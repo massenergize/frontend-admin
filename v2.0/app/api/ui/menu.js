@@ -30,61 +30,204 @@ module.exports = [
     key: 'vendors',
     name: 'Vendors',
     icon: 'md-hammer',
-    child: []
+    child: [
+      {
+        key: 'about-vendors',
+        name: 'Contractors/Vendors',
+        title: true
+      },
+      {
+        key: 'add-vendor',
+        name: 'Add New Vendor',
+        link: '/add/vendor'
+      },
+      {
+        key: 'all-vendors',
+        name: 'All Vendors',
+        link: '/read/vendors'
+      },
+    ]
   },
   {
     key: 'actions',
     name: 'Actions',
     icon: 'ios-bulb',
-    child: []
+    child: [
+      {
+        key: 'about-actions',
+        name: 'Actions',
+        title: true
+      },
+      {
+        key: 'add-actions',
+        name: 'Add New Action',
+        link: '/add/action'
+      },
+      {
+        key: 'all-actions',
+        name: 'All Actions',
+        link: '/read/actions'
+      },
+    ]
   },
   {
     key: 'events',
     name: 'Events',
     icon: 'md-wifi',
-    child: []
+    child: [
+      {
+        key: 'about-events',
+        name: 'Events',
+        title: true
+      },
+      {
+        key: 'add-event',
+        name: 'Add Event',
+        link: '/add/event'
+      },
+      {
+        key: 'all-events',
+        name: 'All Events',
+        link: '/read/events'
+      },
+    ]
   },
   {
     key: 'categories',
     name: 'Categories',
     icon: 'md-reorder',
-    child: []
+    child: [
+      {
+        key: 'about-categories',
+        name: 'Categories',
+        title: true
+      },
+      {
+        key: 'add-vendor',
+        name: 'Add New Category',
+        link: '/add/category'
+      },
+      {
+        key: 'all-categories',
+        name: 'All Categories',
+        link: '/read/categories'
+      },
+    ]
   },
   {
     key: 'teams',
     name: 'Teams',
     icon: 'ios-people',
-    child: []
+    child: [
+      {
+        key: 'about-teams',
+        name: 'Teams',
+        title: true
+      },
+      {
+        key: 'add-team',
+        name: 'Add New Team',
+        link: '/add/teams'
+      },
+      {
+        key: 'all-teams',
+        name: 'All Teams',
+        link: '/read/teams'
+      },
+    ]
   },
   {
     key: 'goals',
     name: 'Goals',
     icon: 'ios-checkmark-circle',
-    child: []
+    child: [
+      {
+        key: 'about-goals',
+        name: 'Goals',
+        title: true
+      },
+      {
+        key: 'add-goal',
+        name: 'Add New Goal',
+        link: '/add/goal'
+      },
+      {
+        key: 'all-goals',
+        name: 'All Goals',
+        link: '/read/goals'
+      },
+    ]
   },
   {
-    key: 'stories',
-    name: 'Stories',
+    key: 'testimonials',
+    name: 'Testimonials',
     icon: 'ios-analytics',
-    child: []
+    child: [
+      {
+        key: 'about-testimonials',
+        name: 'testimonials',
+        title: true
+      },
+      {
+        key: 'add-testimonial',
+        name: 'Add New Testimonial',
+        link: '/add/testimonial'
+      },
+      {
+        key: 'all-testimonials',
+        name: 'All Testimonials',
+        link: '/read/testimonials'
+      },
+    ]
   },
   {
     key: 'export',
     name: 'Export',
     icon: 'ios-cloud-download',
-    child: []
+    link: '/export'
   },
   {
     key: 'policies',
     name: 'Policies',
     icon: 'ios-alert',
-    child: []
+    link: '/policies'
   },
   {
     key: 'page-customization',
     name: 'Customize Pages',
     icon: 'ios-apps',
-    child: []
+    child: [
+      {
+        key: 'about-pages',
+        name: 'Website Pages',
+        title: true
+      },
+      {
+        key: 'home',
+        name: 'Home',
+        link: '/add/home'
+      },
+      {
+        key: 'all-actions',
+        name: 'All Actions',
+        link: '/read/all-actions'
+      },
+      {
+        key: 'donate',
+        name: 'Donate',
+        link: '/read/donate'
+      },
+      {
+        key: 'contact',
+        name: 'Contact Us',
+        link: '/read/contact-us'
+      },
+      {
+        key: 'about-us',
+        name: 'About Us',
+        link: '/read/about-us'
+      },
+    ]
   },
   {
     key: 'demo',
