@@ -1,7 +1,7 @@
 module.exports = {
-  name: 'Dandelion Pro',
-  desc: 'Dandelion Pro - React Website Template',
-  prefix: 'dandelion',
-  footerText: 'Dandelion Pro All Rights Reserved 2018',
-  logoText: 'Dandelion Pro',
+  name: 'MassEnergize',
+  desc: 'SuperAdmin',
+  prefix: 'massenergize',
+  footerText: 'MassEnergize All Rights Reserved 2019',
+  logoText: 'MassEnergize',
 };
