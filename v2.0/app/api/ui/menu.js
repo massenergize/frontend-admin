@@ -1,5 +1,97 @@
 module.exports = [
   {
+    key: 'dashboard',
+    name: 'Dashboard',
+    icon: 'ios-stats',
+  },
+  {
+    key: 'communities',
+    name: 'Communities',
+    icon: 'ios-people',
+    child: [
+      {
+        key: 'about-communities',
+        name: 'Communities',
+        title: true,
+      },
+      {
+        key: 'onboard-community',
+        name: 'Add New Community',
+        link: '/add/community'
+      },
+      {
+        key: 'all-communities',
+        name: 'All Communities',
+        link: '/read/communities'
+      },
+    ]
+  },
+  {
+    key: 'vendors',
+    name: 'Vendors',
+    icon: 'md-hammer',
+    child: []
+  },
+  {
+    key: 'actions',
+    name: 'Actions',
+    icon: 'ios-bulb',
+    child: []
+  },
+  {
+    key: 'events',
+    name: 'Events',
+    icon: 'md-wifi',
+    child: []
+  },
+  {
+    key: 'categories',
+    name: 'Categories',
+    icon: 'md-reorder',
+    child: []
+  },
+  {
+    key: 'teams',
+    name: 'Teams',
+    icon: 'ios-people',
+    child: []
+  },
+  {
+    key: 'goals',
+    name: 'Goals',
+    icon: 'ios-checkmark-circle',
+    child: []
+  },
+  {
+    key: 'stories',
+    name: 'Stories',
+    icon: 'ios-analytics',
+    child: []
+  },
+  {
+    key: 'export',
+    name: 'Export',
+    icon: 'ios-cloud-download',
+    child: []
+  },
+  {
+    key: 'policies',
+    name: 'Policies',
+    icon: 'ios-alert',
+    child: []
+  },
+  {
+    key: 'page-customization',
+    name: 'Customize Pages',
+    icon: 'ios-apps',
+    child: []
+  },
+  {
+    key: 'demo',
+    name: 'Demo',
+    title: true,
+  },
+  {
     key: 'pages',
     name: 'Pages',
     icon: 'ios-paper-outline',
