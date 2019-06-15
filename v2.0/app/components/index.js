@@ -1,3 +1,4 @@
+
 // Main Components
 export Header from './Header/Header';
 export HeaderMenu from './Header/HeaderMenu';
@@ -17,3 +18,11 @@ export Notification from './Notification/Notification';
 export EmptyData from './Tables/EmptyData';
 // Error
 export ErrorWrap from './Error/ErrorWrap';
+
+export CounterWidget from './Counter/CounterWidget';
+export CalculatorWidget from './Widget/CalculatorWidget';
+export NewsWidget from './Widget/NewsWidget';
+export SalesChartWidget from './Widget/SalesChartWidget';
+export CarouselWidget from './Widget/CarouselWidget';
+export CounterChartWidget from './Widget/CounterChartWidget';
+export TableWidget from './Widget/TableWidget';

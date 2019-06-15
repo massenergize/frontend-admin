@@ -3,6 +3,7 @@ module.exports = [
     key: 'dashboard',
     name: 'Dashboard',
     icon: 'ios-stats',
+    link: '/app/dashboard'
   },
   {
     key: 'communities',
