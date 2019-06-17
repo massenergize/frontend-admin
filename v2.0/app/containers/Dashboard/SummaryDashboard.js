@@ -15,10 +15,10 @@ import {
 } from 'dan-components';
 import styles from './dashboard-jss';
 
-class Dashboard extends PureComponent {
+
+class SummaryDashboard extends PureComponent {
   render() {
-    console.log('hallelujah');
-    const title = brand.name + ' - CRM Dashboard';
+    const title = brand.name + ' - Summary Dashboard';
     const description = brand.desc;
     const { classes } = this.props;
     return (
@@ -55,8 +55,8 @@ class Dashboard extends PureComponent {
   }
 }
 
-Dashboard.propTypes = {
+SummaryDashboard.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Dashboard);
+export default withStyles(styles)(SummaryDashboard);

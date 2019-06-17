@@ -5,7 +5,7 @@ import loadable from '../utils/loadable';
 export const BlankPage = loadable(() => import('./Pages/BlankPage'), {
   fallback: <Loading />,
 });
-export const DashboardPage = loadable(() => import('./Dashboard/CrmDashboard'), {
+export const DashboardPage = loadable(() => import('./Dashboard/SummaryDashboard'), {
   fallback: <Loading />,
 });
 export const Form = loadable(() => import('./Pages/Forms/ReduxForm'), {

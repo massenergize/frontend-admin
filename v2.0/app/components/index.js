@@ -1,28 +1,34 @@
+import Header from './Header/Header';
+import HeaderMenu from './Header/HeaderMenu';
+import Sidebar from './Sidebar/Sidebar';
+import BreadCrumb from './BreadCrumb/BreadCrumb';
+import SourceReader from './SourceReader/SourceReader';
+import PapperBlock from './PapperBlock/PapperBlock';
+import SearchUi from './Search/SearchUi';
+// Guide
+import GuideSlider from './GuideSlider';
+// Form
+import LoginForm from './Forms/LoginForm';
+import RegisterForm from './Forms/RegisterForm';
+import ResetForm from './Forms/ResetForm';
+import Notification from './Notification/Notification';
+// Table
+import EmptyData from './Tables/EmptyData';
+// Error
+import ErrorWrap from './Error/ErrorWrap';
+
+import CounterWidget from './Counter/CounterWidget';
+import CalculatorWidget from './Widget/CalculatorWidget';
+import NewsWidget from './Widget/NewsWidget';
+import SalesChartWidget from './Widget/SalesChartWidget';
+import CarouselWidget from './Widget/CarouselWidget';
+import CounterChartWidget from './Widget/CounterChartWidget';
+import TableWidget from './Widget/TableWidget';
 
 // Main Components
-export Header from './Header/Header';
-export HeaderMenu from './Header/HeaderMenu';
-export Sidebar from './Sidebar/Sidebar';
-export BreadCrumb from './BreadCrumb/BreadCrumb';
-export SourceReader from './SourceReader/SourceReader';
-export PapperBlock from './PapperBlock/PapperBlock';
-export SearchUi from './Search/SearchUi';
-// Guide
-export GuideSlider from './GuideSlider';
-// Form
-export LoginForm from './Forms/LoginForm';
-export RegisterForm from './Forms/RegisterForm';
-export ResetForm from './Forms/ResetForm';
-export Notification from './Notification/Notification';
-// Table
-export EmptyData from './Tables/EmptyData';
-// Error
-export ErrorWrap from './Error/ErrorWrap';
-
-export CounterWidget from './Counter/CounterWidget';
-export CalculatorWidget from './Widget/CalculatorWidget';
-export NewsWidget from './Widget/NewsWidget';
-export SalesChartWidget from './Widget/SalesChartWidget';
-export CarouselWidget from './Widget/CarouselWidget';
-export CounterChartWidget from './Widget/CounterChartWidget';
-export TableWidget from './Widget/TableWidget';
+export {
+  Header, HeaderMenu, Sidebar, BreadCrumb, SourceReader, PapperBlock, SearchUi,
+  GuideSlider, LoginForm, ResetForm, Notification, EmptyData, ErrorWrap, RegisterForm,
+  CounterWidget, CalculatorWidget, NewsWidget, SalesChartWidget, CarouselWidget,
+  CounterChartWidget, TableWidget
+};

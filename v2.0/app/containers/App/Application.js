@@ -18,8 +18,7 @@ class Application extends React.Component {
     return (
       <Dashboard history={history} changeMode={changeMode}>
         <Switch>
-          {/* <Route exact path="/app" component={DashboardPage} /> */}
-          <Route exact path="/app" component={Dashboard} />
+          <Route exact path="/app" component={DashboardPage} />
           <Route exact path="/communities" component={BlankPage} />
 
           <Route path="/app/dashboard" component={DashboardPage} />
