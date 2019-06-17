@@ -1,6 +1,6 @@
 {
-  "name": "dandelion_pro",
-  "version": "1.4.0",
+  "name": "massenergize_admin_site",
+  "version": "2.0.0",
   "description": "React website tempate with focus on perfomance and design",
   "private": true,
   "engines": {

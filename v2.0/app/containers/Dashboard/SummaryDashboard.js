@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
+
 import {
   CounterChartWidget,
   SalesChartWidget,
