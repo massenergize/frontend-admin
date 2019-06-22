@@ -5,9 +5,81 @@ import loadable from '../utils/loadable';
 export const BlankPage = loadable(() => import('./Pages/BlankPage'), {
   fallback: <Loading />,
 });
-export const DashboardPage = loadable(() => import('./MassEnergizeSuperAdmin/Summary'), {
+export const DashboardSummaryPage = loadable(() => import('./MassEnergizeSuperAdmin/Summary'), {
   fallback: <Loading />,
 });
+export const AllCommunities = loadable(() => import('./MassEnergizeSuperAdmin/Community/AllCommunities'), {
+  fallback: <Loading />,
+});
+export const OnboardCommunity = loadable(() => import('./MassEnergizeSuperAdmin/Community/OnboardCommunity'), {
+  fallback: <Loading />,
+});
+
+export const AddCategory = loadable(() => import('./MassEnergizeSuperAdmin/Categories/AddCategory'), {
+  fallback: <Loading />,
+});
+export const AllCategories = loadable(() => import('./MassEnergizeSuperAdmin/Categories/AllCategories'), {
+  fallback: <Loading />,
+});
+
+export const AllActions = loadable(() => import('./MassEnergizeSuperAdmin/Actions/AllActions'), {
+  fallback: <Loading />,
+});
+export const AddAction = loadable(() => import('./MassEnergizeSuperAdmin/Actions/CreateNewAction'), {
+  fallback: <Loading />,
+});
+
+export const AllEvents = loadable(() => import('./MassEnergizeSuperAdmin/Events/AllEvents'), {
+  fallback: <Loading />,
+});
+export const AddEvent = loadable(() => import('./MassEnergizeSuperAdmin/Events/NewEventPage'), {
+  fallback: <Loading />,
+});
+
+export const AllTeams = loadable(() => import('./MassEnergizeSuperAdmin/Teams/AllTeams'), {
+  fallback: <Loading />,
+});
+export const AddTeam = loadable(() => import('./MassEnergizeSuperAdmin/Teams/CreateNewTeam'), {
+  fallback: <Loading />,
+});
+
+export const AllGoals = loadable(() => import('./MassEnergizeSuperAdmin/Goals/AllGoals'), {
+  fallback: <Loading />,
+});
+export const AddGoal = loadable(() => import('./MassEnergizeSuperAdmin/Goals/CreateGoalPage'), {
+  fallback: <Loading />,
+});
+
+export const AllPolicies = loadable(() => import('./MassEnergizeSuperAdmin/Policies/AllPolicies'), {
+  fallback: <Loading />,
+});
+export const AddPolicy = loadable(() => import('./MassEnergizeSuperAdmin/Policies/CreatePolicy'), {
+  fallback: <Loading />,
+});
+
+export const AllTestimonials = loadable(() => import('./MassEnergizeSuperAdmin/Testimonials/AllTestimonials'), {
+  fallback: <Loading />,
+});
+export const AddTestimonial = loadable(() => import('./MassEnergizeSuperAdmin/Testimonials/CreateNewTestimonial'), {
+  fallback: <Loading />,
+});
+
+export const AddVendor = loadable(() => import('./MassEnergizeSuperAdmin/Vendors/AddVendor'), {
+  fallback: <Loading />,
+});
+export const AllVendors = loadable(() => import('./MassEnergizeSuperAdmin/Vendors/AllVendors'), {
+  fallback: <Loading />,
+});
+
+export const Export = loadable(() => import('./MassEnergizeSuperAdmin/Export'), {
+  fallback: <Loading />,
+});
+
+export const CustomizePages = loadable(() => import('./MassEnergizeSuperAdmin/CustomizePages'), {
+  fallback: <Loading />,
+});
+
+
 export const Form = loadable(() => import('./Pages/Forms/ReduxForm'), {
   fallback: <Loading />,
 });

@@ -18,12 +18,12 @@ module.exports = [
       {
         key: 'onboard-community',
         name: 'Add New Community',
-        link: '/add/community'
+        link: '/app/add/community'
       },
       {
         key: 'all-communities',
         name: 'All Communities',
-        link: '/read/communities'
+        link: '/app/read/communities'
       },
     ]
   },
@@ -40,12 +40,12 @@ module.exports = [
       {
         key: 'add-vendor',
         name: 'Add New Vendor',
-        link: '/add/vendor'
+        link: '/app/add/vendor'
       },
       {
         key: 'all-vendors',
         name: 'All Vendors',
-        link: '/read/vendors'
+        link: '/app/read/vendors'
       },
     ]
   },
@@ -62,12 +62,12 @@ module.exports = [
       {
         key: 'add-actions',
         name: 'Add New Action',
-        link: '/add/action'
+        link: '/app/add/action'
       },
       {
         key: 'all-actions',
         name: 'All Actions',
-        link: '/read/actions'
+        link: '/app/read/actions'
       },
     ]
   },
@@ -84,12 +84,12 @@ module.exports = [
       {
         key: 'add-event',
         name: 'Add Event',
-        link: '/add/event'
+        link: '/app/add/event'
       },
       {
         key: 'all-events',
         name: 'All Events',
-        link: '/read/events'
+        link: '/app/read/events'
       },
     ]
   },
@@ -106,12 +106,12 @@ module.exports = [
       {
         key: 'add-vendor',
         name: 'Add New Category',
-        link: '/add/category'
+        link: '/app/add/category'
       },
       {
         key: 'all-categories',
         name: 'All Categories',
-        link: '/read/categories'
+        link: '/app/read/categories'
       },
     ]
   },
@@ -128,12 +128,12 @@ module.exports = [
       {
         key: 'add-team',
         name: 'Add New Team',
-        link: '/add/teams'
+        link: '/app/add/team'
       },
       {
         key: 'all-teams',
         name: 'All Teams',
-        link: '/read/teams'
+        link: '/app/read/teams'
       },
     ]
   },
@@ -150,12 +150,12 @@ module.exports = [
       {
         key: 'add-goal',
         name: 'Add New Goal',
-        link: '/add/goal'
+        link: '/app/add/goal'
       },
       {
         key: 'all-goals',
         name: 'All Goals',
-        link: '/read/goals'
+        link: '/app/read/goals'
       },
     ]
   },
@@ -172,12 +172,12 @@ module.exports = [
       {
         key: 'add-testimonial',
         name: 'Add New Testimonial',
-        link: '/add/testimonial'
+        link: '/app/add/testimonial'
       },
       {
         key: 'all-testimonials',
         name: 'All Testimonials',
-        link: '/read/testimonials'
+        link: '/app/read/testimonials'
       },
     ]
   },
@@ -206,27 +206,27 @@ module.exports = [
       {
         key: 'home',
         name: 'Home',
-        link: '/add/home'
+        link: '/app/add/home'
       },
       {
         key: 'all-actions',
         name: 'All Actions',
-        link: '/read/all-actions'
+        link: '/app/read/all-actions'
       },
       {
         key: 'donate',
         name: 'Donate',
-        link: '/read/donate'
+        link: '/app/read/donate'
       },
       {
         key: 'contact',
         name: 'Contact Us',
-        link: '/read/contact-us'
+        link: '/app/read/contact-us'
       },
       {
         key: 'about-us',
         name: 'About Us',
-        link: '/read/about-us'
+        link: '/app/read/about-us'
       },
     ]
   },
