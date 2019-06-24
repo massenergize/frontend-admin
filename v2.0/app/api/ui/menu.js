@@ -185,17 +185,33 @@ module.exports = [
     key: 'export',
     name: 'Export',
     icon: 'ios-cloud-download',
-    link: '/export'
+    link: '/app/export'
   },
   {
     key: 'policies',
     name: 'Policies',
     icon: 'ios-alert',
-    link: '/policies'
+    child: [
+      {
+        key: 'about-policies',
+        name: 'policies',
+        title: true
+      },
+      {
+        key: 'add-policy',
+        name: 'Add New Policy',
+        link: '/app/add/policy'
+      },
+      {
+        key: 'all-policies',
+        name: 'All Policies',
+        link: '/app/read/policies'
+      },
+    ]
   },
   {
     key: 'page-customization',
-    name: 'Customize Pages',
+    name: 'Pages',
     icon: 'ios-apps',
     child: [
       {

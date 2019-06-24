@@ -18,7 +18,7 @@ class CreateNewAction extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <PapperBlock title="Onboard New Community" desc="Some text description">
+        <PapperBlock title="Add New Action" desc="Some text description">
           <CreateNewActionForm />
         </PapperBlock>
       </div>
