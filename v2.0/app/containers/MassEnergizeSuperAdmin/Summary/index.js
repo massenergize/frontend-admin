@@ -8,9 +8,9 @@ import Divider from '@material-ui/core/Divider';
 
 import {
   CounterChartWidget,
-  SalesChartWidget,
-  CarouselWidget,
-  NewsWidget,
+  // SalesChartWidget,
+  // CarouselWidget,
+  // NewsWidget,
 } from 'dan-components';
 import styles from './dashboard-jss';
 
@@ -34,10 +34,9 @@ class SummaryDashboard extends PureComponent {
           <CounterChartWidget />
         </Grid>
         <Divider className={classes.divider} />
-        <SalesChartWidget />
+        {/* <SalesChartWidget /> */}
         <Divider className={classes.divider} />
-        <Divider className={classes.divider} />
-        <Grid container spacing={24} className={classes.root}>
+        {/* <Grid container spacing={24} className={classes.root}>
           <Grid item md={4} xs={12}>
             <CarouselWidget />
           </Grid>
@@ -47,7 +46,7 @@ class SummaryDashboard extends PureComponent {
           <Grid item md={4} sm={6} xs={12}>
             <CarouselWidget />
           </Grid>
-        </Grid>
+        </Grid> */}
       </div>
     );
   }
