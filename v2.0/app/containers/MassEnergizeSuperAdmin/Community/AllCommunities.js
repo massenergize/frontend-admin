@@ -2,6 +2,14 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
 import { PapperBlock } from 'dan-components';
+import {
+  CounterChartWidget,
+  SalesChartWidget,
+  CarouselWidget,
+  TableWidget,
+  NewsWidget,
+  CalculatorWidget,
+} from 'dan-components';
 
 class AllCommunities extends React.Component {
   render() {
@@ -18,7 +26,7 @@ class AllCommunities extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <PapperBlock title="All Communities" desc="Some text description">
-          Content will go here
+          <TableWidget tableData={{}} />
         </PapperBlock>
       </div>
     );
