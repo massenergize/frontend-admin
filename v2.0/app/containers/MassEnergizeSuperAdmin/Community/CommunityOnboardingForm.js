@@ -3,12 +3,9 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import { Field, reduxForm } from 'redux-form/immutable';
-import MenuItem from '@material-ui/core/MenuItem';
-import InputLabel from '@material-ui/core/InputLabel';
 import Grid from '@material-ui/core/Grid';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Typography from '@material-ui/core/Typography';
@@ -17,12 +14,8 @@ import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import {
   Checkbox,
-  Select,
-  TextField,
-  Switch
+  TextField
 } from 'redux-form-material-ui';
-import MomentUtils from '@date-io/moment';
-import { DateTimePicker, MuiPickersUtilsProvider } from 'material-ui-pickers';
 import { initAction, clearAction } from '../../../actions/ReduxFormActions';
 
 const renderRadioGroup = ({ input, ...rest }) => (
@@ -75,7 +68,8 @@ const initData = {
   is_tech_savvy: 'Yes',
   geographical_focus: 'DISPERSED',
   checkbox: true,
-  about_you: 'We are a town located in Massachussets and looking to engage our community in take climate change actions'
+  about_you: 'I am a resident of Wayland and I lead a group of people who are interested in taking climate actions together as a town.',
+  description: 'We are a town located in Massachusetts and looking to engage our community in take climate change actions'
 };
 
 class CommunityOnboardingForm extends Component {
@@ -175,6 +169,17 @@ class CommunityOnboardingForm extends Component {
                     component={TextField}
                     placeholder="Tell us about you"
                     label="Tell Us About You"
+                    multiline={trueBool}
+                    rows={4}
+                  />
+                </div>
+                <div className={classes.field}>
+                  <Field
+                    name="description"
+                    className={classes.field}
+                    component={TextField}
+                    placeholder="Description of your Organization"
+                    label="Description"
                     multiline={trueBool}
                     rows={4}
                   />

@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-one-expression-per-line */
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
@@ -14,8 +15,6 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Typography from '@material-ui/core/Typography';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import AllInclusive from '@material-ui/icons/AllInclusive';
-import Brightness5 from '@material-ui/icons/Brightness5';
 import People from '@material-ui/icons/People';
 import ArrowForward from '@material-ui/icons/ArrowForward';
 import Paper from '@material-ui/core/Paper';
@@ -79,28 +78,28 @@ class LoginForm extends React.Component {
             </div>
           </Hidden>
           <Typography variant="h4" className={classes.title} gutterBottom>
-            Sign In
+            Administrators - Sign In
           </Typography>
           <Typography variant="caption" className={classes.subtitle} gutterBottom align="center">
-            Lorem ipsum dolor sit amet
+            This site is meant to be exclusively used by Administrators only.
           </Typography>
-          <section className={classes.socmedLogin}>
+          {/* <section className={classes.socmedLogin}>
             <div className={classes.btnArea}>
               <Button variant="outlined" size="small" className={classes.redBtn} type="button">
-                <AllInclusive className={classNames(classes.leftIcon, classes.iconSmall)} />
-                Socmed 1
+                <People className={classNames(classes.leftIcon, classes.iconSmall)} />
+                Google
               </Button>
               <Button variant="outlined" size="small" className={classes.blueBtn} type="button">
-                <Brightness5 className={classNames(classes.leftIcon, classes.iconSmall)} />
-                Socmed 2
+                <People className={classNames(classes.leftIcon, classes.iconSmall)} />
+                Facebook
               </Button>
               <Button variant="outlined" size="small" className={classes.cyanBtn} type="button">
                 <People className={classNames(classes.leftIcon, classes.iconSmall)} />
-                Socmed 3
+                Twitter
               </Button>
             </div>
             <ContentDivider content="Or sign in with email" />
-          </section>
+          </section> */}
           <section className={classes.formWrap}>
             <form onSubmit={handleSubmit}>
               <div>

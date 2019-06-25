@@ -30,48 +30,48 @@ class Application extends React.Component {
     return (
       <Dashboard history={history} changeMode={changeMode}>
         <Switch>
-          <Route exact path="/app" component={BlankPage} />
-          <Route exact path="/communities" component={BlankPage} />
-          <Route path="/app/dashboard" component={DashboardSummaryPage} />
+          <Route exact path="/admin" component={BlankPage} />
+          <Route exact path="/blank" component={BlankPage} />
+          <Route path="/admin/dashboard" component={DashboardSummaryPage} />
 
-          <Route path="/app/read/communities" component={AllCommunities} />
-          <Route path="/app/add/community" component={OnboardCommunity} />
+          <Route path="/admin/read/communities" component={AllCommunities} />
+          <Route path="/admin/add/community" component={OnboardCommunity} />
 
-          <Route path="/app/read/actions" component={AllActions} />
-          <Route path="/app/add/action" component={AddAction} />
+          <Route path="/admin/read/actions" component={AllActions} />
+          <Route path="/admin/add/action" component={AddAction} />
 
-          <Route path="/app/read/categories" component={AllCategories} />
-          <Route path="/app/add/category" component={AddCategory} />
+          <Route path="/admin/read/categories" component={AllCategories} />
+          <Route path="/admin/add/category" component={AddCategory} />
 
-          <Route path="/app/read/events" component={AllEvents} />
-          <Route path="/app/add/event" component={AddEvent} />
+          <Route path="/admin/read/events" component={AllEvents} />
+          <Route path="/admin/add/event" component={AddEvent} />
 
-          <Route path="/app/read/teams" component={AllTeams} />
-          <Route path="/app/add/team" component={AddTeam} />
+          <Route path="/admin/read/teams" component={AllTeams} />
+          <Route path="/admin/add/team" component={AddTeam} />
 
-          <Route path="/app/read/policies" component={AllPolicies} />
-          <Route path="/app/add/policy" component={AddPolicy} />
+          <Route path="/admin/read/policies" component={AllPolicies} />
+          <Route path="/admin/add/policy" component={AddPolicy} />
 
-          <Route path="/app/read/goals" component={AllGoals} />
-          <Route path="/app/add/goal" component={AddGoal} />
+          <Route path="/admin/read/goals" component={AllGoals} />
+          <Route path="/admin/add/goal" component={AddGoal} />
 
-          <Route path="/app/read/testimonials" component={AllTestimonials} />
-          <Route path="/app/add/testimonial" component={AddTestimonial} />
+          <Route path="/admin/read/testimonials" component={AllTestimonials} />
+          <Route path="/admin/add/testimonial" component={AddTestimonial} />
 
-          <Route path="/app/read/vendors" component={AllVendors} />
-          <Route path="/app/add/vendor" component={AddVendor} />
+          <Route path="/admin/read/vendors" component={AllVendors} />
+          <Route path="/admin/add/vendor" component={AddVendor} />
 
-          <Route path="/app/export" component={Export} />
+          <Route path="/admin/export" component={Export} />
 
-          <Route path="/app/customize" component={CustomizePages} />
+          <Route path="/admin/customize" component={CustomizePages} />
 
-          <Route path="/app/read/categories" component={AllCategories} />
-          <Route path="/app/add/category" component={AddCategory} />
-          <Route path="/app/form" component={Form} />
-          <Route path="/app/table" component={Table} />
-          <Route path="/app/page-list" component={Parent} />
-          <Route path="/app/pages/not-found" component={NotFound} />
-          <Route path="/app/pages/error" component={Error} />
+          <Route path="/admin/read/categories" component={AllCategories} />
+          <Route path="/admin/add/category" component={AddCategory} />
+          <Route path="/admin/form" component={Form} />
+          <Route path="/admin/table" component={Table} />
+          <Route path="/admin/page-list" component={Parent} />
+          <Route path="/admin/pages/not-found" component={NotFound} />
+          <Route path="/admin/pages/error" component={Error} />
           <Route component={NotFound} />
         </Switch>
       </Dashboard>

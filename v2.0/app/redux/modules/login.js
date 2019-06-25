@@ -3,9 +3,9 @@ import { INIT } from '../../actions/actionConstants';
 
 const initialState = {
   usersLogin: Map({
-    email: 'johndoe@mail.com',
-    password: '12345678',
-    remember: false
+    email: '',
+    password: '',
+    remember: true
   })
 };
 const initialImmutableState = fromJS(initialState);

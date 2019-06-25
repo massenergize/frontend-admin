@@ -3,7 +3,7 @@ module.exports = [
     key: 'dashboard',
     name: 'Dashboard',
     icon: 'ios-stats',
-    link: '/app/dashboard'
+    link: '/admin/dashboard'
   },
   {
     key: 'communities',
@@ -18,12 +18,12 @@ module.exports = [
       {
         key: 'onboard-community',
         name: 'Add New Community',
-        link: '/app/add/community'
+        link: '/admin/add/community'
       },
       {
         key: 'all-communities',
         name: 'All Communities',
-        link: '/app/read/communities'
+        link: '/admin/read/communities'
       },
     ]
   },
@@ -40,12 +40,12 @@ module.exports = [
       {
         key: 'add-vendor',
         name: 'Add New Vendor',
-        link: '/app/add/vendor'
+        link: '/admin/add/vendor'
       },
       {
         key: 'all-vendors',
         name: 'All Vendors',
-        link: '/app/read/vendors'
+        link: '/admin/read/vendors'
       },
     ]
   },
@@ -62,12 +62,12 @@ module.exports = [
       {
         key: 'add-actions',
         name: 'Add New Action',
-        link: '/app/add/action'
+        link: '/admin/add/action'
       },
       {
         key: 'all-actions',
         name: 'All Actions',
-        link: '/app/read/actions'
+        link: '/admin/read/actions'
       },
     ]
   },
@@ -84,12 +84,12 @@ module.exports = [
       {
         key: 'add-event',
         name: 'Add Event',
-        link: '/app/add/event'
+        link: '/admin/add/event'
       },
       {
         key: 'all-events',
         name: 'All Events',
-        link: '/app/read/events'
+        link: '/admin/read/events'
       },
     ]
   },
@@ -106,12 +106,12 @@ module.exports = [
       {
         key: 'add-vendor',
         name: 'Add New Category',
-        link: '/app/add/category'
+        link: '/admin/add/category'
       },
       {
         key: 'all-categories',
         name: 'All Categories',
-        link: '/app/read/categories'
+        link: '/admin/read/categories'
       },
     ]
   },
@@ -128,12 +128,12 @@ module.exports = [
       {
         key: 'add-team',
         name: 'Add New Team',
-        link: '/app/add/team'
+        link: '/admin/add/team'
       },
       {
         key: 'all-teams',
         name: 'All Teams',
-        link: '/app/read/teams'
+        link: '/admin/read/teams'
       },
     ]
   },
@@ -150,12 +150,12 @@ module.exports = [
       {
         key: 'add-goal',
         name: 'Add New Goal',
-        link: '/app/add/goal'
+        link: '/admin/add/goal'
       },
       {
         key: 'all-goals',
         name: 'All Goals',
-        link: '/app/read/goals'
+        link: '/admin/read/goals'
       },
     ]
   },
@@ -172,12 +172,12 @@ module.exports = [
       {
         key: 'add-testimonial',
         name: 'Add New Testimonial',
-        link: '/app/add/testimonial'
+        link: '/admin/add/testimonial'
       },
       {
         key: 'all-testimonials',
         name: 'All Testimonials',
-        link: '/app/read/testimonials'
+        link: '/admin/read/testimonials'
       },
     ]
   },
@@ -185,7 +185,7 @@ module.exports = [
     key: 'export',
     name: 'Export',
     icon: 'ios-cloud-download',
-    link: '/app/export'
+    link: '/admin/export'
   },
   {
     key: 'policies',
@@ -200,12 +200,12 @@ module.exports = [
       {
         key: 'add-policy',
         name: 'Add New Policy',
-        link: '/app/add/policy'
+        link: '/admin/add/policy'
       },
       {
         key: 'all-policies',
         name: 'All Policies',
-        link: '/app/read/policies'
+        link: '/admin/read/policies'
       },
     ]
   },
@@ -222,27 +222,27 @@ module.exports = [
       {
         key: 'home',
         name: 'Home',
-        link: '/app/add/home'
+        link: '/admin/add/home'
       },
       {
         key: 'all-actions',
         name: 'All Actions',
-        link: '/app/read/all-actions'
+        link: '/admin/read/all-actions'
       },
       {
         key: 'donate',
         name: 'Donate',
-        link: '/app/read/donate'
+        link: '/admin/read/donate'
       },
       {
         key: 'contact',
         name: 'Contact Us',
-        link: '/app/read/contact-us'
+        link: '/admin/read/contact-us'
       },
       {
         key: 'about-us',
         name: 'About Us',
-        link: '/app/read/about-us'
+        link: '/admin/read/about-us'
       },
     ]
   },
@@ -274,17 +274,17 @@ module.exports = [
       {
         key: 'dashboard',
         name: 'Dashboard',
-        link: '/app/dashboard'
+        link: '/admin/dashboard'
       },
       {
         key: 'form',
         name: 'Form',
-        link: '/app/form'
+        link: '/admin/form'
       },
       {
         key: 'table',
         name: 'Table',
-        link: '/app/table'
+        link: '/admin/table'
       },
       {
         key: 'maintenance',
@@ -328,12 +328,12 @@ module.exports = [
       {
         key: 'not_found_page',
         name: 'Not Found Page',
-        link: '/app/pages/not-found'
+        link: '/admin/pages/not-found'
       },
       {
         key: 'error_page',
         name: 'Error Page',
-        link: '/app/pages/error'
+        link: '/admin/pages/error'
       },
     ]
   },
