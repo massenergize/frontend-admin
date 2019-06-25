@@ -15,7 +15,7 @@ class Register extends React.Component {
     setTimeout(() => {
       this.setState({ valueForm: values });
       console.log(`You submitted:\n\n${this.state.valueForm}`); // eslint-disable-line
-      window.location.href = '/app';
+      window.location.href = '/admin';
     }, 500); // simulate server latency
   }
 

@@ -30,7 +30,7 @@ class Application extends React.Component {
     return (
       <Dashboard history={history} changeMode={changeMode}>
         <Switch>
-          <Route exact path="/admin" component={BlankPage} />
+          <Route exact path="/admin" component={DashboardSummaryPage} />
           <Route exact path="/blank" component={BlankPage} />
           <Route path="/admin/dashboard" component={DashboardSummaryPage} />
 

@@ -91,7 +91,7 @@ class RegisterForm extends React.Component {
             Register
           </Typography>
           <Typography variant="caption" className={classes.subtitle} gutterBottom align="center">
-            Lorem ipsum dolor sit amet
+            You can only register an account if you have received an invitation
           </Typography>
           <Tabs
             value={tab}
@@ -102,7 +102,7 @@ class RegisterForm extends React.Component {
             className={classes.tab}
           >
             <Tab label="With Email" />
-            <Tab label="With Social Media" />
+            {/* <Tab label="With Social Media" /> */}
           </Tabs>
           {tab === 0 && (
             <section className={classes.formWrap}>
@@ -128,6 +128,30 @@ class RegisterForm extends React.Component {
                       label="Your Email"
                       required
                       validate={[required, email]}
+                      className={classes.field}
+                    />
+                  </FormControl>
+                </div>
+                <div>
+                  <FormControl className={classes.formControl}>
+                    <Field
+                      name="community_subdomain"
+                      component={TextField}
+                      placeholder="wayland.massenergize.org"
+                      label="Community Domain"
+                      required
+                      className={classes.field}
+                    />
+                  </FormControl>
+                </div>
+                <div>
+                  <FormControl className={classes.formControl}>
+                    <Field
+                      name="invitation_code"
+                      component={TextField}
+                      placeholder="eg. AC-2r45Hj-H"
+                      label="Invitation Code"
+                      required
                       className={classes.field}
                     />
                   </FormControl>

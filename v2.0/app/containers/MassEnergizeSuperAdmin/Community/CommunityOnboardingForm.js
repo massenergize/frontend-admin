@@ -199,7 +199,7 @@ class CommunityOnboardingForm extends Component {
                   </Field>
                 </div>
                 <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Terms and Conditions</FormLabel>
+                  <FormLabel component="label"><a href="#" className={classes.link}>Terms &amp; Condition</a></FormLabel>
                   <div className={classes.inlineWrap}>
                     <FormControlLabel control={<Field name="accepted_terms_and_conditions" component={Checkbox} />} label="I have read and accepted all the terms and conditions" />
                   </div>

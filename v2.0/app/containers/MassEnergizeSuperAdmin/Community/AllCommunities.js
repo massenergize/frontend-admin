@@ -26,7 +26,7 @@ class AllCommunities extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <PapperBlock title="All Communities" desc="Some text description">
-          <TableWidget tableData={{}} />
+          {/* <TableWidget tableData={{}} /> */}
         </PapperBlock>
       </div>
     );
