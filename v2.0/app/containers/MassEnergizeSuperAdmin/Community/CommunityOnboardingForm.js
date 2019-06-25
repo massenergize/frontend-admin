@@ -21,6 +21,8 @@ import {
   TextField,
   Switch
 } from 'redux-form-material-ui';
+import MomentUtils from '@date-io/moment';
+import { DateTimePicker, MuiPickersUtilsProvider } from 'material-ui-pickers';
 import { initAction, clearAction } from '../../../actions/ReduxFormActions';
 
 const renderRadioGroup = ({ input, ...rest }) => (
@@ -65,13 +67,15 @@ const styles = theme => ({
 });
 
 const initData = {
-  text: 'Sample Text',
-  email: 'sample@mail.com',
-  radio: 'option1',
-  selection: 'option1',
-  onof: true,
+  name: 'Wayland',
+  community_admin_email: 'community_admin@wayland.com',
+  subdomain: 'wayland.massenergize.org',
+  community_admin_name: 'Ellen Tohn',
+  community_admin_phone: '508-609-9002',
+  is_tech_savvy: 'Yes',
+  geographical_focus: 'DISPERSED',
   checkbox: true,
-  textarea: 'This is default text'
+  about_you: 'We are a town located in Massachussets and looking to engage our community in take climate change actions'
 };
 
 class CommunityOnboardingForm extends Component {
@@ -86,6 +90,7 @@ class CommunityOnboardingForm extends Component {
       init,
       clear
     } = this.props;
+
     return (
       <div>
         <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
@@ -95,7 +100,7 @@ class CommunityOnboardingForm extends Component {
                 Community Onboarding Form
               </Typography>
               <Typography component="p">
-                The delay between when you click (Submit) and when the alert dialog pops up is intentional, to simulate server latency.
+                Please complete this form to the best of your knowledge.
               </Typography>
               <div className={classes.buttonInit}>
                 <Button onClick={() => init(initData)} color="secondary" type="button">
@@ -106,68 +111,93 @@ class CommunityOnboardingForm extends Component {
                 </Button>
               </div>
               <form onSubmit={handleSubmit}>
+
                 <div>
                   <Field
-                    name="text"
+                    name="name"
                     component={TextField}
-                    placeholder="Text Field"
-                    label="Text Field"
-                    validate={required}
+                    placeholder="Community Name eg. Wayland"
+                    label="Community Name"
                     required
-                    ref={this.saveRef}
+                    validate={[required]}
                     className={classes.field}
                   />
                 </div>
                 <div>
                   <Field
-                    name="email"
+                    name="subdomain"
                     component={TextField}
-                    placeholder="Email Field"
-                    label="Email"
+                    placeholder="eg. subdomain.massenergize.org"
+                    label="Subdomain For your Community Portal"
+                    required
+                    validate={[required]}
+                    className={classes.field}
+                  />
+                </div>
+                <h1>About the Community Admin</h1>
+                <div>
+                  <Field
+                    name="community_admin_name"
+                    component={TextField}
+                    placeholder="Community Admin Name eg. Ellen Tohn"
+                    label="Community Adminstrator's Name"
+                    required
+                    validate={[required]}
+                    className={classes.field}
+                  />
+                </div>
+                <div>
+                  <Field
+                    name="community_admin_email"
+                    component={TextField}
+                    placeholder="eg. admin@wayland.com"
+                    label="Community Adminstrator's Email"
                     required
                     validate={[required, email]}
                     className={classes.field}
                   />
                 </div>
-                <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Choose One Option</FormLabel>
-                  <Field name="radio" className={classes.inlineWrap} component={renderRadioGroup}>
-                    <FormControlLabel value="option1" control={<Radio />} label="Option 1" />
-                    <FormControlLabel value="option2" control={<Radio />} label="Option 2" />
-                  </Field>
-                </div>
                 <div>
-                  <FormControl className={classes.field}>
-                    <InputLabel htmlFor="selection">Selection</InputLabel>
-                    <Field
-                      name="selection"
-                      component={Select}
-                      placeholder="Selection"
-                      autoWidth={trueBool}
-                    >
-                      <MenuItem value="option1">Option One</MenuItem>
-                      <MenuItem value="option2">Option Two</MenuItem>
-                      <MenuItem value="option3">Option Three</MenuItem>
-                    </Field>
-                  </FormControl>
-                </div>
-                <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Toggle Input</FormLabel>
-                  <div className={classes.inlineWrap}>
-                    <FormControlLabel control={<Field name="onof" component={Switch} />} label="On/OF Switch" />
-                    <FormControlLabel control={<Field name="checkbox" component={Checkbox} />} label="Checkbox" />
-                  </div>
+                  <Field
+                    name="community_admin_phone"
+                    component={TextField}
+                    placeholder="eg. 508 889 1334"
+                    label="Community Adminstrator's Phone"
+                    required
+                    validate={[required]}
+                    className={classes.field}
+                  />
                 </div>
                 <div className={classes.field}>
                   <Field
-                    name="textarea"
+                    name="about_you"
                     className={classes.field}
                     component={TextField}
-                    placeholder="Textarea"
-                    label="Textarea"
+                    placeholder="Tell us about you"
+                    label="Tell Us About You"
                     multiline={trueBool}
                     rows={4}
                   />
+                </div>
+                <div className={classes.fieldBasic}>
+                  <FormLabel component="label">Are you Tech Savvy?</FormLabel>
+                  <Field name="is_tech_savvy" className={classes.inlineWrap} component={renderRadioGroup}>
+                    <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
+                    <FormControlLabel value="No" control={<Radio />} label="No" />
+                  </Field>
+                </div>
+                <div className={classes.fieldBasic}>
+                  <FormLabel component="label">Geographic Focus</FormLabel>
+                  <Field name="geographical_focus" className={classes.inlineWrap} component={renderRadioGroup}>
+                    <FormControlLabel value="DISPERSED" control={<Radio />} label="Geographically Dispersed" />
+                    <FormControlLabel value="FOCUSED" control={<Radio />} label="Geographically Focused" />
+                  </Field>
+                </div>
+                <div className={classes.fieldBasic}>
+                  <FormLabel component="label">Terms and Conditions</FormLabel>
+                  <div className={classes.inlineWrap}>
+                    <FormControlLabel control={<Field name="accepted_terms_and_conditions" component={Checkbox} />} label="I have read and accepted all the terms and conditions" />
+                  </div>
                 </div>
                 <div>
                   <Button variant="contained" color="secondary" type="submit" disabled={submitting}>

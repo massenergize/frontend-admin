@@ -16,10 +16,13 @@ import styles from './dashboard-jss';
 
 
 class SummaryDashboard extends PureComponent {
+
+
   render() {
     const title = brand.name + ' - Summary Dashboard';
     const description = brand.desc;
     const { classes } = this.props;
+
     return (
       <div>
         <Helmet>
