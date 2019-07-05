@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
+import Cookies from 'js-cookie';
 
 import {
   CounterChartWidget,
@@ -14,15 +15,42 @@ import {
 } from 'dan-components';
 import styles from './dashboard-jss';
 
-
 class SummaryDashboard extends PureComponent {
-
-
   render() {
     const title = brand.name + ' - Summary Dashboard';
     const description = brand.desc;
     const { classes } = this.props;
+    const csrftoken = Cookies.get('csrfToken');
 
+    fetch('http://localhost:8000/super-admin/create/action', {
+      credentials: 'include',
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken,
+      },
+      body: {
+        a: 3,
+        b: 3,
+      }
+    }).catch(error => {
+      console.log(error);
+    });
+
+    fetch('http://localhost:8000/super-admin/menu/navbar', {
+      credentials: 'include',
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken,
+      }
+    }).then(rawResponse => rawResponse.json()).then(data => {
+      console.log(data);
+    }).catch(error => {
+      console.log(error);
+    });
     return (
       <div>
         <Helmet>
