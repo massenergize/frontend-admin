@@ -5,52 +5,64 @@ import { Helmet } from 'react-helmet';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
-import Cookies from 'js-cookie';
 
 import {
   CounterChartWidget,
   // SalesChartWidget,
-  // CarouselWidget,
-  // NewsWidget,
+  CarouselWidget,
+  NewsWidget,
 } from 'dan-components';
 import styles from './dashboard-jss';
 
+const API_URL = 'http://localhost:8000';
+// const API_URL = 'http://api.massenergize.org:8000';
+
+
 class SummaryDashboard extends PureComponent {
+  sendToBackEnd = (dataToSend, destinationUrl) => {
+    fetch(`${API_URL}/auth/csrf`, {
+      method: 'GET',
+      credentials: 'include',
+    }).then(response => response.json()).then(jsonResponse => {
+      const { csrfToken } = jsonResponse.data;
+      console.log(csrfToken);
+      return fetch(destinationUrl, {
+        credentials: 'include',
+        method: 'POST',
+        headers: {
+          // Accept: 'application/json',
+          // 'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify(dataToSend)
+      })
+        .then(response => response.json()).then(data => {
+          console.log(data);
+        });
+    }).catch(error => {
+      console.log(error.message);
+    });
+  }
+
   render() {
     const title = brand.name + ' - Summary Dashboard';
     const description = brand.desc;
     const { classes } = this.props;
-    const csrftoken = Cookies.get('csrfToken');
+    this.sendToBackEnd({ a: 1, b: 3 }, `${API_URL}/user/create/account`);
 
-    fetch('http://localhost:8000/super-admin/create/action', {
-      credentials: 'include',
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrftoken,
-      },
-      body: {
-        a: 3,
-        b: 3,
-      }
-    }).catch(error => {
-      console.log(error);
-    });
+    // fetch(API_URL + '/super-admin/actions', {
+    //   credentials: 'include',
+    //   method: 'GET',
+    //   headers: {
+    //     Accept: 'application/json',
+    //     'Content-Type': 'application/json',
+    //   }
+    // }).then(rawResponse => rawResponse.text()).then(data => {
+    //   console.log(JSON.parse(data));
+    // }).catch(error => {
+    //   console.log(error);
+    // });
 
-    fetch('http://localhost:8000/super-admin/menu/navbar', {
-      credentials: 'include',
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrftoken,
-      }
-    }).then(rawResponse => rawResponse.json()).then(data => {
-      console.log(data);
-    }).catch(error => {
-      console.log(error);
-    });
     return (
       <div>
         <Helmet>
@@ -67,7 +79,7 @@ class SummaryDashboard extends PureComponent {
         <Divider className={classes.divider} />
         {/* <SalesChartWidget /> */}
         <Divider className={classes.divider} />
-        {/* <Grid container spacing={24} className={classes.root}>
+        <Grid container spacing={24} className={classes.root}>
           <Grid item md={4} xs={12}>
             <CarouselWidget />
           </Grid>
@@ -77,7 +89,7 @@ class SummaryDashboard extends PureComponent {
           <Grid item md={4} sm={6} xs={12}>
             <CarouselWidget />
           </Grid>
-        </Grid> */}
+        </Grid>
       </div>
     );
   }

@@ -7,6 +7,21 @@ class Onboarding extends React.Component {
   render() {
     const title = brand.name + ' - Onboard New Community';
     const description = brand.desc;
+    // fetch('http://localhost:8000/super-admin/create/action', {
+    //   credentials: 'include',
+    //   method: 'POST',
+    //   headers: {
+    //     Accept: 'application/json',
+    //     'Content-Type': 'application/json',
+    //     'X-CSRFToken': csrftoken,
+    //   },
+    //   body: {
+    //     a: 3,
+    //     b: 3,
+    //   }
+    // }).catch(error => {
+    //   console.log(error);
+    // });
     return (
       <div>
         <Helmet>

@@ -46,7 +46,8 @@ const data = [
 ];
 
 function TableWidget(props) {
-  const { classes } = props;
+  const { classes, tableData } = props;
+  const { data }  = tableData;
   const getStatus = status => {
     switch (status) {
       case 'Error': return messageStyles.bgError;
@@ -66,16 +67,16 @@ function TableWidget(props) {
     }
   };
   return (
-    <PapperBlock noMargin title="Latest Sales" icon="ios-share-outline" whiteBg desc="Monitoring Your products. Tracking sales, and shipping status here.">
+    <PapperBlock noMargin title={tableData.title} icon="ios-share-outline" whiteBg desc="">
       <div className={classes.root}>
         <Table className={classNames(classes.tableLong, classes.stripped)} padding="dense">
           <TableHead>
             <TableRow>
-              <TableCell padding="dense">Products</TableCell>
-              <TableCell>Buyer</TableCell>
-              <TableCell align="right">Total</TableCell>
+              <TableCell padding="dense">Community Name</TableCell>
+              <TableCell>Admin</TableCell>
+              <TableCell align="right">Population</TableCell>
               <TableCell>Status</TableCell>
-              <TableCell>Stock</TableCell>
+              <TableCell>Is Dispersed?</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -87,10 +88,9 @@ function TableWidget(props) {
                     <div>
                       <Typography variant="caption">{n.id}</Typography>
                       <Typography variant="subtitle1">{n.name}</Typography>
-                      <a href="/app/pages/invoice" className={classes.downloadInvoice}>
+                      <a href="/admin/export" className={classes.downloadInvoice}>
                         <ArrowDownward />
-                        &nbsp;INVOICE_
-                        {n.id}
+                        &nbsp;Download Data
                       </a>
                     </div>
                   </div>
@@ -101,7 +101,7 @@ function TableWidget(props) {
                     <div>
                       <Typography>{n.buyerName}</Typography>
                       <Typography variant="caption">
-                        Purchased date:&nbsp;
+                        Date Registered:&nbsp;
                         {n.date}
                       </Typography>
                     </div>
@@ -109,9 +109,7 @@ function TableWidget(props) {
                 </TableCell>
                 <TableCell align="right">
                   <Typography variant="button">
-                    $
                     {n.total}
-                    ,00
                   </Typography>
                 </TableCell>
                 <TableCell>
@@ -121,12 +119,10 @@ function TableWidget(props) {
                   <div className={classes.taskStatus}>
                     <Icon className={classes.taskIcon}>{n.type}</Icon>
                     <Typography variant="caption">
-                      {n.currentStock}
-                      &nbsp;/&nbsp;
-                      {n.totalStock}
+                      {n.geography}
                     </Typography>
                   </div>
-                  <LinearProgress variant="determinate" className={getProgress(n.status)} value={(n.currentStock / n.totalStock) * 100} />
+                  {/* <LinearProgress variant="determinate" className={getProgress(n.status)} value={(n.currentStock / n.totalStock) * 100} /> */}
                 </TableCell>
               </TableRow>
             ]))}

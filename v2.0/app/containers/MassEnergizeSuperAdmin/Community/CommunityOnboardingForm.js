@@ -17,7 +17,9 @@ import {
   TextField
 } from 'redux-form-material-ui';
 import { initAction, clearAction } from '../../../actions/ReduxFormActions';
-
+// const csrftoken = Cookies.get('csrfToken');
+// import Cookies from 'js-cookie';
+//<input type="hidden" name="csrfmiddlewaretoken" value="MNudhw7qzaCQPJ7z0wEdJbSwMszYILqzu4XDO0JOM4EZnrUrz4KgTUtz9w6sG6Kf">
 const renderRadioGroup = ({ input, ...rest }) => (
   <RadioGroup
     {...input}

@@ -14,29 +14,29 @@ import styles from './widget-jss';
 
 const slideData = [
   {
-    label: 'How to be success :)',
+    label: 'Heat Pump Event in Concord',
     imgPath: imgApi[11],
-    desc: 'Nulla lobortis nunc vitae nisi semper semper.'
+    desc: 'Heat Pump Event happening on Mon 22/01/2019'
   },
   {
-    label: 'Work with something that you like, like…',
+    label: 'Solar Event in Wayland',
     imgPath: imgApi[31],
-    desc: 'Pellentesque ac bibendum tortor, vel blandit nulla.'
+    desc: 'Heat Pump Event happening on Mon 22/01/2019'
   },
   {
-    label: 'Keep your schedule in the right time',
+    label: 'MassEnergize General Event in Wayland',
     imgPath: imgApi[38],
-    desc: 'Aenean facilisis vitae purus facilisis semper.'
+    desc: 'More Description to Come'
   },
   {
-    label: 'Travel everytime that you have a chance',
+    label: 'Sudbury Solar Event',
     imgPath: imgApi[10],
-    desc: 'Curabitur egestas consequat lorem, vel fermentum augue porta id.'
+    desc: 'More Description to Come'
   },
   {
-    label: 'And contribute to Material-UI :D',
+    label: 'MassEnergize Welcoming New Communties',
     imgPath: imgApi[40],
-    desc: 'Integer orci justo, fringilla at faucibus vel, pulvinar in eros.'
+    desc: 'More Description to Come'
   },
 ];
 
