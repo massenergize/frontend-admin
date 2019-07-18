@@ -5,7 +5,6 @@ import { Helmet } from 'react-helmet';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
-
 import {
   CounterChartWidget,
   // SalesChartWidget,
@@ -14,54 +13,12 @@ import {
 } from 'dan-components';
 import styles from './dashboard-jss';
 
-const API_URL = 'http://localhost:8000';
-// const API_URL = 'http://api.massenergize.org:8000';
-
 
 class SummaryDashboard extends PureComponent {
-  sendToBackEnd = (dataToSend, destinationUrl) => {
-    fetch(`${API_URL}/auth/csrf`, {
-      method: 'GET',
-      credentials: 'include',
-    }).then(response => response.json()).then(jsonResponse => {
-      const { csrfToken } = jsonResponse.data;
-      console.log(csrfToken);
-      return fetch(destinationUrl, {
-        credentials: 'include',
-        method: 'POST',
-        headers: {
-          // Accept: 'application/json',
-          // 'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
-        },
-        body: JSON.stringify(dataToSend)
-      })
-        .then(response => response.json()).then(data => {
-          console.log(data);
-        });
-    }).catch(error => {
-      console.log(error.message);
-    });
-  }
-
   render() {
     const title = brand.name + ' - Summary Dashboard';
     const description = brand.desc;
     const { classes } = this.props;
-    this.sendToBackEnd({ a: 1, b: 3 }, `${API_URL}/user/create/account`);
-
-    // fetch(API_URL + '/super-admin/actions', {
-    //   credentials: 'include',
-    //   method: 'GET',
-    //   headers: {
-    //     Accept: 'application/json',
-    //     'Content-Type': 'application/json',
-    //   }
-    // }).then(rawResponse => rawResponse.text()).then(data => {
-    //   console.log(JSON.parse(data));
-    // }).catch(error => {
-    //   console.log(error);
-    // });
 
     return (
       <div>

@@ -83,7 +83,7 @@ class LoginForm extends React.Component {
           <Typography variant="caption" className={classes.subtitle} gutterBottom align="center">
             This site is meant to be exclusively used by Administrators only.
           </Typography>
-          {/* <section className={classes.socmedLogin}>
+          <section className={classes.socmedLogin}>
             <div className={classes.btnArea}>
               <Button variant="outlined" size="small" className={classes.redBtn} type="button">
                 <People className={classNames(classes.leftIcon, classes.iconSmall)} />
@@ -99,7 +99,7 @@ class LoginForm extends React.Component {
               </Button>
             </div>
             <ContentDivider content="Or sign in with email" />
-          </section> */}
+          </section>
           <section className={classes.formWrap}>
             <form onSubmit={handleSubmit}>
               <div>
