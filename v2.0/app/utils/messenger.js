@@ -2,15 +2,15 @@
  * This file contains code used to transmit data
  */
 
-const API_URL = 'http://localhost:8000';
+const API_HOST = 'http://localhost:8000';
 
-export function sendJson(dataToSend, destinationUrl) {
-  fetch(`${API_URL}/auth/csrf`, {
+export function sendJson(dataToSend, destinationUrl, relocationPage = '/admin') {
+  fetch(`${API_HOST}/auth/csrf`, {
     method: 'GET',
     credentials: 'include',
   }).then(response => response.json()).then(jsonResponse => {
     const { csrfToken } = jsonResponse.data;
-    return fetch(destinationUrl, {
+    return fetch(`${API_HOST}${destinationUrl}`, {
       credentials: 'include',
       method: 'POST',
       headers: {
@@ -21,6 +21,7 @@ export function sendJson(dataToSend, destinationUrl) {
     })
       .then(response => response.json()).then(data => {
         console.log(data);
+        // window.location.href = relocationPage;
         return data;
       });
   }).catch(error => {
@@ -30,7 +31,7 @@ export function sendJson(dataToSend, destinationUrl) {
 }
 
 export function sendFormWithMedia(formData, destinationUrl) {
-  fetch(`${API_URL}/auth/csrf`, {
+  fetch(`${API_HOST}/auth/csrf`, {
     method: 'GET',
     credentials: 'include',
   }).then(response => response.json()).then(jsonResponse => {
@@ -52,4 +53,13 @@ export function sendFormWithMedia(formData, destinationUrl) {
     console.log(error.message);
     return null;
   });
+}
+
+
+export function cleanFormData(formValues) {
+  const result = {};
+  [...formValues].forEach(([k, v]) => {
+    result[k] = v;
+  });
+  return result;
 }

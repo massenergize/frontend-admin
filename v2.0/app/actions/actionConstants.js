@@ -13,3 +13,7 @@ export const LOAD_PAGE = 'LOAD_PAGE';
 // Redux Form
 export const INIT = 'INIT';
 export const CLEAR = 'CLEAR';
+
+
+// Specific Actions
+export const START_UP = 'START_UP';
