@@ -2,7 +2,7 @@
  * This file contains code used to transmit data
  */
 
-const API_HOST = 'http://localhost:8000';
+import { API_HOST } from '../config/constants';
 
 export function sendJson(dataToSend, destinationUrl, relocationPage = '/admin') {
   fetch(`${API_HOST}/auth/csrf`, {
@@ -62,4 +62,16 @@ export function cleanFormData(formValues) {
     result[k] = v;
   });
   return result;
+}
+
+export async function fetchData(sourceUrl) {
+  return fetch(`${API_HOST}/${sourceUrl}`, {
+    method: 'GET',
+    credentials: 'include',
+  }).then(response => response.json())
+    .then(jsonResponse => jsonResponse)
+    .catch(error => {
+      console.log(error.message);
+      return null;
+    });
 }
