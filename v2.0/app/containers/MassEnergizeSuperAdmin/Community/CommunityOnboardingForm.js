@@ -149,17 +149,6 @@ class CommunityOnboardingForm extends Component {
                     className={classes.field}
                   />
                 </div>
-                {/* <div>
-                  <Field
-                    name="community_admin_phone"
-                    component={TextField}
-                    placeholder="eg. 508 889 1334"
-                    label="Community Administrator's Phone"
-                    required
-                    validate={[required]}
-                    className={classes.field}
-                  />
-                </div> */}
                 <div className={classes.field}>
                   <Field
                     name="about_community"

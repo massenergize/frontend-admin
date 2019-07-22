@@ -21,7 +21,7 @@ export function sendJson(dataToSend, destinationUrl, relocationPage = '/admin') 
     })
       .then(response => response.json()).then(data => {
         console.log(data);
-        // window.location.href = relocationPage;
+        window.location.href = relocationPage;
         return data;
       });
   }).catch(error => {
