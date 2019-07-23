@@ -15,6 +15,11 @@ export const OnboardCommunity = loadable(() => import('./MassEnergizeSuperAdmin/
   fallback: <Loading />,
 });
 
+export const CommunityProfile = loadable(() => import('./MassEnergizeSuperAdmin/Community/CommunityProfile'), {
+  fallback: <Loading />,
+});
+
+
 export const AddCategory = loadable(() => import('./MassEnergizeSuperAdmin/Categories/AddCategory'), {
   fallback: <Loading />,
 });

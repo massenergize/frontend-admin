@@ -59,30 +59,28 @@ const styles = theme => ({
   },
 });
 
-const initData = {
-  name: 'Test',
-  subdomain: 'testing1',
-  owner_name: 'Ellen Tohn',
-  owner_email: 'etohn@massenergize.org',
-  is_tech_savvy: 'Yes',
-  geographical_focus: 'DISPERSED',
-  accepted_terms_and_conditions: true,
-  about_community: 'I am a resident of Wayland and I lead a group of people who are interested in taking climate actions together as a town.',
-};
 
 class EditCommunityForm extends Component {
+  getInitData = (community) => ({
+    name: community.name,
+    subdomain: community.subdomain,
+    about_community: community.about_community,
+    owner_name: community.owner_name,
+    owner_email: community.owner_email,
+    geographical_focus: community.is_geographically_focused ? 'FOCUSED' : 'DISPERSED',
+  });
+
   render() {
     const trueBool = true;
     const {
       classes,
       handleSubmit,
-      pristine,
-      reset,
       submitting,
       init,
-      clear,
-      data,
+      community
     } = this.props;
+
+    init(this.getInitData(community));
 
     return (
       <div>
@@ -90,21 +88,12 @@ class EditCommunityForm extends Component {
           <Grid item xs={12} md={6}>
             <Paper className={classes.root}>
               <Typography variant="h5" component="h3">
-                Community Onboarding Form
+                Edit {`for ${community.name} (ID: ${community.id})`}
               </Typography>
               <Typography component="p">
                 Please complete this form to the best of your knowledge.
               </Typography>
-              <div className={classes.buttonInit}>
-                <Button onClick={() => init(initData)} color="secondary" type="button">
-                  Load Sample Data
-                </Button>
-                <Button onClick={() => clear()} type="button">
-                  Clear Data
-                </Button>
-              </div>
               <form onSubmit={handleSubmit}>
-
                 <div>
                   <Field
                     name="name"
@@ -114,7 +103,7 @@ class EditCommunityForm extends Component {
                     required
                     validate={[required]}
                     className={classes.field}
-                    value={data.name}
+                    value={community.name}
                   />
                 </div>
                 <div>
@@ -126,7 +115,7 @@ class EditCommunityForm extends Component {
                     required
                     validate={[required]}
                     className={classes.field}
-                    value={data.name}
+                    value={community.name}
                   />
                 </div>
                 <h1>About the Community Admin</h1>
@@ -164,35 +153,15 @@ class EditCommunityForm extends Component {
                   />
                 </div>
                 <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Are you Tech Savvy?</FormLabel>
-                  <Field name="is_tech_savvy" className={classes.inlineWrap} component={renderRadioGroup}>
-                    <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
-                    <FormControlLabel value="No" control={<Radio />} label="No" />
-                  </Field>
-                </div>
-                <div className={classes.fieldBasic}>
                   <FormLabel component="label">Geographic Focus</FormLabel>
                   <Field name="geographical_focus" className={classes.inlineWrap} component={renderRadioGroup}>
                     <FormControlLabel value="DISPERSED" control={<Radio />} label="Geographically Dispersed" />
                     <FormControlLabel value="FOCUSED" control={<Radio />} label="Geographically Focused" />
                   </Field>
                 </div>
-                <div className={classes.fieldBasic}>
-                  <FormLabel component="label"><a href="#" className={classes.link}>Terms &amp; Condition</a></FormLabel>
-                  <div className={classes.inlineWrap}>
-                    <FormControlLabel control={<Field name="accepted_terms_and_conditions" component={Checkbox} />} label="I have read and accepted all the terms and conditions" />
-                  </div>
-                </div>
                 <div>
                   <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
                     Submit
-                  </Button>
-                  <Button
-                    type="button"
-                    disabled={pristine || submitting}
-                    onClick={reset}
-                  >
-                    Reset
                   </Button>
                 </div>
               </form>
@@ -216,7 +185,7 @@ EditCommunityForm.propTypes = {
   submitting: PropTypes.bool.isRequired,
   init: PropTypes.func.isRequired,
   clear: PropTypes.func.isRequired,
-  data: PropTypes.object.isRequired
+  community: PropTypes.object.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({

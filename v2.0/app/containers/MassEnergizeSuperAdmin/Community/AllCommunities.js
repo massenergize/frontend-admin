@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
-import { PapperBlock, TableWidget } from 'dan-components';
+import { PapperBlock } from 'dan-components';
 import imgApi from 'dan-api/images/photos';
 import classNames from 'classnames';
 import Typography from '@material-ui/core/Typography';
@@ -15,7 +15,9 @@ import TableRow from '@material-ui/core/TableRow';
 import Chip from '@material-ui/core/Chip';
 import Avatar from '@material-ui/core/Avatar';
 import Icon from '@material-ui/core/Icon';
-import Create from '@material-ui/icons/Create';
+import Assignment from '@material-ui/icons/Assignment';
+import Language from '@material-ui/icons/Language';
+import Email from '@material-ui/icons/Email';
 import messageStyles from 'dan-styles/Messages.scss';
 import { fetchData } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
@@ -42,7 +44,7 @@ class AllCommunities extends React.Component {
     switch (isApproved) {
       case false: return messageStyles.bgError;
       case true: return messageStyles.bgSuccess;
-      default: return messageStyles.bgDefault;
+      default: return messageStyles.bgSuccess;
     }
   };
 
@@ -55,7 +57,7 @@ class AllCommunities extends React.Component {
             <TableRow>
               <TableCell padding="dense">Community Name</TableCell>
               <TableCell>Admin</TableCell>
-              <TableCell>Population</TableCell>
+              <TableCell>Subdomain</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Is Dispersed?</TableCell>
             </TableRow>
@@ -69,9 +71,9 @@ class AllCommunities extends React.Component {
                     <div>
                       <Typography variant="caption">{n.id}</Typography>
                       <Typography variant="subtitle1">{n.name}</Typography>
-                      <a href={`/edit/community/${n.id}`} className={classes.downloadInvoice}>
-                        <Create />
-                        &nbsp; Edit this Community
+                      <a href={`/admin/community/${n.id}`} className={classes.downloadInvoice}>
+                        <Assignment />
+                        &nbsp; Preview this Community
                       </a>
                     </div>
                   </div>
@@ -82,24 +84,32 @@ class AllCommunities extends React.Component {
                     <div>
                       <Typography>{n.owner_name}</Typography>
                       <Typography variant="caption">
-                                Admin Email:&nbsp;
-                        {n.owner_email}
+                        <a href={`mailto:${n.owner_email}`} target="_blank" rel="noopener noreferrer" className={classes.downloadInvoice}>
+                          <Email />
+                          &nbsp;
+                          {n.owner_email}
+                        </a>
+                        &nbsp;
                       </Typography>
                     </div>
                   </div>
                 </TableCell>
-                <TableCell align="right">
-                  <Typography variant="button">
-                    {/* {n.total} */}
-                    { 100 }
+                <TableCell align="left">
+                  <Typography variant="caption">
+                    { n.subdomain }
+                    <br />
+                    <a href={`http://${n.subdomain}.massenergize.org`} target="_blank" rel="noopener noreferrer" className={classes.downloadInvoice}>
+                      <Language />
+                      &nbsp;Visit Site
+                    </a>
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  <Chip label={n.is_approved ? 'Verified' : 'Not Verified'} className={classNames(classes.chip, this.getStatus(n.status))} />
+                  <Chip label={n.is_approved ? 'Verified' : 'Not Verified'} className={classNames(classes.chip, this.getStatus(n.is_approved))} />
                 </TableCell>
                 <TableCell>
                   <div className={classes.taskStatus}>
-                    <Icon className={classes.taskIcon}>{n.type}</Icon>
+                    <Icon className={classes.taskIcon}>{n.is_geographically_focused ? 'location_on' : 'blur_on'}</Icon>
                     <Typography variant="caption">
                       {n.is_geographically_focused ? 'Geographically Focused' : 'Geographically Dispersed'}
                     </Typography>

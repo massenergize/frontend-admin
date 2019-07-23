@@ -3,11 +3,32 @@ import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
 import { PapperBlock } from 'dan-components';
 import CommunityOnboardingForm from './CommunityOnboardingForm';
-import { sendJson, cleanFormData } from '../../../utils/messenger';
+import { sendJson, cleanFormData, fetchData } from '../../../utils/messenger';
+import EditCommunityForm from './EditCommunityForm';
 
-class Onboarding extends React.Component {
+class OnboardCommunity extends React.Component {
+  constructor() {
+    super();
+    this.state = { community: null, id: null };
+  }
+
+  async componentDidMount() {
+    const { id } = this.props.match.params;
+    if (id) {
+      const response = await fetchData('v2/community/1');
+      await this.setStateAsync({ community: response.data, id:id });
+    }
+  }
+
+  setStateAsync(state) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve);
+    });
+  }
+
   organizeCommunityInfo = (values) => {
     const result = values;
+    console.log(result);
     if (values.geographic_focus === 'DISPERSED') {
       result.is_geographically_focused = false;
     } else {
@@ -15,7 +36,6 @@ class Onboarding extends React.Component {
     }
     delete result.geographical_focus;
     delete result.is_tech_savvy;
-    console.log(result);
     return result;
   }
 
@@ -25,10 +45,17 @@ class Onboarding extends React.Component {
     sendJson(values, '/v2/communities', '/admin/read/communities');
   }
 
+
+  updateCommunitySubmission = (formValues) => {
+    const cleanedValues = cleanFormData(formValues);
+    const values = this.organizeCommunityInfo(cleanedValues);
+    sendJson(values, `/v2/community/${this.state.id}`, `/admin/community/${this.state.id}/edit`);
+  }
+
   render() {
     const title = brand.name + ' - Onboard New Community';
     const description = brand.desc;
-
+    const { community } = this.state;
     return (
       <div>
         <Helmet>
@@ -40,11 +67,16 @@ class Onboarding extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <PapperBlock title="Onboard New Community" desc="Some text description">
-          <CommunityOnboardingForm onSubmit={this.submitForm} />
+          {community
+            && <EditCommunityForm onSubmit={this.updateCommunitySubmission} community={community} />
+          }
+          {!community
+            && <CommunityOnboardingForm onSubmit={this.submitForm} community={community} />
+          }
         </PapperBlock>
       </div>
     );
   }
 }
 
-export default Onboarding;
+export default OnboardCommunity;

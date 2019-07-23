@@ -7,6 +7,8 @@ import {
   DashboardSummaryPage,
   AllCommunities,
   OnboardCommunity,
+  CommunityProfile,
+  AllVendors, AddVendor,
   AllCategories,
   AddCategory,
   BlankPage,
@@ -21,8 +23,7 @@ import {
   AddPolicy, AllPolicies,
   AddTestimonial, AllTestimonials, Export, CustomizePages
 } from '../pageListAsync';
-import AllVendors from '../MassEnergizeSuperAdmin/Vendors/AllVendors';
-import AddVendor from '../MassEnergizeSuperAdmin/Vendors/AddVendor';
+import EditCommunityForm from '../MassEnergizeSuperAdmin/Community/EditCommunityForm';
 
 class Application extends React.Component {
   render() {
@@ -36,6 +37,8 @@ class Application extends React.Component {
 
           <Route path="/admin/read/communities" component={AllCommunities} />
           <Route path="/admin/add/community" component={OnboardCommunity} />
+          <Route path="/admin/community/:id" component={CommunityProfile} exact />
+          <Route path="/admin/community/:id/edit" component={OnboardCommunity} exact />
 
           <Route path="/admin/read/actions" component={AllActions} />
           <Route path="/admin/add/action" component={AddAction} />
