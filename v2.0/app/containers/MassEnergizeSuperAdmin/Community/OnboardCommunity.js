@@ -1,4 +1,6 @@
+/* eslint-disable react/destructuring-assignment */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
 import { PapperBlock } from 'dan-components';
@@ -16,7 +18,7 @@ class OnboardCommunity extends React.Component {
     const { id } = this.props.match.params;
     if (id) {
       const response = await fetchData('v2/community/1');
-      await this.setStateAsync({ community: response.data, id:id });
+      await this.setStateAsync({ community: response.data, id });
     }
   }
 
@@ -79,4 +81,7 @@ class OnboardCommunity extends React.Component {
   }
 }
 
+OnboardCommunity.propTypes = {
+  match: PropTypes.object.isRequired,
+};
 export default OnboardCommunity;
