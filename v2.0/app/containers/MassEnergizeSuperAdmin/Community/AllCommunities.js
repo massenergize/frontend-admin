@@ -67,7 +67,7 @@ class AllCommunities extends React.Component {
               <TableRow key={n.id}>
                 <TableCell padding="dense">
                   <div className={classes.flex}>
-                    <Avatar alt={n.name} src={n.logo ? n.logo.file : imgApi[21]} className={classes.productPhoto} />
+                    <Avatar alt={n.name} src={n.logo ? n.logo.url : imgApi[21]} className={classes.productPhoto} />
                     <div>
                       <Typography variant="caption">{n.id}</Typography>
                       <Typography variant="subtitle1">{n.name}</Typography>

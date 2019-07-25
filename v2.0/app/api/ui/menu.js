@@ -37,11 +37,11 @@ module.exports = [
         name: 'Contractors/Vendors',
         title: true
       },
-      {
-        key: 'add-vendor',
-        name: 'Add New Vendor',
-        link: '/admin/add/vendor'
-      },
+      // {
+      //   key: 'add-vendor',
+      //   name: 'Add New Vendor',
+      //   link: '/admin/add/vendor'
+      // },
       {
         key: 'all-vendors',
         name: 'All Vendors',
@@ -59,11 +59,11 @@ module.exports = [
         name: 'Actions',
         title: true
       },
-      {
-        key: 'add-actions',
-        name: 'Add New Action',
-        link: '/admin/add/action'
-      },
+      // {
+      //   key: 'add-action',
+      //   name: 'Add New Action',
+      //   link: '/admin/add/action'
+      // },
       {
         key: 'all-actions',
         name: 'All Actions',
@@ -81,11 +81,11 @@ module.exports = [
         name: 'Events',
         title: true
       },
-      {
-        key: 'add-event',
-        name: 'Add Event',
-        link: '/admin/add/event'
-      },
+      // {
+      //   key: 'add-event',
+      //   name: 'Add Event',
+      //   link: '/admin/add/event'
+      // },
       {
         key: 'all-events',
         name: 'All Events',
@@ -103,11 +103,11 @@ module.exports = [
         name: 'Categories',
         title: true
       },
-      {
-        key: 'add-vendor',
-        name: 'Add New Category',
-        link: '/admin/add/category'
-      },
+      // {
+      //   key: 'add-vendor',
+      //   name: 'Add New Category',
+      //   link: '/admin/add/category'
+      // },
       {
         key: 'all-categories',
         name: 'All Categories',
@@ -125,11 +125,11 @@ module.exports = [
         name: 'Teams',
         title: true
       },
-      {
-        key: 'add-team',
-        name: 'Add New Team',
-        link: '/admin/add/team'
-      },
+      // {
+      //   key: 'add-team',
+      //   name: 'Add New Team',
+      //   link: '/admin/add/team'
+      // },
       {
         key: 'all-teams',
         name: 'All Teams',
@@ -147,11 +147,11 @@ module.exports = [
         name: 'Goals',
         title: true
       },
-      {
-        key: 'add-goal',
-        name: 'Add New Goal',
-        link: '/admin/add/goal'
-      },
+      // {
+      //   key: 'add-goal',
+      //   name: 'Add New Goal',
+      //   link: '/admin/add/goal'
+      // },
       {
         key: 'all-goals',
         name: 'All Goals',
@@ -169,11 +169,11 @@ module.exports = [
         name: 'testimonials',
         title: true
       },
-      {
-        key: 'add-testimonial',
-        name: 'Add New Testimonial',
-        link: '/admin/add/testimonial'
-      },
+      // {
+      //   key: 'add-testimonial',
+      //   name: 'Add New Testimonial',
+      //   link: '/admin/add/testimonial'
+      // },
       {
         key: 'all-testimonials',
         name: 'All Testimonials',
@@ -197,11 +197,11 @@ module.exports = [
         name: 'policies',
         title: true
       },
-      {
-        key: 'add-policy',
-        name: 'Add New Policy',
-        link: '/admin/add/policy'
-      },
+      // {
+      //   key: 'add-policy',
+      //   name: 'Add New Policy',
+      //   link: '/admin/add/policy'
+      // },
       {
         key: 'all-policies',
         name: 'All Policies',
