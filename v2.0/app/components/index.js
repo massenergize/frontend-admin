@@ -25,10 +25,12 @@ import CarouselWidget from './Widget/CarouselWidget';
 import CounterChartWidget from './Widget/CounterChartWidget';
 import TableWidget from './Widget/TableWidget';
 
+import ProductCard from './CardPaper/ProductCard';
+
 // Main Components
 export {
   Header, HeaderMenu, Sidebar, BreadCrumb, SourceReader, PapperBlock, SearchUi,
   GuideSlider, LoginForm, ResetForm, Notification, EmptyData, ErrorWrap, RegisterForm,
   CounterWidget, CalculatorWidget, NewsWidget, SalesChartWidget, CarouselWidget,
-  CounterChartWidget, TableWidget
+  CounterChartWidget, TableWidget, ProductCard
 };

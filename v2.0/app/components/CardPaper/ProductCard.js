@@ -27,7 +27,7 @@ class ProductCard extends React.Component {
       thumbnail,
       name,
       desc,
-      ratting,
+      rating,
       price,
       prevPrice,
       list,
@@ -64,14 +64,13 @@ class ProductCard extends React.Component {
           <Typography component="p" className={classes.desc}>
             {desc}
           </Typography>
-          <div className={classes.ratting}>
-            <Rating value={ratting} max={5} readOnly />
+          <div className={classes.rating}>
+            <Rating value={rating} max={5} readOnly />
           </div>
         </CardContent>
         <CardActions className={classes.price}>
           <Typography variant="h5">
             <span>
-              $
               {price}
             </span>
           </Typography>
@@ -109,8 +108,7 @@ ProductCard.propTypes = {
   thumbnail: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   desc: PropTypes.string.isRequired,
-  ratting: PropTypes.number.isRequired,
-  price: PropTypes.number.isRequired,
+  rating: PropTypes.number.isRequired,
   prevPrice: PropTypes.number,
   list: PropTypes.bool,
   detailOpen: PropTypes.func,

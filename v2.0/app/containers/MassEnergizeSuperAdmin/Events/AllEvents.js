@@ -137,7 +137,6 @@ class AllEvents extends React.Component {
     const description = brand.desc;
     const { events } = this.state;
     const { classes } = this.props;
-    console.log(events);
 
     return (
       <div>
