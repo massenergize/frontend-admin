@@ -15,7 +15,6 @@ import TableRow from '@material-ui/core/TableRow';
 import Chip from '@material-ui/core/Chip';
 import Avatar from '@material-ui/core/Avatar';
 import Icon from '@material-ui/core/Icon';
-import Assignment from '@material-ui/icons/Assignment';
 import Edit from '@material-ui/icons/Edit';
 import Language from '@material-ui/icons/Language';
 import Email from '@material-ui/icons/Email';
@@ -25,8 +24,8 @@ import styles from '../../../components/Widget/widget-jss';
 
 
 class AllCommunities extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = { communities: [] };
   }
 

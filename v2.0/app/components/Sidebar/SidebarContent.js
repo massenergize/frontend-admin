@@ -84,7 +84,7 @@ class SidebarContent extends React.Component {
                 className={classNames(classes.avatar, classes.bigAvatar)}
               />
               <div>
-                <h4>{dummy.profile.full_name}</h4>
+                <h4>{dummy.profile ? dummy.profile.full_name : dummy.user.name}</h4>
                 <Button size="small" onClick={openMenuStatus}>
                   <i className={classNames(classes.dotStatus, setStatus(status))} />
                   {status}
@@ -104,7 +104,7 @@ class SidebarContent extends React.Component {
                     <i className={classNames(classes.dotStatus, classes.idle)} />
                     Idle
                   </MenuItem>
-                  <MenuItem onClick={() => changeStatus('bussy')}>
+                  <MenuItem onClick={() => changeStatus('busy')}>
                     <i className={classNames(classes.dotStatus, classes.bussy)} />
                     Bussy
                   </MenuItem>
