@@ -101,7 +101,6 @@ class AllTagCollections extends React.Component {
     const title = brand.name + ' - All Tag Collections';
     const description = brand.desc;
     const { tagCollections } = this.state;
-    console.log(tagCollections);
     const { classes } = this.props;
 
     return (
