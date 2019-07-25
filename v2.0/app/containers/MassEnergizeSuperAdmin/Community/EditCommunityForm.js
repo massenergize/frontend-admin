@@ -61,6 +61,13 @@ const styles = theme => ({
 
 
 class EditCommunityForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showLocation: false
+    };
+  }
+
   getInitData = (community) => ({
     name: community.name,
     subdomain: community.subdomain,
@@ -68,6 +75,7 @@ class EditCommunityForm extends Component {
     owner_name: community.owner_name,
     owner_email: community.owner_email,
     geographical_focus: community.is_geographically_focused ? 'FOCUSED' : 'DISPERSED',
+    ...community.location
   });
 
   render() {
@@ -155,10 +163,71 @@ class EditCommunityForm extends Component {
                 <div className={classes.fieldBasic}>
                   <FormLabel component="label">Geographic Focus</FormLabel>
                   <Field name="geographical_focus" className={classes.inlineWrap} component={renderRadioGroup}>
-                    <FormControlLabel value="DISPERSED" control={<Radio />} label="Geographically Dispersed" />
-                    <FormControlLabel value="FOCUSED" control={<Radio />} label="Geographically Focused" />
+                    <FormControlLabel value="DISPERSED" control={<Radio />} label="Geographically Dispersed" onClick={() => { this.setState({ ...this.sate, showLocation: false }); }} />
+                    <FormControlLabel value="FOCUSED" control={<Radio />} label="Geographically Focused" onClick={() => { this.setState({ ...this.sate, showLocation: true }); }} />
                   </Field>
                 </div>
+                {this.state.showLocation
+                  && (
+
+                    <Grid container spacing={24}>
+                      <Grid item xs={12}>
+                        <Field
+                          name="address1"
+                          component={TextField}
+                          placeholder="eg. 9 Fields Lane"
+                          label="Address Line 1"
+                          className={classes.field}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Field
+                          name="address2"
+                          component={TextField}
+                          placeholder="eg. Apt 4"
+                          label="Address Line 2"
+                          className={classes.field}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Field
+                          name="city"
+                          component={TextField}
+                          placeholder="eg. Wayland"
+                          label="City"
+                          className={classes.field}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Field
+                          name="state"
+                          component={TextField}
+                          placeholder="eg. New York"
+                          label="State"
+                          className={classes.field}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Field
+                          name="zip"
+                          component={TextField}
+                          placeholder="eg. 10120"
+                          label="Zip / Postal Code"
+                          className={classes.field}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Field
+                          name="country"
+                          component={TextField}
+                          placeholder="eg. Ghana"
+                          label="Country"
+                          className={classes.field}
+                        />
+                      </Grid>
+                    </Grid>
+                  )
+                }
                 <div>
                   <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
                     Submit

@@ -16,6 +16,7 @@ import Chip from '@material-ui/core/Chip';
 import Avatar from '@material-ui/core/Avatar';
 import Icon from '@material-ui/core/Icon';
 import Assignment from '@material-ui/icons/Assignment';
+import Edit from '@material-ui/icons/Edit';
 import Language from '@material-ui/icons/Language';
 import Email from '@material-ui/icons/Email';
 import messageStyles from 'dan-styles/Messages.scss';
@@ -71,9 +72,9 @@ class AllCommunities extends React.Component {
                     <div>
                       <Typography variant="caption">{n.id}</Typography>
                       <Typography variant="subtitle1">{n.name}</Typography>
-                      <a href={`/admin/community/${n.id}`} className={classes.downloadInvoice}>
-                        <Assignment />
-                        &nbsp; Preview this Community
+                      <a href={`/admin/community/${n.id}/edit`} className={classes.downloadInvoice}>
+                        <Edit />
+                        &nbsp; Edit this Community
                       </a>
                     </div>
                   </div>

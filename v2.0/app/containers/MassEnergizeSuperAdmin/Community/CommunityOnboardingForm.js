@@ -71,6 +71,13 @@ const initData = {
 };
 
 class CommunityOnboardingForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showLocation: false
+    };
+  }
+
   render() {
     const trueBool = true;
     const {
@@ -170,10 +177,72 @@ class CommunityOnboardingForm extends Component {
                 <div className={classes.fieldBasic}>
                   <FormLabel component="label">Geographic Focus</FormLabel>
                   <Field name="geographical_focus" className={classes.inlineWrap} component={renderRadioGroup}>
-                    <FormControlLabel value="DISPERSED" control={<Radio />} label="Geographically Dispersed" />
-                    <FormControlLabel value="FOCUSED" control={<Radio />} label="Geographically Focused" />
+                    <FormControlLabel value="DISPERSED" control={<Radio />} label="Geographically Dispersed" onClick={() => { this.setState({ ...this.sate, showLocation: false }); }} />
+                    <FormControlLabel value="FOCUSED" control={<Radio />} label="Geographically Focused" onClick={() => { this.setState({ ...this.sate, showLocation: true }); }} />
                   </Field>
                 </div>
+                {this.state.showLocation
+                  && (
+
+                    <Grid container spacing={24}>
+                      <Grid item xs={12}>
+                        <Field
+                          name="address1"
+                          component={TextField}
+                          placeholder="eg. 9 Fields Lane"
+                          label="Address Line 1"
+                          className={classes.field}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Field
+                          name="address2"
+                          component={TextField}
+                          placeholder="eg. Apt 4"
+                          label="Address Line 2"
+                          className={classes.field}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Field
+                          name="city"
+                          component={TextField}
+                          placeholder="eg. Wayland"
+                          label="City"
+                          className={classes.field}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Field
+                          name="state"
+                          component={TextField}
+                          placeholder="eg. New York"
+                          label="State"
+                          className={classes.field}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Field
+                          name="zip"
+                          component={TextField}
+                          placeholder="eg. 10120"
+                          label="Zip / Postal Code"
+                          className={classes.field}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Field
+                          name="country"
+                          component={TextField}
+                          placeholder="eg. Ghana"
+                          label="Country"
+                          className={classes.field}
+                        />
+                      </Grid>
+                    </Grid>
+                  )
+                }
+
                 <div className={classes.fieldBasic}>
                   <FormLabel component="label"><a href="#" className={classes.link}>Terms &amp; Condition</a></FormLabel>
                   <div className={classes.inlineWrap}>
@@ -229,7 +298,7 @@ const reducer = 'initval';
 const FormInit = connect(
   state => ({
     force: state,
-    initialValues: state.getIn([reducer, 'formValues'])
+    initialValues: state.getIn([reducer, 'formValues']),
   }),
   mapDispatchToProps,
 )(ReduxFormMapped);

@@ -79,12 +79,12 @@ class SidebarContent extends React.Component {
               style={{ opacity: 1 - (transform / 100), marginTop: transform * -0.3 }}
             >
               <Avatar
-                alt={dummy.user.name}
-                src={dummy.user.avatar}
+                alt={dummy.profile ? dummy.profile.full_name : dummy.user.name}
+                src={dummy.profile ? dummy.profile.profile_picture.url : dummy.user.avatar}
                 className={classNames(classes.avatar, classes.bigAvatar)}
               />
               <div>
-                <h4>{dummy.user.name}</h4>
+                <h4>{dummy.profile.full_name}</h4>
                 <Button size="small" onClick={openMenuStatus}>
                   <i className={classNames(classes.dotStatus, setStatus(status))} />
                   {status}

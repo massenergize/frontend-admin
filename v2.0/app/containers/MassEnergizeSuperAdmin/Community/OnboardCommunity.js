@@ -17,7 +17,7 @@ class OnboardCommunity extends React.Component {
   async componentDidMount() {
     const { id } = this.props.match.params;
     if (id) {
-      const response = await fetchData('v2/community/1');
+      const response = await fetchData(`v2/community/${id}`);
       await this.setStateAsync({ community: response.data, id });
     }
   }
@@ -34,7 +34,23 @@ class OnboardCommunity extends React.Component {
     if (values.geographic_focus === 'DISPERSED') {
       result.is_geographically_focused = false;
     } else {
+      console.log(result);
       result.is_geographically_focused = true;
+      result.location = {
+        address1: result.address1,
+        address2: result.address2,
+        city: result.city,
+        state: result.state,
+        zip: result.zip,
+        country: result.country
+      };
+      delete result.address1;
+      delete result.address2;
+      delete result.city;
+      delete result.state;
+      delete result.zip;
+      delete result.country;
+      console.log(result);
     }
     delete result.geographical_focus;
     delete result.is_tech_savvy;
@@ -58,6 +74,7 @@ class OnboardCommunity extends React.Component {
     const title = brand.name + ' - Onboard New Community';
     const description = brand.desc;
     const { community } = this.state;
+
     return (
       <div>
         <Helmet>
