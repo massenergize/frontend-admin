@@ -17,7 +17,7 @@ const dummyContents = {
   }
 };
 
-fetchData('v2/user/c43cdb70-29cd-4edf-a38f-e87476cbf77a').then(p => {
+fetchData('v2/user/3573eef7-b000-4d2e-8dd3-5495cc13df6f').then(p => {
   dummyContents.profile = p.data;
 });
 

@@ -96,7 +96,8 @@ class EditCommunityForm extends Component {
           <Grid item xs={12} md={6}>
             <Paper className={classes.root}>
               <Typography variant="h5" component="h3">
-                Edit {`for ${community.name} (ID: ${community.id})`}
+                Edit
+                {`for ${community.name} (ID: ${community.id})`}
               </Typography>
               <Typography component="p">
                 Please complete this form to the best of your knowledge.
