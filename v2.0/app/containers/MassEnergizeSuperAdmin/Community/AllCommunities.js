@@ -70,7 +70,11 @@ class AllCommunities extends React.Component {
                     <Avatar alt={n.name} src={n.logo ? n.logo.url : imgApi[21]} className={classes.productPhoto} />
                     <div>
                       <Typography variant="caption">{n.id}</Typography>
-                      <Typography variant="subtitle1">{n.name}</Typography>
+                      <Typography variant="subtitle1">
+                        <a href={`/admin/community/${n.id}/profile`} className={classes.downloadInvoice}>
+                          {n.name}
+                        </a>
+                      </Typography>
                       <a href={`/admin/community/${n.id}/edit`} className={classes.downloadInvoice}>
                         <Edit />
                         &nbsp; Edit this Community

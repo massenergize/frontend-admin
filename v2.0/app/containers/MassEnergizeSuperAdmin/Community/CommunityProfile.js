@@ -12,6 +12,8 @@ import SupervisorAccount from '@material-ui/icons/SupervisorAccount';
 import Favorite from '@material-ui/icons/Favorite';
 import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
 import Message from '@material-ui/icons/Message';
+import InsertChart from '@material-ui/icons/InsertChart';
+// import BarChart from '@material-ui/icons/BarChart';
 import { withStyles } from '@material-ui/core/styles';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -42,16 +44,19 @@ TabContainer.propTypes = {
 };
 
 class CommunityProfile extends React.Component {
-  state = {
-    value: 0,
-    community: {}
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: 0,
+      community: {}
+    };
+  }
+
 
   async componentDidMount() {
     const { id } = this.props.match.params;
     if (id) {
       const response = await fetchData(`v2/community/${id}/full`);
-      console.log(response);
       await this.setStateAsync({ community: response.data, id });
     }
   }
@@ -71,6 +76,8 @@ class CommunityProfile extends React.Component {
     const description = brand.desc;
     const { dataProps, classes } = this.props;
     const { value, community } = this.state;
+    console.log(community);
+
     return (
       <div>
         <Helmet>
@@ -114,16 +121,16 @@ class CommunityProfile extends React.Component {
               centered
             >
               <Tab icon={<AccountCircle />} label="ABOUT" />
+              {/* <Tab icon={<InsertChart />} label="Impact" /> */}
               <Tab icon={<SupervisorAccount />} label="USERS" />
-              <Tab icon={<Message />} label="TESTIMONIALS" />
-              <Tab icon={<Message />} label="MESSAGES" />
+              <Tab icon={<Message />} label="Events & TESTIMONIALS" />
             </Tabs>
           </Hidden>
         </AppBar>
-        {value === 0 && <TabContainer><About data={dataProps} /></TabContainer>}
-        {value === 1 && <TabContainer><Connection data={community.users} /></TabContainer>}
-        {value === 2 && <TabContainer><Favorites data={community.testimonials} /></TabContainer>}
-        {value === 3 && <TabContainer><Albums data={[community.actions]} /></TabContainer>}
+        {value === 0 && <TabContainer><About data={dataProps} community={community} /></TabContainer>}
+        {/* {value === 1 && <TabContainer><Albums data={[community.actions]} /></TabContainer>} */}
+        {value === 1 && <TabContainer><Connection data={{ users: community.users, avatar: dummy.user.avatar }} /></TabContainer>}
+        {value === 2 && <TabContainer><Favorites data={{ testimonials: community.testimonials, events: community.events }} /></TabContainer>}
       </div>
     );
   }

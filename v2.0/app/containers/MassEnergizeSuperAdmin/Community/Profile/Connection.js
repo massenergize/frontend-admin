@@ -8,7 +8,9 @@ import styles from './profile-jss';
 
 class Connection extends React.Component {
   render() {
-    const { classes } = this.props;
+    const { classes, data } = this.props;
+    const { users, avatar } = data;
+
     return (
       <Grid
         container
@@ -16,19 +18,20 @@ class Connection extends React.Component {
         justify="space-between"
         direction="row"
         spacing={16}
-        className={classes.rootx}
+        className={classes.root}
       >
-        {
-          datas.map((data, index) => (
+        { users
+          && users.map((u, index) => (
             <Grid item md={4} sm={6} xs={12} key={index.toString()}>
               <ProfileCard
-                cover={data.cover}
-                avatar={data.avatar}
-                name={data.name}
-                title={data.title}
-                connection={data.connection}
+                cover={u.cover}
+                avatar={u.profile_picture ? u.profile_picture.url : avatar}
+                name={u.full_name}
+                title={u.preferred_name}
+                connection="Member"
                 isVerified={data.verified}
-                btnText="See Profile"
+                btnText="See Full Profile"
+                user={u}
               />
             </Grid>
           ))

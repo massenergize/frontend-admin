@@ -13,8 +13,8 @@ import VerifiedUser from '@material-ui/icons/VerifiedUser';
 import BottomNavigation from '@material-ui/core/BottomNavigation';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import SupervisorAccount from '@material-ui/icons/SupervisorAccount';
-import Favorite from '@material-ui/icons/Favorite';
-import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
+// import Favorite from '@material-ui/icons/Favorite';
+// import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
 import Divider from '@material-ui/core/Divider';
 import styles from './cardStyle-jss';
 
@@ -28,14 +28,15 @@ class ProfileCard extends React.Component {
       title,
       connection,
       isVerified,
-      btnText
+      btnText,
+      user
     } = this.props;
 
     return (
       <Card className={classes.cardSocmed}>
         <CardMedia
           className={classes.mediaProfile}
-          image={cover}
+          image={avatar}
           title="cover"
         />
         <CardContent className={classes.contentProfile}>
@@ -48,8 +49,8 @@ class ProfileCard extends React.Component {
             <span className={Type.regular}>{title}</span>
           </Typography>
           <Typography variant="caption" component="p">
-            {connection}
-            &nbsp;connection
+            {user.email}
+            &nbsp;
           </Typography>
           <Button className={classes.buttonProfile} size="large" variant="outlined" color="secondary">
             {btnText}
@@ -61,9 +62,9 @@ class ProfileCard extends React.Component {
             showLabels
             className={classes.bottomLink}
           >
-            <BottomNavigationAction label="20 Connection" icon={<SupervisorAccount />} />
-            <BottomNavigationAction label="10 Favorites" icon={<Favorite />} />
-            <BottomNavigationAction label="5 Albums" icon={<PhotoLibrary />} />
+            <BottomNavigationAction label={`ID: ${user.id}`} icon={<SupervisorAccount />} />
+            {/* <BottomNavigationAction label="10 Favorites" icon={<Favorite />} />
+            <BottomNavigationAction label="5 Albums" icon={<PhotoLibrary />} /> */}
           </BottomNavigation>
         </CardActions>
       </Card>
@@ -73,11 +74,11 @@ class ProfileCard extends React.Component {
 
 ProfileCard.propTypes = {
   classes: PropTypes.object.isRequired,
-  cover: PropTypes.string.isRequired,
-  avatar: PropTypes.string.isRequired,
+  // cover: PropTypes.string.isRequired,
+  // avatar: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  connection: PropTypes.number.isRequired,
+  // connection: PropTypes.number.isRequired,
   btnText: PropTypes.string.isRequired,
   isVerified: PropTypes.bool
 };

@@ -16,6 +16,7 @@ import DateRange from '@material-ui/icons/DateRange';
 import LocationOn from '@material-ui/icons/LocationOn';
 import Divider from '@material-ui/core/Divider';
 import Chip from '@material-ui/core/Chip';
+import Email from '@material-ui/icons/Email';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
@@ -28,13 +29,23 @@ import AllInclusive from '@material-ui/icons/AllInclusive';
 import AssistantPhoto from '@material-ui/icons/AssistantPhoto';
 import imgData from 'dan-api/images/imgData';
 import Type from 'dan-styles/Typography.scss';
-import Timeline from 'dan-components/SocialMedia/Timeline';
+// import Timeline from 'dan-components/SocialMedia/Timeline';
 import PapperBlock from 'dan-components/PapperBlock/PapperBlock';
 import styles from './profile-jss';
 
 class About extends React.Component {
+  summarizeLocation = (location) => {
+    if (!location) return 'No Address Provided';
+    return `${location.address1}${location.address2}${location.state}${location.zip}${location.country}`;
+  }
+
+  getTags = tags => (tags.map(t => (t.name))).join(', ');
+
+
   render() {
-    const { classes, data } = this.props;
+    const { classes, community } = this.props;
+
+
     return (
       <Grid
         container
@@ -49,8 +60,8 @@ class About extends React.Component {
           <div className={classes.progressRoot}>
             <Paper className={classes.styledPaper} elevation={4}>
               <Typography className={classes.title} variant="h5" component="h3">
-                <span className={Type.light}>Profile Strength: </span>
-                <span className={Type.bold}>Intermediate</span>
+                <span className={Type.light}>Goals Set By Community Members </span>
+                {/* <span className={Type.bold}>Intermediate</span> */}
               </Typography>
               <Grid container justify="center">
                 <Chip
@@ -69,33 +80,39 @@ class About extends React.Component {
           </div>
           {/* ----------------------------------------------------------------------*/}
           {/* About Me */}
-          <PapperBlock title="About Me" icon="ios-contact-outline" whiteBg noMargin desc="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed urna in justo euismod condimentum.">
+          <PapperBlock title="About Community" icon="ios-contact-outline" whiteBg noMargin desc={`${community ? community.about_community : ''}`}>
             <Divider className={classes.divider} />
             <List dense className={classes.profileList}>
               <ListItem>
                 <Avatar>
                   <DateRange />
                 </Avatar>
-                <ListItemText primary="Born" secondary="Jan 9, 1994" />
+                <ListItemText primary="Admin Name" secondary={`${community.owner_name}`} />
               </ListItem>
               <ListItem>
                 <Avatar>
-                  <LocalPhone />
+                  <Email />
                 </Avatar>
-                <ListItemText primary="Phone" secondary="(+62)8765432190" />
+                <ListItemText primary="Admin Email" secondary={`${community.owner_email}`} />
               </ListItem>
               <ListItem>
                 <Avatar>
-                  <LocationOn />
+                  <DateRange />
                 </Avatar>
-                <ListItemText primary="Address" secondary="Chicendo Street no.105 Block A/5A - Barcelona, Spain" />
+                <ListItemText primary="Date Registered" secondary={`${community.created_at}`} />
+              </ListItem>
+              <ListItem>
+                <Avatar>
+                  <DateRange />
+                </Avatar>
+                <ListItemText primary="Last Updated" secondary={`${community.updated_at}`} />
               </ListItem>
             </List>
           </PapperBlock>
           <Divider className={classes.divider} />
           {/* ----------------------------------------------------------------------*/}
           {/* My Albums */}
-          <PapperBlock title="My Albums (6)" icon="ios-images-outline" whiteBg desc="">
+          {/* <PapperBlock title="My Albums (6)" icon="ios-images-outline" whiteBg desc="">
             <div className={classes.albumRoot}>
               <GridList cellHeight={180} className={classes.gridList}>
                 {
@@ -132,7 +149,7 @@ class About extends React.Component {
                 See All
               </Button>
             </Grid>
-          </PapperBlock>
+          </PapperBlock> */}
           {/* ----------------------------------------------------------------------*/}
 
 
@@ -145,38 +162,38 @@ class About extends React.Component {
           </div>
           {/* ----------------------------------------------------------------------*/}
           {/* My Interests */}
-          <PapperBlock title="My Interests" icon="ios-aperture-outline" whiteBg desc="">
+          <PapperBlock title="More Details" icon="ios-aperture-outline" whiteBg desc="">
             <Grid container className={classes.colList}>
               <Grid item md={6}>
                 <ListItem>
                   <Avatar className={classNames(classes.avatar, classes.purpleAvatar)}>
                     <AcUnit />
                   </Avatar>
-                  <ListItemText primary="Snow" secondary="100 Connected" />
+                  <ListItemText primary="Subdomain" secondary={`${community.subdomain}`} />
                 </ListItem>
               </Grid>
               <Grid item md={6}>
                 <ListItem>
                   <Avatar className={classNames(classes.avatar, classes.greenAvatar)}>
-                    <Adb />
+                    <AcUnit />
                   </Avatar>
-                  <ListItemText primary="Android" secondary="120 Connected" />
+                  <ListItemText primary="Is Geographically Focused" secondary={`${community.is_geographically_focused}`} />
                 </ListItem>
               </Grid>
               <Grid item md={6}>
                 <ListItem>
                   <Avatar className={classNames(classes.avatar, classes.pinkAvatar)}>
-                    <AllInclusive />
+                    <AcUnit />
                   </Avatar>
-                  <ListItemText primary="All Inclusive" secondary="999+ Connected" />
+                  <ListItemText primary="Is Approved" secondary={`${community.is_approved}`} />
                 </ListItem>
               </Grid>
               <Grid item md={6}>
                 <ListItem>
                   <Avatar className={classNames(classes.avatar, classes.orangeAvatar)}>
-                    <AssistantPhoto />
+                    <LocationOn />
                   </Avatar>
-                  <ListItemText primary="My Country" secondary="99+ Connected" />
+                  <ListItemText primary="Location" secondary={`${this.summarizeLocation(community.location)}`} />
                 </ListItem>
               </Grid>
             </Grid>
@@ -184,24 +201,18 @@ class About extends React.Component {
 
 
           {/* My Connection Me */}
-          <PapperBlock title="My Connection" icon="ios-contacts-outline" whiteBg desc="">
+          <PapperBlock title="Top Actions" icon="ios-contacts-outline" whiteBg desc="">
             <List dense className={classes.profileList}>
-              <ListItem button>
-                <Avatar className={classNames(classes.avatar, classes.orangeAvatar)}>H</Avatar>
-                <ListItemText primary="Harry Wells" secondary="2 Mutual Connection" />
-              </ListItem>
-              <ListItem button>
-                <Avatar className={classNames(classes.avatar, classes.purpleAvatar)}>J</Avatar>
-                <ListItemText primary="John DOe" secondary="8 Mutual Connection" />
-              </ListItem>
-              <ListItem button>
-                <Avatar className={classNames(classes.avatar, classes.pinkAvatar)}>V</Avatar>
-                <ListItemText primary="Victor Wanggai" secondary="12 Mutual Connection" />
-              </ListItem>
-              <ListItem button>
-                <Avatar className={classNames(classes.avatar, classes.greenAvatar)}>H</Avatar>
-                <ListItemText primary="Baron Phoenix" secondary="10 Mutual Connection" />
-              </ListItem>
+              {
+                community
+                  && community.actions
+                  && community.actions.map((a, i) => (
+                    <ListItem button key={i}>
+                      {/* <Avatar className={classNames(classes.avatar, classes.orangeAvatar)}>H</Avatar> */}
+                      <ListItemText primary={`${a.title}`} secondary={`${this.getTags(a.tags)}`} />
+                    </ListItem>
+                  ))
+              }
             </List>
             <Divider className={classes.divider} />
             <Grid container justify="center">
@@ -218,6 +229,7 @@ class About extends React.Component {
 
 About.propTypes = {
   classes: PropTypes.object.isRequired,
+  community: PropTypes.object.isRequired,
   // data: PropTypes.object.isRequired
 };
 

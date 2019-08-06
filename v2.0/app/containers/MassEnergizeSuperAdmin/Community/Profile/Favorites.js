@@ -19,7 +19,9 @@ const styles = theme => ({
 
 class Favorites extends React.Component {
   render() {
-    const { classes } = this.props;
+    const { classes, data } = this.props;
+    const { events, testimonials } = data;
+    console.log(events, testimonials);
     const bull = <span className={classes.bullet}>•</span>;
     return (
       <Grid
@@ -29,96 +31,49 @@ class Favorites extends React.Component {
         spacing={24}
       >
         <Grid item md={6}>
-          <PostCard
-            liked={1}
-            shared={20}
-            commented={15}
-            date="Sept, 25 2018"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed urna in justo euismod condimentum."
-            image={imgApi[5]}
-            avatar={avatarApi[6]}
-            name="John Doe"
-          />
-          <Divider className={classes.divider} />
-          <GeneralCard liked={1} shared={20} commented={15}>
-            <Typography className={classes.title} color="textSecondary">
-              Word of the Day
-            </Typography>
-            <Typography variant="h5" component="h2">
-              be
-              {bull}
-              nev
-              {bull}
-              o
-              {bull}
-              lent
-            </Typography>
-            <Typography className={classes.pos} color="textSecondary">
-              adjective
-            </Typography>
-            <Typography component="p">
-              well meaning and kindly.
-              <br />
-              {'"a benevolent smile"'}
-            </Typography>
-          </GeneralCard>
-          <Divider className={classes.divider} />
-          <PostCard
-            liked={1}
-            shared={20}
-            commented={15}
-            date="Sept, 25 2018"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed urna in justo euismod condimentum."
-            image={imgApi[16]}
-            avatar={avatarApi[6]}
-            name="John Doe"
-          />
-          <Divider className={classes.divider} />
-          <PostCard
-            liked={90}
-            shared={10}
-            commented={22}
-            date="Sept, 15 2018"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed urna in justo euismod condimentum."
-            avatar={avatarApi[5]}
-            name="Jane Doe"
-          />
+          {
+            testimonials
+            && testimonials.map((t, i) => (
+              <div>
+                <PostCard
+                  liked={90}
+                  shared={10}
+                  commented={22}
+                  avatar={t.user && t.user.profile_picture ? t.user.profile_picture.url : avatarApi[11]}
+                  date={`Submitted at: ${t.created_at}`}
+                  content={`${t.body}`}
+                  name={`${t.user ? t.user.full_name : 'Anonymous'}`}
+                  data1={`Vendor: ${t.vendor ? t.vendor.name : ''}`}
+                  data2={`Action: ${t.vendor ? t.action.title : ''}`}
+                  data3={`ID: ${t ? t.id : ''}`}
+                />
+                <Divider className={classes.divider} />
+              </div>
+            ))
+          }
         </Grid>
+
+
         <Grid item md={6}>
-          <PostCard
-            liked={90}
-            shared={10}
-            commented={22}
-            date="Sept, 15 2018"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed urna in justo euismod condimentum."
-            avatar={avatarApi[4]}
-            name="Jane Doe"
-          />
-          <Divider className={classes.divider} />
-          <PostCard
-            liked={1}
-            shared={20}
-            commented={15}
-            date="Sept, 25 2018"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed urna in justo euismod condimentum."
-            image={imgApi[20]}
-            avatar={avatarApi[6]}
-            name="John Doe"
-          />
-          <Divider className={classes.divider} />
-          <GeneralCard liked={1} shared={20} commented={15}>
-            <Quote align="left" content="Imagine all the people living life in peace. You may say I'm a dreamer, but I'm not the only one. I hope someday you'll join us, and the world will be as one." footnote="John Lennon" />
-          </GeneralCard>
-          <Divider className={classes.divider} />
-          <PostCard
-            liked={90}
-            shared={10}
-            commented={22}
-            date="Sept, 15 2018"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed urna in justo euismod condimentum."
-            avatar={avatarApi[1]}
-            name="Jane Doe"
-          />
+          {
+            events
+              && events.map((e, i) => (
+                <div>
+                  <PostCard
+                    liked={1}
+                    shared={20}
+                    commented={15}
+                    date={`Start At: ${e.start_date_and_time}  Ends At:${e.start_date_and_time}`}
+                    content={`${e.description}`}
+                    image={e.image ? e.image.url : imgApi[5]}
+                    avatar={e.community && e.community.logo ? e.community.logo.url : avatarApi[6]}
+                    name={`${e.name}`}
+                  />
+                  <Divider className={classes.divider} />
+                </div>
+              )
+              )
+          }
         </Grid>
       </Grid>
     );
