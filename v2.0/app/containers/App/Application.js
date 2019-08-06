@@ -48,6 +48,8 @@ class Application extends React.Component {
 
           <Route path="/admin/read/categories" component={AllCategories} />
           <Route path="/admin/add/category" component={AddCategory} />
+          <Route path="/admin/read/tag-collections" component={AllCategories} />
+          <Route path="/admin/add/tag-collection" component={AddCategory} />
 
           <Route path="/admin/read/events" component={AllEvents} />
           <Route path="/admin/add/event" component={AddEvent} />
