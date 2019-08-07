@@ -1,10 +1,10 @@
 module.exports = [
-  {
-    key: 'dashboard',
-    name: 'Dashboard',
-    icon: 'ios-stats',
-    link: '/admin/dashboard'
-  },
+  // {
+  //   key: 'dashboard',
+  //   name: 'Dashboard',
+  //   icon: 'ios-stats',
+  //   link: '/admin/dashboard'
+  // },
   {
     key: 'communities',
     name: 'Communities',
@@ -37,11 +37,11 @@ module.exports = [
         name: 'Contractors/Vendors',
         title: true
       },
-      // {
-      //   key: 'add-vendor',
-      //   name: 'Add New Vendor',
-      //   link: '/admin/add/vendor'
-      // },
+      {
+        key: 'add-vendor',
+        name: 'Add New Vendor',
+        link: '/admin/add/vendor'
+      },
       {
         key: 'all-vendors',
         name: 'All Vendors',
@@ -59,11 +59,11 @@ module.exports = [
         name: 'Actions',
         title: true
       },
-      // {
-      //   key: 'add-action',
-      //   name: 'Add New Action',
-      //   link: '/admin/add/action'
-      // },
+      {
+        key: 'add-action',
+        name: 'Add New Action',
+        link: '/admin/add/action'
+      },
       {
         key: 'all-actions',
         name: 'All Actions',
@@ -81,11 +81,11 @@ module.exports = [
         name: 'Events',
         title: true
       },
-      // {
-      //   key: 'add-event',
-      //   name: 'Add Event',
-      //   link: '/admin/add/event'
-      // },
+      {
+        key: 'add-event',
+        name: 'Add Event',
+        link: '/admin/add/event'
+      },
       {
         key: 'all-events',
         name: 'All Events',
@@ -103,11 +103,11 @@ module.exports = [
         name: 'Tags & Tag Collections',
         title: true
       },
-      // {
-      //   key: 'add-vendor',
-      //   name: 'Add New Category',
-      //   link: '/admin/add/category'
-      // },
+      {
+        key: 'add-vendor',
+        name: 'Add New Category',
+        link: '/admin/add/category'
+      },
       {
         key: 'all-collections',
         name: 'All Tag Collections',
@@ -125,11 +125,11 @@ module.exports = [
         name: 'Teams',
         title: true
       },
-      // {
-      //   key: 'add-team',
-      //   name: 'Add New Team',
-      //   link: '/admin/add/team'
-      // },
+      {
+        key: 'add-team',
+        name: 'Add New Team',
+        link: '/admin/add/team'
+      },
       {
         key: 'all-teams',
         name: 'All Teams',

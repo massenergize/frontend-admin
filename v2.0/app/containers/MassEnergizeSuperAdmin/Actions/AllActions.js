@@ -21,7 +21,7 @@ class AllActions extends React.Component {
 
   async componentDidMount() {
     const response = await fetchData('v2/actions');
-    await this.setStateAsync({ actions: response.data });
+    await this.setStateAsync({ actions: response && response.data });
   }
 
   setStateAsync(state) {

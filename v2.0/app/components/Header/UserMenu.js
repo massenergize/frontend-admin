@@ -47,7 +47,7 @@ class UserMenu extends React.Component {
     const { anchorEl, openMenu } = this.state;
     return (
       <div>
-        <IconButton
+        {/* <IconButton
           aria-haspopup="true"
           onClick={this.handleMenu('notification')}
           color="inherit"
@@ -56,8 +56,8 @@ class UserMenu extends React.Component {
           <Badge className={classes.badge} badgeContent={1} color="secondary">
             <Ionicon icon="ios-notifications-outline" />
           </Badge>
-        </IconButton>
-        <Menu
+        </IconButton> */}
+        {/* <Menu
           id="menu-notification"
           anchorEl={anchorEl}
           anchorOrigin={{
@@ -77,14 +77,14 @@ class UserMenu extends React.Component {
           open={openMenu === 'notification'}
           onClose={this.handleClose}
         >
-          {/* <MenuItem onClick={this.handleClose}>
+          <MenuItem onClick={this.handleClose}>
             <div className={messageStyles.messageInfo}>
               <Avatar alt="User Name" src={avatarApi[0]} />
               <ListItemText primary={dummy.text.subtitle} secondary={dummy.text.date} />
             </div>
           </MenuItem>
-          <Divider variant="inset" /> */}
-          {/* <MenuItem onClick={this.handleClose}>
+          <Divider variant="inset" /> 
+           <MenuItem onClick={this.handleClose}>
             <div className={messageStyles.messageInfo}>
               <Avatar className={messageStyles.icon}>
                 <Info />
@@ -100,7 +100,7 @@ class UserMenu extends React.Component {
               </Avatar>
               <ListItemText primary={dummy.text.subtitle} className={classes.textNotif} secondary={dummy.text.date} />
             </div>
-          </MenuItem> */}
+          </MenuItem> 
           <Divider variant="inset" />
           <MenuItem onClick={this.handleClose}>
             <div className={messageStyles.messageWarning}>
@@ -111,13 +111,13 @@ class UserMenu extends React.Component {
             </div>
           </MenuItem>
           <Divider variant="inset" />
-        </Menu>
-        <Button onClick={this.handleMenu('user-setting')}>
+        </Menu> */}
+        {/* <Button onClick={this.handleMenu('user-setting')}>
           <Avatar
             alt={dummy.user.name}
             src={dummy.user.avatar}
           />
-        </Button>
+        </Button> */}
         <Menu
           id="menu-appbar"
           anchorEl={anchorEl}
