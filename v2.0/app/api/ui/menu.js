@@ -37,11 +37,11 @@ module.exports = [
         name: 'Contractors/Vendors',
         title: true
       },
-      {
-        key: 'add-vendor',
-        name: 'Add New Vendor',
-        link: '/admin/add/vendor'
-      },
+      // {
+      //   key: 'add-vendor',
+      //   name: 'Add New Vendor',
+      //   link: '/admin/add/vendor'
+      // },
       {
         key: 'all-vendors',
         name: 'All Vendors',
