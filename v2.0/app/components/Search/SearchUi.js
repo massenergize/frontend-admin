@@ -150,7 +150,7 @@ class SearchUi extends React.Component {
         className={classes.autocomplete}
         inputProps={{
           classes,
-          placeholder: 'Search Ui',
+          placeholder: 'Search',
           value,
           onChange: this.handleChange,
         }}

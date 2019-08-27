@@ -23,7 +23,7 @@ import messageStyles from 'dan-styles/Messages.scss';
 import avatarApi from 'dan-api/images/avatars';
 import link from 'dan-api/ui/link';
 import styles from './header-jss';
-
+// menu notifications
 class UserMenu extends React.Component {
   state = {
     anchorEl: null,
@@ -47,17 +47,17 @@ class UserMenu extends React.Component {
     const { anchorEl, openMenu } = this.state;
     return (
       <div>
-        <IconButton
+        {/* <IconButton
           aria-haspopup="true"
           onClick={this.handleMenu('notification')}
           color="inherit"
           className={classNames(classes.notifIcon, dark ? classes.dark : classes.light)}
         >
-          <Badge className={classes.badge} badgeContent={4} color="secondary">
+          <Badge className={classes.badge} badgeContent={1} color="secondary">
             <Ionicon icon="ios-notifications-outline" />
           </Badge>
-        </IconButton>
-        <Menu
+        </IconButton> */}
+        {/* <Menu
           id="menu-notification"
           anchorEl={anchorEl}
           anchorOrigin={{
@@ -83,8 +83,8 @@ class UserMenu extends React.Component {
               <ListItemText primary={dummy.text.subtitle} secondary={dummy.text.date} />
             </div>
           </MenuItem>
-          <Divider variant="inset" />
-          <MenuItem onClick={this.handleClose}>
+          <Divider variant="inset" /> 
+           <MenuItem onClick={this.handleClose}>
             <div className={messageStyles.messageInfo}>
               <Avatar className={messageStyles.icon}>
                 <Info />
@@ -100,7 +100,7 @@ class UserMenu extends React.Component {
               </Avatar>
               <ListItemText primary={dummy.text.subtitle} className={classes.textNotif} secondary={dummy.text.date} />
             </div>
-          </MenuItem>
+          </MenuItem> 
           <Divider variant="inset" />
           <MenuItem onClick={this.handleClose}>
             <div className={messageStyles.messageWarning}>
@@ -111,21 +111,13 @@ class UserMenu extends React.Component {
             </div>
           </MenuItem>
           <Divider variant="inset" />
-          <MenuItem onClick={this.handleClose}>
-            <div className={messageStyles.messageError}>
-              <Avatar className={messageStyles.icon}>
-                <Error />
-              </Avatar>
-              <ListItemText primary="Suspendisse pharetra pulvinar sollicitudin. Aenean ut orci eu odio cursus lobortis eget tempus velit. " className={classes.textNotif} secondary="Jan 9, 2016" />
-            </div>
-          </MenuItem>
-        </Menu>
-        <Button onClick={this.handleMenu('user-setting')}>
+        </Menu> */}
+        {/* <Button onClick={this.handleMenu('user-setting')}>
           <Avatar
             alt={dummy.user.name}
             src={dummy.user.avatar}
           />
-        </Button>
+        </Button> */}
         <Menu
           id="menu-appbar"
           anchorEl={anchorEl}

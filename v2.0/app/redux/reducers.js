@@ -10,12 +10,14 @@ import languageProviderReducer from 'containers/LanguageProvider/reducer';
 import login from './modules/login';
 import uiReducer from './modules/ui';
 import initval from './modules/initForm';
+import app from './modules/appReducer';
 
 /**
  * Creates the main reducer with the dynamically injected ones
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    app,
     form,
     login,
     ui: uiReducer,

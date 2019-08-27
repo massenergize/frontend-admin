@@ -46,7 +46,10 @@ class PostCard extends React.Component {
       content,
       liked,
       shared,
-      commented
+      commented,
+      data1,
+      data2,
+      data3
     } = this.props;
     const { anchorElOpt } = this.state;
     return (
@@ -99,7 +102,16 @@ class PostCard extends React.Component {
             {content}
           </Typography>
         </CardContent>
-        <CardActions className={classes.actions} disableActionSpacing>
+        <CardContent>
+          <Typography component="p">
+            {data1}
+            <br />
+            {data2}
+            <br />
+            {data3}
+          </Typography>
+        </CardContent>
+        {/* <CardActions className={classes.actions} disableActionSpacing>
           <IconButton aria-label="Add to favorites" className={classes.button}>
             <FavoriteIcon className={liked > 0 && classes.liked} />
             <span className={classes.num}>{liked}</span>
@@ -112,7 +124,7 @@ class PostCard extends React.Component {
             <Comment />
             <span className={classes.num}>{commented}</span>
           </IconButton>
-        </CardActions>
+        </CardActions> */}
       </Card>
     );
   }
@@ -125,9 +137,9 @@ PostCard.propTypes = {
   date: PropTypes.string.isRequired,
   image: PropTypes.string,
   content: PropTypes.string.isRequired,
-  liked: PropTypes.number.isRequired,
-  shared: PropTypes.number.isRequired,
-  commented: PropTypes.number.isRequired,
+  // liked: PropTypes.number.isRequired,
+  // shared: PropTypes.number.isRequired,
+  // commented: PropTypes.number.isRequired,
 };
 
 PostCard.defaultProps = {
