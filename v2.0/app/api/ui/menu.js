@@ -1,10 +1,10 @@
 module.exports = [
-  // {
-  //   key: 'dashboard',
-  //   name: 'Dashboard',
-  //   icon: 'ios-stats',
-  //   link: '/admin/dashboard'
-  // },
+  {
+    key: 'dashboard',
+    name: 'Dashboard',
+    icon: 'ios-stats',
+    link: '/admin/dashboard'
+  },
   {
     key: 'communities',
     name: 'Communities',
@@ -37,11 +37,11 @@ module.exports = [
         name: 'Contractors/Vendors',
         title: true
       },
-      // {
-      //   key: 'add-vendor',
-      //   name: 'Add New Vendor',
-      //   link: '/admin/add/vendor'
-      // },
+      {
+        key: 'add-vendor',
+        name: 'Add New Vendor',
+        link: '/admin/add/vendor'
+      },
       {
         key: 'all-vendors',
         name: 'All Vendors',
@@ -169,11 +169,11 @@ module.exports = [
         name: 'testimonials',
         title: true
       },
-      // {
-      //   key: 'add-testimonial',
-      //   name: 'Add New Testimonial',
-      //   link: '/admin/add/testimonial'
-      // },
+      {
+        key: 'add-testimonial',
+        name: 'Add New Testimonial',
+        link: '/admin/add/testimonial'
+      },
       {
         key: 'all-testimonials',
         name: 'All Testimonials',
@@ -197,11 +197,11 @@ module.exports = [
         name: 'policies',
         title: true
       },
-      // {
-      //   key: 'add-policy',
-      //   name: 'Add New Policy',
-      //   link: '/admin/add/policy'
-      // },
+      {
+        key: 'add-policy',
+        name: 'Add New Policy',
+        link: '/admin/add/policy'
+      },
       {
         key: 'all-policies',
         name: 'All Policies',
