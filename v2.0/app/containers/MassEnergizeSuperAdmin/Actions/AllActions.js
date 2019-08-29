@@ -47,6 +47,7 @@ class AllActions extends React.Component {
               desc={n.title}
               rating={n.id}
               price={n.average_carbon_score}
+              // classes={classes}
             />
           </Grid>
         ))}
@@ -55,7 +56,7 @@ class AllActions extends React.Component {
   }
 
   render() {
-    const title = brand.name + ' - All Communities';
+    const title = brand.name + ' - All Actions';
     const description = brand.desc;
     const { actions } = this.state;
     const { classes } = this.props;

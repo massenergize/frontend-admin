@@ -21,6 +21,7 @@ import styles from './cardStyle-jss';
 class ProductCard extends React.Component {
   render() {
     const {
+      id,
       classes,
       discount,
       soldout,
@@ -71,7 +72,7 @@ class ProductCard extends React.Component {
         <CardActions className={classes.price}>
           <Typography variant="h5">
             <span>
-              Carbon Score: 
+              Carbon Score:
               { price }
             </span>
           </Typography>
@@ -84,7 +85,7 @@ class ProductCard extends React.Component {
             </Typography>
           )}
           <div className={classes.rightAction}>
-            <Button size="small" variant="outlined" color="secondary" onClick={detailOpen}>
+            <Button size="small" variant="outlined" color="secondary" onClick={detailOpen(id)}>
               See Detail
             </Button>
             {!soldout && (
@@ -121,7 +122,10 @@ ProductCard.defaultProps = {
   soldout: false,
   prevPrice: 0,
   list: false,
-  detailOpen: () => (false),
+  detailOpen: (id) => {
+    // window.location.href = `/admin/action/${id}/edit`;
+    console.log(id);
+  },
   addToCart: () => (false),
 };
 
