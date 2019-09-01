@@ -11,12 +11,14 @@ import CardMedia from '@material-ui/core/CardMedia';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Chip from '@material-ui/core/Chip';
-import AddShoppingCart from '@material-ui/icons/AddShoppingCart';
+import FileCopy from '@material-ui/icons/FileCopy';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
 import Type from 'dan-styles/Typography.scss';
 import Rating from '../Rating/Rating';
 import styles from './cardStyle-jss';
+import { Link } from 'react-router-dom';
+
 
 class ProductCard extends React.Component {
   render() {
@@ -52,13 +54,13 @@ class ProductCard extends React.Component {
           title={name}
         />
         <CardContent className={classes.floatingButtonWrap}>
-          {/* {!soldout && (
-            <Tooltip title="Add to cart" placement="top">
+          {!soldout && (
+            <Tooltip title="Duplicate this Action" placement="top">
               <Fab onClick={addToCart} size="small" color="secondary" aria-label="add" className={classes.buttonAdd}>
-                <AddShoppingCart />
+                <FileCopy />
               </Fab>
             </Tooltip>
-          )} */}
+          )}
           <Typography noWrap gutterBottom variant="h5" className={classes.title} component="h2">
             {name}
           </Typography>
@@ -85,13 +87,16 @@ class ProductCard extends React.Component {
             </Typography>
           )}
           <div className={classes.rightAction}>
-            <Button size="small" variant="outlined" color="secondary" onClick={detailOpen(id)}>
-              See Detail
-            </Button>
+            <Link to={`/admin/read/action/${id}`}>
+              <Button size="small" variant="outlined" color="secondary">
+                See Detail
+              </Button>
+            </Link>
+
             {!soldout && (
               <Tooltip title="Add to cart" placement="top">
                 <IconButton color="secondary" onClick={addToCart} className={classes.buttonAddList}>
-                  <AddShoppingCart />
+                  {/* <AddShoppingCart /> */}
                 </IconButton>
               </Tooltip>
             )}
@@ -124,7 +129,7 @@ ProductCard.defaultProps = {
   list: false,
   detailOpen: (id) => {
     // window.location.href = `/admin/action/${id}/edit`;
-    console.log(id);
+    // console.log(id);
   },
   addToCart: () => (false),
 };

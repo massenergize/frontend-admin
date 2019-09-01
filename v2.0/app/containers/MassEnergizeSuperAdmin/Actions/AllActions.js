@@ -30,36 +30,33 @@ class AllActions extends React.Component {
     });
   }
 
-  renderActions = (data, classes) => {
-    return (
-      <Grid
-        container
-        alignItems="flex-start"
-        justify="center"
-        direction="row"
-        spacing={16}
-      >
-        {data.map(n => (
-          <Grid item md={4} key={n.id}>
-            <ProductCard
-              thumbnail={n.image ? n.image.url : imgApi[21]}
-              name={n.title}
-              desc={n.title}
-              rating={n.id}
-              price={n.average_carbon_score}
-              // classes={classes}
-            />
-          </Grid>
-        ))}
-      </Grid>
-    );
-  }
+  renderActions = (data) => (
+    <Grid
+      container
+      alignItems="flex-start"
+      justify="center"
+      direction="row"
+      spacing={16}
+    >
+      {data.map(n => (
+        <Grid item md={4} key={n.id}>
+          <ProductCard
+            thumbnail={n.image ? n.image.url : imgApi[21]}
+            name={n.title}
+            desc={n.title}
+            rating={n.id}
+            price={n.average_carbon_score}
+            id={n.id}
+          />
+        </Grid>
+      ))}
+    </Grid>
+  )
 
   render() {
     const title = brand.name + ' - All Actions';
     const description = brand.desc;
     const { actions } = this.state;
-    const { classes } = this.props;
     return (
 
       <div>
@@ -72,7 +69,7 @@ class AllActions extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <PapperBlock title="All Actions" desc="">
-          {this.renderActions(actions, classes)}
+          {this.renderActions(actions)}
         </PapperBlock>
       </div>
     );
@@ -80,9 +77,5 @@ class AllActions extends React.Component {
 }
 
 // export default AllActions;
-
-AllActions.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
 
 export default withStyles(styles)(AllActions);
