@@ -1,7 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
+// import { Editor } from 'react-draft-wysiwyg';
+// import draftToHtml from 'draftjs-to-html';
+// import { convertFromRaw, EditorState, convertToRaw } from 'draft-js';
 import InputLabel from '@material-ui/core/InputLabel';
 import Input from '@material-ui/core/Input';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -10,8 +12,6 @@ import Select2 from '@material-ui/core/Select';
 import Paper from '@material-ui/core/Paper';
 import { Field, reduxForm } from 'redux-form/immutable';
 import Grid from '@material-ui/core/Grid';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -19,24 +19,14 @@ import Typography from '@material-ui/core/Typography';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
-import {
-  Checkbox,
-  TextField,
-  Switch,
-  Select
-} from 'redux-form-material-ui';
-import { fetchData, sendJson } from '../../../utils/messenger';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormGroup from '@material-ui/core/FormGroup';
+import { TextField } from 'redux-form-material-ui';
+import { MaterialDropZone } from 'dan-components';
 
+import { fetchData, sendJson } from '../../../utils/messenger';
 import { initAction, clearAction } from '../../../actions/ReduxFormActions';
 
-const renderRadioGroup = ({ input, ...rest }) => (
-  <RadioGroup
-    {...input}
-    {...rest}
-    valueselected={input.value}
-    onChange={(event, value) => input.onChange(value)}
-  />
-);
 
 // validation functions
 const required = value => (value == null ? 'Required' : undefined);
@@ -77,24 +67,6 @@ const MenuProps = {
   },
 };
 
-function getStyles(name, that) {
-  return {
-    fontWeight:
-      that.state.formData.tagsSelected.indexOf(name) === -1
-        ? that.props.theme.typography.fontWeightRegular
-        : that.props.theme.typography.fontWeightMedium,
-  };
-}
-
-
-const initData = {
-  title: 'New Demo Action 1',
-  steps_to_take: 'Dont do anything Yet',
-  average_carbon_score: '1.0',
-  is_global: 'true',
-  about: 'All about this Action'
-};
-
 class CreateNewActionForm extends Component {
   constructor(props) {
     super(props);
@@ -102,7 +74,8 @@ class CreateNewActionForm extends Component {
       formData: { tagsSelected: [], vendorsSelected: [] },
       tags: [],
       vendors: [],
-      communities: []
+      communities: [],
+      tagCollections: []
     };
   }
 
@@ -120,6 +93,7 @@ class CreateNewActionForm extends Component {
         });
       });
       this.setStateAsync({ tags });
+      this.setStateAsync({ tagCollections: tagCollections.data });
     }
 
     if (vendors) {
@@ -154,12 +128,31 @@ class CreateNewActionForm extends Component {
   handleFormDataChange = (event) => {
     const { target } = event;
     if (!target) return;
-    const { name, value } = target;
     const { formData } = this.state;
+    const { name, value } = target;
     this.setState({
       formData: { ...formData, [name]: value }
     });
-  }
+  };
+
+  handleCheckBoxSelect = async (event) => {
+    const { target } = event;
+    if (!target) return;
+    const { formData } = this.state;
+    const { name, value } = target;
+    const theList = formData[name];
+    const newVal = parseInt(value, 10);
+    const pos = theList.indexOf(newVal);
+    if (pos > -1) {
+      theList.splice(pos, pos + 1);
+    } else {
+      theList.push(newVal);
+    }
+    await this.setStateAsync({
+      formData: { ...formData, [name]: theList }
+    });
+    console.log(this.state);
+  };
 
   submitForm = async (event) => {
     event.preventDefault();
@@ -168,10 +161,9 @@ class CreateNewActionForm extends Component {
     cleanedValues.tags = cleanedValues.tagsSelected;
     cleanedValues.vendors = cleanedValues.vendorsSelected;
     cleanedValues.is_global = cleanedValues.is_global === 'true';
-
     delete cleanedValues.tagsSelected;
     delete cleanedValues.vendorsSelected;
-    console.log(cleanedValues);
+    delete cleanedValues.undefined;
     const response = sendJson(cleanedValues, '/v2/actions', '/admin/read/actions');
     console.log(response);
   }
@@ -191,18 +183,15 @@ class CreateNewActionForm extends Component {
     const trueBool = true;
     const {
       classes,
-      pristine,
-      reset,
       submitting,
-      init,
-      clear
     } = this.props;
     const {
-      formData, tags, communities, vendors
+      formData, tags, communities, vendors, tagCollections
     } = this.state;
     const { tagsSelected, vendorsSelected, community } = formData;
     let communitySelected = communities.filter(c => c.id === community)[0];
     communitySelected = communitySelected ? communitySelected.name : '';
+
 
     return (
       <div>
@@ -212,14 +201,7 @@ class CreateNewActionForm extends Component {
               <Typography variant="h5" component="h3">
                  New Action
               </Typography>
-              <div className={classes.buttonInit}>
-                <Button onClick={() => init(initData)} color="secondary" type="button">
-                  Load Sample Data
-                </Button>
-                <Button onClick={() => clear()} type="button">
-                  Clear Data
-                </Button>
-              </div>
+
               <form onSubmit={this.submitForm}>
                 <div>
                   <Field
@@ -234,18 +216,29 @@ class CreateNewActionForm extends Component {
                     onChange={this.handleFormDataChange}
                   />
                 </div>
-                <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Is this action Global ?</FormLabel>
-                  <Field
-                    name="is_global"
-                    className={classes.inlineWrap}
-                    onChange={async (newValue) => { await this.updateForm('is_global', newValue); }}
-                    component={renderRadioGroup}
-                  >
-                    <FormControlLabel value="true" control={<Radio />} label="Yes" />
-                    <FormControlLabel value="false" control={<Radio />} label="No" />
-                  </Field>
+                <div>
+                  <FormControl className={classes.field}>
+                    <InputLabel htmlFor="community">Community</InputLabel>
+                    <Select2
+                      native
+                      name="community"
+                      value="{community}"
+                      onChange={async (newValue) => { await this.updateForm('community', parseInt(newValue.target.value, 10)); }}
+                      inputProps={{
+                        id: 'age-native-simple',
+                      }}
+                    >
+                      <option value={community}>{communitySelected}</option>
+                      { communities
+                        && communities.map(c => (
+                          <option value={c.id} key={c.id}>{c.name}</option>
+                        ))
+                      }
+                    </Select2>
+
+                  </FormControl>
                 </div>
+
                 <div className={classes.field}>
                   <Field
                     name="steps_to_take"
@@ -258,6 +251,14 @@ class CreateNewActionForm extends Component {
                     onChange={this.handleFormDataChange}
                   />
                 </div>
+                {/* <Grid item xs={12}>
+                  <Editor
+                    editorState={editorState}
+                    editorClassName={classes.textEditor}
+                    toolbarClassName={classes.toolbarEditor}
+                    onEditorStateChange={this.onEditorStateChange}
+                  />
+                </Grid> */}
                 <div className={classes.field}>
                   <Field
                     name="about"
@@ -280,95 +281,126 @@ class CreateNewActionForm extends Component {
                     onChange={this.handleFormDataChange}
                   />
                 </div>
-                <div className={classes.field}>
-                  <FormControl className={classNames(classes.formControl, classes.noLabel)}>
-                    <Select2
-                      multiple
-                      displayEmpty
-                      value={tagsSelected}
-                      onChange={this.handleFormDataChange}
-                      input={<Input id="select-multiple-placeholder" name="tagsSelected" />}
-                      renderValue={selected => {
-                        if (selected.length === 0) {
-                          return <em>Please Select Tags</em>;
-                        }
-                        const names = selected.map(s => tags.filter(t => t.id === s)[0].name);
-                        return names.join(', ');
-                      }}
-                      MenuProps={MenuProps}
-                    >
-                      <MenuItem disabled value="">
-                        <em>Tags</em>
-                      </MenuItem>
-                      {
-                        tags.map(t => (
-                          <MenuItem key={t.id} value={t.id} style={getStyles(t.name, this)}>
-                            {`${t.tagCollection} - ${t.name}`}
-                          </MenuItem>
-                        ))
-                      }
-                    </Select2>
-                  </FormControl>
-                </div>
 
-                <div>
-                  <FormControl className={classes.field}>
-                    <InputLabel htmlFor="community">Community</InputLabel>
-                    <Field
-                      name="community"
-                      component={Select}
-                      placeholder="Select a Community"
-                      autoWidth={trueBool}
-                      // value={communitySelected}
-                      onChange={async (newValue) => { await this.updateForm('community', newValue); }}
-                    >
-                      { communities
-                        && communities.map(c => (
-                          <MenuItem value={c.id} key={c.id}>
-                            {c.name}
-                          </MenuItem>
-                        ))
-                      }
-                    </Field>
-                  </FormControl>
-                </div>
                 <div className={classes.field}>
-                  <FormControl className={classNames(classes.formControl, classes.noLabel)}>
+                  <FormControl className={classes.formControl}>
                     <Select2
                       multiple
                       displayEmpty
                       value={vendorsSelected}
                       onChange={this.handleFormDataChange}
-                      input={<Input id="select-multiple-placeholder" name="vendorsSelected" />}
+                      input={<Input id="select-multiple-checkbox" />}
                       renderValue={selected => {
                         if (selected.length === 0) {
-                          return <em>Please Select Vendors</em>;
+                          return (
+                            <em>
+                             Please Select Vendors
+                            </em>
+                          );
                         }
-                        const names = selected.map(s => vendors.filter(t => t.id === s)[0] && vendors.filter(t => t.id === s)[0].name);
-                        return names.join(names ? ', ' : '');
+                        const names = selected.map(s => tags.filter(t => t.id === s)[0].name);
+                        return 'Vendors: ' + names.join(', ');
                       }}
                       MenuProps={MenuProps}
                     >
-                      <MenuItem disabled value="">
-                        <em>Vendors</em>
-                      </MenuItem>
-                      {
-                        vendors.map(t => (
+                      {vendors.map(t => {
+                        return (
                           <MenuItem key={t.id} value={t.id}>
-                            {`${t.name}`}
+                            <Checkbox
+                              checked={vendorsSelected.indexOf(t.id) > -1}
+                              onChange={this.handleCheckBoxSelect}
+                              value={'' + t.id}
+                              name="vendorsSelected"
+                            />
+                            <ListItemText primary={`${t.name}`} />
                           </MenuItem>
-                        ))
-                      }
+                        );
+                      })}
                     </Select2>
                   </FormControl>
                 </div>
-                {/* <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Toggle Input</FormLabel>
-                  <div className={classes.inlineWrap}>
-                    <FormControlLabel control={<Field name="onof" component={Switch} />} label="On/OF Switch" />
-                    <FormControlLabel control={<Field name="checkbox" component={Checkbox} />} label="Checkbox" />
+
+                {tagCollections.map(tc => (
+                  <div className={classes.field} key={tc.id}>
+                    <FormControl component="fieldset">
+                      <FormLabel component="legend">{tc.name}</FormLabel>
+                      <FormGroup>
+                        {tc.tags.map(t => (
+                          <FormControlLabel
+                            key={t.id}
+                            control={(
+                              <Checkbox
+                                checked={tagsSelected.indexOf(t.id) > -1}
+                                onChange={this.handleCheckBoxSelect}
+                                value={'' + t.id}
+                                name="tagsSelected"
+                              />
+                            )}
+                            label={t.name}
+                          />
+                        ))}
+                      </FormGroup>
+                    </FormControl>
+                    <br />
+                    <br />
+                    <br />
                   </div>
-                </div> */}
+                ))}
+
+
+                {tagCollections.map(tc => (
+                  <div className={classes.field} key={tc.id}>
+                    <FormControl className={classes.formControl}>
+                      <Select2
+                        multiple
+                        displayEmpty
+                        value={tagsSelected.filter(i => tc.tags.map(h => h.id).indexOf(i) > -1)}
+                        onChange={this.handleFormDataChange}
+                        input={<Input id="select-multiple-checkbox" />}
+                        renderValue={selected => {
+                          if (selected.length === 0) {
+                            return (
+                              <em>
+                                Select
+                                {` ${tc.name}`}
+                              </em>
+                            );
+                          }
+                          const names = selected.map(s => tags.filter(t => t.id === s)[0].name);
+                          return tc.name + ': ' + names.join(', ');
+                        }}
+                        MenuProps={MenuProps}
+                      >
+                        {tc.tags.map(t => {
+                          return (
+                            <MenuItem key={t.id} value={t.id}>
+                              <Checkbox
+                                checked={tagsSelected.indexOf(t.id) > -1}
+                                onChange={this.handleCheckBoxSelect}
+                                value={'' + t.id}
+                                name="tagsSelected"
+                              />
+                              <ListItemText primary={`${t.name}`} />
+                            </MenuItem>
+                          );
+                        })}
+                      </Select2>
+                    </FormControl>
+                  </div>
+                ))}
+                <Fragment>
+                  <div>
+                    <MaterialDropZone
+                      acceptedFiles={['image/jpeg', 'image/png', 'image/jpg', 'image/bmp', 'image/svg']}
+                      files={[]}
+                      showPreviews
+                      maxSize={5000000}
+                      filesLimit={5}
+                      text="Please Upload the Display Image for this Action"
+                    />
+                  </div>
+                </Fragment>
+
                 <div>
                   <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
                     Submit
@@ -383,18 +415,9 @@ class CreateNewActionForm extends Component {
   }
 }
 
-renderRadioGroup.propTypes = {
-  input: PropTypes.object.isRequired,
-};
-
 CreateNewActionForm.propTypes = {
   classes: PropTypes.object.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
-  reset: PropTypes.func.isRequired,
-  pristine: PropTypes.bool.isRequired,
   submitting: PropTypes.bool.isRequired,
-  init: PropTypes.func.isRequired,
-  clear: PropTypes.func.isRequired,
 };
 
 const mapDispatchToProps = dispatch => ({
