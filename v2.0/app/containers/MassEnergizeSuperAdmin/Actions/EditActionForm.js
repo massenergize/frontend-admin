@@ -10,6 +10,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Select2 from '@material-ui/core/Select';
 import Paper from '@material-ui/core/Paper';
+import { Field, reduxForm } from 'redux-form/immutable';
 import Grid from '@material-ui/core/Grid';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
@@ -61,7 +62,7 @@ const MenuProps = {
   },
 };
 
-class CreateNewActionForm extends Component {
+class EditActionForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -86,9 +87,12 @@ class CreateNewActionForm extends Component {
 
 
   async componentDidMount() {
+    const { id } = this.props.match.params;
     const tagCollections = await fetchData('v2/tag-collections');
     const vendors = await fetchData('v2/vendors');
     const communities = await fetchData('v2/communities');
+    const action = await fetchData(`/v2/action/${id}`);
+    console.log(action);
 
     if (tagCollections) {
       const tags = [];
@@ -427,7 +431,7 @@ class CreateNewActionForm extends Component {
   }
 }
 
-CreateNewActionForm.propTypes = {
+EditActionForm.propTypes = {
   classes: PropTypes.object.isRequired,
   submitting: PropTypes.bool.isRequired,
 };
@@ -440,7 +444,7 @@ const mapDispatchToProps = dispatch => ({
 const ReduxFormMapped = reduxForm({
   form: 'immutableExample',
   enableReinitialize: true,
-})(CreateNewActionForm);
+})(EditActionForm);
 
 const reducer = 'initval';
 const FormInit = connect(
