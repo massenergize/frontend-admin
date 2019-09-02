@@ -24,7 +24,7 @@ import FormGroup from '@material-ui/core/FormGroup';
 import { TextField } from 'redux-form-material-ui';
 import { MaterialDropZone } from 'dan-components';
 
-import { fetchData, sendJson } from '../../../utils/messenger';
+import { fetchData, sendJson, sendFormWithMedia } from '../../../utils/messenger';
 import { initAction, clearAction } from '../../../actions/ReduxFormActions';
 
 
@@ -71,12 +71,23 @@ class CreateNewActionForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      formData: { tagsSelected: [], vendorsSelected: [] },
+      formData: {
+        title: 'Test Action',
+        about: 'Nothing yet about thus Action',
+        average_carbon_score: '1.2',
+        community: 16,
+        image: [],
+        steps_to_take: 'No Steps to take yet',
+        tagsSelected: [14, 8, 10, 2, 5],
+        vendorsSelected: []
+      },
+      // formData: { tagsSelected: [], vendorsSelected: [], image: [] },
       tags: [],
       vendors: [],
       communities: [],
       tagCollections: []
     };
+    this.updateForm = this.updateForm.bind(this);
   }
 
 
@@ -160,11 +171,16 @@ class CreateNewActionForm extends Component {
     const cleanedValues = { ...formData };
     cleanedValues.tags = cleanedValues.tagsSelected;
     cleanedValues.vendors = cleanedValues.vendorsSelected;
-    cleanedValues.is_global = cleanedValues.is_global === 'true';
     delete cleanedValues.tagsSelected;
     delete cleanedValues.vendorsSelected;
     delete cleanedValues.undefined;
-    const response = sendJson(cleanedValues, '/v2/actions', '/admin/read/actions');
+
+    if (cleanedValues.image && cleanedValues.image[0]) {
+      cleanedValues.image = cleanedValues.image[0];
+    } else {
+      delete cleanedValues.image;
+    }
+    const response = sendFormWithMedia(cleanedValues, '/v2/actions', '/admin/read/actions');
     console.log(response);
   }
 
@@ -177,6 +193,7 @@ class CreateNewActionForm extends Component {
       }
     }
     );
+    console.log(this.state);
   }
 
   render() {
@@ -188,7 +205,9 @@ class CreateNewActionForm extends Component {
     const {
       formData, tags, communities, vendors, tagCollections
     } = this.state;
-    const { tagsSelected, vendorsSelected, community } = formData;
+    const { 
+      tagsSelected, vendorsSelected, community, title, steps_to_take,about, average_carbon_score 
+    } = formData;
     let communitySelected = communities.filter(c => c.id === community)[0];
     communitySelected = communitySelected ? communitySelected.name : '';
 
@@ -204,25 +223,18 @@ class CreateNewActionForm extends Component {
 
               <form onSubmit={this.submitForm}>
                 <div>
-                  <Field
-                    name="title"
-                    component={TextField}
-                    placeholder="Title"
-                    label="Title"
-                    validate={required}
-                    required
-                    ref={this.saveRef}
-                    className={classes.field}
-                    onChange={this.handleFormDataChange}
-                  />
+                  <FormControl className={classes.field}>
+                    <InputLabel htmlFor="title">Title</InputLabel>
+                    <Input id="title" defaultValue={title} name="title" onChange={this.handleFormDataChange} />
+                  </FormControl>
                 </div>
                 <div>
+
                   <FormControl className={classes.field}>
                     <InputLabel htmlFor="community">Community</InputLabel>
                     <Select2
                       native
                       name="community"
-                      value="{community}"
                       onChange={async (newValue) => { await this.updateForm('community', parseInt(newValue.target.value, 10)); }}
                       inputProps={{
                         id: 'age-native-simple',
@@ -240,16 +252,17 @@ class CreateNewActionForm extends Component {
                 </div>
 
                 <div className={classes.field}>
-                  <Field
-                    name="steps_to_take"
-                    className={classes.field}
-                    component={TextField}
-                    placeholder="Steps to Take"
-                    label="Steps to Take"
-                    multiline={trueBool}
-                    rows={4}
-                    onChange={this.handleFormDataChange}
-                  />
+                  <FormControl className={classes.field}>
+                    <InputLabel htmlFor="steps_to_take">Steps to Take</InputLabel>
+                    <Input
+                      id="steps_to_take"
+                      defaultValue={steps_to_take} 
+                      name="steps_to_take"
+                      onChange={this.handleFormDataChange}
+                      multiline={trueBool}
+                      rows={4}
+                    />
+                  </FormControl>
                 </div>
                 {/* <Grid item xs={12}>
                   <Editor
@@ -260,27 +273,31 @@ class CreateNewActionForm extends Component {
                   />
                 </Grid> */}
                 <div className={classes.field}>
-                  <Field
-                    name="about"
-                    className={classes.field}
-                    component={TextField}
-                    placeholder="About this Action"
-                    label="About this Action"
-                    multiline={trueBool}
-                    rows={4}
-                    onChange={this.handleFormDataChange}
-                  />
+                  <FormControl className={classes.field}>
+                    <InputLabel htmlFor="about">About this Action</InputLabel>
+                    <Input
+                      id="about"
+                      defaultValue={about}
+                      name="about"
+                      onChange={this.handleFormDataChange}
+                      multiline={trueBool}
+                      rows={4}
+                    />
+                  </FormControl>
                 </div>
                 <div className={classes.field}>
-                  <Field
-                    name="average_carbon_score"
-                    className={classes.field}
-                    component={TextField}
-                    placeholder="Average Carbon Score"
-                    label="Average Carbon Score"
-                    onChange={this.handleFormDataChange}
-                  />
+                  <FormControl className={classes.field}>
+                    <InputLabel htmlFor="average_carbon_score">Average Carbon Score</InputLabel>
+                    <Input
+                      id="average_carbon_score"
+                      defaultValue={average_carbon_score} 
+                      name="average_carbon_score"
+                      placeholder="eg. 5"
+                      onChange={this.handleFormDataChange}
+                    />
+                  </FormControl>
                 </div>
+
 
                 <div className={classes.field}>
                   <FormControl className={classes.formControl}>
@@ -392,11 +409,12 @@ class CreateNewActionForm extends Component {
                   <div>
                     <MaterialDropZone
                       acceptedFiles={['image/jpeg', 'image/png', 'image/jpg', 'image/bmp', 'image/svg']}
-                      files={[]}
+                      files={this.state.formData.image}
                       showPreviews
                       maxSize={5000000}
-                      filesLimit={5}
+                      filesLimit={1}
                       text="Please Upload the Display Image for this Action"
+                      addToState={this.updateForm}
                     />
                   </div>
                 </Fragment>

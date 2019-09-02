@@ -47,10 +47,12 @@ class MaterialDropZone extends React.Component {
       openSnackBar: false,
       errorMessage: '',
       files: this.props.files, // eslint-disable-line
-      acceptedFiles: this.props.acceptedFiles // eslint-disable-line
+      acceptedFiles: this.props.acceptedFiles, // eslint-disable-line
     };
     this.onDrop = this.onDrop.bind(this);
+    this.addToState = props.addToState;
   }
+
 
   onDrop(filesVal) {
     const { files } = this.state;
@@ -65,6 +67,7 @@ class MaterialDropZone extends React.Component {
       });
     } else {
       this.setState({ files: oldFiles });
+      this.addToState('image', oldFiles);
     }
   }
 
@@ -72,6 +75,13 @@ class MaterialDropZone extends React.Component {
     this.setState({
       openSnackBar: true,
       errorMessage: 'File too big, max size is 3MB',
+    });
+  }
+
+
+  setStateAsync(state) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve);
     });
   }
 
@@ -98,6 +108,7 @@ class MaterialDropZone extends React.Component {
       text,
       showButton,
       filesLimit,
+      addToState,
       ...rest
     } = this.props;
 

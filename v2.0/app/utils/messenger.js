@@ -32,23 +32,34 @@ export function sendJson(dataToSend, destinationUrl, relocationPage = '/admin') 
   });
 }
 
-export function sendFormWithMedia(formData, destinationUrl) {
+export function sendFormWithMedia(incomingData, destinationUrl) {
   fetch(`${API_HOST}/auth/csrf`, {
     method: 'GET',
     credentials: 'include',
   }).then(response => response.json()).then(jsonResponse => {
     const { csrfToken } = jsonResponse.data;
-    return fetch(destinationUrl, {
+    const formData = new FormData();
+    Object.keys(incomingData).map(k => (formData.append(k, incomingData[k])));
+
+    return fetch(`${API_HOST}${destinationUrl}`, {
       credentials: 'include',
+      mode: 'no-cors',
       method: 'POST',
       headers: {
-        'Content-Type': 'multipart/form-data',
         'X-CSRFToken': csrfToken,
       },
       body: formData
     })
-      .then(response => response.json()).then(data => {
+      .then(response => {
+        console.log(response);
+        return response.json();
+      }
+      ).then(data => {
         console.log(data);
+        if (data && data.success) {
+          console.log(data);
+          // window.location.href = relocationPage;
+        }
         return data;
       });
   }).catch(error => {
