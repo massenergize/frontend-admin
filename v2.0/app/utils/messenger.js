@@ -32,7 +32,7 @@ export function sendJson(dataToSend, destinationUrl, relocationPage = '/admin') 
   });
 }
 
-export function sendFormWithMedia(incomingData, destinationUrl) {
+export function sendFormWithMedia(incomingData, destinationUrl, relocationPage) {
   fetch(`${API_HOST}/auth/csrf`, {
     method: 'GET',
     credentials: 'include',
@@ -58,12 +58,13 @@ export function sendFormWithMedia(incomingData, destinationUrl) {
         console.log(data);
         if (data && data.success) {
           console.log(data);
-          // window.location.href = relocationPage;
+          window.location.href = relocationPage;
         }
         return data;
       });
   }).catch(error => {
     console.log(error.message);
+    window.location.href = relocationPage;
     return null;
   });
 }

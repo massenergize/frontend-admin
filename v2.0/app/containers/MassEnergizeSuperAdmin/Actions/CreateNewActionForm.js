@@ -6,6 +6,7 @@ import { withStyles } from '@material-ui/core/styles';
 // import { convertFromRaw, EditorState, convertToRaw } from 'draft-js';
 import InputLabel from '@material-ui/core/InputLabel';
 import Input from '@material-ui/core/Input';
+import { reduxForm } from 'redux-form/immutable';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Select2 from '@material-ui/core/Select';
@@ -309,7 +310,7 @@ class CreateNewActionForm extends Component {
                             </em>
                           );
                         }
-                        const names = selected.map(s => tags.filter(t => t.id === s)[0].name);
+                        const names = selected.map(s => vendors.filter(t => t.id === s)[0].name);
                         return 'Vendors: ' + names.join(', ');
                       }}
                       MenuProps={MenuProps}

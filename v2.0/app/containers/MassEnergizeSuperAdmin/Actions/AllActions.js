@@ -9,6 +9,8 @@ import Grid from '@material-ui/core/Grid';
 import imgApi from 'dan-api/images/photos';
 import Email from '@material-ui/icons/Email';
 import messageStyles from 'dan-styles/Messages.scss';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Paper from '@material-ui/core/Paper';
 import { fetchData } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
 import { ProductCard } from '../../../components';
@@ -57,6 +59,24 @@ class AllActions extends React.Component {
     const title = brand.name + ' - All Actions';
     const description = brand.desc;
     const { actions } = this.state;
+
+    if (!actions || actions.length === 0) {
+      return (
+        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+          <Grid item xs={12} md={6}>
+            <Paper className={this.props.classes.root}>
+              <div className={this.props.classes.root}>
+                <LinearProgress />
+                <h1>Fetching all Actions.  This may take a while...</h1>
+                <br />
+                <LinearProgress color="secondary" />
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      );
+    }
+
     return (
 
       <div>

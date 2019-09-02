@@ -44,8 +44,8 @@ class Application extends React.Component {
 
           <Route path="/admin/read/actions" component={AllActions} />
           <Route path="/admin/add/action" component={AddAction} />
+          <Route path="/admin/read/action/:id/edit" component={EditAction} exact />
           <Route path="/admin/add/action/:id" component={EditAction} />
-          <Route path="/admin/add/action/:id/edit" component={EditAction} />
 
           <Route path="/admin/read/categories" component={AllCategories} />
           <Route path="/admin/add/category" component={AddCategory} />

@@ -10,7 +10,9 @@ import MenuItem from '@material-ui/core/MenuItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Select2 from '@material-ui/core/Select';
 import Paper from '@material-ui/core/Paper';
-import { Field, reduxForm } from 'redux-form/immutable';
+import LinearProgress from '@material-ui/core/LinearProgress';
+
+import { reduxForm } from 'redux-form/immutable';
 import Grid from '@material-ui/core/Grid';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
@@ -66,17 +68,7 @@ class EditActionForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      formData: {
-        title: 'Test Action',
-        about: 'Nothing yet about thus Action',
-        average_carbon_score: '1.2',
-        community: 16,
-        image: [],
-        steps_to_take: 'No Steps to take yet',
-        tagsSelected: [14, 8, 10, 2, 5],
-        vendorsSelected: []
-      },
-      // formData: { tagsSelected: [], vendorsSelected: [], image: [] },
+      formData: { tagsSelected: [], vendorsSelected: [], image: [] },
       tags: [],
       vendors: [],
       communities: [],
@@ -91,7 +83,7 @@ class EditActionForm extends Component {
     const tagCollections = await fetchData('v2/tag-collections');
     const vendors = await fetchData('v2/vendors');
     const communities = await fetchData('v2/communities');
-    const action = await fetchData(`/v2/action/${id}`);
+    const action = await fetchData(`v2/action/${id}`);
     console.log(action);
 
     if (tagCollections) {
@@ -106,11 +98,15 @@ class EditActionForm extends Component {
     }
 
     if (vendors) {
-      this.setStateAsync({ vendors: vendors.data });
+      await this.setStateAsync({ vendors: vendors.data });
     }
 
     if (communities) {
-      this.setStateAsync({ communities: communities.data });
+      await this.setStateAsync({ communities: communities.data });
+    }
+
+    if (action) {
+      await this.setStateAsync({ formData: this.getFormDataFromAction(action.data) });
     }
   }
 
@@ -119,6 +115,21 @@ class EditActionForm extends Component {
       this.setState(state, resolve);
     });
   }
+
+  getFormDataFromAction = (action) => {
+    return {
+      id: action.id,
+      title: action.title,
+      about: action.about,
+      average_carbon_score: action.average_carbon_score,
+      community: action.community.id,
+      image: [],
+      steps_to_take: action.steps_to_take,
+      tagsSelected: action.tags.map(t => t.id),
+      vendorsSelected: action.vendors.map(v => v.id)
+    };
+  }
+
 
   handleChangeMultiple = (event) => {
     const { target } = event;
@@ -178,7 +189,7 @@ class EditActionForm extends Component {
     } else {
       delete cleanedValues.image;
     }
-    const response = sendFormWithMedia(cleanedValues, '/v2/actions', '/admin/read/actions');
+    const response = sendFormWithMedia(cleanedValues, `/v2/action/${formData.id}`, '/admin/read/actions');
     console.log(response);
   }
 
@@ -204,31 +215,46 @@ class EditActionForm extends Component {
       formData, tags, communities, vendors, tagCollections
     } = this.state;
     const { 
-      tagsSelected, vendorsSelected, community, title, steps_to_take,about, average_carbon_score 
+      id, tagsSelected, vendorsSelected, community, title, steps_to_take,about, average_carbon_score 
     } = formData;
     let communitySelected = communities.filter(c => c.id === community)[0];
     communitySelected = communitySelected ? communitySelected.name : '';
 
-
+    if (!id) {
+      return (
+        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+          <Grid item xs={12} md={6}>
+            <Paper className={classes.root}>
+              <div className={classes.root}>
+                <LinearProgress />
+                <h1>Fetching all data for this Action</h1>
+                <br />
+                <LinearProgress color="secondary" />
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      );
+    }
     return (
       <div>
         <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
           <Grid item xs={12} md={6}>
             <Paper className={classes.root}>
               <Typography variant="h5" component="h3">
-                 New Action
+                 Edit Action { id ? ` with id: ${id}` : '' }
               </Typography>
 
               <form onSubmit={this.submitForm}>
                 <div>
-                  <FormControl className={classes.field}>
+                  <FormControl className={classes.formControl}>
                     <InputLabel htmlFor="title">Title</InputLabel>
-                    <Input id="title" defaultValue={title} name="title" onChange={this.handleFormDataChange} />
+                    <Input id="title" value={title} name="title" onChange={this.handleFormDataChange} />
                   </FormControl>
                 </div>
                 <div>
 
-                  <FormControl className={classes.field}>
+                  <FormControl className={classes.formControl}>
                     <InputLabel htmlFor="community">Community</InputLabel>
                     <Select2
                       native
@@ -250,11 +276,11 @@ class EditActionForm extends Component {
                 </div>
 
                 <div className={classes.field}>
-                  <FormControl className={classes.field}>
+                  <FormControl className={classes.formControl}>
                     <InputLabel htmlFor="steps_to_take">Steps to Take</InputLabel>
                     <Input
                       id="steps_to_take"
-                      defaultValue={steps_to_take} 
+                      value={steps_to_take} 
                       name="steps_to_take"
                       onChange={this.handleFormDataChange}
                       multiline={trueBool}
@@ -271,11 +297,11 @@ class EditActionForm extends Component {
                   />
                 </Grid> */}
                 <div className={classes.field}>
-                  <FormControl className={classes.field}>
+                  <FormControl className={classes.formControl}>
                     <InputLabel htmlFor="about">About this Action</InputLabel>
                     <Input
                       id="about"
-                      defaultValue={about}
+                      value={about}
                       name="about"
                       onChange={this.handleFormDataChange}
                       multiline={trueBool}
@@ -284,11 +310,11 @@ class EditActionForm extends Component {
                   </FormControl>
                 </div>
                 <div className={classes.field}>
-                  <FormControl className={classes.field}>
+                  <FormControl className={classes.formControl}>
                     <InputLabel htmlFor="average_carbon_score">Average Carbon Score</InputLabel>
                     <Input
                       id="average_carbon_score"
-                      defaultValue={average_carbon_score} 
+                      value={average_carbon_score} 
                       name="average_carbon_score"
                       placeholder="eg. 5"
                       onChange={this.handleFormDataChange}
@@ -313,7 +339,7 @@ class EditActionForm extends Component {
                             </em>
                           );
                         }
-                        const names = selected.map(s => tags.filter(t => t.id === s)[0].name);
+                        const names = selected.map(s => vendors.filter(t => t.id === s)[0].name);
                         return 'Vendors: ' + names.join(', ');
                       }}
                       MenuProps={MenuProps}

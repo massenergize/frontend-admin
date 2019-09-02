@@ -87,7 +87,7 @@ class ProductCard extends React.Component {
             </Typography>
           )}
           <div className={classes.rightAction}>
-            <Link to={`/admin/read/action/${id}`}>
+            <Link to={`/admin/read/action/${id}/edit`}>
               <Button size="small" variant="outlined" color="secondary">
                 See Detail
               </Button>
