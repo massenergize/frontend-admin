@@ -87,7 +87,7 @@ class AllEvents extends React.Component {
                     <div>
                       <Typography variant="caption">{n.id}</Typography>
                       <Typography variant="subtitle1">{n.name}</Typography>
-                      <a href={`/admin/community/${n.id}/edit`} className={classes.downloadInvoice}>
+                      <a href={`/admin/event/${n.id}/edit`} className={classes.downloadInvoice}>
                         <Edit />
                         &nbsp; Edit this Event
                       </a>
