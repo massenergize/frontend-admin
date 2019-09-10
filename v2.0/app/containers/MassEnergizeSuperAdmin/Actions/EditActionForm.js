@@ -239,7 +239,7 @@ class EditActionForm extends Component {
       submitting,
     } = this.props;
     const {
-      formData, tags, communities, vendors, tagCollections, uploadedImage, submitIsClicked
+      formData, tags, communities, vendors, tagCollections, uploadedImage, submitIsClicked, image
     } = this.state;
     const { 
       id, tagsSelected, vendorsSelected, community, title, is_global,
@@ -247,7 +247,6 @@ class EditActionForm extends Component {
     } = formData;
     let communitySelected = communities.filter(c => c.id === community)[0];
     communitySelected = communitySelected ? communitySelected.name : '';
-    console.log(uploadedImage)
 
     if (!id) {
       return (
@@ -433,8 +432,6 @@ class EditActionForm extends Component {
                     <br />
                   </div>
                 ))}
-
-
 
                 <Fragment>
                   <div>

@@ -89,3 +89,16 @@ export async function fetchData(sourceUrl) {
       return null;
     });
 }
+
+
+export async function deleteItem(sourceUrl) {
+  return fetch(`${API_HOST}/${sourceUrl}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  }).then(response => response.json())
+    .then(jsonResponse => jsonResponse)
+    .catch(error => {
+      console.log(error.message);
+      return null;
+    });
+}

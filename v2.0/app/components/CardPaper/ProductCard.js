@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
+import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import Card from '@material-ui/core/Card';
 import IconButton from '@material-ui/core/IconButton';
@@ -12,15 +13,28 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Chip from '@material-ui/core/Chip';
 import FileCopy from '@material-ui/icons/FileCopy';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
-import Type from 'dan-styles/Typography.scss';
-import Rating from '../Rating/Rating';
 import styles from './cardStyle-jss';
-import { Link } from 'react-router-dom';
+import { fetchData, deleteItem } from '../../utils/messenger';
 
 
 class ProductCard extends React.Component {
+  duplicateAction = async (id) => {
+    const res = await fetchData(`v2/action/${id}/copy`);
+    if (res && res.success && res.data) {
+      window.location.href = `/admin/read/action/${res.data.id}/edit`;
+    }
+  }
+
+  handleDeleteAction = async (id) => {
+    const res = await deleteItem(`v2/action/${id}`);
+    if (res && res.success && res.data) {
+      window.location.href = '/admin/read/actions';
+    }
+  }
+
   render() {
     const {
       id,
@@ -30,11 +44,8 @@ class ProductCard extends React.Component {
       thumbnail,
       name,
       desc,
-      rating,
       price,
-      prevPrice,
       list,
-      detailOpen,
       addToCart,
       width,
     } = this.props;
@@ -54,15 +65,13 @@ class ProductCard extends React.Component {
           title={name}
         />
         <CardContent className={classes.floatingButtonWrap}>
-          {!soldout && (
-            <Tooltip title="Duplicate this Action" placement="top">
-              <Fab onClick={addToCart} size="small" color="secondary" aria-label="add" className={classes.buttonAdd}>
-                <FileCopy />
-              </Fab>
-            </Tooltip>
-          )}
+          <Tooltip title="Duplicate this Action" placement="top">
+            <Fab onClick={() => this.duplicateAction(id)} size="small" color="secondary" aria-label="add" className={classes.buttonAdd}>
+              <FileCopy />
+            </Fab>
+          </Tooltip>
           <Typography noWrap gutterBottom variant="h5" className={classes.title} component="h2">
-            {name}
+            {id}: {name}
           </Typography>
           <Typography component="p" className={classes.desc}>
             {desc}
@@ -72,34 +81,25 @@ class ProductCard extends React.Component {
           </div> */}
         </CardContent>
         <CardActions className={classes.price}>
-          <Typography variant="h5">
-            <span>
+          {/* <Typography variant="h5">
+            <h5>
               Carbon Score:
               { price }
-            </span>
+            </h5>
           </Typography>
-          {prevPrice > 0 && (
-            <Typography variant="caption" component="h5">
-              <span className={Type.lineThrought}>
-                $
-                {prevPrice}
-              </span>
-            </Typography>
-          )}
+          <br /> */}
+ 
           <div className={classes.rightAction}>
             <Link to={`/admin/read/action/${id}/edit`}>
               <Button size="small" variant="outlined" color="secondary">
-                See Detail
+                See Details
               </Button>
             </Link>
+            <Button onClick={()=> this.handleDeleteAction(id)} size="small" variant="outlined" color="secondary">
+              Delete
+              <DeleteForeverIcon />
+            </Button>
 
-            {!soldout && (
-              <Tooltip title="Add to cart" placement="top">
-                <IconButton color="secondary" onClick={addToCart} className={classes.buttonAddList}>
-                  {/* <AddShoppingCart /> */}
-                </IconButton>
-              </Tooltip>
-            )}
           </div>
         </CardActions>
       </Card>
