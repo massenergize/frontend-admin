@@ -24,6 +24,7 @@ import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormGroup from '@material-ui/core/FormGroup';
 import { MaterialDropZone } from 'dan-components';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { fetchData, sendFormWithMedia } from '../../../utils/messenger';
 import { initAction, clearAction } from '../../../actions/ReduxFormActions';
@@ -72,7 +73,9 @@ class EditActionForm extends Component {
       tags: [],
       vendors: [],
       communities: [],
-      tagCollections: []
+      tagCollections: [],
+      uploadedImage: null,
+      submitIsClicked: false
     };
     this.updateForm = this.updateForm.bind(this);
   }
@@ -107,6 +110,7 @@ class EditActionForm extends Component {
 
     if (action) {
       await this.setStateAsync({ formData: this.getFormDataFromAction(action.data) });
+      await this.setStateAsync({ uploadedImage: action.data.image });
     }
   }
 
@@ -117,17 +121,21 @@ class EditActionForm extends Component {
   }
 
   getFormDataFromAction = (action) => {
-    return {
+    const res = {
       id: action.id,
       title: action.title,
       about: action.about,
+      is_global: action.is_global ? 'true' : 'false',
       average_carbon_score: action.average_carbon_score,
-      community: action.community.id,
       image: [],
       steps_to_take: action.steps_to_take,
       tagsSelected: action.tags.map(t => t.id),
       vendorsSelected: action.vendors.map(v => v.id)
     };
+    if (action.community) {
+      res.community = action.community.id;
+    }
+    return res;
   }
 
 
@@ -152,6 +160,20 @@ class EditActionForm extends Component {
     const { name, value } = target;
     this.setState({
       formData: { ...formData, [name]: value }
+    });
+  };
+
+  handleIsTemplateCheckbox = async (event) => {
+    const { target } = event;
+    if (!target) return;
+    const { formData } = this.state;
+    const oldValue = formData.is_global;
+    const { name } = target;
+    if (oldValue !== 'true') {
+      delete formData.community;
+    }
+    await this.setStateAsync({
+      formData: { ...formData, [name]: oldValue === 'true' ? 'false' : 'true' }
     });
   };
 
@@ -189,7 +211,12 @@ class EditActionForm extends Component {
     } else {
       delete cleanedValues.image;
     }
-    const response = sendFormWithMedia(cleanedValues, `/v2/action/${formData.id}`, '/admin/read/actions');
+    if (cleanedValues.is_global === 'true') {
+      delete cleanedValues.community;
+    }
+    const response = sendFormWithMedia(cleanedValues, `/v2/action/${formData.id}`, `/admin/read/action/${cleanedValues.id}/edit`);
+    await this.setStateAsync({ ...this.state, submitIsClicked: true });
+
     console.log(response);
   }
 
@@ -212,13 +239,15 @@ class EditActionForm extends Component {
       submitting,
     } = this.props;
     const {
-      formData, tags, communities, vendors, tagCollections
+      formData, tags, communities, vendors, tagCollections, uploadedImage, submitIsClicked
     } = this.state;
     const { 
-      id, tagsSelected, vendorsSelected, community, title, steps_to_take,about, average_carbon_score 
+      id, tagsSelected, vendorsSelected, community, title, is_global,
+      steps_to_take, about, average_carbon_score
     } = formData;
     let communitySelected = communities.filter(c => c.id === community)[0];
     communitySelected = communitySelected ? communitySelected.name : '';
+    console.log(uploadedImage)
 
     if (!id) {
       return (
@@ -244,7 +273,9 @@ class EditActionForm extends Component {
               <Typography variant="h5" component="h3">
                  Edit Action { id ? ` with id: ${id}` : '' }
               </Typography>
-
+              <div>
+                <img src={uploadedImage ? uploadedImage.url : ""} className={classes.img} alt={"Title"} />
+              </div>
               <form onSubmit={this.submitForm}>
                 <div>
                   <FormControl className={classes.formControl}>
@@ -253,28 +284,43 @@ class EditActionForm extends Component {
                   </FormControl>
                 </div>
                 <div>
-
-                  <FormControl className={classes.formControl}>
-                    <InputLabel htmlFor="community">Community</InputLabel>
-                    <Select2
-                      native
-                      name="community"
-                      onChange={async (newValue) => { await this.updateForm('community', parseInt(newValue.target.value, 10)); }}
-                      inputProps={{
-                        id: 'age-native-simple',
-                      }}
-                    >
-                      <option value={community}>{communitySelected}</option>
-                      { communities
-                        && communities.map(c => (
-                          <option value={c.id} key={c.id}>{c.name}</option>
-                        ))
-                      }
-                    </Select2>
-
-                  </FormControl>
+                  <FormControlLabel
+                    control={(
+                      <Checkbox
+                        checked={is_global === 'true'}
+                        onChange={this.handleIsTemplateCheckbox}
+                        value="true"
+                        name="is_global"
+                      />
+                    )}
+                    label="Is this action a global/template action?"
+                  />
                 </div>
-
+                <div>
+                  {is_global !== 'true'
+                    &&
+                    (
+                      <FormControl className={classes.field}>
+                        <InputLabel htmlFor="community">Community</InputLabel>
+                        <Select2
+                          native
+                          name="community"
+                          onChange={async (newValue) => { await this.updateForm('community', parseInt(newValue.target.value, 10)); }}
+                          inputProps={{
+                            id: 'age-native-simple',
+                          }}
+                        >
+                          <option value={community}>{communitySelected}</option>
+                          { communities
+                            && communities.map(c => (
+                              <option value={c.id} key={c.id}>{c.name}</option>
+                            ))
+                          }
+                        </Select2>
+                      </FormControl>
+                    )
+                  }
+                </div>
                 <div className={classes.field}>
                   <FormControl className={classes.formControl}>
                     <InputLabel htmlFor="steps_to_take">Steps to Take</InputLabel>
@@ -389,46 +435,7 @@ class EditActionForm extends Component {
                 ))}
 
 
-                {tagCollections.map(tc => (
-                  <div className={classes.field} key={tc.id}>
-                    <FormControl className={classes.formControl}>
-                      <Select2
-                        multiple
-                        displayEmpty
-                        value={tagsSelected.filter(i => tc.tags.map(h => h.id).indexOf(i) > -1)}
-                        onChange={this.handleFormDataChange}
-                        input={<Input id="select-multiple-checkbox" />}
-                        renderValue={selected => {
-                          if (selected.length === 0) {
-                            return (
-                              <em>
-                                Select
-                                {` ${tc.name}`}
-                              </em>
-                            );
-                          }
-                          const names = selected.map(s => tags.filter(t => t.id === s)[0].name);
-                          return tc.name + ': ' + names.join(', ');
-                        }}
-                        MenuProps={MenuProps}
-                      >
-                        {tc.tags.map(t => {
-                          return (
-                            <MenuItem key={t.id} value={t.id}>
-                              <Checkbox
-                                checked={tagsSelected.indexOf(t.id) > -1}
-                                onChange={this.handleCheckBoxSelect}
-                                value={'' + t.id}
-                                name="tagsSelected"
-                              />
-                              <ListItemText primary={`${t.name}`} />
-                            </MenuItem>
-                          );
-                        })}
-                      </Select2>
-                    </FormControl>
-                  </div>
-                ))}
+
                 <Fragment>
                   <div>
                     <MaterialDropZone
@@ -443,6 +450,15 @@ class EditActionForm extends Component {
                   </div>
                 </Fragment>
 
+                {submitIsClicked
+                  && (
+                    <div>
+                      <h5>Updating this Action ...</h5>
+                      <InputLabel>This could take a few seconds ...</InputLabel>
+                      <CircularProgress className={classes.progress} />
+                    </div>
+                  )
+                }
                 <div>
                   <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
                     Submit

@@ -13,6 +13,7 @@ import Select2 from '@material-ui/core/Select';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import FormControl from '@material-ui/core/FormControl';
+import Checkbox from '@material-ui/core/Checkbox';
 import FormLabel from '@material-ui/core/FormLabel';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Typography from '@material-ui/core/Typography';
@@ -21,6 +22,7 @@ import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import FormGroup from '@material-ui/core/FormGroup';
 import { MaterialDropZone } from 'dan-components';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { fetchData, sendFormWithMedia } from '../../../utils/messenger';
 import { initAction, clearAction } from '../../../actions/ReduxFormActions';
@@ -66,10 +68,10 @@ class CreateNewActionForm extends Component {
     super(props);
     this.state = {
       formData: {
-        title: 'Test Action',
-        about: 'Nothing yet about thus Action',
+        title: 'Solar Action',
+        about: 'Nothing yet about this Action',
         average_carbon_score: '1.2',
-        community: 16,
+        // community: 16,
         image: [],
         steps_to_take: 'No Steps to take yet',
         tagsSelected: [14, 8, 10, 2, 5],
@@ -79,7 +81,8 @@ class CreateNewActionForm extends Component {
       tags: [],
       vendors: [],
       communities: [],
-      tagCollections: []
+      tagCollections: [],
+      submitIsClicked: false
     };
     this.updateForm = this.updateForm.bind(this);
   }
@@ -159,7 +162,22 @@ class CreateNewActionForm extends Component {
     console.log(this.state);
   };
 
+  handleIsTemplateCheckbox = async (event) => {
+    const { target } = event;
+    if (!target) return;
+    const { formData } = this.state;
+    const oldValue = formData.is_global;
+    const { name } = target;
+    if (oldValue !== 'true') {
+      delete formData.community;
+    }
+    await this.setStateAsync({
+      formData: { ...formData, [name]: oldValue === 'true' ? 'false' : 'true' }
+    });
+  };
+
   submitForm = async (event) => {
+
     event.preventDefault();
     const { formData } = this.state;
     const cleanedValues = { ...formData };
@@ -174,7 +192,12 @@ class CreateNewActionForm extends Component {
     } else {
       delete cleanedValues.image;
     }
+    if (cleanedValues.is_global === 'true') {
+      delete cleanedValues.community;
+    }
     const response = sendFormWithMedia(cleanedValues, '/v2/actions', '/admin/read/actions');
+    await this.setStateAsync({ ...this.state, submitIsClicked: true });
+
     console.log(response);
   }
 
@@ -197,14 +220,13 @@ class CreateNewActionForm extends Component {
       submitting,
     } = this.props;
     const {
-      formData, tags, communities, vendors, tagCollections
+      formData, tags, communities, vendors, tagCollections, submitIsClicked
     } = this.state;
     const { 
-      tagsSelected, vendorsSelected, community, title, steps_to_take,about, average_carbon_score 
+      tagsSelected, vendorsSelected, community, title, steps_to_take,about, average_carbon_score, is_global
     } = formData;
     let communitySelected = communities.filter(c => c.id === community)[0];
     communitySelected = communitySelected ? communitySelected.name : '';
-
 
     return (
       <div>
@@ -223,26 +245,42 @@ class CreateNewActionForm extends Component {
                   </FormControl>
                 </div>
                 <div>
-
-                  <FormControl className={classes.field}>
-                    <InputLabel htmlFor="community">Community</InputLabel>
-                    <Select2
-                      native
-                      name="community"
-                      onChange={async (newValue) => { await this.updateForm('community', parseInt(newValue.target.value, 10)); }}
-                      inputProps={{
-                        id: 'age-native-simple',
-                      }}
-                    >
-                      <option value={community}>{communitySelected}</option>
-                      { communities
-                        && communities.map(c => (
-                          <option value={c.id} key={c.id}>{c.name}</option>
-                        ))
-                      }
-                    </Select2>
-
-                  </FormControl>
+                  <FormControlLabel
+                    control={(
+                      <Checkbox
+                        checked={is_global === 'true'}
+                        onChange={this.handleIsTemplateCheckbox}
+                        value="true"
+                        name="is_global"
+                      />
+                    )}
+                    label="Is this action a global/template action?"
+                  />
+                </div>
+                <div>
+                  {is_global !== 'true'
+                    &&
+                    (
+                      <FormControl className={classes.field}>
+                        <InputLabel htmlFor="community">Community</InputLabel>
+                        <Select2
+                          native
+                          name="community"
+                          onChange={async (newValue) => { await this.updateForm('community', parseInt(newValue.target.value, 10)); }}
+                          inputProps={{
+                            id: 'age-native-simple',
+                          }}
+                        >
+                          <option value={community}>{communitySelected}</option>
+                          { communities
+                            && communities.map(c => (
+                              <option value={c.id} key={c.id}>{c.name}</option>
+                            ))
+                          }
+                        </Select2>
+                      </FormControl>
+                    )
+                  }
                 </div>
 
                 <div className={classes.field}>
@@ -358,47 +396,6 @@ class CreateNewActionForm extends Component {
                   </div>
                 ))}
 
-
-                {tagCollections.map(tc => (
-                  <div className={classes.field} key={tc.id}>
-                    <FormControl className={classes.formControl}>
-                      <Select2
-                        multiple
-                        displayEmpty
-                        value={tagsSelected.filter(i => tc.tags.map(h => h.id).indexOf(i) > -1)}
-                        onChange={this.handleFormDataChange}
-                        input={<Input id="select-multiple-checkbox" />}
-                        renderValue={selected => {
-                          if (selected.length === 0) {
-                            return (
-                              <em>
-                                Select
-                                {` ${tc.name}`}
-                              </em>
-                            );
-                          }
-                          const names = selected.map(s => tags.filter(t => t.id === s)[0].name);
-                          return tc.name + ': ' + names.join(', ');
-                        }}
-                        MenuProps={MenuProps}
-                      >
-                        {tc.tags.map(t => {
-                          return (
-                            <MenuItem key={t.id} value={t.id}>
-                              <Checkbox
-                                checked={tagsSelected.indexOf(t.id) > -1}
-                                onChange={this.handleCheckBoxSelect}
-                                value={'' + t.id}
-                                name="tagsSelected"
-                              />
-                              <ListItemText primary={`${t.name}`} />
-                            </MenuItem>
-                          );
-                        })}
-                      </Select2>
-                    </FormControl>
-                  </div>
-                ))}
                 <Fragment>
                   <div>
                     <MaterialDropZone
@@ -412,6 +409,17 @@ class CreateNewActionForm extends Component {
                     />
                   </div>
                 </Fragment>
+
+                {submitIsClicked
+                  && (
+                    <div>
+                      <h5>Creating your Action ...</h5>
+                      <InputLabel>This might take a minute ...</InputLabel>
+                      <CircularProgress className={classes.progress} />
+                    </div>
+                  )
+                }
+
 
                 <div>
                   <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
