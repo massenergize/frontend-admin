@@ -71,7 +71,7 @@ class ProductCard extends React.Component {
             </Fab>
           </Tooltip>
           <Typography noWrap gutterBottom variant="h5" className={classes.title} component="h2">
-            {id}: {name}
+            {name}
           </Typography>
           <Typography component="p" className={classes.desc}>
             {desc}
