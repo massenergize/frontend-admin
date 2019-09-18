@@ -60,7 +60,7 @@ module.exports = [
         title: true
       },
       {
-        key: 'add-actions',
+        key: 'add-action',
         name: 'Add New Action',
         link: '/admin/add/action'
       },
@@ -94,13 +94,13 @@ module.exports = [
     ]
   },
   {
-    key: 'categories',
-    name: 'Categories',
+    key: 'tags-collections',
+    name: 'Tag Collections',
     icon: 'md-reorder',
     child: [
       {
         key: 'about-categories',
-        name: 'Categories',
+        name: 'Tags & Tag Collections',
         title: true
       },
       {
@@ -109,9 +109,9 @@ module.exports = [
         link: '/admin/add/category'
       },
       {
-        key: 'all-categories',
-        name: 'All Categories',
-        link: '/admin/read/categories'
+        key: 'all-collections',
+        name: 'All Tag Collections',
+        link: '/admin/read/tag-collections'
       },
     ]
   },
@@ -147,11 +147,11 @@ module.exports = [
         name: 'Goals',
         title: true
       },
-      {
-        key: 'add-goal',
-        name: 'Add New Goal',
-        link: '/admin/add/goal'
-      },
+      // {
+      //   key: 'add-goal',
+      //   name: 'Add New Goal',
+      //   link: '/admin/add/goal'
+      // },
       {
         key: 'all-goals',
         name: 'All Goals',

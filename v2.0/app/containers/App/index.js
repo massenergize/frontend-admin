@@ -15,7 +15,12 @@ class App extends React.Component {
         <AppContext.Consumer>
           {(changeMode) => (
             <Switch>
-              <Route path="/" exact component={LoginDedicated} />
+              {/* <Route path="/" exact component={LoginDedicated} /> */}
+              <Route path="/login" exact component={LoginDedicated} />
+              <Route
+                path="/"
+                render={(props) => <Application {...props} changeMode={changeMode} />}
+              />
               <Route
                 path="/admin"
                 render={(props) => <Application {...props} changeMode={changeMode} />}

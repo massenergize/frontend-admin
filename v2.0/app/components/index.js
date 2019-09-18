@@ -1,34 +1,61 @@
-import Header from './Header/Header';
-import HeaderMenu from './Header/HeaderMenu';
-import Sidebar from './Sidebar/Sidebar';
-import BreadCrumb from './BreadCrumb/BreadCrumb';
-import SourceReader from './SourceReader/SourceReader';
-import PapperBlock from './PapperBlock/PapperBlock';
-import SearchUi from './Search/SearchUi';
+export Header from './Header/Header';
+export HeaderMenu from './Header/HeaderMenu';
+export Sidebar from './Sidebar/Sidebar';
+export BreadCrumb from './BreadCrumb/BreadCrumb';
+export SourceReader from './SourceReader/SourceReader';
+export PapperBlock from './PapperBlock/PapperBlock';
+export SearchUi from './Search/SearchUi';
 // Guide
-import GuideSlider from './GuideSlider';
+export GuideSlider from './GuideSlider';
 // Form
-import LoginForm from './Forms/LoginForm';
-import RegisterForm from './Forms/RegisterForm';
-import ResetForm from './Forms/ResetForm';
-import Notification from './Notification/Notification';
+export LoginForm from './Forms/LoginForm';
+export RegisterForm from './Forms/RegisterForm';
+export ResetForm from './Forms/ResetForm';
+export Notification from './Notification/Notification';
 // Table
-import EmptyData from './Tables/EmptyData';
+export EmptyData from './Tables/EmptyData';
 // Error
-import ErrorWrap from './Error/ErrorWrap';
+export ErrorWrap from './Error/ErrorWrap';
 
-import CounterWidget from './Counter/CounterWidget';
-import CalculatorWidget from './Widget/CalculatorWidget';
-import NewsWidget from './Widget/NewsWidget';
-import SalesChartWidget from './Widget/SalesChartWidget';
-import CarouselWidget from './Widget/CarouselWidget';
-import CounterChartWidget from './Widget/CounterChartWidget';
-import TableWidget from './Widget/TableWidget';
+// Dashboard and Widget
+export CounterWidget from './Counter/CounterWidget';
+export CounterTrading from './Counter/CounterTrading';
+export SliderWidget from './Widget/SliderWidget';
+export CounterChartWidget from './Widget/CounterChartWidget';
+export CounterIconsWidget from './Widget/CounterIconsWidget';
+export PerformanceChartWidget from './Widget/PerformanceChartWidget';
+export TableWidget from './Widget/TableWidget';
+export TaskWidget from './Widget/TaskWidget';
+export ProfileWidget from './Widget/ProfileWidget';
+export ProgressWidget from './Widget/ProgressWidget';
+export SalesChartWidget from './Widget/SalesChartWidget';
+export CarouselWidget from './Widget/CarouselWidget';
+export AlbumWidget from './Widget/AlbumWidget';
+export MapWidget from './Widget/MapWidget';
+export ContactWidget from './Widget/ContactWidget';
+export WeatherWidget from './Widget/WeatherWidget';
+export DateWidget from './Widget/DateWidget';
+export FilesWidget from './Widget/FilesWidget';
+export NewsWidget from './Widget/NewsWidget';
+export CalculatorWidget from './Widget/CalculatorWidget';
+export TimelineWidget from './Widget/TimelineWidget';
+export LatestTransactionWidget from './Widget/LatestTransactionWidget';
+export HistoryWidget from './Widget/HistoryWidget';
+
+export ProductCard from './CardPaper/ProductCard';
+
+
+export About from './Profile/About';
+export Albums from './Profile/Albums';
+export Connection from './Profile/Connection';
+export Favorites from './Profile/Favorites';
+export Cover from './SocialMedia/Cover';
+
 
 // Main Components
-export {
-  Header, HeaderMenu, Sidebar, BreadCrumb, SourceReader, PapperBlock, SearchUi,
-  GuideSlider, LoginForm, ResetForm, Notification, EmptyData, ErrorWrap, RegisterForm,
-  CounterWidget, CalculatorWidget, NewsWidget, SalesChartWidget, CarouselWidget,
-  CounterChartWidget, TableWidget
-};
+// export {
+//   Header, HeaderMenu, Sidebar, BreadCrumb, SourceReader, PapperBlock, SearchUi,
+//   GuideSlider, LoginForm, ResetForm, Notification, EmptyData, ErrorWrap, RegisterForm,
+//   CounterWidget, CalculatorWidget, NewsWidget, SalesChartWidget, CarouselWidget,
+//   CounterChartWidget, TableWidget, ProductCard
+// };

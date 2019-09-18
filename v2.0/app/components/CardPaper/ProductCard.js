@@ -27,7 +27,7 @@ class ProductCard extends React.Component {
       thumbnail,
       name,
       desc,
-      ratting,
+      rating,
       price,
       prevPrice,
       list,
@@ -51,28 +51,28 @@ class ProductCard extends React.Component {
           title={name}
         />
         <CardContent className={classes.floatingButtonWrap}>
-          {!soldout && (
+          {/* {!soldout && (
             <Tooltip title="Add to cart" placement="top">
               <Fab onClick={addToCart} size="small" color="secondary" aria-label="add" className={classes.buttonAdd}>
                 <AddShoppingCart />
               </Fab>
             </Tooltip>
-          )}
+          )} */}
           <Typography noWrap gutterBottom variant="h5" className={classes.title} component="h2">
             {name}
           </Typography>
           <Typography component="p" className={classes.desc}>
             {desc}
           </Typography>
-          <div className={classes.ratting}>
-            <Rating value={ratting} max={5} readOnly />
-          </div>
+          {/* <div className={classes.rating}>
+            <Rating value={rating} max={5} readOnly />
+          </div> */}
         </CardContent>
         <CardActions className={classes.price}>
           <Typography variant="h5">
             <span>
-              $
-              {price}
+              Carbon Score: 
+              { price }
             </span>
           </Typography>
           {prevPrice > 0 && (
@@ -109,8 +109,7 @@ ProductCard.propTypes = {
   thumbnail: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   desc: PropTypes.string.isRequired,
-  ratting: PropTypes.number.isRequired,
-  price: PropTypes.number.isRequired,
+  rating: PropTypes.number.isRequired,
   prevPrice: PropTypes.number,
   list: PropTypes.bool,
   detailOpen: PropTypes.func,

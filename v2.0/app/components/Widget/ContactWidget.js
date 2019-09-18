@@ -72,7 +72,7 @@ function ContactList(props) {
             </IconButton>
           </Tooltip>
           <Tooltip title="Call">
-            <IconButton className={props.classes.tealText} aria-label="Telp">
+            <IconButton className={props.classes.tealText} aria-label="Help">
               <PhoneIcon />
             </IconButton>
           </Tooltip>

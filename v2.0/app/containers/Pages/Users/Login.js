@@ -5,20 +5,11 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { LoginForm } from 'dan-components';
 import styles from 'dan-components/Forms/user-jss';
+import { sendJson } from '../../../utils/messenger';
 
 class Login extends React.Component {
-  state = {
-    valueForm: []
-  }
-
-  submitForm(values) {
-    const { valueForm } = this.state;
-    console.log(valueForm.values());
-    setTimeout(() => {
-      this.setState({ valueForm: values });
-      console.log(`You submitted:\n\n${valueForm}`);
-      window.location.href = '/admin';
-    }, 500); // simulate server latency
+  submitForm = (values) => {
+    sendJson(values.entries(), '/v2/users', '/admin');
   }
 
   render() {
@@ -37,7 +28,7 @@ class Login extends React.Component {
         </Helmet>
         <div className={classes.container}>
           <div className={classes.userFormWrap}>
-            <LoginForm onSubmit={(values) => this.submitForm(values)} />
+            <LoginForm onSubmit={this.submitForm} />
           </div>
         </div>
       </div>

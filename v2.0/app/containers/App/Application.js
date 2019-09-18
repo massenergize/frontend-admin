@@ -7,6 +7,8 @@ import {
   DashboardSummaryPage,
   AllCommunities,
   OnboardCommunity,
+  CommunityProfile,
+  AllVendors, AddVendor,
   AllCategories,
   AddCategory,
   BlankPage,
@@ -21,8 +23,7 @@ import {
   AddPolicy, AllPolicies,
   AddTestimonial, AllTestimonials, Export, CustomizePages
 } from '../pageListAsync';
-import AllVendors from '../MassEnergizeSuperAdmin/Vendors/AllVendors';
-import AddVendor from '../MassEnergizeSuperAdmin/Vendors/AddVendor';
+import EditCommunityForm from '../MassEnergizeSuperAdmin/Community/EditCommunityForm';
 
 class Application extends React.Component {
   render() {
@@ -30,18 +31,25 @@ class Application extends React.Component {
     return (
       <Dashboard history={history} changeMode={changeMode}>
         <Switch>
+          <Route exact path="/" component={DashboardSummaryPage} />
           <Route exact path="/admin" component={DashboardSummaryPage} />
           <Route exact path="/blank" component={BlankPage} />
           <Route path="/admin/dashboard" component={DashboardSummaryPage} />
 
           <Route path="/admin/read/communities" component={AllCommunities} />
           <Route path="/admin/add/community" component={OnboardCommunity} />
+          <Route path="/admin/community/:id" component={CommunityProfile} exact />
+          <Route path="/admin/community/:id/preview" component={CommunityProfile} exact />
+          <Route path="/admin/community/:id/profile" component={CommunityProfile} exact />
+          <Route path="/admin/community/:id/edit" component={OnboardCommunity} exact />
 
           <Route path="/admin/read/actions" component={AllActions} />
           <Route path="/admin/add/action" component={AddAction} />
 
           <Route path="/admin/read/categories" component={AllCategories} />
           <Route path="/admin/add/category" component={AddCategory} />
+          <Route path="/admin/read/tag-collections" component={AllCategories} />
+          <Route path="/admin/add/tag-collection" component={AddCategory} />
 
           <Route path="/admin/read/events" component={AllEvents} />
           <Route path="/admin/add/event" component={AddEvent} />

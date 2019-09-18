@@ -5,7 +5,7 @@ import { PapperBlock } from 'dan-components';
 import NewCategoryForm from './NewCategoryForm';
 class Onboarding extends React.Component {
   render() {
-    const title = brand.name + ' - Add Category';
+    const title = brand.name + ' - Add Tag Collection';
     const description = brand.desc;
     return (
       <div>
@@ -17,7 +17,7 @@ class Onboarding extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <PapperBlock title="Add New Category" desc="Some text description">
+        <PapperBlock title="Add New Tag Collection" desc="Some text description">
           <NewCategoryForm />
         </PapperBlock>
       </div>

@@ -60,19 +60,24 @@ const styles = theme => ({
 });
 
 const initData = {
-  name: 'Wayland',
-  community_admin_email: 'community_admin@wayland.com',
-  subdomain: 'wayland.massenergize.org',
-  community_admin_name: 'Ellen Tohn',
-  community_admin_phone: '508-609-9002',
+  name: 'Test',
+  subdomain: 'testing1',
+  owner_name: 'Ellen Tohn',
+  owner_email: 'etohn@massenergize.org',
   is_tech_savvy: 'Yes',
   geographical_focus: 'DISPERSED',
-  checkbox: true,
-  about_you: 'I am a resident of Wayland and I lead a group of people who are interested in taking climate actions together as a town.',
-  description: 'We are a town located in Massachusetts and looking to engage our community in take climate change actions'
+  accepted_terms_and_conditions: true,
+  about_community: 'I am a resident of Wayland and I lead a group of people who are interested in taking climate actions together as a town.',
 };
 
 class CommunityOnboardingForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showLocation: false
+    };
+  }
+
   render() {
     const trueBool = true;
     const {
@@ -121,7 +126,7 @@ class CommunityOnboardingForm extends Component {
                   <Field
                     name="subdomain"
                     component={TextField}
-                    placeholder="eg. subdomain.massenergize.org"
+                    placeholder="eg. You will need your subdomain to access your community portal through subdomain.massenergize.org"
                     label="Subdomain For your Community Portal"
                     required
                     validate={[required]}
@@ -131,10 +136,10 @@ class CommunityOnboardingForm extends Component {
                 <h1>About the Community Admin</h1>
                 <div>
                   <Field
-                    name="community_admin_name"
+                    name="owner_name"
                     component={TextField}
                     placeholder="Community Admin Name eg. Ellen Tohn"
-                    label="Community Adminstrator's Name"
+                    label="Community Administrator's Name"
                     required
                     validate={[required]}
                     className={classes.field}
@@ -142,44 +147,22 @@ class CommunityOnboardingForm extends Component {
                 </div>
                 <div>
                   <Field
-                    name="community_admin_email"
+                    name="owner_email"
                     component={TextField}
                     placeholder="eg. admin@wayland.com"
-                    label="Community Adminstrator's Email"
+                    label="Community Administrator's Email"
                     required
                     validate={[required, email]}
                     className={classes.field}
                   />
                 </div>
-                <div>
-                  <Field
-                    name="community_admin_phone"
-                    component={TextField}
-                    placeholder="eg. 508 889 1334"
-                    label="Community Adminstrator's Phone"
-                    required
-                    validate={[required]}
-                    className={classes.field}
-                  />
-                </div>
                 <div className={classes.field}>
                   <Field
-                    name="about_you"
+                    name="about_community"
                     className={classes.field}
                     component={TextField}
                     placeholder="Tell us about you"
                     label="Tell Us About You"
-                    multiline={trueBool}
-                    rows={4}
-                  />
-                </div>
-                <div className={classes.field}>
-                  <Field
-                    name="description"
-                    className={classes.field}
-                    component={TextField}
-                    placeholder="Description of your Organization"
-                    label="Description"
                     multiline={trueBool}
                     rows={4}
                   />
@@ -194,10 +177,72 @@ class CommunityOnboardingForm extends Component {
                 <div className={classes.fieldBasic}>
                   <FormLabel component="label">Geographic Focus</FormLabel>
                   <Field name="geographical_focus" className={classes.inlineWrap} component={renderRadioGroup}>
-                    <FormControlLabel value="DISPERSED" control={<Radio />} label="Geographically Dispersed" />
-                    <FormControlLabel value="FOCUSED" control={<Radio />} label="Geographically Focused" />
+                    <FormControlLabel value="DISPERSED" control={<Radio />} label="Geographically Dispersed" onClick={() => { this.setState({ ...this.sate, showLocation: false }); }} />
+                    <FormControlLabel value="FOCUSED" control={<Radio />} label="Geographically Focused" onClick={() => { this.setState({ ...this.sate, showLocation: true }); }} />
                   </Field>
                 </div>
+                {this.state.showLocation
+                  && (
+
+                    <Grid container spacing={24}>
+                      <Grid item xs={12}>
+                        <Field
+                          name="address1"
+                          component={TextField}
+                          placeholder="eg. 9 Fields Lane"
+                          label="Address Line 1"
+                          className={classes.field}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Field
+                          name="address2"
+                          component={TextField}
+                          placeholder="eg. Apt 4"
+                          label="Address Line 2"
+                          className={classes.field}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Field
+                          name="city"
+                          component={TextField}
+                          placeholder="eg. Wayland"
+                          label="City"
+                          className={classes.field}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Field
+                          name="state"
+                          component={TextField}
+                          placeholder="eg. New York"
+                          label="State"
+                          className={classes.field}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Field
+                          name="zip"
+                          component={TextField}
+                          placeholder="eg. 10120"
+                          label="Zip / Postal Code"
+                          className={classes.field}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Field
+                          name="country"
+                          component={TextField}
+                          placeholder="eg. Ghana"
+                          label="Country"
+                          className={classes.field}
+                        />
+                      </Grid>
+                    </Grid>
+                  )
+                }
+
                 <div className={classes.fieldBasic}>
                   <FormLabel component="label"><a href="#" className={classes.link}>Terms &amp; Condition</a></FormLabel>
                   <div className={classes.inlineWrap}>
@@ -253,7 +298,7 @@ const reducer = 'initval';
 const FormInit = connect(
   state => ({
     force: state,
-    initialValues: state.getIn([reducer, 'formValues'])
+    initialValues: state.getIn([reducer, 'formValues']),
   }),
   mapDispatchToProps,
 )(ReduxFormMapped);
