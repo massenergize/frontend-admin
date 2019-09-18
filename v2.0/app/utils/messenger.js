@@ -65,7 +65,7 @@ export function cleanFormData(formValues) {
   });
   return result;
 }
-
+ 
 export async function fetchData(sourceUrl) {
   return fetch(`${API_HOST}/${sourceUrl}`, {
     method: 'GET',

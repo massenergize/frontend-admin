@@ -11,39 +11,13 @@ import Button from '@material-ui/core/Button';
 import imgApi from 'dan-api/images/photos';
 import NewsCard from '../CardPaper/NewsCard';
 import styles from './widget-jss';
-
-const slideData = [
-  {
-    label: 'Heat Pump Event in Concord',
-    imgPath: imgApi[11],
-    desc: 'Heat Pump Event happening on Mon 22/01/2019'
-  },
-  {
-    label: 'Solar Event in Wayland',
-    imgPath: imgApi[31],
-    desc: 'Heat Pump Event happening on Mon 22/01/2019'
-  },
-  {
-    label: 'MassEnergize General Event in Wayland',
-    imgPath: imgApi[38],
-    desc: 'More Description to Come'
-  },
-  {
-    label: 'Sudbury Solar Event',
-    imgPath: imgApi[10],
-    desc: 'More Description to Come'
-  },
-  {
-    label: 'MassEnergize Welcoming New Communties',
-    imgPath: imgApi[40],
-    desc: 'More Description to Come'
-  },
-];
+import unavailableImage from './../../../public/images/unavailable.jpg';
 
 class NewsWidget extends React.Component {
-  state = {
-    activeStepSwipe: 0,
-  };
+  constructor(props){
+    super(props); 
+    this.state  = { activeStepSwipe: 0}
+  }
 
   handleNextSwipe = () => {
     this.setState(prevState => ({
@@ -61,11 +35,7 @@ class NewsWidget extends React.Component {
     this.setState({ activeStepSwipe });
   };
 
-  render() {
-    const { classes, theme } = this.props;
-    const { activeStepSwipe } = this.state;
-
-    const maxStepsSwipe = slideData.length;
+  eventElements = (dataCollection,classes,theme,activeStepSwipe,maxStepsSwipe) =>{
     return (
       <div>
         <Paper>
@@ -76,18 +46,26 @@ class NewsWidget extends React.Component {
             enableMouseEvents
             className={classes.sliderWrap}
           >
-            {slideData.map((slide, index) => (
+            {dataCollection.map((slide, index) => (
               <div className={classes.figure} key={index.toString()}>
                 <NewsCard
-                  image={slide.imgPath}
+                  image={slide.image? slide.image.url: unavailableImage}
                   title="slide.label"
                   className={classes.sliderContent}
                 >
-                  <Typography gutterBottom className={classes.title} variant="h6" component="h2">
-                    {slide.label}
-                  </Typography>
-                  <Typography component="p">
-                    {slide.desc}
+                  <small style={{marginRight:5}}><b>Start Date : {slide.start_date_and_time}</b></small>
+                  <br/><small style={{marginRight:5}}><b>Start EndDate : {slide.end_date_and_time}</b></small>
+                  <br/><small style={{marginRight:5}}><b>{slide.name}</b></small>
+                  <br/><small style={{marginRight:5}}>
+                    <b>
+                      Location: { 
+                        slide.location? slide.location.state+', '+slide.location.city+', '+slide.location.street: ' Not Available'
+                        }
+                    </b>
+                  </small>
+            
+                  <Typography gutterBottom className={classes.title} variant="h6" component="p">
+                    {slide.description}
                   </Typography>
                 </NewsCard>
               </div>
@@ -113,6 +91,80 @@ class NewsWidget extends React.Component {
             )}
           />
         </Paper>
+      </div>
+    );
+  }
+  actionElements = (dataCollection,classes,theme,activeStepSwipe,maxStepsSwipe)=>{
+    return (
+      <div>
+        <Paper>
+          <SwipeableViews
+            axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+            index={activeStepSwipe}
+            onChangeIndex={this.handleStepChangeSwipe}
+            enableMouseEvents
+            className={classes.sliderWrap}
+          >
+            {dataCollection.map((slide, index) => (
+              <div className={classes.figure} key={index.toString()}>
+                <NewsCard
+                  image={slide.image? slide.image.url: unavailableImage}
+                  title="slide.label"
+                  className={classes.sliderContent}
+                >
+                  <Typography gutterBottom className={classes.title} variant="h6" component="h2">
+                    {slide.title}
+                  </Typography>
+                  <Typography component="p">
+                    {slide.about.length > 70 ? slide.about.substring(0,70) +"...": slide.about}
+                  </Typography>
+                  <small>
+                    {slide.steps_to_take.length > 20 ? slide.steps_to_take.substring(0,20) +"...": slide.steps_to_take }
+                  </small>
+                </NewsCard>
+              </div>
+            ))}
+          </SwipeableViews>
+          <MobileStepper
+            variant="dots"
+            steps={maxStepsSwipe}
+            position="static"
+            activeStep={activeStepSwipe}
+            className={classes.mobileStepper}
+            nextButton={(
+              <Button size="small" onClick={this.handleNextSwipe} disabled={activeStepSwipe === maxStepsSwipe - 1}>
+                Next
+                {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+              </Button>
+            )}
+            backButton={(
+              <Button size="small" onClick={this.handleBackSwipe} disabled={activeStepSwipe === 0}>
+                {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+                Back
+              </Button>
+            )}
+          />
+        </Paper>
+      </div>
+    );
+  }
+  ejectElements = (dataCollection,classes,theme,activeStepSwipe,maxStepsSwipe) =>{
+    if (this.props.kind === "action"){
+      return this.actionElements(dataCollection,classes,theme,activeStepSwipe,maxStepsSwipe)
+    }
+    else if(this.props.kind ==="event"){
+      return this.eventElements(dataCollection,classes,theme,activeStepSwipe,maxStepsSwipe)
+    }
+  }
+
+  render() {
+    const dataCollection = this.props.dataCollection;
+    const { classes, theme } = this.props;
+    const { activeStepSwipe } = this.state;
+    const maxStepsSwipe = dataCollection.length;
+    return (
+      <div> 
+        {this.ejectElements(dataCollection,classes,theme,activeStepSwipe,maxStepsSwipe)}
       </div>
     );
   }

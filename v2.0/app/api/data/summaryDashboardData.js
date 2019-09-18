@@ -1,7 +1,7 @@
 module.exports.data = {
   quickFacts: [
     {
-      start: 0,
+      start: 0,  
       end: 120,
       duration: 3,
       title: 'Users',
