@@ -18,6 +18,9 @@ import Icon from '@material-ui/core/Icon';
 import Edit from '@material-ui/icons/Edit';
 import Language from '@material-ui/icons/Language';
 import Email from '@material-ui/icons/Email';
+import Paper from '@material-ui/core/Paper';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Grid from '@material-ui/core/Grid';
 import messageStyles from 'dan-styles/Messages.scss';
 import { fetchData } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
@@ -133,6 +136,23 @@ class AllCommunities extends React.Component {
     const description = brand.desc;
     const { communities } = this.state;
     const { classes } = this.props;
+
+    if (!communities || communities.length === 0) {
+      return (
+        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+          <Grid item xs={12} md={6}>
+            <Paper className={this.props.classes.root}>
+              <div className={this.props.classes.root}>
+                <LinearProgress />
+                <h1>Fetching all Communities.  This may take a while...</h1>
+                <br />
+                <LinearProgress color="secondary" />
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      );
+    }
 
     return (
       <div>

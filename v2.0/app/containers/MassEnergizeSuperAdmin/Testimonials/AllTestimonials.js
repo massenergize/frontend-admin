@@ -48,7 +48,7 @@ class AllTestimonials extends React.Component {
 
 
   renderTable = (data, classes) => (
-    <PapperBlock noMargin title="All Communities" icon="ios-share-outline" whiteBg desc="">
+    <PapperBlock noMargin title="All Testimonials" icon="ios-share-outline" whiteBg desc="">
       <div className={classes.root}>
         <Table className={classNames(classes.tableLong, classes.stripped)} padding="dense">
           <TableHead>

@@ -32,27 +32,39 @@ export function sendJson(dataToSend, destinationUrl, relocationPage = '/admin') 
   });
 }
 
-export function sendFormWithMedia(formData, destinationUrl) {
+export function sendFormWithMedia(incomingData, destinationUrl, relocationPage) {
   fetch(`${API_HOST}/auth/csrf`, {
     method: 'GET',
     credentials: 'include',
   }).then(response => response.json()).then(jsonResponse => {
     const { csrfToken } = jsonResponse.data;
-    return fetch(destinationUrl, {
+    const formData = new FormData();
+    Object.keys(incomingData).map(k => (formData.append(k, incomingData[k])));
+
+    return fetch(`${API_HOST}${destinationUrl}`, {
       credentials: 'include',
+      mode: 'no-cors',
       method: 'POST',
       headers: {
-        'Content-Type': 'multipart/form-data',
         'X-CSRFToken': csrfToken,
       },
       body: formData
     })
-      .then(response => response.json()).then(data => {
+      .then(response => {
+        console.log(response);
+        return response.json();
+      }
+      ).then(data => {
         console.log(data);
+        if (data && data.success) {
+          console.log(data);
+          window.location.href = relocationPage;
+        }
         return data;
       });
   }).catch(error => {
     console.log(error.message);
+    window.location.href = relocationPage;
     return null;
   });
 }
@@ -69,6 +81,19 @@ export function cleanFormData(formValues) {
 export async function fetchData(sourceUrl) {
   return fetch(`${API_HOST}/${sourceUrl}`, {
     method: 'GET',
+    credentials: 'include',
+  }).then(response => response.json())
+    .then(jsonResponse => jsonResponse)
+    .catch(error => {
+      console.log(error.message);
+      return null;
+    });
+}
+
+
+export async function deleteItem(sourceUrl) {
+  return fetch(`${API_HOST}/${sourceUrl}`, {
+    method: 'DELETE',
     credentials: 'include',
   }).then(response => response.json())
     .then(jsonResponse => jsonResponse)

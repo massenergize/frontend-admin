@@ -9,8 +9,11 @@ export SearchUi from './Search/SearchUi';
 export GuideSlider from './GuideSlider';
 // Form
 export LoginForm from './Forms/LoginForm';
+
 export RegisterForm from './Forms/RegisterForm';
 export ResetForm from './Forms/ResetForm';
+export MaterialDropZone from './Forms/MaterialDropZone.js';
+
 export Notification from './Notification/Notification';
 // Table
 export EmptyData from './Tables/EmptyData';

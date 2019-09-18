@@ -6,20 +6,22 @@ import { withStyles } from '@material-ui/core/styles';
 // import { convertFromRaw, EditorState, convertToRaw } from 'draft-js';
 import InputLabel from '@material-ui/core/InputLabel';
 import Input from '@material-ui/core/Input';
-import { reduxForm } from 'redux-form/immutable';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Select2 from '@material-ui/core/Select';
 import Paper from '@material-ui/core/Paper';
+import LinearProgress from '@material-ui/core/LinearProgress';
+
+import { reduxForm } from 'redux-form/immutable';
 import Grid from '@material-ui/core/Grid';
 import FormControl from '@material-ui/core/FormControl';
-import Checkbox from '@material-ui/core/Checkbox';
 import FormLabel from '@material-ui/core/FormLabel';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Typography from '@material-ui/core/Typography';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
+import Checkbox from '@material-ui/core/Checkbox';
 import FormGroup from '@material-ui/core/FormGroup';
 import { MaterialDropZone } from 'dan-components';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -63,25 +65,16 @@ const MenuProps = {
   },
 };
 
-class CreateNewActionForm extends Component {
+class EditActionForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      formData: {
-        title: 'Solar Action',
-        about: 'Nothing yet about this Action',
-        average_carbon_score: '1.2',
-        // community: 16,
-        image: [],
-        steps_to_take: 'No Steps to take yet',
-        tagsSelected: [14, 8, 10, 2, 5],
-        vendorsSelected: []
-      },
-      // formData: { tagsSelected: [], vendorsSelected: [], image: [] },
+      formData: { tagsSelected: [], vendorsSelected: [], image: [] },
       tags: [],
       vendors: [],
       communities: [],
       tagCollections: [],
+      uploadedImage: null,
       submitIsClicked: false
     };
     this.updateForm = this.updateForm.bind(this);
@@ -89,9 +82,12 @@ class CreateNewActionForm extends Component {
 
 
   async componentDidMount() {
+    const { id } = this.props.match.params;
     const tagCollections = await fetchData('v2/tag-collections');
     const vendors = await fetchData('v2/vendors');
     const communities = await fetchData('v2/communities');
+    const action = await fetchData(`v2/action/${id}`);
+    console.log(action);
 
     if (tagCollections) {
       const tags = [];
@@ -105,11 +101,16 @@ class CreateNewActionForm extends Component {
     }
 
     if (vendors) {
-      this.setStateAsync({ vendors: vendors.data });
+      await this.setStateAsync({ vendors: vendors.data });
     }
 
     if (communities) {
-      this.setStateAsync({ communities: communities.data });
+      await this.setStateAsync({ communities: communities.data });
+    }
+
+    if (action) {
+      await this.setStateAsync({ formData: this.getFormDataFromAction(action.data) });
+      await this.setStateAsync({ uploadedImage: action.data.image });
     }
   }
 
@@ -118,6 +119,25 @@ class CreateNewActionForm extends Component {
       this.setState(state, resolve);
     });
   }
+
+  getFormDataFromAction = (action) => {
+    const res = {
+      id: action.id,
+      title: action.title,
+      about: action.about,
+      is_global: action.is_global ? 'true' : 'false',
+      average_carbon_score: action.average_carbon_score,
+      image: [],
+      steps_to_take: action.steps_to_take,
+      tagsSelected: action.tags.map(t => t.id),
+      vendorsSelected: action.vendors.map(v => v.id)
+    };
+    if (action.community) {
+      res.community = action.community.id;
+    }
+    return res;
+  }
+
 
   handleChangeMultiple = (event) => {
     const { target } = event;
@@ -143,6 +163,20 @@ class CreateNewActionForm extends Component {
     });
   };
 
+  handleIsTemplateCheckbox = async (event) => {
+    const { target } = event;
+    if (!target) return;
+    const { formData } = this.state;
+    const oldValue = formData.is_global;
+    const { name } = target;
+    if (oldValue !== 'true') {
+      delete formData.community;
+    }
+    await this.setStateAsync({
+      formData: { ...formData, [name]: oldValue === 'true' ? 'false' : 'true' }
+    });
+  };
+
   handleCheckBoxSelect = async (event) => {
     const { target } = event;
     if (!target) return;
@@ -162,22 +196,7 @@ class CreateNewActionForm extends Component {
     console.log(this.state);
   };
 
-  handleIsTemplateCheckbox = async (event) => {
-    const { target } = event;
-    if (!target) return;
-    const { formData } = this.state;
-    const oldValue = formData.is_global;
-    const { name } = target;
-    if (oldValue !== 'true') {
-      delete formData.community;
-    }
-    await this.setStateAsync({
-      formData: { ...formData, [name]: oldValue === 'true' ? 'false' : 'true' }
-    });
-  };
-
   submitForm = async (event) => {
-
     event.preventDefault();
     const { formData } = this.state;
     const cleanedValues = { ...formData };
@@ -195,7 +214,7 @@ class CreateNewActionForm extends Component {
     if (cleanedValues.is_global === 'true') {
       delete cleanedValues.community;
     }
-    const response = sendFormWithMedia(cleanedValues, '/v2/actions', '/admin/read/actions');
+    const response = sendFormWithMedia(cleanedValues, `/v2/action/${formData.id}`, `/admin/read/action/${cleanedValues.id}/edit`);
     await this.setStateAsync({ ...this.state, submitIsClicked: true });
 
     console.log(response);
@@ -220,28 +239,47 @@ class CreateNewActionForm extends Component {
       submitting,
     } = this.props;
     const {
-      formData, tags, communities, vendors, tagCollections, submitIsClicked
+      formData, tags, communities, vendors, tagCollections, uploadedImage, submitIsClicked, image
     } = this.state;
     const { 
-      tagsSelected, vendorsSelected, community, title, steps_to_take,about, average_carbon_score, is_global
+      id, tagsSelected, vendorsSelected, community, title, is_global,
+      steps_to_take, about, average_carbon_score
     } = formData;
     let communitySelected = communities.filter(c => c.id === community)[0];
     communitySelected = communitySelected ? communitySelected.name : '';
 
+    if (!id) {
+      return (
+        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+          <Grid item xs={12} md={6}>
+            <Paper className={classes.root}>
+              <div className={classes.root}>
+                <LinearProgress />
+                <h1>Fetching all data for this Action</h1>
+                <br />
+                <LinearProgress color="secondary" />
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      );
+    }
     return (
       <div>
         <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
           <Grid item xs={12} md={6}>
             <Paper className={classes.root}>
               <Typography variant="h5" component="h3">
-                 New Action
+                 Edit Action { id ? ` with id: ${id}` : '' }
               </Typography>
-
+              <div>
+                <img src={uploadedImage ? uploadedImage.url : ""} className={classes.img} alt={"Title"} />
+              </div>
               <form onSubmit={this.submitForm}>
                 <div>
-                  <FormControl className={classes.field}>
+                  <FormControl className={classes.formControl}>
                     <InputLabel htmlFor="title">Title</InputLabel>
-                    <Input id="title" defaultValue={title} name="title" onChange={this.handleFormDataChange} />
+                    <Input id="title" value={title} name="title" onChange={this.handleFormDataChange} />
                   </FormControl>
                 </div>
                 <div>
@@ -282,13 +320,12 @@ class CreateNewActionForm extends Component {
                     )
                   }
                 </div>
-
                 <div className={classes.field}>
-                  <FormControl className={classes.field}>
+                  <FormControl className={classes.formControl}>
                     <InputLabel htmlFor="steps_to_take">Steps to Take</InputLabel>
                     <Input
                       id="steps_to_take"
-                      defaultValue={steps_to_take} 
+                      value={steps_to_take} 
                       name="steps_to_take"
                       onChange={this.handleFormDataChange}
                       multiline={trueBool}
@@ -305,11 +342,11 @@ class CreateNewActionForm extends Component {
                   />
                 </Grid> */}
                 <div className={classes.field}>
-                  <FormControl className={classes.field}>
+                  <FormControl className={classes.formControl}>
                     <InputLabel htmlFor="about">About this Action</InputLabel>
                     <Input
                       id="about"
-                      defaultValue={about}
+                      value={about}
                       name="about"
                       onChange={this.handleFormDataChange}
                       multiline={trueBool}
@@ -318,11 +355,11 @@ class CreateNewActionForm extends Component {
                   </FormControl>
                 </div>
                 <div className={classes.field}>
-                  <FormControl className={classes.field}>
+                  <FormControl className={classes.formControl}>
                     <InputLabel htmlFor="average_carbon_score">Average Carbon Score</InputLabel>
                     <Input
                       id="average_carbon_score"
-                      defaultValue={average_carbon_score} 
+                      value={average_carbon_score} 
                       name="average_carbon_score"
                       placeholder="eg. 5"
                       onChange={this.handleFormDataChange}
@@ -413,14 +450,12 @@ class CreateNewActionForm extends Component {
                 {submitIsClicked
                   && (
                     <div>
-                      <h5>Creating your Action ...</h5>
-                      <InputLabel>This might take a minute ...</InputLabel>
+                      <h5>Updating this Action ...</h5>
+                      <InputLabel>This could take a few seconds ...</InputLabel>
                       <CircularProgress className={classes.progress} />
                     </div>
                   )
                 }
-
-
                 <div>
                   <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
                     Submit
@@ -435,7 +470,7 @@ class CreateNewActionForm extends Component {
   }
 }
 
-CreateNewActionForm.propTypes = {
+EditActionForm.propTypes = {
   classes: PropTypes.object.isRequired,
   submitting: PropTypes.bool.isRequired,
 };
@@ -448,7 +483,7 @@ const mapDispatchToProps = dispatch => ({
 const ReduxFormMapped = reduxForm({
   form: 'immutableExample',
   enableReinitialize: true,
-})(CreateNewActionForm);
+})(EditActionForm);
 
 const reducer = 'initval';
 const FormInit = connect(

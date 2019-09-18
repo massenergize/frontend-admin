@@ -9,6 +9,8 @@ import Grid from '@material-ui/core/Grid';
 import imgApi from 'dan-api/images/photos';
 import Email from '@material-ui/icons/Email';
 import messageStyles from 'dan-styles/Messages.scss';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Paper from '@material-ui/core/Paper';
 import { fetchData } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
 import { ProductCard } from '../../../components';
@@ -30,35 +32,51 @@ class AllActions extends React.Component {
     });
   }
 
-  renderActions = (data, classes) => {
-    return (
-      <Grid
-        container
-        alignItems="flex-start"
-        justify="center"
-        direction="row"
-        spacing={16}
-      >
-        {data.map(n => (
-          <Grid item md={4} key={n.id}>
-            <ProductCard
-              thumbnail={n.image ? n.image.url : imgApi[21]}
-              name={n.title}
-              desc={n.title}
-              rating={n.id}
-              price={n.average_carbon_score}
-            />
-          </Grid>
-        ))}
-      </Grid>
-    );
-  }
+  renderActions = (data) => (
+    <Grid
+      container
+      alignItems="flex-start"
+      justify="center"
+      direction="row"
+      spacing={16}
+    >
+      {data.map(n => (
+        <Grid item md={4} key={n.id}>
+          <ProductCard
+            thumbnail={n.image ? n.image.url : imgApi[21]}
+            name={n.title}
+            desc={n.title}
+            rating={n.id}
+            price={n.average_carbon_score}
+            id={n.id}
+          />
+        </Grid>
+      ))}
+    </Grid>
+  )
 
   render() {
-    const title = brand.name + ' - All Communities';
+    const title = brand.name + ' - All Actions';
     const description = brand.desc;
     const { actions } = this.state;
-    const { classes } = this.props;
+
+    if (!actions || actions.length === 0) {
+      return (
+        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+          <Grid item xs={12} md={6}>
+            <Paper className={this.props.classes.root}>
+              <div className={this.props.classes.root}>
+                <LinearProgress />
+                <h1>Fetching all Actions.  This may take a while...</h1>
+                <br />
+                <LinearProgress color="secondary" />
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      );
+    }
+
     return (
 
       <div>
@@ -71,7 +89,7 @@ class AllActions extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <PapperBlock title="All Actions" desc="">
-          {this.renderActions(actions, classes)}
+          {this.renderActions(actions)}
         </PapperBlock>
       </div>
     );
@@ -79,9 +97,5 @@ class AllActions extends React.Component {
 }
 
 // export default AllActions;
-
-AllActions.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
 
 export default withStyles(styles)(AllActions);

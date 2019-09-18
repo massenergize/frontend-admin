@@ -21,9 +21,8 @@ import {
   AddTeam, AllTeams,
   AllGoals, AddGoal,
   AddPolicy, AllPolicies,
-  AddTestimonial, AllTestimonials, Export, CustomizePages
+  AddTestimonial, AllTestimonials, Export, CustomizePages, EditAction
 } from '../pageListAsync';
-import EditCommunityForm from '../MassEnergizeSuperAdmin/Community/EditCommunityForm';
 
 class Application extends React.Component {
   render() {
@@ -45,6 +44,8 @@ class Application extends React.Component {
 
           <Route path="/admin/read/actions" component={AllActions} />
           <Route path="/admin/add/action" component={AddAction} />
+          <Route path="/admin/read/action/:id/edit" component={EditAction} exact />
+          <Route path="/admin/add/action/:id" component={EditAction} />
 
           <Route path="/admin/read/categories" component={AllCategories} />
           <Route path="/admin/add/category" component={AddCategory} />
