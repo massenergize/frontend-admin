@@ -12,10 +12,14 @@ import Button from '@material-ui/core/Button';
 import Type from 'dan-styles/Typography.scss';
 import Fab from '@material-ui/core/Fab';
 import DeleteIcon from '@material-ui/icons/Close';
-
+import IconQuickLinks from './Frags/IconLinks';
+import AboutUsVideo from './Frags/AboutUsVideo';
+import AboutUsDescription from './Frags/AboutUsDescription';
 class AdminEditHome extends React.Component {
   constructor(props) {
     super(props);
+    this.addFeatures = this.addFeatures.bind(this);
+    this.removeIconFeature = this.removeIconFeature.bind(this);
     this.state = {
       available_sections: [
         { id: 1, name: "Terms Of Service" },
@@ -30,6 +34,7 @@ class AdminEditHome extends React.Component {
         { id: 10, name: "Home Header" },
         { id: 11, name: "About Us Description" },
       ],
+      selected_icon_features: [],
       selected_sections: [],
       communities: ['Ghana Cedis', 'Dollars', 'Rupees', 'Rands'],
       selected_community: 'Choose Community',
@@ -37,6 +42,10 @@ class AdminEditHome extends React.Component {
     }
   }
 
+  addFeatures = (item) => {
+    var old = this.state.selected_icon_features;
+    this.setState({ selected_icon_features: old.includes(item) ? [...old] : [...old, item] });
+  }
   findSectionObj = (val) => {
     var section = this.state.available_sections;
     for (var i = 0; i < section.length; i++) {
@@ -69,17 +78,17 @@ class AdminEditHome extends React.Component {
     }
     return string;
   }
-  removeSection = (id)=>{
-    var sel = this.state.selected_sections; 
-    this.setState({ selected_sections: sel.filter( itm => itm.id !== id) })
+  removeSection = (id) => {
+    var sel = this.state.selected_sections;
+    this.setState({ selected_sections: sel.filter(itm => itm.id !== id) })
   }
   ejectSelectedSections(classes) {
     return this.state.selected_sections.map((item) => {
       return (
         <Fab
-          onClick ={()=>{ this.removeSection(item.id)}}
+          onClick={() => { this.removeSection(item.id) }}
           key={item.id.toString()}
-          style={{ background: '#af0f0f', color: "white",margin:5 }}
+          style={{ background: '#af0f0f', color: "white", margin: 5 }}
           variant="extended"
           color="danger"
           aria-label="Delete"
@@ -91,18 +100,54 @@ class AdminEditHome extends React.Component {
       );
     });
   }
-  stringifySelected(){
-    var string = ""; 
+  stringifySelected() {
+    var string = "";
     var items = this.state.selected_sections;
-   for( var i = 0; i < items.length; i ++){
-      if(string !== ""){
-        string += ", "+ items[i].name;
+    for (var i = 0; i < items.length; i++) {
+      if (string !== "") {
+        string += ", " + items[i].name;
       }
-      else{
+      else {
         string = items[i].name;
       }
     }
     return string;
+  }
+
+  removeIconFeature = (item) => {
+    var f = this.state.selected_icon_features.filter(itm => itm !== item);
+    this.setState({ selected_icon_features: f });
+  }
+
+  switchForComponent = (section) => {
+    switch (section.id) {
+      case 7:
+        return (
+          <IconQuickLinks
+            key={section.id}
+            addFeaturesFxn={this.addFeatures}
+            selectedFeatures={this.state.selected_icon_features}
+            removeFeatureFxn={this.removeIconFeature}
+          />
+        );
+        break;
+      case 8:
+        return <AboutUsVideo key={section.id} />
+        break;
+      case 11:
+        return <AboutUsDescription key={section.id} />
+        break;
+
+      default:
+        return <div><h5>Not done yet!</h5></div>
+        break;
+    }
+  }
+
+  ejectSelectedSectionsPanel() {
+    return this.state.selected_sections.map(item => {
+      return this.switchForComponent(item);
+    });
   }
   render() {
     const communities = this.state.communities;
@@ -110,7 +155,7 @@ class AdminEditHome extends React.Component {
     const community = this.state.selected_community;
     const { available_sections } = this.state;
     const { selected_sections } = this.state;
-    
+
     return (
       <div>
         <div style={{ margin: 30 }}></div>
@@ -215,7 +260,11 @@ class AdminEditHome extends React.Component {
               ))}
             </TextField>
 
+
           </Paper>
+          {/*  --------------------- DYNAMIC SECTION AREA ------------- */}
+          {this.ejectSelectedSectionsPanel()}
+
         </Grid>
       </div>
     )
