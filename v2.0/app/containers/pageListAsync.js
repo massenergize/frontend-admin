@@ -2,12 +2,15 @@ import React from 'react';
 import Loading from 'dan-components/Loading';
 import loadable from '../utils/loadable';
 
+export const SuperHome = loadable(() => import('./Pages/CustomPages/AdminEditHome'), {
+  fallback: <Loading />,
+});
 export const BlankPage = loadable(() => import('./Pages/BlankPage'), {
   fallback: <Loading />,
 });
 export const DashboardSummaryPage = loadable(() => import('./MassEnergizeSuperAdmin/Summary'), {
   fallback: <Loading />,
-});
+}); 
 export const AllCommunities = loadable(() => import('./MassEnergizeSuperAdmin/Community/AllCommunities'), {
   fallback: <Loading />,
 });

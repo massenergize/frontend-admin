@@ -21,7 +21,7 @@ import {
   AddTeam, AllTeams,
   AllGoals, AddGoal,
   AddPolicy, AllPolicies,
-  AddTestimonial, AllTestimonials, Export, CustomizePages
+  AddTestimonial, AllTestimonials, Export, CustomizePages, SuperHome
 } from '../pageListAsync';
 import EditCommunityForm from '../MassEnergizeSuperAdmin/Community/EditCommunityForm';
 
@@ -80,6 +80,7 @@ class Application extends React.Component {
           <Route path="/admin/page-list" component={Parent} />
           <Route path="/admin/pages/not-found" component={NotFound} />
           <Route path="/admin/pages/error" component={Error} />
+          <Route path="/admin/add/home" component={SuperHome} />
           <Route component={NotFound} />
         </Switch>
       </Dashboard>

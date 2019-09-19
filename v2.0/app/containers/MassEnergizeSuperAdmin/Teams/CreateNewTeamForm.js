@@ -26,7 +26,6 @@ import {
   Select
 } from 'redux-form-material-ui';
 import { fetchData, sendJson } from '../../../utils/messenger';
-
 import { initAction, clearAction } from '../../../actions/ReduxFormActions';
 
 const renderRadioGroup = ({ input, ...rest }) => (
@@ -140,7 +139,6 @@ class CreateNewTeamForm extends Component {
     const { target } = event;
     if (!target) return;
     const { name, value } = target;
-    console.log("I am the target", target);
     const { formData } = this.state;
     this.setState({
       formData: { ...formData, [name]: value }
@@ -174,7 +172,7 @@ class CreateNewTeamForm extends Component {
       submitting,
       init,
       clear
-    } = this.props;
+    } = this.props; 
     const {
       formData, people, communities
     } = this.state;
