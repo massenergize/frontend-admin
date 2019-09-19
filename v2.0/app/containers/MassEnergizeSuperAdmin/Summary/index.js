@@ -5,21 +5,57 @@ import { Helmet } from 'react-helmet';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
+import {connect} from 'react-redux';
+import * as adminActions from './../../../actions/adminActionSet';
 import {
   CounterChartWidget,
   // SalesChartWidget,
   CarouselWidget,
   NewsWidget,
+ 
 } from 'dan-components';
 import styles from './dashboard-jss';
-
+import { getTestimonialsData,getActionsData,getEventsData } from './../../../api/data/';
 
 class SummaryDashboard extends PureComponent {
+  constructor(props){
+    super(props); 
+    this.state = { events:[],testimonials:[],actions:[]}
+  }
+
+  callForEvents = ()=>{
+    const me = this;
+    getEventsData().then(res =>{
+      me.setState({events:[...res.data.slice(0,10)]})
+    }).catch(err =>{
+      console.log(err);
+    })
+  }
+  callForTestimonials = ()=>{
+    const me = this;
+    getTestimonialsData().then(res =>{
+      me.setState({testimonials:[...res.data.slice(0,10)]})
+    }).catch(err =>{
+      console.log(err);
+    })
+  }
+  callForActions  =()=>{
+    const me = this;
+    getActionsData().then(res =>{
+      me.setState({actions:[...res.data.slice(0,10)]})
+    }).catch(err =>{
+      console.log(err);
+    })
+  }
+  componentDidMount = ()=>{
+   this.callForTestimonials();
+   this.callForActions();
+   this.callForEvents();
+  }
   render() {
     const title = brand.name + ' - Summary Dashboard';
     const description = brand.desc;
     const { classes } = this.props;
-
     return (
       <div>
         <Helmet>
@@ -29,22 +65,22 @@ class SummaryDashboard extends PureComponent {
           <meta property="og:description" content={description} />
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
-        </Helmet>
+        </Helmet> 
         <Grid container className={classes.root}>
-          <CounterChartWidget />
+          <CounterChartWidget /> 
         </Grid>
         <Divider className={classes.divider} />
         {/* <SalesChartWidget /> */}
         <Divider className={classes.divider} />
         <Grid container spacing={24} className={classes.root}>
           <Grid item md={4} xs={12}>
-            <CarouselWidget />
+            <CarouselWidget goals ={this.state.testimonials}/>
           </Grid>
           <Grid item md={4} sm={6} xs={12}>
-            <NewsWidget />
+            <NewsWidget kind = "action" dataCollection = {this.state.actions}/>
           </Grid>
           <Grid item md={4} sm={6} xs={12}>
-            <CarouselWidget />
+             <NewsWidget kind ="event" dataCollection={this.state.events}/>
           </Grid>
         </Grid>
       </div>
@@ -56,4 +92,4 @@ SummaryDashboard.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(SummaryDashboard);
+export default  withStyles(styles)(SummaryDashboard) ;

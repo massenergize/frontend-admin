@@ -56,6 +56,8 @@ SamplePrevArrow.defaultProps = {
 
 class CarouselWidget extends React.Component {
   render() {
+    const testimonialsData = this.props.goals;
+    const colorArray = ['#7CB342','#00ACC1','#00BFA5','#F57F17','#546E7A' ];
     const { classes } = this.props;
     const settings = {
       dots: true,
@@ -92,17 +94,31 @@ class CarouselWidget extends React.Component {
       prevArrow: <SamplePrevArrow />
     };
     return (
+      
       <div className="container custom-arrow">
         <Slider {...settings}>
-          {carouselData.map((item, index) => (
+          {testimonialsData.map((item, index) => (
             <div key={index.toString()}>
-              <div style={{ backgroundColor: item.background }} className={classes.carouselItem}>
-                <Icon className={classes.iconBg}>{item.icon}</Icon>
-                <Typography className={classes.carouselTitle} variant="subtitle1">
-                  <Icon>{item.icon}</Icon>
+              <div style={{ backgroundColor: colorArray[Math.floor(Math.random() * 5)] }} className={classes.carouselItem}>
+                    <Icon className={classes.iconBg}>{item.icon}</Icon>
+                <Typography className={classes.carouselDesc} variant="subtitle1">
+                   {/* <Icon>{'done'}</Icon> */}
                   {item.title}
                 </Typography>
-                <Typography className={classes.carouselDesc}>{item.desc}</Typography>
+                <div style={{marginBottom:10}}></div>
+                <Typography className={classes.carouselDesc}>{item.body}</Typography>
+                <div style={{marginBottom:10}}></div>
+                <small style={{marginRight:5,color:'white'}}>
+                  <b>{item.is_approved ? 'Approved,' : 'Not Approved,'}</b>
+                  </small>
+                <small style={{color:'white'}}>
+                  <b>Made by {item.user.preferred_name}</b>
+                </small>
+                <br/>
+                  {/* <small style={{color:'white'}}><b> {item.created_at}</b></small><br/> */}
+                <br/>
+                <br/>
+                <br/>
                 <Button variant="outlined" size="small" className={classes.buttonReadMore}>
                   Read More
                 </Button>

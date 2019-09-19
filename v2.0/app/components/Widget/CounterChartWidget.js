@@ -5,18 +5,45 @@ import Grid from '@material-ui/core/Grid';
 import {
   BarChart, Bar,
   AreaChart, Area,
-  LineChart, Line,
+  LineChart, Line, 
 } from 'recharts';
 import { data1 } from 'dan-api/chart/chartMiniData';
 import colorfull from 'dan-api/palette/colorfull';
 import CounterWidget from '../Counter/CounterWidget';
 import styles from './widget-jss';
-import { getSummaryPageData } from '../../api/data';
-
+import { getSummaryPageData,getCommunitiesPageData, getTagCollectionsData } from '../../api/data';
+import  summaryArray from './../../api/data/structuredDataArray';
 class CounterChartWidget extends PureComponent {
-  renderCards = () => {
-    const data = getSummaryPageData().quickFacts;
+  constructor(props){
+    super(props);
+    this.state = { summary : [] };
+  }
 
+  componentWillMount = () =>{
+    this.fashionData();
+  }
+  fashionData = () =>{
+    const me = this;
+    summaryArray.forEach( item =>{
+      item.fxn().then(res=>{
+        const info = {
+          start: 0,  
+          end: res.data.length,
+          duration: 3,
+          title: item.title,
+          unitBefore: '',
+          unitAfter: ''
+        }
+        me.setState((prev)=>{
+          return{summary:[...prev.summary,info]}
+        })
+      });
+    });
+  }
+
+  renderCards = () => {
+    var data = this.state.summary ? this.state.summary : []; 
+   
     if (!data) {
       return (<div />);
     }
