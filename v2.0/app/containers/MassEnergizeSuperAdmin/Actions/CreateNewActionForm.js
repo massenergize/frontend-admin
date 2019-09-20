@@ -67,21 +67,22 @@ class CreateNewActionForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      formData: {
-        title: 'Solar Action',
-        about: 'Nothing yet about this Action',
-        average_carbon_score: '1.2',
-        // community: 16,
-        image: [],
-        steps_to_take: 'No Steps to take yet',
-        tagsSelected: [14, 8, 10, 2, 5],
-        vendorsSelected: []
-      },
-      // formData: { tagsSelected: [], vendorsSelected: [], image: [] },
+      // formData: {
+      //   title: 'Solar Action',
+      //   about: 'Nothing yet about this Action',
+      //   average_carbon_score: '1.2',
+      //   // community: 16,
+      //   image: [],
+      //   steps_to_take: 'No Steps to take yet',
+      //   tagsSelected: [14, 8, 10, 2, 5],
+      //   vendorsSelected: []
+      // },
+      formData: { tagsSelected: [], vendorsSelected: [], image: [] },
       tags: [],
       vendors: [],
       communities: [],
       tagCollections: [],
+      singleSelectIDs: new Set(),
       submitIsClicked: false
     };
     this.updateForm = this.updateForm.bind(this);
@@ -100,8 +101,13 @@ class CreateNewActionForm extends Component {
           tags.push({ ...t, tagCollection: tCol.name });
         });
       });
-      this.setStateAsync({ tags });
-      this.setStateAsync({ tagCollections: tagCollections.data });
+      await this.setStateAsync({ tags });
+      await this.setStateAsync({ tagCollections: tagCollections.data });
+      const s = new Set();
+      tagCollections.data.filter(tc => !tc.allow_multiple).map(l => (
+        l.tags.map(t => s.add(t.id))
+      ));
+      await this.setStateAsync({ singleSelectIDs: s });
     }
 
     if (vendors) {
@@ -148,18 +154,28 @@ class CreateNewActionForm extends Component {
     if (!target) return;
     const { formData } = this.state;
     const { name, value } = target;
-    const theList = formData[name];
+    let theList = formData[name];
+
+    if (!theList) {
+      theList = [];
+    }
     const newVal = parseInt(value, 10);
     const pos = theList.indexOf(newVal);
     if (pos > -1) {
       theList.splice(pos, pos + 1);
+    }
+
+    if (name.includes('single')) {
+      theList = [newVal];
     } else {
       theList.push(newVal);
     }
+
     await this.setStateAsync({
       formData: { ...formData, [name]: theList }
     });
-    console.log(this.state);
+
+    console.log(this.state.formData);
   };
 
   handleIsTemplateCheckbox = async (event) => {
@@ -201,6 +217,14 @@ class CreateNewActionForm extends Component {
     console.log(response);
   }
 
+  isThisSelectedOrNot = (formData, fieldName, value) => {
+    const fieldValues = formData[fieldName];
+    console.log(fieldValues);
+    if (!fieldValues) return false;
+    // if (!Array.isArray(fieldValues)) return false;
+    return fieldValues.indexOf(value) > -1;
+  }
+
   async updateForm(fieldName, value) {
     const { formData } = this.state;
     await this.setStateAsync({
@@ -210,8 +234,9 @@ class CreateNewActionForm extends Component {
       }
     }
     );
-    console.log(this.state);
+    console.log(this.state.formData);
   }
+
 
   render() {
     const trueBool = true;
@@ -372,17 +397,17 @@ class CreateNewActionForm extends Component {
                 {tagCollections.map(tc => (
                   <div className={classes.field} key={tc.id}>
                     <FormControl component="fieldset">
-                      <FormLabel component="legend">{tc.name}</FormLabel>
+                      <FormLabel component="legend">{`${tc.name} ${tc.allow_multiple ? '' : '(Only one selection allowed)'}`}</FormLabel>
                       <FormGroup>
                         {tc.tags.map(t => (
                           <FormControlLabel
                             key={t.id}
                             control={(
                               <Checkbox
-                                checked={tagsSelected.indexOf(t.id) > -1}
+                                checked={this.isThisSelectedOrNot(formData, `tag-${tc.name.toLowerCase()}--${tc.allow_multiple ? 'multiple' : 'single'}`,  t.id)}
                                 onChange={this.handleCheckBoxSelect}
                                 value={'' + t.id}
-                                name="tagsSelected"
+                                name={`tag-${tc.name.toLowerCase()}--${tc.allow_multiple ? 'multiple' : 'single'}`}
                               />
                             )}
                             label={t.name}

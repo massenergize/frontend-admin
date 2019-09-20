@@ -192,6 +192,12 @@ module.exports = options => ({
     extensions: ['.js', '.jsx', '.react.js'],
     mainFields: ['browser', 'jsnext:main', 'main'],
     alias: {
+      'massenergize-components': path.resolve(__dirname, '../../app/components/'),
+      'massenergize-actions': path.resolve(__dirname, '../../app/actions/'),
+      'massenergize-styles': path.resolve(__dirname, '../../app/styles/components/'),
+      'massenergize-api': path.resolve(__dirname, '../../app/api/'),
+      'massenergize-images': path.resolve(__dirname, '../../public/images/'),
+      'massenergize-vendor': path.resolve(__dirname, '../../node_modules/'),
       'dan-components': path.resolve(__dirname, '../../app/components/'),
       'dan-actions': path.resolve(__dirname, '../../app/actions/'),
       'dan-styles': path.resolve(__dirname, '../../app/styles/components/'),
