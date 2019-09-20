@@ -48,8 +48,12 @@ const vanish = {
     borderRadius:5,
     padding:25
   }
+  const marginTop5 = {
+    marginTop:5
+  }
 module.exports = {
   vanish,
   styles,
-  uploadBox
+  uploadBox,
+  marginTop5
 };

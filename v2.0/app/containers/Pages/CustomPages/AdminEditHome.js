@@ -15,55 +15,45 @@ import DeleteIcon from '@material-ui/icons/Close';
 import IconQuickLinks from './Frags/IconLinks';
 import AboutUsVideo from './Frags/AboutUsVideo';
 import AboutUsDescription from './Frags/AboutUsDescription';
+import GraphChoice from './Frags/GraphChoice';
+import EventChoices from './Frags/EventChoices';
 class AdminEditHome extends React.Component {
   constructor(props) {
     super(props);
+    this.trackSelectedFeatureEdit = this.trackSelectedFeatureEdit.bind(this);
+    this.handleEventSelection = this.handleEventSelection.bind(this); 
+    this.removeEvent = this.removeEvent.bind(this);
     this.addFeatures = this.addFeatures.bind(this);
     this.removeIconFeature = this.removeIconFeature.bind(this);
     this.state = {
-      available_sections: [
-        { id: 1, name: "Terms Of Service" },
-        { id: 2, name: "Privacey Policy" },
-        { id: 3, name: "Donate Bar" },
-        { id: 4, name: "Graph Section" },
-        { id: 5, name: "Donate Page Header" },
-        { id: 6, name: "Welcome Images" },
-        { id: 7, name: "Icon Quick Links" },
-        { id: 8, name: "About Us Video" },
-        { id: 9, name: "Donate Page Button" },
-        { id: 10, name: "Home Header" },
-        { id: 11, name: "About Us Description" },
-      ],
       selected_icon_features: [],
-      selected_sections: [],
-      communities: ['Ghana Cedis', 'Dollars', 'Rupees', 'Rands'],
+      selected_graphs:[],
+      selected_events:[],
+      communities: ['Wayland', 'Ghana', 'Denver', 'New York'],
       selected_community: 'Choose Community',
       files: []
     }
   }
 
+  handleEventSelection = ( item ) =>{
+    var old = this.state.selected_events;
+    if(old.length !== 3){
+      this.setState({ selected_events: old.includes(item) ? [...old] : [...old, item] });
+    }
+  }
+  handleGraphSelection = ( item ) =>{
+    var old = this.state.selected_graphs;
+    this.setState({selected_graphs: old.includes(item) ? [...old] : [...old, item] });
+  }
   addFeatures = (item) => {
     var old = this.state.selected_icon_features;
     this.setState({ selected_icon_features: old.includes(item) ? [...old] : [...old, item] });
   }
-  findSectionObj = (val) => {
-    var section = this.state.available_sections;
-    for (var i = 0; i < section.length; i++) {
-      if (section[i].name === val) {
-        return section[i];
-      }
-    }
-    return null;
-  }
+ 
   handleCommunitiesChoice = (event) => {
     this.setState({ selected_community: event.target.value });
   }
-
-  handleSectionChoice = (event) => {
-    const wholeTray = this.findSectionObj(event.target.value);
-    const oldValues = this.state.selected_sections;
-    this.setState({ selected_sections: oldValues.includes(wholeTray) ? [...oldValues] : [...oldValues, wholeTray] });
-  }
+  
   showFileList() {
     const { files } = this.state;
     if (files.length === 0) return "You have not selected any files. ";
@@ -78,77 +68,30 @@ class AdminEditHome extends React.Component {
     }
     return string;
   }
-  removeSection = (id) => {
-    var sel = this.state.selected_sections;
-    this.setState({ selected_sections: sel.filter(itm => itm.id !== id) })
-  }
-  ejectSelectedSections(classes) {
-    return this.state.selected_sections.map((item) => {
-      return (
-        <Fab
-          onClick={() => { this.removeSection(item.id) }}
-          key={item.id.toString()}
-          style={{ background: '#af0f0f', color: "white", margin: 5 }}
-          variant="extended"
-          color="danger"
-          aria-label="Delete"
-          className={classes.button}
-        >
-          {item.name}
-          <DeleteIcon className={classes.extendedIcon} />
-        </Fab>
-      );
-    });
-  }
-  stringifySelected() {
-    var string = "";
-    var items = this.state.selected_sections;
-    for (var i = 0; i < items.length; i++) {
-      if (string !== "") {
-        string += ", " + items[i].name;
-      }
-      else {
-        string = items[i].name;
-      }
-    }
-    return string;
-  }
-
-  removeIconFeature = (item) => {
-    var f = this.state.selected_icon_features.filter(itm => itm !== item);
+  removeIconFeature = (name) => {
+    var f = this.state.selected_icon_features.filter(itm => itm.name !== name);
     this.setState({ selected_icon_features: f });
   }
+  removeGraph = (item) => {
+    var f = this.state.selected_graphs.filter(itm => itm !== item);
+    this.setState({ selected_graphs: f });
+  }
+  removeEvent = (id) => {
+    var f = this.state.selected_events.filter(itm => itm.id !== id);
+    this.setState({ selected_events: f });
+  }
 
-  switchForComponent = (section) => {
-    switch (section.id) {
-      case 7:
-        return (
-          <IconQuickLinks
-            key={section.id}
-            addFeaturesFxn={this.addFeatures}
-            selectedFeatures={this.state.selected_icon_features}
-            removeFeatureFxn={this.removeIconFeature}
-          />
-        );
-        break;
-      case 8:
-        return <AboutUsVideo key={section.id} />
-        break;
-      case 11:
-        return <AboutUsDescription key={section.id} />
-        break;
-
-      default:
-        return <div><h5>Not done yet!</h5></div>
-        break;
+  trackSelectedFeatureEdit = (obj)=>{
+    const selected = this.state.selected_icon_features; 
+    for ( var i = 0 ; i < selected.length ; i++){
+      if(selected[i].name === obj.name){
+        selected[i] ={...obj};
+      }
     }
+    this.setState({selected_icon_features:selected});
   }
-
-  ejectSelectedSectionsPanel() {
-    return this.state.selected_sections.map(item => {
-      return this.switchForComponent(item);
-    });
-  }
+  
+ 
   render() {
     const communities = this.state.communities;
     const { classes } = this.props;
@@ -234,37 +177,29 @@ class AdminEditHome extends React.Component {
                 </Button>
               </label>
             </div>
-            <Typography style={{ marginTop: 10 }} variant="h5" className={Type.medium} gutterBottom>Add Sections Of The Homepage Here</Typography>
-            {/* -------Selected Sections -------- */}
-            {this.ejectSelectedSections(classes)}
-            <TextField
-              id="outlined-select-sections"
-              select
-              label="Choose Sections"
-              className={classes.textField}
-              fullWidth
-              onChange={option => { this.handleSectionChoice(option) }}
-              SelectProps={{
-                MenuProps: {
-                  className: classes.menu,
-                },
-              }}
-              helperText={"Add Sections To The Wayland Home Page And Fill Them Below "}
-              margin="normal"
-              variant="outlined"
-            >
-              {available_sections.map(option => (
-                <MenuItem key={option.id.toString()} id={option.id} value={option.name}>
-                  {option.name}
-                </MenuItem>
-              ))}
-            </TextField>
-
-
+              
+              
           </Paper>
           {/*  --------------------- DYNAMIC SECTION AREA ------------- */}
-          {this.ejectSelectedSectionsPanel()}
 
+          <EventChoices 
+            addEventFxn = {this.handleEventSelection}
+            removeEventFxn = {this.removeEvent}
+            events = {this.state.selected_events}
+          />
+          <IconQuickLinks
+            trackChangeFxn = {this.trackSelectedFeatureEdit}
+            addFeaturesFxn={this.addFeatures}
+            selectedFeatures={this.state.selected_icon_features}
+            removeFeatureFxn={this.removeIconFeature}
+          />
+          <GraphChoice
+            addGraphFxn={this.handleGraphSelection}
+            selectedGraphs={this.state.selected_graphs}
+            removeGraphFxn={this.removeGraph}
+          />
+          <AboutUsVideo />
+          <AboutUsDescription />
         </Grid>
       </div>
     )
