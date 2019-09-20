@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
@@ -19,8 +19,11 @@ import Typography from '@material-ui/core/Typography';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
+import FormGroup from '@material-ui/core/FormGroup';
+import { MaterialDropZone } from 'dan-components';
+import Checkbox from '@material-ui/core/Checkbox';
+
 import {
-  Checkbox,
   TextField,
   Switch,
   Select
@@ -102,9 +105,16 @@ class CreateNewEventForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      formData: { tagsSelected: [], communitiesSelected: [] },
+      formData: {
+        is_external_event: 'false',
+        archive:'false',
+        image:[],
+        tagsSelected: [], 
+        communitiesSelected: [] 
+      },
       tags: [],
-      communities: []
+      communities: [],
+      tagCollections: []
     };
   }
 
@@ -121,6 +131,7 @@ class CreateNewEventForm extends Component {
         });
       });
       this.setStateAsync({ tags });
+      this.setStateAsync({ tagCollections: tagCollections.data });
     }
 
     if (communities) {
@@ -197,7 +208,7 @@ class CreateNewEventForm extends Component {
       clear
     } = this.props;
     const {
-      formData, tags, communities
+      formData, tags, communities, tagCollections
     } = this.state;
     const { tagsSelected, communitiesSelected, community } = formData;
     // let communitySelected = communities.filter(c => c.id === community)[0];
@@ -365,6 +376,46 @@ class CreateNewEventForm extends Component {
                     </Select2>
                   </FormControl>
                 </div>
+
+                {tagCollections.map(tc => (
+                  <div className={classes.field} key={tc.id}>
+                    <FormControl component="fieldset">
+                      <FormLabel component="legend">{tc.name}</FormLabel>
+                      <FormGroup>
+                        {tc.tags.map(t => (
+                          <FormControlLabel
+                            key={t.id}
+                            control={(
+                              <Checkbox
+                                checked={tagsSelected.indexOf(t.id) > -1}
+                                onChange={this.handleCheckBoxSelect}
+                                value={'' + t.id}
+                                name="tagsSelected"
+                              />
+                            )}
+                            label={t.name}
+                          />
+                        ))}
+                      </FormGroup>
+                    </FormControl>
+                    <br />
+                    <br />
+                    <br />
+                  </div>
+                ))}
+                <Fragment>
+                  <div>
+                    <MaterialDropZone
+                      acceptedFiles={['image/jpeg', 'image/png', 'image/jpg', 'image/bmp', 'image/svg']}
+                      files={this.state.formData.image}
+                      showPreviews
+                      maxSize={5000000}
+                      filesLimit={1}
+                      text="Please Upload the Display Image for this Action"
+                      addToState={this.updateForm}
+                    />
+                  </div>
+                </Fragment>
                 {/* <div className={classes.fieldBasic}>
                   <FormLabel component="label">Toggle Input</FormLabel>
                   <div className={classes.inlineWrap}>
