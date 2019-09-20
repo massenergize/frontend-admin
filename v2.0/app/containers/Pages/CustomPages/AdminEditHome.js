@@ -17,43 +17,78 @@ import AboutUsVideo from './Frags/AboutUsVideo';
 import AboutUsDescription from './Frags/AboutUsDescription';
 import GraphChoice from './Frags/GraphChoice';
 import EventChoices from './Frags/EventChoices';
+import { allCommunities, immediateEventQuest } from './DataRetriever';
 class AdminEditHome extends React.Component {
   constructor(props) {
     super(props);
     this.trackSelectedFeatureEdit = this.trackSelectedFeatureEdit.bind(this);
-    this.handleEventSelection = this.handleEventSelection.bind(this); 
+    this.handleEventSelection = this.handleEventSelection.bind(this);
     this.removeEvent = this.removeEvent.bind(this);
     this.addFeatures = this.addFeatures.bind(this);
     this.removeIconFeature = this.removeIconFeature.bind(this);
     this.state = {
       selected_icon_features: [],
-      selected_graphs:[],
-      selected_events:[],
-      communities: ['Wayland', 'Ghana', 'Denver', 'New York'],
-      selected_community: 'Choose Community',
+      selected_graphs: [],
+      selected_events: [],
+      communities: [],
+      events: [],
+      selected_community: { id: null, name: "Choose Community" },
       files: []
     }
   }
 
-  handleEventSelection = ( item ) =>{
+  componentDidMount() {
+    this.callForAllCommunities();
+  }
+
+  eventSearch = (id) => {
+    const me = this;
+    if (id !== null) {
+      immediateEventQuest(id)
+        .then(res => {
+          console.log(res.data);
+          me.setState({ events: res.data })
+        });
+    }
+  }
+  callForAllCommunities = () => {
+    const me = this;
+    allCommunities().then(res => {
+      me.setState({ communities: res.data });
+    });
+  }
+  handleEventSelection = (item) => {
     var old = this.state.selected_events;
-    if(old.length !== 3){
+    if (old.length !== 3) {
       this.setState({ selected_events: old.includes(item) ? [...old] : [...old, item] });
     }
   }
-  handleGraphSelection = ( item ) =>{
+  handleGraphSelection = (item) => {
     var old = this.state.selected_graphs;
-    this.setState({selected_graphs: old.includes(item) ? [...old] : [...old, item] });
+    this.setState({ selected_graphs: old.includes(item) ? [...old] : [...old, item] });
   }
   addFeatures = (item) => {
     var old = this.state.selected_icon_features;
     this.setState({ selected_icon_features: old.includes(item) ? [...old] : [...old, item] });
   }
- 
+
   handleCommunitiesChoice = (event) => {
-    this.setState({ selected_community: event.target.value });
+    var obj = this.findCommunityObj(event.target.value);
+    this.setState({ selected_community: obj, selected_events: [], events: [] }); //also flash the event values just in case
+    this.eventSearch(obj.id);
   }
-  
+
+  findCommunityObj = (name) => {
+    var section = this.state.communities;
+    for (var i = 0; i < section.length; i++) {
+      if (section[i].name === name) {
+        return section[i];
+      }
+    }
+    return null;
+  }
+
+
   showFileList() {
     const { files } = this.state;
     if (files.length === 0) return "You have not selected any files. ";
@@ -81,23 +116,23 @@ class AdminEditHome extends React.Component {
     this.setState({ selected_events: f });
   }
 
-  trackSelectedFeatureEdit = (obj)=>{
-    const selected = this.state.selected_icon_features; 
-    for ( var i = 0 ; i < selected.length ; i++){
-      if(selected[i].name === obj.name){
-        selected[i] ={...obj};
+  trackSelectedFeatureEdit = (obj) => {
+    const selected = this.state.selected_icon_features;
+    for (var i = 0; i < selected.length; i++) {
+      if (selected[i].name === obj.name) {
+        selected[i] = { ...obj };
       }
     }
-    this.setState({selected_icon_features:selected});
+    this.setState({ selected_icon_features: selected });
   }
-  
- 
+
+
   render() {
     const communities = this.state.communities;
     const { classes } = this.props;
-    const community = this.state.selected_community;
-    const { available_sections } = this.state;
-    const { selected_sections } = this.state;
+    const community = this.state.selected_community.name;
+    //const { available_sections } = this.state;
+    //const { selected_sections } = this.state;
 
     return (
       <div>
@@ -122,8 +157,8 @@ class AdminEditHome extends React.Component {
               variant="outlined"
             >
               {communities.map(option => (
-                <MenuItem key={option.toString()} value={option}>
-                  {option}
+                <MenuItem key={option.id.toString()} value={option.name}>
+                  {option.name}
                 </MenuItem>
               ))}
             </TextField>
@@ -177,18 +212,19 @@ class AdminEditHome extends React.Component {
                 </Button>
               </label>
             </div>
-              
-              
+
+
           </Paper>
           {/*  --------------------- DYNAMIC SECTION AREA ------------- */}
 
-          <EventChoices 
-            addEventFxn = {this.handleEventSelection}
-            removeEventFxn = {this.removeEvent}
-            events = {this.state.selected_events}
+          <EventChoices
+            avEvents={this.state.events}
+            addEventFxn={this.handleEventSelection}
+            removeEventFxn={this.removeEvent}
+            events={this.state.selected_events}
           />
           <IconQuickLinks
-            trackChangeFxn = {this.trackSelectedFeatureEdit}
+            trackChangeFxn={this.trackSelectedFeatureEdit}
             addFeaturesFxn={this.addFeatures}
             selectedFeatures={this.state.selected_icon_features}
             removeFeatureFxn={this.removeIconFeature}

@@ -21,7 +21,7 @@ class GraphChoice extends React.Component {
   ejectFeatures(classes) {
     return this.props.selectedGraphs.map(item => {
       return (
-        <Button onClick={()=>{this.props.removeGraphFxn(item)}} style={{ margin: 5 }} key={item} variant="contained" className={classes.button}>
+        <Button onClick={()=>{this.props.removeGraphFxn(item)}} style={{ margin: 5,textTransform:'capitalize' }} key={item} variant="contained" className={classes.button}>
           {item}
           <DeleteIcon className={classes.extendedIcon} />
         </Button>

@@ -11,18 +11,11 @@ import Button from '@material-ui/core/Button';
 import Type from 'dan-styles/Typography.scss';
 import DeleteIcon from '@material-ui/icons/Close';
 import SimpleEventCard from './SimpleEventCard';
-const events = [
-  { id: 1, name: "First Event", img: "" },
-  { id: 2, name: "Second Event", img: "" },
-  { id: 3, name: "Third Event", img: "" },
-  { id: 4, name: "Fourth Event", img: "" },
-  { id: 5, name: "Fifth Event", img: "" },
-]
 
 class EventChoices extends React.Component {
 
   findObj = (val) => {
-    var section = events;
+    var section = this.props.avEvents;
     for (var i = 0; i < section.length; i++) {
       if (section[i].name === val) {
         return section[i];
@@ -37,10 +30,11 @@ class EventChoices extends React.Component {
     this.props.addEventFxn(obj);
   }
   ejectEventCards = (classes) => {
-    return this.props.events.map(item => {
+    return this.props.events.map((item,index) => {
       return (
-        <Grid item xl={3} md={3} sm={4} xs={12}>
-          <SimpleEventCard 
+        <Grid key={index.toString()}item xl={3} md={3} sm={4} xs={12}>
+          <SimpleEventCard
+            wholeObj = {item} 
             title ={item.name}
             removeEventFxn ={this.props.removeEventFxn}
             id = {item.id}
@@ -49,8 +43,27 @@ class EventChoices extends React.Component {
       );
     });
   }
+
+  ejectList = ()=>{
+    const avEvents = this.props.avEvents;
+    if(avEvents.length !==0){
+      return avEvents.map(option => (
+        <MenuItem key={option.name.toString()} value={option.name}>
+          {option.name}
+        </MenuItem>
+      ));
+    }
+    else{
+      return (
+        <MenuItem  value={"Nothing"}>
+          No Events available for this community yet.
+        </MenuItem>
+      )
+    }
+  }
   render() {
     const { classes } = this.props;
+    const events = this.props.avEvents;
     return (
       <div style={{ marginTop: 10, marginBottom: 10 }}>
         <Grid container xl={12} md={12}>
@@ -63,7 +76,7 @@ class EventChoices extends React.Component {
               className={classes.textField}
 
               fullWidth
-              onChange={option => { this.handleChange(option) }}
+              onChange={option => { if(events.length!==0) this.handleChange(option); }}
               SelectProps={{
                 MenuProps: {
                   className: classes.menu,
@@ -73,11 +86,7 @@ class EventChoices extends React.Component {
               margin="normal"
               variant="outlined"
             >
-              {events.map(option => (
-                <MenuItem key={option.name.toString()} value={option.name}>
-                  {option.name}
-                </MenuItem>
-              ))}
+              {this.ejectList()}
             </TextField>
 
             <Grid container >
