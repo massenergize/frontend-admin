@@ -37,6 +37,10 @@ export const AddAction = loadable(() => import('./MassEnergizeSuperAdmin/Actions
   fallback: <Loading />,
 });
 
+export const EditAction = loadable(() => import('./MassEnergizeSuperAdmin/Actions/EditActionForm'), {
+  fallback: <Loading />,
+});
+
 export const AllEvents = loadable(() => import('./MassEnergizeSuperAdmin/Events/AllEvents'), {
   fallback: <Loading />,
 });

@@ -15,6 +15,9 @@ import TableRow from '@material-ui/core/TableRow';
 import Chip from '@material-ui/core/Chip';
 import Avatar from '@material-ui/core/Avatar';
 import Icon from '@material-ui/core/Icon';
+import Paper from '@material-ui/core/Paper';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Grid from '@material-ui/core/Grid';
 import Edit from '@material-ui/icons/Edit';
 import Language from '@material-ui/icons/Language';
 import messageStyles from 'dan-styles/Messages.scss';
@@ -63,7 +66,7 @@ class AllEvents extends React.Component {
 
 
   renderTable = (data, classes) => (
-    <PapperBlock noMargin title="All Communities" icon="ios-share-outline" whiteBg desc="">
+    <PapperBlock noMargin title="All Events" icon="ios-share-outline" whiteBg desc="">
       <div className={classes.root}>
         <Table className={classNames(classes.tableLong, classes.stripped)} padding="dense">
           <TableHead>
@@ -84,7 +87,7 @@ class AllEvents extends React.Component {
                     <div>
                       <Typography variant="caption">{n.id}</Typography>
                       <Typography variant="subtitle1">{n.name}</Typography>
-                      <a href={`/admin/community/${n.id}/edit`} className={classes.downloadInvoice}>
+                      <a href={`/admin/event/${n.id}/edit`} className={classes.downloadInvoice}>
                         <Edit />
                         &nbsp; Edit this Event
                       </a>
@@ -137,6 +140,24 @@ class AllEvents extends React.Component {
     const description = brand.desc;
     const { events } = this.state;
     const { classes } = this.props;
+
+
+    if (!events || events.length === 0) {
+      return (
+        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+          <Grid item xs={12} md={6}>
+            <Paper className={this.props.classes.root}>
+              <div className={this.props.classes.root}>
+                <LinearProgress />
+                <h1>Fetching all Events.  This may take a while...</h1>
+                <br />
+                <LinearProgress color="secondary" />
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      );
+    }
 
     return (
       <div>
