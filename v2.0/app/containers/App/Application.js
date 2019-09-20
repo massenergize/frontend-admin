@@ -21,7 +21,7 @@ import {
   AddTeam, AllTeams,
   AllGoals, AddGoal,
   AddPolicy, AllPolicies,
-  AddTestimonial, AllTestimonials, Export, CustomizePages, EditAction
+  AddTestimonial, AllTestimonials, Export, CustomizePages, EditAction,SuperHome
 } from '../pageListAsync';
 
 class Application extends React.Component {
@@ -81,6 +81,7 @@ class Application extends React.Component {
           <Route path="/admin/page-list" component={Parent} />
           <Route path="/admin/pages/not-found" component={NotFound} />
           <Route path="/admin/pages/error" component={Error} />
+          <Route path="/admin/add/home" component={SuperHome} />
           <Route component={NotFound} />
         </Switch>
       </Dashboard>
