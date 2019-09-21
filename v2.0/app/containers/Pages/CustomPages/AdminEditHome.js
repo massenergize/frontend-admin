@@ -46,7 +46,6 @@ class AdminEditHome extends React.Component {
     if (id !== null) {
       immediateEventQuest(id)
         .then(res => {
-          console.log(res.data);
           me.setState({ events: res.data })
         });
     }
@@ -87,8 +86,6 @@ class AdminEditHome extends React.Component {
     }
     return null;
   }
-
-
   showFileList() {
     const { files } = this.state;
     if (files.length === 0) return "You have not selected any files. ";
@@ -212,22 +209,13 @@ class AdminEditHome extends React.Component {
                 </Button>
               </label>
             </div>
-
-
           </Paper>
           {/*  --------------------- DYNAMIC SECTION AREA ------------- */}
-
           <EventChoices
             avEvents={this.state.events}
             addEventFxn={this.handleEventSelection}
             removeEventFxn={this.removeEvent}
             events={this.state.selected_events}
-          />
-          <IconQuickLinks
-            trackChangeFxn={this.trackSelectedFeatureEdit}
-            addFeaturesFxn={this.addFeatures}
-            selectedFeatures={this.state.selected_icon_features}
-            removeFeatureFxn={this.removeIconFeature}
           />
           <GraphChoice
             addGraphFxn={this.handleGraphSelection}
@@ -235,7 +223,12 @@ class AdminEditHome extends React.Component {
             removeGraphFxn={this.removeGraph}
           />
           <AboutUsVideo />
-          <AboutUsDescription />
+          <IconQuickLinks
+            trackChangeFxn={this.trackSelectedFeatureEdit}
+            addFeaturesFxn={this.addFeatures}
+            selectedFeatures={this.state.selected_icon_features}
+            removeFeatureFxn={this.removeIconFeature}
+          />
         </Grid>
       </div>
     )

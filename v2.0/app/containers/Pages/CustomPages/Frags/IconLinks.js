@@ -22,7 +22,7 @@ class IconLinks extends React.Component {
   ejectFeatures = (classes) => {
     return this.props.selectedFeatures.map(item => {
       return (
-        <Button onClick={() => { this.props.removeFeatureFxn(item.name) }} style={{ textTransform:'capitalize', margin: 5 }} key={item.name.toString()} variant="contained" className={classes.button}>
+        <Button onClick={() => { this.props.removeFeatureFxn(item.name) }} style={{ background: '#f9f5d7', textTransform: 'capitalize', margin: 3 }} key={item.name.toString()} variant="contained" className={classes.button}>
           {item.name}
           <DeleteIcon className={classes.extendedIcon} />
         </Button>
