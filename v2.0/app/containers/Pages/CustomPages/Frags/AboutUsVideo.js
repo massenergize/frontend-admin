@@ -21,6 +21,7 @@ class AboutUsVideo extends React.Component {
           <Paper className={classes.root} elevation={4} style={{ background: '#fbfff7' }}>
               <h4>Add A Link To Any Video </h4>
               <TextField
+              onChange = {(event)=>{this.props.changeHandler(event)}}
               fullWidth
               placeholder="URL To Video "
               margin="normal"

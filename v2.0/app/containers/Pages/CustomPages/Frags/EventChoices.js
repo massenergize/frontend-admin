@@ -14,11 +14,11 @@ import SimpleEventCard from './SimpleEventCard';
 
 class EventChoices extends React.Component {
 
-  findObj = (val) => {
-    var section = this.props.avEvents;
-    for (var i = 0; i < section.length; i++) {
-      if (section[i].name === val) {
-        return section[i];
+  findObj = (id) => {
+    var events = this.props.avEvents;
+    for (var i = 0; i < events.length; i++) {
+      if (events[i].id === Number(id)) {
+        return events[i];
       }
     }
     return null;
@@ -26,36 +26,36 @@ class EventChoices extends React.Component {
 
 
   handleChange = (event) => {
-    var obj = this.findObj(event.target.value);
+    var obj = this.findObj(this.props.deCouple('id',event.target.value));
     this.props.addEventFxn(obj);
   }
   ejectEventCards = (classes) => {
-    return this.props.events.map((item,index) => {
+    return this.props.events.map((item, index) => {
       return (
-        <Grid key={index.toString()}item xl={3} md={3} sm={4} xs={12}>
+        <Grid key={index.toString()} item xl={3} md={3} sm={4} xs={12}>
           <SimpleEventCard
-            wholeObj = {item} 
-            title ={item.name}
-            removeEventFxn ={this.props.removeEventFxn}
-            id = {item.id}
+            wholeObj={item}
+            title={item.name}
+            removeEventFxn={this.props.removeEventFxn}
+            id={item.id}
           />
         </Grid>
       );
     });
   }
 
-  ejectList = ()=>{
+  ejectList = () => {
     const avEvents = this.props.avEvents;
-    if(avEvents.length !==0){
+    if (avEvents.length !== 0) {
       return avEvents.map(option => (
-        <MenuItem key={option.name.toString()} value={option.name}>
+        <MenuItem key={option.name.toString()} value={option.id+"<==>"+option.name}>
           {option.name}
         </MenuItem>
       ));
     }
-    else{
+    else {
       return (
-        <MenuItem  value={"Nothing"}>
+        <MenuItem value={"Nothing"}>
           No Events available for this community yet.
         </MenuItem>
       )
@@ -76,7 +76,7 @@ class EventChoices extends React.Component {
               className={classes.textField}
 
               fullWidth
-              onChange={option => { if(events.length!==0) this.handleChange(option); }}
+              onChange={option => { if (events.length !== 0) this.handleChange(option); }}
               SelectProps={{
                 MenuProps: {
                   className: classes.menu,
@@ -90,7 +90,7 @@ class EventChoices extends React.Component {
             </TextField>
 
             <Grid container >
-                {this.ejectEventCards(classes)}
+              {this.ejectEventCards(classes)}
             </Grid>
           </Paper>
         </Grid>

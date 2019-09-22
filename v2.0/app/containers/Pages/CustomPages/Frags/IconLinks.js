@@ -12,7 +12,7 @@ import Type from 'dan-styles/Typography.scss';
 import DeleteIcon from '@material-ui/icons/Close';
 import LinkEditBox from './LinkEditBox';
 const links = [
-  { name: "Events", title: "Events", desc: "Check out these events" },
+  { name: "Events", title: "Events", desc: "" },
   { name: "Actions", title: "Actions", desc: "" },
   { name: "Testimonials", title: "Testimonials", desc: "" },
   { name: "Service Providers", title: "Service Providers", desc: "" }

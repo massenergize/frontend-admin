@@ -31,6 +31,7 @@ class LinkEditBox extends React.Component {
         <div style={{ marginTop: 5 }}></div>
         <div style={uploadBox} >
           <h5>{f.name}</h5>
+          <p style={{color:'green'}}>You can leave everything empty here, we will cook something up.</p>
           <TextField
             fullWidth
             onChange ={(event)=>{this.handleTitleChange(event)}}

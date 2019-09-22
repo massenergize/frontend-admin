@@ -17,7 +17,9 @@ import AboutUsVideo from './Frags/AboutUsVideo';
 import AboutUsDescription from './Frags/AboutUsDescription';
 import GraphChoice from './Frags/GraphChoice';
 import EventChoices from './Frags/EventChoices';
-import { allCommunities, immediateEventQuest } from './DataRetriever';
+import Public from '@material-ui/icons/Public';
+import { allCommunities, immediateEventQuest, immediateGraphQuest, formForJokes, iconTextDefaults } from './DataRetriever';
+import VerificationModal from './Frags/VerificationModal';
 class AdminEditHome extends React.Component {
   constructor(props) {
     super(props);
@@ -25,15 +27,23 @@ class AdminEditHome extends React.Component {
     this.handleEventSelection = this.handleEventSelection.bind(this);
     this.removeEvent = this.removeEvent.bind(this);
     this.addFeatures = this.addFeatures.bind(this);
+    this.deCouple = this.deCouple.bind(this);
+    this.closeSummary = this.closeSummary.bind(this);
     this.removeIconFeature = this.removeIconFeature.bind(this);
+    this.publishContent = this.publishContent.bind(this);
     this.state = {
+      about_video_url: "",
+      name: "",
+      description: "",
       selected_icon_features: [],
       selected_graphs: [],
       selected_events: [],
       communities: [],
       events: [],
+      graphs: [],
       selected_community: { id: null, name: "Choose Community" },
-      files: []
+      files: [],
+      summary_modal_is_open: false
     }
   }
 
@@ -41,14 +51,31 @@ class AdminEditHome extends React.Component {
     this.callForAllCommunities();
   }
 
+
+  handleVideoUrl = (event) => {
+    this.setState({ about_video_url: event.target.value.trim() });
+  }
+  handleName = (event) => {
+    this.setState({ name: event.target.value.trim() });
+  }
+  handleDescription = (event) => {
+    this.setState({ description: event.target.value.trim() });
+  }
+  graphSearch = (id) => {
+    const me = this;
+    immediateGraphQuest(id)
+      .then(res => {
+        me.setState({ graphs: res.data })
+      });
+
+  }
   eventSearch = (id) => {
     const me = this;
-    if (id !== null) {
-      immediateEventQuest(id)
-        .then(res => {
-          me.setState({ events: res.data })
-        });
-    }
+    immediateEventQuest(id)
+      .then(res => {
+        me.setState({ events: res.data })
+      });
+
   }
   callForAllCommunities = () => {
     const me = this;
@@ -73,8 +100,25 @@ class AdminEditHome extends React.Component {
 
   handleCommunitiesChoice = (event) => {
     var obj = this.findCommunityObj(event.target.value);
-    this.setState({ selected_community: obj, selected_events: [], events: [] }); //also flash the event values just in case
+    this.setState({
+      selected_community: obj,
+      selected_events: [],
+      events: [],
+      graphs: [],
+      selected_graphs: []
+    }); //also flash the event values just in case
     this.eventSearch(obj.id);
+    this.graphSearch(obj.id);
+  }
+
+  deCouple = (what, mesh) => {
+    const arr = mesh.trim().split("<==>");
+    if (what === "value") {
+      return arr[1];
+    }
+    else if (what === "id") {
+      return arr[0];
+    }
   }
 
   findCommunityObj = (name) => {
@@ -104,15 +148,14 @@ class AdminEditHome extends React.Component {
     var f = this.state.selected_icon_features.filter(itm => itm.name !== name);
     this.setState({ selected_icon_features: f });
   }
-  removeGraph = (item) => {
-    var f = this.state.selected_graphs.filter(itm => itm !== item);
+  removeGraph = (id) => {
+    var f = this.state.selected_graphs.filter(itm => itm.id !== id);
     this.setState({ selected_graphs: f });
   }
   removeEvent = (id) => {
     var f = this.state.selected_events.filter(itm => itm.id !== id);
     this.setState({ selected_events: f });
   }
-
   trackSelectedFeatureEdit = (obj) => {
     const selected = this.state.selected_icon_features;
     for (var i = 0; i < selected.length; i++) {
@@ -122,20 +165,99 @@ class AdminEditHome extends React.Component {
     }
     this.setState({ selected_icon_features: selected });
   }
+  searchForIconDefaults = (name) => {
+    switch (name) {
+      case "Events":
+        return iconTextDefaults.events;
+      case "Actions":
+        return iconTextDefaults.actions;
+      case "Service Providers":
+        return iconTextDefaults.service;
+      case "Testimonials":
+        return iconTextDefaults.testimonials;
+      default:
+        break;
+    }
+  }
+  cleanUpIconEdits = () => {
+    const edits = this.state.selected_icon_features;
+    var icons = [];
+    for (var i = 0; i < edits.length; i++) {
+      var ico = edits[i];
+      var item = { ...ico };
+      var DEFAULT = this.searchForIconDefaults(ico.name);
+      if (ico.title.trim() === "") {
+        item.title = DEFAULT.title;
+      }
+      if (ico.desc.trim() === "") {
+        item.desc = DEFAULT.desc;
+      }
+      item.name = ico.name;
+      icons.push(item);
+    }
+    return icons;
+  }
+  publishContent = () => {
 
-
+    const data = {
+      chosen_community: this.state.selected_community,
+      name: this.state.name,
+      description: this.state.description,
+      selected_icons: this.cleanUpIconEdits(this.state.selected_icon_features),
+      selected_graphs: this.state.selected_graphs,
+      selected_events: this.state.selected_events,
+      images: this.state.files,
+      about_video_url: this.state.about_video_url
+    };
+    console.log("I am the form data", data);
+    //formForJokes(data);
+  }
+  openSummary = () => {
+    this.setState({ summary_modal_is_open: true });
+  }
+  closeSummary = () => {
+    this.setState({ summary_modal_is_open: false });
+  }
+  showSummary = () => {
+    if (this.state.summary_modal_is_open) {
+      return (
+        <VerificationModal
+          name={this.state.name}
+          videoURL={this.state.about_video_url}
+          community={this.state.selected_community}
+          graphs={this.state.selected_graphs}
+          events={this.state.selected_events}
+          iconLinks={this.cleanUpIconEdits()}
+          description={this.state.description}
+          files={this.showFileList()}
+          closeModal={this.closeSummary}
+          publishContentFxn={this.publishContent}
+        />
+      );
+    }
+  }
   render() {
     const communities = this.state.communities;
     const { classes } = this.props;
     const community = this.state.selected_community.name;
     //const { available_sections } = this.state;
     //const { selected_sections } = this.state;
-
     return (
       <div>
+        {this.showSummary()}
         <div style={{ margin: 30 }}></div>
         <Grid item xl={12} md={12}>
           <Paper className={classes.root} elevation={4}>
+            <Fab
+              onClick={() => { this.openSummary() }}
+              variant="extended"
+              color="secondary"
+              aria-label="Delete"
+              className={classes.button}
+            >
+              Finish Up <span style={{ margin: 3 }}></span>
+              <Public />
+            </Fab>
             <TextField
               id="outlined-select-currency"
               select
@@ -161,6 +283,7 @@ class AdminEditHome extends React.Component {
             </TextField>
 
             <TextField
+              onChange={(event) => { this.handleName(event) }}
               fullWidth
               placeholder="Name"
               margin="normal"
@@ -168,6 +291,7 @@ class AdminEditHome extends React.Component {
               helperText="This will be the name of the homepage..."
             />
             <TextField
+              onChange={(event) => { this.handleDescription(event) }}
               id="outlined-multiline-flexible"
               label="Description"
               fullWidth
@@ -175,7 +299,7 @@ class AdminEditHome extends React.Component {
               cols="20"
               rowsMax="19"
               rows="10"
-              value={"Write a description for Wayland Homepage ..."}
+              placeholder="Write a description for Wayland Homepage ..."
               className={classes.textField}
               margin="normal"
               helperText="This will be shown somewhere on the wayland homepage"
@@ -212,23 +336,37 @@ class AdminEditHome extends React.Component {
           </Paper>
           {/*  --------------------- DYNAMIC SECTION AREA ------------- */}
           <EventChoices
+            deCouple={this.deCouple}
             avEvents={this.state.events}
             addEventFxn={this.handleEventSelection}
             removeEventFxn={this.removeEvent}
             events={this.state.selected_events}
           />
           <GraphChoice
+            deCouple={this.deCouple}
+            avGraphs={this.state.graphs}
             addGraphFxn={this.handleGraphSelection}
             selectedGraphs={this.state.selected_graphs}
             removeGraphFxn={this.removeGraph}
           />
-          <AboutUsVideo />
+          <AboutUsVideo changeHandler={this.handleVideoUrl} />
           <IconQuickLinks
             trackChangeFxn={this.trackSelectedFeatureEdit}
             addFeaturesFxn={this.addFeatures}
             selectedFeatures={this.state.selected_icon_features}
             removeFeatureFxn={this.removeIconFeature}
           />
+          <Fab
+            onClick={() => { this.openSummary(); window.scrollTo(0, 20) }}
+            variant="extended"
+            color="secondary"
+            aria-label="Delete"
+            style={{ margin: 20, float: 'right' }}
+            className={classes.button}
+          >
+            Finish Up <span style={{ margin: 3 }}></span>
+            <Public />
+          </Fab>
         </Grid>
       </div>
     )
