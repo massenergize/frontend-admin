@@ -15,54 +15,120 @@ import DeleteIcon from '@material-ui/icons/Close';
 import IconQuickLinks from './Frags/IconLinks';
 import AboutUsVideo from './Frags/AboutUsVideo';
 import AboutUsDescription from './Frags/AboutUsDescription';
+import GraphChoice from './Frags/GraphChoice';
+import EventChoices from './Frags/EventChoices';
+import Public from '@material-ui/icons/Public';
+import { allCommunities, immediateEventQuest, immediateGraphQuest, formForJokes, iconTextDefaults } from './DataRetriever';
+import VerificationModal from './Frags/VerificationModal';
 class AdminEditHome extends React.Component {
   constructor(props) {
     super(props);
+    this.trackSelectedFeatureEdit = this.trackSelectedFeatureEdit.bind(this);
+    this.handleEventSelection = this.handleEventSelection.bind(this);
+    this.removeEvent = this.removeEvent.bind(this);
     this.addFeatures = this.addFeatures.bind(this);
+    this.deCouple = this.deCouple.bind(this);
+    this.closeSummary = this.closeSummary.bind(this);
     this.removeIconFeature = this.removeIconFeature.bind(this);
+    this.publishContent = this.publishContent.bind(this);
     this.state = {
-      available_sections: [
-        { id: 1, name: "Terms Of Service" },
-        { id: 2, name: "Privacey Policy" },
-        { id: 3, name: "Donate Bar" },
-        { id: 4, name: "Graph Section" },
-        { id: 5, name: "Donate Page Header" },
-        { id: 6, name: "Welcome Images" },
-        { id: 7, name: "Icon Quick Links" },
-        { id: 8, name: "About Us Video" },
-        { id: 9, name: "Donate Page Button" },
-        { id: 10, name: "Home Header" },
-        { id: 11, name: "About Us Description" },
-      ],
+      about_video_url: "",
+      name: "",
+      description: "",
       selected_icon_features: [],
-      selected_sections: [],
-      communities: ['Ghana Cedis', 'Dollars', 'Rupees', 'Rands'],
-      selected_community: 'Choose Community',
-      files: []
+      selected_graphs: [],
+      selected_events: [],
+      communities: [],
+      events: [],
+      graphs: [],
+      selected_community: { id: null, name: "Choose Community" },
+      files: [],
+      summary_modal_is_open: false
     }
   }
 
+  componentDidMount() {
+    this.callForAllCommunities();
+  }
+
+
+  handleVideoUrl = (event) => {
+    this.setState({ about_video_url: event.target.value.trim() });
+  }
+  handleName = (event) => {
+    this.setState({ name: event.target.value.trim() });
+  }
+  handleDescription = (event) => {
+    this.setState({ description: event.target.value.trim() });
+  }
+  graphSearch = (id) => {
+    const me = this;
+    immediateGraphQuest(id)
+      .then(res => {
+        me.setState({ graphs: res.data })
+      });
+
+  }
+  eventSearch = (id) => {
+    const me = this;
+    immediateEventQuest(id)
+      .then(res => {
+        me.setState({ events: res.data })
+      });
+
+  }
+  callForAllCommunities = () => {
+    const me = this;
+    allCommunities().then(res => {
+      me.setState({ communities: res.data });
+    });
+  }
+  handleEventSelection = (item) => {
+    var old = this.state.selected_events;
+    if (old.length !== 3) {
+      this.setState({ selected_events: old.includes(item) ? [...old] : [...old, item] });
+    }
+  }
+  handleGraphSelection = (item) => {
+    var old = this.state.selected_graphs;
+    this.setState({ selected_graphs: old.includes(item) ? [...old] : [...old, item] });
+  }
   addFeatures = (item) => {
     var old = this.state.selected_icon_features;
     this.setState({ selected_icon_features: old.includes(item) ? [...old] : [...old, item] });
   }
-  findSectionObj = (val) => {
-    var section = this.state.available_sections;
+
+  handleCommunitiesChoice = (event) => {
+    var obj = this.findCommunityObj(event.target.value);
+    this.setState({
+      selected_community: obj,
+      selected_events: [],
+      events: [],
+      graphs: [],
+      selected_graphs: []
+    }); //also flash the event values just in case
+    this.eventSearch(obj.id);
+    this.graphSearch(obj.id);
+  }
+
+  deCouple = (what, mesh) => {
+    const arr = mesh.trim().split("<==>");
+    if (what === "value") {
+      return arr[1];
+    }
+    else if (what === "id") {
+      return arr[0];
+    }
+  }
+
+  findCommunityObj = (name) => {
+    var section = this.state.communities;
     for (var i = 0; i < section.length; i++) {
-      if (section[i].name === val) {
+      if (section[i].name === name) {
         return section[i];
       }
     }
     return null;
-  }
-  handleCommunitiesChoice = (event) => {
-    this.setState({ selected_community: event.target.value });
-  }
-
-  handleSectionChoice = (event) => {
-    const wholeTray = this.findSectionObj(event.target.value);
-    const oldValues = this.state.selected_sections;
-    this.setState({ selected_sections: oldValues.includes(wholeTray) ? [...oldValues] : [...oldValues, wholeTray] });
   }
   showFileList() {
     const { files } = this.state;
@@ -78,89 +144,120 @@ class AdminEditHome extends React.Component {
     }
     return string;
   }
-  removeSection = (id) => {
-    var sel = this.state.selected_sections;
-    this.setState({ selected_sections: sel.filter(itm => itm.id !== id) })
-  }
-  ejectSelectedSections(classes) {
-    return this.state.selected_sections.map((item) => {
-      return (
-        <Fab
-          onClick={() => { this.removeSection(item.id) }}
-          key={item.id.toString()}
-          style={{ background: '#af0f0f', color: "white", margin: 5 }}
-          variant="extended"
-          color="danger"
-          aria-label="Delete"
-          className={classes.button}
-        >
-          {item.name}
-          <DeleteIcon className={classes.extendedIcon} />
-        </Fab>
-      );
-    });
-  }
-  stringifySelected() {
-    var string = "";
-    var items = this.state.selected_sections;
-    for (var i = 0; i < items.length; i++) {
-      if (string !== "") {
-        string += ", " + items[i].name;
-      }
-      else {
-        string = items[i].name;
-      }
-    }
-    return string;
-  }
-
-  removeIconFeature = (item) => {
-    var f = this.state.selected_icon_features.filter(itm => itm !== item);
+  removeIconFeature = (name) => {
+    var f = this.state.selected_icon_features.filter(itm => itm.name !== name);
     this.setState({ selected_icon_features: f });
   }
-
-  switchForComponent = (section) => {
-    switch (section.id) {
-      case 7:
-        return (
-          <IconQuickLinks
-            key={section.id}
-            addFeaturesFxn={this.addFeatures}
-            selectedFeatures={this.state.selected_icon_features}
-            removeFeatureFxn={this.removeIconFeature}
-          />
-        );
-        break;
-      case 8:
-        return <AboutUsVideo key={section.id} />
-        break;
-      case 11:
-        return <AboutUsDescription key={section.id} />
-        break;
-
+  removeGraph = (id) => {
+    var f = this.state.selected_graphs.filter(itm => itm.id !== id);
+    this.setState({ selected_graphs: f });
+  }
+  removeEvent = (id) => {
+    var f = this.state.selected_events.filter(itm => itm.id !== id);
+    this.setState({ selected_events: f });
+  }
+  trackSelectedFeatureEdit = (obj) => {
+    const selected = this.state.selected_icon_features;
+    for (var i = 0; i < selected.length; i++) {
+      if (selected[i].name === obj.name) {
+        selected[i] = { ...obj };
+      }
+    }
+    this.setState({ selected_icon_features: selected });
+  }
+  searchForIconDefaults = (name) => {
+    switch (name) {
+      case "Events":
+        return iconTextDefaults.events;
+      case "Actions":
+        return iconTextDefaults.actions;
+      case "Service Providers":
+        return iconTextDefaults.service;
+      case "Testimonials":
+        return iconTextDefaults.testimonials;
       default:
-        return <div><h5>Not done yet!</h5></div>
         break;
     }
   }
+  cleanUpIconEdits = () => {
+    const edits = this.state.selected_icon_features;
+    var icons = [];
+    for (var i = 0; i < edits.length; i++) {
+      var ico = edits[i];
+      var item = { ...ico };
+      var DEFAULT = this.searchForIconDefaults(ico.name);
+      if (ico.title.trim() === "") {
+        item.title = DEFAULT.title;
+      }
+      if (ico.desc.trim() === "") {
+        item.desc = DEFAULT.desc;
+      }
+      item.name = ico.name;
+      icons.push(item);
+    }
+    return icons;
+  }
+  publishContent = () => {
 
-  ejectSelectedSectionsPanel() {
-    return this.state.selected_sections.map(item => {
-      return this.switchForComponent(item);
-    });
+    const data = {
+      chosen_community: this.state.selected_community,
+      name: this.state.name,
+      description: this.state.description,
+      selected_icons: this.cleanUpIconEdits(this.state.selected_icon_features),
+      selected_graphs: this.state.selected_graphs,
+      selected_events: this.state.selected_events,
+      images: this.state.files,
+      about_video_url: this.state.about_video_url
+    };
+    console.log("I am the form data", data);
+    //formForJokes(data);
+  }
+  openSummary = () => {
+    this.setState({ summary_modal_is_open: true });
+  }
+  closeSummary = () => {
+    this.setState({ summary_modal_is_open: false });
+  }
+  showSummary = () => {
+    if (this.state.summary_modal_is_open) {
+      return (
+        <VerificationModal
+          name={this.state.name}
+          videoURL={this.state.about_video_url}
+          community={this.state.selected_community}
+          graphs={this.state.selected_graphs}
+          events={this.state.selected_events}
+          iconLinks={this.cleanUpIconEdits()}
+          description={this.state.description}
+          files={this.showFileList()}
+          closeModal={this.closeSummary}
+          publishContentFxn={this.publishContent}
+        />
+      );
+    }
   }
   render() {
     const communities = this.state.communities;
     const { classes } = this.props;
-    const community = this.state.selected_community;
-    const { available_sections } = this.state;
-    const { selected_sections } = this.state;
-
+    const community = this.state.selected_community.name;
+    //const { available_sections } = this.state;
+    //const { selected_sections } = this.state;
     return (
       <div>
+        {this.showSummary()}
         <div style={{ margin: 30 }}></div>
         <Grid item xl={12} md={12}>
           <Paper className={classes.root} elevation={4}>
+            <Fab
+              onClick={() => { this.openSummary() }}
+              variant="extended"
+              color="secondary"
+              aria-label="Delete"
+              className={classes.button}
+            >
+              Finish Up <span style={{ margin: 3 }}></span>
+              <Public />
+            </Fab>
             <TextField
               id="outlined-select-currency"
               select
@@ -179,13 +276,14 @@ class AdminEditHome extends React.Component {
               variant="outlined"
             >
               {communities.map(option => (
-                <MenuItem key={option.toString()} value={option}>
-                  {option}
+                <MenuItem key={option.id.toString()} value={option.name}>
+                  {option.name}
                 </MenuItem>
               ))}
             </TextField>
 
             <TextField
+              onChange={(event) => { this.handleName(event) }}
               fullWidth
               placeholder="Name"
               margin="normal"
@@ -193,6 +291,7 @@ class AdminEditHome extends React.Component {
               helperText="This will be the name of the homepage..."
             />
             <TextField
+              onChange={(event) => { this.handleDescription(event) }}
               id="outlined-multiline-flexible"
               label="Description"
               fullWidth
@@ -200,7 +299,7 @@ class AdminEditHome extends React.Component {
               cols="20"
               rowsMax="19"
               rows="10"
-              value={"Write a description for Wayland Homepage ..."}
+              placeholder="Write a description for Wayland Homepage ..."
               className={classes.textField}
               margin="normal"
               helperText="This will be shown somewhere on the wayland homepage"
@@ -234,37 +333,40 @@ class AdminEditHome extends React.Component {
                 </Button>
               </label>
             </div>
-            <Typography style={{ marginTop: 10 }} variant="h5" className={Type.medium} gutterBottom>Add Sections Of The Homepage Here</Typography>
-            {/* -------Selected Sections -------- */}
-            {this.ejectSelectedSections(classes)}
-            <TextField
-              id="outlined-select-sections"
-              select
-              label="Choose Sections"
-              className={classes.textField}
-              fullWidth
-              onChange={option => { this.handleSectionChoice(option) }}
-              SelectProps={{
-                MenuProps: {
-                  className: classes.menu,
-                },
-              }}
-              helperText={"Add Sections To The Wayland Home Page And Fill Them Below "}
-              margin="normal"
-              variant="outlined"
-            >
-              {available_sections.map(option => (
-                <MenuItem key={option.id.toString()} id={option.id} value={option.name}>
-                  {option.name}
-                </MenuItem>
-              ))}
-            </TextField>
-
-
           </Paper>
           {/*  --------------------- DYNAMIC SECTION AREA ------------- */}
-          {this.ejectSelectedSectionsPanel()}
-
+          <EventChoices
+            deCouple={this.deCouple}
+            avEvents={this.state.events}
+            addEventFxn={this.handleEventSelection}
+            removeEventFxn={this.removeEvent}
+            events={this.state.selected_events}
+          />
+          <GraphChoice
+            deCouple={this.deCouple}
+            avGraphs={this.state.graphs}
+            addGraphFxn={this.handleGraphSelection}
+            selectedGraphs={this.state.selected_graphs}
+            removeGraphFxn={this.removeGraph}
+          />
+          <AboutUsVideo changeHandler={this.handleVideoUrl} />
+          <IconQuickLinks
+            trackChangeFxn={this.trackSelectedFeatureEdit}
+            addFeaturesFxn={this.addFeatures}
+            selectedFeatures={this.state.selected_icon_features}
+            removeFeatureFxn={this.removeIconFeature}
+          />
+          <Fab
+            onClick={() => { this.openSummary(); window.scrollTo(0, 20) }}
+            variant="extended"
+            color="secondary"
+            aria-label="Delete"
+            style={{ margin: 20, float: 'right' }}
+            className={classes.button}
+          >
+            Finish Up <span style={{ margin: 3 }}></span>
+            <Public />
+          </Fab>
         </Grid>
       </div>
     )
