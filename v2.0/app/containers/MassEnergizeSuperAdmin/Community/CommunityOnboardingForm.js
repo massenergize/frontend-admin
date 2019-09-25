@@ -12,6 +12,9 @@ import Typography from '@material-ui/core/Typography';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import InputLabel from '@material-ui/core/InputLabel';
+
 import {
   Checkbox,
   TextField
@@ -74,7 +77,7 @@ class CommunityOnboardingForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showLocation: false
+      showLocation: false,
     };
   }
 
@@ -87,7 +90,8 @@ class CommunityOnboardingForm extends Component {
       reset,
       submitting,
       init,
-      clear
+      clear,
+      submitIsClicked
     } = this.props;
 
     return (
@@ -243,13 +247,17 @@ class CommunityOnboardingForm extends Component {
                   )
                 }
 
-                <div className={classes.fieldBasic}>
-                  <FormLabel component="label"><a href="#" className={classes.link}>Terms &amp; Condition</a></FormLabel>
-                  <div className={classes.inlineWrap}>
-                    <FormControlLabel control={<Field name="accepted_terms_and_conditions" component={Checkbox} />} label="I have read and accepted all the terms and conditions" />
-                  </div>
-                </div>
                 <div>
+                  {submitIsClicked
+                    && (
+                      <div>
+                        <h5>Creating a new Community now ...</h5>
+                        <InputLabel>This might take a minute ...</InputLabel>
+                        <CircularProgress className={classes.progress} />
+                      </div>
+                    )
+                  }
+
                   <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
                     Submit
                   </Button>

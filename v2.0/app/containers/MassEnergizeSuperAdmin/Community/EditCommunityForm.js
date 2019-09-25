@@ -12,6 +12,8 @@ import Typography from '@material-ui/core/Typography';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import InputLabel from '@material-ui/core/InputLabel';
 import {
   Checkbox,
   TextField
@@ -85,7 +87,8 @@ class EditCommunityForm extends Component {
       handleSubmit,
       submitting,
       init,
-      community
+      community,
+      submitIsClicked
     } = this.props;
 
     init(this.getInitData(community));
@@ -230,6 +233,15 @@ class EditCommunityForm extends Component {
                   )
                 }
                 <div>
+                  {submitIsClicked
+                    && (
+                      <div>
+                        <h5>Updating this Community ...</h5>
+                        <InputLabel>This might take a minute ...</InputLabel>
+                        <CircularProgress className={classes.progress} />
+                      </div>
+                    )
+                  }
                   <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
                     Submit
                   </Button>

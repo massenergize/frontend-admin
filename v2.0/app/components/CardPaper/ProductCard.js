@@ -6,13 +6,12 @@ import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import Card from '@material-ui/core/Card';
-import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import CardMedia from '@material-ui/core/CardMedia';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Chip from '@material-ui/core/Chip';
-//import FileCopy from '@material-ui/icons/FileCopy';
+import FileCopy from '@material-ui/icons/FileCopy';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
@@ -67,7 +66,7 @@ class ProductCard extends React.Component {
         <CardContent className={classes.floatingButtonWrap}>
           <Tooltip title="Duplicate this Action" placement="top">
             <Fab onClick={() => this.duplicateAction(id)} size="small" color="secondary" aria-label="add" className={classes.buttonAdd}>
-                 {/* <FileCopy /> */}
+              <FileCopy />
             </Fab>
           </Tooltip>
           <Typography noWrap gutterBottom variant="h5" className={classes.title} component="h2">
@@ -95,7 +94,7 @@ class ProductCard extends React.Component {
                 See Details
               </Button>
             </Link>
-            <Button onClick={()=> this.handleDeleteAction(id)} size="small" variant="outlined" color="secondary">
+            <Button onClick={() => this.handleDeleteAction(id)} size="small" variant="outlined" color="secondary">
               Delete
               <DeleteForeverIcon />
             </Button>
@@ -127,10 +126,6 @@ ProductCard.defaultProps = {
   soldout: false,
   prevPrice: 0,
   list: false,
-  detailOpen: (id) => {
-    // window.location.href = `/admin/action/${id}/edit`;
-    // console.log(id);
-  },
   addToCart: () => (false),
 };
 

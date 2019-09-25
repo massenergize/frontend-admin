@@ -172,32 +172,24 @@ class CreateNewTeamForm extends Component {
       submitting,
       init,
       clear
-    } = this.props; 
+    } = this.props;
     const {
       formData, people, communities
     } = this.state;
     const { admins, members, community } = formData;
-    // let communitySelected = communities.filter(c => c.id === community)[0];
-    // communitySelected = communitySelected ? communitySelected.name : '';
+    let communitySelected = communities.filter(c => c.id === community)[0];
+    communitySelected = communitySelected ? communitySelected.name : '';
 
     return (
       <div>
         <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
           <Grid item xs={12} md={6}>
             <Paper className={classes.root}>
-            <div style={{margin:30}}></div>
+              <div style={{ margin: 30 }} />
               <Typography variant="h5" component="h3">
                  New Team
               </Typography>
-              <div style={{margin:50}}></div>
-                {/* <div className={classes.buttonInit}>
-                  <Button onClick={() => init(initData)} color="secondary" type="button">
-                    Load Sample Data
-                  </Button>
-                  <Button onClick={()=>{clear()}} type="button">
-                    Clear Data
-                  </Button>
-                </div> */}
+              <div style={{ margin: 50 }} />
               <form onSubmit={this.submitForm}>
                 <div>
                   <Field
@@ -205,6 +197,39 @@ class CreateNewTeamForm extends Component {
                     component={TextField}
                     placeholder="Team Name"
                     label="Team Name"
+                    validate={required}
+                    required
+                    ref={this.saveRef}
+                    className={classes.field}
+                    onChange={this.handleFormDataChange}
+                  />
+                </div>
+                <div>
+                  <FormControl className={classes.field}>
+                    <InputLabel htmlFor="community">Community</InputLabel>
+                    <Select2
+                      native
+                      name="community"
+                      onChange={async (newValue) => { await this.updateForm('community', parseInt(newValue.target.value, 10)); }}
+                      inputProps={{
+                        id: 'age-native-simple',
+                      }}
+                    >
+                      <option value={community}>{communitySelected}</option>
+                      { communities
+                            && communities.map(c => (
+                              <option value={c.id} key={c.id}>{c.name}</option>
+                            ))
+                      }
+                    </Select2>
+                  </FormControl>
+                </div>
+                <div>
+                  <Field
+                    name="team_admin_email"
+                    component={TextField}
+                    placeholder="Team Admin Email"
+                    label="Add Team admin by email"
                     validate={required}
                     required
                     ref={this.saveRef}
@@ -224,118 +249,7 @@ class CreateNewTeamForm extends Component {
                     onChange={this.handleFormDataChange}
                   />
                 </div>
-                    <div>
-                      {/* <FormControl className={classNames(classes.formControl, classes.noLabel)}>
-                          <Select2
-                            multiple
-                            displayEmpty
-                            value={admins}
-                            input={<Input id="select-a-community" name="community" />}
-                            renderValue ={()=>{ return "Please Choose A Community "}}
-                            MenuProps={MenuProps}
-                          >
-                            <MenuItem disabled value="">
-                              <em>Team Admins</em>
-                            </MenuItem>
-                            {
-                              communities
-                              && communities.map(c => (
-                                <MenuItem value={c.id} key={c.id}>
-                                  {c.name}
-                                </MenuItem>
-                              ))
-                            }
-                          </Select2>
-                        </FormControl> */}
-                        {/* <FormControl className={classes.field}>
-                          <InputLabel htmlFor="community">Community</InputLabel>
-                          <Field
-                            name="community"
-                            component={Select}
-                            placeholder="Select a Community"
-                            autoWidth={trueBool}
-                            onChange={async (newValue) => { await this.updateForm('community', newValue); }}
-                          >
-                            { communities
-                              && communities.map(c => (
-                                <MenuItem value={c.id} key={c.id}>
-                                  {c.name}
-                                </MenuItem>
-                              ))
-                            }
-                          </Field>
-                        </FormControl> */}
-                    </div>
-                      {/* <div className={classes.field}>
-                        <FormControl className={classNames(classes.formControl, classes.noLabel)}>
-                          <Select2
-                            multiple
-                            displayEmpty
-                            value={admins}
-                            onChange={this.handleFormDataChange}
-                            input={<Input id="select-multiple-placeholder" name="admins" />}
-                            renderValue={selected => {
-                              if (selected.length === 0) {
-                                return <em>Please Select Administrators of this Team</em>;
-                              }
-                              const names = selected.map(s => people.filter(t => t.id === s)[0].full_name);
-                              return names.join(', ');
-                            }}
-                            MenuProps={MenuProps}
-                          >
-                            <MenuItem disabled value="">
-                              <em>Team Admins</em>
-                            </MenuItem>
-                            {
-                              people.map(t => (
-                                <MenuItem key={t.id} value={t.id} style={getStyles(t.name, this)}>
-                                  {`${t.full_name} - ${t.email}`}
-                                </MenuItem>
-                              ))
-                            }
-                          </Select2>
-                        </FormControl>
-                      </div> */}
-
-
-                    {/* <div className={classes.field}>
-                      <FormControl className={classNames(classes.formControl, classes.noLabel)}>
-                        <Select2
-                          multiple
-                          displayEmpty
-                          value={members}
-                          onChange={this.handleFormDataChange}
-                          input={<Input id="select-multiple-placeholder" name="members" />}
-                          renderValue={selected => {
-                            if (selected.length === 0) {
-                              return <em>Please Select members of this Team</em>;
-                            }
-                            const names = selected.map(s => people.filter(t => t.id === s)[0] && people.filter(t => t.id === s)[0].full_name);
-                            return names.join(names ? ', ' : '');
-                          }}
-                          MenuProps={MenuProps}
-                        >
-                          <MenuItem disabled value="">
-                            <em>Members</em>
-                          </MenuItem>
-                          {
-                            people.map(t => (
-                              <MenuItem key={t.id} value={t.id}>
-                                {`${t.full_name} - ${t.email}`}
-                              </MenuItem>
-                            ))
-                          }
-                        </Select2>
-                      </FormControl>
-                    </div> */}
-                  {/* <div className={classes.fieldBasic}>
-                    <FormLabel component="label">Toggle Input</FormLabel>
-                    <div className={classes.inlineWrap}>
-                      <FormControlLabel control={<Field name="onof" component={Switch} />} label="On/OF Switch" />
-                      <FormControlLabel control={<Field name="checkbox" component={Checkbox} />} label="Checkbox" />
-                    </div>
-                  </div> */}
-                  <div>
+                <div>
                   <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
                     Submit
                   </Button>

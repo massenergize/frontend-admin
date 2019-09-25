@@ -11,7 +11,7 @@ import EditCommunityForm from './EditCommunityForm';
 class OnboardCommunity extends React.Component {
   constructor() {
     super();
-    this.state = { community: null, id: null };
+    this.state = { community: null, id: null, submitIsClicked: false };
   }
 
   async componentDidMount() {
@@ -57,14 +57,16 @@ class OnboardCommunity extends React.Component {
     return result;
   }
 
-  submitForm = (formValues) => {
+  submitForm = async (formValues) => {
+    await this.setStateAsync({ submitIsClicked: true });
     const cleanedValues = cleanFormData(formValues);
     const values = this.organizeCommunityInfo(cleanedValues);
     sendJson(values, '/v2/communities', '/admin/read/communities');
   }
 
 
-  updateCommunitySubmission = (formValues) => {
+  updateCommunitySubmission = async (formValues) => {
+    await this.setStateAsync({ submitIsClicked: true });
     const cleanedValues = cleanFormData(formValues);
     const values = this.organizeCommunityInfo(cleanedValues);
     sendJson(values, `/v2/community/${this.state.id}`, `/admin/community/${this.state.id}/edit`);
@@ -73,7 +75,7 @@ class OnboardCommunity extends React.Component {
   render() {
     const title = brand.name + ' - Onboard New Community';
     const description = brand.desc;
-    const { community } = this.state;
+    const { community, submitIsClicked } = this.state;
 
     return (
       <div>
@@ -87,10 +89,10 @@ class OnboardCommunity extends React.Component {
         </Helmet>
         <PapperBlock title="Onboard New Community" desc="Some text description">
           {community
-            && <EditCommunityForm onSubmit={this.updateCommunitySubmission} community={community} />
+            && <EditCommunityForm onSubmit={this.updateCommunitySubmission} community={community} submitIsClicked={submitIsClicked} />
           }
           {!community
-            && <CommunityOnboardingForm onSubmit={this.submitForm} community={community} />
+            && <CommunityOnboardingForm onSubmit={this.submitForm} community={community} submitIsClicked={submitIsClicked} />
           }
         </PapperBlock>
       </div>
