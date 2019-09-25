@@ -302,7 +302,7 @@ class AdminEditHome extends React.Component {
               placeholder="Write a description for Wayland Homepage ..."
               className={classes.textField}
               margin="normal"
-              helperText="This will be shown somewhere on the wayland homepage"
+              helperText="This will be shown somewhere on ... homepage"
               variant="outlined"
             />
             <div style={uploadBox}>

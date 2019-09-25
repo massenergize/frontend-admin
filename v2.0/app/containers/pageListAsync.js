@@ -5,6 +5,18 @@ import loadable from '../utils/loadable';
 export const SuperHome = loadable(() => import('./Pages/CustomPages/AdminEditHome'), {
   fallback: <Loading />,
 });
+export const SuperAllActions = loadable(() => import('./MassEnergizeSuperAdmin/Pages/AllActions'), {
+  fallback: <Loading />,
+});
+export const SuperDonate = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Donate'), {
+  fallback: <Loading />,
+});
+export const SuperContactUs = loadable(() => import('./MassEnergizeSuperAdmin/Pages/ContactUs'), {
+  fallback: <Loading />,
+});
+export const SuperAboutUs = loadable(() => import('./MassEnergizeSuperAdmin/Pages/AboutUs'), {
+  fallback: <Loading />,
+});
 export const BlankPage = loadable(() => import('./Pages/BlankPage'), {
   fallback: <Loading />,
 });
