@@ -1,3 +1,58 @@
+   
+   
+   import React from 'react';
+import { PropTypes } from 'prop-types';
+import TextField from '@material-ui/core/TextField';
+import { withStyles } from '@material-ui/core/styles';
+import { styles, vanish, uploadBox } from './../styles';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
+import MenuItem from '@material-ui/core/MenuItem';
+import Button from '@material-ui/core/Button';
+import Type from 'dan-styles/Typography.scss';
+import DeleteIcon from '@material-ui/icons/Close';
+import Fab from '@material-ui/core/Fab';
+import Public from '@material-ui/icons/Public';
+
+class AboutUs extends React.Component {
+
+  render() {
+    const { classes } = this.props;
+    
+    
+  }
+}
+export default withStyles(styles)(AboutUs)
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
    findSectionObj = (val) => {
     var section = this.state.available_sections;
     for (var i = 0; i < section.length; i++) {

@@ -232,7 +232,7 @@ module.exports = [
       {
         key: 'donate',
         name: 'Donate',
-        link: '/admin/read/donate'
+        link: '/admin/add/donate'
       },
       {
         key: 'contact',
