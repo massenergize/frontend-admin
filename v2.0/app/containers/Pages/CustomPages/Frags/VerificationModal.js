@@ -183,7 +183,7 @@ class VerificationModal extends React.Component {
       <div style={verificationContainer}>
         <Grid item xl={12} md={12} style={{ margin: 30 }}>
           <Paper className={classes.root} elevation={4} style={verficationPaper}>
-            <h3 style={summaryH3}>Feature that will appear on <b>{community.id !== null ? community.name : '...'}</b> homepage </h3>
+            <h3 style={summaryH3}>Features that will appear on <b>{community.id !== null ? community.name : '...'}</b> homepage </h3>
             <Fab
               onClick={() => { this.props.closeModal() }}
               size="small"
