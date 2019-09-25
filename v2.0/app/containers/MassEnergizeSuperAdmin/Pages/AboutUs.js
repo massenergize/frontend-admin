@@ -113,7 +113,7 @@ class AboutUs extends React.Component {
               cols="20"
               rowsMax="19"
               rows="10"
-              placeholder="Write a description for Wayland Homepage ..."
+              placeholder="Write a description ..."
               className={classes.textField}
               margin="normal"
               helperText={`This will be shown somewhere on ${this.state.selected_community ? this.state.selected_community.name : '...'} about page`}
