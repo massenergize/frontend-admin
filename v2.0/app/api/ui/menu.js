@@ -147,11 +147,11 @@ module.exports = [
         name: 'Goals',
         title: true
       },
-      // {
-      //   key: 'add-goal',
-      //   name: 'Add New Goal',
-      //   link: '/admin/add/goal'
-      // },
+      {
+        key: 'add-goal',
+        name: 'Add New Goal',
+        link: '/admin/add/goal'
+      },
       {
         key: 'all-goals',
         name: 'All Goals',

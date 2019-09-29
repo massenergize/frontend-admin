@@ -79,16 +79,16 @@ class AllVendors extends React.Component {
                 </TableCell>
                 <TableCell>
                   <div className={classes.flex}>
-                    <Avatar alt={n.key_contact.full_name} src={n.key_contact.profile_picture ? n.key_contact.profile_picture.url : imgApi[21]} className={classNames(classes.avatar, classes.sm)} />
+                    <Avatar alt={n.key_contact && n.key_contact.full_name} src={n.key_contact && n.key_contact.profile_picture ? n.key_contact.profile_picture.url : imgApi[21]} className={classNames(classes.avatar, classes.sm)} />
                     <div>
                       <Typography>{n.owner_name}</Typography>
                       <Typography variant="caption">
-                        <a href={`mailto:${n.key_contact.email}`} target="_blank" rel="noopener noreferrer" className={classes.downloadInvoice}>
-                        {n.key_contact.full_name}
-                        <br/>
+                        <a href={`mailto:${n.key_contact && n.key_contact.email}`} target="_blank" rel="noopener noreferrer" className={classes.downloadInvoice}>
+                          {n.key_contact && n.key_contact.full_name}
+                          <br />
                           <Email />
                           &nbsp;
-                          {n.key_contact.email}
+                          {n.key_contact && n.key_contact.email}
                         </a>
                         &nbsp;
                       </Typography>
