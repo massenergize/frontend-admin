@@ -15,6 +15,8 @@ import Typography from '@material-ui/core/Typography';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
+import Type from 'dan-styles/Typography.scss';
+import Fab from '@material-ui/core/Fab';
 import {
   Checkbox,
   Select,
@@ -39,7 +41,11 @@ const email = value => (
     ? 'Invalid email'
     : undefined
 );
-
+const uploadBox = {
+  border: 'solid 1px #e0e0e0',
+  borderRadius: 5,
+  padding: 25
+}
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -75,6 +81,30 @@ const initData = {
 };
 
 class NewCategoryForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      files: []
+    }
+  }
+  showFileList() {
+    const { files } = this.state;
+    if (files.length === 0) return "You have not selected any image ";
+    var string = "";
+    for (var i = 0; i < files.length; i++) {
+      if (string !== "") {
+        string += ", " + files[i].name;
+      }
+      else {
+        string = files[i].name;
+      }
+    }
+    return string;
+  }
+
+  handleTexts = (event)=>{
+    this.setState({ [event.target.name]:event.target.value});
+  }
   render() {
     const trueBool = true;
     const {
@@ -89,99 +119,70 @@ class NewCategoryForm extends Component {
     return (
       <div>
         <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={10} sm={12} xs={12}>
             <Paper className={classes.root}>
-              <Typography variant="h5" component="h3">
-                 Form
+              <h4 style={{color:'#585858',fontWeight:"500"}}>Use this form to create a new tag/category</h4>
+              <TextField
+              name = "title"
+                onChange={(event) => { this.handleTexts(event) }}
+                fullWidth
+                placeholder="Title"
+                margin="normal"
+                variant="outlined"
+                helperText="Add the title of this category"
+              />
+              <TextField
+              name = "description"
+                onChange={(event) => {this.handleTexts(event) }}
+                id="outlined-multiline-flexible"
+                label="Description"
+                fullWidth
+                multiline
+                cols="20"
+                rowsMax="19"
+                rows="10"
+                placeholder="Write a description for this category..."
+                className={classes.textField}
+                margin="normal"
+                helperText="Describe the category..."
+                variant="outlined"
+              />
+              <div style={uploadBox}>
+                <Typography className={Type.textGrey} gutterBottom>
+                  Upload an image
               </Typography>
-              <Typography component="p">
-                The delay between when you click (Submit) and when the alert dialog pops up is intentional, to simulate server latency.
+                <Typography className={Type.textGreyLight} gutterBottom>
+                  {this.showFileList()}
               </Typography>
-              <div className={classes.buttonInit}>
-                <Button onClick={() => init(initData)} color="secondary" type="button">
-                  Load Sample Data
-                </Button>
-                <Button onClick={() => clear()} type="button">
-                  Clear Data
-                </Button>
-              </div>
-              <form onSubmit={handleSubmit}>
-                <div>
-                  <Field
-                    name="text"
-                    component={TextField}
-                    placeholder="Text Field"
-                    label="Text Field"
-                    validate={required}
-                    required
-                    ref={this.saveRef}
-                    className={classes.field}
-                  />
-                </div>
-                <div>
-                  <Field
-                    name="email"
-                    component={TextField}
-                    placeholder="Email Field"
-                    label="Email"
-                    required
-                    validate={[required, email]}
-                    className={classes.field}
-                  />
-                </div>
-                <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Choose One Option</FormLabel>
-                  <Field name="radio" className={classes.inlineWrap} component={renderRadioGroup}>
-                    <FormControlLabel value="option1" control={<Radio />} label="Option 1" />
-                    <FormControlLabel value="option2" control={<Radio />} label="Option 2" />
-                  </Field>
-                </div>
-                <div>
-                  <FormControl className={classes.field}>
-                    <InputLabel htmlFor="selection">Selection</InputLabel>
-                    <Field
-                      name="selection"
-                      component={Select}
-                      placeholder="Selection"
-                      autoWidth={trueBool}
-                    >
-                      <MenuItem value="option1">Option One</MenuItem>
-                      <MenuItem value="option2">Option Two</MenuItem>
-                      <MenuItem value="option3">Option Three</MenuItem>
-                    </Field>
-                  </FormControl>
-                </div>
-                <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Toggle Input</FormLabel>
-                  <div className={classes.inlineWrap}>
-                    <FormControlLabel control={<Field name="onof" component={Switch} />} label="On/OF Switch" />
-                    <FormControlLabel control={<Field name="checkbox" component={Checkbox} />} label="Checkbox" />
-                  </div>
-                </div>
-                <div className={classes.field}>
-                  <Field
-                    name="textarea"
-                    className={classes.field}
-                    component={TextField}
-                    placeholder="Textarea"
-                    label="Textarea"
-                    multiline={trueBool}
-                    rows={4}
-                  />
-                </div>
-                <div>
-                  <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
-                    Submit
-                  </Button>
+                <input
+                  onChange={info => { this.setState({ files: info.target.files }) }}
+                  style={{ display: 'none' }}
+                  accept="image/*"
+                  className={classes.inputUpload}
+                  id="raised-button-file"
+                  type="file"
+                />
+                { /* eslint-disable-next-line */}
+                <label htmlFor="raised-button-file">
                   <Button
-                    type="button"
-                    disabled={pristine || submitting}
-                    onClick={reset}
+                    variant="contained"
+                    component="span"
+                    id="raised-button-file"
+                    className={classes.button}
                   >
-                    Reset
-                  </Button>
-                </div>
-              </form>
+                    Upload
+                </Button>
+                </label>
+              </div>
+              <Fab
+                justify="right"
+                style={{ margin: 6, background: 'green' }}
+                onClick={() => { console.log("I am the values ", {title:"",description:"",...this.state}) }}
+                variant="extended"
+                color="secondary"
+                aria-label="Delete"
+                className={classes.button}
+              > Add Testimonial </Fab>
             </Paper>
           </Grid>
         </Grid>
@@ -190,37 +191,6 @@ class NewCategoryForm extends Component {
   }
 }
 
-renderRadioGroup.propTypes = {
-  input: PropTypes.object.isRequired,
-};
 
-NewCategoryForm.propTypes = {
-  classes: PropTypes.object.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
-  reset: PropTypes.func.isRequired,
-  pristine: PropTypes.bool.isRequired,
-  submitting: PropTypes.bool.isRequired,
-  init: PropTypes.func.isRequired,
-  clear: PropTypes.func.isRequired,
-};
 
-const mapDispatchToProps = dispatch => ({
-  init: bindActionCreators(initAction, dispatch),
-  clear: () => dispatch(clearAction),
-});
-
-const ReduxFormMapped = reduxForm({
-  form: 'immutableExample',
-  enableReinitialize: true,
-})(NewCategoryForm);
-
-const reducer = 'initval';
-const FormInit = connect(
-  state => ({
-    force: state,
-    initialValues: state.getIn([reducer, 'formValues'])
-  }),
-  mapDispatchToProps,
-)(ReduxFormMapped);
-
-export default withStyles(styles)(FormInit);
+export default withStyles(styles)(NewCategoryForm);
