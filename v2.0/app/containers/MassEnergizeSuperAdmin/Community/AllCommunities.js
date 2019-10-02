@@ -70,7 +70,9 @@ class AllCommunities extends React.Component {
               <TableRow key={n.id}>
                 <TableCell padding="dense">
                   <div className={classes.flex}>
-                    <Avatar alt={n.name} src={n.logo ? n.logo.url : imgApi[21]} className={classes.productPhoto} />
+                    <a href={`/admin/community/${n.id}/profile`} className={classes.downloadInvoice}>
+                      <Avatar alt={n.name} src={n.logo ? n.logo.url : imgApi[21]} className={classes.productPhoto} />
+                    </a>
                     <div>
                       <Typography variant="caption">{n.id}</Typography>
                       <Typography variant="subtitle1">
