@@ -177,12 +177,12 @@ class NewCategoryForm extends Component {
               <Fab
                 justify="right"
                 style={{ margin: 6, background: 'green' }}
-                onClick={() => { console.log("I am the values ", {title:"",description:"",...this.state}) }}
+                onClick={() => { console.log( {title:"",description:"",...this.state}) }}
                 variant="extended"
                 color="secondary"
                 aria-label="Delete"
                 className={classes.button}
-              > Add Testimonial </Fab>
+              > Add Category </Fab>
             </Paper>
           </Grid>
         </Grid>

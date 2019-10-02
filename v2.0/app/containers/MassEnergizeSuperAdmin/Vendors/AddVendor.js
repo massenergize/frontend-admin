@@ -18,7 +18,7 @@ class AddVendor extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <PapperBlock title="Add New Vendor" desc="Some text description">
+        <PapperBlock title="Add New Vendor" desc="">
           <AddVendorForm />
         </PapperBlock>
       </div>
