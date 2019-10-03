@@ -169,6 +169,15 @@ class CreateNewEventForm extends Component {
     });
   }
 
+
+  isThisSelectedOrNot = (formData, fieldName, value) => {
+    const fieldValues = formData[fieldName];
+    console.log(fieldValues);
+    if (!fieldValues) return false;
+    // if (!Array.isArray(fieldValues)) return false;
+    return fieldValues.indexOf(value) > -1;
+  }
+
   submitForm = async (event) => {
     event.preventDefault();
     const { formData } = this.state;
@@ -186,6 +195,35 @@ class CreateNewEventForm extends Component {
     console.log(response);
   }
 
+  handleCheckBoxSelect = async (event) => {
+    const { target } = event;
+    if (!target) return;
+    const { formData } = this.state;
+    const { name, value } = target;
+    let theList = formData[name];
+
+    if (!theList) {
+      theList = [];
+    }
+    const newVal = parseInt(value, 10);
+    const pos = theList.indexOf(newVal);
+    if (pos > -1) {
+      theList.splice(pos, pos + 1);
+    }
+
+    if (name.includes('single')) {
+      theList = [newVal];
+    } else {
+      theList.push(newVal);
+    }
+
+    await this.setStateAsync({
+      formData: { ...formData, [name]: theList }
+    });
+
+    console.log(this.state.formData);
+  };
+
   async updateForm(fieldName, value) {
     const { formData } = this.state;
     await this.setStateAsync({
@@ -197,6 +235,7 @@ class CreateNewEventForm extends Component {
     );
   }
 
+  
   render() {
     const trueBool = true;
     const {
@@ -211,8 +250,9 @@ class CreateNewEventForm extends Component {
       formData, tags, communities, tagCollections
     } = this.state;
     const { tagsSelected, communitiesSelected, community } = formData;
-    // let communitySelected = communities.filter(c => c.id === community)[0];
-    // communitySelected = communitySelected ? communitySelected.name : '';
+    let communitySelected = communities.filter(c => c.id === community)[0];
+    communitySelected = communitySelected ? communitySelected.name : '';
+
 
     return (
       <div>
@@ -294,57 +334,24 @@ class CreateNewEventForm extends Component {
                     onChange={this.handleFormDataChange}
                   />
                 </div>
-                <div>
-                  <FormControl className={classes.field}>
-                    <InputLabel htmlFor="community">Community</InputLabel>
-                    <Field
-                      name="community"
-                      component={Select}
-                      placeholder="Select a Community"
-                      autoWidth={trueBool}
-                      onChange={async (newValue) => { await this.updateForm('community', newValue); }}
-                    >
-                      { communities
-                        && communities.map(c => (
-                          <MenuItem value={c.id} key={c.id}>
-                            {c.name}
-                          </MenuItem>
-                        ))
-                      }
-                    </Field>
-                  </FormControl>
-                </div>
-                <div className={classes.field}>
-                  <FormControl className={classNames(classes.formControl, classes.noLabel)}>
-                    <Select2
-                      multiple
-                      displayEmpty
-                      value={tagsSelected}
-                      onChange={this.handleFormDataChange}
-                      input={<Input id="select-multiple-placeholder" name="tagsSelected" />}
-                      renderValue={selected => {
-                        if (selected.length === 0) {
-                          return <em>Please Select Tags</em>;
-                        }
-                        const names = selected.map(s => tags.filter(t => t.id === s)[0].name);
-                        return names.join(', ');
-                      }}
-                      MenuProps={MenuProps}
-                    >
-                      <MenuItem disabled value="">
-                        <em>Tags</em>
-                      </MenuItem>
-                      {
-                        tags.map(t => (
-                          <MenuItem key={t.id} value={t.id} style={getStyles(t.name, this)}>
-                            {`${t.tagCollection} - ${t.name}`}
-                          </MenuItem>
-                        ))
-                      }
-                    </Select2>
-                  </FormControl>
-                </div>
-
+                <FormControl className={classes.field}>
+                  <InputLabel htmlFor="community">Community</InputLabel>
+                  <Select2
+                    native
+                    name="community"
+                    onChange={async (newValue) => { await this.updateForm('community', parseInt(newValue.target.value, 10)); }}
+                    inputProps={{
+                      id: 'age-native-simple',
+                    }}
+                  >
+                    <option value={community}>{communitySelected}</option>
+                    { communities
+                      && communities.map(c => (
+                        <option value={c.id} key={c.id}>{c.name}</option>
+                      ))
+                    }
+                  </Select2>
+                </FormControl>
 
                 <div className={classes.field}>
                   <FormControl className={classNames(classes.formControl, classes.noLabel)}>
@@ -376,21 +383,20 @@ class CreateNewEventForm extends Component {
                     </Select2>
                   </FormControl>
                 </div>
-
                 {tagCollections.map(tc => (
                   <div className={classes.field} key={tc.id}>
                     <FormControl component="fieldset">
-                      <FormLabel component="legend">{tc.name}</FormLabel>
+                      <FormLabel component="legend">{`${tc.name} ${tc.allow_multiple ? '' : '(Only one selection allowed)'}`}</FormLabel>
                       <FormGroup>
                         {tc.tags.map(t => (
                           <FormControlLabel
                             key={t.id}
                             control={(
                               <Checkbox
-                                checked={tagsSelected.indexOf(t.id) > -1}
+                                checked={this.isThisSelectedOrNot(formData, `tag-${tc.name.toLowerCase()}--${tc.allow_multiple ? 'multiple' : 'single'}`,  t.id)}
                                 onChange={this.handleCheckBoxSelect}
                                 value={'' + t.id}
-                                name="tagsSelected"
+                                name={`tag-${tc.name.toLowerCase()}--${tc.allow_multiple ? 'multiple' : 'single'}`}
                               />
                             )}
                             label={t.name}
@@ -403,6 +409,8 @@ class CreateNewEventForm extends Component {
                     <br />
                   </div>
                 ))}
+
+
                 <Fragment>
                   <div>
                     <MaterialDropZone

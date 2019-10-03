@@ -22,7 +22,7 @@ import {
   AllGoals, AddGoal,
   AddPolicy, AllPolicies,
   AddTestimonial, AllTestimonials, Export, CustomizePages, EditAction,
-  SuperAllActions,SuperContactUs,SuperHome,SuperAboutUs,SuperDonate
+  SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate
 } from '../pageListAsync';
 
 class Application extends React.Component {
