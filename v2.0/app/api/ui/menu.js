@@ -28,28 +28,6 @@ module.exports = [
     ]
   },
   {
-    key: 'vendors',
-    name: 'Vendors',
-    icon: 'md-hammer',
-    child: [
-      {
-        key: 'about-vendors',
-        name: 'Contractors/Vendors',
-        title: true
-      },
-      {
-        key: 'add-vendor',
-        name: 'Add New Vendor',
-        link: '/admin/add/vendor'
-      },
-      {
-        key: 'all-vendors',
-        name: 'All Vendors',
-        link: '/admin/read/vendors'
-      },
-    ]
-  },
-  {
     key: 'actions',
     name: 'Actions',
     icon: 'ios-bulb',
@@ -178,6 +156,28 @@ module.exports = [
         key: 'all-testimonials',
         name: 'All Testimonials',
         link: '/admin/read/testimonials'
+      },
+    ]
+  },
+  {
+    key: 'vendors',
+    name: 'Vendors',
+    icon: 'md-hammer',
+    child: [
+      {
+        key: 'about-vendors',
+        name: 'Contractors/Vendors',
+        title: true
+      },
+      {
+        key: 'add-vendor',
+        name: 'Add New Vendor',
+        link: '/admin/add/vendor'
+      },
+      {
+        key: 'all-vendors',
+        name: 'All Vendors',
+        link: '/admin/read/vendors'
       },
     ]
   },

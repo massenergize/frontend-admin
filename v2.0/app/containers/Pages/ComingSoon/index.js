@@ -12,7 +12,7 @@ import Ionicon from 'react-ionicons';
 import IconButton from '@material-ui/core/IconButton';
 import Paper from '@material-ui/core/Paper';
 import brand from 'dan-api/dummy/brand';
-import logo from 'dan-images/logo.svg';
+import logo from 'dan-images/logo.png';
 import styles from 'dan-components/Forms/user-jss';
 
 class ComingSoon extends React.Component {

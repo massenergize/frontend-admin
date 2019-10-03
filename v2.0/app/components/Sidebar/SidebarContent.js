@@ -9,7 +9,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Avatar from '@material-ui/core/Avatar';
 import brand from 'dan-api/dummy/brand';
 import dummy from 'dan-api/dummy/dummyContents';
-import logo from 'dan-images/logo.svg';
+import logo from 'dan-images/logo.png';
 import MainMenu from './MainMenu';
 import styles from './sidebar-jss';
 
