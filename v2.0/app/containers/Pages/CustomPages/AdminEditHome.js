@@ -197,15 +197,22 @@ class AdminEditHome extends React.Component {
     }
     return icons;
   }
+  popIDs = (arr) => {
+    var idArray = [];
+    for (var i = 0; i < arr.length; i++) {
+      idArray.push(arr[i].id);
+    }
+    return idArray;
+  }
   publishContent = () => {
 
     const data = {
-      chosen_community: this.state.selected_community,
+      chosen_community: this.state.selected_community.id,
       name: this.state.name,
       description: this.state.description,
       selected_icons: this.cleanUpIconEdits(this.state.selected_icon_features),
-      selected_graphs: this.state.selected_graphs,
-      selected_events: this.state.selected_events,
+      selected_graphs: this.popIDs(this.state.selected_graphs),
+      selected_events: this.popIDs(this.state.selected_events),
       images: this.state.files,
       about_video_url: this.state.about_video_url
     };

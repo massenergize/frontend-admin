@@ -17,7 +17,7 @@ class Onboarding extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <PapperBlock title="Add New Tag Collection" desc="Some text description">
+        <PapperBlock title="Add New Tag Collection" desc="">
           <NewCategoryForm />
         </PapperBlock>
       </div>
