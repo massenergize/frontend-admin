@@ -91,80 +91,43 @@ class CreatePolicyForm extends Component {
         <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
           <Grid item xs={12} md={6}>
             <Paper className={classes.root}>
-              <Typography variant="h5" component="h3">
-                 Form
-              </Typography>
-              <Typography component="p">
-                The delay between when you click (Submit) and when the alert dialog pops up is intentional, to simulate server latency.
-              </Typography>
-              <div className={classes.buttonInit}>
-                <Button onClick={() => init(initData)} color="secondary" type="button">
-                  Load Sample Data
-                </Button>
-                <Button onClick={() => clear()} type="button">
-                  Clear Data
-                </Button>
-              </div>
+              
               <form onSubmit={handleSubmit}>
                 <div>
                   <Field
-                    name="text"
+                    name="title"
                     component={TextField}
-                    placeholder="Text Field"
-                    label="Text Field"
+                    placeholder="eg. Terms and Conditions"
+                    label="Policy Title"
                     validate={required}
                     required
                     ref={this.saveRef}
                     className={classes.field}
                   />
                 </div>
-                <div>
-                  <Field
-                    name="email"
-                    component={TextField}
-                    placeholder="Email Field"
-                    label="Email"
-                    required
-                    validate={[required, email]}
-                    className={classes.field}
-                  />
-                </div>
-                <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Choose One Option</FormLabel>
-                  <Field name="radio" className={classes.inlineWrap} component={renderRadioGroup}>
-                    <FormControlLabel value="option1" control={<Radio />} label="Option 1" />
-                    <FormControlLabel value="option2" control={<Radio />} label="Option 2" />
-                  </Field>
-                </div>
+      
                 <div>
                   <FormControl className={classes.field}>
-                    <InputLabel htmlFor="selection">Selection</InputLabel>
+                    <InputLabel htmlFor="selection">Community</InputLabel>
                     <Field
                       name="selection"
                       component={Select}
                       placeholder="Selection"
                       autoWidth={trueBool}
                     >
-                      <MenuItem value="option1">Option One</MenuItem>
-                      <MenuItem value="option2">Option Two</MenuItem>
-                      <MenuItem value="option3">Option Three</MenuItem>
+                      <MenuItem value="option1">Wayland</MenuItem>
+                      <MenuItem value="option2">Concord</MenuItem>
+                      <MenuItem value="option3">Global</MenuItem>
                     </Field>
                   </FormControl>
                 </div>
-                <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Toggle Input</FormLabel>
-                  <div className={classes.inlineWrap}>
-                    <FormControlLabel control={<Field name="onof" component={Switch} />} label="On/OF Switch" />
-                    <FormControlLabel control={<Field name="checkbox" component={Checkbox} />} label="Checkbox" />
-                  </div>
-                </div>
                 <div className={classes.field}>
                   <Field
-                    name="textarea"
+                    name="description"
                     className={classes.field}
                     component={TextField}
-                    placeholder="Textarea"
-                    label="Textarea"
+                    placeholder="eg. This policy is about ..."
+                    label="Description"
                     multiline={trueBool}
                     rows={4}
                   />
@@ -172,13 +135,6 @@ class CreatePolicyForm extends Component {
                 <div>
                   <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
                     Submit
-                  </Button>
-                  <Button
-                    type="button"
-                    disabled={pristine || submitting}
-                    onClick={reset}
-                  >
-                    Reset
                   </Button>
                 </div>
               </form>

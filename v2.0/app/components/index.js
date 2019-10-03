@@ -17,6 +17,8 @@ export MaterialDropZone from './Forms/MaterialDropZone.js';
 export Notification from './Notification/Notification';
 // Table
 export EmptyData from './Tables/EmptyData';
+
+export AdvTable from './Tables/AdvTable';
 // Error
 export ErrorWrap from './Error/ErrorWrap';
 
