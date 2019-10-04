@@ -5,7 +5,7 @@ import { START_UP } from '../../actions/actionConstants';
 const initialState = Map({
   constants: {
     // API_HOST: 'http://127.0.0.1:8000',
-    API_HOST: 'http://api.massenergize.org',
+    // API_HOST: 'http://api.massenergize.org',
   },
   profile: null
 });
