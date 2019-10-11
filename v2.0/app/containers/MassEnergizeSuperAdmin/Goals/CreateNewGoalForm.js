@@ -6,6 +6,8 @@ import Select2 from '@material-ui/core/Select';
 import Paper from '@material-ui/core/Paper';
 import { Field, reduxForm } from 'redux-form/immutable';
 import Grid from '@material-ui/core/Grid';
+import Snackbar from '@material-ui/core/Snackbar';
+import SnackbarContent from '@material-ui/core/SnackbarContent';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControl from '@material-ui/core/FormControl';
 import Typography from '@material-ui/core/Typography';
@@ -14,11 +16,12 @@ import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
+import ErrorIcon from '@material-ui/icons/Error';
 
 import {
   TextField,
 } from 'redux-form-material-ui';
-import { fetchData, sendJson, send } from '../../../utils/messenger';
+import { apiCall } from '../../../utils/messenger';
 import { initAction, clearAction } from '../../../actions/ReduxFormActions';
 
 const renderRadioGroup = ({ input, ...rest }) => (
@@ -57,6 +60,31 @@ const styles = theme => ({
   },
 });
 
+const variantIcon = {
+  error: ErrorIcon,
+};
+
+const styles1 = theme => ({
+  error: {
+    backgroundColor: theme.palette.error.dark,
+  },
+  info: {
+    backgroundColor: theme.palette.primary.dark,
+  },
+  icon: {
+    fontSize: 20,
+  },
+  iconVariant: {
+    opacity: 0.9,
+    marginRight: theme.spacing(1),
+  },
+  message: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+});
+const MySnackbarContentWrapper = withStyles(styles1)(SnackbarContent);
+
 
 class CreateNewGoalForm extends Component {
   constructor(props) {
@@ -65,21 +93,21 @@ class CreateNewGoalForm extends Component {
       formData: {},
       communities: [],
       teams: [],
-      is_community_goal: true
+      is_community_goal: true,
+      error: null
     };
   }
 
 
   async componentDidMount() {
-    const teams = await fetchData('v2/teams');
-    const communities = await fetchData('v2/communities');
-
-    if (teams && teams.success) {
-      this.setStateAsync({ teams: teams.data });
+    const teamsResponse = await apiCall('/teams.listForSuperAdmin');
+    const communitiesResponse = await apiCall('/communities.listForSuperAdmin');
+    if (teamsResponse && teamsResponse.success) {
+      this.setStateAsync({ teams: teamsResponse.data });
     }
 
-    if (communities) {
-      this.setStateAsync({ communities: communities.data });
+    if (communitiesResponse && communitiesResponse.success) {
+      this.setStateAsync({ communities: communitiesResponse.data });
     }
   }
 
@@ -117,9 +145,10 @@ class CreateNewGoalForm extends Component {
     event.preventDefault();
     const { formData } = this.state;
     const cleanedValues = { ...formData };
-    console.log(cleanedValues);
-    const response = await send(cleanedValues, '/v3/goals.create', '/admin/read/goals');
-    console.log(response);
+    const response = await apiCall('/goals.create', cleanedValues, '/admin/read/goals');
+    if (response && !response.success) {
+      await this.setStateAsync({ error: response.error });
+    }
   }
 
   async updateForm(fieldName, value) {
@@ -140,7 +169,7 @@ class CreateNewGoalForm extends Component {
       submitting,
     } = this.props;
     const {
-      formData, communities, teams, is_community_goal
+      formData, communities, teams, is_community_goal, error
     } = this.state;
     const { community, team } = formData;
     let communitySelected = communities.filter(c => c.id === community)[0];
@@ -161,12 +190,36 @@ class CreateNewGoalForm extends Component {
               <form onSubmit={this.submitForm}>
                 <div>
 
+                  {error
+                  && (
+                    <Snackbar
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                      }}
+                      autoHideDuration={6000}
+                      onClose={this.handleCloseStyle}
+                    >
+                      <MySnackbarContentWrapper
+                        variant="error"
+                        message={error}
+                      />
+                    </Snackbar>
+                  )
+                  }
+
+                  {error
+                  && (
+                    <p style={{color: 'red'}}>{error}</p>
+                  )
+                  }
+
                   <FormControlLabel
                     control={(
                       <Checkbox
                         checked={is_community_goal}
                         onChange={async () => await this.setStateAsync({ is_community_goal: !is_community_goal })}
-                        value={is_community_goal}
+                        value={''+is_community_goal}
                         name="is_community_goal"
 
                       />

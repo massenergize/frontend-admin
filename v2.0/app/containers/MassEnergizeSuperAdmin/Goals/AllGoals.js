@@ -19,7 +19,7 @@ import Edit from '@material-ui/icons/Edit';
 import Language from '@material-ui/icons/Language';
 import Email from '@material-ui/icons/Email';
 import messageStyles from 'dan-styles/Messages.scss';
-import { fetchData } from '../../../utils/messenger';
+import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
 
 
@@ -30,8 +30,10 @@ class AllGoals extends React.Component {
   }
 
   async componentDidMount() {
-    const response = await fetchData('v2/goals');
-    await this.setStateAsync({ goals: response.data });
+    const allGoalsResponse = await apiCall('/goals.listForSuperAdmin');
+    if (allGoalsResponse && allGoalsResponse.success) {
+      await this.setStateAsync({ goals: allGoalsResponse.data });
+    }
   }
 
   setStateAsync(state) {
@@ -80,7 +82,7 @@ class AllGoals extends React.Component {
                 </TableCell>
                 <TableCell align="left">
                   <Typography variant="caption">
-                    <Chip label={n.status} className={classNames(classes.chip, this.getStatus(n.status === 'COMPLETE'))} />
+                    <Chip label={n.attained_number_of_actions * 100 / (n.target_number_of_actions + 1)} className={classNames(classes.chip, this.getStatus(n.status === 'COMPLETE'))} />
                   </Typography>
                 </TableCell>
                 <TableCell align="left">
@@ -102,8 +104,6 @@ class AllGoals extends React.Component {
     const description = brand.desc;
     const { goals } = this.state;
     const { classes } = this.props;
-
-    console.log(goals);
 
     return (
       <div>

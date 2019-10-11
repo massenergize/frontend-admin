@@ -33,9 +33,8 @@ export function sendJson(dataToSend, destinationUrl, relocationPage = '/admin') 
 }
 
 
-export async function send(dataToSend, destinationUrl, relocationPage = null) {
-  console.log(qs.stringify(dataToSend));
-  const response = await fetch(`${API_HOST}${destinationUrl}`, {
+export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = null) {
+  const response = await fetch(`${API_HOST}/v3${destinationUrl}`, {
     credentials: 'include',
     method: 'POST',
     headers: {
@@ -52,18 +51,6 @@ export async function send(dataToSend, destinationUrl, relocationPage = null) {
   return json;
 }
 
-export async function get(destinationUrl) {
-  const response = await fetch(`${API_HOST}${destinationUrl}`, {
-    credentials: 'include',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-  });
-
-  const json = response.json();
-  return json;
-}
 
 export function sendFormWithMedia(incomingData, destinationUrl, relocationPage) {
   fetch(`${API_HOST}/auth/csrf`, {
