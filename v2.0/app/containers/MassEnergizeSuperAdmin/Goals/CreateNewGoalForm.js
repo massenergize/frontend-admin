@@ -117,7 +117,7 @@ class CreateNewGoalForm extends Component {
     event.preventDefault();
     const { formData } = this.state;
     const cleanedValues = { ...formData };
-    const response = await sendJson(cleanedValues, '/v2/teams', '/admin/read/goals');
+    const response = await sendJson(cleanedValues, '/v3/goals.create');
     console.log(response);
   }
 

@@ -85,11 +85,11 @@ class SidebarContent extends React.Component {
               />
               <div>
                 <h4>{dummy.profile ? dummy.profile.full_name : dummy.user.name}</h4>
-                <Button size="small" onClick={openMenuStatus}>
+                {/* <Button size="small" onClick={openMenuStatus}>
                   <i className={classNames(classes.dotStatus, setStatus(status))} />
                   {status}
-                </Button>
-                <Menu
+                </Button> */}
+                {/* <Menu
                   id="status-menu"
                   anchorEl={anchorEl}
                   open={Boolean(anchorEl)}
@@ -112,7 +112,7 @@ class SidebarContent extends React.Component {
                     <i className={classNames(classes.dotStatus, classes.offline)} />
                     Offline
                   </MenuItem>
-                </Menu>
+                </Menu> */}
               </div>
             </div>
           )}

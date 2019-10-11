@@ -1,7 +1,7 @@
 /**
  * This file contains code used to transmit data
  */
-
+import qs from 'qs';
 import { API_HOST } from '../config/constants';
 
 export function sendJson(dataToSend, destinationUrl, relocationPage = '/admin') {
@@ -32,13 +32,32 @@ export function sendJson(dataToSend, destinationUrl, relocationPage = '/admin') 
   });
 }
 
+
+export async function send(dataToSend, destinationUrl, relocationPage = null) {
+  const response = await fetch(`${API_HOST}${destinationUrl}`, {
+    credentials: 'include',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'x-www-form-urlencoded',
+    },
+    body: qs.stringify(dataToSend)
+  });
+  const json = response.json();
+
+  if (relocationPage) {
+    window.location.href = relocationPage;
+  }
+
+  return json;
+}
+
 export function sendFormWithMedia(incomingData, destinationUrl, relocationPage) {
   fetch(`${API_HOST}/auth/csrf`, {
     method: 'GET',
     credentials: 'include',
   }).then(response => response.json()).then(jsonResponse => {
     const { csrfToken } = jsonResponse.data;
-    const formData = new FormData();
+    const formData = qs.stringify()
     Object.keys(incomingData).map(k => (formData.append(k, incomingData[k])));
 
     return fetch(`${API_HOST}${destinationUrl}`, {
@@ -77,7 +96,7 @@ export function cleanFormData(formValues) {
   });
   return result;
 }
- 
+
 export async function fetchData(sourceUrl) {
   return fetch(`${API_HOST}/${sourceUrl}`, {
     method: 'GET',
@@ -103,20 +122,22 @@ export async function deleteItem(sourceUrl) {
     });
 }
 
-export function formForJokes(dataTrain){
-  var formData  = new FormData();
+export function formForJokes(dataTrain) {
+  const formData = new FormData();
   Object.keys(dataTrain).map(key => formData.append(key, dataTrain[key]));
-  return fetch("https://postman-echo.com/post", {
+  return fetch('https://postman-echo.com/post', {
     method: 'POST',
     credentials: 'include',
-    mode:"no-cors",
-    body:formData
+    mode: 'no-cors',
+    body: formData
   }).then(response => response.json())
     .then(jsonResponse => {
-      console.log("I have been returned from postman",jsonResponse);
+      console.log('I have been returned from postman', jsonResponse);
     })
     .catch(error => {
       console.log(error.message);
       return null;
     });
 }
+
+
