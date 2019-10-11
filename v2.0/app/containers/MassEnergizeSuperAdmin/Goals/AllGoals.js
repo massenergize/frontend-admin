@@ -18,21 +18,50 @@ import Icon from '@material-ui/core/Icon';
 import Edit from '@material-ui/icons/Edit';
 import Language from '@material-ui/icons/Language';
 import Email from '@material-ui/icons/Email';
+import MUIDataTable from 'mui-datatables';
+
 import messageStyles from 'dan-styles/Messages.scss';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
 
 
+const tableStyles = theme => ({
+  table: {
+    '& > div': {
+      overflow: 'auto'
+    },
+    '& table': {
+      minWidth: 500,
+      [theme.breakpoints.down('md')]: {
+        '& td': {
+          height: 40
+        }
+      }
+    }
+  }
+});
+
 class AllGoals extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { goals: [] };
+    this.state = { goals: [], columns: this.getColumns(), data: [] };
   }
 
   async componentDidMount() {
     const allGoalsResponse = await apiCall('/goals.listForSuperAdmin');
     if (allGoalsResponse && allGoalsResponse.success) {
-      await this.setStateAsync({ goals: allGoalsResponse.data });
+      const data = allGoalsResponse.data.map(d => (
+        [
+          d.id,
+          d.name,
+          `${d.attained_number_of_actions}/${d.target_number_of_actions}`,
+          `${d.attained_number_of_households}/${d.target_number_of_actions}`,
+          `${d.attained_carbon_footprint_reduction}/${d.target_carbon_footprint_reduction}`,
+          `${('' + d.description).substring(0, 100)}...`
+        ]
+      ));
+      console.log(data);
+      await this.setStateAsync({ goals: allGoalsResponse.data, data });
     }
   }
 
@@ -49,6 +78,81 @@ class AllGoals extends React.Component {
       default: return messageStyles.bgSuccess;
     }
   };
+
+  getColumns = () => {
+    return [
+      {
+        name: 'ID',
+        options: {
+          filter: true
+        }
+      },
+      {
+        name: 'Name',
+        options: {
+          filter: true
+        }
+      },
+      {
+        name: '% Actions Achieved',
+        options: {
+          filter: true,
+        }
+      },
+      {
+        name: '% Households Achieved',
+        options: {
+          filter: true,
+        }
+      },
+      {
+        name: '% CarbonFootprintSavings',
+        options: {
+          filter: true,
+        }
+      },
+      {
+        name: '% Carbon Achieved',
+        options: {
+          filter: false,
+          // customBodyRender: (value) => (
+          //   <LinearProgress variant="determinate" color="secondary" value={value} />
+          // )
+        }
+      },
+      {
+        name: 'Description',
+        options: {
+          filter: true,
+          // customBodyRender: (value) => {
+          //   if (value === 'active') {
+          //     return (<Chip label="Active" color="secondary" />);
+          //   }
+          //   if (value === 'non-active') {
+          //     return (<Chip label="Non Active" color="primary" />);
+          //   }
+          //   return (<Chip label="Unknown" />);
+          // }
+        }
+      },
+      {
+        name: 'Options',
+        options: {
+          filter: true,
+          // customBodyRender: (value) => {
+          //   const nf = new Intl.NumberFormat('en-US', {
+          //     style: 'currency',
+          //     currency: 'USD',
+          //     minimumFractionDigits: 2,
+          //     maximumFractionDigits: 2
+          //   });
+
+          //   return nf.format(value);
+          // }
+        }
+      },
+    ];
+  }
 
 
   renderTable = (data, classes) => (
@@ -102,8 +206,16 @@ class AllGoals extends React.Component {
   render() {
     const title = brand.name + ' - All Goals';
     const description = brand.desc;
-    const { goals } = this.state;
+    const { goals, columns, data } = this.state;
     const { classes } = this.props;
+
+    const options = {
+      filterType: 'dropdown',
+      responsive: 'stacked',
+      print: true,
+      rowsPerPage: 10,
+      page: 1
+    };
 
     return (
       <div>
@@ -116,6 +228,15 @@ class AllGoals extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         {this.renderTable(goals, classes)}
+
+        <div className={classes.table}>
+          <MUIDataTable
+            title="All Goals"
+            data={data}
+            columns={columns}
+            options={options}
+          />
+        </div>
       </div>
     );
   }
