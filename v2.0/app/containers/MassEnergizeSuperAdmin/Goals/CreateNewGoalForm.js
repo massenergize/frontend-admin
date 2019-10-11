@@ -18,7 +18,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import {
   TextField,
 } from 'redux-form-material-ui';
-import { fetchData, sendJson } from '../../../utils/messenger';
+import { fetchData, sendJson, send } from '../../../utils/messenger';
 import { initAction, clearAction } from '../../../actions/ReduxFormActions';
 
 const renderRadioGroup = ({ input, ...rest }) => (
@@ -62,7 +62,7 @@ class CreateNewGoalForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      formData: { admins: [], members: [] },
+      formData: {},
       communities: [],
       teams: [],
       is_community_goal: true
@@ -117,7 +117,8 @@ class CreateNewGoalForm extends Component {
     event.preventDefault();
     const { formData } = this.state;
     const cleanedValues = { ...formData };
-    const response = await sendJson(cleanedValues, '/v3/goals.create');
+    console.log(cleanedValues);
+    const response = await send(cleanedValues, '/v3/goals.create', '/admin/read/goals');
     console.log(response);
   }
 
@@ -176,11 +177,11 @@ class CreateNewGoalForm extends Component {
                   {is_community_goal
                     && (
                       <FormControl className={classes.field}>
-                        <InputLabel htmlFor="community">Community</InputLabel>
+                        <InputLabel htmlFor="community_id">Community</InputLabel>
                         <Select2
                           native
-                          name="community"
-                          onChange={async (newValue) => { await this.updateForm('community', parseInt(newValue.target.value, 10)); }}
+                          name="community_id"
+                          onChange={async (newValue) => { await this.updateForm('community_id', parseInt(newValue.target.value, 10)); }}
                           inputProps={{
                             id: 'age-native-simple',
                           }}
@@ -204,11 +205,11 @@ class CreateNewGoalForm extends Component {
                   && (
                     <div>
                       <FormControl className={classes.field}>
-                        <InputLabel htmlFor="team">Team</InputLabel>
+                        <InputLabel htmlFor="team_id">Team</InputLabel>
                         <Select2
                           native
-                          name="team"
-                          onChange={async (newValue) => { await this.updateForm('team', parseInt(newValue.target.value, 10)); }}
+                          name="team_id"
+                          onChange={async (newValue) => { await this.updateForm('team_id', parseInt(newValue.target.value, 10)); }}
                           inputProps={{
                             id: 'age-native-simple',
                           }}
@@ -225,6 +226,19 @@ class CreateNewGoalForm extends Component {
                   )
                 }
 
+                <div>
+                  <Field
+                    name="name"
+                    component={TextField}
+                    placeholder="Name"
+                    label="Name"
+                    validate={required}
+                    required
+                    ref={this.saveRef}
+                    className={classes.field}
+                    onChange={this.handleFormDataChange}
+                  />
+                </div>
                 <div>
                   <Field
                     name="target_number_of_actions"
