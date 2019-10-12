@@ -3,22 +3,12 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
-import { PapperBlock } from 'dan-components';
-import imgApi from 'dan-api/images/photos';
-import classNames from 'classnames';
-import Typography from '@material-ui/core/Typography';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Chip from '@material-ui/core/Chip';
-import Avatar from '@material-ui/core/Avatar';
-import Icon from '@material-ui/core/Icon';
-import Edit from '@material-ui/icons/Edit';
-import Language from '@material-ui/icons/Language';
-import Email from '@material-ui/icons/Email';
+
 import MUIDataTable from 'mui-datatables';
+import FileCopy from '@material-ui/icons/FileCopy';
+import EditIcon from '@material-ui/icons/Edit';
+import Button from '@material-ui/core/Button';
+import { Link } from 'react-router-dom';
 
 import messageStyles from 'dan-styles/Messages.scss';
 import { apiCall } from '../../../utils/messenger';
@@ -44,7 +34,7 @@ const tableStyles = theme => ({
 class AllGoals extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { goals: [], columns: this.getColumns(), data: [] };
+    this.state = { columns: this.getColumns(), data: [] };
   }
 
   async componentDidMount() {
@@ -57,10 +47,9 @@ class AllGoals extends React.Component {
           `${d.attained_number_of_actions}/${d.target_number_of_actions}`,
           `${d.attained_number_of_households}/${d.target_number_of_actions}`,
           `${d.attained_carbon_footprint_reduction}/${d.target_carbon_footprint_reduction}`,
-          `${('' + d.description).substring(0, 100)}...`
+          d.id
         ]
       ));
-      console.log(data);
       await this.setStateAsync({ goals: allGoalsResponse.data, data });
     }
   }
@@ -83,130 +72,71 @@ class AllGoals extends React.Component {
     return [
       {
         name: 'ID',
+        key: 'id',
         options: {
           filter: true
         }
       },
       {
         name: 'Name',
+        key: 'name',
         options: {
           filter: true
         }
       },
       {
-        name: '% Actions Achieved',
+        name: 'Actions Achieved/Target',
+        key: 'actions',
         options: {
           filter: true,
         }
       },
       {
-        name: '% Households Achieved',
+        name: 'Households Achieved/Target',
+        key: 'households',
         options: {
           filter: true,
         }
       },
       {
-        name: '% CarbonFootprintSavings',
+        name: 'CarbonSavings Achieved/Target',
+        key: 'carbon',
         options: {
           filter: true,
         }
       },
       {
-        name: '% Carbon Achieved',
-        options: {
-          filter: false,
-          // customBodyRender: (value) => (
-          //   <LinearProgress variant="determinate" color="secondary" value={value} />
-          // )
-        }
-      },
-      {
-        name: 'Description',
+        name: 'Actions',
+        key: 'actions',
         options: {
           filter: true,
-          // customBodyRender: (value) => {
-          //   if (value === 'active') {
-          //     return (<Chip label="Active" color="secondary" />);
-          //   }
-          //   if (value === 'non-active') {
-          //     return (<Chip label="Non Active" color="primary" />);
-          //   }
-          //   return (<Chip label="Unknown" />);
-          // }
-        }
-      },
-      {
-        name: 'Options',
-        options: {
-          filter: true,
-          // customBodyRender: (value) => {
-          //   const nf = new Intl.NumberFormat('en-US', {
-          //     style: 'currency',
-          //     currency: 'USD',
-          //     minimumFractionDigits: 2,
-          //     maximumFractionDigits: 2
-          //   });
-
-          //   return nf.format(value);
-          // }
+          customBodyRender: (id) => (
+            <div>
+              <Link to={`/admin/edit/goal/${id}`}>
+                <EditIcon size="small" variant="outlined" color="secondary" />
+              </Link>
+              &nbsp;&nbsp;
+              <Link onClick={async () => {
+                const copiedGoalResponse = await apiCall('/goals.copy', { goal_id: id });
+                const newGoal = copiedGoalResponse && copiedGoalResponse.data;
+                if (newGoal) {
+                  window.location.href = `/admin/edit/goal/${newGoal.id}`;
+                }
+              }}
+              >
+                <FileCopy size="small" variant="outlined" color="secondary" />
+              </Link>
+            </div>
+          )
         }
       },
     ];
   }
 
-
-  renderTable = (data, classes) => (
-    <PapperBlock noMargin title="All Goals" icon="ios-share-outline" whiteBg desc="">
-      <div className={classes.root}>
-        <Table className={classNames(classes.tableLong, classes.stripped)} padding="dense">
-          <TableHead>
-            <TableRow>
-              <TableCell padding="dense">ID</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Description</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map(n => ([
-              <TableRow key={n.id}>
-                <TableCell padding="dense">
-                  <div className={classes.flex}>
-                    <div>
-                      <Typography variant="caption">{n.id}</Typography>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className={classes.flex}>
-                    <div>
-                      <Typography>{n.name}</Typography>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell align="left">
-                  <Typography variant="caption">
-                    <Chip label={n.attained_number_of_actions * 100 / (n.target_number_of_actions + 1)} className={classNames(classes.chip, this.getStatus(n.status === 'COMPLETE'))} />
-                  </Typography>
-                </TableCell>
-                <TableCell align="left">
-                  <Typography variant="caption">
-                    {n.description}
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            ]))}
-          </TableBody>
-        </Table>
-      </div>
-    </PapperBlock>
-  )
-
-
   render() {
     const title = brand.name + ' - All Goals';
     const description = brand.desc;
-    const { goals, columns, data } = this.state;
+    const { columns, data } = this.state;
     const { classes } = this.props;
 
     const options = {
@@ -214,7 +144,14 @@ class AllGoals extends React.Component {
       responsive: 'stacked',
       print: true,
       rowsPerPage: 10,
-      page: 1
+      page: 1,
+      onRowsDelete: (rowsDeleted) => {
+        const idsToDelete = rowsDeleted.data;
+        idsToDelete.forEach(d => {
+          const goalId = data[d.index][0];
+          apiCall('/goals.delete', { goal_id: goalId });
+        });
+      }
     };
 
     return (
@@ -227,8 +164,6 @@ class AllGoals extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        {this.renderTable(goals, classes)}
-
         <div className={classes.table}>
           <MUIDataTable
             title="All Goals"
