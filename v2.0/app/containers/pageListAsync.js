@@ -71,7 +71,11 @@ export const AddTeam = loadable(() => import('./MassEnergizeSuperAdmin/Teams/Cre
 export const AllGoals = loadable(() => import('./MassEnergizeSuperAdmin/Goals/AllGoals'), {
   fallback: <Loading />,
 });
-export const AddGoal = loadable(() => import('./MassEnergizeSuperAdmin/Goals/CreateGoalPage'), {
+
+export const EditGoal = loadable(() => import('./MassEnergizeSuperAdmin/Goals/GoalPage'), {
+  fallback: <Loading />,
+});
+export const AddGoal = loadable(() => import('./MassEnergizeSuperAdmin/Goals/GoalPage'), {
   fallback: <Loading />,
 });
 

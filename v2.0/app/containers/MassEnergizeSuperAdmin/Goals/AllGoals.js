@@ -68,70 +68,70 @@ class AllGoals extends React.Component {
     }
   };
 
-  getColumns = () => {
-    return [
-      {
-        name: 'ID',
-        key: 'id',
-        options: {
-          filter: true
-        }
-      },
-      {
-        name: 'Name',
-        key: 'name',
-        options: {
-          filter: true
-        }
-      },
-      {
-        name: 'Actions Achieved/Target',
-        key: 'actions',
-        options: {
-          filter: true,
-        }
-      },
-      {
-        name: 'Households Achieved/Target',
-        key: 'households',
-        options: {
-          filter: true,
-        }
-      },
-      {
-        name: 'CarbonSavings Achieved/Target',
-        key: 'carbon',
-        options: {
-          filter: true,
-        }
-      },
-      {
-        name: 'Actions',
-        key: 'actions',
-        options: {
-          filter: true,
-          customBodyRender: (id) => (
-            <div>
-              <Link to={`/admin/edit/goal/${id}`}>
-                <EditIcon size="small" variant="outlined" color="secondary" />
-              </Link>
-              &nbsp;&nbsp;
-              <Link onClick={async () => {
+  getColumns = () => [
+    {
+      name: 'ID',
+      key: 'id',
+      options: {
+        filter: true
+      }
+    },
+    {
+      name: 'Name',
+      key: 'name',
+      options: {
+        filter: true,
+      }
+    },
+    {
+      name: 'Actions Achieved/Target',
+      key: 'actions',
+      options: {
+        filter: true,
+      }
+    },
+    {
+      name: 'Households Achieved/Target',
+      key: 'households',
+      options: {
+        filter: true,
+      }
+    },
+    {
+      name: 'CarbonSavings Achieved/Target',
+      key: 'carbon',
+      options: {
+        filter: true,
+      }
+    },
+    {
+      name: 'Actions',
+      key: 'actions',
+      options: {
+        filter: true,
+        customBodyRender: (id) => (
+          <div>
+            <Link to={`/admin/goal/${id}/edit`}>
+              <EditIcon size="small" variant="outlined" color="secondary" />
+            </Link>
+            &nbsp;&nbsp;
+            <Link
+              onClick={async () => {
                 const copiedGoalResponse = await apiCall('/goals.copy', { goal_id: id });
                 const newGoal = copiedGoalResponse && copiedGoalResponse.data;
                 if (newGoal) {
-                  window.location.href = `/admin/edit/goal/${newGoal.id}`;
+                  window.location.href = `/admin/goal/${newGoal.id}/edit`;
                 }
               }}
-              >
-                <FileCopy size="small" variant="outlined" color="secondary" />
-              </Link>
-            </div>
-          )
-        }
-      },
-    ];
-  }
+              to="/admin/read/goals"
+            >
+              <FileCopy size="small" variant="outlined" color="secondary" />
+            </Link>
+          </div>
+        )
+      }
+    },
+  ]
 
   render() {
     const title = brand.name + ' - All Goals';
@@ -145,6 +145,7 @@ class AllGoals extends React.Component {
       print: true,
       rowsPerPage: 10,
       page: 1,
+      indexColumn: 'id',
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {

@@ -1,13 +1,15 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
-import { PapperBlock } from 'dan-components';
 import CreateNewGoalForm from './CreateNewGoalForm';
+import EditGoalForm from './EditGoalForm';
 
-class CreateNewGoal extends React.Component {
+class GoalPage extends React.Component {
   render() {
     const title = brand.name + ' - Create New Goal';
     const description = brand.desc;
+
+    const isEditForm = this.props.location.pathname.includes('edit');
     return (
       <div>
         <Helmet>
@@ -18,12 +20,15 @@ class CreateNewGoal extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <PapperBlock title="Create New Goal" desc="Some text description">
-          <CreateNewGoalForm />
-        </PapperBlock>
+        {!isEditForm
+          && <CreateNewGoalForm {...this.props} />
+        }
+        {isEditForm
+          && <EditGoalForm {...this.props} />
+        }
       </div>
     );
   }
 }
 
-export default CreateNewGoal;
+export default GoalPage;

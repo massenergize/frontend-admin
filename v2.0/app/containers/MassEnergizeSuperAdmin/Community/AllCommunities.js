@@ -132,6 +132,69 @@ class AllCommunities extends React.Component {
     </PapperBlock>
   )
 
+  getColumns = () => [
+    {
+      name: 'ID',
+      key: 'id',
+      options: {
+        filter: true
+      }
+    },
+    {
+      name: 'Name',
+      key: 'name',
+      options: {
+        filter: true
+      }
+    },
+    {
+      name: 'Actions Achieved/Target',
+      key: 'actions',
+      options: {
+        filter: false,
+      }
+    },
+    {
+      name: 'Households Achieved/Target',
+      key: 'households',
+      options: {
+        filter: false,
+      }
+    },
+    {
+      name: 'CarbonSavings Achieved/Target',
+      key: 'carbon',
+      options: {
+        filter: true,
+      }
+    },
+    {
+      name: 'Actions',
+      key: 'actions',
+      options: {
+        filter: true,
+        customBodyRender: (id) => (
+          <div>
+            <Link to={`/admin/goal/${id}/edit`}>
+              <EditIcon size="small" variant="outlined" color="secondary" />
+            </Link>
+            &nbsp;&nbsp;
+            <Link onClick={async () => {
+              const copiedGoalResponse = await apiCall('/goals.copy', { goal_id: id });
+              const newGoal = copiedGoalResponse && copiedGoalResponse.data;
+              if (newGoal) {
+                window.location.href = `/admin/goal/${newGoal.id}/edit`;
+              }
+            }}
+            >
+              <FileCopy size="small" variant="outlined" color="secondary" />
+            </Link>
+          </div>
+        )
+      }
+    },
+  ]
+
 
   render() {
     const title = brand.name + ' - All Communities';

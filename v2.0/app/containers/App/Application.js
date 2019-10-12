@@ -22,7 +22,7 @@ import {
   AllGoals, AddGoal,
   AddPolicy, AllPolicies,
   AddTestimonial, AllTestimonials, Export, CustomizePages, EditAction,
-  SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate
+  SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditGoal
 } from '../pageListAsync';
 
 class Application extends React.Component {
@@ -64,6 +64,7 @@ class Application extends React.Component {
 
           <Route path="/admin/read/goals" component={AllGoals} />
           <Route path="/admin/add/goal" component={AddGoal} />
+          <Route path="/admin/goal/:id/edit" component={EditGoal} />
 
           <Route path="/admin/read/testimonials" component={AllTestimonials} />
           <Route path="/admin/add/testimonial" component={AddTestimonial} />
