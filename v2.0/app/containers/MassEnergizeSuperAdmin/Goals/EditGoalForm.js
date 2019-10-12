@@ -1,38 +1,17 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import InputLabel from '@material-ui/core/InputLabel';
-import Select2 from '@material-ui/core/Select';
 import Paper from '@material-ui/core/Paper';
-import { Field, reduxForm } from 'redux-form/immutable';
 import Grid from '@material-ui/core/Grid';
 import Snackbar from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControl from '@material-ui/core/FormControl';
 import Typography from '@material-ui/core/Typography';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import ErrorIcon from '@material-ui/icons/Error';
-import Input from '@material-ui/core/Input';
-
-import {
-  TextField,
-} from 'redux-form-material-ui';
+import TextField from '@material-ui/core/TextField';
 import { apiCall } from '../../../utils/messenger';
-import { initAction, clearAction } from '../../../actions/ReduxFormActions';
 
-const renderRadioGroup = ({ input, ...rest }) => (
-  <RadioGroup
-    {...input}
-    {...rest}
-    valueselected={input.value}
-    onChange={(event, value) => input.onChange(value)}
-  />
-);
 
 // validation functions
 const required = value => (value == null ? 'Required' : undefined);
@@ -59,11 +38,14 @@ const styles = theme => ({
     margin: theme.spacing.unit * 4,
     textAlign: 'center'
   },
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  menu: {
+    width: 200,
+  },
 });
-
-const variantIcon = {
-  error: ErrorIcon,
-};
 
 const styles1 = theme => ({
   error: {
@@ -87,7 +69,7 @@ const styles1 = theme => ({
 const MySnackbarContentWrapper = withStyles(styles1)(SnackbarContent);
 
 
-class CreateNewGoalForm extends Component {
+class EditGoalForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -176,26 +158,49 @@ class CreateNewGoalForm extends Component {
       submitting,
     } = this.props;
     const {
-      formData, communities, teams, is_community_goal, error
+      formData, error
     } = this.state;
-    const { community, team, name } = formData;
-    let communitySelected = communities.filter(c => c.id === community)[0];
-    communitySelected = communitySelected ? communitySelected.name : '';
-    let teamSelected = teams.filter(t => t.id === team)[0];
-    teamSelected = teamSelected ? teamSelected.id : '';
+    const {
+      name,
+      id,
+      attained_number_of_actions,
+      attained_number_of_households,
+      attained_carbon_footprint_reduction,
+      target_number_of_actions,
+      target_number_of_households,
+      target_carbon_footprint_reduction,
+      description
+    } = formData;
 
-    console.log(name)
+    if (!id) {
+      return (
+        <div style={{ margin: 30 }}>
+          <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+            <Grid item xs={12} md={6}>
+              <Paper className={classes.root} elevation={4} style={{ padding: 30 }}>
+                <div style={{ margin: 30 }} />
+                <Typography variant="h5" component="h3">
+                 Loading Data ...
+                </Typography>
+              </Paper>
+            </Grid>
+          </Grid>
+        </div>
+      );
+    }
+
     return (
-      <div>
+      <div style={{ margin: 30 }}>
         <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
           <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
+            <Paper className={classes.root} elevation={4} style={{ padding: 30 }}>
               <div style={{ margin: 30 }} />
               <Typography variant="h5" component="h3">
-                 Edit Goal
+                 Edit Goal with ID:
+                {' ' + id}
               </Typography>
               <div style={{ margin: 50 }} />
-              <form onSubmit={this.submitForm}>
+              <form onSubmit={this.submitForm} noValidate autoComplete="off">
                 <div>
 
                   {error
@@ -218,125 +223,104 @@ class CreateNewGoalForm extends Component {
 
                   {error
                   && (
-                    <p style={{color: 'red'}}>{error}</p>
+                    <p style={{ color: 'red' }}>{error}</p>
                   )
                   }
-
-                  <FormControlLabel
-                    control={(
-                      <Checkbox
-                        checked={is_community_goal}
-                        onChange={async () => await this.setStateAsync({ is_community_goal: !is_community_goal })}
-                        value={''+is_community_goal}
-                        name="is_community_goal"
-
-                      />
-                    )}
-                    label="This is a Community Goal"
-                  />
-
-                  {is_community_goal
-                    && (
-                      <FormControl className={classes.field}>
-                        <InputLabel htmlFor="community_id">Community</InputLabel>
-                        <Select2
-                          native
-                          name="community_id"
-                          onChange={async (newValue) => { await this.updateForm('community_id', parseInt(newValue.target.value, 10)); }}
-                          inputProps={{
-                            id: 'age-native-simple',
-                          }}
-                        >
-                          <option value={community}>{communitySelected}</option>
-                          { communities
-                                && communities.map(c => (
-                                  <option value={c.id} key={c.id}>{c.name}</option>
-                                ))
-                          }
-                        </Select2>
-                      </FormControl>
-                    )
-                  }
-
                 </div>
+                <TextField
+                  id="outline-required"
+                  required
+                  name="name"
+                  onChange={this.handleFormDataChange}
+                  label="Name"
+                  placeholder="eg. Take 10,000 actions"
+                  className={classes.textField}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  defaultValue={name}
+                />
 
+                <TextField
+                  name="attained_number_of_actions"
+                  placeholder="eg 100"
+                  label="Attained Number of Actions"
+                  className={classes.field}
+                  onChange={this.handleFormDataChange}
+                  defaultValue={attained_number_of_actions}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  name="attained_number_of_households"
+                  placeholder="eg. 250"
+                  label="Attained Number of Households"
+                  className={classes.field}
+                  onChange={this.handleFormDataChange}
+                  defaultValue={attained_number_of_households}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  name="attained_carbon_footprint_reduction"
+                  placeholder="eg. 250"
+                  label="Attained Carbon Footprint Reduction"
+                  className={classes.field}
+                  onChange={this.handleFormDataChange}
+                  defaultValue={attained_carbon_footprint_reduction}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
 
-                {!is_community_goal 
-
-                  && (
-                    <div>
-                      <FormControl className={classes.field}>
-                        <InputLabel htmlFor="team_id">Team</InputLabel>
-                        <Select2
-                          native
-                          name="team_id"
-                          onChange={async (newValue) => { await this.updateForm('team_id', parseInt(newValue.target.value, 10)); }}
-                          inputProps={{
-                            id: 'age-native-simple',
-                          }}
-                        >
-                          <option value={team}>{teamSelected}</option>
-                          { teams
-                                && teams.map(c => (
-                                  <option value={c.id} key={c.id}>{c.name}</option>
-                                ))
-                          }
-                        </Select2>
-                      </FormControl>
-                    </div>
-                  )
-                }
-
-                <div>
-                  <Field
-                    name="name"
-                    component={TextField}
-                    placeholder="Name"
-                    label="Name"
-                    validate={required}
-                    required
-                    className={classes.field}
-                    onChange={this.handleFormDataChange}
-                  />
-                </div>
-                <div>
-                  <Field
-                    name="target_number_of_actions"
-                    component={TextField}
-                    placeholder="eg 100"
-                    label="Target Number of Actions"
-                    validate={required}
-                    required
-                    ref={this.saveRef}
-                    className={classes.field}
-                    onChange={this.handleFormDataChange}
-                  />
-                </div>
-                <div>
-                  <Field
-                    name="target_number_of_households"
-                    component={TextField}
-                    placeholder="eg. 250"
-                    label="Target Number of Households"
-                    validate={required}
-                    required
-                    ref={this.saveRef}
-                    className={classes.field}
-                    onChange={this.handleFormDataChange}
-                  />
-                </div>
-                <div className={classes.field}>
-                  <Field
-                    name="description"
-                    className={classes.field}
-                    component={TextField}
-                    placeholder="eg. Description ..."
-                    label="Describe this Goal"
-                    multiline={trueBool}
-                    rows={4}
-                    onChange={this.handleFormDataChange}
-                  />
-                </div>
+                <TextField
+                  name="target_number_of_actions"
+                  placeholder="eg 100"
+                  label="Target Number of Actions"
+                  className={classes.field}
+                  onChange={this.handleFormDataChange}
+                  defaultValue={target_number_of_actions}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  name="target_number_of_households"
+                  placeholder="eg. 250"
+                  label="Target Number of Households"
+                  className={classes.field}
+                  onChange={this.handleFormDataChange}
+                  defaultValue={target_number_of_households}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  name="target_carbon_footprint_reduction"
+                  placeholder="eg. 250"
+                  label="Target Carbon Footprint Reduction"
+                  className={classes.field}
+                  onChange={this.handleFormDataChange}
+                  defaultValue={target_carbon_footprint_reduction}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  name="description"
+                  className={classes.field}
+                  placeholder="eg. Description ..."
+                  label="Describe this Goal"
+                  multiline={trueBool}
+                  rows={4}
+                  onChange={this.handleFormDataChange}
+                  defaultValue={description}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
                 <div>
                   <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
                     Submit
@@ -351,28 +335,4 @@ class CreateNewGoalForm extends Component {
   }
 }
 
-renderRadioGroup.propTypes = {
-  input: PropTypes.object.isRequired,
-};
-
-
-const mapDispatchToProps = dispatch => ({
-  init: bindActionCreators(initAction, dispatch),
-  clear: () => dispatch(clearAction),
-});
-
-const ReduxFormMapped = reduxForm({
-  form: 'immutableExample',
-  enableReinitialize: true,
-})(CreateNewGoalForm);
-
-const reducer = 'initval';
-const FormInit = connect(
-  state => ({
-    force: state,
-    initialValues: state.getIn([reducer, 'formValues'])
-  }),
-  mapDispatchToProps,
-)(ReduxFormMapped);
-
-export default withStyles(styles, { withTheme: true })(FormInit);
+export default withStyles(styles, { withTheme: true })(EditGoalForm);

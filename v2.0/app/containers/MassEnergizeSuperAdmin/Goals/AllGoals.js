@@ -15,22 +15,6 @@ import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
 
 
-const tableStyles = theme => ({
-  table: {
-    '& > div': {
-      overflow: 'auto'
-    },
-    '& table': {
-      minWidth: 500,
-      [theme.breakpoints.down('md')]: {
-        '& td': {
-          height: 40
-        }
-      }
-    }
-  }
-});
-
 class AllGoals extends React.Component {
   constructor(props) {
     super(props);
@@ -45,7 +29,7 @@ class AllGoals extends React.Component {
           d.id,
           d.name,
           `${d.attained_number_of_actions}/${d.target_number_of_actions}`,
-          `${d.attained_number_of_households}/${d.target_number_of_actions}`,
+          `${d.attained_number_of_households}/${d.target_number_of_households}`,
           `${d.attained_carbon_footprint_reduction}/${d.target_carbon_footprint_reduction}`,
           d.id
         ]

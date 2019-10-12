@@ -2,7 +2,6 @@ import React from 'react';
 import { PropTypes } from 'prop-types';
 import TextField from '@material-ui/core/TextField';
 import { withStyles } from '@material-ui/core/styles';
-import { styles, vanish, uploadBox } from './../../Pages/CustomPages/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
@@ -13,6 +12,7 @@ import DeleteIcon from '@material-ui/icons/Close';
 import { allCommunities } from './../../Pages/CustomPages/DataRetriever';
 import Fab from '@material-ui/core/Fab';
 import Public from '@material-ui/icons/Public';
+import { styles, vanish, uploadBox } from './../../Pages/CustomPages/styles';
 
 class AboutUs extends React.Component {
   constructor(props) {
@@ -20,22 +20,23 @@ class AboutUs extends React.Component {
     this.state = {
       communities: [],
       selected_community: null,
-      about: "",
-      video_url: ""
-    }
+      about: '',
+      video_url: ''
+    };
   }
 
   findCommunityObj = (name) => {
-    var section = this.state.communities;
-    for (var i = 0; i < section.length; i++) {
+    let section = this.state.communities;
+    for (let i = 0; i < section.length; i++) {
       if (section[i].name === name) {
         return section[i];
       }
     }
     return null;
   }
+
   handleCommunitiesChoice = (event) => {
-    var obj = this.findCommunityObj(event.target.value);
+    let obj = this.findCommunityObj(event.target.value);
     this.setState({
       selected_community: obj,
     });
@@ -44,26 +45,29 @@ class AboutUs extends React.Component {
   componentDidMount = () => {
     this.callForCommunities();
   }
+
   callForCommunities = () => {
     const me = this;
     allCommunities().then(response => {
-      me.setState({ communities: response.data })
+      me.setState({ communities: response.data });
     });
   }
+
   handleURL = (event) => {
     this.setState({ video_url: event.target.value });
   }
 
   handleDescription = (event) => {
-    this.setState({ about: event.target.value })
+    this.setState({ about: event.target.value });
   }
+
   render() {
     const { classes } = this.props;
     const { communities } = this.state;
     const community = this.state.selected_community ? this.state.selected_community.name : '';
     return (
       <div>
-        <div style={{ margin: 30 }}></div>
+        <div style={{ margin: 30 }} />
         <Grid item xl={12} md={12}>
           <Paper className={classes.root} elevation={4} style={{ padding: 30 }}>
             <h3>Edit the about page of any of these communities</h3>
@@ -74,7 +78,7 @@ class AboutUs extends React.Component {
               className={classes.textField}
               value={community}
               fullWidth
-              onChange={option => { this.handleCommunitiesChoice(option) }}
+              onChange={option => { this.handleCommunitiesChoice(option); }}
               SelectProps={{
                 MenuProps: {
                   className: classes.menu,
@@ -92,7 +96,7 @@ class AboutUs extends React.Component {
             </TextField>
 
             <TextField
-              onChange={(event) => { this.handleURL(event) }}
+              onChange={(event) => { this.handleURL(event); }}
               id="outlined-multiline-flexible"
               label="Video URL"
               fullWidth
@@ -122,20 +126,21 @@ class AboutUs extends React.Component {
 
 
             <Fab
-              onClick={() => { console.log("I am the data: ", this.state) }}
+              onClick={() => { console.log('I am the data: ', this.state); }}
               variant="extended"
               color="secondary"
               aria-label="Delete"
               className={classes.button}
             >
-              Publish Content <span style={{ margin: 3 }}></span>
+              Publish Content 
+              {' '}
+              <span style={{ margin: 3 }} />
 
             </Fab>
           </Paper>
         </Grid>
       </div>
-    )
-
+    );
   }
 }
-export default withStyles(styles)(AboutUs)
+export default withStyles(styles)(AboutUs);
