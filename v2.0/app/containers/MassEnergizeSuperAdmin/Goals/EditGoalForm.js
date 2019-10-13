@@ -268,7 +268,7 @@ class EditGoalForm extends Component {
                   onChange={this.handleFormDataChange}
                   label="Name"
                   placeholder="eg. Take 10,000 actions"
-                  className={classes.textField}
+                  className={classes.field}
                   InputLabelProps={{
                     shrink: true,
                   }}

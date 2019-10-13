@@ -7,7 +7,6 @@ import Paper from '@material-ui/core/Paper';
 import { Field, reduxForm } from 'redux-form/immutable';
 import Grid from '@material-ui/core/Grid';
 import Snackbar from '@material-ui/core/Snackbar';
-import SnackbarContent from '@material-ui/core/SnackbarContent';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControl from '@material-ui/core/FormControl';
 import Typography from '@material-ui/core/Typography';
@@ -16,11 +15,9 @@ import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import ErrorIcon from '@material-ui/icons/Error';
+import TextField from '@material-ui/core/TextField';
+import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
 
-import {
-  TextField,
-} from 'redux-form-material-ui';
 import { apiCall } from '../../../utils/messenger';
 import { initAction, clearAction } from '../../../actions/ReduxFormActions';
 
@@ -54,36 +51,8 @@ const styles = theme => ({
     display: 'flex',
     flexDirection: 'row'
   },
-  buttonInit: {
-    margin: theme.spacing.unit * 4,
-    textAlign: 'center'
-  },
-});
 
-const variantIcon = {
-  error: ErrorIcon,
-};
-
-const styles1 = theme => ({
-  error: {
-    backgroundColor: theme.palette.error.dark,
-  },
-  info: {
-    backgroundColor: theme.palette.primary.dark,
-  },
-  icon: {
-    fontSize: 20,
-  },
-  iconVariant: {
-    opacity: 0.9,
-    marginRight: theme.spacing(1),
-  },
-  message: {
-    display: 'flex',
-    alignItems: 'center',
-  },
 });
-const MySnackbarContentWrapper = withStyles(styles1)(SnackbarContent);
 
 
 class CreateNewGoalForm extends Component {
@@ -94,7 +63,8 @@ class CreateNewGoalForm extends Component {
       communities: [],
       teams: [],
       is_community_goal: true,
-      error: null
+      error: null,
+      successMsg: null
     };
   }
 
@@ -141,13 +111,32 @@ class CreateNewGoalForm extends Component {
     });
   }
 
+  handleCloseStyle = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    this.setState({ successMsg: null, error: null });
+  };
+
   submitForm = async (event) => {
     event.preventDefault();
     const { formData } = this.state;
     const cleanedValues = { ...formData };
-    const response = await apiCall('/goals.create', cleanedValues, '/admin/read/goals');
+    if (cleanedValues.community) {
+      cleanedValues.community_id = cleanedValues.community;
+    }
+    if (cleanedValues.team) {
+      cleanedValues.team_id = cleanedValues.team;
+    }
+    delete cleanedValues.community;
+    delete cleanedValues.team;
+
+    const response = await apiCall('/goals.create', cleanedValues);
     if (response && !response.success) {
-      await this.setStateAsync({ error: response.error });
+      await this.setStateAsync({ error: response.error, successMsg: null });
+    } else if (response && response.success) {
+      await this.setStateAsync({ successMsg: 'Successfully Created this Goal', error: null });
+      window.location.href = `/admin/goal/${response.data.id}/edit`;
     }
   }
 
@@ -169,7 +158,7 @@ class CreateNewGoalForm extends Component {
       submitting,
     } = this.props;
     const {
-      formData, communities, teams, is_community_goal, error
+      formData, communities, teams, is_community_goal, error, successMsg
     } = this.state;
     const { community, team } = formData;
     let communitySelected = communities.filter(c => c.id === community)[0];
@@ -189,28 +178,46 @@ class CreateNewGoalForm extends Component {
               <div style={{ margin: 50 }} />
               <form onSubmit={this.submitForm}>
                 <div>
+                  <Snackbar
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    open={error != null}
+                    autoHideDuration={6000}
+                    onClose={this.handleCloseStyle}
+                  >
+                    <MySnackbarContentWrapper
+                      onClose={this.handleCloseStyle}
+                      variant="error"
+                      message={`Error Occurred: ${error}`}
+                    />
+                  </Snackbar>
+                  <Snackbar
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    open={successMsg != null}
+                    autoHideDuration={6000}
+                    onClose={this.handleCloseStyle}
+                  >
+                    <MySnackbarContentWrapper
+                      onClose={this.handleCloseStyle}
+                      variant="success"
+                      message={successMsg}
+                    />
+                  </Snackbar>
+
 
                   {error
                   && (
-                    <Snackbar
-                      anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'left',
-                      }}
-                      autoHideDuration={6000}
-                      onClose={this.handleCloseStyle}
-                    >
-                      <MySnackbarContentWrapper
-                        variant="error"
-                        message={error}
-                      />
-                    </Snackbar>
+                    <p style={{ color: 'red' }}>{error}</p>
                   )
                   }
-
-                  {error
+                  {successMsg
                   && (
-                    <p style={{color: 'red'}}>{error}</p>
+                    <p style={{ color: 'green' }}>{successMsg}</p>
                   )
                   }
 
@@ -279,57 +286,98 @@ class CreateNewGoalForm extends Component {
                   )
                 }
 
-                <div>
-                  <Field
-                    name="name"
-                    component={TextField}
-                    placeholder="Name"
-                    label="Name"
-                    validate={required}
-                    required
-                    ref={this.saveRef}
-                    className={classes.field}
-                    onChange={this.handleFormDataChange}
-                  />
-                </div>
-                <div>
-                  <Field
-                    name="target_number_of_actions"
-                    component={TextField}
-                    placeholder="eg 100"
-                    label="Target Number of Actions"
-                    validate={required}
-                    required
-                    ref={this.saveRef}
-                    className={classes.field}
-                    onChange={this.handleFormDataChange}
-                  />
-                </div>
-                <div>
-                  <Field
-                    name="target_number_of_households"
-                    component={TextField}
-                    placeholder="eg. 250"
-                    label="Target Number of Households"
-                    validate={required}
-                    required
-                    ref={this.saveRef}
-                    className={classes.field}
-                    onChange={this.handleFormDataChange}
-                  />
-                </div>
-                <div className={classes.field}>
-                  <Field
-                    name="description"
-                    className={classes.field}
-                    component={TextField}
-                    placeholder="eg. Description ..."
-                    label="Describe this Goal"
-                    multiline={trueBool}
-                    rows={4}
-                    onChange={this.handleFormDataChange}
-                  />
-                </div>
+                <TextField
+                  id="outline-required"
+                  required
+                  name="name"
+                  onChange={this.handleFormDataChange}
+                  label="Name"
+                  placeholder="eg. Take 10,000 actions"
+                  className={classes.field}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+
+                <TextField
+                  name="attained_number_of_actions"
+                  type="number"
+                  placeholder="eg 100"
+                  label="Attained Number of Actions"
+                  className={classes.field}
+                  onChange={this.handleFormDataChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  name="attained_number_of_households"
+                  placeholder="eg. 250"
+                  type="number"
+                  label="Attained Number of Households"
+                  className={classes.field}
+                  onChange={this.handleFormDataChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  name="attained_carbon_footprint_reduction"
+                  placeholder="eg. 250"
+                  type="number"
+                  label="Attained Carbon Footprint Reduction"
+                  className={classes.field}
+                  onChange={this.handleFormDataChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+
+                <TextField
+                  name="target_number_of_actions"
+                  placeholder="eg 100"
+                  label="Target Number of Actions"
+                  type="number"
+                  className={classes.field}
+                  onChange={this.handleFormDataChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  name="target_number_of_households"
+                  placeholder="eg. 250"
+                  type="number"
+                  label="Target Number of Households"
+                  className={classes.field}
+                  onChange={this.handleFormDataChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  name="target_carbon_footprint_reduction"
+                  placeholder="eg. 250"
+                  type="number"
+                  label="Target Carbon Footprint Reduction"
+                  className={classes.field}
+                  onChange={this.handleFormDataChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  name="description"
+                  className={classes.field}
+                  placeholder="eg. Description ..."
+                  label="Describe this Goal"
+                  multiline={trueBool}
+                  rows={4}
+                  onChange={this.handleFormDataChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
                 <div>
                   <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
                     Submit
