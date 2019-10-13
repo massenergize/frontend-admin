@@ -87,7 +87,6 @@ class EditActionForm extends Component {
     const vendors = await fetchData('v2/vendors');
     const communities = await fetchData('v2/communities');
     const action = await fetchData(`v2/action/${id}`);
-    console.log(action);
 
     if (tagCollections) {
       const tags = [];
@@ -193,7 +192,6 @@ class EditActionForm extends Component {
     await this.setStateAsync({
       formData: { ...formData, [name]: theList }
     });
-    console.log(this.state);
   };
 
   submitForm = async (event) => {
@@ -214,10 +212,8 @@ class EditActionForm extends Component {
     if (cleanedValues.is_global === 'true') {
       delete cleanedValues.community;
     }
-    const response = sendFormWithMedia(cleanedValues, `/v2/action/${formData.id}`, `/admin/read/action/${cleanedValues.id}/edit`);
+    await sendFormWithMedia(cleanedValues, `/v2/action/${formData.id}`, `/admin/read/action/${cleanedValues.id}/edit`);
     await this.setStateAsync({ ...this.state, submitIsClicked: true });
-
-    console.log(response);
   }
 
   async updateForm(fieldName, value) {

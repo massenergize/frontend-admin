@@ -45,7 +45,7 @@ class Application extends React.Component {
 
           <Route path="/admin/read/actions" component={AllActions} />
           <Route path="/admin/add/action" component={AddAction} />
-          <Route path="/admin/read/action/:id/edit" component={EditAction} exact />
+          <Route path="/admin/edit/:id/action" component={EditAction} exact />
           <Route path="/admin/add/action/:id" component={EditAction} />
 
           <Route path="/admin/read/categories" component={AllCategories} />
@@ -64,7 +64,7 @@ class Application extends React.Component {
 
           <Route path="/admin/read/goals" component={AllGoals} />
           <Route path="/admin/add/goal" component={AddGoal} />
-          <Route path="/admin/goal/:id/edit" component={EditGoal} />
+          <Route path="/admin/edit/:id/goal" component={EditGoal} />
 
           <Route path="/admin/read/testimonials" component={AllTestimonials} />
           <Route path="/admin/add/testimonial" component={AddTestimonial} />

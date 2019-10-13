@@ -46,29 +46,6 @@ const styles = theme => ({
   },
 });
 
-// const snackBarStyles = theme => ({
-//   success: {
-//     backgroundColor: green[600],
-//   },
-//   error: {
-//     backgroundColor: theme.palette.error.dark,
-//   },
-//   info: {
-//     backgroundColor: theme.palette.primary.dark,
-//   },
-//   icon: {
-//     fontSize: 20,
-//   },
-//   iconVariant: {
-//     opacity: 0.9,
-//   },
-//   message: {
-//     display: 'flex',
-//     alignItems: 'center',
-//   },
-// });
-// const MySnackbarContentWrapper = withStyles(snackBarStyles)(SnackbarContent);
-
 
 class EditGoalForm extends Component {
   constructor(props) {

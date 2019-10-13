@@ -7,7 +7,6 @@ import brand from 'dan-api/dummy/brand';
 import MUIDataTable from 'mui-datatables';
 import FileCopy from '@material-ui/icons/FileCopy';
 import EditIcon from '@material-ui/icons/Edit';
-import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom';
 
 import messageStyles from 'dan-styles/Messages.scss';
@@ -34,7 +33,7 @@ class AllGoals extends React.Component {
           d.id
         ]
       ));
-      await this.setStateAsync({ goals: allGoalsResponse.data, data });
+      await this.setStateAsync({ data });
     }
   }
 
@@ -95,7 +94,7 @@ class AllGoals extends React.Component {
         filter: true,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/goal/${id}/edit`}>
+            <Link to={`/admin/edit/${id}/goal`}>
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
             &nbsp;&nbsp;
@@ -104,7 +103,7 @@ class AllGoals extends React.Component {
                 const copiedGoalResponse = await apiCall('/goals.copy', { goal_id: id });
                 const newGoal = copiedGoalResponse && copiedGoalResponse.data;
                 if (newGoal) {
-                  window.location.href = `/admin/goal/${newGoal.id}/edit`;
+                  window.location.href = `/admin/edit/${newGoal.id}/goal`;
                 }
               }}
               to="/admin/read/goals"
