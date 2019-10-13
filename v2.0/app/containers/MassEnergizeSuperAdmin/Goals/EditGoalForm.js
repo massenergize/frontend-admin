@@ -10,11 +10,14 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import ErrorIcon from '@material-ui/icons/Error';
 import TextField from '@material-ui/core/TextField';
+import green from '@material-ui/core/colors/green';
+import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
+
 import { apiCall } from '../../../utils/messenger';
 
 
 // validation functions
-const required = value => (value == null ? 'Required' : undefined);
+// const required = value => (value == null ? 'Required' : undefined);
 
 const styles = theme => ({
   root: {
@@ -34,10 +37,6 @@ const styles = theme => ({
     display: 'flex',
     flexDirection: 'row'
   },
-  buttonInit: {
-    margin: theme.spacing.unit * 4,
-    textAlign: 'center'
-  },
   container: {
     display: 'flex',
     flexWrap: 'wrap',
@@ -47,26 +46,28 @@ const styles = theme => ({
   },
 });
 
-const styles1 = theme => ({
-  error: {
-    backgroundColor: theme.palette.error.dark,
-  },
-  info: {
-    backgroundColor: theme.palette.primary.dark,
-  },
-  icon: {
-    fontSize: 20,
-  },
-  iconVariant: {
-    opacity: 0.9,
-    marginRight: theme.spacing(1),
-  },
-  message: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-});
-const MySnackbarContentWrapper = withStyles(styles1)(SnackbarContent);
+// const snackBarStyles = theme => ({
+//   success: {
+//     backgroundColor: green[600],
+//   },
+//   error: {
+//     backgroundColor: theme.palette.error.dark,
+//   },
+//   info: {
+//     backgroundColor: theme.palette.primary.dark,
+//   },
+//   icon: {
+//     fontSize: 20,
+//   },
+//   iconVariant: {
+//     opacity: 0.9,
+//   },
+//   message: {
+//     display: 'flex',
+//     alignItems: 'center',
+//   },
+// });
+// const MySnackbarContentWrapper = withStyles(snackBarStyles)(SnackbarContent);
 
 
 class EditGoalForm extends Component {
@@ -77,7 +78,8 @@ class EditGoalForm extends Component {
       communities: [],
       teams: [],
       is_community_goal: true,
-      error: null
+      error: null,
+      successMsg: null
     };
   }
 
@@ -130,13 +132,24 @@ class EditGoalForm extends Component {
     });
   }
 
+  handleCloseStyle = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    this.setState({ successMsg: null, error: null });
+  };
+
   submitForm = async (event) => {
     event.preventDefault();
     const { formData } = this.state;
     const cleanedValues = { ...formData };
-    const response = await apiCall('/goals.update', cleanedValues, '/admin/read/goals');
+    cleanedValues.goal_id = cleanedValues.id;
+    delete cleanedValues.id;
+    const response = await apiCall('/goals.update', cleanedValues);
     if (response && !response.success) {
-      await this.setStateAsync({ error: response.error });
+      await this.setStateAsync({ error: response.error, successMsg: null });
+    } else if (response && response.success) {
+      await this.setStateAsync({ successMsg: 'Successfully Updated', error: null });
     }
   }
 
@@ -158,7 +171,7 @@ class EditGoalForm extends Component {
       submitting,
     } = this.props;
     const {
-      formData, error
+      formData, error, successMsg
     } = this.state;
     const {
       name,
@@ -171,6 +184,7 @@ class EditGoalForm extends Component {
       target_carbon_footprint_reduction,
       description
     } = formData;
+
 
     if (!id) {
       return (
@@ -202,28 +216,48 @@ class EditGoalForm extends Component {
               <div style={{ margin: 50 }} />
               <form onSubmit={this.submitForm} noValidate autoComplete="off">
                 <div>
-
-                  {error
-                  && (
-                    <Snackbar
-                      anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'left',
-                      }}
-                      autoHideDuration={6000}
+                  <Snackbar
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    open={error != null}
+                    autoHideDuration={6000}
+                    onClose={this.handleCloseStyle}
+                  >
+                    <MySnackbarContentWrapper
                       onClose={this.handleCloseStyle}
-                    >
-                      <MySnackbarContentWrapper
-                        variant="error"
-                        message={error}
-                      />
-                    </Snackbar>
-                  )
-                  }
+                      variant="error"
+                      message={`Error Occurred: ${error}`}
+                    />
+                  </Snackbar>
+                  <Snackbar
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    open={successMsg != null}
+                    autoHideDuration={6000}
+                    onClose={this.handleCloseStyle}
+                  >
+                    <MySnackbarContentWrapper
+                      onClose={this.handleCloseStyle}
+                      className={classes.snackbar}
+                      classes={classes}
+                      variant="success"
+                      message="Successfully Updated this Goal"
+                    />
+                  </Snackbar>
+
 
                   {error
                   && (
                     <p style={{ color: 'red' }}>{error}</p>
+                  )
+                  }
+                  {successMsg
+                  && (
+                    <p style={{ color: 'green' }}>{successMsg}</p>
                   )
                   }
                 </div>
@@ -243,6 +277,7 @@ class EditGoalForm extends Component {
 
                 <TextField
                   name="attained_number_of_actions"
+                  type="number"
                   placeholder="eg 100"
                   label="Attained Number of Actions"
                   className={classes.field}
@@ -255,6 +290,7 @@ class EditGoalForm extends Component {
                 <TextField
                   name="attained_number_of_households"
                   placeholder="eg. 250"
+                  type="number"
                   label="Attained Number of Households"
                   className={classes.field}
                   onChange={this.handleFormDataChange}
@@ -266,6 +302,7 @@ class EditGoalForm extends Component {
                 <TextField
                   name="attained_carbon_footprint_reduction"
                   placeholder="eg. 250"
+                  type="number"
                   label="Attained Carbon Footprint Reduction"
                   className={classes.field}
                   onChange={this.handleFormDataChange}
@@ -279,6 +316,7 @@ class EditGoalForm extends Component {
                   name="target_number_of_actions"
                   placeholder="eg 100"
                   label="Target Number of Actions"
+                  type="number"
                   className={classes.field}
                   onChange={this.handleFormDataChange}
                   defaultValue={target_number_of_actions}
@@ -289,6 +327,7 @@ class EditGoalForm extends Component {
                 <TextField
                   name="target_number_of_households"
                   placeholder="eg. 250"
+                  type="number"
                   label="Target Number of Households"
                   className={classes.field}
                   onChange={this.handleFormDataChange}
@@ -300,6 +339,7 @@ class EditGoalForm extends Component {
                 <TextField
                   name="target_carbon_footprint_reduction"
                   placeholder="eg. 250"
+                  type="number"
                   label="Target Carbon Footprint Reduction"
                   className={classes.field}
                   onChange={this.handleFormDataChange}

@@ -1,3 +1,4 @@
+
 export Header from './Header/Header';
 export HeaderMenu from './Header/HeaderMenu';
 export Sidebar from './Sidebar/Sidebar';
@@ -21,6 +22,8 @@ export EmptyData from './Tables/EmptyData';
 export AdvTable from './Tables/AdvTable';
 // Error
 export ErrorWrap from './Error/ErrorWrap';
+
+export MySnackbarContentWrapper from './SnackBar/SnackbarContentWrapper';
 
 // Dashboard and Widget
 export CounterWidget from './Counter/CounterWidget';
