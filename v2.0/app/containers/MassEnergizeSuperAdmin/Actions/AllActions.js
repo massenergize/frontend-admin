@@ -14,7 +14,6 @@ import Avatar from '@material-ui/core/Avatar';
 import Grid from '@material-ui/core/Grid';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Paper from '@material-ui/core/Paper';
-import Chip from '@material-ui/core/Chip';
 
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
@@ -41,7 +40,7 @@ class AllActions extends React.Component {
           },
           `${d.title}...`.substring(0, 30), // limit to first 30 chars
           `${d.about}...`.substring(0, 20), // limit to first 20 chars
-          d.tags,
+          `${d.tags.map(t => t.name).join(', ')} `,
           d.community && d.community.name,
           d.id
         ]
@@ -62,6 +61,7 @@ class AllActions extends React.Component {
       key: 'action',
       options: {
         filter: false,
+        download: false,
         customBodyRender: (d) => (
           <div>
             {d.image
@@ -93,8 +93,6 @@ class AllActions extends React.Component {
       key: 'tags',
       options: {
         filter: true,
-        searchable: true,
-        customBodyRender: (tags) => tags.map(t => t.name).join(', ')
       }
     },
     {
@@ -109,6 +107,7 @@ class AllActions extends React.Component {
       key: 'edit_or_copy',
       options: {
         filter: false,
+        download: false,
         customBodyRender: (id) => (
           <div>
             <Link to={`/admin/edit/${id}/action`}>
@@ -118,8 +117,8 @@ class AllActions extends React.Component {
             <Link
               onClick={async () => {
                 const copiedActionResponse = await apiCall('/actions.copy', { action_id: id });
-                const newAction = copiedActionResponse && copiedActionResponse.data;
-                if (newAction) {
+                if (copiedActionResponse && copiedActionResponse.success) {
+                  const newAction = copiedActionResponse && copiedActionResponse.data;
                   window.location.href = `/admin/edit/${newAction.id}/action`;
                 }
               }}
@@ -158,8 +157,8 @@ class AllActions extends React.Component {
       return (
         <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
           <Grid item xs={12} md={6}>
-            <Paper className={this.props.classes.root}>
-              <div className={this.props.classes.root}>
+            <Paper className={classes.root}>
+              <div className={classes.root}>
                 <LinearProgress />
                 <h1>Fetching all Actions.  This may take a while...</h1>
                 <br />
