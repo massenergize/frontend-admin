@@ -78,6 +78,7 @@ class CommunityOnboardingForm extends Component {
     super(props);
     this.state = {
       showLocation: false,
+      accepted_terms_and_conditions: false
     };
   }
 
@@ -93,6 +94,7 @@ class CommunityOnboardingForm extends Component {
       clear,
       submitIsClicked
     } = this.props;
+    const {accepted_terms_and_conditions} = this.state 
 
     return (
       <div>
@@ -246,7 +248,12 @@ class CommunityOnboardingForm extends Component {
                     </Grid>
                   )
                 }
-
+                <div className={classes.fieldBasic}>
+                  <FormLabel component="label">Terms and Conditions</FormLabel>
+                  <Field name="accepted_terms_and_conditions" className={classes.inlineWrap} component={renderRadioGroup}>
+                    <FormControlLabel value="True" control={<Radio />} label="Accept" onClick={() => { this.setState({ ...this.sate, accepted_terms_and_conditions: !accepted_terms_and_conditions }); }} />
+                  </Field>
+                </div>
                 <div>
                   {submitIsClicked
                     && (
@@ -258,16 +265,14 @@ class CommunityOnboardingForm extends Component {
                     )
                   }
 
-                  <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
-                    Submit
-                  </Button>
-                  <Button
-                    type="button"
-                    disabled={pristine || submitting}
-                    onClick={reset}
-                  >
-                    Reset
-                  </Button>
+                  {accepted_terms_and_conditions && 
+                  (
+                    <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
+                      Submit
+                    </Button>
+                  )
+                  }
+             
                 </div>
               </form>
             </Paper>
