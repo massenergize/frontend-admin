@@ -1,10 +1,12 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
-import { PapperBlock } from 'dan-components';
 import CreatePolicyForm from './CreatePolicyForm';
+import EditPolicyForm from './EditPolicyForm';
 class Onboarding extends React.Component {
+
   render() {
+    const isEditForm = this.props.location.pathname.includes('edit');
     const title = brand.name + ' - Create Policy';
     const description = brand.desc;
     return (
@@ -17,9 +19,12 @@ class Onboarding extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <PapperBlock title="Create New Policy here" desc="Some text description">
-          <CreatePolicyForm />
-        </PapperBlock>
+        {!isEditForm
+        && <CreatePolicyForm {...this.props} />
+        }
+        {isEditForm
+          && <EditPolicyForm {...this.props} />
+        }
       </div>
     );
   }

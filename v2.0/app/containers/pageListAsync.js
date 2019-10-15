@@ -75,6 +75,10 @@ export const AllGoals = loadable(() => import('./MassEnergizeSuperAdmin/Goals/Al
 export const EditGoal = loadable(() => import('./MassEnergizeSuperAdmin/Goals/GoalPage'), {
   fallback: <Loading />,
 });
+
+export const EditPolicy = loadable(() => import('./MassEnergizeSuperAdmin/Policies/CreatePolicy'), {
+  fallback: <Loading />,
+});
 export const AddGoal = loadable(() => import('./MassEnergizeSuperAdmin/Goals/GoalPage'), {
   fallback: <Loading />,
 });

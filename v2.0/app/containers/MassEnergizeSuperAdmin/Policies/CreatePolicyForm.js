@@ -58,8 +58,6 @@ class CreatePolicyForm extends Component {
     this.state = {
       formData: {},
       communities: [],
-      teams: [],
-      is_community_goal: true,
       error: null,
       successMsg: null
     };
@@ -140,7 +138,7 @@ class CreatePolicyForm extends Component {
     const {
       formData, communities, error, successMsg
     } = this.state;
-    const { community, team } = formData;
+    const { community } = formData;
     let communitySelected = communities.filter(c => c.id === community)[0];
     communitySelected = communitySelected ? communitySelected.name : '';
 
@@ -202,7 +200,7 @@ class CreatePolicyForm extends Component {
                   name="name"
                   onChange={this.handleFormDataChange}
                   label="Name"
-                  placeholder="eg. Take 10,000 actions"
+                  placeholder="eg. Terms and Conditions"
                   className={classes.field}
                   InputLabelProps={{
                     shrink: true,
@@ -232,7 +230,7 @@ class CreatePolicyForm extends Component {
                 <TextField
                   name="description"
                   className={classes.field}
-                  placeholder="eg. Description ..."
+                  placeholder="eg. Our terms and conditions ..."
                   label="Describe this Goal"
                   multiline={trueBool}
                   rows={4}
