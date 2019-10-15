@@ -1,10 +1,10 @@
 module.exports = [
-  {
-    key: 'dashboard',
-    name: 'Dashboard',
-    icon: 'ios-stats',
-    link: '/admin/dashboard'
-  },
+  // {
+  //   key: 'dashboard',
+  //   name: 'Dashboard',
+  //   icon: 'ios-stats',
+  //   link: '/admin/dashboard'
+  // },
   {
     key: 'communities',
     name: 'Communities',
@@ -49,72 +49,72 @@ module.exports = [
       },
     ]
   },
-  {
-    key: 'events',
-    name: 'Events',
-    icon: 'md-wifi',
-    child: [
-      {
-        key: 'about-events',
-        name: 'Events',
-        title: true
-      },
-      {
-        key: 'add-event',
-        name: 'Add Event',
-        link: '/admin/add/event'
-      },
-      {
-        key: 'all-events',
-        name: 'All Events',
-        link: '/admin/read/events'
-      },
-    ]
-  },
-  {
-    key: 'tags-collections',
-    name: 'Tag Collections',
-    icon: 'md-reorder',
-    child: [
-      {
-        key: 'about-categories',
-        name: 'Tags & Tag Collections',
-        title: true
-      },
-      {
-        key: 'add-vendor',
-        name: 'Add New Category',
-        link: '/admin/add/category'
-      },
-      {
-        key: 'all-collections',
-        name: 'All Tag Collections',
-        link: '/admin/read/tag-collections'
-      },
-    ]
-  },
-  {
-    key: 'teams',
-    name: 'Teams',
-    icon: 'ios-people',
-    child: [
-      {
-        key: 'about-teams',
-        name: 'Teams',
-        title: true
-      },
-      {
-        key: 'add-team',
-        name: 'Add New Team',
-        link: '/admin/add/team'
-      },
-      {
-        key: 'all-teams',
-        name: 'All Teams',
-        link: '/admin/read/teams'
-      },
-    ]
-  },
+  // {
+  //   key: 'events',
+  //   name: 'Events',
+  //   icon: 'md-wifi',
+  //   child: [
+  //     {
+  //       key: 'about-events',
+  //       name: 'Events',
+  //       title: true
+  //     },
+  //     {
+  //       key: 'add-event',
+  //       name: 'Add Event',
+  //       link: '/admin/add/event'
+  //     },
+  //     {
+  //       key: 'all-events',
+  //       name: 'All Events',
+  //       link: '/admin/read/events'
+  //     },
+  //   ]
+  // },
+  // {
+  //   key: 'tags-collections',
+  //   name: 'Tag Collections',
+  //   icon: 'md-reorder',
+  //   child: [
+  //     {
+  //       key: 'about-categories',
+  //       name: 'Tags & Tag Collections',
+  //       title: true
+  //     },
+  //     {
+  //       key: 'add-vendor',
+  //       name: 'Add New Category',
+  //       link: '/admin/add/category'
+  //     },
+  //     {
+  //       key: 'all-collections',
+  //       name: 'All Tag Collections',
+  //       link: '/admin/read/tag-collections'
+  //     },
+  //   ]
+  // },
+  // {
+  //   key: 'teams',
+  //   name: 'Teams',
+  //   icon: 'ios-people',
+  //   child: [
+  //     {
+  //       key: 'about-teams',
+  //       name: 'Teams',
+  //       title: true
+  //     },
+  //     {
+  //       key: 'add-team',
+  //       name: 'Add New Team',
+  //       link: '/admin/add/team'
+  //     },
+  //     {
+  //       key: 'all-teams',
+  //       name: 'All Teams',
+  //       link: '/admin/read/teams'
+  //     },
+  //   ]
+  // },
   {
     key: 'goals',
     name: 'Goals',
@@ -137,56 +137,56 @@ module.exports = [
       },
     ]
   },
-  {
-    key: 'testimonials',
-    name: 'Testimonials',
-    icon: 'ios-analytics',
-    child: [
-      {
-        key: 'about-testimonials',
-        name: 'testimonials',
-        title: true
-      },
-      {
-        key: 'add-testimonial',
-        name: 'Add New Testimonial',
-        link: '/admin/add/testimonial'
-      },
-      {
-        key: 'all-testimonials',
-        name: 'All Testimonials',
-        link: '/admin/read/testimonials'
-      },
-    ]
-  },
-  {
-    key: 'vendors',
-    name: 'Vendors',
-    icon: 'md-hammer',
-    child: [
-      {
-        key: 'about-vendors',
-        name: 'Contractors/Vendors',
-        title: true
-      },
-      {
-        key: 'add-vendor',
-        name: 'Add New Vendor',
-        link: '/admin/add/vendor'
-      },
-      {
-        key: 'all-vendors',
-        name: 'All Vendors',
-        link: '/admin/read/vendors'
-      },
-    ]
-  },
-  {
-    key: 'export',
-    name: 'Export',
-    icon: 'ios-cloud-download',
-    link: '/admin/export'
-  },
+  // {
+  //   key: 'testimonials',
+  //   name: 'Testimonials',
+  //   icon: 'ios-analytics',
+  //   child: [
+  //     {
+  //       key: 'about-testimonials',
+  //       name: 'testimonials',
+  //       title: true
+  //     },
+  //     {
+  //       key: 'add-testimonial',
+  //       name: 'Add New Testimonial',
+  //       link: '/admin/add/testimonial'
+  //     },
+  //     {
+  //       key: 'all-testimonials',
+  //       name: 'All Testimonials',
+  //       link: '/admin/read/testimonials'
+  //     },
+  //   ]
+  // },
+  // {
+  //   key: 'vendors',
+  //   name: 'Vendors',
+  //   icon: 'md-hammer',
+  //   child: [
+  //     {
+  //       key: 'about-vendors',
+  //       name: 'Contractors/Vendors',
+  //       title: true
+  //     },
+  //     {
+  //       key: 'add-vendor',
+  //       name: 'Add New Vendor',
+  //       link: '/admin/add/vendor'
+  //     },
+  //     {
+  //       key: 'all-vendors',
+  //       name: 'All Vendors',
+  //       link: '/admin/read/vendors'
+  //     },
+  //   ]
+  // },
+  // {
+  //   key: 'export',
+  //   name: 'Export',
+  //   icon: 'ios-cloud-download',
+  //   link: '/admin/export'
+  // },
   {
     key: 'policies',
     name: 'Policies',
@@ -209,43 +209,43 @@ module.exports = [
       },
     ]
   },
-  {
-    key: 'page-customization',
-    name: 'Pages',
-    icon: 'ios-apps',
-    child: [
-      {
-        key: 'about-pages',
-        name: 'Website Pages',
-        title: true
-      },
-      {
-        key: 'home',
-        name: 'Home',
-        link: '/admin/add/home'
-      },
-      {
-        key: 'all-actions',
-        name: 'All Actions',
-        link: '/admin/read/all-actions'
-      },
-      {
-        key: 'donate',
-        name: 'Donate',
-        link: '/admin/add/donate'
-      },
-      {
-        key: 'contact',
-        name: 'Contact Us',
-        link: '/admin/read/contact-us'
-      },
-      {
-        key: 'about-us',
-        name: 'About Us',
-        link: '/admin/read/about-us'
-      },
-    ]
-  },
+  // {
+  //   key: 'page-customization',
+  //   name: 'Pages',
+  //   icon: 'ios-apps',
+  //   child: [
+  //     {
+  //       key: 'about-pages',
+  //       name: 'Website Pages',
+  //       title: true
+  //     },
+  //     {
+  //       key: 'home',
+  //       name: 'Home',
+  //       link: '/admin/add/home'
+  //     },
+  //     {
+  //       key: 'all-actions',
+  //       name: 'All Actions',
+  //       link: '/admin/read/all-actions'
+  //     },
+  //     {
+  //       key: 'donate',
+  //       name: 'Donate',
+  //       link: '/admin/add/donate'
+  //     },
+  //     {
+  //       key: 'contact',
+  //       name: 'Contact Us',
+  //       link: '/admin/read/contact-us'
+  //     },
+  //     {
+  //       key: 'about-us',
+  //       name: 'About Us',
+  //       link: '/admin/read/about-us'
+  //     },
+  //   ]
+  // },
   // {
   //   key: 'demo',
   //   name: 'Demo',

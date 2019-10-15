@@ -175,7 +175,7 @@ class AllCommunities extends React.Component {
         filter: true,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/goal/${id}/edit`}>
+            {/* <Link to={`/admin/goal/${id}/edit`}>
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
             &nbsp;&nbsp;
@@ -188,7 +188,7 @@ class AllCommunities extends React.Component {
             }}
             >
               <FileCopy size="small" variant="outlined" color="secondary" />
-            </Link>
+            </Link> */}
           </div>
         )
       }

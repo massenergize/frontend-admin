@@ -136,7 +136,7 @@ class CreateNewGoalForm extends Component {
       await this.setStateAsync({ error: response.error, successMsg: null });
     } else if (response && response.success) {
       await this.setStateAsync({ successMsg: 'Successfully Created this Goal', error: null });
-      window.location.href = `/admin/goal/${response.data.id}/edit`;
+      window.location.href = `/admin/edit/${response.data.id}/goal`;
     }
   }
 
