@@ -100,8 +100,6 @@ export function sendJson(dataToSend, destinationUrl, relocationPage = '/admin') 
 }
 
 
-
-
 export function sendFormWithMedia(incomingData, destinationUrl, relocationPage) {
   fetch(`${API_HOST}/auth/csrf`, {
     method: 'GET',

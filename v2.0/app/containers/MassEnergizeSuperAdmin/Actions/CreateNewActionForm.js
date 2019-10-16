@@ -1,9 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-// import { Editor } from 'react-draft-wysiwyg';
-// import draftToHtml from 'draftjs-to-html';
-// import { convertFromRaw, EditorState, convertToRaw } from 'draft-js';
 import InputLabel from '@material-ui/core/InputLabel';
 import Input from '@material-ui/core/Input';
 import { reduxForm } from 'redux-form/immutable';
@@ -22,10 +19,16 @@ import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import FormGroup from '@material-ui/core/FormGroup';
 import { MaterialDropZone } from 'dan-components';
+import Snackbar from '@material-ui/core/Snackbar';
+import { Link } from 'react-router-dom';
 import CircularProgress from '@material-ui/core/CircularProgress';
-
-import { fetchData, sendFormWithMedia, asyncSendFormWithMedia } from '../../../utils/messenger';
+import { Editor } from 'react-draft-wysiwyg';
+import draftToHtml from 'draftjs-to-html';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import { convertFromRaw, EditorState, convertToRaw } from 'draft-js';
+import { apiCall, apiCallWithMedia } from '../../../utils/messenger';
 import { initAction, clearAction } from '../../../actions/ReduxFormActions';
+import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
 
 const styles = theme => ({
   root: {
@@ -63,26 +66,30 @@ const MenuProps = {
   },
 };
 
+
 class CreateNewActionForm extends Component {
   constructor(props) {
     super(props);
+
+    this.updateForm = this.updateForm.bind(this);
     this.state = {
       formData: { tagsSelected: [], vendorsSelected: [], image: [] },
-      tags: [],
       vendors: [],
       communities: [],
       tagCollections: [],
-      singleSelectIDs: new Set(),
-      submitIsClicked: false
+      submitIsClicked: false,
+      stepsToTake: EditorState.createEmpty(),
+      aboutThisAction: EditorState.createEmpty(),
+      successMsg: null,
+      error: null
     };
-    this.updateForm = this.updateForm.bind(this);
   }
 
 
   async componentDidMount() {
-    const tagCollections = await fetchData('v2/tag-collections');
-    const vendors = await fetchData('v2/vendors');
-    const communities = await fetchData('v2/communities');
+    const tagCollections = await apiCall('/tag_collections.listForSuperAdmin');
+    const vendors = await apiCall('/vendors.listForSuperAdmin');
+    const communities = await apiCall('/communities.listForSuperAdmin');
 
     if (tagCollections) {
       const tags = [];
@@ -114,6 +121,12 @@ class CreateNewActionForm extends Component {
       this.setState(state, resolve);
     });
   }
+
+  onEditorStateChange = async (name, editorState) => {
+    await this.setStateAsync({
+      [name]: editorState,
+    });
+  };
 
   handleChangeMultiple = (event) => {
     const { target } = event;
@@ -165,8 +178,6 @@ class CreateNewActionForm extends Component {
     await this.setStateAsync({
       formData: { ...formData, [name]: theList }
     });
-
-    console.log(this.state.formData);
   };
 
   handleIsTemplateCheckbox = async (event) => {
@@ -183,10 +194,20 @@ class CreateNewActionForm extends Component {
     });
   };
 
+  handleCloseStyle = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    this.setState({ successMsg: null, error: null });
+  };
+
   submitForm = async (event) => {
     event.preventDefault();
-    const { formData } = this.state;
+    const { formData, stepsToTake, aboutThisAction } = this.state;
     const cleanedValues = { ...formData };
+    cleanedValues.steps_to_take = draftToHtml(convertToRaw(stepsToTake.getCurrentContent()));
+    cleanedValues.about = draftToHtml(convertToRaw(aboutThisAction.getCurrentContent()));
+
     if (cleanedValues.vendors) {
       cleanedValues.vendors = cleanedValues.vendorsSelected;
     }
@@ -194,37 +215,54 @@ class CreateNewActionForm extends Component {
     delete cleanedValues.tagsSelected;
     delete cleanedValues.vendorsSelected;
     delete cleanedValues.undefined;
+    cleanedValues.is_global = cleanedValues.is_global === 'true';
 
+    if (cleanedValues.community) {
+      cleanedValues.community_id = cleanedValues.community;
+      delete cleanedValues.community;
+    }
 
     if (cleanedValues.image && cleanedValues.image[0]) {
       cleanedValues.image = cleanedValues.image[0];
     } else {
       delete cleanedValues.image;
     }
+
     if (cleanedValues.is_global === 'true') {
       delete cleanedValues.community;
     }
 
     let tags = [];
-
     Object.keys(cleanedValues).forEach(name => {
       if (name.includes('tag')) {
         tags = tags.concat(cleanedValues[name]);
         delete cleanedValues[name];
       }
     });
-    console.log(tags);
     if (tags) {
       cleanedValues.tags = tags;
     }
 
+    console.log(cleanedValues);
 
+    let response = null;
     // await this.setStateAsync({ ...this.state, submitIsClicked: true });
+    if (cleanedValues.image) {
+      response = await apiCallWithMedia('/actions.create', cleanedValues);
+    } else {
+      response = await apiCall('/actions.create', cleanedValues);
+    }
 
-    const response = await asyncSendFormWithMedia(cleanedValues, '/v2/actions', '/admin/read/actions');
-    console.log(response);
-    if (response && response.data) {
-      window.location.href = '/admin/read/actions';
+    if (response && response.success) {
+      await this.setStateAsync({
+        successMsg: `Successfully Created ${response.data.title} Action. Want to Create a new one?  Modify the fields`,
+        error: null,
+        formData: { tagsSelected: [], vendorsSelected: [], image: [] }
+      });
+    }
+
+    if (response && !response.success) {
+      await this.setStateAsync({ error: response.error, successMsg: null });
     }
     console.log(response);
   }
@@ -245,7 +283,6 @@ class CreateNewActionForm extends Component {
       }
     }
     );
-    console.log(this.state.formData);
   }
 
 
@@ -256,10 +293,10 @@ class CreateNewActionForm extends Component {
       submitting,
     } = this.props;
     const {
-      formData, tags, communities, vendors, tagCollections, submitIsClicked
+      formData, error, successMsg, communities, vendors, tagCollections, submitIsClicked, stepsToTake, aboutThisAction
     } = this.state;
     const {
-      tagsSelected, vendorsSelected, community, title, steps_to_take, about, average_carbon_score, is_global
+      vendorsSelected, community, title, average_carbon_score, is_global
     } = formData;
     let communitySelected = communities.filter(c => c.id === community)[0];
     communitySelected = communitySelected ? communitySelected.name : '';
@@ -267,11 +304,54 @@ class CreateNewActionForm extends Component {
     return (
       <div>
         <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={12}>
             <Paper className={classes.root}>
               <Typography variant="h5" component="h3">
                  New Action
               </Typography>
+              <div>
+                <Snackbar
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                  open={error != null}
+                  autoHideDuration={6000}
+                  onClose={this.handleCloseStyle}
+                >
+                  <MySnackbarContentWrapper
+                    onClose={this.handleCloseStyle}
+                    variant="error"
+                    message={`Error Occurred: ${error}`}
+                  />
+                </Snackbar>
+                <Snackbar
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                  open={successMsg != null}
+                  autoHideDuration={6000}
+                  onClose={this.handleCloseStyle}
+                >
+                  <MySnackbarContentWrapper
+                    onClose={this.handleCloseStyle}
+                    variant="success"
+                    message={successMsg}
+                  />
+                </Snackbar>
+
+                {error
+                      && (
+                        <p style={{ color: 'red' }}>{error}</p>
+                      )
+                }
+                { successMsg
+                      && (
+                        <p style={{ color: 'green' }}>{successMsg}</p>
+                      )
+                }
+              </div>
 
               <form onSubmit={this.submitForm}>
                 <div>
@@ -317,55 +397,6 @@ class CreateNewActionForm extends Component {
                     )
                   }
                 </div>
-
-                <div className={classes.field}>
-                  <FormControl className={classes.field}>
-                    <InputLabel htmlFor="steps_to_take">Steps to Take</InputLabel>
-                    <Input
-                      id="steps_to_take"
-                      defaultValue={steps_to_take}
-                      name="steps_to_take"
-                      onChange={this.handleFormDataChange}
-                      multiline={trueBool}
-                      rows={4}
-                    />
-                  </FormControl>
-                </div>
-                {/* <Grid item xs={12}>
-                  <Editor
-                    editorState={editorState}
-                    editorClassName={classes.textEditor}
-                    toolbarClassName={classes.toolbarEditor}
-                    onEditorStateChange={this.onEditorStateChange}
-                  />
-                </Grid> */}
-                <div className={classes.field}>
-                  <FormControl className={classes.field}>
-                    <InputLabel htmlFor="about">About this Action</InputLabel>
-                    <Input
-                      id="about"
-                      defaultValue={about}
-                      name="about"
-                      onChange={this.handleFormDataChange}
-                      multiline={trueBool}
-                      rows={4}
-                    />
-                  </FormControl>
-                </div>
-                <div className={classes.field}>
-                  <FormControl className={classes.field}>
-                    <InputLabel htmlFor="average_carbon_score">Average Carbon Score</InputLabel>
-                    <Input
-                      id="average_carbon_score"
-                      defaultValue={average_carbon_score}
-                      name="average_carbon_score"
-                      placeholder="eg. 5"
-                      onChange={this.handleFormDataChange}
-                    />
-                  </FormControl>
-                </div>
-
-
                 <div className={classes.field}>
                   <FormControl className={classes.formControl}>
                     <Select2
@@ -402,6 +433,44 @@ class CreateNewActionForm extends Component {
                   </FormControl>
                 </div>
 
+                <div className={classes.field}>
+                  <FormControl className={classes.field}>
+                    <InputLabel htmlFor="average_carbon_score">Average Carbon Score</InputLabel>
+                    <Input
+                      id="average_carbon_score"
+                      defaultValue={average_carbon_score}
+                      name="average_carbon_score"
+                      placeholder="eg. 5"
+                      onChange={this.handleFormDataChange}
+                    />
+                  </FormControl>
+                </div>
+
+                <Grid item xs={12} style={{ borderColor: '#EAEAEA', borderStyle: 'solid', borderWidth: 'thin' }}>
+                  <Typography>About this Action:</Typography>
+                  <Editor
+                    editorState={aboutThisAction}
+                    editorClassName="editorClassName"
+                    onEditorStateChange={(e) => this.onEditorStateChange('aboutThisAction', e)}
+                    toolbarClassName="toolbarClassName"
+                    wrapperClassName="wrapperClassName"
+                  />
+                </Grid>
+                <br />
+                <br />
+
+                <Grid item xs={12} style={{ borderColor: '#EAEAEA', borderStyle: 'solid', borderWidth: 'thin' }}>
+                  <Typography>Steps To Take :</Typography>
+                  <Editor
+                    editorState={stepsToTake}
+                    editorClassName="editorClassName"
+                    onEditorStateChange={(e) => this.onEditorStateChange('stepsToTake', e)}
+                    toolbarClassName="toolbarClassName"
+                    wrapperClassName="wrapperClassName"
+                  />
+                </Grid>
+                <br />
+                <br />
                 {tagCollections.map(tc => (
                   <div className={classes.field} key={tc.id}>
                     <FormControl component="fieldset">
@@ -460,6 +529,18 @@ class CreateNewActionForm extends Component {
                   </Button>
                 </div>
               </form>
+
+
+              <div>
+                <br />
+                <br />
+                <Button variant="contained" color="secondary">
+                  <Link to="/admin/read/actions" style={{ color: 'white' }}>
+                    See All Actions
+                  </Link>
+                </Button>
+              </div>
+
             </Paper>
           </Grid>
         </Grid>
