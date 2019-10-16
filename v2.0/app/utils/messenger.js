@@ -4,6 +4,73 @@
 import qs from 'qs';
 import { API_HOST } from '../config/constants';
 
+/**
+ *
+ * @param {object} destinationUrl
+ * @param {object} dataToSend
+ * @param {string} relocationPage
+ * This function handles sending data to the backend.  It takes advantage of
+ * being a SimpleRequest hence no preflight checks will be done saving some
+ * band-with and being faster in general while avoiding CORS issues.
+ */
+export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = null) {
+  const response = await fetch(`${API_HOST}/v3${destinationUrl}`, {
+    credentials: 'include',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: qs.stringify(dataToSend)
+  });
+
+  try {
+    const json = await response.json();
+    if (relocationPage && json && json.success) {
+      window.location.href = relocationPage;
+    }
+    return json;
+  } catch (error) {
+    return { success: false, error };
+  }
+}
+
+/**
+ *
+ * @param {object} destinationUrl
+ * @param {object} dataToSend
+ * @param {string} relocationPage
+ * This function handles sending data which has media like file attachments
+ * to the backend.  It takes advantage of being a SimpleRequest hence no
+ * preflight checks will be done saving some band-with and being faster in
+ * general while avoiding CORS issues.
+ */
+export async function apiCallWithMedia(destinationUrl, dataToSend = {}, relocationPage = null) {
+  const formData = new FormData();
+  Object.keys(dataToSend).map(k => (formData.append(k, dataToSend[k])));
+
+  const response = await fetch(`${API_HOST}/v3${destinationUrl}`, {
+    credentials: 'include',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    body: formData
+  });
+
+  try {
+    const json = await response.json();
+    if (relocationPage && json && json.success) {
+      window.location.href = relocationPage;
+    }
+    return json;
+  } catch (error) {
+    return { success: false, error };
+  }
+}
+
+
+// DO NOT USE THE METHODS BELOW - NOT EFFICIENT
+
 export function sendJson(dataToSend, destinationUrl, relocationPage = '/admin') {
   fetch(`${API_HOST}/auth/csrf`, {
     method: 'GET',
@@ -33,23 +100,6 @@ export function sendJson(dataToSend, destinationUrl, relocationPage = '/admin') 
 }
 
 
-export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = null) {
-  const response = await fetch(`${API_HOST}/v3${destinationUrl}`, {
-    credentials: 'include',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: qs.stringify(dataToSend)
-  });
-  const json = await response.json();
-
-  if (relocationPage && json && json.success) {
-    window.location.href = relocationPage;
-  }
-
-  return json;
-}
 
 
 export function sendFormWithMedia(incomingData, destinationUrl, relocationPage) {
@@ -83,7 +133,6 @@ export function sendFormWithMedia(incomingData, destinationUrl, relocationPage) 
 }
 
 export async function asyncSendFormWithMedia(incomingData, destinationUrl, relocationPage) {
-
   const formData = new FormData();
   Object.keys(incomingData).map(k => (formData.append(k, incomingData[k])));
 
@@ -93,10 +142,10 @@ export async function asyncSendFormWithMedia(incomingData, destinationUrl, reloc
     method: 'POST',
     body: formData
   });
-  if(response){
-    window.location.href = '/admin/read/actions'
+  if (response) {
+    window.location.href = '/admin/read/actions';
   }
-  return response
+  return response;
 }
 
 
