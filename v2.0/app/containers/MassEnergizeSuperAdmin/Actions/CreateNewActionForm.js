@@ -24,7 +24,7 @@ import FormGroup from '@material-ui/core/FormGroup';
 import { MaterialDropZone } from 'dan-components';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-import { fetchData, sendFormWithMedia } from '../../../utils/messenger';
+import { fetchData, sendFormWithMedia, asyncSendFormWithMedia } from '../../../utils/messenger';
 import { initAction, clearAction } from '../../../actions/ReduxFormActions';
 
 const styles = theme => ({
@@ -67,16 +67,6 @@ class CreateNewActionForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // formData: {
-      //   title: 'Solar Action',
-      //   about: 'Nothing yet about this Action',
-      //   average_carbon_score: '1.2',
-      //   // community: 16,
-      //   image: [],
-      //   steps_to_take: 'No Steps to take yet',
-      //   tagsSelected: [14, 8, 10, 2, 5],
-      //   vendorsSelected: []
-      // },
       formData: { tagsSelected: [], vendorsSelected: [], image: [] },
       tags: [],
       vendors: [],
@@ -165,9 +155,10 @@ class CreateNewActionForm extends Component {
       theList.splice(pos, pos + 1);
     }
 
+
     if (name.includes('single')) {
       theList = [newVal];
-    } else {
+    } else if (name.includes('multiple')) {
       theList.push(newVal);
     }
 
@@ -193,15 +184,17 @@ class CreateNewActionForm extends Component {
   };
 
   submitForm = async (event) => {
-
     event.preventDefault();
     const { formData } = this.state;
     const cleanedValues = { ...formData };
-    cleanedValues.tags = cleanedValues.tagsSelected;
+    if (cleanedValues.vendors) {
+      cleanedValues.vendors = cleanedValues.vendorsSelected;
+    }
     cleanedValues.vendors = cleanedValues.vendorsSelected;
     delete cleanedValues.tagsSelected;
     delete cleanedValues.vendorsSelected;
     delete cleanedValues.undefined;
+
 
     if (cleanedValues.image && cleanedValues.image[0]) {
       cleanedValues.image = cleanedValues.image[0];
@@ -211,15 +204,33 @@ class CreateNewActionForm extends Component {
     if (cleanedValues.is_global === 'true') {
       delete cleanedValues.community;
     }
-    const response = sendFormWithMedia(cleanedValues, '/v2/actions', '/admin/read/actions');
-    await this.setStateAsync({ ...this.state, submitIsClicked: true });
 
+    let tags = [];
+
+    Object.keys(cleanedValues).forEach(name => {
+      if (name.includes('tag')) {
+        tags = tags.concat(cleanedValues[name]);
+        delete cleanedValues[name];
+      }
+    });
+    console.log(tags);
+    if (tags) {
+      cleanedValues.tags = tags;
+    }
+
+
+    // await this.setStateAsync({ ...this.state, submitIsClicked: true });
+
+    const response = await asyncSendFormWithMedia(cleanedValues, '/v2/actions', '/admin/read/actions');
+    console.log(response);
+    if (response && response.data) {
+      window.location.href = '/admin/read/actions';
+    }
     console.log(response);
   }
 
   isThisSelectedOrNot = (formData, fieldName, value) => {
     const fieldValues = formData[fieldName];
-    console.log(fieldValues);
     if (!fieldValues) return false;
     // if (!Array.isArray(fieldValues)) return false;
     return fieldValues.indexOf(value) > -1;
@@ -247,8 +258,8 @@ class CreateNewActionForm extends Component {
     const {
       formData, tags, communities, vendors, tagCollections, submitIsClicked
     } = this.state;
-    const { 
-      tagsSelected, vendorsSelected, community, title, steps_to_take,about, average_carbon_score, is_global
+    const {
+      tagsSelected, vendorsSelected, community, title, steps_to_take, about, average_carbon_score, is_global
     } = formData;
     let communitySelected = communities.filter(c => c.id === community)[0];
     communitySelected = communitySelected ? communitySelected.name : '';
@@ -284,8 +295,7 @@ class CreateNewActionForm extends Component {
                 </div>
                 <div>
                   {is_global !== 'true'
-                    &&
-                    (
+                    && (
                       <FormControl className={classes.field}>
                         <InputLabel htmlFor="community">Community</InputLabel>
                         <Select2
@@ -313,7 +323,7 @@ class CreateNewActionForm extends Component {
                     <InputLabel htmlFor="steps_to_take">Steps to Take</InputLabel>
                     <Input
                       id="steps_to_take"
-                      defaultValue={steps_to_take} 
+                      defaultValue={steps_to_take}
                       name="steps_to_take"
                       onChange={this.handleFormDataChange}
                       multiline={trueBool}
@@ -347,7 +357,7 @@ class CreateNewActionForm extends Component {
                     <InputLabel htmlFor="average_carbon_score">Average Carbon Score</InputLabel>
                     <Input
                       id="average_carbon_score"
-                      defaultValue={average_carbon_score} 
+                      defaultValue={average_carbon_score}
                       name="average_carbon_score"
                       placeholder="eg. 5"
                       onChange={this.handleFormDataChange}
@@ -377,19 +387,17 @@ class CreateNewActionForm extends Component {
                       }}
                       MenuProps={MenuProps}
                     >
-                      {vendors.map(t => {
-                        return (
-                          <MenuItem key={t.id} value={t.id}>
-                            <Checkbox
-                              checked={vendorsSelected.indexOf(t.id) > -1}
-                              onChange={this.handleCheckBoxSelect}
-                              value={'' + t.id}
-                              name="vendorsSelected"
-                            />
-                            <ListItemText primary={`${t.name}`} />
-                          </MenuItem>
-                        );
-                      })}
+                      {vendors.map(t => (
+                        <MenuItem key={t.id} value={t.id}>
+                          <Checkbox
+                            checked={vendorsSelected.indexOf(t.id) > -1}
+                            onChange={this.handleCheckBoxSelect}
+                            value={'' + t.id}
+                            name="vendorsSelected"
+                          />
+                          <ListItemText primary={`${t.name}`} />
+                        </MenuItem>
+                      ))}
                     </Select2>
                   </FormControl>
                 </div>
@@ -404,7 +412,7 @@ class CreateNewActionForm extends Component {
                             key={t.id}
                             control={(
                               <Checkbox
-                                checked={this.isThisSelectedOrNot(formData, `tag-${tc.name.toLowerCase()}--${tc.allow_multiple ? 'multiple' : 'single'}`,  t.id)}
+                                checked={this.isThisSelectedOrNot(formData, `tag-${tc.name.toLowerCase()}--${tc.allow_multiple ? 'multiple' : 'single'}`, t.id)}
                                 onChange={this.handleCheckBoxSelect}
                                 value={'' + t.id}
                                 name={`tag-${tc.name.toLowerCase()}--${tc.allow_multiple ? 'multiple' : 'single'}`}

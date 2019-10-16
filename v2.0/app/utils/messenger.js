@@ -58,7 +58,7 @@ export function sendFormWithMedia(incomingData, destinationUrl, relocationPage) 
     credentials: 'include',
   }).then(response => response.json()).then(jsonResponse => {
     const { csrfToken } = jsonResponse.data;
-    const formData = qs.stringify()
+    const formData = new FormData();
     Object.keys(incomingData).map(k => (formData.append(k, incomingData[k])));
 
     return fetch(`${API_HOST}${destinationUrl}`, {
@@ -69,24 +69,34 @@ export function sendFormWithMedia(incomingData, destinationUrl, relocationPage) 
         'X-CSRFToken': csrfToken,
       },
       body: formData
-    })
-      .then(response => {
-        console.log(response);
-        return response.json();
-      }
-      ).then(data => {
-        console.log(data);
-        if (data && data.success) {
-          console.log(data);
-          window.location.href = relocationPage;
-        }
-        return data;
+    }).then(response => response.json())
+      .then(data => data)
+      .catch(error => {
+        console.log(error.message);
+        return null;
       });
   }).catch(error => {
     console.log(error.message);
     window.location.href = relocationPage;
     return null;
   });
+}
+
+export async function asyncSendFormWithMedia(incomingData, destinationUrl, relocationPage) {
+
+  const formData = new FormData();
+  Object.keys(incomingData).map(k => (formData.append(k, incomingData[k])));
+
+  const response = await fetch(`${API_HOST}${destinationUrl}`, {
+    credentials: 'include',
+    mode: 'no-cors',
+    method: 'POST',
+    body: formData
+  });
+  if(response){
+    window.location.href = '/admin/read/actions'
+  }
+  return response
 }
 
 
@@ -140,5 +150,3 @@ export function formForJokes(dataTrain) {
       return null;
     });
 }
-
-

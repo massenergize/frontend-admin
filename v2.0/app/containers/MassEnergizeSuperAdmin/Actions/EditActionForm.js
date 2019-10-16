@@ -235,7 +235,7 @@ class EditActionForm extends Component {
       submitting,
     } = this.props;
     const {
-      formData, tags, communities, vendors, tagCollections, uploadedImage, submitIsClicked, image
+      formData, communities, vendors, tagCollections, uploadedImage, submitIsClicked, 
     } = this.state;
     const { 
       id, tagsSelected, vendorsSelected, community, title, is_global,

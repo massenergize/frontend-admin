@@ -153,22 +153,22 @@ class AllActions extends React.Component {
       }
     };
 
-    if (!data || data.length === 0) {
-      return (
-        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
-              <div className={classes.root}>
-                <LinearProgress />
-                <h1>Fetching all Actions.  This may take a while...</h1>
-                <br />
-                <LinearProgress color="secondary" />
-              </div>
-            </Paper>
-          </Grid>
-        </Grid>
-      );
-    }
+    // if (!data || data.length === 0) {
+    //   return (
+    //     <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+    //       <Grid item xs={12} md={6}>
+    //         <Paper className={classes.root}>
+    //           <div className={classes.root}>
+    //             <LinearProgress />
+    //             <h1>Fetching all Actions.  This may take a while...</h1>
+    //             <br />
+    //             <LinearProgress color="secondary" />
+    //           </div>
+    //         </Paper>
+    //       </Grid>
+    //     </Grid>
+    //   );
+    // }
 
     return (
       <div>
