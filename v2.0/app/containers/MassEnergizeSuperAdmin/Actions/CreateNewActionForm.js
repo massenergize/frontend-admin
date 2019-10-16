@@ -173,6 +173,8 @@ class CreateNewActionForm extends Component {
       theList = [newVal];
     } else if (name.includes('multiple')) {
       theList.push(newVal);
+    } else {
+      theList.push(newVal);
     }
 
     await this.setStateAsync({
@@ -300,7 +302,7 @@ class CreateNewActionForm extends Component {
     } = formData;
     let communitySelected = communities.filter(c => c.id === community)[0];
     communitySelected = communitySelected ? communitySelected.name : '';
-
+    console.log(vendorsSelected)
     return (
       <div>
         <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
