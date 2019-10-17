@@ -24,6 +24,7 @@ import { Link } from 'react-router-dom';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { Editor } from 'react-draft-wysiwyg';
 import draftToHtml from 'draftjs-to-html';
+import TextField from '@material-ui/core/TextField';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { convertFromRaw, EditorState, convertToRaw } from 'draft-js';
 import { apiCall, apiCallWithMedia } from '../../../utils/messenger';
@@ -256,10 +257,11 @@ class CreateNewActionForm extends Component {
     }
 
     if (response && response.success) {
+      console.log(response.data);
       await this.setStateAsync({
         successMsg: `Successfully Created ${response.data.title} Action. Want to Create a new one?  Modify the fields`,
         error: null,
-        formData: { tagsSelected: [], vendorsSelected: [], image: [] }
+        formData: { tagsSelected: [], vendorsSelected: [], image: [], title: null }
       });
     }
 
@@ -302,7 +304,7 @@ class CreateNewActionForm extends Component {
     } = formData;
     let communitySelected = communities.filter(c => c.id === community)[0];
     communitySelected = communitySelected ? communitySelected.name : '';
-    console.log(vendorsSelected)
+
     return (
       <div>
         <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
@@ -312,56 +314,68 @@ class CreateNewActionForm extends Component {
                  New Action
               </Typography>
               <div>
-                <Snackbar
-                  anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                  }}
-                  open={error != null}
-                  autoHideDuration={6000}
-                  onClose={this.handleCloseStyle}
-                >
-                  <MySnackbarContentWrapper
+                {error
+                && (
+                  <Snackbar
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    open={error != null}
+                    autoHideDuration={6000}
                     onClose={this.handleCloseStyle}
-                    variant="error"
-                    message={`Error Occurred: ${error}`}
-                  />
-                </Snackbar>
-                <Snackbar
-                  anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                  }}
-                  open={successMsg != null}
-                  autoHideDuration={6000}
-                  onClose={this.handleCloseStyle}
-                >
-                  <MySnackbarContentWrapper
+                  >
+                    <MySnackbarContentWrapper
+                      onClose={this.handleCloseStyle}
+                      variant="error"
+                      message={`Error Occurred: ${error}`}
+                    />
+                  </Snackbar>
+                )}
+
+                {successMsg
+                && (
+                  <Snackbar
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    open={successMsg != null}
+                    autoHideDuration={6000}
                     onClose={this.handleCloseStyle}
-                    variant="success"
-                    message={successMsg}
-                  />
-                </Snackbar>
+                  >
+                    <MySnackbarContentWrapper
+                      onClose={this.handleCloseStyle}
+                      variant="success"
+                      message={successMsg}
+                    />
+                  </Snackbar>
+                )}
 
                 {error
-                      && (
-                        <p style={{ color: 'red' }}>{error}</p>
-                      )
+                  && (
+                    <p style={{ color: 'red' }}>{error}</p>
+                  )
                 }
                 { successMsg
-                      && (
-                        <p style={{ color: 'green' }}>{successMsg}</p>
-                      )
+                  && (
+                    <p style={{ color: 'green' }}>{successMsg}</p>
+                  )
                 }
               </div>
 
               <form onSubmit={this.submitForm}>
-                <div>
-                  <FormControl className={classes.field}>
-                    <InputLabel htmlFor="title">Title</InputLabel>
-                    <Input id="title" defaultValue={title} name="title" onChange={this.handleFormDataChange} />
-                  </FormControl>
-                </div>
+                <TextField
+                  id="outline-required"
+                  required
+                  name="title"
+                  onChange={this.handleFormDataChange}
+                  label="Title"
+                  placeholder="eg. Take Solar Action"
+                  className={classes.field}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  defaultValue={title}
+                />
+
                 <div>
                   <FormControlLabel
                     control={(
