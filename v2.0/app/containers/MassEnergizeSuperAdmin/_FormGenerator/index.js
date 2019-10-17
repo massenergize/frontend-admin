@@ -68,13 +68,13 @@ const MenuProps = {
 };
 
 
-class CreateNewActionForm extends Component {
+class MassEnergizeForm extends Component {
   constructor(props) {
     super(props);
 
     this.updateForm = this.updateForm.bind(this);
     this.state = {
-      formData: { tagsSelected: [], vendorsSelected: [], image: [] },
+      formData: { },
       vendors: [],
       communities: [],
       tagCollections: [],
@@ -569,7 +569,7 @@ class CreateNewActionForm extends Component {
   }
 }
 
-CreateNewActionForm.propTypes = {
+MassEnergizeForm.propTypes = {
   classes: PropTypes.object.isRequired,
   submitting: PropTypes.bool.isRequired,
 };
@@ -582,7 +582,7 @@ const mapDispatchToProps = dispatch => ({
 const ReduxFormMapped = reduxForm({
   form: 'immutableExample',
   enableReinitialize: true,
-})(CreateNewActionForm);
+})(MassEnergizeForm);
 
 const reducer = 'initval';
 const FormInit = connect(
