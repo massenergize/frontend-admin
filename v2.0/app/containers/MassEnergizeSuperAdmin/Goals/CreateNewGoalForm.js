@@ -178,55 +178,56 @@ class CreateNewGoalForm extends Component {
               <div style={{ margin: 50 }} />
               <form onSubmit={this.submitForm}>
                 <div>
-                  <Snackbar
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
-                    }}
-                    open={error != null}
-                    autoHideDuration={6000}
-                    onClose={this.handleCloseStyle}
-                  >
-                    <MySnackbarContentWrapper
+                  <div>
+                    <Snackbar
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                      }}
+                      open={error != null}
+                      autoHideDuration={6000}
                       onClose={this.handleCloseStyle}
-                      variant="error"
-                      message={`Error Occurred: ${error}`}
-                    />
-                  </Snackbar>
-                  <Snackbar
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
-                    }}
-                    open={successMsg != null}
-                    autoHideDuration={6000}
-                    onClose={this.handleCloseStyle}
-                  >
-                    <MySnackbarContentWrapper
+                    >
+                      <MySnackbarContentWrapper
+                        onClose={this.handleCloseStyle}
+                        variant="error"
+                        message={`Error Occurred: ${error}`}
+                      />
+                    </Snackbar>
+                    <Snackbar
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                      }}
+                      open={successMsg != null}
+                      autoHideDuration={6000}
                       onClose={this.handleCloseStyle}
-                      variant="success"
-                      message={successMsg}
-                    />
-                  </Snackbar>
+                    >
+                      <MySnackbarContentWrapper
+                        onClose={this.handleCloseStyle}
+                        variant="success"
+                        message={successMsg}
+                      />
+                    </Snackbar>
 
-
-                  {error
-                  && (
-                    <p style={{ color: 'red' }}>{error}</p>
-                  )
-                  }
-                  {successMsg
-                  && (
-                    <p style={{ color: 'green' }}>{successMsg}</p>
-                  )
-                  }
+                    {error
+                      && (
+                        <p style={{ color: 'red' }}>{error}</p>
+                      )
+                    }
+                    { successMsg
+                      && (
+                        <p style={{ color: 'green' }}>{successMsg}</p>
+                      )
+                    }
+                  </div>
 
                   <FormControlLabel
                     control={(
                       <Checkbox
                         checked={is_community_goal}
                         onChange={async () => await this.setStateAsync({ is_community_goal: !is_community_goal })}
-                        value={''+is_community_goal}
+                        value={'' + is_community_goal}
                         name="is_community_goal"
 
                       />
@@ -260,7 +261,7 @@ class CreateNewGoalForm extends Component {
                 </div>
 
 
-                {!is_community_goal 
+                {!is_community_goal
 
                   && (
                     <div>

@@ -51,9 +51,7 @@ export async function apiCallWithMedia(destinationUrl, dataToSend = {}, relocati
   const response = await fetch(`${API_HOST}/v3${destinationUrl}`, {
     credentials: 'include',
     method: 'POST',
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
+    // mode: 'no-cors',
     body: formData
   });
 
@@ -64,7 +62,7 @@ export async function apiCallWithMedia(destinationUrl, dataToSend = {}, relocati
     }
     return json;
   } catch (error) {
-    return { success: false, error };
+    return { success: false, error: error.toString() };
   }
 }
 
@@ -98,8 +96,6 @@ export function sendJson(dataToSend, destinationUrl, relocationPage = '/admin') 
     return null;
   });
 }
-
-
 
 
 export function sendFormWithMedia(incomingData, destinationUrl, relocationPage) {

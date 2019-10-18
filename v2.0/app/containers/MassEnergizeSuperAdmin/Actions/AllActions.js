@@ -23,7 +23,8 @@ class AllActions extends React.Component {
     super(props);
     this.state = {
       columns: this.getColumns(),
-      data: []
+      data: [],
+      loading: true
     };
   }
 
@@ -45,7 +46,7 @@ class AllActions extends React.Component {
           d.id
         ]
       ));
-      await this.setStateAsync({ data });
+      await this.setStateAsync({ data, loading: false });
     }
   }
 
@@ -136,14 +137,14 @@ class AllActions extends React.Component {
   render() {
     const title = brand.name + ' - All Actions';
     const description = brand.desc;
-    const { data, columns } = this.state;
+    const { data, columns, loading } = this.state;
     const { classes } = this.props;
 
     const options = {
       filterType: 'dropdown',
       responsive: 'stacked',
       print: true,
-      rowsPerPage: 25,
+      rowsPerPage: 10,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {
@@ -153,22 +154,22 @@ class AllActions extends React.Component {
       }
     };
 
-    // if (!data || data.length === 0) {
-    //   return (
-    //     <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-    //       <Grid item xs={12} md={6}>
-    //         <Paper className={classes.root}>
-    //           <div className={classes.root}>
-    //             <LinearProgress />
-    //             <h1>Fetching all Actions.  This may take a while...</h1>
-    //             <br />
-    //             <LinearProgress color="secondary" />
-    //           </div>
-    //         </Paper>
-    //       </Grid>
-    //     </Grid>
-    //   );
-    // }
+    if (loading) {
+      return (
+        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+          <Grid item xs={12} md={6}>
+            <Paper className={classes.root}>
+              <div className={classes.root}>
+                <LinearProgress />
+                <h1>Fetching all Actions.  This may take a while...</h1>
+                <br />
+                <LinearProgress color="secondary" />
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      );
+    }
 
     return (
       <div>
