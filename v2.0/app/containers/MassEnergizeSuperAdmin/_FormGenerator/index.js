@@ -232,10 +232,11 @@ class MassEnergizeForm extends Component {
             break;
           case FieldTypes.File:
             hasMediaFiles = true;
-            if (field.filesLimit === 1) {
-              cleanedValues[field.dbName] = fieldValueInForm;
+            if (field.filesLimit === 1 && fieldValueInForm.length > 0) {
+              const [file] = fieldValueInForm;
+              cleanedValues[field.dbName] = file;
             } else {
-              cleanedValues[field.dbName] = fieldValueInForm[0];
+              cleanedValues[field.dbName] = fieldValueInForm;
             }
             break;
           default:
@@ -244,8 +245,8 @@ class MassEnergizeForm extends Component {
       }
     });
 
-    console.log(cleanedValues)
-    console.log(hasMediaFiles)
+    console.log(cleanedValues);
+
     // let's make an api call to send the data
     let response = null;
     if (hasMediaFiles) {
@@ -379,6 +380,8 @@ class MassEnergizeForm extends Component {
                 wrapperClassName="wrapperClassName"
               />
             </Grid>
+            <br />
+            <br />
           </div>
         );
       case FieldTypes.Radio:

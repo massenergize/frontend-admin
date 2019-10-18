@@ -84,7 +84,7 @@ class CreateNewEventForm extends Component {
           contentType: 'text',
           isRequired: true,
           defaultValue: '',
-          dbName: '',
+          dbName: 'name',
           readOnly: false
         },
         {
