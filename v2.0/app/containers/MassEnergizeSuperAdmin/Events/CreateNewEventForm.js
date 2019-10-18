@@ -109,33 +109,33 @@ class CreateNewEventForm extends Component {
           dbName: 'end_date_and_time',
           readOnly: false
         },
-        {
-          name: 'is_global',
-          label: 'Is this Event Global',
-          fieldType: 'Radio',
-          isRequired: false,
-          defaultValue: false,
-          dbName: 'is_global',
-          readOnly: false,
-          data: [
-            { id: false, value: 'No' },
-            { id: true, value: 'Yes' }
-          ],
-          child: {
-            valueToCheck: false,
-            fields: [
-              {
-                name: 'community',
-                label: 'Primary Community',
-                placeholder: 'eg. Wayland',
-                fieldType: 'Dropdown',
-                defaultValue: null,
-                dbName: 'community_id',
-                data: communities
-              },
-            ]
-          }
-        },
+        // {
+        //   name: 'is_global',
+        //   label: 'Is this Event Global',
+        //   fieldType: 'Radio',
+        //   isRequired: false,
+        //   defaultValue: false,
+        //   dbName: 'is_global',
+        //   readOnly: false,
+        //   data: [
+        //     { id: false, value: 'No' },
+        //     { id: true, value: 'Yes' }
+        //   ],
+        //   child: {
+        //     valueToCheck: false,
+        //     fields: [
+        //       {
+        //         name: 'community',
+        //         label: 'Primary Community',
+        //         placeholder: 'eg. Wayland',
+        //         fieldType: 'Dropdown',
+        //         defaultValue: null,
+        //         dbName: 'community_id',
+        //         data: communities
+        //       },
+        //     ]
+        //   }
+        // },
         {
           name: 'description',
           label: 'Event Description',
@@ -145,18 +145,18 @@ class CreateNewEventForm extends Component {
           defaultValue: null,
           dbName: 'description',
         },
-        {
-          name: 'tags',
-          label: 'Select your Tag',
-          placeholder: 'YYYY-MM-DD HH:MM',
-          fieldType: 'TextField',
-          contentType: 'text',
-          isRequired: false,
-          defaultValue: '',
-          dbName: 'tags',
-          readOnly: false,
-          data: tagCollections
-        },
+        // {
+        //   name: 'tags',
+        //   label: 'Select your Tag',
+        //   placeholder: 'YYYY-MM-DD HH:MM',
+        //   fieldType: 'TextField',
+        //   contentType: 'text',
+        //   isRequired: false,
+        //   defaultValue: '',
+        //   dbName: 'tags',
+        //   readOnly: false,
+        //   data: tagCollections
+        // },
         {
           name: 'image',
           placeholder: 'Select an Image',
@@ -168,27 +168,14 @@ class CreateNewEventForm extends Component {
           defaultValue: '',
           filesLimit: 1
         },
-        {
-          name: 'tags',
-          placeholder: '',
-          fieldType: 'Checkbox',
-          selectMany: true,
-          dbName: '',
-          data: tagCollections
-        },
-        {
-          name: 'files',
-          label: 'Upload Files',
-          placeholder: '',
-          fieldType: 'File',
-          selectMany: true,
-          contentType: 'text',
-          isRequired: true,
-          defaultValue: '',
-          dbName: 'files',
-          readOnly: false,
-          filesLimit: 1
-        },
+        // {
+        //   name: 'tags',
+        //   placeholder: '',
+        //   fieldType: 'Checkbox',
+        //   selectMany: true,
+        //   dbName: '',
+        //   data: tagCollections
+        // },
       ]
     };
     await this.setStateAsync({ formJson });

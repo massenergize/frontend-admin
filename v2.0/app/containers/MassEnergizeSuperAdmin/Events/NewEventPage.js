@@ -1,7 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
-import { PapperBlock } from 'dan-components';
 import CreateNewEventForm from './CreateNewEventForm';
 class CreateNewEvent extends React.Component {
   render() {
@@ -17,9 +16,7 @@ class CreateNewEvent extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <PapperBlock title="New Event Page" desc="Add Event Form">
-          <CreateNewEventForm />
-        </PapperBlock>
+        <CreateNewEventForm />
       </div>
     );
   }

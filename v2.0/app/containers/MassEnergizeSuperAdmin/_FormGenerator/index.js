@@ -71,12 +71,14 @@ class MassEnergizeForm extends Component {
       error: null,
       formJson: null
     };
+    this.updateForm = this.updateForm.bind(this);
   }
 
 
   async componentDidMount() {
     const { formJson } = this.props;
-    await this.setStateAsync({ formJson });
+    const formData = this.initialFormData(formJson.fields);
+    await this.setStateAsync({ formJson, formData });
   }
 
   setStateAsync(state) {
@@ -85,9 +87,39 @@ class MassEnergizeForm extends Component {
     });
   }
 
+    /**
+   * Given the field, it renders the actual component
+   */
+    initialFormData = (fields) => {
+      const formData = {};
+      fields.forEach(field => {
+        switch (field.fieldType) {
+          case FieldTypes.Checkbox:
+            formData[field.name] = [];
+            break;
+          case FieldTypes.File:
+            formData[field.name] = [];
+            break;
+          case FieldTypes.HTMLField:
+            formData[field.name] = EditorState.createEmpty();
+            break;
+          default:
+            formData[field.name] = null;
+            break;
+        }
+      }
+      );
+      return formData;
+    }
+
+
+  /**
+   * ============ HELPER FUNCTIONS FOR INPUTS
+   */
   onEditorStateChange = async (name, editorState) => {
+    const { formData } = this.state;
     await this.setStateAsync({
-      formData: { [name]: editorState }
+      formData: { ...formData, [name]: editorState }
     });
   };
 
@@ -117,8 +149,9 @@ class MassEnergizeForm extends Component {
     const { target } = event;
     if (!target) return;
     const { name, value } = target;
+    const { formData } = this.state;
     this.setState({
-      formData: { [name]: value }
+      formData: { ...formData, [name]: value }
     });
   };
 
@@ -157,14 +190,18 @@ class MassEnergizeForm extends Component {
   /**
    * Returns what value was entered in the form for this fieldName
    */
-  getValue = (name) => {
-    const { formData } = this.state;
-    const val = formData[name];
+  getValue = (name, defaultValue = null) => {
+    let { formData } = this.state;
+    let val = formData[name];
+    if (!val) {
+      formData = { ...formData, [name]: defaultValue };
+      // this.setState({ formData });
+      val = defaultValue;
+    }
     return val;
   }
 
   handleCloseStyle = (event, reason) => {
-    event.preventDefault();
     if (reason === 'clickaway') {
       return;
     }
@@ -189,13 +226,17 @@ class MassEnergizeForm extends Component {
     formJson.fields.forEach(field => {
       const fieldValueInForm = tmpFormValues[field.name];
       if (fieldValueInForm) {
-        switch (field.type) {
+        switch (field.fieldType) {
           case FieldTypes.HTMLField:
             cleanedValues[field.dbName] = draftToHtml(convertToRaw(fieldValueInForm.getCurrentContent()));
             break;
           case FieldTypes.File:
             hasMediaFiles = true;
-            cleanedValues[field.dbName] = fieldValueInForm;
+            if (field.filesLimit === 1) {
+              cleanedValues[field.dbName] = fieldValueInForm;
+            } else {
+              cleanedValues[field.dbName] = fieldValueInForm[0];
+            }
             break;
           default:
             cleanedValues[field.dbName] = fieldValueInForm;
@@ -203,6 +244,8 @@ class MassEnergizeForm extends Component {
       }
     });
 
+    console.log(cleanedValues)
+    console.log(hasMediaFiles)
     // let's make an api call to send the data
     let response = null;
     if (hasMediaFiles) {
@@ -249,16 +292,17 @@ class MassEnergizeForm extends Component {
     );
   }
 
+
   /**
    * Given the field, it renders the actual component
    */
   renderField = (field) => {
     const { classes } = this.props;
-    switch (field.type) {
+    switch (field.fieldType) {
       case FieldTypes.Checkbox:
         return (
-          <div>
-            <div className={classes.field} key={field.name + field.dbName}>
+          <div key={field.name}>
+            <div className={classes.field}>
               <FormControl component="fieldset">
                 <FormLabel component="legend">{field.label}</FormLabel>
                 <FormGroup>
@@ -284,60 +328,66 @@ class MassEnergizeForm extends Component {
         );
       case FieldTypes.Dropdown:
         return (
-          <FormControl className={classes.field} key={field.name + field.dbName}>
-            <InputLabel htmlFor={field.name}>{field.label}</InputLabel>
-            <Select
-              native
-              name={field.name}
-              onChange={async (newValue) => { await this.updateForm(field.name, newValue.target.value); }}
-              inputProps={{
-                id: 'age-native-simple',
-              }}
-            >
-              <option value={this.getValue(field.name)}>{this.getDisplayName(field.name, field.dataMemberDisplayName, field.data)}</option>
-              { field.data
-                && field.data.map(c => (
-                  <option value={c.id} key={c.id}>{c[field.dataMemberDisplayName]}</option>
-                ))
-              }
-            </Select>
-            {field.child && this.getValue(field.name) === field.child.valueToCheck && this.renderField(field.child)}
-          </FormControl>
+          <div key={field.name}>
+            <FormControl className={classes.field}>
+              <InputLabel htmlFor={field.name}>{field.label}</InputLabel>
+              <Select
+                native
+                name={field.name}
+                onChange={async (newValue) => { await this.updateForm(field.name, newValue.target.value); }}
+                inputProps={{
+                  id: 'age-native-simple',
+                }}
+              >
+                <option value={this.getValue(field.name)}>{this.getDisplayName(field.name, field.dataMemberDisplayName, field.data)}</option>
+                { field.data
+                  && field.data.map(c => (
+                    <option value={c.id} key={c.id}>{c[field.dataMemberDisplayName]}</option>
+                  ))
+                }
+              </Select>
+              {field.child && this.getValue(field.name) === field.child.valueToCheck && this.renderField(field.child)}
+            </FormControl>
+          </div>
         );
       case FieldTypes.File:
         return (
-          <Fragment key={field.name + field.dbName}>
-            <MaterialDropZone
-              acceptedFiles={['image/jpeg', 'image/png', 'image/jpg', 'image/bmp', 'image/svg']}
-              files={this.getValue(field.name)}
-              showPreviews
-              maxSize={5000000}
-              filesLimit={field.fieldsLimit}
-              text={field.label}
-              addToState={this.updateForm}
-            />
-          </Fragment>
+          <div key={field.name}>
+            <Fragment>
+              <MaterialDropZone
+                acceptedFiles={['image/jpeg', 'image/png', 'image/jpg', 'image/bmp', 'image/svg']}
+                files={this.getValue(field.name, [])}
+                showPreviews
+                maxSize={5000000}
+                filesLimit={field.filesLimit}
+                text={field.label}
+                addToState={this.updateForm}
+              />
+            </Fragment>
+          </div>
         );
       case FieldTypes.HTMLField:
         return (
-          <Grid item xs={12} style={{ borderColor: '#EAEAEA', borderStyle: 'solid', borderWidth: 'thin' }} key={field.name + field.dbName}>
-            <Typography>{field.label}</Typography>
-            <Editor
-              editorState={this.getValue(field.name)}
-              editorClassName="editorClassName"
-              onEditorStateChange={(e) => this.onEditorStateChange(field.name, e)}
-              toolbarClassName="toolbarClassName"
-              wrapperClassName="wrapperClassName"
-            />
-          </Grid>
+          <div key={field.name + field.label}>
+            <Grid item xs={12} style={{ borderColor: '#EAEAEA', borderStyle: 'solid', borderWidth: 'thin' }}>
+              <Typography>{field.label}</Typography>
+              <Editor
+                editorState={this.getValue(field.name, EditorState.createEmpty())}
+                editorClassName="editorClassName"
+                onEditorStateChange={(e) => this.onEditorStateChange(field.name, e)}
+                toolbarClassName="toolbarClassName"
+                wrapperClassName="wrapperClassName"
+              />
+            </Grid>
+          </div>
         );
       case FieldTypes.Radio:
         return (
-          <div className={classes.fieldBasic} key={field.name + field.dbName}>
+          <div className={classes.fieldBasic} key={field.name + field.label}>
             <FormLabel component="label">{field.label}</FormLabel>
             <Field name={field.name} className={classes.inlineWrap} component={renderRadioGroup}>
               {field.data.map(d => (
-                <FormControlLabel value={d.id} name={field.name} control={<Radio />} label={d.dataMemberDisplayName} onClick={this.radioSelect} />
+                <FormControlLabel key={d.id} value={d.id} name={field.name} control={<Radio />} label={d.dataMemberDisplayName} onClick={this.radioSelect} />
               ))}
             </Field>
             <div>{field.description}</div>
@@ -346,7 +396,7 @@ class MassEnergizeForm extends Component {
         );
       case FieldTypes.TextField:
         return (
-          <div key={field.name + field.dbName}>
+          <div key={field.name + field.label}>
             <TextField
               required={field.isRequired}
               name={field.name}
@@ -364,7 +414,7 @@ class MassEnergizeForm extends Component {
 
         );
       default:
-        return <div />;
+        return <div key={field.name + field.label} />;
     }
   }
 
@@ -372,23 +422,17 @@ class MassEnergizeForm extends Component {
    * Takes a list of fields and renders them one by depending on which type
    * by making use of a helper function
    */
-  renderFields = (fields) => (
-    (
-      <div>
-        {fields.map(field => this.renderField(field))}
-      </div>
-    )
-  )
+  renderFields = (fields) => fields.map(field => this.renderField(field))
 
 
   render() {
     const { classes } = this.props;
     const {
-      formJson, error, successMsg, startCircularSpinner
+      formJson, formData, error, successMsg, startCircularSpinner
     } = this.state;
 
     if (!formJson) return <div />;
-
+    console.log(formData)
     return (
       <div>
         <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
@@ -443,7 +487,10 @@ class MassEnergizeForm extends Component {
 
               {/* Generating the Actual Form */}
               <form onSubmit={this.submitForm}>
+
+                {/* render the fields from the formJson */}
                 {this.renderFields(formJson.fields)}
+
                 {startCircularSpinner
                 && (
                   <div>
