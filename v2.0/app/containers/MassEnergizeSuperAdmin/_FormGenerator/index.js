@@ -64,9 +64,8 @@ const renderRadioGroup = ({ input, ...rest }) => (
 class MassEnergizeForm extends Component {
   constructor(props) {
     super(props);
-    this.updateForm = this.updateForm.bind(this);
     this.state = {
-      formData: { },
+      formData: {},
       startCircularSpinner: false,
       successMsg: null,
       error: null,
@@ -88,10 +87,14 @@ class MassEnergizeForm extends Component {
 
   onEditorStateChange = async (name, editorState) => {
     await this.setStateAsync({
-      [name]: editorState,
+      formData: { [name]: editorState }
     });
   };
 
+
+  /**
+   * Handle multi select
+   */
   handleChangeMultiple = (event) => {
     const { target } = event;
     const { name, options } = target;
@@ -106,17 +109,24 @@ class MassEnergizeForm extends Component {
     });
   };
 
+
+  /**
+   * Handles general input
+   */
   handleFormDataChange = (event) => {
     const { target } = event;
     if (!target) return;
-    const { formData } = this.state;
     const { name, value } = target;
     this.setState({
-      formData: { ...formData, [name]: value }
+      formData: { [name]: value }
     });
   };
 
-  handleCheckBoxSelect = async (event) => {
+
+  /**
+   * Handle checkboxes when they are clicked
+   */
+  handleCheckBoxSelect = async (event, selectMany) => {
     const { target } = event;
     if (!target) return;
     const { formData } = this.state;
@@ -129,14 +139,11 @@ class MassEnergizeForm extends Component {
     const newVal = parseInt(value, 10);
     const pos = theList.indexOf(newVal);
     if (pos > -1) {
-      theList.splice(pos, pos + 1);
+      theList.splice(pos, 1);
     }
 
-
-    if (name.includes('single')) {
+    if (!selectMany) {
       theList = [newVal];
-    } else if (name.includes('multiple')) {
-      theList.push(newVal);
     } else {
       theList.push(newVal);
     }
@@ -146,27 +153,28 @@ class MassEnergizeForm extends Component {
     });
   };
 
-  handleIsTemplateCheckbox = async (event) => {
-    const { target } = event;
-    if (!target) return;
+
+  /**
+   * Returns what value was entered in the form for this fieldName
+   */
+  getValue = (name) => {
     const { formData } = this.state;
-    const oldValue = formData.is_global;
-    const { name } = target;
-    if (oldValue !== 'true') {
-      delete formData.community;
-    }
-    await this.setStateAsync({
-      formData: { ...formData, [name]: oldValue === 'true' ? 'false' : 'true' }
-    });
-  };
+    const val = formData[name];
+    return val;
+  }
 
   handleCloseStyle = (event, reason) => {
+    event.preventDefault();
     if (reason === 'clickaway') {
       return;
     }
     this.setState({ successMsg: null, error: null });
   };
 
+
+  /**
+   * This handles the form data submission
+   */
   submitForm = async (event) => {
     event.preventDefault();
 
@@ -198,9 +206,9 @@ class MassEnergizeForm extends Component {
     // let's make an api call to send the data
     let response = null;
     if (hasMediaFiles) {
-      response = await apiCallWithMedia('/actions.create', cleanedValues);
+      response = await apiCallWithMedia(formJson.method, cleanedValues);
     } else {
-      response = await apiCall('/actions.create', cleanedValues);
+      response = await apiCall(formJson.method, cleanedValues);
     }
 
     if (response && response.success) {
@@ -241,6 +249,9 @@ class MassEnergizeForm extends Component {
     );
   }
 
+  /**
+   * Given the field, it renders the actual component
+   */
   renderField = (field) => {
     const { classes } = this.props;
     switch (field.type) {
@@ -438,7 +449,7 @@ class MassEnergizeForm extends Component {
                 )
                 }
                 <div>
-                  <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
+                  <Button variant="contained" color="secondary" type="submit">
                     Submit
                   </Button>
                 </div>
@@ -453,7 +464,6 @@ class MassEnergizeForm extends Component {
 
 MassEnergizeForm.propTypes = {
   classes: PropTypes.object.isRequired,
-  submitting: PropTypes.bool.isRequired,
   formJson: PropTypes.object.isRequired,
 };
 

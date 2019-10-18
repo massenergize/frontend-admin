@@ -1,48 +1,8 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
-import InputLabel from '@material-ui/core/InputLabel';
-import Input from '@material-ui/core/Input';
-import MenuItem from '@material-ui/core/MenuItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Select2 from '@material-ui/core/Select';
-import Paper from '@material-ui/core/Paper';
-import { Field, reduxForm } from 'redux-form/immutable';
-import Grid from '@material-ui/core/Grid';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Typography from '@material-ui/core/Typography';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-import Button from '@material-ui/core/Button';
-import FormGroup from '@material-ui/core/FormGroup';
-import { MaterialDropZone } from 'dan-components';
-import Checkbox from '@material-ui/core/Checkbox';
-
-import {
-  TextField,
-  Switch,
-  Select
-} from 'redux-form-material-ui';
-import { fetchData, sendJson } from '../../../utils/messenger';
-
-import { initAction, clearAction } from '../../../actions/ReduxFormActions';
-
-const renderRadioGroup = ({ input, ...rest }) => (
-  <RadioGroup
-    {...input}
-    {...rest}
-    valueselected={input.value}
-    onChange={(event, value) => input.onChange(value)}
-  />
-);
-
-// validation functions
-const required = value => (value == null ? 'Required' : undefined);
+import { apiCall } from '../../../utils/messenger';
+import MassEnergizeForm from '../_FormGenerator';
 
 const styles = theme => ({
   root: {
@@ -69,74 +29,38 @@ const styles = theme => ({
 });
 
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
-function getStyles(name, that) {
-  return {
-    fontWeight:
-      that.state.formData.tagsSelected.indexOf(name) === -1
-        ? that.props.theme.typography.fontWeightRegular
-        : that.props.theme.typography.fontWeightMedium,
-  };
-}
-
-
-const initData = {
-  name: 'New Event Happening',
-  start_date_and_time: '2019-08-25 16:00',
-  end_date_and_time: '2019-01-25 17:00',
-  description: 'No Description yet',
-  is_global: 'true',
-  archive: 'false',
-  external_link: '#',
-  is_external_event: 'false'
-};
-
 class CreateNewEventForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      formData: {
-        is_external_event: 'false',
-        archive:'false',
-        image:[],
-        tagsSelected: [], 
-        communitiesSelected: [] 
-      },
-      tags: [],
+      // tags: [],
       communities: [],
-      tagCollections: []
+      tagCollections: [],
+      formJson: {}
     };
   }
 
 
   async componentDidMount() {
-    const tagCollections = await fetchData('v2/tag-collections');
-    const communities = await fetchData('v2/communities');
+    const tagCollectionsResponse = await apiCall('/tag_collections.listForSuperAdmin');
+    const communitiesResponse = await apiCall('/tag_collections.listForSuperAdmin');
 
-    if (tagCollections) {
+    if (tagCollectionsResponse && tagCollectionsResponse.data) {
       const tags = [];
-      Object.values(tagCollections.data).forEach(tCol => {
+      Object.values(tagCollectionsResponse.data).forEach(tCol => {
         Object.values(tCol.tags).forEach(t => {
           tags.push({ ...t, tagCollection: tCol.name });
         });
       });
-      this.setStateAsync({ tags });
-      this.setStateAsync({ tagCollections: tagCollections.data });
+      await this.setStateAsync({ tags });
+      await this.setStateAsync({ tagCollections: tagCollectionsResponse.data });
     }
 
-    if (communities) {
-      this.setStateAsync({ communities: communities.data });
+    if (communitiesResponse && communitiesResponse.data) {
+      await this.setStateAsync({ communities: communitiesResponse.data });
     }
+
+    await this.createFormJson();
   }
 
   setStateAsync(state) {
@@ -145,336 +69,154 @@ class CreateNewEventForm extends Component {
     });
   }
 
-  handleChangeMultiple = (event) => {
-    const { target } = event;
-    const { name, options } = target;
-    const value = [];
-    for (let i = 0, l = options.length; i < l; i += 1) {
-      if (options[i].selected) {
-        value.push(options[i].value);
-      }
-    }
-    this.setState({
-      formData: { [name]: value }
-    });
-  };
-
-  handleFormDataChange = (event) => {
-    const { target } = event;
-    if (!target) return;
-    const { name, value } = target;
-    const { formData } = this.state;
-    this.setState({
-      formData: { ...formData, [name]: value }
-    });
+  createFormJson = async () => {
+    const { communities, tagCollections } = this.state;
+    console.log(communities);
+    console.log(tagCollections)
+    const formJson = {
+      title: 'Create New Event',
+      subTitle: '',
+      method: '/events.create',
+      fields: [
+        {
+          name: 'name',
+          label: 'Name of Event',
+          placeholder: '',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: true,
+          defaultValue: '',
+          dbName: '',
+          readOnly: false
+        },
+        {
+          name: 'start_date_and_time',
+          label: 'Start Date And Time: YYYY-MM-DD HH:MM',
+          placeholder: 'YYYY-MM-DD HH:MM',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: false,
+          defaultValue: '',
+          dbName: 'start_date_and_time',
+          readOnly: false
+        },
+        {
+          name: 'end_date_and_time',
+          label: 'End Date And Time: YYYY-MM-DD HH:MM',
+          placeholder: 'YYYY-MM-DD HH:MM',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: false,
+          defaultValue: '',
+          dbName: 'end_date_and_time',
+          readOnly: false
+        },
+        {
+          name: 'is_global',
+          label: 'Is this Event Global',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: false,
+          dbName: 'is_global',
+          readOnly: false,
+          data: [
+            { id: false, value: 'No' },
+            { id: true, value: 'Yes' }
+          ],
+          child: {
+            valueToCheck: false,
+            fields: [
+              {
+                name: 'community',
+                label: 'Primary Community',
+                placeholder: 'eg. Wayland',
+                fieldType: 'Dropdown',
+                defaultValue: null,
+                dbName: 'community_id',
+                data: communities
+              },
+            ]
+          }
+        },
+        {
+          name: 'description',
+          label: 'Event Description',
+          placeholder: 'eg. This event is happening in ...',
+          fieldType: 'HTMLField',
+          isRequired: true,
+          defaultValue: null,
+          dbName: 'description',
+        },
+        {
+          name: 'tags',
+          label: 'Select your Tag',
+          placeholder: 'YYYY-MM-DD HH:MM',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: false,
+          defaultValue: '',
+          dbName: 'tags',
+          readOnly: false,
+          data: tagCollections
+        },
+        {
+          name: 'image',
+          placeholder: 'Select an Image',
+          fieldType: 'File',
+          dbName: 'image',
+          label: 'Upload Files',
+          selectMany: false,
+          isRequired: true,
+          defaultValue: '',
+          filesLimit: 1
+        },
+        {
+          name: 'tags',
+          placeholder: '',
+          fieldType: 'Checkbox',
+          selectMany: true,
+          dbName: '',
+          data: tagCollections
+        },
+        {
+          name: 'files',
+          label: 'Upload Files',
+          placeholder: '',
+          fieldType: 'File',
+          selectMany: true,
+          contentType: 'text',
+          isRequired: true,
+          defaultValue: '',
+          dbName: 'files',
+          readOnly: false,
+          filesLimit: 1
+        },
+      ]
+    };
+    console.log(formJson)
+    await this.setStateAsync({ formJson });
+    console.log(this.state.formJson)
   }
 
 
-  isThisSelectedOrNot = (formData, fieldName, value) => {
-    const fieldValues = formData[fieldName];
-    console.log(fieldValues);
-    if (!fieldValues) return false;
-    // if (!Array.isArray(fieldValues)) return false;
-    return fieldValues.indexOf(value) > -1;
-  }
-
-  submitForm = async (event) => {
-    event.preventDefault();
-    const { formData } = this.state;
-    const cleanedValues = { ...formData };
-    cleanedValues.tags = cleanedValues.tagsSelected;
-    cleanedValues.communitiesSelected = cleanedValues.communitiesSelected;
-    cleanedValues.is_global = cleanedValues.is_global === 'true';
-    cleanedValues.archive = cleanedValues.archive === 'true';
-    cleanedValues.is_external_event = cleanedValues.is_external_event === 'true';
-
-    delete cleanedValues.tagsSelected;
-    delete cleanedValues.communitiesSelected;
-    console.log(cleanedValues);
-    const response = sendJson(cleanedValues, '/v2/events', '/admin/read/events');
-    console.log(response);
-  }
-
-  handleCheckBoxSelect = async (event) => {
-    const { target } = event;
-    if (!target) return;
-    const { formData } = this.state;
-    const { name, value } = target;
-    let theList = formData[name];
-
-    if (!theList) {
-      theList = [];
-    }
-    const newVal = parseInt(value, 10);
-    const pos = theList.indexOf(newVal);
-    if (pos > -1) {
-      theList.splice(pos, pos + 1);
-    }
-
-    if (name.includes('single')) {
-      theList = [newVal];
-    } else {
-      theList.push(newVal);
-    }
-
-    await this.setStateAsync({
-      formData: { ...formData, [name]: theList }
-    });
-
-    console.log(this.state.formData);
-  };
-
-  async updateForm(fieldName, value) {
-    const { formData } = this.state;
-    await this.setStateAsync({
-      formData: {
-        ...formData,
-        [fieldName]: value
-      }
-    }
-    );
-  }
-
-  
   render() {
-    const trueBool = true;
-    const {
-      classes,
-      pristine,
-      reset,
-      submitting,
-      init,
-      clear
-    } = this.props;
-    const {
-      formData, tags, communities, tagCollections
-    } = this.state;
-    const { tagsSelected, communitiesSelected, community } = formData;
-    let communitySelected = communities.filter(c => c.id === community)[0];
-    communitySelected = communitySelected ? communitySelected.name : '';
-
-
+    const { classes } = this.props;
+    const { formJson } = this.state;
+    if (!formJson) return (<div />);
     return (
       <div>
-        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
-              <Typography variant="h5" component="h3">
-                 New Event
-              </Typography>
-              <div className={classes.buttonInit}>
-                <Button onClick={() => init(initData)} color="secondary" type="button">
-                  Load Sample Data
-                </Button>
-                <Button onClick={() => clear()} type="button">
-                  Clear Data
-                </Button>
-              </div>
-              <form onSubmit={this.submitForm}>
-                <div>
-                  <Field
-                    name="name"
-                    component={TextField}
-                    placeholder="Event Name"
-                    label="Event Name"
-                    validate={required}
-                    required
-                    ref={this.saveRef}
-                    className={classes.field}
-                    onChange={this.handleFormDataChange}
-                  />
-                </div>
-                <div>
-                  <Field
-                    name="start_date_and_time"
-                    component={TextField}
-                    placeholder="YYYY-MM-DD HH:MM"
-                    label="Start Date And Time: YYYY-MM-DD HH:MM"
-                    validate={required}
-                    required
-                    ref={this.saveRef}
-                    className={classes.field}
-                    onChange={this.handleFormDataChange}
-                  />
-                </div>
-                <div>
-                  <Field
-                    name="end_date_and_time"
-                    component={TextField}
-                    placeholder="YYYY-MM-DD HH:MM"
-                    label="end Date And Time: YYYY-MM-DD HH:MM"
-                    validate={required}
-                    required
-                    ref={this.saveRef}
-                    className={classes.field}
-                    onChange={this.handleFormDataChange}
-                  />
-                </div>
-                <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Is this Event Global ?</FormLabel>
-                  <Field
-                    name="is_global"
-                    className={classes.inlineWrap}
-                    onChange={async (newValue) => { await this.updateForm('is_global', newValue); }}
-                    component={renderRadioGroup}
-                  >
-                    <FormControlLabel value="true" control={<Radio />} label="Yes" />
-                    <FormControlLabel value="false" control={<Radio />} label="No" />
-                  </Field>
-                </div>
-                <div className={classes.field}>
-                  <Field
-                    name="description"
-                    className={classes.field}
-                    component={TextField}
-                    placeholder="Event Description"
-                    label="Event Description"
-                    multiline={trueBool}
-                    rows={4}
-                    onChange={this.handleFormDataChange}
-                  />
-                </div>
-                <FormControl className={classes.field}>
-                  <InputLabel htmlFor="community">Community</InputLabel>
-                  <Select2
-                    native
-                    name="community"
-                    onChange={async (newValue) => { await this.updateForm('community', parseInt(newValue.target.value, 10)); }}
-                    inputProps={{
-                      id: 'age-native-simple',
-                    }}
-                  >
-                    <option value={community}>{communitySelected}</option>
-                    { communities
-                      && communities.map(c => (
-                        <option value={c.id} key={c.id}>{c.name}</option>
-                      ))
-                    }
-                  </Select2>
-                </FormControl>
-
-                <div className={classes.field}>
-                  <FormControl className={classNames(classes.formControl, classes.noLabel)}>
-                    <Select2
-                      multiple
-                      displayEmpty
-                      value={communitiesSelected}
-                      onChange={this.handleFormDataChange}
-                      input={<Input id="select-multiple-placeholder" name="communitiesSelected" />}
-                      renderValue={selected => {
-                        if (selected.length === 0) {
-                          return <em>Please Select Communities who Can Attend</em>;
-                        }
-                        const names = selected.map(s => communities.filter(t => t.id === s)[0] && communities.filter(t => t.id === s)[0].name);
-                        return names.join(names ? ', ' : '');
-                      }}
-                      MenuProps={MenuProps}
-                    >
-                      <MenuItem disabled value="">
-                        <em>Vendors</em>
-                      </MenuItem>
-                      {
-                        communities.map(t => (
-                          <MenuItem key={t.id} value={t.id}>
-                            {`${t.name}`}
-                          </MenuItem>
-                        ))
-                      }
-                    </Select2>
-                  </FormControl>
-                </div>
-                {tagCollections.map(tc => (
-                  <div className={classes.field} key={tc.id}>
-                    <FormControl component="fieldset">
-                      <FormLabel component="legend">{`${tc.name} ${tc.allow_multiple ? '' : '(Only one selection allowed)'}`}</FormLabel>
-                      <FormGroup>
-                        {tc.tags.map(t => (
-                          <FormControlLabel
-                            key={t.id}
-                            control={(
-                              <Checkbox
-                                checked={this.isThisSelectedOrNot(formData, `tag-${tc.name.toLowerCase()}--${tc.allow_multiple ? 'multiple' : 'single'}`,  t.id)}
-                                onChange={this.handleCheckBoxSelect}
-                                value={'' + t.id}
-                                name={`tag-${tc.name.toLowerCase()}--${tc.allow_multiple ? 'multiple' : 'single'}`}
-                              />
-                            )}
-                            label={t.name}
-                          />
-                        ))}
-                      </FormGroup>
-                    </FormControl>
-                    <br />
-                    <br />
-                    <br />
-                  </div>
-                ))}
-
-
-                <Fragment>
-                  <div>
-                    <MaterialDropZone
-                      acceptedFiles={['image/jpeg', 'image/png', 'image/jpg', 'image/bmp', 'image/svg']}
-                      files={this.state.formData.image}
-                      showPreviews
-                      maxSize={5000000}
-                      filesLimit={1}
-                      text="Please Upload the Display Image for this Action"
-                      addToState={this.updateForm}
-                    />
-                  </div>
-                </Fragment>
-                {/* <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Toggle Input</FormLabel>
-                  <div className={classes.inlineWrap}>
-                    <FormControlLabel control={<Field name="onof" component={Switch} />} label="On/OF Switch" />
-                    <FormControlLabel control={<Field name="checkbox" component={Checkbox} />} label="Checkbox" />
-                  </div>
-                </div> */}
-                <div>
-                  <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
-                    Submit
-                  </Button>
-                </div>
-              </form>
-            </Paper>
-          </Grid>
-        </Grid>
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+        />
       </div>
     );
   }
 }
 
-renderRadioGroup.propTypes = {
-  input: PropTypes.object.isRequired,
-};
-
 CreateNewEventForm.propTypes = {
   classes: PropTypes.object.isRequired,
-  reset: PropTypes.func.isRequired,
-  pristine: PropTypes.bool.isRequired,
-  submitting: PropTypes.bool.isRequired,
-  init: PropTypes.func.isRequired,
-  clear: PropTypes.func.isRequired,
 };
 
-const mapDispatchToProps = dispatch => ({
-  init: bindActionCreators(initAction, dispatch),
-  clear: () => dispatch(clearAction),
-});
 
-const ReduxFormMapped = reduxForm({
-  form: 'immutableExample',
-  enableReinitialize: true,
-})(CreateNewEventForm);
-
-const reducer = 'initval';
-const FormInit = connect(
-  state => ({
-    force: state,
-    initialValues: state.getIn([reducer, 'formValues'])
-  }),
-  mapDispatchToProps,
-)(ReduxFormMapped);
-
-export default withStyles(styles, { withTheme: true })(FormInit);
+export default withStyles(styles, { withTheme: true })(CreateNewEventForm);
