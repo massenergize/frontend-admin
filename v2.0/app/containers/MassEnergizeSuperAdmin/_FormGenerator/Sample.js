@@ -44,7 +44,7 @@ const form = {
       readOnly: false,
       data: [],
       child: {
-        ifParentEquals: '',
+        valueToCheck: '',
         fields: [
           {
             name: 'title',
@@ -119,7 +119,8 @@ const form = {
       isRequired: true,
       defaultValue: '',
       dbName: 'files',
-      readOnly: false
+      readOnly: false,
+      filesLimit: 1
     },
   ]
 

@@ -183,8 +183,8 @@ class CommunityOnboardingForm extends Component {
                 <div className={classes.fieldBasic}>
                   <FormLabel component="label">Geographic Focus</FormLabel>
                   <Field name="geographical_focus" className={classes.inlineWrap} component={renderRadioGroup}>
-                    <FormControlLabel value="DISPERSED" control={<Radio />} label="Geographically Dispersed" onClick={() => { this.setState({ ...this.sate, showLocation: false }); }} />
-                    <FormControlLabel value="FOCUSED" control={<Radio />} label="Geographically Focused" onClick={() => { this.setState({ ...this.sate, showLocation: true }); }} />
+                    <FormControlLabel value="DISPERSED" control={<Radio />} label="Geographically Dispersed" onClick={() => { this.setState({ ...this.state, showLocation: false }); }} />
+                    <FormControlLabel value="FOCUSED" control={<Radio />} label="Geographically Focused" onClick={() => { this.setState({ ...this.state, showLocation: true }); }} />
                   </Field>
                 </div>
                 {this.state.showLocation
@@ -251,7 +251,7 @@ class CommunityOnboardingForm extends Component {
                 <div className={classes.fieldBasic}>
                   <FormLabel component="label">Terms and Conditions</FormLabel>
                   <Field name="accepted_terms_and_conditions" className={classes.inlineWrap} component={renderRadioGroup}>
-                    <FormControlLabel value="True" control={<Radio />} label="Accept" onClick={() => { this.setState({ ...this.sate, accepted_terms_and_conditions: !accepted_terms_and_conditions }); }} />
+                    <FormControlLabel value="True" control={<Radio />} label="Accept" onClick={() => { this.setState({ ...this.state, accepted_terms_and_conditions: !accepted_terms_and_conditions }); }} />
                   </Field>
                 </div>
                 <div>
