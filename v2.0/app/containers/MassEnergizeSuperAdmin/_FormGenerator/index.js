@@ -258,7 +258,7 @@ class MassEnergizeForm extends Component {
       case FieldTypes.Checkbox:
         return (
           <div>
-            <div className={classes.field}>
+            <div className={classes.field} key={field.name + field.dbName}>
               <FormControl component="fieldset">
                 <FormLabel component="legend">{field.label}</FormLabel>
                 <FormGroup>
@@ -284,7 +284,7 @@ class MassEnergizeForm extends Component {
         );
       case FieldTypes.Dropdown:
         return (
-          <FormControl className={classes.field}>
+          <FormControl className={classes.field} key={field.name + field.dbName}>
             <InputLabel htmlFor={field.name}>{field.label}</InputLabel>
             <Select
               native
@@ -306,7 +306,7 @@ class MassEnergizeForm extends Component {
         );
       case FieldTypes.File:
         return (
-          <Fragment>
+          <Fragment key={field.name + field.dbName}>
             <MaterialDropZone
               acceptedFiles={['image/jpeg', 'image/png', 'image/jpg', 'image/bmp', 'image/svg']}
               files={this.getValue(field.name)}
@@ -320,7 +320,7 @@ class MassEnergizeForm extends Component {
         );
       case FieldTypes.HTMLField:
         return (
-          <Grid item xs={12} style={{ borderColor: '#EAEAEA', borderStyle: 'solid', borderWidth: 'thin' }}>
+          <Grid item xs={12} style={{ borderColor: '#EAEAEA', borderStyle: 'solid', borderWidth: 'thin' }} key={field.name + field.dbName}>
             <Typography>{field.label}</Typography>
             <Editor
               editorState={this.getValue(field.name)}
@@ -333,7 +333,7 @@ class MassEnergizeForm extends Component {
         );
       case FieldTypes.Radio:
         return (
-          <div className={classes.fieldBasic}>
+          <div className={classes.fieldBasic} key={field.name + field.dbName}>
             <FormLabel component="label">{field.label}</FormLabel>
             <Field name={field.name} className={classes.inlineWrap} component={renderRadioGroup}>
               {field.data.map(d => (
@@ -346,19 +346,22 @@ class MassEnergizeForm extends Component {
         );
       case FieldTypes.TextField:
         return (
-          <TextField
-            required={field.isRequired}
-            name={field.name}
-            onChange={this.handleFormDataChange}
-            label={field.label}
-            type={field.contentType}
-            placeholder={field.placeholder}
-            className={classes.field}
-            InputLabelProps={{
-              shrink: true,
-            }}
-            defaultValue={field.defaultValue}
-          />
+          <div key={field.name + field.dbName}>
+            <TextField
+              required={field.isRequired}
+              name={field.name}
+              onChange={this.handleFormDataChange}
+              label={field.label}
+              type={field.contentType}
+              placeholder={field.placeholder}
+              className={classes.field}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              defaultValue={field.defaultValue}
+            />
+          </div>
+
         );
       default:
         return <div />;
@@ -379,10 +382,12 @@ class MassEnergizeForm extends Component {
 
 
   render() {
-    const { classes, submitting } = this.props;
+    const { classes } = this.props;
     const {
       formJson, error, successMsg, startCircularSpinner
     } = this.state;
+
+    if (!formJson) return <div />;
 
     return (
       <div>

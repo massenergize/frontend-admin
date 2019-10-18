@@ -36,7 +36,7 @@ class CreateNewEventForm extends Component {
       // tags: [],
       communities: [],
       tagCollections: [],
-      formJson: {}
+      formJson: null
     };
   }
 
@@ -71,8 +71,6 @@ class CreateNewEventForm extends Component {
 
   createFormJson = async () => {
     const { communities, tagCollections } = this.state;
-    console.log(communities);
-    console.log(tagCollections)
     const formJson = {
       title: 'Create New Event',
       subTitle: '',
@@ -193,9 +191,7 @@ class CreateNewEventForm extends Component {
         },
       ]
     };
-    console.log(formJson)
     await this.setStateAsync({ formJson });
-    console.log(this.state.formJson)
   }
 
 
