@@ -69,7 +69,7 @@ class CreateNewEventForm extends Component {
           placeholder: '',
           fieldType: 'Checkbox',
           selectMany: tCol.allow_multiple,
-          defaultValue: tCol.tags.filter(t => event.tags.indexOf(t)).map(t => '' + t.id),
+          defaultValue: this.getSelectedIds(event.tags, tCol.tags),
           dbName: 'tags',
           data: tCol.tags.map(t => ({ ...t, displayName: t.name, id: '' + t.id }))
         };
@@ -85,6 +85,18 @@ class CreateNewEventForm extends Component {
     await this.setStateAsync({ formJson });
   }
 
+  getSelectedIds = (selected, dataToCrossCheck) => {
+    const res = [];
+    selected.forEach(s => {
+      if (dataToCrossCheck.filter(d => d.id === s.id).length > 0) {
+        res.push('' + s.id);
+      }
+    });
+    console.log(res);
+    return res;
+  }
+
+
   setStateAsync(state) {
     return new Promise((resolve) => {
       this.setState(state, resolve);
@@ -93,6 +105,7 @@ class CreateNewEventForm extends Component {
 
   createFormJson = async (event) => {
     const { communities } = this.state;
+
     const formJson = {
       title: 'Create New Event',
       subTitle: '',

@@ -1,12 +1,10 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles, makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
-import { Field, reduxForm } from 'redux-form/immutable';
 import Input from '@material-ui/core/Input';
 import Select from '@material-ui/core/Select';
 import Radio from '@material-ui/core/Radio';
-// import Field from '@material-ui/core/Field';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -16,7 +14,6 @@ import FormLabel from '@material-ui/core/FormLabel';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import FormGroup from '@material-ui/core/FormGroup';
 import Chip from '@material-ui/core/Chip';
 import { MaterialDropZone } from 'dan-components';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -26,7 +23,9 @@ import { MenuItem } from '@material-ui/core';
 import draftToHtml from 'draftjs-to-html';
 import TextField from '@material-ui/core/TextField';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import { EditorState, convertToRaw } from 'draft-js';
+import {
+ EditorState, convertToRaw, ContentState, convertFromHTML 
+} from 'draft-js';
 import { apiCall, apiCallWithMedia } from '../../../utils/messenger';
 import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
 import FieldTypes from './fieldTypes';
@@ -84,6 +83,7 @@ class MassEnergizeForm extends Component {
   async componentDidMount() {
     const { formJson } = this.props;
     const formData = this.initialFormData(formJson.fields);
+    console.log(formData);
     await this.setStateAsync({ formJson, formData });
   }
 
@@ -101,23 +101,29 @@ class MassEnergizeForm extends Component {
       fields.forEach(field => {
         switch (field.fieldType) {
           case FieldTypes.Checkbox:
-            formData[field.name] = [];
+            formData[field.name] = field.defaultValue || [];
             break;
           case FieldTypes.File:
             formData[field.name] = [];
             break;
           case FieldTypes.HTMLField:
-            formData[field.name] = EditorState.createEmpty();
+            formData[field.name] = (field.defaultValue && EditorState.createWithContent(
+              ContentState.createFromBlockArray(
+                convertFromHTML(field.defaultValue)
+              ))) || (EditorState.createEmpty());
             break;
           case FieldTypes.Section: {
             const cFormData = this.initialFormData(field.children);
             Object.keys(cFormData).forEach(k => { formData[k] = cFormData[k]; });
             break;
           }
-
           default:
             formData[field.name] = field.defaultValue || null;
             break;
+        }
+        if (field.child) {
+          const cFormData = this.initialFormData(field.child.fields);
+          Object.keys(cFormData).forEach(k => { formData[k] = cFormData[k]; });
         }
       }
       );
@@ -410,7 +416,6 @@ class MassEnergizeForm extends Component {
                       />
                     </MenuItem>
                   ))}
-                 
                 </Select>
               </FormControl>
               <br />
@@ -444,6 +449,13 @@ class MassEnergizeForm extends Component {
       case FieldTypes.File:
         return (
           <div key={field.name}>
+            {field.previewLink
+            && (
+              <div>
+                <h5>Uploaded Image</h5>
+                <img style={{ maxWidth: '250px', maxHeight: '250px' }} src={field.previewLink} alt={field.label} />
+              </div>
+            )}
             <Fragment>
               <MaterialDropZone
                 acceptedFiles={['image/jpeg', 'image/png', 'image/jpg', 'image/bmp', 'image/svg']}
