@@ -160,15 +160,15 @@ class MassEnergizeForm extends Component {
     if (!theList) {
       theList = [];
     }
-    const newVal = parseInt(value, 10);
-    const pos = theList.indexOf(newVal);
+
+    const pos = theList.indexOf(value);
 
     if (pos > -1) {
       theList.splice(pos, 1);
     } else if (!selectMany) {
-      theList = [newVal];
+      theList = [value];
     } else if (selectMany) {
-      theList.push(newVal);
+      theList.push(value);
     }
 
     await this.setStateAsync({
@@ -228,6 +228,13 @@ class MassEnergizeForm extends Component {
           case FieldTypes.HTMLField:
             cleanedValues[field.dbName] = draftToHtml(convertToRaw(fieldValueInForm.getCurrentContent()));
             break;
+          case FieldTypes.Checkbox:
+            if (cleanedValues[field.dbName]) {
+              cleanedValues[field.dbName] = cleanedValues[field.dbName].concat(fieldValueInForm);
+            } else {
+              cleanedValues[field.dbName] = fieldValueInForm;
+            }
+            break;
           case FieldTypes.File:
             hasMediaFiles = true;
             if (field.filesLimit === 1 && fieldValueInForm.length > 0) {
@@ -280,13 +287,13 @@ class MassEnergizeForm extends Component {
 
     if (response && response.success) {
       // the api call was executed without any issues
-      const initialFormData = this.initialFormData(formJson.fields);
+      // const initialFormData = this.initialFormData(formJson.fields);
       // await this.setStateAsync({ formJson, formData });
       await this.setStateAsync({
         successMsg: `Successfully Created the Resource with Id: ${response.data.id}. Want to Create a new one?  Modify the fields`,
         error: null,
         startCircularSpinner: false,
-        formData: initialFormData
+        // formData: initialFormData
       });
 
       if (formJson.successRedirectPage) {

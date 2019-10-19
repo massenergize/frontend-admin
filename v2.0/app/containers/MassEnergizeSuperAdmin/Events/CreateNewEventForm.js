@@ -42,13 +42,13 @@ class CreateNewEventForm extends Component {
   async componentDidMount() {
     const tagCollectionsResponse = await apiCall('/tag_collections.listForSuperAdmin');
     const communitiesResponse = await apiCall('/communities.listForSuperAdmin');
-    const formJson = await this.createFormJson();
 
     if (communitiesResponse && communitiesResponse.data) {
-      communitiesResponse.data.forEach(c => ({ ...c, displayName: c.name }));
-      await this.setStateAsync({ communities: communitiesResponse.data });
+      const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name }));
+      await this.setStateAsync({ communities });
     }
 
+    const formJson = await this.createFormJson();
     if (tagCollectionsResponse && tagCollectionsResponse.data) {
       Object.values(tagCollectionsResponse.data).forEach(tCol => {
         const newField = {
@@ -57,10 +57,12 @@ class CreateNewEventForm extends Component {
           placeholder: '',
           fieldType: 'Checkbox',
           selectMany: tCol.allow_multiple,
+          defaultValue: [],
           dbName: 'tags',
-          data: tCol.tags.map(t => ({ ...t, displayName: t.name }))
+          data: tCol.tags.map(t => ({ ...t, displayName: t.name, id: '' + t.id }))
         };
-        formJson.fields.push(newField);
+        // want this to be the 5th field
+        formJson.fields.splice(4, 0, newField);
       });
     }
 
@@ -79,7 +81,7 @@ class CreateNewEventForm extends Component {
       title: 'Create New Event',
       subTitle: '',
       method: '/events.create',
-      successRedirectPage: '/admin/read/events',
+      // successRedirectPage: '/admin/read/events',
       fields: [
         {
           name: 'name',
@@ -163,7 +165,7 @@ class CreateNewEventForm extends Component {
         },
       ]
     };
-    return  formJson;
+    return formJson;
   }
 
 
