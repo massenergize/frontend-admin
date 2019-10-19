@@ -1,8 +1,9 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles, makeStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
 import { Field, reduxForm } from 'redux-form/immutable';
+import Input from '@material-ui/core/Input';
 import Select from '@material-ui/core/Select';
 import Radio from '@material-ui/core/Radio';
 // import Field from '@material-ui/core/Field';
@@ -16,10 +17,12 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import FormGroup from '@material-ui/core/FormGroup';
+import Chip from '@material-ui/core/Chip';
 import { MaterialDropZone } from 'dan-components';
 import Snackbar from '@material-ui/core/Snackbar';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { Editor } from 'react-draft-wysiwyg';
+import { MenuItem } from '@material-ui/core';
 import draftToHtml from 'draftjs-to-html';
 import TextField from '@material-ui/core/TextField';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
@@ -52,6 +55,17 @@ const styles = theme => ({
   },
 });
 
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 
 class MassEnergizeForm extends Component {
   constructor(props) {
@@ -95,6 +109,12 @@ class MassEnergizeForm extends Component {
           case FieldTypes.HTMLField:
             formData[field.name] = EditorState.createEmpty();
             break;
+          case FieldTypes.Section: {
+            const cFormData = this.initialFormData(field.children);
+            Object.keys(cFormData).forEach(k => { formData[k] = cFormData[k]; });
+            break;
+          }
+
           default:
             formData[field.name] = field.defaultValue || null;
             break;
@@ -200,6 +220,13 @@ class MassEnergizeForm extends Component {
 
   getDisplayName = (fieldName, id, data) => {
     const { formData } = this.state;
+    if (id) {
+      const [result] = data.filter(d => d.id === id);
+      if (result) {
+        return result.displayName;
+      }
+    }
+
     const val = formData[fieldName];
     if (!val) {
       return 'Please select an option';
@@ -208,7 +235,7 @@ class MassEnergizeForm extends Component {
     const [first] = searchRes;
 
     if (first) {
-      return first.name || first.title || ('' + id);
+      return first.displayName;
     }
     return ('Unknown Resource with ID: ' + id);
   }
@@ -257,6 +284,15 @@ class MassEnergizeForm extends Component {
         Object.keys(childCleanValues).forEach(k => {
           cleanedValues[k] = childCleanValues[k];
         });
+      } else if (field.fieldType === FieldTypes.Section && field.children) {
+        const [childCleanValues, childHasMediaFiles] = this.cleanItUp(formData, field.children);
+        if (childHasMediaFiles) {
+          hasMediaFiles = childHasMediaFiles || hasMediaFiles;
+        }
+
+        Object.keys(childCleanValues).forEach(k => {
+          cleanedValues[k] = childCleanValues[k];
+        });
       }
     });
 
@@ -275,6 +311,7 @@ class MassEnergizeForm extends Component {
 
     // let's clean up the data
     const { formData, formJson } = this.state;
+    console.log(formJson.fields);
     const [cleanedValues, hasMediaFiles] = this.cleanItUp(formData, formJson.fields);
 
     // let's make an api call to send the data
@@ -341,22 +378,40 @@ class MassEnergizeForm extends Component {
             <div className={classes.field}>
               <FormControl component="fieldset">
                 <FormLabel component="legend">{field.label}</FormLabel>
-                <FormGroup>
+                <Select
+                  multiple
+                  displayEmpty
+                  value={this.getValue(field.name)}
+                  onChange={this.handleFormDataChange}
+                  input={<Input id="select-multiple-chip" />}
+                  renderValue={selected => (
+                    <div className={classes.chips}>
+                      {selected.map(id => (
+                        <Chip key={id} label={this.getDisplayName(field.name, id, field.data)} className={classes.chip} />
+                      ))}
+                    </div>
+                  )
+                  }
+                  MenuProps={MenuProps}
+                >
                   {field.data.map(t => (
-                    <FormControlLabel
-                      key={t.id}
-                      control={(
-                        <Checkbox
-                          checked={this.isThisSelectedOrNot(field.name, t.id)}
-                          onChange={(event) => this.handleCheckBoxSelect(event, field.selectMany)}
-                          value={t.id}
-                          name={field.name}
-                        />
-                      )}
-                      label={t.displayName}
-                    />
+                    <MenuItem>
+                      <FormControlLabel
+                        key={t.id}
+                        control={(
+                          <Checkbox
+                            checked={this.isThisSelectedOrNot(field.name, t.id)}
+                            onChange={(event) => this.handleCheckBoxSelect(event, field.selectMany)}
+                            value={t.id}
+                            name={field.name}
+                          />
+                        )}
+                        label={t.displayName}
+                      />
+                    </MenuItem>
                   ))}
-                </FormGroup>
+                 
+                </Select>
               </FormControl>
               <br />
             </div>
@@ -454,6 +509,19 @@ class MassEnergizeForm extends Component {
               }}
               defaultValue={field.defaultValue}
             />
+          </div>
+
+        );
+      case FieldTypes.Section:
+        return (
+          <div>
+            <br />
+            <div style={{ border: '1px solid rgb(229, 238, 245)', padding: 15, borderRadius: 6 }}>
+              <p>{field.label}</p>
+              {this.renderFields(field.children)}
+            </div>
+            <br />
+            <br />
           </div>
 
         );
@@ -562,6 +630,6 @@ MassEnergizeForm.propTypes = {
   formJson: PropTypes.object.isRequired,
 };
 
-const ReduxFormMapped = reduxForm({ form: 'immutableExample' })(MassEnergizeForm);
+// const ReduxFormMapped = reduxForm({ form: 'immutableExample' })(MassEnergizeForm);
 
-export default withStyles(styles, { withTheme: true })(ReduxFormMapped);
+export default withStyles(styles, { withTheme: true })(MassEnergizeForm);
