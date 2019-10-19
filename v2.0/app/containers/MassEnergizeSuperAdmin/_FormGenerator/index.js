@@ -507,6 +507,7 @@ class MassEnergizeForm extends Component {
               InputLabelProps={{
                 shrink: true,
               }}
+              disabled={field.readOnly}
               defaultValue={field.defaultValue}
             />
           </div>
@@ -514,7 +515,7 @@ class MassEnergizeForm extends Component {
         );
       case FieldTypes.Section:
         return (
-          <div>
+          <div key={field.label}>
             <br />
             <div style={{ border: '1px solid rgb(229, 238, 245)', padding: 15, borderRadius: 6 }}>
               <p>{field.label}</p>

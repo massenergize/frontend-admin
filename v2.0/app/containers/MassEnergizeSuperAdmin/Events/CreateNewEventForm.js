@@ -91,7 +91,7 @@ class CreateNewEventForm extends Component {
       title: 'Create New Event',
       subTitle: '',
       method: '/events.create',
-      // successRedirectPage: '/admin/read/events',
+      successRedirectPage: '/admin/read/events',
       fields: [
         {
           label: 'About this event',
@@ -159,8 +159,6 @@ class CreateNewEventForm extends Component {
             },
           ]
         },
-
-
         {
           name: 'description',
           label: 'Event Description',

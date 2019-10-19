@@ -60,6 +60,9 @@ export const AllEvents = loadable(() => import('./MassEnergizeSuperAdmin/Events/
 export const AddEvent = loadable(() => import('./MassEnergizeSuperAdmin/Events/NewEventPage'), {
   fallback: <Loading />,
 });
+export const EditEvent = loadable(() => import('./MassEnergizeSuperAdmin/Events/NewEventPage'), {
+  fallback: <Loading />,
+});
 
 export const AllTeams = loadable(() => import('./MassEnergizeSuperAdmin/Teams/AllTeams'), {
   fallback: <Loading />,

@@ -22,7 +22,7 @@ import {
   AllGoals, AddGoal,
   AddPolicy, AllPolicies,
   AddTestimonial, AllTestimonials, Export, CustomizePages, EditAction,
-  SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditGoal, EditPolicy
+  SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditGoal, EditPolicy, EditEvent
 } from '../pageListAsync';
 
 class Application extends React.Component {
@@ -55,6 +55,7 @@ class Application extends React.Component {
 
           <Route path="/admin/read/events" component={AllEvents} />
           <Route path="/admin/add/event" component={AddEvent} />
+          <Route path="/admin/edit/:id/event" component={EditEvent} />
 
           <Route path="/admin/read/teams" component={AllTeams} />
           <Route path="/admin/add/team" component={AddTeam} />
