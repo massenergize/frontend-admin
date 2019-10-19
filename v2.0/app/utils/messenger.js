@@ -30,7 +30,7 @@ export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = 
     }
     return json;
   } catch (error) {
-    return { success: false, error };
+    return { success: false, error: error.toString() };
   }
 }
 
@@ -45,6 +45,7 @@ export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = 
  * general while avoiding CORS issues.
  */
 export async function apiCallWithMedia(destinationUrl, dataToSend = {}, relocationPage = null) {
+  console.log(dataToSend)
   const formData = new FormData();
   Object.keys(dataToSend).map(k => (formData.append(k, dataToSend[k])));
 

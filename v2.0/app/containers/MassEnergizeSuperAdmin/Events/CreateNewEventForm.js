@@ -33,9 +33,7 @@ class CreateNewEventForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // tags: [],
       communities: [],
-      tagCollections: [],
       formJson: null
     };
   }
@@ -43,24 +41,30 @@ class CreateNewEventForm extends Component {
 
   async componentDidMount() {
     const tagCollectionsResponse = await apiCall('/tag_collections.listForSuperAdmin');
-    const communitiesResponse = await apiCall('/tag_collections.listForSuperAdmin');
-
-    if (tagCollectionsResponse && tagCollectionsResponse.data) {
-      const tags = [];
-      Object.values(tagCollectionsResponse.data).forEach(tCol => {
-        Object.values(tCol.tags).forEach(t => {
-          tags.push({ ...t, tagCollection: tCol.name });
-        });
-      });
-      await this.setStateAsync({ tags });
-      await this.setStateAsync({ tagCollections: tagCollectionsResponse.data });
-    }
+    const communitiesResponse = await apiCall('/communities.listForSuperAdmin');
+    const formJson = await this.createFormJson();
 
     if (communitiesResponse && communitiesResponse.data) {
+      communitiesResponse.data.forEach(c => ({ ...c, displayName: c.name }));
       await this.setStateAsync({ communities: communitiesResponse.data });
     }
 
-    await this.createFormJson();
+    if (tagCollectionsResponse && tagCollectionsResponse.data) {
+      Object.values(tagCollectionsResponse.data).forEach(tCol => {
+        const newField = {
+          name: tCol.name,
+          label: `${tCol.name} ${tCol.allow_multiple ? '(You can select multiple)' : '(Only one selection allowed)'}`,
+          placeholder: '',
+          fieldType: 'Checkbox',
+          selectMany: tCol.allow_multiple,
+          dbName: 'tags',
+          data: tCol.tags.map(t => ({ ...t, displayName: t.name }))
+        };
+        formJson.fields.push(newField);
+      });
+    }
+
+    await this.setStateAsync({ formJson });
   }
 
   setStateAsync(state) {
@@ -70,21 +74,22 @@ class CreateNewEventForm extends Component {
   }
 
   createFormJson = async () => {
-    const { communities, tagCollections } = this.state;
+    const { communities } = this.state;
     const formJson = {
       title: 'Create New Event',
       subTitle: '',
       method: '/events.create',
+      successRedirectPage: '/admin/read/events',
       fields: [
         {
           name: 'name',
           label: 'Name of Event',
-          placeholder: '',
+          placeholder: 'Wayland Heatpump Event',
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: true,
           defaultValue: '',
-          dbName: '',
+          dbName: 'name',
           readOnly: false
         },
         {
@@ -109,33 +114,33 @@ class CreateNewEventForm extends Component {
           dbName: 'end_date_and_time',
           readOnly: false
         },
-        // {
-        //   name: 'is_global',
-        //   label: 'Is this Event Global',
-        //   fieldType: 'Radio',
-        //   isRequired: false,
-        //   defaultValue: false,
-        //   dbName: 'is_global',
-        //   readOnly: false,
-        //   data: [
-        //     { id: false, value: 'No' },
-        //     { id: true, value: 'Yes' }
-        //   ],
-        //   child: {
-        //     valueToCheck: false,
-        //     fields: [
-        //       {
-        //         name: 'community',
-        //         label: 'Primary Community',
-        //         placeholder: 'eg. Wayland',
-        //         fieldType: 'Dropdown',
-        //         defaultValue: null,
-        //         dbName: 'community_id',
-        //         data: communities
-        //       },
-        //     ]
-        //   }
-        // },
+        {
+          name: 'is_global',
+          label: 'Is this Event Global',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: 'true',
+          dbName: 'is_global',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+          child: {
+            valueToCheck: 'false',
+            fields: [
+              {
+                name: 'community',
+                label: 'Primary Community',
+                placeholder: 'eg. Wayland',
+                fieldType: 'Dropdown',
+                defaultValue: null,
+                dbName: 'community_id',
+                data: communities
+              },
+            ]
+          }
+        },
         {
           name: 'description',
           label: 'Event Description',
@@ -145,18 +150,6 @@ class CreateNewEventForm extends Component {
           defaultValue: null,
           dbName: 'description',
         },
-        // {
-        //   name: 'tags',
-        //   label: 'Select your Tag',
-        //   placeholder: 'YYYY-MM-DD HH:MM',
-        //   fieldType: 'TextField',
-        //   contentType: 'text',
-        //   isRequired: false,
-        //   defaultValue: '',
-        //   dbName: 'tags',
-        //   readOnly: false,
-        //   data: tagCollections
-        // },
         {
           name: 'image',
           placeholder: 'Select an Image',
@@ -168,17 +161,9 @@ class CreateNewEventForm extends Component {
           defaultValue: '',
           filesLimit: 1
         },
-        // {
-        //   name: 'tags',
-        //   placeholder: '',
-        //   fieldType: 'Checkbox',
-        //   selectMany: true,
-        //   dbName: '',
-        //   data: tagCollections
-        // },
       ]
     };
-    await this.setStateAsync({ formJson });
+    return  formJson;
   }
 
 

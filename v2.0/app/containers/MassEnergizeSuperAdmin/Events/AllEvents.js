@@ -96,9 +96,9 @@ class AllEvents extends React.Component {
                 </TableCell>
                 <TableCell>
                   <div className={classes.flex}>
-                    <Avatar alt={n.community.name} src={n.community.logo ? n.community.logo : imgApi[21]} className={classNames(classes.avatar, classes.sm)} />
+                    <Avatar alt={n.community && n.community.name} src={n.community.logo ? n.community.logo : imgApi[21]} className={classNames(classes.avatar, classes.sm)} />
                     <div>
-                      <Typography>{n.community.name}</Typography>
+                      <Typography>{n.community && n.community.name}</Typography>
                       <Typography variant="caption">
                         <a href={`http:${n.community.subdomain}.massenergize.org`} target="_blank" rel="noopener noreferrer" className={classes.downloadInvoice}>
                           <Language />

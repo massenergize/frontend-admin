@@ -2,9 +2,10 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
-import { Field } from 'redux-form/immutable';
+import { Field, reduxForm } from 'redux-form/immutable';
 import Select from '@material-ui/core/Select';
 import Radio from '@material-ui/core/Radio';
+// import Field from '@material-ui/core/Field';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -51,15 +52,6 @@ const styles = theme => ({
   },
 });
 
-const renderRadioGroup = ({ input, ...rest }) => (
-  <RadioGroup
-    {...input}
-    {...rest}
-    valueselected={input.value}
-    onChange={(event, value) => input.onChange(value)}
-  />
-);
-
 
 class MassEnergizeForm extends Component {
   constructor(props) {
@@ -104,7 +96,7 @@ class MassEnergizeForm extends Component {
             formData[field.name] = EditorState.createEmpty();
             break;
           default:
-            formData[field.name] = null;
+            formData[field.name] = field.defaultValue || null;
             break;
         }
       }
@@ -165,19 +157,17 @@ class MassEnergizeForm extends Component {
     const { formData } = this.state;
     const { name, value } = target;
     let theList = formData[name];
-
     if (!theList) {
       theList = [];
     }
     const newVal = parseInt(value, 10);
     const pos = theList.indexOf(newVal);
+
     if (pos > -1) {
       theList.splice(pos, 1);
-    }
-
-    if (!selectMany) {
+    } else if (!selectMany) {
       theList = [newVal];
-    } else {
+    } else if (selectMany) {
       theList.push(newVal);
     }
 
@@ -208,6 +198,64 @@ class MassEnergizeForm extends Component {
     this.setState({ successMsg: null, error: null });
   };
 
+  getDisplayName = (fieldName, id, data) => {
+    const { formData } = this.state;
+    const val = formData[fieldName];
+    if (!val) {
+      return 'Please select an option';
+    }
+    const searchRes = data.filter(d => d.id === val);
+    const [first] = searchRes;
+
+    if (first) {
+      return first.name || first.title || ('' + id);
+    }
+    return ('Unknown Resource with ID: ' + id);
+  }
+
+
+  /**
+   * This is a recursive function traversing all the fields and their children
+   * and extracting their values from the form
+   */
+  cleanItUp = (formData, fields) => {
+    const cleanedValues = {};
+    let hasMediaFiles = false;
+    fields.forEach(field => {
+      const fieldValueInForm = formData[field.name];
+      if (fieldValueInForm) {
+        switch (field.fieldType) {
+          case FieldTypes.HTMLField:
+            cleanedValues[field.dbName] = draftToHtml(convertToRaw(fieldValueInForm.getCurrentContent()));
+            break;
+          case FieldTypes.File:
+            hasMediaFiles = true;
+            if (field.filesLimit === 1 && fieldValueInForm.length > 0) {
+              const [file] = fieldValueInForm;
+              cleanedValues[field.dbName] = file;
+            } else {
+              cleanedValues[field.dbName] = fieldValueInForm;
+            }
+            break;
+          default:
+            cleanedValues[field.dbName] = fieldValueInForm;
+        }
+      }
+
+      if (field.child) {
+        const [childCleanValues, childHasMediaFiles] = this.cleanItUp(formData, field.child.fields);
+        if (childHasMediaFiles) {
+          hasMediaFiles = childHasMediaFiles || hasMediaFiles;
+        }
+        Object.keys(childCleanValues).forEach(k => {
+          cleanedValues[k] = childCleanValues[k];
+        });
+      }
+    });
+
+    return [cleanedValues, hasMediaFiles];
+  }
+
 
   /**
    * This handles the form data submission
@@ -218,34 +266,10 @@ class MassEnergizeForm extends Component {
     // lets set the startCircularSpinner Value so the spinner starts spinning
     await this.setStateAsync({ startCircularSpinner: true });
 
-    // let's sow the data together
+    // let's clean up the data
     const { formData, formJson } = this.state;
-    const cleanedValues = {};
-    const tmpFormValues = { ...formData };
-    let hasMediaFiles = false;
-    formJson.fields.forEach(field => {
-      const fieldValueInForm = tmpFormValues[field.name];
-      if (fieldValueInForm) {
-        switch (field.fieldType) {
-          case FieldTypes.HTMLField:
-            cleanedValues[field.dbName] = draftToHtml(convertToRaw(fieldValueInForm.getCurrentContent()));
-            break;
-          case FieldTypes.File:
-            hasMediaFiles = true;
-            if (field.filesLimit === 1) {
-              cleanedValues[field.dbName] = fieldValueInForm;
-            } else {
-              cleanedValues[field.dbName] = fieldValueInForm[0];
-            }
-            break;
-          default:
-            cleanedValues[field.dbName] = fieldValueInForm;
-        }
-      }
-    });
+    const [cleanedValues, hasMediaFiles] = this.cleanItUp(formData, formJson.fields);
 
-    console.log(cleanedValues)
-    console.log(hasMediaFiles)
     // let's make an api call to send the data
     let response = null;
     if (hasMediaFiles) {
@@ -256,16 +280,20 @@ class MassEnergizeForm extends Component {
 
     if (response && response.success) {
       // the api call was executed without any issues
-      console.log(response.data);
+      const initialFormData = this.initialFormData(formJson.fields);
+      // await this.setStateAsync({ formJson, formData });
       await this.setStateAsync({
         successMsg: `Successfully Created the Resource with Id: ${response.data.id}. Want to Create a new one?  Modify the fields`,
         error: null,
         startCircularSpinner: false,
-        formData: {}
+        formData: initialFormData
       });
+
+      if (formJson.successRedirectPage) {
+        window.location.href = formJson.successRedirectPage;
+      }
     } else if (response && !response.success) {
       // we got an error from the backend so let's set it so the snackbar can pick it up
-      console.log(response);
       await this.setStateAsync({
         error: response.error,
         successMsg: null,
@@ -274,7 +302,8 @@ class MassEnergizeForm extends Component {
     }
   }
 
-  isThisSelectedOrNot = (formData, fieldName, value) => {
+  isThisSelectedOrNot = (fieldName, value) => {
+    const { formData } = this.state;
     const fieldValues = formData[fieldName];
     if (!fieldValues) return false;
     // if (!Array.isArray(fieldValues)) return false;
@@ -317,7 +346,7 @@ class MassEnergizeForm extends Component {
                           name={field.name}
                         />
                       )}
-                      label={field.label}
+                      label={t.displayName}
                     />
                   ))}
                 </FormGroup>
@@ -339,10 +368,10 @@ class MassEnergizeForm extends Component {
                   id: 'age-native-simple',
                 }}
               >
-                <option value={this.getValue(field.name)}>{this.getDisplayName(field.name, field.dataMemberDisplayName, field.data)}</option>
+                <option value={this.getValue(field.name)}>{this.getDisplayName(field.name, this.getValue(field.name), field.data)}</option>
                 { field.data
                   && field.data.map(c => (
-                    <option value={c.id} key={c.id}>{c[field.dataMemberDisplayName]}</option>
+                    <option value={c.id} key={c.id}>{c.displayName}</option>
                   ))
                 }
               </Select>
@@ -379,19 +408,27 @@ class MassEnergizeForm extends Component {
                 wrapperClassName="wrapperClassName"
               />
             </Grid>
+            <br />
+            <br />
           </div>
         );
       case FieldTypes.Radio:
         return (
           <div className={classes.fieldBasic} key={field.name + field.label}>
             <FormLabel component="label">{field.label}</FormLabel>
-            <Field name={field.name} className={classes.inlineWrap} component={renderRadioGroup}>
+            <RadioGroup
+              aria-label={field.label}
+              name={field.name}
+              className={classes.group}
+              value={this.getValue(field.name)}
+              onChange={this.handleFormDataChange}
+            >
               {field.data.map(d => (
-                <FormControlLabel key={d.id} value={d.id} name={field.name} control={<Radio />} label={d.dataMemberDisplayName} onClick={this.radioSelect} />
+                <FormControlLabel key={d.id} value={d.id} name={field.name} control={<Radio />} label={d.value} />
               ))}
-            </Field>
+            </RadioGroup>
             <div>{field.description}</div>
-            {field.child && (this.getValue(field.name) === field.child.valueToCheck) && this.renderField(field.child)}
+            {field.child && (this.getValue(field.name) === field.child.valueToCheck) && this.renderFields(field.child.fields)}
           </div>
         );
       case FieldTypes.TextField:
@@ -428,11 +465,10 @@ class MassEnergizeForm extends Component {
   render() {
     const { classes } = this.props;
     const {
-      formJson, formData, error, successMsg, startCircularSpinner
+      formJson, error, successMsg, startCircularSpinner
     } = this.state;
 
     if (!formJson) return <div />;
-    console.log(formData)
     return (
       <div>
         <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
@@ -519,4 +555,6 @@ MassEnergizeForm.propTypes = {
   formJson: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(MassEnergizeForm);
+const ReduxFormMapped = reduxForm({ form: 'immutableExample' })(MassEnergizeForm);
+
+export default withStyles(styles, { withTheme: true })(ReduxFormMapped);

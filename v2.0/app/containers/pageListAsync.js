@@ -119,16 +119,16 @@ export const Form = loadable(() => import('./Pages/Forms/ReduxForm'), {
 export const Table = loadable(() => import('./Pages/Table/BasicTable'), {
   fallback: <Loading />,
 });
-export const Login = loadable(() => import('./Pages/Users/Login'), {
+export const Login = loadable(() => import('./MassEnergizeSuperAdmin/LoginAndRegistration/Login'), {
   fallback: <Loading />,
 });
 export const LoginDedicated = loadable(() => import('./Pages/Standalone/LoginDedicated'), {
   fallback: <Loading />,
 });
-export const Register = loadable(() => import('./Pages/Users/Register'), {
+export const Register = loadable(() => import('./MassEnergizeSuperAdmin/LoginAndRegistration/Register'), {
   fallback: <Loading />,
 });
-export const ResetPassword = loadable(() => import('./Pages/Users/ResetPassword'), {
+export const ResetPassword = loadable(() => import('./MassEnergizeSuperAdmin/LoginAndRegistration/ResetPassword'), {
   fallback: <Loading />,
 });
 export const NotFound = loadable(() => import('./NotFound/NotFound'), {
