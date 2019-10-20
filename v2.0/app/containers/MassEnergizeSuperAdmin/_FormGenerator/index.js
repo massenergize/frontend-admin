@@ -2,10 +2,9 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
-import { Field, reduxForm } from 'redux-form/immutable';
+import Input from '@material-ui/core/Input';
 import Select from '@material-ui/core/Select';
 import Radio from '@material-ui/core/Radio';
-// import Field from '@material-ui/core/Field';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -15,15 +14,18 @@ import FormLabel from '@material-ui/core/FormLabel';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import FormGroup from '@material-ui/core/FormGroup';
+import Chip from '@material-ui/core/Chip';
 import { MaterialDropZone } from 'dan-components';
 import Snackbar from '@material-ui/core/Snackbar';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { Editor } from 'react-draft-wysiwyg';
+import { MenuItem } from '@material-ui/core';
 import draftToHtml from 'draftjs-to-html';
 import TextField from '@material-ui/core/TextField';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import { EditorState, convertToRaw } from 'draft-js';
+import {
+  EditorState, convertToRaw, ContentState, convertFromHTML
+} from 'draft-js';
 import { apiCall, apiCallWithMedia } from '../../../utils/messenger';
 import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
 import FieldTypes from './fieldTypes';
@@ -52,6 +54,17 @@ const styles = theme => ({
   },
 });
 
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 
 class MassEnergizeForm extends Component {
   constructor(props) {
@@ -87,17 +100,29 @@ class MassEnergizeForm extends Component {
       fields.forEach(field => {
         switch (field.fieldType) {
           case FieldTypes.Checkbox:
-            formData[field.name] = [];
+            formData[field.name] = field.defaultValue || [];
             break;
           case FieldTypes.File:
             formData[field.name] = [];
             break;
           case FieldTypes.HTMLField:
-            formData[field.name] = EditorState.createEmpty();
+            formData[field.name] = (field.defaultValue && EditorState.createWithContent(
+              ContentState.createFromBlockArray(
+                convertFromHTML(field.defaultValue)
+              ))) || (EditorState.createEmpty());
             break;
+          case FieldTypes.Section: {
+            const cFormData = this.initialFormData(field.children);
+            Object.keys(cFormData).forEach(k => { formData[k] = cFormData[k]; });
+            break;
+          }
           default:
             formData[field.name] = field.defaultValue || null;
             break;
+        }
+        if (field.child) {
+          const cFormData = this.initialFormData(field.child.fields);
+          Object.keys(cFormData).forEach(k => { formData[k] = cFormData[k]; });
         }
       }
       );
@@ -160,15 +185,15 @@ class MassEnergizeForm extends Component {
     if (!theList) {
       theList = [];
     }
-    const newVal = parseInt(value, 10);
-    const pos = theList.indexOf(newVal);
+
+    const pos = theList.indexOf(value);
 
     if (pos > -1) {
       theList.splice(pos, 1);
     } else if (!selectMany) {
-      theList = [newVal];
+      theList = [value];
     } else if (selectMany) {
-      theList.push(newVal);
+      theList.push(value);
     }
 
     await this.setStateAsync({
@@ -200,6 +225,13 @@ class MassEnergizeForm extends Component {
 
   getDisplayName = (fieldName, id, data) => {
     const { formData } = this.state;
+    if (id) {
+      const [result] = data.filter(d => d.id === id);
+      if (result) {
+        return result.displayName;
+      }
+    }
+
     const val = formData[fieldName];
     if (!val) {
       return 'Please select an option';
@@ -208,9 +240,9 @@ class MassEnergizeForm extends Component {
     const [first] = searchRes;
 
     if (first) {
-      return first.name || first.title || ('' + id);
+      return first.displayName;
     }
-    return ('Unknown Resource with ID: ' + id);
+    return 'Please select an option';
   }
 
 
@@ -227,6 +259,13 @@ class MassEnergizeForm extends Component {
         switch (field.fieldType) {
           case FieldTypes.HTMLField:
             cleanedValues[field.dbName] = draftToHtml(convertToRaw(fieldValueInForm.getCurrentContent()));
+            break;
+          case FieldTypes.Checkbox:
+            if (cleanedValues[field.dbName]) {
+              cleanedValues[field.dbName] = cleanedValues[field.dbName].concat(fieldValueInForm);
+            } else {
+              cleanedValues[field.dbName] = fieldValueInForm;
+            }
             break;
           case FieldTypes.File:
             hasMediaFiles = true;
@@ -247,6 +286,15 @@ class MassEnergizeForm extends Component {
         if (childHasMediaFiles) {
           hasMediaFiles = childHasMediaFiles || hasMediaFiles;
         }
+        Object.keys(childCleanValues).forEach(k => {
+          cleanedValues[k] = childCleanValues[k];
+        });
+      } else if (field.fieldType === FieldTypes.Section && field.children) {
+        const [childCleanValues, childHasMediaFiles] = this.cleanItUp(formData, field.children);
+        if (childHasMediaFiles) {
+          hasMediaFiles = childHasMediaFiles || hasMediaFiles;
+        }
+
         Object.keys(childCleanValues).forEach(k => {
           cleanedValues[k] = childCleanValues[k];
         });
@@ -278,15 +326,17 @@ class MassEnergizeForm extends Component {
       response = await apiCall(formJson.method, cleanedValues);
     }
 
+    console.log(cleanedValues);
+
     if (response && response.success) {
       // the api call was executed without any issues
-      const initialFormData = this.initialFormData(formJson.fields);
+      // const initialFormData = this.initialFormData(formJson.fields);
       // await this.setStateAsync({ formJson, formData });
       await this.setStateAsync({
         successMsg: `Successfully Created the Resource with Id: ${response.data.id}. Want to Create a new one?  Modify the fields`,
         error: null,
         startCircularSpinner: false,
-        formData: initialFormData
+        // formData: initialFormData
       });
 
       if (formJson.successRedirectPage) {
@@ -334,22 +384,40 @@ class MassEnergizeForm extends Component {
             <div className={classes.field}>
               <FormControl component="fieldset">
                 <FormLabel component="legend">{field.label}</FormLabel>
-                <FormGroup>
+                <Select
+                  multiple
+                  displayEmpty
+                  name={field.name}
+                  value={this.getValue(field.name)}
+                  onChange={this.handleFormDataChange}
+                  input={<Input id="select-multiple-chip" />}
+                  renderValue={selected => (
+                    <div className={classes.chips}>
+                      {selected.map(id => (
+                        <Chip key={id} label={this.getDisplayName(field.name, id, field.data)} className={classes.chip} />
+                      ))}
+                    </div>
+                  )
+                  }
+                  MenuProps={MenuProps}
+                >
                   {field.data.map(t => (
-                    <FormControlLabel
-                      key={t.id}
-                      control={(
-                        <Checkbox
-                          checked={this.isThisSelectedOrNot(field.name, t.id)}
-                          onChange={(event) => this.handleCheckBoxSelect(event, field.selectMany)}
-                          value={t.id}
-                          name={field.name}
-                        />
-                      )}
-                      label={t.displayName}
-                    />
+                    <MenuItem key={t.id}>
+                      <FormControlLabel
+                        key={t.id}
+                        control={(
+                          <Checkbox
+                            checked={this.isThisSelectedOrNot(field.name, t.id)}
+                            onChange={(event) => this.handleCheckBoxSelect(event, field.selectMany)}
+                            value={t.id}
+                            name={field.name}
+                          />
+                        )}
+                        label={t.displayName}
+                      />
+                    </MenuItem>
                   ))}
-                </FormGroup>
+                </Select>
               </FormControl>
               <br />
             </div>
@@ -382,6 +450,13 @@ class MassEnergizeForm extends Component {
       case FieldTypes.File:
         return (
           <div key={field.name}>
+            {field.previewLink
+            && (
+              <div>
+                <h5>Uploaded Image</h5>
+                <img style={{ maxWidth: '250px', maxHeight: '250px' }} src={field.previewLink} alt={field.label} />
+              </div>
+            )}
             <Fragment>
               <MaterialDropZone
                 acceptedFiles={['image/jpeg', 'image/png', 'image/jpg', 'image/bmp', 'image/svg']}
@@ -439,14 +514,30 @@ class MassEnergizeForm extends Component {
               name={field.name}
               onChange={this.handleFormDataChange}
               label={field.label}
+              multiline={field.isMultiline}
+              rows={4}
               type={field.contentType}
               placeholder={field.placeholder}
               className={classes.field}
               InputLabelProps={{
                 shrink: true,
               }}
+              disabled={field.readOnly}
               defaultValue={field.defaultValue}
             />
+          </div>
+
+        );
+      case FieldTypes.Section:
+        return (
+          <div key={field.label}>
+            <br />
+            <div style={{ border: '1px solid rgb(229, 238, 245)', padding: 15, borderRadius: 6 }}>
+              <p>{field.label}</p>
+              {this.renderFields(field.children)}
+            </div>
+            <br />
+            <br />
           </div>
 
         );
@@ -555,6 +646,6 @@ MassEnergizeForm.propTypes = {
   formJson: PropTypes.object.isRequired,
 };
 
-const ReduxFormMapped = reduxForm({ form: 'immutableExample' })(MassEnergizeForm);
+// const ReduxFormMapped = reduxForm({ form: 'immutableExample' })(MassEnergizeForm);
 
-export default withStyles(styles, { withTheme: true })(ReduxFormMapped);
+export default withStyles(styles, { withTheme: true })(MassEnergizeForm);
