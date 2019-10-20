@@ -83,7 +83,6 @@ class MassEnergizeForm extends Component {
   async componentDidMount() {
     const { formJson } = this.props;
     const formData = this.initialFormData(formJson.fields);
-    console.log(formData);
     await this.setStateAsync({ formJson, formData });
   }
 
@@ -243,7 +242,7 @@ class MassEnergizeForm extends Component {
     if (first) {
       return first.displayName;
     }
-    return ('Unknown Resource with ID: ' + id);
+    return 'Please select an option';
   }
 
 
@@ -317,7 +316,6 @@ class MassEnergizeForm extends Component {
 
     // let's clean up the data
     const { formData, formJson } = this.state;
-    console.log(formJson.fields);
     const [cleanedValues, hasMediaFiles] = this.cleanItUp(formData, formJson.fields);
 
     // let's make an api call to send the data
@@ -327,6 +325,8 @@ class MassEnergizeForm extends Component {
     } else {
       response = await apiCall(formJson.method, cleanedValues);
     }
+
+    console.log(cleanedValues);
 
     if (response && response.success) {
       // the api call was executed without any issues
@@ -387,6 +387,7 @@ class MassEnergizeForm extends Component {
                 <Select
                   multiple
                   displayEmpty
+                  name={field.name}
                   value={this.getValue(field.name)}
                   onChange={this.handleFormDataChange}
                   input={<Input id="select-multiple-chip" />}
@@ -401,7 +402,7 @@ class MassEnergizeForm extends Component {
                   MenuProps={MenuProps}
                 >
                   {field.data.map(t => (
-                    <MenuItem>
+                    <MenuItem key={t.id}>
                       <FormControlLabel
                         key={t.id}
                         control={(
@@ -513,6 +514,8 @@ class MassEnergizeForm extends Component {
               name={field.name}
               onChange={this.handleFormDataChange}
               label={field.label}
+              multiline={field.isMultiline}
+              rows={4}
               type={field.contentType}
               placeholder={field.placeholder}
               className={classes.field}

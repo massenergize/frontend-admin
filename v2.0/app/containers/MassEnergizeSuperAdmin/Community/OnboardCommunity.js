@@ -87,7 +87,7 @@ class OnboardCommunity extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <PapperBlock title="Onboard New Community" desc="Some text description">
+        <PapperBlock title="Onboard New Community" desc="">
           {community
             && <EditCommunityForm onSubmit={this.updateCommunitySubmission} community={community} submitIsClicked={submitIsClicked} />
           }

@@ -175,7 +175,7 @@ class CreateNewEventForm extends Component {
           dbName: 'image',
           label: 'Upload Files',
           selectMany: false,
-          isRequired: true,
+          isRequired: false,
           defaultValue: '',
           filesLimit: 1
         },
