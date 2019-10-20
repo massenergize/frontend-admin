@@ -24,7 +24,7 @@ import draftToHtml from 'draftjs-to-html';
 import TextField from '@material-ui/core/TextField';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import {
- EditorState, convertToRaw, ContentState, convertFromHTML 
+  EditorState, convertToRaw, ContentState, convertFromHTML
 } from 'draft-js';
 import { apiCall, apiCallWithMedia } from '../../../utils/messenger';
 import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
