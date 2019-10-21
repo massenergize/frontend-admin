@@ -121,7 +121,7 @@
     "draftjs-to-html": "^0.8.3",
     "draftjs-to-markdown": "^0.5.1",
     "express": "4.16.4",
-    "firebase": "^6.3.1",
+    "firebase": "^6.6.2",
     "fontfaceobserver": "2.1.0",
     "history": "4.9.0",
     "hoist-non-react-statics": "3.3.0",
