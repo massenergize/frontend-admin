@@ -51,7 +51,7 @@ class CreateNewTagCollectionForm extends Component {
 
   createFormJson = async () => {
     const formJson = {
-      title: 'Create New Team',
+      title: 'Create New Tag Collection',
       subTitle: '',
       method: '/tag_collections.create',
       successRedirectPage: '/admin/read/categories',

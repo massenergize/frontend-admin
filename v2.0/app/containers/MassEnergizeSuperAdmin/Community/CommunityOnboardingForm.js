@@ -114,7 +114,7 @@ class CreateNewCommunityForm extends Component {
                     placeholder: 'eg. Wayland',
                     fieldType: 'TextField',
                     contentType: 'text',
-                    isRequired: true,
+                    isRequired: false,
                     defaultValue: '',
                     dbName: 'address',
                     readOnly: false
@@ -122,10 +122,10 @@ class CreateNewCommunityForm extends Component {
                   {
                     name: 'unit',
                     label: 'Unit Number',
-                    placeholder: 'eg. wayland',
+                    placeholder: 'eg. Unit 904',
                     fieldType: 'TextField',
                     contentType: 'text',
-                    isRequired: true,
+                    isRequired: false,
                     defaultValue: '',
                     dbName: 'unit',
                     readOnly: false
@@ -136,7 +136,7 @@ class CreateNewCommunityForm extends Component {
                     placeholder: 'eg. wayland',
                     fieldType: 'TextField',
                     contentType: 'text',
-                    isRequired: true,
+                    isRequired: false,
                     defaultValue: '',
                     dbName: 'city',
                     readOnly: false
@@ -147,7 +147,18 @@ class CreateNewCommunityForm extends Component {
                     placeholder: 'eg. New York',
                     fieldType: 'TextField',
                     contentType: 'text',
-                    isRequired: true,
+                    isRequired: false,
+                    defaultValue: '',
+                    dbName: 'state',
+                    readOnly: false
+                  },
+                  {
+                    name: 'zipcode',
+                    label: 'Zip code ',
+                    placeholder: 'eg. 80202',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: false,
                     defaultValue: '',
                     dbName: 'state',
                     readOnly: false
@@ -158,13 +169,39 @@ class CreateNewCommunityForm extends Component {
                     placeholder: 'eg. United States',
                     fieldType: 'TextField',
                     contentType: 'text',
-                    isRequired: true,
+                    isRequired: false,
                     defaultValue: '',
                     dbName: 'country',
                     readOnly: false
                   },
                 ]
               }
+            },
+            {
+              name: 'is_published',
+              label: 'Should this go live now?',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: 'false',
+              dbName: 'is_published',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+            },
+            {
+              name: 'is_approved',
+              label: 'Do you approve this community? (Check yes after background check)',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: 'true',
+              dbName: 'is_published',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
             },
           ]
         },
