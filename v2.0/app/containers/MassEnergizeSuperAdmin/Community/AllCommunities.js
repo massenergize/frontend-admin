@@ -5,7 +5,7 @@ import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
 
 import MUIDataTable from 'mui-datatables';
-import FileCopy from '@material-ui/icons/FileCopy';
+import CallMadeIcon from '@material-ui/icons/CallMade';
 import EditIcon from '@material-ui/icons/Edit';
 import { Link } from 'react-router-dom';
 import Avatar from '@material-ui/core/Avatar';
@@ -227,19 +227,10 @@ class AllCommunities extends React.Component {
             <Link to={`/admin/community/${id}/edit`}>
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
+            <Link to={`/admin/community/${id}/profile`}>
+              <CallMadeIcon size="small" variant="outlined" color="secondary" />
+            </Link>
             &nbsp;&nbsp;
-            {/* <Link
-              onClick={async () => {
-                const copiedActionResponse = await apiCall('/actions.copy', { action_id: id });
-                if (copiedActionResponse && copiedActionResponse.success) {
-                  const newAction = copiedActionResponse && copiedActionResponse.data;
-                  window.location.href = `/admin/edit/${newAction.id}/action`;
-                }
-              }}
-              to="/admin/read/actions"
-            >
-              <FileCopy size="small" variant="outlined" color="secondary" />
-            </Link> */}
           </div>
         )
       }
