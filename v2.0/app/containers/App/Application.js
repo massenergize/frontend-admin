@@ -25,13 +25,15 @@ import {
   SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditGoal, EditPolicy, EditEvent
 } from '../pageListAsync';
 
+
 class Application extends React.Component {
+  
   render() {
     const { changeMode, history } = this.props;
     return (
       <Dashboard history={history} changeMode={changeMode}>
         <Switch>
-          <Route exact path="/" component={DashboardSummaryPage} />
+          <Route exact path="/dash-summary" component={DashboardSummaryPage} />
           <Route exact path="/admin" component={DashboardSummaryPage} />
           <Route exact path="/blank" component={BlankPage} />
           <Route path="/admin/dashboard" component={DashboardSummaryPage} />

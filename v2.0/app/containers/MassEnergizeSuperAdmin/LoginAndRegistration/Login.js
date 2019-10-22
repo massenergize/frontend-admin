@@ -6,7 +6,8 @@ import { withStyles } from '@material-ui/core/styles';
 import { LoginForm } from 'dan-components';
 import styles from 'dan-components/Forms/user-jss';
 import { sendJson } from '../../../utils/messenger';
-
+import { bindActionCreators } from 'redux';
+import {connect} from 'react-redux';
 class Login extends React.Component {
   submitForm = (values) => {
     sendJson(values.entries(), '/v2/users', '/admin');
@@ -28,7 +29,7 @@ class Login extends React.Component {
         </Helmet>
         <div className={classes.container}>
           <div className={classes.userFormWrap}>
-            <LoginForm onSubmit={this.submitForm} />
+            <LoginForm signOutFxn ={this.props.signOutFxn } loginWithFacebookFxn = {this.props.loginWithFacebookFxn } normalLoginFxn = {this.props.normalLoginFxn} err = {this.props.error} onSubmit={this.submitForm} loginWithGoogleFxn={this.props.loginWithGoogleFxn}/>
           </div>
         </div>
       </div>
@@ -39,5 +40,14 @@ class Login extends React.Component {
 Login.propTypes = {
   classes: PropTypes.object.isRequired,
 };
-
-export default withStyles(styles)(Login);
+const mapDispatchToProps = dispatch => ({
+ 
+  
+});
+const mapStateToProps =(store)=>{
+  auth: store.auth
+}
+const LoginMapped = connect(
+  mapDispatchToProps
+)(Login);
+export default withStyles(styles)(LoginMapped);

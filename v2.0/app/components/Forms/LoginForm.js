@@ -24,6 +24,7 @@ import brand from 'dan-api/dummy/brand';
 import logo from 'dan-images/logo.png';
 import styles from './user-jss';
 import { ContentDivider } from '../Divider';
+import fire from 'firebase';
 
 // validation functions
 const required = value => (value == null ? 'Required' : undefined);
@@ -56,6 +57,7 @@ class LoginForm extends React.Component {
       deco,
     } = this.props;
     const { showPassword } = this.state;
+    
     return (
       <Fragment>
         <Hidden mdUp>
@@ -71,10 +73,10 @@ class LoginForm extends React.Component {
                 <img src={logo} alt={brand.name} />
                 {brand.name}
               </NavLink>
-              <Button size="small" className={classes.buttonLink} component={NavLink} to="/register">
+              {/* <Button size="small" className={classes.buttonLink} component={NavLink} to="/register">
                 <Icon className={classes.icon}>arrow_forward</Icon>
                 Create new account
-              </Button>
+              </Button> */}
             </div>
           </Hidden>
           <Typography variant="h4" className={classes.title} gutterBottom>
@@ -85,18 +87,18 @@ class LoginForm extends React.Component {
           </Typography>
           <section className={classes.socmedLogin}>
             <div className={classes.btnArea}>
-              <Button variant="outlined" size="small" className={classes.redBtn} type="button">
+              <Button variant="outlined" size="small" onClick={() => this.props.loginWithGoogleFxn()} className={classes.redBtn} type="button">
                 <People className={classNames(classes.leftIcon, classes.iconSmall)} />
                 Google
               </Button>
-              <Button variant="outlined" size="small" className={classes.blueBtn} type="button">
+              <Button variant="outlined" onClick={() => this.props.loginWithFacebookFxn()}size="small" className={classes.blueBtn} type="button">
                 <People className={classNames(classes.leftIcon, classes.iconSmall)} />
                 Facebook
               </Button>
-              <Button variant="outlined" size="small" className={classes.cyanBtn} type="button">
+              {/* <Button variant="outlined" size="small" className={classes.cyanBtn} type="button">
                 <People className={classNames(classes.leftIcon, classes.iconSmall)} />
                 Twitter
-              </Button>
+              </Button> */}
             </div>
             <ContentDivider content="Or sign in with email" />
           </section>
@@ -104,7 +106,15 @@ class LoginForm extends React.Component {
             <form onSubmit={handleSubmit}>
               <div>
                 <FormControl className={classes.formControl}>
+                  {
+                    this.props.err ?
+                      <Typography style={{ color: 'red' }} variant="caption" className={classes.subtitle} gutterBottom align="center">
+                        {this.props.err.message}
+                      </Typography>
+                      : null
+                  }
                   <Field
+                  ref="email"
                     name="email"
                     component={TextField}
                     placeholder="Your Email"
@@ -118,6 +128,7 @@ class LoginForm extends React.Component {
               <div>
                 <FormControl className={classes.formControl}>
                   <Field
+                  ref="pass"
                     name="password"
                     component={TextField}
                     type={showPassword ? 'text' : 'password'}
@@ -142,14 +153,15 @@ class LoginForm extends React.Component {
                 </FormControl>
               </div>
               <div className={classes.optArea}>
-                <FormControlLabel className={classes.label} control={<Field name="checkbox" component={Checkbox} />} label="Remember" />
-                <Button size="small" component={NavLink} to="/reset-password" className={classes.buttonLink}>Forgot Password</Button>
+                {/* <FormControlLabel className={classes.label} control={<Field name="checkbox" component={Checkbox} />} label="Remember" /> */}
+                {/* <Button size="small" component={NavLink} to="/reset-password" className={classes.buttonLink}>Forgot Password</Button> */}
               </div>
               <div className={classes.btnArea}>
-                <Button variant="contained" color="primary" size="large" type="submit">
-                  Continue
+                <Button variant="contained" onClick={() => this.props.normalLoginFxn(this.refs.email.value,this.refs.pass.value)}color="primary" size="large" type="submit">
+                  Finish
                   <ArrowForward className={classNames(classes.rightIcon, classes.iconSmall)} disabled={submitting || pristine} />
                 </Button>
+                 {/* <button onClick = {(e)=>{e.preventDefault();this.props.signOutFxn()}}>signout</button> */}
               </div>
             </form>
           </section>
