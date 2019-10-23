@@ -35,7 +35,8 @@ class HomePageEditForm extends Component {
     this.state = {
       formJson: null,
       homePageData: null,
-      events: null
+      events: null,
+      noDataFound: false
     };
   }
 
@@ -46,12 +47,19 @@ class HomePageEditForm extends Component {
     const homePageResponse = await apiCall('/home_page_settings.info', { community_id: id });
     if (homePageResponse && homePageResponse.success) {
       await this.setStateAsync({ homePageData: homePageResponse.data });
+    } else {
+      await this.setStateAsync({ noDataFound: true });
+      return;
     }
+
 
     const eventsResponse = await apiCall('/events.list', { community_id: id });
     if (eventsResponse && eventsResponse.data) {
       const events = eventsResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
       await this.setStateAsync({ events });
+    } else {
+      await this.setStateAsync({ noDataFound: true });
+      return;
     }
 
     const formJson = await this.createFormJson(homePageResponse.data);
@@ -66,11 +74,25 @@ class HomePageEditForm extends Component {
 
   createFormJson = async () => {
     const { homePageData, events } = this.state;
-    const { community, images, featured_links, featured_events } = homePageData;
+    const {
+      community, featured_events
+    } = homePageData;
+    let {
+      images, featured_links
+    } = homePageData;
+
+    if (!images) {
+      images = [];
+    }
+
+    if (!featured_links) {
+      featured_links = [];
+    }
+
     const [image1, image2, image3] = images;
     const [iconBox1, iconBox2, iconBox3, iconBox4] = featured_links;
     const { goal } = homePageData;
-    const selectedEvents = homePageData ? featured_events.map(e => '' + e.id) : [];
+    const selectedEvents = homePageData && featured_events ? featured_events.map(e => '' + e.id) : [];
 
 
     const formJson = {
@@ -499,7 +521,9 @@ class HomePageEditForm extends Component {
 
   render() {
     const { classes } = this.props;
-    const { formJson } = this.state;
+    const { formJson, noDataFound } = this.state;
+    console.log(this.state)
+    if (!noDataFound) return (<div>Sorry no Home Page data available for this community ...</div>);
     if (!formJson) return (<div>Hold tight! Retrieving your data ...</div>);
     return (
       <div>

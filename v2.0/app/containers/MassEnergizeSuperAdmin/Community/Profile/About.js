@@ -22,6 +22,7 @@ import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import IconButton from '@material-ui/core/IconButton';
 import InfoIcon from '@material-ui/icons/Info';
+import { Link } from 'react-router-dom';
 import Check from '@material-ui/icons/Check';
 import AcUnit from '@material-ui/icons/AcUnit';
 import Adb from '@material-ui/icons/Adb';
@@ -216,9 +217,12 @@ class About extends React.Component {
             </List>
             <Divider className={classes.divider} />
             <Grid container justify="center">
-              <Button color="secondary" className={classes.button}>
-                See All
-              </Button>
+              <Link to="/admin/read/actions">
+                <Button color="secondary" className={classes.button}>
+                  See All
+                </Button>
+              </Link>
+              
             </Grid>
           </PapperBlock>
         </Grid>

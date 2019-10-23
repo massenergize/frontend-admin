@@ -87,7 +87,6 @@ class Application extends React.Component {
           <Route path="/admin/page-list" component={Parent} />
           <Route path="/admin/pages/not-found" component={NotFound} />
           <Route path="/admin/pages/error" component={Error} />
-          <Route path="/admin/add/home" component={SuperHome} />
           <Route path="/admin/edit/:id/home" component={SuperHome} />
           <Route path="/admin/edit/:id/actions" component={SuperAllActions} />
           <Route path="/admin/edit/:id/all-actions" component={SuperAllActions} />
