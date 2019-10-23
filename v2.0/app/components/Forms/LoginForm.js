@@ -55,9 +55,11 @@ class LoginForm extends React.Component {
       pristine,
       submitting,
       deco,
+      err,
+      normalLoginFxn,
     } = this.props;
     const { showPassword } = this.state;
-    
+
     return (
       <Fragment>
         <Hidden mdUp>
@@ -106,15 +108,14 @@ class LoginForm extends React.Component {
             <form onSubmit={handleSubmit}>
               <div>
                 <FormControl className={classes.formControl}>
-                  {
-                    this.props.err ?
-                      <Typography style={{ color: 'red' }} variant="caption" className={classes.subtitle} gutterBottom align="center">
-                        {this.props.err.message}
-                      </Typography>
-                      : null
+                  { err && (
+                    <Typography style={{ color: 'red' }} variant="caption" className={classes.subtitle} gutterBottom align="center">
+                      {err.message}
+                    </Typography>
+                  )
                   }
                   <Field
-                  ref="email"
+                    ref="email"
                     name="email"
                     component={TextField}
                     placeholder="Your Email"
@@ -128,7 +129,7 @@ class LoginForm extends React.Component {
               <div>
                 <FormControl className={classes.formControl}>
                   <Field
-                  ref="pass"
+                    ref="pass"
                     name="password"
                     component={TextField}
                     type={showPassword ? 'text' : 'password'}
@@ -157,11 +158,11 @@ class LoginForm extends React.Component {
                 {/* <Button size="small" component={NavLink} to="/reset-password" className={classes.buttonLink}>Forgot Password</Button> */}
               </div>
               <div className={classes.btnArea}>
-                <Button variant="contained" onClick={() => this.props.normalLoginFxn(this.refs.email.value,this.refs.pass.value)}color="primary" size="large" type="submit">
+                <Button variant="contained" onClick={() => normalLoginFxn(this.refs.email.value, this.refs.pass.value)} color="primary" size="large" type="submit">
                   Finish
                   <ArrowForward className={classNames(classes.rightIcon, classes.iconSmall)} disabled={submitting || pristine} />
                 </Button>
-                 {/* <button onClick = {(e)=>{e.preventDefault();this.props.signOutFxn()}}>signout</button> */}
+                {/* <button onClick = {(e)=>{e.preventDefault();this.props.signOutFxn()}}>signout</button> */}
               </div>
             </form>
           </section>
