@@ -44,7 +44,6 @@ class HomePageEditForm extends Component {
     const { id } = this.props.match.params;
 
     const homePageResponse = await apiCall('/home_page_settings.info', { community_id: id });
-    console.log(homePageResponse)
     if (homePageResponse && homePageResponse.success) {
       await this.setStateAsync({ homePageData: homePageResponse.data });
     }
@@ -66,7 +65,6 @@ class HomePageEditForm extends Component {
   }
 
   createFormJson = async () => {
-    console.log(this.state);
     const { homePageData, events } = this.state;
     const { community, images, featured_links, featured_events } = homePageData;
     const [image1, image2, image3] = images;

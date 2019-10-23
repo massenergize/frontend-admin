@@ -89,10 +89,12 @@ class Application extends React.Component {
           <Route path="/admin/pages/error" component={Error} />
           <Route path="/admin/add/home" component={SuperHome} />
           <Route path="/admin/edit/:id/home" component={SuperHome} />
-          <Route path="/admin/edit/:id/actions" component={SuperHome} />
+          <Route path="/admin/edit/:id/actions" component={SuperAllActions} />
           <Route path="/admin/edit/:id/about_us" component={SuperHome} />
-          <Route path="/admin/edit/:id/contact_us" component={SuperHome} />
-          <Route path="/admin/edit/:id/donate" component={SuperHome} />
+          <Route path="/admin/edit/:id/all-actions" component={SuperAllActions} />
+          <Route path="/admin/edit/:id/contact_us" component={SuperContactUs} />
+          <Route path="/admin/edit/:id/donate" component={SuperDonate} />
+          <Route path="/admin/edit/:id/about" component={SuperAboutUs} />
           <Route path="/admin/read/about-us" component={SuperAboutUs} />
           <Route path="/admin/add/donate" component={SuperDonate} />
           <Route path="/admin/read/contact-us" component={SuperContactUs} />
