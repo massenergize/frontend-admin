@@ -56,7 +56,7 @@ class MaterialDropZone extends React.Component {
 
   onDrop(filesVal) {
     const { files } = this.state;
-    const { filesLimit } = this.props;
+    const { filesLimit, name } = this.props;
     let oldFiles = files;
     const filesLimitVal = filesLimit || '3';
     oldFiles = oldFiles.concat(filesVal);
@@ -67,7 +67,7 @@ class MaterialDropZone extends React.Component {
       });
     } else {
       this.setState({ files: oldFiles });
-      this.addToState('image', oldFiles);
+      this.addToState(name || 'image', oldFiles);
     }
   }
 

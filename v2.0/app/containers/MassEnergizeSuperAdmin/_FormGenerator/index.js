@@ -463,6 +463,7 @@ class MassEnergizeForm extends Component {
                 files={this.getValue(field.name, [])}
                 showPreviews
                 maxSize={5000000}
+                name={field.name}
                 filesLimit={field.filesLimit}
                 text={field.label}
                 addToState={this.updateForm}
