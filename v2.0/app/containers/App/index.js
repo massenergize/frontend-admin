@@ -80,26 +80,13 @@ class App extends React.Component {
 
   render() {
     const { user, error } = this.state;
+
     return (
       <ThemeWrapper>
         <AppContext.Consumer>
           {(changeMode) => (
             <Switch>
-              <Route
-                path="/"
-                exact
-                render={(props) => (
-                  <LoginDedicated
-                    {...props}
-                    signOutFxn={this.signOut}
-                    error={error}
-                    user={user}
-                    normalLoginFxn={this.normalLogin}
-                    loginWithFacebookFxn={this.loginWithFacebook}
-                    loginWithGoogleFxn={this.loginWithGoogle}
-                  />
-                )}
-              />
+
               <Route
                 path="/login"
                 exact
@@ -139,10 +126,31 @@ class App extends React.Component {
                   />
                 )
               }
-              {/* <Route
-                  path="/admin"
-                  render={(props) => <Application {...props} changeMode={changeMode} />}
-                /> */}
+              {!user
+                && (
+                  <Route
+                    path="/"
+                    exact
+                    render={(props) => (
+                      <LoginDedicated
+                        {...props}
+                        signOutFxn={this.signOut}
+                        error={error}
+                        user={user}
+                        normalLoginFxn={this.normalLogin}
+                        loginWithFacebookFxn={this.loginWithFacebook}
+                        loginWithGoogleFxn={this.loginWithGoogle}
+                      />
+                    )}
+                  />
+                )
+              }
+
+
+              <Route
+                path="/admin"
+                render={(props) => <Application {...props} changeMode={changeMode} />}
+              />
               <Route component={Auth} />
               <Route component={NotFound} />
             </Switch>

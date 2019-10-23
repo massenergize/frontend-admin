@@ -9,7 +9,7 @@ class LoginDedicated extends React.Component {
     } = this.props;
 
     if (user) {
-      window.location = '/dash-summary';
+      window.location = '/admin';
     }
 
     return (
