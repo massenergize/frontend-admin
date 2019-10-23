@@ -48,7 +48,7 @@ class HomePageEditForm extends Component {
     if (homePageResponse && homePageResponse.success) {
       await this.setStateAsync({ homePageData: homePageResponse.data });
     } else {
-      await this.setStateAsync({ noDataFound: true });
+      await this.setStateAsync({ noDataFound: true, formJson: {} });
       return;
     }
 
@@ -58,12 +58,12 @@ class HomePageEditForm extends Component {
       const events = eventsResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
       await this.setStateAsync({ events });
     } else {
-      await this.setStateAsync({ noDataFound: true });
+      await this.setStateAsync({ noDataFound: true, formJson: {} });
       return;
     }
 
     const formJson = await this.createFormJson(homePageResponse.data);
-    await this.setStateAsync({ formJson });
+    await this.setStateAsync({ formJson, noDataFound: false });
   }
 
   setStateAsync(state) {
@@ -523,8 +523,8 @@ class HomePageEditForm extends Component {
     const { classes } = this.props;
     const { formJson, noDataFound } = this.state;
     console.log(this.state)
-    if (!noDataFound) return (<div>Sorry no Home Page data available for this community ...</div>);
     if (!formJson) return (<div>Hold tight! Retrieving your data ...</div>);
+    if (noDataFound) return (<div>Sorry no Home Page data available for this community ...</div>);
     return (
       <div>
         <MassEnergizeForm
