@@ -182,12 +182,6 @@ module.exports = [
     ]
   },
   {
-    key: 'export',
-    name: 'Export',
-    icon: 'ios-cloud-download',
-    link: '/admin/export'
-  },
-  {
     key: 'policies',
     name: 'Policies',
     icon: 'ios-alert',
@@ -208,6 +202,12 @@ module.exports = [
         link: '/admin/read/policies'
       },
     ]
+  },
+  {
+    key: 'export',
+    name: 'Export',
+    icon: 'ios-cloud-download',
+    link: '/admin/export'
   },
   // {
   //   key: 'page-customization',
