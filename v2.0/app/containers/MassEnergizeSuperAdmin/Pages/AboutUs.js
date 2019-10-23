@@ -1,146 +1,131 @@
-import React from 'react';
-import { PropTypes } from 'prop-types';
-import TextField from '@material-ui/core/TextField';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
-import MenuItem from '@material-ui/core/MenuItem';
-import Button from '@material-ui/core/Button';
-import Type from 'dan-styles/Typography.scss';
-import DeleteIcon from '@material-ui/icons/Close';
-import { allCommunities } from './../../Pages/CustomPages/DataRetriever';
-import Fab from '@material-ui/core/Fab';
-import Public from '@material-ui/icons/Public';
-import { styles, vanish, uploadBox } from './../../Pages/CustomPages/styles';
+import MassEnergizeForm from '../_FormGenerator';
+import { apiCall } from '../../../utils/messenger';
 
-class AboutUs extends React.Component {
+const styles = theme => ({
+  root: {
+    flexGrow: 1,
+    padding: 30
+  },
+  field: {
+    width: '100%',
+    marginBottom: 20
+  },
+  fieldBasic: {
+    width: '100%',
+    marginBottom: 20,
+    marginTop: 10
+  },
+  inlineWrap: {
+    display: 'flex',
+    flexDirection: 'row'
+  },
+  buttonInit: {
+    margin: theme.spacing.unit * 4,
+    textAlign: 'center'
+  },
+});
+
+
+class HomePageEditForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      communities: [],
-      selected_community: null,
-      about: '',
-      video_url: ''
+      formJson: null,
+      aboutUsPageData: null,
     };
   }
 
-  findCommunityObj = (name) => {
-    let section = this.state.communities;
-    for (let i = 0; i < section.length; i++) {
-      if (section[i].name === name) {
-        return section[i];
-      }
+
+  async componentDidMount() {
+    const { id } = this.props.match.params;
+
+    const aboutUsPageData = await apiCall('/about_us_page_settings.info', { community_id: id });
+    if (aboutUsPageData && aboutUsPageData.success) {
+      await this.setStateAsync({ aboutUsPageData: aboutUsPageData.data });
     }
-    return null;
+
+    const formJson = await this.createFormJson(aboutUsPageData.data);
+    await this.setStateAsync({ formJson });
   }
 
-  handleCommunitiesChoice = (event) => {
-    let obj = this.findCommunityObj(event.target.value);
-    this.setState({
-      selected_community: obj,
+  setStateAsync(state) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve);
     });
   }
 
-  componentDidMount = () => {
-    this.callForCommunities();
+  createFormJson = async () => {
+    const { aboutUsPageData } = this.state;
+    console.log(aboutUsPageData);
+    const { community } = aboutUsPageData;
+
+    const formJson = {
+      title: `Edit ${community ? community.name + '\'s' : 'Community\'s'} - About Us Page`,
+      subTitle: '',
+      method: '/about_us_page_settings.update',
+      // successRedirectPage: `/admin/edit/${community.id}/about_us`,
+      fields: [
+        {
+          name: 'id',
+          label: 'ID',
+          placeholder: 'eg. 1',
+          fieldType: 'TextField',
+          contentType: 'number',
+          isRequired: true,
+          defaultValue: `${aboutUsPageData.id}`,
+          dbName: 'id',
+          readOnly: true
+        },
+        {
+          name: 'title',
+          label: 'Main Title',
+          placeholder: 'eg. Welcome to Wayland!',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: true,
+          defaultValue: `${aboutUsPageData.title}`,
+          dbName: 'title',
+          readOnly: false
+        },
+        {
+          name: 'description',
+          label: 'Paragraph to be displayed below the title',
+          placeholder: 'Tell us more ...',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: true,
+          isMultiline: true,
+          defaultValue: `${aboutUsPageData.description}`,
+          dbName: 'description',
+          readOnly: false
+        }
+      ]
+    };
+    return formJson;
   }
 
-  callForCommunities = () => {
-    const me = this;
-    allCommunities().then(response => {
-      me.setState({ communities: response.data });
-    });
-  }
-
-  handleURL = (event) => {
-    this.setState({ video_url: event.target.value });
-  }
-
-  handleDescription = (event) => {
-    this.setState({ about: event.target.value });
-  }
 
   render() {
     const { classes } = this.props;
-    const { communities } = this.state;
-    const community = this.state.selected_community ? this.state.selected_community.name : '';
+    const { formJson } = this.state;
+    if (!formJson) return (<div>Hold tight! Retrieving your data ...</div>);
     return (
       <div>
-        <div style={{ margin: 30 }} />
-        <Grid item xl={12} md={12}>
-          <Paper className={classes.root} elevation={4} style={{ padding: 30 }}>
-            <h3>Edit the about page of any of these communities</h3>
-            <TextField
-              id="outlined-select-currency"
-              select
-              label="Select Community"
-              className={classes.textField}
-              value={community}
-              fullWidth
-              onChange={option => { this.handleCommunitiesChoice(option); }}
-              SelectProps={{
-                MenuProps: {
-                  className: classes.menu,
-                },
-              }}
-              helperText="Please select the community"
-              margin="normal"
-              variant="outlined"
-            >
-              {communities.map(option => (
-                <MenuItem key={option.id.toString()} value={option.name}>
-                  {option.name}
-                </MenuItem>
-              ))}
-            </TextField>
-
-            <TextField
-              onChange={(event) => { this.handleURL(event); }}
-              id="outlined-multiline-flexible"
-              label="Video URL"
-              fullWidth
-              cols="20"
-              rowsMax="19"
-              rows="10"
-              placeholder="Add a video URL"
-              className={classes.textField}
-              margin="normal"
-              variant="outlined"
-            />
-            <TextField
-              id="outlined-multiline-flexible"
-              label="Description"
-              fullWidth
-              multiline
-              onChange={(event) => this.handleDescription(event)}
-              cols="20"
-              rowsMax="19"
-              rows="10"
-              placeholder="Write a description ..."
-              className={classes.textField}
-              margin="normal"
-              helperText={`This will be shown somewhere on ${this.state.selected_community ? this.state.selected_community.name : '...'} about page`}
-              variant="outlined"
-            />
-
-
-            <Fab
-              onClick={() => { console.log('I am the data: ', this.state); }}
-              variant="extended"
-              color="secondary"
-              aria-label="Delete"
-              className={classes.button}
-            >
-              Publish Content 
-              {' '}
-              <span style={{ margin: 3 }} />
-
-            </Fab>
-          </Paper>
-        </Grid>
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+        />
       </div>
     );
   }
 }
-export default withStyles(styles)(AboutUs);
+
+HomePageEditForm.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+
+export default withStyles(styles, { withTheme: true })(HomePageEditForm);

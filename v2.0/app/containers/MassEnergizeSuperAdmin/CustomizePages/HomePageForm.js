@@ -77,7 +77,7 @@ class HomePageEditForm extends Component {
       title: `Edit ${community ? community.name + '\'s' : 'Community\'s'} HomePage`,
       subTitle: '',
       method: '/home_page_settings.update',
-      successRedirectPage: `/admin/edit/${community.id}/home`,
+      // successRedirectPage: `/admin/edit/${community.id}/home`,
       fields: [
         {
           name: 'id',

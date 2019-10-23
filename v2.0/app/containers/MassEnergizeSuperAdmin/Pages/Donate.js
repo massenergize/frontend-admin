@@ -65,7 +65,7 @@ class HomePageEditForm extends Component {
       title: `Edit ${community ? community.name + '\'s' : 'Community\'s'} Donate Page`,
       subTitle: '',
       method: '/donate_page_settings.update',
-      successRedirectPage: `/admin/edit/${community.id}/donate`,
+      // successRedirectPage: `/admin/edit/${community.id}/donate`,
       fields: [
         {
           name: 'id',
@@ -101,17 +101,17 @@ class HomePageEditForm extends Component {
           dbName: 'description',
           readOnly: false
         },
-        {
-          name: 'featured_video_link',
-          label: 'Video Link',
-          placeholder: 'eg. https://www.youtube.com/?v=as122aas',
-          fieldType: 'TextField',
-          contentType: 'text',
-          isRequired: true,
-          defaultValue: `${donatePageData.featured_video_link}`,
-          dbName: 'featured_video_link',
-          readOnly: false
-        },
+        // {
+        //   name: 'featured_video_link',
+        //   label: 'Video Link',
+        //   placeholder: 'eg. https://www.youtube.com/?v=as122aas',
+        //   fieldType: 'TextField',
+        //   contentType: 'text',
+        //   isRequired: true,
+        //   defaultValue: `${donatePageData.featured_video_link}`,
+        //   dbName: 'featured_video_link',
+        //   readOnly: false
+        // },
       ]
     };
     return formJson;
