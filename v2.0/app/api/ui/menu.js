@@ -209,43 +209,43 @@ module.exports = [
       },
     ]
   },
-  {
-    key: 'page-customization',
-    name: 'Pages',
-    icon: 'ios-apps',
-    child: [
-      {
-        key: 'about-pages',
-        name: 'Website Pages',
-        title: true
-      },
-      {
-        key: 'home',
-        name: 'Home',
-        link: '/admin/add/home'
-      },
-      {
-        key: 'all-actions',
-        name: 'All Actions',
-        link: '/admin/read/all-actions'
-      },
-      {
-        key: 'donate',
-        name: 'Donate',
-        link: '/admin/add/donate'
-      },
-      {
-        key: 'contact',
-        name: 'Contact Us',
-        link: '/admin/read/contact-us'
-      },
-      {
-        key: 'about-us',
-        name: 'About Us',
-        link: '/admin/read/about-us'
-      },
-    ]
-  },
+  // {
+  //   key: 'page-customization',
+  //   name: 'Pages',
+  //   icon: 'ios-apps',
+  //   child: [
+  //     {
+  //       key: 'about-pages',
+  //       name: 'Website Pages',
+  //       title: true
+  //     },
+  //     {
+  //       key: 'home',
+  //       name: 'Home',
+  //       link: '/admin/add/home'
+  //     },
+  //     {
+  //       key: 'all-actions',
+  //       name: 'All Actions',
+  //       link: '/admin/read/all-actions'
+  //     },
+  //     {
+  //       key: 'donate',
+  //       name: 'Donate',
+  //       link: '/admin/add/donate'
+  //     },
+  //     {
+  //       key: 'contact',
+  //       name: 'Contact Us',
+  //       link: '/admin/read/contact-us'
+  //     },
+  //     {
+  //       key: 'about-us',
+  //       name: 'About Us',
+  //       link: '/admin/read/about-us'
+  //     },
+  //   ]
+  // },
   // {
   //   key: 'demo',
   //   name: 'Demo',
