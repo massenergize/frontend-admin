@@ -1,44 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import { Field, reduxForm } from 'redux-form/immutable';
-import MenuItem from '@material-ui/core/MenuItem';
-import InputLabel from '@material-ui/core/InputLabel';
-import Grid from '@material-ui/core/Grid';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Typography from '@material-ui/core/Typography';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-import Button from '@material-ui/core/Button';
-import {
-  Checkbox,
-  Select,
-  TextField,
-  Switch
-} from 'redux-form-material-ui';
-import { initAction, clearAction } from '../../../actions/ReduxFormActions';
-
-const renderRadioGroup = ({ input, ...rest }) => (
-  <RadioGroup
-    {...input}
-    {...rest}
-    valueselected={input.value}
-    onChange={(event, value) => input.onChange(value)}
-  />
-);
-
-// validation functions
-const required = value => (value == null ? 'Required' : undefined);
-const email = value => (
-  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)
-    ? 'Invalid email'
-    : undefined
-);
+import MassEnergizeForm from '../_FormGenerator';
+import { apiCall } from '../../../utils/messenger';
 
 const styles = theme => ({
   root: {
@@ -64,163 +28,495 @@ const styles = theme => ({
   },
 });
 
-const initData = {
-  text: 'Sample Text',
-  email: 'sample@mail.com',
-  radio: 'option1',
-  selection: 'option1',
-  onof: true,
-  checkbox: true,
-  textarea: 'This is default text'
-};
 
-class HomePageForm extends Component {
+class HomePageEditForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      formJson: null,
+      homePageData: null,
+      events: null
+    };
+  }
+
+
+  async componentDidMount() {
+    const { id } = this.props.match.params;
+
+    const homePageResponse = await apiCall('/home_page_settings.info', { community_id: id });
+    console.log(homePageResponse)
+    if (homePageResponse && homePageResponse.success) {
+      await this.setStateAsync({ homePageData: homePageResponse.data });
+    }
+
+    const eventsResponse = await apiCall('/events.list', { community_id: id });
+    if (eventsResponse && eventsResponse.data) {
+      const events = eventsResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
+      await this.setStateAsync({ events });
+    }
+
+    const formJson = await this.createFormJson(homePageResponse.data);
+    await this.setStateAsync({ formJson });
+  }
+
+  setStateAsync(state) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve);
+    });
+  }
+
+  createFormJson = async () => {
+    console.log(this.state);
+    const { homePageData, events } = this.state;
+    const { community, images, featured_links, featured_events } = homePageData;
+    const [image1, image2, image3] = images;
+    const [iconBox1, iconBox2, iconBox3, iconBox4] = featured_links;
+    const { goal } = homePageData;
+    const selectedEvents = homePageData ? featured_events.map(e => '' + e.id) : [];
+
+
+    const formJson = {
+      title: `Edit ${community ? community.name + '\'s' : 'Community\'s'} HomePage`,
+      subTitle: '',
+      method: '/home_page_settings.update',
+      successRedirectPage: `/admin/edit/${community.id}/home`,
+      fields: [
+        {
+          name: 'id',
+          label: 'ID',
+          placeholder: 'eg. 1',
+          fieldType: 'TextField',
+          contentType: 'number',
+          isRequired: true,
+          defaultValue: `${homePageData.id}`,
+          dbName: 'id',
+          readOnly: true
+        },
+        {
+          label: 'Welcome Title and Pictures',
+          fieldType: 'Section',
+          children: [
+            {
+              name: 'title',
+              label: 'Main Title',
+              placeholder: 'eg. Welcome to Wayland!',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: `${homePageData.title}`,
+              dbName: 'title',
+              readOnly: false
+            },
+            {
+              name: 'description',
+              label: 'Paragraph to be displayed below the title',
+              placeholder: 'Tell us more ...',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              isMultiline: true,
+              defaultValue: `${homePageData.description}`,
+              dbName: 'description',
+              readOnly: false
+            },
+          ]
+        },
+        {
+          label: 'Upload your 3 pictures',
+          fieldType: 'Section',
+          children: [
+            {
+              name: 'image_1',
+              placeholder: 'Picture 1',
+              fieldType: 'File',
+              dbName: 'image_1',
+              label: 'Upload Picture 1',
+              previewLink: `${image1 && image1.url}`,
+              selectMany: false,
+              isRequired: false,
+              defaultValue: [],
+              filesLimit: 1
+            },
+            {
+              name: 'image_2',
+              placeholder: 'Picture 2',
+              fieldType: 'File',
+              dbName: 'image_2',
+              previewLink: `${image2 && image2.url}`,
+              label: 'Upload Picture 2',
+              selectMany: false,
+              isRequired: false,
+              defaultValue: [],
+              filesLimit: 1
+            },
+            {
+              name: 'image_3',
+              placeholder: 'Picture 3',
+              fieldType: 'File',
+              previewLink: `${image3 && image3.url}`,
+              dbName: 'image_3',
+              label: 'Upload Picture 3',
+              selectMany: false,
+              isRequired: false,
+              defaultValue: [],
+              filesLimit: 1
+            },
+          ]
+        },
+        {
+          label: 'Home Page Statistics',
+          fieldType: 'Section',
+          children: [
+            {
+              name: 'show_featured_stats',
+              label: 'Should we display summary Stats on your home page?',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: `${homePageData.show_featured_stats}`,
+              dbName: 'show_featured_stats',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+              child: {
+                valueToCheck: 'true',
+                fields: [
+                  {
+                    name: 'attained_number_of_actions',
+                    label: 'Attained Number of Actions',
+                    placeholder: 'eg. 100',
+                    fieldType: 'TextField',
+                    contentType: 'number',
+                    isRequired: false,
+                    defaultValue: goal && goal.attained_number_of_actions,
+                    dbName: 'attained_number_of_actions',
+                    readOnly: false
+                  },
+                  {
+                    name: 'target_number_of_actions',
+                    label: 'Attained Number of Actions',
+                    placeholder: 'eg. 100',
+                    fieldType: 'TextField',
+                    contentType: 'number',
+                    isRequired: false,
+                    defaultValue: goal && goal.target_number_of_actions,
+                    dbName: 'target_number_of_actions',
+                    readOnly: false
+                  },
+                  {
+                    name: 'attained_number_of_households',
+                    label: 'How many households joined this community?',
+                    placeholder: 'eg. 100',
+                    fieldType: 'TextField',
+                    contentType: 'number',
+                    isRequired: false,
+                    defaultValue: goal && goal.attained_number_of_households,
+                    dbName: 'attained_number_of_households',
+                    readOnly: false
+                  },
+                  {
+                    name: 'target_number_of_households',
+                    label: 'How many households joined this community?',
+                    placeholder: 'eg. 100',
+                    fieldType: 'TextField',
+                    contentType: 'number',
+                    isRequired: false,
+                    defaultValue: goal && goal.target_number_of_households,
+                    dbName: 'target_number_of_households',
+                    readOnly: false
+                  },
+                ]
+              }
+            },
+          ]
+        },
+        {
+          label: 'Events Section',
+          fieldType: 'Section',
+          children: [
+            {
+              name: 'show_featured_events',
+              label: 'Should we display some selected events on the home page?',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: `${homePageData.show_featured_events}`,
+              dbName: 'show_featured_events',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+              child: {
+                valueToCheck: 'true',
+                fields: [
+                  {
+                    name: 'featured_events',
+                    label: 'Select which events to show up on the home Page',
+                    placeholder: '',
+                    fieldType: 'Checkbox',
+                    selectMany: true,
+                    defaultValue: selectedEvents,
+                    dbName: 'featured_events',
+                    data: events
+                  }
+                ]
+              }
+            },
+          ]
+        },
+        {
+          label: 'Icon Links: The four icon boxes on the Home Page',
+          fieldType: 'Section',
+          children: [
+            {
+              name: 'show_featured_links',
+              label: 'Should we display summary Stats on your home page?',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: `${homePageData.show_featured_links}`,
+              dbName: 'show_featured_links',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+              child: {
+                valueToCheck: 'true',
+                fields: [
+                  {
+                    label: 'Icon Box 1',
+                    fieldType: 'Section',
+                    children: [
+                      {
+                        name: 'icon_box_1_title',
+                        label: 'Title on Icon Box 1',
+                        placeholder: 'eg. Take Action',
+                        fieldType: 'TextField',
+                        contentType: 'text',
+                        isRequired: false,
+                        defaultValue: `${iconBox1 && iconBox1.title}`,
+                        dbName: 'icon_box_1_title',
+                        readOnly: false
+                      },
+                      {
+                        name: 'icon_box_1_icon',
+                        label: 'Put an icon Name: (select from ...)',
+                        placeholder: 'eg. 100',
+                        fieldType: 'TextField',
+                        contentType: 'text',
+                        isRequired: false,
+                        defaultValue: `${iconBox1 && iconBox1.icon}`,
+                        dbName: 'icon_box_1_icon',
+                        readOnly: false
+                      },
+                      {
+                        name: 'icon_box_1_link',
+                        label: 'Url: When someone clicks, where should it go?',
+                        placeholder: 'eg. 100',
+                        fieldType: 'TextField',
+                        contentType: 'text',
+                        isRequired: false,
+                        defaultValue: `${iconBox1 && iconBox1.link}`,
+                        dbName: 'icon_box_1_link',
+                        readOnly: false
+                      },
+                      {
+                        name: 'icon_box_1_description',
+                        label: 'Short description the card (no more than 20 characters)',
+                        placeholder: 'Tell us more ...',
+                        fieldType: 'TextField',
+                        contentType: 'text',
+                        isRequired: true,
+                        isMultiline: true,
+                        defaultValue: `${iconBox1 && iconBox1.description}`,
+                        dbName: 'icon_box_1_description',
+                        readOnly: false
+                      },
+                    ]
+                  },
+                  {
+                    label: 'Icon Box 2',
+                    fieldType: 'Section',
+                    children: [
+                      {
+                        name: 'icon_box_2_title',
+                        label: 'Title on Icon Box 2',
+                        placeholder: 'eg. Take Action',
+                        fieldType: 'TextField',
+                        contentType: 'text',
+                        isRequired: false,
+                        defaultValue: `${iconBox2 && iconBox2.title}`,
+                        dbName: 'icon_box_2_title',
+                        readOnly: false
+                      },
+                      {
+                        name: 'icon_box_2_icon',
+                        label: 'Put an icon Name: (select from ...)',
+                        placeholder: 'eg. 100',
+                        fieldType: 'TextField',
+                        contentType: 'text',
+                        isRequired: false,
+                        defaultValue: `${iconBox2 && iconBox2.icon}`,
+                        dbName: 'icon_box_2_icon',
+                        readOnly: false
+                      },
+                      {
+                        name: 'icon_box_2_link',
+                        label: 'Url: When someone clicks, where should it go?',
+                        placeholder: 'eg. 100',
+                        fieldType: 'TextField',
+                        contentType: 'text',
+                        isRequired: false,
+                        defaultValue:  `${iconBox2 && iconBox2.link}`,
+                        dbName: 'icon_box_2_link',
+                        readOnly: false
+                      },
+                      {
+                        name: 'icon_box_2_description',
+                        label: 'Short description the card (no more than 20 characters)',
+                        placeholder: 'Tell us more ...',
+                        fieldType: 'TextField',
+                        contentType: 'text',
+                        isRequired: true,
+                        isMultiline: true,
+                        defaultValue: `${iconBox2 && iconBox2.description}`,
+                        dbName: 'icon_box_2_description',
+                        readOnly: false
+                      },
+                    ]
+                  },
+                  {
+                    label: 'Icon Box 3',
+                    fieldType: 'Section',
+                    children: [
+                      {
+                        name: 'icon_box_3_title',
+                        label: 'Title on Icon Box 1',
+                        placeholder: 'eg. Take Action',
+                        fieldType: 'TextField',
+                        contentType: 'text',
+                        isRequired: false,
+                        defaultValue: `${iconBox3 && iconBox3.title}`,
+                        dbName: 'icon_box_3_title',
+                        readOnly: false
+                      },
+                      {
+                        name: 'icon_box_3_icon',
+                        label: 'Put an icon Name: (select from ...)',
+                        placeholder: 'eg. 100',
+                        fieldType: 'TextField',
+                        contentType: 'text',
+                        isRequired: false,
+                        defaultValue: `${iconBox3 && iconBox3.icon}`,
+                        dbName: 'icon_box_3_icon',
+                        readOnly: false
+                      },
+                      {
+                        name: 'icon_box_3_link',
+                        label: 'Url: When someone clicks, where should it go?',
+                        placeholder: 'eg. 100',
+                        fieldType: 'TextField',
+                        contentType: 'text',
+                        isRequired: false,
+                        defaultValue: `${iconBox3 && iconBox3.link}`,
+                        dbName: 'icon_box_3_link',
+                        readOnly: false
+                      },
+                      {
+                        name: 'icon_box_3_description',
+                        label: 'Short description the card (no more than 20 characters)',
+                        placeholder: 'Tell us more ...',
+                        fieldType: 'TextField',
+                        contentType: 'text',
+                        isRequired: true,
+                        isMultiline: true,
+                        defaultValue: `${iconBox3 && iconBox3.description}`,
+                        dbName: 'icon_box_3_description',
+                        readOnly: false
+                      },
+                    ]
+                  },
+                  {
+                    label: 'Icon Box 4',
+                    fieldType: 'Section',
+                    children: [
+                      {
+                        name: 'icon_box_4_title',
+                        label: 'Title on Icon Box 1',
+                        placeholder: 'eg. Take Action',
+                        fieldType: 'TextField',
+                        contentType: 'text',
+                        isRequired: false,
+                        defaultValue: `${iconBox4 && iconBox4.title}`,
+                        dbName: 'icon_box_4_title',
+                        readOnly: false
+                      },
+                      {
+                        name: 'icon_box_4_icon',
+                        label: 'Put an icon Name: (select from ...)',
+                        placeholder: 'eg. 100',
+                        fieldType: 'TextField',
+                        contentType: 'text',
+                        isRequired: false,
+                        defaultValue: `${iconBox4 && iconBox4.icon}`,
+                        dbName: 'icon_box_4_icon',
+                        readOnly: false
+                      },
+                      {
+                        name: 'icon_box_4_link',
+                        label: 'Url: When someone clicks, where should it go?',
+                        placeholder: 'eg. 100',
+                        fieldType: 'TextField',
+                        contentType: 'text',
+                        isRequired: false,
+                        defaultValue: `${iconBox4 && iconBox4.link}`,
+                        dbName: 'icon_box_4_link',
+                        readOnly: false
+                      },
+                      {
+                        name: 'icon_box_1_description',
+                        label: 'Short description the card (no more than 20 characters)',
+                        placeholder: 'Tell us more ...',
+                        fieldType: 'TextField',
+                        contentType: 'text',
+                        isRequired: true,
+                        isMultiline: true,
+                        defaultValue: `${iconBox4 && iconBox4.description}`,
+                        dbName: 'icon_box_4_description',
+                        readOnly: false
+                      },
+                    ]
+                  },
+                ]
+              }
+            },
+          ]
+        },
+      ]
+    };
+    return formJson;
+  }
+
+
   render() {
-    const trueBool = true;
-    const {
-      classes,
-      handleSubmit,
-      pristine,
-      reset,
-      submitting,
-      init,
-      clear
-    } = this.props;
+    const { classes } = this.props;
+    const { formJson } = this.state;
+    if (!formJson) return (<div>Hold tight! Retrieving your data ...</div>);
     return (
       <div>
-        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
-              <Typography variant="h5" component="h3">
-                Community Onboarding Form
-              </Typography>
-              <Typography component="p">
-                The delay between when you click (Submit) and when the alert dialog pops up is intentional, to simulate server latency.
-              </Typography>
-              <div className={classes.buttonInit}>
-                <Button onClick={() => init(initData)} color="secondary" type="button">
-                  Load Sample Data
-                </Button>
-                <Button onClick={() => clear()} type="button">
-                  Clear Data
-                </Button>
-              </div>
-              <form onSubmit={handleSubmit}>
-                <div>
-                  <Field
-                    name="text"
-                    component={TextField}
-                    placeholder="Text Field"
-                    label="Text Field"
-                    validate={required}
-                    required
-                    ref={this.saveRef}
-                    className={classes.field}
-                  />
-                </div>
-                <div>
-                  <Field
-                    name="email"
-                    component={TextField}
-                    placeholder="Email Field"
-                    label="Email"
-                    required
-                    validate={[required, email]}
-                    className={classes.field}
-                  />
-                </div>
-                <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Choose One Option</FormLabel>
-                  <Field name="radio" className={classes.inlineWrap} component={renderRadioGroup}>
-                    <FormControlLabel value="option1" control={<Radio />} label="Option 1" />
-                    <FormControlLabel value="option2" control={<Radio />} label="Option 2" />
-                  </Field>
-                </div>
-                <div>
-                  <FormControl className={classes.field}>
-                    <InputLabel htmlFor="selection">Selection</InputLabel>
-                    <Field
-                      name="selection"
-                      component={Select}
-                      placeholder="Selection"
-                      autoWidth={trueBool}
-                    >
-                      <MenuItem value="option1">Option One</MenuItem>
-                      <MenuItem value="option2">Option Two</MenuItem>
-                      <MenuItem value="option3">Option Three</MenuItem>
-                    </Field>
-                  </FormControl>
-                </div>
-                <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Toggle Input</FormLabel>
-                  <div className={classes.inlineWrap}>
-                    <FormControlLabel control={<Field name="onof" component={Switch} />} label="On/OF Switch" />
-                    <FormControlLabel control={<Field name="checkbox" component={Checkbox} />} label="Checkbox" />
-                  </div>
-                </div>
-                <div className={classes.field}>
-                  <Field
-                    name="textarea"
-                    className={classes.field}
-                    component={TextField}
-                    placeholder="Textarea"
-                    label="Textarea"
-                    multiline={trueBool}
-                    rows={4}
-                  />
-                </div>
-                <div>
-                  <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
-                    Submit
-                  </Button>
-                  <Button
-                    type="button"
-                    disabled={pristine || submitting}
-                    onClick={reset}
-                  >
-                    Reset
-                  </Button>
-                </div>
-              </form>
-            </Paper>
-          </Grid>
-        </Grid>
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+        />
       </div>
     );
   }
 }
 
-renderRadioGroup.propTypes = {
-  input: PropTypes.object.isRequired,
-};
-
-HomePageForm.propTypes = {
+HomePageEditForm.propTypes = {
   classes: PropTypes.object.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
-  reset: PropTypes.func.isRequired,
-  pristine: PropTypes.bool.isRequired,
-  submitting: PropTypes.bool.isRequired,
-  init: PropTypes.func.isRequired,
-  clear: PropTypes.func.isRequired,
 };
 
-const mapDispatchToProps = dispatch => ({
-  init: bindActionCreators(initAction, dispatch),
-  clear: () => dispatch(clearAction),
-});
 
-const ReduxFormMapped = reduxForm({
-  form: 'immutableExample',
-  enableReinitialize: true,
-})(HomePageForm);
-
-const reducer = 'initval';
-const FormInit = connect(
-  state => ({
-    force: state,
-    initialValues: state.getIn([reducer, 'formValues'])
-  }),
-  mapDispatchToProps,
-)(ReduxFormMapped);
-
-export default withStyles(styles)(FormInit);
+export default withStyles(styles, { withTheme: true })(HomePageEditForm);
