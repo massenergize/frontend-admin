@@ -196,7 +196,7 @@ class CreateNewCommunityForm extends Component {
               fieldType: 'Radio',
               isRequired: false,
               defaultValue: 'true',
-              dbName: 'is_published',
+              dbName: 'is_approved',
               readOnly: false,
               data: [
                 { id: 'false', value: 'No' },
