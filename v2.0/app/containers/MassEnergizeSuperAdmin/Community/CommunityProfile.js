@@ -13,7 +13,7 @@ import Favorite from '@material-ui/icons/Favorite';
 import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
 import Message from '@material-ui/icons/Message';
 import InsertChart from '@material-ui/icons/InsertChart';
-// import BarChart from '@material-ui/icons/BarChart';
+import { Link } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -48,7 +48,8 @@ class CommunityProfile extends React.Component {
     super(props);
     this.state = {
       value: 0,
-      community: {}
+      community: {},
+      id: null
     };
   }
 
@@ -121,16 +122,29 @@ class CommunityProfile extends React.Component {
               centered
             >
               <Tab icon={<AccountCircle />} label="ABOUT" />
-              {/* <Tab icon={<InsertChart />} label="Impact" /> */}
               <Tab icon={<SupervisorAccount />} label="USERS" />
               <Tab icon={<Message />} label="Events & TESTIMONIALS" />
+              <Tab icon={<InsertChart />} label="Pages" />
             </Tabs>
           </Hidden>
         </AppBar>
         {value === 0 && <TabContainer><About data={dataProps} community={community} /></TabContainer>}
-        {/* {value === 1 && <TabContainer><Albums data={[community.actions]} /></TabContainer>} */}
         {value === 1 && <TabContainer><Connection data={{ users: community.users, avatar: dummy.user.avatar }} /></TabContainer>}
         {value === 2 && <TabContainer><Favorites data={{ testimonials: community.testimonials, events: community.events }} /></TabContainer>}
+        {value === 3 
+          && (
+            <TabContainer>
+              <h1>Edit Pages</h1>
+              <ul>
+                <li><Link to={`/admin/edit/${community.id}/home`}>Home Page</Link></li>
+                <li><Link to={`/admin/edit/${community.id}/all-actions`}>All Actions Page</Link></li>
+                <li><Link to={`/admin/edit/${community.id}/about`}>About Us Page</Link></li>
+                <li><Link to={`/admin/edit/${community.id}/contact_us`}>Contact Us Page</Link></li>
+                <li><Link to={`/admin/edit/${community.id}/donate`}>Donate Page</Link></li>
+              </ul>
+            </TabContainer>
+          )}
+
       </div>
     );
   }

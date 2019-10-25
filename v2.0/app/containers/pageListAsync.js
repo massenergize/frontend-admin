@@ -2,7 +2,7 @@ import React from 'react';
 import Loading from 'dan-components/Loading';
 import loadable from '../utils/loadable';
 
-export const SuperHome = loadable(() => import('./Pages/CustomPages/AdminEditHome'), {
+export const SuperHome = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Home'), {
   fallback: <Loading />,
 });
 export const SuperAllActions = loadable(() => import('./MassEnergizeSuperAdmin/Pages/AllActions'), {

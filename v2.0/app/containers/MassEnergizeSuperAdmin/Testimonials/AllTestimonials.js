@@ -5,6 +5,17 @@ import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
 import { PapperBlock } from 'dan-components';
 import imgApi from 'dan-api/images/photos';
+
+import MUIDataTable from 'mui-datatables';
+// import FileCopy from '@material-ui/icons/FileCopy';
+import EditIcon from '@material-ui/icons/Edit';
+import { Link } from 'react-router-dom';
+import Avatar from '@material-ui/core/Avatar';
+
+import Paper from '@material-ui/core/Paper';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Grid from '@material-ui/core/Grid';
+
 import classNames from 'classnames';
 import Typography from '@material-ui/core/Typography';
 import Table from '@material-ui/core/Table';
@@ -13,22 +24,45 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Chip from '@material-ui/core/Chip';
-import Avatar from '@material-ui/core/Avatar';
-import Icon from '@material-ui/core/Icon';
+// import Avatar from '@material-ui/core/Avatar';
+// import Icon from '@material-ui/core/Icon';
 import messageStyles from 'dan-styles/Messages.scss';
-import { fetchData } from '../../../utils/messenger';
+import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
 
 
 class AllTestimonials extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { testimonials: [] };
+    this.state = {
+      columns: this.getColumns(),
+      data: [],
+      loading: true
+    };
   }
 
   async componentDidMount() {
-    const response = await fetchData('v2/testimonials');
-    await this.setStateAsync({ testimonials: response.data });
+    const allTestimonialsResponse = await apiCall('/testimonials.listForSuperAdmin');
+
+    if (allTestimonialsResponse && allTestimonialsResponse.success) {
+      const data = allTestimonialsResponse.data.map(d => (
+        [
+          {
+            id: d.id,
+            image: d.image,
+            initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
+          },
+          `${d.title}...`.substring(0, 30), // limit to first 30 chars
+          `${d.body}...`.substring(0, 30), // limit to first 30 chars
+          `${d.user ? d.user.full_name : ''}...`.substring(0, 20), // limit to first 20 chars
+          `${d.action ? d.action.title : ''} ${d.action && d.action.community ? ` -  (${d.action.community.name})` : ''}`,
+          `${d.is_published && d.is_approved ? 'Live' : 'Not Live'}`,
+          d.id
+        ]
+      ));
+      await this.setStateAsync({ data, loading: false });
+    // await this.setStateAsync({ communities: response.data });
+    }
   }
 
   setStateAsync(state) {
@@ -45,6 +79,90 @@ class AllTestimonials extends React.Component {
     }
   };
 
+
+  getColumns = () => [
+    {
+      name: 'id',
+      key: 'id',
+      options: {
+        filter: false,
+        download: false,
+        customBodyRender: (d) => (
+          <div>
+            {d.image
+              && <Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} />
+            }
+            {!d.image
+              && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
+            }
+          </div>
+        )
+      }
+    },
+    {
+      name: 'Title',
+      key: 'title',
+      options: {
+        filter: true,
+      }
+    },
+    {
+      name: 'About',
+      key: 'about',
+      options: {
+        filter: false,
+      }
+    },
+    {
+      name: 'User',
+      key: 'user',
+      options: {
+        filter: true,
+      }
+    },
+    {
+      name: 'Action',
+      key: 'action',
+      options: {
+        filter: true,
+      }
+    },
+    {
+      name: 'Is it Live? (Published & Approved',
+      key: 'is_published',
+      options: {
+        filter: true,
+      }
+    },
+    {
+      name: 'Edit? Copy?',
+      key: 'edit_or_copy',
+      options: {
+        filter: false,
+        download: false,
+        customBodyRender: (id) => (
+          <div>
+            <Link to={`/admin/testimonial/${id}/edit`}>
+              <EditIcon size="small" variant="outlined" color="secondary" />
+            </Link>
+            &nbsp;&nbsp;
+            {/* <Link
+              onClick={async () => {
+                const copiedActionResponse = await apiCall('/actions.copy', { action_id: id });
+                if (copiedActionResponse && copiedActionResponse.success) {
+                  const newAction = copiedActionResponse && copiedActionResponse.data;
+                  window.location.href = `/admin/edit/${newAction.id}/action`;
+                }
+              }}
+              to="/admin/read/actions"
+            >
+              <FileCopy size="small" variant="outlined" color="secondary" />
+            </Link> */}
+          </div>
+        )
+      }
+    },
+  ]
 
 
   renderTable = (data, classes) => (
@@ -106,8 +224,40 @@ class AllTestimonials extends React.Component {
   render() {
     const title = brand.name + ' - All Testimonials';
     const description = brand.desc;
-    const { testimonials } = this.state;
+    const { data, columns, loading } = this.state;
     const { classes } = this.props;
+
+    const options = {
+      filterType: 'dropdown',
+      responsive: 'stacked',
+      print: true,
+      rowsPerPage: 10,
+      onRowsDelete: (rowsDeleted) => {
+        const idsToDelete = rowsDeleted.data;
+        idsToDelete.forEach(d => {
+          const testimonialId = data[d.index][0].id;
+          apiCall('/testimonials.delete', { testimonial_id: testimonialId });
+        });
+      }
+    };
+
+    if (loading) {
+      return (
+        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+          <Grid item xs={12} md={6}>
+            <Paper className={classes.root}>
+              <div className={classes.root}>
+                <LinearProgress />
+                <h1>Fetching all Testimonials.  This may take a while...</h1>
+                <br />
+                <LinearProgress color="secondary" />
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      );
+    }
+
     return (
       <div>
         <Helmet>
@@ -118,7 +268,14 @@ class AllTestimonials extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        {this.renderTable(testimonials, classes)}
+        <div className={classes.table}>
+          <MUIDataTable
+            title="All Communities"
+            data={data}
+            columns={columns}
+            options={options}
+          />
+        </div>
       </div>
     );
   }

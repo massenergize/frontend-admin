@@ -82,6 +82,17 @@ class CreateNewVendorForm extends Component {
               readOnly: false
             },
             {
+              name: 'email',
+              label: 'Primary Email of this vendor',
+              placeholder: 'eg. abc@gmail.com',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: '',
+              dbName: 'email',
+              readOnly: false
+            },
+            {
               name: 'description',
               label: 'Tell us about what you do',
               placeholder: 'Tell us more ...',
@@ -190,14 +201,14 @@ class CreateNewVendorForm extends Component {
                 valueToCheck: 'statewide',
                 fields: [
                   {
-                    name: 'service_area_state',
-                    label: 'Which State?',
+                    name: 'service_area_states',
+                    label: 'Which States? Separate them by commas',
                     placeholder: 'eg. New York',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: true,
                     defaultValue: '',
-                    dbName: 'service_area_state',
+                    dbName: 'service_area_states',
                     readOnly: false
                   },
                 ]
@@ -226,7 +237,7 @@ class CreateNewVendorForm extends Component {
           fieldType: 'Section',
           children: [
             {
-              name: 'contact_person_name',
+              name: 'key_contact_full_name',
               label: 'Contact Person\'s Full Name',
               placeholder: 'eg. Ellen Tohn',
               fieldType: 'TextField',
@@ -237,14 +248,14 @@ class CreateNewVendorForm extends Component {
               readOnly: false
             },
             {
-              name: 'contact_person_name',
+              name: 'key_contact_email',
               label: 'Contact Person\'s Email (this person should already have an account with us)',
               placeholder: 'eg. etohn@comcast.net',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
               defaultValue: '',
-              dbName: 'owner_email',
+              dbName: 'key_contact_email',
               readOnly: false
             },
           ]
