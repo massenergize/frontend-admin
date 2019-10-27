@@ -61,6 +61,7 @@ class SummaryDashboard extends PureComponent {
       <div>
         <Helmet>
           <title>{title}</title>
+         
           <meta name="description" content={description} />
           <meta property="og:title" content={title} />
           <meta property="og:description" content={description} />
@@ -68,6 +69,7 @@ class SummaryDashboard extends PureComponent {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <Grid container className={classes.root}>
+        <button onClick = {()=>{this.props.signOut()}}>Signout</button>
           <CounterChartWidget />
         </Grid>
         <Divider className={classes.divider} />

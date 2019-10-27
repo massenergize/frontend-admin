@@ -7,12 +7,15 @@ import { withStyles } from '@material-ui/core/styles';
 import { LoginForm } from 'dan-components';
 import styles from 'dan-components/Forms/user-jss';
 import { sendJson } from '../../../utils/messenger';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import purple from '@material-ui/core/colors/purple';
 // import { bindActionCreators } from 'redux';
 
 class Login extends React.Component {
   submitForm = (values) => {
     sendJson(values.entries(), '/v2/users', '/admin');
   }
+
 
   render() {
     const title = brand.name + ' - Login';
@@ -31,6 +34,7 @@ class Login extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
+        
         <div className={classes.container}>
           <div className={classes.userFormWrap}>
             <LoginForm

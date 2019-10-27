@@ -33,8 +33,8 @@ class Application extends React.Component {
     return (
       <Dashboard history={history} changeMode={changeMode}>
         <Switch>
-          <Route exact path="/dash-summary" component={DashboardSummaryPage} />
-          <Route exact path="/admin" component={DashboardSummaryPage} />
+          <Route exact path="/" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
+          <Route exact path="/admin" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
           <Route exact path="/blank" component={BlankPage} />
           <Route path="/admin/dashboard" component={DashboardSummaryPage} />
 

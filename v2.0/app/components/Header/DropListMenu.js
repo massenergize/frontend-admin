@@ -157,7 +157,7 @@ const reducer = 'ui';
 const mapStateToProps = state => ({
   force: state, // force active class for sidebar menu
   open: state.getIn([reducer, 'subMenuOpen'])
-});
+}); 
 
 const mapDispatchToProps = dispatch => ({
   openSubMenu: bindActionCreators(openAction, dispatch),

@@ -1,18 +1,33 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import NotFound from 'containers/Pages/Standalone/NotFoundDedicated';
 import Auth from './Auth';
 import Application from './Application';
 import LoginDedicated from '../Pages/Standalone/LoginDedicated';
 import ThemeWrapper, { AppContext } from './ThemeWrapper';
 import firebase, { googleProvider, facebookProvider } from './fire-config';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { redLoadUser } from './../../components/Forms/ReduxAuthActions';
+import { apiCall } from './../../utils/messenger';
+import ProtectedRoutes from './ProtectedRoutes';
 window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
 
+const UNSET = "UNSET";
+const localUser = localStorage.getItem('authUser');
+// check local storage to see if user exists, 
+//while checking onAuthStateChanged with firebase, 
+//if local storage is positive, move on the the homepage, 
+//if firebase is positive, replace the localStorage with firebase return value 
+// if all is negative, redirect to login 
+//while logging in, save user to local storage  
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { user: null, error: null };
-
+    this.state = {
+      user: localUser ? JSON.parse(localUser) : null,
+      error: null
+    };
     this.signOut = this.signOut.bind(this);
     this.loginWithFacebook = this.loginWithFacebook.bind(this);
     this.loginWithGoogle = this.loginWithGoogle.bind(this);
@@ -26,12 +41,15 @@ class App extends React.Component {
 
   signOut = () => {
     firebase.auth().signOut().then(() => {
+      localStorage.removeItem("authUser");
       this.setState({ user: null, error: null });
+      console.log("I ahve signed out");
     });
   }
 
   loginWithFacebook = () => {
     firebase.auth().signInWithPopup(facebookProvider).then(res => {
+      localStorage.setItem('authUser', JSON.stringify(res.user));
       this.setState({ user: res.user });
     })
       .catch(err => {
@@ -42,6 +60,15 @@ class App extends React.Component {
 
   loginWithGoogle = () => {
     firebase.auth().signInWithPopup(googleProvider).then(res => {
+      const body = {
+        accessToken:res.accessToken, 
+        email: res.user.email,
+        idToken: res.idToken
+      }
+      apiCall("/auth.verify",body).then(u =>{
+        console.log(u);
+      })
+      localStorage.setItem('authUser', JSON.stringify(res.user));
       this.setState({ user: res.user });
     })
       .catch(err => {
@@ -60,23 +87,21 @@ class App extends React.Component {
       });
   }
 
-  redirectIfUser = (user) => {
-    if (user) {
-      window.location = '/dash-summary';
-    }
+  getAuthenticatedUserProfile = () => {
+
   }
 
   authListener() {
-    const { user } = this.state;
     if (firebase) {
       firebase.auth().onAuthStateChanged(u => {
-        if (u && !user) {
-          this.setState({ user });
+        if (u) {
+          console.log("I am the listen", u);
+          localStorage.setItem('authUser', JSON.stringify(u));
+          this.setState({ user: u });
         }
       });
     }
   }
-
 
   render() {
     const { user, error } = this.state;
@@ -86,7 +111,6 @@ class App extends React.Component {
         <AppContext.Consumer>
           {(changeMode) => (
             <Switch>
-
               <Route
                 path="/login"
                 exact
@@ -117,12 +141,14 @@ class App extends React.Component {
                   />
                 )}
               />
+
+
               {/* <Route path="/login" exact render={(props) => <LoginDedicated {...props} signOutFxn={this.signOut.bind(this)} user={this.state.user} error={this.state.error} normalLoginFxn={this.normalLogin.bind(this)} loginWithFacebookFxn={this.loginWithFacebook.bind(this)} loginWithGoogleFxn={this.loginWithGoogle.bind(this)} />} /> */}
               {user
                 && (
                   <Route
                     path="/"
-                    render={(props) => <Application {...props} changeMode={changeMode} />}
+                    render={(props) => <Application {...props} changeMode={changeMode} signOut = {this.signOut} />}
                   />
                 )
               }
@@ -146,10 +172,9 @@ class App extends React.Component {
                 )
               }
 
-
               <Route
                 path="/admin"
-                render={(props) => <Application {...props} changeMode={changeMode} />}
+                render={(props) => <Application {...props} changeMode={changeMode} signOut = {this.signOut}/>}
               />
               <Route component={Auth} />
               <Route component={NotFound} />
@@ -161,4 +186,15 @@ class App extends React.Component {
   }
 }
 
-export default App;
+function mapStateToProps(state) {
+  return {
+    auth: state.auth
+  }
+};
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    sendToRedux: redLoadUser
+  }, dispatch);
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
