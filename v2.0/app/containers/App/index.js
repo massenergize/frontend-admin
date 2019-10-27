@@ -8,12 +8,11 @@ import ThemeWrapper, { AppContext } from './ThemeWrapper';
 import firebase, { googleProvider, facebookProvider } from './fire-config';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { redLoadUser } from './../../components/Forms/ReduxAuthActions';
+//import { redLoadUser } from './../../components/Forms/ReduxAuthActions';
 import { apiCall } from './../../utils/messenger';
-import ProtectedRoutes from './ProtectedRoutes';
 window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
+import {reduxCallIdToken} from './../../../app/redux/redux-actions/adminActions';
 
-const UNSET = "UNSET";
 const localUser = localStorage.getItem('authUser');
 // check local storage to see if user exists, 
 //while checking onAuthStateChanged with firebase, 
@@ -42,8 +41,9 @@ class App extends React.Component {
   signOut = () => {
     firebase.auth().signOut().then(() => {
       localStorage.removeItem("authUser");
+      localStorage.removeItem("idToken");
       this.setState({ user: null, error: null });
-      console.log("I ahve signed out");
+      console.log("I have signed out");
     });
   }
 
@@ -60,17 +60,14 @@ class App extends React.Component {
 
   loginWithGoogle = () => {
     firebase.auth().signInWithPopup(googleProvider).then(res => {
-      const body = {
-        accessToken:res.accessToken, 
-        email: res.user.email,
-        idToken: res.idToken
-      }
-      apiCall("/auth.verify",body).then(u =>{
-        console.log(u);
-      })
+      
+      apiCall("/auth.verify").then(u =>{
+        console.log("I am the user profile",u);
+      });
       localStorage.setItem('authUser', JSON.stringify(res.user));
+      localStorage.setItem('idToken', JSON.stringify(idToken));
       this.setState({ user: res.user });
-    })
+    }) 
       .catch(err => {
         console.log('Error', err);
         this.setState({ error: err });
@@ -91,12 +88,27 @@ class App extends React.Component {
 
   }
 
+  getIDToken(){
+    if(firebase){
+      firebase.auth().currentUser.getIdToken(true).then(token =>{
+        console.log("I am the token",token);
+        localStorage.setItem('idToken',token.toString()); 
+        //set it to redux
+      })
+      .catch(err=>{
+        localStorage.setItem('idToken','null'); 
+        console.log(err);
+      })
+    }
+  }
   authListener() {
     if (firebase) {
       firebase.auth().onAuthStateChanged(u => {
+        this.props.reduxCallIdToken();
         if (u) {
           console.log("I am the listen", u);
           localStorage.setItem('authUser', JSON.stringify(u));
+          //will be removed later
           this.setState({ user: u });
         }
       });
@@ -169,13 +181,13 @@ class App extends React.Component {
                       />
                     )}
                   />
-                )
+                ) 
               }
-
-              <Route
+ 
+              {/* <Route
                 path="/admin"
                 render={(props) => <Application {...props} changeMode={changeMode} signOut = {this.signOut}/>}
-              />
+              /> */}
               <Route component={Auth} />
               <Route component={NotFound} />
             </Switch>
@@ -193,7 +205,7 @@ function mapStateToProps(state) {
 };
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
-    sendToRedux: redLoadUser
+    reduxCallIdToken: reduxCallIdToken
   }, dispatch);
 };
 

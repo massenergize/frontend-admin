@@ -1,6 +1,6 @@
 import { Map, fromJS } from 'immutable';
 import { START_UP } from '../../actions/actionConstants';
-
+import { LOAD_ALL_COMMUNITIES,LOAD_AUTH_ADMIN,LOAD_AUTH_TOKEN,LOAD_ID_TOKEN, SELECTED_COMMUNITY} from './../ReduxConstants';
 
 const initialState = Map({
   constants: {
@@ -20,3 +20,51 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+
+export const communitiesReducer = (state = null, action ={})=>{
+  switch (action.type) {
+    case LOAD_ALL_COMMUNITIES:
+        return action.payload;
+      return state;
+  
+    default:
+      return state;
+  }
+}
+export const authAdminReducer = (state = null, action ={})=>{
+  switch (action.type) {
+    case LOAD_AUTH_ADMIN:
+        return action.payload;
+      return state;
+  
+    default:
+      return state;
+  }
+}
+export const tokenReducer = (state = null, action ={})=>{
+  switch (action.type) {
+    case LOAD_ID_TOKEN:
+        return action.payload;
+      return state;
+  
+    default:
+      return state;
+  }
+}
+export const selectedCommunityReducer = (state = null, action ={})=>{
+  switch (action.type) {
+    case SELECTED_COMMUNITY:
+        return action.payload;
+      return state;
+  
+    default:
+      return state;
+  }
+}
+
+
+export const allReducers = { 
+  communities: communitiesReducer
+}
+
+

@@ -1,4 +1,4 @@
-import { fetchData, formForJokes } from './../../../utils/messenger'; 
+import { fetchData, formForJokes, apiCall } from './../../../utils/messenger'; 
 
 const iconTextDefaults = {
   events:{
@@ -28,10 +28,15 @@ const iconTextDefaults = {
  async function immediateGraphQuest(community_id){
   return await fetchData(`v2/data?community=${community_id}`);
 }
+
+async function v3AllCommunities(){
+  return await apiCall('/communities.list');
+}
 export {
   allCommunities,
   immediateEventQuest,
   immediateGraphQuest,
   formForJokes, 
-  iconTextDefaults
+  iconTextDefaults, 
+  v3AllCommunities,
 }

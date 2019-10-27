@@ -1,7 +1,10 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
 import { Switch, Route } from 'react-router-dom';
+import {connect} from 'react-redux'; 
+import { bindActionCreators } from 'redux';
 import Dashboard from '../Templates/Dashboard';
+import {reduxCallCommunities} from './../../redux/redux-actions/adminActions';
 import {
   Parent,
   DashboardSummaryPage,
@@ -28,6 +31,9 @@ import {
 
 class Application extends React.Component {
   
+  componentWillMount() {
+    this.props.reduxCallCommunities();
+  }
   render() {
     const { changeMode, history } = this.props;
     return (
@@ -110,4 +116,9 @@ Application.propTypes = {
   history: PropTypes.object.isRequired,
 };
 
-export default Application;
+function mapDispatchToProps(dispatch){
+  return bindActionCreators({
+    reduxCallCommunities: reduxCallCommunities
+  },dispatch);
+}
+export default connect(null,mapDispatchToProps)(Application);

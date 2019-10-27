@@ -91,7 +91,11 @@ class Cover extends React.Component {
           <Typography className={classes.subheading} gutterBottom>
             {desc}
           </Typography>
+          <Button variant="outlined" color="secondary" style={{background:'white',marginBottom:8}} className={classes.button}>
+              Go Live
+            </Button><br/>
           <a
+          style={{color:'white'}}
             className={classes.button}
             href={community ? `http://${community.subdomain}.massenergize.org` : '#'}
             target="_blank"

@@ -77,7 +77,6 @@ class CommunityProfile extends React.Component {
     const description = brand.desc;
     const { dataProps, classes } = this.props;
     const { value, community } = this.state;
-    console.log(community);
 
     return (
       <div>
