@@ -93,7 +93,7 @@ class Cover extends React.Component {
           </Typography>
           <a
             className={classes.button}
-            href={community ? `http://${community.subdomain}.massenergize.org` : '#'}
+            href={community ? `http://community.massenergize.org/${community.subdomain}` : '#'}
             target="_blank"
             rel="noopener noreferrer"
             size="large"

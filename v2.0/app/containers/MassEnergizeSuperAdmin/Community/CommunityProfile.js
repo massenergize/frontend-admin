@@ -131,7 +131,7 @@ class CommunityProfile extends React.Component {
         {value === 0 && <TabContainer><About data={dataProps} community={community} /></TabContainer>}
         {value === 1 && <TabContainer><Connection data={{ users: community.users, avatar: dummy.user.avatar }} /></TabContainer>}
         {value === 2 && <TabContainer><Favorites data={{ testimonials: community.testimonials, events: community.events }} /></TabContainer>}
-        {value === 3 
+        {value === 3
           && (
             <TabContainer>
               <h1>Edit Pages</h1>

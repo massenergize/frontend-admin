@@ -141,7 +141,7 @@ class EditCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: `${community.location ? community.location.address : ''}`,
+                    defaultValue: `${community.location && community.location.address ? community.location.address : ''}`,
                     dbName: 'address',
                     readOnly: false
                   },
@@ -152,7 +152,7 @@ class EditCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: `${community.location ? community.location.unit : ''}`,
+                    defaultValue: `${community.location && community.location.unit ? community.location.unit : ''}`,
                     dbName: 'unit',
                     readOnly: false
                   },
@@ -163,7 +163,7 @@ class EditCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: `${community.location ? community.location.city : ''}`,
+                    defaultValue: `${community.location && community.location.city ? community.location.city : ''}`,
                     dbName: 'city',
                     readOnly: false
                   },
@@ -174,7 +174,7 @@ class EditCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: `${community.location ? community.location.state : ''}`,
+                    defaultValue: `${community.location && community.location.state ? community.location.state : ''}`,
                     dbName: 'state',
                     readOnly: false
                   },
@@ -185,7 +185,7 @@ class EditCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: `${community.location ? community.location.zipcode : ''}`,
+                    defaultValue: `${community.location && community.location.zipcode ? community.location.zipcode : ''}`,
                     dbName: 'zipcode',
                     readOnly: false
                   },
@@ -196,7 +196,7 @@ class EditCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: `${community.location ? community.location.country : ''}`,
+                    defaultValue: `${community.location && community.location.country ? community.location.country : ''}`,
                     dbName: 'country',
                     readOnly: false
                   },
