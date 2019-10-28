@@ -14,11 +14,13 @@ import { API_HOST } from '../config/constants';
  * band-with and being faster in general while avoiding CORS issues.
  */
 export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = null) {
+  // insert idToken from redux store here
   const response = await fetch(`${API_HOST}/v3${destinationUrl}`, {
     credentials: 'include',
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
+      // Authorization: `Bearer ${idToken}`
     },
     body: qs.stringify(dataToSend)
   });
@@ -45,7 +47,7 @@ export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = 
  * general while avoiding CORS issues.
  */
 export async function apiCallWithMedia(destinationUrl, dataToSend = {}, relocationPage = null) {
-  console.log(dataToSend)
+  console.log(dataToSend);
   const formData = new FormData();
   Object.keys(dataToSend).map(k => (formData.append(k, dataToSend[k])));
 

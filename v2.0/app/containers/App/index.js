@@ -80,6 +80,7 @@ class App extends React.Component {
 
   render() {
     const { user, error } = this.state;
+    console.log(user)
 
     return (
       <ThemeWrapper>
