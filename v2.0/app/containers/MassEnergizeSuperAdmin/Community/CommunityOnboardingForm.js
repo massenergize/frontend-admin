@@ -160,7 +160,7 @@ class CreateNewCommunityForm extends Component {
                     contentType: 'text',
                     isRequired: false,
                     defaultValue: '',
-                    dbName: 'state',
+                    dbName: 'zipcode',
                     readOnly: false
                   },
                   {

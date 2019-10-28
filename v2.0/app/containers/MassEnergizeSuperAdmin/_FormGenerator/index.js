@@ -333,7 +333,7 @@ class MassEnergizeForm extends Component {
       // const initialFormData = this.initialFormData(formJson.fields);
       // await this.setStateAsync({ formJson, formData });
       await this.setStateAsync({
-        successMsg: `Successfully Created the Resource with Id: ${response.data.id}. Want to Create a new one?  Modify the fields`,
+        successMsg: `Successfully Created/Updated the Resource with Id: ${response.data.id}.`,
         error: null,
         startCircularSpinner: false,
         // formData: initialFormData
