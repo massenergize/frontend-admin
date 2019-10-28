@@ -106,6 +106,10 @@ class MassEnergizeForm extends Component {
             formData[field.name] = [];
             break;
           case FieldTypes.HTMLField:
+            if (!field.defaultValue || field.defaultValue === '<p></p>\n') {
+              formData[field.name] = EditorState.createEmpty();
+              break;
+            }
             formData[field.name] = (field.defaultValue && EditorState.createWithContent(
               ContentState.createFromBlockArray(
                 convertFromHTML(field.defaultValue)

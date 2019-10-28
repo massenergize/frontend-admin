@@ -30,7 +30,6 @@ class AllActions extends React.Component {
 
   async componentDidMount() {
     const allActionsResponse = await apiCall('/actions.listForSuperAdmin');
-
     if (allActionsResponse && allActionsResponse.success) {
       const data = allActionsResponse.data.map(d => (
         [
@@ -40,7 +39,7 @@ class AllActions extends React.Component {
             initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
           },
           `${d.title}...`.substring(0, 30), // limit to first 30 chars
-          `${d.about}...`.substring(0, 20), // limit to first 20 chars
+          `${d.featured_summary || 'No summary Provided'}...`.substring(0, 20), // limit to first 20 chars
           `${d.tags.map(t => t.name).join(', ')} `,
           d.community && d.community.name,
           d.id
@@ -83,8 +82,8 @@ class AllActions extends React.Component {
       }
     },
     {
-      name: 'About',
-      key: 'about',
+      name: 'Featured Summary',
+      key: 'summary',
       options: {
         filter: false,
       }
