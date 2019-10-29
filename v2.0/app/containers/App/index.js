@@ -8,18 +8,12 @@ import ThemeWrapper, { AppContext } from './ThemeWrapper';
 import firebase, { googleProvider, facebookProvider } from './fire-config';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-//import { redLoadUser } from './../../components/Forms/ReduxAuthActions';
-import { apiCall } from './../../utils/messenger';
+import { apiCall, fetchData, rawCall } from './../../utils/messenger';
 window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
-import {reduxCallIdToken} from './../../../app/redux/redux-actions/adminActions';
+import { reduxCallIdToken } from './../../../app/redux/redux-actions/adminActions';
 
 const localUser = localStorage.getItem('authUser');
-// check local storage to see if user exists, 
-//while checking onAuthStateChanged with firebase, 
-//if local storage is positive, move on the the homepage, 
-//if firebase is positive, replace the localStorage with firebase return value 
-// if all is negative, redirect to login 
-//while logging in, save user to local storage  
+ 
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -35,7 +29,7 @@ class App extends React.Component {
 
 
   componentDidMount() {
-    this.authListener();
+    //this.authListener();
   }
 
   signOut = () => {
@@ -60,14 +54,16 @@ class App extends React.Component {
 
   loginWithGoogle = () => {
     firebase.auth().signInWithPopup(googleProvider).then(res => {
-      
-      apiCall("/auth.verify").then(u =>{
-        console.log("I am the user profile",u);
+      const body = {idToken: res.user._lat};
+      rawCall("auth/verify",body).then(massToken => {
+        const idToken = massToken.data.idToken; 
+        localStorage.setItem("idToken",idToken.toString());
+        this.getAuthenticatedUserProfile(res.user.uid);
+
       });
-      localStorage.setItem('authUser', JSON.stringify(res.user));
-      localStorage.setItem('idToken', JSON.stringify(idToken));
-      this.setState({ user: res.user });
-    }) 
+      //localStorage.setItem('authUser', JSON.stringify(res.user));
+      //this.setState({ user: res.user });
+    })
       .catch(err => {
         console.log('Error', err);
         this.setState({ error: err });
@@ -83,24 +79,16 @@ class App extends React.Component {
         this.setState({ error: err });
       });
   }
+  
 
-  getAuthenticatedUserProfile = () => {
-
+  getAuthenticatedUserProfile = (user_id) => {
+    const body = {user_id: user_id}
+    console.log("i am the uuid", user_id);
+    rawCall("auth/whoami",body).then(user =>{
+      console.log("I am the user::: ",user);
+    })
   }
 
-  getIDToken(){
-    if(firebase){
-      firebase.auth().currentUser.getIdToken(true).then(token =>{
-        console.log("I am the token",token);
-        localStorage.setItem('idToken',token.toString()); 
-        //set it to redux
-      })
-      .catch(err=>{
-        localStorage.setItem('idToken','null'); 
-        console.log(err);
-      })
-    }
-  }
   authListener() {
     if (firebase) {
       firebase.auth().onAuthStateChanged(u => {
@@ -160,7 +148,7 @@ class App extends React.Component {
                 && (
                   <Route
                     path="/"
-                    render={(props) => <Application {...props} changeMode={changeMode} signOut = {this.signOut} />}
+                    render={(props) => <Application {...props} changeMode={changeMode} signOut={this.signOut} />}
                   />
                 )
               }
@@ -181,9 +169,9 @@ class App extends React.Component {
                       />
                     )}
                   />
-                ) 
+                )
               }
- 
+
               {/* <Route
                 path="/admin"
                 render={(props) => <Application {...props} changeMode={changeMode} signOut = {this.signOut}/>}

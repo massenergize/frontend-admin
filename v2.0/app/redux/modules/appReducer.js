@@ -1,6 +1,6 @@
 import { Map, fromJS } from 'immutable';
 import { START_UP } from '../../actions/actionConstants';
-import { LOAD_ALL_COMMUNITIES,LOAD_AUTH_ADMIN,LOAD_AUTH_TOKEN,LOAD_ID_TOKEN, SELECTED_COMMUNITY} from './../ReduxConstants';
+import { LOAD_ALL_COMMUNITIES,LOAD_AUTH_ADMIN,LOAD_AUTH_TOKEN,LOAD_ID_TOKEN, SELECTED_COMMUNITY, SELECTED_COMMUNITY_FULL} from './../ReduxConstants';
 
 const initialState = Map({
   constants: {
@@ -54,6 +54,16 @@ export const tokenReducer = (state = null, action ={})=>{
 export const selectedCommunityReducer = (state = null, action ={})=>{
   switch (action.type) {
     case SELECTED_COMMUNITY:
+        return action.payload;
+      return state;
+  
+    default:
+      return state;
+  }
+}
+export const fullSelectedCommunityReducer = (state = null, action ={})=>{
+  switch (action.type) {
+    case SELECTED_COMMUNITY_FULL:
         return action.payload;
       return state;
   

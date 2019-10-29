@@ -29,6 +29,7 @@ import {
   Albums
 } from './Profile';
 import { fetchData } from '../../../utils/messenger';
+import { reduxLoadSelectedCommunity, reduxCallFullCommunity, reduxLiveOrNot } from '../../../redux/redux-actions/adminActions';
 
 function TabContainer(props) {
   const { children } = props;
@@ -48,24 +49,16 @@ class CommunityProfile extends React.Component {
     super(props);
     this.state = {
       value: 0,
-      community: {},
       id: null
     };
   }
 
-
   async componentDidMount() {
     const { id } = this.props.match.params;
     if (id) {
-      const response = await fetchData(`v2/community/${id}/full`);
-      await this.setStateAsync({ community: response.data, id });
+      this.setState({ id })
+      this.props.callCommunity(id);
     }
-  }
-
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
-    });
   }
 
   handleChange = (event, value) => {
@@ -76,8 +69,8 @@ class CommunityProfile extends React.Component {
     const title = brand.name + ' - Profile';
     const description = brand.desc;
     const { dataProps, classes } = this.props;
-    const { value, community } = this.state;
-
+    const { value } = this.state;
+    const community = this.props.full_community ? this.props.full_community : {};
     return (
       <div>
         <Helmet>
@@ -89,6 +82,7 @@ class CommunityProfile extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <Cover
+          liveOrNotFxn={this.props.liveOrNot}
           coverImg={bgCover}
           avatar={community && community.logo ? community.logo.url : dummy.user.avatar}
           name={community && (community.name || '')}
@@ -130,7 +124,7 @@ class CommunityProfile extends React.Component {
         {value === 0 && <TabContainer><About data={dataProps} community={community} /></TabContainer>}
         {value === 1 && <TabContainer><Connection data={{ users: community.users, avatar: dummy.user.avatar }} /></TabContainer>}
         {value === 2 && <TabContainer><Favorites data={{ testimonials: community.testimonials, events: community.events }} /></TabContainer>}
-        {value === 3 
+        {value === 3
           && (
             <TabContainer>
               <h1>Edit Pages</h1>
@@ -158,16 +152,20 @@ CommunityProfile.propTypes = {
 const reducer = 'socmed';
 const mapStateToProps = state => ({
   force: state, // force state from reducer
+  full_community: state.getIn(['full_selected_community'])
   // dataProps: state.getIn([reducer, 'dataTimeline'])
 });
 
-const constDispatchToProps = dispatch => ({
-  // fetchData: bindActionCreators(fetchAction, dispatch)
-});
+const mapDispatchToProps = dispatch => {
+  return bindActionCreators({
+    callCommunity: reduxCallFullCommunity,
+    liveOrNot: reduxLiveOrNot,
+  }, dispatch);
+};
 
 const CommunityProfileMapped = connect(
   mapStateToProps,
-  constDispatchToProps
+  mapDispatchToProps
 )(CommunityProfile);
 
 export default withStyles(styles)(CommunityProfileMapped);

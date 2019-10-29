@@ -14,8 +14,30 @@ import { API_HOST } from '../config/constants';
  * band-with and being faster in general while avoiding CORS issues.
  */
 export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = null) {
-  const idToken = localStorage.getItem('idToken');
+  const idToken = localStorage.getItem("idToken");
   const response = await fetch(`${API_HOST}/v3${destinationUrl}`, {
+    credentials: 'include',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+       Authorization:`Bearer ${idToken}`
+    },
+    body: qs.stringify(dataToSend)
+  });
+
+  try {
+    const json = await response.json();
+    if (relocationPage && json && json.success) {
+      window.location.href = relocationPage;
+    }
+    return json;
+  } catch (error) {
+    return { success: false, error: error.toString() };
+  }
+}
+export async function rawCall(destinationUrl, dataToSend = {}, relocationPage = null) {
+  const idToken = localStorage.getItem("idToken");
+  const response = await fetch(`${API_HOST}/${destinationUrl}`, {
     credentials: 'include',
     method: 'POST',
     headers: {

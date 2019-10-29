@@ -13,6 +13,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom';
 
 import styles from './jss/cover-jss';
+import { apiCall } from '../../utils/messenger';
 
 const optionsOpt = [
   'Edit Profile',
@@ -36,6 +37,41 @@ class Cover extends React.Component {
   handleCloseOpt = () => {
     this.setState({ anchorElOpt: null });
   };
+  goLive = () => {
+    const val = this.props.community.is_published;
+    const id = this.props.community.id;
+    const body = { is_published: !val, is_dev:true, community_id:id };
+    this.props.liveOrNotFxn(this.props.community);
+    apiCall('/communities.update',body).then(res =>{
+      console.log("You are live!");
+    })
+    .catch(err=>{
+      console.log("Error:",err);
+    })
+  }
+
+  showLiveBtn = () => {
+    const val = this.props.community.is_published;
+    const { classes } = this.props;
+    if (val) {
+      return (
+        <div>
+          <Button onClick={() => { this.goLive() }} variant="outlined" color="secondary" style={{ background: 'crimson', color: 'white', marginBottom: 8 }} className={classes.button}>
+            Unpublish Me
+            </Button>
+        </div>
+      )
+    }
+    else {
+      return (
+        <div>
+          <Button onClick={() => { this.goLive() }} variant="outlined" color="primary" style={{ background: 'white', marginBottom: 8 }} className={classes.button}>
+            Go Live
+        </Button>
+        </div>
+      )
+    }
+  }
 
   render() {
     const {
@@ -46,8 +82,9 @@ class Cover extends React.Component {
       coverImg,
       community
     } = this.props;
-    const { anchorElOpt } = this.state;
 
+
+    const { anchorElOpt } = this.state;
     return (
       <div className={classes.cover} style={{ backgroundImage: `url(${coverImg})` }}>
         <div className={classes.opt}>
@@ -91,11 +128,9 @@ class Cover extends React.Component {
           <Typography className={classes.subheading} gutterBottom>
             {desc}
           </Typography>
-          <Button variant="outlined" color="secondary" style={{background:'white',marginBottom:8}} className={classes.button}>
-              Go Live
-            </Button><br/>
+          {this.showLiveBtn()}
           <a
-          style={{color:'white'}}
+            style={{ color: 'white' }}
             className={classes.button}
             href={community ? `http://${community.subdomain}.massenergize.org` : '#'}
             target="_blank"

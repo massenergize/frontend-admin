@@ -5,7 +5,6 @@ import Login from '../../MassEnergizeSuperAdmin/LoginAndRegistration/Login';
 class LoginDedicated extends React.Component {
   componentDidMount() {
     if(this.props.user){
-      console.log("I am busy checking");
       window.location = "/admin";
     }
   }

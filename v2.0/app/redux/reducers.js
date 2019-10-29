@@ -10,7 +10,7 @@ import languageProviderReducer from 'containers/LanguageProvider/reducer';
 import login from './modules/login';
 import uiReducer from './modules/ui';
 import initval from './modules/initForm';
-import app,{ communitiesReducer,tokenReducer, selectedCommunityReducer } from './modules/appReducer';
+import app,{ communitiesReducer,tokenReducer, selectedCommunityReducer, fullSelectedCommunityReducer } from './modules/appReducer';
 import {summaryReducer} from './modules/adminReducer';
 
 /**
@@ -26,6 +26,7 @@ export default function createReducer(injectedReducers = {}) {
     communities:communitiesReducer,
     token:tokenReducer,
     selected_community:selectedCommunityReducer,
+    full_selected_community:fullSelectedCommunityReducer,
     initval,
     language: languageProviderReducer,
     router: connectRouter(history),

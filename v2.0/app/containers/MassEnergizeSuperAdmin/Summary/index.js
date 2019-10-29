@@ -82,6 +82,7 @@ class SummaryDashboard extends PureComponent {
     const description = brand.desc;
     const { classes, communities,selected_community } = this.props;
     const community = selected_community? selected_community.name :"Choose a community";
+    
     return (
       <div>
         <Helmet>
