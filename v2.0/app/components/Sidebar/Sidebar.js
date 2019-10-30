@@ -94,7 +94,7 @@ class Sidebar extends React.Component {
             }}
             open={open}
             anchor={leftSidebar ? 'left' : 'right'}
-          >
+          > 
             <SidebarContent
               drawerPaper={open}
               leftSidebar={leftSidebar}

@@ -57,7 +57,7 @@ Login.propTypes = {
 };
 const mapDispatchToProps = dispatch => ({});
 const mapStateToProps = (store) => {
-  auth: store.auth
+  auth: store.getIn(['auth'])
 };
 
 const LoginMapped = connect(

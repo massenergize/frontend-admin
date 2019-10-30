@@ -65,6 +65,9 @@ class AllCommunities extends React.Component {
       await this.setStateAsync({ data, loading: false });
     // await this.setStateAsync({ communities: response.data });
     }
+    else{
+      console.log("THERE IS NOTHING HERE MR");
+    }
   }
 
   setStateAsync(state) {
@@ -203,7 +206,7 @@ class AllCommunities extends React.Component {
       }
     },
     {
-      name: 'Is it Live? (Published & Approved',
+      name: 'Is it Live? (Published & Approved)',
       key: 'is_published',
       options: {
         filter: true,

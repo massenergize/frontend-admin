@@ -21,7 +21,7 @@ export default function reducer(state = initialImmutableState, action = {}) {
   }
 }
 
-export const communitiesReducer = (state = null, action ={})=>{
+export const communitiesReducer = (state = [], action ={})=>{
   switch (action.type) {
     case LOAD_ALL_COMMUNITIES:
         return action.payload;
@@ -31,7 +31,9 @@ export const communitiesReducer = (state = null, action ={})=>{
       return state;
   }
 }
-export const authAdminReducer = (state = null, action ={})=>{
+var localUser = localStorage.getItem('authUser');
+localUser = localUser ? JSON.parse(localUser) : null;
+export const authAdminReducer = (state = localUser, action ={})=>{
   switch (action.type) {
     case LOAD_AUTH_ADMIN:
         return action.payload;

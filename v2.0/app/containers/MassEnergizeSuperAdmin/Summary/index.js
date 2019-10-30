@@ -87,7 +87,6 @@ class SummaryDashboard extends PureComponent {
       <div>
         <Helmet>
           <title>{title}</title>
-
           <meta name="description" content={description} />
           <meta property="og:title" content={title} />
           <meta property="og:description" content={description} />

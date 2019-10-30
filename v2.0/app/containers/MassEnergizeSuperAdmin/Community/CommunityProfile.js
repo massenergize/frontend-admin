@@ -71,6 +71,7 @@ class CommunityProfile extends React.Component {
     const { dataProps, classes } = this.props;
     const { value } = this.state;
     const community = this.props.full_community ? this.props.full_community : {};
+    console.log("I am wherererere community", community);
     return (
       <div>
         <Helmet>

@@ -1,5 +1,5 @@
 import { v3AllCommunities } from './../../../app/containers/Pages/CustomPages/DataRetriever';
-import { LOAD_ACCESS_TOKEN, LOAD_ALL_COMMUNITIES, LOAD_AUTH_ADMIN, LOAD_ID_TOKEN, SELECTED_COMMUNITY, SELECTED_COMMUNITY_FULL } from './../ReduxConstants';
+import { LOAD_ACCESS_TOKEN, LOAD_ALL_COMMUNITIES, LOAD_AUTH_ADMIN, LOAD_ID_TOKEN, SELECTED_COMMUNITY, SELECTED_COMMUNITY_FULL, AUTH_SIGN_OUT } from './../ReduxConstants';
 import { apiCall, fetchData } from './../../utils/messenger';
 import firebase from './../../containers/App/fire-config';
 
@@ -27,15 +27,15 @@ export const reduxCallIdToken = () => {
 
 export const reduxCallFullCommunity = (id) => {
   return dispatch => {
-    fetchData(`v2/community/${id}/full`).then(res=>{
+    fetchData(`v2/community/${id}/full`).then(res => {
       dispatch(reduxLoadFullSelectedCommunity(res.data));
     });
-   
+
   }
 }
 
-export const reduxLiveOrNot =(community) =>{
-  const newCom = {...community,is_published: !community.is_published}
+export const reduxLiveOrNot = (community) => {
+  const newCom = { ...community, is_published: !community.is_published }
   return reduxLoadFullSelectedCommunity(newCom);
 }
 export const reduxLoadSelectedCommunity = (data = null) => {
@@ -48,8 +48,21 @@ const reduxLoadFullSelectedCommunity = (data = null) => {
 export const reduxLoadAllCommunities = (data = []) => {
   return { type: LOAD_ALL_COMMUNITIES, payload: data }
 }
+export const reduxSignOut = () => {
+  return dispatch => {
+    if (firebase) {
+      firebase.auth().signOut().then(() => {
+        localStorage.removeItem("authUser");
+        localStorage.removeItem('idToken');
+        dispatch({ type: LOAD_AUTH_ADMIN, payload: null });
+      })
+    }
+  }
+}
 export const reduxLoadAuthAdmin = (data = null) => {
-  return { type: LOAD_AUTH_ADMIN, payload: data }
+  reduxCallCommunities();
+  return { type: LOAD_AUTH_ADMIN, payload: data };
+
 }
 export const reduxLoadIdToken = (token = null) => {
   return { type: LOAD_ID_TOKEN, payload: token }

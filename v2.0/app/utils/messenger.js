@@ -20,7 +20,7 @@ export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = 
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-       Authorization:`Bearer ${idToken}`
+       Authorization: `Bearer ${idToken}`
     },
     body: qs.stringify(dataToSend)
   });
@@ -37,15 +37,29 @@ export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = 
 }
 export async function rawCall(destinationUrl, dataToSend = {}, relocationPage = null) {
   const idToken = localStorage.getItem("idToken");
-  const response = await fetch(`${API_HOST}/${destinationUrl}`, {
-    credentials: 'include',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-       Authorization:`Bearer ${idToken}`
-    },
-    body: qs.stringify(dataToSend)
-  });
+  var params = {};
+  if (idToken) {
+    params = {
+      credentials: 'include',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Bearer ${idToken}`
+      },
+      body: qs.stringify(dataToSend)
+    }
+  } else {
+    params = {
+      credentials: 'include',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: qs.stringify(dataToSend)
+    }
+  }
+
+  const response = await fetch(`${API_HOST}/${destinationUrl}`, params);
 
   try {
     const json = await response.json();
@@ -69,7 +83,6 @@ export async function rawCall(destinationUrl, dataToSend = {}, relocationPage = 
  * general while avoiding CORS issues.
  */
 export async function apiCallWithMedia(destinationUrl, dataToSend = {}, relocationPage = null) {
-  console.log(dataToSend)
   const formData = new FormData();
   Object.keys(dataToSend).map(k => (formData.append(k, dataToSend[k])));
 
@@ -179,9 +192,14 @@ export function cleanFormData(formValues) {
 }
 
 export async function fetchData(sourceUrl) {
+  const idToken = localStorage.getItem("idToken");
   return fetch(`${API_HOST}/${sourceUrl}`, {
     method: 'GET',
     credentials: 'include',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+       Authorization: `Bearer ${idToken}`
+    }
   }).then(response => response.json())
     .then(jsonResponse => jsonResponse)
     .catch(error => {

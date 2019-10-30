@@ -24,6 +24,7 @@ import {
   AddTeam, AllTeams,
   AllGoals, AddGoal,
   AddPolicy, AllPolicies,
+  DashboardAdminSummaryPage,
   AddTestimonial, AllTestimonials, Export, CustomizePages, EditAction,
   SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditGoal, EditPolicy, EditEvent
 } from '../pageListAsync';
@@ -36,11 +37,28 @@ class Application extends React.Component {
   }
   render() {
     const { changeMode, history } = this.props;
+    const user = this.props.auth;
     return (
       <Dashboard history={history} changeMode={changeMode}>
         <Switch>
-          <Route exact path="/" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
-          <Route exact path="/admin" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
+          { user.is_community_admin ? 
+            <Route>
+               <Route exact path="/" render={(props) =><DashboardAdminSummaryPage {...props} signOut = {this.props.signOut} />} />
+               <Route exact path="/admin" render={(props) =><DashboardAdminSummaryPage {...props} signOut = {this.props.signOut} />} />
+            </Route>
+            : 
+            null
+          }
+          { user.is_super_admin ? 
+            <Route>
+               <Route exact path="/" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
+               <Route exact path="/admin" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
+            </Route>
+            : 
+            null
+          }
+          {/* <Route exact path="/" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
+          <Route exact path="/admin" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} /> */}
           <Route exact path="/blank" component={BlankPage} />
           <Route path="/admin/dashboard" component={DashboardSummaryPage} />
 
@@ -116,9 +134,14 @@ Application.propTypes = {
   history: PropTypes.object.isRequired,
 };
 
+function mapStateToProps(state){
+  return {
+    auth: state.getIn(['auth'])
+  }
+}
 function mapDispatchToProps(dispatch){
   return bindActionCreators({
     reduxCallCommunities: reduxCallCommunities
   },dispatch);
 }
-export default connect(null,mapDispatchToProps)(Application);
+export default connect(mapStateToProps,mapDispatchToProps)(Application);

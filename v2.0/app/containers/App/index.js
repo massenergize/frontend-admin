@@ -10,15 +10,35 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { apiCall, fetchData, rawCall } from './../../utils/messenger';
 window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
-import { reduxCallIdToken } from './../../../app/redux/redux-actions/adminActions';
+import { reduxSignOut, reduxCallIdToken, reduxLoadAuthAdmin } from './../../../app/redux/redux-actions/adminActions';
 
-const localUser = localStorage.getItem('authUser');
- 
+/*
+    1. Collect user Auth user From Firebase 
+    2. Strip out the user's idToken and sent it to /auth/verify
+    3. /auth/verify returns another token 
+      save that token in the local storage to be used in the 
+      'messenger.js' file for apiCalls
+    4. Shoot that token to /auth/whoami
+    5. returns user if .. exists or the usual 
+    ----All failures bring a success == false && data == null
+
+    6. After user is obtained, save user in redux, and save user in
+      localStorage too ( with this, even when the user refreshes 
+        the entire page and redux is cleared, the app can quickly 
+        use the local auth obj to sign the user in, while checking 
+        firebase too. 
+        1. If the firebase request comes in positive, it just fixes into 
+        redux and the local storage again, like nothing happened! 
+        Lol! 
+        If firebase comes in negative, it just takes the user back to re-login.
+        like "Hey, my bad! You are not authenticated, please follow protocol! LOOL!"
+        )
+  */
+
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: localUser ? JSON.parse(localUser) : null,
       error: null
     };
     this.signOut = this.signOut.bind(this);
@@ -33,12 +53,7 @@ class App extends React.Component {
   }
 
   signOut = () => {
-    firebase.auth().signOut().then(() => {
-      localStorage.removeItem("authUser");
-      localStorage.removeItem("idToken");
-      this.setState({ user: null, error: null });
-      console.log("I have signed out");
-    });
+    this.props.reduxSignOut();
   }
 
   loginWithFacebook = () => {
@@ -52,41 +67,56 @@ class App extends React.Component {
       });
   }
 
+  requestMassToken = (fireToken) => {
+    const body = { idToken: fireToken };
+    rawCall("auth/verify", body).then(massToken => {
+      const idToken = massToken.data.idToken;
+      localStorage.setItem("idToken", idToken.toString());
+      this.getAuthenticatedUserProfile();
+    }).catch(err => {
+      console.log("Error MASSTOKEN: ", err);
+      me.setState({ error: "Sorry, we could not sign you in!" });
+    });
+  }
   loginWithGoogle = () => {
+    const me = this;
     firebase.auth().signInWithPopup(googleProvider).then(res => {
-      const body = {idToken: res.user._lat};
-      rawCall("auth/verify",body).then(massToken => {
-        const idToken = massToken.data.idToken; 
-        localStorage.setItem("idToken",idToken.toString());
-        this.getAuthenticatedUserProfile(res.user.uid);
-
-      });
-      //localStorage.setItem('authUser', JSON.stringify(res.user));
-      //this.setState({ user: res.user });
+      me.requestMassToken(res.user._lat);
     })
       .catch(err => {
-        console.log('Error', err);
-        this.setState({ error: err });
+        me.setState({ error: err.message });
       });
   }
 
   normalLogin = (email, password) => {
+    const me = this;
     firebase.auth().signInWithEmailAndPassword(email, password).then(res => {
-      this.setState({ user: res.user });
+      me.requestMassToken(res.user._lat);
     })
       .catch(err => {
         console.log('Error:', err.message);
-        this.setState({ error: err });
+        this.setState({ error: err.message });
       });
   }
-  
 
-  getAuthenticatedUserProfile = (user_id) => {
-    const body = {user_id: user_id}
-    console.log("i am the uuid", user_id);
-    rawCall("auth/whoami",body).then(user =>{
-      console.log("I am the user::: ",user);
+
+  getAuthenticatedUserProfile = () => {
+    const me = this;
+    rawCall("auth/whoami").then(userObj => {
+      console.log(userObj);
+      const user = userObj.data;
+      if (user.is_community_admin === true || user.is_super_admin === true) {
+        localStorage.setItem('authUser', JSON.stringify(user))
+        me.props.reduxLoadAuthAdmin(user);
+      }
+      else {
+        me.setState({ error: `Sorry ${user.preferred_name}, you are not an admin :(` })
+      }
     })
+      .catch(err => {
+        console.log("Error WHOAMI: ", err);
+        me.setState({ error: "Sorry, something went wrong, please try again!" })
+      })
   }
 
   authListener() {
@@ -104,8 +134,9 @@ class App extends React.Component {
   }
 
   render() {
-    const { user, error } = this.state;
-
+    const { error } = this.state;
+    const user = this.props.auth;
+    console.log("testing le props", this.props.auth);
     return (
       <ThemeWrapper>
         <AppContext.Consumer>
@@ -188,12 +219,14 @@ class App extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    auth: state.auth
+    auth: state.getIn(['auth'])
   }
 };
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
-    reduxCallIdToken: reduxCallIdToken
+    reduxCallIdToken: reduxCallIdToken,
+    reduxLoadAuthAdmin: reduxLoadAuthAdmin,
+    reduxSignOut: reduxSignOut
   }, dispatch);
 };
 

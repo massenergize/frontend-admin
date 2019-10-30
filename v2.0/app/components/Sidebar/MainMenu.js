@@ -16,12 +16,23 @@ import Ionicon from 'react-ionicons';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import styles from './sidebar-jss';
+import { reduxSignOut } from '../../redux/redux-actions/adminActions';
 
 class MainMenu extends React.Component {
   handleClick() {
     const { toggleDrawerOpen, loadTransition } = this.props;
     toggleDrawerOpen();
     loadTransition(false);
+  }
+
+  ejectSignOut() {
+    const { classes } = this.props;
+    return (
+      <button style={{ borderBottomRightRadius: 55, borderTopRightRadius: 55, textTransform: 'capitalize', background: "#fff6f6", fontWeight: 500, width: '100%' }} onClick={() => { this.props.reduxSignOut(); }}>
+        <Ionicon icon="md-log-out" style={{ float: 'left', marginRight: 21 }} />
+        <span style={{ float: 'left', marginTop: 3, fontWeight: '700' }}>signout</span>
+      </button>
+    )
   }
 
   render() {
@@ -52,7 +63,7 @@ class MainMenu extends React.Component {
                 </ListItemIcon>
               )}
               <ListItemText classes={{ primary: classes.primary }} variant="inset" primary={item.name} />
-              { open.indexOf(item.key) > -1 ? <ExpandLess /> : <ExpandMore /> }
+              {open.indexOf(item.key) > -1 ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
             <Collapse
               component="div"
@@ -65,7 +76,7 @@ class MainMenu extends React.Component {
               unmountOnExit
             >
               <List className={classes.dense} component="nav" dense>
-                { getMenus(item.child, 'key') }
+                {getMenus(item.child, 'key')}
               </List>
             </Collapse>
           </div>
@@ -109,6 +120,8 @@ class MainMenu extends React.Component {
     return (
       <div>
         {getMenus(dataMenu)}
+        {this.ejectSignOut()}
+
       </div>
     );
   }
@@ -132,7 +145,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  openSubMenu: bindActionCreators(openAction, dispatch)
+  openSubMenu: bindActionCreators(openAction, dispatch),
+  reduxSignOut: bindActionCreators(reduxSignOut, dispatch)
 });
 
 const MainMenuMapped = connect(

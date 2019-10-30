@@ -12,6 +12,8 @@ import dummy from 'dan-api/dummy/dummyContents';
 import logo from 'dan-images/logo.png';
 import MainMenu from './MainMenu';
 import styles from './sidebar-jss';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
 class SidebarContent extends React.Component {
   state = {
@@ -37,6 +39,7 @@ class SidebarContent extends React.Component {
   }
 
   render() {
+    console.log("iun the sidebar  auth::::: ", this.props.auth);
     const {
       classes,
       turnDarker,
@@ -52,6 +55,7 @@ class SidebarContent extends React.Component {
       changeStatus,
       isLogin
     } = this.props;
+    const user = this.props.auth;
     const { transform } = this.state;
 
     const setStatus = st => {
@@ -84,7 +88,7 @@ class SidebarContent extends React.Component {
                 className={classNames(classes.avatar, classes.bigAvatar)}
               />
               <div>
-                <h4>{dummy.profile ? dummy.profile.full_name : dummy.user.name}</h4>
+                <h4>{user.preferred_name? user.preferred_name : "..."}</h4>
                 {/* <Button size="small" onClick={openMenuStatus}>
                   <i className={classNames(classes.dotStatus, setStatus(status))} />
                   {status}
@@ -158,4 +162,10 @@ SidebarContent.defaultProps = {
   isLogin: true,
 };
 
-export default withStyles(styles)(SidebarContent);
+function mapStateToProps(state){
+  return {
+    auth: state.getIn(['auth'])
+  }
+}
+const ContentMapped = connect(mapStateToProps,null)(SidebarContent);
+export default withStyles(styles)(ContentMapped);

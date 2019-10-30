@@ -110,7 +110,7 @@ class LoginForm extends React.Component {
                 <FormControl className={classes.formControl}>
                   { err && (
                     <Typography style={{ color: 'red' }} variant="caption" className={classes.subtitle} gutterBottom align="center">
-                      {err.message}
+                      {err}
                     </Typography>
                   )
                   }
