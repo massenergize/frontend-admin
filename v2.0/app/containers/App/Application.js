@@ -38,24 +38,23 @@ class Application extends React.Component {
   render() {
     const { changeMode, history } = this.props;
     const user = this.props.auth;
+
     return (
       <Dashboard history={history} changeMode={changeMode}>
         <Switch>
-          { user.is_community_admin ? 
-            <Route>
-               <Route exact path="/" render={(props) =><DashboardAdminSummaryPage {...props} signOut = {this.props.signOut} />} />
-               <Route exact path="/admin" render={(props) =><DashboardAdminSummaryPage {...props} signOut = {this.props.signOut} />} />
-            </Route>
-            : 
-            null
+          { (user.is_community_admin || user.is_community_admin) && 
+            (
+                <Route exact path="/" render={(props) =><DashboardAdminSummaryPage {...props} signOut = {this.props.signOut} />} />
+            )
           }
-          { user.is_super_admin ? 
-            <Route>
-               <Route exact path="/" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
-               <Route exact path="/admin" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
-            </Route>
-            : 
-            null
+          { user.is_community_admin && 
+            (
+                <Route exact path="/admin" render={(props) =><DashboardAdminSummaryPage {...props} signOut = {this.props.signOut} />} />
+            )
+          }
+          { user.is_super_admin && (
+            <Route exact path="/admin" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
+          )
           }
           {/* <Route exact path="/" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
           <Route exact path="/admin" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} /> */}
