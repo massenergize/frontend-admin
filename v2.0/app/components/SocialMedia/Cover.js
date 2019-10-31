@@ -18,9 +18,6 @@ import { apiCall } from '../../utils/messenger';
 const optionsOpt = [
   'Edit Profile',
   'Change Cover',
-  'Option 1',
-  'Option 2',
-  'Option 3',
 ];
 
 const ITEM_HEIGHT = 48;
@@ -40,14 +37,14 @@ class Cover extends React.Component {
   goLive = () => {
     const val = this.props.community.is_published;
     const id = this.props.community.id;
-    const body = { is_published: !val, is_dev:true, community_id:id };
+    const body = { is_published: !val, is_dev: true, community_id: id };
     this.props.liveOrNotFxn(this.props.community);
-    apiCall('/communities.update',body).then(res =>{
+    apiCall('/communities.update', body).then(res => {
       console.log("You are live!");
     })
-    .catch(err=>{
-      console.log("Error:",err);
-    })
+      .catch(err => {
+        console.log("Error:", err);
+      })
   }
 
   showLiveBtn = () => {
@@ -56,8 +53,8 @@ class Cover extends React.Component {
     if (val) {
       return (
         <div>
-          <Button onClick={() => { this.goLive() }} variant="outlined" color="secondary" style={{ background: 'crimson', color: 'white', marginBottom: 8 }} className={classes.button}>
-            Unpublish Me
+          <Button onClick={() => { this.goLive() }} variant="outlined" color="secondary" className={classes.publishBtn + " " + classes.raise}>
+            Unpublish
             </Button>
         </div>
       )
@@ -65,7 +62,7 @@ class Cover extends React.Component {
     else {
       return (
         <div>
-          <Button onClick={() => { this.goLive() }} variant="outlined" color="primary" style={{ background: 'white', marginBottom: 8 }} className={classes.button}>
+          <Button onClick={() => { this.goLive() }} variant="outlined" color="primary" className={classes.goLiveBtn + " " + classes.raise}>
             Go Live
         </Button>
         </div>
@@ -86,10 +83,11 @@ class Cover extends React.Component {
 
     const { anchorElOpt } = this.state;
     return (
-      <div className={classes.cover} style={{ backgroundImage: `url(${coverImg})` }}>
+      // <div className={classes.cover} style={{ backgroundImage: `url(${coverImg})` }}>
+      <div className={classes.cover} style={{ height: 250, textAlign: 'left', justifyContent: 'flex-start' }}>
         <div className={classes.opt}>
           <IconButton className={classes.button} aria-label="Delete">
-            <Info />
+            <Info  style={{color:'#585858'}}/>
           </IconButton>
           <IconButton
             aria-label="More"
@@ -98,7 +96,7 @@ class Cover extends React.Component {
             className={classes.button}
             onClick={this.handleClickOpt}
           >
-            <MoreVertIcon />
+            <MoreVertIcon style={{color:'#585858'}}/>
           </IconButton>
           <Menu
             id="long-menu"
@@ -109,6 +107,7 @@ class Cover extends React.Component {
               style: {
                 maxHeight: ITEM_HEIGHT * 4.5,
                 width: 200,
+               
               },
             }}
           >
@@ -119,8 +118,52 @@ class Cover extends React.Component {
             ))}
           </Menu>
         </div>
-        <div className={classes.content}>
-          <Avatar alt={name} src={avatar} className={classes.avatar} />
+        <div className={classes.content} style={{ display: 'inline-block' }}>
+          <div >
+
+            <h2 style={{ display: 'inline-block', marginLeft: 20, marginBottom: 2, fontSize: '1.8rem', fontWeight: "500", textTransform: 'capitalize' }} >{name}</h2>
+            <VerifiedUser style={{ color:'#0095ff',marginTop: -2, display: 'inline-block', }} className={classes.verified} />
+            <div style={{ float: 'right' }}>
+              <center>
+                {this.showLiveBtn()}
+                <a
+                style={{fontSize:14}}
+                  className={classes.leAnchor}
+                  href={community ? `http://community.massenergize.org/${community.subdomain}` : '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  size="large"
+                  variant="contained"
+                  color="secondary"
+                >
+                  Visit Portal
+                </a>
+              </center>
+            </div>
+          </div>
+          <p style={{ marginLeft: 20, color: 'darkgray' }}>{desc}</p>
+
+          {/* <div className={classes.raise} style={{ float: 'left', padding: 1, borderRadius: 10, width: '25%' }}>
+            <img src={avatar} style={{ borderRadius: 10, height: '100px', width: '100%', objectFit: 'cover' }} />
+          </div>
+          <div className={classes.inline}>
+            <h2 style={{ marginLeft: 20, marginBottom: 2, fontSize: '1.8rem', fontWeight: "500", textTransform: 'capitalize' }} >{name}</h2>
+            <p style={{ marginLeft: 20, color: 'darkgray' }}>{desc}</p>
+            {this.showLiveBtn()}
+            <a
+              style={{ color: 'white', float: 'right' }}
+              className={classes.leAnchor}
+              href={community ? `http://community.massenergize.org/${community.subdomain}` : '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              size="large"
+              variant="contained"
+              color="secondary"
+            >
+              Visit Portal
+          </a>
+          </div> */}
+          {/* <Avatar alt={name} src={avatar} className={classes.avatar} />
           <Typography variant="h4" className={classes.name} gutterBottom>
             {name}
             <VerifiedUser className={classes.verified} />
@@ -131,8 +174,8 @@ class Cover extends React.Component {
           {this.showLiveBtn()}
           <a
             style={{ color: 'white' }}
-            className={classes.button}
-            href={community ? `http://${community.subdomain}.massenergize.org` : '#'}
+            className={classes.leAnchor}
+            href={community ? `http://community.massenergize.org/${community.subdomain}` : '#'}
             target="_blank"
             rel="noopener noreferrer"
             size="large"
@@ -140,7 +183,7 @@ class Cover extends React.Component {
             color="secondary"
           >
             Visit Portal
-          </a>
+          </a> */}
         </div>
       </div>
     );

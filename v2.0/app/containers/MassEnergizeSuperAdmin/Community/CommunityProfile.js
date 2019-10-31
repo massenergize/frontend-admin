@@ -26,6 +26,7 @@ import {
   About,
   Connection,
   Favorites,
+  Pages,
   Albums
 } from './Profile';
 import { fetchData } from '../../../utils/messenger';
@@ -128,14 +129,15 @@ class CommunityProfile extends React.Component {
         {value === 3
           && (
             <TabContainer>
-              <h1>Edit Pages</h1>
+              <Pages community = {community} />
+              {/* <h1>Edit Pages</h1>
               <ul>
                 <li><Link to={`/admin/edit/${community.id}/home`}>Home Page</Link></li>
                 <li><Link to={`/admin/edit/${community.id}/all-actions`}>All Actions Page</Link></li>
                 <li><Link to={`/admin/edit/${community.id}/about`}>About Us Page</Link></li>
                 <li><Link to={`/admin/edit/${community.id}/contact_us`}>Contact Us Page</Link></li>
                 <li><Link to={`/admin/edit/${community.id}/donate`}>Donate Page</Link></li>
-              </ul>
+              </ul> */}
             </TabContainer>
           )}
 

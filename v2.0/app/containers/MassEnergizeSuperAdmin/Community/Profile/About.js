@@ -42,10 +42,20 @@ class About extends React.Component {
 
   getTags = tags => (tags.map(t => (t.name))).join(', ');
 
-
+  getGoalPercentage(){
+    console.log("me kom mom om ", this.props.community)
+    let community = this.props.community ? this.props.community : 0; 
+    if(community !==0){
+      let goal = community.goal? community.goal : {};
+      let targ = goal.target_carbon_footprint_reduction; 
+      let att = goal.attained_carbon_footprint_reduction
+      return (att/targ) * 100;
+    }
+    return community;
+  }
   render() {
     const { classes, community } = this.props;
-
+ 
 
     return (
       <Grid
@@ -61,7 +71,7 @@ class About extends React.Component {
           <div className={classes.progressRoot}>
             <Paper className={classes.styledPaper} elevation={4}>
               <Typography className={classes.title} variant="h5" component="h3">
-                <span className={Type.light}>Goals Set By Community Members </span>
+                <center><span className={Type.light} style={{textAlign:'center'}}>Carbon Goal Reached</span></center>
                 {/* <span className={Type.bold}>Intermediate</span> */}
               </Typography>
               <Grid container justify="center">
@@ -71,12 +81,12 @@ class About extends React.Component {
                       <Check />
                     </Avatar>
                   )}
-                  label="60% Progress"
+                  label={`${this.getGoalPercentage()}% Progress`}
                   className={classes.chip}
                   color="primary"
                 />
               </Grid>
-              <LinearProgress variant="determinate" className={classes.progress} value={60} />
+              <LinearProgress variant="determinate" className={classes.progress} value={this.getGoalPercentage()} />
             </Paper>
           </div>
           {/* ----------------------------------------------------------------------*/}

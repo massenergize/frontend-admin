@@ -4,7 +4,7 @@ import { Switch, Route } from 'react-router-dom';
 import {connect} from 'react-redux'; 
 import { bindActionCreators } from 'redux';
 import Dashboard from '../Templates/Dashboard';
-import {reduxCallCommunities} from './../../redux/redux-actions/adminActions';
+import {reduxCallCommunities, reduxCheckUser} from './../../redux/redux-actions/adminActions';
 import {
   Parent,
   DashboardSummaryPage,
@@ -33,18 +33,27 @@ import {
 class Application extends React.Component {
   
   componentWillMount() {
+   
     this.props.reduxCallCommunities();
+
   }
+  
   render() {
+   
     const { changeMode, history } = this.props;
     const user = this.props.auth;
 
     return (
       <Dashboard history={history} changeMode={changeMode}>
         <Switch>
-          { (user.is_community_admin || user.is_community_admin) && 
+          { (user.is_community_admin) && 
             (
                 <Route exact path="/" render={(props) =><DashboardAdminSummaryPage {...props} signOut = {this.props.signOut} />} />
+            )
+          }
+          { (user.is_super_admin) && 
+            (
+                <Route exact path="/" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
             )
           }
           { user.is_community_admin && 
@@ -140,7 +149,8 @@ function mapStateToProps(state){
 }
 function mapDispatchToProps(dispatch){
   return bindActionCreators({
-    reduxCallCommunities: reduxCallCommunities
+    reduxCallCommunities: reduxCallCommunities,
+    checkUser: reduxCheckUser
   },dispatch);
 }
 export default connect(mapStateToProps,mapDispatchToProps)(Application);

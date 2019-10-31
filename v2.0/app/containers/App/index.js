@@ -68,6 +68,7 @@ class App extends React.Component {
   }
 
   requestMassToken = (fireToken) => {
+    const me = this;
     const body = { idToken: fireToken };
     rawCall("auth/verify", body).then(massToken => {
       const idToken = massToken.data.idToken;

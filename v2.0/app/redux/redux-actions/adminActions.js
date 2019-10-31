@@ -3,6 +3,25 @@ import { LOAD_ACCESS_TOKEN, LOAD_ALL_COMMUNITIES, LOAD_AUTH_ADMIN, LOAD_ID_TOKEN
 import { apiCall, fetchData } from './../../utils/messenger';
 import firebase from './../../containers/App/fire-config';
 
+//try to put checkUser in a a more general area later
+export const reduxCheckUser = () => {
+  fetchData("/auth/whoami")
+    .then(res => {
+      if (!res.data) { //means the user token has expired, redirect to login
+        console.log("treating me right")
+        localStorage.removeItem("idToken"); 
+        localStorage.removeItem("authUser");
+        window.location = "/";
+      }
+      return {type:"DO_NOTHING", payload:null}
+    });
+    return {type:"DO_NOTHING", payload:null}
+}
+export const reduxIfExpired = (errorMsg) => {
+  if (errroMsg === "Signature has expired") {
+    reduxSignOut();
+  }
+}
 export const reduxCallCommunities = () => {
   return dispatch => {
     apiCall('/communities.list').then(res => {

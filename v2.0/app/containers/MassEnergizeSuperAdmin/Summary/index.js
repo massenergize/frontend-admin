@@ -18,7 +18,7 @@ import styles from './dashboard-jss';
 import { getTestimonialsData, getActionsData, getEventsData } from '../../../api/data';
 import { connectRouter } from 'connected-react-router';
 import { bindActionCreators } from 'redux';
-import { reduxLoadSelectedCommunity } from '../../../redux/redux-actions/adminActions';
+import { reduxLoadSelectedCommunity, reduxIfExpired, reduxCheckUser } from '../../../redux/redux-actions/adminActions';
 
 class SummaryDashboard extends PureComponent {
   constructor(props) {
@@ -29,9 +29,10 @@ class SummaryDashboard extends PureComponent {
   callForEvents = () => {
     const me = this;
     getEventsData().then(res => {
+      console.log("i am the events",res);
       me.setState({ events: res.data });
     }).catch(err => {
-      console.log(err);
+      
     });
   }
 
@@ -54,6 +55,7 @@ class SummaryDashboard extends PureComponent {
   }
 
   componentDidMount = () => {
+    this.props.ifExpired();
     this.callForTestimonials();
     this.callForActions();
     this.callForEvents();
@@ -93,10 +95,9 @@ class SummaryDashboard extends PureComponent {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <h1 style={{color:"white", fontSize:'2rem',margin:25}}>Super Admin</h1>
+        {/* <h1 style={{color:"white", fontSize:'2rem',margin:25}}>Super Admin</h1> */}
+        <div style={{marginTop:70}}></div>
         <Grid container className={classes.root}>
-      
-          <button onClick={() => { this.props.signOut() }}>Signout</button>
           <CounterChartWidget />
         </Grid>
         <div style={{marginTop:60}}>
@@ -158,7 +159,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch)=>{
   return bindActionCreators({
-    selectCommunity: reduxLoadSelectedCommunity
+    selectCommunity: reduxLoadSelectedCommunity, 
+    ifExpired : reduxCheckUser
+    
   },dispatch)
 }
 const summaryMapped = connect(mapStateToProps, mapDispatchToProps)(SummaryDashboard);
