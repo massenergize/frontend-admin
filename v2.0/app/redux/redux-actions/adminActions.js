@@ -1,21 +1,71 @@
 import { v3AllCommunities } from './../../../app/containers/Pages/CustomPages/DataRetriever';
-import { LOAD_ACCESS_TOKEN, LOAD_ALL_COMMUNITIES, LOAD_AUTH_ADMIN, LOAD_ID_TOKEN, SELECTED_COMMUNITY, SELECTED_COMMUNITY_FULL, AUTH_SIGN_OUT } from './../ReduxConstants';
+import { LOAD_ACCESS_TOKEN, LOAD_ALL_COMMUNITIES, LOAD_AUTH_ADMIN, LOAD_ID_TOKEN, SELECTED_COMMUNITY, SELECTED_COMMUNITY_FULL, AUTH_SIGN_OUT, GET_ALL_ACTIONS, GET_ALL_TAG_COLLECTIONS, GET_ALL_USERS } from './../ReduxConstants';
 import { apiCall, fetchData } from './../../utils/messenger';
 import firebase from './../../containers/App/fire-config';
+import { getTestimonialsData, getTagCollectionsData } from '../../api/data';
 
+
+
+export const reduxGetAllUsers= () => {
+  return dispatch => {
+    fetchData("v2/users").then(response => {
+      if (response && response.success) {
+        dispatch(loadAllUsers(response.data));
+      }
+      return { type: "DO_NOTHING", payload: null };
+
+    });
+    return { type: "DO_NOTHING", payload: null };
+  }
+}
+export const reduxGetAllTags= () => {
+  return dispatch => {
+    getTagCollectionsData().then(response => {
+      if (response && response.success) {
+        dispatch(loadAllTags(response.data));
+      }
+      return { type: "DO_NOTHING", payload: null };
+
+    });
+    return { type: "DO_NOTHING", payload: null };
+  }
+}
+
+export const reduxGetAllActions = () => {
+  return dispatch => {
+    apiCall('/actions.listForSuperAdmin').then(response => {
+      if (response && response.success) {
+        dispatch(loadAllActions(response.data));
+      }
+      return { type: "DO_NOTHING", payload: null };
+
+    });
+    return { type: "DO_NOTHING", payload: null };
+  }
+}
+
+export const loadAllUsers = (data) => {
+  return { type: GET_ALL_USERS, payload: data };
+}
+export const loadAllTags = (data) => {
+  return { type: GET_ALL_TAG_COLLECTIONS, payload: data };
+}
+export const loadAllActions = (data) => {
+  return { type: GET_ALL_ACTIONS, payload: data };
+}
 //try to put checkUser in a a more general area later
 export const reduxCheckUser = () => {
   fetchData("/auth/whoami")
     .then(res => {
       if (!res.data) { //means the user token has expired, redirect to login
         console.log("treating me right")
-        localStorage.removeItem("idToken"); 
+        localStorage.removeItem("idToken");
         localStorage.removeItem("authUser");
-        window.location = "/";
+        window.location = "/login";
       }
-      return {type:"DO_NOTHING", payload:null}
+      return { type: "DO_NOTHING", payload: null }
     });
-    return {type:"DO_NOTHING", payload:null}
+  return { type: "DO_NOTHING", payload: null }
 }
 export const reduxIfExpired = (errorMsg) => {
   if (errroMsg === "Signature has expired") {
@@ -31,6 +81,7 @@ export const reduxCallCommunities = () => {
     })
   }
 }
+
 
 export const reduxCallIdToken = () => {
   return dispatch => {

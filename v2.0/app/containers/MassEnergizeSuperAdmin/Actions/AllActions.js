@@ -17,6 +17,9 @@ import Paper from '@material-ui/core/Paper';
 
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
+import {connect} from 'react-redux'; 
+import {bindActionCreators } from 'redux';
+import { reduxGetAllActions } from '../../../redux/redux-actions/adminActions';
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -24,15 +27,16 @@ class AllActions extends React.Component {
     this.state = {
       columns: this.getColumns(),
       data: [],
-      loading: true
+      loading: true 
     };
   }
 
   async componentDidMount() {
-    const allActionsResponse = await apiCall('/actions.listForSuperAdmin');
+    this.props.callAllActions();
+    const allActionsResponse = this.props.allActions;
 
-    if (allActionsResponse && allActionsResponse.success) {
-      const data = allActionsResponse.data.map(d => (
+    if (allActionsResponse) {
+      const data = allActionsResponse.map(d => (
         [
           {
             id: d.id,
@@ -138,7 +142,7 @@ class AllActions extends React.Component {
     const title = brand.name + ' - All Actions';
     const description = brand.desc;
     const { data, columns, loading } = this.state;
-    const { classes } = this.props;
+    const { classes, allActions } = this.props;
 
     const options = {
       filterType: 'dropdown',
@@ -153,7 +157,8 @@ class AllActions extends React.Component {
         });
       }
     };
-
+    
+    console.log("ayayayayayayayaa",allActions);
     if (loading) {
       return (
         <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
@@ -198,4 +203,16 @@ AllActions.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(AllActions);
+const mapStateToProps =(state) =>{
+  return{
+    auth:state.getIn(['auth']), 
+    allActions:state.getIn(['allActions']),
+  }
+}
+const mapDispatchToProps = (dispatch) =>{
+  return bindActionCreators({
+    callAllActions: reduxGetAllActions
+  },dispatch);
+};
+const ActionsMapped = connect(mapStateToProps,mapDispatchToProps)(AllActions);
+export default withStyles(styles)(ActionsMapped);

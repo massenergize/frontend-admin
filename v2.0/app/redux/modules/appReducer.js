@@ -1,6 +1,6 @@
 import { Map, fromJS } from 'immutable';
 import { START_UP } from '../../actions/actionConstants';
-import { LOAD_ALL_COMMUNITIES,LOAD_AUTH_ADMIN,LOAD_AUTH_TOKEN,LOAD_ID_TOKEN, SELECTED_COMMUNITY, SELECTED_COMMUNITY_FULL} from './../ReduxConstants';
+import { LOAD_ALL_COMMUNITIES,LOAD_AUTH_ADMIN,LOAD_AUTH_TOKEN,LOAD_ID_TOKEN, SELECTED_COMMUNITY, SELECTED_COMMUNITY_FULL, GET_ALL_ACTIONS, GET_ALL_TESTIMONIALS, GET_ALL_EVENTS, GET_ALL_USERS, GET_ALL_TAG_COLLECTIONS} from './../ReduxConstants';
 
 const initialState = Map({
   constants: {
@@ -19,7 +19,7 @@ export default function reducer(state = initialImmutableState, action = {}) {
     default:
       return state;
   }
-}
+} 
 
 export const communitiesReducer = (state = [], action ={})=>{
   switch (action.type) {
@@ -46,6 +46,57 @@ export const authAdminReducer = (state = localUser, action ={})=>{
 export const tokenReducer = (state = null, action ={})=>{
   switch (action.type) {
     case LOAD_ID_TOKEN:
+        return action.payload;
+      return state;
+  
+    default:
+      return state;
+  }
+}
+export const allActionsReducer = (state = [], action ={})=>{
+  switch (action.type) {
+    case GET_ALL_ACTIONS:
+        return action.payload;
+      return state;
+  
+    default:
+      return state;
+  }
+}
+export const allEventsReducer = (state = [], action ={})=>{
+  switch (action.type) {
+    case GET_ALL_EVENTS:
+        return action.payload;
+      return state;
+  
+    default:
+      return state;
+  }
+}
+
+export const allTagsReducer = (state = [], action ={})=>{
+  switch (action.type) {
+    case GET_ALL_TAG_COLLECTIONS:
+        return action.payload;
+      return state;
+  
+    default:
+      return state;
+  }
+}
+export const allUsersReducer = (state = [], action ={})=>{
+  switch (action.type) {
+    case GET_ALL_USERS:
+        return action.payload;
+      return state;
+  
+    default:
+      return state;
+  }
+}
+export const allTestimonialsReducer = (state = [], action ={})=>{
+  switch (action.type) {
+    case GET_ALL_TESTIMONIALS:
         return action.payload;
       return state;
   
