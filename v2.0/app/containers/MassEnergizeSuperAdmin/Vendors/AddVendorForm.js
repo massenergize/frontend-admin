@@ -105,6 +105,19 @@ class CreateNewVendorForm extends Component {
               readOnly: false
             },
             {
+              name: 'is_verified',
+              label: 'Have you verified this Vendor?',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: 'false',
+              dbName: 'is_verified',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ]
+            },
+            {
               name: 'have_address',
               label: 'Do you have an address?',
               fieldType: 'Radio',
@@ -244,7 +257,7 @@ class CreateNewVendorForm extends Component {
               contentType: 'text',
               isRequired: true,
               defaultValue: '',
-              dbName: 'owner_name',
+              dbName: 'key_contact_name',
               readOnly: false
             },
             {
@@ -259,6 +272,17 @@ class CreateNewVendorForm extends Component {
               readOnly: false
             },
           ]
+        },
+        {
+          name: 'onboarding_contact_email',
+          label: 'Email of Person onboarding this vendor',
+          placeholder: 'eg. ellen@gmail.com',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: true,
+          defaultValue: '',
+          dbName: 'onboarding_contact_email',
+          readOnly: false
         },
         {
           name: 'image',
