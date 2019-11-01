@@ -103,6 +103,10 @@ export const AddTestimonial = loadable(() => import('./MassEnergizeSuperAdmin/Te
 export const AddVendor = loadable(() => import('./MassEnergizeSuperAdmin/Vendors/AddVendor'), {
   fallback: <Loading />,
 });
+
+export const EditVendor = loadable(() => import('./MassEnergizeSuperAdmin/Vendors/EditVendor'), {
+  fallback: <Loading />,
+});
 export const AllVendors = loadable(() => import('./MassEnergizeSuperAdmin/Vendors/AllVendors'), {
   fallback: <Loading />,
 });
