@@ -32,39 +32,75 @@ import Email from '@material-ui/icons/Email';
 import messageStyles from 'dan-styles/Messages.scss';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-import {connect} from 'react-redux'; 
-import { bindActionCreators} from 'redux';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { reduxGetAllVendors, reduxGetAllCommunityVendors } from '../../../redux/redux-actions/adminActions';
-
+import CommunitySwitch from './../Summary/CommunitySwitch'; 
 class AllVendors extends React.Component {
   constructor(props) {
     super(props);
     this.state = { data: [], loading: true, columns: this.getColumns(props.classes) };
   }
 
-  async componentDidMount() {
-    const allVendorsResponse = await apiCall('/vendors.listForSuperAdmin');
-    if (allVendorsResponse && allVendorsResponse.success) {
-      const data = allVendorsResponse.data.map(d => (
-        [
-          {
-            id: d.id,
-            image: d.logo,
-            initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
-          },
-          `${d.name}...`.substring(0, 30), // limit to first 30 chars
-          d.key_contact, // limit to first 20 chars
-          d.properties_serviced && d.properties_serviced.join(', '),
-          d.service_area,
-          d.communities && d.communities.slice(0, 5).map(c => c.name).join(', '),
-          d.id
-        ]
-      ));
-      await this.setStateAsync({ data, loading: false });
+  showCommunitySwitch = ()=>{
+    const user= this.props.auth? this.props.auth: {}; 
+    if(user.is_community_admin){
+      return(
+        <CommunitySwitch actionToPerform={this.handleCommunityChange}/>
+      )
     }
   }
+  handleCommunityChange =(id)=>{
+    this.props.callVendorsForNormalAdmin(id);
+  }
+  async componentDidMount() {
+    const user = this.props.auth ? this.props.auth : {}
+    if (user.is_super_admin) {
+      this.props.callVendorsForSuperAdmin();
+    }
+    if (user.is_community_admin) {
+      var com = this.props.community ? this.props.community : user.communities[0]
+      this.props.callVendorsForNormalAdmin(com.id)
+    }
+    // const allVendorsResponse = await apiCall('/vendors.listForSuperAdmin');
+    // if (allVendorsResponse && allVendorsResponse.success) {
+    //   const data = allVendorsResponse.data.map(d => (
+    //     [
+    //       {
+    //         id: d.id,
+    //         image: d.logo,
+    //         initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
+    //       },
+    //       `${d.name}...`.substring(0, 30), // limit to first 30 chars
+    //       d.key_contact, // limit to first 20 chars
+    //       d.properties_serviced && d.properties_serviced.join(', '),
+    //       d.service_area,
+    //       d.communities && d.communities.slice(0, 5).map(c => c.name).join(', '),
+    //       d.id
+    //     ]
+    //   ));
+    //   await this.setStateAsync({ data, loading: false });
+    // }
+  }
 
-
+  fashionData = (data) => {
+    data = data.map(d => (
+      [
+        {
+          id: d.id,
+          image: d.logo,
+          initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
+        },
+        `${d.name}...`.substring(0, 30), // limit to first 30 chars
+        d.key_contact, // limit to first 20 chars
+        d.properties_serviced && d.properties_serviced.join(', '),
+        d.service_area,
+        d.communities && d.communities.slice(0, 5).map(c => c.name).join(', '),
+        d.id
+      ]
+    ));
+    return data;
+  }
   setStateAsync(state) {
     return new Promise((resolve) => {
       this.setState(state, resolve);
@@ -250,8 +286,9 @@ class AllVendors extends React.Component {
   render() {
     const title = brand.name + ' - All Vendors';
     const description = brand.desc;
-    const { data, columns, loading } = this.state;
+    const { columns, loading } = this.state;
     const { classes } = this.props;
+    const data = this.fashionData(this.props.allVendors)
 
     const options = {
       filterType: 'dropdown',
@@ -268,22 +305,22 @@ class AllVendors extends React.Component {
     };
 
 
-    if (loading) {
-      return (
-        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
-              <div className={classes.root}>
-                <LinearProgress />
-                <h1>Fetching all Vendors.  This may take a while...</h1>
-                <br />
-                <LinearProgress color="secondary" />
-              </div>
-            </Paper>
-          </Grid>
-        </Grid>
-      );
-    }
+    // if (loading) {
+    //   return (
+    //     <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+    //       <Grid item xs={12} md={6}>
+    //         <Paper className={classes.root}>
+    //           <div className={classes.root}>
+    //             <LinearProgress />
+    //             <h1>Fetching all Vendors.  This may take a while...</h1>
+    //             <br />
+    //             <LinearProgress color="secondary" />
+    //           </div>
+    //         </Paper>
+    //       </Grid>
+    //     </Grid>
+    //   );
+    // }
 
 
     return (
@@ -297,6 +334,7 @@ class AllVendors extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <div className={classes.table}>
+          {this.showCommunitySwitch()}
           <MUIDataTable
             title="All Vendors"
             data={data}
@@ -316,7 +354,8 @@ AllVendors.propTypes = {
 function mapStateToProps(state) {
   return {
     auth: state.getIn(['auth']),
-    allVendors: state.getIn(['allVendors'])
+    allVendors: state.getIn(['allVendors']), 
+    community: state.getIn(['selected_community'])
   }
 }
 function mapDispatchToProps(dispatch) {

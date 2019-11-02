@@ -29,10 +29,10 @@ import Chip from '@material-ui/core/Chip';
 import messageStyles from 'dan-styles/Messages.scss';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-import {connect} from 'react-redux'; 
-import {bindActionCreators} from 'redux';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { reduxGetAllCommunityTestimonials, reduxGetAllTestimonials } from '../../../redux/redux-actions/adminActions';
-
+import CommunitySwitch from './../Summary/CommunitySwitch'; 
 class AllTestimonials extends React.Component {
   constructor(props) {
     super(props);
@@ -44,27 +44,65 @@ class AllTestimonials extends React.Component {
   }
 
   async componentDidMount() {
-    const allTestimonialsResponse = await apiCall('/testimonials.listForSuperAdmin');
-
-    if (allTestimonialsResponse && allTestimonialsResponse.success) {
-      const data = allTestimonialsResponse.data.map(d => (
-        [
-          {
-            id: d.id,
-            image: d.image,
-            initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
-          },
-          `${d.title}...`.substring(0, 30), // limit to first 30 chars
-          `${d.body}...`.substring(0, 30), // limit to first 30 chars
-          `${d.user ? d.user.full_name : ''}...`.substring(0, 20), // limit to first 20 chars
-          `${d.action ? d.action.title : ''} ${d.action && d.action.community ? ` -  (${d.action.community.name})` : ''}`,
-          `${d.is_published && d.is_approved ? 'Live' : 'Not Live'}`,
-          d.id
-        ]
-      ));
-      await this.setStateAsync({ data, loading: false });
-    // await this.setStateAsync({ communities: response.data });
+    const user = this.props.auth ? this.props.auth : {};
+    if (user.is_super_admin) {
+      await this.props.callTestimonialsForSuperAdmin()
     }
+    if (user.is_community_admin) {
+      var com = this.props.community ? this.props.community : user.communities[0];
+      await this.props.callTestimonialsForNormalAdmin(com.id);
+    }
+    // const allTestimonialsResponse = await apiCall('/testimonials.listForSuperAdmin');
+
+    // if (allTestimonialsResponse && allTestimonialsResponse.success) {
+    //   const data = allTestimonialsResponse.data.map(d => (
+    //     [
+    //       {
+    //         id: d.id,
+    //         image: d.image,
+    //         initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
+    //       },
+    //       `${d.title}...`.substring(0, 30), // limit to first 30 chars
+    //       `${d.body}...`.substring(0, 30), // limit to first 30 chars
+    //       `${d.user ? d.user.full_name : ''}...`.substring(0, 20), // limit to first 20 chars
+    //       `${d.action ? d.action.title : ''} ${d.action && d.action.community ? ` -  (${d.action.community.name})` : ''}`,
+    //       `${d.is_published && d.is_approved ? 'Live' : 'Not Live'}`,
+    //       d.id
+    //     ]
+    //   ));
+    //   await this.setStateAsync({ data, loading: false });
+    // // await this.setStateAsync({ communities: response.data });
+    // }
+  }
+  showCommunitySwitch = ()=>{
+    const user= this.props.auth? this.props.auth: {}; 
+    if(user.is_community_admin){
+      return(
+        <CommunitySwitch actionToPerform={this.handleCommunityChange}/>
+      )
+    }
+  }
+  handleCommunityChange =(id)=>{
+    this.props.callTestimonialsForNormalAdmin(id);
+  }
+  fashionData = (data) => {
+    data = data.map(d => (
+      [
+        {
+          id: d.id,
+          image: d.image,
+          initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
+        },
+        `${d.title}...`.substring(0, 30), // limit to first 30 chars
+        `${d.body}...`.substring(0, 30), // limit to first 30 chars
+        `${d.user ? d.user.full_name : ''}...`.substring(0, 20), // limit to first 20 chars
+        `${d.action ? d.action.title : ''} ${d.action && d.action.community ? ` -  (${d.action.community.name})` : ''}`,
+        `${d.is_published && d.is_approved ? 'Live' : 'Not Live'}`,
+        d.id
+      ]
+    ));
+
+    return data;
   }
 
   setStateAsync(state) {
@@ -209,7 +247,7 @@ class AllTestimonials extends React.Component {
                 </TableCell>
                 <TableCell align="left">
                   <Typography variant="caption">
-                    { n.vendor ? n.vendor.name : 'None'}
+                    {n.vendor ? n.vendor.name : 'None'}
                   </Typography>
                 </TableCell>
                 <TableCell>
@@ -226,9 +264,9 @@ class AllTestimonials extends React.Component {
   render() {
     const title = brand.name + ' - All Testimonials';
     const description = brand.desc;
-    const { data, columns, loading } = this.state;
+    const { columns, loading } = this.state;
     const { classes } = this.props;
-
+    const data = this.fashionData(this.props.allTestimonials);
     const options = {
       filterType: 'dropdown',
       responsive: 'stacked',
@@ -243,23 +281,23 @@ class AllTestimonials extends React.Component {
       }
     };
 
-    if (loading) {
-      return (
-        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
-              <div className={classes.root} style={{padding:30}}>
-                <h2>Will be deployed soon!</h2>
-                {/* <LinearProgress />
-                <h1>Fetching all Testimonials.  This may take a while...</h1>
-                <br />
-                <LinearProgress color="secondary" /> */}
-              </div>
-            </Paper>
-          </Grid>
-        </Grid>
-      );
-    }
+    // if (loading) {
+    //   return (
+    //     <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+    //       <Grid item xs={12} md={6}>
+    //         <Paper className={classes.root}>
+    //           <div className={classes.root} style={{padding:30}}>
+    //             <h2>Will be deployed soon!</h2>
+    //             {/* <LinearProgress />
+    //             <h1>Fetching all Testimonials.  This may take a while...</h1>
+    //             <br />
+    //             <LinearProgress color="secondary" /> */}
+    //           </div>
+    //         </Paper>
+    //       </Grid>
+    //     </Grid>
+    //   );
+    // }
 
     return (
       <div>
@@ -272,8 +310,9 @@ class AllTestimonials extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <div className={classes.table}>
+          {this.showCommunitySwitch()}
           <MUIDataTable
-            title="All Communities"
+            title="All Testimonials"
             data={data}
             columns={columns}
             options={options}
@@ -291,7 +330,8 @@ AllTestimonials.propTypes = {
 function mapStateToProps(state) {
   return {
     auth: state.getIn(['auth']),
-    allTestimonials: state.getIn(['allTestimonials'])
+    allTestimonials: state.getIn(['allTestimonials']),
+    community: state.getIn(['selected_community'])
   }
 }
 function mapDispatchToProps(dispatch) {

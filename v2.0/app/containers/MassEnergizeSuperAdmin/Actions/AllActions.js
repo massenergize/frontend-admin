@@ -31,7 +31,7 @@ class AllActions extends React.Component {
       loading: true
     };
   }
-
+ 
 
   async componentDidMount() {
     const {
@@ -171,9 +171,9 @@ class AllActions extends React.Component {
   render() {
     const title = brand.name + ' - All Actions';
     const description = brand.desc;
-    const { columns, loading, data } = this.state;
+    const { columns, loading } = this.state;
     const { classes } = this.props;
-
+    const data =this.fashionData(this.props.allActions);
     const options = {
       filterType: 'dropdown',
       responsive: 'stacked',
