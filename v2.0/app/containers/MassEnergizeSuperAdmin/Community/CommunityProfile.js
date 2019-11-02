@@ -21,7 +21,7 @@ import data from 'dan-api/apps/timelineData';
 import { fetchAction } from 'dan-actions/SocmedActions';
 import bgCover from 'dan-images/petal_bg.svg';
 import styles from 'dan-components/SocialMedia/jss/cover-jss';
-import CommunitySwitch from './../Summary/CommunitySwitch'; 
+import CommunitySwitch from '../Summary/CommunitySwitch';
 import {
   Cover,
   About,
@@ -55,25 +55,27 @@ class CommunityProfile extends React.Component {
     };
   }
 
-  showCommunitySwitch = ()=>{
-    const user= this.props.auth? this.props.auth: {}; 
-    if(user.is_community_admin){
-      return(
-        <CommunitySwitch actionToPerform={this.handleCommunityChange}/>
-      )
-    }
-  }
-  handleCommunityChange =(id)=>{
-    window.location = `/admin/community/${id}/profile`;
-  }
+
   async componentDidMount() {
     const { id } = this.props.match.params;
     if (id) {
-      this.setState({ id })
+      this.setState({ id });
       this.props.callCommunity(id);
     }
   }
 
+  showCommunitySwitch = () => {
+    const user = this.props.auth ? this.props.auth : {};
+    if (user.is_community_admin) {
+      return (
+        <CommunitySwitch actionToPerform={this.handleCommunityChange} />
+      );
+    }
+  }
+
+  handleCommunityChange =(id) => {
+    window.location = `/admin/community/${id}/profile`;
+  }
   handleChange = (event, value) => {
     this.setState({ value });
   };
@@ -84,7 +86,7 @@ class CommunityProfile extends React.Component {
     const { dataProps, classes } = this.props;
     const { value } = this.state;
     const community = this.props.full_community ? this.props.full_community : {};
-    console.log("I am wherererere community", community);
+
     return (
       <div>
         <Helmet>
@@ -104,7 +106,7 @@ class CommunityProfile extends React.Component {
           desc={community && (community.about_community || '')}
           community={community}
         />
-        
+
         <AppBar position="static" className={classes.profileTab}>
           <Hidden mdUp>
             <Tabs
@@ -129,7 +131,7 @@ class CommunityProfile extends React.Component {
               indicatorColor="primary"
               textColor="primary"
               centered
-              style={{boxShadow:"0 0px 3px 0 rgba(0,0,0,.18),0 0px 3px 0 rgba(0,0,0,.15)"}}
+              style={{ boxShadow: '0 0px 3px 0 rgba(0,0,0,.18),0 0px 3px 0 rgba(0,0,0,.15)' }}
             >
               <Tab icon={<AccountCircle />} label="ABOUT" />
               <Tab icon={<SupervisorAccount />} label="USERS" />
@@ -143,8 +145,8 @@ class CommunityProfile extends React.Component {
         {value === 2 && <TabContainer><Favorites data={{ testimonials: community.testimonials, events: community.events }} /></TabContainer>}
         {value === 3
           && (
-            <TabContainer >
-              <Pages community = {community} />
+            <TabContainer>
+              <Pages community={community} />
               {/* <h1>Edit Pages</h1>
               <ul>
                 <li><Link to={`/admin/edit/${community.id}/home`}>Home Page</Link></li>
@@ -175,12 +177,10 @@ const mapStateToProps = state => ({
   // dataProps: state.getIn([reducer, 'dataTimeline'])
 });
 
-const mapDispatchToProps = dispatch => {
-  return bindActionCreators({
-    callCommunity: reduxCallFullCommunity,
-    liveOrNot: reduxLiveOrNot,
-  }, dispatch);
-};
+const mapDispatchToProps = dispatch => bindActionCreators({
+  callCommunity: reduxCallFullCommunity,
+  liveOrNot: reduxLiveOrNot,
+}, dispatch);
 
 const CommunityProfileMapped = connect(
   mapStateToProps,

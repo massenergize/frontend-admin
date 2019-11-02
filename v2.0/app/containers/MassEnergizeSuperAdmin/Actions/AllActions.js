@@ -15,44 +15,35 @@ import Grid from '@material-ui/core/Grid';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Paper from '@material-ui/core/Paper';
 
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-import {connect} from 'react-redux'; 
-import {bindActionCreators } from 'redux';
 import { reduxGetAllActions, reduxGetAllCommunityActions } from '../../../redux/redux-actions/adminActions';
-import CommunitySwitch from './../Summary/CommunitySwitch'; 
+import CommunitySwitch from '../Summary/CommunitySwitch';
 class AllActions extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       columns: this.getColumns(),
       data: [],
-      loading: true 
+      loading: true
     };
   }
 
-  showCommunitySwitch = ()=>{
-    const user= this.props.auth? this.props.auth: {}; 
-    if(user.is_community_admin){
-      return(
-        <CommunitySwitch actionToPerform={this.changeActions}/>
-      )
-    }
-  }
-  changeActions = (id)=>{
-    this.props.callCommunityActions(id);
-  }
+
+
   async componentDidMount() {
-    const user = this.props.auth ? this.props.auth : {}; 
-    if(user.is_super_admin){
+    const user = this.props.auth ? this.props.auth : {};
+    if (user.is_super_admin) {
       this.props.callAllActions();
     }
-    if(user.is_community_admin){
-      //not nec.. remove later
-      const community = this.props.community? this.props.community : user.communities[0];
+    if (user.is_community_admin) {
+      // not nec.. remove later
+      const community = this.props.community ? this.props.community : user.communities[0];
       this.props.callCommunityActions(community.id);
     }
-   
+
     // const allActionsResponse = this.props.allActions;
     // if (allActionsResponse) {
     //   const data = allActionsResponse.map(d => (
@@ -73,7 +64,20 @@ class AllActions extends React.Component {
     // }
   }
 
-  fashionData =(data)=>{
+  showCommunitySwitch = () => {
+    const user = this.props.auth ? this.props.auth : {};
+    if (user.is_community_admin) {
+      return (
+        <CommunitySwitch actionToPerform={this.changeActions} />
+      );
+    }
+  }
+
+  changeActions = (id) => {
+    this.props.callCommunityActions(id);
+  }
+
+  fashionData =(data) => {
     const fashioned = data.map(d => (
       [
         {
@@ -88,7 +92,7 @@ class AllActions extends React.Component {
         d.id
       ]
     ));
-    return fashioned
+    return fashioned;
   }
   // setStateAsync(state) {
   //   return new Promise((resolve) => {
@@ -194,7 +198,7 @@ class AllActions extends React.Component {
         });
       }
     };
-    
+
     // if (loading) {
     //   return (
     //     <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
@@ -240,19 +244,15 @@ AllActions.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-const mapStateToProps =(state) =>{
-  return{
-    auth:state.getIn(['auth']), 
-    allActions:state.getIn(['allActions']),
-    community:state.getIn(['selected_community'])
-    //community:state.getIn(['selected_community'])
-  }
-}
-const mapDispatchToProps = (dispatch) =>{
-  return bindActionCreators({
-    callAllActions: reduxGetAllActions,
-    callCommunityActions: reduxGetAllCommunityActions
-  },dispatch);
-};
-const ActionsMapped = connect(mapStateToProps,mapDispatchToProps)(AllActions);
+const mapStateToProps = (state) => ({
+  auth: state.getIn(['auth']),
+  allActions: state.getIn(['allActions']),
+  community: state.getIn(['selected_community'])
+  // community:state.getIn(['selected_community'])
+});
+const mapDispatchToProps = (dispatch) => bindActionCreators({
+  callAllActions: reduxGetAllActions,
+  callCommunityActions: reduxGetAllCommunityActions
+}, dispatch);
+const ActionsMapped = connect(mapStateToProps, mapDispatchToProps)(AllActions);
 export default withStyles(styles)(ActionsMapped);

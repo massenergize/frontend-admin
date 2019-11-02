@@ -1,24 +1,13 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
-import brand from 'dan-api/dummy/brand';
-import { Helmet } from 'react-helmet';
 import { withStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-import Divider from '@material-ui/core/Divider';
 import { connect } from 'react-redux';
 import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
-import {
-  CounterChartWidget,
-  // SalesChartWidget,
-  CarouselWidget,
-  NewsWidget
-} from 'dan-components';
-import styles from './dashboard-jss';
-import { connectRouter } from 'connected-react-router';
 import { bindActionCreators } from 'redux';
 import { reduxLoadSelectedCommunity } from '../../../redux/redux-actions/adminActions';
+import styles from './dashboard-jss';
 
 class CommunitySwitch extends PureComponent {
   constructor(props) {
