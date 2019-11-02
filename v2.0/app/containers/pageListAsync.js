@@ -38,6 +38,14 @@ export const CommunityProfile = loadable(() => import('./MassEnergizeSuperAdmin/
   fallback: <Loading />,
 });
 
+export const AddRemoveCommunityAdmin = loadable(() => import('./MassEnergizeSuperAdmin/Community/AddRemoveAdmin'), {
+  fallback: <Loading />,
+});
+
+export const AddRemoveSupertAdmin = loadable(() => import('./MassEnergizeSuperAdmin/Community/AddRemoveSuperAdmin'), {
+  fallback: <Loading />,
+});
+
 
 export const AddCategory = loadable(() => import('./MassEnergizeSuperAdmin/Categories/AddCategory'), {
   fallback: <Loading />,

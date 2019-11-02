@@ -78,6 +78,7 @@ class About extends React.Component {
     const { classes, community } = this.props;
     const goalsEditLink = `/admin/edit/${community ? community.id : null}/goal`;
     const communityEditLink = `/admin/edit/${community ? community.id : null}/community`;
+    const addRemoveCommuntyAdminLink = `/admin/edit/${community ? community.id : null}/community-admins`;
 
 
     return (
@@ -142,6 +143,21 @@ class About extends React.Component {
                 </Avatar>
                 <ListItemText primary="Last Updated" secondary={`${community.owner_phone_number || 'No Phone Number Provided'}`} />
               </ListItem>
+            </List>
+
+            <Divider className={classes.divider} />
+
+            <List dense className={classes.profileList}>
+              {community && community.admins &&
+                (community.admins.map(a => (
+                  <ListItem>
+                    <Avatar>
+                      <img src={a.profile_picture ? a.profile_picture.url : '#'} alt={a.name} />
+                    </Avatar>
+                    <ListItemText primary={a.name} secondary={`${a.email}`} />
+                  </ListItem>
+                )))
+              }
             </List>
           </PapperBlock>
           <Divider className={classes.divider} />
@@ -219,6 +235,13 @@ class About extends React.Component {
             <Paper onClick={() => goHere(communityEditLink)} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
                 Edit Community Info
+                {' '}
+                <Icon style={{ paddingTop: 3, color: 'green' }}>forward</Icon>
+              </Typography>
+            </Paper>
+            <Paper onClick={() => goHere(addRemoveCommuntyAdminLink)} className={`${classes.pageCard}`} elevation={1}>
+              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                Add/Remove Administrators for Community
                 {' '}
                 <Icon style={{ paddingTop: 3, color: 'green' }}>forward</Icon>
               </Typography>

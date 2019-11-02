@@ -29,6 +29,8 @@ import {
   SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditGoal, EditPolicy, EditEvent
 } from '../pageListAsync';
 import EditVendor from '../MassEnergizeSuperAdmin/Vendors/EditVendor';
+import AddRemoveAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveAdmin';
+import AddRemoveSuperAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveSuperAdmin';
 
 
 class Application extends React.Component {
@@ -78,6 +80,9 @@ class Application extends React.Component {
           <Route path="/admin/community/:id/profile" component={CommunityProfile} exact />
           <Route path="/admin/community/:id/edit" component={OnboardCommunity} exact />
           <Route path="/admin/edit/:id/community" component={OnboardCommunity} exact />
+          <Route path="/admin/add/:id/community-admins" component={AddRemoveAdmin} exact />
+          <Route path="/admin/edit/:id/community-admins" component={AddRemoveAdmin} exact />
+          <Route path="/admin/add-super-admin" component={AddRemoveSuperAdmin} exact />
 
           <Route path="/admin/read/actions" component={AllActions} />
           <Route path="/admin/add/action" component={AddAction} />
