@@ -29,7 +29,7 @@ function checkAuthUser() {
   }
 }
 export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = null) {
-   checkAuthUser();
+  checkAuthUser();
   const idToken = localStorage.getItem("idToken");
   const response = await fetch(`${API_HOST}/v3${destinationUrl}`, {
     credentials: 'include',

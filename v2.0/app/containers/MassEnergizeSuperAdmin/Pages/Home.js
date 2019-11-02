@@ -215,7 +215,7 @@ class HomePageEditForm extends Component {
                   },
                   {
                     name: 'target_number_of_actions',
-                    label: 'Attained Number of Actions',
+                    label: 'Target Number of Actions',
                     placeholder: 'eg. 100',
                     fieldType: 'TextField',
                     contentType: 'number',
@@ -237,7 +237,7 @@ class HomePageEditForm extends Component {
                   },
                   {
                     name: 'target_number_of_households',
-                    label: 'How many households joined this community?',
+                    label: 'How many households are expected to join this community?',
                     placeholder: 'eg. 100',
                     fieldType: 'TextField',
                     contentType: 'number',
@@ -388,7 +388,7 @@ class HomePageEditForm extends Component {
                         fieldType: 'TextField',
                         contentType: 'text',
                         isRequired: false,
-                        defaultValue:  `${iconBox2 && iconBox2.link}`,
+                        defaultValue: `${iconBox2 && iconBox2.link}`,
                         dbName: 'icon_box_2_link',
                         readOnly: false
                       },
@@ -495,7 +495,7 @@ class HomePageEditForm extends Component {
                         readOnly: false
                       },
                       {
-                        name: 'icon_box_1_description',
+                        name: 'icon_box_4_description',
                         label: 'Short description the card (no more than 20 characters)',
                         placeholder: 'Tell us more ...',
                         fieldType: 'TextField',

@@ -68,7 +68,7 @@ class EditCommunityForm extends Component {
       title: 'Edit your Community',
       subTitle: '',
       method: '/communities.update',
-      successRedirectPage: '/admin/read/communities',
+      successRedirectPage: `/admin/community/${community.id}/edit`,
       fields: [
         {
           label: 'About this Community',
@@ -82,7 +82,7 @@ class EditCommunityForm extends Component {
               contentType: 'number',
               isRequired: true,
               defaultValue: community.id,
-              dbName: 'id',
+              dbName: 'community_id',
               readOnly: true
             },
             {
@@ -141,7 +141,7 @@ class EditCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: '',
+                    defaultValue: `${community.location && community.location.address ? community.location.address : ''}`,
                     dbName: 'address',
                     readOnly: false
                   },
@@ -152,7 +152,7 @@ class EditCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: '',
+                    defaultValue: `${community.location && community.location.unit ? community.location.unit : ''}`,
                     dbName: 'unit',
                     readOnly: false
                   },
@@ -163,7 +163,7 @@ class EditCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: '',
+                    defaultValue: `${community.location && community.location.city ? community.location.city : ''}`,
                     dbName: 'city',
                     readOnly: false
                   },
@@ -174,7 +174,7 @@ class EditCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: '',
+                    defaultValue: `${community.location && community.location.state ? community.location.state : ''}`,
                     dbName: 'state',
                     readOnly: false
                   },
@@ -185,8 +185,8 @@ class EditCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: '',
-                    dbName: 'state',
+                    defaultValue: `${community.location && community.location.zipcode ? community.location.zipcode : ''}`,
+                    dbName: 'zipcode',
                     readOnly: false
                   },
                   {
@@ -196,7 +196,7 @@ class EditCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: '',
+                    defaultValue: `${community.location && community.location.country ? community.location.country : ''}`,
                     dbName: 'country',
                     readOnly: false
                   },
@@ -221,7 +221,7 @@ class EditCommunityForm extends Component {
               label: 'Do you approve this community? (Check yes after background check)',
               fieldType: 'Radio',
               isRequired: false,
-              defaultValue: community.iss_approved ? 'true' : 'false',
+              defaultValue: community.is_approved ? 'true' : 'false',
               dbName: 'is_approved',
               readOnly: false,
               data: [

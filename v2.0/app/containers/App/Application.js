@@ -28,6 +28,7 @@ import {
   AddTestimonial, AllTestimonials, Export, CustomizePages, EditAction,
   SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditGoal, EditPolicy, EditEvent
 } from '../pageListAsync';
+import EditVendor from '../MassEnergizeSuperAdmin/Vendors/EditVendor';
 
 
 class Application extends React.Component {
@@ -107,6 +108,7 @@ class Application extends React.Component {
 
           <Route path="/admin/read/vendors" component={AllVendors} />
           <Route path="/admin/add/vendor" component={AddVendor} />
+          <Route path="/admin/edit/:id/vendor" component={EditVendor} />
 
           <Route path="/admin/export" component={Export} />
 

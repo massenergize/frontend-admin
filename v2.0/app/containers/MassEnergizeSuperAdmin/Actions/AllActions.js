@@ -32,7 +32,6 @@ class AllActions extends React.Component {
   }
 
 
-
   async componentDidMount() {
     const user = this.props.auth ? this.props.auth : {};
     if (user.is_super_admin) {
@@ -43,25 +42,6 @@ class AllActions extends React.Component {
       const community = this.props.community ? this.props.community : user.communities[0];
       this.props.callCommunityActions(community.id);
     }
-
-    // const allActionsResponse = this.props.allActions;
-    // if (allActionsResponse) {
-    //   const data = allActionsResponse.map(d => (
-    //     [
-    //       {
-    //         id: d.id,
-    //         image: d.image,
-    //         initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
-    //       },
-    //       `${d.title}...`.substring(0, 30), // limit to first 30 chars
-    //       `${d.about}...`.substring(0, 20), // limit to first 20 chars
-    //       `${d.tags.map(t => t.name).join(', ')} `,
-    //       d.community && d.community.name,
-    //       d.id
-    //     ]
-    //   ));
-    //   await this.setStateAsync({ data, loading: false });
-    // }
   }
 
   showCommunitySwitch = () => {
@@ -79,21 +59,22 @@ class AllActions extends React.Component {
 
   fashionData =(data) => {
     const fashioned = data.map(d => (
-      [
-        {
-          id: d.id,
-          image: d.image,
-          initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
-        },
-        `${d.title}...`.substring(0, 30), // limit to first 30 chars
-        `${d.about}...`.substring(0, 20), // limit to first 20 chars
-        `${d.tags.map(t => t.name).join(', ')} `,
-        d.community && d.community.name,
-        d.id
-      ]
-    ));
+        [
+          {
+            id: d.id,
+            image: d.image,
+            initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
+          },
+          `${d.title}...`.substring(0, 30), // limit to first 30 chars
+          `${d.featured_summary || 'No summary Provided'}...`.substring(0, 20), // limit to first 20 chars
+          `${d.tags.map(t => t.name).join(', ')} `,
+          d.community && d.community.name,
+          d.id
+        ]
+      ));
     return fashioned;
   }
+  
   // setStateAsync(state) {
   //   return new Promise((resolve) => {
   //     this.setState(state, resolve);
@@ -127,8 +108,8 @@ class AllActions extends React.Component {
       }
     },
     {
-      name: 'About',
-      key: 'about',
+      name: 'Featured Summary',
+      key: 'summary',
       options: {
         filter: false,
       }

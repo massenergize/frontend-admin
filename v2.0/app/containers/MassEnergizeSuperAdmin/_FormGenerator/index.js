@@ -106,6 +106,10 @@ class MassEnergizeForm extends Component {
             formData[field.name] = [];
             break;
           case FieldTypes.HTMLField:
+            if (!field.defaultValue || field.defaultValue === '<p></p>\n') {
+              formData[field.name] = EditorState.createEmpty();
+              break;
+            }
             formData[field.name] = (field.defaultValue && EditorState.createWithContent(
               ContentState.createFromBlockArray(
                 convertFromHTML(field.defaultValue)
@@ -333,7 +337,7 @@ class MassEnergizeForm extends Component {
       // const initialFormData = this.initialFormData(formJson.fields);
       // await this.setStateAsync({ formJson, formData });
       await this.setStateAsync({
-        successMsg: `Successfully Created the Resource with Id: ${response.data.id}. Want to Create a new one?  Modify the fields`,
+        successMsg: `Successfully Created/Updated the Resource with Id: ${response.data.id}.`,
         error: null,
         startCircularSpinner: false,
         // formData: initialFormData

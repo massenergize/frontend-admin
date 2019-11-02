@@ -144,6 +144,7 @@ class App extends React.Component {
     const { error, started } = this.state;
     const user = this.props.auth;
     console.log("testing le props", this.props.auth);
+
     return (
       <ThemeWrapper>
         <AppContext.Consumer>

@@ -1,33 +1,8 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-// import { Editor } from 'react-draft-wysiwyg';
-// import draftToHtml from 'draftjs-to-html';
-// import { convertFromRaw, EditorState, convertToRaw } from 'draft-js';
-import InputLabel from '@material-ui/core/InputLabel';
-import Input from '@material-ui/core/Input';
-import MenuItem from '@material-ui/core/MenuItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Select2 from '@material-ui/core/Select';
-import Paper from '@material-ui/core/Paper';
-import LinearProgress from '@material-ui/core/LinearProgress';
-
-import { reduxForm } from 'redux-form/immutable';
-import Grid from '@material-ui/core/Grid';
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Typography from '@material-ui/core/Typography';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-import Button from '@material-ui/core/Button';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormGroup from '@material-ui/core/FormGroup';
-import { MaterialDropZone } from 'dan-components';
-import CircularProgress from '@material-ui/core/CircularProgress';
-
-import { fetchData, sendFormWithMedia } from '../../../utils/messenger';
-import { initAction, clearAction } from '../../../actions/ReduxFormActions';
+import { apiCall } from '../../../utils/messenger';
+import MassEnergizeForm from '../_FormGenerator';
 
 const styles = theme => ({
   root: {
@@ -54,64 +29,83 @@ const styles = theme => ({
 });
 
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
-class EditActionForm extends Component {
+class CreateNewActionForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      formData: { tagsSelected: [], vendorsSelected: [], image: [] },
-      tags: [],
-      vendors: [],
       communities: [],
-      tagCollections: [],
-      uploadedImage: null,
-      submitIsClicked: false
+      action: null,
+      vendors: [],
+      formJson: null
     };
-    this.updateForm = this.updateForm.bind(this);
   }
 
 
   async componentDidMount() {
     const { id } = this.props.match.params;
-    const tagCollections = await fetchData('v2/tag-collections');
-    const vendors = await fetchData('v2/vendors');
-    const communities = await fetchData('v2/communities');
-    const action = await fetchData(`v2/action/${id}`);
+    const actionResponse = await apiCall('/actions.info', { action_id: id });
+    if (actionResponse && !actionResponse.success) {
+      return;
+    }
+    if (actionResponse && actionResponse.success) {
+      await this.setStateAsync({ action: actionResponse.data });
+    }
+    const tagCollectionsResponse = await apiCall('/tag_collections.listForSuperAdmin');
+    const communitiesResponse = await apiCall('/communities.listForSuperAdmin');
+    const vendorsResponse = await apiCall('/vendors.listForSuperAdmin');
 
-    if (tagCollections) {
-      const tags = [];
-      Object.values(tagCollections.data).forEach(tCol => {
-        Object.values(tCol.tags).forEach(t => {
-          tags.push({ ...t, tagCollection: tCol.name });
-        });
+    if (communitiesResponse && communitiesResponse.data) {
+      const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
+      await this.setStateAsync({ communities });
+    }
+
+    if (vendorsResponse && vendorsResponse.data) {
+      const vendors = vendorsResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
+      await this.setStateAsync({ vendors });
+    }
+
+    const formJson = await this.createFormJson();
+    if (tagCollectionsResponse && tagCollectionsResponse.data) {
+      const section = {
+        label: 'Please select tag(s) that apply to this event',
+        fieldType: 'Section',
+        children: []
+      };
+
+      Object.values(tagCollectionsResponse.data).forEach(tCol => {
+        const { action } = this.state;
+        const newField = {
+          name: tCol.name,
+          label: `${tCol.name} ${tCol.allow_multiple ? '(You can select multiple)' : '(Only one selection allowed)'}`,
+          placeholder: '',
+          fieldType: 'Checkbox',
+          selectMany: tCol.allow_multiple,
+          defaultValue: this.getSelectedIds(action.tags, tCol.tags),
+          dbName: 'tags',
+          data: tCol.tags.map(t => ({ ...t, displayName: t.name, id: '' + t.id }))
+        };
+
+        // want this to be the 5th field
+        section.children.push(newField);
       });
-      this.setStateAsync({ tags });
-      this.setStateAsync({ tagCollections: tagCollections.data });
+
+      // want this to be the 2nd field
+      formJson.fields.splice(1, 0, section);
     }
 
-    if (vendors) {
-      await this.setStateAsync({ vendors: vendors.data });
-    }
-
-    if (communities) {
-      await this.setStateAsync({ communities: communities.data });
-    }
-
-    if (action) {
-      await this.setStateAsync({ formData: this.getFormDataFromAction(action.data) });
-      await this.setStateAsync({ uploadedImage: action.data.image });
-    }
+    await this.setStateAsync({ formJson });
   }
+
+  getSelectedIds = (selected, dataToCrossCheck) => {
+    const res = [];
+    selected.forEach(s => {
+      if (dataToCrossCheck.filter(d => d.id === s.id).length > 0) {
+        res.push('' + s.id);
+      }
+    });
+    return res;
+  }
+
 
   setStateAsync(state) {
     return new Promise((resolve) => {
@@ -119,375 +113,155 @@ class EditActionForm extends Component {
     });
   }
 
-  getFormDataFromAction = (action) => {
-    const res = {
-      id: action.id,
-      title: action.title,
-      about: action.about,
-      is_global: action.is_global ? 'true' : 'false',
-      average_carbon_score: action.average_carbon_score,
-      image: [],
-      steps_to_take: action.steps_to_take,
-      tagsSelected: action.tags.map(t => t.id),
-      vendorsSelected: action.vendors.map(v => v.id)
+  createFormJson = async () => {
+    const { action, communities, vendors } = this.state;
+    const formJson = {
+      title: 'Update Action',
+      subTitle: '',
+      method: '/actions.update',
+      successRedirectPage: `/admin/edit/${action.id}/action`,
+      fields: [
+        {
+          label: 'About this Action',
+          fieldType: 'Section',
+          children: [
+            {
+              name: 'action_id',
+              label: 'Action ID (Do not Edit)',
+              placeholder: 'Use Heat Pumps',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: action.id,
+              dbName: 'id',
+              readOnly: true
+            },
+            {
+              name: 'title',
+              label: 'Title of Action (Between 4 and 25 characters)',
+              placeholder: 'Use Heat Pumps',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: action.title,
+              dbName: 'title',
+              readOnly: false
+            },
+            {
+              name: 'is_global',
+              label: 'Is this Action a Global/Template Action?',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: action.is_global ? 'true' : 'false',
+              dbName: 'is_global',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+              child: {
+                valueToCheck: 'false',
+                fields: [
+                  {
+                    name: 'community',
+                    label: 'Primary Community',
+                    placeholder: 'eg. Wayland',
+                    fieldType: 'Dropdown',
+                    defaultValue: action.community && '' + action.community.id,
+                    dbName: 'community_id',
+                    data: communities
+                  },
+                ]
+              }
+            },
+            {
+              name: 'is_published',
+              label: 'Should this action go live?',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: action.is_published ? 'true' : 'false',
+              dbName: 'is_published',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+            },
+          ]
+        },
+        {
+          name: 'featured_summary',
+          label: 'Featured Summary',
+          placeholder: 'eg. This event is happening in ...',
+          fieldType: 'TextField',
+          isMulti: true,
+          isRequired: true,
+          defaultValue: action.featured_summary,
+          dbName: 'featured_summary',
+        },
+        {
+          name: 'about',
+          label: 'Write some detailed description about this action',
+          placeholder: 'eg. Write some detailed description about this action',
+          fieldType: 'HTMLField',
+          isRequired: true,
+          defaultValue: action.about,
+          dbName: 'about',
+        },
+        {
+          name: 'steps_to_take',
+          label: 'Please outline steps to take for your users',
+          placeholder: 'eg. Please outline steps to take for your users',
+          fieldType: 'HTMLField',
+          isRequired: true,
+          defaultValue: action.steps_to_take,
+          dbName: 'steps_to_take',
+        },
+        {
+          name: 'vendors',
+          label: 'Select which vendors provide services for this action',
+          placeholder: 'eg. Solarize Wayland',
+          fieldType: 'Checkbox',
+          selectMany: true,
+          defaultValue: action.vendors ? action.vendors.map(v => '' + v.id) : [],
+          dbName: 'vendors',
+          data: vendors
+        },
+        {
+          name: 'image',
+          placeholder: 'Select an Image',
+          fieldType: 'File',
+          previewLink: action.image && action.image.url,
+          dbName: 'image',
+          label: 'Upload Files',
+          isRequired: false,
+          defaultValue: '',
+          filesLimit: 1
+        },
+      ]
     };
-    if (action.community) {
-      res.community = action.community.id;
-    }
-    return res;
+    return formJson;
   }
 
-
-  handleChangeMultiple = (event) => {
-    const { target } = event;
-    const { name, options } = target;
-    const value = [];
-    for (let i = 0, l = options.length; i < l; i += 1) {
-      if (options[i].selected) {
-        value.push(options[i].value);
-      }
-    }
-    this.setState({
-      formData: { [name]: value }
-    });
-  };
-
-  handleFormDataChange = (event) => {
-    const { target } = event;
-    if (!target) return;
-    const { formData } = this.state;
-    const { name, value } = target;
-    this.setState({
-      formData: { ...formData, [name]: value }
-    });
-  };
-
-  handleIsTemplateCheckbox = async (event) => {
-    const { target } = event;
-    if (!target) return;
-    const { formData } = this.state;
-    const oldValue = formData.is_global;
-    const { name } = target;
-    if (oldValue !== 'true') {
-      delete formData.community;
-    }
-    await this.setStateAsync({
-      formData: { ...formData, [name]: oldValue === 'true' ? 'false' : 'true' }
-    });
-  };
-
-  handleCheckBoxSelect = async (event) => {
-    const { target } = event;
-    if (!target) return;
-    const { formData } = this.state;
-    const { name, value } = target;
-    const theList = formData[name];
-    const newVal = parseInt(value, 10);
-    const pos = theList.indexOf(newVal);
-    if (pos > -1) {
-      theList.splice(pos, pos + 1);
-    } else {
-      theList.push(newVal);
-    }
-    await this.setStateAsync({
-      formData: { ...formData, [name]: theList }
-    });
-  };
-
-  submitForm = async (event) => {
-    event.preventDefault();
-    const { formData } = this.state;
-    const cleanedValues = { ...formData };
-    cleanedValues.tags = cleanedValues.tagsSelected;
-    cleanedValues.vendors = cleanedValues.vendorsSelected;
-    delete cleanedValues.tagsSelected;
-    delete cleanedValues.vendorsSelected;
-    delete cleanedValues.undefined;
-
-    if (cleanedValues.image && cleanedValues.image[0]) {
-      cleanedValues.image = cleanedValues.image[0];
-    } else {
-      delete cleanedValues.image;
-    }
-    if (cleanedValues.is_global === 'true') {
-      delete cleanedValues.community;
-    }
-    await sendFormWithMedia(cleanedValues, `/v2/action/${formData.id}`, `/admin/read/action/${cleanedValues.id}/edit`);
-    await this.setStateAsync({ ...this.state, submitIsClicked: true });
-  }
-
-  async updateForm(fieldName, value) {
-    const { formData } = this.state;
-    await this.setStateAsync({
-      formData: {
-        ...formData,
-        [fieldName]: value
-      }
-    }
-    );
-    console.log(this.state);
-  }
 
   render() {
-    const trueBool = true;
-    const {
-      classes,
-      submitting,
-    } = this.props;
-    const {
-      formData, communities, vendors, tagCollections, uploadedImage, submitIsClicked, 
-    } = this.state;
-    const { 
-      id, tagsSelected, vendorsSelected, community, title, is_global,
-      steps_to_take, about, average_carbon_score
-    } = formData;
-    let communitySelected = communities.filter(c => c.id === community)[0];
-    communitySelected = communitySelected ? communitySelected.name : '';
-
-    if (!id) {
-      return (
-        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
-              <div className={classes.root}>
-                <LinearProgress />
-                <h1>Fetching all data for this Action</h1>
-                <br />
-                <LinearProgress color="secondary" />
-              </div>
-            </Paper>
-          </Grid>
-        </Grid>
-      );
-    }
+    const { classes } = this.props;
+    const { formJson } = this.state;
+    if (!formJson) return (<div />);
     return (
       <div>
-        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
-              <Typography variant="h5" component="h3">
-                 Edit Action { id ? ` with id: ${id}` : '' }
-              </Typography>
-              <div>
-                <img src={uploadedImage ? uploadedImage.url : ""} className={classes.img} alt={"Title"} />
-              </div>
-              <form onSubmit={this.submitForm}>
-                <div>
-                  <FormControl className={classes.formControl}>
-                    <InputLabel htmlFor="title">Title</InputLabel>
-                    <Input id="title" value={title} name="title" onChange={this.handleFormDataChange} />
-                  </FormControl>
-                </div>
-                <div>
-                  <FormControlLabel
-                    control={(
-                      <Checkbox
-                        checked={is_global === 'true'}
-                        onChange={this.handleIsTemplateCheckbox}
-                        value="true"
-                        name="is_global"
-                      />
-                    )}
-                    label="Is this action a global/template action?"
-                  />
-                </div>
-                <div>
-                  {is_global !== 'true'
-                    &&
-                    (
-                      <FormControl className={classes.field}>
-                        <InputLabel htmlFor="community">Community</InputLabel>
-                        <Select2
-                          native
-                          name="community"
-                          onChange={async (newValue) => { await this.updateForm('community', parseInt(newValue.target.value, 10)); }}
-                          inputProps={{
-                            id: 'age-native-simple',
-                          }}
-                        >
-                          <option value={community}>{communitySelected}</option>
-                          { communities
-                            && communities.map(c => (
-                              <option value={c.id} key={c.id}>{c.name}</option>
-                            ))
-                          }
-                        </Select2>
-                      </FormControl>
-                    )
-                  }
-                </div>
-                <div className={classes.field}>
-                  <FormControl className={classes.formControl}>
-                    <InputLabel htmlFor="steps_to_take">Steps to Take</InputLabel>
-                    <Input
-                      id="steps_to_take"
-                      value={steps_to_take} 
-                      name="steps_to_take"
-                      onChange={this.handleFormDataChange}
-                      multiline={trueBool}
-                      rows={4}
-                    />
-                  </FormControl>
-                </div>
-                {/* <Grid item xs={12}>
-                  <Editor
-                    editorState={editorState}
-                    editorClassName={classes.textEditor}
-                    toolbarClassName={classes.toolbarEditor}
-                    onEditorStateChange={this.onEditorStateChange}
-                  />
-                </Grid> */}
-                <div className={classes.field}>
-                  <FormControl className={classes.formControl}>
-                    <InputLabel htmlFor="about">About this Action</InputLabel>
-                    <Input
-                      id="about"
-                      value={about}
-                      name="about"
-                      onChange={this.handleFormDataChange}
-                      multiline={trueBool}
-                      rows={4}
-                    />
-                  </FormControl>
-                </div>
-                <div className={classes.field}>
-                  <FormControl className={classes.formControl}>
-                    <InputLabel htmlFor="average_carbon_score">Average Carbon Score</InputLabel>
-                    <Input
-                      id="average_carbon_score"
-                      value={average_carbon_score} 
-                      name="average_carbon_score"
-                      placeholder="eg. 5"
-                      onChange={this.handleFormDataChange}
-                    />
-                  </FormControl>
-                </div>
-
-
-                <div className={classes.field}>
-                  <FormControl className={classes.formControl}>
-                    <Select2
-                      multiple
-                      displayEmpty
-                      value={vendorsSelected}
-                      onChange={this.handleFormDataChange}
-                      input={<Input id="select-multiple-checkbox" />}
-                      renderValue={selected => {
-                        if (selected.length === 0) {
-                          return (
-                            <em>
-                             Please Select Vendors
-                            </em>
-                          );
-                        }
-                        const names = selected.map(s => vendors.filter(t => t.id === s)[0].name);
-                        return 'Vendors: ' + names.join(', ');
-                      }}
-                      MenuProps={MenuProps}
-                    >
-                      {vendors.map(t => {
-                        return (
-                          <MenuItem key={t.id} value={t.id}>
-                            <Checkbox
-                              checked={vendorsSelected.indexOf(t.id) > -1}
-                              onChange={this.handleCheckBoxSelect}
-                              value={'' + t.id}
-                              name="vendorsSelected"
-                            />
-                            <ListItemText primary={`${t.name}`} />
-                          </MenuItem>
-                        );
-                      })}
-                    </Select2>
-                  </FormControl>
-                </div>
-
-                {tagCollections.map(tc => (
-                  <div className={classes.field} key={tc.id}>
-                    <FormControl component="fieldset">
-                      <FormLabel component="legend">{tc.name}</FormLabel>
-                      <FormGroup>
-                        {tc.tags.map(t => (
-                          <FormControlLabel
-                            key={t.id}
-                            control={(
-                              <Checkbox
-                                checked={tagsSelected.indexOf(t.id) > -1}
-                                onChange={this.handleCheckBoxSelect}
-                                value={'' + t.id}
-                                name="tagsSelected"
-                              />
-                            )}
-                            label={t.name}
-                          />
-                        ))}
-                      </FormGroup>
-                    </FormControl>
-                    <br />
-                    <br />
-                    <br />
-                  </div>
-                ))}
-
-                <Fragment>
-                  <div>
-                    <MaterialDropZone
-                      acceptedFiles={['image/jpeg', 'image/png', 'image/jpg', 'image/bmp', 'image/svg']}
-                      files={this.state.formData.image}
-                      showPreviews
-                      maxSize={5000000}
-                      filesLimit={1}
-                      text="Please Upload the Display Image for this Action"
-                      addToState={this.updateForm}
-                    />
-                  </div>
-                </Fragment>
-
-                {submitIsClicked
-                  && (
-                    <div>
-                      <h5>Updating this Action ...</h5>
-                      <InputLabel>This could take a few seconds ...</InputLabel>
-                      <CircularProgress className={classes.progress} />
-                    </div>
-                  )
-                }
-                <div>
-                  <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
-                    Submit
-                  </Button>
-                </div>
-              </form>
-            </Paper>
-          </Grid>
-        </Grid>
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+        />
       </div>
     );
   }
 }
 
-EditActionForm.propTypes = {
+CreateNewActionForm.propTypes = {
   classes: PropTypes.object.isRequired,
-  submitting: PropTypes.bool.isRequired,
 };
 
-const mapDispatchToProps = dispatch => ({
-  init: bindActionCreators(initAction, dispatch),
-  clear: () => dispatch(clearAction),
-});
 
-const ReduxFormMapped = reduxForm({
-  form: 'immutableExample',
-  enableReinitialize: true,
-})(EditActionForm);
-
-const reducer = 'initval';
-const FormInit = connect(
-  state => ({
-    force: state,
-    initialValues: state.getIn([reducer, 'formValues'])
-  }),
-  mapDispatchToProps,
-)(ReduxFormMapped);
-
-export default withStyles(styles, { withTheme: true })(FormInit);
+export default withStyles(styles, { withTheme: true })(CreateNewActionForm);

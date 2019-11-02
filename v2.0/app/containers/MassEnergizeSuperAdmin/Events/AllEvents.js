@@ -240,13 +240,13 @@ class AllEvents extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/action`}>
+            <Link to={`/admin/edit/${id}/event`}>
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
             &nbsp;&nbsp;
             <Link
               onClick={async () => {
-                const copiedEventResponse = await apiCall('/events.copy', { action_id: id });
+                const copiedEventResponse = await apiCall('/events.copy', { event_id: id });
                 if (copiedEventResponse && copiedEventResponse.success) {
                   const newEvent = copiedEventResponse && copiedEventResponse.data;
                   window.location.href = `/admin/edit/${newEvent.id}/event`;
