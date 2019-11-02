@@ -12,6 +12,9 @@ import { Link } from 'react-router-dom';
 import messageStyles from 'dan-styles/Messages.scss';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
+import {connect} from 'react-redux'; 
+import {bindActionCreators} from 'redux';
+import { reduxGetAllGoals, reduxGetAllCommunityGoals } from '../../../redux/redux-actions/adminActions';
 
 
 class AllGoals extends React.Component {
@@ -164,5 +167,18 @@ class AllGoals extends React.Component {
 AllGoals.propTypes = {
   classes: PropTypes.object.isRequired,
 };
+function mapStateToProps(state) {
+  return {
+    auth: state.getIn(['auth']),
+    allGoals: state.getIn(['allTeams'])
+  }
+}
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    callTeamsForSuperAdmin: reduxGetAllGoals,
+    callTeamsForNormalAdmin: reduxGetAllCommunityGoals
+  }, dispatch);
+}
+const GoalsMapped = connect(mapStateToProps, mapDispatchToProps)(AllGoals);
 
-export default withStyles(styles)(AllGoals);
+export default withStyles(styles)(GoalsMapped);

@@ -3,18 +3,21 @@ import Outer from '../../Templates/Outer';
 import Login from '../../MassEnergizeSuperAdmin/LoginAndRegistration/Login';
 
 class LoginDedicated extends React.Component {
+  componentDidMount() {
+    if(this.props.user){
+      window.location = "/admin";
+    }
+  }
+  
   render() {
     const {
-      user, error, signOutFxn, loginWithFacebookFxn, loginWithGoogleFxn, normalLoginFxn
+      user, started,error, signOutFxn, loginWithFacebookFxn, loginWithGoogleFxn, normalLoginFxn
     } = this.props;
-
-    if (user) {
-      window.location = '/admin';
-    }
-
+    
     return (
       <Outer>
         <Login
+          started = {started}
           error={error}
           signOutFxn={signOutFxn}
           loginWithFacebookFxn={loginWithFacebookFxn}

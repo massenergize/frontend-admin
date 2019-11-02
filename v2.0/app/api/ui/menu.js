@@ -1,10 +1,10 @@
 module.exports = [
-  // {
-  //   key: 'dashboard',
-  //   name: 'Dashboard',
-  //   icon: 'ios-stats',
-  //   link: '/admin/dashboard'
-  // },
+  {
+    key: 'dashboard',
+    name: 'Dashboard',
+    icon: 'ios-stats',
+    link: '/'
+  },
   {
     key: 'communities',
     name: 'Communities',

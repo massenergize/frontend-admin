@@ -15,7 +15,10 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import Grid from '@material-ui/core/Grid';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-
+import {connect} from 'react-redux'; 
+import {bindActionCreators} from 'redux';
+import { reduxGetAllActions, reduxGetAllEvents, reduxGetAllCommunityEvents } from '../../../redux/redux-actions/adminActions';
+import CommunitySwitch from './../Summary/CommunitySwitch'; 
 
 class AllEvents extends React.Component {
   constructor(props) {
@@ -23,32 +26,72 @@ class AllEvents extends React.Component {
     this.state = { data: [], loading: true, columns: this.getColumns() };
   }
 
-  async componentDidMount() {
-    const allEventsResponse = await apiCall('/events.listForSuperAdmin');
-    if (allEventsResponse && allEventsResponse.success) {
-      const data = allEventsResponse.data.map(d => (
-        [
-          {
-            id: d.id,
-            image: d.image,
-            initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
-          },
-          `${d.name}...`.substring(0, 30), // limit to first 30 chars
-          `${d.description}...`.substring(0, 20), // limit to first 20 chars
-          `${d.tags.map(t => t.name).join(', ')}`,
-          d.community && d.community.name,
-          d.id
-        ]
-      ));
-      await this.setStateAsync({ data, loading: false });
+  showCommunitySwitch = ()=>{
+    const user= this.props.auth? this.props.auth: {}; 
+    if(user.is_community_admin){
+      return(
+        <CommunitySwitch actionToPerform={this.handleCommunityChange}/>
+      )
     }
   }
-
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
-    });
+  handleCommunityChange =(id)=>{
+    this.props.callForNormalEvents(id);
   }
+  async componentDidMount() {
+    const user = this.props.auth ? this.props.auth: {};
+    
+    if(user.is_super_admin){
+      this.props.callForSuperAdminEvents();
+    }
+    if(user.is_community_admin){
+      this.props.callForNormalAdminEvents(user.communities[0].id);
+
+    }
+   // await this.setStateAsync({ loading: false });
+    //await this.setStateAsync({ data, loading: false });
+    // const allEventsResponse = this.props.allEvents;
+    // if (allEventsResponse) {
+    //   const data = allEventsResponse.map(d => (
+    //     [
+    //       {
+    //         id: d.id,
+    //         image: d.image,
+    //         initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
+    //       },
+    //       `${d.name}...`.substring(0, 30), // limit to first 30 chars
+    //       `${d.description}...`.substring(0, 20), // limit to first 20 chars
+    //       `${d.tags.map(t => t.name).join(', ')}`,
+    //       d.community && d.community.name,
+    //       d.id
+    //     ]
+    //   ));
+    //   await this.setStateAsync({ data, loading: false });
+    // }
+   
+  }
+  fashionData = (data)=>{
+    const fashioned =data.map(d => (
+      [
+        {
+          id: d.id,
+          image: d.image,
+          initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
+        },
+        `${d.name}...`.substring(0, 30), // limit to first 30 chars
+        `${d.description}...`.substring(0, 20), // limit to first 20 chars
+        `${d.tags.map(t => t.name).join(', ')}`,
+        d.community && d.community.name,
+        d.id
+      ]
+    ));
+    return fashioned
+  }
+
+  // setStateAsync(state) {
+  //   return new Promise((resolve) => {
+  //     this.setState(state, resolve);
+  //   });
+  // }
 
   // getLocation = location => {
   //   if (location) {
@@ -223,9 +266,10 @@ class AllEvents extends React.Component {
   render() {
     const title = brand.name + ' - All Events';
     const description = brand.desc;
-    const { data, columns, loading } = this.state;
+    const { columns, loading } = this.state;
     const { classes } = this.props;
-
+    const data = this.fashionData(this.props.allEvents);
+    console.log("I AM THE DATA IN EVENTS", this.props.allEvents);
     const options = {
       filterType: 'dropdown',
       responsive: 'stacked',
@@ -240,22 +284,22 @@ class AllEvents extends React.Component {
       }
     };
 
-    if (loading) {
-      return (
-        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
-              <div className={classes.root}>
-                <LinearProgress />
-                <h1>Fetching all Events.  This may take a while...</h1>
-                <br />
-                <LinearProgress color="secondary" />
-              </div>
-            </Paper>
-          </Grid>
-        </Grid>
-      );
-    }
+    // if (loading) {
+    //   return (
+    //     <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+    //       <Grid item xs={12} md={6}>
+    //         <Paper className={classes.root}>
+    //           <div className={classes.root}>
+    //             <LinearProgress />
+    //             <h1>Fetching all Events.  This may take a while...</h1>
+    //             <br />
+    //             <LinearProgress color="secondary" />
+    //           </div>
+    //         </Paper>
+    //       </Grid>
+    //     </Grid>
+    //   );
+    // }
 
 
     return (
@@ -269,6 +313,7 @@ class AllEvents extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <div className={classes.table}>
+          {this.showCommunitySwitch()}
           <MUIDataTable
             title="All Events"
             data={data}
@@ -285,4 +330,19 @@ AllEvents.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(AllEvents);
+function mapStateToProps(state){
+  return{
+    auth: state.getIn(['auth']), 
+    allEvents: state.getIn(['allEvents'])
+  }
+}
+function mapDispatchToProps(dispatch){
+  return bindActionCreators({
+    callForSuperAdminEvents: reduxGetAllEvents, 
+    callForNormalAdminEvents: reduxGetAllCommunityEvents
+
+  },dispatch)
+}
+
+const EventsMapped =  connect (mapStateToProps,mapDispatchToProps)(AllEvents);
+export default withStyles(styles)(EventsMapped);

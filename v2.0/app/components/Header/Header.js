@@ -6,15 +6,25 @@ import Typography from '@material-ui/core/Typography';
 import Hidden from '@material-ui/core/Hidden';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import SearchIcon from '@material-ui/icons/Search';
 import Fab from '@material-ui/core/Fab';
 import Ionicon from 'react-ionicons';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import MenuIcon from '@material-ui/icons/Menu';
 import UserMenu from './UserMenu';
-import SearchUi from '../Search/SearchUi';
 import styles from './header-jss';
+// import CommunitySwitch from './CommunitySwitch';
+import {
+  reduxGetAllTeams,
+  reduxGetAllCommunityTeams,
+  reduxGetAllActions,
+  reduxLoadSelectedCommunity,
+  reduxLoadAllCommunities,
+  reduxCallFullCommunity,
+  reduxGetAllCommunityActions
+} from '../../redux/redux-actions/adminActions';
 
 const elem = document.documentElement;
 
@@ -88,6 +98,29 @@ class Header extends React.Component {
       changeMode('light');
     }
   };
+
+  handleCommunityChange = (id) => {
+    const { pathname } = window.location;
+    const page = pathname.split('/').slice(-1)[0];
+    switch (page) {
+      case '':
+        window.location = `/admin/community/${id}/profile`;
+        break;
+      case 'summary':
+        break;
+      case 'profile':
+        window.location = `/admin/community/${id}/profile`;
+        break;
+      case 'actions':
+        this.props.callCommunityActions(id);
+        break;
+      case 'teams':
+        this.props.callTeamsForNormalAdmin(id);
+        break;
+      default:
+        return;
+    }
+  }
 
   render() {
     const {
@@ -169,14 +202,16 @@ class Header extends React.Component {
               </Typography>
             </div>
           </Hidden>
-          <div className={classes.searchWrapper}>
+          {/* <CommunitySwitch actionToPerform={this.handleCommunityChange} /> */}
+
+          {/* <div className={classes.searchWrapper}>
             <div className={classNames(classes.wrapper, classes.light)}>
               <div className={classes.search}>
                 <SearchIcon />
               </div>
               <SearchUi history={history} />
             </div>
-          </div>
+          </div> */}
           <Hidden xsDown>
             <span className={classes.separatorV} />
           </Hidden>
@@ -200,4 +235,21 @@ Header.propTypes = {
   history: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Header);
+const mapStateToProps = (state) => ({
+  auth: state.getIn(['auth']),
+  allTeams: state.getIn(['allTeams']),
+  allActions: state.getIn(['allActions']),
+  community: state.getIn(['selected_community'])
+});
+
+const mapDispatchToProps = (dispatch) => bindActionCreators({
+  callTeamsForSuperAdmin: reduxGetAllTeams,
+  callTeamsForNormalAdmin: reduxGetAllCommunityTeams,
+  callAllActions: reduxGetAllActions,
+  callCommunityActions: reduxGetAllCommunityActions,
+  loadSelectedCommunity: reduxLoadSelectedCommunity,
+  loadAllCommunities: reduxLoadAllCommunities,
+  callFullCommunity: reduxCallFullCommunity,
+}, dispatch);
+const HeaderMapped = connect(mapStateToProps, mapDispatchToProps)(Header);
+export default withStyles(styles)(HeaderMapped);

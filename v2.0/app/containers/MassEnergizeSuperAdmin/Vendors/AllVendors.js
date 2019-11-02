@@ -32,7 +32,9 @@ import Email from '@material-ui/icons/Email';
 import messageStyles from 'dan-styles/Messages.scss';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-
+import {connect} from 'react-redux'; 
+import { bindActionCreators} from 'redux';
+import { reduxGetAllVendors, reduxGetAllCommunityVendors } from '../../../redux/redux-actions/adminActions';
 
 class AllVendors extends React.Component {
   constructor(props) {
@@ -302,6 +304,7 @@ class AllVendors extends React.Component {
             options={options}
           />
         </div>
+
       </div>
     );
   }
@@ -310,5 +313,18 @@ class AllVendors extends React.Component {
 AllVendors.propTypes = {
   classes: PropTypes.object.isRequired,
 };
+function mapStateToProps(state) {
+  return {
+    auth: state.getIn(['auth']),
+    allVendors: state.getIn(['allVendors'])
+  }
+}
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    callVendorsForSuperAdmin: reduxGetAllVendors,
+    callVendorsForNormalAdmin: reduxGetAllCommunityVendors
+  }, dispatch);
+}
+const VendorsMapped = connect(mapStateToProps, mapDispatchToProps)(AllVendors);
 
-export default withStyles(styles)(AllVendors);
+export default withStyles(styles)(VendorsMapped);
