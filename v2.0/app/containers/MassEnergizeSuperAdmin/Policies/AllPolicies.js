@@ -30,7 +30,7 @@ class AllPolicies extends React.Component {
    }
   }
 
-  showCommunitySwitch = ()=>{
+  showCommunitySwitch = () => {
     const user= this.props.auth? this.props.auth: {}; 
     if(user.is_community_admin){
       return(
