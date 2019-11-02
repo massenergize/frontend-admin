@@ -56,7 +56,8 @@ class EditGoalForm extends Component {
       teams: [],
       is_community_goal: true,
       error: null,
-      successMsg: null
+      successMsg: null,
+      goal: null
     };
   }
 
@@ -76,6 +77,7 @@ class EditGoalForm extends Component {
 
     if (goalResponse && goalResponse.success) {
       await this.setStateAsync({ ...this.state, formData: goalResponse.data });
+      await this.setStateAsync({ ...this.state, goal: goalResponse.data });
     }
   }
 
@@ -148,7 +150,7 @@ class EditGoalForm extends Component {
       submitting,
     } = this.props;
     const {
-      formData, error, successMsg
+      formData, error, successMsg, goal
     } = this.state;
     const {
       name,
@@ -190,6 +192,25 @@ class EditGoalForm extends Component {
                  Edit Goal with ID:
                 {' ' + id}
               </Typography>
+              {goal && goal.team &&
+                (
+                  <Typography variant="h5" component="h5">
+                    This Goal is for Team:
+                    {'  '}
+                    {goal.team.name}
+                  </Typography>
+                )
+              }
+              {goal && goal.community &&
+                (
+                  <Typography variant="h5" component="h5">
+                    This Goal is for Community:
+                    {'  '}
+                    {goal.community.name}
+                  </Typography>
+                )
+              }
+              
               <div style={{ margin: 50 }} />
               <form onSubmit={this.submitForm} noValidate autoComplete="off">
                 <div>

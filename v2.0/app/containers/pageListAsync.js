@@ -24,6 +24,7 @@ export const BlankPage = loadable(() => import('./Pages/BlankPage'), {
 export const DashboardSummaryPage = loadable(() => import('./MassEnergizeSuperAdmin/Summary'), {
   fallback: <Loading />,
 }); 
+
 export const DashboardAdminSummaryPage = loadable(() => import('./MassEnergizeSuperAdmin/Summary/NormalAdminHome'), {
   fallback: <Loading />,
 }); 
@@ -82,6 +83,9 @@ export const AllTeams = loadable(() => import('./MassEnergizeSuperAdmin/Teams/Al
   fallback: <Loading />,
 });
 export const AddTeam = loadable(() => import('./MassEnergizeSuperAdmin/Teams/CreateNewTeam'), {
+  fallback: <Loading />,
+});
+export const EditTeam = loadable(() => import('./MassEnergizeSuperAdmin/Teams/EditTeam'), {
   fallback: <Loading />,
 });
 

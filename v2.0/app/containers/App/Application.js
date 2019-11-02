@@ -32,6 +32,7 @@ import EditVendor from '../MassEnergizeSuperAdmin/Vendors/EditVendor';
 import AddRemoveAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveAdmin';
 import AddRemoveSuperAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveSuperAdmin';
 import EditCommunityByCommunityAdmin from '../MassEnergizeSuperAdmin/Community/EditCommunityByCommunityAdmin';
+import EditTeam from '../MassEnergizeSuperAdmin/Teams/EditTeam';
 
 
 class Application extends React.Component {
@@ -98,6 +99,7 @@ class Application extends React.Component {
 
           <Route path="/admin/read/teams" component={AllTeams} />
           <Route path="/admin/add/team" component={AddTeam} />
+          <Route path="/admin/edit/:id/team" component={EditTeam} />
 
           <Route path="/admin/read/policies" component={AllPolicies} />
           <Route path="/admin/add/policy" component={AddPolicy} />

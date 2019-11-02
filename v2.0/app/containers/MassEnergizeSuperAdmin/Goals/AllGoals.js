@@ -8,14 +8,15 @@ import MUIDataTable from 'mui-datatables';
 import FileCopy from '@material-ui/icons/FileCopy';
 import EditIcon from '@material-ui/icons/Edit';
 import { Link } from 'react-router-dom';
+import Avatar from '@material-ui/core/Avatar';
 
 import messageStyles from 'dan-styles/Messages.scss';
-import { apiCall } from '../../../utils/messenger';
-import styles from '../../../components/Widget/widget-jss';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { apiCall } from '../../../utils/messenger';
+import styles from '../../../components/Widget/widget-jss';
 import { reduxGetAllGoals, reduxGetAllCommunityGoals } from '../../../redux/redux-actions/adminActions';
-import CommunitySwitch from './../Summary/CommunitySwitch'; 
+import CommunitySwitch from '../Summary/CommunitySwitch';
 
 class AllGoals extends React.Component {
   constructor(props) {
@@ -23,26 +24,15 @@ class AllGoals extends React.Component {
     this.state = { columns: this.getColumns(), data: [] };
   }
 
-  showCommunitySwitch = ()=>{
-    const user= this.props.auth? this.props.auth: {}; 
-    if(user.is_community_admin){
-      return(
-        <CommunitySwitch actionToPerform={this.handleCommunityChange}/>
-      )
-    }
-  }
-  handleCommunityChange =(id)=>{
-    this.props.callGoalsForNormalAdmin(id);
-  }
-  
+
   async componentDidMount() {
     const user = this.props.auth ? this.props.auth : {};
     if (user.is_super_admin) {
-      await this.props.callGoalsForSuperAdmin()
+      await this.props.callGoalsForSuperAdmin();
     }
     if (user.is_community_admin) {
-      var com = this.props.community ? this.props.community : user.communities[0]
-      await this.props.callGoalsForNormalAdmin(com.id)
+      const com = this.props.community ? this.props.community : user.communities[0];
+      await this.props.callGoalsForNormalAdmin(com.id);
     }
     // const allGoalsResponse = await apiCall('/goals.listForSuperAdmin');
     // if (allGoalsResponse && allGoalsResponse.success) {
@@ -59,24 +49,24 @@ class AllGoals extends React.Component {
     //   await this.setStateAsync({ data });
     // }
   }
-  fashionData = (data) => {
-    data = data.map(d => (
-      [
-        d.id,
-        d.name,
-        `${d.attained_number_of_actions}/${d.target_number_of_actions}`,
-        `${d.attained_number_of_households}/${d.target_number_of_households}`,
-        `${d.attained_carbon_footprint_reduction}/${d.target_carbon_footprint_reduction}`,
-        d.id
-      ]
-    ));
-    return data;
-  }
 
   setStateAsync(state) {
     return new Promise((resolve) => {
       this.setState(state, resolve);
     });
+  }
+
+  showCommunitySwitch = () => {
+    const user = this.props.auth ? this.props.auth : {};
+    if (user.is_community_admin) {
+      return (
+        <CommunitySwitch actionToPerform={this.handleCommunityChange} />
+      );
+    }
+  }
+
+  handleCommunityChange =(id) => {
+    this.props.callGoalsForNormalAdmin(id);
   }
 
   getStatus = isApproved => {
@@ -87,12 +77,34 @@ class AllGoals extends React.Component {
     }
   };
 
+
+  fashionData = (data) => data.map(d => {
+    const teamOrCommunity = d.community || d.team || {};
+    const typeOfObj = d.community ? '(Community)' : (d.team ? '(Team)' : '');
+    const res = [
+      d.id,
+      d.name,
+      {
+        id: teamOrCommunity.id,
+        image: teamOrCommunity.logo,
+        initials: `${teamOrCommunity.name && teamOrCommunity.name.substring(0, 2).toUpperCase()}`,
+        name: teamOrCommunity.name,
+        type: typeOfObj
+      },
+      `${d.attained_number_of_actions}/${d.target_number_of_actions}`,
+      `${d.attained_number_of_households}/${d.target_number_of_households}`,
+      d.id
+    ];
+    return res;
+  })
+
+
   getColumns = () => [
     {
       name: 'ID',
       key: 'id',
       options: {
-        filter: true
+        filter: true,
       }
     },
     {
@@ -100,6 +112,25 @@ class AllGoals extends React.Component {
       key: 'name',
       options: {
         filter: true,
+      }
+    },
+    {
+      name: 'Community/Team',
+      key: 'name',
+      options: {
+        filter: true,
+        download: false,
+        customBodyRender: (d) => (
+          <div>
+            {d.image
+              && <Link to={`/admin/community/${d.id}/profile`}><Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} /></Link>
+            }
+            {!d.image
+              && <Link to={`/admin/community/${d.id}/profile`}><Avatar style={{ margin: 10 }}>{d.initials}</Avatar></Link>
+            }
+            {d.name + d.type}
+          </div>
+        )
       }
     },
     {
@@ -112,13 +143,6 @@ class AllGoals extends React.Component {
     {
       name: 'Households Achieved/Target',
       key: 'households',
-      options: {
-        filter: true,
-      }
-    },
-    {
-      name: 'CarbonSavings Achieved/Target',
-      key: 'carbon',
       options: {
         filter: true,
       }
@@ -167,9 +191,9 @@ class AllGoals extends React.Component {
       indexColumn: 'id',
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach(d => {
+        idsToDelete.forEach(async d => {
           const goalId = data[d.index][0];
-          apiCall('/goals.delete', { goal_id: goalId });
+          await apiCall('/goals.delete', { goal_id: goalId });
         });
       }
     };
@@ -206,7 +230,7 @@ function mapStateToProps(state) {
     auth: state.getIn(['auth']),
     allGoals: state.getIn(['allGoals']),
     community: state.getIn(['selected_community'])
-  }
+  };
 }
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
