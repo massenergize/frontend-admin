@@ -20,7 +20,7 @@ import { getTestimonialsData, getActionsData, getEventsData } from '../../../api
 import { connectRouter } from 'connected-react-router';
 import { bindActionCreators } from 'redux';
 import { reduxLoadSelectedCommunity, reduxIfExpired, reduxCheckUser } from '../../../redux/redux-actions/adminActions';
-
+import CommunitySwitch from './CommunitySwitch';
 class NormalAdminHome extends PureComponent {
   constructor(props) {
     super(props);

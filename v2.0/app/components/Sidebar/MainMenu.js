@@ -80,7 +80,7 @@ class MainMenu extends React.Component {
               </List>
             </Collapse>
           </div>
-        );
+        ); 
       }
       if (item.title) {
         return (

@@ -21,7 +21,9 @@ import Email from '@material-ui/icons/Email';
 import messageStyles from 'dan-styles/Messages.scss';
 import { fetchData } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-
+import {connect} from 'react-redux'; 
+import { bindActionCreators} from 'redux';
+import { reduxGetAllVendors, reduxGetAllCommunityVendors } from '../../../redux/redux-actions/adminActions';
 
 class AllVendors extends React.Component {
   constructor(props) {
@@ -134,7 +136,10 @@ class AllVendors extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        {this.renderTable(vendors, classes)}
+        {/* {this.renderTable(vendors, classes)} */}
+        <PapperBlock noMargin title="All Vendors" icon="ios-share-outline" whiteBg desc="">
+          <h1>Coming Soon!</h1>
+        </PapperBlock>
       </div>
     );
   }
@@ -143,5 +148,18 @@ class AllVendors extends React.Component {
 AllVendors.propTypes = {
   classes: PropTypes.object.isRequired,
 };
+function mapStateToProps(state) {
+  return {
+    auth: state.getIn(['auth']),
+    allVendors: state.getIn(['allVendors'])
+  }
+}
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    callVendorsForSuperAdmin: reduxGetAllVendors,
+    callVendorsForNormalAdmin: reduxGetAllCommunityVendors
+  }, dispatch);
+}
+const VendorsMapped = connect(mapStateToProps, mapDispatchToProps)(AllVendors);
 
-export default withStyles(styles)(AllVendors);
+export default withStyles(styles)(VendorsMapped);

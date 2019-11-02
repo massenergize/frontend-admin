@@ -61,7 +61,7 @@ class Sidebar extends React.Component {
     const { auth, dataMenu } = this.props;
     if (auth) {
       if (auth.is_community_admin){
-        return dataMenu.filter(menu => menu.key !== "communities");
+        return dataMenu.filter(menu => menu.key !== "communities" && menu.key !=="tags-collections");
     }
     return [...dataMenu,new_super_link];
   }

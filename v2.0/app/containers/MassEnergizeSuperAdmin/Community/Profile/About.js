@@ -49,6 +49,7 @@ class About extends React.Component {
       let goal = community.goal? community.goal : {};
       let targ = goal.target_carbon_footprint_reduction; 
       let att = goal.attained_carbon_footprint_reduction
+      if(!targ) return 0;
       return (att/targ) * 100;
     }
     return community;

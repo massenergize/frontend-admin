@@ -43,7 +43,7 @@ class Application extends React.Component {
     const { changeMode, history } = this.props;
     const user = this.props.auth;
 
-    return (
+    return ( 
       <Dashboard history={history} changeMode={changeMode}>
         <Switch>
           { (user.is_community_admin) && 

@@ -25,6 +25,7 @@ import logo from 'dan-images/logo.png';
 import styles from './user-jss';
 import { ContentDivider } from '../Divider';
 import fire from 'firebase';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 // validation functions
 const required = value => (value == null ? 'Required' : undefined);
@@ -48,6 +49,16 @@ class LoginForm extends React.Component {
     event.preventDefault();
   };
 
+  showProgressBar = () => {
+    if (this.props.started) {
+      return (
+        <div>
+          <p style={{ color: "darkgray" }}>We are checking...</p>
+          <LinearProgress />
+        </div>
+      )
+    }
+  }
   render() {
     const {
       classes,
@@ -93,22 +104,23 @@ class LoginForm extends React.Component {
                 <People className={classNames(classes.leftIcon, classes.iconSmall)} />
                 Google
               </Button>
-              <Button variant="outlined" onClick={() => this.props.loginWithFacebookFxn()}size="small" className={classes.blueBtn} type="button">
+              {/* <Button variant="outlined" onClick={() => this.props.loginWithFacebookFxn()}size="small" className={classes.blueBtn} type="button">
                 <People className={classNames(classes.leftIcon, classes.iconSmall)} />
                 Facebook
-              </Button>
+              </Button> */}
               {/* <Button variant="outlined" size="small" className={classes.cyanBtn} type="button">
                 <People className={classNames(classes.leftIcon, classes.iconSmall)} />
                 Twitter
               </Button> */}
             </div>
             <ContentDivider content="Or sign in with email" />
+
           </section>
           <section className={classes.formWrap}>
             <form onSubmit={handleSubmit}>
               <div>
                 <FormControl className={classes.formControl}>
-                  { err && (
+                  {err && (
                     <Typography style={{ color: 'red' }} variant="caption" className={classes.subtitle} gutterBottom align="center">
                       {err}
                     </Typography>
@@ -157,7 +169,9 @@ class LoginForm extends React.Component {
                 {/* <FormControlLabel className={classes.label} control={<Field name="checkbox" component={Checkbox} />} label="Remember" /> */}
                 {/* <Button size="small" component={NavLink} to="/reset-password" className={classes.buttonLink}>Forgot Password</Button> */}
               </div>
+              {this.showProgressBar()}
               <div className={classes.btnArea}>
+
                 <Button variant="contained" onClick={() => normalLoginFxn(this.refs.email.value, this.refs.pass.value)} color="primary" size="large" type="submit">
                   Finish
                   <ArrowForward className={classNames(classes.rightIcon, classes.iconSmall)} disabled={submitting || pristine} />

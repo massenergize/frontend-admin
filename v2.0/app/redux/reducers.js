@@ -10,7 +10,7 @@ import languageProviderReducer from 'containers/LanguageProvider/reducer';
 import login from './modules/login';
 import uiReducer from './modules/ui';
 import initval from './modules/initForm';
-import app,{ communitiesReducer,tokenReducer, selectedCommunityReducer, fullSelectedCommunityReducer, authAdminReducer, allActionsReducer, allEventsReducer, allTestimonialsReducer, allUsersReducer, allTagsReducer } from './modules/appReducer';
+import app,{ communitiesReducer,tokenReducer, selectedCommunityReducer, fullSelectedCommunityReducer, authAdminReducer, allActionsReducer, allEventsReducer, allTestimonialsReducer, allUsersReducer, allTagsReducer, allTeamsReducer, allGoalsReducer, vendorsReducer, policiesReducer } from './modules/appReducer';
 import {summaryReducer} from './modules/adminReducer';
 
 /**
@@ -30,6 +30,10 @@ export default function createReducer(injectedReducers = {}) {
     allTags: allTagsReducer,
     allUsers: allUsersReducer,
     allEvents: allEventsReducer,
+    allTeams:allTeamsReducer,
+    allGoals:allGoalsReducer,
+    allVendors:vendorsReducer,
+    allPolicies:policiesReducer,
     token:tokenReducer,
     selected_community:selectedCommunityReducer,
     full_selected_community:fullSelectedCommunityReducer,

@@ -17,6 +17,7 @@ import ImageIcon from '@material-ui/icons/Image';
 import WorkIcon from '@material-ui/icons/Work';
 import BeachAccessIcon from '@material-ui/icons/BeachAccess';
 import Divider from '@material-ui/core/Divider';
+import Paper from '@material-ui/core/Paper';
 
 class Connection extends React.Component {
   render() {
@@ -24,6 +25,7 @@ class Connection extends React.Component {
     const { users, avatar } = data;
     console.log("tuire ruier ueirueir ", users);
     return (
+      <Paper elevation={0} style={{padding:30}}>
       <Grid
         container
         alignItems="flex-start"
@@ -32,27 +34,28 @@ class Connection extends React.Component {
         spacing={16}
         className={classes.root}
       >
-        {users
-          && users.map((u, index) => (
-            <Grid item md={12} sm={12} xs={12} key={index.toString()} style={{ marginTop: -50 }}>
-              <ListItem button style={{marginTop:35}}>
-                <Avatar className={classes.avatarRed}>
-                  {
-                    u.profile_picture? 
-                    <img src ={u.profile_picture.url} />
-                    :
-                    <ImageIcon />
-                  }
-                </Avatar>
-                <ListItemText primary={`${u.full_name}`} />
-                <ListItemText primary={`${u.email}`} />
-                <ListItemText primary="Member" />
-              </ListItem>
-              <Divider />
-              
+        
+          {users
+            && users.map((u, index) => (
+              <Grid item md={12} sm={12} xs={12} key={index.toString()} style={{ marginTop: -50 }}>
+                <ListItem button style={{ marginTop: 35 }}>
+                  <Avatar className={classes.avatarRed}>
+                    {
+                      u.profile_picture ?
+                        <img src={u.profile_picture.url} />
+                        :
+                        <ImageIcon />
+                    }
+                  </Avatar>
+                  <ListItemText primary={`${u.full_name}`} />
+                  <ListItemText primary={`${u.email}`} />
+                  <ListItemText primary="Member" />
+                </ListItem>
+                <Divider />
 
 
-              {/* <ProfileCard
+
+                {/* <ProfileCard
                 cover={u.cover}
                 avatar={u.profile_picture ? u.profile_picture.url : avatar}
                 name={u.full_name}
@@ -62,10 +65,12 @@ class Connection extends React.Component {
                 btnText="See Full Profile"
                 user={u}
               /> */}
-            </Grid>
-          ))
-        }
+              </Grid>
+            ))
+          }
+      
       </Grid>
+      </Paper>
     );
   }
 }

@@ -9,10 +9,11 @@ import EditIcon from '@material-ui/icons/Edit';
 import { Link } from 'react-router-dom';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-
+import {connect} from 'react-redux'; 
+import {bindActionCreators} from 'redux';
+import CommunitySwitch from './../Summary/CommunitySwitch'; 
+import { reduxGetAllPolicies, reduxGetAllCommunityPolicies } from '../../../redux/redux-actions/adminActions';
 class AllPolicies extends React.Component {
-
-
   constructor(props) {
     super(props);
     this.state = { columns: this.getColumns(), data: [] };
@@ -20,21 +21,38 @@ class AllPolicies extends React.Component {
 
 
   async componentDidMount() {
-    const allPolicysResponse = await apiCall('/policies.listForSuperAdmin');
-    if (allPolicysResponse && allPolicysResponse.success) {
-      const data = allPolicysResponse.data.map(d => (
-        [
-          d.id,
-          d.name,
-          `${d.description && d.description.substring(0, 30)}...`,
-          d.community && d.community.name,
-          d.is_published,
-          d.id
-        ]
-      ));
-      console.log(allPolicysResponse.data);
-      await this.setStateAsync({ data });
+   const user = this.props.auth? this.props.auth: {}; 
+   if(user.is_super_admin){
+    this.props.callPoliciesForSuperAdmin();
+   }
+   if(user.is_community_admin){
+     this.props.callPoliciesForNormalAdmin(user.communities[0].id);
+   }
+  }
+
+  showCommunitySwitch = ()=>{
+    const user= this.props.auth? this.props.auth: {}; 
+    if(user.is_community_admin){
+      return(
+        <CommunitySwitch actionToPerform={this.handleCommunityChange}/>
+      )
     }
+  }
+  handleCommunityChange =(id)=>{
+    this.props.callPoliciesForNormalAdmin(id);
+  }
+  fashionData =(data)=>{
+    const fashioned = data.map(d => (
+      [
+        d.id,
+        d.name,
+        `${d.description && d.description.substring(0, 30)}...`,
+        d.community && d.community.name,
+        d.is_published,
+        d.id
+      ]
+    ));
+    return fashioned;
   }
 
   getColumns = () => [
@@ -102,18 +120,13 @@ class AllPolicies extends React.Component {
     },
   ]
 
-
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
-    });
-  }
-
   render() {
+    console.log(" IAM IN POLICIES:::", this.props.allPolicies);
     const title = brand.name + ' - All Policies';
     const description = brand.desc;
-    const { columns, data } = this.state;
+    const { columns } = this.state;
     const { classes } = this.props;
+    const data = this.fashionData(this.props.allPolicies);
 
     const options = {
       filterType: 'dropdown',
@@ -142,6 +155,7 @@ class AllPolicies extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <div className={classes.table}>
+          {this.showCommunitySwitch()}
           <MUIDataTable
             title="All Policies"
             data={data}
@@ -158,4 +172,18 @@ AllPolicies.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(AllPolicies);
+function mapStateToProps(state) {
+  return {
+    auth: state.getIn(['auth']),
+    allPolicies: state.getIn(['allPolicies'])
+  }
+}
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    callPoliciesForSuperAdmin: reduxGetAllPolicies,
+    callPoliciesForNormalAdmin: reduxGetAllCommunityPolicies
+  }, dispatch);
+}
+const PoliciesMapped = connect(mapStateToProps, mapDispatchToProps)(AllPolicies);
+
+export default withStyles(styles)(PoliciesMapped);

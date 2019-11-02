@@ -61,7 +61,7 @@ const styles = theme => ({
     width: '100%',
     overflow: 'hidden',
     height: 480,
-    backgroundColor: theme.palette.type === 'dark' ? darken(theme.palette.primary.dark, 0.8) : "whitesmoke",
+    backgroundColor: theme.palette.type === 'dark' ? darken(theme.palette.primary.dark, 0.8) : "white",
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'flex-end',

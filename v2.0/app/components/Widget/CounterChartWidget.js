@@ -55,7 +55,6 @@ class CounterChartWidget extends PureComponent {
   fashionData = () => {
     const me = this;
     this.summaryArray().forEach(item => {
-      console.log("KE EKKR E RITEM::::", item);
       let data = item.data;
         const info = {
           start: 0,
@@ -112,7 +111,6 @@ class CounterChartWidget extends PureComponent {
 
   render() {
     const { classes, auth,users } = this.props;
-    console.log("counter ousdfjskldjf USER USER USER:::",users);
     return (
       <div className={classes.rootCounter}>
         <Grid container spacing={16}>

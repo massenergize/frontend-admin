@@ -29,7 +29,9 @@ import Chip from '@material-ui/core/Chip';
 import messageStyles from 'dan-styles/Messages.scss';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-
+import {connect} from 'react-redux'; 
+import {bindActionCreators} from 'redux';
+import { reduxGetAllCommunityTestimonials, reduxGetAllTestimonials } from '../../../redux/redux-actions/adminActions';
 
 class AllTestimonials extends React.Component {
   constructor(props) {
@@ -240,44 +242,45 @@ class AllTestimonials extends React.Component {
         });
       }
     };
-
-    if (loading) {
+    
+    //if (loading) {
       return (
         <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
           <Grid item xs={12} md={6}>
             <Paper className={classes.root}>
-              <div className={classes.root}>
-                <LinearProgress />
+              <div className={classes.root} style={{padding:30}}>
+                <h2>Will be deployed soon!</h2>
+                {/* <LinearProgress />
                 <h1>Fetching all Testimonials.  This may take a while...</h1>
                 <br />
-                <LinearProgress color="secondary" />
+                <LinearProgress color="secondary" /> */}
               </div>
             </Paper>
           </Grid>
         </Grid>
       );
-    }
+    //}
 
-    return (
-      <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
-        <div className={classes.table}>
-          <MUIDataTable
-            title="All Communities"
-            data={data}
-            columns={columns}
-            options={options}
-          />
-        </div>
-      </div>
-    );
+    // return (
+    //   <div>
+    //     <Helmet>
+    //       <title>{title}</title>
+    //       <meta name="description" content={description} />
+    //       <meta property="og:title" content={title} />
+    //       <meta property="og:description" content={description} />
+    //       <meta property="twitter:title" content={title} />
+    //       <meta property="twitter:description" content={description} />
+    //     </Helmet>
+    //     <div className={classes.table}>
+    //       <MUIDataTable
+    //         title="All Communities"
+    //         data={data}
+    //         columns={columns}
+    //         options={options}
+    //       />
+    //     </div>
+    //   </div>
+    // );
   }
 }
 
@@ -285,4 +288,18 @@ AllTestimonials.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(AllTestimonials);
+function mapStateToProps(state) {
+  return {
+    auth: state.getIn(['auth']),
+    allTestimonials: state.getIn(['allTestimonials'])
+  }
+}
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    callTestimonialsForSuperAdmin: reduxGetAllTestimonials,
+    callTestimonialsForNormalAdmin: reduxGetAllCommunityTestimonials
+  }, dispatch);
+}
+const TestimonialsMapped = connect(mapStateToProps, mapDispatchToProps)(AllTestimonials);
+
+export default withStyles(styles)(TestimonialsMapped);

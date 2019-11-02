@@ -18,7 +18,7 @@ import styles from './dashboard-jss';
 import { getTestimonialsData, getActionsData, getEventsData } from '../../../api/data';
 import { connectRouter } from 'connected-react-router';
 import { bindActionCreators } from 'redux';
-import { reduxLoadSelectedCommunity, reduxIfExpired, reduxCheckUser } from '../../../redux/redux-actions/adminActions';
+import { reduxLoadSelectedCommunity, reduxIfExpired, reduxCheckUser, reduxGetAllUsers, reduxCallCommunities, reduxGetAllTags } from '../../../redux/redux-actions/adminActions';
 
 class SummaryDashboard extends PureComponent {
   constructor(props) {
@@ -55,7 +55,7 @@ class SummaryDashboard extends PureComponent {
   }
 
   componentDidMount = () => {
-    this.props.ifExpired();
+    //this.props.ifExpired();
     this.callForTestimonials();
     this.callForActions();
     this.callForEvents();
