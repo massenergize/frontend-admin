@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -33,15 +34,28 @@ class AllActions extends React.Component {
 
 
   async componentDidMount() {
-    const user = this.props.auth ? this.props.auth : {};
+    const {
+      auth, allActions, callAllActions, callCommunityActions, community
+    } = this.props;
+
+    const user = auth || {};
+
     if (user.is_super_admin) {
-      this.props.callAllActions();
+      callAllActions();
     }
     if (user.is_community_admin) {
       // not nec.. remove later
-      const community = this.props.community ? this.props.community : user.communities[0];
-      this.props.callCommunityActions(community.id);
+      const comm = community || user.communities[0];
+      callCommunityActions(comm.id);
     }
+
+    await this.setStateAsync({ data: this.fashionData(allActions) });
+  }
+
+  setStateAsync(state) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve);
+    });
   }
 
   showCommunitySwitch = () => {
@@ -59,27 +73,22 @@ class AllActions extends React.Component {
 
   fashionData =(data) => {
     const fashioned = data.map(d => (
-        [
-          {
-            id: d.id,
-            image: d.image,
-            initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
-          },
-          `${d.title}...`.substring(0, 30), // limit to first 30 chars
-          `${d.featured_summary || 'No summary Provided'}...`.substring(0, 20), // limit to first 20 chars
-          `${d.tags.map(t => t.name).join(', ')} `,
-          d.community && d.community.name,
-          d.id
-        ]
-      ));
+      [
+        {
+          id: d.id,
+          image: d.image,
+          initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
+        },
+        `${d.title}...`.substring(0, 30), // limit to first 30 chars
+        `${d.featured_summary || 'No summary Provided'}...`.substring(0, 20), // limit to first 20 chars
+        `${d.tags.map(t => t.name).join(', ')} `,
+        d.community && d.community.name,
+        d.id
+      ]
+    ));
     return fashioned;
   }
-  
-  // setStateAsync(state) {
-  //   return new Promise((resolve) => {
-  //     this.setState(state, resolve);
-  //   });
-  // }
+
 
   getColumns = () => [
     {
@@ -162,9 +171,8 @@ class AllActions extends React.Component {
   render() {
     const title = brand.name + ' - All Actions';
     const description = brand.desc;
-    const { columns, loading } = this.state;
-    const { classes, allActions } = this.props;
-    const data = this.fashionData(this.props.allActions);
+    const { columns, loading, data } = this.state;
+    const { classes } = this.props;
 
     const options = {
       filterType: 'dropdown',
@@ -180,22 +188,22 @@ class AllActions extends React.Component {
       }
     };
 
-    // if (loading) {
-    //   return (
-    //     <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-    //       <Grid item xs={12} md={6}>
-    //         <Paper className={classes.root}>
-    //           <div className={classes.root}>
-    //             <LinearProgress />
-    //             <h1>Fetching all Actions.  This may take a while...</h1>
-    //             <br />
-    //             <LinearProgress color="secondary" />
-    //           </div>
-    //         </Paper>
-    //       </Grid>
-    //     </Grid>
-    //   );
-    // }
+    if (loading) {
+      return (
+        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+          <Grid item xs={12} md={6}>
+            <Paper className={classes.root}>
+              <div className={classes.root}>
+                <LinearProgress />
+                <h1>Fetching all Actions.  This may take a while...</h1>
+                <br />
+                <LinearProgress color="secondary" />
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      );
+    }
 
     return (
       <div>
