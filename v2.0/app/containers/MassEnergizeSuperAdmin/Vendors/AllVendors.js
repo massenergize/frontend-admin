@@ -230,7 +230,6 @@ class AllVendors extends React.Component {
             <Link
               onClick={async () => {
                 const copiedVendorResponse = await apiCall('/vendors.copy', { vendor_id: id });
-                console.log(copiedVendorResponse)
                 if (copiedVendorResponse && copiedVendorResponse.success) {
                   const newVendor = copiedVendorResponse && copiedVendorResponse.data;
                   window.location.href = `/admin/edit/${newVendor.id}/vendor`;
