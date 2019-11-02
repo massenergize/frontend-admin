@@ -34,11 +34,13 @@ class AllTeams extends React.Component {
 
   async componentDidMount() {
     const user = this.props.auth ? this.props.auth : {};
+   
     if (user.is_super_admin) {
       await this.props.callTeamsForSuperAdmin();
     }
     if (user.is_community_admin) {
-      await this.props.callTeamsForNormalAdmin(user.communities[0].id);
+      var com = this.props.community ? this.props.community : user.communities[0]
+      await this.props.callTeamsForNormalAdmin(com.id);
     }
     //await this.setStateAsync({ teams: response.data });
   }
@@ -145,7 +147,8 @@ AllTeams.propTypes = {
 function mapStateToProps(state) {
   return {
     auth: state.getIn(['auth']),
-    allTeams: state.getIn(['allTeams'])
+    allTeams: state.getIn(['allTeams']), 
+    community:state.getIn(['selected_community'])
   }
 }
 function mapDispatchToProps(dispatch) {

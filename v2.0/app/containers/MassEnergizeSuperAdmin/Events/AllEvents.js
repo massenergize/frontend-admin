@@ -36,17 +36,18 @@ class AllEvents extends React.Component {
   }
 
   handleCommunityChange =(id) => {
-    this.props.callForNormalEvents(id);
+    this.props.callForNormalAdminEvents(id);
   }
 
   async componentDidMount() {
     const user = this.props.auth ? this.props.auth : {};
-
+    const community = this.props.community? this.props.community :{};
     if (user.is_super_admin) {
       this.props.callForSuperAdminEvents();
     }
     if (user.is_community_admin) {
-      this.props.callForNormalAdminEvents(user.communities[0].id);
+      var com = community ? community : user.communities[0];
+      this.props.callForNormalAdminEvents(com.id);
     }
     // await this.setStateAsync({ loading: false });
     // await this.setStateAsync({ data, loading: false });
@@ -273,7 +274,6 @@ class AllEvents extends React.Component {
     const { columns, loading } = this.state;
     const { classes } = this.props;
     const data = this.fashionData(this.props.allEvents);
-    console.log('I AM THE DATA IN EVENTS', this.props.allEvents);
     const options = {
       filterType: 'dropdown',
       responsive: 'stacked',
@@ -337,7 +337,8 @@ AllEvents.propTypes = {
 function mapStateToProps(state) {
   return {
     auth: state.getIn(['auth']),
-    allEvents: state.getIn(['allEvents'])
+    allEvents: state.getIn(['allEvents']), 
+    community:state.getIn(['selected_community'])
   };
 }
 function mapDispatchToProps(dispatch) {

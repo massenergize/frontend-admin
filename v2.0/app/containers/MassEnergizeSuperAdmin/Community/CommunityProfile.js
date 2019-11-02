@@ -63,7 +63,6 @@ class CommunityProfile extends React.Component {
       this.props.callCommunity(id);
     }
   }
-
   showCommunitySwitch = () => {
     const user = this.props.auth ? this.props.auth : {};
     if (user.is_community_admin) {

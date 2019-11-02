@@ -12,10 +12,10 @@ import { Link } from 'react-router-dom';
 import messageStyles from 'dan-styles/Messages.scss';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-import {connect} from 'react-redux'; 
-import {bindActionCreators} from 'redux';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { reduxGetAllGoals, reduxGetAllCommunityGoals } from '../../../redux/redux-actions/adminActions';
-
+import CommunitySwitch from './../Summary/CommunitySwitch'; 
 
 class AllGoals extends React.Component {
   constructor(props) {
@@ -23,21 +23,54 @@ class AllGoals extends React.Component {
     this.state = { columns: this.getColumns(), data: [] };
   }
 
-  async componentDidMount() {
-    const allGoalsResponse = await apiCall('/goals.listForSuperAdmin');
-    if (allGoalsResponse && allGoalsResponse.success) {
-      const data = allGoalsResponse.data.map(d => (
-        [
-          d.id,
-          d.name,
-          `${d.attained_number_of_actions}/${d.target_number_of_actions}`,
-          `${d.attained_number_of_households}/${d.target_number_of_households}`,
-          `${d.attained_carbon_footprint_reduction}/${d.target_carbon_footprint_reduction}`,
-          d.id
-        ]
-      ));
-      await this.setStateAsync({ data });
+  showCommunitySwitch = ()=>{
+    const user= this.props.auth? this.props.auth: {}; 
+    if(user.is_community_admin){
+      return(
+        <CommunitySwitch actionToPerform={this.handleCommunityChange}/>
+      )
     }
+  }
+  handleCommunityChange =(id)=>{
+    this.props.callGoalsForNormalAdmin(id);
+  }
+  
+  async componentDidMount() {
+    const user = this.props.auth ? this.props.auth : {};
+    if (user.is_super_admin) {
+      await this.props.callGoalsForSuperAdmin()
+    }
+    if (user.is_community_admin) {
+      var com = this.props.community ? this.props.community : user.communities[0]
+      await this.props.callGoalsForNormalAdmin(com.id)
+    }
+    // const allGoalsResponse = await apiCall('/goals.listForSuperAdmin');
+    // if (allGoalsResponse && allGoalsResponse.success) {
+    //   const data = allGoalsResponse.data.map(d => (
+    //     [
+    //       d.id,
+    //       d.name,
+    //       `${d.attained_number_of_actions}/${d.target_number_of_actions}`,
+    //       `${d.attained_number_of_households}/${d.target_number_of_households}`,
+    //       `${d.attained_carbon_footprint_reduction}/${d.target_carbon_footprint_reduction}`,
+    //       d.id
+    //     ]
+    //   ));
+    //   await this.setStateAsync({ data });
+    // }
+  }
+  fashionData = (data) => {
+    data = data.map(d => (
+      [
+        d.id,
+        d.name,
+        `${d.attained_number_of_actions}/${d.target_number_of_actions}`,
+        `${d.attained_number_of_households}/${d.target_number_of_households}`,
+        `${d.attained_carbon_footprint_reduction}/${d.target_carbon_footprint_reduction}`,
+        d.id
+      ]
+    ));
+    return data;
   }
 
   setStateAsync(state) {
@@ -122,9 +155,9 @@ class AllGoals extends React.Component {
   render() {
     const title = brand.name + ' - All Goals';
     const description = brand.desc;
-    const { columns, data } = this.state;
+    const { columns } = this.state;
     const { classes } = this.props;
-
+    const data = this.fashionData(this.props.allGoals);
     const options = {
       filterType: 'dropdown',
       responsive: 'stacked',
@@ -152,6 +185,7 @@ class AllGoals extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <div className={classes.table}>
+          {this.showCommunitySwitch()}
           <MUIDataTable
             title="All Goals"
             data={data}
@@ -170,13 +204,14 @@ AllGoals.propTypes = {
 function mapStateToProps(state) {
   return {
     auth: state.getIn(['auth']),
-    allGoals: state.getIn(['allTeams'])
+    allGoals: state.getIn(['allGoals']),
+    community: state.getIn(['selected_community'])
   }
 }
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
-    callTeamsForSuperAdmin: reduxGetAllGoals,
-    callTeamsForNormalAdmin: reduxGetAllCommunityGoals
+    callGoalsForSuperAdmin: reduxGetAllGoals,
+    callGoalsForNormalAdmin: reduxGetAllCommunityGoals
   }, dispatch);
 }
 const GoalsMapped = connect(mapStateToProps, mapDispatchToProps)(AllGoals);

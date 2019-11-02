@@ -113,7 +113,6 @@ class AllPolicies extends React.Component {
   ]
 
   render() {
-    console.log(" IAM IN POLICIES:::", this.props.allPolicies);
     const title = brand.name + ' - All Policies';
     const description = brand.desc;
     const { columns } = this.state;
