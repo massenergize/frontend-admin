@@ -95,12 +95,8 @@ class SummaryDashboard extends PureComponent {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        {/* <h1 style={{color:"white", fontSize:'2rem',margin:25}}>Super Admin</h1> */}
-        <div style={{marginTop:70}}></div>
-        <Grid container className={classes.root}>
-          <CounterChartWidget />
-        </Grid>
-        <div style={{marginTop:60}}>
+
+        <div>
           <h3>Choose A Community To Manage</h3>
           <TextField
             id="outlined-select-currency"
@@ -109,7 +105,7 @@ class SummaryDashboard extends PureComponent {
             className={classes.textField}
             value={community}
             fullWidth
-             onChange={option => { this.chooseCommunity(option); }}
+            onChange={option => { this.chooseCommunity(option); }}
             SelectProps={{
               MenuProps: {
                 className: classes.menu,
@@ -126,6 +122,9 @@ class SummaryDashboard extends PureComponent {
             ))}
           </TextField>
         </div>
+        <Grid container className={classes.root}>
+          <CounterChartWidget />
+        </Grid>
         <Divider className={classes.divider} />
         {/* <SalesChartWidget /> */}
         <Divider className={classes.divider} />

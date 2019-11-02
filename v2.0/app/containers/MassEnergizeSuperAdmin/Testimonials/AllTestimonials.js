@@ -242,8 +242,8 @@ class AllTestimonials extends React.Component {
         });
       }
     };
-    
-    //if (loading) {
+
+    if (loading) {
       return (
         <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
           <Grid item xs={12} md={6}>
@@ -259,28 +259,28 @@ class AllTestimonials extends React.Component {
           </Grid>
         </Grid>
       );
-    //}
+    }
 
-    // return (
-    //   <div>
-    //     <Helmet>
-    //       <title>{title}</title>
-    //       <meta name="description" content={description} />
-    //       <meta property="og:title" content={title} />
-    //       <meta property="og:description" content={description} />
-    //       <meta property="twitter:title" content={title} />
-    //       <meta property="twitter:description" content={description} />
-    //     </Helmet>
-    //     <div className={classes.table}>
-    //       <MUIDataTable
-    //         title="All Communities"
-    //         data={data}
-    //         columns={columns}
-    //         options={options}
-    //       />
-    //     </div>
-    //   </div>
-    // );
+    return (
+      <div>
+        <Helmet>
+          <title>{title}</title>
+          <meta name="description" content={description} />
+          <meta property="og:title" content={title} />
+          <meta property="og:description" content={description} />
+          <meta property="twitter:title" content={title} />
+          <meta property="twitter:description" content={description} />
+        </Helmet>
+        <div className={classes.table}>
+          <MUIDataTable
+            title="All Communities"
+            data={data}
+            columns={columns}
+            options={options}
+          />
+        </div>
+      </div>
+    );
   }
 }
 

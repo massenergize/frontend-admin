@@ -49,7 +49,7 @@ class AllActions extends React.Component {
       callCommunityActions(comm.id);
     }
 
-    await this.setStateAsync({ data: this.fashionData(allActions) });
+    await this.setStateAsync({ data: this.fashionData(allActions), loading: false });
   }
 
   setStateAsync(state) {

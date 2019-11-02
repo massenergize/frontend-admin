@@ -46,7 +46,6 @@ class AllPolicies extends React.Component {
       [
         d.id,
         d.name,
-        `${d.description && d.description.substring(0, 30)}...`,
         d.community && d.community.name,
         d.is_published,
         d.id
@@ -66,13 +65,6 @@ class AllPolicies extends React.Component {
     {
       name: 'Name',
       key: 'name',
-      options: {
-        filter: true,
-      }
-    },
-    {
-      name: 'Description',
-      key: 'actions',
       options: {
         filter: true,
       }
