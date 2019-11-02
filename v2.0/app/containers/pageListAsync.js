@@ -24,6 +24,9 @@ export const BlankPage = loadable(() => import('./Pages/BlankPage'), {
 export const DashboardSummaryPage = loadable(() => import('./MassEnergizeSuperAdmin/Summary'), {
   fallback: <Loading />,
 }); 
+export const DashboardAdminSummaryPage = loadable(() => import('./MassEnergizeSuperAdmin/Summary/NormalAdminHome'), {
+  fallback: <Loading />,
+}); 
 export const AllCommunities = loadable(() => import('./MassEnergizeSuperAdmin/Community/AllCommunities'), {
   fallback: <Loading />,
 });

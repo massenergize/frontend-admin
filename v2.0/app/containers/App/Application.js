@@ -1,7 +1,10 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
 import { Switch, Route } from 'react-router-dom';
+import {connect} from 'react-redux'; 
+import { bindActionCreators } from 'redux';
 import Dashboard from '../Templates/Dashboard';
+import {reduxCallCommunities, reduxCheckUser} from './../../redux/redux-actions/adminActions';
 import {
   Parent,
   DashboardSummaryPage,
@@ -21,6 +24,7 @@ import {
   AddTeam, AllTeams,
   AllGoals, AddGoal,
   AddPolicy, AllPolicies,
+  DashboardAdminSummaryPage,
   AddTestimonial, AllTestimonials, Export, CustomizePages, EditAction,
   SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditGoal, EditPolicy, EditEvent
 } from '../pageListAsync';
@@ -28,13 +32,41 @@ import {
 
 class Application extends React.Component {
   
+  componentWillMount() {
+   
+    this.props.reduxCallCommunities();
+
+  }
+  
   render() {
+   
     const { changeMode, history } = this.props;
-    return (
+    const user = this.props.auth;
+
+    return ( 
       <Dashboard history={history} changeMode={changeMode}>
         <Switch>
-          <Route exact path="/dash-summary" component={DashboardSummaryPage} />
-          <Route exact path="/admin" component={DashboardSummaryPage} />
+          { (user.is_community_admin) && 
+            (
+                <Route exact path="/" render={(props) =><DashboardAdminSummaryPage {...props} signOut = {this.props.signOut} />} />
+            )
+          }
+          { (user.is_super_admin) && 
+            (
+                <Route exact path="/" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
+            )
+          }
+          { user.is_community_admin && 
+            (
+                <Route exact path="/admin" render={(props) =><DashboardAdminSummaryPage {...props} signOut = {this.props.signOut} />} />
+            )
+          }
+          { user.is_super_admin && (
+            <Route exact path="/admin" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
+          )
+          }
+          {/* <Route exact path="/" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
+          <Route exact path="/admin" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} /> */}
           <Route exact path="/blank" component={BlankPage} />
           <Route path="/admin/dashboard" component={DashboardSummaryPage} />
 
@@ -110,4 +142,15 @@ Application.propTypes = {
   history: PropTypes.object.isRequired,
 };
 
-export default Application;
+function mapStateToProps(state){
+  return {
+    auth: state.getIn(['auth'])
+  }
+}
+function mapDispatchToProps(dispatch){
+  return bindActionCreators({
+    reduxCallCommunities: reduxCallCommunities,
+    checkUser: reduxCheckUser
+  },dispatch);
+}
+export default connect(mapStateToProps,mapDispatchToProps)(Application);

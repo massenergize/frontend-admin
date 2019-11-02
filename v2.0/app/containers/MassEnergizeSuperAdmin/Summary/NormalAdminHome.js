@@ -8,6 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
 import { connect } from 'react-redux';
 import MenuItem from '@material-ui/core/MenuItem';
+import Paper from '@material-ui/core/Paper';
 import {
   CounterChartWidget,
   // SalesChartWidget,
@@ -18,9 +19,9 @@ import styles from './dashboard-jss';
 import { getTestimonialsData, getActionsData, getEventsData } from '../../../api/data';
 import { connectRouter } from 'connected-react-router';
 import { bindActionCreators } from 'redux';
-import { reduxLoadSelectedCommunity, reduxIfExpired, reduxCheckUser, reduxGetAllUsers, reduxCallCommunities, reduxGetAllTags } from '../../../redux/redux-actions/adminActions';
-
-class SummaryDashboard extends PureComponent {
+import { reduxLoadSelectedCommunity, reduxIfExpired, reduxCheckUser } from '../../../redux/redux-actions/adminActions';
+import CommunitySwitch from './CommunitySwitch';
+class NormalAdminHome extends PureComponent {
   constructor(props) {
     super(props);
     this.state = { events: [], testimonials: [], actions: [] };
@@ -29,10 +30,10 @@ class SummaryDashboard extends PureComponent {
   callForEvents = () => {
     const me = this;
     getEventsData().then(res => {
-      console.log("i am the events",res);
+      console.log("i am the events", res);
       me.setState({ events: res.data });
     }).catch(err => {
-      
+
     });
   }
 
@@ -55,13 +56,14 @@ class SummaryDashboard extends PureComponent {
   }
 
   componentDidMount = () => {
-    //this.props.ifExpired();
+    this.props.ifExpired();
     this.callForTestimonials();
     this.callForActions();
     this.callForEvents();
   }
   findCommunityObj = (name) => {
-    let section = this.props.communities;
+    const auth = this.props.auth;
+    let section = auth?auth.communities :[];
     for (let i = 0; i < section.length; i++) {
       if (section[i].name === name) {
         return section[i];
@@ -70,21 +72,22 @@ class SummaryDashboard extends PureComponent {
     return null;
   }
 
-  chooseCommunity = (event) =>{
-    let obj = this.findCommunityObj(event.target.value); 
-    this.props.selectCommunity(obj); 
-    if(obj){
+  chooseCommunity = (event) => {
+    let obj = this.findCommunityObj(event.target.value);
+    this.props.selectCommunity(obj);
+    if (obj) {
       window.location = `/admin/community/${obj.id}/profile`;
     }
   }
 
-  
+
   render() {
     const title = brand.name + ' - Summary Dashboard';
     const description = brand.desc;
-    const { classes, communities,selected_community } = this.props;
-    const community = selected_community? selected_community.name :"Choose a community";
-    
+    const { classes, selected_community, auth } = this.props;
+    const communities = auth ? auth.communities : [];
+    const community = selected_community ? selected_community.name : "Choose a community";
+    const noc = auth? auth.communities.length : 0;
     return (
       <div>
         <Helmet>
@@ -95,41 +98,43 @@ class SummaryDashboard extends PureComponent {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        {/* <h1 style={{color:"white", fontSize:'2rem',margin:25}}>Super Admin</h1> */}
-        <div style={{marginTop:70}}></div>
-        <Grid container className={classes.root}>
+        <h1 style={{color:"#bae4f1", fontSize:'1.7rem',fontWeight:'400',margin:25}}>You are in charge of <b>{noc}</b> {noc ===1 ? "community":"communities"}</h1>
+        {/* <div style={{ marginTop: 70 }}></div> */}
+        {/* <Grid container className={classes.root}>
           <CounterChartWidget />
-        </Grid>
-        <div style={{marginTop:60}}>
-          <h3>Choose A Community To Manage</h3>
-          <TextField
-            id="outlined-select-currency"
-            select
-            label="Select Community"
-            className={classes.textField}
-            value={community}
-            fullWidth
-             onChange={option => { this.chooseCommunity(option); }}
-            SelectProps={{
-              MenuProps: {
-                className: classes.menu,
-              },
-            }}
-            helperText="Select a community"
-            margin="normal"
-            variant="outlined"
-          >
-            {communities.map(option => (
-              <MenuItem key={option.id.toString()} value={option.name}>
-                {option.name}
-              </MenuItem>
-            ))}
-          </TextField>
+        </Grid> */}
+        <div style={{ marginTop: 30 }}>
+          <Paper style={{padding:35}} elevation={4}>
+            <h3>Choose A Community To Manage</h3>
+            <TextField
+              id="outlined-select-currency"
+              select
+              label="Select Community"
+              className={classes.textField}
+              value={community}
+              fullWidth
+              onChange={option => { this.chooseCommunity(option); }}
+              SelectProps={{
+                MenuProps: {
+                  className: classes.menu,
+                },
+              }}
+              helperText="Select a community"
+              margin="normal"
+              variant="outlined"
+            >
+              {communities.map(option => (
+                <MenuItem key={option.id.toString()} value={option.name}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Paper>
         </div>
         <Divider className={classes.divider} />
         {/* <SalesChartWidget /> */}
         <Divider className={classes.divider} />
-        <Grid container spacing={24} className={classes.root}>
+        {/* <Grid container spacing={24} className={classes.root}>
           <Grid item md={4} xs={12}>
             <CarouselWidget goals={this.state.testimonials} />
           </Grid>
@@ -140,30 +145,31 @@ class SummaryDashboard extends PureComponent {
             <NewsWidget kind="event" dataCollection={this.state.events} />
           </Grid>
 
-        </Grid>
+        </Grid> */}
       </div>
     );
   }
 }
 
-SummaryDashboard.propTypes = {
+NormalAdminHome.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => {
   return {
-    communities: state.getIn(['communities']), 
-    selected_community:state.getIn(['selected_community'])
+    auth: state.getIn(['auth']),
+    //communities: state.getIn(['communities']), 
+    selected_community: state.getIn(['selected_community'])
   }
 }
 
-const mapDispatchToProps = (dispatch)=>{
+const mapDispatchToProps = (dispatch) => {
   return bindActionCreators({
-    selectCommunity: reduxLoadSelectedCommunity, 
-    ifExpired : reduxCheckUser
-    
-  },dispatch)
+    selectCommunity: reduxLoadSelectedCommunity,
+    ifExpired: reduxCheckUser
+
+  }, dispatch)
 }
-const summaryMapped = connect(mapStateToProps, mapDispatchToProps)(SummaryDashboard);
+const summaryMapped = connect(mapStateToProps, mapDispatchToProps)(NormalAdminHome);
 
 export default withStyles(styles)(summaryMapped);

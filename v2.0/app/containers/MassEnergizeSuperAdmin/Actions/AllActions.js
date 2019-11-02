@@ -15,9 +15,12 @@ import Grid from '@material-ui/core/Grid';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Paper from '@material-ui/core/Paper';
 
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-
+import { reduxGetAllActions, reduxGetAllCommunityActions } from '../../../redux/redux-actions/adminActions';
+import CommunitySwitch from '../Summary/CommunitySwitch';
 class AllActions extends React.Component {
   constructor(props) {
     super(props);
@@ -28,33 +31,74 @@ class AllActions extends React.Component {
     };
   }
 
-  async componentDidMount() {
-    const allActionsResponse = await apiCall('/actions.listForSuperAdmin');
 
-    if (allActionsResponse && allActionsResponse.success) {
-      const data = allActionsResponse.data.map(d => (
-        [
-          {
-            id: d.id,
-            image: d.image,
-            initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
-          },
-          `${d.title}...`.substring(0, 30), // limit to first 30 chars
-          `${d.about}...`.substring(0, 20), // limit to first 20 chars
-          `${d.tags.map(t => t.name).join(', ')} `,
-          d.community && d.community.name,
-          d.id
-        ]
-      ));
-      await this.setStateAsync({ data, loading: false });
+
+  async componentDidMount() {
+    const user = this.props.auth ? this.props.auth : {};
+    if (user.is_super_admin) {
+      this.props.callAllActions();
+    }
+    if (user.is_community_admin) {
+      // not nec.. remove later
+      const community = this.props.community ? this.props.community : user.communities[0];
+      this.props.callCommunityActions(community.id);
+    }
+
+    // const allActionsResponse = this.props.allActions;
+    // if (allActionsResponse) {
+    //   const data = allActionsResponse.map(d => (
+    //     [
+    //       {
+    //         id: d.id,
+    //         image: d.image,
+    //         initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
+    //       },
+    //       `${d.title}...`.substring(0, 30), // limit to first 30 chars
+    //       `${d.about}...`.substring(0, 20), // limit to first 20 chars
+    //       `${d.tags.map(t => t.name).join(', ')} `,
+    //       d.community && d.community.name,
+    //       d.id
+    //     ]
+    //   ));
+    //   await this.setStateAsync({ data, loading: false });
+    // }
+  }
+
+  showCommunitySwitch = () => {
+    const user = this.props.auth ? this.props.auth : {};
+    if (user.is_community_admin) {
+      return (
+        <CommunitySwitch actionToPerform={this.changeActions} />
+      );
     }
   }
 
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
-    });
+  changeActions = (id) => {
+    this.props.callCommunityActions(id);
   }
+
+  fashionData =(data) => {
+    const fashioned = data.map(d => (
+      [
+        {
+          id: d.id,
+          image: d.image,
+          initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
+        },
+        `${d.title}...`.substring(0, 30), // limit to first 30 chars
+        `${d.about}...`.substring(0, 20), // limit to first 20 chars
+        `${d.tags.map(t => t.name).join(', ')} `,
+        d.community && d.community.name,
+        d.id
+      ]
+    ));
+    return fashioned;
+  }
+  // setStateAsync(state) {
+  //   return new Promise((resolve) => {
+  //     this.setState(state, resolve);
+  //   });
+  // }
 
   getColumns = () => [
     {
@@ -137,8 +181,9 @@ class AllActions extends React.Component {
   render() {
     const title = brand.name + ' - All Actions';
     const description = brand.desc;
-    const { data, columns, loading } = this.state;
-    const { classes } = this.props;
+    const { columns, loading } = this.state;
+    const { classes, allActions } = this.props;
+    const data = this.fashionData(this.props.allActions);
 
     const options = {
       filterType: 'dropdown',
@@ -154,22 +199,22 @@ class AllActions extends React.Component {
       }
     };
 
-    if (loading) {
-      return (
-        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
-              <div className={classes.root}>
-                <LinearProgress />
-                <h1>Fetching all Actions.  This may take a while...</h1>
-                <br />
-                <LinearProgress color="secondary" />
-              </div>
-            </Paper>
-          </Grid>
-        </Grid>
-      );
-    }
+    // if (loading) {
+    //   return (
+    //     <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+    //       <Grid item xs={12} md={6}>
+    //         <Paper className={classes.root}>
+    //           <div className={classes.root}>
+    //             <LinearProgress />
+    //             <h1>Fetching all Actions.  This may take a while...</h1>
+    //             <br />
+    //             <LinearProgress color="secondary" />
+    //           </div>
+    //         </Paper>
+    //       </Grid>
+    //     </Grid>
+    //   );
+    // }
 
     return (
       <div>
@@ -182,6 +227,7 @@ class AllActions extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <div className={classes.table}>
+          {this.showCommunitySwitch()}
           <MUIDataTable
             title="All Actions"
             data={data}
@@ -198,4 +244,15 @@ AllActions.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(AllActions);
+const mapStateToProps = (state) => ({
+  auth: state.getIn(['auth']),
+  allActions: state.getIn(['allActions']),
+  community: state.getIn(['selected_community'])
+  // community:state.getIn(['selected_community'])
+});
+const mapDispatchToProps = (dispatch) => bindActionCreators({
+  callAllActions: reduxGetAllActions,
+  callCommunityActions: reduxGetAllCommunityActions
+}, dispatch);
+const ActionsMapped = connect(mapStateToProps, mapDispatchToProps)(AllActions);
+export default withStyles(styles)(ActionsMapped);

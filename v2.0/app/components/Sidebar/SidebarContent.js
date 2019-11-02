@@ -12,6 +12,8 @@ import dummy from 'dan-api/dummy/dummyContents';
 import logo from 'dan-images/logo.png';
 import MainMenu from './MainMenu';
 import styles from './sidebar-jss';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
 class SidebarContent extends React.Component {
   state = {
@@ -37,6 +39,7 @@ class SidebarContent extends React.Component {
   }
 
   render() {
+   
     const {
       classes,
       turnDarker,
@@ -47,12 +50,15 @@ class SidebarContent extends React.Component {
       dataMenu,
       status,
       anchorEl,
-      openMenuStatus,
+      openMenuStatus, 
       closeMenuStatus,
       changeStatus,
       isLogin
     } = this.props;
+    const user = this.props.auth;
     const { transform } = this.state;
+    const profile = user.profile_picture ? user.profile_picture.url : null;
+    
 
     const setStatus = st => {
       switch (st) {
@@ -80,11 +86,12 @@ class SidebarContent extends React.Component {
             >
               <Avatar
                 alt={dummy.profile ? dummy.profile.full_name : dummy.user.name}
-                src={dummy.profile ? dummy.profile.profile_picture.url : dummy.user.avatar}
+                src={profile ? profile : dummy.user.avatar}
                 className={classNames(classes.avatar, classes.bigAvatar)}
               />
               <div>
-                <h4>{dummy.profile ? dummy.profile.full_name : dummy.user.name}</h4>
+                <h4>{user.preferred_name? user.preferred_name : "..."}</h4>
+                <small>{user.is_super_admin? "Super Admin" :" Admin " }</small>
                 {/* <Button size="small" onClick={openMenuStatus}>
                   <i className={classNames(classes.dotStatus, setStatus(status))} />
                   {status}
@@ -157,5 +164,6 @@ SidebarContent.defaultProps = {
   anchorEl: null,
   isLogin: true,
 };
+
 
 export default withStyles(styles)(SidebarContent);

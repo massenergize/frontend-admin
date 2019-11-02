@@ -3,7 +3,24 @@ import deepOrange from '@material-ui/core/colors/deepOrange';
 import deepPurple from '@material-ui/core/colors/deepPurple';
 import pink from '@material-ui/core/colors/pink';
 import green from '@material-ui/core/colors/green';
+import customJss from './../../../../utils/jss/Custom-jss';
+const raise = customJss;
+const pagesCustom = {
+  pageCard:{
+    borderRadius:5,
+    fontSize:20,
+    margin:9,
+    padding:'30px 29px 27px',
+    cursor:'pointer',
+    '&:hover':{
+      background:'floralwhite', 
+      transition:'.4s'
+    }
+  }
+}
 const styles = theme => ({
+  ...pagesCustom,
+  ...raise,
   profileList: {
     padding: 0,
     '& li': {
