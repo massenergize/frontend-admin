@@ -21,7 +21,10 @@ import Email from '@material-ui/icons/Email';
 import messageStyles from 'dan-styles/Messages.scss';
 import { fetchData } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { reduxGetAllTeams, reduxGetAllCommunityTeams } from '../../../redux/redux-actions/adminActions';
+import CommunitySwitch from './../Summary/CommunitySwitch'; 
 
 class AllTeams extends React.Component {
   constructor(props) {
@@ -30,15 +33,32 @@ class AllTeams extends React.Component {
   }
 
   async componentDidMount() {
-    const response = await fetchData('v2/teams');
-    await this.setStateAsync({ teams: response.data });
+    const user = this.props.auth ? this.props.auth : {};
+    if (user.is_super_admin) {
+      await this.props.callTeamsForSuperAdmin();
+    }
+    if (user.is_community_admin) {
+      await this.props.callTeamsForNormalAdmin(user.communities[0].id);
+    }
+    //await this.setStateAsync({ teams: response.data });
   }
 
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
-    });
+  showCommunitySwitch = ()=>{
+    const user= this.props.auth? this.props.auth: {}; 
+    if(user.is_community_admin){
+      return(
+        <CommunitySwitch actionToPerform={this.handleCommunityChange}/>
+      )
+    }
   }
+  handleCommunityChange =(id)=>{
+    this.props.callTeamsForNormalAdmin(id);
+  }
+  // setStateAsync(state) {
+  //   return new Promise((resolve) => {
+  //     this.setState(state, resolve);
+  //   });
+  // }
 
   getStatus = isApproved => {
     switch (isApproved) {
@@ -61,6 +81,11 @@ class AllTeams extends React.Component {
             </TableRow>
           </TableHead>
           <TableBody>
+            {data.length === 0 ?
+              <p style={{margin:25}}>Sorry, teams for this community yet!</p>
+              :
+              null
+            }
             {data.map(n => ([
               <TableRow key={n.id}>
                 <TableCell padding="dense">
@@ -94,7 +119,7 @@ class AllTeams extends React.Component {
   render() {
     const title = brand.name + ' - All Teams';
     const description = brand.desc;
-    const { teams } = this.state;
+    const teams = this.props.allTeams;
     const { classes } = this.props;
 
     return (
@@ -107,6 +132,7 @@ class AllTeams extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
+        {this.showCommunitySwitch()}
         {this.renderTable(teams, classes)}
       </div>
     );
@@ -116,5 +142,18 @@ class AllTeams extends React.Component {
 AllTeams.propTypes = {
   classes: PropTypes.object.isRequired,
 };
+function mapStateToProps(state) {
+  return {
+    auth: state.getIn(['auth']),
+    allTeams: state.getIn(['allTeams'])
+  }
+}
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    callTeamsForSuperAdmin: reduxGetAllTeams,
+    callTeamsForNormalAdmin: reduxGetAllCommunityTeams
+  }, dispatch);
+}
+const TeamsMapped = connect(mapStateToProps, mapDispatchToProps)(AllTeams);
 
-export default withStyles(styles)(AllTeams);
+export default withStyles(styles)(TeamsMapped);

@@ -11,12 +11,13 @@ class LoginDedicated extends React.Component {
   
   render() {
     const {
-      user, error, signOutFxn, loginWithFacebookFxn, loginWithGoogleFxn, normalLoginFxn
+      user, started,error, signOutFxn, loginWithFacebookFxn, loginWithGoogleFxn, normalLoginFxn
     } = this.props;
     
     return (
       <Outer>
         <Login
+          started = {started}
           error={error}
           signOutFxn={signOutFxn}
           loginWithFacebookFxn={loginWithFacebookFxn}

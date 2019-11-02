@@ -21,7 +21,7 @@ class Login extends React.Component {
     const title = brand.name + ' - Login';
     const description = brand.desc;
     const {
-      classes, signOutFxn, loginWithFacebookFxn, loginWithGoogleFxn, normalLoginFxn, error
+      classes, started, signOutFxn, loginWithFacebookFxn, loginWithGoogleFxn, normalLoginFxn, error
     } = this.props;
 
     return (
@@ -34,10 +34,11 @@ class Login extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        
+
         <div className={classes.container}>
           <div className={classes.userFormWrap}>
             <LoginForm
+              started={started}
               signOutFxn={signOutFxn}
               loginWithFacebookFxn={loginWithFacebookFxn}
               normalLoginFxn={normalLoginFxn}

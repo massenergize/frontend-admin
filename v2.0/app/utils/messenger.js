@@ -13,14 +13,30 @@ import { API_HOST } from '../config/constants';
  * being a SimpleRequest hence no preflight checks will be done saving some
  * band-with and being faster in general while avoiding CORS issues.
  */
+
+function checkAuthUser() {
+  const user = localStorage.getItem("authUser");
+  const token = localStorage.getItem("idToken");
+  if (user && token) {
+    rawCall('auth/whoami').then(res => {
+      if (!res.data) {
+        window.location = "/login";
+        localStorage.removeItem('authUser');
+        localStorage.removeItem('idToken');
+
+      }
+    })
+  }
+}
 export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = null) {
+   checkAuthUser();
   const idToken = localStorage.getItem("idToken");
   const response = await fetch(`${API_HOST}/v3${destinationUrl}`, {
     credentials: 'include',
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-       Authorization: `Bearer ${idToken}`
+      Authorization: `Bearer ${idToken}`
     },
     body: qs.stringify(dataToSend)
   });
@@ -83,6 +99,7 @@ export async function rawCall(destinationUrl, dataToSend = {}, relocationPage = 
  * general while avoiding CORS issues.
  */
 export async function apiCallWithMedia(destinationUrl, dataToSend = {}, relocationPage = null) {
+  checkAuthUser();
   const formData = new FormData();
   Object.keys(dataToSend).map(k => (formData.append(k, dataToSend[k])));
 
@@ -192,13 +209,14 @@ export function cleanFormData(formValues) {
 }
 
 export async function fetchData(sourceUrl) {
+  checkAuthUser();
   const idToken = localStorage.getItem("idToken");
   return fetch(`${API_HOST}/${sourceUrl}`, {
     method: 'GET',
     credentials: 'include',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-       Authorization: `Bearer ${idToken}`
+      Authorization: `Bearer ${idToken}`
     }
   }).then(response => response.json())
     .then(jsonResponse => jsonResponse)

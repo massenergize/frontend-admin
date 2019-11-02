@@ -39,14 +39,14 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      error: null
+      error: null,
+      started: false
     };
     this.signOut = this.signOut.bind(this);
     this.loginWithFacebook = this.loginWithFacebook.bind(this);
     this.loginWithGoogle = this.loginWithGoogle.bind(this);
     this.normalLogin = this.normalLogin.bind(this);
   }
-
 
   componentDidMount() {
     //this.authListener();
@@ -68,6 +68,7 @@ class App extends React.Component {
   }
 
   requestMassToken = (fireToken) => {
+    const me = this;
     const body = { idToken: fireToken };
     rawCall("auth/verify", body).then(massToken => {
       const idToken = massToken.data.idToken;
@@ -75,30 +76,35 @@ class App extends React.Component {
       this.getAuthenticatedUserProfile();
     }).catch(err => {
       console.log("Error MASSTOKEN: ", err);
-      me.setState({ error: "Sorry, we could not sign you in!" });
+      me.setState({ error: "Sorry, we could not sign you in!", started: false });
     });
   }
   loginWithGoogle = () => {
+    this.setState({ started: true })
     const me = this;
     firebase.auth().signInWithPopup(googleProvider).then(res => {
       me.requestMassToken(res.user._lat);
     })
       .catch(err => {
-        me.setState({ error: err.message });
+        me.setState({ error: err.message, started: false });
+
       });
   }
 
   normalLogin = (email, password) => {
+    this.setState({ started: true });
     const me = this;
     firebase.auth().signInWithEmailAndPassword(email, password).then(res => {
       me.requestMassToken(res.user._lat);
     })
       .catch(err => {
         console.log('Error:', err.message);
-        this.setState({ error: err.message });
+        this.setState({ error: err.message, started: false });
       });
   }
-
+  goHome = ()=>{
+    window.location = "/";
+  }
 
   getAuthenticatedUserProfile = () => {
     const me = this;
@@ -108,33 +114,34 @@ class App extends React.Component {
       if (user.is_community_admin === true || user.is_super_admin === true) {
         localStorage.setItem('authUser', JSON.stringify(user))
         me.props.reduxLoadAuthAdmin(user);
+        this.goHome();
       }
       else {
-        me.setState({ error: `Sorry ${user.preferred_name}, you are not an admin :(` })
+        me.setState({ error: `Sorry ${user.preferred_name}, you are not an admin :(`, started: false })
       }
     })
       .catch(err => {
         console.log("Error WHOAMI: ", err);
-        me.setState({ error: "Sorry, something went wrong, please try again!" })
+        me.setState({ error: "Sorry, something went wrong, please try again!", started: false })
       })
   }
 
-  authListener() {
-    if (firebase) {
-      firebase.auth().onAuthStateChanged(u => {
-        this.props.reduxCallIdToken();
-        if (u) {
-          console.log("I am the listen", u);
-          localStorage.setItem('authUser', JSON.stringify(u));
-          //will be removed later
-          this.setState({ user: u });
-        }
-      });
-    }
-  }
+  // authListener() {
+  //   if (firebase) {
+  //     firebase.auth().onAuthStateChanged(u => {
+  //       this.props.reduxCallIdToken();
+  //       if (u) {
+  //         console.log("I am the listen", u);
+  //         localStorage.setItem('authUser', JSON.stringify(u));
+  //         //will be removed later
+  //         this.setState({ user: u });
+  //       }
+  //     });
+  //   }
+  // }
 
   render() {
-    const { error } = this.state;
+    const { error, started } = this.state;
     const user = this.props.auth;
     console.log("testing le props", this.props.auth);
     return (
@@ -149,6 +156,7 @@ class App extends React.Component {
                   <LoginDedicated
                     {...props}
                     signOutFxn={this.signOut}
+                    started={started}
                     error={error}
                     user={user}
                     normalLoginFxn={this.normalLogin}
@@ -164,6 +172,7 @@ class App extends React.Component {
                   <LoginDedicated
                     {...props}
                     signOutFxn={this.signOut}
+                    started={started}
                     error={error}
                     user={user}
                     normalLoginFxn={this.normalLogin}

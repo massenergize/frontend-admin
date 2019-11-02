@@ -8,6 +8,8 @@ import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import dummy from 'dan-api/dummy/dummyContents';
 import styles from './sidebar-jss';
 import SidebarContent from './SidebarContent';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 
 class Sidebar extends React.Component {
   state = {
@@ -49,56 +51,47 @@ class Sidebar extends React.Component {
     this.setState({ status });
     this.handleClose();
   }
+  getAdminMenus = () => {
+    const new_super_link = {
+      key:"add-new-super-admin", 
+      name:"New Super admin", 
+      icon:"ios-add-circle",
+      link:"/admin/add-super-admin"
+    }
+    const { auth, dataMenu } = this.props;
+    if (auth) {
+      if (auth.is_community_admin){
+        return dataMenu.filter(menu => menu.key !== "communities" && menu.key !=="tags-collections");
+    }
+    return [...dataMenu,new_super_link];
+  }
+}
 
-  render() {
-    const {
-      classes,
-      open,
-      toggleDrawerOpen,
-      loadTransition,
-      leftSidebar,
-      dataMenu
-    } = this.props;
-    const { status, anchorEl, turnDarker } = this.state;
-    return (
-      <Fragment>
-        <Hidden lgUp>
-          <SwipeableDrawer
-            onClose={toggleDrawerOpen}
-            onOpen={toggleDrawerOpen}
-            open={!open}
-            anchor={leftSidebar ? 'left' : 'right'}
-          >
-            <div className={classes.swipeDrawerPaper}>
-              <SidebarContent
-                drawerPaper
-                leftSidebar={leftSidebar}
-                toggleDrawerOpen={toggleDrawerOpen}
-                loadTransition={loadTransition}
-                dataMenu={dataMenu}
-                status={status}
-                anchorEl={anchorEl}
-                openMenuStatus={this.handleOpen}
-                closeMenuStatus={this.handleClose}
-                changeStatus={this.handleChangeStatus}
-              />
-            </div>
-          </SwipeableDrawer>
-        </Hidden>
-        <Hidden mdDown>
-          <Drawer
-            variant="permanent"
-            onClose={toggleDrawerOpen}
-            classes={{
-              paper: classNames(classes.drawer, classes.drawerPaper, !open ? classes.drawerPaperClose : ''),
-            }}
-            open={open}
-            anchor={leftSidebar ? 'left' : 'right'}
-          > 
+render() {
+  const {
+    classes,
+    open,
+    toggleDrawerOpen,
+    loadTransition,
+    leftSidebar,
+    auth,
+  } = this.props;
+  const { status, anchorEl, turnDarker } = this.state;
+  const dataMenu = this.getAdminMenus();
+  return (
+    <Fragment>
+      <Hidden lgUp>
+        <SwipeableDrawer
+          onClose={toggleDrawerOpen}
+          onOpen={toggleDrawerOpen}
+          open={!open}
+          anchor={leftSidebar ? 'left' : 'right'}
+        >
+          <div className={classes.swipeDrawerPaper}>
             <SidebarContent
-              drawerPaper={open}
+              drawerPaper
               leftSidebar={leftSidebar}
-              turnDarker={turnDarker}
+              toggleDrawerOpen={toggleDrawerOpen}
               loadTransition={loadTransition}
               dataMenu={dataMenu}
               status={status}
@@ -107,11 +100,37 @@ class Sidebar extends React.Component {
               closeMenuStatus={this.handleClose}
               changeStatus={this.handleChangeStatus}
             />
-          </Drawer>
-        </Hidden>
-      </Fragment>
-    );
-  }
+          </div>
+        </SwipeableDrawer>
+      </Hidden>
+      <Hidden mdDown>
+        <Drawer
+          variant="permanent"
+          onClose={toggleDrawerOpen}
+          classes={{
+            paper: classNames(classes.drawer, classes.drawerPaper, !open ? classes.drawerPaperClose : ''),
+          }}
+          open={open}
+          anchor={leftSidebar ? 'left' : 'right'}
+        >
+          <SidebarContent
+            auth={auth}
+            drawerPaper={open}
+            leftSidebar={leftSidebar}
+            turnDarker={turnDarker}
+            loadTransition={loadTransition}
+            dataMenu={dataMenu}
+            status={status}
+            anchorEl={anchorEl}
+            openMenuStatus={this.handleOpen}
+            closeMenuStatus={this.handleClose}
+            changeStatus={this.handleChangeStatus}
+          />
+        </Drawer>
+      </Hidden>
+    </Fragment>
+  );
+}
 }
 
 Sidebar.propTypes = {
@@ -127,4 +146,11 @@ Sidebar.defaultProps = {
   leftSidebar: true
 };
 
-export default withStyles(styles)(Sidebar);
+function mapStateToProps(state) {
+  return {
+    auth: state.getIn(['auth'])
+  }
+}
+const SidebarMapped = connect(mapStateToProps, null)(Sidebar);
+export default withStyles(styles)(SidebarMapped);
+
