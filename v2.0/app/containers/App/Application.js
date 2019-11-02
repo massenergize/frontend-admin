@@ -77,6 +77,7 @@ class Application extends React.Component {
           <Route path="/admin/community/:id/preview" component={CommunityProfile} exact />
           <Route path="/admin/community/:id/profile" component={CommunityProfile} exact />
           <Route path="/admin/community/:id/edit" component={OnboardCommunity} exact />
+          <Route path="/admin/edit/:id/community" component={OnboardCommunity} exact />
 
           <Route path="/admin/read/actions" component={AllActions} />
           <Route path="/admin/add/action" component={AddAction} />

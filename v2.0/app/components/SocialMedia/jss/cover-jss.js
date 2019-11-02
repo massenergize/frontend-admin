@@ -32,8 +32,8 @@ const custom = {
   leAnchor:{
     textDecoration:'none !important',
     padding:"10px 30px", 
-    background:'#e8d8d8', 
-    color:'#885d5d',
+    background:'green', 
+    color:'white',
     borderRadius:55,
     "&:hover":{
       background:"#d8e4e8",

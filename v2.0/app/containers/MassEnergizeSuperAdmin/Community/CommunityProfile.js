@@ -63,6 +63,7 @@ class CommunityProfile extends React.Component {
       this.props.callCommunity(id);
     }
   }
+
   showCommunitySwitch = () => {
     const user = this.props.auth ? this.props.auth : {};
     if (user.is_community_admin) {
@@ -75,6 +76,7 @@ class CommunityProfile extends React.Component {
   handleCommunityChange =(id) => {
     window.location = `/admin/community/${id}/profile`;
   }
+
   handleChange = (event, value) => {
     this.setState({ value });
   };
@@ -118,7 +120,7 @@ class CommunityProfile extends React.Component {
             >
               <Tab icon={<AccountCircle />} />
               <Tab icon={<SupervisorAccount />} />
-              <Tab icon={<Favorite />} />
+              {/* <Tab icon={<Favorite />} /> */}
               <Tab icon={<PhotoLibrary />} />
             </Tabs>
           </Hidden>
@@ -134,15 +136,15 @@ class CommunityProfile extends React.Component {
             >
               <Tab icon={<AccountCircle />} label="ABOUT" />
               <Tab icon={<SupervisorAccount />} label="USERS" />
-              <Tab icon={<Message />} label="Events & TESTIMONIALS" />
+              {/* <Tab icon={<Message />} label="Events & TESTIMONIALS" /> */}
               <Tab icon={<InsertChart />} label="Pages" />
             </Tabs>
           </Hidden>
         </AppBar>
         {value === 0 && <TabContainer><About data={dataProps} community={community} /></TabContainer>}
         {value === 1 && <TabContainer><Connection data={{ users: community.users, avatar: dummy.user.avatar }} /></TabContainer>}
-        {value === 2 && <TabContainer><Favorites data={{ testimonials: community.testimonials, events: community.events }} /></TabContainer>}
-        {value === 3
+        {/* {value === 2 && <TabContainer><Favorites data={{ testimonials: community.testimonials, events: community.events }} /></TabContainer>} */}
+        {value === 2
           && (
             <TabContainer>
               <Pages community={community} />
