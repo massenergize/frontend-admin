@@ -54,6 +54,10 @@ export const AddRemoveSuperAdmin = loadable(() => import('./MassEnergizeSuperAdm
 export const AddCategory = loadable(() => import('./MassEnergizeSuperAdmin/Categories/AddCategory'), {
   fallback: <Loading />,
 });
+
+export const EditCategory = loadable(() => import('./MassEnergizeSuperAdmin/Categories/EditCategory'), {
+  fallback: <Loading />,
+});
 export const AllCategories = loadable(() => import('./MassEnergizeSuperAdmin/Categories/AllCategories'), {
   fallback: <Loading />,
 });

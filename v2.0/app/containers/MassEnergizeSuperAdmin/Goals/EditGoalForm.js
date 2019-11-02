@@ -210,7 +210,6 @@ class EditGoalForm extends Component {
                   </Typography>
                 )
               }
-              
               <div style={{ margin: 50 }} />
               <form onSubmit={this.submitForm} noValidate autoComplete="off">
                 <div>

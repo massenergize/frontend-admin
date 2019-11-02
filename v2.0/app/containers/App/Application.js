@@ -33,6 +33,7 @@ import AddRemoveAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveAdmin';
 import AddRemoveSuperAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveSuperAdmin';
 import EditCommunityByCommunityAdmin from '../MassEnergizeSuperAdmin/Community/EditCommunityByCommunityAdmin';
 import EditTeam from '../MassEnergizeSuperAdmin/Teams/EditTeam';
+import EditCategory from '../MassEnergizeSuperAdmin/Categories/EditCategory';
 
 
 class Application extends React.Component {
@@ -92,6 +93,7 @@ class Application extends React.Component {
           <Route path="/admin/add/category" component={AddCategory} />
           <Route path="/admin/read/tag-collections" component={AllCategories} />
           <Route path="/admin/add/tag-collection" component={AddCategory} />
+          <Route path="/admin/edit/:id/tag-collection" component={EditCategory} />
 
           <Route path="/admin/read/events" component={AllEvents} />
           <Route path="/admin/add/event" component={AddEvent} />

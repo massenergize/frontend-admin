@@ -65,9 +65,6 @@ class AllCommunities extends React.Component {
       await this.setStateAsync({ data, loading: false });
     // await this.setStateAsync({ communities: response.data });
     }
-    else{
-      console.log("THERE IS NOTHING HERE MR");
-    }
   }
 
   setStateAsync(state) {
@@ -246,8 +243,6 @@ class AllCommunities extends React.Component {
     const description = brand.desc;
     const { data, columns, loading } = this.state;
     const { classes } = this.props;
-    console.log(data)
-    console.log(12345678)
 
     const options = {
       filterType: 'dropdown',
