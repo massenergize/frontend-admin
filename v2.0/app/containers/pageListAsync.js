@@ -33,6 +33,9 @@ export const AllCommunities = loadable(() => import('./MassEnergizeSuperAdmin/Co
 export const OnboardCommunity = loadable(() => import('./MassEnergizeSuperAdmin/Community/OnboardCommunity'), {
   fallback: <Loading />,
 });
+export const EditCommunityByCommunityAdmin = loadable(() => import('./MassEnergizeSuperAdmin/Community/EditCommunityByCommunityAdmin'), {
+  fallback: <Loading />,
+});
 
 export const CommunityProfile = loadable(() => import('./MassEnergizeSuperAdmin/Community/CommunityProfile'), {
   fallback: <Loading />,
@@ -42,7 +45,7 @@ export const AddRemoveCommunityAdmin = loadable(() => import('./MassEnergizeSupe
   fallback: <Loading />,
 });
 
-export const AddRemoveSupertAdmin = loadable(() => import('./MassEnergizeSuperAdmin/Community/AddRemoveSuperAdmin'), {
+export const AddRemoveSuperAdmin = loadable(() => import('./MassEnergizeSuperAdmin/Community/AddRemoveSuperAdmin'), {
   fallback: <Loading />,
 });
 

@@ -77,7 +77,7 @@ class About extends React.Component {
   render() {
     const { classes, community } = this.props;
     const goalsEditLink = `/admin/edit/${community ? community.id : null}/goal`;
-    const communityEditLink = `/admin/edit/${community ? community.id : null}/community`;
+    const communityEditLink = `/admin/edit/${community ? community.id : null}/community/community-admin`;
     const addRemoveCommuntyAdminLink = `/admin/edit/${community ? community.id : null}/community-admins`;
 
 

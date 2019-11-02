@@ -1,10 +1,10 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
 import { Switch, Route } from 'react-router-dom';
-import {connect} from 'react-redux'; 
+import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Dashboard from '../Templates/Dashboard';
-import {reduxCallCommunities, reduxCheckUser} from './../../redux/redux-actions/adminActions';
+import { reduxCallCommunities, reduxCheckUser } from "../../redux/redux-actions/adminActions";
 import {
   Parent,
   DashboardSummaryPage,
@@ -31,41 +31,38 @@ import {
 import EditVendor from '../MassEnergizeSuperAdmin/Vendors/EditVendor';
 import AddRemoveAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveAdmin';
 import AddRemoveSuperAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveSuperAdmin';
+import EditCommunityByCommunityAdmin from '../MassEnergizeSuperAdmin/Community/EditCommunityByCommunityAdmin';
 
 
 class Application extends React.Component {
-  
   componentWillMount() {
-   
     this.props.reduxCallCommunities();
-
   }
-  
+
   render() {
-   
     const { changeMode, history } = this.props;
     const user = this.props.auth;
 
-    return ( 
+    return (
       <Dashboard history={history} changeMode={changeMode}>
         <Switch>
-          { (user.is_community_admin) && 
-            (
-                <Route exact path="/" render={(props) =><DashboardAdminSummaryPage {...props} signOut = {this.props.signOut} />} />
+          { (user.is_community_admin) 
+            && (
+              <Route exact path="/" render={(props) => <DashboardAdminSummaryPage {...props} signOut= {this.props.signOut} />} />
             )
           }
-          { (user.is_super_admin) && 
-            (
-                <Route exact path="/" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
+          { (user.is_super_admin) 
+            && (
+              <Route exact path="/" render={(props) => <DashboardSummaryPage {...props} signOut= {this.props.signOut} />} />
             )
           }
-          { user.is_community_admin && 
-            (
-                <Route exact path="/admin" render={(props) =><DashboardAdminSummaryPage {...props} signOut = {this.props.signOut} />} />
+          { user.is_community_admin 
+            && (
+              <Route exact path="/admin" render={(props) => <DashboardAdminSummaryPage {...props} signOut ={this.props.signOut} />} />
             )
           }
           { user.is_super_admin && (
-            <Route exact path="/admin" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
+            <Route exact path="/admin" render={(props) => <DashboardSummaryPage {...props} signOut= {this.props.signOut} />} />
           )
           }
           {/* <Route exact path="/" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
@@ -79,6 +76,7 @@ class Application extends React.Component {
           <Route path="/admin/community/:id/preview" component={CommunityProfile} exact />
           <Route path="/admin/community/:id/profile" component={CommunityProfile} exact />
           <Route path="/admin/community/:id/edit" component={OnboardCommunity} exact />
+          <Route path="/admin/edit/:id/community/community-admin" component={EditCommunityByCommunityAdmin} exact />
           <Route path="/admin/edit/:id/community" component={OnboardCommunity} exact />
           <Route path="/admin/add/:id/community-admins" component={AddRemoveAdmin} exact />
           <Route path="/admin/edit/:id/community-admins" component={AddRemoveAdmin} exact />
@@ -150,15 +148,15 @@ Application.propTypes = {
   history: PropTypes.object.isRequired,
 };
 
-function mapStateToProps(state){
+function mapStateToProps(state) {
   return {
     auth: state.getIn(['auth'])
-  }
+  };
 }
-function mapDispatchToProps(dispatch){
+function mapDispatchToProps(dispatch) {
   return bindActionCreators({
-    reduxCallCommunities: reduxCallCommunities,
+    reduxCallCommunities,
     checkUser: reduxCheckUser
-  },dispatch);
+  }, dispatch);
 }
-export default connect(mapStateToProps,mapDispatchToProps)(Application);
+export default connect(mapStateToProps, mapDispatchToProps)(Application);
