@@ -49,7 +49,7 @@ class Connection extends React.Component {
                   </Avatar>
                   <ListItemText primary={`${u.full_name}`} />
                   <ListItemText primary={`${u.email}`} />
-                  <ListItemText primary="Member" />
+                  {/* <ListItemText primary="Member" /> */}
                 </ListItem>
                 <Divider />
 
