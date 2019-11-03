@@ -10,9 +10,9 @@ import Avatar from '@material-ui/core/Avatar';
 import brand from 'dan-api/dummy/brand';
 import dummy from 'dan-api/dummy/dummyContents';
 import logo from 'dan-images/logo.png';
+import { connect } from 'react-redux';
 import MainMenu from './MainMenu';
 import styles from './sidebar-jss';
-import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 class SidebarContent extends React.Component {
@@ -39,7 +39,6 @@ class SidebarContent extends React.Component {
   }
 
   render() {
-   
     const {
       classes,
       turnDarker,
@@ -50,7 +49,7 @@ class SidebarContent extends React.Component {
       dataMenu,
       status,
       anchorEl,
-      openMenuStatus, 
+      openMenuStatus,
       closeMenuStatus,
       changeStatus,
       isLogin
@@ -58,7 +57,7 @@ class SidebarContent extends React.Component {
     const user = this.props.auth;
     const { transform } = this.state;
     const profile = user.profile_picture ? user.profile_picture.url : null;
-    
+
 
     const setStatus = st => {
       switch (st) {
@@ -84,14 +83,15 @@ class SidebarContent extends React.Component {
               className={classNames(classes.profile, classes.user)}
               style={{ opacity: 1 - (transform / 100), marginTop: transform * -0.3 }}
             >
-              <Avatar
-                alt={dummy.profile ? dummy.profile.full_name : dummy.user.name}
-                src={profile ? profile : dummy.user.avatar}
-                className={classNames(classes.avatar, classes.bigAvatar)}
-              />
+              {user.profile_picture
+                && <Avatar alt={user.preferred_name} src={user.profile_picture.url} style={{ margin: 10 }} />
+              }
+              {!user.profile_picture
+                && <Avatar style={{ margin: 10 }}>{user.preferred_name.substring(0, 2)}</Avatar>
+              }
               <div>
-                <h4>{user.preferred_name? user.preferred_name : "..."}</h4>
-                <small>{user.is_super_admin? "Super Admin" :" Admin " }</small>
+                <h4>{user.preferred_name ? user.preferred_name : '...'}</h4>
+                <small>{user.is_super_admin ? 'Super Admin' : 'Community Admin ' }</small>
                 {/* <Button size="small" onClick={openMenuStatus}>
                   <i className={classNames(classes.dotStatus, setStatus(status))} />
                   {status}

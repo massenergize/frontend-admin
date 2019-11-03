@@ -148,13 +148,17 @@ class About extends React.Component {
             <Divider className={classes.divider} />
 
             <List dense className={classes.profileList}>
+              {'Community Admins'}
               {community && community.admins &&
                 (community.admins.map(a => (
                   <ListItem>
-                    <Avatar>
-                      <img src={a.profile_picture ? a.profile_picture.url : '#'} alt={a.name} />
-                    </Avatar>
-                    <ListItemText primary={a.name} secondary={`${a.email}`} />
+                    {a.profile_picture
+                      && <Avatar alt={a.initials} src={a.profile_picture.url} style={{ margin: 10 }} />
+                    }
+                    {!a.profile_picture
+                      && <Avatar style={{ margin: 10 }}>{a.preferred_name.substring(0, 2)}</Avatar>
+                    }
+                    <ListItemText primary={a.preferred_name} secondary={a.email} />
                   </ListItem>
                 )))
               }

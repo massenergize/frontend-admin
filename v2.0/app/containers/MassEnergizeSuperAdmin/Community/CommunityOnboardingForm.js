@@ -231,6 +231,17 @@ class CreateNewCommunityForm extends Component {
               dbName: 'owner_email',
               readOnly: false
             },
+            {
+              name: 'admin_phone_number',
+              label: 'Administrator\'s Phone Number',
+              placeholder: 'eg. 571 222 4567',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: '',
+              dbName: 'owner_phone_number',
+              readOnly: false
+            },
           ]
         },
         {
