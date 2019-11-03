@@ -59,7 +59,6 @@ class CreateNewTagCollectionForm extends Component {
 
   createFormJson = async () => {
     const { tagCollection } = this.state;
-    console.log(tagCollection)
     const formJson = {
       title: 'Edit Tag Collection',
       subTitle: '',
@@ -107,7 +106,7 @@ class CreateNewTagCollectionForm extends Component {
             placeholder: 'eg. High',
             fieldType: 'TextField',
             contentType: 'text',
-            isRequired: true,
+            isRequired: false,
             defaultValue: t.name,
             dbName: `tag_${t.id}`,
             readOnly: false
@@ -127,18 +126,33 @@ class CreateNewTagCollectionForm extends Component {
 
       formJson.fields.push(
         {
-          name: 'new_tags',
+          name: 'tags_to_add',
           label: 'Type new tags here separated by commas',
           placeholder: 'eg. High',
           fieldType: 'TextField',
           contentType: 'text',
-          isRequired: true,
+          isRequired: false,
           defaultValue: '',
-          dbName: 'new_tags',
+          dbName: 'tags_to_add',
+          readOnly: false
+        },
+      );
+
+      formJson.fields.push(
+        {
+          name: 'tags_to_delete',
+          label: 'Want to delete some tags? Type their names here separated by commas',
+          placeholder: 'eg. Low, High',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: false,
+          defaultValue: '',
+          dbName: 'tags_to_delete',
           readOnly: false
         },
       );
     }
+
     return formJson;
   }
 

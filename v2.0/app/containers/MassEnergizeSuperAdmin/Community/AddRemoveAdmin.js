@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import MUIDataTable from 'mui-datatables';
+import CallMadeIcon from '@material-ui/icons/CallMade';
+import EditIcon from '@material-ui/icons/Edit';
+import { Link } from 'react-router-dom';
+import Avatar from '@material-ui/core/Avatar';
 import { withStyles } from '@material-ui/core/styles';
 import { apiCall } from '../../../utils/messenger';
 import MassEnergizeForm from '../_FormGenerator';
@@ -33,18 +38,50 @@ class AddRemoveAdmin extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      community: {},
-      formJson: null
+      data: [],
+      formJson: null,
+      columns: this.getColumns(),
+      community: null
     };
   }
 
 
   async componentDidMount() {
-    const communityResponse = await apiCall('/communities.info');
-
-    if (communityResponse && communityResponse.data) {
-      const community = communityResponse.data;
-      await this.setStateAsync({ community });
+    const { id } = this.props.match.params;
+    const communityAdminResponse = await apiCall('/admins.community.list', { community_id: id });
+    console.log(communityAdminResponse);
+    if (communityAdminResponse && communityAdminResponse.data) {
+      const members = communityAdminResponse.data.members || [];
+      const pending = communityAdminResponse.data.pending_members || [];
+      const data = members.map(d => (
+        [
+          {
+            id: d.email,
+            image: d.profile_picture,
+            initials: `${d.preferred_name && d.preferred_name.substring(0, 2).toUpperCase()}`
+          },
+          d.full_name,
+          d.preferred_name,
+          d.email,
+          'Accepted'
+        ]
+      ));
+      pending.forEach(p => {
+        data.push(
+          [
+            {
+              id: p.email,
+              image: null,
+              initials: `${p.name && p.name.substring(0, 2).toUpperCase()}`
+            },
+            p.name,
+            p.name,
+            p.email,
+            'Pending',
+          ]
+        );
+      });
+      await this.setStateAsync({ data, community: communityAdminResponse.data.community });
     }
 
     const formJson = await this.createFormJson();
@@ -60,16 +97,28 @@ class AddRemoveAdmin extends Component {
 
   createFormJson = async () => {
     const { pathname } = window.location;
+    const { community } = this.state;
     const formJson = {
-      title: 'Add New Adminstrator for this Community (DO NOT TEST YET!!!)',
+      title: `Add New Administrator for ${community ? community.name : 'this Community'}`,
       subTitle: '',
-      method: '/communities.admins.add',
+      method: '/admins.community.add',
       successRedirectPage: pathname,
       fields: [
         {
           label: 'About this Admin',
           fieldType: 'Section',
           children: [
+            {
+              name: 'community_id',
+              label: 'Community ID',
+              placeholder: 'eg. 67',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: community && community.id,
+              dbName: 'community_id',
+              readOnly: true
+            },
             {
               name: 'name',
               label: 'Name',
@@ -100,9 +149,78 @@ class AddRemoveAdmin extends Component {
   }
 
 
+  getColumns = () => [
+    {
+      name: 'Image',
+      key: 'id',
+      options: {
+        filter: false,
+        download: false,
+        customBodyRender: (d) => (
+          <div>
+            {d.image
+              && <Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} />
+            }
+            {!d.image
+              && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
+            }
+          </div>
+        )
+      }
+    },
+    {
+      name: 'Name',
+      key: 'name',
+      options: {
+        filter: true,
+      }
+    },
+    {
+      name: 'Preferred Name',
+      key: 'preferred_name',
+      options: {
+        filter: true,
+      }
+    },
+    {
+      name: 'Email',
+      key: 'email',
+      options: {
+        filter: false,
+      }
+    },
+    {
+      name: 'Status',
+      key: 'status',
+      options: {
+        filter: false,
+      }
+    },
+  ]
+
   render() {
     const { classes } = this.props;
-    const { formJson } = this.state;
+    const {
+      formJson, data, columns, community
+    } = this.state;
+
+    const options = {
+      filterType: 'dropdown',
+      responsive: 'stacked',
+      print: true,
+      rowsPerPage: 10,
+      onRowsDelete: (rowsDeleted) => {
+        const idsToDelete = rowsDeleted.data;
+        const { pathname } = window.location;
+        idsToDelete.forEach(async d => {
+          const email = data[d.index][0].id;
+          await apiCall('/admins.community.remove', { email, community_id: community.id });
+          window.location.href = pathname;
+        });
+      }
+    };
+
+
     if (!formJson) return (<div />);
     return (
       <div>
@@ -110,6 +228,16 @@ class AddRemoveAdmin extends Component {
           classes={classes}
           formJson={formJson}
         />
+        <br />
+        <br />
+        <div className={classes.table}>
+          <MUIDataTable
+            title={`Community Admins ${community && ' In ' + community.name}`}
+            data={data}
+            columns={columns}
+            options={options}
+          />
+        </div>
       </div>
     );
   }

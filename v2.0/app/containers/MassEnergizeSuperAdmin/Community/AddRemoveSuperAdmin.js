@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import MUIDataTable from 'mui-datatables';
+import CallMadeIcon from '@material-ui/icons/CallMade';
+import EditIcon from '@material-ui/icons/Edit';
+import { Link } from 'react-router-dom';
+import Avatar from '@material-ui/core/Avatar';
 import { apiCall } from '../../../utils/messenger';
 import MassEnergizeForm from '../_FormGenerator';
 
@@ -33,18 +38,29 @@ class AddRemoveSuperAdmin extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      community: {},
-      formJson: null
+      formJson: null,
+      data: [],
+      columns: this.getColumns()
     };
   }
 
 
   async componentDidMount() {
-    const communityResponse = await apiCall('/communities.info');
-
-    if (communityResponse && communityResponse.data) {
-      const community = communityResponse.data;
-      await this.setStateAsync({ community });
+    const superAdminResponse = await apiCall('/admins.super.list');
+    if (superAdminResponse && superAdminResponse.data) {
+      const data = superAdminResponse.data.map(d => (
+        [
+          {
+            id: d.id,
+            image: d.profile_picture,
+            initials: `${d.preferred_name && d.preferred_name.substring(0, 2).toUpperCase()}`
+          },
+          d.full_name,
+          d.preferred_name,
+          d.email, // limit to first 20 chars
+        ]
+      ));
+      await this.setStateAsync({ data });
     }
 
     const formJson = await this.createFormJson();
@@ -61,9 +77,9 @@ class AddRemoveSuperAdmin extends Component {
   createFormJson = async () => {
     const { pathname } = window.location;
     const formJson = {
-      title: 'Add New Super Admin (DO NOT TEST YET!!!)',
+      title: 'Add New Super Admin',
       subTitle: '',
-      method: '/communities.admins.add',
+      method: '/admins.super.add',
       successRedirectPage: pathname,
       fields: [
         {
@@ -100,9 +116,69 @@ class AddRemoveSuperAdmin extends Component {
   }
 
 
+  getColumns = () => [
+    {
+      name: 'Image',
+      key: 'id',
+      options: {
+        filter: false,
+        download: false,
+        customBodyRender: (d) => (
+          <div>
+            {d.image
+              && <Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} />
+            }
+            {!d.image
+              && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
+            }
+          </div>
+        )
+      }
+    },
+    {
+      name: 'Name',
+      key: 'name',
+      options: {
+        filter: true,
+      }
+    },
+    {
+      name: 'Preferred Name',
+      key: 'preferred_name',
+      options: {
+        filter: true,
+      }
+    },
+    {
+      name: 'Email',
+      key: 'email',
+      options: {
+        filter: false,
+      }
+    },
+  ]
+
+
   render() {
     const { classes } = this.props;
-    const { formJson } = this.state;
+    const { formJson, data, columns } = this.state;
+
+    const options = {
+      filterType: 'dropdown',
+      responsive: 'stacked',
+      print: true,
+      rowsPerPage: 10,
+      onRowsDelete: (rowsDeleted) => {
+        const idsToDelete = rowsDeleted.data;
+        const { pathname } = window.location;
+        idsToDelete.forEach(async d => {
+          const userId = data[d.index][0].id;
+          await apiCall('/admins.super.remove', { user_id: userId });
+          window.location.href = pathname;
+        });
+      }
+    };
+
     if (!formJson) return (<div />);
     return (
       <div>
@@ -110,6 +186,16 @@ class AddRemoveSuperAdmin extends Component {
           classes={classes}
           formJson={formJson}
         />
+        <br />
+        <br />
+        <div className={classes.table}>
+          <MUIDataTable
+            title="All Super Admins"
+            data={data}
+            columns={columns}
+            options={options}
+          />
+        </div>
       </div>
     );
   }
