@@ -18,6 +18,14 @@ export const loadAllActions = (data) => ({ type: GET_ALL_ACTIONS, payload: data 
 export const reduxLoadIdToken = (token = null) => ({ type: LOAD_ID_TOKEN, payload: token });
 export const reduxLoadAccessToken = (data = []) => ({ type: 'LOAD_ACCESS_TOKEN', payload: data });
 
+
+function redirectIfExpired(response){
+  if(!response.data && response.error ==="Signature has expired"){
+    window.location = "/login";
+    localStorage.removeItem('authUser');
+    localStorage.removeItem('idToken');
+  }
+}
 const reduxLoadFullSelectedCommunity = (data = null) => ({ type: SELECTED_COMMUNITY_FULL, payload: data });
 export const reduxLoadAllCommunities = (data = []) => ({ type: LOAD_ALL_COMMUNITIES, payload: data });
 export const reduxSignOut = () => dispatch => {
@@ -35,6 +43,7 @@ export const reduxSignOut = () => dispatch => {
 export const reduxGetAllCommunityPolicies = (community_id) => dispatch => {
   apiCall('/policies.listForCommunityAdmin', { community_id }).then(response => {
     if (response && response.success) {
+      redirectIfExpired(response);
       dispatch(loadAllPolicies(response.data));
     }
     return { type: 'DO_NOTHING', payload: null };
@@ -45,6 +54,7 @@ export const reduxGetAllCommunityPolicies = (community_id) => dispatch => {
 export const reduxGetAllCommunityVendors = (community_id) => dispatch => {
   apiCall('/vendors.listForCommunityAdmin', { community_id }).then(response => {
     if (response && response.success) {
+      redirectIfExpired(response);
       dispatch(loadAllVendors(response.data));
     }
     return { type: 'DO_NOTHING', payload: null };
@@ -55,6 +65,7 @@ export const reduxGetAllCommunityVendors = (community_id) => dispatch => {
 export const reduxGetAllCommunityTestimonials = (community_id) => dispatch => {
   apiCall('/testimonials.listForCommunityAdmin', { community_id }).then(response => {
     if (response && response.success) {
+      redirectIfExpired(response);
       dispatch(loadAllTestimonials(response.data));
     }
     return { type: 'DO_NOTHING', payload: null };
@@ -65,6 +76,7 @@ export const reduxGetAllCommunityTestimonials = (community_id) => dispatch => {
 export const reduxGetAllCommunityGoals = (community_id) => dispatch => {
   apiCall('/goals.listForCommunityAdmin', { community_id }).then(response => {
     if (response && response.success) {
+      redirectIfExpired(response);
       dispatch(loadAllGoals(response.data));
     }
     return { type: 'DO_NOTHING', payload: null };
@@ -75,6 +87,7 @@ export const reduxGetAllCommunityGoals = (community_id) => dispatch => {
 export const reduxGetAllCommunityTeams = (community_id) => dispatch => {
   apiCall('/teams.listForCommunityAdmin', { community_id }).then(response => {
     if (response && response.success) {
+      redirectIfExpired(response);
       dispatch(loadAllTeams(response.data));
     }
     return { type: 'DO_NOTHING', payload: null };
@@ -85,6 +98,7 @@ export const reduxGetAllCommunityTeams = (community_id) => dispatch => {
 export const reduxGetAllCommunityEvents = (community_id) => dispatch => {
   apiCall('/events.listForCommunityAdmin', { community_id }).then(response => {
     if (response && response.success) {
+      redirectIfExpired(response);
       dispatch(loadAllEvents(response.data));
     }
     return { type: 'DO_NOTHING', payload: null };
@@ -95,6 +109,7 @@ export const reduxGetAllCommunityEvents = (community_id) => dispatch => {
 export const reduxGetAllVendors = () => dispatch => {
   apiCall('/vendors.listForSuperAdmin').then(response => {
     if (response && response.success) {
+      redirectIfExpired(response);
       dispatch(loadAllVendors(response.data));
     }
     return { type: 'DO_NOTHING', payload: null };
@@ -105,6 +120,7 @@ export const reduxGetAllVendors = () => dispatch => {
 export const reduxGetAllGoals = () => dispatch => {
   apiCall('/goals.listForSuperAdmin').then(response => {
     if (response && response.success) {
+      redirectIfExpired(response);
       dispatch(loadAllGoals(response.data));
     }
     return { type: 'DO_NOTHING', payload: null };
@@ -115,6 +131,7 @@ export const reduxGetAllGoals = () => dispatch => {
 export const reduxGetAllTeams = () => dispatch => {
   apiCall('/teams.listForSuperAdmin').then(response => {
     if (response && response.success) {
+      redirectIfExpired(response);
       dispatch(loadAllTeams(response.data));
     }
     return { type: 'DO_NOTHING', payload: null };
@@ -125,6 +142,7 @@ export const reduxGetAllTeams = () => dispatch => {
 export const reduxGetAllPolicies = () => dispatch => {
   apiCall('/policies.listForSuperAdmin').then(response => {
     if (response && response.success) {
+      redirectIfExpired(response);
       dispatch(loadAllPolicies(response.data));
     }
     return { type: 'DO_NOTHING', payload: null };
@@ -135,6 +153,7 @@ export const reduxGetAllPolicies = () => dispatch => {
 export const reduxGetAllEvents = () => dispatch => {
   apiCall('/events.listForSuperAdmin').then(response => {
     if (response && response.success) {
+      redirectIfExpired(response);
       dispatch(loadAllEvents(response.data));
     }
     return { type: 'DO_NOTHING', payload: null };
@@ -145,6 +164,7 @@ export const reduxGetAllEvents = () => dispatch => {
 export const reduxGetAllTestimonials = () => dispatch => {
   apiCall('/testimonials.listForSuperAdmin').then(response => {
     if (response && response.success) {
+      redirectIfExpired(response);
       dispatch(loadAllTestimonials(response.data));
     }
     return { type: 'DO_NOTHING', payload: null };
@@ -155,6 +175,7 @@ export const reduxGetAllTestimonials = () => dispatch => {
 export const reduxGetAllCommunityActions = (community_id) => dispatch => {
   apiCall('/actions.listForCommunityAdmin', { community_id }).then(response => {
     if (response && response.success) {
+      redirectIfExpired(response);
       dispatch(loadAllActions(response.data));
     }
     return { type: 'DO_NOTHING', payload: null };
@@ -165,6 +186,7 @@ export const reduxGetAllCommunityActions = (community_id) => dispatch => {
 export const reduxGetAllUsers = () => dispatch => {
   fetchData('v2/users').then(response => {
     if (response && response.success) {
+      redirectIfExpired(response);
       dispatch(loadAllUsers(response.data));
     }
     return { type: 'DO_NOTHING', payload: null };
@@ -175,6 +197,7 @@ export const reduxGetAllUsers = () => dispatch => {
 export const reduxGetAllTags = () => dispatch => {
   getTagCollectionsData().then(response => {
     if (response && response.success) {
+      redirectIfExpired(response);
       dispatch(loadAllTags(response.data));
     }
     return { type: 'DO_NOTHING', payload: null };
@@ -185,6 +208,7 @@ export const reduxGetAllTags = () => dispatch => {
 export const reduxGetAllActions = () => dispatch => {
   apiCall('/actions.listForSuperAdmin').then(response => {
     if (response && response.success) {
+      redirectIfExpired(response);
       dispatch(loadAllActions(response.data));
     }
     return { type: 'DO_NOTHING', payload: null };

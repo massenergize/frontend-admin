@@ -66,13 +66,13 @@ class PostCard extends React.Component {
               className={classes.button}
               onClick={this.handleClickOpt}
             >
-              <MoreVertIcon />
+              {/* <MoreVertIcon /> */}
             </IconButton>
           )}
           title={name}
           subheader={date}
         />
-        <Menu
+        {/* <Menu
           id="long-menu"
           anchorEl={anchorElOpt}
           open={Boolean(anchorElOpt)}
@@ -89,7 +89,7 @@ class PostCard extends React.Component {
               {option}
             </MenuItem>
           ))}
-        </Menu>
+        </Menu> */}
         { image !== '' && (
           <CardMedia
             className={classes.media}
@@ -104,6 +104,7 @@ class PostCard extends React.Component {
         </CardContent>
         <CardContent>
           <Typography component="p">
+            
             {data1}
             <br />
             {data2}
