@@ -34,7 +34,8 @@ class CreateNewEventForm extends Component {
     super(props);
     this.state = {
       communities: [],
-      formJson: null
+      formJson: null,
+      loading: true
     };
   }
 
@@ -76,7 +77,7 @@ class CreateNewEventForm extends Component {
       formJson.fields.splice(1, 0, section);
     }
 
-    await this.setStateAsync({ formJson });
+    await this.setStateAsync({ formJson, loading: false });
   }
 
   setStateAsync(state) {
@@ -135,7 +136,7 @@ class CreateNewEventForm extends Component {
               label: 'Is this Event Global',
               fieldType: 'Radio',
               isRequired: false,
-              defaultValue: 'true',
+              defaultValue: 'false',
               dbName: 'is_global',
               readOnly: false,
               data: [
@@ -187,8 +188,8 @@ class CreateNewEventForm extends Component {
 
   render() {
     const { classes } = this.props;
-    const { formJson } = this.state;
-    if (!formJson) return (<div />);
+    const { formJson, loading } = this.state;
+    if (loading) return (<div>Loading...</div>);
     return (
       <div>
         <MassEnergizeForm

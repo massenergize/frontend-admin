@@ -19,13 +19,14 @@ export const reduxLoadIdToken = (token = null) => ({ type: LOAD_ID_TOKEN, payloa
 export const reduxLoadAccessToken = (data = []) => ({ type: 'LOAD_ACCESS_TOKEN', payload: data });
 
 
-function redirectIfExpired(response){
-  if(!response.data && response.error ==="Signature has expired"){
-    window.location = "/login";
+function redirectIfExpired(response) {
+  if (!response.data && response.error === 'Signature has expired') {
+    window.location = '/login';
     localStorage.removeItem('authUser');
     localStorage.removeItem('idToken');
   }
 }
+
 const reduxLoadFullSelectedCommunity = (data = null) => ({ type: SELECTED_COMMUNITY_FULL, payload: data });
 export const reduxLoadAllCommunities = (data = []) => ({ type: LOAD_ALL_COMMUNITIES, payload: data });
 export const reduxSignOut = () => dispatch => {

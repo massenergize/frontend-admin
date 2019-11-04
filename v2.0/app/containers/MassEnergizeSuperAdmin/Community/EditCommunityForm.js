@@ -263,7 +263,7 @@ class EditCommunityForm extends Component {
               placeholder: 'eg. 571 222 4567',
               fieldType: 'TextField',
               contentType: 'text',
-              isRequired: true,
+              isRequired: false,
               defaultValue: '',
               dbName: community.owner_phone_number,
               readOnly: false

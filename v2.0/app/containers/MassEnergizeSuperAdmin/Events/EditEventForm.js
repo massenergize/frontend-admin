@@ -105,12 +105,13 @@ class CreateNewEventForm extends Component {
 
   createFormJson = async (event) => {
     const { communities } = this.state;
+    const { pathname } = window.location;
 
     const formJson = {
       title: 'Create New Event',
       subTitle: '',
       method: '/events.update',
-      // successRedirectPage: '/admin/read/events',
+      successRedirectPage: pathname || '/admin/read/events',
       fields: [
         {
           label: 'Update this event',
@@ -219,7 +220,7 @@ class CreateNewEventForm extends Component {
   render() {
     const { classes } = this.props;
     const { formJson } = this.state;
-    if (!formJson) return (<div style={{ color: 'white' }}><h1>There is no event with the specified id</h1></div>);
+    if (!formJson) return (<div style={{ color: 'white' }}><h1>Loading ...</h1></div>);
     return (
       <div>
         <MassEnergizeForm

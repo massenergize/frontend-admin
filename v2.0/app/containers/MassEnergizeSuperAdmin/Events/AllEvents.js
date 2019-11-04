@@ -69,6 +69,7 @@ class AllEvents extends React.Component {
     //   ));
     //   await this.setStateAsync({ data, loading: false });
     // }
+    await this.setStateAsync({ loading: false });
   }
 
   fashionData = (data) => {
@@ -89,11 +90,11 @@ class AllEvents extends React.Component {
     return fashioned;
   }
 
-  // setStateAsync(state) {
-  //   return new Promise((resolve) => {
-  //     this.setState(state, resolve);
-  //   });
-  // }
+  setStateAsync(state) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve);
+    });
+  }
 
   // getLocation = location => {
   //   if (location) {
@@ -238,7 +239,7 @@ class AllEvents extends React.Component {
       }
     },
     {
-      name: 'Edit? Copy?',
+      name: 'Edit?',
       key: 'edit_or_copy',
       options: {
         filter: false,
@@ -248,7 +249,7 @@ class AllEvents extends React.Component {
             <Link to={`/admin/edit/${id}/event`}>
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
-            &nbsp;&nbsp;
+            {/* &nbsp;&nbsp;
             <Link
               onClick={async () => {
                 const copiedEventResponse = await apiCall('/events.copy', { event_id: id });
@@ -260,7 +261,7 @@ class AllEvents extends React.Component {
               to="/admin/read/events"
             >
               <FileCopy size="small" variant="outlined" color="secondary" />
-            </Link>
+            </Link> */}
           </div>
         )
       }
@@ -288,22 +289,22 @@ class AllEvents extends React.Component {
       }
     };
 
-    // if (loading) {
-    //   return (
-    //     <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-    //       <Grid item xs={12} md={6}>
-    //         <Paper className={classes.root}>
-    //           <div className={classes.root}>
-    //             <LinearProgress />
-    //             <h1>Fetching all Events.  This may take a while...</h1>
-    //             <br />
-    //             <LinearProgress color="secondary" />
-    //           </div>
-    //         </Paper>
-    //       </Grid>
-    //     </Grid>
-    //   );
-    // }
+    if (loading) {
+      return (
+        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+          <Grid item xs={12} md={6}>
+            <Paper className={classes.root}>
+              <div className={classes.root}>
+                <LinearProgress />
+                <h1>Fetching all Events.  This may take a while...</h1>
+                <br />
+                <LinearProgress color="secondary" />
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      );
+    }
 
 
     return (

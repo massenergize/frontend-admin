@@ -141,7 +141,7 @@ class About extends React.Component {
                 <Avatar>
                   <LocalPhone />
                 </Avatar>
-                <ListItemText primary="Last Updated" secondary={`${community.owner_phone_number || 'No Phone Number Provided'}`} />
+                <ListItemText primary="Phone Number" secondary={`${community.owner_phone_number || 'No Phone Number Provided'}`} />
               </ListItem>
             </List>
 

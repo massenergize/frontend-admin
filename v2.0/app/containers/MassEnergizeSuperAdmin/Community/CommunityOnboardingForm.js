@@ -237,7 +237,7 @@ class CreateNewCommunityForm extends Component {
               placeholder: 'eg. 571 222 4567',
               fieldType: 'TextField',
               contentType: 'text',
-              isRequired: true,
+              isRequired: false,
               defaultValue: '',
               dbName: 'owner_phone_number',
               readOnly: false
