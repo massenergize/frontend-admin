@@ -51,7 +51,7 @@ class CreateNewActionForm extends Component {
       await this.setStateAsync({ action: actionResponse.data });
     }
     const tagCollectionsResponse = await apiCall('/tag_collections.listForSuperAdmin');
-    const communitiesResponse = await apiCall('/communities.listForSuperAdmin');
+    const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
     const vendorsResponse = await apiCall('/vendors.listForSuperAdmin');
 
     if (communitiesResponse && communitiesResponse.data) {

@@ -301,9 +301,9 @@ class CreateNewVendorForm extends Component {
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: true,
-          defaultValue: vendor.onboarding_contact_email,
+          defaultValue: vendor && vendor.onboarding_contact && vendor.onboarding_contact.email,
           dbName: 'onboarding_contact_email',
-          readOnly: false
+          readOnly: true
         },
         {
           name: 'image',

@@ -27,6 +27,7 @@ function checkAuthUser() {
     });
   }
 }
+
 export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = null) {
   const idToken = localStorage.getItem('idToken');
   const response = await fetch(`${API_HOST}/v3${destinationUrl}`, {
@@ -44,11 +45,17 @@ export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = 
     if (relocationPage && json && json.success) {
       window.location.href = relocationPage;
     }
+    if (json && !json.success && json.error === 'Signature has expired') {
+      localStorage.removeItem('authUser');
+      localStorage.removeItem('idToken');
+      window.location.href = '/login';
+    }
     return json;
   } catch (error) {
     return { success: false, error: error.toString() };
   }
 }
+
 export async function rawCall(destinationUrl, dataToSend = {}, relocationPage = null) {
   const idToken = localStorage.getItem('idToken');
   let params = {};
@@ -80,6 +87,9 @@ export async function rawCall(destinationUrl, dataToSend = {}, relocationPage = 
     if (relocationPage && json && json.success) {
       window.location.href = relocationPage;
     }
+    // if (json && !json.success && json.error === 'Signature has expired') {
+    //   window.location.href = '/login';
+    // }
     return json;
   } catch (error) {
     return { success: false, error: error.toString() };
@@ -97,7 +107,7 @@ export async function rawCall(destinationUrl, dataToSend = {}, relocationPage = 
  * general while avoiding CORS issues.
  */
 export async function apiCallWithMedia(destinationUrl, dataToSend = {}, relocationPage = null) {
-  //checkAuthUser();
+  // checkAuthUser();
   const formData = new FormData();
   Object.keys(dataToSend).map(k => (formData.append(k, dataToSend[k])));
 
@@ -207,8 +217,8 @@ export function cleanFormData(formValues) {
 }
 
 export async function fetchData(sourceUrl) {
-  //checkAuthUser();
-  const idToken = localStorage.getItem("idToken");
+  // checkAuthUser();
+  const idToken = localStorage.getItem('idToken');
 
   return fetch(`${API_HOST}/${sourceUrl}`, {
     method: 'GET',

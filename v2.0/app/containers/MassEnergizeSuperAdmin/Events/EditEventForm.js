@@ -47,7 +47,7 @@ class CreateNewEventForm extends Component {
     }
     const event = eventResponse.data;
     const tagCollectionsResponse = await apiCall('/tag_collections.listForSuperAdmin');
-    const communitiesResponse = await apiCall('/communities.listForSuperAdmin');
+    const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
 
     if (communitiesResponse && communitiesResponse.data) {
       const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name }));

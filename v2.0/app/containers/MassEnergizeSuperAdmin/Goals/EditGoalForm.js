@@ -64,7 +64,7 @@ class EditGoalForm extends Component {
 
   async componentDidMount() {
     const teamsResponse = await apiCall('/teams.listForSuperAdmin');
-    const communitiesResponse = await apiCall('/communities.listForSuperAdmin');
+    const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
     const { id } = this.props.match.params;
     const goalResponse = await apiCall('/goals.info', { goal_id: id });
     if (teamsResponse && teamsResponse.success) {

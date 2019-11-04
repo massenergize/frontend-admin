@@ -34,6 +34,7 @@ import AddRemoveSuperAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveSu
 import EditCommunityByCommunityAdmin from '../MassEnergizeSuperAdmin/Community/EditCommunityByCommunityAdmin';
 import EditTeam from '../MassEnergizeSuperAdmin/Teams/EditTeam';
 import EditCategory from '../MassEnergizeSuperAdmin/Categories/EditCategory';
+import EditTestimonial from '../MassEnergizeSuperAdmin/Testimonials/EditTestimonial';
 
 
 class Application extends React.Component {
@@ -113,6 +114,7 @@ class Application extends React.Component {
 
           <Route path="/admin/read/testimonials" component={AllTestimonials} />
           <Route path="/admin/add/testimonial" component={AddTestimonial} />
+          <Route path="/admin/edit/:id/testimonial" component={EditTestimonial} />
 
           <Route path="/admin/read/vendors" component={AllVendors} />
           <Route path="/admin/add/vendor" component={AddVendor} />

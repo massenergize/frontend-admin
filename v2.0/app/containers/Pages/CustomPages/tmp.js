@@ -1498,7 +1498,7 @@ class CreatePolicyForm extends Component {
 
 
   async componentDidMount() {
-    const communitiesResponse = await apiCall('/communities.listForSuperAdmin');
+    const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
     if (communitiesResponse && communitiesResponse.success) {
       this.setStateAsync({ communities: communitiesResponse.data });
     }
@@ -2519,7 +2519,7 @@ class CreateNewActionForm extends Component {
   async componentDidMount() {
     const tagCollections = await apiCall('/tag_collections.listForSuperAdmin');
     const vendors = await apiCall('/vendors.listForSuperAdmin');
-    const communities = await apiCall('/communities.listForSuperAdmin');
+    const communities = await apiCall('/communities.listForCommunityAdmin');
 
     if (tagCollections) {
       const tags = [];

@@ -29,35 +29,44 @@ const styles = theme => ({
 });
 
 
-class CreateNewTestimonialForm extends Component {
+class EditTestimonial extends Component {
   constructor(props) {
     super(props);
     this.state = {
       communities: [],
       actions: [],
       vendors: [],
-      formJson: null
+      formJson: null,
+      testimonial: null
     };
   }
 
 
   async componentDidMount() {
+    const { id } = this.props.match.params;
+    const testimonialResponse = await apiCall('/testimonials.info', { testimonial_id: id });
+    console.log(testimonialResponse)
+    if (testimonialResponse && !testimonialResponse.success) {
+      return;
+    }
+    const testimonial = testimonialResponse.data;
+    await this.setStateAsync({ testimonial });
     const tagCollectionsResponse = await apiCall('/tag_collections.listForSuperAdmin');
     const actionsResponse = await apiCall('/actions.listForSuperAdmin');
     const vendorsResponse = await apiCall('/vendors.listForSuperAdmin');
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
 
     if (communitiesResponse && communitiesResponse.data) {
-      const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name }));
+      const communities = communitiesResponse.data.map(c => ({ ...c, id: '' + c.id, displayName: c.name }));
       await this.setStateAsync({ communities });
     }
 
     if (actionsResponse && actionsResponse.data) {
-      const actions = actionsResponse.data.map(c => ({ ...c, displayName: c.title + ` - ${c.community && c.community.name}` }));
+      const actions = actionsResponse.data.map(c => ({ ...c, id: '' + c.id, displayName: c.title + ` - ${c.community && c.community.name}` }));
       await this.setStateAsync({ actions });
     }
     if (vendorsResponse && vendorsResponse.data) {
-      const vendors = vendorsResponse.data.map(c => ({ ...c, displayName: c.name }));
+      const vendors = vendorsResponse.data.map(c => ({ ...c, id: '' + c.id, displayName: c.name }));
       await this.setStateAsync({ vendors });
     }
 
@@ -76,7 +85,7 @@ class CreateNewTestimonialForm extends Component {
           placeholder: '',
           fieldType: 'Checkbox',
           selectMany: tCol.allow_multiple,
-          defaultValue: [],
+          defaultValue: this.getSelectedIds(testimonial.tags, tCol.tags),
           dbName: 'tags',
           data: tCol.tags.map(t => ({ ...t, displayName: t.name, id: '' + t.id }))
         };
@@ -98,18 +107,41 @@ class CreateNewTestimonialForm extends Component {
     });
   }
 
+  getSelectedIds = (selected, dataToCrossCheck) => {
+    const res = [];
+    selected.forEach(s => {
+      if (dataToCrossCheck.filter(d => d.id === s.id).length > 0) {
+        res.push('' + s.id);
+      }
+    });
+    console.log(res);
+    return res;
+  }
+
   createFormJson = async () => {
-    const { communities, actions, vendors } = this.state;
+    const { communities, actions, vendors, testimonial } = this.state;
+    const { pathname } = window.location;
     const formJson = {
-      title: 'Create New Testimonial',
+      title: 'Edit Testimonial',
       subTitle: '',
-      method: '/testimonials.create',
-      successRedirectPage: '/admin/read/testimonials',
+      method: '/testimonials.update',
+      successRedirectPage: pathname || '/admin/read/testimonials',
       fields: [
         {
           label: 'About this Testimonial',
           fieldType: 'Section',
           children: [
+            {
+              name: 'ID',
+              label: 'ID',
+              placeholder: 'Omg! HEat pumps are the best!',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: testimonial && testimonial.id,
+              dbName: 'testimonial_id',
+              readOnly: true
+            },
             {
               name: 'title',
               label: 'Title of Testimonial',
@@ -117,7 +149,7 @@ class CreateNewTestimonialForm extends Component {
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
-              defaultValue: '',
+              defaultValue: testimonial && testimonial.title,
               dbName: 'title',
               readOnly: false
             },
@@ -129,16 +161,16 @@ class CreateNewTestimonialForm extends Component {
               contentType: 'text',
               isRequired: true,
               isMultiline: true,
-              defaultValue: '',
+              defaultValue: testimonial && testimonial.body,
               dbName: 'body',
               readOnly: false
             },
             {
               name: 'is_approved',
-              label: 'Should this go live ?',
+              label: 'Do you approve this testimonial?',
               fieldType: 'Radio',
               isRequired: false,
-              defaultValue: 'true',
+              defaultValue: (testimonial && testimonial.is_approved) ? 'true' : 'false',
               dbName: 'is_approved',
               readOnly: false,
               data: [
@@ -151,7 +183,7 @@ class CreateNewTestimonialForm extends Component {
               label: 'Should this go live ?',
               fieldType: 'Radio',
               isRequired: false,
-              defaultValue: 'false',
+              defaultValue: (testimonial && testimonial.is_published) ? 'true' : 'false',
               dbName: 'is_published',
               readOnly: false,
               data: [
@@ -166,7 +198,7 @@ class CreateNewTestimonialForm extends Component {
               fieldType: 'TextField',
               contentType: 'number',
               isRequired: true,
-              defaultValue: '',
+              defaultValue: testimonial && testimonial.rank,
               dbName: 'rank',
               readOnly: false
             },
@@ -181,7 +213,7 @@ class CreateNewTestimonialForm extends Component {
               label: 'Primary Community',
               placeholder: 'eg. Wayland',
               fieldType: 'Dropdown',
-              defaultValue: null,
+              defaultValue: testimonial && testimonial.community && '' + testimonial.community.id,
               dbName: 'community_id',
               data: communities
             },
@@ -190,7 +222,7 @@ class CreateNewTestimonialForm extends Component {
               label: 'Primary Action',
               placeholder: 'eg. Action',
               fieldType: 'Dropdown',
-              defaultValue: null,
+              defaultValue: testimonial && testimonial.action && '' + testimonial.action.id,
               dbName: 'action_id',
               data: actions
             },
@@ -199,21 +231,10 @@ class CreateNewTestimonialForm extends Component {
               label: 'Which Vendor did you use?',
               placeholder: 'eg. Wayland',
               fieldType: 'Dropdown',
-              defaultValue: null,
+              defaultValue: testimonial && testimonial.vendor && testimonial && '' + testimonial.vendor.id,
               dbName: 'vendor_id',
               data: vendors
-            },
-            {
-              name: 'user_email',
-              label: 'Please provide email of the user',
-              placeholder: 'eg. etohn@massenergize.org',
-              fieldType: 'TextField',
-              contentType: 'text',
-              isRequired: true,
-              defaultValue: '',
-              dbName: 'user_email',
-              readOnly: false
-            },
+            }
           ]
         },
         {
@@ -221,6 +242,7 @@ class CreateNewTestimonialForm extends Component {
           placeholder: 'Select an Image',
           fieldType: 'File',
           dbName: 'image',
+          previewLink: testimonial && testimonial.image && testimonial.image.url,
           label: 'Upload a file for this testimonial',
           selectMany: false,
           isRequired: true,
@@ -248,9 +270,9 @@ class CreateNewTestimonialForm extends Component {
   }
 }
 
-CreateNewTestimonialForm.propTypes = {
+EditTestimonial.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
 
-export default withStyles(styles, { withTheme: true })(CreateNewTestimonialForm);
+export default withStyles(styles, { withTheme: true })(EditTestimonial);

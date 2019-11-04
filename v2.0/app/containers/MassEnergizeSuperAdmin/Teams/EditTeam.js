@@ -47,7 +47,7 @@ class EditTeam extends Component {
       const team = teamResponse.data;
       await this.setStateAsync({ team });
     }
-    const communitiesResponse = await apiCall('/communities.listForSuperAdmin');
+    const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
 
     if (communitiesResponse && communitiesResponse.data) {
       const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name }));

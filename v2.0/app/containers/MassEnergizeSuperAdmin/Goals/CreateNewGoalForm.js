@@ -71,7 +71,7 @@ class CreateNewGoalForm extends Component {
 
   async componentDidMount() {
     const teamsResponse = await apiCall('/teams.listForSuperAdmin');
-    const communitiesResponse = await apiCall('/communities.listForSuperAdmin');
+    const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
     if (teamsResponse && teamsResponse.success) {
       this.setStateAsync({ teams: teamsResponse.data });
     }

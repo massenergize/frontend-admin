@@ -56,7 +56,7 @@ class SidebarContent extends React.Component {
     } = this.props;
     const user = this.props.auth;
     const { transform } = this.state;
-    const profile = user.profile_picture ? user.profile_picture.url : null;
+    const profile = user && user.profile_picture ? user.profile_picture.url : null;
 
 
     const setStatus = st => {
@@ -78,7 +78,7 @@ class SidebarContent extends React.Component {
             <img src={logo} alt={brand.name} />
             {brand.name}
           </NavLink>
-          {isLogin && (
+          {isLogin && user && (
             <div
               className={classNames(classes.profile, classes.user)}
               style={{ opacity: 1 - (transform / 100), marginTop: transform * -0.3 }}

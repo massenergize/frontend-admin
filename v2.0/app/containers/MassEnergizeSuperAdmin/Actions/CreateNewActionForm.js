@@ -42,7 +42,7 @@ class CreateNewActionForm extends Component {
 
   async componentDidMount() {
     const tagCollectionsResponse = await apiCall('/tag_collections.listForSuperAdmin');
-    const communitiesResponse = await apiCall('/communities.listForSuperAdmin');
+    const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
     const vendorsResponse = await apiCall('/vendors.listForSuperAdmin');
 
     if (communitiesResponse && communitiesResponse.data) {

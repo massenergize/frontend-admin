@@ -44,7 +44,7 @@ class AllCommunities extends React.Component {
   }
 
   async componentDidMount() {
-    const allCommunitiesResponse = await apiCall('/communities.listForSuperAdmin');
+    const allCommunitiesResponse = await apiCall('/communities.listForCommunityAdmin');
 
     if (allCommunitiesResponse && allCommunitiesResponse.success) {
       const data = allCommunitiesResponse.data.map(d => (

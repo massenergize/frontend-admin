@@ -22,9 +22,9 @@ import Icon from '@material-ui/core/Icon';
 import Hidden from '@material-ui/core/Hidden';
 import brand from 'dan-api/dummy/brand';
 import logo from 'dan-images/logo.png';
+import fire from 'firebase';
 import styles from './user-jss';
 import { ContentDivider } from '../Divider';
-import fire from 'firebase';
 import LinearProgress from '@material-ui/core/LinearProgress';
 
 // validation functions
@@ -53,12 +53,13 @@ class LoginForm extends React.Component {
     if (this.props.started) {
       return (
         <div>
-          <p style={{ color: "darkgray" }}>We are checking...</p>
+          <p style={{ color: 'darkgray' }}>We are checking...</p>
           <LinearProgress />
         </div>
-      )
+      );
     }
   }
+
   render() {
     const {
       classes,

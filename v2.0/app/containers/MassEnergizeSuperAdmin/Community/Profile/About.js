@@ -163,6 +163,13 @@ class About extends React.Component {
                 )))
               }
             </List>
+            <Paper onClick={() => goHere(addRemoveCommuntyAdminLink)} className={`${classes.pageCard}`} elevation={1}>
+              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                Add/Remove Administrators for Community
+                {' '}
+                <Icon style={{ paddingTop: 3, color: 'green' }}>forward</Icon>
+              </Typography>
+            </Paper>
           </PapperBlock>
           <Divider className={classes.divider} />
 
@@ -243,13 +250,7 @@ class About extends React.Component {
                 <Icon style={{ paddingTop: 3, color: 'green' }}>forward</Icon>
               </Typography>
             </Paper>
-            <Paper onClick={() => goHere(addRemoveCommuntyAdminLink)} className={`${classes.pageCard}`} elevation={1}>
-              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                Add/Remove Administrators for Community
-                {' '}
-                <Icon style={{ paddingTop: 3, color: 'green' }}>forward</Icon>
-              </Typography>
-            </Paper>
+            
           </PapperBlock>
         </Grid>
       </Grid>

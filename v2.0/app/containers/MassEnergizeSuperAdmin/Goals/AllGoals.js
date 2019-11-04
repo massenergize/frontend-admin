@@ -79,7 +79,7 @@ class AllGoals extends React.Component {
 
 
   fashionData = (data) => data.map(d => {
-    const teamOrCommunity = d.community || d.team || {};
+    const teamOrCommunity = d.community || d.team || { name: 'Unknown' };
     const typeOfObj = d.community ? '(Community)' : (d.team ? '(Team)' : '');
     const res = [
       d.id,

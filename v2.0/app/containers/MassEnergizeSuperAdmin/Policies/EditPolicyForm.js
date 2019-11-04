@@ -15,6 +15,7 @@ import Select2 from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import green from '@material-ui/core/colors/green';
 import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
+import MassEnergizeForm from '../_FormGenerator';
 
 import { apiCall } from '../../../utils/messenger';
 
@@ -55,9 +56,9 @@ class EditPolicyForm extends Component {
     super(props);
     this.state = {
       formData: {},
-      community: null,
-      error: null,
-      successMsg: null
+      policy: null,
+      communities: []
+
     };
   }
 
@@ -65,19 +66,19 @@ class EditPolicyForm extends Component {
   async componentDidMount() {
     const { id } = this.props.match.params;    
     const policyResponse = await apiCall('/policies.info', { policy_id: id });
+    const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
 
 
     if (policyResponse && policyResponse.success) {
-      const formData = { ...policyResponse.data };
-      if (formData.community) {
-        await this.setStateAsync({ community: formData.community.name });
-        delete formData.community;
-      }
-      delete formData.is_deleted;
-      delete formData.is_published;
-      delete formData.is_global;
-      await this.setStateAsync({ ...this.state, formData });
+      await this.setStateAsync({ policy: policyResponse.data });
     }
+    if (communitiesResponse && communitiesResponse.data) {
+      const communities = communitiesResponse.data.map(c => ({ ...c, id: '' + c.id, displayName: c.name }));
+      await this.setStateAsync({ communities });
+    }
+
+    const formJson = await this.createFormJson();
+    await this.setStateAsync({ formJson });
   }
 
   setStateAsync(state) {
@@ -86,193 +87,107 @@ class EditPolicyForm extends Component {
     });
   }
 
-  handleChangeMultiple = (event) => {
-    const { target } = event;
-    const { name, options } = target;
-    const value = [];
-    for (let i = 0, l = options.length; i < l; i += 1) {
-      if (options[i].selected) {
-        value.push(options[i].value);
-      }
-    }
-    this.setState({
-      formData: { [name]: value }
-    });
-  };
+  createFormJson = async () => {
+    const { communities, policy } = this.state;
+    const { pathname } = window.location;
 
-  handleFormDataChange = (event) => {
-    const { target } = event;
-    if (!target) return;
-    const { name, value } = target;
-    const { formData } = this.state;
-    this.setState({
-      formData: { ...formData, [name]: value }
-    });
+    const formJson = {
+      title: 'Create New Policy',
+      subTitle: '',
+      method: '/policies.update',
+      successRedirectPage: pathname || '/admin/read/policies',
+      fields: [
+        {
+          label: 'About this Policy',
+          fieldType: 'Section',
+          children: [
+            {
+              name: 'ID',
+              label: 'ID',
+              placeholder: 'eg. 1',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: policy && policy.id,
+              dbName: 'policy_id',
+              readOnly: true
+            },
+            {
+              name: 'name',
+              label: 'Name of Policy',
+              placeholder: 'eg. Terms and Conditions',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: policy && policy.name,
+              dbName: 'name',
+              readOnly: false
+            },
+            {
+              name: 'is_global',
+              label: 'Is this Policy Global',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: policy && policy.is_global ? 'true' : 'false',
+              dbName: 'is_global',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+              child: {
+                valueToCheck: 'false',
+                fields: [
+                  {
+                    name: 'community',
+                    label: 'Primary Community',
+                    placeholder: 'eg. Wayland',
+                    fieldType: 'Dropdown',
+                    defaultValue: policy && policy.community && '' + policy.community.id,
+                    dbName: 'community_id',
+                    data: communities
+                  },
+                ]
+              }
+            },
+          ]
+        },
+        {
+          name: 'description',
+          label: 'Policy Details',
+          placeholder: 'eg. Provide details about this Policy ...',
+          fieldType: 'HTMLField',
+          contentType: 'text',
+          isRequired: true,
+          isMultiline: true,
+          defaultValue: policy && policy.description,
+          dbName: 'description',
+          readOnly: false
+        },
+      ]
+    };
+    return formJson;
   }
 
-  handleCloseStyle = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    this.setState({ successMsg: null, error: null });
-  };
-
-  submitForm = async (event) => {
-    event.preventDefault();
-    const { formData } = this.state;
-    const cleanedValues = { ...formData };
-    cleanedValues.policy_id = cleanedValues.id;
-    delete cleanedValues.id;
-    const response = await apiCall('/policies.update', cleanedValues);
-    if (response && !response.success) {
-      await this.setStateAsync({ error: response.error, successMsg: null });
-    } else if (response && response.success) {
-      await this.setStateAsync({ successMsg: 'Successfully Updated', error: null });
-    }
-  }
-
-  async updateForm(fieldName, value) {
-    const { formData } = this.state;
-    await this.setStateAsync({
-      formData: {
-        ...formData,
-        [fieldName]: value
-      }
-    }
-    );
-  }
 
   render() {
-    const trueBool = true;
-    const {
-      classes,
-      submitting,
-    } = this.props;
-    const {
-      formData, error, successMsg, communities
-    } = this.state;
-    const {
-      name,
-      id,
-      description,
-      community
-    } = formData;
-
-
-    if (!id) {
-      return (
-        <div style={{ margin: 30 }}>
-          <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-            <Grid item xs={12} md={6}>
-              <Paper className={classes.root} elevation={4} style={{ padding: 30 }}>
-                <div style={{ margin: 30 }} />
-                <Typography variant="h5" component="h3">
-                 Loading Data ...
-                </Typography>
-              </Paper>
-            </Grid>
-          </Grid>
-        </div>
-      );
-    }
-
+    const { classes } = this.props;
+    const { formJson } = this.state;
+    if (!formJson) return (<div />);
     return (
-      <div style={{ margin: 30 }}>
-        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root} elevation={4} style={{ padding: 30 }}>
-              <div style={{ margin: 30 }} />
-              <Typography variant="h5" component="h3">
-                {`Edit Policy with ID: ${id}`}
-                {`${community ? 'Community: '+community : ''}`}
-              </Typography>
-              <div style={{ margin: 50 }} />
-              <form onSubmit={this.submitForm} noValidate autoComplete="off">
-                <div>
-                  <Snackbar
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
-                    }}
-                    open={error != null}
-                    autoHideDuration={6000}
-                    onClose={this.handleCloseStyle}
-                  >
-                    <MySnackbarContentWrapper
-                      onClose={this.handleCloseStyle}
-                      variant="error"
-                      message={`Error Occurred: ${error}`}
-                    />
-                  </Snackbar>
-                  <Snackbar
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
-                    }}
-                    open={successMsg != null}
-                    autoHideDuration={6000}
-                    onClose={this.handleCloseStyle}
-                  >
-                    <MySnackbarContentWrapper
-                      onClose={this.handleCloseStyle}
-                      className={classes.snackbar}
-                      classes={classes}
-                      variant="success"
-                      message="Successfully Updated this Policy"
-                    />
-                  </Snackbar>
-
-
-                  {error
-                  && (
-                    <p style={{ color: 'red' }}>{error}</p>
-                  )
-                  }
-                  {successMsg
-                  && (
-                    <p style={{ color: 'green' }}>{successMsg}</p>
-                  )
-                  }
-                </div>
-                <TextField
-                  id="outline-required"
-                  required
-                  name="name"
-                  onChange={this.handleFormDataChange}
-                  label="Name"
-                  placeholder="eg. Terms and Conditions"
-                  className={classes.field}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  defaultValue={name}
-                />
-
-                <TextField
-                  name="description"
-                  className={classes.field}
-                  placeholder="eg. Description ..."
-                  label="Describe this Policy"
-                  multiline={trueBool}
-                  rows={4}
-                  onChange={this.handleFormDataChange}
-                  defaultValue={description}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-                <div>
-                  <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
-                    Submit
-                  </Button>
-                </div>
-              </form>
-            </Paper>
-          </Grid>
-        </Grid>
+      <div>
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+        />
       </div>
     );
   }
 }
+
+EditPolicyForm.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
 
 export default withStyles(styles, { withTheme: true })(EditPolicyForm);
