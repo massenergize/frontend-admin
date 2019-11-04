@@ -219,7 +219,7 @@ class CreateNewVendorForm extends Component {
           children: [
             {
               name: 'service_area',
-              label: 'Please select your service Area',
+              label: 'Please select your service sector(s)',
               placeholder: 'eg. Ellen Tohn',
               fieldType: 'Radio',
               contentType: 'text',

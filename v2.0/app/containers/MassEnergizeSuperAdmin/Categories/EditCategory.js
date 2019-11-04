@@ -59,11 +59,13 @@ class CreateNewTagCollectionForm extends Component {
 
   createFormJson = async () => {
     const { tagCollection } = this.state;
+    const { pathname } = window.location;
     const formJson = {
       title: 'Edit Tag Collection',
       subTitle: '',
+      cancelLink: '/admin/read/categories',
       method: '/tag_collections.update',
-      successRedirectPage: '/admin/read/categories',
+      successRedirectPage: pathname || '/admin/read/categories',
       fields: [
         {
           label: 'About this Tag Collection',
@@ -90,7 +92,18 @@ class CreateNewTagCollectionForm extends Component {
               defaultValue: tagCollection.name,
               dbName: 'name',
               readOnly: false
-            }
+            },
+            {
+              name: 'rank',
+              label: 'Rank of Category (Lower comes first)',
+              placeholder: 'eg. 1',
+              fieldType: 'TextField',
+              contentType: 'number',
+              isRequired: true,
+              defaultValue: tagCollection.rank,
+              dbName: 'rank',
+              readOnly: false
+            },
           ]
         },
       ]
@@ -109,6 +122,17 @@ class CreateNewTagCollectionForm extends Component {
             isRequired: false,
             defaultValue: t.name,
             dbName: `tag_${t.id}`,
+            readOnly: false
+          },
+          {
+            name: `tag_${t.id}_rank`,
+            label: `Tag #${i + 1} Rank`,
+            placeholder: 'eg. 1',
+            fieldType: 'TextField',
+            contentType: 'text',
+            isRequired: false,
+            defaultValue: t.order,
+            dbName: `tag_${t.id}_rank`,
             readOnly: false
           }
         );

@@ -116,6 +116,17 @@ class CreateNewActionForm extends Component {
               readOnly: false
             },
             {
+              name: 'rank',
+              label: 'Rank (Which order should this action appear in?  Lower numbers come first)',
+              placeholder: 'eg. 1',
+              fieldType: 'TextField',
+              contentType: 'number',
+              isRequired: true,
+              defaultValue: '',
+              dbName: 'rank',
+              readOnly: false
+            },
+            {
               name: 'is_global',
               label: 'Is this Action a Global/Template Action?',
               fieldType: 'Radio',

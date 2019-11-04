@@ -62,6 +62,7 @@ class CreateNewPolicyForm extends Component {
     const formJson = {
       title: 'Create New Policy',
       subTitle: '',
+      cancelLink: '/admin/read/policies',
       method: '/policies.create',
       successRedirectPage: '/admin/read/policies',
       fields: [

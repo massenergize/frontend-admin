@@ -15,6 +15,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
+import { Link } from 'react-router-dom';
 import { MaterialDropZone } from 'dan-components';
 import Snackbar from '@material-ui/core/Snackbar';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -529,6 +530,7 @@ class MassEnergizeForm extends Component {
               }}
               disabled={field.readOnly}
               defaultValue={field.defaultValue}
+              maxLength={field.maxLength}
             />
           </div>
 
@@ -633,6 +635,14 @@ class MassEnergizeForm extends Component {
                 )
                 }
                 <div>
+                  {formJson && formJson.cancelLink &&
+                    (
+                      <Link to={formJson.cancelLink}>
+                        Cancel
+                      </Link>
+                    )
+                  }
+                  {'    '}
                   <Button variant="contained" color="secondary" type="submit">
                     Submit
                   </Button>

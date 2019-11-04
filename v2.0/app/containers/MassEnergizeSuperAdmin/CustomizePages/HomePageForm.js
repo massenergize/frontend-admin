@@ -94,12 +94,12 @@ class HomePageEditForm extends Component {
     const { goal } = homePageData;
     const selectedEvents = homePageData && featured_events ? featured_events.map(e => '' + e.id) : [];
 
-
     const formJson = {
       title: `Edit ${community ? community.name + '\'s' : 'Community\'s'} HomePage`,
       subTitle: '',
       method: '/home_page_settings.update',
-      // successRedirectPage: `/admin/edit/${community.id}/home`,
+      cancelLink: `/admin/edit/${community.id}/home`,
+      successRedirectPage: `/admin/edit/${community.id}/home`,
       fields: [
         {
           name: 'id',
@@ -317,7 +317,7 @@ class HomePageEditForm extends Component {
                         isRequired: false,
                         defaultValue: `${iconBox1 && iconBox1.title}`,
                         dbName: 'icon_box_1_title',
-                        readOnly: false
+                        readOnly: false,
                       },
                       {
                         name: 'icon_box_1_icon',
@@ -351,7 +351,8 @@ class HomePageEditForm extends Component {
                         isMultiline: true,
                         defaultValue: `${iconBox1 && iconBox1.description}`,
                         dbName: 'icon_box_1_description',
-                        readOnly: false
+                        readOnly: false,
+                        maxLength: '5'
                       },
                     ]
                   },

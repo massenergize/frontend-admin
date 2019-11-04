@@ -95,6 +95,7 @@ class EditPolicyForm extends Component {
       title: 'Create New Policy',
       subTitle: '',
       method: '/policies.update',
+      cancelLink: '/admin/read/policies',
       successRedirectPage: pathname || '/admin/read/policies',
       fields: [
         {

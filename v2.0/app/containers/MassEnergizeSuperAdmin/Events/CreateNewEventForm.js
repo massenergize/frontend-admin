@@ -110,6 +110,17 @@ class CreateNewEventForm extends Component {
               readOnly: false
             },
             {
+              name: 'rank',
+              label: 'Rank (Which order should this event appear in?  Lower numbers come first)',
+              placeholder: 'eg. 1',
+              fieldType: 'TextField',
+              contentType: 'number',
+              isRequired: true,
+              defaultValue: '',
+              dbName: 'rank',
+              readOnly: false
+            },
+            {
               name: 'start_date_and_time',
               label: 'Start Date And Time: YYYY-MM-DD HH:MM',
               placeholder: 'YYYY-MM-DD HH:MM',

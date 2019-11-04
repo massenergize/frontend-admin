@@ -65,6 +65,7 @@ class HomePageEditForm extends Component {
       title: `Edit ${community ? community.name + '\'s' : 'Community\'s'} Actions Page`,
       subTitle: '',
       method: '/actions_page_settings.update',
+      cancelLink: `/admin/edit/${community.id}/home`,
       // successRedirectPage: `/admin/edit/${community.id}/all-actions`,
       fields: [
         {

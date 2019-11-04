@@ -74,7 +74,7 @@ class SidebarContent extends React.Component {
     return (
       <div className={classNames(classes.drawerInner, !drawerPaper ? classes.drawerPaperClose : '')}>
         <div className={classes.drawerHeader}>
-          <NavLink to="/app" className={classNames(classes.brand, classes.brandBar, turnDarker && classes.darker)}>
+          <NavLink to="/admin" className={classNames(classes.brand, classes.brandBar, turnDarker && classes.darker)}>
             <img src={logo} alt={brand.name} />
             {brand.name}
           </NavLink>

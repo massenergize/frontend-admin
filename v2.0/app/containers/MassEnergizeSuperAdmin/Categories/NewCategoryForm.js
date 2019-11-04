@@ -53,6 +53,7 @@ class CreateNewTagCollectionForm extends Component {
     const formJson = {
       title: 'Create New Tag Collection',
       subTitle: '',
+      cancelLink: '/admin/read/categories',
       method: '/tag_collections.create',
       successRedirectPage: '/admin/read/categories',
       fields: [
@@ -69,6 +70,17 @@ class CreateNewTagCollectionForm extends Component {
               isRequired: true,
               defaultValue: '',
               dbName: 'name',
+              readOnly: false
+            },
+            {
+              name: 'rank',
+              label: 'Rank of Category (Lower comes first)',
+              placeholder: 'eg. 1',
+              fieldType: 'TextField',
+              contentType: 'number',
+              isRequired: true,
+              defaultValue: '',
+              dbName: 'rank',
               readOnly: false
             },
             {

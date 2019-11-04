@@ -300,39 +300,7 @@ class CreateNewGoalForm extends Component {
                   }}
                 />
 
-                <TextField
-                  name="attained_number_of_actions"
-                  type="number"
-                  placeholder="eg 100"
-                  label="Attained Number of Actions"
-                  className={classes.field}
-                  onChange={this.handleFormDataChange}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-                <TextField
-                  name="attained_number_of_households"
-                  placeholder="eg. 250"
-                  type="number"
-                  label="Attained Number of Households"
-                  className={classes.field}
-                  onChange={this.handleFormDataChange}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-                <TextField
-                  name="attained_carbon_footprint_reduction"
-                  placeholder="eg. 250"
-                  type="number"
-                  label="Attained Carbon Footprint Reduction"
-                  className={classes.field}
-                  onChange={this.handleFormDataChange}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
+ 
 
                 <TextField
                   name="target_number_of_actions"
@@ -361,6 +329,40 @@ class CreateNewGoalForm extends Component {
                   placeholder="eg. 250"
                   type="number"
                   label="Target Carbon Footprint Reduction"
+                  className={classes.field}
+                  onChange={this.handleFormDataChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+
+                <TextField
+                  name="attained_number_of_actions"
+                  type="number"
+                  placeholder="eg 100"
+                  label="Attained Number of Actions"
+                  className={classes.field}
+                  onChange={this.handleFormDataChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  name="attained_number_of_households"
+                  placeholder="eg. 250"
+                  type="number"
+                  label="Attained Number of Households"
+                  className={classes.field}
+                  onChange={this.handleFormDataChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  name="attained_carbon_footprint_reduction"
+                  placeholder="eg. 250"
+                  type="number"
+                  label="Attained Carbon Footprint Reduction"
                   className={classes.field}
                   onChange={this.handleFormDataChange}
                   InputLabelProps={{

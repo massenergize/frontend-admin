@@ -40,6 +40,7 @@ class AllTagCollections extends React.Component {
         [
           d.id,
           `${d.name}...`.substring(0, 30), // limit to first 30 chars
+          d.rank,
           d.tags,
           d.id
         ]
@@ -68,6 +69,13 @@ class AllTagCollections extends React.Component {
       {
         name: 'Name',
         key: 'name',
+        options: {
+          filter: true,
+        }
+      },
+      {
+        name: 'Rank',
+        key: 'rank',
         options: {
           filter: true,
         }
