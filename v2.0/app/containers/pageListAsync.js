@@ -24,6 +24,7 @@ export const BlankPage = loadable(() => import('./Pages/BlankPage'), {
 export const DashboardSummaryPage = loadable(() => import('./MassEnergizeSuperAdmin/Summary'), {
   fallback: <Loading />,
 }); 
+
 export const DashboardAdminSummaryPage = loadable(() => import('./MassEnergizeSuperAdmin/Summary/NormalAdminHome'), {
   fallback: <Loading />,
 }); 
@@ -33,13 +34,28 @@ export const AllCommunities = loadable(() => import('./MassEnergizeSuperAdmin/Co
 export const OnboardCommunity = loadable(() => import('./MassEnergizeSuperAdmin/Community/OnboardCommunity'), {
   fallback: <Loading />,
 });
+export const EditCommunityByCommunityAdmin = loadable(() => import('./MassEnergizeSuperAdmin/Community/EditCommunityByCommunityAdmin'), {
+  fallback: <Loading />,
+});
 
 export const CommunityProfile = loadable(() => import('./MassEnergizeSuperAdmin/Community/CommunityProfile'), {
   fallback: <Loading />,
 });
 
+export const AddRemoveCommunityAdmin = loadable(() => import('./MassEnergizeSuperAdmin/Community/AddRemoveAdmin'), {
+  fallback: <Loading />,
+});
+
+export const AddRemoveSuperAdmin = loadable(() => import('./MassEnergizeSuperAdmin/Community/AddRemoveSuperAdmin'), {
+  fallback: <Loading />,
+});
+
 
 export const AddCategory = loadable(() => import('./MassEnergizeSuperAdmin/Categories/AddCategory'), {
+  fallback: <Loading />,
+});
+
+export const EditCategory = loadable(() => import('./MassEnergizeSuperAdmin/Categories/EditCategory'), {
   fallback: <Loading />,
 });
 export const AllCategories = loadable(() => import('./MassEnergizeSuperAdmin/Categories/AllCategories'), {
@@ -71,6 +87,9 @@ export const AllTeams = loadable(() => import('./MassEnergizeSuperAdmin/Teams/Al
   fallback: <Loading />,
 });
 export const AddTeam = loadable(() => import('./MassEnergizeSuperAdmin/Teams/CreateNewTeam'), {
+  fallback: <Loading />,
+});
+export const EditTeam = loadable(() => import('./MassEnergizeSuperAdmin/Teams/EditTeam'), {
   fallback: <Loading />,
 });
 

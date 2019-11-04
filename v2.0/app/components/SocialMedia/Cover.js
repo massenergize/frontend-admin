@@ -34,17 +34,18 @@ class Cover extends React.Component {
   handleCloseOpt = () => {
     this.setState({ anchorElOpt: null });
   };
+
   goLive = () => {
     const val = this.props.community.is_published;
-    const id = this.props.community.id;
+    const {id} = this.props.community;
     const body = { is_published: !val, is_dev: true, community_id: id };
     this.props.liveOrNotFxn(this.props.community);
     apiCall('/communities.update', body).then(res => {
-      console.log("You are live!");
+      console.log('You are live!');
     })
       .catch(err => {
-        console.log("Error:", err);
-      })
+        console.log('Error:', err);
+      });
   }
 
   showLiveBtn = () => {
@@ -55,11 +56,11 @@ class Cover extends React.Component {
         <div>
           <Button onClick={() => { this.goLive() }} variant="outlined" color="secondary" className={classes.publishBtn + " " + classes.raise}>
             Unpublish
-            </Button>
+          </Button>
         </div>
       )
     }
-    else {
+    
       return (
         <div>
           <Button onClick={() => { this.goLive() }} variant="outlined" color="primary" className={classes.goLiveBtn + " " + classes.raise}>
@@ -67,7 +68,7 @@ class Cover extends React.Component {
         </Button>
         </div>
       )
-    }
+    
   }
 
   render() {
@@ -84,10 +85,12 @@ class Cover extends React.Component {
     const { anchorElOpt } = this.state;
     return (
       // <div className={classes.cover} style={{ backgroundImage: `url(${coverImg})` }}>
-      <div className={classes.cover} style={{ height: 250, textAlign: 'left', justifyContent: 'flex-start' }}>
+      <div className={classes.cover} style={{
+        height: 250, textAlign: 'left', justifyContent: 'flex-start', backgroundImage: `url(${coverImg})` 
+        }}>
         <div className={classes.opt}>
           <IconButton className={classes.button} aria-label="Delete">
-            <Info  style={{color:'#585858'}}/>
+            <Info style={{ color: '#585858' }} />
           </IconButton>
           <IconButton
             aria-label="More"
@@ -96,7 +99,7 @@ class Cover extends React.Component {
             className={classes.button}
             onClick={this.handleClickOpt}
           >
-            <MoreVertIcon style={{color:'#585858'}}/>
+            <MoreVertIcon style={{ color: '#585858' }} />
           </IconButton>
           <Menu
             id="long-menu"
@@ -107,7 +110,7 @@ class Cover extends React.Component {
               style: {
                 maxHeight: ITEM_HEIGHT * 4.5,
                 width: 200,
-               
+
               },
             }}
           >
@@ -119,15 +122,28 @@ class Cover extends React.Component {
           </Menu>
         </div>
         <div className={classes.content} style={{ display: 'inline-block' }}>
-          <div >
-
-            <h2 style={{ display: 'inline-block', marginLeft: 20, marginBottom: 2, fontSize: '1.8rem', fontWeight: "500", textTransform: 'capitalize' }} >{name}</h2>
-            <VerifiedUser style={{ color:'#0095ff',marginTop: -2, display: 'inline-block', }} className={classes.verified} />
+          <div>
+            <h2 style={{
+              display: 'inline-block', marginLeft: 20, marginBottom: 2, fontSize: '1.8rem', fontWeight: '500px', textTransform: 'capitalize' 
+              }}>{name}</h2>
+            <VerifiedUser style={{ color: '#0095ff', marginTop: -2, display: 'inline-block', }} className={classes.verified} />
             <div style={{ float: 'right' }}>
               <center>
                 {this.showLiveBtn()}
                 <a
-                style={{fontSize:14}}
+                  style={{ fontSize: 14 }}
+                  className={classes.leAnchor}
+                  href={community ? `http://community-dev.massenergize.org/${community.subdomain}` : '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  size="large"
+                  variant="contained"
+                  color="secondary"
+                >
+                  Preview Site
+                </a>
+                <a
+                  style={{ fontSize: 14 }}
                   className={classes.leAnchor}
                   href={community ? `http://community.massenergize.org/${community.subdomain}` : '#'}
                   target="_blank"
@@ -142,48 +158,6 @@ class Cover extends React.Component {
             </div>
           </div>
           <p style={{ marginLeft: 20, color: 'darkgray' }}>{desc}</p>
-
-          {/* <div className={classes.raise} style={{ float: 'left', padding: 1, borderRadius: 10, width: '25%' }}>
-            <img src={avatar} style={{ borderRadius: 10, height: '100px', width: '100%', objectFit: 'cover' }} />
-          </div>
-          <div className={classes.inline}>
-            <h2 style={{ marginLeft: 20, marginBottom: 2, fontSize: '1.8rem', fontWeight: "500", textTransform: 'capitalize' }} >{name}</h2>
-            <p style={{ marginLeft: 20, color: 'darkgray' }}>{desc}</p>
-            {this.showLiveBtn()}
-            <a
-              style={{ color: 'white', float: 'right' }}
-              className={classes.leAnchor}
-              href={community ? `http://community.massenergize.org/${community.subdomain}` : '#'}
-              target="_blank"
-              rel="noopener noreferrer"
-              size="large"
-              variant="contained"
-              color="secondary"
-            >
-              Visit Portal
-          </a>
-          </div> */}
-          {/* <Avatar alt={name} src={avatar} className={classes.avatar} />
-          <Typography variant="h4" className={classes.name} gutterBottom>
-            {name}
-            <VerifiedUser className={classes.verified} />
-          </Typography>
-          <Typography className={classes.subheading} gutterBottom>
-            {desc}
-          </Typography>
-          {this.showLiveBtn()}
-          <a
-            style={{ color: 'white' }}
-            className={classes.leAnchor}
-            href={community ? `http://community.massenergize.org/${community.subdomain}` : '#'}
-            target="_blank"
-            rel="noopener noreferrer"
-            size="large"
-            variant="contained"
-            color="secondary"
-          >
-            Visit Portal
-          </a> */}
         </div>
       </div>
     );

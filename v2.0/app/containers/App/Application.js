@@ -1,10 +1,10 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
 import { Switch, Route } from 'react-router-dom';
-import {connect} from 'react-redux'; 
+import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Dashboard from '../Templates/Dashboard';
-import {reduxCallCommunities, reduxCheckUser} from './../../redux/redux-actions/adminActions';
+import { reduxCallCommunities, reduxCheckUser } from "../../redux/redux-actions/adminActions";
 import {
   Parent,
   DashboardSummaryPage,
@@ -29,41 +29,42 @@ import {
   SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditGoal, EditPolicy, EditEvent
 } from '../pageListAsync';
 import EditVendor from '../MassEnergizeSuperAdmin/Vendors/EditVendor';
+import AddRemoveAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveAdmin';
+import AddRemoveSuperAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveSuperAdmin';
+import EditCommunityByCommunityAdmin from '../MassEnergizeSuperAdmin/Community/EditCommunityByCommunityAdmin';
+import EditTeam from '../MassEnergizeSuperAdmin/Teams/EditTeam';
+import EditCategory from '../MassEnergizeSuperAdmin/Categories/EditCategory';
 
 
 class Application extends React.Component {
-  
   componentWillMount() {
-   
     this.props.reduxCallCommunities();
-
   }
-  
+
   render() {
-   
     const { changeMode, history } = this.props;
     const user = this.props.auth;
 
-    return ( 
+    return (
       <Dashboard history={history} changeMode={changeMode}>
         <Switch>
-          { (user.is_community_admin) && 
-            (
-                <Route exact path="/" render={(props) =><DashboardAdminSummaryPage {...props} signOut = {this.props.signOut} />} />
+          { (user.is_community_admin) 
+            && (
+              <Route exact path="/" render={(props) => <DashboardAdminSummaryPage {...props} signOut= {this.props.signOut} />} />
             )
           }
-          { (user.is_super_admin) && 
-            (
-                <Route exact path="/" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
+          { (user.is_super_admin) 
+            && (
+              <Route exact path="/" render={(props) => <DashboardSummaryPage {...props} signOut= {this.props.signOut} />} />
             )
           }
-          { user.is_community_admin && 
-            (
-                <Route exact path="/admin" render={(props) =><DashboardAdminSummaryPage {...props} signOut = {this.props.signOut} />} />
+          { user.is_community_admin 
+            && (
+              <Route exact path="/admin" render={(props) => <DashboardAdminSummaryPage {...props} signOut ={this.props.signOut} />} />
             )
           }
           { user.is_super_admin && (
-            <Route exact path="/admin" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
+            <Route exact path="/admin" render={(props) => <DashboardSummaryPage {...props} signOut= {this.props.signOut} />} />
           )
           }
           {/* <Route exact path="/" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
@@ -77,6 +78,11 @@ class Application extends React.Component {
           <Route path="/admin/community/:id/preview" component={CommunityProfile} exact />
           <Route path="/admin/community/:id/profile" component={CommunityProfile} exact />
           <Route path="/admin/community/:id/edit" component={OnboardCommunity} exact />
+          <Route path="/admin/edit/:id/community/community-admin" component={EditCommunityByCommunityAdmin} exact />
+          <Route path="/admin/edit/:id/community" component={OnboardCommunity} exact />
+          <Route path="/admin/add/:id/community-admins" component={AddRemoveAdmin} exact />
+          <Route path="/admin/edit/:id/community-admins" component={AddRemoveAdmin} exact />
+          <Route path="/admin/add-super-admin" component={AddRemoveSuperAdmin} exact />
 
           <Route path="/admin/read/actions" component={AllActions} />
           <Route path="/admin/add/action" component={AddAction} />
@@ -87,6 +93,7 @@ class Application extends React.Component {
           <Route path="/admin/add/category" component={AddCategory} />
           <Route path="/admin/read/tag-collections" component={AllCategories} />
           <Route path="/admin/add/tag-collection" component={AddCategory} />
+          <Route path="/admin/edit/:id/tag-collection" component={EditCategory} />
 
           <Route path="/admin/read/events" component={AllEvents} />
           <Route path="/admin/add/event" component={AddEvent} />
@@ -94,6 +101,7 @@ class Application extends React.Component {
 
           <Route path="/admin/read/teams" component={AllTeams} />
           <Route path="/admin/add/team" component={AddTeam} />
+          <Route path="/admin/edit/:id/team" component={EditTeam} />
 
           <Route path="/admin/read/policies" component={AllPolicies} />
           <Route path="/admin/add/policy" component={AddPolicy} />
@@ -144,15 +152,15 @@ Application.propTypes = {
   history: PropTypes.object.isRequired,
 };
 
-function mapStateToProps(state){
+function mapStateToProps(state) {
   return {
     auth: state.getIn(['auth'])
-  }
+  };
 }
-function mapDispatchToProps(dispatch){
+function mapDispatchToProps(dispatch) {
   return bindActionCreators({
-    reduxCallCommunities: reduxCallCommunities,
+    reduxCallCommunities,
     checkUser: reduxCheckUser
-  },dispatch);
+  }, dispatch);
 }
-export default connect(mapStateToProps,mapDispatchToProps)(Application);
+export default connect(mapStateToProps, mapDispatchToProps)(Application);

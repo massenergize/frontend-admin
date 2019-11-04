@@ -15,21 +15,19 @@ import { API_HOST } from '../config/constants';
  */
 
 function checkAuthUser() {
-  const user = localStorage.getItem("authUser");
-  const token = localStorage.getItem("idToken");
+  const user = localStorage.getItem('authUser');
+  const token = localStorage.getItem('idToken');
   if (user && token) {
     rawCall('auth/whoami').then(res => {
       if (!res.data) {
-        window.location = "/login";
+        window.location = '/login';
         localStorage.removeItem('authUser');
         localStorage.removeItem('idToken');
-
       }
-    })
+    });
   }
 }
 export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = null) {
-  //checkAuthUser();
   const idToken = localStorage.getItem("idToken");
   const response = await fetch(`${API_HOST}/v3${destinationUrl}`, {
     credentials: 'include',
@@ -52,8 +50,8 @@ export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = 
   }
 }
 export async function rawCall(destinationUrl, dataToSend = {}, relocationPage = null) {
-  const idToken = localStorage.getItem("idToken");
-  var params = {};
+  const idToken = localStorage.getItem('idToken');
+  let params = {};
   if (idToken) {
     params = {
       credentials: 'include',
@@ -63,7 +61,7 @@ export async function rawCall(destinationUrl, dataToSend = {}, relocationPage = 
         Authorization: `Bearer ${idToken}`
       },
       body: qs.stringify(dataToSend)
-    }
+    };
   } else {
     params = {
       credentials: 'include',
@@ -72,7 +70,7 @@ export async function rawCall(destinationUrl, dataToSend = {}, relocationPage = 
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: qs.stringify(dataToSend)
-    }
+    };
   }
 
   const response = await fetch(`${API_HOST}/${destinationUrl}`, params);
@@ -211,6 +209,7 @@ export function cleanFormData(formValues) {
 export async function fetchData(sourceUrl) {
   //checkAuthUser();
   const idToken = localStorage.getItem("idToken");
+
   return fetch(`${API_HOST}/${sourceUrl}`, {
     method: 'GET',
     credentials: 'include',

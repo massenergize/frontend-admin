@@ -79,6 +79,7 @@ class App extends React.Component {
       me.setState({ error: "Sorry, we could not sign you in!", started: false });
     });
   }
+  
   loginWithGoogle = () => {
     this.setState({ started: true })
     const me = this;

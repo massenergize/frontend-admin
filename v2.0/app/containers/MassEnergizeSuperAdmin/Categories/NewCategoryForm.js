@@ -80,7 +80,7 @@ class CreateNewTagCollectionForm extends Component {
               isRequired: true,
               isMultiline: true,
               defaultValue: '',
-              dbName: 'description',
+              dbName: 'tags',
               readOnly: false
             },
           ]

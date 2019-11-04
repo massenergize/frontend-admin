@@ -13,23 +13,39 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Chip from '@material-ui/core/Chip';
-import Avatar from '@material-ui/core/Avatar';
 import Icon from '@material-ui/core/Icon';
-import Edit from '@material-ui/icons/Edit';
-import Language from '@material-ui/icons/Language';
-import Email from '@material-ui/icons/Email';
-import { fetchData } from '../../../utils/messenger';
+
+import MUIDataTable from 'mui-datatables';
+import CallMadeIcon from '@material-ui/icons/CallMade';
+import EditIcon from '@material-ui/icons/Edit';
+import { Link } from 'react-router-dom';
+import Avatar from '@material-ui/core/Avatar';
+import Paper from '@material-ui/core/Paper';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Grid from '@material-ui/core/Grid';
+import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
 
 class AllTagCollections extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { tagCollections: [] };
+    this.state = { data: [], loading: false, columns: this.getColumns() };
   }
 
   async componentDidMount() {
-    const response = await fetchData('v2/tag-collections');
-    await this.setStateAsync({ tagCollections: response.data });
+    const tagCollectionsResponse = await apiCall('/tag_collections.listForSuperAdmin');
+
+    if (tagCollectionsResponse && tagCollectionsResponse.success) {
+      const data = tagCollectionsResponse.data.map(d => (
+        [
+          d.id,
+          `${d.name}...`.substring(0, 30), // limit to first 30 chars
+          d.tags,
+          d.id
+        ]
+      ));
+      await this.setStateAsync({ data, loading: false });
+    }
   }
 
   setStateAsync(state) {
@@ -38,71 +54,157 @@ class AllTagCollections extends React.Component {
     });
   }
 
+  getColumns = () => {
+    const { classes } = this.props;
 
-  renderTable = (data, classes) => (
-    <PapperBlock noMargin title="All Tag Collections" icon="ios-share-outline" whiteBg desc="">
-      <div className={classes.root}>
-        <Table className={classNames(classes.tableLong, classes.stripped)} padding="dense">
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Is Global</TableCell>
-              <TableCell>Tags</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map(n => ([
-              <TableRow key={n.id}>
-                <TableCell padding="dense">
-                  <div className={classes.flex}>
-                    <div>
-                      <Typography variant="caption">{n.id}</Typography>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell padding="dense">
-                  <div className={classes.flex}>
-                    <div>
-                      <Typography variant="subtitle1">{n.name}</Typography>
-                      {/* <a href={`/admin/category/${n.id}/edit`} className={classes.downloadInvoice}>
-                        <Edit />
-                        &nbsp; Edit
-                      </a> */}
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell align="left">
-                  <Typography variant="caption">
-                    { n.is_global ? 'Global' : 'Not Global' }
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <div className={classes.taskStatus}>
-                    <Icon className={classes.taskIcon}>{n.is_geographically_focused ? 'location_on' : 'blur_on'}</Icon>
-                    {n.tags.map(t => (
-                      <Typography key={t.id} variant="caption">
-                        { t.name }
-                        ,&nbsp;&nbsp;
-                      </Typography>
-                    ))}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ]))}
-          </TableBody>
-        </Table>
-      </div>
-    </PapperBlock>
-  )
+    const cols = [
+      {
+        name: 'id',
+        key: 'id',
+        options: {
+          filter: false
+        }
+      },
+      {
+        name: 'Name',
+        key: 'name',
+        options: {
+          filter: true,
+        }
+      },
+      {
+        name: 'Tags',
+        key: 'tags',
+        options: {
+          filter: false,
+          customBodyRender: (tags) => (
+            <div className={classes.taskStatus}>
+              <Icon className={classes.taskIcon}>blur_on</Icon>
+              {tags.map(t => (
+                <Typography key={t.id} variant="caption">
+                  { t.name }
+              ,&nbsp;&nbsp;
+                </Typography>
+              ))}
+            </div>
+          )
+        }
+      },
+
+      {
+        name: 'Edit?',
+        key: 'edit_or_copy',
+        options: {
+          filter: false,
+          download: false,
+          customBodyRender: (id) => (
+            <div>
+              <Link to={`/admin/edit/${id}/tag-collection`}>
+                <EditIcon size="small" variant="outlined" color="secondary" />
+              </Link>
+            &nbsp;&nbsp;
+            </div>
+          )
+        }
+      },
+    ];
+
+    return cols;
+  }
+
+  // renderTable = (data, classes) => (
+  //   <PapperBlock noMargin title="All Tag Collections" icon="ios-share-outline" whiteBg desc="">
+  //     <div className={classes.root}>
+  //       <Table className={classNames(classes.tableLong, classes.stripped)} padding="dense">
+  //         <TableHead>
+  //           <TableRow>
+  //             <TableCell>ID</TableCell>
+  //             <TableCell>Name</TableCell>
+  //             <TableCell>Is Global</TableCell>
+  //             <TableCell>Tags</TableCell>
+  //           </TableRow>
+  //         </TableHead>
+  //         <TableBody>
+  //           {data.map(n => ([
+  //             <TableRow key={n.id}>
+  //               <TableCell padding="dense">
+  //                 <div className={classes.flex}>
+  //                   <div>
+  //                     <Typography variant="caption">{n.id}</Typography>
+  //                   </div>
+  //                 </div>
+  //               </TableCell>
+  //               <TableCell padding="dense">
+  //                 <div className={classes.flex}>
+  //                   <div>
+  //                     <Typography variant="subtitle1">{n.name}</Typography>
+  //                     {/* <a href={`/admin/category/${n.id}/edit`} className={classes.downloadInvoice}>
+  //                       <Edit />
+  //                       &nbsp; Edit
+  //                     </a> */}
+  //                   </div>
+  //                 </div>
+  //               </TableCell>
+  //               <TableCell align="left">
+  //                 <Typography variant="caption">
+  //                   { n.is_global ? 'Global' : 'Not Global' }
+  //                 </Typography>
+  //               </TableCell>
+  //               <TableCell>
+  //                 <div className={classes.taskStatus}>
+  //                   <Icon className={classes.taskIcon}>{n.is_geographically_focused ? 'location_on' : 'blur_on'}</Icon>
+  //                   {n.tags.map(t => (
+  //                     <Typography key={t.id} variant="caption">
+  //                       { t.name }
+  //                       ,&nbsp;&nbsp;
+  //                     </Typography>
+  //                   ))}
+  //                 </div>
+  //               </TableCell>
+  //             </TableRow>
+  //           ]))}
+  //         </TableBody>
+  //       </Table>
+  //     </div>
+  //   </PapperBlock>
+  // )
 
 
   render() {
     const title = brand.name + ' - All Tag Collections';
     const description = brand.desc;
-    const { tagCollections } = this.state;
+    const { data, columns, loading } = this.state;
     const { classes } = this.props;
-
+    console.log(data)
+    const options = {
+      filterType: 'dropdown',
+      responsive: 'stacked',
+      print: true,
+      rowsPerPage: 10,
+      onRowsDelete: (rowsDeleted) => {
+        const idsToDelete = rowsDeleted.data;
+        idsToDelete.forEach(d => {
+          const tagCollectionId = data[d.index][0];
+          apiCall('/tag_collections.delete', { tag_collection_id: tagCollectionId });
+        });
+      }
+    };
+    if (loading) {
+      return (
+        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+          <Grid item xs={12} md={6}>
+            <Paper className={classes.root}>
+              <div className={classes.root}>
+                <LinearProgress />
+                <h1>Fetching all Tag Collections.  This may take a while...</h1>
+                <br />
+                <LinearProgress color="secondary" />
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      );
+    }
     return (
 
       <div>
@@ -114,8 +216,14 @@ class AllTagCollections extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-
-        {this.renderTable(tagCollections, classes)}
+        <div className={classes.table}>
+          <MUIDataTable
+            title="All Tag Collections"
+            data={data}
+            columns={columns}
+            options={options}
+          />
+        </div>
 
       </div>
     );

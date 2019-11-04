@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import MassEnergizeForm from '../_FormGenerator';
+import { apiCall } from '../../../utils/messenger';
 
 const styles = theme => ({
   root: {
@@ -28,16 +29,26 @@ const styles = theme => ({
 });
 
 
-class CreateNewCommunityForm extends Component {
+class EditCommunityByCommunityAdmin extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      formJson: null
+      formJson: null,
+      community: null
     };
   }
 
 
   async componentDidMount() {
+    const { id } = this.props.match.params;
+    const communityResponse = await apiCall('/communities.info', { community_id: id });
+    if (communityResponse && !communityResponse.success) {
+      return;
+    }
+
+    const community = communityResponse.data;
+    await this.setStateAsync({ community });
+
     const formJson = await this.createFormJson();
     await this.setStateAsync({ formJson });
   }
@@ -49,16 +60,31 @@ class CreateNewCommunityForm extends Component {
   }
 
   createFormJson = async () => {
+    const { community } = this.state;
+    console.log(community);
+    // if (!community) return {};
+
     const formJson = {
-      title: 'Create New Community',
+      title: 'Edit your Community',
       subTitle: '',
-      method: '/communities.create',
-      successRedirectPage: '/admin/read/communities',
+      method: '/communities.update',
+      successRedirectPage: `/admin/community/${community.id}/edit`,
       fields: [
         {
           label: 'About this Community',
           fieldType: 'Section',
           children: [
+            {
+              name: 'id',
+              label: 'Community ID',
+              placeholder: 'eg. 10',
+              fieldType: 'TextField',
+              contentType: 'number',
+              isRequired: true,
+              defaultValue: community.id,
+              dbName: 'community_id',
+              readOnly: true
+            },
             {
               name: 'name',
               label: 'Name of this Community',
@@ -66,7 +92,7 @@ class CreateNewCommunityForm extends Component {
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
-              defaultValue: '',
+              defaultValue: community.name,
               dbName: 'name',
               readOnly: false
             },
@@ -77,7 +103,7 @@ class CreateNewCommunityForm extends Component {
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
-              defaultValue: '',
+              defaultValue: community.subdomain,
               dbName: 'subdomain',
               readOnly: false
             },
@@ -89,7 +115,7 @@ class CreateNewCommunityForm extends Component {
               contentType: 'text',
               isRequired: true,
               isMultiline: true,
-              defaultValue: '',
+              defaultValue: community.about_community,
               dbName: 'about_community',
               readOnly: false
             },
@@ -98,7 +124,7 @@ class CreateNewCommunityForm extends Component {
               label: 'Is this community Geographically focused?',
               fieldType: 'Radio',
               isRequired: false,
-              defaultValue: 'false',
+              defaultValue: community.is_geographically_focused ? 'true' : 'false',
               dbName: 'is_geographically_focused',
               readOnly: false,
               data: [
@@ -115,7 +141,7 @@ class CreateNewCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: '',
+                    defaultValue: `${community.location && community.location.address ? community.location.address : ''}`,
                     dbName: 'address',
                     readOnly: false
                   },
@@ -126,7 +152,7 @@ class CreateNewCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: '',
+                    defaultValue: `${community.location && community.location.unit ? community.location.unit : ''}`,
                     dbName: 'unit',
                     readOnly: false
                   },
@@ -137,7 +163,7 @@ class CreateNewCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: '',
+                    defaultValue: `${community.location && community.location.city ? community.location.city : ''}`,
                     dbName: 'city',
                     readOnly: false
                   },
@@ -148,7 +174,7 @@ class CreateNewCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: '',
+                    defaultValue: `${community.location && community.location.state ? community.location.state : ''}`,
                     dbName: 'state',
                     readOnly: false
                   },
@@ -159,7 +185,7 @@ class CreateNewCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: '',
+                    defaultValue: `${community.location && community.location.zipcode ? community.location.zipcode : ''}`,
                     dbName: 'zipcode',
                     readOnly: false
                   },
@@ -170,7 +196,7 @@ class CreateNewCommunityForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: '',
+                    defaultValue: `${community.location && community.location.country ? community.location.country : ''}`,
                     dbName: 'country',
                     readOnly: false
                   },
@@ -182,21 +208,8 @@ class CreateNewCommunityForm extends Component {
               label: 'Should this go live now?',
               fieldType: 'Radio',
               isRequired: false,
-              defaultValue: 'false',
+              defaultValue: community.is_published ? 'true' : 'false',
               dbName: 'is_published',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ],
-            },
-            {
-              name: 'is_approved',
-              label: 'Do you approve this community? (Check yes after background check)',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: 'true',
-              dbName: 'is_approved',
               readOnly: false,
               data: [
                 { id: 'false', value: 'No' },
@@ -216,7 +229,7 @@ class CreateNewCommunityForm extends Component {
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
-              defaultValue: '',
+              defaultValue: community.owner_name,
               dbName: 'owner_name',
               readOnly: false
             },
@@ -227,7 +240,7 @@ class CreateNewCommunityForm extends Component {
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
-              defaultValue: '',
+              defaultValue: community.owner_email,
               dbName: 'owner_email',
               readOnly: false
             },
@@ -239,7 +252,7 @@ class CreateNewCommunityForm extends Component {
               contentType: 'text',
               isRequired: true,
               defaultValue: '',
-              dbName: 'owner_phone_number',
+              dbName: community.owner_phone_number,
               readOnly: false
             },
           ]
@@ -249,27 +262,16 @@ class CreateNewCommunityForm extends Component {
           placeholder: 'Upload a Logo',
           fieldType: 'File',
           dbName: 'image',
-          label: 'Upload a logo for this community',
+          previewLink: `${community.logo && community.logo.url}`,
+          label: 'Upload a new logo for this community',
           selectMany: false,
           isRequired: false,
           defaultValue: '',
           filesLimit: 1
-        },
-        {
-          name: 'accepted_terms_and_conditions',
-          label: 'Accept Terms And Conditions',
-          fieldType: 'Radio',
-          isRequired: false,
-          defaultValue: 'false',
-          dbName: 'accepted_terms_and_conditions',
-          readOnly: false,
-          data: [
-            { id: 'false', value: 'No' },
-            { id: 'true', value: 'Yes' }
-          ]
-        },
+        }
       ]
     };
+
     return formJson;
   }
 
@@ -289,9 +291,9 @@ class CreateNewCommunityForm extends Component {
   }
 }
 
-CreateNewCommunityForm.propTypes = {
+EditCommunityByCommunityAdmin.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
 
-export default withStyles(styles, { withTheme: true })(CreateNewCommunityForm);
+export default withStyles(styles, { withTheme: true })(EditCommunityByCommunityAdmin);
