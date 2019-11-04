@@ -56,11 +56,12 @@ class NormalAdminHome extends PureComponent {
   }
 
   componentDidMount = () => {
-    this.props.ifExpired();
-    this.callForTestimonials();
-    this.callForActions();
-    this.callForEvents();
+    // this.props.ifExpired();
+    // this.callForTestimonials();
+    // this.callForActions();
+    // this.callForEvents();
   }
+
   findCommunityObj = (name) => {
     const auth = this.props.auth;
     let section = auth?auth.communities :[];
@@ -85,7 +86,7 @@ class NormalAdminHome extends PureComponent {
     const title = brand.name + ' - Summary Dashboard';
     const description = brand.desc;
     const { classes, selected_community, auth } = this.props;
-    const communities = auth ? auth.communities : [];
+    const communities = auth ? auth.admin_at : [];
     const community = selected_community ? selected_community.name : "Choose a community";
     const noc = auth? auth.communities.length : 0;
     return (

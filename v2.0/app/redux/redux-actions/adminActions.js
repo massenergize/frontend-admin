@@ -214,7 +214,7 @@ export const reduxIfExpired = (errorMsg) => {
 };
 
 export const reduxCallCommunities = () => dispatch => {
-  apiCall('/communities.list').then(res => {
+  apiCall('/communities.listForCommunityAdmin').then(res => {
     if (res.data) {
       dispatch(reduxLoadAllCommunities(res.data));
     }

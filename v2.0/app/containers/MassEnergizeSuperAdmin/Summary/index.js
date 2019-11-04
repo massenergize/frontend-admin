@@ -14,11 +14,13 @@ import {
   CarouselWidget,
   NewsWidget
 } from 'dan-components';
+import { connectRouter } from 'connected-react-router';
 import styles from './dashboard-jss';
 import { getTestimonialsData, getActionsData, getEventsData } from '../../../api/data';
-import { connectRouter } from 'connected-react-router';
 import { bindActionCreators } from 'redux';
-import { reduxLoadSelectedCommunity, reduxIfExpired, reduxCheckUser, reduxGetAllUsers, reduxCallCommunities, reduxGetAllTags } from '../../../redux/redux-actions/adminActions';
+import {
+ reduxLoadSelectedCommunity, reduxIfExpired, reduxCheckUser, reduxGetAllUsers, reduxCallCommunities, reduxGetAllTags 
+} from '../../../redux/redux-actions/adminActions';
 
 class SummaryDashboard extends PureComponent {
   constructor(props) {
@@ -29,10 +31,10 @@ class SummaryDashboard extends PureComponent {
   callForEvents = () => {
     const me = this;
     getEventsData().then(res => {
-      console.log("i am the events",res);
+      console.log('i am the events', res);
       me.setState({ events: res.data });
     }).catch(err => {
-      
+
     });
   }
 
@@ -55,13 +57,14 @@ class SummaryDashboard extends PureComponent {
   }
 
   componentDidMount = () => {
-    //this.props.ifExpired();
-    this.callForTestimonials();
-    this.callForActions();
-    this.callForEvents();
+    // this.props.ifExpired();
+    // this.callForTestimonials();
+    // this.callForActions();
+    // this.callForEvents();
   }
+
   findCommunityObj = (name) => {
-    let section = this.props.communities;
+    const section = this.props.communities;
     for (let i = 0; i < section.length; i++) {
       if (section[i].name === name) {
         return section[i];
@@ -70,21 +73,21 @@ class SummaryDashboard extends PureComponent {
     return null;
   }
 
-  chooseCommunity = (event) =>{
-    let obj = this.findCommunityObj(event.target.value); 
-    this.props.selectCommunity(obj); 
-    if(obj){
+  chooseCommunity = (event) => {
+    const obj = this.findCommunityObj(event.target.value);
+    this.props.selectCommunity(obj);
+    if (obj) {
       window.location = `/admin/community/${obj.id}/profile`;
     }
   }
 
-  
+
   render() {
     const title = brand.name + ' - Summary Dashboard';
     const description = brand.desc;
-    const { classes, communities,selected_community } = this.props;
-    const community = selected_community? selected_community.name :"Choose a community";
-    
+    const { classes, communities, selected_community } = this.props;
+    const community = selected_community ? selected_community.name :'Choose a community';
+
     return (
       <div>
         <Helmet>
@@ -122,13 +125,13 @@ class SummaryDashboard extends PureComponent {
             ))}
           </TextField>
         </div>
-        <Grid container className={classes.root}>
+        {/* <Grid container className={classes.root}>
           <CounterChartWidget />
         </Grid>
-        <Divider className={classes.divider} />
+        <Divider className={classes.divider} /> */}
         {/* <SalesChartWidget /> */}
         <Divider className={classes.divider} />
-        <Grid container spacing={24} className={classes.root}>
+        {/* <Grid container spacing={24} className={classes.root}>
           <Grid item md={4} xs={12}>
             <CarouselWidget goals={this.state.testimonials} />
           </Grid>
@@ -139,7 +142,7 @@ class SummaryDashboard extends PureComponent {
             <NewsWidget kind="event" dataCollection={this.state.events} />
           </Grid>
 
-        </Grid>
+        </Grid> */}
       </div>
     );
   }
@@ -149,20 +152,16 @@ SummaryDashboard.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => {
-  return {
+const mapStateToProps = (state) => ({
     communities: state.getIn(['communities']), 
     selected_community:state.getIn(['selected_community'])
-  }
-}
+  });
 
-const mapDispatchToProps = (dispatch)=>{
-  return bindActionCreators({
+const mapDispatchToProps = (dispatch) => bindActionCreators({
     selectCommunity: reduxLoadSelectedCommunity, 
     ifExpired : reduxCheckUser
     
-  },dispatch)
-}
+  },dispatch);
 const summaryMapped = connect(mapStateToProps, mapDispatchToProps)(SummaryDashboard);
 
 export default withStyles(styles)(summaryMapped);
