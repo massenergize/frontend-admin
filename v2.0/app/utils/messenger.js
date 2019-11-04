@@ -28,8 +28,7 @@ function checkAuthUser() {
   }
 }
 export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = null) {
-  // checkAuthUser();
-  const idToken = localStorage.getItem('idToken');
+  const idToken = localStorage.getItem("idToken");
   const response = await fetch(`${API_HOST}/v3${destinationUrl}`, {
     credentials: 'include',
     method: 'POST',
@@ -98,7 +97,7 @@ export async function rawCall(destinationUrl, dataToSend = {}, relocationPage = 
  * general while avoiding CORS issues.
  */
 export async function apiCallWithMedia(destinationUrl, dataToSend = {}, relocationPage = null) {
-  checkAuthUser();
+  //checkAuthUser();
   const formData = new FormData();
   Object.keys(dataToSend).map(k => (formData.append(k, dataToSend[k])));
 
@@ -208,8 +207,9 @@ export function cleanFormData(formValues) {
 }
 
 export async function fetchData(sourceUrl) {
-  checkAuthUser();
-  const idToken = localStorage.getItem('idToken');
+  //checkAuthUser();
+  const idToken = localStorage.getItem("idToken");
+
   return fetch(`${API_HOST}/${sourceUrl}`, {
     method: 'GET',
     credentials: 'include',
