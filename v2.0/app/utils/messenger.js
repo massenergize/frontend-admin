@@ -87,9 +87,11 @@ export async function rawCall(destinationUrl, dataToSend = {}, relocationPage = 
     if (relocationPage && json && json.success) {
       window.location.href = relocationPage;
     }
-    // if (json && !json.success && json.error === 'Signature has expired') {
-    //   window.location.href = '/login';
-    // }
+    if (json && !json.success && json.error === 'Signature has expired') {
+      localStorage.removeItem('authUser');
+      localStorage.removeItem('idToken');
+      window.location.href = '/login';
+    }
     return json;
   } catch (error) {
     return { success: false, error: error.toString() };
