@@ -81,6 +81,7 @@ class AllEvents extends React.Component {
           initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
         },
         `${d.name}...`.substring(0, 30), // limit to first 30 chars
+        d.rank,
         `${d.description}...`.substring(0, 20), // limit to first 20 chars
         `${d.tags.map(t => t.name).join(', ')}`,
         d.community && d.community.name,
@@ -210,6 +211,13 @@ class AllEvents extends React.Component {
     {
       name: 'Name',
       key: 'name',
+      options: {
+        filter: true,
+      }
+    },
+    {
+      name: 'Rank',
+      key: 'rank',
       options: {
         filter: true,
       }

@@ -27,12 +27,12 @@ import Chip from '@material-ui/core/Chip';
 // import Avatar from '@material-ui/core/Avatar';
 // import Icon from '@material-ui/core/Icon';
 import messageStyles from 'dan-styles/Messages.scss';
-import { apiCall } from '../../../utils/messenger';
-import styles from '../../../components/Widget/widget-jss';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { apiCall } from '../../../utils/messenger';
+import styles from '../../../components/Widget/widget-jss';
 import { reduxGetAllCommunityTestimonials, reduxGetAllTestimonials } from '../../../redux/redux-actions/adminActions';
-import CommunitySwitch from './../Summary/CommunitySwitch'; 
+import CommunitySwitch from '../Summary/CommunitySwitch';
 class AllTestimonials extends React.Component {
   constructor(props) {
     super(props);
@@ -46,10 +46,10 @@ class AllTestimonials extends React.Component {
   async componentDidMount() {
     const user = this.props.auth ? this.props.auth : {};
     if (user.is_super_admin) {
-      await this.props.callTestimonialsForSuperAdmin()
+      await this.props.callTestimonialsForSuperAdmin();
     }
     if (user.is_community_admin) {
-      var com = this.props.community ? this.props.community : user.communities[0];
+      const com = this.props.community ? this.props.community : user.communities[0];
       await this.props.callTestimonialsForNormalAdmin(com.id);
     }
     // const allTestimonialsResponse = await apiCall('/testimonials.listForSuperAdmin');
@@ -74,17 +74,20 @@ class AllTestimonials extends React.Component {
     // // await this.setStateAsync({ communities: response.data });
     // }
   }
-  showCommunitySwitch = ()=>{
-    const user= this.props.auth? this.props.auth: {}; 
-    if(user.is_community_admin){
-      return(
-        <CommunitySwitch actionToPerform={this.handleCommunityChange}/>
-      )
+
+  showCommunitySwitch = () => {
+    const user = this.props.auth ? this.props.auth : {};
+    if (user.is_community_admin) {
+      return (
+        <CommunitySwitch actionToPerform={this.handleCommunityChange} />
+      );
     }
   }
-  handleCommunityChange =(id)=>{
+
+  handleCommunityChange =(id) => {
     this.props.callTestimonialsForNormalAdmin(id);
   }
+
   fashionData = (data) => {
     data = data.map(d => (
       [
@@ -94,9 +97,10 @@ class AllTestimonials extends React.Component {
           initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
         },
         `${d.title}...`.substring(0, 30), // limit to first 30 chars
+        d.rank,
         `${d.body}...`.substring(0, 30), // limit to first 30 chars
         `${d.user ? d.user.full_name : ''}...`.substring(0, 20), // limit to first 20 chars
-        `${d.action ? d.action.title : ''} ${d.action && d.action.community ? ` -  (${d.action.community.name})` : ''}`,
+        `${d.action ? d.action.title : ''} ${d.action && d.action.community ? ` -  (${d.action.community.name})` : ''}...`.substring(0, 20),
         `${d.is_published && d.is_approved ? 'Live' : 'Not Live'}`,
         d.id
       ]
@@ -144,6 +148,13 @@ class AllTestimonials extends React.Component {
       key: 'title',
       options: {
         filter: true,
+      }
+    },
+    {
+      name: 'Rank',
+      key: 'rank',
+      options: {
+        filter: false,
       }
     },
     {
@@ -332,7 +343,7 @@ function mapStateToProps(state) {
     auth: state.getIn(['auth']),
     allTestimonials: state.getIn(['allTestimonials']),
     community: state.getIn(['selected_community'])
-  }
+  };
 }
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({

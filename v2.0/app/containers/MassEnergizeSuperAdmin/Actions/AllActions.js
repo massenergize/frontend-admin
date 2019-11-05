@@ -80,6 +80,7 @@ class AllActions extends React.Component {
           initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
         },
         `${d.title}...`.substring(0, 30), // limit to first 30 chars
+        d.rank,
         `${d.featured_summary || 'No summary Provided'}...`.substring(0, 20), // limit to first 20 chars
         `${d.tags.map(t => t.name).join(', ')} `,
         d.community && d.community.name,
@@ -112,6 +113,13 @@ class AllActions extends React.Component {
     {
       name: 'Title',
       key: 'title',
+      options: {
+        filter: true,
+      }
+    },
+    {
+      name: 'Rank',
+      key: 'rank',
       options: {
         filter: true,
       }
