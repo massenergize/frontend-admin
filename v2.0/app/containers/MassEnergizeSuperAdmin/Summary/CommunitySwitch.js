@@ -18,7 +18,7 @@ class CommunitySwitch extends PureComponent {
 
   findCommunityObj = (name) => {
     const auth = this.props.auth;
-    let section = auth?auth.communities :[];
+    let section = auth ? auth.admin_at : [];
     for (let i = 0; i < section.length; i++) {
       if (section[i].name === name) {
         return section[i];
@@ -30,15 +30,14 @@ class CommunitySwitch extends PureComponent {
   chooseCommunity = (event) => {
     let obj = this.findCommunityObj(event.target.value);
     this.props.selectCommunity(obj);
-    console.log(" LOADING FOR:::", obj.name, obj.id)
     this.props.actionToPerform(obj.id);
   }
 
 
   render() {
     const {classes, auth, selected_community} = this.props;
-    const communities = auth ? auth.communities : {};
-    const firstCom = auth? auth.communities[0].name :"Choose Community"
+    const communities = auth ? auth.admin_at : {};
+    const firstCom = auth? auth.admin_at[0].name :"Choose Community"
     const community = selected_community ? selected_community.name :firstCom;
     return (
       <div>

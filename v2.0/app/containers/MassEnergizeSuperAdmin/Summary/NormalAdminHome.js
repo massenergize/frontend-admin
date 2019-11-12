@@ -64,7 +64,7 @@ class NormalAdminHome extends PureComponent {
 
   findCommunityObj = (name) => {
     const auth = this.props.auth;
-    let section = auth?auth.communities :[];
+    let section = auth ? auth.admin_at : [];
     for (let i = 0; i < section.length; i++) {
       if (section[i].name === name) {
         return section[i];
@@ -87,8 +87,9 @@ class NormalAdminHome extends PureComponent {
     const description = brand.desc;
     const { classes, selected_community, auth } = this.props;
     const communities = auth ? auth.admin_at : [];
+    console.log(communities)
     const community = selected_community ? selected_community.name : "Choose a community";
-    const noc = auth? auth.communities.length : 0;
+    const noc = auth? auth.admin_at.length : 0;
     return (
       <div>
         <Helmet>
