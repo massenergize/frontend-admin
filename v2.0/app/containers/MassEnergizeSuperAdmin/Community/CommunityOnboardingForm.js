@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import states from 'dan-api/data/states';
+import countries from 'dan-api/data/countries';
 import { withStyles } from '@material-ui/core/styles';
 import MassEnergizeForm from '../_FormGenerator';
 
@@ -49,6 +51,7 @@ class CreateNewCommunityForm extends Component {
   }
 
   createFormJson = async () => {
+    console.log(states)
     const formJson = {
       title: 'Create New Community',
       subTitle: '',
@@ -142,17 +145,6 @@ class CreateNewCommunityForm extends Component {
                     readOnly: false
                   },
                   {
-                    name: 'state',
-                    label: 'State ',
-                    placeholder: 'eg. New York',
-                    fieldType: 'TextField',
-                    contentType: 'text',
-                    isRequired: false,
-                    defaultValue: '',
-                    dbName: 'state',
-                    readOnly: false
-                  },
-                  {
                     name: 'zipcode',
                     label: 'Zip code ',
                     placeholder: 'eg. 80202',
@@ -167,12 +159,30 @@ class CreateNewCommunityForm extends Component {
                     name: 'country',
                     label: 'Which Country is this community Located?',
                     placeholder: 'eg. United States',
-                    fieldType: 'TextField',
+                    fieldType: 'Dropdown',
                     contentType: 'text',
-                    isRequired: false,
-                    defaultValue: '',
+                    isRequired: true,
+                    data: countries,
+                    defaultValue: 'United States',
                     dbName: 'country',
-                    readOnly: false
+                    readOnly: false,
+                    child: {
+                      valueToCheck: 'United States',
+                      fields: [
+                        {
+                          name: 'state',
+                          label: 'State ',
+                          placeholder: 'eg. New York',
+                          fieldType: 'Dropdown',
+                          contentType: 'text',
+                          isRequired: false,
+                          data: states,
+                          defaultValue: '',
+                          dbName: 'state',
+                          readOnly: false
+                        },
+                      ]
+                    }
                   },
                 ]
               }

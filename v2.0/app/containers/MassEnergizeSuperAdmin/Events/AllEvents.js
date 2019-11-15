@@ -46,7 +46,7 @@ class AllEvents extends React.Component {
       this.props.callForSuperAdminEvents();
     }
     if (user.is_community_admin) {
-      var com = community ? community : user.communities[0];
+      var com = community ? community : user.admin_at[0];
       this.props.callForNormalAdminEvents(com.id);
     }
     // await this.setStateAsync({ loading: false });

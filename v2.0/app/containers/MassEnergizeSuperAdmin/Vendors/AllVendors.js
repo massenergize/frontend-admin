@@ -59,7 +59,7 @@ class AllVendors extends React.Component {
       this.props.callVendorsForSuperAdmin();
     }
     if (user.is_community_admin) {
-      var com = this.props.community ? this.props.community : user.communities[0]
+      var com = this.props.community ? this.props.community : user.admin_at[0]
       this.props.callVendorsForNormalAdmin(com.id)
     }
     // const allVendorsResponse = await apiCall('/vendors.listForSuperAdmin');

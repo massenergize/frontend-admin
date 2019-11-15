@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import countries from 'dan-api/data/countries';
+import states from 'dan-api/data/states';
 import MassEnergizeForm from '../_FormGenerator';
 import { apiCall } from '../../../utils/messenger';
 
@@ -174,6 +176,7 @@ class EditCommunityByCommunityAdmin extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
+                    data: states,
                     defaultValue: `${community.location && community.location.state ? community.location.state : ''}`,
                     dbName: 'state',
                     readOnly: false
@@ -193,12 +196,30 @@ class EditCommunityByCommunityAdmin extends Component {
                     name: 'country',
                     label: 'Which Country is this community Located?',
                     placeholder: 'eg. United States',
-                    fieldType: 'TextField',
+                    fieldType: 'Dropdown',
                     contentType: 'text',
-                    isRequired: false,
-                    defaultValue: `${community.location && community.location.country ? community.location.country : ''}`,
+                    isRequired: true,
+                    data: countries,
+                    defaultValue: `${community.location && community.location.country ? community.location.country : 'United States'}`,
                     dbName: 'country',
-                    readOnly: false
+                    readOnly: false,
+                    child: {
+                      valueToCheck: 'United States',
+                      fields: [
+                        {
+                          name: 'state',
+                          label: 'State ',
+                          placeholder: 'eg. New York',
+                          fieldType: 'Dropdown',
+                          contentType: 'text',
+                          isRequired: false,
+                          data: states,
+                          defaultValue: `${community.location && community.location.state ? community.location.state : ''}`,
+                          dbName: 'state',
+                          readOnly: false
+                        },
+                      ]
+                    }
                   },
                 ]
               }

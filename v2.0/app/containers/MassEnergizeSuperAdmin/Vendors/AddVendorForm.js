@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import states from 'dan-api/data/states';
+import countries from 'dan-api/data/countries';
 import { withStyles } from '@material-ui/core/styles';
 import MassEnergizeForm from '../_FormGenerator';
+import { apiCall } from '../../../utils/messenger';
 
 const styles = theme => ({
   root: {
@@ -32,13 +35,48 @@ class CreateNewVendorForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      formJson: null
+      formJson: null, communities: []
     };
   }
 
 
   async componentDidMount() {
+    const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
+    console.log(tagCollectionsResponse)
+    const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
+    if (communitiesResponse && communitiesResponse.data) {
+      const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
+      await this.setStateAsync({ communities });
+    }
+
     const formJson = await this.createFormJson();
+    if (tagCollectionsResponse && tagCollectionsResponse.data) {
+      const section = {
+        label: 'Please select tag(s) that apply to this vendor',
+        fieldType: 'Section',
+        children: []
+      };
+
+      Object.values(tagCollectionsResponse.data).forEach(tCol => {
+        const newField = {
+          name: tCol.name,
+          label: `${tCol.name} ${tCol.allow_multiple ? '(You can select multiple)' : '(Only one selection allowed)'}`,
+          placeholder: '',
+          fieldType: 'Checkbox',
+          selectMany: tCol.allow_multiple,
+          defaultValue: [],
+          dbName: 'tags',
+          data: tCol.tags.map(t => ({ ...t, displayName: t.name, id: '' + t.id }))
+        };
+
+        // want this to be the 5th field
+        section.children.push(newField);
+      });
+
+      // want this to be the 2nd field
+      formJson.fields.splice(1, 0, section);
+    }
+
     await this.setStateAsync({ formJson });
   }
 
@@ -49,6 +87,7 @@ class CreateNewVendorForm extends Component {
   }
 
   createFormJson = async () => {
+    const { communities } = this.state;
     const formJson = {
       title: 'Create New Vendor',
       subTitle: '',
@@ -80,6 +119,19 @@ class CreateNewVendorForm extends Component {
               defaultValue: '',
               dbName: 'phone_number',
               readOnly: false
+            },
+            {
+              name: 'communities',
+              label: 'Which communities would this vendor service ?',
+              placeholder: 'eg. +1(571)-000-2231',
+              fieldType: 'Checkbox',
+              contentType: 'text',
+              isRequired: true,
+              selectMany: true,
+              defaultValue: [],
+              dbName: 'communities',
+              readOnly: false,
+              data: communities || [],
             },
             {
               name: 'email',
@@ -169,8 +221,9 @@ class CreateNewVendorForm extends Component {
                     name: 'state',
                     label: 'State ',
                     placeholder: 'eg. New York',
-                    fieldType: 'TextField',
+                    fieldType: 'Dropdown',
                     contentType: 'text',
+                    data: states,
                     isRequired: true,
                     defaultValue: '',
                     dbName: 'state',
@@ -180,12 +233,30 @@ class CreateNewVendorForm extends Component {
                     name: 'country',
                     label: 'Which Country is this community Located?',
                     placeholder: 'eg. United States',
-                    fieldType: 'TextField',
+                    fieldType: 'Dropdown',
                     contentType: 'text',
                     isRequired: true,
-                    defaultValue: '',
+                    data: countries,
+                    defaultValue: 'United States',
                     dbName: 'country',
-                    readOnly: false
+                    readOnly: false,
+                    child: {
+                      valueToCheck: 'United States',
+                      fields: [
+                        {
+                          name: 'state',
+                          label: 'State ',
+                          placeholder: 'eg. New York',
+                          fieldType: 'Dropdown',
+                          contentType: 'text',
+                          isRequired: false,
+                          data: states,
+                          defaultValue: '',
+                          dbName: 'state',
+                          readOnly: false
+                        },
+                      ]
+                    }
                   },
                 ]
               }

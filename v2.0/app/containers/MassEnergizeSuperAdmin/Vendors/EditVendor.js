@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import states from 'dan-api/data/states';
+import countries from 'dan-api/data/countries';
 import MassEnergizeForm from '../_FormGenerator';
 import { apiCall } from '../../../utils/messenger';
 
@@ -187,26 +189,33 @@ class CreateNewVendorForm extends Component {
                     readOnly: false
                   },
                   {
-                    name: 'state',
-                    label: 'State ',
-                    placeholder: 'eg. New York',
-                    fieldType: 'TextField',
-                    contentType: 'text',
-                    isRequired: true,
-                    defaultValue: vendor.location && vendor.location.state,
-                    dbName: 'state',
-                    readOnly: false
-                  },
-                  {
                     name: 'country',
                     label: 'Which Country is this community Located?',
                     placeholder: 'eg. United States',
-                    fieldType: 'TextField',
+                    fieldType: 'Dropdown',
                     contentType: 'text',
                     isRequired: true,
-                    defaultValue: vendor.location && vendor.location.country,
+                    data: countries,
+                    defaultValue: (vendor.location && vendor.location.country) || 'United States',
                     dbName: 'country',
-                    readOnly: false
+                    readOnly: false,
+                    child: {
+                      valueToCheck: 'United States',
+                      fields: [
+                        {
+                          name: 'state',
+                          label: 'State ',
+                          placeholder: 'eg. New York',
+                          fieldType: 'TextField',
+                          contentType: 'text',
+                          isRequired: true,
+                          data: states,
+                          defaultValue: vendor.location && vendor.location.state,
+                          dbName: 'state',
+                          readOnly: false
+                        },
+                      ]
+                    }
                   },
                 ]
               }

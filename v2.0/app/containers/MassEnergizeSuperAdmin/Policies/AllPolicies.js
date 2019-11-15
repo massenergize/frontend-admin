@@ -7,11 +7,11 @@ import MUIDataTable from 'mui-datatables';
 import FileCopy from '@material-ui/icons/FileCopy';
 import EditIcon from '@material-ui/icons/Edit';
 import { Link } from 'react-router-dom';
+import {connect} from 'react-redux'; 
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-import {connect} from 'react-redux'; 
-import {bindActionCreators} from 'redux';
-import CommunitySwitch from './../Summary/CommunitySwitch'; 
+import { bindActionCreators } from 'redux';
+import CommunitySwitch from "../Summary/CommunitySwitch";
 import { reduxGetAllPolicies, reduxGetAllCommunityPolicies } from '../../../redux/redux-actions/adminActions';
 class AllPolicies extends React.Component {
   constructor(props) {
@@ -21,33 +21,36 @@ class AllPolicies extends React.Component {
 
 
   async componentDidMount() {
-   const user = this.props.auth? this.props.auth: {}; 
-   if(user.is_super_admin){
-    this.props.callPoliciesForSuperAdmin();
-   }
-   if(user.is_community_admin){
-     this.props.callPoliciesForNormalAdmin(user.communities[0].id);
-   }
+    const user = this.props.auth ? this.props.auth: {};
+    if (user.is_super_admin) {
+      this.props.callPoliciesForSuperAdmin();
+    }
+    if (user.is_community_admin) {
+      this.props.callPoliciesForNormalAdmin(user.admin_at[0].id);
+    }
   }
 
   showCommunitySwitch = () => {
-    const user= this.props.auth? this.props.auth: {}; 
-    if(user.is_community_admin){
-      return(
-        <CommunitySwitch actionToPerform={this.handleCommunityChange}/>
-      )
+    const user = this.props.auth ? this.props.auth: {};
+    if (user.is_community_admin) {
+      return (
+        <CommunitySwitch actionToPerform={this.handleCommunityChange} />
+      );
     }
   }
-  handleCommunityChange =(id)=>{
+
+  handleCommunityChange =(id) => {
     this.props.callPoliciesForNormalAdmin(id);
   }
-  fashionData =(data)=>{
+
+  fashionData =(data) => {
+    console.log(data)
     const fashioned = data.map(d => (
       [
         d.id,
         d.name,
-        d.community && d.community.name,
-        d.is_published,
+        (d.is_global ? 'Global' : (d.community && d.community.name)),
+        '' + d.is_published,
         d.id
       ]
     ));
@@ -99,7 +102,7 @@ class AllPolicies extends React.Component {
                 const copiedPolicyResponse = await apiCall('/policies.copy', { policy_id: id });
                 const newPolicy = copiedPolicyResponse && copiedPolicyResponse.data;
                 if (newPolicy) {
-                  window.location.href = '/admin/read/policies';
+                  window.location.href = `/admin/edit/${newPolicy.id}/policy`;
                 }
               }}
               to="/admin/read/policies"
@@ -167,7 +170,7 @@ function mapStateToProps(state) {
   return {
     auth: state.getIn(['auth']),
     allPolicies: state.getIn(['allPolicies'])
-  }
+  };
 }
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({

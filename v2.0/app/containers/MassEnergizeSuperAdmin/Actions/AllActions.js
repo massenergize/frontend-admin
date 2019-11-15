@@ -45,7 +45,7 @@ class AllActions extends React.Component {
     }
     if (user.is_community_admin) {
       // not nec.. remove later
-      const comm = community || user.communities[0];
+      const comm = community || user.admin_at[0];
       callCommunityActions(comm.id);
     }
 
@@ -83,7 +83,7 @@ class AllActions extends React.Component {
         d.rank,
         `${d.featured_summary || 'No summary Provided'}...`.substring(0, 20), // limit to first 20 chars
         `${d.tags.map(t => t.name).join(', ')} `,
-        d.community && d.community.name,
+        (d.is_global ? 'Global' : (d.community && d.community.name)),
         d.id
       ]
     ));
@@ -245,7 +245,6 @@ const mapStateToProps = (state) => ({
   auth: state.getIn(['auth']),
   allActions: state.getIn(['allActions']),
   community: state.getIn(['selected_community'])
-  // community:state.getIn(['selected_community'])
 });
 const mapDispatchToProps = (dispatch) => bindActionCreators({
   callAllActions: reduxGetAllActions,

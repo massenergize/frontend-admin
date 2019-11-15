@@ -31,7 +31,7 @@ class AllGoals extends React.Component {
       await this.props.callGoalsForSuperAdmin();
     }
     if (user.is_community_admin) {
-      const com = this.props.community ? this.props.community : user.communities[0];
+      const com = this.props.community ? this.props.community : user.admin_at[0];
       await this.props.callGoalsForNormalAdmin(com.id);
     }
     // const allGoalsResponse = await apiCall('/goals.listForSuperAdmin');

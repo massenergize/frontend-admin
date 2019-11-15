@@ -448,7 +448,8 @@ class MassEnergizeForm extends Component {
                   ))
                 }
               </Select>
-              {field.child && this.getValue(field.name) === field.child.valueToCheck && this.renderField(field.child)}
+              {field.child && (this.getValue(field.name) === field.child.valueToCheck) && this.renderFields(field.child.fields)}
+
             </FormControl>
           </div>
         );

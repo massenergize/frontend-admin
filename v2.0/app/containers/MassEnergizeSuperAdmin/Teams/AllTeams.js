@@ -34,7 +34,7 @@ class AllTeams extends React.Component {
       await this.props.callTeamsForSuperAdmin();
     }
     if (user.is_community_admin) {
-      let com = this.props.community ? this.props.community : user.communities[0];
+      let com = this.props.community ? this.props.community : user.admin_at[0];
       const teams = await this.props.callTeamsForNormalAdmin(com.id);
       await this.setStateAsync({ data: this.fashionData(teams.data) });
     }
