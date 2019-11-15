@@ -5,5 +5,6 @@ export default {
   HTMLField: 'HTMLField',
   Radio: 'Radio',
   TextField: 'TextField',
+  DateTime: 'DateTime',
   Section: 'Section'
 };

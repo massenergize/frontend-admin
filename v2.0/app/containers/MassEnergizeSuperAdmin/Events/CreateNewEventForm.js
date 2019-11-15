@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import timezones from 'dan-api/data/timezones';
+
 import { apiCall } from '../../../utils/messenger';
 import MassEnergizeForm from '../_FormGenerator';
 
@@ -92,7 +94,7 @@ class CreateNewEventForm extends Component {
       title: 'Create New Event',
       subTitle: '',
       method: '/events.create',
-      successRedirectPage: '/admin/read/events',
+      // successRedirectPage: '/admin/read/events',
       fields: [
         {
           label: 'About this event',
@@ -122,9 +124,9 @@ class CreateNewEventForm extends Component {
             },
             {
               name: 'start_date_and_time',
-              label: 'Start Date And Time: YYYY-MM-DD HH:MM',
+              label: 'Start Date And Time',
               placeholder: 'YYYY-MM-DD HH:MM',
-              fieldType: 'TextField',
+              fieldType: 'DateTime',
               contentType: 'text',
               isRequired: true,
               defaultValue: '',
@@ -133,13 +135,25 @@ class CreateNewEventForm extends Component {
             },
             {
               name: 'end_date_and_time',
-              label: 'End Date And Time: YYYY-MM-DD HH:MM',
+              label: 'End Date And Time',
               placeholder: 'YYYY-MM-DD HH:MM',
-              fieldType: 'TextField',
+              fieldType: 'DateTime',
               contentType: 'text',
               isRequired: true,
               defaultValue: '',
               dbName: 'end_date_and_time',
+              readOnly: false
+            },
+            {
+              name: 'timezone',
+              label: 'Please select your time zone',
+              placeholder: 'YYYY-MM-DD HH:MM',
+              fieldType: 'Dropdown',
+              contentType: 'text',
+              data: timezones,
+              isRequired: true,
+              defaultValue: '',
+              dbName: 'timezone',
               readOnly: false
             },
             {

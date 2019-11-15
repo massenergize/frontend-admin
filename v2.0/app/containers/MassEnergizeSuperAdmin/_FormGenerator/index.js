@@ -8,6 +8,8 @@ import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
+import { DateTimePicker, MuiPickersUtilsProvider } from 'material-ui-pickers';
+import MomentUtils from '@date-io/moment';
 import FormControl from '@material-ui/core/FormControl';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormLabel from '@material-ui/core/FormLabel';
@@ -105,6 +107,9 @@ class MassEnergizeForm extends Component {
             break;
           case FieldTypes.File:
             formData[field.name] = [];
+            break;
+          case FieldTypes.DateTime:
+            formData[field.name] = new Date();
             break;
           case FieldTypes.HTMLField:
             if (!field.defaultValue || field.defaultValue === '<p></p>\n') {
@@ -264,6 +269,10 @@ class MassEnergizeForm extends Component {
         switch (field.fieldType) {
           case FieldTypes.HTMLField:
             cleanedValues[field.dbName] = draftToHtml(convertToRaw(fieldValueInForm.getCurrentContent()));
+            break;
+          case FieldTypes.DateTime:
+            console.log(fieldValueInForm.getCurrentContent());
+            cleanedValues[field.dbName] = '' + fieldValueInForm.getCurrentContent();
             break;
           case FieldTypes.Checkbox:
             if (cleanedValues[field.dbName]) {
@@ -547,7 +556,25 @@ class MassEnergizeForm extends Component {
             <br />
             <br />
           </div>
+        );
+      case FieldTypes.DateTime:
+        return (
+          <div key={field.label}>
+            <Typography variant="button" className={classes.divider}>{field.label}</Typography>
+            <div className={classes.picker}>
+              <MuiPickersUtilsProvider utils={MomentUtils}>
+                <DateTimePicker
+                  value={this.getValue(field.name, new Date())}
+                  disablePast
+                  onChange={this.handleFormDataChange}
+                  label="DateTimePicker"
+                />
+              </MuiPickersUtilsProvider>
+            </div>
 
+            <br />
+            <br />
+          </div>
         );
       default:
         return <div key={field.name + field.label} />;
