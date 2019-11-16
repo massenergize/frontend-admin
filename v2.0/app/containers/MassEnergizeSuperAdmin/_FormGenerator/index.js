@@ -25,6 +25,7 @@ import { Editor } from 'react-draft-wysiwyg';
 import { MenuItem } from '@material-ui/core';
 import draftToHtml from 'draftjs-to-html';
 import TextField from '@material-ui/core/TextField';
+import moment from 'moment';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import {
   EditorState, convertToRaw, ContentState, convertFromHTML
@@ -109,7 +110,7 @@ class MassEnergizeForm extends Component {
             formData[field.name] = [];
             break;
           case FieldTypes.DateTime:
-            formData[field.name] = new Date();
+            formData[field.name] = field.defaultValue ? moment(field.defaultValue) : new Date();
             break;
           case FieldTypes.HTMLField:
             if (!field.defaultValue || field.defaultValue === '<p></p>\n') {
@@ -271,8 +272,7 @@ class MassEnergizeForm extends Component {
             cleanedValues[field.dbName] = draftToHtml(convertToRaw(fieldValueInForm.getCurrentContent()));
             break;
           case FieldTypes.DateTime:
-            console.log(fieldValueInForm.getCurrentContent());
-            cleanedValues[field.dbName] = '' + fieldValueInForm.getCurrentContent();
+            cleanedValues[field.dbName] = moment.utc(fieldValueInForm || new Date()).format();
             break;
           case FieldTypes.Checkbox:
             if (cleanedValues[field.dbName]) {
@@ -561,13 +561,13 @@ class MassEnergizeForm extends Component {
         return (
           <div key={field.label}>
             <Typography variant="button" className={classes.divider}>{field.label}</Typography>
-            <div className={classes.picker}>
-              <MuiPickersUtilsProvider utils={MomentUtils}>
+            <div className={classes.picker} style={{ width: '100%' }}>
+              <MuiPickersUtilsProvider utils={MomentUtils} style={{ width: '100%' }}>
                 <DateTimePicker
                   value={this.getValue(field.name, new Date())}
-                  disablePast
                   onChange={this.handleFormDataChange}
-                  label="DateTimePicker"
+                  label={field.label}
+                  format="MM/DD/YYYY, h:mm a"
                 />
               </MuiPickersUtilsProvider>
             </div>

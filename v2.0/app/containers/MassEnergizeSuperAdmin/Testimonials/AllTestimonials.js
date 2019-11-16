@@ -98,7 +98,7 @@ class AllTestimonials extends React.Component {
         },
         `${d.title}...`.substring(0, 30), // limit to first 30 chars
         d.rank,
-        `${d.body}...`.substring(0, 30), // limit to first 30 chars
+        (d.community && d.community.name),
         `${d.user ? d.user.full_name : ''}...`.substring(0, 20), // limit to first 20 chars
         `${d.action ? d.action.title : ''} ${d.action && d.action.community ? ` -  (${d.action.community.name})` : ''}...`.substring(0, 20),
         `${d.is_published && d.is_approved ? 'Live' : 'Not Live'}`,
@@ -158,8 +158,8 @@ class AllTestimonials extends React.Component {
       }
     },
     {
-      name: 'About',
-      key: 'about',
+      name: 'Community',
+      key: 'community',
       options: {
         filter: false,
       }

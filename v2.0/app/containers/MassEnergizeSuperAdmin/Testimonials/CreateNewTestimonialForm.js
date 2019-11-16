@@ -64,7 +64,7 @@ class CreateNewTestimonialForm extends Component {
     const formJson = await this.createFormJson();
     if (tagCollectionsResponse && tagCollectionsResponse.data) {
       const section = {
-        label: 'Please select tag(s) that apply to this event',
+        label: 'Please select tag(s) that apply to this testimonial',
         fieldType: 'Section',
         children: []
       };
@@ -82,7 +82,9 @@ class CreateNewTestimonialForm extends Component {
         };
 
         // want this to be the 5th field
-        section.children.push(newField);
+        if (tCol.name === 'Category') {
+          section.children.push(newField);
+        }
       });
 
       // want this to be the 2nd field

@@ -49,26 +49,6 @@ class AllEvents extends React.Component {
       var com = community ? community : user.admin_at[0];
       this.props.callForNormalAdminEvents(com.id);
     }
-    // await this.setStateAsync({ loading: false });
-    // await this.setStateAsync({ data, loading: false });
-    // const allEventsResponse = this.props.allEvents;
-    // if (allEventsResponse) {
-    //   const data = allEventsResponse.map(d => (
-    //     [
-    //       {
-    //         id: d.id,
-    //         image: d.image,
-    //         initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
-    //       },
-    //       `${d.name}...`.substring(0, 30), // limit to first 30 chars
-    //       `${d.description}...`.substring(0, 20), // limit to first 20 chars
-    //       `${d.tags.map(t => t.name).join(', ')}`,
-    //       d.community && d.community.name,
-    //       d.id
-    //     ]
-    //   ));
-    //   await this.setStateAsync({ data, loading: false });
-    // }
     await this.setStateAsync({ loading: false });
   }
 
@@ -84,7 +64,7 @@ class AllEvents extends React.Component {
         d.rank,
         `${d.description}...`.substring(0, 20), // limit to first 20 chars
         `${d.tags.map(t => t.name).join(', ')}`,
-        d.community && d.community.name,
+        (d.is_global ? 'Global' : (d.community && d.community.name)),
         d.id
       ]
     ));
@@ -97,97 +77,6 @@ class AllEvents extends React.Component {
     });
   }
 
-  // getLocation = location => {
-  //   if (location) {
-  //     const {
-  //       address1, address2, state, zip, country
-  //     } = location;
-  //     return `${address1 ? address1 + ',' : ''}
-  //       ${address2 ? address2 + ', ' : ''}
-  //       ${state ? state + ', ' : ''}
-  //       ${zip || ''}
-  //       ${country || ''}`;
-  //   }
-  //   return '';
-  // };
-
-  // getStatus = isApproved => {
-  //   switch (isApproved) {
-  //     case false: return messageStyles.bgError;
-  //     case true: return messageStyles.bgSuccess;
-  //     default: return messageStyles.bgSuccess;
-  //   }
-  // };
-
-
-  // renderTable = (data, classes) => (
-  //   <PapperBlock noMargin title="All Events" icon="ios-share-outline" whiteBg desc="">
-  //     <div className={classes.root}>
-  //       <Table className={classNames(classes.tableLong, classes.stripped)} padding="dense">
-  //         <TableHead>
-  //           <TableRow>
-  //             <TableCell padding="dense">Event Name</TableCell>
-  //             <TableCell>Community</TableCell>
-  //             <TableCell>Date</TableCell>
-  //             <TableCell>Is Archived</TableCell>
-  //             <TableCell>Location</TableCell>
-  //           </TableRow>
-  //         </TableHead>
-  //         <TableBody>
-  //           {data.map(n => ([
-  //             <TableRow key={n.id}>
-  //               <TableCell padding="dense">
-  //                 <div className={classes.flex}>
-  //                   <Avatar alt={n.name} src={n.image ? n.image.url : imgApi[21]} className={classes.productPhoto} />
-  //                   <div>
-  //                     <Typography variant="caption">{n.id}</Typography>
-  //                     <Typography variant="subtitle1">{n.name}</Typography>
-  //                     <a href={`/admin/event/${n.id}/edit`} className={classes.downloadInvoice}>
-  //                       <Edit />
-  //                       &nbsp; Edit this Event
-  //                     </a>
-  //                   </div>
-  //                 </div>
-  //               </TableCell>
-  //               <TableCell>
-  //                 <div className={classes.flex}>
-  //                   <Avatar alt={n.community && n.community.name} src={n.community.logo ? n.community.logo : imgApi[21]} className={classNames(classes.avatar, classes.sm)} />
-  //                   <div>
-  //                     <Typography>{n.community && n.community.name}</Typography>
-  //                     <Typography variant="caption">
-  //                       <a href={`http:${n.community.subdomain}.massenergize.org`} target="_blank" rel="noopener noreferrer" className={classes.downloadInvoice}>
-  //                         <Language />
-  //                         &nbsp;
-  //                         Visit site
-  //                       </a>
-  //                       &nbsp;
-  //                     </Typography>
-  //                   </div>
-  //                 </div>
-  //               </TableCell>
-  //               <TableCell align="left">
-  //                 <Typography variant="caption">
-  //                   { Date.parse(n.start_date_and_time) }
-  //                 </Typography>
-  //               </TableCell>
-  //               <TableCell>
-  //                 <Chip label={n.is_archived ? 'Yes' : 'No'} className={classNames(classes.chip, this.getStatus(n.is_archived))} />
-  //               </TableCell>
-  //               <TableCell>
-  //                 <div className={classes.taskStatus}>
-  //                   <Icon className={classes.taskIcon}>{n.is_geographically_focused ? 'location_on' : 'blur_on'}</Icon>
-  //                   <Typography variant="caption">
-  //                     {this.getLocation(n.location)}
-  //                   </Typography>
-  //                 </div>
-  //               </TableCell>
-  //             </TableRow>
-  //           ]))}
-  //         </TableBody>
-  //       </Table>
-  //     </div>
-  //   </PapperBlock>
-  // )
 
   getColumns = () => [
     {

@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import states from 'dan-api/data/states';
+import countries from 'dan-api/data/countries';
 import { withStyles } from '@material-ui/core/styles';
 import { apiCall } from '../../../utils/messenger';
 import MassEnergizeForm from '../_FormGenerator';
@@ -75,7 +77,9 @@ class CreateNewEventForm extends Component {
         };
 
         // want this to be the 5th field
-        section.children.push(newField);
+        if (tCol.name === 'Category') {
+          section.children.push(newField);
+        }
       });
 
       // want this to be the 2nd field
@@ -92,7 +96,6 @@ class CreateNewEventForm extends Component {
         res.push('' + s.id);
       }
     });
-    console.log(res);
     return res;
   }
 
@@ -106,7 +109,7 @@ class CreateNewEventForm extends Component {
   createFormJson = async (event) => {
     const { communities } = this.state;
     const { pathname } = window.location;
-
+    console.log(event);
     const formJson = {
       title: 'Create New Event',
       subTitle: '',
@@ -152,9 +155,9 @@ class CreateNewEventForm extends Component {
             },
             {
               name: 'start_date_and_time',
-              label: 'Start Date And Time: YYYY-MM-DD HH:MM',
+              label: 'Start Date And Time',
               placeholder: 'YYYY-MM-DD HH:MM',
-              fieldType: 'TextField',
+              fieldType: 'DateTime',
               contentType: 'text',
               isRequired: true,
               defaultValue: event.start_date_and_time,
@@ -163,9 +166,9 @@ class CreateNewEventForm extends Component {
             },
             {
               name: 'end_date_and_time',
-              label: 'End Date And Time: YYYY-MM-DD HH:MM',
+              label: 'End Date And Time',
               placeholder: 'YYYY-MM-DD HH:MM',
-              fieldType: 'TextField',
+              fieldType: 'DateTime',
               contentType: 'text',
               isRequired: true,
               defaultValue: event.end_date_and_time,
@@ -200,6 +203,86 @@ class CreateNewEventForm extends Component {
               }
             },
           ]
+        },
+        {
+          name: 'have_address',
+          label: 'Do you have an address?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: event.location ? 'true' : 'false',
+          dbName: 'have_address',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+          child: {
+            valueToCheck: 'true',
+            fields: [
+              {
+                name: 'address',
+                label: 'Street Address',
+                placeholder: 'eg. Wayland',
+                fieldType: 'TextField',
+                contentType: 'text',
+                isRequired: true,
+                defaultValue: event.location && event.location.address,
+                dbName: 'address',
+                readOnly: false
+              },
+              {
+                name: 'unit',
+                label: 'Unit Number',
+                placeholder: 'eg. wayland',
+                fieldType: 'TextField',
+                contentType: 'text',
+                isRequired: true,
+                defaultValue: event.location && event.location.unit,
+                dbName: 'unit',
+                readOnly: false
+              },
+              {
+                name: 'city',
+                label: 'City',
+                placeholder: 'eg. wayland',
+                fieldType: 'TextField',
+                contentType: 'text',
+                isRequired: true,
+                defaultValue: event.location && event.location.city,
+                dbName: 'city',
+                readOnly: false
+              },
+              {
+                name: 'country',
+                label: 'Which Country is this community Located?',
+                placeholder: 'eg. United States',
+                fieldType: 'Dropdown',
+                contentType: 'text',
+                isRequired: true,
+                data: countries,
+                defaultValue: (event.location && event.location.country) || 'United States',
+                dbName: 'country',
+                readOnly: false,
+                child: {
+                  valueToCheck: 'United States',
+                  fields: [
+                    {
+                      name: 'state',
+                      label: 'State ',
+                      placeholder: 'eg. New York',
+                      fieldType: 'Dropdown',
+                      contentType: 'text',
+                      isRequired: true,
+                      data: states,
+                      defaultValue: event.location && event.location.state,
+                      dbName: 'state',
+                      readOnly: false
+                    },
+                  ]
+                }
+              },
+            ]
+          }
         },
         {
           name: 'description',

@@ -70,7 +70,9 @@ class CreateNewVendorForm extends Component {
         };
 
         // want this to be the 5th field
-        section.children.push(newField);
+        if (tCol.name === 'Category') {
+          section.children.push(newField);
+        }
       });
 
       // want this to be the 2nd field
@@ -215,18 +217,6 @@ class CreateNewVendorForm extends Component {
                     isRequired: true,
                     defaultValue: '',
                     dbName: 'city',
-                    readOnly: false
-                  },
-                  {
-                    name: 'state',
-                    label: 'State ',
-                    placeholder: 'eg. New York',
-                    fieldType: 'Dropdown',
-                    contentType: 'text',
-                    data: states,
-                    isRequired: true,
-                    defaultValue: '',
-                    dbName: 'state',
                     readOnly: false
                   },
                   {

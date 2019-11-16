@@ -50,7 +50,37 @@ class CreateNewVendorForm extends Component {
     }
 
     const formJson = await this.createFormJson();
-    await this.setStateAsync({ formJson });
+    const tagCollectionsResponse = await apiCall('/tag_collections.listForSuperAdmin');
+    if (tagCollectionsResponse && tagCollectionsResponse.data) {
+      const section = {
+        label: 'Please select tag(s) that apply to this event',
+        fieldType: 'Section',
+        children: []
+      };
+
+      Object.values(tagCollectionsResponse.data).forEach(tCol => {
+        const { vendor } = this.state;
+        const newField = {
+          name: tCol.name,
+          label: `${tCol.name} ${tCol.allow_multiple ? '(You can select multiple)' : '(Only one selection allowed)'}`,
+          placeholder: '',
+          fieldType: 'Checkbox',
+          selectMany: tCol.allow_multiple,
+          defaultValue: this.getSelectedIds(vendor.tags, tCol.tags),
+          dbName: 'tags',
+          data: tCol.tags.map(t => ({ ...t, displayName: t.name, id: '' + t.id }))
+        };
+
+        // want this to be the 5th field
+        if (tCol.name === 'Category') {
+          section.children.push(newField);
+        }
+      });
+
+      // want this to be the 2nd field
+      formJson.fields.splice(1, 0, section);
+    }
+    await this.setStateAsync({ formJson, loading: false });
   }
 
   setStateAsync(state) {
@@ -145,7 +175,7 @@ class CreateNewVendorForm extends Component {
               label: 'Do you have an address?',
               fieldType: 'Radio',
               isRequired: false,
-              defaultValue: 'false',
+              defaultValue: vendor.location ? 'true' : 'false',
               dbName: 'have_address',
               readOnly: false,
               data: [

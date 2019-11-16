@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import states from 'dan-api/data/states';
+import countries from 'dan-api/data/countries';
 import { withStyles } from '@material-ui/core/styles';
-import timezones from 'dan-api/data/timezones';
-
 import { apiCall } from '../../../utils/messenger';
 import MassEnergizeForm from '../_FormGenerator';
 
@@ -72,7 +72,9 @@ class CreateNewEventForm extends Component {
         };
 
         // want this to be the 5th field
-        section.children.push(newField);
+        if (tCol.name === 'Category') {
+          section.children.push(newField);
+        }
       });
 
       // want this to be the 2nd field
@@ -145,18 +147,6 @@ class CreateNewEventForm extends Component {
               readOnly: false
             },
             {
-              name: 'timezone',
-              label: 'Please select your time zone',
-              placeholder: 'YYYY-MM-DD HH:MM',
-              fieldType: 'Dropdown',
-              contentType: 'text',
-              data: timezones,
-              isRequired: true,
-              defaultValue: '',
-              dbName: 'timezone',
-              readOnly: false
-            },
-            {
               name: 'is_global',
               label: 'Is this Event Global',
               fieldType: 'Radio',
@@ -184,6 +174,86 @@ class CreateNewEventForm extends Component {
               }
             },
           ]
+        },
+        {
+          name: 'have_address',
+          label: 'Want to add an address for this event?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: 'false',
+          dbName: 'have_address',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+          child: {
+            valueToCheck: 'true',
+            fields: [
+              {
+                name: 'address',
+                label: 'Street Address',
+                placeholder: 'eg. Wayland',
+                fieldType: 'TextField',
+                contentType: 'text',
+                isRequired: true,
+                defaultValue: '',
+                dbName: 'address',
+                readOnly: false
+              },
+              {
+                name: 'unit',
+                label: 'Unit Number',
+                placeholder: 'eg. wayland',
+                fieldType: 'TextField',
+                contentType: 'text',
+                isRequired: true,
+                defaultValue: '',
+                dbName: 'unit',
+                readOnly: false
+              },
+              {
+                name: 'city',
+                label: 'City',
+                placeholder: 'eg. wayland',
+                fieldType: 'TextField',
+                contentType: 'text',
+                isRequired: true,
+                defaultValue: '',
+                dbName: 'city',
+                readOnly: false
+              },
+              {
+                name: 'country',
+                label: 'Which Country is this community Located?',
+                placeholder: 'eg. United States',
+                fieldType: 'Dropdown',
+                contentType: 'text',
+                isRequired: true,
+                data: countries,
+                defaultValue: 'United States',
+                dbName: 'country',
+                readOnly: false,
+                child: {
+                  valueToCheck: 'United States',
+                  fields: [
+                    {
+                      name: 'state',
+                      label: 'State ',
+                      placeholder: 'eg. New York',
+                      fieldType: 'Dropdown',
+                      contentType: 'text',
+                      isRequired: false,
+                      data: states,
+                      defaultValue: '',
+                      dbName: 'state',
+                      readOnly: false
+                    },
+                  ]
+                }
+              },
+            ]
+          }
         },
         {
           name: 'description',

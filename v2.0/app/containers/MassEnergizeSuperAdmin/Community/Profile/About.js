@@ -8,6 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import moment from 'moment';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import LinearProgress from '@material-ui/core/LinearProgress';
@@ -135,7 +136,7 @@ class About extends React.Component {
                 <Avatar>
                   <DateRange />
                 </Avatar>
-                <ListItemText primary="Date Registered" secondary={`${community.created_at}`} />
+                <ListItemText primary="Date Registered" secondary={`${moment(community.created_at).format('MMMM Do YYYY, h:mm:ss a')}`} />
               </ListItem>
               <ListItem>
                 <Avatar>
