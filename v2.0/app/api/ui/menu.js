@@ -28,6 +28,12 @@ module.exports = [
     ]
   },
   {
+    key: 'users',
+    name: 'Users',
+    icon: 'ios-people',
+    link: '/admin/read/users'
+  },
+  {
     key: 'actions',
     name: 'Actions',
     icon: 'ios-bulb',

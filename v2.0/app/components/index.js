@@ -10,6 +10,7 @@ export SearchUi from './Search/SearchUi';
 export GuideSlider from './GuideSlider';
 // Form
 export LoginForm from './Forms/LoginForm';
+export FloatingPanel from './Panel/FloatingPanel';
 
 export RegisterForm from './Forms/RegisterForm';
 export ResetForm from './Forms/ResetForm';

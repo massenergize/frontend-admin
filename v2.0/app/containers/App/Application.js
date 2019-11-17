@@ -26,7 +26,7 @@ import {
   AddPolicy, AllPolicies,
   DashboardAdminSummaryPage,
   AddTestimonial, AllTestimonials, Export, CustomizePages, EditAction,
-  SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditGoal, EditPolicy, EditEvent
+  SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditGoal, EditPolicy, EditEvent, UsersList
 } from '../pageListAsync';
 import EditVendor from '../MassEnergizeSuperAdmin/Vendors/EditVendor';
 import AddRemoveAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveAdmin';
@@ -72,6 +72,8 @@ class Application extends React.Component {
           <Route exact path="/admin" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} /> */}
           <Route exact path="/blank" component={BlankPage} />
           <Route path="/admin/dashboard" component={DashboardSummaryPage} />
+
+          <Route path="/admin/read/users" component={UsersList} />
 
           <Route path="/admin/read/communities" component={AllCommunities} />
           <Route path="/admin/add/community" component={OnboardCommunity} />

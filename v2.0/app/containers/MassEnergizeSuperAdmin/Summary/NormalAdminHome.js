@@ -15,10 +15,10 @@ import {
   CarouselWidget,
   NewsWidget
 } from 'dan-components';
-import styles from './dashboard-jss';
-import { getTestimonialsData, getActionsData, getEventsData } from '../../../api/data';
 import { connectRouter } from 'connected-react-router';
 import { bindActionCreators } from 'redux';
+import styles from './dashboard-jss';
+import { getTestimonialsData, getActionsData, getEventsData } from '../../../api/data';
 import { reduxLoadSelectedCommunity, reduxIfExpired, reduxCheckUser } from '../../../redux/redux-actions/adminActions';
 import CommunitySwitch from './CommunitySwitch';
 class NormalAdminHome extends PureComponent {
@@ -30,7 +30,7 @@ class NormalAdminHome extends PureComponent {
   callForEvents = () => {
     const me = this;
     getEventsData().then(res => {
-      console.log("i am the events", res);
+      console.log('i am the events', res);
       me.setState({ events: res.data });
     }).catch(err => {
 
@@ -63,8 +63,8 @@ class NormalAdminHome extends PureComponent {
   }
 
   findCommunityObj = (name) => {
-    const auth = this.props.auth;
-    let section = auth ? auth.admin_at : [];
+    const { auth } = this.props;
+    const section = auth ? auth.admin_at : [];
     for (let i = 0; i < section.length; i++) {
       if (section[i].name === name) {
         return section[i];
@@ -74,7 +74,7 @@ class NormalAdminHome extends PureComponent {
   }
 
   chooseCommunity = (event) => {
-    let obj = this.findCommunityObj(event.target.value);
+    const obj = this.findCommunityObj(event.target.value);
     this.props.selectCommunity(obj);
     if (obj) {
       window.location = `/admin/community/${obj.id}/profile`;
@@ -87,9 +87,9 @@ class NormalAdminHome extends PureComponent {
     const description = brand.desc;
     const { classes, selected_community, auth } = this.props;
     const communities = auth ? auth.admin_at : [];
-    console.log(communities)
-    const community = selected_community ? selected_community.name : "Choose a community";
-    const noc = auth? auth.admin_at.length : 0;
+    console.log(communities);
+    const community = selected_community ? selected_community.name : 'Choose a community';
+    const noc = auth ? auth.admin_at.length : 0;
     return (
       <div>
         <Helmet>
@@ -100,13 +100,21 @@ class NormalAdminHome extends PureComponent {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <h1 style={{color:"#bae4f1", fontSize:'1.7rem',fontWeight:'400',margin:25}}>You are in charge of <b>{noc}</b> {noc ===1 ? "community":"communities"}</h1>
+        <h1>Welcome! Community Admin</h1>
+        <h1 style={{
+          color: '#bae4f1', fontSize: '1.7rem', fontWeight: '400', margin: 25
+        }}
+        >
+          You are admin for
+          <b>{` ${noc} `}</b>
+          { noc === 1 ? 'community' : 'communities'}
+        </h1>
         {/* <div style={{ marginTop: 70 }}></div> */}
         {/* <Grid container className={classes.root}>
           <CounterChartWidget />
         </Grid> */}
         <div style={{ marginTop: 30 }}>
-          <Paper style={{padding:35}} elevation={4}>
+          <Paper style={{ padding: 35 }} elevation={4}>
             <h3>Choose A Community To Manage</h3>
             <TextField
               id="outlined-select-currency"
@@ -157,21 +165,17 @@ NormalAdminHome.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => {
-  return {
-    auth: state.getIn(['auth']),
-    //communities: state.getIn(['communities']), 
-    selected_community: state.getIn(['selected_community'])
-  }
-}
+const mapStateToProps = (state) => ({
+  auth: state.getIn(['auth']),
+  // communities: state.getIn(['communities']),
+  selected_community: state.getIn(['selected_community'])
+});
 
-const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({
-    selectCommunity: reduxLoadSelectedCommunity,
-    ifExpired: reduxCheckUser
+const mapDispatchToProps = (dispatch) => bindActionCreators({
+  selectCommunity: reduxLoadSelectedCommunity,
+  ifExpired: reduxCheckUser
 
-  }, dispatch)
-}
+}, dispatch);
 const summaryMapped = connect(mapStateToProps, mapDispatchToProps)(NormalAdminHome);
 
 export default withStyles(styles)(summaryMapped);
