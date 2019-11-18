@@ -13,12 +13,12 @@ import Avatar from '@material-ui/core/Avatar';
 import Paper from '@material-ui/core/Paper';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Grid from '@material-ui/core/Grid';
-import {connect} from 'react-redux'; 
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-import { bindActionCreators } from 'redux';
-import { reduxGetAllActions, reduxGetAllEvents, reduxGetAllCommunityEvents } from '../../../redux/redux-actions/adminActions';
-import CommunitySwitch from "../Summary/CommunitySwitch";
+import { reduxGetAllEvents, reduxGetAllCommunityEvents } from '../../../redux/redux-actions/adminActions';
+import CommunitySwitch from '../Summary/CommunitySwitch';
 
 class AllEvents extends React.Component {
   constructor(props) {
@@ -26,8 +26,28 @@ class AllEvents extends React.Component {
     this.state = { data: [], loading: true, columns: this.getColumns() };
   }
 
+  async componentDidMount() {
+    const user = this.props.auth ? this.props.auth : {};
+    const community = this.props.community ? this.props.community :{};
+    if (user.is_super_admin) {
+      this.props.callForSuperAdminEvents();
+    }
+    if (user.is_community_admin) {
+      let com = community || user.admin_at[0];
+      this.props.callForNormalAdminEvents(com.id);
+    }
+    await this.setStateAsync({ loading: false });
+  }
+
+  setStateAsync(state) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve);
+    });
+  }
+
+
   showCommunitySwitch = () => {
-    const user = this.props.auth ? this.props.auth: {};
+    const user = this.props.auth ? this.props.auth : {};
     if (user.is_community_admin) {
       return (
         <CommunitySwitch actionToPerform={this.handleCommunityChange} />
@@ -37,19 +57,6 @@ class AllEvents extends React.Component {
 
   handleCommunityChange =(id) => {
     this.props.callForNormalAdminEvents(id);
-  }
-
-  async componentDidMount() {
-    const user = this.props.auth ? this.props.auth : {};
-    const community = this.props.community? this.props.community :{};
-    if (user.is_super_admin) {
-      this.props.callForSuperAdminEvents();
-    }
-    if (user.is_community_admin) {
-      var com = community ? community : user.admin_at[0];
-      this.props.callForNormalAdminEvents(com.id);
-    }
-    await this.setStateAsync({ loading: false });
   }
 
   fashionData = (data) => {
@@ -69,12 +76,6 @@ class AllEvents extends React.Component {
       ]
     ));
     return fashioned;
-  }
-
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
-    });
   }
 
 
@@ -235,8 +236,8 @@ AllEvents.propTypes = {
 function mapStateToProps(state) {
   return {
     auth: state.getIn(['auth']),
-    allEvents: state.getIn(['allEvents']), 
-    community:state.getIn(['selected_community'])
+    allEvents: state.getIn(['allEvents']),
+    community: state.getIn(['selected_community'])
   };
 }
 function mapDispatchToProps(dispatch) {

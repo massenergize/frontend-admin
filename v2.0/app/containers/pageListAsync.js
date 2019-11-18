@@ -5,6 +5,9 @@ import loadable from '../utils/loadable';
 export const SuperHome = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Home'), {
   fallback: <Loading />,
 });
+export const ImpactPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Impact'), {
+  fallback: <Loading />,
+});
 export const SuperAllActions = loadable(() => import('./MassEnergizeSuperAdmin/Pages/AllActions'), {
   fallback: <Loading />,
 });
@@ -59,6 +62,9 @@ export const EditCategory = loadable(() => import('./MassEnergizeSuperAdmin/Cate
   fallback: <Loading />,
 });
 export const AllCategories = loadable(() => import('./MassEnergizeSuperAdmin/Categories/AllCategories'), {
+  fallback: <Loading />,
+});
+export const AllSubscribers = loadable(() => import('./MassEnergizeSuperAdmin/Subscribers/AllSubscribers'), {
   fallback: <Loading />,
 });
 

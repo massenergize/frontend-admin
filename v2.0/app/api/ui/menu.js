@@ -144,6 +144,28 @@ module.exports = [
     ]
   },
   {
+    key: 'subscribers',
+    name: 'Subscribers',
+    icon: 'md-reorder',
+    child: [
+      {
+        key: 'about-subscribers',
+        name: 'Subscribers',
+        title: true
+      },
+      {
+        key: 'add-subscriber',
+        name: 'Add Subscriber',
+        link: '/admin/add/subscriber'
+      },
+      {
+        key: 'all-subscribers',
+        name: 'All Subscribers',
+        link: '/admin/read/subscribers'
+      },
+    ]
+  },
+  {
     key: 'testimonials',
     name: 'Testimonials',
     icon: 'ios-analytics',

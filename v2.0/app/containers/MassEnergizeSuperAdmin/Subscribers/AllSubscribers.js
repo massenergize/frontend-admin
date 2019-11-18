@@ -42,6 +42,24 @@ class AllVendors extends React.Component {
     this.state = { data: [], loading: true, columns: this.getColumns(props.classes) };
   }
 
+  async componentDidMount() {
+    const user = this.props.auth ? this.props.auth : {};
+    if (user.is_super_admin) {
+      this.props.callVendorsForSuperAdmin();
+    }
+    if (user.is_community_admin) {
+      let com = this.props.community ? this.props.community : user.admin_at[0];
+      this.props.callVendorsForNormalAdmin(com.id);
+    }
+  }
+
+
+  setStateAsync(state) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve);
+    });
+  }
+
   showCommunitySwitch = () => {
     const user = this.props.auth ? this.props.auth: {};
     if (user.is_community_admin) {
@@ -55,16 +73,6 @@ class AllVendors extends React.Component {
     this.props.callVendorsForNormalAdmin(id);
   }
 
-  async componentDidMount() {
-    const user = this.props.auth ? this.props.auth : {};
-    if (user.is_super_admin) {
-      this.props.callVendorsForSuperAdmin();
-    }
-    if (user.is_community_admin) {
-      let com = this.props.community ? this.props.community : user.admin_at[0];
-      this.props.callVendorsForNormalAdmin(com.id);
-    }
-  }
 
   fashionData = (data) => {
     data = data.map(d => (
@@ -85,11 +93,6 @@ class AllVendors extends React.Component {
     return data;
   }
 
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
-    });
-  }
 
   getStatus = isApproved => {
     switch (isApproved) {

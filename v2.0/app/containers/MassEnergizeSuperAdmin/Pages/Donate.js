@@ -95,23 +95,23 @@ class HomePageEditForm extends Component {
           placeholder: 'Tell us more ...',
           fieldType: 'TextField',
           contentType: 'text',
-          isRequired: true,
+          isRequired: false,
           isMultiline: true,
           defaultValue: `${donatePageData.description}`,
           dbName: 'description',
           readOnly: false
         },
-        // {
-        //   name: 'featured_video_link',
-        //   label: 'Video Link',
-        //   placeholder: 'eg. https://www.youtube.com/?v=as122aas',
-        //   fieldType: 'TextField',
-        //   contentType: 'text',
-        //   isRequired: true,
-        //   defaultValue: `${donatePageData.featured_video_link}`,
-        //   dbName: 'featured_video_link',
-        //   readOnly: false
-        // },
+        {
+          name: 'featured_video_link',
+          label: 'Video Link',
+          placeholder: 'eg. https://www.youtube.com/?v=as122aas',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: false,
+          defaultValue: `${donatePageData.featured_video_link}`,
+          dbName: 'featured_video_link',
+          readOnly: false
+        },
       ]
     };
     return formJson;

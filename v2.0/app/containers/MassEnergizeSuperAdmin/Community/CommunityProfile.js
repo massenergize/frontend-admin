@@ -9,16 +9,11 @@ import Tab from '@material-ui/core/Tab';
 import Hidden from '@material-ui/core/Hidden';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import SupervisorAccount from '@material-ui/icons/SupervisorAccount';
-import Favorite from '@material-ui/icons/Favorite';
 import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
-import Message from '@material-ui/icons/Message';
 import InsertChart from '@material-ui/icons/InsertChart';
-import { Link } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import data from 'dan-api/apps/timelineData';
-import { fetchAction } from 'dan-actions/SocmedActions';
 import bgCover from 'dan-images/petal_bg.svg';
 import styles from 'dan-components/SocialMedia/jss/cover-jss';
 import CommunitySwitch from '../Summary/CommunitySwitch';
@@ -28,10 +23,8 @@ import {
   Connection,
   Favorites,
   Pages,
-  Albums
 } from './Profile';
-import { fetchData } from '../../../utils/messenger';
-import { reduxLoadSelectedCommunity, reduxCallFullCommunity, reduxLiveOrNot } from '../../../redux/redux-actions/adminActions';
+import { reduxCallFullCommunity, reduxLiveOrNot } from '../../../redux/redux-actions/adminActions';
 
 function TabContainer(props) {
   const { children } = props;
@@ -85,8 +78,12 @@ class CommunityProfile extends React.Component {
     const title = brand.name + ' - Profile';
     const description = brand.desc;
     const { dataProps, classes } = this.props;
-    const { value } = this.state;
+    const { value, id } = this.state;
     const community = this.props.full_community ? this.props.full_community : {};
+
+    if(!id){
+      return <dvi>Loading Data ...</dvi>
+    }
 
     return (
       <div>
@@ -135,39 +132,26 @@ class CommunityProfile extends React.Component {
               style={{ boxShadow: '0 0px 3px 0 rgba(0,0,0,.18),0 0px 3px 0 rgba(0,0,0,.15)' }}
             >
               <Tab icon={<AccountCircle />} label="ABOUT" />
-              <Tab icon={<SupervisorAccount />} label="USERS" />
-              {/* <Tab icon={<Message />} label="Events & TESTIMONIALS" /> */}
+              <Tab icon={<SupervisorAccount />} label="Subscribers" />
               <Tab icon={<InsertChart />} label="Pages" />
             </Tabs>
           </Hidden>
         </AppBar>
         {value === 0 && <TabContainer><About data={dataProps} community={community} /></TabContainer>}
         {value === 1 && <TabContainer><Connection data={{ users: community.users, avatar: dummy.user.avatar }} /></TabContainer>}
-        {/* {value === 2 && <TabContainer><Favorites data={{ testimonials: community.testimonials, events: community.events }} /></TabContainer>} */}
         {value === 2
           && (
             <TabContainer>
               <Pages community={community} />
-              {/* <h1>Edit Pages</h1>
-              <ul>
-                <li><Link to={`/admin/edit/${community.id}/home`}>Home Page</Link></li>
-                <li><Link to={`/admin/edit/${community.id}/all-actions`}>All Actions Page</Link></li>
-                <li><Link to={`/admin/edit/${community.id}/about`}>About Us Page</Link></li>
-                <li><Link to={`/admin/edit/${community.id}/contact_us`}>Contact Us Page</Link></li>
-                <li><Link to={`/admin/edit/${community.id}/donate`}>Donate Page</Link></li>
-              </ul> */}
             </TabContainer>
           )}
-
       </div>
     );
   }
 }
 
 CommunityProfile.propTypes = {
-  classes: PropTypes.object.isRequired,
-  // dataProps: PropTypes.object.isRequired,
-  // fetchData: PropTypes.func.isRequired,
+  classes: PropTypes.object.isRequired
 };
 
 const reducer = 'socmed';

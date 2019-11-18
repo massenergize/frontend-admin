@@ -96,7 +96,7 @@ class HomePageEditForm extends Component {
           placeholder: 'Tell us more ...',
           fieldType: 'TextField',
           contentType: 'text',
-          isRequired: true,
+          isRequired: false,
           isMultiline: true,
           defaultValue: `${actionsPageData.description}`,
           dbName: 'description',
@@ -108,7 +108,7 @@ class HomePageEditForm extends Component {
           placeholder: 'eg. https://www.youtube.com/?v=as122aas',
           fieldType: 'TextField',
           contentType: 'text',
-          isRequired: true,
+          isRequired: false,
           defaultValue: `${actionsPageData.featured_video_link}`,
           dbName: 'featured_video_link',
           readOnly: false

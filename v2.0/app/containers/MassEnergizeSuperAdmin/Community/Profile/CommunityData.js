@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import MassEnergizeForm from '../_FormGenerator';
-import { apiCall } from '../../../utils/messenger';
+import MassEnergizeForm from '../../_FormGenerator';
+import { apiCall } from '../../../../utils/messenger';
 
 const styles = theme => ({
   root: {
@@ -29,7 +29,7 @@ const styles = theme => ({
 });
 
 
-class ImpactPage extends Component {
+class CommunityData extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -40,7 +40,7 @@ class ImpactPage extends Component {
 
 
   async componentDidMount() {
-    const { id } = this.props.match.params;
+    const { id } = this.props;
     console.log(id);
     const graphResponse = await apiCall('/graphs.actions.completed', { community_id: id });
     if (graphResponse && !graphResponse.success) {
@@ -123,9 +123,9 @@ class ImpactPage extends Component {
   }
 }
 
-ImpactPage.propTypes = {
+CommunityData.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
 
-export default withStyles(styles, { withTheme: true })(ImpactPage);
+export default withStyles(styles, { withTheme: true })(CommunityData);

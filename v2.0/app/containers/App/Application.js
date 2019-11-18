@@ -26,7 +26,7 @@ import {
   AddPolicy, AllPolicies,
   DashboardAdminSummaryPage,
   AddTestimonial, AllTestimonials, Export, CustomizePages, EditAction,
-  SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditGoal, EditPolicy, EditEvent, UsersList
+  SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditGoal, EditPolicy, EditEvent, UsersList, ImpactPage
 } from '../pageListAsync';
 import EditVendor from '../MassEnergizeSuperAdmin/Vendors/EditVendor';
 import AddRemoveAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveAdmin';
@@ -35,6 +35,8 @@ import EditCommunityByCommunityAdmin from '../MassEnergizeSuperAdmin/Community/E
 import EditTeam from '../MassEnergizeSuperAdmin/Teams/EditTeam';
 import EditCategory from '../MassEnergizeSuperAdmin/Categories/EditCategory';
 import EditTestimonial from '../MassEnergizeSuperAdmin/Testimonials/EditTestimonial';
+import Impact from '../MassEnergizeSuperAdmin/Pages/Impact';
+import AllSubscribers from '../MassEnergizeSuperAdmin/Subscribers/AllSubscribers';
 
 
 class Application extends React.Component {
@@ -106,6 +108,8 @@ class Application extends React.Component {
           <Route path="/admin/add/team" component={AddTeam} />
           <Route path="/admin/edit/:id/team" component={EditTeam} />
 
+          <Route path="/admin/read/subscribers" component={AllSubscribers} />
+
           <Route path="/admin/read/policies" component={AllPolicies} />
           <Route path="/admin/add/policy" component={AddPolicy} />
           <Route path="/admin/edit/:id/policy" component={EditPolicy} />
@@ -134,6 +138,7 @@ class Application extends React.Component {
           <Route path="/admin/pages/not-found" component={NotFound} />
           <Route path="/admin/pages/error" component={Error} />
           <Route path="/admin/edit/:id/home" component={SuperHome} />
+          <Route path="/admin/edit/:id/impact" component={ImpactPage} />
           <Route path="/admin/edit/:id/actions" component={SuperAllActions} />
           <Route path="/admin/edit/:id/all-actions" component={SuperAllActions} />
           <Route path="/admin/edit/:id/contact_us" component={SuperContactUs} />

@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import {
-  LOAD_ALL_COMMUNITIES, LOAD_AUTH_ADMIN, LOAD_ID_TOKEN, SELECTED_COMMUNITY, SELECTED_COMMUNITY_FULL, GET_ALL_ACTIONS, GET_ALL_TAG_COLLECTIONS, GET_ALL_USERS, GET_ALL_COMMUNITY_EVENTS, GET_ALL_EVENTS, GET_ALL_TEAMS, GET_ALL_GOALS, GET_ALL_TESTIMONIALS, GET_ALL_VENDORS, GET_ALL_POLICIES
+  LOAD_ALL_COMMUNITIES, LOAD_AUTH_ADMIN, LOAD_ID_TOKEN, SELECTED_COMMUNITY, SELECTED_COMMUNITY_FULL, GET_ALL_ACTIONS, GET_ALL_TAG_COLLECTIONS, GET_ALL_USERS, GET_ALL_SUBSCRIBERS, GET_ALL_EVENTS, GET_ALL_TEAMS, GET_ALL_GOALS, GET_ALL_TESTIMONIALS, GET_ALL_VENDORS, GET_ALL_POLICIES
 } from '../ReduxConstants';
 import { apiCall, fetchData } from '../../utils/messenger';
 import firebase from '../../containers/App/fire-config';
@@ -13,6 +13,7 @@ export const loadAllGoals = (data = null) => ({ type: GET_ALL_GOALS, payload: da
 export const loadAllTeams = (data = null) => ({ type: GET_ALL_TEAMS, payload: data });
 export const loadAllEvents = (data = null) => ({ type: GET_ALL_EVENTS, payload: data });
 export const loadAllUsers = (data) => ({ type: GET_ALL_USERS, payload: data });
+export const loadAllSubscribers = (data) => ({ type: GET_ALL_SUBSCRIBERS, payload: data });
 export const loadAllTags = (data) => ({ type: GET_ALL_TAG_COLLECTIONS, payload: data });
 export const loadAllActions = (data) => ({ type: GET_ALL_ACTIONS, payload: data });
 export const reduxLoadIdToken = (token = null) => ({ type: LOAD_ID_TOKEN, payload: token });
@@ -96,6 +97,17 @@ export const reduxGetAllCommunityTeams = (community_id) => dispatch => {
   return { type: 'DO_NOTHING', payload: null };
 };
 
+export const reduxGetAllCommunityUsers = (community_id) => dispatch => {
+  apiCall('/users.listForCommunityAdmin', { community_id }).then(response => {
+    if (response && response.success) {
+      redirectIfExpired(response);
+      dispatch(loadAllTeams(response.data));
+    }
+    return { type: 'DO_NOTHING', payload: null };
+  });
+  return { type: 'DO_NOTHING', payload: null };
+};
+
 export const reduxGetAllCommunityEvents = (community_id) => dispatch => {
   apiCall('/events.listForCommunityAdmin', { community_id }).then(response => {
     if (response && response.success) {
@@ -162,6 +174,17 @@ export const reduxGetAllEvents = () => dispatch => {
   return { type: 'DO_NOTHING', payload: null };
 };
 
+export const reduxGetAllUsers = () => dispatch => {
+  apiCall('/users.listForSuperAdmin').then(response => {
+    if (response && response.success) {
+      redirectIfExpired(response);
+      dispatch(loadAllUsers(response.data));
+    }
+    return { type: 'DO_NOTHING', payload: null };
+  });
+  return { type: 'DO_NOTHING', payload: null };
+};
+
 export const reduxGetAllTestimonials = () => dispatch => {
   apiCall('/testimonials.listForSuperAdmin').then(response => {
     if (response && response.success) {
@@ -184,16 +207,6 @@ export const reduxGetAllCommunityActions = (community_id) => dispatch => {
   return { type: 'DO_NOTHING', payload: null };
 };
 
-export const reduxGetAllUsers = () => dispatch => {
-  fetchData('v2/users').then(response => {
-    if (response && response.success) {
-      redirectIfExpired(response);
-      dispatch(loadAllUsers(response.data));
-    }
-    return { type: 'DO_NOTHING', payload: null };
-  });
-  return { type: 'DO_NOTHING', payload: null };
-};
 
 export const reduxGetAllTags = () => dispatch => {
   getTagCollectionsData().then(response => {

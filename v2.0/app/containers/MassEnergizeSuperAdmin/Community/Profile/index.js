@@ -1,3 +1,4 @@
+import CommunityData from "./CommunityData";
 
 
 export About from './About';
@@ -6,3 +7,4 @@ export Connection from './Connection';
 export Favorites from './Favorites';
 export Cover from 'dan-components/SocialMedia/Cover';
 export Pages from './Pages';
+export CommunityData from './CommunityData';

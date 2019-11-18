@@ -29,18 +29,34 @@ import ContactDetail from './ContactDetail';
 import ContactList from './ContactList';
 import AddContact from './AddContact';
 import styles from './contact-jss';
+import CommunitySwitch from '../Summary/CommunitySwitch';
+import { reduxGetAllCommunityUsers, reduxGetAllUsers } from '../../../redux/redux-actions/adminActions';
 
 class Contact extends React.Component {
   componentDidMount() {
-    
     const { fetchData } = this.props;
     fetchData(data);
   }
 
+  
   submitContact = (item, avatar) => {
     const { submit } = this.props;
     submit(item, avatar);
   }
+
+  showCommunitySwitch = () => {
+    const user = this.props.auth ? this.props.auth : {};
+    if (user.is_community_admin) {
+      return (
+        <CommunitySwitch actionToPerform={this.handleCommunityChange} />
+      );
+    }
+  }
+
+  handleCommunityChange =(id) => {
+    this.props.callForNormalAdminUsers(id);
+  }
+
 
   render() {
     const title = brand.name + ' - Contact';
@@ -54,7 +70,7 @@ class Contact extends React.Component {
       avatarInit,
       open,
       showMobileDetail,
-      add,
+      add, 
       edit,
       close,
       remove,
@@ -62,8 +78,10 @@ class Contact extends React.Component {
       keyword,
       search,
       closeNotif,
-      messageNotif
+      messageNotif,
+      full_community 
     } = this.props;
+    console.log(full_community);
     return (
       <div>
         <Helmet>
@@ -74,6 +92,7 @@ class Contact extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
+        {this.showCommunitySwitch()}
         <Notification close={() => closeNotif()} message={messageNotif} />
         <div className={classes.root}>
           <ContactList
@@ -134,6 +153,7 @@ Contact.propTypes = {
 const reducer = 'contact';
 const mapStateToProps = state => ({
   force: state, // force state from reducer
+  auth: state.getIn(['auth']),
   avatarInit: state.getIn([reducer, 'avatarInit']),
   dataContact: state.getIn([reducer, 'contactList']),
   itemSelected: state.getIn([reducer, 'selectedIndex']),
@@ -141,6 +161,7 @@ const mapStateToProps = state => ({
   open: state.getIn([reducer, 'openFrm']),
   showMobileDetail: state.getIn([reducer, 'showMobileDetail']),
   messageNotif: state.getIn([reducer, 'notifMsg']),
+  full_community: state.getIn(['full_selected_community'])
 });
 
 const constDispatchToProps = dispatch => ({
@@ -155,6 +176,8 @@ const constDispatchToProps = dispatch => ({
   favorite: bindActionCreators(addToFavoriteAction, dispatch),
   search: bindActionCreators(searchAction, dispatch),
   closeNotif: () => dispatch(closeNotifAction),
+  callForSuperAdminUsers: reduxGetAllUsers,
+  callForNormalAdminUsers: reduxGetAllCommunityUsers
 });
 
 const ContactMapped = connect(
