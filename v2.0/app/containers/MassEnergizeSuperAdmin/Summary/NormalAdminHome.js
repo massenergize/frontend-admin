@@ -11,7 +11,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
 import {
   CounterChartWidget,
-  // SalesChartWidget,
+  SalesChartWidget,
   CarouselWidget,
   NewsWidget
 } from 'dan-components';
@@ -21,6 +21,8 @@ import styles from './dashboard-jss';
 import { getTestimonialsData, getActionsData, getEventsData } from '../../../api/data';
 import { reduxLoadSelectedCommunity, reduxIfExpired, reduxCheckUser } from '../../../redux/redux-actions/adminActions';
 import CommunitySwitch from './CommunitySwitch';
+import SummaryChart from './graph/ChartInfographic';
+import ActionsChartWidget from './graph/ActionsChartWidget';
 class NormalAdminHome extends PureComponent {
   constructor(props) {
     super(props);
@@ -55,18 +57,12 @@ class NormalAdminHome extends PureComponent {
     });
   }
 
-  componentDidMount = () => {
-    // this.props.ifExpired();
-    // this.callForTestimonials();
-    // this.callForActions();
-    // this.callForEvents();
-  }
-
-  findCommunityObj = (name) => {
+  findCommunityObj = (id) => {
     const { auth } = this.props;
     const section = auth ? auth.admin_at : [];
     for (let i = 0; i < section.length; i++) {
-      if (section[i].name === name) {
+      console.log(section[i].id, id);
+      if (section[i].id === id) {
         return section[i];
       }
     }
@@ -82,14 +78,36 @@ class NormalAdminHome extends PureComponent {
   }
 
 
+  handleCommunityChange = async (id) => {
+    if (!id) return;
+    const obj = this.findCommunityObj(id);
+    this.props.selectCommunity(obj);
+    if (obj) {
+      window.location = `/admin/community/${obj.id}/profile`;
+    }
+  }
+
+
+  showCommunitySwitch = () => {
+    const { auth } = this.props;
+    const user = auth || {};
+    if (user.is_community_admin) {
+      return (
+        <CommunitySwitch actionToPerform={this.handleCommunityChange} />
+      );
+    }
+    return <div />;
+  }
+
   render() {
     const title = brand.name + ' - Summary Dashboard';
     const description = brand.desc;
-    const { classes, selected_community, auth } = this.props;
-    const communities = auth ? auth.admin_at : [];
-    console.log(communities);
-    const community = selected_community ? selected_community.name : 'Choose a community';
-    const noc = auth ? auth.admin_at.length : 0;
+    const {  auth, summary_data, graph_data, classes } = this.props;
+    const firstComm = (auth.admin_at || [])[0];
+    const firstCommId = firstComm && firstComm.id;
+    if (!firstCommId) {
+      this.showCommunitySwitch();
+    }
     return (
       <div>
         <Helmet>
@@ -100,75 +118,33 @@ class NormalAdminHome extends PureComponent {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <h1>Welcome! Community Admin</h1>
-        <h1 style={{
-          color: '#bae4f1', fontSize: '1.7rem', fontWeight: '400', margin: 25
-        }}
-        >
-          You are admin for
-          <b>{` ${noc} `}</b>
-          { noc === 1 ? 'community' : 'communities'}
+        <h1>
+          Howdy Community Admin
+          <span role="img" aria-label="smiley">
+            😊
+          </span>
         </h1>
-        {/* <div style={{ marginTop: 70 }}></div> */}
-        {/* <Grid container className={classes.root}>
-          <CounterChartWidget />
-        </Grid> */}
-        <div style={{ marginTop: 30 }}>
-          <Paper style={{ padding: 35 }} elevation={4}>
-            <h3>Choose A Community To Manage</h3>
-            <TextField
-              id="outlined-select-currency"
-              select
-              label="Select Community"
-              className={classes.textField}
-              value={community}
-              fullWidth
-              onChange={option => { this.chooseCommunity(option); }}
-              SelectProps={{
-                MenuProps: {
-                  className: classes.menu,
-                },
-              }}
-              helperText="Select a community"
-              margin="normal"
-              variant="outlined"
-            >
-              {communities.map(option => (
-                <MenuItem key={option.id.toString()} value={option.name}>
-                  {option.name}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Paper>
-        </div>
+        {/* {this.showCommunitySwitch()} */}
+        <Grid container className={classes.root}>
+          <SummaryChart data={summary_data} />
+        </Grid>
         <Divider className={classes.divider} />
-        {/* <SalesChartWidget /> */}
-        <Divider className={classes.divider} />
-        {/* <Grid container spacing={24} className={classes.root}>
-          <Grid item md={4} xs={12}>
-            <CarouselWidget goals={this.state.testimonials} />
-          </Grid>
-          <Grid item md={4} sm={6} xs={12}>
-            <NewsWidget kind="action" dataCollection={this.state.actions} />
-          </Grid>
-          <Grid item md={4} sm={6} xs={12}>
-            <NewsWidget kind="event" dataCollection={this.state.events} />
-          </Grid>
-
-        </Grid> */}
+        {graph_data && 
+          <ActionsChartWidget data={graph_data || {}} />
+        }
       </div>
     );
   }
 }
 
-NormalAdminHome.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
+NormalAdminHome.propTypes = {};
 
 const mapStateToProps = (state) => ({
   auth: state.getIn(['auth']),
   // communities: state.getIn(['communities']),
-  selected_community: state.getIn(['selected_community'])
+  selected_community: state.getIn(['selected_community']),
+  summary_data: state.getIn(['summary_data']),
+  graph_data: state.getIn(['graph_data'])
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({

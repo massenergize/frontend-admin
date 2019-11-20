@@ -50,7 +50,7 @@ class CommunityProfile extends React.Component {
 
 
   async componentDidMount() {
-    const { id } = this.props.match.params;
+    const id = this.props.id || this.props.match.params.id;
     if (id) {
       this.setState({ id });
       this.props.callCommunity(id);
@@ -81,8 +81,8 @@ class CommunityProfile extends React.Component {
     const { value, id } = this.state;
     const community = this.props.full_community ? this.props.full_community : {};
 
-    if(!id){
-      return <dvi>Loading Data ...</dvi>
+    if(!community){
+      return <div>Loading Data ...</div>
     }
 
     return (

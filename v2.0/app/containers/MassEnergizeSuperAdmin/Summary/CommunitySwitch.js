@@ -12,13 +12,13 @@ import styles from './dashboard-jss';
 class CommunitySwitch extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = { events: [], testimonials: [], actions: [] };
+    this.state = {};
   }
 
 
   findCommunityObj = (name) => {
-    const auth = this.props.auth;
-    let section = auth ? auth.admin_at : [];
+    const { auth } = this.props;
+    const section = auth ? auth.admin_at : [];
     for (let i = 0; i < section.length; i++) {
       if (section[i].name === name) {
         return section[i];
@@ -28,27 +28,28 @@ class CommunitySwitch extends PureComponent {
   }
 
   chooseCommunity = (event) => {
-    let obj = this.findCommunityObj(event.target.value);
+    const obj = this.findCommunityObj(event.target.value);
     this.props.selectCommunity(obj);
-    this.props.actionToPerform(obj.id);
+    this.props.actionToPerform(obj && obj.id);
   }
 
 
   render() {
-    const {classes, auth, selected_community} = this.props;
-    const communities = auth ? auth.admin_at : {};
-    const firstCom = auth? auth.admin_at[0].name :"Choose Community"
-    const community = selected_community ? selected_community.name :firstCom;
+    const { classes, auth, selected_community } = this.props;
+    const communities = auth ? auth.admin_at : [];
+
+    const firstCom = auth ? auth.admin_at[0].name : '--- Please Select a Community ---';
+    const communityName = selected_community ? selected_community.name : firstCom;
     return (
       <div>
-        <Paper style={{ padding:20, marginBottom:10 }}>
-          <h4 style={{fontWeight:'400', marginBottom:2}}>Switch Community</h4>
+        <Paper style={{ padding: 20, marginBottom: 10 }}>
+          <h4 style={{ fontWeight: '400', marginBottom: 2 }}>Switch Community</h4>
           <TextField
             id="outlined-select-currency"
             select
             label=""
             className={classes.textField}
-            value={community}
+            value={communityName}
             fullWidth
             onChange={option => { this.chooseCommunity(option); }}
             SelectProps={{
@@ -67,7 +68,6 @@ class CommunitySwitch extends PureComponent {
             ))}
           </TextField>
         </Paper>
-
       </div>
     );
   }
@@ -77,19 +77,14 @@ CommunitySwitch.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => {
-  return {
-    auth: state.getIn(['auth']),
-    //communities: state.getIn(['communities']), 
-    selected_community: state.getIn(['selected_community'])
-  }
-}
+const mapStateToProps = (state) => ({
+  auth: state.getIn(['auth']),
+  selected_community: (state.getIn(['selected_community']) || state.getIn(['full_selected_community'])),
+});
 
-const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({
-    selectCommunity: reduxLoadSelectedCommunity
-  }, dispatch)
-}
+const mapDispatchToProps = (dispatch) => bindActionCreators({
+  selectCommunity: reduxLoadSelectedCommunity
+}, dispatch);
 const summaryMapped = connect(mapStateToProps, mapDispatchToProps)(CommunitySwitch);
 
 export default withStyles(styles)(summaryMapped);

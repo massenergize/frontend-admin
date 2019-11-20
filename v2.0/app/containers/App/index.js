@@ -110,9 +110,8 @@ class App extends React.Component {
   getAuthenticatedUserProfile = () => {
     const me = this;
     rawCall('auth/whoami').then(userObj => {
-      console.log(userObj);
       const user = userObj.data;
-      if (user.is_community_admin === true || user.is_super_admin === true) {
+      if (user.is_community_admin || user.is_super_admin) {
         localStorage.setItem('authUser', JSON.stringify(user));
         me.props.reduxLoadAuthAdmin(user);
         this.goHome();
@@ -126,25 +125,11 @@ class App extends React.Component {
       });
   }
 
-  // authListener() {
-  //   if (firebase) {
-  //     firebase.auth().onAuthStateChanged(u => {
-  //       this.props.reduxCallIdToken();
-  //       if (u) {
-  //         console.log("I am the listen", u);
-  //         localStorage.setItem('authUser', JSON.stringify(u));
-  //         //will be removed later
-  //         this.setState({ user: u });
-  //       }
-  //     });
-  //   }
-  // }
 
   render() {
     const { error, started } = this.state;
-    const user = this.props.auth;
-    console.log('testing le props', this.props.auth);
-
+    const { auth } = this.props;
+    const user = auth;
     return (
       <ThemeWrapper>
         <AppContext.Consumer>

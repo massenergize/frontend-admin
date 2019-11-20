@@ -1,7 +1,7 @@
 import { Map, fromJS } from 'immutable';
 import { START_UP } from '../../actions/actionConstants';
 import {
-  LOAD_ALL_COMMUNITIES, LOAD_AUTH_ADMIN, LOAD_ID_TOKEN, SELECTED_COMMUNITY, SELECTED_COMMUNITY_FULL, GET_ALL_ACTIONS, GET_ALL_TESTIMONIALS, GET_ALL_EVENTS, GET_ALL_USERS, GET_ALL_TAG_COLLECTIONS, GET_ALL_TEAMS, GET_ALL_GOALS, GET_ALL_VENDORS, GET_ALL_POLICIES
+  LOAD_ALL_COMMUNITIES, LOAD_AUTH_ADMIN, LOAD_ID_TOKEN, SELECTED_COMMUNITY, SELECTED_COMMUNITY_FULL, GET_ALL_ACTIONS, GET_ALL_TESTIMONIALS, GET_ALL_EVENTS, GET_ALL_USERS, GET_ALL_TAG_COLLECTIONS, GET_ALL_TEAMS, GET_ALL_GOALS, GET_ALL_VENDORS, GET_ALL_POLICIES, LOAD_SUMMARY_DATA, LOAD_GRAPH_DATA
 } from '../ReduxConstants';
 
 const initialState = Map({
@@ -24,6 +24,26 @@ export default function reducer(state = initialImmutableState, action = {}) {
 export const communitiesReducer = (state = [], action = {}) => {
   switch (action.type) {
     case LOAD_ALL_COMMUNITIES:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+
+export const summaryDataReducer = (state = [], action = {}) => {
+  switch (action.type) {
+    case LOAD_SUMMARY_DATA:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+
+export const graphDataReducer = (state = [], action = {}) => {
+  switch (action.type) {
+    case LOAD_GRAPH_DATA:
       return action.payload;
 
     default:

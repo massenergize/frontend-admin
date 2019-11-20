@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import {
-  LOAD_ALL_COMMUNITIES, LOAD_AUTH_ADMIN, LOAD_ID_TOKEN, SELECTED_COMMUNITY, SELECTED_COMMUNITY_FULL, GET_ALL_ACTIONS, GET_ALL_TAG_COLLECTIONS, GET_ALL_USERS, GET_ALL_SUBSCRIBERS, GET_ALL_EVENTS, GET_ALL_TEAMS, GET_ALL_GOALS, GET_ALL_TESTIMONIALS, GET_ALL_VENDORS, GET_ALL_POLICIES
+  LOAD_ALL_COMMUNITIES, LOAD_GRAPH_DATA, LOAD_AUTH_ADMIN, LOAD_ID_TOKEN, SELECTED_COMMUNITY, SELECTED_COMMUNITY_FULL, GET_ALL_ACTIONS, GET_ALL_TAG_COLLECTIONS, GET_ALL_USERS, GET_ALL_SUBSCRIBERS, GET_ALL_EVENTS, GET_ALL_TEAMS, GET_ALL_GOALS, GET_ALL_TESTIMONIALS, GET_ALL_VENDORS, GET_ALL_POLICIES, LOAD_SUMMARY_DATA
 } from '../ReduxConstants';
 import { apiCall, fetchData } from '../../utils/messenger';
 import firebase from '../../containers/App/fire-config';
@@ -30,6 +30,8 @@ function redirectIfExpired(response) {
 
 const reduxLoadFullSelectedCommunity = (data = null) => ({ type: SELECTED_COMMUNITY_FULL, payload: data });
 export const reduxLoadAllCommunities = (data = []) => ({ type: LOAD_ALL_COMMUNITIES, payload: data });
+export const reduxLoadSummaryData = (data = []) => ({ type: LOAD_SUMMARY_DATA, payload: data });
+export const reduxLoadGraphData = (data = []) => ({ type: LOAD_GRAPH_DATA, payload: data });
 export const reduxSignOut = () => dispatch => {
   if (firebase) {
     firebase.auth().signOut().then(() => {
@@ -252,9 +254,20 @@ export const reduxIfExpired = (errorMsg) => {
 };
 
 export const reduxCallCommunities = () => dispatch => {
-  apiCall('/communities.listForCommunityAdmin').then(res => {
-    if (res.data) {
-      dispatch(reduxLoadAllCommunities(res.data));
+  Promise.all([
+    apiCall('/communities.listForCommunityAdmin'),
+    apiCall('/summary.listForCommunityAdmin'),
+    apiCall('/graphs.listForCommunityAdmin')
+  ]).then(res => {
+    const [commResponse, summaryResponse, graphResponse] = res;
+    if (commResponse.data) {
+      dispatch(reduxLoadAllCommunities(commResponse.data));
+    }
+    if (summaryResponse.data) {
+      dispatch(reduxLoadSummaryData(summaryResponse.data));
+    }
+    if (graphResponse.data) {
+      dispatch(reduxLoadGraphData(graphResponse.data));
     }
   });
 };

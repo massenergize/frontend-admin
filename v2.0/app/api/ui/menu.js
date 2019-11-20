@@ -153,11 +153,11 @@ module.exports = [
         name: 'Subscribers',
         title: true
       },
-      {
-        key: 'add-subscriber',
-        name: 'Add Subscriber',
-        link: '/admin/add/subscriber'
-      },
+      // {
+      //   key: 'add-subscriber',
+      //   name: 'Add Subscriber',
+      //   link: '/admin/add/subscriber'
+      // },
       {
         key: 'all-subscribers',
         name: 'All Subscribers',

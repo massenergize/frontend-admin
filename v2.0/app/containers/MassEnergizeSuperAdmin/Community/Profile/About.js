@@ -152,7 +152,7 @@ class About extends React.Component {
               {'Community Admins'}
               {community && community.admins &&
                 (community.admins.map(a => (
-                  <ListItem>
+                  <ListItem key={a.email}>
                     {a.profile_picture
                       && <Avatar alt={a.initials} src={a.profile_picture.url} style={{ margin: 10 }} />
                     }

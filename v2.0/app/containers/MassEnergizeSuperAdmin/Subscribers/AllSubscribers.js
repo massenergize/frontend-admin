@@ -3,54 +3,44 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
-// import { PapperBlock } from 'dan-components';
-// import imgApi from 'dan-api/images/photos';
-// import classNames from 'classnames';
 import Typography from '@material-ui/core/Typography';
-// import Table from '@material-ui/core/Table';
-// import TableBody from '@material-ui/core/TableBody';
-// import TableCell from '@material-ui/core/TableCell';
-// import TableHead from '@material-ui/core/TableHead';
-// import TableRow from '@material-ui/core/TableRow';
-// import Chip from '@material-ui/core/Chip';
 import Avatar from '@material-ui/core/Avatar';
-
-
+import { bindActionCreators } from 'redux';
 import MUIDataTable from 'mui-datatables';
 import FileCopy from '@material-ui/icons/FileCopy';
 import EditIcon from '@material-ui/icons/Edit';
 import { Link } from 'react-router-dom';
-
-import Paper from '@material-ui/core/Paper';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import Grid from '@material-ui/core/Grid';
-
-// import Icon from '@material-ui/core/Icon';
-// import Edit from '@material-ui/icons/Edit';
-// import Language from '@material-ui/icons/Language';
 import Email from '@material-ui/icons/Email';
 import messageStyles from 'dan-styles/Messages.scss';
 import { connect } from 'react-redux';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-import { bindActionCreators } from 'redux';
-import { reduxGetAllVendors, reduxGetAllCommunityVendors } from '../../../redux/redux-actions/adminActions';
-import CommunitySwitch from "../Summary/CommunitySwitch";
-class AllVendors extends React.Component {
+import CommunitySwitch from '../Summary/CommunitySwitch';
+
+
+class AllSubscribers extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { data: [], loading: true, columns: this.getColumns(props.classes) };
+    this.state = {
+      data: [], dataFiltered: [], loading: true, columns: this.getColumns(props.classes) 
+    };
   }
 
   async componentDidMount() {
     const user = this.props.auth ? this.props.auth : {};
+    let allSubscribersResponse = null;
     if (user.is_super_admin) {
-      this.props.callVendorsForSuperAdmin();
+      allSubscribersResponse = await apiCall('/subscribers.listForSuperAdmin');
+    } else if (user.is_community_admin) {
+      allSubscribersResponse = await apiCall('/subscribers.listForCommunityAdmin', { community_id: null });
     }
-    if (user.is_community_admin) {
-      let com = this.props.community ? this.props.community : user.admin_at[0];
-      this.props.callVendorsForNormalAdmin(com.id);
+
+    if (allSubscribersResponse && allSubscribersResponse.data) {
+      const { data } = allSubscribersResponse;
+      await this.setStateAsync({ data, dataFiltered: data });
     }
+
+    await this.setStateAsync({ loading: false });
   }
 
 
@@ -61,37 +51,35 @@ class AllVendors extends React.Component {
   }
 
   showCommunitySwitch = () => {
-    const user = this.props.auth ? this.props.auth: {};
+    const user = this.props.auth ? this.props.auth : {};
     if (user.is_community_admin) {
       return (
         <CommunitySwitch actionToPerform={this.handleCommunityChange} />
       );
     }
+    return <div />;
   }
 
-  handleCommunityChange =(id) => {
-    this.props.callVendorsForNormalAdmin(id);
+  handleCommunityChange = async (id) => {
+    const { data } = this.state;
+    if (!id) {
+      await this.setStateAsync({ dataFiltered: data });
+      return;
+    }
+    const filteredData = (data || []) && data.filter(d => d.community && d.community.id === id);
+    console.log(data, filteredData, id);
+    await this.setStateAsync({ dataFiltered: filteredData });
   }
 
 
-  fashionData = (data) => {
-    data = data.map(d => (
-      [
-        {
-          id: d.id,
-          image: d.logo,
-          initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
-        },
-        `${d.name}...`.substring(0, 30), // limit to first 30 chars
-        d.key_contact, // limit to first 20 chars
-        d.properties_serviced && d.properties_serviced.join(', '),
-        d.communities && d.communities.slice(0, 5).map(c => c.name).join(', '),
-        d.service_area,
-        d.id
-      ]
-    ));
-    return data;
-  }
+  fashionData = (data) => data.map(d => (
+    [
+      d.id,
+      d.name,
+      d.email,
+      d.community && d.community.name,
+    ]
+  ))
 
 
   getStatus = isApproved => {
@@ -104,109 +92,41 @@ class AllVendors extends React.Component {
 
   getColumns = (classes) => [
     {
-      name: 'Vendor',
-      key: 'vendor_id',
+      name: 'ID',
+      key: 'id',
       options: {
         filter: false,
-        download: false,
-        customBodyRender: (d) => (
-          <div>
-            {d.image
-              && <Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} />
-            }
-            {!d.image
-              && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
-            }
-          </div>
-        )
       }
     },
     {
       name: 'Name',
       key: 'name',
       options: {
-        filter: true,
+        filter: false,
       }
     },
     {
-      name: 'Key Contact',
-      key: 'key_contact',
-      options: {
-        filter: false,
-        customBodyRender: (n) => (
-          <div className={classes.flex}>
-            <div>
-              <Typography>{n && n.name}</Typography>
-              <Typography variant="caption">
-                <a href={`mailto:${n && n.email}`} target="_blank" rel="noopener noreferrer" className={classes.downloadInvoice}>
-                  <Email />
-                  &nbsp;
-                  {n && n.email}
-                </a>
-                &nbsp;
-              </Typography>
-            </div>
-          </div>
-        )
-      },
-    },
-    {
-      name: 'Properties Serviced',
-      key: 'properties_serviced',
+      name: 'Email',
+      key: 'email',
       options: {
         filter: false,
       }
     },
     {
-      name: 'Communities Serviced',
-      key: 'communities',
-      options: {
-        filter: false,
-      }
-    },
-    {
-      name: 'Service Area',
-      key: 'service_area',
+      name: 'Community',
+      key: 'community',
       options: {
         filter: true,
-      }
-    },
-    {
-      name: 'Edit? Copy?',
-      key: 'edit_or_copy',
-      options: {
-        filter: false,
-        download: false,
-        customBodyRender: (id) => (
-          <div>
-            <Link to={`/admin/edit/${id}/vendor`}>
-              <EditIcon size="small" variant="outlined" color="secondary" />
-            </Link>
-            &nbsp;&nbsp;
-            <Link
-              onClick={async () => {
-                const copiedVendorResponse = await apiCall('/vendors.copy', { vendor_id: id });
-                if (copiedVendorResponse && copiedVendorResponse.success) {
-                  const newVendor = copiedVendorResponse && copiedVendorResponse.data;
-                  window.location.href = `/admin/edit/${newVendor.id}/vendor`;
-                }
-              }}
-              to="/admin/read/vendors"
-            >
-              <FileCopy size="small" variant="outlined" color="secondary" />
-            </Link>
-          </div>
-        )
       }
     },
   ]
 
   render() {
-    const title = brand.name + ' - All Vendors';
+    const title = brand.name + ' - All Subscribers';
     const description = brand.desc;
-    const { columns, loading } = this.state;
+    const { columns, dataFiltered } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.allVendors);
+    const data = this.fashionData(dataFiltered);
 
     const options = {
       filterType: 'dropdown',
@@ -215,31 +135,14 @@ class AllVendors extends React.Component {
       rowsPerPage: 10,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach(d => {
-          const vendorId = data[d.index][0].id;
-          apiCall('/vendors.delete', { vendor_id: vendorId });
+        idsToDelete.forEach(async d => {
+          const subscriberId = dataFiltered[d.index][0];
+          await apiCall('/subscribers.delete', { subscriber_id: subscriberId });
         });
       }
     };
 
-
-    // if (loading) {
-    //   return (
-    //     <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-    //       <Grid item xs={12} md={6}>
-    //         <Paper className={classes.root}>
-    //           <div className={classes.root}>
-    //             <LinearProgress />
-    //             <h1>Fetching all Vendors.  This may take a while...</h1>
-    //             <br />
-    //             <LinearProgress color="secondary" />
-    //           </div>
-    //         </Paper>
-    //       </Grid>
-    //     </Grid>
-    //   );
-    // }
-
+    console.log(data);
 
     return (
       <div>
@@ -254,19 +157,18 @@ class AllVendors extends React.Component {
         <div className={classes.table}>
           {this.showCommunitySwitch()}
           <MUIDataTable
-            title="All Vendors"
+            title="All Subscribers"
             data={data}
             columns={columns}
             options={options}
           />
         </div>
-
       </div>
     );
   }
 }
 
-AllVendors.propTypes = {
+AllSubscribers.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 function mapStateToProps(state) {
@@ -278,10 +180,8 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
-    callVendorsForSuperAdmin: reduxGetAllVendors,
-    callVendorsForNormalAdmin: reduxGetAllCommunityVendors
   }, dispatch);
 }
-const VendorsMapped = connect(mapStateToProps, mapDispatchToProps)(AllVendors);
+const VendorsMapped = connect(mapStateToProps, mapDispatchToProps)(AllSubscribers);
 
 export default withStyles(styles)(VendorsMapped);

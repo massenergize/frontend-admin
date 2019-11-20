@@ -84,7 +84,6 @@ class Cover extends React.Component {
 
     const { anchorElOpt } = this.state;
     return (
-      // <div className={classes.cover} style={{ backgroundImage: `url(${coverImg})` }}>
       <div className={classes.cover} style={{
         height: 250, textAlign: 'left', justifyContent: 'flex-start', backgroundImage: `url(${coverImg})` 
         }}>
@@ -126,7 +125,9 @@ class Cover extends React.Component {
             <h2 style={{
               display: 'inline-block', marginLeft: 20, marginBottom: 2, fontSize: '1.8rem', fontWeight: '500px', textTransform: 'capitalize' 
               }}>{name}</h2>
-            <VerifiedUser style={{ color: '#0095ff', marginTop: -2, display: 'inline-block', }} className={classes.verified} />
+              {community.is_approved && 
+                <VerifiedUser style={{ color: '#0095ff', marginTop: -2, display: 'inline-block', }} className={classes.verified} />
+              }
             <div style={{ float: 'right' }}>
               <center>
                 {this.showLiveBtn()}

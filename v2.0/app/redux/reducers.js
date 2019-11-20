@@ -12,7 +12,7 @@ import uiReducer from './modules/ui';
 import contact from './modules/contact';
 import initval from './modules/initForm';
 import app, {
-  communitiesReducer, tokenReducer, selectedCommunityReducer, fullSelectedCommunityReducer, authAdminReducer, allActionsReducer, allEventsReducer, allTestimonialsReducer, allUsersReducer, allTagsReducer, allTeamsReducer, allGoalsReducer, vendorsReducer, policiesReducer
+  communitiesReducer, summaryDataReducer, graphDataReducer, tokenReducer, selectedCommunityReducer, fullSelectedCommunityReducer, authAdminReducer, allActionsReducer, allEventsReducer, allTestimonialsReducer, allUsersReducer, allTagsReducer, allTeamsReducer, allGoalsReducer, vendorsReducer, policiesReducer
 } from './modules/appReducer';
 
 /**
@@ -27,6 +27,8 @@ export default function createReducer(injectedReducers = {}) {
     ui: uiReducer,
     auth: authAdminReducer,
     communities: communitiesReducer,
+    summary_data: summaryDataReducer,
+    graph_data: graphDataReducer,
     allActions: allActionsReducer,
     allTestimonials: allTestimonialsReducer,
     allTags: allTagsReducer,
