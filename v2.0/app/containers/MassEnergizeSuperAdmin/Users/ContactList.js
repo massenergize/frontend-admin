@@ -39,10 +39,10 @@ class ContactList extends React.Component {
       addFn, total
     } = this.props;
     const { filter } = this.state;
-    const favoriteData = dataContact.filter(item => item.get('favorited') === true);
+    const favoriteData = false;
     const getItem = dataArray => dataArray.map(data => {
       const index = dataContact.indexOf(data);
-      if (data.get('name').toLowerCase().indexOf(keyword) === -1) {
+      if (data.get('full_name').toLowerCase().indexOf(keyword) === -1) {
         return false;
       }
       return (
@@ -52,8 +52,8 @@ class ContactList extends React.Component {
           className={index === itemSelected ? classes.selected : ''}
           onClick={() => showDetail(data)}
         >
-          <Avatar alt={data.get('name')} src={data.get('avatar')} className={classes.avatar} />
-          <ListItemText primary={data.get('name')} secondary={data.get('title')} />
+          <Avatar alt={data.get('full_name')} src={data.get('avatar')} className={classes.avatar} />
+          <ListItemText primary={data.get('full_name')} secondary="Member" />
         </ListItem>
       );
     });

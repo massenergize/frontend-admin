@@ -30,12 +30,18 @@ import ContactList from './ContactList';
 import AddContact from './AddContact';
 import styles from './contact-jss';
 import CommunitySwitch from '../Summary/CommunitySwitch';
+import { apiCall } from '../../../utils/messenger';
 import { reduxGetAllCommunityUsers, reduxGetAllUsers } from '../../../redux/redux-actions/adminActions';
 
 class Contact extends React.Component {
-  componentDidMount() {
+  async componentDidMount() {
     const { fetchData } = this.props;
-    fetchData(data);
+    const usersResponse = await apiCall('/users.listForCommunityAdmin');
+    if (usersResponse.success){
+      fetchData(usersResponse.data);
+    }
+    console.log(data)
+    //fetchData(data);
   }
 
   

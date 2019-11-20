@@ -132,7 +132,7 @@ class ContactDetail extends React.Component {
         <div>
           <Hidden smUp>
             <div className={classes.avatarTop}>
-              <Avatar alt={dataContact.getIn([itemSelected, 'name'])} src={dataContact.getIn([itemSelected, 'avatar'])} className={classes.avatar} />
+              <Avatar alt={dataContact.getIn([itemSelected, 'full_name'])} src={dataContact.getIn([itemSelected, 'avatar'])} className={classes.avatar} />
               <Typography variant="h5">
                 {dataContact.getIn([itemSelected, 'name'])}
                 <Typography>
@@ -146,21 +146,21 @@ class ContactDetail extends React.Component {
               <Avatar className={classes.blueIcon}>
                 <LocalPhone />
               </Avatar>
-              <ListItemText primary={dataContact.getIn([itemSelected, 'phone'])} secondary="Phone" />
+              <ListItemText primary={dataContact.getIn([itemSelected, 'preferred_name'])} secondary="Preferred Name" />
             </ListItem>
             <Divider variant="inset" />
-            <ListItem>
+            {/* <ListItem>
               <Avatar className={classes.amberIcon}>
                 <Smartphone />
               </Avatar>
               <ListItemText primary={dataContact.getIn([itemSelected, 'secondaryPhone'])} secondary="Secondary Phone" />
-            </ListItem>
+            </ListItem> */}
             <Divider variant="inset" />
             <ListItem>
               <Avatar className={classes.tealIcon}>
                 <Email />
               </Avatar>
-              <ListItemText primary={dataContact.getIn([itemSelected, 'personalEmail'])} secondary="Personal Email" />
+              <ListItemText primary={dataContact.getIn([itemSelected, 'email'])} secondary="Personal Email" />
             </ListItem>
             <Divider variant="inset" />
             <ListItem>
