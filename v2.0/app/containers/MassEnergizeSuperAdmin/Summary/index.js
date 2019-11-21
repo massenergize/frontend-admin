@@ -15,11 +15,13 @@ import {
   NewsWidget
 } from 'dan-components';
 import { connectRouter } from 'connected-react-router';
+import { bindActionCreators } from 'redux';
 import styles from './dashboard-jss';
 import { getTestimonialsData, getActionsData, getEventsData } from '../../../api/data';
-import { bindActionCreators } from 'redux';
+import SummaryChart from './graph/ChartInfographic';
+import ActionsChartWidget from './graph/ActionsChartWidget';
 import {
- reduxLoadSelectedCommunity, reduxIfExpired, reduxCheckUser, reduxGetAllUsers, reduxCallCommunities, reduxGetAllTags 
+  reduxLoadSelectedCommunity, reduxIfExpired, reduxCheckUser, reduxGetAllUsers, reduxCallCommunities, reduxGetAllTags
 } from '../../../redux/redux-actions/adminActions';
 
 class SummaryDashboard extends PureComponent {
@@ -85,8 +87,10 @@ class SummaryDashboard extends PureComponent {
   render() {
     const title = brand.name + ' - Summary Dashboard';
     const description = brand.desc;
-    const { classes, communities, selected_community } = this.props;
-    const community = selected_community ? selected_community.name :'Choose a community';
+    const {
+ classes, communities, selected_community, auth, summary_data, graph_data 
+} = this.props;
+    const community = selected_community ? selected_community.name : 'Choose a community';
 
     return (
       <div>
@@ -99,50 +103,51 @@ class SummaryDashboard extends PureComponent {
           <meta property="twitter:description" content={description} />
         </Helmet>
 
-        <div>
-          <h3>Choose A Community To Manage</h3>
-          <TextField
-            id="outlined-select-currency"
-            select
-            label="Select Community"
-            className={classes.textField}
-            value={community}
-            fullWidth
-            onChange={option => { this.chooseCommunity(option); }}
-            SelectProps={{
-              MenuProps: {
-                className: classes.menu,
-              },
-            }}
-            helperText="Select a community"
-            margin="normal"
-            variant="outlined"
-          >
-            {communities.map(option => (
-              <MenuItem key={option.id.toString()} value={option.name}>
-                {option.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        </div>
-        {/* <Grid container className={classes.root}>
-          <CounterChartWidget />
-        </Grid>
-        <Divider className={classes.divider} /> */}
-        {/* <SalesChartWidget /> */}
-        <Divider className={classes.divider} />
-        {/* <Grid container spacing={24} className={classes.root}>
-          <Grid item md={4} xs={12}>
-            <CarouselWidget goals={this.state.testimonials} />
-          </Grid>
-          <Grid item md={4} sm={6} xs={12}>
-            <NewsWidget kind="action" dataCollection={this.state.actions} />
-          </Grid>
-          <Grid item md={4} sm={6} xs={12}>
-            <NewsWidget kind="event" dataCollection={this.state.events} />
-          </Grid>
 
-        </Grid> */}
+        <h1>
+          Howdy Super Admin
+          <span role="img" aria-label="smiley">
+            😊
+          </span>
+        </h1>
+        {/* {this.showCommunitySwitch()} */}
+        <Grid container className={classes.root}>
+          <SummaryChart data={summary_data} />
+        </Grid>
+        <Divider className={classes.divider} />
+        {graph_data
+          && <ActionsChartWidget data={graph_data || {}} />
+        }
+        <br />
+        <br />
+        <Grid item xs={12} md={12}>
+          <div>
+            <h3>Choose A Community To Manage</h3>
+            <TextField
+              id="outlined-select-currency"
+              select
+              label="Select Community"
+              className={classes.textField}
+              value={community}
+              fullWidth
+              onChange={option => { this.chooseCommunity(option); }}
+              SelectProps={{
+                MenuProps: {
+                  className: classes.menu,
+                },
+              }}
+              helperText="Select a community"
+              margin="normal"
+              variant="outlined"
+            >
+              {communities.map(option => (
+                <MenuItem key={option.id.toString()} value={option.name}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </div>
+        </Grid>
       </div>
     );
   }
@@ -153,15 +158,17 @@ SummaryDashboard.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-    communities: state.getIn(['communities']), 
-    selected_community:state.getIn(['selected_community'])
-  });
+  communities: state.getIn(['communities']),
+  selected_community: state.getIn(['selected_community']),
+  summary_data: state.getIn(['summary_data']),
+  graph_data: state.getIn(['graph_data']) || {}
+});
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
-    selectCommunity: reduxLoadSelectedCommunity, 
-    ifExpired : reduxCheckUser
-    
-  },dispatch);
+  selectCommunity: reduxLoadSelectedCommunity,
+  ifExpired: reduxCheckUser
+
+}, dispatch);
 const summaryMapped = connect(mapStateToProps, mapDispatchToProps)(SummaryDashboard);
 
 export default withStyles(styles)(summaryMapped);
