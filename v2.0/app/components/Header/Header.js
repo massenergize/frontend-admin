@@ -118,7 +118,6 @@ class Header extends React.Component {
         this.props.callTeamsForNormalAdmin(id);
         break;
       default:
-        return;
     }
   }
 
@@ -132,7 +131,8 @@ class Header extends React.Component {
       mode,
       title,
       openGuide,
-      history
+      history,
+      auth
     } = this.props;
     const {
       fullScreen,
@@ -140,13 +140,13 @@ class Header extends React.Component {
       turnDarker,
       showTitle
     } = this.state;
-
     const setMargin = (sidebarPosition) => {
       if (sidebarPosition === 'right-sidebar') {
         return classes.right;
       }
       return classes.left;
     };
+
 
     return (
       <AppBar
@@ -204,14 +204,22 @@ class Header extends React.Component {
           </Hidden>
           {/* <CommunitySwitch actionToPerform={this.handleCommunityChange} /> */}
 
-          {/* <div className={classes.searchWrapper}>
-            <div className={classNames(classes.wrapper, classes.light)}>
-              <div className={classes.search}>
+          <div className={classes.searchWrapper}>
+            {/* <div className={classNames(classes.wrapper, classes.light)}> */}
+            {/* <div className={classes.search}>
                 <SearchIcon />
               </div>
-              <SearchUi history={history} />
-            </div>
-          </div> */}
+              <SearchUi history={history} /> */}
+            <h3>
+            Howdy,
+              {auth && ' ' + auth.preferred_name}
+              {auth && (auth.is_super_admin ? ' (Super Admin) ' : ' (Community Admin) ')}
+              <span role="img" aria-label="smiley">
+                😊
+              </span>
+            </h3>
+            {/* </div> */}
+          </div>
           <Hidden xsDown>
             <span className={classes.separatorV} />
           </Hidden>

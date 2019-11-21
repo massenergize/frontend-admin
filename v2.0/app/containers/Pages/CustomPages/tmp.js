@@ -3023,3 +3023,63 @@ const FormInit = connect(
 )(ReduxFormMapped);
 
 export default withStyles(styles, { withTheme: true })(FormInit);
+
+
+        {/* <Grid item xs={12} md={12}>
+          <div>
+            <h3>Choose A Community To Manage</h3>
+            <TextField
+              id="outlined-select-currency"
+              select
+              label="Select Community"
+              className={classes.textField}
+              value={community}
+              fullWidth
+              onChange={option => { this.chooseCommunity(option); }}
+              SelectProps={{
+                MenuProps: {
+                  className: classes.menu,
+                },
+              }}
+              helperText="Select a community"
+              margin="normal"
+              variant="outlined"
+            >
+              {communities.map(option => (
+                <MenuItem key={option.id.toString()} value={option.name}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </div>
+        </Grid> */}
+
+
+        callForEvents = () => {
+          const me = this;
+          getEventsData().then(res => {
+            console.log('i am the events', res);
+            me.setState({ events: res.data });
+          }).catch(err => {
+      
+          });
+        }
+      
+        callForTestimonials = () => {
+          const me = this;
+          getTestimonialsData().then(res => {
+            me.setState({ testimonials: res.data });
+          }).catch(err => {
+            console.log(err);
+          });
+        }
+      
+        callForActions = () => {
+          const me = this;
+          getActionsData().then(res => {
+            me.setState({ actions: res.data });
+          }).catch(err => {
+            console.log(err);
+          });
+        }
+      

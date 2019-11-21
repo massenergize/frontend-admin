@@ -32,33 +32,6 @@ class NormalAdminHome extends PureComponent {
     this.state = { };
   }
 
-  callForEvents = () => {
-    const me = this;
-    getEventsData().then(res => {
-      console.log('i am the events', res);
-      me.setState({ events: res.data });
-    }).catch(err => {
-
-    });
-  }
-
-  callForTestimonials = () => {
-    const me = this;
-    getTestimonialsData().then(res => {
-      me.setState({ testimonials: res.data });
-    }).catch(err => {
-      console.log(err);
-    });
-  }
-
-  callForActions = () => {
-    const me = this;
-    getActionsData().then(res => {
-      me.setState({ actions: res.data });
-    }).catch(err => {
-      console.log(err);
-    });
-  }
 
   findCommunityObj = (id) => {
     const { auth } = this.props;
