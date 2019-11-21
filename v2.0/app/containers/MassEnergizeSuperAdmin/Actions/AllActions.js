@@ -22,6 +22,8 @@ import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
 import { reduxGetAllActions, reduxGetAllCommunityActions } from '../../../redux/redux-actions/adminActions';
 import CommunitySwitch from '../Summary/CommunitySwitch';
+import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
+
 class AllActions extends React.Component {
   constructor(props) {
     super(props);
@@ -201,12 +203,7 @@ class AllActions extends React.Component {
         <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
           <Grid item xs={12} md={6}>
             <Paper className={classes.root}>
-              <div className={classes.root}>
-                <LinearProgress />
-                <h1>Fetching all Actions.  This may take a while...</h1>
-                <br />
-                <LinearProgress color="secondary" />
-              </div>
+              <LinearBuffer />
             </Paper>
           </Grid>
         </Grid>

@@ -13,7 +13,7 @@ import ActionsChartWidget from './graph/ActionsChartWidget';
 import {
   reduxLoadSelectedCommunity, reduxCheckUser
 } from '../../../redux/redux-actions/adminActions';
-
+// import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
 class SummaryDashboard extends PureComponent {
   constructor(props) {
     super(props);

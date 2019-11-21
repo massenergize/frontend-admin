@@ -267,6 +267,8 @@ class CreateNewCommunityForm extends Component {
         },
         {
           name: 'accepted_terms_and_conditions',
+          modalText: 'Terms and Conditions',
+          modalTitle: 'Terms and Conditions',
           label: 'Accept Terms And Conditions',
           fieldType: 'Radio',
           isRequired: false,

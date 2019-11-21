@@ -33,6 +33,7 @@ import { dataSales } from 'dan-api/chart/chartData';
 import { data2 } from 'dan-api/chart/chartMiniData';
 import PapperBlock from 'dan-components/PapperBlock/PapperBlock';
 import styles from './widget-jss';
+import LinearBuffer from '../../../../components/Massenergize/LinearBuffer';
 
 const color = ({
   primary: colorfull[6],
@@ -95,7 +96,9 @@ class ActionsChartWidget extends PureComponent {
     if (!communities && !dataToGraph) {
       return (
         <PapperBlock whiteBg noMargin title="Community Engagement" icon="ios-stats-outline" desc="">
-          <Grid container spacing={16}>Fetching Data</Grid>
+          <Grid container spacing={16}>
+            <LinearBuffer />
+          </Grid>
         </PapperBlock>
       );
     }

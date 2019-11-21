@@ -33,6 +33,7 @@ import {
 import { apiCall, apiCallWithMedia } from '../../../utils/messenger';
 import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
 import FieldTypes from './fieldTypes';
+import Modal from './Modal';
 
 const styles = theme => ({
   root: {
@@ -385,6 +386,12 @@ class MassEnergizeForm extends Component {
     );
   }
 
+  renderModalText = (field) => {
+    if (field && field.modalText) {
+      return (<Modal title={field.modalTitle} text={field.modalText} />);
+    }
+    return <div />;
+  }
 
   /**
    * Given the field, it renders the actual component
@@ -585,7 +592,12 @@ class MassEnergizeForm extends Component {
    * Takes a list of fields and renders them one by depending on which type
    * by making use of a helper function
    */
-  renderFields = (fields) => fields.map(field => this.renderField(field))
+  renderFields = (fields) => fields.map(field => (
+    <div>
+      {this.renderModalText(field)}
+      {this.renderField(field)}
+    </div>
+  ))
 
 
   render() {
@@ -663,8 +675,8 @@ class MassEnergizeForm extends Component {
                 )
                 }
                 <div>
-                  {formJson && formJson.cancelLink &&
-                    (
+                  {formJson && formJson.cancelLink
+                    && (
                       <Link to={formJson.cancelLink}>
                         Cancel
                       </Link>

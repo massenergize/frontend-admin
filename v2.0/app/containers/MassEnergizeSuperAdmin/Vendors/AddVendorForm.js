@@ -359,6 +359,8 @@ class CreateNewVendorForm extends Component {
         {
           name: 'accepted_terms_and_conditions',
           label: 'Accept Terms And Conditions',
+          modalText: 'Terms and Conditions',
+          modalTitle: 'Terms and Conditions',
           fieldType: 'Radio',
           isRequired: false,
           defaultValue: 'false',
