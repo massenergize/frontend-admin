@@ -37,14 +37,13 @@ class Contact extends React.Component {
   async componentDidMount() {
     const { fetchData } = this.props;
     const usersResponse = await apiCall('/users.listForCommunityAdmin');
-    if (usersResponse.success){
+    if (usersResponse.success) {
+      console.log(usersResponse.data)
       fetchData(usersResponse.data);
     }
-    console.log(data)
-    //fetchData(data);
   }
 
-  
+
   submitContact = (item, avatar) => {
     const { submit } = this.props;
     submit(item, avatar);
@@ -76,7 +75,7 @@ class Contact extends React.Component {
       avatarInit,
       open,
       showMobileDetail,
-      add, 
+      add,
       edit,
       close,
       remove,
@@ -85,9 +84,9 @@ class Contact extends React.Component {
       search,
       closeNotif,
       messageNotif,
-      full_community 
+      full_community,
+      auth
     } = this.props;
-    console.log(full_community);
     return (
       <div>
         <Helmet>
@@ -98,7 +97,7 @@ class Contact extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        {this.showCommunitySwitch()}
+        {/* {this.showCommunitySwitch()} */}
         <Notification close={() => closeNotif()} message={messageNotif} />
         <div className={classes.root}>
           <ContactList
@@ -111,6 +110,7 @@ class Contact extends React.Component {
             showDetail={showDetail}
             search={search}
             keyword={keyword}
+            communities={auth.admin_at || []}
           />
           <ContactDetail
             showMobileDetail={showMobileDetail}
@@ -122,13 +122,13 @@ class Contact extends React.Component {
             favorite={favorite}
           />
         </div>
-        <AddContact
+        {/* <AddContact
           addContact={add}
           openForm={open}
           closeForm={close}
           submit={this.submitContact}
           avatarInit={avatarInit}
-        />
+        /> */}
       </div>
     );
   }

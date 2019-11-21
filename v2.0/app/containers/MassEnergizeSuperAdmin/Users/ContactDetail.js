@@ -69,13 +69,13 @@ class ContactDetail extends React.Component {
       <main className={classNames(classes.content, showMobileDetail ? classes.detailPopup : '')}>
         <section className={classes.cover}>
           <div className={classes.opt}>
-            <IconButton className={classes.favorite} aria-label="Favorite" onClick={() => favorite(dataContact.get(itemSelected))}>
+            {/* <IconButton className={classes.favorite} aria-label="Favorite" onClick={() => favorite(dataContact.get(itemSelected))}>
               {dataContact.getIn([itemSelected, 'favorited']) ? (<Star />) : <StarBorder />}
             </IconButton>
             <IconButton aria-label="Edit" onClick={() => edit(dataContact.get(itemSelected))}>
               <Edit />
-            </IconButton>
-            <IconButton
+            </IconButton> */}
+            {/* <IconButton
               aria-label="More"
               aria-owns={anchorElOpt ? 'long-menu' : null}
               aria-haspopup="true"
@@ -83,8 +83,8 @@ class ContactDetail extends React.Component {
               onClick={this.handleClickOpt}
             >
               <MoreVertIcon />
-            </IconButton>
-            <Menu
+            </IconButton> */}
+            {/* <Menu
               id="long-menu"
               anchorEl={anchorElOpt}
               open={Boolean(anchorElOpt)}
@@ -110,7 +110,7 @@ class ContactDetail extends React.Component {
                   </MenuItem>
                 );
               })}
-            </Menu>
+            </Menu> */}
           </div>
           <IconButton
             onClick={hideDetail}
@@ -120,7 +120,12 @@ class ContactDetail extends React.Component {
             <ArrowBack />
           </IconButton>
           <Hidden xsDown>
-            <Avatar alt={dataContact.getIn([itemSelected, 'name'])} src={dataContact.getIn([itemSelected, 'avatar'])} className={classes.avatar} />
+            {dataContact.getIn([itemSelected, 'profile_picture'])
+              && (<Avatar alt={dataContact.getIn([itemSelected, 'full_name'])} src={dataContact.getIn([itemSelected, 'profile_picture']).url} className={classes.avatar} />)
+            }
+            {!dataContact.getIn([itemSelected, 'profile_picture']) && dataContact.getIn([itemSelected, 'full_name'])
+              && (<Avatar className={classes.avatar}>{dataContact.getIn([itemSelected, 'full_name']).substring(0, 2).toUpperCase()}</Avatar>)
+            }
             <Typography className={classes.userName} variant="h6">
               {dataContact.getIn([itemSelected, 'name'])}
               <Typography variant="caption">
@@ -149,13 +154,6 @@ class ContactDetail extends React.Component {
               <ListItemText primary={dataContact.getIn([itemSelected, 'preferred_name'])} secondary="Preferred Name" />
             </ListItem>
             <Divider variant="inset" />
-            {/* <ListItem>
-              <Avatar className={classes.amberIcon}>
-                <Smartphone />
-              </Avatar>
-              <ListItemText primary={dataContact.getIn([itemSelected, 'secondaryPhone'])} secondary="Secondary Phone" />
-            </ListItem> */}
-            <Divider variant="inset" />
             <ListItem>
               <Avatar className={classes.tealIcon}>
                 <Email />
@@ -164,24 +162,17 @@ class ContactDetail extends React.Component {
             </ListItem>
             <Divider variant="inset" />
             <ListItem>
-              <Avatar className={classes.brownIcon}>
-                <Work />
-              </Avatar>
-              <ListItemText primary={dataContact.getIn([itemSelected, 'companyEmail'])} secondary="Company Email" />
-            </ListItem>
-            <Divider variant="inset" />
-            <ListItem>
               <Avatar className={classes.redIcon}>
                 <LocationOn />
               </Avatar>
-              <ListItemText primary={dataContact.getIn([itemSelected, 'address'])} secondary="Address" />
+              <ListItemText primary={(dataContact.getIn([itemSelected, 'communities']) || []).join(', ')} secondary="Member Communities" />
             </ListItem>
             <Divider variant="inset" />
             <ListItem>
               <Avatar className={classes.purpleIcon}>
                 <Language />
               </Avatar>
-              <ListItemText primary={dataContact.getIn([itemSelected, 'website'])} secondary="Website" />
+              <ListItemText primary={dataContact.getIn([itemSelected, 'is_super_admin']) ? 'Super Admin' : dataContact.getIn([itemSelected, 'is_community_admin']) ? 'Community Admin' : 'Member'} secondary="Role" />
             </ListItem>
           </List>
         </div>

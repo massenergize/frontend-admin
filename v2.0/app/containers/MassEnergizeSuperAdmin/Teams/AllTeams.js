@@ -70,6 +70,7 @@ class AllTeams extends React.Component {
   }
 
   fashionData = (data) => {
+    if (!data) return [];
     const fashioned = data.map(d => (
       [
         {

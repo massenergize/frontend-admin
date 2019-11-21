@@ -26,6 +26,15 @@ class ContactList extends React.Component {
     this.setState({ filter: value });
   };
 
+  filterUsers = (allData, val) => {
+    console.log(allData)
+    if (!allData) return [];
+    if (val === 'all') {
+      return allData;
+    }
+    return allData.filter(d => d.communities.filter(val) > 0);
+  }
+
   render() {
     const {
       classes,
@@ -36,10 +45,12 @@ class ContactList extends React.Component {
       keyword,
       clippedRight,
       addContact,
-      addFn, total
+      addFn, total,
+      communities
     } = this.props;
+    console.log(communities);
+
     const { filter } = this.state;
-    const favoriteData = false;
     const getItem = dataArray => dataArray.map(data => {
       const index = dataContact.indexOf(data);
       if (data.get('full_name').toLowerCase().indexOf(keyword) === -1) {
@@ -52,8 +63,13 @@ class ContactList extends React.Component {
           className={index === itemSelected ? classes.selected : ''}
           onClick={() => showDetail(data)}
         >
-          <Avatar alt={data.get('full_name')} src={data.get('avatar')} className={classes.avatar} />
-          <ListItemText primary={data.get('full_name')} secondary="Member" />
+          {data.get('profile_picture')
+            && (<Avatar alt={data.get('full_name')} src={data.get('profile_picture').url} className={classes.avatar} />)
+          }
+          {!data.get('profile_picture')
+            && (<Avatar className={classes.avatar}>{data.get('full_name').substring(0, 2).toUpperCase()}</Avatar>)
+          }
+          <ListItemText primary={data.get('full_name')} secondary={data.get('is_super_admin') ? 'Super Admin' : data.getIn('is_community_admin') ? 'Community Admin' : 'Member'} />
         </ListItem>
       );
     });
@@ -76,29 +92,31 @@ class ContactList extends React.Component {
                   </div>
                   <input className={classes.input} onChange={(event) => search(event)} placeholder="Search" />
                 </div>
-                {addFn && (
+                {/* {addFn && (
                   <Tooltip title="Add New Contact">
                     <IconButton className={classes.buttonAdd} onClick={() => addContact()} color="secondary" aria-label="Delete">
                       <Add />
                     </IconButton>
                   </Tooltip>
-                )}
+                )} */}
               </div>
             </div>
             <div className={classes.total}>
               {total}
               &nbsp;
-              Contacts
+              Users
             </div>
             <List>
-              {filter === 'all' ? getItem(dataContact) : getItem(favoriteData)}
+              {getItem(dataContact, filter)}
             </List>
           </div>
         </Drawer>
-        <BottomNavigation value={filter} onChange={this.handleChange} className={classes.bottomFilter}>
+        {/* <BottomNavigation value={filter} onChange={this.handleChange} className={classes.bottomFilter}>
           <BottomNavigationAction label="All" value="all" icon={<PermContactCalendar />} />
-          <BottomNavigationAction label="Favorites" value="favorites" icon={<Star />} />
-        </BottomNavigation>
+          {communities && communities.map(c => (
+            <BottomNavigationAction key={c.name} label={c.name && c.name} value={c.name} icon={<PermContactCalendar />} />
+          ))}
+        </BottomNavigation> */}
       </Fragment>
     );
   }
@@ -106,6 +124,7 @@ class ContactList extends React.Component {
 
 ContactList.propTypes = {
   classes: PropTypes.object.isRequired,
+  communities: PropTypes.array.isRequired,
   total: PropTypes.number.isRequired,
   dataContact: PropTypes.object.isRequired,
   keyword: PropTypes.string.isRequired,

@@ -231,12 +231,12 @@ module.exports = [
       },
     ]
   },
-  {
-    key: 'export',
-    name: 'Export',
-    icon: 'ios-cloud-download',
-    link: '/admin/export'
-  },
+  // {
+  //   key: 'export',
+  //   name: 'Export',
+  //   icon: 'ios-cloud-download',
+  //   link: '/admin/export'
+  // },
   // {
   //   key: 'page-customization',
   //   name: 'Pages',
