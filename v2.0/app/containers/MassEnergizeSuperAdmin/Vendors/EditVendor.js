@@ -202,7 +202,7 @@ class CreateNewVendorForm extends Component {
                     placeholder: 'eg. wayland',
                     fieldType: 'TextField',
                     contentType: 'text',
-                    isRequired: true,
+                    isRequired: false,
                     defaultValue: vendor.location && vendor.location.unit,
                     dbName: 'unit',
                     readOnly: false
@@ -226,7 +226,7 @@ class CreateNewVendorForm extends Component {
                     contentType: 'text',
                     isRequired: true,
                     data: countries,
-                    defaultValue: (vendor.location && vendor.location.country) || 'United States',
+                    defaultValue: (vendor.location && vendor.location.country),
                     dbName: 'country',
                     readOnly: false,
                     child: {

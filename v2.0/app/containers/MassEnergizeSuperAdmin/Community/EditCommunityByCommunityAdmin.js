@@ -143,7 +143,7 @@ class EditCommunityByCommunityAdmin extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: `${community.location && community.location.address ? community.location.address : ''}`,
+                    defaultValue: community.location && community.location.address,
                     dbName: 'address',
                     readOnly: false
                   },
@@ -154,7 +154,7 @@ class EditCommunityByCommunityAdmin extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: `${community.location && community.location.unit ? community.location.unit : ''}`,
+                    defaultValue: community.location && community.location.unit,
                     dbName: 'unit',
                     readOnly: false
                   },
@@ -165,7 +165,7 @@ class EditCommunityByCommunityAdmin extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: `${community.location && community.location.city ? community.location.city : ''}`,
+                    defaultValue: community.location && community.location.city,
                     dbName: 'city',
                     readOnly: false
                   },
@@ -177,7 +177,7 @@ class EditCommunityByCommunityAdmin extends Component {
                     contentType: 'text',
                     isRequired: false,
                     data: states,
-                    defaultValue: `${community.location && community.location.state ? community.location.state : ''}`,
+                    defaultValue: community.location && community.location.state,
                     dbName: 'state',
                     readOnly: false
                   },
@@ -188,7 +188,7 @@ class EditCommunityByCommunityAdmin extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: `${community.location && community.location.zipcode ? community.location.zipcode : ''}`,
+                    defaultValue: community.location && community.location.zipcode,
                     dbName: 'zipcode',
                     readOnly: false
                   },
@@ -200,7 +200,7 @@ class EditCommunityByCommunityAdmin extends Component {
                     contentType: 'text',
                     isRequired: true,
                     data: countries,
-                    defaultValue: `${community.location && community.location.country ? community.location.country : 'United States'}`,
+                    defaultValue: community.location && community.location.country,
                     dbName: 'country',
                     readOnly: false,
                     child: {

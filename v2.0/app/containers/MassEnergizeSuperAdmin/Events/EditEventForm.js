@@ -236,7 +236,7 @@ class CreateNewEventForm extends Component {
                 placeholder: 'eg. wayland',
                 fieldType: 'TextField',
                 contentType: 'text',
-                isRequired: true,
+                isRequired: false,
                 defaultValue: event.location && event.location.unit,
                 dbName: 'unit',
                 readOnly: false
@@ -260,7 +260,7 @@ class CreateNewEventForm extends Component {
                 contentType: 'text',
                 isRequired: true,
                 data: countries,
-                defaultValue: (event.location && event.location.country) || 'United States',
+                defaultValue: (event.location && event.location.country),
                 dbName: 'country',
                 readOnly: false,
                 child: {

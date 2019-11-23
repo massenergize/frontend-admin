@@ -163,7 +163,7 @@ class CreateNewCommunityForm extends Component {
                     contentType: 'text',
                     isRequired: true,
                     data: countries,
-                    defaultValue: 'United States',
+                    defaultValue: '',
                     dbName: 'country',
                     readOnly: false,
                     child: {
