@@ -92,6 +92,9 @@ class SidebarContent extends React.Component {
               <div>
                 <h4>{user.preferred_name ? user.preferred_name : '...'}</h4>
                 <small>{user.is_super_admin ? 'Super Admin' : 'Community Admin ' }</small>
+                <p style={{fontSize: '7px'}}>
+                  Build version 0.7.2
+                </p>
                 {/* <Button size="small" onClick={openMenuStatus}>
                   <i className={classNames(classes.dotStatus, setStatus(status))} />
                   {status}
@@ -136,6 +139,9 @@ class SidebarContent extends React.Component {
         >
           <MainMenu loadTransition={loadTransition} dataMenu={dataMenu} toggleDrawerOpen={toggleDrawerOpen} />
         </div>
+        <h6>
+          Build version 0.7.2
+        </h6>
       </div>
     );
   }

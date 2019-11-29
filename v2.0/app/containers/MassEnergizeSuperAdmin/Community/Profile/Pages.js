@@ -41,21 +41,21 @@ class Pages extends React.Component {
             </Paper>
             <Paper onClick={() => this.goHere(impactPageLink)} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                IMPACT PAGE 
+                IMPACT PAGE
                 {' '}
                 <Icon style={{paddingTop:3, color:'green'}}>forward</Icon>
               </Typography>
             </Paper>
-            <Paper onClick={() => this.goHere(allActions)} className={`${classes.pageCard}`} elevation={1}>
+            {/* <Paper onClick={() => this.goHere(allActions)} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
                 ALL ACTIONS PAGE 
                 {' '}
                 <Icon style={{paddingTop:3, color:'green'}}>forward</Icon>
               </Typography>
-            </Paper>
+            </Paper> */}
             <Paper onClick={() => this.goHere(about)} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                ABOUT PAGE 
+                ABOUT PAGE
                 {' '}
                 <Icon style={{paddingTop:3, color:"green"}}>forward</Icon>
               </Typography>

@@ -89,6 +89,16 @@ class CreateNewVendorForm extends Component {
     });
   }
 
+  getSelectedIds = (selected, dataToCrossCheck) => {
+    const res = [];
+    selected.forEach(s => {
+      if (dataToCrossCheck.filter(d => d.id === s.id).length > 0) {
+        res.push('' + s.id);
+      }
+    });
+    return res;
+  }
+  
   createFormJson = async () => {
     const { vendor } = this.state;
     const formJson = {
