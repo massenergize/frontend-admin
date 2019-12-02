@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import countries from 'dan-api/data/countries';
 import states from 'dan-api/data/states';
 import { withStyles } from '@material-ui/core/styles';
 import MassEnergizeForm from '../_FormGenerator';
@@ -180,33 +179,16 @@ class EditCommunityForm extends Component {
                     readOnly: false
                   },
                   {
-                    name: 'country',
-                    label: 'Which Country is this community Located?',
-                    placeholder: 'eg. United States',
+                    name: 'state',
+                    label: 'State ',
+                    placeholder: 'eg. New York',
                     fieldType: 'Dropdown',
                     contentType: 'text',
-                    isRequired: true,
-                    data: countries,
-                    defaultValue: community.location && community.location.country,
-                    dbName: 'country',
-                    readOnly: false,
-                    child: {
-                      valueToCheck: 'United States',
-                      fields: [
-                        {
-                          name: 'state',
-                          label: 'State ',
-                          placeholder: 'eg. New York',
-                          fieldType: 'Dropdown',
-                          contentType: 'text',
-                          isRequired: false,
-                          data: states,
-                          defaultValue: community.location && community.location.state,
-                          dbName: 'state',
-                          readOnly: false
-                        },
-                      ]
-                    }
+                    isRequired: false,
+                    data: states,
+                    defaultValue: community.location && community.location.state,
+                    dbName: 'state',
+                    readOnly: false
                   },
                 ]
               }

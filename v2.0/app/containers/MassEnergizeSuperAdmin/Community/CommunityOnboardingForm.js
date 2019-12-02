@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import states from 'dan-api/data/states';
-import countries from 'dan-api/data/countries';
 import { withStyles } from '@material-ui/core/styles';
 import MassEnergizeForm from '../_FormGenerator';
 
@@ -156,33 +155,16 @@ class CreateNewCommunityForm extends Component {
                     readOnly: false
                   },
                   {
-                    name: 'country',
-                    label: 'Which Country is this community Located?',
-                    placeholder: 'eg. United States',
+                    name: 'state',
+                    label: 'State ',
+                    placeholder: 'eg. New York',
                     fieldType: 'Dropdown',
                     contentType: 'text',
-                    isRequired: true,
-                    data: countries,
+                    isRequired: false,
+                    data: states,
                     defaultValue: '',
-                    dbName: 'country',
-                    readOnly: false,
-                    child: {
-                      valueToCheck: 'United States',
-                      fields: [
-                        {
-                          name: 'state',
-                          label: 'State ',
-                          placeholder: 'eg. New York',
-                          fieldType: 'Dropdown',
-                          contentType: 'text',
-                          isRequired: false,
-                          data: states,
-                          defaultValue: '',
-                          dbName: 'state',
-                          readOnly: false
-                        },
-                      ]
-                    }
+                    dbName: 'state',
+                    readOnly: false
                   },
                 ]
               }

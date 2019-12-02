@@ -41,7 +41,6 @@ class ImpactPage extends Component {
 
   async componentDidMount() {
     const { id } = this.props.match.params;
-    console.log(id);
     const graphResponse = await apiCall('/graphs.actions.completed', { community_id: id });
     if (graphResponse && !graphResponse.success) {
       return;
@@ -62,25 +61,24 @@ class ImpactPage extends Component {
 
   createFormJson = async () => {
     const { graph } = this.state;
-    console.log(graph);
-    // if (!community) return {};
+    const { community } = graph;
 
     const formJson = {
       title: 'Community Reported Data',
       subTitle: '',
       method: '/graphs.data.update',
-      // successRedirectPage: window.location.href,
+      successRedirectPage: window.location.href,
       fields: []
     };
 
     formJson.fields = graph && graph.data.map(d => (
       {
-        label: `${d.name} Data`,
+        label: `${community && community.name} - ${d.name} Data`,
         fieldType: 'Section',
         children: [
           {
             name: `reported_value_${d.id}`,
-            label: 'Reported Data',
+            label: 'State/Other Reported Data',
             placeholder: 'eg. 10',
             fieldType: 'TextField',
             contentType: 'number',

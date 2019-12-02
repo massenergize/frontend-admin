@@ -97,9 +97,10 @@ class MassEnergizeForm extends Component {
     });
   }
 
-    /**
+  /**
    * Given the field, it renders the actual component
    */
+
     initialFormData = (fields) => {
       const formData = {};
       fields.forEach(field => {
@@ -111,7 +112,7 @@ class MassEnergizeForm extends Component {
             formData[field.name] = [];
             break;
           case FieldTypes.DateTime:
-            formData[field.name] = field.defaultValue ? moment(field.defaultValue) : new Date();
+            formData[field.name] = field.defaultValue ? moment(field.defaultValue) : moment.now();
             break;
           case FieldTypes.HTMLField:
             if (!field.defaultValue || field.defaultValue === '<p></p>\n') {
@@ -193,6 +194,10 @@ class MassEnergizeForm extends Component {
     if (!target) return;
     const { formData } = this.state;
     const { name, value } = target;
+    console.log(value);
+
+    if (!value) return;
+    console.log(value);
     let theList = formData[name];
     if (!theList) {
       theList = [];
@@ -273,7 +278,7 @@ class MassEnergizeForm extends Component {
             cleanedValues[field.dbName] = draftToHtml(convertToRaw(fieldValueInForm.getCurrentContent()));
             break;
           case FieldTypes.DateTime:
-            cleanedValues[field.dbName] = moment.utc(fieldValueInForm || new Date()).format();
+            cleanedValues[field.dbName] = (moment.utc(fieldValueInForm) || moment.now()).format();
             break;
           case FieldTypes.Checkbox:
             if (cleanedValues[field.dbName]) {
@@ -410,7 +415,6 @@ class MassEnergizeForm extends Component {
                   displayEmpty
                   name={field.name}
                   value={this.getValue(field.name)}
-                  onChange={this.handleFormDataChange}
                   input={<Input id="select-multiple-chip" />}
                   renderValue={selected => (
                     <div className={classes.chips}>
@@ -479,6 +483,9 @@ class MassEnergizeForm extends Component {
                 <img style={{ maxWidth: '250px', maxHeight: '250px' }} src={field.previewLink} alt={field.label} />
               </div>
             )}
+            <br />
+            <Modal title="File Upload Instructions" text="If this file is meant to be a logo, use the tool here: https://www4.lunapic.com/editor/?action=resize and resize it to height:57.88px, width:150px.   Also, if this is an image, please don't upload a file > 5MB or a png file" />
+            <br />
             <Fragment>
               <MaterialDropZone
                 acceptedFiles={['image/jpeg', 'image/png', 'image/jpg', 'image/bmp', 'image/svg']}
@@ -571,8 +578,8 @@ class MassEnergizeForm extends Component {
             <div className={classes.picker} style={{ width: '100%' }}>
               <MuiPickersUtilsProvider utils={MomentUtils} style={{ width: '100%' }}>
                 <DateTimePicker
-                  value={this.getValue(field.name, new Date())}
-                  onChange={this.handleFormDataChange}
+                  value={this.getValue(field.name, moment.now())}
+                  onChange={(date) => this.handleFormDataChange({ target: { name: field.name, value: date } })}
                   label={field.label}
                   format="MM/DD/YYYY, h:mm a"
                 />
@@ -700,7 +707,5 @@ MassEnergizeForm.propTypes = {
   classes: PropTypes.object.isRequired,
   formJson: PropTypes.object.isRequired,
 };
-
-// const ReduxFormMapped = reduxForm({ form: 'immutableExample' })(MassEnergizeForm);
 
 export default withStyles(styles, { withTheme: true })(MassEnergizeForm);

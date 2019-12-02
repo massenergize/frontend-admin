@@ -51,9 +51,9 @@ class EditTestimonial extends Component {
     }
     const testimonial = testimonialResponse.data;
     await this.setStateAsync({ testimonial });
-    const tagCollectionsResponse = await apiCall('/tag_collections.listForSuperAdmin');
-    const actionsResponse = await apiCall('/actions.listForSuperAdmin');
-    const vendorsResponse = await apiCall('/vendors.listForSuperAdmin');
+    const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
+    const actionsResponse = await apiCall('/actions.listForCommunityAdmin');
+    const vendorsResponse = await apiCall('/vendors.listForCommunityAdmin');
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
 
     if (communitiesResponse && communitiesResponse.data) {
@@ -121,13 +121,14 @@ class EditTestimonial extends Component {
   }
 
   createFormJson = async () => {
-    const { communities, actions, vendors, testimonial } = this.state;
-    const { pathname } = window.location;
+    const {
+      communities, actions, vendors, testimonial
+    } = this.state;
     const formJson = {
       title: 'Edit Testimonial',
       subTitle: '',
       method: '/testimonials.update',
-      successRedirectPage: pathname || '/admin/read/testimonials',
+      successRedirectPage: '/admin/read/testimonials',
       fields: [
         {
           label: 'About this Testimonial',

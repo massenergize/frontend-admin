@@ -122,7 +122,7 @@ export const reduxGetAllCommunityEvents = (community_id) => dispatch => {
 };
 
 export const reduxGetAllVendors = () => dispatch => {
-  apiCall('/vendors.listForSuperAdmin').then(response => {
+  apiCall('/vendors.listForCommunityAdmin').then(response => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllVendors(response.data));
@@ -133,7 +133,7 @@ export const reduxGetAllVendors = () => dispatch => {
 };
 
 export const reduxGetAllGoals = () => dispatch => {
-  apiCall('/goals.listForSuperAdmin').then(response => {
+  apiCall('/goals.listForCommunityAdmin').then(response => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllGoals(response.data));
@@ -144,7 +144,7 @@ export const reduxGetAllGoals = () => dispatch => {
 };
 
 export const reduxGetAllTeams = () => dispatch => {
-  apiCall('/teams.listForSuperAdmin').then(response => {
+  apiCall('/teams.listForCommunityAdmin').then(response => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllTeams(response.data));
@@ -155,7 +155,7 @@ export const reduxGetAllTeams = () => dispatch => {
 };
 
 export const reduxGetAllPolicies = () => dispatch => {
-  apiCall('/policies.listForSuperAdmin').then(response => {
+  apiCall('/policies.listForCommunityAdmin').then(response => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllPolicies(response.data));
@@ -166,7 +166,7 @@ export const reduxGetAllPolicies = () => dispatch => {
 };
 
 export const reduxGetAllEvents = () => dispatch => {
-  apiCall('/events.listForSuperAdmin').then(response => {
+  apiCall('/events.listForCommunityAdmin').then(response => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllEvents(response.data));
@@ -177,7 +177,7 @@ export const reduxGetAllEvents = () => dispatch => {
 };
 
 export const reduxGetAllUsers = () => dispatch => {
-  apiCall('/users.listForSuperAdmin').then(response => {
+  apiCall('/users.listForCommunityAdmin').then(response => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllUsers(response.data));
@@ -188,7 +188,7 @@ export const reduxGetAllUsers = () => dispatch => {
 };
 
 export const reduxGetAllTestimonials = () => dispatch => {
-  apiCall('/testimonials.listForSuperAdmin').then(response => {
+  apiCall('/testimonials.listForCommunityAdmin').then(response => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllTestimonials(response.data));
@@ -222,7 +222,7 @@ export const reduxGetAllTags = () => dispatch => {
 };
 
 export const reduxGetAllActions = () => dispatch => {
-  apiCall('/actions.listForSuperAdmin').then(response => {
+  apiCall('/actions.listForCommunityAdmin').then(response => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllActions(response.data));

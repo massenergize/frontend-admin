@@ -231,4 +231,10 @@ module.exports = [
     icon: 'ios-people',
     link: '/admin/read/users'
   },
+  {
+    key: 'add-new-super-admin',
+    name: 'New Super admin',
+    icon: 'ios-add-circle',
+    link: '/admin/add-super-admin'
+  }
 ];

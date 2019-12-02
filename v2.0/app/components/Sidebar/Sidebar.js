@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import { connect } from 'react-redux';
 import classNames from 'classnames';
 import Hidden from '@material-ui/core/Hidden';
 import Drawer from '@material-ui/core/Drawer';
@@ -9,7 +10,9 @@ import dummy from 'dan-api/dummy/dummyContents';
 import { bindActionCreators } from 'redux';
 import styles from './sidebar-jss';
 import SidebarContent from './SidebarContent';
-import { connect } from 'react-redux';
+import communityAdminMenu from '../../api/ui/communityAdminMenu';
+import superAdminMenu from '../../api/ui/superAdminMenu';
+
 
 class Sidebar extends React.Component {
   state = {
@@ -52,21 +55,6 @@ class Sidebar extends React.Component {
     this.handleClose();
   }
 
-  getAdminMenus = () => {
-    const new_super_link = {
-      key: 'add-new-super-admin',
-      name: 'New Super admin',
-      icon: 'ios-add-circle',
-      link: '/admin/add-super-admin'
-    };
-    const { auth, dataMenu } = this.props;
-    if (auth) {
-      if (auth.is_community_admin) {
-        return dataMenu.filter(menu => menu.key !== 'communities' && menu.key !== 'tags-collections');
-      }
-      return [...dataMenu, new_super_link];
-    }
-  }
 
   render() {
     const {
@@ -78,7 +66,7 @@ class Sidebar extends React.Component {
       auth,
     } = this.props;
     const { status, anchorEl, turnDarker } = this.state;
-    const dataMenu = this.getAdminMenus();
+    const dataMenu = auth && auth.is_super_admin ? superAdminMenu : communityAdminMenu;
     return (
       <Fragment>
         <Hidden lgUp>

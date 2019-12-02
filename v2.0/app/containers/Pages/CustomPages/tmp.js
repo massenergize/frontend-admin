@@ -2517,8 +2517,8 @@ class CreateNewActionForm extends Component {
 
 
   async componentDidMount() {
-    const tagCollections = await apiCall('/tag_collections.listForSuperAdmin');
-    const vendors = await apiCall('/vendors.listForSuperAdmin');
+    const tagCollections = await apiCall('/tag_collections.listForCommunityAdmin');
+    const vendors = await apiCall('/vendors.listForCommunityAdmin');
     const communities = await apiCall('/communities.listForCommunityAdmin');
 
     if (tagCollections) {

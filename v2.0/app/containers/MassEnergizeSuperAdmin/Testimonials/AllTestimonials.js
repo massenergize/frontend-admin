@@ -52,7 +52,7 @@ class AllTestimonials extends React.Component {
       const com = this.props.community ? this.props.community : user.admin_at[0];
       await this.props.callTestimonialsForNormalAdmin(com.id);
     }
-    // const allTestimonialsResponse = await apiCall('/testimonials.listForSuperAdmin');
+    // const allTestimonialsResponse = await apiCall('/testimonials.listForCommunityAdmin');
 
     // if (allTestimonialsResponse && allTestimonialsResponse.success) {
     //   const data = allTestimonialsResponse.data.map(d => (

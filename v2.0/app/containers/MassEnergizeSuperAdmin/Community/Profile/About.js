@@ -238,13 +238,13 @@ class About extends React.Component {
                 <Icon style={{ paddingTop: 3, color: 'green' }}>forward</Icon>
               </Typography>
             </Paper>
-            <Paper onClick={() => goHere(goalsEditLink)} className={`${classes.pageCard}`} elevation={1}>
+            {/* <Paper onClick={() => goHere(goalsEditLink)} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
                 Edit Community Goal
                 {' '}
                 <Icon style={{ paddingTop: 3, color: 'green' }}>forward</Icon>
               </Typography>
-            </Paper>
+            </Paper> */}
             <Paper onClick={() => goHere(communityEditLink)} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
                 Edit Community Info

@@ -4,7 +4,7 @@ import { Switch, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Dashboard from '../Templates/Dashboard';
-import { reduxCallCommunities, reduxCheckUser } from "../../redux/redux-actions/adminActions";
+import { reduxCallCommunities, reduxCheckUser } from '../../redux/redux-actions/adminActions';
 import {
   Parent,
   DashboardSummaryPage,
@@ -45,50 +45,53 @@ class Application extends React.Component {
   }
 
   render() {
+    const { auth, signOut } = this.props;
+
     const { changeMode, history } = this.props;
-    const user = this.props.auth;
+    const user = auth || {};
+
+    const communityAdminSpecialRoutes = [
+      <Route key="" exact path="/" render={(props) => <DashboardAdminSummaryPage {...props} signOut={signOut} />} />,
+      <Route key="" path="/admin/community/:id/edit" component={EditCommunityByCommunityAdmin} exact />,
+      <Route key="" exact path="/admin" render={(props) => <DashboardAdminSummaryPage {...props} signOut={signOut} />} />,
+      <Route key="" path="/admin/dashboard" render={(props) => <DashboardAdminSummaryPage {...props} signOut={signOut} />} />
+    ];
+
+    const superAdminSpecialRoutes = [
+      <Route key="" exact path="/" render={(props) => <DashboardSummaryPage {...props} signOut={signOut} />} />,
+      <Route key="" path="/admin/community/:id/edit" component={OnboardCommunity} exact />,
+      <Route key="" exact path="/admin" render={(props) => <DashboardSummaryPage {...props} signOut={signOut} />} />,
+      <Route key="" path="/admin/dashboard" render={(props) => <DashboardSummaryPage {...props} signOut={signOut} />} />
+    ];
 
     return (
       <Dashboard history={history} changeMode={changeMode}>
         <Switch>
-          { (user.is_community_admin) 
+          { (user.is_community_admin)
             && (
-              <Route exact path="/" render={(props) => <DashboardAdminSummaryPage {...props} signOut= {this.props.signOut} />} />
+              communityAdminSpecialRoutes
             )
           }
-          { (user.is_super_admin) 
+          { (user.is_super_admin)
             && (
-              <Route exact path="/" render={(props) => <DashboardSummaryPage {...props} signOut= {this.props.signOut} />} />
+              superAdminSpecialRoutes
             )
           }
-          { user.is_community_admin 
-            && (
-              <Route exact path="/admin" render={(props) => <DashboardAdminSummaryPage {...props} signOut ={this.props.signOut} />} />
-            )
-          }
-          { user.is_super_admin && (
-            <Route exact path="/admin" render={(props) => <DashboardSummaryPage {...props} signOut= {this.props.signOut} />} />
-          )
-          }
-          {/* <Route exact path="/" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} />
-          <Route exact path="/admin" render={(props) =><DashboardSummaryPage {...props} signOut = {this.props.signOut} />} /> */}
+
           <Route exact path="/blank" component={BlankPage} />
-          <Route path="/admin/dashboard" component={DashboardSummaryPage} />
-
           <Route path="/admin/read/users" component={UsersList} />
-
           <Route path="/admin/read/communities" component={AllCommunities} />
           <Route path="/admin/add/community" component={OnboardCommunity} />
           <Route path="/admin/community/:id" component={CommunityProfile} exact />
           <Route path="/admin/community/:id/preview" component={CommunityProfile} exact />
           <Route path="/admin/community/:id/profile" component={CommunityProfile} exact />
-          <Route path="/admin/community/:id/edit" component={OnboardCommunity} exact />
           <Route path="/admin/edit/:id/community/community-admin" component={EditCommunityByCommunityAdmin} exact />
           <Route path="/admin/edit/:id/community" component={OnboardCommunity} exact />
           <Route path="/admin/add/:id/community-admins" component={AddRemoveAdmin} exact />
           <Route path="/admin/edit/:id/community-admins" component={AddRemoveAdmin} exact />
           <Route path="/admin/add-super-admin" component={AddRemoveSuperAdmin} exact />
 
+          <Route path="/admin/read/actions" component={AllActions} />
           <Route path="/admin/read/actions" component={AllActions} />
           <Route path="/admin/add/action" component={AddAction} />
           <Route path="/admin/edit/:id/action" component={EditAction} exact />

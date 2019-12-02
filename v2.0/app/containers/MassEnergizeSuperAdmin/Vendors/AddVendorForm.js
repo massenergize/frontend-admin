@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import states from 'dan-api/data/states';
-import countries from 'dan-api/data/countries';
 import { withStyles } from '@material-ui/core/styles';
 import MassEnergizeForm from '../_FormGenerator';
 import { apiCall } from '../../../utils/messenger';
@@ -42,7 +41,6 @@ class CreateNewVendorForm extends Component {
 
   async componentDidMount() {
     const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
-    console.log(tagCollectionsResponse)
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
     if (communitiesResponse && communitiesResponse.data) {
       const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
@@ -220,33 +218,16 @@ class CreateNewVendorForm extends Component {
                     readOnly: false
                   },
                   {
-                    name: 'country',
-                    label: 'Which Country is this community Located?',
-                    placeholder: 'eg. United States',
+                    name: 'state',
+                    label: 'State ',
+                    placeholder: 'eg. New York',
                     fieldType: 'Dropdown',
                     contentType: 'text',
-                    isRequired: true,
-                    data: countries,
+                    isRequired: false,
+                    data: states,
                     defaultValue: '',
-                    dbName: 'country',
-                    readOnly: false,
-                    child: {
-                      valueToCheck: 'United States',
-                      fields: [
-                        {
-                          name: 'state',
-                          label: 'State ',
-                          placeholder: 'eg. New York',
-                          fieldType: 'Dropdown',
-                          contentType: 'text',
-                          isRequired: false,
-                          data: states,
-                          defaultValue: '',
-                          dbName: 'state',
-                          readOnly: false
-                        },
-                      ]
-                    }
+                    dbName: 'state',
+                    readOnly: false
                   },
                 ]
               }
@@ -278,10 +259,12 @@ class CreateNewVendorForm extends Component {
                     name: 'service_area_states',
                     label: 'Which States? Separate them by commas',
                     placeholder: 'eg. New York',
-                    fieldType: 'TextField',
+                    fieldType: 'Checkbox',
                     contentType: 'text',
-                    isRequired: true,
-                    defaultValue: '',
+                    data: states,
+                    selectMany: true,
+                    isRequired: false,
+                    defaultValue: [],
                     dbName: 'service_area_states',
                     readOnly: false
                   },
@@ -290,8 +273,8 @@ class CreateNewVendorForm extends Component {
             },
             {
               name: 'properties_serviced',
-              label: 'Please select your service Area',
-              placeholder: 'eg. Please select one option',
+              label: 'Please select your customer type(s)',
+              placeholder: 'eg. Please select one or more options',
               fieldType: 'Checkbox',
               contentType: 'text',
               isRequired: true,

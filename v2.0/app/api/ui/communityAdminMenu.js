@@ -12,17 +12,12 @@ module.exports = [
     child: [
       {
         key: 'about-communities',
-        name: 'Communities',
+        name: 'My Communities',
         title: true,
       },
       {
-        key: 'onboard-community',
-        name: 'Add New Community',
-        link: '/admin/add/community'
-      },
-      {
         key: 'all-communities',
-        name: 'All Communities',
+        name: 'All My Communities',
         link: '/admin/read/communities'
       },
     ]
@@ -72,28 +67,6 @@ module.exports = [
     ]
   },
   {
-    key: 'tags-collections',
-    name: 'Tag Collections',
-    icon: 'md-reorder',
-    child: [
-      {
-        key: 'about-categories',
-        name: 'Tags & Tag Collections',
-        title: true
-      },
-      {
-        key: 'add-vendor',
-        name: 'Add New Category',
-        link: '/admin/add/category'
-      },
-      {
-        key: 'all-collections',
-        name: 'All Tag Collections',
-        link: '/admin/read/tag-collections'
-      },
-    ]
-  },
-  {
     key: 'teams',
     name: 'Teams',
     icon: 'ios-people',
@@ -116,28 +89,6 @@ module.exports = [
     ]
   },
   {
-    key: 'goals',
-    name: 'Goals',
-    icon: 'ios-checkmark-circle',
-    child: [
-      {
-        key: 'about-goals',
-        name: 'Goals',
-        title: true
-      },
-      {
-        key: 'add-goal',
-        name: 'Add New Goal',
-        link: '/admin/add/goal'
-      },
-      {
-        key: 'all-goals',
-        name: 'All Goals',
-        link: '/admin/read/goals'
-      },
-    ]
-  },
-  {
     key: 'subscribers',
     name: 'Subscribers',
     icon: 'md-reorder',
@@ -147,11 +98,6 @@ module.exports = [
         name: 'Subscribers',
         title: true
       },
-      // {
-      //   key: 'add-subscriber',
-      //   name: 'Add Subscriber',
-      //   link: '/admin/add/subscriber'
-      // },
       {
         key: 'all-subscribers',
         name: 'All Subscribers',
@@ -200,28 +146,6 @@ module.exports = [
         key: 'all-vendors',
         name: 'All Vendors',
         link: '/admin/read/vendors'
-      },
-    ]
-  },
-  {
-    key: 'policies',
-    name: 'Policies',
-    icon: 'ios-alert',
-    child: [
-      {
-        key: 'about-policies',
-        name: 'policies',
-        title: true
-      },
-      {
-        key: 'add-policy',
-        name: 'Add New Policy',
-        link: '/admin/add/policy'
-      },
-      {
-        key: 'all-policies',
-        name: 'All Policies',
-        link: '/admin/read/policies'
       },
     ]
   },

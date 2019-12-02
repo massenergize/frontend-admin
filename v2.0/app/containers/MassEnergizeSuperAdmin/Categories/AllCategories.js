@@ -33,7 +33,7 @@ class AllTagCollections extends React.Component {
   }
 
   async componentDidMount() {
-    const tagCollectionsResponse = await apiCall('/tag_collections.listForSuperAdmin');
+    const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
 
     if (tagCollectionsResponse && tagCollectionsResponse.success) {
       const data = tagCollectionsResponse.data.map(d => (

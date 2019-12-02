@@ -50,9 +50,9 @@ class CreateNewActionForm extends Component {
     if (actionResponse && actionResponse.success) {
       await this.setStateAsync({ action: actionResponse.data });
     }
-    const tagCollectionsResponse = await apiCall('/tag_collections.listForSuperAdmin');
+    const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
-    const vendorsResponse = await apiCall('/vendors.listForSuperAdmin');
+    const vendorsResponse = await apiCall('/vendors.listForCommunityAdmin');
 
     if (communitiesResponse && communitiesResponse.data) {
       const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));

@@ -30,7 +30,7 @@ class AllSubscribers extends React.Component {
     const user = this.props.auth ? this.props.auth : {};
     let allSubscribersResponse = null;
     if (user.is_super_admin) {
-      allSubscribersResponse = await apiCall('/subscribers.listForSuperAdmin');
+      allSubscribersResponse = await apiCall('/subscribers.listForCommunityAdmin');
     } else if (user.is_community_admin) {
       allSubscribersResponse = await apiCall('/subscribers.listForCommunityAdmin', { community_id: null });
     }

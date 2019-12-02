@@ -147,7 +147,7 @@ class AllEvents extends React.Component {
             <Link to={`/admin/edit/${id}/event`}>
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
-            {/* &nbsp;&nbsp;
+            &nbsp;&nbsp;
             <Link
               onClick={async () => {
                 const copiedEventResponse = await apiCall('/events.copy', { event_id: id });
@@ -159,7 +159,7 @@ class AllEvents extends React.Component {
               to="/admin/read/events"
             >
               <FileCopy size="small" variant="outlined" color="secondary" />
-            </Link> */}
+            </Link>
           </div>
         )
       }

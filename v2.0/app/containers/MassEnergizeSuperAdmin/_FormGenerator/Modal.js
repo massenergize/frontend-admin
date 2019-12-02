@@ -6,7 +6,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-export default function AlertDialog() {
+export default function AlertDialog(props) {
   const [open, setOpen] = React.useState(false);
 
   function handleClickOpen() {
@@ -16,12 +16,14 @@ export default function AlertDialog() {
   function handleClose() {
     setOpen(false);
   }
-  
+
+  const { title, text } = props;
 
   return (
+
     <div>
       <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-        Read Terms and Conditions
+        {title || 'Read Terms and Conditions'}
       </Button>
       <Dialog
         open={open}
@@ -30,12 +32,11 @@ export default function AlertDialog() {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {'Massenergize Terms & Conditions'}
+          {title || 'Read Terms and Conditions'}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-          These Website Standard Terms And Conditions (these “Terms” or these “Website Standard Terms And Conditions”) contained herein on this webpage, shall govern your use of this website, including all pages within this website (collectively referred to herein below as this “Website”). These Terms apply in full force and effect to your use of this Website and by using this Website, you expressly accept all terms and conditions contained herein in full. You must not use this Website, if you have any objection to any of these Website Standard Terms And Conditions.
-          This Website is not for use by any minors (defined as those who are not at least 18 years of age), and you must not use this Website if you a minor.
+            {(text && text !== 'Terms and Conditions') || 'These Website Standard Terms And Conditions (these “Terms” or these “Website Standard Terms And Conditions”) contained herein on this webpage, shall govern your use of this website, including all pages within this website (collectively referred to herein below as this “Website”). These Terms apply in full force and effect to your use of this Website and by using this Website, you expressly accept all terms and conditions contained herein in full. You must not use this Website, if you have any objection to any of these Website Standard Terms And Conditions.  This Website is not for use by any minors (defined as those who are not at least 18 years of age), and you must not use this Website if you a minor.'}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
