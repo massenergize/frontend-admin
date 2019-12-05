@@ -61,12 +61,12 @@ module.exports = [
       },
       {
         key: 'add-event',
-        name: 'Add Event',
+        name: 'Add Event or Campaign',
         link: '/admin/add/event'
       },
       {
         key: 'all-events',
-        name: 'All Events',
+        name: 'All Events & Campaigns',
         link: '/admin/read/events'
       },
     ]
@@ -112,28 +112,6 @@ module.exports = [
         key: 'all-teams',
         name: 'All Teams',
         link: '/admin/read/teams'
-      },
-    ]
-  },
-  {
-    key: 'goals',
-    name: 'Goals',
-    icon: 'ios-checkmark-circle',
-    child: [
-      {
-        key: 'about-goals',
-        name: 'Goals',
-        title: true
-      },
-      {
-        key: 'add-goal',
-        name: 'Add New Goal',
-        link: '/admin/add/goal'
-      },
-      {
-        key: 'all-goals',
-        name: 'All Goals',
-        link: '/admin/read/goals'
       },
     ]
   },

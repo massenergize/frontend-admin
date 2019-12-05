@@ -56,12 +56,12 @@ module.exports = [
       },
       {
         key: 'add-event',
-        name: 'Add Event',
+        name: 'Add Event or Campaign',
         link: '/admin/add/event'
       },
       {
         key: 'all-events',
-        name: 'All Events',
+        name: 'All Events & Campaigns',
         link: '/admin/read/events'
       },
     ]

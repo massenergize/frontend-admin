@@ -13,14 +13,13 @@ import { Link } from 'react-router-dom';
 import Avatar from '@material-ui/core/Avatar';
 
 import Grid from '@material-ui/core/Grid';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import Paper from '@material-ui/core/Paper';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-import { reduxGetAllActions, reduxGetAllCommunityActions } from '../../../redux/redux-actions/adminActions';
+import { reduxGetAllActions, reduxGetAllCommunityActions, loadAllActions } from '../../../redux/redux-actions/adminActions';
 import CommunitySwitch from '../Summary/CommunitySwitch';
 import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
 
@@ -29,29 +28,19 @@ class AllActions extends React.Component {
     super(props);
     this.state = {
       columns: this.getColumns(),
-      data: [],
-      loading: true
+      loading: true,
+      allActions: [],
+      data: []
     };
   }
- 
+
 
   async componentDidMount() {
-    const {
-      auth, allActions, callAllActions, callCommunityActions, community
-    } = this.props;
-
-    const user = auth || {};
-
-    if (user.is_super_admin) {
-      callAllActions();
+    const allActionsResponse = await apiCall('/actions.listForCommunityAdmin');
+    if (allActionsResponse && allActionsResponse.success) {
+      loadAllActions(allActionsResponse.data);
+      await this.setStateAsync({ loading: false, allActions: allActionsResponse.data, data: this.fashionData(allActionsResponse.data) });
     }
-    if (user.is_community_admin) {
-      // not nec.. remove later
-      const comm = community || user.admin_at[0];
-      callCommunityActions(comm.id);
-    }
-
-    await this.setStateAsync({ data: this.fashionData(allActions), loading: false });
   }
 
   setStateAsync(state) {
@@ -69,8 +58,10 @@ class AllActions extends React.Component {
     }
   }
 
-  changeActions = (id) => {
-    this.props.callCommunityActions(id);
+  changeActions = async (id) => {
+    const { allActions } = this.state;
+    const newData = allActions.filter(a => (a.community && (a.community.id === id)) || a.is_global);
+    await this.setStateAsync({ data: this.fashionData(newData) });
   }
 
   fashionData =(data) => {
@@ -83,7 +74,6 @@ class AllActions extends React.Component {
         },
         `${d.title}...`.substring(0, 30), // limit to first 30 chars
         d.rank,
-        `${d.featured_summary || 'No summary Provided'}...`.substring(0, 20), // limit to first 20 chars
         `${d.tags.map(t => t.name).join(', ')} `,
         (d.is_global ? 'Global' : (d.community && d.community.name)),
         d.id
@@ -124,13 +114,6 @@ class AllActions extends React.Component {
       key: 'rank',
       options: {
         filter: true,
-      }
-    },
-    {
-      name: 'Featured Summary',
-      key: 'summary',
-      options: {
-        filter: false,
       }
     },
     {
@@ -181,9 +164,13 @@ class AllActions extends React.Component {
   render() {
     const title = brand.name + ' - All Actions';
     const description = brand.desc;
-    const { columns, loading } = this.state;
     const { classes } = this.props;
-    const data =this.fashionData(this.props.allActions);
+    const { columns, loading, data } = this.state;
+
+    if (loading) {
+      return <LinearBuffer />;
+    }
+
     const options = {
       filterType: 'dropdown',
       responsive: 'stacked',
@@ -197,18 +184,6 @@ class AllActions extends React.Component {
         });
       }
     };
-
-    if (loading) {
-      return (
-        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
-              <LinearBuffer />
-            </Paper>
-          </Grid>
-        </Grid>
-      );
-    }
 
     return (
       <div>

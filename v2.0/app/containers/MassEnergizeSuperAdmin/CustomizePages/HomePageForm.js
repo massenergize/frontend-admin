@@ -116,21 +116,21 @@ class HomePageEditForm extends Component {
           label: 'Welcome Title and Pictures',
           fieldType: 'Section',
           children: [
-            {
-              name: 'title',
-              label: 'Main Title',
-              placeholder: 'eg. Welcome to Wayland!',
-              fieldType: 'TextField',
-              contentType: 'text',
-              isRequired: true,
-              defaultValue: `${homePageData.title}`,
-              dbName: 'title',
-              readOnly: false
-            },
+            // {
+            //   name: 'title',
+            //   label: 'Main Title',
+            //   placeholder: 'eg. Welcome to Wayland!',
+            //   fieldType: 'TextField',
+            //   contentType: 'text',
+            //   isRequired: true,
+            //   defaultValue: `${homePageData.title}`,
+            //   dbName: 'title',
+            //   readOnly: false
+            // },
             {
               name: 'description',
-              label: 'Paragraph to be displayed below the title',
-              placeholder: 'Tell us more ...',
+              label: 'Welcome Text: Displayed right below the three images',
+              placeholder: 'eg. Join our effort to fight climate risks ...',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,

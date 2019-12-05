@@ -5,7 +5,7 @@ import CreateNewEventForm from './CreateNewEventForm';
 import EditEventForm from './EditEventForm';
 class CreateNewEvent extends React.Component {
   render() {
-    const title = brand.name + ' - Create New Event';
+    const title = brand.name + ' - Event & Campaigns';
     const description = brand.desc;
     const isEditForm = this.props.location.pathname.includes('edit');
 

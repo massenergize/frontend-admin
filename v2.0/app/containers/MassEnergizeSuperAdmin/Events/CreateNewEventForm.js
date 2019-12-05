@@ -92,10 +92,10 @@ class CreateNewEventForm extends Component {
   createFormJson = async () => {
     const { communities } = this.state;
     const formJson = {
-      title: 'Create New Event',
+      title: 'Create New Event or Campaign',
       subTitle: '',
       method: '/events.create',
-      // successRedirectPage: '/admin/read/events',
+      successRedirectPage: '/admin/read/events',
       fields: [
         {
           label: 'About this event',
@@ -103,7 +103,7 @@ class CreateNewEventForm extends Component {
           children: [
             {
               name: 'name',
-              label: 'Name of Event',
+              label: 'Name of Event or Campaign',
               placeholder: 'Wayland Heatpump Event',
               fieldType: 'TextField',
               contentType: 'text',
