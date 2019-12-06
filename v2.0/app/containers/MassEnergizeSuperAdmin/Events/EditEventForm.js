@@ -107,13 +107,13 @@ class CreateNewEventForm extends Component {
 
   createFormJson = async (event) => {
     const { communities } = this.state;
-    const { pathname } = window.location;
+    // const { pathname } = window.location;
 
     const formJson = {
       title: 'Edit Event or Campaign',
       subTitle: '',
       method: '/events.update',
-      successRedirectPage: pathname || '/admin/read/events',
+      successRedirectPage: '/admin/read/events',
       fields: [
         {
           label: 'Update this event',

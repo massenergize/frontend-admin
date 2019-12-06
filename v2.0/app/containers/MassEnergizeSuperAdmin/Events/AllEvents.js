@@ -62,6 +62,7 @@ class AllEvents extends React.Component {
   fashionData = (data) => {
     const fashioned = data.map(d => (
       [
+        d.id,
         {
           id: d.id,
           image: d.image,
@@ -69,7 +70,6 @@ class AllEvents extends React.Component {
         },
         `${d.name}...`.substring(0, 30), // limit to first 30 chars
         d.rank,
-        `${d.description}...`.substring(0, 20), // limit to first 20 chars
         `${d.tags.map(t => t.name).join(', ')}`,
         (d.is_global ? 'Global' : (d.community && d.community.name)),
         d.id
@@ -80,6 +80,14 @@ class AllEvents extends React.Component {
 
 
   getColumns = () => [
+    {
+      name: 'ID',
+      key: 'id',
+      options: {
+        filter: false,
+        filterType: 'textField'
+      }
+    },
     {
       name: 'Event',
       key: 'event',
@@ -102,24 +110,14 @@ class AllEvents extends React.Component {
       name: 'Name',
       key: 'name',
       options: {
-        filter: true,
+        filter: false,
       }
     },
     {
       name: 'Rank',
       key: 'rank',
       options: {
-        filter: true,
-      }
-    },
-    {
-      name: 'About',
-      key: 'about',
-      options: {
         filter: false,
-        customBodyRender: (d) => (
-          <div dangerouslySetInnerHTML={{ __html: d }} />
-        )
       }
     },
     {
@@ -127,6 +125,7 @@ class AllEvents extends React.Component {
       key: 'tags',
       options: {
         filter: true,
+        filterType: 'textField'
       }
     },
     {
@@ -134,6 +133,7 @@ class AllEvents extends React.Component {
       key: 'community',
       options: {
         filter: true,
+        filterType: 'multiselect'
       }
     },
     {
@@ -181,7 +181,7 @@ class AllEvents extends React.Component {
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {
-          const eventId = data[d.index][0].id;
+          const eventId = data[d.index][0];
           apiCall('/events.delete', { event_id: eventId });
         });
       }
@@ -216,7 +216,7 @@ class AllEvents extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <div className={classes.table}>
-          {this.showCommunitySwitch()}
+          {/* {this.showCommunitySwitch()} */}
           <MUIDataTable
             title="All Events"
             data={data}

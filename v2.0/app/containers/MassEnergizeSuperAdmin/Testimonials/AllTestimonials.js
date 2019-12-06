@@ -52,27 +52,6 @@ class AllTestimonials extends React.Component {
       const com = this.props.community ? this.props.community : user.admin_at[0];
       await this.props.callTestimonialsForNormalAdmin(com.id);
     }
-    // const allTestimonialsResponse = await apiCall('/testimonials.listForCommunityAdmin');
-
-    // if (allTestimonialsResponse && allTestimonialsResponse.success) {
-    //   const data = allTestimonialsResponse.data.map(d => (
-    //     [
-    //       {
-    //         id: d.id,
-    //         image: d.image,
-    //         initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
-    //       },
-    //       `${d.title}...`.substring(0, 30), // limit to first 30 chars
-    //       `${d.body}...`.substring(0, 30), // limit to first 30 chars
-    //       `${d.user ? d.user.full_name : ''}...`.substring(0, 20), // limit to first 20 chars
-    //       `${d.action ? d.action.title : ''} ${d.action && d.action.community ? ` -  (${d.action.community.name})` : ''}`,
-    //       `${d.is_published && d.is_approved ? 'Live' : 'Not Live'}`,
-    //       d.id
-    //     ]
-    //   ));
-    //   await this.setStateAsync({ data, loading: false });
-    // // await this.setStateAsync({ communities: response.data });
-    // }
   }
 
   showCommunitySwitch = () => {
@@ -89,10 +68,12 @@ class AllTestimonials extends React.Component {
   }
 
   fashionData = (data) => {
-    data = data.map(d => (
+    return data.map(d => (
       [
+        d.id,
         {
           id: d.id,
+          is_live: d.is_published && d.is_approved,
           image: d.image,
           initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
         },
@@ -101,12 +82,10 @@ class AllTestimonials extends React.Component {
         (d.community && d.community.name),
         `${d.user ? d.user.full_name : ''}...`.substring(0, 20), // limit to first 20 chars
         `${d.action ? d.action.title : ''} ${d.action && d.action.community ? ` -  (${d.action.community.name})` : ''}...`.substring(0, 20),
-        `${d.is_published && d.is_approved ? 'Live' : 'Not Live'}`,
+        `${d.tags && d.tags.map(t => t.name).join(', ')}`,
         d.id
       ]
     ));
-
-    return data;
   }
 
   setStateAsync(state) {
@@ -126,8 +105,16 @@ class AllTestimonials extends React.Component {
 
   getColumns = () => [
     {
-      name: 'id',
+      name: 'ID',
       key: 'id',
+      options: {
+        filter: true,
+        filterType: 'textField'
+      }
+    },
+    {
+      name: 'Image',
+      key: 'Image',
       options: {
         filter: false,
         download: false,
@@ -179,14 +166,15 @@ class AllTestimonials extends React.Component {
       }
     },
     {
-      name: 'Is it Live? (Published & Approved',
-      key: 'is_published',
+      name: 'Tags',
+      key: 'tags',
       options: {
         filter: true,
+        filterType: 'textField'
       }
     },
     {
-      name: 'Edit? Copy?',
+      name: 'Edit',
       key: 'edit_or_copy',
       options: {
         filter: false,
@@ -216,62 +204,6 @@ class AllTestimonials extends React.Component {
   ]
 
 
-  renderTable = (data, classes) => (
-    <PapperBlock noMargin title="All Testimonials" icon="ios-share-outline" whiteBg desc="">
-      <div className={classes.root}>
-        <Table className={classNames(classes.tableLong, classes.stripped)} padding="dense">
-          <TableHead>
-            <TableRow>
-              <TableCell padding="dense">Title</TableCell>
-              <TableCell>User</TableCell>
-              <TableCell>Action</TableCell>
-              <TableCell>Vendor</TableCell>
-              <TableCell>Is Approved</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map(n => ([
-              <TableRow key={n.id}>
-                <TableCell padding="dense">
-                  <div className={classes.flex}>
-                    <Avatar alt={n.user.full_name} src={n.user.profile_picture ? n.user.profile_picture.url : imgApi[21]} className={classes.productPhoto} />
-                    <div>
-                      <Typography variant="caption">{n.id}</Typography>
-                      <Typography variant="subtitle1">{n.title}</Typography>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell padding="dense">
-                  <div className={classes.flex}>
-                    <div>
-                      <Typography variant="subtitle1">{n.user.full_name}</Typography>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className={classes.flex}>
-                    <Avatar alt={n.action.image ? n.action.image.url : imgApi[21]} src={n.avatar} className={classNames(classes.avatar, classes.sm)} />
-                    <div>
-                      <Typography>{n.action.title}</Typography>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell align="left">
-                  <Typography variant="caption">
-                    {n.vendor ? n.vendor.name : 'None'}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Chip label={n.is_approved ? 'Approved' : 'Not Approved'} className={classNames(classes.chip, this.getStatus(n.is_approved))} />
-                </TableCell>
-              </TableRow>
-            ]))}
-          </TableBody>
-        </Table>
-      </div>
-    </PapperBlock>
-  )
-
   render() {
     const title = brand.name + ' - All Testimonials';
     const description = brand.desc;
@@ -286,29 +218,13 @@ class AllTestimonials extends React.Component {
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {
-          const testimonialId = data[d.index][0].id;
+          const testimonialId = data[d.index][0];
           apiCall('/testimonials.delete', { testimonial_id: testimonialId });
         });
       }
     };
 
-    // if (loading) {
-    //   return (
-    //     <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-    //       <Grid item xs={12} md={6}>
-    //         <Paper className={classes.root}>
-    //           <div className={classes.root} style={{padding:30}}>
-    //             <h2>Will be deployed soon!</h2>
-    //             {/* <LinearProgress />
-    //             <h1>Fetching all Testimonials.  This may take a while...</h1>
-    //             <br />
-    //             <LinearProgress color="secondary" /> */}
-    //           </div>
-    //         </Paper>
-    //       </Grid>
-    //     </Grid>
-    //   );
-    // }
+
 
     return (
       <div>
@@ -321,7 +237,7 @@ class AllTestimonials extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <div className={classes.table}>
-          {this.showCommunitySwitch()}
+          {/* {this.showCommunitySwitch()} */}
           <MUIDataTable
             title="All Testimonials"
             data={data}

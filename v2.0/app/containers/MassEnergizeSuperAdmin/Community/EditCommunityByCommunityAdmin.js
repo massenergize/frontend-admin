@@ -106,7 +106,7 @@ class EditCommunityByCommunityAdmin extends Component {
               isRequired: true,
               defaultValue: community.subdomain,
               dbName: 'subdomain',
-              readOnly: false
+              readOnly: true
             },
             {
               name: 'about',

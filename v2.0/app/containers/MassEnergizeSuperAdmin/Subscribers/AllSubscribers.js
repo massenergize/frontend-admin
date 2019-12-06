@@ -136,13 +136,11 @@ class AllSubscribers extends React.Component {
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(async d => {
-          const subscriberId = dataFiltered[d.index][0];
+          const subscriberId = dataFiltered[d.index].id;
           await apiCall('/subscribers.delete', { subscriber_id: subscriberId });
         });
       }
     };
-
-    console.log(data);
 
     return (
       <div>
@@ -155,7 +153,7 @@ class AllSubscribers extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <div className={classes.table}>
-          {this.showCommunitySwitch()}
+          {/* {this.showCommunitySwitch()} */}
           <MUIDataTable
             title="All Subscribers"
             data={data}

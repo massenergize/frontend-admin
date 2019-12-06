@@ -3,17 +3,9 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
-// import { PapperBlock } from 'dan-components';
-// import imgApi from 'dan-api/images/photos';
-// import classNames from 'classnames';
 import Typography from '@material-ui/core/Typography';
-// import Table from '@material-ui/core/Table';
-// import TableBody from '@material-ui/core/TableBody';
-// import TableCell from '@material-ui/core/TableCell';
-// import TableHead from '@material-ui/core/TableHead';
-// import TableRow from '@material-ui/core/TableRow';
-// import Chip from '@material-ui/core/Chip';
 import Avatar from '@material-ui/core/Avatar';
+import { bindActionCreators } from 'redux';
 
 
 import MUIDataTable from 'mui-datatables';
@@ -21,21 +13,13 @@ import FileCopy from '@material-ui/icons/FileCopy';
 import EditIcon from '@material-ui/icons/Edit';
 import { Link } from 'react-router-dom';
 
-import Paper from '@material-ui/core/Paper';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import Grid from '@material-ui/core/Grid';
-
-// import Icon from '@material-ui/core/Icon';
-// import Edit from '@material-ui/icons/Edit';
-// import Language from '@material-ui/icons/Language';
 import Email from '@material-ui/icons/Email';
 import messageStyles from 'dan-styles/Messages.scss';
 import { connect } from 'react-redux';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-import { bindActionCreators } from 'redux';
 import { reduxGetAllVendors, reduxGetAllCommunityVendors } from '../../../redux/redux-actions/adminActions';
-import CommunitySwitch from "../Summary/CommunitySwitch";
+import CommunitySwitch from '../Summary/CommunitySwitch';
 class AllVendors extends React.Component {
   constructor(props) {
     super(props);
@@ -43,7 +27,7 @@ class AllVendors extends React.Component {
   }
 
   showCommunitySwitch = () => {
-    const user = this.props.auth ? this.props.auth: {};
+    const user = this.props.auth ? this.props.auth : {};
     if (user.is_community_admin) {
       return (
         <CommunitySwitch actionToPerform={this.handleCommunityChange} />
@@ -61,14 +45,16 @@ class AllVendors extends React.Component {
       this.props.callVendorsForSuperAdmin();
     }
     if (user.is_community_admin) {
-      let com = this.props.community ? this.props.community : user.admin_at[0];
+      const com = this.props.community ? this.props.community : user.admin_at[0];
       this.props.callVendorsForNormalAdmin(com.id);
     }
   }
 
   fashionData = (data) => {
+    console.log(data)
     data = data.map(d => (
       [
+        d.id,
         {
           id: d.id,
           image: d.logo,
@@ -101,8 +87,16 @@ class AllVendors extends React.Component {
 
   getColumns = (classes) => [
     {
-      name: 'Vendor',
-      key: 'vendor_id',
+      name: 'ID',
+      key: 'id',
+      options: {
+        filter: true,
+        filterType: 'textField'
+      }
+    },
+    {
+      name: 'Image',
+      key: 'image',
       options: {
         filter: false,
         download: false,
@@ -123,6 +117,7 @@ class AllVendors extends React.Component {
       key: 'name',
       options: {
         filter: true,
+        filterType: 'textField',
       }
     },
     {
@@ -151,15 +146,15 @@ class AllVendors extends React.Component {
       name: 'Properties Serviced',
       key: 'properties_serviced',
       options: {
-        filter: false,
-      }
+        filter: true,
+        filterType: 'textField'      }
     },
     {
       name: 'Communities Serviced',
       key: 'communities',
       options: {
-        filter: false,
-      }
+        filter: true,
+        filterType: 'textField'      }
     },
     {
       name: 'Service Area',
@@ -213,29 +208,11 @@ class AllVendors extends React.Component {
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {
-          const vendorId = data[d.index][0].id;
+          const vendorId = data[d.index][0];
           apiCall('/vendors.delete', { vendor_id: vendorId });
         });
       }
     };
-
-
-    // if (loading) {
-    //   return (
-    //     <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-    //       <Grid item xs={12} md={6}>
-    //         <Paper className={classes.root}>
-    //           <div className={classes.root}>
-    //             <LinearProgress />
-    //             <h1>Fetching all Vendors.  This may take a while...</h1>
-    //             <br />
-    //             <LinearProgress color="secondary" />
-    //           </div>
-    //         </Paper>
-    //       </Grid>
-    //     </Grid>
-    //   );
-    // }
 
 
     return (
@@ -249,7 +226,7 @@ class AllVendors extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <div className={classes.table}>
-          {this.showCommunitySwitch()}
+          {/* {this.showCommunitySwitch()} */}
           <MUIDataTable
             title="All Vendors"
             data={data}

@@ -73,13 +73,13 @@ class AllTeams extends React.Component {
     if (!data) return [];
     const fashioned = data.map(d => (
       [
+        d.id,
         {
           id: d.id,
           image: d.logo,
           initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
         },
         `${d.name}...`.substring(0, 30), // limit to first 30 chars
-        `${d.description}...`.substring(0, 20), // limit to first 20 chars
         d.community && d.community.name,
         d.id
       ]
@@ -90,7 +90,15 @@ class AllTeams extends React.Component {
 
   getColumns = () => [
     {
-      name: 'TeamID',
+      name: 'ID',
+      key: 'id',
+      options: {
+        filter: true,
+        filterType: 'textField'
+      }
+    },
+    {
+      name: 'Team Logo',
       key: 'id',
       options: {
         filter: false,
@@ -98,10 +106,10 @@ class AllTeams extends React.Component {
         customBodyRender: (d) => (
           <div>
             {d.image
-              && <Link to={`/admin/community/${d.id}/profile`}><Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} /></Link>
+              && <Link to={`/admin/edit/${d.id}/team`}><Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} /></Link>
             }
             {!d.image
-              && <Link to={`/admin/community/${d.id}/profile`}><Avatar style={{ margin: 10 }}>{d.initials}</Avatar></Link>
+              && <Link to={`/admin/edit/${d.id}/team`}><Avatar style={{ margin: 10 }}>{d.initials}</Avatar></Link>
             }
           </div>
         )
@@ -111,13 +119,6 @@ class AllTeams extends React.Component {
       name: 'Name',
       key: 'name',
       options: {
-        filter: true,
-      }
-    },
-    {
-      name: 'About',
-      key: 'about',
-      options: {
         filter: false,
       }
     },
@@ -126,6 +127,7 @@ class AllTeams extends React.Component {
       key: 'community',
       options: {
         filter: true,
+        filterType: 'multiselect'
       }
     },
     {
@@ -159,57 +161,11 @@ class AllTeams extends React.Component {
   ]
 
 
-  // renderTable = (data, classes) => (
-  //   <PapperBlock noMargin title="All Teams" icon="ios-share-outline" whiteBg desc="">
-  //     <div className={classes.root}>
-  //       <Table className={classNames(classes.tableLong, classes.stripped)} padding="dense">
-  //         <TableHead>
-  //           <TableRow>
-  //             <TableCell padding="dense">ID</TableCell>
-  //             <TableCell>Name</TableCell>
-  //             <TableCell>Description</TableCell>
-  //           </TableRow>
-  //         </TableHead>
-  //         <TableBody>
-  //           {data.length === 0 ?
-  //             <p style={{margin:25}}>Sorry, teams for this community yet!</p>
-  //             :
-  //             null
-  //           }
-  //           {data.map(n => ([
-  //             <TableRow key={n.id}>
-  //               <TableCell padding="dense">
-  //                 <div className={classes.flex}>
-  //                   <div>
-  //                     <Typography variant="caption">{n.id}</Typography>
-  //                   </div>
-  //                 </div>
-  //               </TableCell>
-  //               <TableCell>
-  //                 <div className={classes.flex}>
-  //                   <div>
-  //                     <Typography>{n.name}</Typography>
-  //                   </div>
-  //                 </div>
-  //               </TableCell>
-
-  //               <TableCell align="left">
-  //                 <Typography variant="caption">
-  //                   {n.description}
-  //                 </Typography>
-  //               </TableCell>
-  //             </TableRow>
-  //           ]))}
-  //         </TableBody>
-  //       </Table>
-  //     </div>
-  //   </PapperBlock>
-  // )
 
   render() {
     const title = brand.name + ' - All Teams';
     const description = brand.desc;
-    const { columns, loading } = this.state;
+    const { columns } = this.state;
     const data = this.fashionData(this.props.allTeams);
     const { classes } = this.props;
     const options = {
@@ -220,7 +176,7 @@ class AllTeams extends React.Component {
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {
-          const teamId = data[d.index][0].id;
+          const teamId = data[d.index][0];
           apiCall('/teams.delete', { team_id: teamId });
         });
       }
@@ -235,8 +191,7 @@ class AllTeams extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        {this.showCommunitySwitch()}
-        {/* {this.renderTable(teams, classes)} */}
+        {/* {this.showCommunitySwitch()} */}
         <div className={classes.table}>
           <MUIDataTable
             title="All Teams"

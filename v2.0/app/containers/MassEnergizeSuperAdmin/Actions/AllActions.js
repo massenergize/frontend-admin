@@ -67,6 +67,7 @@ class AllActions extends React.Component {
   fashionData =(data) => {
     const fashioned = data.map(d => (
       [
+        d.id,
         {
           id: d.id,
           image: d.image,
@@ -85,8 +86,16 @@ class AllActions extends React.Component {
 
   getColumns = () => [
     {
-      name: 'Action',
-      key: 'action',
+      name: 'ID',
+      key: 'id',
+      options: {
+        filter: true,
+        filterType: 'textField'
+      }
+    },
+    {
+      name: 'Image',
+      key: 'image',
       options: {
         filter: false,
         download: false,
@@ -106,14 +115,15 @@ class AllActions extends React.Component {
       name: 'Title',
       key: 'title',
       options: {
-        filter: true,
+        filter: false,
+        filterType: 'textField'
       }
     },
     {
       name: 'Rank',
       key: 'rank',
       options: {
-        filter: true,
+        filter: false,
       }
     },
     {
@@ -121,6 +131,7 @@ class AllActions extends React.Component {
       key: 'tags',
       options: {
         filter: true,
+        filterType: 'textField'
       }
     },
     {
@@ -128,6 +139,7 @@ class AllActions extends React.Component {
       key: 'community',
       options: {
         filter: true,
+        filterType: 'multiselect'
       }
     },
     {
@@ -179,7 +191,7 @@ class AllActions extends React.Component {
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {
-          const actionId = data[d.index][0].id;
+          const actionId = data[d.index][0];
           apiCall('/actions.delete', { action_id: actionId });
         });
       }
@@ -196,7 +208,7 @@ class AllActions extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <div className={classes.table}>
-          {this.showCommunitySwitch()}
+          {/* {this.showCommunitySwitch()} */}
           <MUIDataTable
             title="All Actions"
             data={data}
