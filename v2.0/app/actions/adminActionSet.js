@@ -7,9 +7,9 @@ import { fetchData } from './../utils/messenger';
 
 export const getAllSummaryAction =()=>{
   return dispatch =>{
-    const data = fechData('v2/users') 
-    .then( res => {
-      console.log("I am in the action",res);
-    })
+    // const data = fechData('v2/users') 
+    // .then( res => {
+    //   console.log("I am in the action",res);
+    // })
   }
 }

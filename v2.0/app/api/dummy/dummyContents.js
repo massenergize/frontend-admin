@@ -1,5 +1,4 @@
 import avatarApi from '../images/avatars';
-import { fetchData } from '../../utils/messenger';
 
 const dummyContents = {
   user: {
@@ -17,8 +16,6 @@ const dummyContents = {
   }
 };
 
-fetchData('v2/user/3573eef7-b000-4d2e-8dd3-5495cc13df6f').then(p => {
-  dummyContents.profile = p.data;
-});
+dummyContents.profile = {};
 
 export default dummyContents;

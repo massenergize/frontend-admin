@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import { apiCall } from '../../../utils/messenger';
 import MassEnergizeForm from '../_FormGenerator';
+import { Paper } from '@material-ui/core';
 
 const styles = theme => ({
   root: {
@@ -35,6 +37,7 @@ class EditTeam extends Component {
     this.state = {
       communities: [],
       formJson: null,
+      addTeamAdminJson: null,
       team: null
     };
   }
@@ -66,9 +69,8 @@ class EditTeam extends Component {
 
   createFormJson = async () => {
     const { communities, team } = this.state;
-    console.log(team)
     const formJson = {
-      title: 'Edit Team',
+      title: 'Edit Team Information',
       subTitle: '',
       method: '/teams.update',
       successRedirectPage: '/admin/read/teams',
@@ -143,10 +145,16 @@ class EditTeam extends Component {
 
   render() {
     const { classes } = this.props;
-    const { formJson } = this.state;
+    const { formJson, team } = this.state;
     if (!formJson) return (<div />);
     return (
       <div>
+        <Paper>
+          <Link to={`/admin/edit/${team && team.id}/team_members`}>Team Members and Admins</Link>
+        </Paper>
+
+
+        <br />
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}

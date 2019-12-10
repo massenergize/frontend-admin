@@ -67,6 +67,28 @@ module.exports = [
     ]
   },
   {
+    key: 'messages',
+    name: 'Messages',
+    icon: 'md-reorder',
+    child: [
+      {
+        key: 'all-messages',
+        name: 'All Messages',
+        title: true
+      },
+      {
+        key: 'all-team-admin-messages',
+        name: 'Team Admin Messages',
+        link: '/admin/read/team_admin_messages'
+      },
+      {
+        key: 'all-community-admin-messages',
+        name: 'Community Admin Messages',
+        link: '/admin/read/community_admin_messages'
+      },
+    ]
+  },
+  {
     key: 'teams',
     name: 'Teams',
     icon: 'ios-people',

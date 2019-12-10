@@ -50,7 +50,7 @@ class AllTestimonials extends React.Component {
     }
     if (user.is_community_admin) {
       const com = this.props.community ? this.props.community : user.admin_at[0];
-      await this.props.callTestimonialsForNormalAdmin(com.id);
+      await this.props.callTestimonialsForNormalAdmin(null);
     }
   }
 
@@ -135,6 +135,7 @@ class AllTestimonials extends React.Component {
       key: 'title',
       options: {
         filter: true,
+        filterType: 'textField'
       }
     },
     {
@@ -142,13 +143,14 @@ class AllTestimonials extends React.Component {
       key: 'rank',
       options: {
         filter: false,
+        filterType: 'textField'
       }
     },
     {
       name: 'Community',
       key: 'community',
       options: {
-        filter: false,
+        filter: true,
       }
     },
     {
@@ -156,6 +158,7 @@ class AllTestimonials extends React.Component {
       key: 'user',
       options: {
         filter: true,
+        filterType: 'textField'
       }
     },
     {
@@ -163,6 +166,7 @@ class AllTestimonials extends React.Component {
       key: 'action',
       options: {
         filter: true,
+        filterType: 'textField'
       }
     },
     {

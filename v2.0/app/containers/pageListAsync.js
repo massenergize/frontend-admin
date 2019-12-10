@@ -49,6 +49,16 @@ export const AddRemoveCommunityAdmin = loadable(() => import('./MassEnergizeSupe
   fallback: <Loading />,
 });
 
+export const CommunityAdminMessages = loadable(() => import('./MassEnergizeSuperAdmin/Messages/CommunityAdminMessages'), {
+  fallback: <Loading />,
+});
+export const TeamAdminMessages = loadable(() => import('./MassEnergizeSuperAdmin/Messages/TeamAdminMessages'), {
+  fallback: <Loading />,
+});
+export const MessageDetails = loadable(() => import('./MassEnergizeSuperAdmin/Messages/MessageDetails'), {
+  fallback: <Loading />,
+});
+
 export const AddRemoveSuperAdmin = loadable(() => import('./MassEnergizeSuperAdmin/Community/AddRemoveSuperAdmin'), {
   fallback: <Loading />,
 });
@@ -96,6 +106,9 @@ export const AddTeam = loadable(() => import('./MassEnergizeSuperAdmin/Teams/Cre
   fallback: <Loading />,
 });
 export const EditTeam = loadable(() => import('./MassEnergizeSuperAdmin/Teams/EditTeam'), {
+  fallback: <Loading />,
+});
+export const TeamMembers = loadable(() => import('./MassEnergizeSuperAdmin/Teams/TeamMembers'), {
   fallback: <Loading />,
 });
 

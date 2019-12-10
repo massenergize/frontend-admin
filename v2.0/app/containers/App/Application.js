@@ -35,8 +35,11 @@ import EditCommunityByCommunityAdmin from '../MassEnergizeSuperAdmin/Community/E
 import EditTeam from '../MassEnergizeSuperAdmin/Teams/EditTeam';
 import EditCategory from '../MassEnergizeSuperAdmin/Categories/EditCategory';
 import EditTestimonial from '../MassEnergizeSuperAdmin/Testimonials/EditTestimonial';
-import Impact from '../MassEnergizeSuperAdmin/Pages/Impact';
 import AllSubscribers from '../MassEnergizeSuperAdmin/Subscribers/AllSubscribers';
+import CommunityAdminMessages from '../MassEnergizeSuperAdmin/Messages/CommunityAdminMessages';
+import MessageDetails from '../MassEnergizeSuperAdmin/Messages/MessageDetails';
+import TeamAdminMessages from '../MassEnergizeSuperAdmin/Messages/TeamAdminMessages';
+import TeamMembers from '../MassEnergizeSuperAdmin/Teams/TeamMembers';
 
 
 class Application extends React.Component {
@@ -80,6 +83,9 @@ class Application extends React.Component {
 
           <Route exact path="/blank" component={BlankPage} />
           <Route path="/admin/read/users" component={UsersList} />
+          <Route path="/admin/read/community_admin_messages" exact component={CommunityAdminMessages} />
+          <Route path="/admin/read/team_admin_messages" exact component={TeamAdminMessages} />
+          <Route path="/admin/edit/:id/message" exact component={MessageDetails} />
           <Route path="/admin/read/communities" component={AllCommunities} />
           <Route path="/admin/add/community" component={OnboardCommunity} />
           <Route path="/admin/community/:id" component={CommunityProfile} exact />
@@ -107,9 +113,10 @@ class Application extends React.Component {
           <Route path="/admin/add/event" component={AddEvent} />
           <Route path="/admin/edit/:id/event" component={EditEvent} />
 
-          <Route path="/admin/read/teams" component={AllTeams} />
+          <Route path="/admin/read/teams" exact component={AllTeams} />
           <Route path="/admin/add/team" component={AddTeam} />
           <Route path="/admin/edit/:id/team" component={EditTeam} />
+          <Route path="/admin/edit/:id/team_members" component={TeamMembers} />
 
           <Route path="/admin/read/subscribers" component={AllSubscribers} />
 

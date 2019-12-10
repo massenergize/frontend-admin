@@ -11,7 +11,7 @@ import Avatar from '@material-ui/core/Avatar';
 import Icon from '@material-ui/core/Icon';
 import Edit from '@material-ui/icons/Edit';
 import Language from '@material-ui/icons/Language';
-import Email from '@material-ui/icons/Email';
+import PeopleIcon from '@material-ui/icons/People';
 import messageStyles from 'dan-styles/Messages.scss';
 import { connect } from 'react-redux';
 import { fetchData } from '../../../utils/messenger';
@@ -81,6 +81,7 @@ class AllTeams extends React.Component {
         },
         `${d.name}...`.substring(0, 30), // limit to first 30 chars
         d.community && d.community.name,
+        d.id,
         d.id
       ]
     ));
@@ -131,35 +132,32 @@ class AllTeams extends React.Component {
       }
     },
     {
+      name: 'Team Members',
+      key: 'team_members',
+      options: {
+        filter: false,
+        download: false,
+        customBodyRender: (id) => (
+          <Link to={`/admin/edit/${id}/team_members`}>
+            <PeopleIcon size="small" variant="outlined" color="secondary" />
+          </Link>
+        )
+      }
+    },
+    {
       name: 'Edit?',
       key: 'edit_or_copy',
       options: {
         filter: false,
         download: false,
         customBodyRender: (id) => (
-          <div>
-            <Link to={`/admin/edit/${id}/team`}>
-              <EditIcon size="small" variant="outlined" color="secondary" />
-            </Link>
-            &nbsp;&nbsp;
-            {/* <Link
-              onClick={async () => {
-                const copiedEventResponse = await apiCall('/events.copy', { event_id: id });
-                if (copiedEventResponse && copiedEventResponse.success) {
-                  const newEvent = copiedEventResponse && copiedEventResponse.data;
-                  window.location.href = `/admin/edit/${newEvent.id}/event`;
-                }
-              }}
-              to="/admin/read/events"
-            >
-              <FileCopy size="small" variant="outlined" color="secondary" />
-            </Link> */}
-          </div>
+          <Link to={`/admin/edit/${id}/team`}>
+            <EditIcon size="small" variant="outlined" color="secondary" />
+          </Link>
         )
       }
     },
   ]
-
 
 
   render() {
