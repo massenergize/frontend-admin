@@ -112,6 +112,17 @@ class HomePageEditForm extends Component {
           dbName: 'featured_video_link',
           readOnly: false
         },
+        {
+          name: 'donation_link',
+          label: 'Donation Link',
+          placeholder: 'eg. https://www.paypal.com/massenergize',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: false,
+          defaultValue: `${donatePageData.featured_video_link}`,
+          dbName: 'donation_link',
+          readOnly: false
+        },
       ]
     };
     return formJson;

@@ -93,36 +93,8 @@ class SidebarContent extends React.Component {
                 <h4>{user.preferred_name ? user.preferred_name : '...'}</h4>
                 <small>{user.is_super_admin ? 'Super Admin' : 'Community Admin ' }</small>
                 <p style={{fontSize: '7px'}}>
-                  Build version 0.7.5
+                  Build version 0.9.3
                 </p>
-                {/* <Button size="small" onClick={openMenuStatus}>
-                  <i className={classNames(classes.dotStatus, setStatus(status))} />
-                  {status}
-                </Button> */}
-                {/* <Menu
-                  id="status-menu"
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={closeMenuStatus}
-                  className={classes.statusMenu}
-                >
-                  <MenuItem onClick={() => changeStatus('online')}>
-                    <i className={classNames(classes.dotStatus, classes.online)} />
-                    Online
-                  </MenuItem>
-                  <MenuItem onClick={() => changeStatus('idle')}>
-                    <i className={classNames(classes.dotStatus, classes.idle)} />
-                    Idle
-                  </MenuItem>
-                  <MenuItem onClick={() => changeStatus('busy')}>
-                    <i className={classNames(classes.dotStatus, classes.bussy)} />
-                    Bussy
-                  </MenuItem>
-                  <MenuItem onClick={() => changeStatus('offline')}>
-                    <i className={classNames(classes.dotStatus, classes.offline)} />
-                    Offline
-                  </MenuItem>
-                </Menu> */}
               </div>
             </div>
           )}
@@ -139,9 +111,6 @@ class SidebarContent extends React.Component {
         >
           <MainMenu loadTransition={loadTransition} dataMenu={dataMenu} toggleDrawerOpen={toggleDrawerOpen} />
         </div>
-        <h6>
-          Build version 0.7.2
-        </h6>
       </div>
     );
   }

@@ -200,6 +200,6 @@ export const ComingSoon = loadable(() => import('./Pages/ComingSoon'), {
 export const Parent = loadable(() => import('./Parent'), {
   fallback: <Loading />,
 });
-export const UsersList = loadable(() => import('./MassEnergizeSuperAdmin/Users'), {
+export const UsersList = loadable(() => import('./MassEnergizeSuperAdmin/Users/AllUsers'), {
   fallback: <Loading />,
 });

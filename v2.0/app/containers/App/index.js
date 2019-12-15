@@ -1,15 +1,15 @@
 import React from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import { Switch, Route } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import NotFound from 'containers/Pages/Standalone/NotFoundDedicated';
-import Auth from './Auth';
 import Application from './Application';
 import LoginDedicated from '../Pages/Standalone/LoginDedicated';
 import ThemeWrapper, { AppContext } from './ThemeWrapper';
 import firebase, { googleProvider, facebookProvider } from './fire-config';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { apiCall, fetchData, rawCall } from './../../utils/messenger';
-import { reduxSignOut, reduxCallIdToken, reduxLoadAuthAdmin } from './../../../app/redux/redux-actions/adminActions';
+import Auth from './Auth';
+import { rawCall } from '../../utils/messenger';
+import { reduxSignOut, reduxCallIdToken, reduxLoadAuthAdmin } from '../../redux/redux-actions/adminActions';
 window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
 
 /*

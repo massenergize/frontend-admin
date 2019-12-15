@@ -1,16 +1,8 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
+import { FIREBASE_CONFIG } from '../../config/constants';
 
-const firebaseConfig = {
-  apiKey: 'AIzaSyBjcwjC_0H1bgGKqPyqKnbWaGmAtzc4BJQ',
-  authDomain: 'massenergize-auth.firebaseapp.com',
-  databaseURL: 'https://massenergize-auth.firebaseio.com',
-  projectId: 'massenergize-auth',
-  messagingSenderId: '72842344535',
-  appId: '1:72842344535:web:9b1517b1b3d2e818'
-};
-
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(FIREBASE_CONFIG);
 
 export default firebase;
 export const googleProvider = new firebase.auth.GoogleAuthProvider();

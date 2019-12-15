@@ -1,7 +1,6 @@
+/* eslint-disable camelcase */
 import React from 'react';
 import PropTypes from 'prop-types';
-import Avatar from '@material-ui/core/Avatar';
-import Typography from '@material-ui/core/Typography';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button';
@@ -10,10 +9,10 @@ import VerifiedUser from '@material-ui/icons/VerifiedUser';
 import Info from '@material-ui/icons/Info';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { withStyles } from '@material-ui/core/styles';
-import { Link } from 'react-router-dom';
-
 import styles from './jss/cover-jss';
-import { apiCall } from '../../utils/messenger';
+import { apiCall } from '../../../../utils/messenger';
+import { SANDBOX_PORTAL_HOST, PORTAL_HOST } from '../../../../config/constants';
+
 
 const optionsOpt = [
   'Edit Profile',
@@ -35,46 +34,41 @@ class Cover extends React.Component {
     this.setState({ anchorElOpt: null });
   };
 
-  goLive = () => {
-    const val = this.props.community.is_published;
-    const {id} = this.props.community;
-    const body = { is_published: !val, is_dev: true, community_id: id };
-    this.props.liveOrNotFxn(this.props.community);
-    apiCall('/communities.update', body).then(res => {
-      console.log('You are live!');
-    })
-      .catch(err => {
-        console.log('Error:', err);
-      });
+  goLive = async () => {
+    const { community, liveOrNotFxn } = this.props;
+    const { is_published } = community;
+    const { id } = community;
+    const body = { is_published: !is_published, is_dev: true, community_id: id };
+    liveOrNotFxn(community);
+    await apiCall('/communities.update', body);
   }
 
   showLiveBtn = () => {
-    const val = this.props.community.is_published;
+    const { community } = this.props;
+    const { is_published } = community;
     const { classes } = this.props;
-    if (val) {
+    if (is_published) {
       return (
         <div>
-          <Button onClick={() => { this.goLive() }} variant="outlined" color="secondary" className={classes.publishBtn + " " + classes.raise}>
+          <Button onClick={() => { this.goLive(); }} variant="outlined" color="secondary" className={classes.publishBtn + ' ' + classes.raise}>
             Unpublish
           </Button>
         </div>
-      )
+      );
     }
-    
-      return (
-        <div>
-          <Button onClick={() => { this.goLive() }} variant="outlined" color="primary" className={classes.goLiveBtn + " " + classes.raise}>
-            Go Live
+
+    return (
+      <div>
+        <Button onClick={() => { this.goLive(); }} variant="outlined" color="primary" className={classes.goLiveBtn + ' ' + classes.raise}>
+          Go Live
         </Button>
-        </div>
-      )
-    
+      </div>
+    );
   }
 
   render() {
     const {
       classes,
-      avatar,
       name,
       desc,
       coverImg,
@@ -83,10 +77,15 @@ class Cover extends React.Component {
 
 
     const { anchorElOpt } = this.state;
+    const coverStyle = {
+      height: 250, textAlign: 'left', justifyContent: 'flex-start', backgroundImage: `url(${coverImg})`
+    };
+    const contentStyle = {
+      display: 'inline-block', marginLeft: 20, marginBottom: 2, fontSize: '1.8rem', fontWeight: '500px', textTransform: 'capitalize'
+    };
+
     return (
-      <div className={classes.cover} style={{
-        height: 250, textAlign: 'left', justifyContent: 'flex-start', backgroundImage: `url(${coverImg})` 
-        }}>
+      <div className={classes.cover} style={coverStyle}>
         <div className={classes.opt}>
           <IconButton className={classes.button} aria-label="Delete">
             <Info style={{ color: '#585858' }} />
@@ -122,19 +121,17 @@ class Cover extends React.Component {
         </div>
         <div className={classes.content} style={{ display: 'inline-block' }}>
           <div>
-            <h2 style={{
-              display: 'inline-block', marginLeft: 20, marginBottom: 2, fontSize: '1.8rem', fontWeight: '500px', textTransform: 'capitalize' 
-              }}>{name}</h2>
-              {community.is_approved && 
-                <VerifiedUser style={{ color: '#0095ff', marginTop: -2, display: 'inline-block', }} className={classes.verified} />
-              }
+            <h2 style={contentStyle}>{name}</h2>
+            {community.is_approved
+                && <VerifiedUser style={{ color: '#0095ff', marginTop: -2, display: 'inline-block', }} className={classes.verified} />
+            }
             <div style={{ float: 'right' }}>
               <center>
                 {this.showLiveBtn()}
                 <a
                   style={{ fontSize: 14 }}
                   className={classes.leAnchor}
-                  href={community ? `http://sandbox.community-dev.massenergize.org/${community.subdomain}` : '#'}
+                  href={community ? `${SANDBOX_PORTAL_HOST}/${community.subdomain}` : '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   size="large"
@@ -146,7 +143,7 @@ class Cover extends React.Component {
                 <a
                   style={{ fontSize: 14 }}
                   className={classes.leAnchor}
-                  href={community ? `http://community-dev.massenergize.org/${community.subdomain}` : '#'}
+                  href={community ? `${PORTAL_HOST}/${community.subdomain}` : '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   size="large"
@@ -167,11 +164,11 @@ class Cover extends React.Component {
 
 Cover.propTypes = {
   classes: PropTypes.object.isRequired,
-  avatar: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   desc: PropTypes.string.isRequired,
   coverImg: PropTypes.string.isRequired,
-  community: PropTypes.object.isRequired
+  community: PropTypes.object.isRequired,
+  liveOrNotFxn: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(Cover);
