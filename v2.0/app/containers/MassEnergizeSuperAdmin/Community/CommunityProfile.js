@@ -21,7 +21,6 @@ import {
   Cover,
   About,
   Connection,
-  Favorites,
   Pages,
 } from './Profile';
 import { reduxCallFullCommunity, reduxLiveOrNot } from '../../../redux/redux-actions/adminActions';
@@ -81,8 +80,8 @@ class CommunityProfile extends React.Component {
     const { value, id } = this.state;
     const community = this.props.full_community ? this.props.full_community : {};
 
-    if(!community){
-      return <div>Loading Data ...</div>
+    if (!community) {
+      return <div>Loading Data ...</div>;
     }
 
     return (
@@ -116,8 +115,6 @@ class CommunityProfile extends React.Component {
               centered
             >
               <Tab icon={<AccountCircle />} />
-              <Tab icon={<SupervisorAccount />} />
-              {/* <Tab icon={<Favorite />} /> */}
               <Tab icon={<PhotoLibrary />} />
             </Tabs>
           </Hidden>
@@ -132,14 +129,12 @@ class CommunityProfile extends React.Component {
               style={{ boxShadow: '0 0px 3px 0 rgba(0,0,0,.18),0 0px 3px 0 rgba(0,0,0,.15)' }}
             >
               <Tab icon={<AccountCircle />} label="ABOUT" />
-              <Tab icon={<SupervisorAccount />} label="Subscribers" />
               <Tab icon={<InsertChart />} label="Pages" />
             </Tabs>
           </Hidden>
         </AppBar>
         {value === 0 && <TabContainer><About data={dataProps} community={community} /></TabContainer>}
-        {value === 1 && <TabContainer><Connection data={{ users: community.users, avatar: dummy.user.avatar }} /></TabContainer>}
-        {value === 2
+        {value === 1
           && (
             <TabContainer>
               <Pages community={community} />

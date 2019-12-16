@@ -254,8 +254,8 @@ class EditCommunityByCommunityAdmin extends Component {
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: false,
-              defaultValue: '',
-              dbName: community.owner_phone_number,
+              defaultValue: community.owner_phone_number,
+              dbName: 'owner_phone_number',
               readOnly: false
             },
           ]

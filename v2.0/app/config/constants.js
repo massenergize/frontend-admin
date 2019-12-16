@@ -4,7 +4,7 @@
 
 const APP_NAME = 'MassEnergize Administration';
 
-const IS_LOCAL = false;
+const IS_LOCAL = true;
 const IS_PROD = false;
 const IS_DEV = !IS_PROD;
 

@@ -94,7 +94,7 @@ class HomePageEditForm extends Component {
           name: 'description',
           label: 'Paragraph to be displayed below the title',
           placeholder: 'Tell us more ...',
-          fieldType: 'TextField',
+          fieldType: 'HTMLField',
           contentType: 'text',
           isRequired: true,
           isMultiline: true,

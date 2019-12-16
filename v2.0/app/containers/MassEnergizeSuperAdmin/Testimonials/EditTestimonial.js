@@ -260,10 +260,23 @@ class EditTestimonial extends Component {
 
   render() {
     const { classes } = this.props;
-    const { formJson } = this.state;
+    const { formJson, testimonial } = this.state;
     if (!formJson) return (<div>Hold tight! Preparing your form ...</div>);
     return (
       <div>
+        {testimonial.user && (
+          <p>
+            Created By:&nbsp;
+            {testimonial.user.full_name}
+            ,&nbsp;
+            {testimonial.user.email}
+          </p>
+        )}
+        {!testimonial.user && (
+          <p>Created By: Community Admin</p>
+        )
+        }
+        <br />
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
