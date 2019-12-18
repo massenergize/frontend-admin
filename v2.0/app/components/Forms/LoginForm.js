@@ -23,6 +23,8 @@ import logo from 'dan-images/logo.png';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { ContentDivider } from '../Divider';
 import styles from './user-jss';
+import { IS_PROD, BUILD_VERSION } from '../../config/constants';
+
 
 // validation functions
 const required = value => (value == null ? 'Required' : undefined);
@@ -90,9 +92,17 @@ class LoginForm extends React.Component {
               </Button> */}
             </div>
           </Hidden>
-          <Typography variant="h4" className={classes.title} gutterBottom>
-            Administrators - Sign In
-          </Typography>
+          {IS_PROD && (
+            <Typography variant="h4" className={classes.title} gutterBottom>
+              Administrators - Sign In
+            </Typography>
+          )}
+          {!IS_PROD && (
+            <Typography variant="h4" className={classes.title} gutterBottom>
+              DEV: Administrators - Sign In
+            </Typography>
+          )}
+
           <Typography variant="caption" className={classes.subtitle} gutterBottom align="center">
             This site is meant to be exclusively used by Administrators only.
           </Typography>
@@ -177,6 +187,16 @@ class LoginForm extends React.Component {
                 {/* <button onClick = {(e)=>{e.preventDefault();this.props.signOutFxn()}}>signout</button> */}
               </div>
             </form>
+            {IS_PROD && (
+              <Typography variant="p" className={classes.title} gutterBottom>
+                Production Build {BUILD_VERSION}
+              </Typography>
+            )}
+            {!IS_PROD && (
+              <Typography variant="p" className={classes.title} gutterBottom>
+                Development Build {BUILD_VERSION}
+              </Typography>
+            )}
           </section>
         </Paper>
       </Fragment>

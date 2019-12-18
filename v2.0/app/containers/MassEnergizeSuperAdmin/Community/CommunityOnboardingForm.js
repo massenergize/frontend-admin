@@ -198,12 +198,12 @@ class CreateNewCommunityForm extends Component {
           ]
         },
         {
-          label: 'About the Admin',
+          label: 'Community Public Information (Will be displayed in the community portal\'s footer)',
           fieldType: 'Section',
           children: [
             {
               name: 'admin_full_name',
-              label: 'Administrator\'s Full Name',
+              label: 'Contact Person\'s Full Name',
               placeholder: 'eg. Ellen Tohn',
               fieldType: 'TextField',
               contentType: 'text',
@@ -214,7 +214,7 @@ class CreateNewCommunityForm extends Component {
             },
             {
               name: 'admin_email',
-              label: 'Administrator\'s Email',
+              label: 'Community\'s Public Email',
               placeholder: 'eg. etohn@comcast.net',
               fieldType: 'TextField',
               contentType: 'text',
@@ -225,7 +225,7 @@ class CreateNewCommunityForm extends Component {
             },
             {
               name: 'admin_phone_number',
-              label: 'Administrator\'s Phone Number',
+              label: 'Community\'s Public Phone Number',
               placeholder: 'eg. 571 222 4567',
               fieldType: 'TextField',
               contentType: 'text',

@@ -3,10 +3,9 @@
  */
 
 const APP_NAME = 'MassEnergize Administration';
-
-const IS_LOCAL = true;
+const BUILD_VERSION = '0.9.5';
+const IS_LOCAL = false;
 const IS_PROD = false;
-const IS_DEV = !IS_PROD;
 
 //  ---- setting  API routes
 let API_HOST = 'https://api.massenergize.org';
@@ -14,7 +13,7 @@ if (IS_LOCAL) {
   API_HOST = 'http://127.0.0.1:8000';
 } else if (IS_PROD) {
   API_HOST = 'https://api.massenergize.org';
-} else if (IS_DEV) {
+} else {
   // IS_DEV
   API_HOST = 'https://api-dev.massenergize.org';
 }
@@ -50,7 +49,7 @@ if (IS_LOCAL) {
   PORTAL_HOST = 'http://127.0.0.1:3000';
 } else if (IS_PROD) {
   PORTAL_HOST = 'https://community.massenergize.org';
-} else if (IS_DEV) {
+} else {
   // IS_DEV
   PORTAL_HOST = 'https://community-dev.massenergize.org';
 }
@@ -61,7 +60,7 @@ if (IS_LOCAL) {
   SANDBOX_PORTAL_HOST = 'http://127.0.0.1:3000';
 } else if (IS_PROD) {
   SANDBOX_PORTAL_HOST = 'https://sandbox.community.massenergize.org';
-} else if (IS_DEV) {
+} else {
   // IS_DEV
   SANDBOX_PORTAL_HOST = 'https://sandbox.community-dev.massenergize.org';
 }
@@ -70,10 +69,10 @@ if (IS_LOCAL) {
 module.exports = {
   IS_LOCAL,
   IS_PROD,
-  IS_DEV,
   API_HOST,
   APP_NAME,
   FIREBASE_CONFIG,
   PORTAL_HOST,
-  SANDBOX_PORTAL_HOST
+  SANDBOX_PORTAL_HOST,
+  BUILD_VERSION
 };

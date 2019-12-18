@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import { bindActionCreators } from 'redux';
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
@@ -13,7 +14,7 @@ import logo from 'dan-images/logo.png';
 import { connect } from 'react-redux';
 import MainMenu from './MainMenu';
 import styles from './sidebar-jss';
-import { bindActionCreators } from 'redux';
+import { IS_PROD, BUILD_VERSION } from '../../config/constants';
 
 class SidebarContent extends React.Component {
   state = {
@@ -93,7 +94,9 @@ class SidebarContent extends React.Component {
                 <h4>{user.preferred_name ? user.preferred_name : '...'}</h4>
                 <small>{user.is_super_admin ? 'Super Admin' : 'Community Admin ' }</small>
                 <p style={{fontSize: '7px'}}>
-                  Build version 0.9.3
+                  {IS_PROD ? 'Production ' : 'Development '}
+                  Build version
+                  {' ' + BUILD_VERSION}
                 </p>
               </div>
             </div>

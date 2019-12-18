@@ -238,7 +238,7 @@ class EditCommunityForm extends Component {
             },
             {
               name: 'admin_email',
-              label: 'Administrator\'s Email',
+              label: 'Contact Person\'s Full Name',
               placeholder: 'eg. etohn@comcast.net',
               fieldType: 'TextField',
               contentType: 'text',
@@ -249,7 +249,7 @@ class EditCommunityForm extends Component {
             },
             {
               name: 'admin_phone_number',
-              label: 'Administrator\'s Phone Number',
+              label: 'Community\'s Public Phone Number',
               placeholder: 'eg. 571 222 4567',
               fieldType: 'TextField',
               contentType: 'text',
