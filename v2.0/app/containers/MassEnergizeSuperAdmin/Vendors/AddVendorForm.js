@@ -170,6 +170,19 @@ class CreateNewVendorForm extends Component {
               ]
             },
             {
+              name: 'is_published',
+              label: 'Should this vendor go live?',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: 'false',
+              dbName: 'is_published',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+            },
+            {
               name: 'have_address',
               label: 'Do you have an address?',
               fieldType: 'Radio',

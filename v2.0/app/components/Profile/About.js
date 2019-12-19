@@ -73,7 +73,7 @@ class About extends React.Component {
           </div>
           {/* ----------------------------------------------------------------------*/}
           {/* About Me */}
-          <PapperBlock title="About Me" icon="ios-contact-outline" whiteBg noMargin desc="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed urna in justo euismod condimentum.">
+          <PapperBlock title="About Me" icon="ios-contact-outline" whiteBg noMargin desc="About">
             <Divider className={classes.divider} />
             <List dense className={classes.profileList}>
               <ListItem>

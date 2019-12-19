@@ -9,7 +9,7 @@ const contactData = [
     secondaryPhone: '+6280987654321',
     personalEmail: 'johndoe@mail.com',
     companyEmail: 'johndoe@company.com',
-    address: 'Ipsum Street no.77 Block A/5A, New York',
+    address: 'Street no.77 Block A/5A, New York',
     website: 'http://doeclans.net',
     favorited: false
   },
@@ -22,7 +22,7 @@ const contactData = [
     secondaryPhone: '',
     personalEmail: 'jimdoe@mail.com',
     companyEmail: 'jimdoe@company.com',
-    address: 'Lorem Street no.76 Block B/8B, Brooklyn',
+    address: 'Street no.76 Block B/8B, Brooklyn',
     website: 'http://doejim.com',
     favorited: true
   },
@@ -35,7 +35,7 @@ const contactData = [
     secondaryPhone: '+678910111213',
     personalEmail: 'janedoe@mail.com',
     companyEmail: 'janedoe@company.com',
-    address: 'Dolor Street no.76 Block B/8B, Tokyo',
+    address: 'Street no.76 Block B/8B, Tokyo',
     website: 'http://janedoe.com',
     favorited: false
   },
@@ -48,7 +48,7 @@ const contactData = [
     secondaryPhone: '',
     personalEmail: 'jinx@mail.com',
     companyEmail: '',
-    address: 'Paskal Street no.101 Block B/10B, Samarinda',
+    address: 'Street no.101 Block B/10B, Samarinda',
     website: '',
     favorited: 'false'
   },
@@ -61,7 +61,7 @@ const contactData = [
     secondaryPhone: '+56743210468',
     personalEmail: 'jihan@mail.com',
     companyEmail: 'jihan@company.com',
-    address: 'Sit amet Street no.76 Block B/8B, New York',
+    address: 'Street no.76 Block B/8B, New York',
     website: '',
     favorited: true
   },
@@ -74,7 +74,7 @@ const contactData = [
     secondaryPhone: '+6742234235666',
     personalEmail: 'johny_doe@mail.com',
     companyEmail: '',
-    address: 'Vivacus Street no.2 Block C/10A, Paris',
+    address: 'Street no.2 Block C/10A, Paris',
     website: '',
     favorited: true
   },

@@ -7,28 +7,28 @@ const chatData = [
         from: 'contact',
         date: 'May, 29 2018',
         time: '22:45',
-        message: 'Lorem ipsum dolor sit amet'
+        message: ''
       },
       {
         id: '1_2',
         from: 'me',
         date: 'May, 29 2018',
         time: '22:45',
-        message: 'Pellentesque ac bibendum tortor'
+        message: ''
       },
       {
         id: '1_3',
         from: 'contact',
         date: 'May, 30 2018',
         time: '09:20',
-        message: 'Sed imperdiet enim ligula, vitae viverra justo porta vel. Duis eget felis bibendum, pretium mi sed, placerat ante. '
+        message: ''
       },
       {
         id: '1_4',
         from: 'me',
         date: 'May, 30 2018',
         time: '09:55',
-        message: 'Curabitur egestas consequat lorem, vel fermentum augue porta id. Aliquam lobortis magna neque'
+        message: ''
       },
       {
         id: '1_5',
@@ -42,7 +42,7 @@ const chatData = [
         from: 'contact',
         date: 'May, 30 2018',
         time: '09:58',
-        message: 'Nam posuere accumsan porta. Integer id orci sed ante tincidunt tincidunt sit amet sed libero. Quisque ut metus sit amet augue rutrum feugiat. Vestibulum bibendum nisi eget magna malesuada'
+        message: ''
       },
     ]
   },
@@ -54,21 +54,21 @@ const chatData = [
         from: 'contact',
         date: 'May, 29 2018',
         time: '22:45',
-        message: 'Lorem ipsum dolor sit amet'
+        message: ''
       },
       {
         id: '2_2',
         from: 'me',
         date: 'May, 29 2018',
         time: '22:45',
-        message: 'Pellentesque ac bibendum tortor'
+        message: ''
       },
       {
         id: '2_3',
         from: 'contact',
         date: 'May, 30 2018',
         time: '09:20',
-        message: 'Sed imperdiet enim ligula, vitae viverra justo porta vel. Duis eget felis bibendum, pretium mi sed, placerat ante. '
+        message: ''
       },
     ]
   },
@@ -80,14 +80,14 @@ const chatData = [
         from: 'contact',
         date: 'May, 29 2018',
         time: '22:45',
-        message: 'Lorem ipsum dolor sit amet'
+        message: ''
       },
       {
         id: '3_2',
         from: 'me',
         date: 'May, 29 2018',
         time: '22:45',
-        message: 'Pellentesque ac bibendum tortor'
+        message: ''
       },
     ]
   },
@@ -99,28 +99,28 @@ const chatData = [
         from: 'contact',
         date: 'May, 30 2018',
         time: '09:20',
-        message: 'Sed imperdiet enim ligula, vitae viverra justo porta vel. Duis eget felis bibendum, pretium mi sed, placerat ante. '
+        message: ''
       },
       {
         id: '4_2',
         from: 'me',
         date: 'May, 30 2018',
         time: '09:55',
-        message: 'Curabitur egestas consequat lorem, vel fermentum augue porta id. Aliquam lobortis magna neque'
+        message: ''
       },
       {
         id: '4_3',
         from: 'me',
         date: 'May, 30 2018',
         time: '09:58',
-        message: 'Integer orci justo'
+        message: ''
       },
       {
         id: '4_4',
         from: 'contact',
         date: 'May, 30 2018',
         time: '09:58',
-        message: 'Nam posuere accumsan porta. Integer id orci sed ante tincidunt tincidunt sit amet sed libero. Quisque ut metus sit amet augue rutrum feugiat. Vestibulum bibendum nisi eget magna malesuada'
+        message: ''
       },
     ]
   },

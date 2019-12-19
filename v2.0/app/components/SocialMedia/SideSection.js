@@ -166,31 +166,31 @@ class SideSection extends React.Component {
         <PapperBlock title="Trends for You" icon="ios-flame-outline" whiteBg desc="">
           <List dense className={classes.trendingList}>
             <ListItem className={classes.noPadding}>
-              <a href="#" className={classes.link}>#Lorem ipsum dolor</a>
+              <a href="#" className={classes.link}>Hello</a>
               <ListItemText secondary="2987 Posts" />
             </ListItem>
             <ListItem className={classes.noPadding}>
-              <a href="#" className={classes.link}>#Aliquam venenatis</a>
+              <a href="#" className={classes.link}>Hello</a>
               <ListItemText secondary="2345 Posts" />
             </ListItem>
             <ListItem className={classes.noPadding}>
-              <a href="#" className={classes.link}>#Nam sollicitudin</a>
+              <a href="#" className={classes.link}>Hello</a>
               <ListItemText secondary="1234 Posts" />
             </ListItem>
             <ListItem className={classes.noPadding}>
-              <a href="#" className={classes.link}>#Cras convallis</a>
+              <a href="#" className={classes.link}>#Hello</a>
               <ListItemText secondary="6789 Connection" />
             </ListItem>
             <ListItem className={classes.noPadding}>
-              <a href="#" className={classes.link}>#Aenean sit amet</a>
+              <a href="#" className={classes.link}>#Hello</a>
               <ListItemText secondary="2987 Connection" />
             </ListItem>
             <ListItem className={classes.noPadding}>
-              <a href="#" className={classes.link}>#Quisque</a>
+              <a href="#" className={classes.link}>#Hello</a>
               <ListItemText secondary="1456 Connection" />
             </ListItem>
             <ListItem className={classes.noPadding}>
-              <a href="#" className={classes.link}>#Lorem ipusm dolor</a>
+              <a href="#" className={classes.link}>#Hello</a>
               <ListItemText secondary="2987 Connection" />
             </ListItem>
           </List>

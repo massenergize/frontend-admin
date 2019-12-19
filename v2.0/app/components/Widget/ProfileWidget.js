@@ -15,7 +15,7 @@ import styles from './widget-jss';
 function ProfileWidget(props) {
   const { classes } = props;
   return (
-    <PapperBlock title="About Me" whiteBg noMargin desc="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed urna in justo euismod condimentum.">
+    <PapperBlock title="About Me" whiteBg noMargin desc="">
       <Divider className={classes.divider} />
       <List dense className={classes.profileList}>
         <ListItem>
@@ -34,7 +34,7 @@ function ProfileWidget(props) {
           <Avatar>
             <LocationOn />
           </Avatar>
-          <ListItemText primary="Address" secondary="Chicendo Street no.105 Block A/5A - Barcelona, Spain" />
+          <ListItemText primary="Address" secondary="Street no.105 Block A/5A - Barcelona, Spain" />
         </ListItem>
       </List>
     </PapperBlock>

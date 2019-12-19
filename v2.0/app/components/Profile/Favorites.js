@@ -34,7 +34,7 @@ class Favorites extends React.Component {
             shared={20}
             commented={15}
             date="Sept, 25 2018"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed urna in justo euismod condimentum."
+            content=""
             image={imgApi[5]}
             avatar={avatarApi[6]}
             name="John Doe"
@@ -68,7 +68,7 @@ class Favorites extends React.Component {
             shared={20}
             commented={15}
             date="Sept, 25 2018"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed urna in justo euismod condimentum."
+            content=""
             image={imgApi[16]}
             avatar={avatarApi[6]}
             name="John Doe"
@@ -79,7 +79,7 @@ class Favorites extends React.Component {
             shared={10}
             commented={22}
             date="Sept, 15 2018"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed urna in justo euismod condimentum."
+            content=""
             avatar={avatarApi[5]}
             name="Jane Doe"
           />
@@ -90,7 +90,7 @@ class Favorites extends React.Component {
             shared={10}
             commented={22}
             date="Sept, 15 2018"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed urna in justo euismod condimentum."
+            content=""
             avatar={avatarApi[4]}
             name="Jane Doe"
           />
@@ -100,7 +100,7 @@ class Favorites extends React.Component {
             shared={20}
             commented={15}
             date="Sept, 25 2018"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed urna in justo euismod condimentum."
+            content=""
             image={imgApi[20]}
             avatar={avatarApi[6]}
             name="John Doe"
@@ -115,7 +115,7 @@ class Favorites extends React.Component {
             shared={10}
             commented={22}
             date="Sept, 15 2018"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed urna in justo euismod condimentum."
+            content=""
             avatar={avatarApi[1]}
             name="Jane Doe"
           />

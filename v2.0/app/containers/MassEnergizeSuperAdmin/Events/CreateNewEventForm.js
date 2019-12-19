@@ -113,6 +113,17 @@ class CreateNewEventForm extends Component {
               readOnly: false
             },
             {
+              name: 'featured_summary',
+              label: 'One sentence that describes this event',
+              placeholder: 'Wayland Heatpump Event',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: '',
+              dbName: 'featured_summary',
+              readOnly: false
+            },
+            {
               name: 'rank',
               label: 'Rank (Which order should this event appear in?  Lower numbers come first)',
               placeholder: 'eg. 1',
