@@ -222,12 +222,12 @@ class EditCommunityForm extends Component {
           ]
         },
         {
-          label: 'About the Admin',
+          label: 'Community Public Information (Will be displayed in the community portal\'s footer)',
           fieldType: 'Section',
           children: [
             {
               name: 'admin_full_name',
-              label: 'Administrator\'s Full Name',
+              label: 'Contact Person\'s Full Name',
               placeholder: 'eg. Ellen Tohn',
               fieldType: 'TextField',
               contentType: 'text',
@@ -238,7 +238,7 @@ class EditCommunityForm extends Component {
             },
             {
               name: 'admin_email',
-              label: 'Contact Person\'s Full Name',
+              label: 'Community\'s Public Email',
               placeholder: 'eg. etohn@comcast.net',
               fieldType: 'TextField',
               contentType: 'text',

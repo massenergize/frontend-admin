@@ -3,7 +3,7 @@
  */
 
 const APP_NAME = 'MassEnergize Administration';
-const BUILD_VERSION = '0.9.5';
+const BUILD_VERSION = '0.9.7';
 const IS_LOCAL = false;
 const IS_PROD = true;
 

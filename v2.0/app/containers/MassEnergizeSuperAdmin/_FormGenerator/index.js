@@ -194,10 +194,8 @@ class MassEnergizeForm extends Component {
     if (!target) return;
     const { formData } = this.state;
     const { name, value } = target;
-    console.log(value);
 
     if (!value) return;
-    console.log(value);
     let theList = formData[name];
     if (!theList) {
       theList = [];
@@ -345,8 +343,6 @@ class MassEnergizeForm extends Component {
     } else {
       response = await apiCall(formJson.method, cleanedValues);
     }
-
-    console.log(cleanedValues);
 
     if (response && response.success) {
       // the api call was executed without any issues

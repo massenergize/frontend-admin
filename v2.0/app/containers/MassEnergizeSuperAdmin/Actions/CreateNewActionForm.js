@@ -34,6 +34,7 @@ class CreateNewActionForm extends Component {
     super(props);
     this.state = {
       communities: [],
+      ccActions: [],
       vendors: [],
       formJson: null
     };
@@ -44,6 +45,7 @@ class CreateNewActionForm extends Component {
     const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
     const vendorsResponse = await apiCall('/vendors.listForCommunityAdmin');
+    const ccActionsResponse = await apiCall('/cc/info/actions', {}, null, true);
 
     if (communitiesResponse && communitiesResponse.data) {
       const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
@@ -53,6 +55,11 @@ class CreateNewActionForm extends Component {
     if (vendorsResponse && vendorsResponse.data) {
       const vendors = vendorsResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
       await this.setStateAsync({ vendors });
+    }
+
+    if (ccActionsResponse && ccActionsResponse.actions) {
+      const ccActions = (ccActionsResponse.actions || []).map(c => ({ ...c, displayName: c.description, id: '' + c.id }));
+      await this.setStateAsync({ ccActions });
     }
 
     const formJson = await this.createFormJson();
@@ -93,12 +100,12 @@ class CreateNewActionForm extends Component {
   }
 
   createFormJson = async () => {
-    const { communities, vendors } = this.state;
+    const { communities, ccActions, vendors } = this.state;
     const formJson = {
       title: 'Create a New Action',
       subTitle: '',
       method: '/actions.create',
-      // successRedirectPage: '/admin/read/actions',
+      successRedirectPage: '/admin/read/actions',
       fields: [
         {
           label: 'About this Action',
@@ -195,6 +202,17 @@ class CreateNewActionForm extends Component {
           isRequired: true,
           defaultValue: null,
           dbName: 'steps_to_take',
+        },
+        {
+          name: 'calculator_action',
+          label: 'Calculator Action',
+          placeholder: 'eg. Wayland',
+          fieldType: 'Dropdown',
+          defaultValue: null,
+          dbName: 'calculator_action',
+          data: ccActions,
+          modalTitle: 'Carbon Action List & Instructions',
+          modalText: 'Check out the instructions here: https://docs.google.com/document/d/1RisvrGJQifCq9c62etcwR1YCUffExz_T8lR2XDGmokQ/edit',
         },
         {
           name: 'vendors',

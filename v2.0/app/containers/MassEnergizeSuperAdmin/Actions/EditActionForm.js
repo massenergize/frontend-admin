@@ -36,6 +36,7 @@ class CreateNewActionForm extends Component {
       communities: [],
       action: null,
       vendors: [],
+      ccActions: [],
       formJson: null
     };
   }
@@ -53,6 +54,7 @@ class CreateNewActionForm extends Component {
     const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
     const vendorsResponse = await apiCall('/vendors.listForCommunityAdmin');
+    const ccActionsResponse = await apiCall('/cc/info/actions', {}, null, true);
 
     if (communitiesResponse && communitiesResponse.data) {
       const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
@@ -62,6 +64,11 @@ class CreateNewActionForm extends Component {
     if (vendorsResponse && vendorsResponse.data) {
       const vendors = vendorsResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
       await this.setStateAsync({ vendors });
+    }
+
+    if (ccActionsResponse && ccActionsResponse.actions) {
+      const ccActions = (ccActionsResponse.actions || []).map(c => ({ ...c, displayName: c.description, id: '' + c.id }));
+      await this.setStateAsync({ ccActions });
     }
 
     const formJson = await this.createFormJson();
@@ -114,7 +121,8 @@ class CreateNewActionForm extends Component {
   }
 
   createFormJson = async () => {
-    const { action, communities, vendors } = this.state;
+    const { action, communities, ccActions, vendors } = this.state;
+    console.log(action)
     const formJson = {
       title: 'Update Action',
       subTitle: '',
@@ -206,7 +214,7 @@ class CreateNewActionForm extends Component {
           placeholder: 'eg. This event is happening in ...',
           fieldType: 'TextField',
           isMulti: true,
-          isRequired: true,
+          isRequired: false,
           defaultValue: action.featured_summary,
           dbName: 'featured_summary',
         },
@@ -227,6 +235,17 @@ class CreateNewActionForm extends Component {
           isRequired: true,
           defaultValue: action.steps_to_take,
           dbName: 'steps_to_take',
+        },
+        {
+          name: 'calculator_action',
+          label: 'Calculator Action',
+          placeholder: 'eg. Wayland',
+          fieldType: 'Dropdown',
+          defaultValue: action.calculator_action && '' + action.calculator_action.id,
+          dbName: 'calculator_action',
+          data: ccActions,
+          modalTitle: 'Carbon Action List & Instructions',
+          modalText: 'Check out the instructions here: https://docs.google.com/document/d/1RisvrGJQifCq9c62etcwR1YCUffExz_T8lR2XDGmokQ/edit',
         },
         {
           name: 'vendors',

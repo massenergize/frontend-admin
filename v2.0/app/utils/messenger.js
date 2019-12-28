@@ -4,33 +4,11 @@
 import qs from 'qs';
 import { API_HOST } from '../config/constants';
 
-/**
- *
- * @param {object} destinationUrl
- * @param {object} dataToSend
- * @param {string} relocationPage
- * This function handles sending data to the backend.  It takes advantage of
- * being a SimpleRequest hence no preflight checks will be done saving some
- * band-with and being faster in general while avoiding CORS issues.
- */
 
-function checkAuthUser() {
-  const user = localStorage.getItem('authUser');
-  const token = localStorage.getItem('idToken');
-  if (user && token) {
-    rawCall('auth/whoami').then(res => {
-      if (!res.data) {
-        window.location = '/login';
-        localStorage.removeItem('authUser');
-        localStorage.removeItem('idToken');
-      }
-    });
-  }
-}
-
-export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = null) {
+export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = null, strictUrl = false) {
   const idToken = localStorage.getItem('idToken');
-  const response = await fetch(`${API_HOST}/v3${destinationUrl}`, {
+  const url = strictUrl ? `${API_HOST}${destinationUrl}` : `${API_HOST}/v3${destinationUrl}`;
+  const response = await fetch(url, {
     credentials: 'include',
     method: 'POST',
     headers: {

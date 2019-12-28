@@ -26,14 +26,6 @@ class AllVendors extends React.Component {
     this.state = { data: [], loading: true, columns: this.getColumns(props.classes) };
   }
 
-  showCommunitySwitch = () => {
-    const user = this.props.auth ? this.props.auth : {};
-    if (user.is_community_admin) {
-      return (
-        <CommunitySwitch actionToPerform={this.handleCommunityChange} />
-      );
-    }
-  }
 
   handleCommunityChange =(id) => {
     this.props.callVendorsForNormalAdmin(id);
@@ -62,7 +54,6 @@ class AllVendors extends React.Component {
         },
         `${d.name}...`.substring(0, 30), // limit to first 30 chars
         d.key_contact, // limit to first 20 chars
-        d.properties_serviced && d.properties_serviced.join(', '),
         d.communities && d.communities.slice(0, 5).map(c => c.name).join(', '),
         d.service_area,
         d.id
@@ -143,18 +134,12 @@ class AllVendors extends React.Component {
       },
     },
     {
-      name: 'Properties Serviced',
-      key: 'properties_serviced',
-      options: {
-        filter: true,
-        filterType: 'textField'      }
-    },
-    {
       name: 'Communities Serviced',
       key: 'communities',
       options: {
         filter: true,
-        filterType: 'textField'      }
+        filterType: 'textField'
+      }
     },
     {
       name: 'Service Area',
@@ -226,7 +211,6 @@ class AllVendors extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <div className={classes.table}>
-          {/* {this.showCommunitySwitch()} */}
           <MUIDataTable
             title="All Vendors"
             data={data}
