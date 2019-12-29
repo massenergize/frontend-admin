@@ -11,6 +11,7 @@ import FileCopy from '@material-ui/icons/FileCopy';
 import EditIcon from '@material-ui/icons/Edit';
 import { Link } from 'react-router-dom';
 import Avatar from '@material-ui/core/Avatar';
+import TextField from '@material-ui/core/TextField';
 
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -49,14 +50,6 @@ class AllActions extends React.Component {
     });
   }
 
-  showCommunitySwitch = () => {
-    const user = this.props.auth ? this.props.auth : {};
-    if (user.is_community_admin) {
-      return (
-        <CommunitySwitch actionToPerform={this.changeActions} />
-      );
-    }
-  }
 
   changeActions = async (id) => {
     const { allActions } = this.state;
@@ -74,7 +67,7 @@ class AllActions extends React.Component {
           initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
         },
         `${d.title}...`.substring(0, 30), // limit to first 30 chars
-        d.rank,
+        { rank: d.rank, id: d.id },
         `${d.tags.map(t => t.name).join(', ')} `,
         (d.is_global ? 'Global' : (d.community && d.community.name)),
         d.id
@@ -124,6 +117,24 @@ class AllActions extends React.Component {
       key: 'rank',
       options: {
         filter: false,
+        customBodyRender: (d) => (
+          <TextField
+            name="rank"
+            required="true"
+            onChange={async event => {
+              const { target } = event;
+              if (!target) return;
+              const { name, value } = target;
+              await apiCall('/actions.update', { action_id: d && d.id, [name]: value });
+            }}
+            label="Rank"
+            InputLabelProps={{
+              shrink: true,
+              maxWidth: '10px'
+            }}
+            defaultValue={d && d.rank}
+          />
+        )
       }
     },
     {

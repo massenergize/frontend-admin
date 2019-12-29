@@ -118,7 +118,7 @@ class CreateNewVendorForm extends Component {
               contentType: 'text',
               isRequired: true,
               defaultValue: vendor.id,
-              dbName: 'id',
+              dbName: 'vendor_id',
               readOnly: true
             },
             {

@@ -113,7 +113,7 @@ class CreateNewActionForm extends Component {
           children: [
             {
               name: 'title',
-              label: 'Title of Action (Between 4 and 25 characters)',
+              label: 'Title of Action (Between 4 and 40 characters)',
               placeholder: 'Use Heat Pumps',
               fieldType: 'TextField',
               contentType: 'text',
@@ -176,6 +176,23 @@ class CreateNewActionForm extends Component {
           ]
         },
         {
+          label: 'Carbon Calculator - Link your Action to one of our Carbon Calculator Actions',
+          fieldType: 'Section',
+          children: [
+            {
+              name: 'calculator_action',
+              label: 'Calculator Action',
+              placeholder: 'eg. Wayland',
+              fieldType: 'Dropdown',
+              defaultValue: null,
+              dbName: 'calculator_action',
+              data: ccActions,
+              modalTitle: 'Carbon Action List & Instructions',
+              modalText: 'Check out the instructions here: https://docs.google.com/document/d/1RisvrGJQifCq9c62etcwR1YCUffExz_T8lR2XDGmokQ/edit',
+            },
+          ]
+        },
+        {
           name: 'featured_summary',
           label: 'Featured Summary',
           placeholder: 'eg. This event is happening in ...',
@@ -202,17 +219,6 @@ class CreateNewActionForm extends Component {
           isRequired: true,
           defaultValue: null,
           dbName: 'steps_to_take',
-        },
-        {
-          name: 'calculator_action',
-          label: 'Calculator Action',
-          placeholder: 'eg. Wayland',
-          fieldType: 'Dropdown',
-          defaultValue: null,
-          dbName: 'calculator_action',
-          data: ccActions,
-          modalTitle: 'Carbon Action List & Instructions',
-          modalText: 'Check out the instructions here: https://docs.google.com/document/d/1RisvrGJQifCq9c62etcwR1YCUffExz_T8lR2XDGmokQ/edit',
         },
         {
           name: 'vendors',

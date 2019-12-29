@@ -7,15 +7,10 @@ import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
 import { bindActionCreators } from 'redux';
 import MUIDataTable from 'mui-datatables';
-import FileCopy from '@material-ui/icons/FileCopy';
-import EditIcon from '@material-ui/icons/Edit';
-import { Link } from 'react-router-dom';
-import DetailsIcon from '@material-ui/icons/Details';
-import messageStyles from 'dan-styles/Messages.scss';
 import { connect } from 'react-redux';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-import CommunitySwitch from '../Summary/CommunitySwitch';
+
 class AllUsers extends React.Component {
   constructor(props) {
     super(props);
@@ -48,7 +43,6 @@ class AllUsers extends React.Component {
   fashionData = (data) => {
     return data.map(d => (
       [
-        d.id,
         d.full_name,
         d.preferred_name,
         d.email,
@@ -60,15 +54,6 @@ class AllUsers extends React.Component {
 
 
   getColumns = (classes) => [
-    {
-      name: 'ID',
-      key: 'id',
-      options: {
-        filter: true,
-        filterType: 'textField',
-        download: false,
-      }
-    },
     {
       name: 'Full Name',
       key: 'full_name',

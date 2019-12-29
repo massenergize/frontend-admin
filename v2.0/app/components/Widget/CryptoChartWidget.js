@@ -159,7 +159,7 @@ class CryptoChartWidget extends PureComponent {
                     tabIndex={-1}
                     disableRipple
                   />
-                  <ListItemText primary="Bolinger Bands" secondary="Maecenas nisl libero, tincidunt id odio id" />
+                  <ListItemText primary="Bolinger Bands" secondary="Yes" />
                 </ListItem>
                 <ListItem
                   role={undefined}
@@ -173,7 +173,7 @@ class CryptoChartWidget extends PureComponent {
                     tabIndex={-1}
                     disableRipple
                   />
-                  <ListItemText primary="Parabolic SAR" secondary="Quisque ut metus sit amet" />
+                  <ListItemText primary="Parabolic SAR" secondary="Yes" />
                 </ListItem>
                 <ListItem
                   role={undefined}
@@ -187,7 +187,7 @@ class CryptoChartWidget extends PureComponent {
                     tabIndex={-1}
                     disableRipple
                   />
-                  <ListItemText primary="Stochastic" secondary="Vestibulum nec mi suscipit" />
+                  <ListItemText primary="Stochastic" secondary="Yes" />
                 </ListItem>
                 <ListItem
                   role={undefined}
@@ -201,7 +201,7 @@ class CryptoChartWidget extends PureComponent {
                     tabIndex={-1}
                     disableRipple
                   />
-                  <ListItemText primary="RSI" secondary="Interdum et malesuada fames" />
+                  <ListItemText primary="RSI" secondary="Yes" />
                 </ListItem>
               </List>
             </div>

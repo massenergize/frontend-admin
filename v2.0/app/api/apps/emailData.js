@@ -27,7 +27,7 @@ const emailData = [
     avatar: avatarApi[2],
     name: 'Jane Doe',
     date: 'May, 13 2018',
-    subject: 'Vivamus sit',
+    subject: 'Hello',
     category: 'updates',
     content: 'Hello',
     attachment: [],
