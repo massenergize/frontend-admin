@@ -188,7 +188,7 @@ class CreateNewActionForm extends Component {
               dbName: 'calculator_action',
               data: ccActions,
               modalTitle: 'Carbon Action List & Instructions',
-              modalText: 'Check out the instructions here: https://docs.google.com/document/d/1RisvrGJQifCq9c62etcwR1YCUffExz_T8lR2XDGmokQ/edit',
+              modalText: 'Check out the instructions here: https://docs.google.com/document/d/1b-tCB83hKk9yWFcB15YdHBORAFOPyh63c8jt1i15WL4',
             },
           ]
         },
