@@ -1,5 +1,6 @@
+
 const carouselData = [
-  {
+  { 
     background: '#7CB342',
     title: 'Solar Panels in Wayland.',
     desc: 'I installed Solar Panels and it has been amazing',

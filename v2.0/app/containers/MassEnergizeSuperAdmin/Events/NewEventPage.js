@@ -1,12 +1,14 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
-import { PapperBlock } from 'dan-components';
 import CreateNewEventForm from './CreateNewEventForm';
+import EditEventForm from './EditEventForm';
 class CreateNewEvent extends React.Component {
   render() {
-    const title = brand.name + ' - Create New Event';
+    const title = brand.name + ' - Event & Campaigns';
     const description = brand.desc;
+    const isEditForm = this.props.location.pathname.includes('edit');
+
     return (
       <div>
         <Helmet>
@@ -17,9 +19,13 @@ class CreateNewEvent extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <PapperBlock title="New Event Page" desc="Some text description">
-          <CreateNewEventForm />
-        </PapperBlock>
+
+        { isEditForm &&
+          <EditEventForm {...this.props} />
+        }
+        { !isEditForm &&
+          <CreateNewEventForm {...this.props} />
+        }
       </div>
     );
   }

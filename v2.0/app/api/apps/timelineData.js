@@ -9,7 +9,7 @@ const timelineData = [
     icon: 'add_circle',
     avatar: avatarApi[6],
     image: imgApi[19],
-    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed urna in justo euismod condimentum. Fusce placerat enim et odio molestie sagittis.',
+    content: 'Hello',
     liked: true,
     comments: [
       {
@@ -17,21 +17,21 @@ const timelineData = [
         from: 'Jane Doe',
         avatar: avatarApi[2],
         date: 'May, 29 2018',
-        message: 'Maecenas nisl libero, tincidunt id odio id, feugiat vulputate quam. Vestibulum feugiat rhoncus metus. In non erat et ipsum molestie porta sit amet ut felis. Vestibulum a massa vestibulum, gravida odio id, fringilla ipsum.'
+        message: 'Hello'
       },
       {
         id: '1_2',
         from: 'Jim Doe',
         avatar: avatarApi[10],
         date: 'May, 29 2018',
-        message: 'Ut sed eros finibus, placerat orci id, dapibus mauris.'
+        message: 'Hello'
       },
       {
         id: '1_3',
         from: 'Jihan Doe',
         avatar: avatarApi[4],
         date: 'May, 29 2018',
-        message: 'Sed imperdiet enim ligula, vitae viverra justo porta vel. Duis eget felis bibendum, pretium mi sed, placerat ante. Vivamus sit amet interdum elit. Proin lacinia erat ac velit tempus auctor. Interdum et malesuada fames ac ante ipsum primis in faucibus. Aliquam nec ex aliquet, aliquam neque non, gravida est. '
+        message: 'Hello'
       }
     ]
   },
@@ -43,7 +43,7 @@ const timelineData = [
     icon: 'date_range',
     avatar: avatarApi[6],
     image: '',
-    content: 'Quisque ut metus sit amet augue rutrum feugiat. Vestibulum bibendum nisi eget magna malesuada, at mattis eros efficitur. Vivamus facilisis quam ullamcorper iaculis gravida.',
+    content: 'Hello',
     liked: true,
     comments: [
       {
@@ -51,14 +51,14 @@ const timelineData = [
         from: 'Jane Doe',
         avatar: avatarApi[2],
         date: 'May, 29 2018',
-        message: 'Maecenas nisl libero, tincidunt id odio id, feugiat vulputate quam. Vestibulum feugiat rhoncus metus. In non erat et ipsum molestie porta sit amet ut felis. Vestibulum a massa vestibulum, gravida odio id, fringilla ipsum.'
+        message: 'Hello'
       },
       {
         id: '2_2',
         from: 'Jihan Doe',
         avatar: avatarApi[4],
         date: 'May, 29 2018',
-        message: 'Sed imperdiet enim ligula, vitae viverra justo porta vel. Duis eget felis bibendum, pretium mi sed, placerat ante. Vivamus sit amet interdum elit. Proin lacinia erat ac velit tempus auctor. Interdum et malesuada fames ac ante ipsum primis in faucibus. Aliquam nec ex aliquet, aliquam neque non, gravida est. '
+        message: 'Hello'
       }
     ]
   },
@@ -70,7 +70,7 @@ const timelineData = [
     icon: 'description',
     avatar: avatarApi[6],
     image: imgApi[20],
-    content: 'Vivamus sit amet interdum elit. Proin lacinia erat ac velit tempus auctor. Interdum et malesuada fames ac ante ipsum primis in faucibus.',
+    content: 'Hello',
     liked: false,
     comments: [
       {
@@ -78,28 +78,28 @@ const timelineData = [
         from: 'Jack Doe',
         avatar: avatarApi[8],
         date: 'May, 29 2018',
-        message: 'Maecenas nisl libero, tincidunt id odio id, feugiat vulputate quam. Vestibulum feugiat rhoncus metus. In non erat et ipsum molestie porta sit amet ut felis. Vestibulum a massa vestibulum, gravida odio id, fringilla ipsum.'
+        message: 'Hello'
       },
       {
         id: '3_2',
         from: 'Jim Doe',
         avatar: avatarApi[9],
         date: 'May, 29 2018',
-        message: 'Ut sed eros finibus, placerat orci id, dapibus mauris.'
+        message: 'Hello'
       },
       {
         id: '3_3',
         from: 'Jihan Doe',
         avatar: avatarApi[4],
         date: 'May, 29 2018',
-        message: 'Sed imperdiet enim ligula, vitae viverra justo porta vel. Duis eget felis bibendum, pretium mi sed, placerat ante. Vivamus sit amet interdum elit. Proin lacinia erat ac velit tempus auctor. Interdum et malesuada fames ac ante ipsum primis in faucibus. Aliquam nec ex aliquet, aliquam neque non, gravida est. '
+        message: 'Hello'
       },
       {
         id: '3_4',
         from: 'Janet Doe',
         avatar: avatarApi[5],
         date: 'May, 29 2018',
-        message: 'Aenean sit amet magna'
+        message: 'Hello'
       }
     ]
   },
@@ -111,7 +111,7 @@ const timelineData = [
     icon: 'favorite',
     avatar: avatarApi[6],
     image: '',
-    content: 'Donec dignissim, odio ac imperdiet luctus, ante nisl accumsan justo, et venenatis ante metus pellentesque sem.',
+    content: 'Hello',
     liked: true,
     comments: [
       {
@@ -119,7 +119,7 @@ const timelineData = [
         from: 'Jane Doe',
         avatar: avatarApi[2],
         date: 'May, 29 2018',
-        message: 'Maecenas nisl libero, tincidunt id odio id, feugiat vulputate quam. Vestibulum feugiat rhoncus metus. In non erat et ipsum molestie porta sit amet ut felis. Vestibulum a massa vestibulum, gravida odio id, fringilla ipsum.'
+        message: 'Hello'
       }
     ]
   },
@@ -131,7 +131,7 @@ const timelineData = [
     icon: 'lock',
     avatar: avatarApi[6],
     image: imgApi[12],
-    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed urna in justo euismod condimentum. Fusce placerat enim et odio molestie sagittis.',
+    content: 'Hello',
     liked: false,
     comments: [
       {
@@ -139,14 +139,14 @@ const timelineData = [
         from: 'Jim Doe',
         avatar: avatarApi[9],
         date: 'May, 29 2018',
-        message: 'Ut sed eros finibus, placerat orci id, dapibus mauris.'
+        message: 'Hello'
       },
       {
         id: '5_2',
         from: 'Jihan Doe',
         avatar: avatarApi[4],
         date: 'May, 29 2018',
-        message: 'Sed imperdiet enim ligula, vitae viverra justo porta vel. Duis eget felis bibendum, pretium mi sed, placerat ante. Vivamus sit amet interdum elit. Proin lacinia erat ac velit tempus auctor. Interdum et malesuada fames ac ante ipsum primis in faucibus. Aliquam nec ex aliquet, aliquam neque non, gravida est. '
+        message: 'Hello'
       }
     ]
   }

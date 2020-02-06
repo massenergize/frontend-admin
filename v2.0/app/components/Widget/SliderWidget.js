@@ -31,38 +31,35 @@ const styles = theme => ({
 
 const content = [
   {
-    title: 'Vulputate Mollis Ultricies',
-    description:
-    'Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.',
+    title: 'Title',
+    description:'Description',
     button: 'Watch Video',
     image: imgApi[8],
     label: 'Uploaded to',
     tag: 'Just Uploaded',
-    to: 'Lorem Video',
+    to: 'Video',
     userProfile: imgApi[54],
     type: 'video',
   },
   {
-    title: 'Tortor Dapibus Fermentum',
-    description:
-    'Cras mattis consectetur purus sit amet fermentum.',
+    title: 'Title',
+    description:'Description',
     button: 'See Post',
     image: imgApi[15],
     label: 'Posted to',
     tag: 'Newest Post',
-    to: 'Ipsum Media',
+    to: 'Video',
     userProfile: imgApi[53],
     type: 'article'
   },
   {
-    title: 'Phasellus volutpat',
-    description:
-    'Lorem ipsum dolor sit amet',
+    title: 'Title',
+    description:'Description',
     button: 'Read Article',
     image: imgApi[29],
     label: 'Posted to',
     tag: 'Latest Article',
-    to: 'Dolor Sit News',
+    to: 'Video',
     userProfile: imgApi[58],
     type: 'article'
   }

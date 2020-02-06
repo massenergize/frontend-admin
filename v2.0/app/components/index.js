@@ -1,3 +1,4 @@
+
 export Header from './Header/Header';
 export HeaderMenu from './Header/HeaderMenu';
 export Sidebar from './Sidebar/Sidebar';
@@ -9,13 +10,21 @@ export SearchUi from './Search/SearchUi';
 export GuideSlider from './GuideSlider';
 // Form
 export LoginForm from './Forms/LoginForm';
+export FloatingPanel from './Panel/FloatingPanel';
+
 export RegisterForm from './Forms/RegisterForm';
 export ResetForm from './Forms/ResetForm';
+export MaterialDropZone from './Forms/MaterialDropZone.js';
+
 export Notification from './Notification/Notification';
 // Table
 export EmptyData from './Tables/EmptyData';
+
+export AdvTable from './Tables/AdvTable';
 // Error
 export ErrorWrap from './Error/ErrorWrap';
+
+export MySnackbarContentWrapper from './SnackBar/SnackbarContentWrapper';
 
 // Dashboard and Widget
 export CounterWidget from './Counter/CounterWidget';

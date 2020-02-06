@@ -1,13 +1,18 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import { connect } from 'react-redux';
 import classNames from 'classnames';
 import Hidden from '@material-ui/core/Hidden';
 import Drawer from '@material-ui/core/Drawer';
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import dummy from 'dan-api/dummy/dummyContents';
+import { bindActionCreators } from 'redux';
 import styles from './sidebar-jss';
 import SidebarContent from './SidebarContent';
+import communityAdminMenu from '../../api/ui/communityAdminMenu';
+import superAdminMenu from '../../api/ui/superAdminMenu';
+
 
 class Sidebar extends React.Component {
   state = {
@@ -50,6 +55,7 @@ class Sidebar extends React.Component {
     this.handleClose();
   }
 
+
   render() {
     const {
       classes,
@@ -57,9 +63,10 @@ class Sidebar extends React.Component {
       toggleDrawerOpen,
       loadTransition,
       leftSidebar,
-      dataMenu
+      auth,
     } = this.props;
     const { status, anchorEl, turnDarker } = this.state;
+    const dataMenu = auth && auth.is_super_admin ? superAdminMenu : communityAdminMenu;
     return (
       <Fragment>
         <Hidden lgUp>
@@ -96,6 +103,7 @@ class Sidebar extends React.Component {
             anchor={leftSidebar ? 'left' : 'right'}
           >
             <SidebarContent
+              auth={auth}
               drawerPaper={open}
               leftSidebar={leftSidebar}
               turnDarker={turnDarker}
@@ -127,4 +135,10 @@ Sidebar.defaultProps = {
   leftSidebar: true
 };
 
-export default withStyles(styles)(Sidebar);
+function mapStateToProps(state) {
+  return {
+    auth: state.getIn(['auth'])
+  };
+}
+const SidebarMapped = connect(mapStateToProps, null)(Sidebar);
+export default withStyles(styles)(SidebarMapped);

@@ -2,11 +2,11 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
 import { PapperBlock } from 'dan-components';
-import CreateNewGoalForm from './CreateNewGoalForm';
+import AddVendorForm from './AddVendorForm';
 
-class CreateNewGoal extends React.Component {
+class AddVendor extends React.Component {
   render() {
-    const title = brand.name + ' - Create New Goal';
+    const title = brand.name + ' - Add New Vendor';
     const description = brand.desc;
     return (
       <div>
@@ -18,12 +18,12 @@ class CreateNewGoal extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <PapperBlock title="Create New Goal" desc="Some text description">
-          <CreateNewGoalForm />
+        <PapperBlock title="Add New Vendor" desc="">
+          <AddVendorForm />
         </PapperBlock>
       </div>
     );
   }
 }
 
-export default CreateNewGoal;
+export default AddVendor;

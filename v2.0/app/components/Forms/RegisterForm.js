@@ -20,7 +20,7 @@ import People from '@material-ui/icons/People';
 import Icon from '@material-ui/core/Icon';
 import Hidden from '@material-ui/core/Hidden';
 import brand from 'dan-api/dummy/brand';
-import logo from 'dan-images/logo.svg';
+import logo from 'dan-images/logo.png';
 import styles from './user-jss';
 
 // validation functions

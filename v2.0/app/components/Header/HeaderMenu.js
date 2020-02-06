@@ -9,7 +9,7 @@ import classNames from 'classnames';
 import Tooltip from '@material-ui/core/Tooltip';
 import Ionicon from 'react-ionicons';
 import IconButton from '@material-ui/core/IconButton';
-import logo from 'dan-images/logo.svg';
+import logo from 'dan-images/logo.png';
 import brand from 'dan-api/dummy/brand';
 import Hidden from '@material-ui/core/Hidden';
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';

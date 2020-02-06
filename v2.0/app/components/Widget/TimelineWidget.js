@@ -12,27 +12,27 @@ const dataTimeline = [
   {
     time: '11:20',
     title: 'Updated Product',
-    desc: 'Quisque a consequat ante, at volutpat enim.'
+    desc: 'Hello'
   },
   {
-    time: 'Yesteray',
+    time: 'Yesterday',
     title: 'You liked James products',
-    desc: 'Aenean sit amet magna vel magna fringilla fermentum.'
+    desc: 'Hello'
   },
   {
     time: 'Yesterday',
     title: 'James just like your product',
-    desc: 'Nam posuere accumsan porta.'
+    desc: 'Hello'
   },
   {
     time: '11 Oct 2018',
     title: 'Jenna commented on your product',
-    desc: 'Curabitur egestas consequat lorem.'
+    desc: 'Hello'
   },
   {
     time: 'Last week',
     title: 'Jihan Doe just like your product',
-    desc: 'Vestibulum nec mi suscipit, dapibus purus a'
+    desc: 'Hello'
   },
 ];
 

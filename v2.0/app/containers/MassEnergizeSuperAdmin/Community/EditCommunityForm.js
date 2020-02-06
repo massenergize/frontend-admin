@@ -1,39 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import states from 'dan-api/data/states';
 import { withStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import { Field, reduxForm } from 'redux-form/immutable';
-import Grid from '@material-ui/core/Grid';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormLabel from '@material-ui/core/FormLabel';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Typography from '@material-ui/core/Typography';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-import Button from '@material-ui/core/Button';
-import {
-  Checkbox,
-  TextField
-} from 'redux-form-material-ui';
-import { initAction, clearAction } from '../../../actions/ReduxFormActions';
-
-const renderRadioGroup = ({ input, ...rest }) => (
-  <RadioGroup
-    {...input}
-    {...rest}
-    valueselected={input.value}
-    onChange={(event, value) => input.onChange(value)}
-  />
-);
-
-// validation functions
-const required = value => (value == null ? 'Required' : undefined);
-const email = value => (
-  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)
-    ? 'Invalid email'
-    : undefined
-);
+import MassEnergizeForm from '../_FormGenerator';
+import { apiCall } from '../../../utils/messenger';
 
 const styles = theme => ({
   root: {
@@ -64,217 +34,269 @@ class EditCommunityForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showLocation: false
+      formJson: null,
+      community: null
     };
   }
 
-  getInitData = (community) => ({
-    name: community.name,
-    subdomain: community.subdomain,
-    about_community: community.about_community,
-    owner_name: community.owner_name,
-    owner_email: community.owner_email,
-    geographical_focus: community.is_geographically_focused ? 'FOCUSED' : 'DISPERSED',
-    ...community.location
-  });
+
+  async componentDidMount() {
+    const { id } = this.props.match.params;
+    const communityResponse = await apiCall('/communities.info', { community_id: id });
+    if (communityResponse && !communityResponse.success) {
+      return;
+    }
+
+    const community = communityResponse.data;
+    await this.setStateAsync({ community });
+
+    const formJson = await this.createFormJson();
+    await this.setStateAsync({ formJson });
+  }
+
+  setStateAsync(state) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve);
+    });
+  }
+
+  createFormJson = async () => {
+    const { community } = this.state;
+    console.log(community);
+    // if (!community) return {};
+    const formJson = {
+      title: 'Edit your Community',
+      subTitle: '',
+      method: '/communities.update',
+      successRedirectPage: `/admin/community/${community.id}/edit`,
+      fields: [
+        {
+          label: 'About this Community',
+          fieldType: 'Section',
+          children: [
+            {
+              name: 'id',
+              label: 'Community ID',
+              placeholder: 'eg. 10',
+              fieldType: 'TextField',
+              contentType: 'number',
+              isRequired: true,
+              defaultValue: community.id,
+              dbName: 'community_id',
+              readOnly: true
+            },
+            {
+              name: 'name',
+              label: 'Name of this Community',
+              placeholder: 'eg. Wayland',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: community.name,
+              dbName: 'name',
+              readOnly: false
+            },
+            {
+              name: 'subdomain',
+              label: 'Subdomain: Please Provide a short unique name.  (only letters and numbers) ',
+              placeholder: 'eg. wayland',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: community.subdomain,
+              dbName: 'subdomain',
+              readOnly: false
+            },
+            {
+              name: 'about',
+              label: 'Tell us about this community',
+              placeholder: 'Tell us more ...',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              isMultiline: true,
+              defaultValue: community.about_community,
+              dbName: 'about_community',
+              readOnly: false
+            },
+            {
+              name: 'is_geographically_focused',
+              label: 'Is this community Geographically focused?',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: community.is_geographically_focused ? 'true' : 'false',
+              dbName: 'is_geographically_focused',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+              child: {
+                valueToCheck: 'true',
+                fields: [
+                  {
+                    name: 'address',
+                    label: 'Street Address',
+                    placeholder: 'eg. Wayland',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: false,
+                    defaultValue: `${community.location && community.location.address ? community.location.address : ''}`,
+                    dbName: 'address',
+                    readOnly: false
+                  },
+                  {
+                    name: 'unit',
+                    label: 'Unit Number',
+                    placeholder: 'eg. Unit 904',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: false,
+                    defaultValue: `${community.location && community.location.unit ? community.location.unit : ''}`,
+                    dbName: 'unit',
+                    readOnly: false
+                  },
+                  {
+                    name: 'city',
+                    label: 'City',
+                    placeholder: 'eg. wayland',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: false,
+                    defaultValue: `${community.location && community.location.city ? community.location.city : ''}`,
+                    dbName: 'city',
+                    readOnly: false
+                  },
+                  {
+                    name: 'zipcode',
+                    label: 'Zip code ',
+                    placeholder: 'eg. 80202',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: false,
+                    defaultValue: community.location && community.location.zipcode,
+                    dbName: 'zipcode',
+                    readOnly: false
+                  },
+                  {
+                    name: 'state',
+                    label: 'State ',
+                    placeholder: 'eg. New York',
+                    fieldType: 'Dropdown',
+                    contentType: 'text',
+                    isRequired: false,
+                    data: states,
+                    defaultValue: community.location && community.location.state,
+                    dbName: 'state',
+                    readOnly: false
+                  },
+                ]
+              }
+            },
+            {
+              name: 'is_published',
+              label: 'Should this go live now?',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: community.is_published ? 'true' : 'false',
+              dbName: 'is_published',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+            },
+            {
+              name: 'is_approved',
+              label: 'Do you approve this community? (Check yes after background check)',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: community.is_approved ? 'true' : 'false',
+              dbName: 'is_approved',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+            },
+          ]
+        },
+        {
+          label: 'Community Public Information (Will be displayed in the community portal\'s footer)',
+          fieldType: 'Section',
+          children: [
+            {
+              name: 'admin_full_name',
+              label: 'Contact Person\'s Full Name',
+              placeholder: 'eg. Ellen Tohn',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: community.owner_name,
+              dbName: 'owner_name',
+              readOnly: false
+            },
+            {
+              name: 'admin_email',
+              label: 'Community\'s Public Email',
+              placeholder: 'eg. etohn@comcast.net',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: community.owner_email,
+              dbName: 'owner_email',
+              readOnly: false
+            },
+            {
+              name: 'admin_phone_number',
+              label: 'Community\'s Public Phone Number',
+              placeholder: 'eg. 571 222 4567',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: false,
+              defaultValue: community.owner_phone_number,
+              dbName: 'owner_phone_number',
+              readOnly: false
+            },
+          ]
+        },
+        {
+          name: 'image',
+          placeholder: 'Upload a Logo',
+          fieldType: 'File',
+          dbName: 'image',
+          previewLink: `${community.logo && community.logo.url}`,
+          label: 'Upload a new logo for this community',
+          selectMany: false,
+          isRequired: false,
+          defaultValue: '',
+          filesLimit: 1
+        }
+      ]
+    };
+
+    return formJson;
+  }
+
 
   render() {
-    const trueBool = true;
-    const {
-      classes,
-      handleSubmit,
-      submitting,
-      init,
-      community
-    } = this.props;
-
-    init(this.getInitData(community));
-
+    const { classes } = this.props;
+    const { formJson } = this.state;
+    if (!formJson) return (<div>Hold tight! Preparing your form ...</div>);
     return (
       <div>
-        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
-              <Typography variant="h5" component="h3">
-                Edit
-                {`for ${community.name} (ID: ${community.id})`}
-              </Typography>
-              <Typography component="p">
-                Please complete this form to the best of your knowledge.
-              </Typography>
-              <form onSubmit={handleSubmit}>
-                <div>
-                  <Field
-                    name="name"
-                    component={TextField}
-                    placeholder="Community Name eg. Wayland"
-                    label="Community Name"
-                    required
-                    validate={[required]}
-                    className={classes.field}
-                    value={community.name}
-                  />
-                </div>
-                <div>
-                  <Field
-                    name="subdomain"
-                    component={TextField}
-                    placeholder="eg. You will need your subdomain to access your community portal through subdomain.massenergize.org"
-                    label="Subdomain For your Community Portal"
-                    required
-                    validate={[required]}
-                    className={classes.field}
-                    value={community.name}
-                  />
-                </div>
-                <h1>About the Community Admin</h1>
-                <div>
-                  <Field
-                    name="owner_name"
-                    component={TextField}
-                    placeholder="Community Admin Name eg. Ellen Tohn"
-                    label="Community Administrator's Name"
-                    required
-                    validate={[required]}
-                    className={classes.field}
-                  />
-                </div>
-                <div>
-                  <Field
-                    name="owner_email"
-                    component={TextField}
-                    placeholder="eg. admin@wayland.com"
-                    label="Community Administrator's Email"
-                    required
-                    validate={[required, email]}
-                    className={classes.field}
-                  />
-                </div>
-                <div className={classes.field}>
-                  <Field
-                    name="about_community"
-                    className={classes.field}
-                    component={TextField}
-                    placeholder="Tell us about you"
-                    label="Tell Us About You"
-                    multiline={trueBool}
-                    rows={4}
-                  />
-                </div>
-                <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Geographic Focus</FormLabel>
-                  <Field name="geographical_focus" className={classes.inlineWrap} component={renderRadioGroup}>
-                    <FormControlLabel value="DISPERSED" control={<Radio />} label="Geographically Dispersed" onClick={() => { this.setState({ ...this.sate, showLocation: false }); }} />
-                    <FormControlLabel value="FOCUSED" control={<Radio />} label="Geographically Focused" onClick={() => { this.setState({ ...this.sate, showLocation: true }); }} />
-                  </Field>
-                </div>
-                {this.state.showLocation
-                  && (
-
-                    <Grid container spacing={24}>
-                      <Grid item xs={12}>
-                        <Field
-                          name="address1"
-                          component={TextField}
-                          placeholder="eg. 9 Fields Lane"
-                          label="Address Line 1"
-                          className={classes.field}
-                        />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Field
-                          name="address2"
-                          component={TextField}
-                          placeholder="eg. Apt 4"
-                          label="Address Line 2"
-                          className={classes.field}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Field
-                          name="city"
-                          component={TextField}
-                          placeholder="eg. Wayland"
-                          label="City"
-                          className={classes.field}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Field
-                          name="state"
-                          component={TextField}
-                          placeholder="eg. New York"
-                          label="State"
-                          className={classes.field}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Field
-                          name="zip"
-                          component={TextField}
-                          placeholder="eg. 10120"
-                          label="Zip / Postal Code"
-                          className={classes.field}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Field
-                          name="country"
-                          component={TextField}
-                          placeholder="eg. Ghana"
-                          label="Country"
-                          className={classes.field}
-                        />
-                      </Grid>
-                    </Grid>
-                  )
-                }
-                <div>
-                  <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
-                    Submit
-                  </Button>
-                </div>
-              </form>
-            </Paper>
-          </Grid>
-        </Grid>
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+        />
       </div>
     );
   }
 }
 
-renderRadioGroup.propTypes = {
-  input: PropTypes.object.isRequired,
-};
-
 EditCommunityForm.propTypes = {
   classes: PropTypes.object.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
-  reset: PropTypes.func.isRequired,
-  pristine: PropTypes.bool.isRequired,
-  submitting: PropTypes.bool.isRequired,
-  init: PropTypes.func.isRequired,
-  clear: PropTypes.func.isRequired,
-  community: PropTypes.object.isRequired
 };
 
-const mapDispatchToProps = dispatch => ({
-  init: bindActionCreators(initAction, dispatch),
-  clear: () => dispatch(clearAction),
-});
 
-const ReduxFormMapped = reduxForm({
-  form: 'immutableExample',
-  enableReinitialize: true,
-})(EditCommunityForm);
-
-const reducer = 'initval';
-const FormInit = connect(
-  state => ({
-    force: state,
-    initialValues: state.getIn([reducer, 'formValues'])
-  }),
-  mapDispatchToProps,
-)(ReduxFormMapped);
-
-export default withStyles(styles)(FormInit);
+export default withStyles(styles, { withTheme: true })(EditCommunityForm);

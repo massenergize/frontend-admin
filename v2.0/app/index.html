@@ -43,7 +43,29 @@
     <style>
       #app { position: absolute;top:0;left: 0;background: #fafafa;width: 100%;min-height: 100%;z-index: 1000; display: flex;}
       .preloader-init { position: absolute; top: calc(50% - 65px); left: calc(50% - 65px) }
+    
+      .my-sign-out{
+        text-transform: capitalize; 
+        padding:10px; 
+        background:red;
+      }
+
+      .my-sign-out:hover{
+        background:crimson; 
+        color:white; 
+        transition: .4s ease-in-out;
+      }
     </style>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-140128910-3"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-140128910-3');
+    </script>
+
   </head>
   <body>
     <!-- Display a message if JS has been disabled on the browser. -->

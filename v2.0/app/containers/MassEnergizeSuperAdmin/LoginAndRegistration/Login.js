@@ -2,20 +2,28 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { LoginForm } from 'dan-components';
 import styles from 'dan-components/Forms/user-jss';
 import { sendJson } from '../../../utils/messenger';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import purple from '@material-ui/core/colors/purple';
+// import { bindActionCreators } from 'redux';
 
 class Login extends React.Component {
   submitForm = (values) => {
     sendJson(values.entries(), '/v2/users', '/admin');
   }
 
+
   render() {
     const title = brand.name + ' - Login';
     const description = brand.desc;
-    const { classes } = this.props;
+    const {
+      classes, started, signOutFxn, loginWithFacebookFxn, loginWithGoogleFxn, normalLoginFxn, error
+    } = this.props;
+
     return (
       <div className={classes.root}>
         <Helmet>
@@ -26,9 +34,18 @@ class Login extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
+
         <div className={classes.container}>
           <div className={classes.userFormWrap}>
-            <LoginForm onSubmit={this.submitForm} />
+            <LoginForm
+              started={started}
+              signOutFxn={signOutFxn}
+              loginWithFacebookFxn={loginWithFacebookFxn}
+              normalLoginFxn={normalLoginFxn}
+              err={error}
+              onSubmit={this.submitForm}
+              loginWithGoogleFxn={loginWithGoogleFxn}
+            />
           </div>
         </div>
       </div>
@@ -39,5 +56,12 @@ class Login extends React.Component {
 Login.propTypes = {
   classes: PropTypes.object.isRequired,
 };
+const mapDispatchToProps = dispatch => ({});
+const mapStateToProps = (store) => {
+  auth: store.getIn(['auth'])
+};
 
-export default withStyles(styles)(Login);
+const LoginMapped = connect(
+  mapDispatchToProps
+)(Login);
+export default withStyles(styles)(LoginMapped);

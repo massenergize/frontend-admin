@@ -1,0 +1,2 @@
+npm run build && aws2 s3 sync build/ s3://admin-dev.massenergize.org
+npm run build && aws2 s3 sync build/ s3://admin.massenergize.org

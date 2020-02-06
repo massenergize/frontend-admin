@@ -3,7 +3,7 @@ module.exports = [
     key: 'dashboard',
     name: 'Dashboard',
     icon: 'ios-stats',
-    link: '/admin/dashboard'
+    link: '/'
   },
   {
     key: 'communities',
@@ -24,28 +24,6 @@ module.exports = [
         key: 'all-communities',
         name: 'All Communities',
         link: '/admin/read/communities'
-      },
-    ]
-  },
-  {
-    key: 'vendors',
-    name: 'Vendors',
-    icon: 'md-hammer',
-    child: [
-      {
-        key: 'about-vendors',
-        name: 'Contractors/Vendors',
-        title: true
-      },
-      {
-        key: 'add-vendor',
-        name: 'Add New Vendor',
-        link: '/admin/add/vendor'
-      },
-      {
-        key: 'all-vendors',
-        name: 'All Vendors',
-        link: '/admin/read/vendors'
       },
     ]
   },
@@ -73,12 +51,12 @@ module.exports = [
   },
   {
     key: 'events',
-    name: 'Events',
+    name: 'Events & Campaigns',
     icon: 'md-wifi',
     child: [
       {
         key: 'about-events',
-        name: 'Events',
+        name: 'Events & Campaigns',
         title: true
       },
       {
@@ -147,15 +125,37 @@ module.exports = [
         name: 'Goals',
         title: true
       },
-      // {
-      //   key: 'add-goal',
-      //   name: 'Add New Goal',
-      //   link: '/admin/add/goal'
-      // },
+      {
+        key: 'add-goal',
+        name: 'Add New Goal',
+        link: '/admin/add/goal'
+      },
       {
         key: 'all-goals',
         name: 'All Goals',
         link: '/admin/read/goals'
+      },
+    ]
+  },
+  {
+    key: 'subscribers',
+    name: 'Subscribers',
+    icon: 'md-reorder',
+    child: [
+      {
+        key: 'about-subscribers',
+        name: 'Subscribers',
+        title: true
+      },
+      // {
+      //   key: 'add-subscriber',
+      //   name: 'Add Subscriber',
+      //   link: '/admin/add/subscriber'
+      // },
+      {
+        key: 'all-subscribers',
+        name: 'All Subscribers',
+        link: '/admin/read/subscribers'
       },
     ]
   },
@@ -182,10 +182,26 @@ module.exports = [
     ]
   },
   {
-    key: 'export',
-    name: 'Export',
-    icon: 'ios-cloud-download',
-    link: '/admin/export'
+    key: 'vendors',
+    name: 'Vendors',
+    icon: 'md-hammer',
+    child: [
+      {
+        key: 'about-vendors',
+        name: 'Contractors/Vendors',
+        title: true
+      },
+      {
+        key: 'add-vendor',
+        name: 'Add New Vendor',
+        link: '/admin/add/vendor'
+      },
+      {
+        key: 'all-vendors',
+        name: 'All Vendors',
+        link: '/admin/read/vendors'
+      },
+    ]
   },
   {
     key: 'policies',
@@ -210,161 +226,9 @@ module.exports = [
     ]
   },
   {
-    key: 'page-customization',
-    name: 'Pages',
-    icon: 'ios-apps',
-    child: [
-      {
-        key: 'about-pages',
-        name: 'Website Pages',
-        title: true
-      },
-      {
-        key: 'home',
-        name: 'Home',
-        link: '/admin/add/home'
-      },
-      {
-        key: 'all-actions',
-        name: 'All Actions',
-        link: '/admin/read/all-actions'
-      },
-      {
-        key: 'donate',
-        name: 'Donate',
-        link: '/admin/read/donate'
-      },
-      {
-        key: 'contact',
-        name: 'Contact Us',
-        link: '/admin/read/contact-us'
-      },
-      {
-        key: 'about-us',
-        name: 'About Us',
-        link: '/admin/read/about-us'
-      },
-    ]
+    key: 'users',
+    name: 'Users',
+    icon: 'ios-people',
+    link: '/admin/read/users'
   },
-  // {
-  //   key: 'demo',
-  //   name: 'Demo',
-  //   title: true,
-  // },
-  // {
-  //   key: 'pages',
-  //   name: 'Pages',
-  //   icon: 'ios-paper-outline',
-  //   child: [
-  //     {
-  //       key: 'other_page',
-  //       name: 'Welcome Page',
-  //       title: true,
-  //     },
-  //     {
-  //       key: 'blank',
-  //       name: 'Blank Page',
-  //       link: '/app'
-  //     },
-  //     {
-  //       key: 'main_page',
-  //       name: 'Sample Page',
-  //       title: true,
-  //     },
-  //     {
-  //       key: 'dashboard',
-  //       name: 'Dashboard',
-  //       link: '/admin/dashboard'
-  //     },
-  //     {
-  //       key: 'form',
-  //       name: 'Form',
-  //       link: '/admin/form'
-  //     },
-  //     {
-  //       key: 'table',
-  //       name: 'Table',
-  //       link: '/admin/table'
-  //     },
-  //     {
-  //       key: 'maintenance',
-  //       name: 'Maintenance',
-  //       link: '/maintenance'
-  //     },
-  //     {
-  //       key: 'coming_soon',
-  //       name: 'Coming Soon',
-  //       link: '/coming-soon'
-  //     },
-  //   ]
-  // },
-  // {
-  //   key: 'auth',
-  //   name: 'Auth Page',
-  //   icon: 'ios-contact-outline',
-  //   child: [
-  //     {
-  //       key: 'login',
-  //       name: 'Login',
-  //       link: '/login'
-  //     },
-  //     {
-  //       key: 'register',
-  //       name: 'Register',
-  //       link: '/register'
-  //     },
-  //     {
-  //       key: 'reset',
-  //       name: 'Reset Password',
-  //       link: '/reset-password'
-  //     },
-  //   ]
-  // },
-  // {
-  //   key: 'errors',
-  //   name: 'Errors',
-  //   icon: 'ios-paw-outline',
-  //   child: [
-  //     {
-  //       key: 'not_found_page',
-  //       name: 'Not Found Page',
-  //       link: '/admin/pages/not-found'
-  //     },
-  //     {
-  //       key: 'error_page',
-  //       name: 'Error Page',
-  //       link: '/admin/pages/error'
-  //     },
-  //   ]
-  // },
-  // {
-  //   key: 'menu_levels',
-  //   name: 'Menu Levels',
-  //   multilevel: true,
-  //   icon: 'ios-menu-outline',
-  //   child: [
-  //     {
-  //       key: 'level_1',
-  //       name: 'Level 1',
-  //       link: '/#'
-  //     },
-  //     {
-  //       key: 'level_2',
-  //       keyParent: 'menu_levels',
-  //       name: 'Level 2',
-  //       child: [
-  //         {
-  //           key: 'sub_menu_1',
-  //           name: 'Sub Menu 1',
-  //           link: '/#'
-  //         },
-  //         {
-  //           key: 'sub_menu_2',
-  //           name: 'Sub Menu 2',
-  //           link: '/#'
-  //         },
-  //       ]
-  //     },
-  //   ]
-  // }
 ];

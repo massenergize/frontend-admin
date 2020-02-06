@@ -1,44 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import { Field, reduxForm } from 'redux-form/immutable';
-import MenuItem from '@material-ui/core/MenuItem';
-import InputLabel from '@material-ui/core/InputLabel';
-import Grid from '@material-ui/core/Grid';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Typography from '@material-ui/core/Typography';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-import Button from '@material-ui/core/Button';
-import {
-  Checkbox,
-  Select,
-  TextField,
-  Switch
-} from 'redux-form-material-ui';
-import { initAction, clearAction } from '../../../actions/ReduxFormActions';
-
-const renderRadioGroup = ({ input, ...rest }) => (
-  <RadioGroup
-    {...input}
-    {...rest}
-    valueselected={input.value}
-    onChange={(event, value) => input.onChange(value)}
-  />
-);
-
-// validation functions
-const required = value => (value == null ? 'Required' : undefined);
-const email = value => (
-  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)
-    ? 'Invalid email'
-    : undefined
-);
+import { apiCall } from '../../../utils/messenger';
+import MassEnergizeForm from '../_FormGenerator';
 
 const styles = theme => ({
   root: {
@@ -64,163 +28,231 @@ const styles = theme => ({
   },
 });
 
-const initData = {
-  text: 'Sample Text',
-  email: 'sample@mail.com',
-  radio: 'option1',
-  selection: 'option1',
-  onof: true,
-  checkbox: true,
-  textarea: 'This is default text'
-};
 
 class CreateNewTestimonialForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      communities: [],
+      actions: [],
+      vendors: [],
+      formJson: null
+    };
+  }
+
+
+  async componentDidMount() {
+    const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
+    const actionsResponse = await apiCall('/actions.listForCommunityAdmin');
+    const vendorsResponse = await apiCall('/vendors.listForCommunityAdmin');
+    const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
+
+    if (communitiesResponse && communitiesResponse.data) {
+      const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name }));
+      await this.setStateAsync({ communities });
+    }
+
+    if (actionsResponse && actionsResponse.data) {
+      const actions = actionsResponse.data.map(c => ({ ...c, displayName: c.title + ` - ${c.community && c.community.name}` }));
+      await this.setStateAsync({ actions });
+    }
+    if (vendorsResponse && vendorsResponse.data) {
+      const vendors = vendorsResponse.data.map(c => ({ ...c, displayName: c.name }));
+      await this.setStateAsync({ vendors });
+    }
+
+    const formJson = await this.createFormJson();
+    if (tagCollectionsResponse && tagCollectionsResponse.data) {
+      const section = {
+        label: 'Please select tag(s) that apply to this testimonial',
+        fieldType: 'Section',
+        children: []
+      };
+
+      Object.values(tagCollectionsResponse.data).forEach(tCol => {
+        const newField = {
+          name: tCol.name,
+          label: `${tCol.name} ${tCol.allow_multiple ? '(You can select multiple)' : '(Only one selection allowed)'}`,
+          placeholder: '',
+          fieldType: 'Checkbox',
+          selectMany: tCol.allow_multiple,
+          defaultValue: [],
+          dbName: 'tags',
+          data: tCol.tags.map(t => ({ ...t, displayName: t.name, id: '' + t.id }))
+        };
+
+        // want this to be the 5th field
+        if (tCol.name === 'Category') {
+          section.children.push(newField);
+        }
+      });
+
+      // want this to be the 2nd field
+      formJson.fields.splice(1, 0, section);
+    }
+
+    await this.setStateAsync({ formJson });
+  }
+
+  setStateAsync(state) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve);
+    });
+  }
+
+  createFormJson = async () => {
+    const { communities, actions, vendors } = this.state;
+    const formJson = {
+      title: 'Create New Testimonial',
+      subTitle: '',
+      method: '/testimonials.create',
+      successRedirectPage: '/admin/read/testimonials',
+      fields: [
+        {
+          label: 'About this Testimonial',
+          fieldType: 'Section',
+          children: [
+            {
+              name: 'title',
+              label: 'Title of Testimonial',
+              placeholder: 'Omg! HEat pumps are the best!',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: '',
+              dbName: 'title',
+              readOnly: false
+            },
+            {
+              name: 'body',
+              label: 'Body',
+              placeholder: 'Tell us more ...',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              isMultiline: true,
+              defaultValue: '',
+              dbName: 'body',
+              readOnly: false
+            },
+            {
+              name: 'is_approved',
+              label: 'Should this go live ?',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: 'true',
+              dbName: 'is_approved',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ]
+            },
+            {
+              name: 'is_published',
+              label: 'Should this go live ?',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: 'false',
+              dbName: 'is_published',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ]
+            },
+            {
+              name: 'rank',
+              label: 'Give this testimonial a number to determine which order it appears in.  Smaller appears first',
+              placeholder: 'eg. 0',
+              fieldType: 'TextField',
+              contentType: 'number',
+              isRequired: true,
+              defaultValue: '',
+              dbName: 'rank',
+              readOnly: false
+            },
+          ]
+        },
+        {
+          label: 'What this Testimonial is linked to',
+          fieldType: 'Section',
+          children: [
+            {
+              name: 'community',
+              label: 'Primary Community',
+              placeholder: 'eg. Wayland',
+              fieldType: 'Dropdown',
+              defaultValue: null,
+              dbName: 'community_id',
+              data: communities
+            },
+            {
+              name: 'action',
+              label: 'Primary Action',
+              placeholder: 'eg. Action',
+              fieldType: 'Dropdown',
+              defaultValue: null,
+              dbName: 'action_id',
+              data: actions
+            },
+            {
+              name: 'vendor',
+              label: 'Which Vendor did you use?',
+              placeholder: 'eg. Wayland',
+              fieldType: 'Dropdown',
+              defaultValue: null,
+              dbName: 'vendor_id',
+              data: vendors
+            },
+            {
+              name: 'user_email',
+              label: 'Please provide email of the user',
+              placeholder: 'eg. etohn@massenergize.org',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: '',
+              dbName: 'user_email',
+              readOnly: false
+            },
+          ]
+        },
+        {
+          name: 'image',
+          placeholder: 'Select an Image',
+          fieldType: 'File',
+          dbName: 'image',
+          label: 'Upload a file for this testimonial',
+          selectMany: false,
+          isRequired: true,
+          defaultValue: '',
+          filesLimit: 1
+        },
+      ]
+    };
+    return formJson;
+  }
+
+
   render() {
-    const trueBool = true;
-    const {
-      classes,
-      handleSubmit,
-      pristine,
-      reset,
-      submitting,
-      init,
-      clear
-    } = this.props;
+    const { classes } = this.props;
+    const { formJson } = this.state;
+    if (!formJson) return (<div>Hold tight! Preparing your form ...</div>);
     return (
       <div>
-        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
-              <Typography variant="h5" component="h3">
-                 Form
-              </Typography>
-              <Typography component="p">
-                The delay between when you click (Submit) and when the alert dialog pops up is intentional, to simulate server latency.
-              </Typography>
-              <div className={classes.buttonInit}>
-                <Button onClick={() => init(initData)} color="secondary" type="button">
-                  Load Sample Data
-                </Button>
-                <Button onClick={() => clear()} type="button">
-                  Clear Data
-                </Button>
-              </div>
-              <form onSubmit={handleSubmit}>
-                <div>
-                  <Field
-                    name="text"
-                    component={TextField}
-                    placeholder="Text Field"
-                    label="Text Field"
-                    validate={required}
-                    required
-                    ref={this.saveRef}
-                    className={classes.field}
-                  />
-                </div>
-                <div>
-                  <Field
-                    name="email"
-                    component={TextField}
-                    placeholder="Email Field"
-                    label="Email"
-                    required
-                    validate={[required, email]}
-                    className={classes.field}
-                  />
-                </div>
-                <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Choose One Option</FormLabel>
-                  <Field name="radio" className={classes.inlineWrap} component={renderRadioGroup}>
-                    <FormControlLabel value="option1" control={<Radio />} label="Option 1" />
-                    <FormControlLabel value="option2" control={<Radio />} label="Option 2" />
-                  </Field>
-                </div>
-                <div>
-                  <FormControl className={classes.field}>
-                    <InputLabel htmlFor="selection">Selection</InputLabel>
-                    <Field
-                      name="selection"
-                      component={Select}
-                      placeholder="Selection"
-                      autoWidth={trueBool}
-                    >
-                      <MenuItem value="option1">Option One</MenuItem>
-                      <MenuItem value="option2">Option Two</MenuItem>
-                      <MenuItem value="option3">Option Three</MenuItem>
-                    </Field>
-                  </FormControl>
-                </div>
-                <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Toggle Input</FormLabel>
-                  <div className={classes.inlineWrap}>
-                    <FormControlLabel control={<Field name="onof" component={Switch} />} label="On/OF Switch" />
-                    <FormControlLabel control={<Field name="checkbox" component={Checkbox} />} label="Checkbox" />
-                  </div>
-                </div>
-                <div className={classes.field}>
-                  <Field
-                    name="textarea"
-                    className={classes.field}
-                    component={TextField}
-                    placeholder="Textarea"
-                    label="Textarea"
-                    multiline={trueBool}
-                    rows={4}
-                  />
-                </div>
-                <div>
-                  <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
-                    Submit
-                  </Button>
-                  <Button
-                    type="button"
-                    disabled={pristine || submitting}
-                    onClick={reset}
-                  >
-                    Reset
-                  </Button>
-                </div>
-              </form>
-            </Paper>
-          </Grid>
-        </Grid>
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+        />
       </div>
     );
   }
 }
 
-renderRadioGroup.propTypes = {
-  input: PropTypes.object.isRequired,
-};
-
 CreateNewTestimonialForm.propTypes = {
   classes: PropTypes.object.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
-  reset: PropTypes.func.isRequired,
-  pristine: PropTypes.bool.isRequired,
-  submitting: PropTypes.bool.isRequired,
-  init: PropTypes.func.isRequired,
-  clear: PropTypes.func.isRequired,
 };
 
-const mapDispatchToProps = dispatch => ({
-  init: bindActionCreators(initAction, dispatch),
-  clear: () => dispatch(clearAction),
-});
 
-const ReduxFormMapped = reduxForm({
-  form: 'immutableExample',
-  enableReinitialize: true,
-})(CreateNewTestimonialForm);
-
-const reducer = 'initval';
-const FormInit = connect(
-  state => ({
-    force: state,
-    initialValues: state.getIn([reducer, 'formValues'])
-  }),
-  mapDispatchToProps,
-)(ReduxFormMapped);
-
-export default withStyles(styles)(FormInit);
+export default withStyles(styles, { withTheme: true })(CreateNewTestimonialForm);

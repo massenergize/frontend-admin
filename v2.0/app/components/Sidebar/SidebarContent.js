@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import { bindActionCreators } from 'redux';
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
@@ -9,9 +10,11 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Avatar from '@material-ui/core/Avatar';
 import brand from 'dan-api/dummy/brand';
 import dummy from 'dan-api/dummy/dummyContents';
-import logo from 'dan-images/logo.svg';
+import logo from 'dan-images/logo.png';
+import { connect } from 'react-redux';
 import MainMenu from './MainMenu';
 import styles from './sidebar-jss';
+import { IS_PROD, BUILD_VERSION } from '../../config/constants';
 
 class SidebarContent extends React.Component {
   state = {
@@ -52,7 +55,10 @@ class SidebarContent extends React.Component {
       changeStatus,
       isLogin
     } = this.props;
+    const user = this.props.auth;
     const { transform } = this.state;
+    const profile = user && user.profile_picture ? user.profile_picture.url : null;
+
 
     const setStatus = st => {
       switch (st) {
@@ -69,50 +75,29 @@ class SidebarContent extends React.Component {
     return (
       <div className={classNames(classes.drawerInner, !drawerPaper ? classes.drawerPaperClose : '')}>
         <div className={classes.drawerHeader}>
-          <NavLink to="/app" className={classNames(classes.brand, classes.brandBar, turnDarker && classes.darker)}>
+          <NavLink to="/admin" className={classNames(classes.brand, classes.brandBar, turnDarker && classes.darker)}>
             <img src={logo} alt={brand.name} />
             {brand.name}
           </NavLink>
-          {isLogin && (
+          {isLogin && user && (
             <div
               className={classNames(classes.profile, classes.user)}
               style={{ opacity: 1 - (transform / 100), marginTop: transform * -0.3 }}
             >
-              <Avatar
-                alt={dummy.profile ? dummy.profile.full_name : dummy.user.name}
-                src={dummy.profile ? dummy.profile.profile_picture.url : dummy.user.avatar}
-                className={classNames(classes.avatar, classes.bigAvatar)}
-              />
+              {user.profile_picture
+                && <Avatar alt={user.preferred_name} src={user.profile_picture.url} style={{ margin: 10 }} />
+              }
+              {!user.profile_picture
+                && <Avatar style={{ margin: 10 }}>{user.preferred_name.substring(0, 2)}</Avatar>
+              }
               <div>
-                <h4>{dummy.profile ? dummy.profile.full_name : dummy.user.name}</h4>
-                <Button size="small" onClick={openMenuStatus}>
-                  <i className={classNames(classes.dotStatus, setStatus(status))} />
-                  {status}
-                </Button>
-                <Menu
-                  id="status-menu"
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={closeMenuStatus}
-                  className={classes.statusMenu}
-                >
-                  <MenuItem onClick={() => changeStatus('online')}>
-                    <i className={classNames(classes.dotStatus, classes.online)} />
-                    Online
-                  </MenuItem>
-                  <MenuItem onClick={() => changeStatus('idle')}>
-                    <i className={classNames(classes.dotStatus, classes.idle)} />
-                    Idle
-                  </MenuItem>
-                  <MenuItem onClick={() => changeStatus('busy')}>
-                    <i className={classNames(classes.dotStatus, classes.bussy)} />
-                    Bussy
-                  </MenuItem>
-                  <MenuItem onClick={() => changeStatus('offline')}>
-                    <i className={classNames(classes.dotStatus, classes.offline)} />
-                    Offline
-                  </MenuItem>
-                </Menu>
+                <h4>{user.preferred_name ? user.preferred_name : '...'}</h4>
+                <small>{user.is_super_admin ? 'Super Admin' : 'Community Admin ' }</small>
+                <p style={{fontSize: '7px'}}>
+                  {IS_PROD ? 'Production ' : 'Development '}
+                  Build version
+                  {' ' + BUILD_VERSION}
+                </p>
               </div>
             </div>
           )}
@@ -157,5 +142,6 @@ SidebarContent.defaultProps = {
   anchorEl: null,
   isLogin: true,
 };
+
 
 export default withStyles(styles)(SidebarContent);

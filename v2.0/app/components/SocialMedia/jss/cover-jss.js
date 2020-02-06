@@ -1,5 +1,55 @@
 import { fade, darken } from '@material-ui/core/styles/colorManipulator';
+import CustomJss from '../../../utils/jss/Custom-jss';
+const custom = {
+  goLiveBtn:{
+    padding:"9px 44px", 
+    background:'white', 
+    color:'#282828',
+    marginBottom:12,
+    textTransform:'capitalize',
+    borderRadius:55,
+    borderWidth:"0px !important",
+    "&:hover":{
+      background:"green",
+      color:'white',
+      transition:'.4s ease-in-out'
+    }
+  },
+  publishBtn:{
+    padding:"9px 34px", 
+    background:'crimson', 
+    color:'white',
+    marginBottom:10,
+    textTransform:'capitalize',
+    borderRadius:55,
+    borderWidth:"0px !important",
+    "&:hover":{
+      background:"black",
+      color:'white',
+      transition:'.4s ease-in-out'
+    }
+  },
+  leAnchor:{
+    textDecoration:'none !important',
+    padding:"10px 30px", 
+    background:'green', 
+    color:'white',
+    borderRadius:55,
+    "&:hover":{
+      background:"#d8e4e8",
+      color:'#5d7488',
+      transition:'.4s ease-in-out'
+    }
+  }, 
+  inline:{
+    display:'inline-block'
+  }
+}
+const raise = CustomJss;
+
 const styles = theme => ({
+  ...custom,
+  ...raise,
   root: {
     flexGrow: 1,
   },
@@ -11,7 +61,7 @@ const styles = theme => ({
     width: '100%',
     overflow: 'hidden',
     height: 480,
-    backgroundColor: theme.palette.type === 'dark' ? darken(theme.palette.primary.dark, 0.8) : theme.palette.primary.dark,
+    backgroundColor: theme.palette.type === 'dark' ? darken(theme.palette.primary.dark, 0.8) : "white",
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'flex-end',
@@ -31,7 +81,7 @@ const styles = theme => ({
     position: 'relative'
   },
   content: {
-    background: fade(theme.palette.secondary.main, 0.3),
+    //background: fade(theme.palette.secondary.main, 0.3),
     height: '100%',
     width: '100%',
     padding: `70px ${theme.spacing.unit * 3}px 30px`

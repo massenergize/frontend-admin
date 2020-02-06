@@ -9,7 +9,7 @@ import avatarApi from 'dan-api/images/avatars';
 import GeneralCard from 'dan-components/CardPaper/GeneralCard';
 import PostCard from 'dan-components/CardPaper/PostCard';
 import Quote from 'dan-components/Quote/Quote';
-
+import * as moment from 'moment/moment';
 const styles = theme => ({
   divider: {
     margin: `${theme.spacing.unit * 2}px 0`,
@@ -19,9 +19,10 @@ const styles = theme => ({
 
 class Favorites extends React.Component {
   render() {
+    const dateFormat =  "MMMM Do YYYY, h:mm:ss a";
+    const formNoHours = "MMMM Do YYYY"
     const { classes, data } = this.props;
     const { events, testimonials } = data;
-    console.log(events, testimonials);
     const bull = <span className={classes.bullet}>•</span>;
     return (
       <Grid
@@ -40,7 +41,7 @@ class Favorites extends React.Component {
                   shared={10}
                   commented={22}
                   avatar={t.user && t.user.profile_picture ? t.user.profile_picture.url : avatarApi[11]}
-                  date={`Submitted at: ${t.created_at}`}
+                  date={`Submitted on ${moment(t.created_at).format(formNoHours)}`}
                   content={`${t.body}`}
                   name={`${t.user ? t.user.full_name : 'Anonymous'}`}
                   data1={`Vendor: ${t.vendor ? t.vendor.name : ''}`}
@@ -63,7 +64,7 @@ class Favorites extends React.Component {
                     liked={1}
                     shared={20}
                     commented={15}
-                    date={`Start At: ${e.start_date_and_time}  Ends At:${e.start_date_and_time}`}
+                    date={`Start At: ${moment(e.start_date_and_time).format(dateFormat)}  Ends At:${moment(e.start_date_and_time).format(dateFormat)}`}
                     content={`${e.description}`}
                     image={e.image ? e.image.url : imgApi[5]}
                     avatar={e.community && e.community.logo ? e.community.logo.url : avatarApi[6]}

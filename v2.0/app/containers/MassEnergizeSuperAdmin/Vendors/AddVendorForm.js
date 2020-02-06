@@ -1,44 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import states from 'dan-api/data/states';
 import { withStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import { Field, reduxForm } from 'redux-form/immutable';
-import MenuItem from '@material-ui/core/MenuItem';
-import InputLabel from '@material-ui/core/InputLabel';
-import Grid from '@material-ui/core/Grid';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Typography from '@material-ui/core/Typography';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-import Button from '@material-ui/core/Button';
-import {
-  Checkbox,
-  Select,
-  TextField,
-  Switch
-} from 'redux-form-material-ui';
-import { initAction, clearAction } from '../../../actions/ReduxFormActions';
-
-const renderRadioGroup = ({ input, ...rest }) => (
-  <RadioGroup
-    {...input}
-    {...rest}
-    valueselected={input.value}
-    onChange={(event, value) => input.onChange(value)}
-  />
-);
-
-// validation functions
-const required = value => (value == null ? 'Required' : undefined);
-const email = value => (
-  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)
-    ? 'Invalid email'
-    : undefined
-);
+import MassEnergizeForm from '../_FormGenerator';
+import { apiCall } from '../../../utils/messenger';
 
 const styles = theme => ({
   root: {
@@ -64,163 +29,368 @@ const styles = theme => ({
   },
 });
 
-const initData = {
-  text: 'Sample Text',
-  email: 'sample@mail.com',
-  radio: 'option1',
-  selection: 'option1',
-  onof: true,
-  checkbox: true,
-  textarea: 'This is default text'
-};
 
-class AddVendorForm extends Component {
+class CreateNewVendorForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      formJson: null, communities: []
+    };
+  }
+
+
+  async componentDidMount() {
+    const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
+    const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
+    if (communitiesResponse && communitiesResponse.data) {
+      const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
+      await this.setStateAsync({ communities });
+    }
+
+    const formJson = await this.createFormJson();
+    if (tagCollectionsResponse && tagCollectionsResponse.data) {
+      const section = {
+        label: 'Please select tag(s) that apply to this vendor',
+        fieldType: 'Section',
+        children: []
+      };
+
+      Object.values(tagCollectionsResponse.data).forEach(tCol => {
+        const newField = {
+          name: tCol.name,
+          label: `${tCol.name} ${tCol.allow_multiple ? '(You can select multiple)' : '(Only one selection allowed)'}`,
+          placeholder: '',
+          fieldType: 'Checkbox',
+          selectMany: tCol.allow_multiple,
+          defaultValue: [],
+          dbName: 'tags',
+          data: tCol.tags.map(t => ({ ...t, displayName: t.name, id: '' + t.id }))
+        };
+
+        // want this to be the 5th field
+        if (tCol.name === 'Category') {
+          section.children.push(newField);
+        }
+      });
+
+      // want this to be the 2nd field
+      formJson.fields.splice(1, 0, section);
+    }
+
+    await this.setStateAsync({ formJson });
+  }
+
+  setStateAsync(state) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve);
+    });
+  }
+
+  createFormJson = async () => {
+    const { communities } = this.state;
+    const formJson = {
+      title: 'Create New Vendor',
+      subTitle: '',
+      method: '/vendors.create',
+      successRedirectPage: '/admin/read/vendors',
+      fields: [
+        {
+          label: 'About this Vendor',
+          fieldType: 'Section',
+          children: [
+            {
+              name: 'name',
+              label: 'Name of this Vendor',
+              placeholder: 'eg. Solar Provider Inc.',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: '',
+              dbName: 'name',
+              readOnly: false
+            },
+            {
+              name: 'phone_number',
+              label: 'Primary Phone Number',
+              placeholder: 'eg. +1(571)-000-2231',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: '',
+              dbName: 'phone_number',
+              readOnly: false
+            },
+            {
+              name: 'communities',
+              label: 'Which communities would this vendor service ?',
+              placeholder: 'eg. +1(571)-000-2231',
+              fieldType: 'Checkbox',
+              contentType: 'text',
+              isRequired: true,
+              selectMany: true,
+              defaultValue: [],
+              dbName: 'communities',
+              readOnly: false,
+              data: communities || [],
+            },
+            {
+              name: 'email',
+              label: 'Primary Email of this vendor',
+              placeholder: 'eg. abc@gmail.com',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: '',
+              dbName: 'email',
+              readOnly: false
+            },
+            {
+              name: 'description',
+              label: 'Tell us about what you do',
+              placeholder: 'Tell us more ...',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              isMultiline: true,
+              defaultValue: '',
+              dbName: 'description',
+              readOnly: false
+            },
+            {
+              name: 'is_verified',
+              label: 'Have you verified this Vendor?',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: 'false',
+              dbName: 'is_verified',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ]
+            },
+            {
+              name: 'is_published',
+              label: 'Should this vendor go live?',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: 'false',
+              dbName: 'is_published',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+            },
+            {
+              name: 'have_address',
+              label: 'Do you have an address?',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: 'false',
+              dbName: 'have_address',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+              child: {
+                valueToCheck: 'true',
+                fields: [
+                  {
+                    name: 'address',
+                    label: 'Street Address',
+                    placeholder: 'eg. Wayland',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: true,
+                    defaultValue: '',
+                    dbName: 'address',
+                    readOnly: false
+                  },
+                  {
+                    name: 'unit',
+                    label: 'Unit Number',
+                    placeholder: 'eg. wayland',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: false,
+                    defaultValue: '',
+                    dbName: 'unit',
+                    readOnly: false
+                  },
+                  {
+                    name: 'city',
+                    label: 'City',
+                    placeholder: 'eg. wayland',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: true,
+                    defaultValue: '',
+                    dbName: 'city',
+                    readOnly: false
+                  },
+                  {
+                    name: 'state',
+                    label: 'State ',
+                    placeholder: 'eg. New York',
+                    fieldType: 'Dropdown',
+                    contentType: 'text',
+                    isRequired: false,
+                    data: states,
+                    defaultValue: '',
+                    dbName: 'state',
+                    readOnly: false
+                  },
+                ]
+              }
+            },
+          ]
+        },
+        {
+          label: 'Services',
+          fieldType: 'Section',
+          children: [
+            {
+              name: 'service_area',
+              label: 'Please select your service Area',
+              placeholder: 'eg. Ellen Tohn',
+              fieldType: 'Radio',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: 'national',
+              dbName: 'service_area',
+              readOnly: false,
+              data: [
+                { id: 'national', value: 'National', displayName: 'National' },
+                { id: 'statewide', value: 'Statewide', displayName: 'Statewide' },
+              ],
+              child: {
+                valueToCheck: 'statewide',
+                fields: [
+                  {
+                    name: 'service_area_states',
+                    label: 'Which States? Separate them by commas',
+                    placeholder: 'eg. New York',
+                    fieldType: 'Checkbox',
+                    contentType: 'text',
+                    data: states,
+                    selectMany: true,
+                    isRequired: false,
+                    defaultValue: [],
+                    dbName: 'service_area_states',
+                    readOnly: false
+                  },
+                ]
+              }
+            },
+            {
+              name: 'properties_serviced',
+              label: 'Please select your customer type(s)',
+              placeholder: 'eg. Please select one or more options',
+              fieldType: 'Checkbox',
+              contentType: 'text',
+              isRequired: true,
+              selectMany: true,
+              defaultValue: [],
+              dbName: 'properties_serviced',
+              readOnly: false,
+              data: [
+                { id: 'residential', value: 'Residential', displayName: 'Residential' },
+                { id: 'commercial', value: 'Commercial', displayName: 'Commercial' },
+              ],
+            },
+          ]
+        },
+        {
+          label: 'Key Contact Person',
+          fieldType: 'Section',
+          children: [
+            {
+              name: 'key_contact_full_name',
+              label: 'Contact Person\'s Full Name',
+              placeholder: 'eg. Ellen Tohn',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: '',
+              dbName: 'key_contact_name',
+              readOnly: false
+            },
+            {
+              name: 'key_contact_email',
+              label: 'Contact Person\'s Email (this person should already have an account with us)',
+              placeholder: 'eg. etohn@comcast.net',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: '',
+              dbName: 'key_contact_email',
+              readOnly: false
+            },
+          ]
+        },
+        {
+          name: 'onboarding_contact_email',
+          label: 'Email of Person onboarding this vendor',
+          placeholder: 'eg. ellen@gmail.com',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: true,
+          defaultValue: '',
+          dbName: 'onboarding_contact_email',
+          readOnly: false
+        },
+        {
+          name: 'image',
+          placeholder: 'Upload a Logo',
+          fieldType: 'File',
+          dbName: 'image',
+          label: 'Upload a logo for this Vendor',
+          selectMany: false,
+          isRequired: false,
+          defaultValue: '',
+          filesLimit: 1
+        },
+        {
+          name: 'accepted_terms_and_conditions',
+          label: 'Accept Terms And Conditions',
+          modalText: 'Terms and Conditions',
+          modalTitle: 'Terms and Conditions',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: 'false',
+          dbName: 'accepted_terms_and_conditions',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ]
+        },
+      ]
+    };
+    return formJson;
+  }
+
+
   render() {
-    const trueBool = true;
-    const {
-      classes,
-      handleSubmit,
-      pristine,
-      reset,
-      submitting,
-      init,
-      clear
-    } = this.props;
+    const { classes } = this.props;
+    const { formJson } = this.state;
+    if (!formJson) return (<div>Hold tight! Preparing your form ...</div>);
     return (
       <div>
-        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
-              <Typography variant="h5" component="h3">
-                 Form
-              </Typography>
-              <Typography component="p">
-                The delay between when you click (Submit) and when the alert dialog pops up is intentional, to simulate server latency.
-              </Typography>
-              <div className={classes.buttonInit}>
-                <Button onClick={() => init(initData)} color="secondary" type="button">
-                  Load Sample Data
-                </Button>
-                <Button onClick={() => clear()} type="button">
-                  Clear Data
-                </Button>
-              </div>
-              <form onSubmit={handleSubmit}>
-                <div>
-                  <Field
-                    name="text"
-                    component={TextField}
-                    placeholder="Text Field"
-                    label="Text Field"
-                    validate={required}
-                    required
-                    ref={this.saveRef}
-                    className={classes.field}
-                  />
-                </div>
-                <div>
-                  <Field
-                    name="email"
-                    component={TextField}
-                    placeholder="Email Field"
-                    label="Email"
-                    required
-                    validate={[required, email]}
-                    className={classes.field}
-                  />
-                </div>
-                <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Choose One Option</FormLabel>
-                  <Field name="radio" className={classes.inlineWrap} component={renderRadioGroup}>
-                    <FormControlLabel value="option1" control={<Radio />} label="Option 1" />
-                    <FormControlLabel value="option2" control={<Radio />} label="Option 2" />
-                  </Field>
-                </div>
-                <div>
-                  <FormControl className={classes.field}>
-                    <InputLabel htmlFor="selection">Selection</InputLabel>
-                    <Field
-                      name="selection"
-                      component={Select}
-                      placeholder="Selection"
-                      autoWidth={trueBool}
-                    >
-                      <MenuItem value="option1">Option One</MenuItem>
-                      <MenuItem value="option2">Option Two</MenuItem>
-                      <MenuItem value="option3">Option Three</MenuItem>
-                    </Field>
-                  </FormControl>
-                </div>
-                <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Toggle Input</FormLabel>
-                  <div className={classes.inlineWrap}>
-                    <FormControlLabel control={<Field name="onof" component={Switch} />} label="On/OF Switch" />
-                    <FormControlLabel control={<Field name="checkbox" component={Checkbox} />} label="Checkbox" />
-                  </div>
-                </div>
-                <div className={classes.field}>
-                  <Field
-                    name="textarea"
-                    className={classes.field}
-                    component={TextField}
-                    placeholder="Textarea"
-                    label="Textarea"
-                    multiline={trueBool}
-                    rows={4}
-                  />
-                </div>
-                <div>
-                  <Button variant="contained" color="secondary" type="submit" disabled={submitting}>
-                    Submit
-                  </Button>
-                  <Button
-                    type="button"
-                    disabled={pristine || submitting}
-                    onClick={reset}
-                  >
-                    Reset
-                  </Button>
-                </div>
-              </form>
-            </Paper>
-          </Grid>
-        </Grid>
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+        />
       </div>
     );
   }
 }
 
-renderRadioGroup.propTypes = {
-  input: PropTypes.object.isRequired,
-};
-
-AddVendorForm.propTypes = {
+CreateNewVendorForm.propTypes = {
   classes: PropTypes.object.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
-  reset: PropTypes.func.isRequired,
-  pristine: PropTypes.bool.isRequired,
-  submitting: PropTypes.bool.isRequired,
-  init: PropTypes.func.isRequired,
-  clear: PropTypes.func.isRequired,
 };
 
-const mapDispatchToProps = dispatch => ({
-  init: bindActionCreators(initAction, dispatch),
-  clear: () => dispatch(clearAction),
-});
 
-const ReduxFormMapped = reduxForm({
-  form: 'immutableExample',
-  enableReinitialize: true,
-})(AddVendorForm);
-
-const reducer = 'initval';
-const FormInit = connect(
-  state => ({
-    force: state,
-    initialValues: state.getIn([reducer, 'formValues'])
-  }),
-  mapDispatchToProps,
-)(ReduxFormMapped);
-
-export default withStyles(styles)(FormInit);
+export default withStyles(styles, { withTheme: true })(CreateNewVendorForm);

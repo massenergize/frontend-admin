@@ -3,34 +3,40 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
-import { PapperBlock } from 'dan-components';
-import imgApi from 'dan-api/images/photos';
-import classNames from 'classnames';
-import Typography from '@material-ui/core/Typography';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Chip from '@material-ui/core/Chip';
-import Avatar from '@material-ui/core/Avatar';
-import Icon from '@material-ui/core/Icon';
-import Edit from '@material-ui/icons/Edit';
-import Language from '@material-ui/icons/Language';
-import messageStyles from 'dan-styles/Messages.scss';
-import { fetchData } from '../../../utils/messenger';
-import styles from '../../../components/Widget/widget-jss';
 
+import MUIDataTable from 'mui-datatables';
+import FileCopy from '@material-ui/icons/FileCopy';
+import EditIcon from '@material-ui/icons/Edit';
+import { Link } from 'react-router-dom';
+import Avatar from '@material-ui/core/Avatar';
+
+import Paper from '@material-ui/core/Paper';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Grid from '@material-ui/core/Grid';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { apiCall } from '../../../utils/messenger';
+import styles from '../../../components/Widget/widget-jss';
+import { reduxGetAllEvents, reduxGetAllCommunityEvents } from '../../../redux/redux-actions/adminActions';
+import CommunitySwitch from '../Summary/CommunitySwitch';
 
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { events: [] };
+    this.state = { data: [], loading: true, columns: this.getColumns() };
   }
 
   async componentDidMount() {
-    const response = await fetchData('v2/events');
-    await this.setStateAsync({ events: response.data });
+    const user = this.props.auth ? this.props.auth : {};
+    const community = this.props.community ? this.props.community :{};
+    if (user.is_super_admin) {
+      this.props.callForSuperAdminEvents();
+    }
+    if (user.is_community_admin) {
+      let com = community || user.admin_at[0];
+      this.props.callForNormalAdminEvents(com.id);
+    }
+    await this.setStateAsync({ loading: false });
   }
 
   setStateAsync(state) {
@@ -39,104 +45,165 @@ class AllEvents extends React.Component {
     });
   }
 
-  getLocation = location => {
-    if (location) {
-      const {
-        address1, address2, state, zip, country
-      } = location;
-      return `${address1 ? address1 + ',' : ''} 
-        ${address2 ? address2 + ', ' : ''} 
-        ${state ? state + ', ' : ''} 
-        ${zip || ''}
-        ${country || ''}`;
+
+  showCommunitySwitch = () => {
+    const user = this.props.auth ? this.props.auth : {};
+    if (user.is_community_admin) {
+      return (
+        <CommunitySwitch actionToPerform={this.handleCommunityChange} />
+      );
     }
-    return '';
-  };
+  }
 
-  getStatus = isApproved => {
-    switch (isApproved) {
-      case false: return messageStyles.bgError;
-      case true: return messageStyles.bgSuccess;
-      default: return messageStyles.bgSuccess;
-    }
-  };
+  handleCommunityChange =(id) => {
+    this.props.callForNormalAdminEvents(id);
+  }
+
+  fashionData = (data) => {
+    const fashioned = data.map(d => (
+      [
+        d.id,
+        {
+          id: d.id,
+          image: d.image,
+          initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
+        },
+        `${d.name}...`.substring(0, 30), // limit to first 30 chars
+        d.rank,
+        `${d.tags.map(t => t.name).join(', ')}`,
+        (d.is_global ? 'Global' : (d.community && d.community.name)),
+        d.id
+      ]
+    ));
+    return fashioned;
+  }
 
 
-  renderTable = (data, classes) => (
-    <PapperBlock noMargin title="All Communities" icon="ios-share-outline" whiteBg desc="">
-      <div className={classes.root}>
-        <Table className={classNames(classes.tableLong, classes.stripped)} padding="dense">
-          <TableHead>
-            <TableRow>
-              <TableCell padding="dense">Event Name</TableCell>
-              <TableCell>Community</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Is Archived</TableCell>
-              <TableCell>Location</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map(n => ([
-              <TableRow key={n.id}>
-                <TableCell padding="dense">
-                  <div className={classes.flex}>
-                    <Avatar alt={n.name} src={n.image ? n.image.url : imgApi[21]} className={classes.productPhoto} />
-                    <div>
-                      <Typography variant="caption">{n.id}</Typography>
-                      <Typography variant="subtitle1">{n.name}</Typography>
-                      <a href={`/admin/community/${n.id}/edit`} className={classes.downloadInvoice}>
-                        <Edit />
-                        &nbsp; Edit this Event
-                      </a>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className={classes.flex}>
-                    <Avatar alt={n.community.name} src={n.community.logo ? n.community.logo : imgApi[21]} className={classNames(classes.avatar, classes.sm)} />
-                    <div>
-                      <Typography>{n.community.name}</Typography>
-                      <Typography variant="caption">
-                        <a href={`http:${n.community.subdomain}.massenergize.org`} target="_blank" rel="noopener noreferrer" className={classes.downloadInvoice}>
-                          <Language />
-                          &nbsp;
-                          Visit site
-                        </a>
-                        &nbsp;
-                      </Typography>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell align="left">
-                  <Typography variant="caption">
-                    { Date.parse(n.start_date_and_time) }
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Chip label={n.is_archived ? 'Yes' : 'No'} className={classNames(classes.chip, this.getStatus(n.is_archived))} />
-                </TableCell>
-                <TableCell>
-                  <div className={classes.taskStatus}>
-                    <Icon className={classes.taskIcon}>{n.is_geographically_focused ? 'location_on' : 'blur_on'}</Icon>
-                    <Typography variant="caption">
-                      {this.getLocation(n.location)}
-                    </Typography>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ]))}
-          </TableBody>
-        </Table>
-      </div>
-    </PapperBlock>
-  )
+  getColumns = () => [
+    {
+      name: 'ID',
+      key: 'id',
+      options: {
+        filter: false,
+        filterType: 'textField'
+      }
+    },
+    {
+      name: 'Event',
+      key: 'event',
+      options: {
+        filter: false,
+        download: false,
+        customBodyRender: (d) => (
+          <div>
+            {d.image
+              && <Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} />
+            }
+            {!d.image
+              && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
+            }
+          </div>
+        )
+      }
+    },
+    {
+      name: 'Name',
+      key: 'name',
+      options: {
+        filter: false,
+      }
+    },
+    {
+      name: 'Rank',
+      key: 'rank',
+      options: {
+        filter: false,
+      }
+    },
+    {
+      name: 'Tags',
+      key: 'tags',
+      options: {
+        filter: true,
+        filterType: 'textField'
+      }
+    },
+    {
+      name: 'Community',
+      key: 'community',
+      options: {
+        filter: true,
+        filterType: 'multiselect'
+      }
+    },
+    {
+      name: 'Edit?',
+      key: 'edit_or_copy',
+      options: {
+        filter: false,
+        download: false,
+        customBodyRender: (id) => (
+          <div>
+            <Link to={`/admin/edit/${id}/event`}>
+              <EditIcon size="small" variant="outlined" color="secondary" />
+            </Link>
+            &nbsp;&nbsp;
+            <Link
+              onClick={async () => {
+                const copiedEventResponse = await apiCall('/events.copy', { event_id: id });
+                if (copiedEventResponse && copiedEventResponse.success) {
+                  const newEvent = copiedEventResponse && copiedEventResponse.data;
+                  window.location.href = `/admin/edit/${newEvent.id}/event`;
+                }
+              }}
+              to="/admin/read/events"
+            >
+              <FileCopy size="small" variant="outlined" color="secondary" />
+            </Link>
+          </div>
+        )
+      }
+    },
+  ]
 
 
   render() {
     const title = brand.name + ' - All Events';
     const description = brand.desc;
-    const { events } = this.state;
+    const { columns, loading } = this.state;
     const { classes } = this.props;
+    const data = this.fashionData(this.props.allEvents);
+    const options = {
+      filterType: 'dropdown',
+      responsive: 'stacked',
+      print: true,
+      rowsPerPage: 10,
+      onRowsDelete: (rowsDeleted) => {
+        const idsToDelete = rowsDeleted.data;
+        idsToDelete.forEach(d => {
+          const eventId = data[d.index][0];
+          apiCall('/events.delete', { event_id: eventId });
+        });
+      }
+    };
+
+    if (loading) {
+      return (
+        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+          <Grid item xs={12} md={6}>
+            <Paper className={classes.root}>
+              <div className={classes.root}>
+                <LinearProgress />
+                <h1>Fetching all Events.  This may take a while...</h1>
+                <br />
+                <LinearProgress color="secondary" />
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      );
+    }
+
 
     return (
       <div>
@@ -148,7 +215,15 @@ class AllEvents extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        {this.renderTable(events, classes)}
+        <div className={classes.table}>
+          {/* {this.showCommunitySwitch()} */}
+          <MUIDataTable
+            title="All Events"
+            data={data}
+            columns={columns}
+            options={options}
+          />
+        </div>
       </div>
     );
   }
@@ -158,4 +233,20 @@ AllEvents.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(AllEvents);
+function mapStateToProps(state) {
+  return {
+    auth: state.getIn(['auth']),
+    allEvents: state.getIn(['allEvents']),
+    community: state.getIn(['selected_community'])
+  };
+}
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    callForSuperAdminEvents: reduxGetAllEvents,
+    callForNormalAdminEvents: reduxGetAllCommunityEvents
+
+  }, dispatch);
+}
+
+const EventsMapped = connect(mapStateToProps, mapDispatchToProps)(AllEvents);
+export default withStyles(styles)(EventsMapped);

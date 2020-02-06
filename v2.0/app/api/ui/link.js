@@ -1,5 +1,5 @@
 module.exports = {
-  dashboard: '/app',
+  dashboard: '/admin',
   login: '/login',
   market: '#',
   email: '#',

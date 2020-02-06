@@ -9,8 +9,11 @@ import history from 'utils/history';
 import languageProviderReducer from 'containers/LanguageProvider/reducer';
 import login from './modules/login';
 import uiReducer from './modules/ui';
+import contact from './modules/contact';
 import initval from './modules/initForm';
-import app from './modules/appReducer';
+import app, {
+  communitiesReducer, summaryDataReducer, graphDataReducer, tokenReducer, selectedCommunityReducer, fullSelectedCommunityReducer, authAdminReducer, allActionsReducer, allEventsReducer, allTestimonialsReducer, allUsersReducer, allTagsReducer, allTeamsReducer, allGoalsReducer, vendorsReducer, policiesReducer
+} from './modules/appReducer';
 
 /**
  * Creates the main reducer with the dynamically injected ones
@@ -20,7 +23,24 @@ export default function createReducer(injectedReducers = {}) {
     app,
     form,
     login,
+    contact,
     ui: uiReducer,
+    auth: authAdminReducer,
+    communities: communitiesReducer,
+    summary_data: summaryDataReducer,
+    graph_data: graphDataReducer,
+    allActions: allActionsReducer,
+    allTestimonials: allTestimonialsReducer,
+    allTags: allTagsReducer,
+    allUsers: allUsersReducer,
+    allEvents: allEventsReducer,
+    allTeams: allTeamsReducer,
+    allGoals: allGoalsReducer,
+    allVendors: vendorsReducer,
+    allPolicies: policiesReducer,
+    token: tokenReducer,
+    selected_community: selectedCommunityReducer,
+    full_selected_community: fullSelectedCommunityReducer,
     initval,
     language: languageProviderReducer,
     router: connectRouter(history),
