@@ -172,7 +172,7 @@ class AddRemoveSuperAdmin extends Component {
         const idsToDelete = rowsDeleted.data;
         const { pathname } = window.location;
         idsToDelete.forEach(async d => {
-          const userId = data[d.index][0].id;
+          const userId = data[d.dataIndex][0].id;
           await apiCall('/admins.super.remove', { user_id: userId });
           window.location.href = pathname;
         });

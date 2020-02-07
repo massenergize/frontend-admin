@@ -4,8 +4,8 @@
 
 const APP_NAME = 'MassEnergize Administration';
 const BUILD_VERSION = '0.9.8';
-const IS_LOCAL = false;
-const IS_PROD = true;
+const IS_LOCAL = true;
+const IS_PROD = false;
 
 //  ---- setting  API routes
 let API_HOST = 'https://api.massenergize.org';

@@ -132,7 +132,7 @@ class AllPolicies extends React.Component {
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {
-          const policyId = data[d.index][0];
+          const policyId = data[d.dataIndex][0];
           apiCall('/policies.delete', { policy_id: policyId });
         });
       }

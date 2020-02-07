@@ -192,7 +192,7 @@ class AllGoals extends React.Component {
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(async d => {
-          const goalId = data[d.index][0];
+          const goalId = data[d.dataIndex][0];
           await apiCall('/goals.delete', { goal_id: goalId });
         });
       }

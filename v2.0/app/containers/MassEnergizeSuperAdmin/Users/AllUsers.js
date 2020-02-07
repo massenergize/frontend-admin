@@ -107,7 +107,7 @@ class AllUsers extends React.Component {
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {
-          const messageId = data[d.index][0];
+          const messageId = data[d.dataIndex][0];
           apiCall('/users.delete', { message_id: messageId });
         });
       }

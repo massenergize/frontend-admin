@@ -181,7 +181,7 @@ class AllEvents extends React.Component {
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {
-          const eventId = data[d.index][0];
+          const eventId = data[d.dataIndex][0];
           apiCall('/events.delete', { event_id: eventId });
         });
       }

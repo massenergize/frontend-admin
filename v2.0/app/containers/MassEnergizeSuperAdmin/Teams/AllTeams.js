@@ -174,7 +174,7 @@ class AllTeams extends React.Component {
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {
-          const teamId = data[d.index][0];
+          const teamId = data[d.dataIndex][0];
           apiCall('/teams.delete', { team_id: teamId });
         });
       }

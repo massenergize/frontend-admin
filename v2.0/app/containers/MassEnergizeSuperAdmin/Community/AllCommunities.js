@@ -159,7 +159,7 @@ class AllCommunities extends React.Component {
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {
-          const communityId = data[d.index][0];
+          const communityId = data[d.dataIndex][0];
           apiCall('/communities.delete', { community_id: communityId });
         });
       }
