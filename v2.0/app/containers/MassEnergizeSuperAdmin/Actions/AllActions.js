@@ -69,7 +69,7 @@ class AllActions extends React.Component {
         `${d.title}...`.substring(0, 30), // limit to first 30 chars
         { rank: d.rank, id: d.id },
         `${d.tags.map(t => t.name).join(', ')} `,
-        (d.is_global ? 'Global' : (d.community && d.community.name)),
+        (d.is_global ? 'Template' : (d.community && d.community.name)),
         d.id
       ]
     ));

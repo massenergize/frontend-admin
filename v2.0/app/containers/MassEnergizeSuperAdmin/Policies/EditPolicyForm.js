@@ -126,7 +126,7 @@ class EditPolicyForm extends Component {
             },
             {
               name: 'is_global',
-              label: 'Is this Policy Global',
+              label: 'Is this Policy a Template?',
               fieldType: 'Radio',
               isRequired: false,
               defaultValue: policy && policy.is_global ? 'true' : 'false',

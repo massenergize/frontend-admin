@@ -135,7 +135,7 @@ class CreateNewActionForm extends Component {
             },
             {
               name: 'is_global',
-              label: 'Is this Action a Global/Template Action?',
+              label: 'Is this Action a Template?',
               fieldType: 'Radio',
               isRequired: false,
               defaultValue: 'false',

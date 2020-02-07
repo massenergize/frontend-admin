@@ -120,63 +120,6 @@ class AllTagCollections extends React.Component {
     return cols;
   }
 
-  // renderTable = (data, classes) => (
-  //   <PapperBlock noMargin title="All Tag Collections" icon="ios-share-outline" whiteBg desc="">
-  //     <div className={classes.root}>
-  //       <Table className={classNames(classes.tableLong, classes.stripped)} padding="dense">
-  //         <TableHead>
-  //           <TableRow>
-  //             <TableCell>ID</TableCell>
-  //             <TableCell>Name</TableCell>
-  //             <TableCell>Is Global</TableCell>
-  //             <TableCell>Tags</TableCell>
-  //           </TableRow>
-  //         </TableHead>
-  //         <TableBody>
-  //           {data.map(n => ([
-  //             <TableRow key={n.id}>
-  //               <TableCell padding="dense">
-  //                 <div className={classes.flex}>
-  //                   <div>
-  //                     <Typography variant="caption">{n.id}</Typography>
-  //                   </div>
-  //                 </div>
-  //               </TableCell>
-  //               <TableCell padding="dense">
-  //                 <div className={classes.flex}>
-  //                   <div>
-  //                     <Typography variant="subtitle1">{n.name}</Typography>
-  //                     {/* <a href={`/admin/category/${n.id}/edit`} className={classes.downloadInvoice}>
-  //                       <Edit />
-  //                       &nbsp; Edit
-  //                     </a> */}
-  //                   </div>
-  //                 </div>
-  //               </TableCell>
-  //               <TableCell align="left">
-  //                 <Typography variant="caption">
-  //                   { n.is_global ? 'Global' : 'Not Global' }
-  //                 </Typography>
-  //               </TableCell>
-  //               <TableCell>
-  //                 <div className={classes.taskStatus}>
-  //                   <Icon className={classes.taskIcon}>{n.is_geographically_focused ? 'location_on' : 'blur_on'}</Icon>
-  //                   {n.tags.map(t => (
-  //                     <Typography key={t.id} variant="caption">
-  //                       { t.name }
-  //                       ,&nbsp;&nbsp;
-  //                     </Typography>
-  //                   ))}
-  //                 </div>
-  //               </TableCell>
-  //             </TableRow>
-  //           ]))}
-  //         </TableBody>
-  //       </Table>
-  //     </div>
-  //   </PapperBlock>
-  // )
-
 
   render() {
     const title = brand.name + ' - All Tag Collections';
