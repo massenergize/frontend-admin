@@ -187,7 +187,7 @@ class CreateNewEventForm extends Component {
             },
             {
               name: 'is_global',
-              label: 'Is this Event Global',
+              label: 'Is this Event a Template?',
               fieldType: 'Radio',
               isRequired: false,
               defaultValue: '' + event.is_global,

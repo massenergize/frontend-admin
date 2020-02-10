@@ -311,7 +311,7 @@ class CreateNewEventForm extends Component {
                   />
                 </div>
                 <div className={classes.fieldBasic}>
-                  <FormLabel component="label">Is this Event Global ?</FormLabel>
+                  <FormLabel component="label">Is this Event a Template ?</FormLabel>
                   <Field
                     name="is_global"
                     className={classes.inlineWrap}
