@@ -201,9 +201,10 @@ class AllActions extends React.Component {
       rowsPerPage: 10,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach(d => {
-          const actionId = data[d.index][0];
-          apiCall('/actions.delete', { action_id: actionId });
+        console.log(rowsDeleted);
+        idsToDelete.forEach(async d => {
+          const actionId = data[d.dataIndex][0];
+          await apiCall('/actions.delete', { action_id: actionId });
         });
       }
     };

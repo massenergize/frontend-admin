@@ -213,7 +213,7 @@ class AddRemoveAdmin extends Component {
         const idsToDelete = rowsDeleted.data;
         const { pathname } = window.location;
         idsToDelete.forEach(async d => {
-          const email = data[d.index][0].id;
+          const email = data[d.dataIndex][0].id;
           await apiCall('/admins.community.remove', { email, community_id: community.id });
           window.location.href = pathname;
         });

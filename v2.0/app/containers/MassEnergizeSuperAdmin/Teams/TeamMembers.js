@@ -171,7 +171,7 @@ class TeamMembers extends React.Component {
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {
-          const email = data[d.index][2];
+          const email = data[d.dataIndex][2];
           apiCall('/teams.removeMember', { team_id: team.id, email });
         });
       }

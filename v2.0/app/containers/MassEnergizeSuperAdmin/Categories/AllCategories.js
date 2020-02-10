@@ -135,7 +135,7 @@ class AllTagCollections extends React.Component {
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {
-          const tagCollectionId = data[d.index][0];
+          const tagCollectionId = data[d.dataIndex][0];
           apiCall('/tag_collections.delete', { tag_collection_id: tagCollectionId });
         });
       }

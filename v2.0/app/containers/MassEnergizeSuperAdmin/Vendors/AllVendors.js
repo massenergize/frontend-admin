@@ -193,7 +193,7 @@ class AllVendors extends React.Component {
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {
-          const vendorId = data[d.index][0];
+          const vendorId = data[d.dataIndex][0];
           apiCall('/vendors.delete', { vendor_id: vendorId });
         });
       }
