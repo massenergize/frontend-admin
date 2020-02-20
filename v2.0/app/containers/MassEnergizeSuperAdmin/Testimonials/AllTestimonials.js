@@ -53,6 +53,7 @@ class AllTestimonials extends React.Component {
         d.rank,
         (d.community && d.community.name),
         (d.is_approved ? 'Yes' : 'No'),
+        (d.is_approved && d.is_published ? 'Yes' : 'No'),
         `${d.user ? d.user.full_name : ''}...`.substring(0, 20), // limit to first 20 chars
         `${d.action ? d.action.title : ''} ${d.action && d.action.community ? ` -  (${d.action.community.name})` : ''}...`.substring(0, 20),
         d.id
@@ -105,6 +106,13 @@ class AllTestimonials extends React.Component {
     {
       name: 'Is Approved?',
       key: 'is_approved',
+      options: {
+        filter: true,
+      }
+    },
+    {
+      name: 'Is Live?',
+      key: 'is_live',
       options: {
         filter: true,
       }
