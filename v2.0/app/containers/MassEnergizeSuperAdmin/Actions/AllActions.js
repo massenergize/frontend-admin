@@ -13,15 +13,11 @@ import { Link } from 'react-router-dom';
 import Avatar from '@material-ui/core/Avatar';
 import TextField from '@material-ui/core/TextField';
 
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
-
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
 import { reduxGetAllActions, reduxGetAllCommunityActions, loadAllActions } from '../../../redux/redux-actions/adminActions';
-import CommunitySwitch from '../Summary/CommunitySwitch';
 import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
 
 class AllActions extends React.Component {
@@ -70,6 +66,7 @@ class AllActions extends React.Component {
         { rank: d.rank, id: d.id },
         `${d.tags.map(t => t.name).join(', ')} `,
         (d.is_global ? 'Template' : (d.community && d.community.name)),
+        d.is_published ? 'Yes' : 'No',
         d.id
       ]
     ));
@@ -151,6 +148,13 @@ class AllActions extends React.Component {
       options: {
         filter: true,
         filterType: 'multiselect'
+      }
+    },
+    {
+      name: 'Is Live?',
+      key: 'is_live',
+      options: {
+        filter: true,
       }
     },
     {

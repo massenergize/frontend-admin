@@ -46,19 +46,6 @@ class AllEvents extends React.Component {
   }
 
 
-  showCommunitySwitch = () => {
-    const user = this.props.auth ? this.props.auth : {};
-    if (user.is_community_admin) {
-      return (
-        <CommunitySwitch actionToPerform={this.handleCommunityChange} />
-      );
-    }
-  }
-
-  handleCommunityChange =(id) => {
-    this.props.callForNormalAdminEvents(id);
-  }
-
   fashionData = (data) => {
     const fashioned = data.map(d => (
       [
@@ -72,6 +59,7 @@ class AllEvents extends React.Component {
         d.rank,
         `${d.tags.map(t => t.name).join(', ')}`,
         (d.is_global ? 'Template' : (d.community && d.community.name)),
+        d.is_published ? 'Yes' : 'No',
         d.id
       ]
     ));
@@ -134,6 +122,13 @@ class AllEvents extends React.Component {
       options: {
         filter: true,
         filterType: 'multiselect'
+      }
+    },
+    {
+      name: 'Is Live',
+      key: 'is_live',
+      options: {
+        filter: true,
       }
     },
     {
