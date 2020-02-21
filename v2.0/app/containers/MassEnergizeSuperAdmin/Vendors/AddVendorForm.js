@@ -352,21 +352,6 @@ class CreateNewVendorForm extends Component {
           defaultValue: '',
           filesLimit: 1
         },
-        {
-          name: 'accepted_terms_and_conditions',
-          label: 'Accept Terms And Conditions',
-          modalText: 'Terms and Conditions',
-          modalTitle: 'Terms and Conditions',
-          fieldType: 'Radio',
-          isRequired: false,
-          defaultValue: 'false',
-          dbName: 'accepted_terms_and_conditions',
-          readOnly: false,
-          data: [
-            { id: 'false', value: 'No' },
-            { id: 'true', value: 'Yes' }
-          ]
-        },
       ]
     };
     return formJson;
