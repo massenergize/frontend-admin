@@ -23,13 +23,18 @@ import Snackbar from '@material-ui/core/Snackbar';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { Editor } from 'react-draft-wysiwyg';
 import { MenuItem } from '@material-ui/core';
-import draftToHtml from 'draftjs-to-html';
 import TextField from '@material-ui/core/TextField';
 import moment from 'moment';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import {
-  EditorState, convertToRaw, ContentState, convertFromHTML
+  EditorState
 } from 'draft-js';
+
+import { stateToHTML } from 'draft-js-export-html';
+import { stateFromHTML } from 'draft-js-import-html';
+
+import { Map } from 'immutable';
+
 import { apiCall, apiCallWithMedia } from '../../../utils/messenger';
 import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
 import FieldTypes from './fieldTypes';
@@ -71,6 +76,35 @@ const MenuProps = {
   },
 };
 
+
+const htmlLinkOptions = {
+  entityStyleFn: (entity) => {
+    const entityType = entity.get('type').toLowerCase();
+    if (entityType === 'link') {
+      const data = entity.getData();
+      return {
+        element: 'a',
+        attributes: {
+          href: data.url,
+          target: '_blank'
+        },
+        style: {
+          // Put styles here...
+        },
+      };
+    }
+  }
+};
+
+const customRenderMap = Map({
+  unstyled: {
+    element: 'div',
+    // will be used in convertFromHTMLtoContentBlocks
+    aliasedElements: ['p'],
+  },
+});
+
+
 class MassEnergizeForm extends Component {
   constructor(props) {
     super(props);
@@ -97,6 +131,14 @@ class MassEnergizeForm extends Component {
     });
   }
 
+  initializeHtmlField = (content) => {
+    if (!content || content === '<p></p>\n') {
+      return EditorState.createEmpty();
+    }
+    return EditorState.createWithContent(stateFromHTML(content));
+  }
+
+
   /**
    * Given the field, it renders the actual component
    */
@@ -115,14 +157,8 @@ class MassEnergizeForm extends Component {
             formData[field.name] = field.defaultValue ? moment(field.defaultValue) : moment.now();
             break;
           case FieldTypes.HTMLField:
-            if (!field.defaultValue || field.defaultValue === '<p></p>\n') {
-              formData[field.name] = EditorState.createEmpty();
-              break;
-            }
-            formData[field.name] = (field.defaultValue && EditorState.createWithContent(
-              ContentState.createFromBlockArray(
-                convertFromHTML(field.defaultValue)
-              ))) || (EditorState.createEmpty());
+            console.log(field.defaultValue);
+            formData[field.name] = this.initializeHtmlField(field.defaultValue);
             break;
           case FieldTypes.Section: {
             const cFormData = this.initialFormData(field.children);
@@ -273,7 +309,7 @@ class MassEnergizeForm extends Component {
       if (fieldValueInForm) {
         switch (field.fieldType) {
           case FieldTypes.HTMLField:
-            cleanedValues[field.dbName] = draftToHtml(convertToRaw(fieldValueInForm.getCurrentContent()));
+            cleanedValues[field.dbName] = stateToHTML(fieldValueInForm.getCurrentContent(), htmlLinkOptions);
             break;
           case FieldTypes.DateTime:
             cleanedValues[field.dbName] = (moment.utc(fieldValueInForm) || moment.now()).format();

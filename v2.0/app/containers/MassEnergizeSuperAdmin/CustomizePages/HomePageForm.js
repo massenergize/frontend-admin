@@ -116,17 +116,6 @@ class HomePageEditForm extends Component {
           label: 'Welcome Title and Pictures',
           fieldType: 'Section',
           children: [
-            // {
-            //   name: 'title',
-            //   label: 'Main Title',
-            //   placeholder: 'eg. Welcome to Wayland!',
-            //   fieldType: 'TextField',
-            //   contentType: 'text',
-            //   isRequired: true,
-            //   defaultValue: `${homePageData.title}`,
-            //   dbName: 'title',
-            //   readOnly: false
-            // },
             {
               name: 'description',
               label: 'Welcome Text: Displayed right below the three images',
