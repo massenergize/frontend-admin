@@ -204,7 +204,7 @@ class CreateNewCommunityForm extends Component {
             {
               name: 'admin_full_name',
               label: 'Contact Person\'s Full Name',
-              placeholder: 'eg. Ellen Tohn',
+              placeholder: 'eg. Grace Tsu',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,

@@ -221,6 +221,15 @@ class CreateNewActionForm extends Component {
           dbName: 'steps_to_take',
         },
         {
+          name: 'deep_dive',
+          label: 'Deep dive into all the details',
+          placeholder: 'eg. This action ...',
+          fieldType: 'HTMLField',
+          isRequired: true,
+          defaultValue: null,
+          dbName: 'deep_dive',
+        },
+        {
           name: 'vendors',
           label: 'Select which vendors provide services for this action',
           placeholder: 'eg. Solarize Wayland',
