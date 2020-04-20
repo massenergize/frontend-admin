@@ -206,6 +206,15 @@ class CreateNewTestimonialForm extends Component {
               data: vendors
             },
             {
+              name: 'other_vendor',
+              label: 'Other Vendor',
+              placeholder: 'Other Vendor',
+              fieldType: 'TextField',
+              contentType: 'text',
+              defaultValue: null,
+              dbName: 'other_vendor',
+            },
+            {
               name: 'user_email',
               label: 'Please provide email of the user',
               placeholder: 'eg. johny.appleseed@massenergize.org',
