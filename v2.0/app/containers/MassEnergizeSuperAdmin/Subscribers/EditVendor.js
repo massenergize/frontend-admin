@@ -305,7 +305,7 @@ class CreateNewVendorForm extends Component {
             {
               name: 'key_contact_email',
               label: 'Contact Person\'s Email (this person should already have an account with us)',
-              placeholder: 'eg. etohn@comcast.net',
+              placeholder: 'eg. johny.appleseed@gmail.com',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
@@ -318,7 +318,7 @@ class CreateNewVendorForm extends Component {
         {
           name: 'onboarding_contact_email',
           label: 'Email of Person onboarding this vendor',
-          placeholder: 'eg. ellen@gmail.com',
+          placeholder: 'eg. johny.appleseed@gmail.com',
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: true,

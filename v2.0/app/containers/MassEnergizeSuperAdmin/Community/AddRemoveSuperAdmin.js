@@ -100,7 +100,7 @@ class AddRemoveSuperAdmin extends Component {
             {
               name: 'email',
               label: 'Email',
-              placeholder: 'eg. ellen.tohn@gmail.com',
+              placeholder: 'eg. johny.appleseed@gmail.com',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,

@@ -36,7 +36,8 @@ class CreateNewVendorForm extends Component {
     this.state = {
       formJson: null,
       loading: true,
-      vendor: null
+      vendor: null,
+      communities: []
     };
   }
 
@@ -46,6 +47,12 @@ class CreateNewVendorForm extends Component {
     const vendorResponse = await apiCall('/vendors.info', { vendor_id: id });
     if (vendorResponse && vendorResponse.success) {
       await this.setStateAsync({ vendor: vendorResponse.data, loading: false });
+    }
+
+    const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
+    if (communitiesResponse && communitiesResponse.data) {
+      const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
+      await this.setStateAsync({ communities });
     }
 
     const formJson = await this.createFormJson();
@@ -97,9 +104,9 @@ class CreateNewVendorForm extends Component {
     });
     return res;
   }
-  
+
   createFormJson = async () => {
-    const { vendor } = this.state;
+    const { vendor, communities } = this.state;
     const formJson = {
       title: 'Update Vendor',
       subTitle: '',
@@ -144,6 +151,19 @@ class CreateNewVendorForm extends Component {
               readOnly: false
             },
             {
+              name: 'communities',
+              label: 'Which communities would this vendor service ?',
+              placeholder: 'eg. +1(571)-000-2231',
+              fieldType: 'Checkbox',
+              contentType: 'text',
+              isRequired: true,
+              selectMany: true,
+              defaultValue: vendor && vendor.communities ? vendor.communities.map(c => '' + c.id) : [],
+              dbName: 'communities',
+              readOnly: false,
+              data: communities || [],
+            },
+            {
               name: 'email',
               label: 'Primary Email of this vendor',
               placeholder: 'eg. abc@gmail.com',
@@ -158,7 +178,7 @@ class CreateNewVendorForm extends Component {
               name: 'description',
               label: 'Tell us about what you do',
               placeholder: 'Tell us more ...',
-              fieldType: 'TextField',
+              fieldType: 'HTMLField',
               contentType: 'text',
               isRequired: true,
               isMultiline: true,
@@ -191,6 +211,17 @@ class CreateNewVendorForm extends Component {
                 { id: 'false', value: 'No' },
                 { id: 'true', value: 'Yes' }
               ]
+            },
+            {
+              name: 'website',
+              label: "Vendor's Website",
+              placeholder: 'eg. https://www.vendorwebsite.com',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: vendor.more_info && vendor.more_info.website,
+              dbName: 'website',
+              readOnly: false
             },
             {
               name: 'have_address',
@@ -330,7 +361,7 @@ class CreateNewVendorForm extends Component {
             {
               name: 'key_contact_email',
               label: 'Contact Person\'s Email (this person should already have an account with us)',
-              placeholder: 'eg. etohn@comcast.net',
+              placeholder: 'eg. johny.appleseed@gmail.com',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
@@ -343,7 +374,7 @@ class CreateNewVendorForm extends Component {
         {
           name: 'onboarding_contact_email',
           label: 'Email of Person onboarding this vendor',
-          placeholder: 'eg. ellen@gmail.com',
+          placeholder: 'eg. johny.appleseed@gmail.com',
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: true,

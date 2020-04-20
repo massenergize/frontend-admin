@@ -237,7 +237,16 @@ class EditTestimonial extends Component {
               defaultValue: testimonial && testimonial.vendor && testimonial && '' + testimonial.vendor.id,
               dbName: 'vendor_id',
               data: vendors
-            }
+            },
+            {
+              name: 'other_vendor',
+              label: 'Other Vendor',
+              placeholder: 'Other Vendor',
+              fieldType: 'TextField',
+              contentType: 'text',
+              defaultValue: testimonial && testimonial.other_vendor,
+              dbName: 'other_vendor',
+            },
           ]
         },
         {

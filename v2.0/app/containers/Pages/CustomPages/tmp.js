@@ -264,7 +264,7 @@ const initData = {
   name: 'Test',
   subdomain: 'testing1',
   owner_name: 'Grace Tsu',
-  owner_email: 'etohn@massenergize.org',
+  owner_email: 'johny.appleseed@massenergize.org',
   is_tech_savvy: 'Yes',
   geographical_focus: 'DISPERSED',
   accepted_terms_and_conditions: true,
