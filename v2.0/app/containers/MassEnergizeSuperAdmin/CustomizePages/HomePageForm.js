@@ -116,17 +116,6 @@ class HomePageEditForm extends Component {
           label: 'Welcome Title and Pictures',
           fieldType: 'Section',
           children: [
-            // {
-            //   name: 'title',
-            //   label: 'Main Title',
-            //   placeholder: 'eg. Welcome to Wayland!',
-            //   fieldType: 'TextField',
-            //   contentType: 'text',
-            //   isRequired: true,
-            //   defaultValue: `${homePageData.title}`,
-            //   dbName: 'title',
-            //   readOnly: false
-            // },
             {
               name: 'description',
               label: 'Welcome Text: Displayed right below the three images',
@@ -204,7 +193,7 @@ class HomePageEditForm extends Component {
                 fields: [
                   {
                     name: 'attained_number_of_actions',
-                    label: 'Attained Number of Actions',
+                    label: 'Manual Input: Attained Number of Actions',
                     placeholder: 'eg. 100',
                     fieldType: 'TextField',
                     contentType: 'number',
@@ -212,6 +201,17 @@ class HomePageEditForm extends Component {
                     defaultValue: goal && goal.attained_number_of_actions,
                     dbName: 'attained_number_of_actions',
                     readOnly: false
+                  },
+                  {
+                    name: 'organic_attained_number_of_actions',
+                    label: 'Organic Website Usage: Attained Number of Actions',
+                    placeholder: 'eg. 100',
+                    fieldType: 'TextField',
+                    contentType: 'number',
+                    isRequired: false,
+                    defaultValue: goal && goal.organic_attained_number_of_actions,
+                    dbName: 'organic_attained_number_of_actions',
+                    readOnly: true
                   },
                   {
                     name: 'target_number_of_actions',
@@ -226,7 +226,7 @@ class HomePageEditForm extends Component {
                   },
                   {
                     name: 'attained_number_of_households',
-                    label: 'How many households joined this community?',
+                    label: 'Manual Input: How many households joined this community?',
                     placeholder: 'eg. 100',
                     fieldType: 'TextField',
                     contentType: 'number',
@@ -234,6 +234,17 @@ class HomePageEditForm extends Component {
                     defaultValue: goal && goal.attained_number_of_households,
                     dbName: 'attained_number_of_households',
                     readOnly: false
+                  },
+                  {
+                    name: 'organic_attained_number_of_households',
+                    label: 'Organic Website Usage: How many households joined this community?',
+                    placeholder: 'eg. 100',
+                    fieldType: 'TextField',
+                    contentType: 'number',
+                    isRequired: false,
+                    defaultValue: goal && goal.organic_attained_number_of_households,
+                    dbName: 'organic_attained_number_of_households',
+                    readOnly: true
                   },
                   {
                     name: 'target_number_of_households',

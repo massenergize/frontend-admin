@@ -263,7 +263,7 @@ const styles = theme => ({
 const initData = {
   name: 'Test',
   subdomain: 'testing1',
-  owner_name: 'Ellen Tohn',
+  owner_name: 'Grace Tsu',
   owner_email: 'etohn@massenergize.org',
   is_tech_savvy: 'Yes',
   geographical_focus: 'DISPERSED',
@@ -342,7 +342,7 @@ class CommunityOnboardingForm extends Component {
                   <Field
                     name="owner_name"
                     component={TextField}
-                    placeholder="Community Admin Name eg. Ellen Tohn"
+                    placeholder="Community Admin Name eg. Grace Tsu"
                     label="Community Administrator's Name"
                     required
                     validate={[required]}
@@ -2269,7 +2269,7 @@ class EditCommunityForm extends Component {
                   <Field
                     name="owner_name"
                     component={TextField}
-                    placeholder="Community Admin Name eg. Ellen Tohn"
+                    placeholder="Community Admin Name eg. Grace Tsu"
                     label="Community Administrator's Name"
                     required
                     validate={[required]}

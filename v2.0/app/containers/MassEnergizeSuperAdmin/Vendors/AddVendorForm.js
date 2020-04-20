@@ -254,7 +254,7 @@ class CreateNewVendorForm extends Component {
             {
               name: 'service_area',
               label: 'Please select your service Area',
-              placeholder: 'eg. Ellen Tohn',
+              placeholder: 'eg. Grace Tsu',
               fieldType: 'Radio',
               contentType: 'text',
               isRequired: true,
@@ -309,7 +309,7 @@ class CreateNewVendorForm extends Component {
             {
               name: 'key_contact_full_name',
               label: 'Contact Person\'s Full Name',
-              placeholder: 'eg. Ellen Tohn',
+              placeholder: 'eg. Grace Tsu',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
@@ -351,21 +351,6 @@ class CreateNewVendorForm extends Component {
           isRequired: false,
           defaultValue: '',
           filesLimit: 1
-        },
-        {
-          name: 'accepted_terms_and_conditions',
-          label: 'Accept Terms And Conditions',
-          modalText: 'Terms and Conditions',
-          modalTitle: 'Terms and Conditions',
-          fieldType: 'Radio',
-          isRequired: false,
-          defaultValue: 'false',
-          dbName: 'accepted_terms_and_conditions',
-          readOnly: false,
-          data: [
-            { id: 'false', value: 'No' },
-            { id: 'true', value: 'Yes' }
-          ]
         },
       ]
     };

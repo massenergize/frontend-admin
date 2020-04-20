@@ -186,6 +186,32 @@ class CreateNewEventForm extends Component {
               readOnly: false
             },
             {
+              name: 'archive',
+              label: 'Archive this Event',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: '' + event.archive,
+              dbName: 'archive',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+            },
+            {
+              name: 'is_published',
+              label: 'Should this event Go Live?',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: '' + event.is_published,
+              dbName: 'is_published',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+            },
+            {
               name: 'is_global',
               label: 'Is this Event a Template?',
               fieldType: 'Radio',

@@ -122,7 +122,7 @@ class AddRemoveAdmin extends Component {
             {
               name: 'name',
               label: 'Name',
-              placeholder: 'eg. Ellen Tohn',
+              placeholder: 'eg. Grace Tsu',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,

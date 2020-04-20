@@ -242,7 +242,7 @@ class CreateNewVendorForm extends Component {
             {
               name: 'service_area',
               label: 'Please select your service Area',
-              placeholder: 'eg. Ellen Tohn',
+              placeholder: 'eg. Grace Tsu',
               fieldType: 'Radio',
               contentType: 'text',
               isRequired: true,
@@ -295,7 +295,7 @@ class CreateNewVendorForm extends Component {
             {
               name: 'key_contact_full_name',
               label: 'Contact Person\'s Full Name',
-              placeholder: 'eg. Ellen Tohn',
+              placeholder: 'eg. Grace Tsu',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,

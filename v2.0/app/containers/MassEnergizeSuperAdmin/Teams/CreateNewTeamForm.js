@@ -90,6 +90,17 @@ class CreateNewTeamForm extends Component {
               data: communities
             },
             {
+              name: 'admin_emails',
+              label: 'Team Admin Email: separated by commas',
+              placeholder: 'eg. teamadmin1@gmail.com, teamadmin2@gmail.com',
+              fieldType: 'TextField',
+              isRequired: true,
+
+              defaultValue: null,
+              dbName: 'admin_emails',
+              data: communities
+            },
+            {
               name: 'description',
               label: 'Team Description',
               placeholder: 'eg. Tell us more about this Team ...',
