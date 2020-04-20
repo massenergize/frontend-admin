@@ -227,7 +227,7 @@ class EditCommunityByCommunityAdmin extends Component {
             {
               name: 'admin_email',
               label: 'Community\'s Public Email',
-              placeholder: 'eg. etohn@comcast.net',
+              placeholder: 'eg. johny.appleseed@gmail.com',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,

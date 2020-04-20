@@ -208,7 +208,7 @@ class CreateNewTestimonialForm extends Component {
             {
               name: 'user_email',
               label: 'Please provide email of the user',
-              placeholder: 'eg. etohn@massenergize.org',
+              placeholder: 'eg. johny.appleseed@massenergize.org',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
