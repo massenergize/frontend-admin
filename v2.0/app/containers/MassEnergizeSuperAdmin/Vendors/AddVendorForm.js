@@ -183,6 +183,16 @@ class CreateNewVendorForm extends Component {
               ],
             },
             {
+              name: 'website',
+              label: "Vendor's Website",
+              placeholder: 'eg. https://www.vendorwebsite.com',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              dbName: 'website',
+              readOnly: false
+            },
+            {
               name: 'have_address',
               label: 'Do you have an address?',
               fieldType: 'Radio',

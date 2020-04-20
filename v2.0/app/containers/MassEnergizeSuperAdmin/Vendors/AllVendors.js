@@ -7,7 +7,6 @@ import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
 import { bindActionCreators } from 'redux';
 
-
 import MUIDataTable from 'mui-datatables';
 import FileCopy from '@material-ui/icons/FileCopy';
 import EditIcon from '@material-ui/icons/Edit';
@@ -18,18 +17,23 @@ import messageStyles from 'dan-styles/Messages.scss';
 import { connect } from 'react-redux';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-import { reduxGetAllVendors, reduxGetAllCommunityVendors } from '../../../redux/redux-actions/adminActions';
-import CommunitySwitch from '../Summary/CommunitySwitch';
+import {
+  reduxGetAllVendors,
+  reduxGetAllCommunityVendors,
+} from '../../../redux/redux-actions/adminActions';
+
 class AllVendors extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { data: [], loading: true, columns: this.getColumns(props.classes) };
+    this.state = {
+      loading: true,
+      columns: this.getColumns(props.classes),
+    };
   }
 
-
-  handleCommunityChange =(id) => {
+  handleCommunityChange = (id) => {
     this.props.callVendorsForNormalAdmin(id);
-  }
+  };
 
   async componentDidMount() {
     const user = this.props.auth ? this.props.auth : {};
@@ -37,30 +41,33 @@ class AllVendors extends React.Component {
       this.props.callVendorsForSuperAdmin();
     }
     if (user.is_community_admin) {
-      const com = this.props.community ? this.props.community : user.admin_at[0];
+      const com = this.props.community
+        ? this.props.community
+        : user.admin_at[0];
       this.props.callVendorsForNormalAdmin(null);
     }
   }
 
   fashionData = (data) => {
-    console.log(data)
-    data = data.map(d => (
-      [
-        d.id,
-        {
-          id: d.id,
-          image: d.logo,
-          initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
-        },
-        `${d.name}...`.substring(0, 30), // limit to first 30 chars
-        d.key_contact, // limit to first 20 chars
-        d.communities && d.communities.slice(0, 5).map(c => c.name).join(', '),
-        d.service_area,
-        d.id
-      ]
-    ));
+    data = data.map((d) => [
+      d.id,
+      {
+        id: d.id,
+        image: d.logo,
+        initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`,
+      },
+      `${d.name}...`.substring(0, 30), // limit to first 30 chars
+      d.key_contact, // limit to first 20 chars
+      d.communities &&
+        d.communities
+          .slice(0, 5)
+          .map((c) => c.name)
+          .join(', '),
+      d.service_area,
+      d.id,
+    ]);
     return data;
-  }
+  };
 
   setStateAsync(state) {
     return new Promise((resolve) => {
@@ -68,11 +75,14 @@ class AllVendors extends React.Component {
     });
   }
 
-  getStatus = isApproved => {
+  getStatus = (isApproved) => {
     switch (isApproved) {
-      case false: return messageStyles.bgError;
-      case true: return messageStyles.bgSuccess;
-      default: return messageStyles.bgSuccess;
+      case false:
+        return messageStyles.bgError;
+      case true:
+        return messageStyles.bgSuccess;
+      default:
+        return messageStyles.bgSuccess;
     }
   };
 
@@ -82,8 +92,8 @@ class AllVendors extends React.Component {
       key: 'id',
       options: {
         filter: true,
-        filterType: 'textField'
-      }
+        filterType: 'textField',
+      },
     },
     {
       name: 'Image',
@@ -93,15 +103,17 @@ class AllVendors extends React.Component {
         download: false,
         customBodyRender: (d) => (
           <div>
-            {d.image
-              && <Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} />
-            }
-            {!d.image
-              && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
-            }
+            {d.image && (
+              <Avatar
+                alt={d.initials}
+                src={d.image.url}
+                style={{ margin: 10 }}
+              />
+            )}
+            {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
           </div>
-        )
-      }
+        ),
+      },
     },
     {
       name: 'Name',
@@ -109,7 +121,7 @@ class AllVendors extends React.Component {
       options: {
         filter: true,
         filterType: 'textField',
-      }
+      },
     },
     {
       name: 'Key Contact',
@@ -121,7 +133,12 @@ class AllVendors extends React.Component {
             <div>
               <Typography>{n && n.name}</Typography>
               <Typography variant="caption">
-                <a href={`mailto:${n && n.email}`} target="_blank" rel="noopener noreferrer" className={classes.downloadInvoice}>
+                <a
+                  href={`mailto:${n && n.email}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={classes.downloadInvoice}
+                >
                   <Email />
                   &nbsp;
                   {n && n.email}
@@ -130,7 +147,7 @@ class AllVendors extends React.Component {
               </Typography>
             </div>
           </div>
-        )
+        ),
       },
     },
     {
@@ -138,15 +155,15 @@ class AllVendors extends React.Component {
       key: 'communities',
       options: {
         filter: true,
-        filterType: 'textField'
-      }
+        filterType: 'textField',
+      },
     },
     {
       name: 'Service Area',
       key: 'service_area',
       options: {
         filter: true,
-      }
+      },
     },
     {
       name: 'Edit? Copy?',
@@ -162,9 +179,12 @@ class AllVendors extends React.Component {
             &nbsp;&nbsp;
             <Link
               onClick={async () => {
-                const copiedVendorResponse = await apiCall('/vendors.copy', { vendor_id: id });
+                const copiedVendorResponse = await apiCall('/vendors.copy', {
+                  vendor_id: id,
+                });
                 if (copiedVendorResponse && copiedVendorResponse.success) {
-                  const newVendor = copiedVendorResponse && copiedVendorResponse.data;
+                  const newVendor =
+                    copiedVendorResponse && copiedVendorResponse.data;
                   window.location.href = `/admin/edit/${newVendor.id}/vendor`;
                 }
               }}
@@ -173,10 +193,10 @@ class AllVendors extends React.Component {
               <FileCopy size="small" variant="outlined" color="secondary" />
             </Link>
           </div>
-        )
-      }
+        ),
+      },
     },
-  ]
+  ];
 
   render() {
     const title = brand.name + ' - All Vendors';
@@ -192,13 +212,12 @@ class AllVendors extends React.Component {
       rowsPerPage: 10,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach(d => {
+        idsToDelete.forEach((d) => {
           const vendorId = data[d.dataIndex][0];
           apiCall('/vendors.delete', { vendor_id: vendorId });
         });
-      }
+      },
     };
-
 
     return (
       <div>
@@ -218,7 +237,6 @@ class AllVendors extends React.Component {
             options={options}
           />
         </div>
-
       </div>
     );
   }
@@ -231,15 +249,21 @@ function mapStateToProps(state) {
   return {
     auth: state.getIn(['auth']),
     allVendors: state.getIn(['allVendors']),
-    community: state.getIn(['selected_community'])
+    community: state.getIn(['selected_community']),
   };
 }
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-    callVendorsForSuperAdmin: reduxGetAllVendors,
-    callVendorsForNormalAdmin: reduxGetAllCommunityVendors
-  }, dispatch);
+  return bindActionCreators(
+    {
+      callVendorsForSuperAdmin: reduxGetAllVendors,
+      callVendorsForNormalAdmin: reduxGetAllCommunityVendors,
+    },
+    dispatch
+  );
 }
-const VendorsMapped = connect(mapStateToProps, mapDispatchToProps)(AllVendors);
+const VendorsMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AllVendors);
 
 export default withStyles(styles)(VendorsMapped);
