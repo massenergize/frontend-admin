@@ -59,8 +59,8 @@ class AllCommunityAdminMessages extends React.Component {
       [
         d.id,
         d.title,
-        d.user_name,
-        d.email,
+        d.user_name || (d.user && d.user.full_name),
+        d.email || (d.user && d.user.email),
         d.community && d.community.name,
         d.have_replied ? 'Yes' : 'No',
         d.id
