@@ -3,8 +3,8 @@
  */
 
 const APP_NAME = 'MassEnergize Administration';
-const BUILD_VERSION = '0.9.9.6';
-const IS_LOCAL = true;
+const BUILD_VERSION = '0.9.9.9';
+const IS_LOCAL = false;
 const IS_PROD = false;
 
 //  ---- setting  API routes
