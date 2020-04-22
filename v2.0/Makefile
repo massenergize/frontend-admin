@@ -12,15 +12,6 @@ build:
 .PHONY: build
 
 deploy-prod:
-	npm run build && aws2 s3 sync build/ s3://admin.massenergize.org
-.PHONY: deploy-prod
-
-deploy-dev:
-	npm run build && aws2 s3 sync build/ s3://admin-dev.massenergize.org
-.PHONY: deploy-dev
-
-
-deploy-prod:
 	python deployment/prepare_to_deploy.py prod 0 1
 	npm run build && aws2 s3 sync build/ s3://admin.massenergize.org
 .PHONY: deploy-prod
