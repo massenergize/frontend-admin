@@ -116,8 +116,9 @@ class AllActions extends React.Component {
         filter: false,
         customBodyRender: (d) => (
           <TextField
+            required
             name="rank"
-            required="true"
+            variant="outlined"
             onChange={async event => {
               const { target } = event;
               if (!target) return;
@@ -127,9 +128,9 @@ class AllActions extends React.Component {
             label="Rank"
             InputLabelProps={{
               shrink: true,
-              maxWidth: '10px'
+              maxwidth: '10px'
             }}
-            defaultValue={d && d.rank}
+            value={d && d.rank}
           />
         )
       }
@@ -205,14 +206,12 @@ class AllActions extends React.Component {
       rowsPerPage: 10,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        console.log(rowsDeleted);
         idsToDelete.forEach(async d => {
           const actionId = data[d.dataIndex][0];
           await apiCall('/actions.delete', { action_id: actionId });
         });
       }
     };
-
     return (
       <div>
         <Helmet>
