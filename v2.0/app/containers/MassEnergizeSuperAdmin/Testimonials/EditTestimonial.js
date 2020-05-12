@@ -124,6 +124,7 @@ class EditTestimonial extends Component {
     const {
       communities, actions, vendors, testimonial
     } = this.state;
+
     const formJson = {
       title: 'Edit Testimonial',
       subTitle: '',
@@ -137,7 +138,7 @@ class EditTestimonial extends Component {
             {
               name: 'ID',
               label: 'ID',
-              placeholder: 'Omg! HEat pumps are the best!',
+              placeholder: '0',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
@@ -146,9 +147,20 @@ class EditTestimonial extends Component {
               readOnly: true
             },
             {
+              name: 'preferredName',
+              label: 'Preferred user name to display',
+              placeholder: 'User name',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: false,
+              defaultValue: testimonial && testimonial.preferred_name,
+              dbName: 'preferred_name',
+              readOnly: false
+            },
+            {
               name: 'title',
               label: 'Title of Testimonial',
-              placeholder: 'Omg! HEat pumps are the best!',
+              placeholder: 'Enter a catchy title',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
