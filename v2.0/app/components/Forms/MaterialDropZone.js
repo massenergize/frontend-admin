@@ -53,6 +53,13 @@ class MaterialDropZone extends React.Component {
     this.addToState = props.addToState;
   }
 
+  // in onDrop, check if cropping is needed (TODO), then set state isCropping = true (TODO)
+  // in render, if isCropping, render cropping component (TODO). pass component the functions (TODO) onImageCrop(croppedImg) and onImageCropCancel,
+  // which set the state to the cropped image and throw out the image file, respectively. both set isCropping = false
+
+  // figure out why bullet points are not displaying on my upload instructions list (TODO)
+
+  // go accross repo and determine the actual aspect ratios that we want from different forms (TODO)
 
   onDrop(filesVal) {
     const { files } = this.state;
@@ -121,7 +128,6 @@ class MaterialDropZone extends React.Component {
     } = this.state;
 
     console.log(aspectRatio);
-    // TODO: if aspect ratio given, use it in cropping system
 
     const fileSizeLimit = maxSize || 3000000;
     const deleteBtn = (file, index) => (
