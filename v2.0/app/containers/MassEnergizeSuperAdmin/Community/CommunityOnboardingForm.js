@@ -245,7 +245,8 @@ class CreateNewCommunityForm extends Component {
           selectMany: false,
           isRequired: false,
           defaultValue: '',
-          filesLimit: 1
+          filesLimit: 1,
+          aspectRatio: '16:9' // for testing
         },
         {
           name: 'accepted_terms_and_conditions',

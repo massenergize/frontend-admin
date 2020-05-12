@@ -515,9 +515,18 @@ class MassEnergizeForm extends Component {
                 <img style={{ maxWidth: '250px', maxHeight: '250px' }} src={field.previewLink} alt={field.label} />
               </div>
             )}
-            <br />
-            <Modal title="File Upload Instructions" text="If this file is meant to be a logo, use the tool here: https://www4.lunapic.com/editor/?action=resize and resize it to height:57.88px, width:150px.   Also, if this is an image, please don't upload a file > 5MB or a png file" />
-            <br />
+            <p className="imageUploadInstructions">
+              <b>Image Upload Instructions:</b>
+              <ul>
+                <li>Drag an image to the box or click on it to browse your computer. Only image files will be accepted.</li>
+                {field.aspectRatio && 
+                  <li>
+                    The aspect ratio required for this image destination is <i>{field.aspectRatio}</i>. After selecting an image, a cropping tool will open.
+                  </li>
+                }
+                <li>The final upload size must not exceed 5MB. If it does, an error will appear.</li>
+              </ul>
+            </p>
             <Fragment>
               <MaterialDropZone
                 acceptedFiles={['image/jpeg', 'image/png', 'image/jpg', 'image/bmp', 'image/svg']}
