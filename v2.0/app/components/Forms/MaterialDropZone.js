@@ -105,6 +105,7 @@ class MaterialDropZone extends React.Component {
       classes,
       showPreviews,
       maxSize,
+      aspectRatio,
       text,
       showButton,
       filesLimit,
@@ -118,6 +119,10 @@ class MaterialDropZone extends React.Component {
       openSnackBar,
       errorMessage
     } = this.state;
+
+    console.log(aspectRatio);
+    // TODO: if aspect ratio given, use it in cropping system
+
     const fileSizeLimit = maxSize || 3000000;
     const deleteBtn = (file, index) => (
       <div className="middle">
@@ -205,6 +210,7 @@ MaterialDropZone.propTypes = {
   showPreviews: PropTypes.bool.isRequired,
   showButton: PropTypes.bool,
   maxSize: PropTypes.number.isRequired,
+  aspectRatio: PropTypes.string.isRequired,
   filesLimit: PropTypes.number.isRequired,
   classes: PropTypes.object.isRequired,
 };
