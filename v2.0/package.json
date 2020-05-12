@@ -137,7 +137,7 @@
     "keycode": "^2.2.0",
     "lodash": "^4.17.15",
     "material-ui-pickers": "^2.2.4",
-    "minimist": "1.2.0",
+    "minimist": "1.2.3",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.27",
     "mui-datatables": "^2.12.0",
