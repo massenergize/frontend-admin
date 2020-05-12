@@ -267,6 +267,39 @@ class HomePageEditForm extends Component {
                     dbName: 'target_number_of_households',
                     readOnly: false
                   },
+                  {
+                    name: 'attained_carbon_footprint_reduction',
+                    label: 'Manual Input: Community carbon footprint reduction previously attained (lbs)',
+                    placeholder: 'eg. 100',
+                    fieldType: 'TextField',
+                    contentType: 'number',
+                    isRequired: false,
+                    defaultValue: goal && goal.attained_carbon_footprint_reduction,
+                    dbName: 'attained_carbon_footprint_reduction',
+                    readOnly: false
+                  },
+                  {
+                    name: 'organic_attained_carbon_footprint_reduction',
+                    label: 'Organic Website Usage: Carbon Footprint Reduction (lbs)',
+                    placeholder: 'eg. 100',
+                    fieldType: 'TextField',
+                    contentType: 'number',
+                    isRequired: false,
+                    defaultValue: goal && goal.organic_attained_carbon_footprint_reduction,
+                    dbName: 'organic_attained_carbon_footprint_reduction',
+                    readOnly: true
+                  },
+                  {
+                    name: 'target_carbon_footprint_reduction',
+                    label: 'Goal for Carbon Footprint Reduction (lbs.)',
+                    placeholder: 'eg. 100',
+                    fieldType: 'TextField',
+                    contentType: 'number',
+                    isRequired: false,
+                    defaultValue: goal && goal.target_carbon_footprint_reduction,
+                    dbName: 'target_carbon_footprint_reduction',
+                    readOnly: false
+                  },
                 ]
               }
             },
