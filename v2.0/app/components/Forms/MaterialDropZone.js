@@ -10,7 +10,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Snackbar from '@material-ui/core/Snackbar';
 import Ionicon from 'react-ionicons';
 import 'dan-styles/vendors/react-dropzone/react-dropzone.css';
-import { isImage, getAspectRatioFloat, isWithinAspectRatio } from './helpers/helpers.js';
+import { isImage, getAspectRatioFloat } from './helpers/helpers.js';
 
 const styles = theme => ({
   dropItem: {
@@ -55,25 +55,37 @@ class MaterialDropZone extends React.Component {
     this.addToState = props.addToState;
   }
 
+  // TODO: address the warnings about list items w/ key prop and <ul> as descendant of <p>
   // TODO: figure out why bullet points are not displaying on my image upload instructions list
   // TODO: go accross repo and determine the actual aspect ratios that we want from different forms
 
   onDrop(filesVal) {
     const { files } = this.state;
     const { filesLimit, name, aspectRatio } = this.props;
+
     let oldFiles = files;
     const filesLimitVal = filesLimit || '3';
     oldFiles = oldFiles.concat(filesVal);
+
     if (oldFiles.length > filesLimit) {
       this.setState({
         openSnackBar: true,
         errorMessage: 'Cannot upload more than ' + filesLimitVal + ' items.',
       });
-    } else if (aspectRatio && !isWithinAspectRatio(filesVal, aspectRatio, 5)) {
+    } else if (aspectRatio) {
+      /* TODO:
+       - implement a helper function (in helpers.js) to turn the filesVal object into a URL or base64 string (figure out readAsDataURL error).
+       - call said function here and store resulting URL/string in the state (add it to setState call below).
+       - implement a new function onCropCompleted(img):
+            - turns the cropper's result back into a file object (make another helper function?)
+            - then adds the file to the state, sets isCropping = false, and calls addToState like below (why?)
+       - implement the cropping component in render (the div is a placeholder).
+            - pass component the image URL/string and onCropCancelled / onCropCompleted(img) as callbacks
+      */
       this.setState({ isCropping: true });
     } else {
-      this.setState({ files: oldFiles, isCropping: false });
-      this.addToState(name || 'image', oldFiles);
+      this.setState({ files: oldFiles });
+      this.addToState(name || 'image', oldFiles); // understand why this is necessary
     }
   }
 
@@ -167,8 +179,6 @@ class MaterialDropZone extends React.Component {
         </div>
       );
     });
-
-    // TODO: implement the cropping component (div is a placeholder). pass it onCropCancelled and onDrop as callbacks
 
     let dropzoneRef;
     return (

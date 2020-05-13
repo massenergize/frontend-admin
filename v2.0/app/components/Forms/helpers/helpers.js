@@ -11,9 +11,3 @@ export function getAspectRatioFloat(aspectRatio) {
   const arr = aspectRatio.split(':');
   return parseFloat(arr[0]) / parseFloat(arr[1]);
 }
-
-export function isWithinAspectRatio(image, aspectRatio, percentDifferenceMargin = 0) {
-  const aspectRatioFloat = getAspectRatioFloat(aspectRatio);
-  // TODO: finish implementing
-  return false;
-}
