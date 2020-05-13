@@ -519,11 +519,11 @@ class MassEnergizeForm extends Component {
               <b>Image Upload Instructions:</b>
               <ul>
                 <li>Drag an image to the box or click on it to browse your computer. Only image files will be accepted.</li>
-                {field.aspectRatio && 
+                {field.aspectRatio && (
                   <li>
                     The aspect ratio required for this image destination is <i>{field.aspectRatio}</i>. After selecting an image, a cropping tool will open.
                   </li>
-                }
+                )}
                 <li>The final upload size must not exceed 5MB. If it does, an error will appear.</li>
               </ul>
             </p>

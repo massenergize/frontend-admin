@@ -10,7 +10,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Snackbar from '@material-ui/core/Snackbar';
 import Ionicon from 'react-ionicons';
 import 'dan-styles/vendors/react-dropzone/react-dropzone.css';
-import isImage from './helpers/helpers.js';
+import { isImage, getAspectRatioFloat, isWithinAspectRatio } from './helpers/helpers.js';
 
 const styles = theme => ({
   dropItem: {
@@ -46,24 +46,21 @@ class MaterialDropZone extends React.Component {
     this.state = {
       openSnackBar: false,
       errorMessage: '',
+      isCropping: false,
       files: this.props.files, // eslint-disable-line
       acceptedFiles: this.props.acceptedFiles, // eslint-disable-line
     };
     this.onDrop = this.onDrop.bind(this);
+    this.onCropCancelled = this.onCropCancelled.bind(this);
     this.addToState = props.addToState;
   }
 
-  // in onDrop, check if cropping is needed (TODO), then set state isCropping = true (TODO)
-  // in render, if isCropping, render cropping component (TODO). pass component the functions (TODO) onImageCrop(croppedImg) and onImageCropCancel,
-  // which set the state to the cropped image and throw out the image file, respectively. both set isCropping = false
-
-  // figure out why bullet points are not displaying on my upload instructions list (TODO)
-
-  // go accross repo and determine the actual aspect ratios that we want from different forms (TODO)
+  // TODO: figure out why bullet points are not displaying on my image upload instructions list
+  // TODO: go accross repo and determine the actual aspect ratios that we want from different forms
 
   onDrop(filesVal) {
     const { files } = this.state;
-    const { filesLimit, name } = this.props;
+    const { filesLimit, name, aspectRatio } = this.props;
     let oldFiles = files;
     const filesLimitVal = filesLimit || '3';
     oldFiles = oldFiles.concat(filesVal);
@@ -72,10 +69,20 @@ class MaterialDropZone extends React.Component {
         openSnackBar: true,
         errorMessage: 'Cannot upload more than ' + filesLimitVal + ' items.',
       });
+    } else if (aspectRatio && !isWithinAspectRatio(filesVal, aspectRatio, 5)) {
+      this.setState({ isCropping: true });
     } else {
-      this.setState({ files: oldFiles });
+      this.setState({ files: oldFiles, isCropping: false });
       this.addToState(name || 'image', oldFiles);
     }
+  }
+
+  onCropCancelled() {
+    this.setState({
+      isCropping: false,
+      openSnackBar: true,
+      errorMessage: 'Your image must match the required aspect ratio. Please try again.'
+    });
   }
 
   onDropRejected() {
@@ -123,13 +130,15 @@ class MaterialDropZone extends React.Component {
     const {
       acceptedFiles,
       files,
+      isCropping,
       openSnackBar,
       errorMessage
     } = this.state;
 
-    console.log(aspectRatio);
+    // TODO: remove when done
+    console.log('Aspect ratio: ' + aspectRatio + ' (' + getAspectRatioFloat(aspectRatio) + ')');
+    console.log('In cropping state?: ' + isCropping);
 
-    const fileSizeLimit = maxSize || 3000000;
     const deleteBtn = (file, index) => (
       <div className="middle">
         <IconButton onClick={() => this.handleRemove(file, index)}>
@@ -158,9 +167,15 @@ class MaterialDropZone extends React.Component {
         </div>
       );
     });
+
+    // TODO: implement the cropping component (div is a placeholder). pass it onCropCancelled and onDrop as callbacks
+
     let dropzoneRef;
     return (
       <div>
+
+        {isCropping && <div />}
+
         <Dropzone
           accept={acceptedFiles.join(',')}
           onDrop={this.onDrop}
@@ -168,7 +183,7 @@ class MaterialDropZone extends React.Component {
           className={classNames(classes.dropItem, 'dropZone')}
           acceptClassName="stripes"
           rejectClassName="rejectStripes"
-          maxSize={fileSizeLimit}
+          maxSize={maxSize || 3000000}
           ref={(node) => { dropzoneRef = node; }}
           {...rest}
         >
