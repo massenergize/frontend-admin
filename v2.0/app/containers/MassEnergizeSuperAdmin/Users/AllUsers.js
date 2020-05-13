@@ -23,7 +23,6 @@ class AllUsers extends React.Component {
 
   async componentDidMount() {
     const allUsersResponse = await apiCall('/users.listForCommunityAdmin');
-    console.log(allUsersResponse);
     if (allUsersResponse && allUsersResponse.success) {
       await this.setStateAsync({
         loading: false,
@@ -48,10 +47,10 @@ class AllUsers extends React.Component {
         d.email,
         `${d.communities.join(', ')} `,
         d.is_super_admin ? 'Super Admin' : d.is_community_admin ? 'Community Admin' : 'Member',
+        d.id,
       ]
     ));
   }
-
 
   getColumns = (classes) => [
     {
@@ -107,8 +106,9 @@ class AllUsers extends React.Component {
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {
-          const messageId = data[d.dataIndex][0];
-          apiCall('/users.delete', { message_id: messageId });
+          const idField = data[d.dataIndex].length - 1
+          const userId = data[d.dataIndex][idField];
+          apiCall('/users.delete', { id: userId });
         });
       }
     };
