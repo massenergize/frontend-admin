@@ -2,10 +2,10 @@
  * This file contains constants to be used throughout the application
  */
 
+const { IS_LOCAL, IS_PROD, BUILD_VERSION } = require('./config.json')
+console.log({ IS_LOCAL, IS_PROD, BUILD_VERSION });
+
 const APP_NAME = 'MassEnergize Administration';
-const BUILD_VERSION = '0.9.9.6';
-const IS_LOCAL = true;
-const IS_PROD = false;
 
 //  ---- setting  API routes
 let API_HOST = 'https://api.massenergize.org';
@@ -64,7 +64,6 @@ if (IS_LOCAL) {
   // IS_DEV
   SANDBOX_PORTAL_HOST = 'https://sandbox.community-dev.massenergize.org';
 }
-
 
 module.exports = {
   IS_LOCAL,

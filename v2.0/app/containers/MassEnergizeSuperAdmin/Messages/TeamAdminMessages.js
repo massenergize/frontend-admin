@@ -59,8 +59,8 @@ class AllTeamAdminMessages extends React.Component {
       [
         d.id,
         d.title,
-        d.user_name,
-        d.email,
+        d.user_name || (d.user && d.user.full_name),
+        d.email || (d.user && d.user.email),
         d.community && d.community.name,
         d.team && d.team.name,
         d.have_forwarded ? 'Yes' : 'No',

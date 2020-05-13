@@ -223,12 +223,12 @@ class MessageDetails extends Component {
             <br />
             <Typography component="p">
               Username Provided:&nbsp;&nbsp;
-              {message.user_name}
+              {message.user_name || (message.user && message.user.full_name) }
             </Typography>
             <br />
             <Typography component="p">
               From:&nbsp;&nbsp;
-              {message.email}
+              {message.email || (message.user && message.user.email) }
             </Typography>
             <br />
             <Paper className={classes.root} elevation={4}>
