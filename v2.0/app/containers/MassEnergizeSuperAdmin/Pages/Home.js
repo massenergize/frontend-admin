@@ -345,7 +345,7 @@ class HomePageEditForm extends Component {
           children: [
             {
               name: 'show_featured_links',
-              label: 'Should we display summary Stats on your home page?',
+              label: 'Do you want to display the icon boxes on your home page?',
               fieldType: 'Radio',
               isRequired: false,
               defaultValue: `${homePageData.show_featured_links}`,
