@@ -10,6 +10,7 @@
   },
   "parser": "babel-eslint",
   "rules": {
+    "no-plusplus": "off",
     "no-nested-ternary": 0,
     "import/no-unresolved": 0,
     "import/no-named-as-default": 0,
