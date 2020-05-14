@@ -4,6 +4,7 @@ import 'react-image-crop/dist/ReactCrop.css';
 import Modal from '@material-ui/core/Modal';
 import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
+import { getAspectRatioFloat, fileObjToDataURL } from './helpers.js';
 
 class CropModal extends React.Component {
   constructor(props) {
@@ -11,14 +12,21 @@ class CropModal extends React.Component {
 
     this.state = {
       isOpen: true,
-      name: this.props.name, // eslint-disable-line
-      imageSrcURL: this.props.imageSrcURL, // eslint-disable-line
-      crop: { aspect: this.props.aspect }, // eslint-disable-line
+      crop: { aspect: getAspectRatioFloat(this.props.aspectRatio) }, // eslint-disable-line
     };
 
     this.doCrop = this.doCrop.bind(this);
     this.cancelCrop = this.cancelCrop.bind(this);
   }
+
+  componentDidMount() {
+    const { imageFile } = this.props;
+
+    fileObjToDataURL(imageFile, (URL) => {
+      this.setState({ imageSrcURL: URL });
+    });
+  }
+
 
   onCropChange = (crop) => {
     this.setState({ crop });
@@ -28,7 +36,7 @@ class CropModal extends React.Component {
     this.imageRef = image;
   };
 
-  getCroppedImg = (image, crop, fileName) => {
+  getCroppedImg = (image, crop, fileName, fileType) => {
     const canvas = document.createElement('canvas');
     const scaleX = image.naturalWidth / image.width;
     const scaleY = image.naturalHeight / image.height;
@@ -48,23 +56,26 @@ class CropModal extends React.Component {
       crop.height
     );
 
+    console.log(fileName, fileType);
+
     return new Promise((resolve) => {
       canvas.toBlob(blob => {
         blob.name = fileName;
         resolve(blob);
-      }, 'image/jpeg', 1);
+      }, fileType, 1);
     });
   }
 
   async doCrop() {
-    const { onCropCompleted } = this.props;
-    const { crop, name } = this.state;
+    const { onCropCompleted, imageFile } = this.props;
+    const { crop } = this.state;
 
     console.log(crop);
 
     if (this.imageRef && crop.width && crop.height) {
-      const croppedImageUrl = await this.getCroppedImg(this.imageRef, crop, name);
-      onCropCompleted(croppedImageUrl);
+      const croppedImageBlob = await this.getCroppedImg(this.imageRef, crop, imageFile.name, imageFile.type);
+      const croppedImageFile = new File([croppedImageBlob], croppedImageBlob.name);
+      onCropCompleted(croppedImageFile);
     }
 
     this.setState({ isOpen: false });
@@ -99,9 +110,8 @@ class CropModal extends React.Component {
 }
 
 CropModal.propTypes = {
-  imageSrcURL: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  aspect: PropTypes.number.isRequired,
+  imageFile: PropTypes.object.isRequired,
+  aspectRatio: PropTypes.string.isRequired,
   onCropCompleted: PropTypes.func.isRequired,
   onCropCancelled: PropTypes.func.isRequired,
 };

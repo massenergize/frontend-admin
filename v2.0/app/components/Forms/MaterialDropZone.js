@@ -11,7 +11,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import Ionicon from 'react-ionicons';
 import 'dan-styles/vendors/react-dropzone/react-dropzone.css';
 import CropModal from '../CropModal/CropModal';
-import { isImage, getAspectRatioFloat, fileObjToDataURL } from './helpers/helpers.js';
+import isImage from './helpers/helpers.js';
 
 const styles = theme => ({
   dropItem: {
@@ -48,8 +48,7 @@ class MaterialDropZone extends React.Component {
       openSnackBar: false,
       errorMessage: '',
       isCropping: false,
-      currentImageURL: '',
-      currentImageName: '',
+      currentImage: null,
       files: this.props.files, // eslint-disable-line
       acceptedFiles: this.props.acceptedFiles, // eslint-disable-line
     };
@@ -67,14 +66,19 @@ class MaterialDropZone extends React.Component {
   */
 
   /* Technical TODOs
+    - when no crop is given but "Done" button pressed, have to call cancelCrop!
+    - why is the passed file type in toBlob not ending up in the cropped image file? its an empty string instead
+    - why is the oldFiles array in onCropCompleted seemingly having no elements, even though the croppedFile exists and gets concat-ed
+    - test that the looping works in onDrop to sequentially crop images and ignore non-image files
+    - investigate naming of "URL" in fileObjToDataURL and related stuff, because it seems like the function is actually returning a base64 string...?
+    - figure out what's up with PNGs (and other formats?) not working
+    - figure out what's up with the output files seemingly being corrupted/not previewing/not opening
+      - fractions of pixels as size of crop?
+      - no "preview" attribute to the output file objects?
+    - totally redo the look of the CropModal, including a backdrop, text instructions, and sizing. It's unusable right now.
+    - figure out the "Can't perform a React state update on an unmounted component." warning
     - address the warnings about list items w/ key prop and <ul> as descendant of <p>
     - figure out why bullet points are not displaying on my image upload instructions list
-    - test that the looping works in onDrop to sequentially crop images, and ignore non-image files
-    - investigate naming of "URL" in fileObjToDataURL stuff, because it seems like the function is actually returning a base64 string...?
-    - figure out what's up with PNGs not working
-    - figure out what's up with the output files seemingly being corrupted (fractions of pixels as size of crop?)
-    - totally redo the look of the CropModal, including a backdrop + formatting. It's unusable right now.
-    - figure out the "Can't perform a React state update on an unmounted component." warning
   */
 
 
@@ -95,14 +99,9 @@ class MaterialDropZone extends React.Component {
       for (let i = 0; i < filesVal.length; i++) {
         if (aspectRatio && isImage(filesVal[i])) {
           console.log(filesVal[i]);
-
-          fileObjToDataURL(filesVal[i], (URL) => {
-            console.log('Original image string:' + URL);
-            this.setState({
-              currentImageURL: URL,
-              isCropping: true,
-              currentImageName: filesVal[i].name
-            });
+          this.setState({
+            currentImage: filesVal[i],
+            isCropping: true,
           });
         } else {
           this.setState({ files: oldFiles });
@@ -112,21 +111,18 @@ class MaterialDropZone extends React.Component {
     }
   }
 
-  onCropCompleted(croppedImgBlob) {
+  onCropCompleted(croppedImageFile) {
     const { files } = this.state;
     const { name } = this.props;
     let oldFiles = files;
+    oldFiles = oldFiles.concat([croppedImageFile]);
 
-    const croppedImage = new File([croppedImgBlob], croppedImgBlob.name);
-    oldFiles = oldFiles.concat([croppedImage]);
-
-    console.log(oldFiles);
+    console.log(croppedImageFile);
 
     this.setState({
       files: oldFiles,
       isCropping: false,
-      currentImageURL: '',
-      currentImageName: ''
+      currentImage: null
     });
     this.addToState(name || 'image', oldFiles);
   }
@@ -134,8 +130,7 @@ class MaterialDropZone extends React.Component {
   onCropCancelled() {
     this.setState({
       isCropping: false,
-      currentImageURL: '',
-      currentImageName: '',
+      currentImage: null,
       openSnackBar: true,
       errorMessage: 'Your image must match the required aspect ratio. Please try again.'
     });
@@ -187,13 +182,12 @@ class MaterialDropZone extends React.Component {
       acceptedFiles,
       files,
       isCropping,
-      currentImageURL,
-      currentImageName,
+      currentImage,
       openSnackBar,
       errorMessage
     } = this.state;
 
-    console.log('Aspect ratio: ' + aspectRatio + ' (' + getAspectRatioFloat(aspectRatio) + ')');
+    console.log('Aspect ratio: ' + aspectRatio);
     console.log('In cropping state?: ' + isCropping);
 
     const deleteBtn = (file, index) => (
@@ -231,9 +225,8 @@ class MaterialDropZone extends React.Component {
 
         {isCropping && (
           <CropModal
-            imageSrcURL={currentImageURL}
-            name={currentImageName}
-            aspect={getAspectRatioFloat(aspectRatio)}
+            imageFile={currentImage}
+            aspectRatio={aspectRatio}
             onCropCompleted={this.onCropCompleted}
             onCropCancelled={this.onCropCancelled}
           />
