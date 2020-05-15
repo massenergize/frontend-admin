@@ -515,9 +515,9 @@ class MassEnergizeForm extends Component {
                 <img style={{ maxWidth: '250px', maxHeight: '250px' }} src={field.previewLink} alt={field.label} />
               </div>
             )}
-            <p className="imageUploadInstructions">
-              <b>Image Upload Instructions:</b>
-              <ul>
+            <div className="imageUploadInstructions">
+              <h6>Image Upload Instructions:</h6>
+              <ul style={{ listStyleType: 'circle', paddingLeft: '30px' }}>
                 <li>Drag an image to the box or click on it to browse your computer. Only image files will be accepted.</li>
                 {field.aspectRatio && (
                   <li>
@@ -526,7 +526,8 @@ class MassEnergizeForm extends Component {
                 )}
                 <li>The final upload size must not exceed 5MB. If it does, an error will appear.</li>
               </ul>
-            </p>
+            </div>
+            <br />
             <Fragment>
               <MaterialDropZone
                 acceptedFiles={['image/jpeg', 'image/png', 'image/jpg', 'image/bmp', 'image/svg']}

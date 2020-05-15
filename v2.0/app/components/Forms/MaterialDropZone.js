@@ -60,25 +60,29 @@ class MaterialDropZone extends React.Component {
 
   /* General TODOs
     - go accross repo and determine the actual aspect ratios that we want from different forms
+    - MaterialDropZone is meant to be for all files, but it's only used for images in the admin portal. How to design this?
+      - my heart wants to decouple image-specific stuff from this component, but how specifically?
     - remove console logs, code cleanup (including eslint warnings that were already here)
     - testing on mobile!
-    - address wider design questions on my external notes
+    - make sure no memory leaks
+    - use onCropComplete callback to display a crop preview within the Modal? optional bool parameter of CropModal component?
+    - Add ability to crop image even if it’s not specified in form JSON?
+      - do the cropping statechanges every onDrop - not only when aspectRatio exists - and instead make crop modal optionally take in aspectRatio
+    - What about wanting to limit the image to a certain range? (i.e square to 20:10 logos are fine for the banner, but nothing vertical)
+      - Requires more complex parameterization system: to either specify aspect ratio OR minAspectRatio and maxAspectRatio
+      - Does the cropping tool have the capability to enforce this?
   */
 
   /* Technical TODOs
-    - when no crop is given but "Done" button pressed, have to call cancelCrop!
-    - why is the passed file type in toBlob not ending up in the cropped image file? its an empty string instead
-    - why is the oldFiles array in onCropCompleted seemingly having no elements, even though the croppedFile exists and gets concat-ed
-    - test that the looping works in onDrop to sequentially crop images and ignore non-image files
-    - investigate naming of "URL" in fileObjToDataURL and related stuff, because it seems like the function is actually returning a base64 string...?
-    - figure out what's up with PNGs (and other formats?) not working
     - figure out what's up with the output files seemingly being corrupted/not previewing/not opening
       - fractions of pixels as size of crop?
       - no "preview" attribute to the output file objects?
-    - totally redo the look of the CropModal, including a backdrop, text instructions, and sizing. It's unusable right now.
+    - why is the passed file type in toBlob not ending up in the cropped image file? its an empty string instead
+    - totally redo the look of the CropModal, including a backdrop, text, and sizing.
+    - test that the looping works in onDrop to sequentially crop images and ignore non-image files
+    - figure out what's up with PNGs (and other formats?) not working
     - figure out the "Can't perform a React state update on an unmounted component." warning
-    - address the warnings about list items w/ key prop and <ul> as descendant of <p>
-    - figure out why bullet points are not displaying on my image upload instructions list
+    - address the warnings about list items w/ key prop
   */
 
 
@@ -115,9 +119,10 @@ class MaterialDropZone extends React.Component {
     const { files } = this.state;
     const { name } = this.props;
     let oldFiles = files;
-    oldFiles = oldFiles.concat([croppedImageFile]);
 
     console.log(croppedImageFile);
+
+    oldFiles = oldFiles.concat([croppedImageFile]);
 
     this.setState({
       files: oldFiles,

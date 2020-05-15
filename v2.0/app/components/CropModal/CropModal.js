@@ -4,7 +4,7 @@ import 'react-image-crop/dist/ReactCrop.css';
 import Modal from '@material-ui/core/Modal';
 import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
-import { getAspectRatioFloat, fileObjToDataURL } from './helpers.js';
+import { getAspectRatioFloat, fileToBase64 } from './helpers.js';
 
 class CropModal extends React.Component {
   constructor(props) {
@@ -12,7 +12,11 @@ class CropModal extends React.Component {
 
     this.state = {
       isOpen: true,
-      crop: { aspect: getAspectRatioFloat(this.props.aspectRatio) }, // eslint-disable-line
+      crop: {
+        aspect: getAspectRatioFloat(this.props.aspectRatio), // eslint-disable-line
+        unit: '%',
+        width: 90
+      }
     };
 
     this.doCrop = this.doCrop.bind(this);
@@ -22,8 +26,8 @@ class CropModal extends React.Component {
   componentDidMount() {
     const { imageFile } = this.props;
 
-    fileObjToDataURL(imageFile, (URL) => {
-      this.setState({ imageSrcURL: URL });
+    fileToBase64(imageFile, (base64Data) => {
+      this.setState({ imageData: base64Data });
     });
   }
 
@@ -62,7 +66,7 @@ class CropModal extends React.Component {
       canvas.toBlob(blob => {
         blob.name = fileName;
         resolve(blob);
-      }, fileType, 1);
+      }, fileType);
     });
   }
 
@@ -76,9 +80,10 @@ class CropModal extends React.Component {
       const croppedImageBlob = await this.getCroppedImg(this.imageRef, crop, imageFile.name, imageFile.type);
       const croppedImageFile = new File([croppedImageBlob], croppedImageBlob.name);
       onCropCompleted(croppedImageFile);
+      this.setState({ isOpen: false });
+    } else {
+      this.cancelCrop();
     }
-
-    this.setState({ isOpen: false });
   }
 
   cancelCrop() {
@@ -88,7 +93,7 @@ class CropModal extends React.Component {
   }
 
   render() {
-    const { crop, imageSrcURL, isOpen } = this.state;
+    const { crop, imageData, isOpen } = this.state;
 
     return (
       <Modal
@@ -96,8 +101,9 @@ class CropModal extends React.Component {
       >
         <div>
           <ReactCrop
-            src={imageSrcURL}
+            src={imageData}
             crop={crop}
+            ruleOfThirds
             onImageLoaded={this.onImageLoaded}
             onChange={this.onCropChange}
           />
