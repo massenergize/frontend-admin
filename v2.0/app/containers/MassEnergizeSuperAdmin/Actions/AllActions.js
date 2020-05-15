@@ -130,7 +130,7 @@ class AllActions extends React.Component {
               shrink: true,
               maxwidth: '10px'
             }}
-            value={d && d.rank}
+            defaultValue={d && d.rank}
           />
         )
       }
