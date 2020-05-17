@@ -179,7 +179,6 @@ class AllActions extends React.Component {
                 }
               }}
               to="/admin/read/actions"
-              target="_blank"
             >
               <FileCopy size="small" variant="outlined" color="secondary" />
             </Link>

@@ -106,7 +106,6 @@ class AllPolicies extends React.Component {
                 }
               }}
               to="/admin/read/policies"
-              target="_blank"
             >
               <FileCopy size="small" variant="outlined" color="secondary" />
             </Link>

@@ -152,7 +152,6 @@ class AllEvents extends React.Component {
                 }
               }}
               to="/admin/read/events"
-              target="_blank"
             >
               <FileCopy size="small" variant="outlined" color="secondary" />
             </Link>

@@ -183,13 +183,11 @@ class AllVendors extends React.Component {
                   vendor_id: id,
                 });
                 if (copiedVendorResponse && copiedVendorResponse.success) {
-                  const newVendor =
-                    copiedVendorResponse && copiedVendorResponse.data;
+                  const newVendor = copiedVendorResponse && copiedVendorResponse.data;
                   window.location.href = `/admin/edit/${newVendor.id}/vendor`;
                 }
               }}
               to="/admin/read/vendors"
-              target="_blank"
             >
               <FileCopy size="small" variant="outlined" color="secondary" />
             </Link>
