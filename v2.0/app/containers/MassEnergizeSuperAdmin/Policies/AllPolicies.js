@@ -93,7 +93,7 @@ class AllPolicies extends React.Component {
         filter: true,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/policy`}>
+            <Link to={`/admin/edit/${id}/policy`} target="_blank">
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
             &nbsp;&nbsp;
@@ -106,6 +106,7 @@ class AllPolicies extends React.Component {
                 }
               }}
               to="/admin/read/policies"
+              target="_blank"
             >
               <FileCopy size="small" variant="outlined" color="secondary" />
             </Link>

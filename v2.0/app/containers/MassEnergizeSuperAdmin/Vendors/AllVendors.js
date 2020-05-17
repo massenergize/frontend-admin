@@ -173,7 +173,7 @@ class AllVendors extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/vendor`}>
+            <Link to={`/admin/edit/${id}/vendor`} target="_blank">
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
             &nbsp;&nbsp;
@@ -189,6 +189,7 @@ class AllVendors extends React.Component {
                 }
               }}
               to="/admin/read/vendors"
+              target="_blank"
             >
               <FileCopy size="small" variant="outlined" color="secondary" />
             </Link>

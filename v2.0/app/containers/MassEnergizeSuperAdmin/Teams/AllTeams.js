@@ -106,10 +106,10 @@ class AllTeams extends React.Component {
         customBodyRender: (d) => (
           <div>
             {d.image
-              && <Link to={`/admin/edit/${d.id}/team`}><Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} /></Link>
+              && <Link to={`/admin/edit/${d.id}/team`} target="_blank"><Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} /></Link>
             }
             {!d.image
-              && <Link to={`/admin/edit/${d.id}/team`}><Avatar style={{ margin: 10 }}>{d.initials}</Avatar></Link>
+              && <Link to={`/admin/edit/${d.id}/team`} target="_blank"><Avatar style={{ margin: 10 }}>{d.initials}</Avatar></Link>
             }
           </div>
         )
@@ -137,7 +137,7 @@ class AllTeams extends React.Component {
         filter: false,
         download: false,
         customBodyRender: (id) => (
-          <Link to={`/admin/edit/${id}/team_members`}>
+          <Link to={`/admin/edit/${id}/team_members`} target="_blank">
             <PeopleIcon size="small" variant="outlined" color="secondary" />
           </Link>
         )

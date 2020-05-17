@@ -107,7 +107,7 @@ class AllTagCollections extends React.Component {
           download: false,
           customBodyRender: (id) => (
             <div>
-              <Link to={`/admin/edit/${id}/tag-collection`}>
+              <Link to={`/admin/edit/${id}/tag-collection`} target="_blank">
                 <EditIcon size="small" variant="outlined" color="secondary" />
               </Link>
             &nbsp;&nbsp;

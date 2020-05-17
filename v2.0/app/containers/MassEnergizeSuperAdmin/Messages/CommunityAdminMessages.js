@@ -124,7 +124,7 @@ class AllCommunityAdminMessages extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/message`}>
+            <Link to={`/admin/edit/${id}/message`} target="_blank">
               <DetailsIcon size="small" variant="outlined" color="secondary" />
             </Link>
           </div>

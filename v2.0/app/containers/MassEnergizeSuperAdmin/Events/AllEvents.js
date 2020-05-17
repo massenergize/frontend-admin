@@ -139,7 +139,7 @@ class AllEvents extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/event`}>
+            <Link to={`/admin/edit/${id}/event`} target="_blank">
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
             &nbsp;&nbsp;
@@ -152,6 +152,7 @@ class AllEvents extends React.Component {
                 }
               }}
               to="/admin/read/events"
+              target="_blank"
             >
               <FileCopy size="small" variant="outlined" color="secondary" />
             </Link>

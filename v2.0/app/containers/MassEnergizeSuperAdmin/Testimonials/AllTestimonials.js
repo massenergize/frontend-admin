@@ -141,7 +141,7 @@ class AllTestimonials extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/testimonial`}>
+            <Link to={`/admin/edit/${id}/testimonial`} target="_blank">
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
             &nbsp;&nbsp;
