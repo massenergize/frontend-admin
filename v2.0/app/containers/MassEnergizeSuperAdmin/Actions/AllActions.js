@@ -166,7 +166,7 @@ class AllActions extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/action`}>
+            <Link to={`/admin/edit/${id}/action`} target="_blank">
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
             &nbsp;&nbsp;
