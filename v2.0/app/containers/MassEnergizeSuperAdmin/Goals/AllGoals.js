@@ -123,10 +123,10 @@ class AllGoals extends React.Component {
         customBodyRender: (d) => (
           <div>
             {d.image
-              && <Link to={`/admin/community/${d.id}/profile`}><Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} /></Link>
+              && <Link to={`/admin/community/${d.id}/profile`} target="_blank"><Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} /></Link>
             }
             {!d.image
-              && <Link to={`/admin/community/${d.id}/profile`}><Avatar style={{ margin: 10 }}>{d.initials}</Avatar></Link>
+              && <Link to={`/admin/community/${d.id}/profile`} target="_blank"><Avatar style={{ margin: 10 }}>{d.initials}</Avatar></Link>
             }
             {d.name + d.type}
           </div>
@@ -186,7 +186,7 @@ class AllGoals extends React.Component {
       filterType: 'dropdown',
       responsive: 'stacked',
       print: true,
-      rowsPerPage: 10,
+      rowsPerPage: 100,
       page: 1,
       indexColumn: 'id',
       onRowsDelete: (rowsDeleted) => {

@@ -93,7 +93,7 @@ class AllPolicies extends React.Component {
         filter: true,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/policy`}>
+            <Link to={`/admin/edit/${id}/policy`} target="_blank">
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
             &nbsp;&nbsp;
@@ -126,7 +126,7 @@ class AllPolicies extends React.Component {
       filterType: 'dropdown',
       responsive: 'stacked',
       print: true,
-      rowsPerPage: 10,
+      rowsPerPage: 100,
       page: 1,
       indexColumn: 'id',
       onRowsDelete: (rowsDeleted) => {

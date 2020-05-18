@@ -133,7 +133,7 @@ class AllTeamAdminMessages extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/message`}>
+            <Link to={`/admin/edit/${id}/message`} target="_blank">
               <DetailsIcon size="small" variant="outlined" color="secondary" />
             </Link>
           </div>
@@ -152,7 +152,7 @@ class AllTeamAdminMessages extends React.Component {
       filterType: 'dropdown',
       responsive: 'stacked',
       print: true,
-      rowsPerPage: 10,
+      rowsPerPage: 100,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {

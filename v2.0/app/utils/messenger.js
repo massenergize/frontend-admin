@@ -2,7 +2,7 @@
  * This file contains code used to transmit data
  */
 import qs from 'qs';
-import  { API_HOST } from '../config/constants';
+import { API_HOST } from '../config/constants';
 
 export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = null, strictUrl = false) {
   const idToken = localStorage.getItem('idToken');
