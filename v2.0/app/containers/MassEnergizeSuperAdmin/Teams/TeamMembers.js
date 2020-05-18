@@ -6,23 +6,42 @@ import { bindActionCreators } from 'redux';
 import brand from 'dan-api/dummy/brand';
 import MUIDataTable from 'mui-datatables';
 import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
-import EditIcon from '@material-ui/icons/Edit';
 import { Link } from 'react-router-dom';
-import Avatar from '@material-ui/core/Avatar';
-import messageStyles from 'dan-styles/Messages.scss';
 import { connect } from 'react-redux';
-import { Paper } from '@material-ui/core';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import classNames from 'classnames';
+import Tab from '@material-ui/core/Tab';
+import PeopleIcon from '@material-ui/icons/People';
+import AddBoxIcon from '@material-ui/icons/AddBox';
+import messageStyles from 'dan-styles/Messages.scss';
+import SnackbarContent from '@material-ui/core/SnackbarContent';
+
 import styles from '../../../components/Widget/widget-jss';
 import { reduxGetAllTeams, reduxGetAllCommunityTeams } from '../../../redux/redux-actions/adminActions';
 import { apiCall } from '../../../utils/messenger';
 import MassEnergizeForm from '../_FormGenerator';
 
+function TabContainer(props) {
+  const { children } = props;
+  return (
+    <Typography component="div" style={{ padding: 8 * 3 }}>
+      {children}
+    </Typography>
+  );
+}
+
+TabContainer.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+
 class TeamMembers extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: [], loading: true, team: null, columns: this.getColumns()
+      data: [], loading: true, team: null, columns: this.getColumns(), value: 0,
+
     };
   }
 
@@ -155,19 +174,23 @@ class TeamMembers extends React.Component {
     return formJson;
   }
 
+  handleTabChange = (event, value) => {
+    this.setState({ value });
+  };
+
 
   render() {
     const title = brand.name + ' - All Teams';
     const description = brand.desc;
     const {
-      columns, data, team, formJson
+      columns, data, team, formJson, value
     } = this.state;
     const { classes } = this.props;
     const options = {
       filterType: 'dropdown',
       responsive: 'stacked',
       print: true,
-      rowsPerPage: 10,
+      rowsPerPage: 100,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {
@@ -186,48 +209,85 @@ class TeamMembers extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <div className={classes.table}>
-          <Paper className={classes.root} elevation={4}>
-            {team
-            && (
-              <Typography component="p">
-                Team:&nbsp;&nbsp;
-                {team.name}
-              </Typography>
-            )
-            }
-            <br />
-            {team && team.community
-            && (
-              <Typography component="p">
-                Community:&nbsp;&nbsp;
-                {team.community.name}
-              </Typography>
-            )
-            }
-            <br />
-            <Link to="/admin/read/teams">All Teams</Link>
-          </Paper>
-          <br />
-          <br />
-          <MUIDataTable
-            title="Team Members"
-            data={data}
-            columns={columns}
-            options={options}
+        <div>
+          <SnackbarContent
+            className={classNames(classes.snackbar, messageStyles.bgSuccess)}
+            message={`Team: ${team && team.name}`}
+            action={() => (
+              <Link color="secondary" size="small">
+              Action
+              </Link>
+            )}
           />
           <br />
+          <SnackbarContent
+            className={classNames(classes.snackbar, messageStyles.bgWarning)}
+            message={`Community: ${team && team.community && team.community.name}`}
+            action={() => (
+              <Link color="secondary" size="small">
+              Action
+              </Link>
+            )}
+          />
           <br />
-          {formJson
+          <Link to="/admin/read/teams">
+            <SnackbarContent
+              className={classNames(classes.snackbar, messageStyles.bgInfo)}
+              message="<<< Go Back to All Teams"
+              action={() => (
+                <Link color="secondary" size="small">
+              Action
+                </Link>
+              )}
+            />
+          </Link>
+
+        </div>
+        <div className={classes.root}>
+          <AppBar position="static" color="default">
+            <Tabs
+              value={value}
+              onChange={this.handleTabChange}
+              variant="scrollable"
+              scrollButtons="on"
+              indicatorColor="primary"
+              textColor="secondary"
+            >
+              <Tab label="Team Members & Admins" icon={<PeopleIcon />} />
+              <Tab label="Change Team Member Status" icon={<AddBoxIcon />} />
+
+            </Tabs>
+          </AppBar>
+          {value === 0 && (
+            <TabContainer>
+
+              <div className={classes.table}>
+                <MUIDataTable
+                  title="Team Members"
+                  data={data}
+                  columns={columns}
+                  options={options}
+                />
+              </div>
+
+
+            </TabContainer>
+          )}
+          {value === 1 && (
+            <TabContainer>
+              {formJson
             && (
               <MassEnergizeForm
                 classes={classes}
                 formJson={formJson}
               />
             )
-          }
-
+              }
+            </TabContainer>
+          )}
         </div>
+
+
       </div>
     );
   }

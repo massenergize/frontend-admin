@@ -34,8 +34,7 @@ class AllTeams extends React.Component {
       await this.props.callTeamsForSuperAdmin();
     }
     if (user.is_community_admin) {
-      let com = this.props.community ? this.props.community : user.admin_at[0];
-      const teams = await this.props.callTeamsForNormalAdmin(com.id);
+      const teams = await this.props.callTeamsForNormalAdmin();
       await this.setStateAsync({ data: this.fashionData(teams.data) });
     }
     await this.setStateAsync({ loading: false });
@@ -107,10 +106,10 @@ class AllTeams extends React.Component {
         customBodyRender: (d) => (
           <div>
             {d.image
-              && <Link to={`/admin/edit/${d.id}/team`}><Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} /></Link>
+              && <Link to={`/admin/edit/${d.id}/team`} target="_blank"><Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} /></Link>
             }
             {!d.image
-              && <Link to={`/admin/edit/${d.id}/team`}><Avatar style={{ margin: 10 }}>{d.initials}</Avatar></Link>
+              && <Link to={`/admin/edit/${d.id}/team`} target="_blank"><Avatar style={{ margin: 10 }}>{d.initials}</Avatar></Link>
             }
           </div>
         )
@@ -138,7 +137,7 @@ class AllTeams extends React.Component {
         filter: false,
         download: false,
         customBodyRender: (id) => (
-          <Link to={`/admin/edit/${id}/team_members`}>
+          <Link to={`/admin/edit/${id}/team_members`} target="_blank">
             <PeopleIcon size="small" variant="outlined" color="secondary" />
           </Link>
         )
@@ -170,7 +169,7 @@ class AllTeams extends React.Component {
       filterType: 'dropdown',
       responsive: 'stacked',
       print: true,
-      rowsPerPage: 10,
+      rowsPerPage: 100,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {

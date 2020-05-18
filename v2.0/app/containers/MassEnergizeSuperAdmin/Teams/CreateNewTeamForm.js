@@ -91,8 +91,8 @@ class CreateNewTeamForm extends Component {
             },
             {
               name: 'admin_emails',
-              label: 'Team Admin Email: separated by commas',
-              placeholder: 'eg. teamadmin1@gmail.com, teamadmin2@gmail.com',
+              label: 'Team Admin Email: separated by commas.  Emails must be of registered users only',
+              placeholder: 'eg. Provide email of valid registered users eg. teamadmin1@gmail.com, teamadmin2@gmail.com',
               fieldType: 'TextField',
               isRequired: true,
 

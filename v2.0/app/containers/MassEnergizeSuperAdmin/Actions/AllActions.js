@@ -130,7 +130,7 @@ class AllActions extends React.Component {
               shrink: true,
               maxwidth: '10px'
             }}
-            value={d && d.rank}
+            defaultValue={d && d.rank}
           />
         )
       }
@@ -166,7 +166,7 @@ class AllActions extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/action`}>
+            <Link to={`/admin/edit/${id}/action`} target="_blank">
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
             &nbsp;&nbsp;
@@ -203,7 +203,7 @@ class AllActions extends React.Component {
       filterType: 'dropdown',
       responsive: 'stacked',
       print: true,
-      rowsPerPage: 10,
+      rowsPerPage: 100,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(async d => {

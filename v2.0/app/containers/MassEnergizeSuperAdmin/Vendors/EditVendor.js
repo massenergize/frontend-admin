@@ -218,7 +218,7 @@ class CreateNewVendorForm extends Component {
               placeholder: 'eg. https://www.vendorwebsite.com',
               fieldType: 'TextField',
               contentType: 'text',
-              isRequired: true,
+              isRequired: false,
               defaultValue: vendor.more_info && vendor.more_info.website,
               dbName: 'website',
               readOnly: false
