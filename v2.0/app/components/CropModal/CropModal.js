@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import Modal from '@material-ui/core/Modal';
+import Dialog from '@material-ui/core/Dialog';
 import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
 import { getAspectRatioFloat, fileToBase64 } from './helpers.js';
@@ -98,7 +98,7 @@ class CropModal extends React.Component {
     const { crop, imageData, isOpen } = this.state;
 
     return (
-      <Modal
+      <Dialog
         open={isOpen}
       >
         <div>
@@ -109,10 +109,16 @@ class CropModal extends React.Component {
             onImageLoaded={this.onImageLoaded}
             onChange={this.onCropChange}
           />
-          <Button onClick={this.cancelCrop}>Cancel</Button>
-          <Button onClick={this.doCrop}>Done</Button>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}
+          >
+            <Button onClick={this.cancelCrop}>Cancel</Button>
+            <Button onClick={this.doCrop}>Done</Button>
+          </div>
         </div>
-      </Modal>
+      </Dialog>
     );
   }
 }

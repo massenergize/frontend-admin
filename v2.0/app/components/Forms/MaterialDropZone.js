@@ -58,25 +58,20 @@ class MaterialDropZone extends React.Component {
     this.addToState = props.addToState;
   }
 
-  /* General TODOs
+  /* TODOs
     - go accross repo and determine the actual aspect ratios that we want from different forms
-    - MaterialDropZone is meant to be for all files, but it's only used for images in the admin portal. How to design this?
-      - my heart wants to decouple image-specific stuff from this component, but how specifically?
     - remove console logs, code cleanup (including eslint warnings that were already here)
     - testing on mobile!
-    - make sure no memory leaks
-    - use onCropComplete callback to display a crop preview within the Modal? optional bool parameter of CropModal component?
+    - make sure no memory leaks (file URLS)
+    - use onCropComplete callback to display a crop preview WITHIN the Modal? optional bool parameter of CropModal component?
     - Add ability to crop image even if it’s not specified in form JSON?
       - do the cropping statechanges every onDrop - not only when aspectRatio exists - and instead make crop modal optionally take in aspectRatio
     - What about wanting to limit the image to a certain range? (i.e square to 20:10 logos are fine for the banner, but nothing vertical)
       - Requires more complex parameterization system: to either specify aspect ratio OR minAspectRatio and maxAspectRatio
       - Does the cropping tool have the capability to enforce this?
-  */
-
-  /* Technical TODOs
-    - totally redo the look of the CropModal, including a backdrop, text, and sizing.
+    - for the Dialog, make sure that every way to exit it has the appropriate callback
     - test that the looping works in onDrop to sequentially crop images and ignore non-image files
-    - figure out what's up with PNGs (and other formats?) not working
+    - test other image formats!!!
     - figure out the "Can't perform a React state update on an unmounted component." warning
     - address the warnings about list items w/ key prop
   */
