@@ -173,7 +173,7 @@ class AllVendors extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/vendor`}>
+            <Link to={`/admin/edit/${id}/vendor`} target="_blank">
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
             &nbsp;&nbsp;
@@ -183,8 +183,7 @@ class AllVendors extends React.Component {
                   vendor_id: id,
                 });
                 if (copiedVendorResponse && copiedVendorResponse.success) {
-                  const newVendor =
-                    copiedVendorResponse && copiedVendorResponse.data;
+                  const newVendor = copiedVendorResponse && copiedVendorResponse.data;
                   window.location.href = `/admin/edit/${newVendor.id}/vendor`;
                 }
               }}
@@ -209,7 +208,7 @@ class AllVendors extends React.Component {
       filterType: 'dropdown',
       responsive: 'stacked',
       print: true,
-      rowsPerPage: 10,
+      rowsPerPage: 100,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach((d) => {

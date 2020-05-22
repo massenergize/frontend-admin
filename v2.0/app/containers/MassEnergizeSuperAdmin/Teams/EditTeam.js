@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import { Paper } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { apiCall } from '../../../utils/messenger';
 import MassEnergizeForm from '../_FormGenerator';
-import { Paper } from '@material-ui/core';
 
 const styles = theme => ({
   root: {
