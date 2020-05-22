@@ -74,10 +74,6 @@ class MaterialDropZone extends React.Component {
   */
 
   /* Technical TODOs
-    - figure out what's up with the output files seemingly being corrupted/not previewing/not opening
-      - fractions of pixels as size of crop?
-      - no "preview" attribute to the output file objects?
-    - why is the passed file type in toBlob not ending up in the cropped image file? its an empty string instead
     - totally redo the look of the CropModal, including a backdrop, text, and sizing.
     - test that the looping works in onDrop to sequentially crop images and ignore non-image files
     - figure out what's up with PNGs (and other formats?) not working
@@ -119,8 +115,6 @@ class MaterialDropZone extends React.Component {
     const { files } = this.state;
     const { name } = this.props;
     let oldFiles = files;
-
-    console.log(croppedImageFile);
 
     oldFiles = oldFiles.concat([croppedImageFile]);
 

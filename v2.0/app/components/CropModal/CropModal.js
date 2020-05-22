@@ -60,8 +60,6 @@ class CropModal extends React.Component {
       crop.height
     );
 
-    console.log(fileName, fileType);
-
     return new Promise((resolve) => {
       canvas.toBlob(blob => {
         blob.name = fileName;
@@ -74,11 +72,15 @@ class CropModal extends React.Component {
     const { onCropCompleted, imageFile } = this.props;
     const { crop } = this.state;
 
-    console.log(crop);
-
     if (this.imageRef && crop.width && crop.height) {
       const croppedImageBlob = await this.getCroppedImg(this.imageRef, crop, imageFile.name, imageFile.type);
-      const croppedImageFile = new File([croppedImageBlob], croppedImageBlob.name);
+      const previewURL = window.URL.createObjectURL(croppedImageBlob);
+      const croppedImageFile = new File([croppedImageBlob], croppedImageBlob.name, { type: imageFile.type });
+      croppedImageFile.preview = previewURL;
+
+      console.log(imageFile);
+      console.log(croppedImageFile);
+
       onCropCompleted(croppedImageFile);
       this.setState({ isOpen: false });
     } else {
