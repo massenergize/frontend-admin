@@ -44,6 +44,13 @@ class CropModal extends React.Component {
     });
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { imageFile } = nextProps;
+
+    fileToBase64(imageFile, (base64Data) => {
+      this.setState({ imageData: base64Data, isOpen: true });
+    });
+  }
 
   onCropChange = (crop) => {
     this.setState({ crop });

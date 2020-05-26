@@ -48,7 +48,7 @@ class MaterialDropZone extends React.Component {
       openSnackBar: false,
       errorMessage: '',
       isCropping: false,
-      currentImage: null,
+      uncroppedImageQueue: [],
       files: this.props.files, // eslint-disable-line
       acceptedFiles: this.props.acceptedFiles, // eslint-disable-line
     };
@@ -63,8 +63,6 @@ class MaterialDropZone extends React.Component {
        - welcome images -> extra instructions say to center the important stuff
     - remove console logs
     - for the Modal, make sure that every way to exit it has the appropriate callback
-    - make looping work in onDrop to sequentially crop multiple images and ignore non-image files
-      - need state to have list of current images...?
   */
 
 
@@ -72,55 +70,66 @@ class MaterialDropZone extends React.Component {
     const { files } = this.state;
     const { filesLimit, name } = this.props;
 
-    let oldFiles = files;
     const filesLimitVal = filesLimit || '3';
-    oldFiles = oldFiles.concat(filesVal);
 
-    if (oldFiles.length > filesLimit) {
+    if (files.length + filesVal.length > filesLimitVal) {
       this.setState({
         openSnackBar: true,
         errorMessage: 'Cannot upload more than ' + filesLimitVal + ' items.',
       });
     } else {
+      const newImages = [];
+      const newFiles = [];
       for (let i = 0; i < filesVal.length; i++) {
         if (isImage(filesVal[i])) {
-          console.log(filesVal[i]);
-          this.setState({
-            currentImage: filesVal[i],
-            isCropping: true,
-          });
+          newImages.push(filesVal[i]);
         } else {
-          this.setState({ files: oldFiles });
-          this.addToState(name || 'image', oldFiles);
+          newFiles.push(filesVal[i]);
         }
       }
+
+      const initIsCropping = newImages.length > 0;
+
+      let oldFiles = files;
+      oldFiles = oldFiles.concat(newFiles);
+
+      this.setState({
+        uncroppedImageQueue: newImages,
+        isCropping: initIsCropping,
+        files: oldFiles
+      });
+      this.addToState(name || 'image', oldFiles);
     }
   }
 
   onCropCompleted(croppedImageFile) {
-    const { files, currentImage } = this.state;
+    const { files, uncroppedImageQueue } = this.state;
     const { name } = this.props;
 
-    window.URL.revokeObjectURL(currentImage.preview);
+    window.URL.revokeObjectURL(uncroppedImageQueue[0].preview);
+    const newUncroppedImageQueue = uncroppedImageQueue.slice(1);
+    const newIsCropping = newUncroppedImageQueue.length > 0;
 
     let oldFiles = files;
     oldFiles = oldFiles.concat([croppedImageFile]);
 
     this.setState({
       files: oldFiles,
-      isCropping: false,
-      currentImage: null
+      isCropping: newIsCropping,
+      uncroppedImageQueue: newUncroppedImageQueue
     });
     this.addToState(name || 'image', oldFiles);
   }
 
   onCropCancelled() {
-    const { currentImage } = this.state;
-    window.URL.revokeObjectURL(currentImage.preview);
+    const { uncroppedImageQueue } = this.state;
+    window.URL.revokeObjectURL(uncroppedImageQueue[0].preview);
+    const newUncroppedImageQueue = uncroppedImageQueue.slice(1);
+    const newIsCropping = newUncroppedImageQueue.length > 0;
 
     this.setState({
-      isCropping: false,
-      currentImage: null,
+      isCropping: newIsCropping,
+      uncroppedImageQueue: newUncroppedImageQueue,
       openSnackBar: true,
       errorMessage: 'You must click "Done" on the cropper to upload your image. Please try again.'
     });
@@ -172,13 +181,14 @@ class MaterialDropZone extends React.Component {
       acceptedFiles,
       files,
       isCropping,
-      currentImage,
+      uncroppedImageQueue,
       openSnackBar,
       errorMessage
     } = this.state;
 
-    console.log('Aspect ratio: ' + imageAspectRatio);
-    console.log('In cropping state?: ' + isCropping);
+    console.log('Aspect ratio: ', imageAspectRatio);
+    console.log('In cropping state?: ', isCropping);
+    console.log('Remaining images: ', uncroppedImageQueue);
 
     const deleteBtn = (file, index) => (
       <div className="middle">
@@ -215,7 +225,7 @@ class MaterialDropZone extends React.Component {
 
         {isCropping && (
           <CropModal
-            imageFile={currentImage}
+            imageFile={uncroppedImageQueue[0]}
             aspectRatio={imageAspectRatio}
             onCropCompleted={this.onCropCompleted}
             onCropCancelled={this.onCropCancelled}
