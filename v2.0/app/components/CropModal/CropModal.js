@@ -10,13 +10,24 @@ class CropModal extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      isOpen: true,
-      crop: {
+    let myCrop;
+    if (this.props.aspectRatio) {
+      myCrop = {
         aspect: getAspectRatioFloat(this.props.aspectRatio), // eslint-disable-line
         unit: '%',
-        width: 90
-      }
+        width: 100
+      };
+    } else {
+      myCrop = {
+        unit: '%',
+        width: 100,
+        height: 100
+      };
+    }
+
+    this.state = {
+      isOpen: true,
+      crop: myCrop
     };
 
     this.doCrop = this.doCrop.bind(this);

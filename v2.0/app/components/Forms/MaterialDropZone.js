@@ -59,13 +59,13 @@ class MaterialDropZone extends React.Component {
   }
 
   /* TODOs
+    - specifically when uploading to the welcome images, have a note that says to have important stuff in the center of the image
+    - (parameterizable?) text within the crop modal?
     - go accross repo and determine the actual aspect ratios that we want from different forms
     - remove console logs, code cleanup (including eslint warnings that were already here)
     - testing on mobile!
     - make sure no memory leaks (file URLS)
     - use onCropComplete callback to display a crop preview WITHIN the Modal? optional bool parameter of CropModal component?
-    - Add ability to crop image even if it’s not specified in form JSON?
-      - do the cropping statechanges every onDrop - not only when aspectRatio exists - and instead make crop modal optionally take in aspectRatio
     - What about wanting to limit the image to a certain range? (i.e square to 20:10 logos are fine for the banner, but nothing vertical)
       - Requires more complex parameterization system: to either specify aspect ratio OR minAspectRatio and maxAspectRatio
       - Does the cropping tool have the capability to enforce this?
@@ -79,7 +79,7 @@ class MaterialDropZone extends React.Component {
 
   onDrop(filesVal) {
     const { files } = this.state;
-    const { filesLimit, name, aspectRatio } = this.props;
+    const { filesLimit, name } = this.props;
 
     let oldFiles = files;
     const filesLimitVal = filesLimit || '3';
@@ -92,7 +92,7 @@ class MaterialDropZone extends React.Component {
       });
     } else {
       for (let i = 0; i < filesVal.length; i++) {
-        if (aspectRatio && isImage(filesVal[i])) {
+        if (isImage(filesVal[i])) {
           console.log(filesVal[i]);
           this.setState({
             currentImage: filesVal[i],
@@ -126,7 +126,7 @@ class MaterialDropZone extends React.Component {
       isCropping: false,
       currentImage: null,
       openSnackBar: true,
-      errorMessage: 'Your image must match the required aspect ratio. Please try again.'
+      errorMessage: 'You must click "Done" on the cropper to upload your image. Please try again.'
     });
   }
 
