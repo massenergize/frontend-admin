@@ -61,11 +61,10 @@ class MaterialDropZone extends React.Component {
   /* TODOs
     - go accross repo and determine the actual aspect ratios + extraInstructions that we want from different forms
        - welcome images -> extra instructions say to center the important stuff
-    - remove console logs, code cleanup (including eslint warnings that were already here)
+    - remove console logs
     - for the Modal, make sure that every way to exit it has the appropriate callback
-    - test that the looping works in onDrop to sequentially crop images and ignore non-image files
-    - figure out the "Can't perform a React state update on an unmounted component." warning
-    - address the warnings about list items w/ key prop
+    - make looping work in onDrop to sequentially crop multiple images and ignore non-image files
+      - need state to have list of current images...?
   */
 
 
@@ -99,10 +98,12 @@ class MaterialDropZone extends React.Component {
   }
 
   onCropCompleted(croppedImageFile) {
-    const { files } = this.state;
+    const { files, currentImage } = this.state;
     const { name } = this.props;
-    let oldFiles = files;
 
+    window.URL.revokeObjectURL(currentImage.preview);
+
+    let oldFiles = files;
     oldFiles = oldFiles.concat([croppedImageFile]);
 
     this.setState({
@@ -114,6 +115,9 @@ class MaterialDropZone extends React.Component {
   }
 
   onCropCancelled() {
+    const { currentImage } = this.state;
+    window.URL.revokeObjectURL(currentImage.preview);
+
     this.setState({
       isCropping: false,
       currentImage: null,

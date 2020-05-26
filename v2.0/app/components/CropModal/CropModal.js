@@ -10,10 +10,12 @@ class CropModal extends React.Component {
   constructor(props) {
     super(props);
 
+    const { aspectRatio } = this.props;
+
     let myCrop;
-    if (this.props.aspectRatio) {
+    if (aspectRatio) {
       myCrop = {
-        aspect: getAspectRatioFloat(this.props.aspectRatio), // eslint-disable-line
+        aspect: getAspectRatioFloat(aspectRatio),
         unit: '%',
         width: 100
       };
