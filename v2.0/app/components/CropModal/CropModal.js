@@ -72,7 +72,8 @@ class CropModal extends React.Component {
     );
 
     return new Promise((resolve) => {
-      canvas.toBlob(blob => {
+      canvas.toBlob(_blob => {
+        const blob = _blob;
         blob.name = fileName;
         resolve(blob);
       }, fileType);

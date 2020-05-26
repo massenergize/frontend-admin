@@ -513,11 +513,12 @@ class MassEnergizeForm extends Component {
               <div>
                 <h5>Uploaded Image</h5>
                 <img style={{ maxWidth: '250px', maxHeight: '250px' }} src={field.previewLink} alt={field.label} />
+                <br />
               </div>
             )}
             <div className="imageUploadInstructions">
-              <h6>Image Upload Instructions:</h6>
-              <ul style={{ listStyleType: 'circle', paddingLeft: '30px' }}>
+              <p><u>Image Upload Instructions:</u></p>
+              <ul style={{ listStyleType: 'circle', paddingLeft: '30px', fontSize: 14 }}>
                 <li>Drag an image to the box or click on it to browse your computer. Only image files will be accepted.</li>
                 <li>The final upload size must not exceed 5MB. If it does, an error will appear.</li>
                 <li>

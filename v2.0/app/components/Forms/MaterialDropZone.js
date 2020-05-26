@@ -59,19 +59,13 @@ class MaterialDropZone extends React.Component {
   }
 
   /* TODOs
-    - specifically when uploading to the welcome images, have a note that says to have important stuff in the center of the image
-    - (parameterizable?) text within the crop modal?
-    - go accross repo and determine the actual aspect ratios that we want from different forms
+    - go accross repo and determine the actual aspect ratios + extraInstructions that we want from different forms
+       - welcome images -> extra instructions say to center the important stuff
     - remove console logs, code cleanup (including eslint warnings that were already here)
-    - testing on mobile!
-    - make sure no memory leaks (file URLS)
-    - use onCropComplete callback to display a crop preview WITHIN the Modal? optional bool parameter of CropModal component?
-    - What about wanting to limit the image to a certain range? (i.e square to 20:10 logos are fine for the banner, but nothing vertical)
-      - Requires more complex parameterization system: to either specify aspect ratio OR minAspectRatio and maxAspectRatio
-      - Does the cropping tool have the capability to enforce this?
-    - for the Dialog, make sure that every way to exit it has the appropriate callback
+    - testing on mobile
+    - for the Modal, make sure that every way to exit it has the appropriate callback
     - test that the looping works in onDrop to sequentially crop images and ignore non-image files
-    - test other image formats!!!
+    - test other image formats
     - figure out the "Can't perform a React state update on an unmounted component." warning
     - address the warnings about list items w/ key prop
   */
@@ -277,17 +271,20 @@ class MaterialDropZone extends React.Component {
 MaterialDropZone.propTypes = {
   files: PropTypes.array.isRequired,
   text: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  addToState: PropTypes.func.isRequired,
   acceptedFiles: PropTypes.array,
   showPreviews: PropTypes.bool.isRequired,
   showButton: PropTypes.bool,
   maxSize: PropTypes.number.isRequired,
-  imageAspectRatio: PropTypes.string.isRequired,
+  imageAspectRatio: PropTypes.string,
   filesLimit: PropTypes.number.isRequired,
   classes: PropTypes.object.isRequired,
 };
 
 MaterialDropZone.defaultProps = {
   acceptedFiles: [],
+  imageAspectRatio: null,
   showButton: false,
 };
 
