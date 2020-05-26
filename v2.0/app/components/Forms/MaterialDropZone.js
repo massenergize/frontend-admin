@@ -62,10 +62,8 @@ class MaterialDropZone extends React.Component {
     - go accross repo and determine the actual aspect ratios + extraInstructions that we want from different forms
        - welcome images -> extra instructions say to center the important stuff
     - remove console logs, code cleanup (including eslint warnings that were already here)
-    - testing on mobile
     - for the Modal, make sure that every way to exit it has the appropriate callback
     - test that the looping works in onDrop to sequentially crop images and ignore non-image files
-    - test other image formats
     - figure out the "Can't perform a React state update on an unmounted component." warning
     - address the warnings about list items w/ key prop
   */
