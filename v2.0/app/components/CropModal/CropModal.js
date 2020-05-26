@@ -136,9 +136,13 @@ class CropModal extends React.Component {
 
 CropModal.propTypes = {
   imageFile: PropTypes.object.isRequired,
-  aspectRatio: PropTypes.string.isRequired,
+  aspectRatio: PropTypes.string,
   onCropCompleted: PropTypes.func.isRequired,
   onCropCancelled: PropTypes.func.isRequired,
+};
+
+CropModal.defaultProps = {
+  aspectRatio: null
 };
 
 export default CropModal;

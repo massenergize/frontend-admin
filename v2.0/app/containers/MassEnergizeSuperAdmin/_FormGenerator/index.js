@@ -519,12 +519,16 @@ class MassEnergizeForm extends Component {
               <h6>Image Upload Instructions:</h6>
               <ul style={{ listStyleType: 'circle', paddingLeft: '30px' }}>
                 <li>Drag an image to the box or click on it to browse your computer. Only image files will be accepted.</li>
-                {field.aspectRatio && (
-                  <li>
-                    The aspect ratio required for this image destination is <i>{field.aspectRatio}</i>. After selecting an image, a cropping tool will open.
-                  </li>
-                )}
                 <li>The final upload size must not exceed 5MB. If it does, an error will appear.</li>
+                <li>
+                {field.imageAspectRatio ? (
+                      <span> The aspect ratio required for this image destination is <i>{field.imageAspectRatio}</i>. After selecting an image, a cropping tool will open. </span>
+                ) : (<span> After an image is chosen, a cropping tool will open to allow you to change the     image zoom and dimensions. </span>)
+                }
+                </li>
+                {field.extraInstructions
+                  && field.extraInstructions.map(instruction => <li>{instruction}</li>)
+                }
               </ul>
             </div>
             <br />
@@ -534,7 +538,7 @@ class MassEnergizeForm extends Component {
                 files={this.getValue(field.name, [])}
                 showPreviews
                 maxSize={5000000}
-                aspectRatio={field.aspectRatio ? field.aspectRatio : null}
+                imageAspectRatio={field.imageAspectRatio ? field.imageAspectRatio : null}
                 name={field.name}
                 filesLimit={field.filesLimit}
                 text={field.label}

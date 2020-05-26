@@ -164,7 +164,7 @@ class MaterialDropZone extends React.Component {
       classes,
       showPreviews,
       maxSize,
-      aspectRatio,
+      imageAspectRatio,
       text,
       showButton,
       filesLimit,
@@ -181,7 +181,7 @@ class MaterialDropZone extends React.Component {
       errorMessage
     } = this.state;
 
-    console.log('Aspect ratio: ' + aspectRatio);
+    console.log('Aspect ratio: ' + imageAspectRatio);
     console.log('In cropping state?: ' + isCropping);
 
     const deleteBtn = (file, index) => (
@@ -220,7 +220,7 @@ class MaterialDropZone extends React.Component {
         {isCropping && (
           <CropModal
             imageFile={currentImage}
-            aspectRatio={aspectRatio}
+            aspectRatio={imageAspectRatio}
             onCropCompleted={this.onCropCompleted}
             onCropCancelled={this.onCropCancelled}
           />
@@ -281,7 +281,7 @@ MaterialDropZone.propTypes = {
   showPreviews: PropTypes.bool.isRequired,
   showButton: PropTypes.bool,
   maxSize: PropTypes.number.isRequired,
-  aspectRatio: PropTypes.string.isRequired,
+  imageAspectRatio: PropTypes.string.isRequired,
   filesLimit: PropTypes.number.isRequired,
   classes: PropTypes.object.isRequired,
 };
