@@ -99,8 +99,8 @@ class CropModal extends React.Component {
       const croppedImageFile = new File([croppedImageBlob], croppedImageBlob.name, { type: imageFile.type });
       croppedImageFile.preview = previewURL;
 
-      console.log(imageFile);
-      console.log(croppedImageFile);
+      // console.log(imageFile);
+      // console.log(croppedImageFile);
 
       onCropCompleted(croppedImageFile);
       this.setState({ isOpen: false });

@@ -58,14 +58,6 @@ class MaterialDropZone extends React.Component {
     this.addToState = props.addToState;
   }
 
-  /* TODOs
-    - go accross repo and determine the actual aspect ratios + extraInstructions that we want from different forms
-       - welcome images -> extra instructions say to center the important stuff
-    - remove console logs
-    - for the Modal, make sure that every way to exit it has the appropriate callback
-  */
-
-
   onDrop(filesVal) {
     const { files } = this.state;
     const { filesLimit, name } = this.props;
@@ -80,6 +72,7 @@ class MaterialDropZone extends React.Component {
     } else {
       const newImages = [];
       const newFiles = [];
+
       for (let i = 0; i < filesVal.length; i++) {
         if (isImage(filesVal[i])) {
           newImages.push(filesVal[i]);
@@ -123,6 +116,7 @@ class MaterialDropZone extends React.Component {
 
   onCropCancelled() {
     const { uncroppedImageQueue } = this.state;
+
     window.URL.revokeObjectURL(uncroppedImageQueue[0].preview);
     const newUncroppedImageQueue = uncroppedImageQueue.slice(1);
     const newIsCropping = newUncroppedImageQueue.length > 0;
@@ -141,7 +135,6 @@ class MaterialDropZone extends React.Component {
       errorMessage: 'File too big, max size is 3MB',
     });
   }
-
 
   setStateAsync(state) {
     return new Promise((resolve) => {
@@ -186,9 +179,9 @@ class MaterialDropZone extends React.Component {
       errorMessage
     } = this.state;
 
-    console.log('Aspect ratio: ', imageAspectRatio);
-    console.log('In cropping state?: ', isCropping);
-    console.log('Remaining images: ', uncroppedImageQueue);
+    // console.log('Aspect ratio: ', imageAspectRatio);
+    // console.log('In cropping state?: ', isCropping);
+    // console.log('Remaining images: ', uncroppedImageQueue);
 
     const deleteBtn = (file, index) => (
       <div className="middle">
