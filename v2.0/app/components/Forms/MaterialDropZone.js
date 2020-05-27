@@ -179,10 +179,6 @@ class MaterialDropZone extends React.Component {
       errorMessage
     } = this.state;
 
-    // console.log('Aspect ratio: ', imageAspectRatio);
-    // console.log('In cropping state?: ', isCropping);
-    // console.log('Remaining images: ', uncroppedImageQueue);
-
     const deleteBtn = (file, index) => (
       <div className="middle">
         <IconButton onClick={() => this.handleRemove(file, index)}>
