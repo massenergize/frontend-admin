@@ -520,12 +520,18 @@ class MassEnergizeForm extends Component {
               <p><u>Image Upload Instructions:</u></p>
               <ul style={{ listStyleType: 'circle', paddingLeft: '30px', fontSize: 14 }}>
                 <li>Drag an image to the box or click on it to browse your computer. Only image files will be accepted.</li>
-                <li>The final upload size must not exceed 5MB. If it does, an error will appear.</li>
+                <li>The final upload size must not exceed 5MB.</li>
                 <li>
-                {field.imageAspectRatio ? (
-                      <span> The aspect ratio required for this image destination is <i>{field.imageAspectRatio}</i>. After selecting an image, a cropping tool will open. </span>
-                ) : (<span> After an image is chosen, a cropping tool will open to allow you to change the     image zoom and dimensions. </span>)
-                }
+                  {field.imageAspectRatio ? (
+                    <span>
+                      The aspect ratio required for this image destination is <i>{field.imageAspectRatio}</i>. After selecting an image, a cropping tool will open.
+                    </span>
+                  ) : (
+                    <span>
+                        After an image is chosen, a cropping tool will open to allow you to customize the image zoom and dimensions.
+                    </span>
+                  )
+                  }
                 </li>
                 {field.extraInstructions
                   && field.extraInstructions.map(instruction => <li>{instruction}</li>)
