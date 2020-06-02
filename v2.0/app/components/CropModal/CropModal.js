@@ -12,10 +12,16 @@ class CropModal extends React.Component {
 
     const { aspectRatio, imageFile } = this.props;
 
+    let newAR = aspectRatio;
+    if (newAR) {
+      newAR = getAspectRatioFloat(newAR);
+      newAR = !isNaN(newAR) ? newAR : null;
+    }
+
     this.state = {
       isOpen: true,
-      crop: aspectRatio ? {
-        aspect: getAspectRatioFloat(aspectRatio),
+      crop: newAR ? {
+        aspect: newAR,
         unit: '%',
         width: 100
       } : {
