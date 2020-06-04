@@ -10,6 +10,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Snackbar from '@material-ui/core/Snackbar';
 import Ionicon from 'react-ionicons';
 import 'dan-styles/vendors/react-dropzone/react-dropzone.css';
+import CropModal from '../CropModal/CropModal';
 import isImage from './helpers/helpers.js';
 
 const styles = theme => ({
@@ -46,29 +47,86 @@ class MaterialDropZone extends React.Component {
     this.state = {
       openSnackBar: false,
       errorMessage: '',
+      isCropping: false,
+      uncroppedImageQueue: [],
       files: this.props.files, // eslint-disable-line
       acceptedFiles: this.props.acceptedFiles, // eslint-disable-line
     };
     this.onDrop = this.onDrop.bind(this);
+    this.onCropCompleted = this.onCropCompleted.bind(this);
+    this.onCropCancelled = this.onCropCancelled.bind(this);
     this.addToState = props.addToState;
   }
-
 
   onDrop(filesVal) {
     const { files } = this.state;
     const { filesLimit, name } = this.props;
-    let oldFiles = files;
+
     const filesLimitVal = filesLimit || '3';
-    oldFiles = oldFiles.concat(filesVal);
-    if (oldFiles.length > filesLimit) {
+
+    if (files.length + filesVal.length > filesLimitVal) {
       this.setState({
         openSnackBar: true,
         errorMessage: 'Cannot upload more than ' + filesLimitVal + ' items.',
       });
     } else {
-      this.setState({ files: oldFiles });
+      const newImages = [];
+      const newFiles = [];
+
+      for (let i = 0; i < filesVal.length; i++) {
+        if (isImage(filesVal[i])) {
+          newImages.push(filesVal[i]);
+        } else {
+          newFiles.push(filesVal[i]);
+        }
+      }
+
+      const initIsCropping = newImages.length > 0;
+
+      let oldFiles = files;
+      oldFiles = oldFiles.concat(newFiles);
+
+      this.setState({
+        uncroppedImageQueue: newImages,
+        isCropping: initIsCropping,
+        files: oldFiles
+      });
       this.addToState(name || 'image', oldFiles);
     }
+  }
+
+  onCropCompleted(croppedImageFile) {
+    const { files, uncroppedImageQueue } = this.state;
+    const { name } = this.props;
+
+    window.URL.revokeObjectURL(uncroppedImageQueue[0].preview);
+    const newUncroppedImageQueue = uncroppedImageQueue.slice(1);
+    const newIsCropping = newUncroppedImageQueue.length > 0;
+
+    let oldFiles = files;
+    oldFiles = oldFiles.concat([croppedImageFile]);
+
+    this.setState({
+      files: oldFiles,
+      isCropping: newIsCropping,
+      uncroppedImageQueue: newUncroppedImageQueue
+    });
+    this.addToState(name || 'image', oldFiles);
+  }
+
+  onCropCancelled() {
+    const { uncroppedImageQueue } = this.state;
+
+    window.URL.revokeObjectURL(uncroppedImageQueue[0].preview);
+    const newUncroppedImageQueue = uncroppedImageQueue.slice(1);
+    const newIsCropping = newUncroppedImageQueue.length > 0;
+
+    this.setState({
+      isCropping: newIsCropping,
+      uncroppedImageQueue: newUncroppedImageQueue,
+      openSnackBar: true,
+      errorMessage: 'You must click "Done" on the cropper to upload your image. Please try again.'
+    });
   }
 
   onDropRejected() {
@@ -77,7 +135,6 @@ class MaterialDropZone extends React.Component {
       errorMessage: 'File too big, max size is 3MB',
     });
   }
-
 
   setStateAsync(state) {
     return new Promise((resolve) => {
@@ -105,6 +162,7 @@ class MaterialDropZone extends React.Component {
       classes,
       showPreviews,
       maxSize,
+      imageAspectRatio,
       text,
       showButton,
       filesLimit,
@@ -115,10 +173,12 @@ class MaterialDropZone extends React.Component {
     const {
       acceptedFiles,
       files,
+      isCropping,
+      uncroppedImageQueue,
       openSnackBar,
       errorMessage
     } = this.state;
-    const fileSizeLimit = maxSize || 3000000;
+
     const deleteBtn = (file, index) => (
       <div className="middle">
         <IconButton onClick={() => this.handleRemove(file, index)}>
@@ -147,9 +207,20 @@ class MaterialDropZone extends React.Component {
         </div>
       );
     });
+
     let dropzoneRef;
     return (
       <div>
+
+        {isCropping && (
+          <CropModal
+            imageFile={uncroppedImageQueue[0]}
+            aspectRatio={imageAspectRatio}
+            onCropCompleted={this.onCropCompleted}
+            onCropCancelled={this.onCropCancelled}
+          />
+        )}
+
         <Dropzone
           accept={acceptedFiles.join(',')}
           onDrop={this.onDrop}
@@ -157,7 +228,7 @@ class MaterialDropZone extends React.Component {
           className={classNames(classes.dropItem, 'dropZone')}
           acceptClassName="stripes"
           rejectClassName="rejectStripes"
-          maxSize={fileSizeLimit}
+          maxSize={maxSize || 3000000}
           ref={(node) => { dropzoneRef = node; }}
           {...rest}
         >
@@ -201,16 +272,20 @@ class MaterialDropZone extends React.Component {
 MaterialDropZone.propTypes = {
   files: PropTypes.array.isRequired,
   text: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  addToState: PropTypes.func.isRequired,
   acceptedFiles: PropTypes.array,
   showPreviews: PropTypes.bool.isRequired,
   showButton: PropTypes.bool,
   maxSize: PropTypes.number.isRequired,
+  imageAspectRatio: PropTypes.string,
   filesLimit: PropTypes.number.isRequired,
   classes: PropTypes.object.isRequired,
 };
 
 MaterialDropZone.defaultProps = {
   acceptedFiles: [],
+  imageAspectRatio: null,
   showButton: false,
 };
 

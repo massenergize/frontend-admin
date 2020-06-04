@@ -511,12 +511,34 @@ class MassEnergizeForm extends Component {
             {field.previewLink
             && (
               <div>
-                <h5>Uploaded Image</h5>
-                <img style={{ maxWidth: '250px', maxHeight: '250px' }} src={field.previewLink} alt={field.label} />
+                <h6>Current Image:</h6>
+                <img style={{ maxWidth: '400px', maxHeight: '300px' }} src={field.previewLink} alt={field.label} />
+                <br />
+                <br />
               </div>
             )}
-            <br />
-            <Modal title="File Upload Instructions" text="If this file is meant to be a logo, use the tool here: https://www4.lunapic.com/editor/?action=resize and resize it to height:57.88px, width:150px.   Also, if this is an image, please don't upload a file > 5MB or a png file" />
+            <div className="imageUploadInstructions">
+              <h6>Image Upload Instructions:</h6>
+              <ul style={{ listStyleType: 'circle', paddingLeft: '30px', fontSize: 14 }}>
+                <li>Drag an image to the box or click on it to browse your computer. Only image files will be accepted.</li>
+                <li>The final upload size must not exceed 5MB.</li>
+                <li>
+                  {field.imageAspectRatio ? (
+                    <span>
+                      The aspect ratio required for this image destination is <i>{field.imageAspectRatio}</i>. After selecting an image, a cropping tool will open.
+                    </span>
+                  ) : (
+                    <span>
+                        After an image is chosen, a cropping tool will open to allow you to customize the image zoom and dimensions.
+                    </span>
+                  )
+                  }
+                </li>
+                {field.extraInstructions
+                  && field.extraInstructions.map(instruction => <li>{instruction}</li>)
+                }
+              </ul>
+            </div>
             <br />
             <Fragment>
               <MaterialDropZone
@@ -524,6 +546,7 @@ class MassEnergizeForm extends Component {
                 files={this.getValue(field.name, [])}
                 showPreviews
                 maxSize={5000000}
+                imageAspectRatio={field.imageAspectRatio ? field.imageAspectRatio : null}
                 name={field.name}
                 filesLimit={field.filesLimit}
                 text={field.label}
