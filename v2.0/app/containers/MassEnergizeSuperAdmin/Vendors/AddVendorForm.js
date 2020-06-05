@@ -50,7 +50,7 @@ class CreateNewVendorForm extends Component {
     const formJson = await this.createFormJson();
     if (tagCollectionsResponse && tagCollectionsResponse.data) {
       const section = {
-        label: 'Please select tag(s) that apply to this vendor',
+        label: 'Please select tag(s) that apply to this service provider',
         fieldType: 'Section',
         children: []
       };

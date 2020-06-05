@@ -115,7 +115,7 @@ class CreateNewTestimonialForm extends Component {
             {
               name: 'title',
               label: 'Title of Testimonial',
-              placeholder: 'Omg! HEat pumps are the best!',
+              placeholder: 'A catchy title so people will read it',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
@@ -137,7 +137,7 @@ class CreateNewTestimonialForm extends Component {
             },
             {
               name: 'is_approved',
-              label: 'Should this go live ?',
+              label: 'Is this testimonial approved ?',
               fieldType: 'Radio',
               isRequired: false,
               defaultValue: 'true',
@@ -216,13 +216,24 @@ class CreateNewTestimonialForm extends Component {
             },
             {
               name: 'user_email',
-              label: 'Please provide email of the user (email must be registered with us)',
+              label: 'Please provide email of the user',
               placeholder: 'eg. johny.appleseed@massenergize.org',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
               defaultValue: '',
               dbName: 'user_email',
+              readOnly: false
+            },
+            {
+              name: 'preferredName',
+              label: 'Preferred user name to display',
+              placeholder: 'User name',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: '',
+              dbName: 'preferred_name',
               readOnly: false
             },
           ]
