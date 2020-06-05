@@ -154,7 +154,8 @@ class HomePageEditForm extends Component {
               selectMany: false,
               isRequired: false,
               defaultValue: [],
-              filesLimit: 1
+              filesLimit: 1,
+              imageAspectRatio: '4:3'
             },
             {
               name: 'image_2',
@@ -166,7 +167,8 @@ class HomePageEditForm extends Component {
               selectMany: false,
               isRequired: false,
               defaultValue: [],
-              filesLimit: 1
+              filesLimit: 1,
+              imageAspectRatio: '4:3'
             },
             {
               name: 'image_3',
@@ -178,7 +180,8 @@ class HomePageEditForm extends Component {
               selectMany: false,
               isRequired: false,
               defaultValue: [],
-              filesLimit: 1
+              filesLimit: 1,
+              imageAspectRatio: '4:3'
             },
           ]
         },
