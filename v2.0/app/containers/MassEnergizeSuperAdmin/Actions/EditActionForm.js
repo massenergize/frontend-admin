@@ -74,7 +74,7 @@ class CreateNewActionForm extends Component {
     const formJson = await this.createFormJson();
     if (tagCollectionsResponse && tagCollectionsResponse.data) {
       const section = {
-        label: 'Please select tag(s) that apply to this event',
+        label: 'Please select tag(s) that apply to this action',
         fieldType: 'Section',
         children: []
       };

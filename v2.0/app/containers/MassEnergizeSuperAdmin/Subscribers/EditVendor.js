@@ -52,7 +52,7 @@ class CreateNewVendorForm extends Component {
     const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
     if (tagCollectionsResponse && tagCollectionsResponse.data) {
       const section = {
-        label: 'Please select tag(s) that apply to this event',
+        label: 'Please select tag(s) that apply to this service provider',
         fieldType: 'Section',
         children: []
       };

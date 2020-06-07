@@ -144,7 +144,8 @@ class HomePageEditForm extends Component {
               selectMany: false,
               isRequired: false,
               defaultValue: [],
-              filesLimit: 1
+              filesLimit: 1,
+              imageAspectRatio: '4:3'
             },
             {
               name: 'image_2',
@@ -156,7 +157,8 @@ class HomePageEditForm extends Component {
               selectMany: false,
               isRequired: false,
               defaultValue: [],
-              filesLimit: 1
+              filesLimit: 1,
+              imageAspectRatio: '4:3'
             },
             {
               name: 'image_3',
@@ -168,7 +170,8 @@ class HomePageEditForm extends Component {
               selectMany: false,
               isRequired: false,
               defaultValue: [],
-              filesLimit: 1
+              filesLimit: 1,
+              imageAspectRatio: '4:3'
             },
           ]
         },
@@ -433,7 +436,7 @@ class HomePageEditForm extends Component {
                         fieldType: 'TextField',
                         contentType: 'text',
                         isRequired: false,
-                        defaultValue:  `${iconBox2 && iconBox2.link}`,
+                        defaultValue: `${iconBox2 && iconBox2.link}`,
                         dbName: 'icon_box_2_link',
                         readOnly: false
                       },
@@ -567,7 +570,7 @@ class HomePageEditForm extends Component {
   render() {
     const { classes } = this.props;
     const { formJson, noDataFound } = this.state;
-    console.log(this.state)
+      console.log(this.state);
     if (!noDataFound) return (<div>Sorry no Home Page data available for this community ...</div>);
     if (!formJson) return (<div>Hold tight! Retrieving your data ...</div>);
     return (

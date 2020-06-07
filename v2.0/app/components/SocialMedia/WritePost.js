@@ -15,16 +15,8 @@ import Paper from '@material-ui/core/Paper';
 import Select from '@material-ui/core/Select';
 import Tooltip from '@material-ui/core/Tooltip';
 import dummy from 'dan-api/dummy/dummyContents';
+import isImage from '../Forms/helpers/helpers.js';
 import styles from './jss/writePost-jss';
-
-function isImage(file) {
-  const fileName = file.name || file.path;
-  const suffix = fileName.substr(fileName.indexOf('.') + 1).toLowerCase();
-  if (suffix === 'jpg' || suffix === 'jpeg' || suffix === 'bmp' || suffix === 'png') {
-    return true;
-  }
-  return false;
-}
 
 class WritePost extends React.Component {
   constructor(props) {

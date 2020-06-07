@@ -160,6 +160,7 @@
     "react-event-listener": "^0.6.1",
     "react-google-maps": "^9.4.5",
     "react-helmet": "6.0.0-beta",
+    "react-image-crop": "^8.6.2",
     "react-intl": "2.8.0",
     "react-ionicons": "^2.1.6",
     "react-loading-bar": "0.0.7",
