@@ -1,69 +1,69 @@
-import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import InputLabel from '@material-ui/core/InputLabel';
-import Input from '@material-ui/core/Input';
-import Select from '@material-ui/core/Select';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
-import { DateTimePicker, MuiPickersUtilsProvider } from 'material-ui-pickers';
-import MomentUtils from '@date-io/moment';
-import FormControl from '@material-ui/core/FormControl';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormLabel from '@material-ui/core/FormLabel';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import Chip from '@material-ui/core/Chip';
-import { Link } from 'react-router-dom';
-import { MaterialDropZone } from 'dan-components';
-import Snackbar from '@material-ui/core/Snackbar';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { Editor } from 'react-draft-wysiwyg';
-import { MenuItem } from '@material-ui/core';
-import TextField from '@material-ui/core/TextField';
-import moment from 'moment';
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import {
-  EditorState
-} from 'draft-js';
+import React, { Component, Fragment } from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import InputLabel from "@material-ui/core/InputLabel";
+import Input from "@material-ui/core/Input";
+import Select from "@material-ui/core/Select";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import Paper from "@material-ui/core/Paper";
+import Grid from "@material-ui/core/Grid";
+import { DateTimePicker, MuiPickersUtilsProvider } from "material-ui-pickers";
+import MomentUtils from "@date-io/moment";
+import FormControl from "@material-ui/core/FormControl";
+import Checkbox from "@material-ui/core/Checkbox";
+import FormLabel from "@material-ui/core/FormLabel";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import Chip from "@material-ui/core/Chip";
+import { Link } from "react-router-dom";
+import { MaterialDropZone } from "dan-components";
+import Snackbar from "@material-ui/core/Snackbar";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { Editor } from "react-draft-wysiwyg";
+import { Editor as TinyEditor } from "@tinymce/tinymce-react";
+import { MenuItem } from "@material-ui/core";
+import TextField from "@material-ui/core/TextField";
+import moment from "moment";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import { EditorState } from "draft-js";
 
-import { stateToHTML } from 'draft-js-export-html';
-import { stateFromHTML } from 'draft-js-import-html';
+import { stateToHTML } from "draft-js-export-html";
+import { stateFromHTML } from "draft-js-import-html";
 
-import { Map } from 'immutable';
+import { Map } from "immutable";
 
-import { apiCall, apiCallWithMedia } from '../../../utils/messenger';
-import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
-import FieldTypes from './fieldTypes';
-import Modal from './Modal';
+import { apiCall, apiCallWithMedia } from "../../../utils/messenger";
+import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
+import FieldTypes from "./fieldTypes";
+import Modal from "./Modal";
 
-const styles = theme => ({
+const TINY_MCE_API_KEY ="3fpefbsmtkh71yhtjyykjwj5ezs3a5cac5ei018wvnlg2g0r";
+
+const styles = (theme) => ({
   root: {
     flexGrow: 1,
-    padding: 30
+    padding: 30,
   },
   field: {
-    width: '100%',
-    marginBottom: 20
+    width: "100%",
+    marginBottom: 20,
   },
   fieldBasic: {
-    width: '100%',
+    width: "100%",
     marginBottom: 20,
-    marginTop: 10
+    marginTop: 10,
   },
   inlineWrap: {
-    display: 'flex',
-    flexDirection: 'row'
+    display: "flex",
+    flexDirection: "row",
   },
   buttonInit: {
     margin: theme.spacing.unit * 4,
-    textAlign: 'center'
+    textAlign: "center",
   },
 });
-
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -76,34 +76,32 @@ const MenuProps = {
   },
 };
 
-
 const htmlLinkOptions = {
   entityStyleFn: (entity) => {
-    const entityType = entity.get('type').toLowerCase();
-    if (entityType === 'link') {
+    const entityType = entity.get("type").toLowerCase();
+    if (entityType === "link") {
       const data = entity.getData();
       return {
-        element: 'a',
+        element: "a",
         attributes: {
           href: data.url,
-          target: '_blank'
+          target: "_blank",
         },
         style: {
           // Put styles here...
         },
       };
     }
-  }
+  },
 };
 
 const customRenderMap = Map({
   unstyled: {
-    element: 'div',
+    element: "div",
     // will be used in convertFromHTMLtoContentBlocks
-    aliasedElements: ['p'],
+    aliasedElements: ["p"],
   },
 });
-
 
 class MassEnergizeForm extends Component {
   constructor(props) {
@@ -113,11 +111,11 @@ class MassEnergizeForm extends Component {
       startCircularSpinner: false,
       successMsg: null,
       error: null,
-      formJson: null
+      formJson: null,
     };
     this.updateForm = this.updateForm.bind(this);
+    this.handleEditorChange = this.handleEditorChange.bind(this);
   }
-
 
   async componentDidMount() {
     const { formJson } = this.props;
@@ -132,63 +130,72 @@ class MassEnergizeForm extends Component {
   }
 
   initializeHtmlField = (content) => {
-    if (!content || content === '<p></p>\n') {
+    if (!content || content === "<p></p>\n") {
       return EditorState.createEmpty();
     }
     return EditorState.createWithContent(stateFromHTML(content));
-  }
-
+  };
 
   /**
    * Given the field, it renders the actual component
    */
 
-    initialFormData = (fields) => {
-      const formData = {};
-      fields.forEach(field => {
-        switch (field.fieldType) {
-          case FieldTypes.Checkbox:
-            formData[field.name] = field.defaultValue || [];
-            break;
-          case FieldTypes.File:
-            formData[field.name] = [];
-            break;
-          case FieldTypes.DateTime:
-            formData[field.name] = field.defaultValue ? moment(field.defaultValue) : moment.now();
-            break;
-          case FieldTypes.HTMLField:
-            console.log(field.defaultValue);
-            formData[field.name] = this.initializeHtmlField(field.defaultValue);
-            break;
-          case FieldTypes.Section: {
-            const cFormData = this.initialFormData(field.children);
-            Object.keys(cFormData).forEach(k => { formData[k] = cFormData[k]; });
-            break;
-          }
-          default:
-            formData[field.name] = field.defaultValue || null;
-            break;
+  initialFormData = (fields) => {
+    const formData = {};
+    fields.forEach((field) => {
+      switch (field.fieldType) {
+        case FieldTypes.Checkbox:
+          formData[field.name] = field.defaultValue || [];
+          break;
+        case FieldTypes.File:
+          formData[field.name] = [];
+          break;
+        case FieldTypes.DateTime:
+          formData[field.name] = field.defaultValue
+            ? moment(field.defaultValue)
+            : moment.now();
+          break;
+        case FieldTypes.HTMLField:
+          formData[field.name] = '';
+          // formData[field.name] = this.initializeHtmlField(field.defaultValue);
+          break;
+        case FieldTypes.Section: {
+          const cFormData = this.initialFormData(field.children);
+          Object.keys(cFormData).forEach((k) => {
+            formData[k] = cFormData[k];
+          });
+          break;
         }
-        if (field.child) {
-          const cFormData = this.initialFormData(field.child.fields);
-          Object.keys(cFormData).forEach(k => { formData[k] = cFormData[k]; });
-        }
+        default:
+          formData[field.name] = field.defaultValue || null;
+          break;
       }
-      );
-      return formData;
-    }
-
+      if (field.child) {
+        const cFormData = this.initialFormData(field.child.fields);
+        Object.keys(cFormData).forEach((k) => {
+          formData[k] = cFormData[k];
+        });
+      }
+    });
+    return formData;
+  };
 
   /**
    * ============ HELPER FUNCTIONS FOR INPUTS
    */
+  handleEditorChange = async(content, editor,name)=>{
+    const { formData } = this.state;
+    await this.setStateAsync({
+      formData: { ...formData, [name]: content },
+    })
+    
+  }
   onEditorStateChange = async (name, editorState) => {
     const { formData } = this.state;
     await this.setStateAsync({
-      formData: { ...formData, [name]: editorState }
+      formData: { ...formData, [name]: editorState },
     });
   };
-
 
   /**
    * Handle multi select
@@ -203,10 +210,9 @@ class MassEnergizeForm extends Component {
       }
     }
     this.setState({
-      formData: { [name]: value }
+      formData: { [name]: value },
     });
   };
-
 
   /**
    * Handles general input
@@ -217,10 +223,9 @@ class MassEnergizeForm extends Component {
     const { name, value } = target;
     const { formData } = this.state;
     this.setState({
-      formData: { ...formData, [name]: value }
+      formData: { ...formData, [name]: value },
     });
   };
-
 
   /**
    * Handle checkboxes when they are clicked
@@ -248,10 +253,9 @@ class MassEnergizeForm extends Component {
     }
 
     await this.setStateAsync({
-      formData: { ...formData, [name]: theList }
+      formData: { ...formData, [name]: theList },
     });
   };
-
 
   /**
    * Returns what value was entered in the form for this fieldName
@@ -265,10 +269,10 @@ class MassEnergizeForm extends Component {
       val = defaultValue;
     }
     return val;
-  }
+  };
 
   handleCloseStyle = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     this.setState({ successMsg: null, error: null });
@@ -277,7 +281,7 @@ class MassEnergizeForm extends Component {
   getDisplayName = (fieldName, id, data) => {
     const { formData } = this.state;
     if (id) {
-      const [result] = data.filter(d => d.id === id);
+      const [result] = data.filter((d) => d.id === id);
       if (result) {
         return result.displayName;
       }
@@ -285,38 +289,46 @@ class MassEnergizeForm extends Component {
 
     const val = formData[fieldName];
     if (!val) {
-      return 'Please select an option';
+      return "Please select an option";
     }
-    const searchRes = data.filter(d => d.id === val);
+    const searchRes = data.filter((d) => d.id === val);
     const [first] = searchRes;
 
     if (first) {
       return first.displayName;
     }
-    return 'Please select an option';
-  }
-
+    return "Please select an option";
+  };
 
   /**
    * This is a recursive function traversing all the fields and their children
    * and extracting their values from the form
    */
+
   cleanItUp = (formData, fields) => {
     const cleanedValues = {};
     let hasMediaFiles = false;
-    fields.forEach(field => {
+    fields.forEach((field) => {
       const fieldValueInForm = formData[field.name];
       if (fieldValueInForm) {
         switch (field.fieldType) {
           case FieldTypes.HTMLField:
-            cleanedValues[field.dbName] = stateToHTML(fieldValueInForm.getCurrentContent(), htmlLinkOptions);
+            // cleanedValues[field.dbName] = stateToHTML(
+            //   fieldValueInForm.getCurrentContent(),
+            //   htmlLinkOptions
+            // );
+            cleanedValues[field.dbName] = fieldValueInForm;
             break;
           case FieldTypes.DateTime:
-            cleanedValues[field.dbName] = (moment.utc(fieldValueInForm) || moment.now()).format();
+            cleanedValues[field.dbName] = (
+              moment.utc(fieldValueInForm) || moment.now()
+            ).format();
             break;
           case FieldTypes.Checkbox:
             if (cleanedValues[field.dbName]) {
-              cleanedValues[field.dbName] = cleanedValues[field.dbName].concat(fieldValueInForm);
+              cleanedValues[field.dbName] = cleanedValues[field.dbName].concat(
+                fieldValueInForm
+              );
             } else {
               cleanedValues[field.dbName] = fieldValueInForm;
             }
@@ -336,28 +348,33 @@ class MassEnergizeForm extends Component {
       }
 
       if (field.child) {
-        const [childCleanValues, childHasMediaFiles] = this.cleanItUp(formData, field.child.fields);
+        const [childCleanValues, childHasMediaFiles] = this.cleanItUp(
+          formData,
+          field.child.fields
+        );
         if (childHasMediaFiles) {
           hasMediaFiles = childHasMediaFiles || hasMediaFiles;
         }
-        Object.keys(childCleanValues).forEach(k => {
+        Object.keys(childCleanValues).forEach((k) => {
           cleanedValues[k] = childCleanValues[k];
         });
       } else if (field.fieldType === FieldTypes.Section && field.children) {
-        const [childCleanValues, childHasMediaFiles] = this.cleanItUp(formData, field.children);
+        const [childCleanValues, childHasMediaFiles] = this.cleanItUp(
+          formData,
+          field.children
+        );
         if (childHasMediaFiles) {
           hasMediaFiles = childHasMediaFiles || hasMediaFiles;
         }
 
-        Object.keys(childCleanValues).forEach(k => {
+        Object.keys(childCleanValues).forEach((k) => {
           cleanedValues[k] = childCleanValues[k];
         });
       }
     });
 
     return [cleanedValues, hasMediaFiles];
-  }
-
+  };
 
   /**
    * This handles the form data submission
@@ -370,7 +387,10 @@ class MassEnergizeForm extends Component {
 
     // let's clean up the data
     const { formData, formJson } = this.state;
-    const [cleanedValues, hasMediaFiles] = this.cleanItUp(formData, formJson.fields);
+    const [cleanedValues, hasMediaFiles] = this.cleanItUp(
+      formData,
+      formJson.fields
+    );
 
     // let's make an api call to send the data
     let response = null;
@@ -385,7 +405,8 @@ class MassEnergizeForm extends Component {
       // const initialFormData = this.initialFormData(formJson.fields);
       // await this.setStateAsync({ formJson, formData });
       await this.setStateAsync({
-        successMsg: `Successfully Created/Updated the Resource with Id: ${response.data && response.data.id}.`,
+        successMsg: `Successfully Created/Updated the Resource with Id: ${response.data &&
+          response.data.id}.`,
         error: null,
         startCircularSpinner: false,
         // formData: initialFormData
@@ -399,10 +420,10 @@ class MassEnergizeForm extends Component {
       await this.setStateAsync({
         error: response.error,
         successMsg: null,
-        startCircularSpinner: false
+        startCircularSpinner: false,
       });
     }
-  }
+  };
 
   isThisSelectedOrNot = (fieldName, value) => {
     const { formData } = this.state;
@@ -410,25 +431,24 @@ class MassEnergizeForm extends Component {
     if (!fieldValues) return false;
     // if (!Array.isArray(fieldValues)) return false;
     return fieldValues.indexOf(value) > -1;
-  }
+  };
 
   async updateForm(fieldName, value) {
     const { formData } = this.state;
     await this.setStateAsync({
       formData: {
         ...formData,
-        [fieldName]: value
-      }
-    }
-    );
+        [fieldName]: value,
+      },
+    });
   }
 
   renderModalText = (field) => {
     if (field && field.modalText) {
-      return (<Modal title={field.modalTitle} text={field.modalText} />);
+      return <Modal title={field.modalTitle} text={field.modalText} />;
     }
     return <div />;
-  }
+  };
 
   /**
    * Given the field, it renders the actual component
@@ -448,28 +468,37 @@ class MassEnergizeForm extends Component {
                   name={field.name}
                   value={this.getValue(field.name)}
                   input={<Input id="select-multiple-chip" />}
-                  renderValue={selected => (
+                  renderValue={(selected) => (
                     <div className={classes.chips}>
-                      {selected.map(id => (
-                        <Chip key={id} label={this.getDisplayName(field.name, id, field.data)} className={classes.chip} />
+                      {selected.map((id) => (
+                        <Chip
+                          key={id}
+                          label={this.getDisplayName(
+                            field.name,
+                            id,
+                            field.data
+                          )}
+                          className={classes.chip}
+                        />
                       ))}
                     </div>
-                  )
-                  }
+                  )}
                   MenuProps={MenuProps}
                 >
-                  {field.data.map(t => (
+                  {field.data.map((t) => (
                     <MenuItem key={t.id}>
                       <FormControlLabel
                         key={t.id}
-                        control={(
+                        control={
                           <Checkbox
                             checked={this.isThisSelectedOrNot(field.name, t.id)}
-                            onChange={(event) => this.handleCheckBoxSelect(event, field.selectMany)}
+                            onChange={(event) =>
+                              this.handleCheckBoxSelect(event, field.selectMany)
+                            }
                             value={t.id}
                             name={field.name}
                           />
-                        )}
+                        }
                         label={t.displayName}
                       />
                     </MenuItem>
@@ -488,65 +517,98 @@ class MassEnergizeForm extends Component {
               <Select
                 native
                 name={field.name}
-                onChange={async (newValue) => { await this.updateForm(field.name, newValue.target.value); }}
+                onChange={async (newValue) => {
+                  await this.updateForm(field.name, newValue.target.value);
+                }}
                 inputProps={{
-                  id: 'age-native-simple',
+                  id: "age-native-simple",
                 }}
               >
-                <option value={this.getValue(field.name)}>{this.getDisplayName(field.name, this.getValue(field.name), field.data)}</option>
-                { field.data
-                  && field.data.map(c => (
-                    <option value={c.id} key={c.id}>{c.displayName}</option>
-                  ))
-                }
+                <option value={this.getValue(field.name)}>
+                  {this.getDisplayName(
+                    field.name,
+                    this.getValue(field.name),
+                    field.data
+                  )}
+                </option>
+                {field.data &&
+                  field.data.map((c) => (
+                    <option value={c.id} key={c.id}>
+                      {c.displayName}
+                    </option>
+                  ))}
               </Select>
-              {field.child && (this.getValue(field.name) === field.child.valueToCheck) && this.renderFields(field.child.fields)}
-
+              {field.child &&
+                this.getValue(field.name) === field.child.valueToCheck &&
+                this.renderFields(field.child.fields)}
             </FormControl>
           </div>
         );
       case FieldTypes.File:
         return (
           <div key={field.name}>
-            {field.previewLink
-            && (
+            {field.previewLink && (
               <div>
                 <h6>Current Image:</h6>
-                <img style={{ maxWidth: '400px', maxHeight: '300px' }} src={field.previewLink} alt={field.label} />
+                <img
+                  style={{ maxWidth: "400px", maxHeight: "300px" }}
+                  src={field.previewLink}
+                  alt={field.label}
+                />
                 <br />
                 <br />
               </div>
             )}
             <div className="imageUploadInstructions">
               <h6>Image Upload Instructions:</h6>
-              <ul style={{ listStyleType: 'circle', paddingLeft: '30px', fontSize: 14 }}>
-                <li>Drag an image to the box or click on it to browse your computer. Only image files will be accepted.</li>
+              <ul
+                style={{
+                  listStyleType: "circle",
+                  paddingLeft: "30px",
+                  fontSize: 14,
+                }}
+              >
+                <li>
+                  Drag an image to the box or click on it to browse your
+                  computer. Only image files will be accepted.
+                </li>
                 <li>The final upload size must not exceed 5MB.</li>
                 <li>
                   {field.imageAspectRatio ? (
                     <span>
-                      The aspect ratio required for this image destination is <i>{field.imageAspectRatio}</i>. After selecting an image, a cropping tool will open.
+                      The aspect ratio required for this image destination is{" "}
+                      <i>{field.imageAspectRatio}</i>. After selecting an image,
+                      a cropping tool will open.
                     </span>
                   ) : (
                     <span>
-                        After an image is chosen, a cropping tool will open to allow you to customize the image zoom and dimensions.
+                      After an image is chosen, a cropping tool will open to
+                      allow you to customize the image zoom and dimensions.
                     </span>
-                  )
-                  }
+                  )}
                 </li>
-                {field.extraInstructions
-                  && field.extraInstructions.map(instruction => <li>{instruction}</li>)
-                }
+                {field.extraInstructions &&
+                  field.extraInstructions.map((instruction) => (
+                    <li>{instruction}</li>
+                  ))}
               </ul>
             </div>
             <br />
             <Fragment>
               <MaterialDropZone
-                acceptedFiles={['image/jpeg', 'image/png', 'image/jpg', 'image/bmp', 'image/svg']}
+                acceptedFiles={[
+                  "image/jpeg",
+                  "image/png",
+                  "image/jpg",
+                  "image/bmp",
+                  "image/svg",
+                ]}
                 files={this.getValue(field.name, [])}
                 showPreviews
                 maxSize={5000000}
-                imageAspectRatio={field.imageAspectRatio ? field.imageAspectRatio : null}
+                imageAspectRatio={
+                  field.imageAspectRatio ? field.imageAspectRatio : null
+                }
                 name={field.name}
                 filesLimit={field.filesLimit}
                 text={field.label}
@@ -558,14 +620,48 @@ class MassEnergizeForm extends Component {
       case FieldTypes.HTMLField:
         return (
           <div key={field.name + field.label}>
-            <Grid item xs={12} style={{ borderColor: '#EAEAEA', borderStyle: 'solid', borderWidth: 'thin' }}>
+            <Grid
+              item
+              xs={12}
+              style={{
+                borderColor: "#EAEAEA",
+                borderStyle: "solid",
+                borderWidth: "thin",
+              }}
+            >
               <Typography>{field.label}</Typography>
-              <Editor
+              {/* <Editor
                 editorState={this.getValue(field.name, EditorState.createEmpty())}
                 editorClassName="editorClassName"
                 onEditorStateChange={(e) => this.onEditorStateChange(field.name, e)}
                 toolbarClassName="toolbarClassName"
                 wrapperClassName="wrapperClassName"
+              /> */}
+              <TinyEditor
+              value ={this.getValue(field.name)}
+                onEditorChange={(content, editor) => {
+                  this.handleEditorChange(
+                    content,
+                    editor,
+                    field.name
+                  );
+                }}
+                initialValue="<p>Start creating your content here...</p>"
+                init={{
+                  height: 500,
+                  menubar: false,
+
+                  plugins: [
+                    "advlist autolink lists link image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "insertdatetime media table paste code help wordcount",
+                  ],
+                  toolbar:
+                    "undo redo | formatselect | bold italic backcolor | \
+             alignleft aligncenter alignright alignjustify | \
+             link | image | bullist numlist outdent indent |  fontselect | fontsizeselect",
+                }}
+                apiKey={TINY_MCE_API_KEY}
               />
             </Grid>
             <br />
@@ -583,12 +679,20 @@ class MassEnergizeForm extends Component {
               value={this.getValue(field.name)}
               onChange={this.handleFormDataChange}
             >
-              {field.data.map(d => (
-                <FormControlLabel key={d.id} value={d.id} name={field.name} control={<Radio />} label={d.value} />
+              {field.data.map((d) => (
+                <FormControlLabel
+                  key={d.id}
+                  value={d.id}
+                  name={field.name}
+                  control={<Radio />}
+                  label={d.value}
+                />
               ))}
             </RadioGroup>
             <div>{field.description}</div>
-            {field.child && (this.getValue(field.name) === field.child.valueToCheck) && this.renderFields(field.child.fields)}
+            {field.child &&
+              this.getValue(field.name) === field.child.valueToCheck &&
+              this.renderFields(field.child.fields)}
           </div>
         );
       case FieldTypes.TextField:
@@ -612,13 +716,18 @@ class MassEnergizeForm extends Component {
               maxLength={field.maxLength}
             />
           </div>
-
         );
       case FieldTypes.Section:
         return (
           <div key={field.label}>
             <br />
-            <div style={{ border: '1px solid rgb(229, 238, 245)', padding: 15, borderRadius: 6 }}>
+            <div
+              style={{
+                border: "1px solid rgb(229, 238, 245)",
+                padding: 15,
+                borderRadius: 6,
+              }}
+            >
               <p>{field.label}</p>
               {this.renderFields(field.children)}
             </div>
@@ -629,12 +738,21 @@ class MassEnergizeForm extends Component {
       case FieldTypes.DateTime:
         return (
           <div key={field.label}>
-            <Typography variant="button" className={classes.divider}>{field.label}</Typography>
-            <div className={classes.picker} style={{ width: '100%' }}>
-              <MuiPickersUtilsProvider utils={MomentUtils} style={{ width: '100%' }}>
+            <Typography variant="button" className={classes.divider}>
+              {field.label}
+            </Typography>
+            <div className={classes.picker} style={{ width: "100%" }}>
+              <MuiPickersUtilsProvider
+                utils={MomentUtils}
+                style={{ width: "100%" }}
+              >
                 <DateTimePicker
                   value={this.getValue(field.name, moment.now())}
-                  onChange={(date) => this.handleFormDataChange({ target: { name: field.name, value: date } })}
+                  onChange={(date) =>
+                    this.handleFormDataChange({
+                      target: { name: field.name, value: date },
+                    })
+                  }
                   label={field.label}
                   format="MM/DD/YYYY, h:mm a"
                 />
@@ -648,30 +766,34 @@ class MassEnergizeForm extends Component {
       default:
         return <div key={field.name + field.label} />;
     }
-  }
+  };
 
   /**
    * Takes a list of fields and renders them one by depending on which type
    * by making use of a helper function
    */
-  renderFields = (fields) => fields.map(field => (
-    <div>
-      {this.renderModalText(field)}
-      {this.renderField(field)}
-    </div>
-  ))
-
+  renderFields = (fields) =>
+    fields.map((field) => (
+      <div>
+        {this.renderModalText(field)}
+        {this.renderField(field)}
+      </div>
+    ));
 
   render() {
     const { classes } = this.props;
-    const {
-      formJson, error, successMsg, startCircularSpinner
-    } = this.state;
+    const { formJson, error, successMsg, startCircularSpinner } = this.state;
 
     if (!formJson) return <div />;
     return (
       <div>
-        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+        <Grid
+          container
+          spacing={24}
+          alignItems="flex-start"
+          direction="row"
+          justify="center"
+        >
           <Grid item xs={12} md={12}>
             <Paper className={classes.root}>
               <Typography variant="h5" component="h3">
@@ -679,11 +801,10 @@ class MassEnergizeForm extends Component {
               </Typography>
 
               {/* Code to display error messages in case submission causes errors */}
-              {error
-              && (
+              {error && (
                 <div>
                   <Snackbar
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                     open={error != null}
                     autoHideDuration={6000}
                     onClose={this.handleCloseStyle}
@@ -694,18 +815,17 @@ class MassEnergizeForm extends Component {
                       message={`Error Occurred: ${error}`}
                     />
                   </Snackbar>
-                  <p style={{ color: 'red' }}>{error}</p>
+                  <p style={{ color: "red" }}>{error}</p>
                 </div>
               )}
 
               {/* Code to display success messages in case submission is successful */}
-              {successMsg
-              && (
+              {successMsg && (
                 <div>
                   <Snackbar
                     anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
+                      vertical: "bottom",
+                      horizontal: "right",
                     }}
                     open={successMsg != null}
                     autoHideDuration={6000}
@@ -717,34 +837,27 @@ class MassEnergizeForm extends Component {
                       message={successMsg}
                     />
                   </Snackbar>
-                  <p style={{ color: 'green' }}>{successMsg}</p>
+                  <p style={{ color: "green" }}>{successMsg}</p>
                 </div>
               )}
 
               {/* Generating the Actual Form */}
               <form onSubmit={this.submitForm}>
-
                 {/* render the fields from the formJson */}
                 {this.renderFields(formJson.fields)}
 
-                {startCircularSpinner
-                && (
+                {startCircularSpinner && (
                   <div>
                     <h5>Sending Data ...</h5>
                     <InputLabel>This might take a minute ...</InputLabel>
                     <CircularProgress className={classes.progress} />
                   </div>
-                )
-                }
+                )}
                 <div>
-                  {formJson && formJson.cancelLink
-                    && (
-                      <Link to={formJson.cancelLink}>
-                        Cancel
-                      </Link>
-                    )
-                  }
-                  {'    '}
+                  {formJson && formJson.cancelLink && (
+                    <Link to={formJson.cancelLink}>Cancel</Link>
+                  )}
+                  {"    "}
                   <Button variant="contained" color="secondary" type="submit">
                     Submit
                   </Button>
