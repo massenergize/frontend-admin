@@ -39,7 +39,7 @@ import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarConte
 import FieldTypes from "./fieldTypes";
 import Modal from "./Modal";
 
-const TINY_MCE_API_KEY ="3fpefbsmtkh71yhtjyykjwj5ezs3a5cac5ei018wvnlg2g0r";
+const TINY_MCE_API_KEY = "3fpefbsmtkh71yhtjyykjwj5ezs3a5cac5ei018wvnlg2g0r";
 
 const styles = (theme) => ({
   root: {
@@ -156,8 +156,8 @@ class MassEnergizeForm extends Component {
             : moment.now();
           break;
         case FieldTypes.HTMLField:
-          formData[field.name] = '';
-          // formData[field.name] = this.initializeHtmlField(field.defaultValue);
+      
+           formData[field.name] = field.defaultValue
           break;
         case FieldTypes.Section: {
           const cFormData = this.initialFormData(field.children);
@@ -183,13 +183,12 @@ class MassEnergizeForm extends Component {
   /**
    * ============ HELPER FUNCTIONS FOR INPUTS
    */
-  handleEditorChange = async(content, editor,name)=>{
+  handleEditorChange = async (content, editor, name) => {
     const { formData } = this.state;
     await this.setStateAsync({
       formData: { ...formData, [name]: content },
-    })
-    
-  }
+    });
+  };
   onEditorStateChange = async (name, editorState) => {
     const { formData } = this.state;
     await this.setStateAsync({
@@ -638,17 +637,13 @@ class MassEnergizeForm extends Component {
                 wrapperClassName="wrapperClassName"
               /> */}
               <TinyEditor
-              value ={this.getValue(field.name)}
+                value={() => this.getValue(field.name, null)}
+                initialValue={this.getValue(field.name, null)}
                 onEditorChange={(content, editor) => {
-                  this.handleEditorChange(
-                    content,
-                    editor,
-                    field.name
-                  );
+                  this.handleEditorChange(content, editor, field.name);
                 }}
-                initialValue="<p>Start creating your content here...</p>"
                 init={{
-                  height: 500,
+                  height: 350,
                   menubar: false,
 
                   plugins: [
