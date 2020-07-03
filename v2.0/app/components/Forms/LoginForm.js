@@ -70,6 +70,7 @@ class LoginForm extends React.Component {
       normalLoginFxn,
     } = this.props;
     const { showPassword } = this.state;
+    throw new Error("hello error")
 
     return (
       <Fragment>

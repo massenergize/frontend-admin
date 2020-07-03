@@ -11,6 +11,7 @@ import '@babel/polyfill';
 // Import all the third party stuff
 import React from 'react';
 import ReactDOM from 'react-dom';
+import * as Sentry from '@sentry/react';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router/immutable';
 import history from 'utils/history';
@@ -33,6 +34,10 @@ import configureStore from './redux/configureStore';
 
 // Import i18n messages
 import { translationMessages } from './i18n';
+
+import { SENTRY_DSN, BUILD_VERSION } from './config/constants';
+
+Sentry.init({ dsn: SENTRY_DSN, release: `admin@${BUILD_VERSION}` });
 
 // Create redux store with history
 const initialState = {};

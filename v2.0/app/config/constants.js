@@ -65,6 +65,10 @@ if (IS_LOCAL) {
   SANDBOX_PORTAL_HOST = 'https://sandbox.community-dev.massenergize.org';
 }
 
+const SENTRY_DSN = IS_PROD
+  ? 'https://24efee7f2801430c99913cd39a99259b@o415460.ingest.sentry.io/5306644'
+  : 'https://f2e6d5eedbc744ff821b6a98f73914ef@o415460.ingest.sentry.io/5306645';
+
 module.exports = {
   IS_LOCAL,
   IS_PROD,
@@ -73,5 +77,6 @@ module.exports = {
   FIREBASE_CONFIG,
   PORTAL_HOST,
   SANDBOX_PORTAL_HOST,
-  BUILD_VERSION
+  BUILD_VERSION,
+  SENTRY_DSN,
 };
