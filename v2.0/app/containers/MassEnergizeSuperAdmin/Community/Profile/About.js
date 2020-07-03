@@ -36,7 +36,6 @@ import Type from 'dan-styles/Typography.scss';
 import PapperBlock from 'dan-components/PapperBlock/PapperBlock';
 import styles from './profile-jss';
 import { convertBoolean, getAddress, goHere } from '../../../../utils/common';
-
 import Snackbar from '@material-ui/core/Snackbar';
 import MySnackbarContentWrapper from '../../../../components/SnackBar/SnackbarContentWrapper';
 import { apiCallFile } from '../../../../utils/messenger';
@@ -55,8 +54,7 @@ class About extends React.Component {
   async getCSV(endpoint) {
     const { community } = this.props;
     const csvResponse = await apiCallFile('/downloads.' + endpoint,
-      { community_id: community.id }, endpoint + '-data.csv');
-    console.log(csvResponse);
+      { community_id: community.id });
     if (csvResponse.success) {
       downloadFile(csvResponse.file);
     } else {

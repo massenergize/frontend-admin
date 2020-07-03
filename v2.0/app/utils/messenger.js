@@ -33,7 +33,7 @@ export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = 
   }
 }
 
-export async function apiCallFile(destinationUrl, dataToSend = {}, filename = null, strictUrl = false) {
+export async function apiCallFile(destinationUrl, dataToSend = {}, strictUrl = false) {
   const idToken = localStorage.getItem('idToken');
   const url = strictUrl ? `${API_HOST}${destinationUrl}` : `${API_HOST}/v3${destinationUrl}`;
   const response = await fetch(url, {
@@ -61,11 +61,14 @@ export async function apiCallFile(destinationUrl, dataToSend = {}, filename = nu
       });
     }
 
-    // if no JSON, response, it was a success
-    const realFilename = filename ? filename : ('download.' + contentType.split('/')[1]);
+    // if no JSON response, it was a success
+    const contentDisposition = response.headers.get('content-disposition');
+    const filename = contentDisposition
+      ? contentDisposition.match(/filename="(.+)"/)[1]
+      : 'download.' + contentType.split('/')[1];
     return response.blob().then(blob => ({
       success: true,
-      file: new File([blob], realFilename, { type: contentType })
+      file: new File([blob], filename, { type: contentType })
     }));
   } catch (error) {
     return { success: false, error: error.toString() };
