@@ -25,6 +25,7 @@ import { Editor } from "react-draft-wysiwyg";
 import { Editor as TinyEditor } from "@tinymce/tinymce-react";
 import { MenuItem } from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
+import Icon from "@material-ui/core/Icon";
 import moment from "moment";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { EditorState } from "draft-js";
@@ -38,6 +39,7 @@ import { apiCall, apiCallWithMedia } from "../../../utils/messenger";
 import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
 import FieldTypes from "./fieldTypes";
 import Modal from "./Modal";
+import PreviewModal from "./PreviewModal";
 
 const TINY_MCE_API_KEY = "3fpefbsmtkh71yhtjyykjwj5ezs3a5cac5ei018wvnlg2g0r";
 
@@ -112,9 +114,12 @@ class MassEnergizeForm extends Component {
       successMsg: null,
       error: null,
       formJson: null,
+      activeModal: null,
+      activeModalTitle: null,
     };
     this.updateForm = this.updateForm.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
+    this.closePreviewModal = this.closePreviewModal.bind(this);
   }
 
   async componentDidMount() {
@@ -127,6 +132,24 @@ class MassEnergizeForm extends Component {
     return new Promise((resolve) => {
       this.setState(state, resolve);
     });
+  }
+
+  showPreviewModal() {
+    const fieldName = this.state.activeModal;
+    if (fieldName !== null) {
+      const HTML_CONTENT = this.getValue(fieldName);
+      return (
+        <PreviewModal
+          content={HTML_CONTENT}
+          title={this.state.activeModalTitle}
+          closeModal={this.closePreviewModal}
+        />
+      );
+    }
+  }
+
+  closePreviewModal() {
+    this.setState({ activeModal: null });
   }
 
   initializeHtmlField = (content) => {
@@ -156,8 +179,7 @@ class MassEnergizeForm extends Component {
             : moment.now();
           break;
         case FieldTypes.HTMLField:
-      
-           formData[field.name] = field.defaultValue
+          formData[field.name] = field.defaultValue;
           break;
         case FieldTypes.Section: {
           const cFormData = this.initialFormData(field.children);
@@ -617,8 +639,13 @@ class MassEnergizeForm extends Component {
           </div>
         );
       case FieldTypes.HTMLField:
+        const previewStyle =
+          this.state.activeModal === field.name
+            ? { display: "block" }
+            : { display: "none" };
         return (
           <div key={field.name + field.label}>
+            <div style={previewStyle}>{this.showPreviewModal()}</div>
             <Grid
               item
               xs={12}
@@ -628,7 +655,26 @@ class MassEnergizeForm extends Component {
                 borderWidth: "thin",
               }}
             >
-              <Typography>{field.label}</Typography>
+              <div style={{ padding: 20, color: "#d28818" }}>
+                <Typography>{field.label}</Typography>
+                <small>
+                  <b>PLEASE NOTE:</b> the wide spacing between two lines in the
+                  editor, is not what you will get when you content gets to
+                  users.
+                  <br />
+                  If you need a{" "}
+                  <b>
+                    <i>gap </i>
+                  </b>
+                  between two lines, press your <b>Enter Key twice </b> or more,
+                  instead of <b>once</b>
+                  <br />
+                  <b>
+                    Pressing Once, will only show items right on the next line,
+                    without any gap
+                  </b>
+                </small>
+              </div>
               {/* <Editor
                 editorState={this.getValue(field.name, EditorState.createEmpty())}
                 editorClassName="editorClassName"
@@ -636,6 +682,7 @@ class MassEnergizeForm extends Component {
                 toolbarClassName="toolbarClassName"
                 wrapperClassName="wrapperClassName"
               /> */}
+
               <TinyEditor
                 value={() => this.getValue(field.name, null)}
                 initialValue={this.getValue(field.name, null)}
@@ -647,17 +694,31 @@ class MassEnergizeForm extends Component {
                   menubar: false,
 
                   plugins: [
-                    "advlist autolink lists link image charmap print preview anchor",
+                    "advlist autolink lists link image charmap print preview anchor forecolor",
                     "searchreplace visualblocks code fullscreen",
                     "insertdatetime media table paste code help wordcount",
                   ],
                   toolbar:
-                    "undo redo | formatselect | bold italic backcolor | \
+                    "undo redo | formatselect | bold italic backcolor forecolor | \
              alignleft aligncenter alignright alignjustify | \
              link | image | bullist numlist outdent indent |  fontselect | fontsizeselect",
                 }}
                 apiKey={TINY_MCE_API_KEY}
               />
+
+              <Button
+                style={{ width: "100%" }}
+                color="default"
+                onClick={() => {
+                  this.setState({
+                    activeModal: field.name,
+                    activeModalTitle: field.label,
+                  });
+                }}
+              >
+                <Icon style={{ marginRight: 6 }}>remove_red_eye</Icon>Show Me A
+                Preview{" "}
+              </Button>
             </Grid>
             <br />
             <br />
