@@ -96,6 +96,7 @@
     "@material-ui/core": "^3.9.3",
     "@material-ui/icons": "^4.2.1",
     "@material-ui/lab": "^3.0.0-alpha.28",
+    "@tinymce/tinymce-react": "^3.6.0",
     "@types/googlemaps": "^3.30.10",
     "@types/markerclustererplus": "^2.1.33",
     "acorn": "^6.4.1",
