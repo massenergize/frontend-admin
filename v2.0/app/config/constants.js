@@ -65,6 +65,7 @@ if (IS_LOCAL) {
   SANDBOX_PORTAL_HOST = 'https://sandbox.community-dev.massenergize.org';
 }
 
+
 module.exports = {
   IS_LOCAL,
   IS_PROD,

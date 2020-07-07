@@ -192,7 +192,7 @@ class CreateNewActionForm extends Component {
             },
           ]
         },
-        {
+        { 
           name: 'featured_summary',
           label: 'Featured Summary',
           placeholder: 'eg. This event is happening in ...',
