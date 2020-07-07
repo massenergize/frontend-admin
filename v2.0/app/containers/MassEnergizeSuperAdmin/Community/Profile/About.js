@@ -40,6 +40,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import MySnackbarContentWrapper from '../../../../components/SnackBar/SnackbarContentWrapper';
 import { apiCallFile } from '../../../../utils/messenger';
 import { downloadFile } from '../../../../utils/common';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 class About extends React.Component {
@@ -47,19 +48,27 @@ class About extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      error: null
+      error: null,
+      loadingCSVs: []
     };
   }
 
+
   async getCSV(endpoint) {
+    let oldLoadingCSVs = this.state.loadingCSVs;
+    this.setState({ loadingCSVs: oldLoadingCSVs.concat(endpoint) });
     const { community } = this.props;
     const csvResponse = await apiCallFile('/downloads.' + endpoint,
       { community_id: community.id });
+
+    oldLoadingCSVs = this.state.loadingCSVs;
+    oldLoadingCSVs.splice(oldLoadingCSVs.indexOf(endpoint), 1);
     if (csvResponse.success) {
       downloadFile(csvResponse.file);
     } else {
       this.setState({ error: csvResponse.error });
     }
+    this.setState({ loadingCSVs: oldLoadingCSVs });
   }
 
   getTags = tags => (tags.map(t => (t.name))).join(', ');
@@ -113,7 +122,7 @@ class About extends React.Component {
     const communityEditLink = `/admin/edit/${community ? community.id : null}/community/community-admin`;
     const addRemoveCommuntyAdminLink = `/admin/edit/${community ? community.id : null}/community-admins`;
 
-    const { error } = this.state;
+    const { error, loadingCSVs } = this.state;
 
     return (
       <>
@@ -306,21 +315,23 @@ class About extends React.Component {
                 </Typography>
               </Paper>
               <Grid container className={classes.colList}>
-                <Grid item md={6}>
+                <Grid item xs={6}>
                   <Paper onClick={() => this.getCSV('users')} className={`${classes.pageCard}`} elevation={1}>
                     <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
                       Download Users CSV
                     {' '}
                       <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
+                      {loadingCSVs.includes('users') && <CircularProgress size={20} thickness={2} color="secondary" />}
                     </Typography>
                   </Paper>
                 </Grid>
-                <Grid item md={6}>
+                <Grid item xs={6}>
                   <Paper onClick={() => this.getCSV('actions')} className={`${classes.pageCard}`} elevation={1}>
                     <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
                       Download Actions CSV
                     {' '}
                       <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
+                      {loadingCSVs.includes('actions') && <CircularProgress size={20} thickness={2} color="secondary" />}
                     </Typography>
                   </Paper>
                 </Grid>

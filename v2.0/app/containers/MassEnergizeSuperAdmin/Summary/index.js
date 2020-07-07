@@ -20,23 +20,31 @@ import Snackbar from '@material-ui/core/Snackbar';
 import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
 import { apiCallFile } from '../../../utils/messenger';
 import { downloadFile } from '../../../utils/common';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 // import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
 class SummaryDashboard extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      error: null
+      error: null,
+      loadingCSVs: []
     };
   }
 
   async getCSV(endpoint) {
+    let oldLoadingCSVs = this.state.loadingCSVs;
+    this.setState({ loadingCSVs: oldLoadingCSVs.concat(endpoint) });
     const csvResponse = await apiCallFile('/downloads.' + endpoint);
+
+    oldLoadingCSVs = this.state.loadingCSVs;
+    oldLoadingCSVs.splice(oldLoadingCSVs.indexOf(endpoint), 1);
     if (csvResponse.success) {
       downloadFile(csvResponse.file);
     } else {
       this.setState({ error: csvResponse.error });
     }
+    this.setState({ loadingCSVs: oldLoadingCSVs });
   }
 
   handleCloseStyle = (event, reason) => {
@@ -71,7 +79,7 @@ class SummaryDashboard extends PureComponent {
     const {
       classes, communities, selected_community, auth, summary_data, graph_data
     } = this.props;
-    const { error } = this.state;
+    const { error, loadingCSVs } = this.state;
 
     return (
       <div>
@@ -112,21 +120,23 @@ class SummaryDashboard extends PureComponent {
           && <ActionsChartWidget data={graph_data || {}} />
         }
         <Grid container className={classes.colList}>
-          <Grid item md={6} xs={12}>
+          <Grid xs={6}>
             <Paper onClick={() => this.getCSV('users')} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
                 Download All Communities Users CSV
             {' '}
                 <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
+                {loadingCSVs.includes('users') && <CircularProgress size={30} thickness={2} color="secondary" />}
               </Typography>
             </Paper>
           </Grid>
-          <Grid item md={6} xs={12}>
+          <Grid xs={6}>
             <Paper onClick={() => this.getCSV('actions')} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
                 Download All Communities Actions CSV
             {' '}
                 <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
+                {loadingCSVs.includes('actions') && <CircularProgress size={30} thickness={2} color="secondary" />}
               </Typography>
             </Paper>
           </Grid>
