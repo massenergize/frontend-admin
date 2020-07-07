@@ -120,7 +120,7 @@ class SummaryDashboard extends PureComponent {
           && <ActionsChartWidget data={graph_data || {}} />
         }
         <Grid container className={classes.colList}>
-          <Grid xs={6}>
+          <Grid item xs={6}>
             <Paper onClick={() => this.getCSV('users')} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
                 Download All Communities Users CSV
@@ -130,7 +130,7 @@ class SummaryDashboard extends PureComponent {
               </Typography>
             </Paper>
           </Grid>
-          <Grid xs={6}>
+          <Grid item xs={6}>
             <Paper onClick={() => this.getCSV('actions')} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
                 Download All Communities Actions CSV
