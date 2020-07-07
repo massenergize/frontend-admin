@@ -45,6 +45,7 @@ class SummaryDashboard extends PureComponent {
       this.setState({ error: csvResponse.error });
     }
     this.setState({ loadingCSVs: oldLoadingCSVs });
+    this.forceUpdate();
   }
 
   handleCloseStyle = (event, reason) => {
@@ -121,22 +122,22 @@ class SummaryDashboard extends PureComponent {
         }
         <Grid container className={classes.colList}>
           <Grid item xs={6}>
-            <Paper onClick={() => this.getCSV('users')} className={`${classes.pageCard}`} elevation={1}>
+            <Paper onClick={() => { !loadingCSVs.includes('users') && this.getCSV('users'); }} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                Download All Communities Users CSV
-            {' '}
+                Download All Users CSV
+                    {' '}
                 <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
-                {loadingCSVs.includes('users') && <CircularProgress size={30} thickness={2} color="secondary" />}
+                {loadingCSVs.includes('users') && <CircularProgress size={20} thickness={2} color="secondary" />}
               </Typography>
             </Paper>
           </Grid>
           <Grid item xs={6}>
-            <Paper onClick={() => this.getCSV('actions')} className={`${classes.pageCard}`} elevation={1}>
+            <Paper onClick={() => { !loadingCSVs.includes('actions') && this.getCSV('actions'); }} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                Download All Communities Actions CSV
-            {' '}
+                Download All Actions CSV
+                    {' '}
                 <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
-                {loadingCSVs.includes('actions') && <CircularProgress size={30} thickness={2} color="secondary" />}
+                {loadingCSVs.includes('actions') && <CircularProgress size={20} thickness={2} color="secondary" />}
               </Typography>
             </Paper>
           </Grid>

@@ -44,7 +44,6 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 class About extends React.Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -316,7 +315,7 @@ class About extends React.Component {
               </Paper>
               <Grid container className={classes.colList}>
                 <Grid item xs={6}>
-                  <Paper onClick={() => this.getCSV('users')} className={`${classes.pageCard}`} elevation={1}>
+                  <Paper onClick={() => { !loadingCSVs.includes('users') && this.getCSV('users'); }} className={`${classes.pageCard}`} elevation={1}>
                     <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
                       Download Users CSV
                     {' '}
@@ -326,7 +325,7 @@ class About extends React.Component {
                   </Paper>
                 </Grid>
                 <Grid item xs={6}>
-                  <Paper onClick={() => this.getCSV('actions')} className={`${classes.pageCard}`} elevation={1}>
+                  <Paper onClick={() => { !loadingCSVs.includes('actions') && this.getCSV('actions'); }} className={`${classes.pageCard}`} elevation={1}>
                     <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
                       Download Actions CSV
                     {' '}
