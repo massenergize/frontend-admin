@@ -313,29 +313,30 @@ class About extends React.Component {
                   <Icon style={{ paddingTop: 3, color: 'green' }}>forward</Icon>
                 </Typography>
               </Paper>
-              <Grid container className={classes.colList}>
-                <Grid item xs={6}>
-                  <Paper onClick={() => { !loadingCSVs.includes('users') && this.getCSV('users'); }} className={`${classes.pageCard}`} elevation={1}>
-                    <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                      Download Users CSV
-                    {' '}
-                      <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
-                      {loadingCSVs.includes('users') && <CircularProgress size={20} thickness={2} color="secondary" />}
-                    </Typography>
-                  </Paper>
-                </Grid>
-                <Grid item xs={6}>
-                  <Paper onClick={() => { !loadingCSVs.includes('actions') && this.getCSV('actions'); }} className={`${classes.pageCard}`} elevation={1}>
-                    <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                      Download Actions CSV
-                    {' '}
-                      <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
-                      {loadingCSVs.includes('actions') && <CircularProgress size={20} thickness={2} color="secondary" />}
-                    </Typography>
-                  </Paper>
-                </Grid>
-              </Grid>
+
             </PapperBlock>
+          </Grid>
+        </Grid>
+        <Grid container className={classes.colList}>
+          <Grid item xs={6}>
+            <Paper onClick={() => { !loadingCSVs.includes('users') && this.getCSV('users'); }} className={`${classes.pageCard}`} elevation={1}>
+              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                Download Users CSV
+                    {' '}
+                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
+                {loadingCSVs.includes('users') && <CircularProgress size={20} thickness={2} color="secondary" />}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper onClick={() => { !loadingCSVs.includes('actions') && this.getCSV('actions'); }} className={`${classes.pageCard}`} elevation={1}>
+              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                Download Actions CSV
+                    {' '}
+                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
+                {loadingCSVs.includes('actions') && <CircularProgress size={20} thickness={2} color="secondary" />}
+              </Typography>
+            </Paper>
           </Grid>
         </Grid>
       </>
