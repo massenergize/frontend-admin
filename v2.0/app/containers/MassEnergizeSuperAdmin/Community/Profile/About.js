@@ -54,9 +54,13 @@ class About extends React.Component {
 
 
   async getCSV(endpoint) {
+    const { community } = this.props;
+    if (!community) {
+      return;
+    }
     let oldLoadingCSVs = this.state.loadingCSVs;
     this.setState({ loadingCSVs: oldLoadingCSVs.concat(endpoint) });
-    const { community } = this.props;
+
     const csvResponse = await apiCallFile('/downloads.' + endpoint,
       { community_id: community.id });
 
