@@ -179,7 +179,8 @@ class MassEnergizeForm extends Component {
             : moment.now();
           break;
         case FieldTypes.HTMLField:
-          formData[field.name] = field.defaultValue;
+          // formData[field.name] = field.defaultValue;
+          formData[field.name] = this.initializeHtmlField(field.defaultValue);
           break;
         case FieldTypes.Section: {
           const cFormData = this.initialFormData(field.children);
@@ -334,11 +335,11 @@ class MassEnergizeForm extends Component {
       if (fieldValueInForm) {
         switch (field.fieldType) {
           case FieldTypes.HTMLField:
-            // cleanedValues[field.dbName] = stateToHTML(
-            //   fieldValueInForm.getCurrentContent(),
-            //   htmlLinkOptions
-            // );
-            cleanedValues[field.dbName] = fieldValueInForm;
+            cleanedValues[field.dbName] = stateToHTML(
+              fieldValueInForm.getCurrentContent(),
+              htmlLinkOptions
+            );
+            // cleanedValues[field.dbName] = fieldValueInForm;
             break;
           case FieldTypes.DateTime:
             cleanedValues[field.dbName] = (
@@ -645,7 +646,7 @@ class MassEnergizeForm extends Component {
             : { display: "none" };
         return (
           <div key={field.name + field.label}>
-            <div style={previewStyle}>{this.showPreviewModal()}</div>
+            {/* <div style={previewStyle}>{this.showPreviewModal()}</div> */}
             <Grid
               item
               xs={12}
@@ -657,7 +658,7 @@ class MassEnergizeForm extends Component {
             >
               <div style={{ padding: 20, color: "#d28818" }}>
                 <Typography>{field.label}</Typography>
-                <small>
+                {/* <small>
                   <b>PLEASE NOTE:</b> the wide spacing between two lines in the
                   editor, is not what you will get when you content gets to
                   users.
@@ -673,17 +674,22 @@ class MassEnergizeForm extends Component {
                     Pressing Once, will only show items right on the next line,
                     without any gap
                   </b>
-                </small>
+                </small> */}
               </div>
-              {/* <Editor
-                editorState={this.getValue(field.name, EditorState.createEmpty())}
+              <Editor
+                editorState={this.getValue(
+                  field.name,
+                  EditorState.createEmpty()
+                )}
                 editorClassName="editorClassName"
-                onEditorStateChange={(e) => this.onEditorStateChange(field.name, e)}
+                onEditorStateChange={(e) =>
+                  this.onEditorStateChange(field.name, e)
+                }
                 toolbarClassName="toolbarClassName"
                 wrapperClassName="wrapperClassName"
-              /> */}
+              />
 
-              <TinyEditor
+              {/* <TinyEditor
                 value={() => this.getValue(field.name, null)}
                 initialValue={this.getValue(field.name, null)}
                 onEditorChange={(content, editor) => {
@@ -704,9 +710,9 @@ class MassEnergizeForm extends Component {
              link | image | bullist numlist outdent indent |  fontselect | fontsizeselect",
                 }}
                 apiKey={TINY_MCE_API_KEY}
-              />
+              /> */}
 
-              <Button
+              {/* <Button
                 style={{ width: "100%" }}
                 color="default"
                 onClick={() => {
@@ -718,7 +724,7 @@ class MassEnergizeForm extends Component {
               >
                 <Icon style={{ marginRight: 6 }}>remove_red_eye</Icon>Show Me A
                 Preview{" "}
-              </Button>
+              </Button> */}
             </Grid>
             <br />
             <br />

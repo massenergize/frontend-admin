@@ -40,7 +40,6 @@ class PreviewModal extends Component {
   }
 
   render() {
-    console.log("I AM THE WINDOW HEIGHT", window.innerHeight);
     return (
       <div>
         {/* <div style={styles.container} /> */}
