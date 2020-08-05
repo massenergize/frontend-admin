@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Button from "@material-ui/core/Button";
+import { factory } from "./HTML/HTMLShop";
 const styles = {
   container: {
     zIndex: 99,
@@ -36,7 +37,20 @@ class PreviewModal extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      HTML: null,
+    };
+  }
+  componentDidMount = async () => {
+    const { content } = this.props;
+    const HTML = await this.props.stripper(content);
+    this.setStateAsync({ HTML });
+  };
+
+  setStateAsync(state) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve);
+    });
   }
 
   render() {
@@ -48,8 +62,12 @@ class PreviewModal extends Component {
             <h3 style={{ marginBottom: 5 }}>
               This is what your content will look like when it gets to users
             </h3>
-            <p style={{ color: "gray" }}><b>"</b>{this.props.title}<b>"</b></p>
-            <div dangerouslySetInnerHTML={{__html:this.props.content}} />
+            <p style={{ color: "gray" }}>
+              <b>"</b>
+              {this.props.title}
+              <b>"</b>
+            </p>
+            <div dangerouslySetInnerHTML={{ __html: this.state.HTML }} />
           </div>
           <Button
             position="right"

@@ -47,10 +47,11 @@ import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarConte
 import FieldTypes from "./fieldTypes";
 import Modal from "./Modal";
 import PreviewModal from "./PreviewModal";
-import { factory } from "./HTML/HTMLShop";
+import HTMLShop, { factory } from "./HTML/HTMLShop";
 
 // const TINY_MCE_API_KEY = "3fpefbsmtkh71yhtjyykjwj5ezs3a5cac5ei018wvnlg2g0r";
 const NEW_EDITOR_IDENTITY = "@_ME_NEW_CUSTOM_EDITOR_@";
+const USE_OLD_EDITOR_TO_EDIT = "USER_OLD_EDITOR_TO_EDIT";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -137,7 +138,7 @@ class MassEnergizeForm extends Component {
       placeholder: "Start typing here...",
       paragraph: { class: Paragraph, inlineToolbar: true },
       list: { class: List, inlineToolbar: true },
-      linkTool: { class: LinkTool, inlineToolbar: true },
+      // linkTool: { class: LinkTool, inlineToolbar: true },
       header: {
         class: Header,
         config: {
@@ -171,23 +172,20 @@ class MassEnergizeForm extends Component {
     });
   }
 
-  showPreviewModal() {
+  showPreviewModal = () => {
     const fieldName = this.state.activeModal;
     if (fieldName !== null) {
       const fieldValue = this.getValue(fieldName);
-      console.log("HERE IS THE FIELD VALUE", fieldName, fieldValue);
-      console.log("LE STATE ", this.state);
-      const HTML_CONTENT = this.stripHTMLFromNewEditorContent(fieldValue);
-      console.log("FROM THE STRIP CLUB", HTML_CONTENT);
       return (
         <PreviewModal
-          content={HTML_CONTENT}
+          content={fieldValue}
+          stripper={this.stripHTMLFromNewEditorContent}
           title={this.state.activeModalTitle}
           closeModal={this.closePreviewModal}
         />
       );
     }
-  }
+  };
 
   closePreviewModal() {
     this.setState({ activeModal: null });
@@ -200,10 +198,15 @@ class MassEnergizeForm extends Component {
     return EditorState.createWithContent(stateFromHTML(content));
   };
 
+  needsOldEditor = (defaultValue) => {
+    if (!defaultValue) return false;
+    var arr = defaultValue.split(NEW_EDITOR_IDENTITY);
+    if (arr.length === 2) return false;
+    return true;
+  };
   /**
    * Given the field, it renders the actual component
    */
-
   initialFormData = (fields) => {
     const formData = {};
     fields.forEach((field) => {
@@ -220,8 +223,15 @@ class MassEnergizeForm extends Component {
             : moment.now();
           break;
         case FieldTypes.HTMLField:
-          formData[field.name] = field.defaultValue;
-          // formData[field.name] = this.initializeHtmlField(field.defaultValue);
+          var check = this.needsOldEditor(field.defaultValue);
+          const name = `use_new_editor_for_${field.name}`;
+          if (check) {
+            this.setState({ [name]: false });
+            formData[field.name] = this.initializeHtmlField(field.defaultValue);
+          } else {
+            this.setState({ [name]: true });
+            formData[field.name] = field.defaultValue;
+          }
           break;
         case FieldTypes.Section: {
           const cFormData = this.initialFormData(field.children);
@@ -261,28 +271,130 @@ class MassEnergizeForm extends Component {
   };
   handleLightEditorChange = async (e, name) => {
     const data = await e.saver.save();
-    console.log("RAW DATA", data);
-    const HTMLFromShop = factory(data.blocks);
-    console.log("YEAH FROM TEH SHOP", HTMLFromShop);
+    const HTMLFromShop = await factory(data.blocks);
     const blocksToString = `${NEW_EDITOR_IDENTITY}${JSON.stringify(
       HTMLFromShop.blocks
     )}`;
-    console.log("STATE CONTENT:::", blocksToString);
     const { formData } = this.state;
     await this.setStateAsync({
       formData: { ...formData, [name]: blocksToString },
     });
   };
-  stripHTMLFromNewEditorContent = (impureJsonText) => {
-    console.log("I AM THE IMPURE JSON", impureJsonText);
+  stripHTMLFromNewEditorContent = async (impureJsonText) => {
     var jsonText = impureJsonText
       ? impureJsonText.split(NEW_EDITOR_IDENTITY)[1]
       : "";
     var blocks = jsonText ? JSON.parse(jsonText) : [];
-    var result = factory(blocks);
+    var result = await factory(blocks);
     return result.HTML;
   };
 
+  newLightWeightEditor = (field) => {
+    return (
+      <div>
+        <div style={{ padding: 20, color: "#d28818" }}>
+          <Typography
+            style={{
+              textAlign: "center",
+              fontWeight: "bold",
+              color: "#585858",
+            }}
+          >
+            {field.label}
+          </Typography>
+          {/* <small>
+        <b>PLEASE NOTE:</b> the wide spacing between two lines in the
+        editor, is not what you will get when you content gets to
+        users.
+        <br />
+        If you need a{" "}
+        <b>
+          <i>gap </i>
+        </b>
+        between two lines, press your <b>Enter Key twice </b> or more,
+        instead of <b>once</b>
+        <br />
+        <b>
+          Pressing Once, will only show items right on the next line,
+          without any gap
+        </b>
+      </small> */}
+        </div>
+        <EditorJS
+          placeholder="Start Typing here..."
+          hideToolbar={false}
+          onChange={(e) => this.handleLightEditorChange(e, field.name)}
+          instanceRef={(instance) => (this.editorInstance = instance)}
+          holder={`editor-holder-${field.name}`}
+          tools={this.getEditorToolsAndSettings().tools}
+          i18n={this.getEditorToolsAndSettings().settings}
+          data={this.getValue(field.name)}
+        >
+          <div
+            style={{
+              width: "100%",
+              textAlign: "left",
+              minHeight: 30,
+              paddingTop: 10,
+            }}
+            id={`editor-holder-${field.name}`}
+          />
+        </EditorJS>
+      </div>
+    );
+  };
+  oldEditor = (field) => {
+    return (
+      <div style={{ padding: 20, color: "#d28818" }}>
+        <Typography
+          style={{
+            textAlign: "center",
+            fontWeight: "bold",
+            color: "#585858",
+          }}
+        >
+          {field.label}
+        </Typography>
+        <Editor
+          editorState={this.getValue(field.name, EditorState.createEmpty())}
+          editorClassName="editorClassName"
+          onEditorStateChange={(e) => this.onEditorStateChange(field.name, e)}
+          toolbarClassName="toolbarClassName"
+          wrapperClassName="wrapperClassName"
+        />
+      </div>
+    );
+  };
+  /**
+   * Content created with the new editor, is not in HTML. Data that is saved in the backend, is actually
+   * a stringify-ed version of a JSON
+   * However, old content created with the previous editor, saves it's data as a stringify-ed version of
+   * HTML
+   * Because of this, content from the old editor cannot be edited using the new editor,
+   * So, before any editor is rendered, this fxn is meant to determine whether or not the old or new editor should
+   * be used
+   * There are two scenarios:
+   * @scene1 : admin is only here to edit some post they created some time ago --, in this case, just render the old editor with his/her old content
+   * @scene2 : admin is here to create new content ---, in this case we want to @ALWAYS @USE @THE @NEW @EDITOR
+   * @HowAreTheseTwoScenesAreDifferentiated ?
+   * All data coming from the backend for a post edit come as text, whether from old or new editor,
+   * If the scenario is an edit, the defaultValue of the HTML Field is going to have some text from when it was created for this appropriate field
+   * If this text is not provided, defaultValue is @null and when the value is null, it just simply means, nothing was provided for that field, nothing has to be edited,
+   * therefore, go ahead and render the new editor and allow the admin to create content for the particular field with it
+   * However, if the text is provided, to know whether the content was made with the new or old editor, we split
+   * the text, using a constant that I have defined above as (NEW_EDITOR_IDENTITY)
+   * Text created from new editor when split with the constant, will give an array of length = 2,
+   * while text created from the old editor will give an array of length = 1
+   * .....That is basically it .... loooool!
+   * @param {*} field
+   */
+  whichEditor = (field) => {
+    const name = `use_new_editor_for_${field.name}`;
+    if (!this.state[name]) {
+      return this.oldEditor(field);
+    }
+    return this.newLightWeightEditor(field);
+  };
   /**
    * Handle multi select
    */
@@ -399,11 +511,16 @@ class MassEnergizeForm extends Component {
       if (fieldValueInForm) {
         switch (field.fieldType) {
           case FieldTypes.HTMLField:
-            cleanedValues[field.dbName] = stateToHTML(
-              fieldValueInForm.getCurrentContent(),
-              htmlLinkOptions
-            );
-            // cleanedValues[field.dbName] = fieldValueInForm;
+            // check whether or not the old editor is what is in use
+            const name = `use_new_editor_for_${field.name}`;
+            if (this.state[name]) {
+              cleanedValues[field.dbName] = fieldValueInForm;
+            } else {
+              cleanedValues[field.dbName] = stateToHTML(
+                fieldValueInForm.getCurrentContent(),
+                htmlLinkOptions
+              );
+            }
             break;
           case FieldTypes.DateTime:
             cleanedValues[field.dbName] = (
@@ -477,6 +594,9 @@ class MassEnergizeForm extends Component {
       formData,
       formJson.fields
     );
+
+    console.log("I AM THE FORM VALUES BRO", cleanedValues);
+    return;
 
     // let's make an api call to send the data
     let response = null;
@@ -704,6 +824,7 @@ class MassEnergizeForm extends Component {
           </div>
         );
       case FieldTypes.HTMLField:
+        const name = `use_new_editor_for_${field.name}`;
         const previewStyle =
           this.state.activeModal === field.name
             ? { display: "block" }
@@ -719,115 +840,34 @@ class MassEnergizeForm extends Component {
                 borderStyle: "solid",
                 borderWidth: "thin",
                 minHeight: 30,
-                // margin:"0px 90px", 
-                borderRadius:15
+                // margin:"0px 90px",
+                borderRadius: 15,
               }}
             >
-              <div style={{ padding: 20, color: "#d28818" }}>
-                <Typography
+              {this.whichEditor(field)}
+            </Grid>
+            {this.state[name] && (
+              <center>
+                <Button
                   style={{
-                    textAlign: "center",
-                    fontWeight: "bold",
-                    color: "#585858",
+                    padding: "10px 40px",
+                    margin: 13,
+                    boxShadow:
+                      "0 1px 0px 0 rgb(0 0 0 / 0%), 0 2px 10px 0 rgba(0, 0, 0, 0.18)",
+                  }}
+                  color="default"
+                  onClick={() => {
+                    this.setState({
+                      activeModal: field.name,
+                      activeModalTitle: field.label,
+                    });
                   }}
                 >
-                  {field.label}
-                </Typography>
-                {/* <small>
-                  <b>PLEASE NOTE:</b> the wide spacing between two lines in the
-                  editor, is not what you will get when you content gets to
-                  users.
-                  <br />
-                  If you need a{" "}
-                  <b>
-                    <i>gap </i>
-                  </b>
-                  between two lines, press your <b>Enter Key twice </b> or more,
-                  instead of <b>once</b>
-                  <br />
-                  <b>
-                    Pressing Once, will only show items right on the next line,
-                    without any gap
-                  </b>
-                </small> */}
-              </div>
-              {/* ----------------------------- NEW EDITOR --------------------------- */}
-              <EditorJS
-                placeholder="Start Typing here..."
-                hideToolbar={false}
-                onChange={(e) => this.handleLightEditorChange(e, field.name)}
-                instanceRef={(instance) => (this.editorInstance = instance)}
-                holder={`editor-holder-${field.name}`}
-                tools={this.getEditorToolsAndSettings().tools}
-                i18n={this.getEditorToolsAndSettings().settings}
-              >
-                <div
-                  style={{
-                    width: "100%",
-                    textAlign: "left",
-                    minHeight: 30,
-                    paddingTop: 10,
-                  }}
-                  id={`editor-holder-${field.name}`}
-                />
-              </EditorJS>
-              {/* ----------------------------- END NEW EDITOR --------------------------- */}
-              {/* <Editor
-                editorState={this.getValue(
-                  field.name,
-                  EditorState.createEmpty()
-                )}
-                editorClassName="editorClassName"
-                onEditorStateChange={(e) =>
-                  this.onEditorStateChange(field.name, e)
-                }
-                toolbarClassName="toolbarClassName"
-                wrapperClassName="wrapperClassName"
-              /> */}
-
-              {/* <TinyEditor
-                value={() => this.getValue(field.name, null)}
-                initialValue={this.getValue(field.name, null)}
-                onEditorChange={(content, editor) => {
-                  this.handleEditorChange(content, editor, field.name);
-                }}
-                init={{
-                  height: 350,
-                  menubar: false,
-
-                  plugins: [
-                    "advlist autolink lists link image charmap print preview anchor forecolor",
-                    "searchreplace visualblocks code fullscreen",
-                    "insertdatetime media table paste code help wordcount",
-                  ],
-                  toolbar:
-                    "undo redo | formatselect | bold italic backcolor forecolor | \
-             alignleft aligncenter alignright alignjustify | \
-             link | image | bullist numlist outdent indent |  fontselect | fontsizeselect",
-                }}
-                apiKey={TINY_MCE_API_KEY}
-              /> */}
-            </Grid>
-            <center>
-              <Button
-                style={{
-                  padding: "10px 40px",
-                  margin: 13,
-                  boxShadow:
-                    "0 1px 0px 0 rgb(0 0 0 / 0%), 0 2px 10px 0 rgba(0, 0, 0, 0.18)",
-                }}
-                color="default"
-                onClick={() => {
-                  this.setState({
-                    activeModal: field.name,
-                    activeModalTitle: field.label,
-                  });
-                }}
-              >
-                <Icon style={{ marginRight: 6 }}>remove_red_eye</Icon>Show Me A
-                Preview{" "}
-              </Button>
-            </center>
+                  <Icon style={{ marginRight: 6 }}>remove_red_eye</Icon>Show Me
+                  A Preview{" "}
+                </Button>
+              </center>
+            )}
             <br />
             <br />
           </div>
@@ -947,7 +987,7 @@ class MassEnergizeForm extends Component {
   render() {
     const { classes } = this.props;
     const { formJson, error, successMsg, startCircularSpinner } = this.state;
-    console.log("INNER WIDTH", window.innerWidth);
+    console.log("I AM THE STATE", this.state);
     if (!formJson) return <div />;
     return (
       <div>

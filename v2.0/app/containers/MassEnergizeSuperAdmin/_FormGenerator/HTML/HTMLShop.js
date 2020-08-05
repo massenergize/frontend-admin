@@ -152,9 +152,11 @@ const changingRoom = (block) => {
   }
 };
 
-const factory = (blocks) => {
+const factory = async (blocks) => {
   var HTML = "",
-    newBlocks = [];
+  newBlocks = [];
+  if(!blocks) return { HTML, blocks: newBlocks };
+
   blocks.forEach((block) => {
     var refined = changingRoom(block);
     if (block.type === LIST) {
@@ -171,8 +173,8 @@ const factory = (blocks) => {
       newBlocks.push({ ...block, data: { ...block.data, text: refined.text } });
     }
   });
-
-  return { HTML, blocks: newBlocks };
+  return { HTML, blocks: newBlocks }
+  
 };
 
 module.exports = {
