@@ -25,7 +25,8 @@ const styles = {
     marginLeft: "4%",
   },
   content: {
-    overflow: "scroll",
+    paddingRight:10,
+    overflowY: "scroll",
     height: (3 / 4) * window.innerHeight - 85,
   },
   button: {

@@ -48,6 +48,7 @@ import FieldTypes from "./fieldTypes";
 import Modal from "./Modal";
 import PreviewModal from "./PreviewModal";
 import HTMLShop, { factory } from "./HTML/HTMLShop";
+import HelpModal from "./HelpModal";
 
 // const TINY_MCE_API_KEY = "3fpefbsmtkh71yhtjyykjwj5ezs3a5cac5ei018wvnlg2g0r";
 const NEW_EDITOR_IDENTITY = "@_ME_NEW_CUSTOM_EDITOR_@";
@@ -125,11 +126,13 @@ class MassEnergizeForm extends Component {
       formJson: null,
       activeModal: null,
       activeModalTitle: null,
+      show_help_modal: false,
     };
     this.updateForm = this.updateForm.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
     this.closePreviewModal = this.closePreviewModal.bind(this);
     this.handleLightEditorChange = this.handleLightEditorChange.bind(this);
+    this.toggleHelpModal = this.toggleHelpModal.bind(this);
   }
 
   getEditorToolsAndSettings = () => {
@@ -595,8 +598,6 @@ class MassEnergizeForm extends Component {
       formJson.fields
     );
 
-    console.log("I AM THE FORM VALUES BRO", cleanedValues);
-    return;
 
     // let's make an api call to send the data
     let response = null;
@@ -654,6 +655,51 @@ class MassEnergizeForm extends Component {
       return <Modal title={field.modalTitle} text={field.modalText} />;
     }
     return <div />;
+  };
+
+  toggleHelpModal = (name) => {
+    this.setState({
+      show_help_modal: this.state.show_help_modal ? false : name,
+    });
+  };
+  showHelpModal = () => {
+    return <HelpModal toggle={this.toggleHelpModal} />;
+  };
+  showHelpDiv = (name) => {
+    return (
+      <div
+        style={{
+          padding: 20,
+          boxShadow:
+            "0 1px 0px 0 rgb(0 0 0 / 0%), 0 2px 10px 0 rgba(0, 0, 0, 0.082",
+          textSize: 14,
+          background: "rgb(251 243 255)",
+          borderRadius: 10,
+          marginBottom: 10,
+        }}
+      >
+        <p style={{ fontSize: 14 }}>
+          Welcome to <b>MassEnergize' Easy-Use Editor</b>. This editor only
+          provides the most commonly used items for creating content in the
+          simplest ways possible. <br />
+          You have access to{" "}
+          <b>
+            Lists (bullets or numbers), Links, Headers, Normal Paragraph texts & Images
+            (via URL)
+          </b>
+          <br />
+          <a
+            style={{ cursor: "pointer" }}
+            onClick={(e) => {
+              e.preventDefault();
+              this.toggleHelpModal(name);
+            }}
+          >
+            Teach me how to use this editor...
+          </a>
+        </p>
+      </div>
+    );
   };
 
   /**
@@ -832,6 +878,7 @@ class MassEnergizeForm extends Component {
         return (
           <div key={field.name + field.label}>
             <div style={previewStyle}>{this.showPreviewModal()}</div>
+            {this.state[name] && this.showHelpDiv(field.name)}
             <Grid
               item
               xs={12}
@@ -844,6 +891,8 @@ class MassEnergizeForm extends Component {
                 borderRadius: 15,
               }}
             >
+              {field.name === this.state.show_help_modal &&
+                this.showHelpModal()}
               {this.whichEditor(field)}
             </Grid>
             {this.state[name] && (
@@ -987,7 +1036,6 @@ class MassEnergizeForm extends Component {
   render() {
     const { classes } = this.props;
     const { formJson, error, successMsg, startCircularSpinner } = this.state;
-    console.log("I AM THE STATE", this.state);
     if (!formJson) return <div />;
     return (
       <div>
