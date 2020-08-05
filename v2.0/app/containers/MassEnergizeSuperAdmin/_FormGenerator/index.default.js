@@ -22,7 +22,7 @@ import { MaterialDropZone } from "dan-components";
 import Snackbar from "@material-ui/core/Snackbar";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { Editor } from "react-draft-wysiwyg";
-import EditorJS from "react-editor-js";
+import EditorJs from "react-editor-js"; 
 import Paragraph from "@editorjs/paragraph";
 import List from "@editorjs/list";
 import LinkTool from "@editorjs/link";
@@ -47,10 +47,9 @@ import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarConte
 import FieldTypes from "./fieldTypes";
 import Modal from "./Modal";
 import PreviewModal from "./PreviewModal";
-import { factory } from "./HTML/HTMLShop";
 
-// const TINY_MCE_API_KEY = "3fpefbsmtkh71yhtjyykjwj5ezs3a5cac5ei018wvnlg2g0r";
-const NEW_EDITOR_IDENTITY = "@_ME_NEW_CUSTOM_EDITOR_@";
+const TINY_MCE_API_KEY = "3fpefbsmtkh71yhtjyykjwj5ezs3a5cac5ei018wvnlg2g0r";
+
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -128,37 +127,8 @@ class MassEnergizeForm extends Component {
     this.updateForm = this.updateForm.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
     this.closePreviewModal = this.closePreviewModal.bind(this);
-    this.handleLightEditorChange = this.handleLightEditorChange.bind(this);
   }
 
-  getEditorToolsAndSettings = () => {
-    const tools = {
-      autofocus: true,
-      placeholder: "Start typing here...",
-      paragraph: { class: Paragraph, inlineToolbar: true },
-      list: { class: List, inlineToolbar: true },
-      linkTool: { class: LinkTool, inlineToolbar: true },
-      header: {
-        class: Header,
-        config: {
-          placeholder: "Enter a header",
-          levels: [1, 2, 3, 4, 5, 6],
-          defaultLevel: 3,
-        },
-        inlineToolbar: true,
-      },
-      simpleImage: SimpleImage,
-    };
-    const settings = {
-      tools: {
-        list: {
-          Ordered: "Ordered",
-          Unordered: "Not Ordered",
-        },
-      },
-    };
-    return { tools, settings };
-  };
   async componentDidMount() {
     const { formJson } = this.props;
     const formData = this.initialFormData(formJson.fields);
@@ -174,11 +144,7 @@ class MassEnergizeForm extends Component {
   showPreviewModal() {
     const fieldName = this.state.activeModal;
     if (fieldName !== null) {
-      const fieldValue = this.getValue(fieldName);
-      console.log("HERE IS THE FIELD VALUE", fieldName, fieldValue);
-      console.log("LE STATE ", this.state);
-      const HTML_CONTENT = this.stripHTMLFromNewEditorContent(fieldValue);
-      console.log("FROM THE STRIP CLUB", HTML_CONTENT);
+      const HTML_CONTENT = this.getValue(fieldName);
       return (
         <PreviewModal
           content={HTML_CONTENT}
@@ -220,8 +186,8 @@ class MassEnergizeForm extends Component {
             : moment.now();
           break;
         case FieldTypes.HTMLField:
-          formData[field.name] = field.defaultValue;
-          // formData[field.name] = this.initializeHtmlField(field.defaultValue);
+          // formData[field.name] = field.defaultValue;
+          formData[field.name] = this.initializeHtmlField(field.defaultValue);
           break;
         case FieldTypes.Section: {
           const cFormData = this.initialFormData(field.children);
@@ -258,29 +224,6 @@ class MassEnergizeForm extends Component {
     await this.setStateAsync({
       formData: { ...formData, [name]: editorState },
     });
-  };
-  handleLightEditorChange = async (e, name) => {
-    const data = await e.saver.save();
-    console.log("RAW DATA", data);
-    const HTMLFromShop = factory(data.blocks);
-    console.log("YEAH FROM TEH SHOP", HTMLFromShop);
-    const blocksToString = `${NEW_EDITOR_IDENTITY}${JSON.stringify(
-      HTMLFromShop.blocks
-    )}`;
-    console.log("STATE CONTENT:::", blocksToString);
-    const { formData } = this.state;
-    await this.setStateAsync({
-      formData: { ...formData, [name]: blocksToString },
-    });
-  };
-  stripHTMLFromNewEditorContent = (impureJsonText) => {
-    console.log("I AM THE IMPURE JSON", impureJsonText);
-    var jsonText = impureJsonText
-      ? impureJsonText.split(NEW_EDITOR_IDENTITY)[1]
-      : "";
-    var blocks = jsonText ? JSON.parse(jsonText) : [];
-    var result = factory(blocks);
-    return result.HTML;
   };
 
   /**
@@ -710,7 +653,7 @@ class MassEnergizeForm extends Component {
             : { display: "none" };
         return (
           <div key={field.name + field.label}>
-            <div style={previewStyle}>{this.showPreviewModal()}</div>
+            {/* <div style={previewStyle}>{this.showPreviewModal()}</div> */}
             <Grid
               item
               xs={12}
@@ -718,21 +661,10 @@ class MassEnergizeForm extends Component {
                 borderColor: "#EAEAEA",
                 borderStyle: "solid",
                 borderWidth: "thin",
-                minHeight: 30,
-                // margin:"0px 90px", 
-                borderRadius:15
               }}
             >
               <div style={{ padding: 20, color: "#d28818" }}>
-                <Typography
-                  style={{
-                    textAlign: "center",
-                    fontWeight: "bold",
-                    color: "#585858",
-                  }}
-                >
-                  {field.label}
-                </Typography>
+                <Typography>{field.label}</Typography>
                 {/* <small>
                   <b>PLEASE NOTE:</b> the wide spacing between two lines in the
                   editor, is not what you will get when you content gets to
@@ -751,28 +683,7 @@ class MassEnergizeForm extends Component {
                   </b>
                 </small> */}
               </div>
-              {/* ----------------------------- NEW EDITOR --------------------------- */}
-              <EditorJS
-                placeholder="Start Typing here..."
-                hideToolbar={false}
-                onChange={(e) => this.handleLightEditorChange(e, field.name)}
-                instanceRef={(instance) => (this.editorInstance = instance)}
-                holder={`editor-holder-${field.name}`}
-                tools={this.getEditorToolsAndSettings().tools}
-                i18n={this.getEditorToolsAndSettings().settings}
-              >
-                <div
-                  style={{
-                    width: "100%",
-                    textAlign: "left",
-                    minHeight: 30,
-                    paddingTop: 10,
-                  }}
-                  id={`editor-holder-${field.name}`}
-                />
-              </EditorJS>
-              {/* ----------------------------- END NEW EDITOR --------------------------- */}
-              {/* <Editor
+              <Editor
                 editorState={this.getValue(
                   field.name,
                   EditorState.createEmpty()
@@ -783,7 +694,7 @@ class MassEnergizeForm extends Component {
                 }
                 toolbarClassName="toolbarClassName"
                 wrapperClassName="wrapperClassName"
-              /> */}
+              />
 
               {/* <TinyEditor
                 value={() => this.getValue(field.name, null)}
@@ -807,15 +718,9 @@ class MassEnergizeForm extends Component {
                 }}
                 apiKey={TINY_MCE_API_KEY}
               /> */}
-            </Grid>
-            <center>
-              <Button
-                style={{
-                  padding: "10px 40px",
-                  margin: 13,
-                  boxShadow:
-                    "0 1px 0px 0 rgb(0 0 0 / 0%), 0 2px 10px 0 rgba(0, 0, 0, 0.18)",
-                }}
+
+              {/* <Button
+                style={{ width: "100%" }}
                 color="default"
                 onClick={() => {
                   this.setState({
@@ -826,8 +731,8 @@ class MassEnergizeForm extends Component {
               >
                 <Icon style={{ marginRight: 6 }}>remove_red_eye</Icon>Show Me A
                 Preview{" "}
-              </Button>
-            </center>
+              </Button> */}
+            </Grid>
             <br />
             <br />
           </div>
@@ -947,7 +852,7 @@ class MassEnergizeForm extends Component {
   render() {
     const { classes } = this.props;
     const { formJson, error, successMsg, startCircularSpinner } = this.state;
-    console.log("INNER WIDTH", window.innerWidth);
+
     if (!formJson) return <div />;
     return (
       <div>

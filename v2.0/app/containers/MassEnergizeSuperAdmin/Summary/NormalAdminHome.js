@@ -150,7 +150,7 @@ class NormalAdminHome extends PureComponent {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <h1>
+        <h1 style={{color:"white"}}>
           Howdy Community Admin
           <span role="img" aria-label="smiley">
             😊
