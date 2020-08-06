@@ -276,7 +276,7 @@ class MassEnergizeForm extends Component {
     const data = await e.saver.save();
     const HTMLFromShop = await factory(data.blocks);
     const blocksToString = `${NEW_EDITOR_IDENTITY}${JSON.stringify(
-      HTMLFromShop.blocks
+      {...data,blocks:HTMLFromShop.blocks}
     )}`;
     const { formData } = this.state;
     await this.setStateAsync({
@@ -287,11 +287,19 @@ class MassEnergizeForm extends Component {
     var jsonText = impureJsonText
       ? impureJsonText.split(NEW_EDITOR_IDENTITY)[1]
       : "";
-    var blocks = jsonText ? JSON.parse(jsonText) : [];
+    var data = jsonText ? JSON.parse(jsonText) : [];
+    var blocks = data.blocks;
     var result = await factory(blocks);
     return result.HTML;
   };
 
+  getLightEditorInitialData  =(name)=>{
+    const text = this.getValue(name);
+    if(!text) return null; 
+    var jsonText = text.split(NEW_EDITOR_IDENTITY)[1];
+    var json = JSON.parse(jsonText);
+    return json;
+  }
   newLightWeightEditor = (field) => {
     return (
       <div>
@@ -305,23 +313,6 @@ class MassEnergizeForm extends Component {
           >
             {field.label}
           </Typography>
-          {/* <small>
-        <b>PLEASE NOTE:</b> the wide spacing between two lines in the
-        editor, is not what you will get when you content gets to
-        users.
-        <br />
-        If you need a{" "}
-        <b>
-          <i>gap </i>
-        </b>
-        between two lines, press your <b>Enter Key twice </b> or more,
-        instead of <b>once</b>
-        <br />
-        <b>
-          Pressing Once, will only show items right on the next line,
-          without any gap
-        </b>
-      </small> */}
         </div>
         <EditorJS
           placeholder="Start Typing here..."
@@ -331,7 +322,7 @@ class MassEnergizeForm extends Component {
           holder={`editor-holder-${field.name}`}
           tools={this.getEditorToolsAndSettings().tools}
           i18n={this.getEditorToolsAndSettings().settings}
-          data={this.getValue(field.name)}
+          data={this.getLightEditorInitialData(field.name)}
         >
           <div
             style={{

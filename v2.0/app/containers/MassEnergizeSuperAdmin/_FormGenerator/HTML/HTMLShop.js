@@ -118,7 +118,7 @@ const changingRoom = (block) => {
         text = item;
         containsLinks = hasLink(text);
         if (containsLinks) {
-          text = makeLinksOpenNewTab(block.data.text);
+          text = makeLinksOpenNewTab(text);
         }
         dressedUp = `${LIST_START}${text}${LIST_END}`;
         together = `${together}${dressedUp}`;
@@ -153,6 +153,7 @@ const changingRoom = (block) => {
 };
 
 const factory = async (blocks) => {
+
   var HTML = "",
   newBlocks = [];
   if(!blocks) return { HTML, blocks: newBlocks };
