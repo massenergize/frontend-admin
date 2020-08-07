@@ -36,7 +36,44 @@ import Type from 'dan-styles/Typography.scss';
 import PapperBlock from 'dan-components/PapperBlock/PapperBlock';
 import styles from './profile-jss';
 import { convertBoolean, getAddress, goHere } from '../../../../utils/common';
+import Snackbar from '@material-ui/core/Snackbar';
+import MySnackbarContentWrapper from '../../../../components/SnackBar/SnackbarContentWrapper';
+import { apiCallFile } from '../../../../utils/messenger';
+import { downloadFile } from '../../../../utils/common';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
+
 class About extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      error: null,
+      loadingCSVs: []
+    };
+  }
+
+
+  async getCSV(endpoint) {
+    const { community } = this.props;
+    if (!community) {
+      return;
+    }
+    let oldLoadingCSVs = this.state.loadingCSVs;
+    this.setState({ loadingCSVs: oldLoadingCSVs.concat(endpoint) });
+
+    const csvResponse = await apiCallFile('/downloads.' + endpoint,
+      { community_id: community.id });
+
+    oldLoadingCSVs = this.state.loadingCSVs;
+    oldLoadingCSVs.splice(oldLoadingCSVs.indexOf(endpoint), 1);
+    if (csvResponse.success) {
+      downloadFile(csvResponse.file);
+    } else {
+      this.setState({ error: csvResponse.error });
+    }
+    this.setState({ loadingCSVs: oldLoadingCSVs });
+  }
+
   getTags = tags => (tags.map(t => (t.name))).join(', ');
 
   getGoalPercentage() {
@@ -50,6 +87,13 @@ class About extends React.Component {
     }
     return 0;
   }
+
+  handleCloseStyle = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    this.setState({ error: null });
+  };
 
   actionsGoalPercentage() {
     const community = this.props.community ? this.props.community : 0;
@@ -81,181 +125,235 @@ class About extends React.Component {
     const communityEditLink = `/admin/edit/${community ? community.id : null}/community/community-admin`;
     const addRemoveCommuntyAdminLink = `/admin/edit/${community ? community.id : null}/community-admins`;
 
+    const { error, loadingCSVs } = this.state;
 
     return (
-      <Grid
-        container
-        alignItems="flex-start"
-        justify="flex-start"
-        direction="row"
-        spacing={24}
-      >
+      <>
 
-        <Grid item md={6} xs={12}>
-          {/* Profile Progress */}
-          <div className={classes.progressRoot}>
-            <Paper className={classes.styledPaper} elevation={4}>
-              <Typography className={classes.title} variant="h5" component="h3">
-                <center><span className={Type.light} style={{ textAlign: 'center' }}>#Actions Goal</span></center>
-                {/* <span className={Type.bold}>Intermediate</span> */}
-              </Typography>
-              <Grid container justify="center">
-                <Chip
-                  avatar={(
-                    <Avatar>
-                      <Check />
-                    </Avatar>
-                  )}
-                  label={`${this.actionsGoalPercentage()}% Progress`}
-                  className={classes.chip}
-                  color="primary"
+        {error
+          && (
+            <div>
+              <Snackbar
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                open={error != null}
+                autoHideDuration={6000}
+                onClose={this.handleCloseStyle}
+              >
+                <MySnackbarContentWrapper
+                  onClose={this.handleCloseStyle}
+                  variant="error"
+                  message={`Unable to download: ${error}`}
                 />
-              </Grid>
-              <LinearProgress variant="determinate" className={classes.progress} value={this.actionsGoalPercentage()} />
-            </Paper>
-          </div>
-          {/* ----------------------------------------------------------------------*/}
-          {/* About Me */}
-          <PapperBlock title="About Community" icon="ios-contact-outline" whiteBg noMargin desc={`${community ? community.about_community : ''}`}>
+              </Snackbar>
+            </div>
+          )}
+
+        <Grid
+          container
+          alignItems="flex-start"
+          justify="flex-start"
+          direction="row"
+          spacing={24}
+        >
+
+          <Grid item md={6} xs={12}>
+            {/* Profile Progress */}
+            <div className={classes.progressRoot}>
+              <Paper className={classes.styledPaper} elevation={4}>
+                <Typography className={classes.title} variant="h5" component="h3">
+                  <center><span className={Type.light} style={{ textAlign: 'center' }}>#Actions Goal</span></center>
+                  {/* <span className={Type.bold}>Intermediate</span> */}
+                </Typography>
+                <Grid container justify="center">
+                  <Chip
+                    avatar={(
+                      <Avatar>
+                        <Check />
+                      </Avatar>
+                    )}
+                    label={`${this.actionsGoalPercentage()}% Progress`}
+                    className={classes.chip}
+                    color="primary"
+                  />
+                </Grid>
+                <LinearProgress variant="determinate" className={classes.progress} value={this.actionsGoalPercentage()} />
+              </Paper>
+            </div>
+            {/* ----------------------------------------------------------------------*/}
+            {/* About Me */}
+            <PapperBlock title="About Community" icon="ios-contact-outline" whiteBg noMargin desc={`${community ? community.about_community : ''}`}>
+              <Divider className={classes.divider} />
+              <List dense className={classes.profileList}>
+                <ListItem>
+                  <Avatar>
+                    <DateRange />
+                  </Avatar>
+                  <ListItemText primary="Admin Name" secondary={`${community.owner_name}`} />
+                </ListItem>
+                <ListItem>
+                  <Avatar>
+                    <Email />
+                  </Avatar>
+                  <ListItemText primary="Admin Email" secondary={`${community.owner_email}`} />
+                </ListItem>
+
+                <ListItem>
+                  <Avatar>
+                    <DateRange />
+                  </Avatar>
+                  <ListItemText primary="Date Registered" secondary={`${moment(community.created_at).format('MMMM Do YYYY, h:mm:ss a')}`} />
+                </ListItem>
+                <ListItem>
+                  <Avatar>
+                    <LocalPhone />
+                  </Avatar>
+                  <ListItemText primary="Phone Number" secondary={`${community.owner_phone_number || 'No Phone Number Provided'}`} />
+                </ListItem>
+              </List>
+
+              <Divider className={classes.divider} />
+
+              <List dense className={classes.profileList}>
+                {'Community Admins'}
+                {community && community.admins &&
+                  (community.admins.map(a => (
+                    <ListItem key={a.email}>
+                      {a.profile_picture
+                        && <Avatar alt={a.initials} src={a.profile_picture.url} style={{ margin: 10 }} />
+                      }
+                      {!a.profile_picture
+                        && <Avatar style={{ margin: 10 }}>{a.preferred_name.substring(0, 2)}</Avatar>
+                      }
+                      <ListItemText primary={a.preferred_name} secondary={a.email} />
+                    </ListItem>
+                  )))
+                }
+              </List>
+
+            </PapperBlock>
             <Divider className={classes.divider} />
-            <List dense className={classes.profileList}>
-              <ListItem>
-                <Avatar>
-                  <DateRange />
-                </Avatar>
-                <ListItemText primary="Admin Name" secondary={`${community.owner_name}`} />
-              </ListItem>
-              <ListItem>
-                <Avatar>
-                  <Email />
-                </Avatar>
-                <ListItemText primary="Admin Email" secondary={`${community.owner_email}`} />
-              </ListItem>
 
-              <ListItem>
-                <Avatar>
-                  <DateRange />
-                </Avatar>
-                <ListItemText primary="Date Registered" secondary={`${moment(community.created_at).format('MMMM Do YYYY, h:mm:ss a')}`} />
-              </ListItem>
-              <ListItem>
-                <Avatar>
-                  <LocalPhone />
-                </Avatar>
-                <ListItemText primary="Phone Number" secondary={`${community.owner_phone_number || 'No Phone Number Provided'}`} />
-              </ListItem>
-            </List>
+            {/* ----------------------------------------------------------------------*/}
+          </Grid>
 
-            <Divider className={classes.divider} />
 
-            <List dense className={classes.profileList}>
-              {'Community Admins'}
-              {community && community.admins &&
-                (community.admins.map(a => (
-                  <ListItem key={a.email}>
-                    {a.profile_picture
-                      && <Avatar alt={a.initials} src={a.profile_picture.url} style={{ margin: 10 }} />
-                    }
-                    {!a.profile_picture
-                      && <Avatar style={{ margin: 10 }}>{a.preferred_name.substring(0, 2)}</Avatar>
-                    }
-                    <ListItemText primary={a.preferred_name} secondary={a.email} />
+          <Grid item md={6} xs={12}>
+            <div className={classes.progressRoot}>
+              <Paper className={classes.styledPaper} elevation={4}>
+                <Typography className={classes.title} variant="h5" component="h3">
+                  <center><span className={Type.light} style={{ textAlign: 'center' }}>#Household Goal</span></center>
+                </Typography>
+                <Grid container justify="center">
+                  <Chip
+                    avatar={(
+                      <Avatar>
+                        <Check />
+                      </Avatar>
+                    )}
+                    label={`${this.userGoalPercentage()}% Progress`}
+                    className={classes.chip}
+                    color="primary"
+                  />
+                </Grid>
+                <LinearProgress variant="determinate" className={classes.progress} value={this.userGoalPercentage()} />
+              </Paper>
+            </div>
+            {/* ----------------------------------------------------------------------*/}
+            {/* My Interests */}
+            <PapperBlock title="More Details" icon="ios-aperture-outline" whiteBg desc="">
+
+              <Grid container className={classes.colList}>
+                <Grid item md={6}>
+                  <ListItem>
+                    <Avatar className={classNames(classes.avatar, classes.purpleAvatar)}>
+                      <AcUnit />
+                    </Avatar>
+                    <ListItemText primary="Subdomain" secondary={`${community.subdomain}`} />
                   </ListItem>
-                )))
-              }
-            </List>
-            
-          </PapperBlock>
-          <Divider className={classes.divider} />
-
-          {/* ----------------------------------------------------------------------*/}
-        </Grid>
-
-
-        <Grid item md={6} xs={12}>
-          <div className={classes.progressRoot}>
-            <Paper className={classes.styledPaper} elevation={4}>
-              <Typography className={classes.title} variant="h5" component="h3">
-                <center><span className={Type.light} style={{ textAlign: 'center' }}>#Household Goal</span></center>
-              </Typography>
-              <Grid container justify="center">
-                <Chip
-                  avatar={(
-                    <Avatar>
-                      <Check />
+                </Grid>
+                <Grid item md={6}>
+                  <ListItem>
+                    <Avatar className={classNames(classes.avatar, classes.greenAvatar)}>
+                      <AcUnit />
                     </Avatar>
-                  )}
-                  label={`${this.userGoalPercentage()}% Progress`}
-                  className={classes.chip}
-                  color="primary"
-                />
+                    <ListItemText primary="Is Geographically Focused" secondary={`${community.is_geographically_focused}`} />
+                  </ListItem>
+                </Grid>
+                <Grid item md={6}>
+                  <ListItem>
+                    <Avatar className={classNames(classes.avatar, classes.pinkAvatar)}>
+                      <AcUnit />
+                    </Avatar>
+                    <ListItemText primary="Is Approved" secondary={`${community.is_approved}`} />
+                  </ListItem>
+                </Grid>
+                <Grid item md={6}>
+                  <ListItem>
+                    <Avatar className={classNames(classes.avatar, classes.orangeAvatar)}>
+                      <LocationOn />
+                    </Avatar>
+                    <ListItemText primary="Location" secondary={`${getAddress(community.location)}`} />
+                  </ListItem>
+                </Grid>
               </Grid>
-              <LinearProgress variant="determinate" className={classes.progress} value={this.userGoalPercentage()} />
-            </Paper>
-          </div>
-          {/* ----------------------------------------------------------------------*/}
-          {/* My Interests */}
-          <PapperBlock title="More Details" icon="ios-aperture-outline" whiteBg desc="">
-
-            <Grid container className={classes.colList}>
-              <Grid item md={6}>
-                <ListItem>
-                  <Avatar className={classNames(classes.avatar, classes.purpleAvatar)}>
-                    <AcUnit />
-                  </Avatar>
-                  <ListItemText primary="Subdomain" secondary={`${community.subdomain}`} />
-                </ListItem>
-              </Grid>
-              <Grid item md={6}>
-                <ListItem>
-                  <Avatar className={classNames(classes.avatar, classes.greenAvatar)}>
-                    <AcUnit />
-                  </Avatar>
-                  <ListItemText primary="Is Geographically Focused" secondary={`${community.is_geographically_focused}`} />
-                </ListItem>
-              </Grid>
-              <Grid item md={6}>
-                <ListItem>
-                  <Avatar className={classNames(classes.avatar, classes.pinkAvatar)}>
-                    <AcUnit />
-                  </Avatar>
-                  <ListItemText primary="Is Approved" secondary={`${community.is_approved}`} />
-                </ListItem>
-              </Grid>
-              <Grid item md={6}>
-                <ListItem>
-                  <Avatar className={classNames(classes.avatar, classes.orangeAvatar)}>
-                    <LocationOn />
-                  </Avatar>
-                  <ListItemText primary="Location" secondary={`${getAddress(community.location)}`} />
-                </ListItem>
-              </Grid>
-            </Grid>
-            <Paper onClick={() => goHere(addRemoveCommuntyAdminLink)} className={`${classes.pageCard}`} elevation={1}>
-              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                Add/Remove Administrators for Community
+              <Paper onClick={() => goHere(addRemoveCommuntyAdminLink)} className={`${classes.pageCard}`} elevation={1}>
+                <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                  Add/Remove Administrators for Community
                 {' '}
-                <Icon style={{ paddingTop: 3, color: 'green' }}>forward</Icon>
-              </Typography>
-            </Paper>
-            {/* <Paper onClick={() => goHere(goalsEditLink)} className={`${classes.pageCard}`} elevation={1}>
+                  <Icon style={{ paddingTop: 3, color: 'green' }}>forward</Icon>
+                </Typography>
+              </Paper>
+              {/* <Paper onClick={() => goHere(goalsEditLink)} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
                 Edit Community Goal
                 {' '}
                 <Icon style={{ paddingTop: 3, color: 'green' }}>forward</Icon>
               </Typography>
             </Paper> */}
-            <Paper onClick={() => goHere(communityEditLink)} className={`${classes.pageCard}`} elevation={1}>
-              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                Edit Community Info
+              <Paper onClick={() => goHere(communityEditLink)} className={`${classes.pageCard}`} elevation={1}>
+                <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                  Edit Community Info
                 {' '}
-                <Icon style={{ paddingTop: 3, color: 'green' }}>forward</Icon>
+                  <Icon style={{ paddingTop: 3, color: 'green' }}>forward</Icon>
+                </Typography>
+              </Paper>
+
+            </PapperBlock>
+          </Grid>
+        </Grid>
+        <Grid container className={classes.colList}>
+          <Grid item xs={4}>
+            <Paper onClick={() => { !loadingCSVs.includes('users') && this.getCSV('users'); }} className={`${classes.pageCard}`} elevation={1}>
+              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                Download Users CSV
+                    {' '}
+                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
+                {loadingCSVs.includes('users') && <CircularProgress size={20} thickness={2} color="secondary" />}
               </Typography>
             </Paper>
-            
-          </PapperBlock>
+          </Grid>
+          <Grid item xs={4}>
+            <Paper onClick={() => { !loadingCSVs.includes('actions') && this.getCSV('actions'); }} className={`${classes.pageCard}`} elevation={1}>
+              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                Download Actions CSV
+                    {' '}
+                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
+                {loadingCSVs.includes('actions') && <CircularProgress size={20} thickness={2} color="secondary" />}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={4}>
+            <Paper onClick={() => { !loadingCSVs.includes('teams') && this.getCSV('teams'); }} className={`${classes.pageCard}`} elevation={1}>
+              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                Download Teams CSV
+                    {' '}
+                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
+                {loadingCSVs.includes('teams') && <CircularProgress size={20} thickness={2} color="secondary" />}
+              </Typography>
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
+      </>
     );
   }
 }

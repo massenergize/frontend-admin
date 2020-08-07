@@ -13,13 +13,47 @@ import ActionsChartWidget from './graph/ActionsChartWidget';
 import {
   reduxLoadSelectedCommunity, reduxCheckUser
 } from '../../../redux/redux-actions/adminActions';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import Icon from '@material-ui/core/Icon';
+import Snackbar from '@material-ui/core/Snackbar';
+import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
+import { apiCallFile } from '../../../utils/messenger';
+import { downloadFile } from '../../../utils/common';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 // import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
 class SummaryDashboard extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      error: null,
+      loadingCSVs: []
+    };
   }
 
+  async getCSV(endpoint) {
+    let oldLoadingCSVs = this.state.loadingCSVs;
+    this.setState({ loadingCSVs: oldLoadingCSVs.concat(endpoint) });
+    const csvResponse = await apiCallFile('/downloads.' + endpoint);
+
+    oldLoadingCSVs = this.state.loadingCSVs;
+    oldLoadingCSVs.splice(oldLoadingCSVs.indexOf(endpoint), 1);
+    if (csvResponse.success) {
+      downloadFile(csvResponse.file);
+    } else {
+      this.setState({ error: csvResponse.error });
+    }
+    this.setState({ loadingCSVs: oldLoadingCSVs });
+    this.forceUpdate();
+  }
+
+  handleCloseStyle = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    this.setState({ error: null });
+  };
 
   findCommunityObj = (name) => {
     const section = this.props.communities;
@@ -44,11 +78,31 @@ class SummaryDashboard extends PureComponent {
     const title = brand.name + ' - Summary Dashboard';
     const description = brand.desc;
     const {
-      classes, communities, selected_community, auth, summary_data, graph_data 
+      classes, communities, selected_community, auth, summary_data, graph_data
     } = this.props;
+    const { error, loadingCSVs } = this.state;
 
     return (
       <div>
+        {error
+          && (
+            <div>
+              <Snackbar
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                open={error != null}
+                autoHideDuration={6000}
+                onClose={this.handleCloseStyle}
+              >
+                <MySnackbarContentWrapper
+                  onClose={this.handleCloseStyle}
+                  variant="error"
+                  message={`Unable to download: ${error}`}
+                />
+              </Snackbar>
+            </div>
+          )}
+
+
         <Helmet>
           <title>{title}</title>
           <meta name="description" content={description} />
@@ -66,6 +120,38 @@ class SummaryDashboard extends PureComponent {
         {graph_data
           && <ActionsChartWidget data={graph_data || {}} />
         }
+        <Grid container className={classes.colList}>
+          <Grid item xs={4}>
+            <Paper onClick={() => { !loadingCSVs.includes('users') && this.getCSV('users'); }} className={`${classes.pageCard}`} elevation={1}>
+              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                Download All Users CSV
+                    {' '}
+                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
+                {loadingCSVs.includes('users') && <CircularProgress size={20} thickness={2} color="secondary" />}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={4}>
+            <Paper onClick={() => { !loadingCSVs.includes('actions') && this.getCSV('actions'); }} className={`${classes.pageCard}`} elevation={1}>
+              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                Download All Actions CSV
+                    {' '}
+                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
+                {loadingCSVs.includes('actions') && <CircularProgress size={20} thickness={2} color="secondary" />}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={4}>
+            <Paper onClick={() => { !loadingCSVs.includes('communities') && this.getCSV('communities'); }} className={`${classes.pageCard}`} elevation={1}>
+              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                Download All Communities CSV
+                    {' '}
+                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
+                {loadingCSVs.includes('communities') && <CircularProgress size={20} thickness={2} color="secondary" />}
+              </Typography>
+            </Paper>
+          </Grid>
+        </Grid>
         <br />
         <br />
 

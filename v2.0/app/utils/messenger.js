@@ -33,6 +33,48 @@ export async function apiCall(destinationUrl, dataToSend = {}, relocationPage = 
   }
 }
 
+export async function apiCallFile(destinationUrl, dataToSend = {}, strictUrl = false) {
+  const idToken = localStorage.getItem('idToken');
+  const url = strictUrl ? `${API_HOST}${destinationUrl}` : `${API_HOST}/v3${destinationUrl}`;
+  const response = await fetch(url, {
+    credentials: 'include',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Authorization: `Bearer ${idToken}`
+    },
+    body: qs.stringify(dataToSend)
+  });
+
+  try {
+    const contentType = response.headers.get('content-type');
+
+    // endpoints that return non-JSON data will still send JSONs on errors
+    if (contentType && contentType.indexOf('application/json') !== -1) {
+      return response.json().then(json => {
+        if (json.error === 'Signature has expired') {
+          localStorage.removeItem('authUser');
+          localStorage.removeItem('idToken');
+          window.location.href = '/login';
+        }
+        return json;
+      });
+    }
+
+    // if no JSON response, it was a success
+    const contentDisposition = response.headers.get('content-disposition');
+    const filename = contentDisposition
+      ? contentDisposition.match(/filename="(.+)"/)[1]
+      : 'download.' + contentType.split('/')[1];
+    return response.blob().then(blob => ({
+      success: true,
+      file: new File([blob], filename, { type: contentType })
+    }));
+  } catch (error) {
+    return { success: false, error: error.toString() };
+  }
+}
+
 export async function rawCall(destinationUrl, dataToSend = {}, relocationPage = null) {
   const idToken = localStorage.getItem('idToken');
   let params = {};
