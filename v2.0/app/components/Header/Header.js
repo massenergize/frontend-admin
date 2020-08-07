@@ -10,6 +10,7 @@ import Fab from '@material-ui/core/Fab';
 import Ionicon from 'react-ionicons';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -172,7 +173,7 @@ class Header extends React.Component {
           </Fab>
           <Hidden smDown>
             <div className={classes.headerProperties}>
-              <div className={classNames(classes.headerAction, showTitle && classes.fadeOut)}>
+              <div className={classNames(classes.headerAction, showTitle && classes.leftMargin)}>
                 {fullScreen ? (
                   <Tooltip title="Exit Full Screen" placement="bottom">
                     <IconButton className={classes.button} onClick={this.closeFullScreen}>
@@ -191,11 +192,9 @@ class Header extends React.Component {
                     <Ionicon icon="ios-bulb-outline" />
                   </IconButton>
                 </Tooltip>
-                <Tooltip title="Show Guide" placement="bottom">
-                  <IconButton className={classes.button} onClick={openGuide}>
-                    <Ionicon icon="ios-help-circle-outline" />
-                  </IconButton>
-                </Tooltip>
+                <Button className={classes.button} onClick={openGuide}>
+                  <Ionicon icon="ios-help-circle-outline" /> &nbsp; Need Help?
+                </Button>
               </div>
               <Typography component="h2" className={classNames(classes.headerTitle, showTitle && classes.show)}>
                 {title}

@@ -398,7 +398,7 @@ const styles = theme => ({
       display: 'inherit'
     }
   },
-  button: {},
+  button: {color: theme.palette.common.white},
   headerProperties: {
     overflow: 'hidden',
     position: 'relative',
@@ -409,6 +409,7 @@ const styles = theme => ({
   },
   fadeOut: {},
   invert: {},
+  leftMargin: {},
   headerAction: {
     margin: `0 ${theme.spacing.unit * 3}px`,
     transition: 'opacity 0.5s ease',
@@ -422,6 +423,10 @@ const styles = theme => ({
     },
     '&$fadeOut': {
       opacity: 0,
+      },
+    '&$leftMargin': {
+        marginLeft: 200,
+        transition: 'all 0.2s ease-in-out'
     },
     '&$invert': {
       '& $button': {

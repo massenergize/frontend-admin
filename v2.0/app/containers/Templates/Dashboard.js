@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
-import { GuideSlider } from 'dan-components';
+import { GuideModal } from 'dan-components';
 import { toggleAction, openAction, playTransitionAction } from 'dan-actions/UiActions';
 import LeftSidebarLayout from './layouts/LeftSidebarLayout';
 import RightSidebarLayout from './layouts/RightSidebarLayout';
@@ -74,7 +74,7 @@ class Dashboard extends React.Component {
           )
         }
       >
-        <GuideSlider openGuide={openGuide} closeGuide={this.handleCloseGuide} />
+        <GuideModal openGuide={openGuide} closeGuide={this.handleCloseGuide} />
         { /* Left Sidebar Layout */
           layout === 'left-sidebar' && (
             <LeftSidebarLayout
