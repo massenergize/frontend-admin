@@ -116,10 +116,10 @@ class CreateNewTeamForm extends Component {
         },
 
         {
-          name: 'image',
+          name: 'logo',
           placeholder: 'Select a Logo for this team',
           fieldType: 'File',
-          dbName: 'image',
+          dbName: 'logo',
           label: 'Select a Logo for this team',
           selectMany: false,
           isRequired: false,
