@@ -135,7 +135,7 @@
     "js-cookie": "^2.2.0",
     "jss": "^9.8.7",
     "keycode": "^2.2.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "material-ui-pickers": "^2.2.4",
     "minimist": "1.2.3",
     "moment": "^2.24.0",
