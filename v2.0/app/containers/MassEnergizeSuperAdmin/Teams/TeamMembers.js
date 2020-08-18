@@ -11,6 +11,7 @@ import { connect } from 'react-redux';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import classNames from 'classnames';
+import Grid from "@material-ui/core/Grid";
 import Tab from '@material-ui/core/Tab';
 import PeopleIcon from '@material-ui/icons/People';
 import AddBoxIcon from '@material-ui/icons/AddBox';
@@ -209,40 +210,47 @@ class TeamMembers extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <div>
-          <SnackbarContent
-            className={classNames(classes.snackbar, messageStyles.bgSuccess)}
-            message={`Team: ${team && team.name}`}
-            action={() => (
-              <Link color="secondary" size="small">
-              Action
-              </Link>
-            )}
-          />
-          <br />
-          <SnackbarContent
-            className={classNames(classes.snackbar, messageStyles.bgWarning)}
-            message={`Community: ${team && team.community && team.community.name}`}
-            action={() => (
-              <Link color="secondary" size="small">
-              Action
-              </Link>
-            )}
-          />
-          <br />
-          <Link to="/admin/read/teams">
+        <Grid container>
+          <Grid item xs={8}>
             <SnackbarContent
-              className={classNames(classes.snackbar, messageStyles.bgInfo)}
-              message="<<< Go Back to All Teams"
+              className={classNames(classes.snackbar, messageStyles.bgSuccess)}
+              message={`Team: ${team && team.name}`}
               action={() => (
                 <Link color="secondary" size="small">
-              Action
+                  Action
                 </Link>
               )}
             />
-          </Link>
-
-        </div>
+            <br />
+            <SnackbarContent
+              className={classNames(classes.snackbar, messageStyles.bgWarning)}
+              message={`Community: ${team && team.community && team.community.name}`}
+              action={() => (
+                <Link color="secondary" size="small">
+                  Action
+                </Link>
+              )}
+            />
+            <br />
+            <Link to="/admin/read/teams">
+              <SnackbarContent
+                className={classNames(classes.snackbar, messageStyles.bgInfo)}
+                message="<<< Go Back to All Teams"
+                action={() => (
+                  <Link color="secondary" size="small">
+                    Action
+                  </Link>
+                )}
+              />
+            </Link>
+          </Grid>
+          <Grid item xs={3}>
+            <p className={classes.note}>
+              NOTE: this page <i>does not</i> list members of sub-teams.
+              On the community portal, parent team pages <i>do</i> list members of sub-teams.
+            </p>
+          </Grid>
+        </Grid>
         <div className={classes.root}>
           <AppBar position="static" color="default">
             <Tabs
@@ -276,12 +284,12 @@ class TeamMembers extends React.Component {
           {value === 1 && (
             <TabContainer>
               {formJson
-            && (
-              <MassEnergizeForm
-                classes={classes}
-                formJson={formJson}
-              />
-            )
+                && (
+                  <MassEnergizeForm
+                    classes={classes}
+                    formJson={formJson}
+                  />
+                )
               }
             </TabContainer>
           )}
