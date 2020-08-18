@@ -122,7 +122,6 @@ class CreateNewActionForm extends Component {
 
   createFormJson = async () => {
     const { action, communities, ccActions, vendors } = this.state;
-    console.log(action)
     const formJson = {
       title: 'Update Action',
       subTitle: '',

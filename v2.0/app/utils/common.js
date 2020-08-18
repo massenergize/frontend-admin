@@ -19,3 +19,20 @@ export function convertBoolean(b) {
 export function goHere(link) {
   window.location = link;
 }
+
+export function downloadFile(file) {
+  if (!file) return;
+
+  if (window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveBlob(file, file.name);
+  } else {
+    const elem = window.document.createElement('a');
+    const URL = window.URL.createObjectURL(file);
+    elem.href = URL;
+    elem.download = file.name;
+    document.body.appendChild(elem);
+    elem.click();
+    document.body.removeChild(elem);
+    window.URL.revokeObjectURL(URL);
+  }
+}

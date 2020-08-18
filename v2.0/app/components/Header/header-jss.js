@@ -398,7 +398,7 @@ const styles = theme => ({
       display: 'inherit'
     }
   },
-  button: {},
+  button: { color: theme.palette.common.white },
   headerProperties: {
     overflow: 'hidden',
     position: 'relative',
@@ -409,7 +409,9 @@ const styles = theme => ({
   },
   fadeOut: {},
   invert: {},
+  leftMargin: {},
   headerAction: {
+    display: 'inline-block',
     margin: `0 ${theme.spacing.unit * 3}px`,
     transition: 'opacity 0.5s ease',
     '& $button': {
@@ -423,6 +425,9 @@ const styles = theme => ({
     '&$fadeOut': {
       opacity: 0,
     },
+    '&$leftMargin': {
+      transition: 'all 0.2s ease-in-out'
+    },
     '&$invert': {
       '& $button': {
         '& svg': {
@@ -433,9 +438,10 @@ const styles = theme => ({
   },
   show: {},
   headerTitle: {
+    display: 'inline-block',
     transition: 'all 0.3s ease',
     fontSize: theme.spacing.unit * 3,
-    position: 'absolute',
+    marginLeft: '20px',
     textTransform: 'capitalize',
     fontWeight: 700,
     top: 60,
@@ -454,7 +460,8 @@ const styles = theme => ({
     flexDirection: 'row-reverse',
     display: 'flex',
     alignItems: 'center'
-  }
+  },
+  howdy: { margin: 0 }
 });
 
 export default styles;

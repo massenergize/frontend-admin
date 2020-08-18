@@ -1,4 +1,23 @@
 const styles = theme => ({
+  pageCard: {
+    borderRadius: 5,
+    fontSize: 20,
+    margin: 9,
+    padding: '30px 29px 27px',
+    cursor: 'pointer',
+    '&:hover': {
+      background: 'floralwhite',
+      transition: '.4s'
+    }
+  },
+  colList: {
+    '& li': {
+      padding: '10px 0'
+    },
+    '& $avatar': {
+      margin: 0
+    }
+  },
   root: {
     flexGrow: 1,
   },
