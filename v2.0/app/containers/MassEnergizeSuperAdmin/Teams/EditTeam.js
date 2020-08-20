@@ -59,7 +59,10 @@ class EditTeam extends Component {
         // from that point, can set parent teams that are not ourselves AND don't have parents themselves (i.e. aren't sub-teams)
         const parentTeams = teams.data.filter(_team => _team.parent && _team.parent.id === team.id).length === 0
           && teams.data.filter(_team => ((_team.id !== team.id) && !_team.parent));
-        parentTeamOptions = parentTeams && parentTeams.map(_team => ({ ..._team, displayName: _team.name }));
+        if (parentTeams) {
+          parentTeamOptions = parentTeams.map(_team => ({ id: _team.id, displayName: _team.name }));
+          parentTeamOptions.unshift({ id: null, displayName: 'NONE' });
+        }
       }
       await this.setStateAsync({ team, parentTeamOptions });
     }
@@ -128,7 +131,7 @@ class EditTeam extends Component {
               label: 'Parent Team',
               fieldType: 'Dropdown',
               defaultValue: team.parent && team.parent.id,
-              dbName: 'parent',
+              dbName: 'parent_id',
               data: parentTeamOptions
             },
             {
