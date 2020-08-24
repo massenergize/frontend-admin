@@ -5,6 +5,9 @@ import { Paper } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { apiCall } from '../../../utils/messenger';
 import MassEnergizeForm from '../_FormGenerator';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { reduxGetAllCommunityTeams } from '../../../redux/redux-actions/adminActions';
 
 const styles = theme => ({
   root: {
@@ -48,7 +51,20 @@ class EditTeam extends Component {
     const teamResponse = await apiCall('/teams.info', { team_id: id });
     if (teamResponse && teamResponse.data) {
       const team = teamResponse.data;
-      await this.setStateAsync({ team });
+      let parentTeamOptions;
+      if (team.community) {
+        // const teams = await this.props.callTeamsForNormalAdmin();
+        const teams = await apiCall('/teams.list', { community_id: team.community.id });
+        // if other teams have us as a parent, can't set a parent ourselves
+        // from that point, can set parent teams that are not ourselves AND don't have parents themselves (i.e. aren't sub-teams)
+        const parentTeams = teams.data.filter(_team => _team.parent && _team.parent.id === team.id).length === 0
+          && teams.data.filter(_team => ((_team.id !== team.id) && !_team.parent));
+        if (parentTeams) {
+          parentTeamOptions = parentTeams.map(_team => ({ id: _team.id, displayName: _team.name }));
+          parentTeamOptions.unshift({ id: null, displayName: 'NONE' });
+        }
+      }
+      await this.setStateAsync({ team, parentTeamOptions });
     }
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
 
@@ -68,7 +84,7 @@ class EditTeam extends Component {
   }
 
   createFormJson = async () => {
-    const { communities, team } = this.state;
+    const { communities, team, parentTeamOptions } = this.state;
     const formJson = {
       title: 'Edit Team Information',
       subTitle: '',
@@ -110,6 +126,14 @@ class EditTeam extends Component {
               dbName: 'community_id',
               data: communities
             },
+            parentTeamOptions && {
+              name: 'parent',
+              label: 'Parent Team',
+              fieldType: 'Dropdown',
+              defaultValue: team.parent && team.parent.id,
+              dbName: 'parent_id',
+              data: parentTeamOptions
+            },
             {
               name: 'description',
               label: 'Team Description',
@@ -120,6 +144,18 @@ class EditTeam extends Component {
               isMultiline: true,
               defaultValue: team.description,
               dbName: 'description',
+              readOnly: false
+            },
+            {
+              name: 'tagline',
+              label: 'Team Tagline',
+              placeholder: 'eg. A catchy slogan for your team...',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              isMultiline: false,
+              defaultValue: team.tagline && team.tagline,
+              dbName: 'tagline',
               readOnly: false
             },
           ]
@@ -168,5 +204,11 @@ EditTeam.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    callTeamsForNormalAdmin: reduxGetAllCommunityTeams
+  }, dispatch);
+}
+const EditTeamMapped = connect(null, mapDispatchToProps)(EditTeam);
 
-export default withStyles(styles, { withTheme: true })(EditTeam);
+export default withStyles(styles, { withTheme: true })(EditTeamMapped);

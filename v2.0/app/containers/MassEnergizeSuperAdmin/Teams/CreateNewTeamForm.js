@@ -112,14 +112,26 @@ class CreateNewTeamForm extends Component {
               dbName: 'description',
               readOnly: false
             },
+            {
+              name: 'tagline',
+              label: 'Team Tagline',
+              placeholder: 'eg. A catchy slogan for your team...',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              isMultiline: false,
+              defaultValue: '',
+              dbName: 'tagline',
+              readOnly: false
+            },
           ]
         },
 
         {
-          name: 'image',
+          name: 'logo',
           placeholder: 'Select a Logo for this team',
           fieldType: 'File',
-          dbName: 'image',
+          dbName: 'logo',
           label: 'Select a Logo for this team',
           selectMany: false,
           isRequired: false,

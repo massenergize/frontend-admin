@@ -80,6 +80,7 @@ class AllTeams extends React.Component {
         },
         `${d.name}...`.substring(0, 30), // limit to first 30 chars
         d.community && d.community.name,
+        d.parent && d.parent.name,
         d.id,
         d.id
       ]
@@ -125,6 +126,14 @@ class AllTeams extends React.Component {
     {
       name: 'Community',
       key: 'community',
+      options: {
+        filter: true,
+        filterType: 'multiselect'
+      }
+    },
+    {
+      name: 'Parent',
+      key: 'parent',
       options: {
         filter: true,
         filterType: 'multiselect'

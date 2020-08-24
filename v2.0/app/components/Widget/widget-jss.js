@@ -664,8 +664,14 @@ const styles = theme => ({
     '&$cloud': {
       backgroundImage: `url(${images[18]})`,
       backgroundPosition: '0 -120px'
-    }
-  }
+    },
+
+  },
+  'note': {
+    fontWeight: 300,
+    fontSize: 16,
+    color: theme.palette.common.white,
+  },
 });
 
 export default styles;
