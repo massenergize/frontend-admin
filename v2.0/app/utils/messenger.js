@@ -182,61 +182,6 @@ export function sendJson(dataToSend, destinationUrl, relocationPage = '/admin') 
 }
 
 
-export function sendFormWithMedia(incomingData, destinationUrl, relocationPage) {
-  fetch(`${API_HOST}/auth/csrf`, {
-    method: 'GET',
-    credentials: 'include',
-  }).then(response => response.json()).then(jsonResponse => {
-    const { csrfToken } = jsonResponse.data;
-    const formData = new FormData();
-    Object.keys(incomingData).map(k => (formData.append(k, incomingData[k])));
-
-    return fetch(`${API_HOST}${destinationUrl}`, {
-      credentials: 'include',
-      mode: 'no-cors',
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': csrfToken,
-      },
-      body: formData
-    }).then(response => response.json())
-      .then(data => data)
-      .catch(error => {
-        console.log(error.message);
-        return null;
-      });
-  }).catch(error => {
-    console.log(error.message);
-    window.location.href = relocationPage;
-    return null;
-  });
-}
-
-export async function asyncSendFormWithMedia(incomingData, destinationUrl, relocationPage) {
-  const formData = new FormData();
-  Object.keys(incomingData).map(k => (formData.append(k, incomingData[k])));
-
-  const response = await fetch(`${API_HOST}${destinationUrl}`, {
-    credentials: 'include',
-    mode: 'no-cors',
-    method: 'POST',
-    body: formData
-  });
-  if (response) {
-    window.location.href = '/admin/read/actions';
-  }
-  return response;
-}
-
-
-export function cleanFormData(formValues) {
-  const result = {};
-  [...formValues].forEach(([k, v]) => {
-    result[k] = v;
-  });
-  return result;
-}
-
 export async function fetchData(sourceUrl) {
   // checkAuthUser();
   const idToken = localStorage.getItem('idToken');

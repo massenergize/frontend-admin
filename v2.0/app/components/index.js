@@ -52,7 +52,6 @@ export TimelineWidget from './Widget/TimelineWidget';
 export LatestTransactionWidget from './Widget/LatestTransactionWidget';
 export HistoryWidget from './Widget/HistoryWidget';
 
-export ProductCard from './CardPaper/ProductCard';
 
 
 export About from './Profile/About';
