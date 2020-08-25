@@ -8,22 +8,19 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import MenuItem from '@material-ui/core/MenuItem';
-import FileUpload from '@material-ui/icons/CloudUpload'
 import Button from '@material-ui/core/Button';
 import Type from 'dan-styles/Typography.scss';
 import Fab from '@material-ui/core/Fab';
-import DeleteIcon from '@material-ui/icons/Close';
-import IconQuickLinks from './Frags/IconLinks';
+import Public from '@material-ui/icons/Public';
 import AboutUsVideo from './Frags/AboutUsVideo';
-import AboutUsDescription from './Frags/AboutUsDescription';
 import GraphChoice from './Frags/GraphChoice';
 import EventChoices from './Frags/EventChoices';
-import Public from '@material-ui/icons/Public';
-import { styles, vanish, uploadBox } from './styles';
 import {
- allCommunities, immediateEventQuest, immediateGraphQuest, formForJokes, iconTextDefaults 
+ allCommunities, immediateEventQuest, immediateGraphQuest, iconTextDefaults
 } from './DataRetriever';
 import VerificationModal from './Frags/VerificationModal';
+import { styles, vanish, uploadBox } from './styles';
+
 class AdminEditHome extends React.Component {
   constructor(props) {
     super(props);
@@ -234,7 +231,6 @@ class AdminEditHome extends React.Component {
       about_video_url: this.state.about_video_url
     };
     console.log('I am the form data', data);
-    // formForJokes(data);
   }
 
   openSummary = () => {

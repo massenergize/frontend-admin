@@ -8,7 +8,7 @@ import LoginDedicated from '../Pages/Standalone/LoginDedicated';
 import ThemeWrapper, { AppContext } from './ThemeWrapper';
 import firebase, { googleProvider, facebookProvider } from './fire-config';
 import Auth from './Auth';
-import { rawCall } from '../../utils/messenger';
+import { apiCall } from '../../utils/messenger';
 import { reduxSignOut, reduxCallIdToken, reduxLoadAuthAdmin } from '../../redux/redux-actions/adminActions';
 window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
 
@@ -70,7 +70,7 @@ class App extends React.Component {
   requestMassToken = (fireToken) => {
     const me = this;
     const body = { idToken: fireToken };
-    rawCall('auth/verify', body).then(massToken => {
+    apiCall('auth.login', body).then(massToken => {
       const { idToken } = massToken.data;
       localStorage.setItem('idToken', idToken.toString());
       this.getAuthenticatedUserProfile();
@@ -109,7 +109,7 @@ class App extends React.Component {
 
   getAuthenticatedUserProfile = () => {
     const me = this;
-    rawCall('auth/whoami').then(userObj => {
+    apiCall('auth.whoami').then(userObj => {
       const user = userObj.data;
       if (user.is_community_admin || user.is_super_admin) {
         localStorage.setItem('authUser', JSON.stringify(user));
