@@ -10,7 +10,7 @@ import { apiCall } from '../../../utils/messenger';
 
 class Login extends React.Component {
   submitForm = async (values) => {
-    await apiCall('auth.login', values.entries(), '/admin');
+    await apiCall('/auth.login', values.entries(), '/admin');
   }
 
 

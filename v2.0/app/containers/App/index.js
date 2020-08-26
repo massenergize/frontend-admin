@@ -70,7 +70,7 @@ class App extends React.Component {
   requestMassToken = (fireToken) => {
     const me = this;
     const body = { idToken: fireToken };
-    apiCall('auth.login', body).then(massToken => {
+    apiCall('/auth.login', body).then(massToken => {
       const { idToken } = massToken.data;
       localStorage.setItem('idToken', idToken.toString());
       this.getAuthenticatedUserProfile();
@@ -109,9 +109,10 @@ class App extends React.Component {
 
   getAuthenticatedUserProfile = () => {
     const me = this;
-    apiCall('auth.whoami').then(userObj => {
+    apiCall('/auth.whoami').then(userObj => {
       const user = userObj.data;
-      if (user.is_community_admin || user.is_super_admin) {
+      console.log(user);
+      if (user && (user.is_community_admin || user.is_super_admin)) {
         localStorage.setItem('authUser', JSON.stringify(user));
         me.props.reduxLoadAuthAdmin(user);
         this.goHome();

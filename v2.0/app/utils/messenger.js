@@ -2,8 +2,8 @@
  * This file contains code used to transmit data
  */
 import qs from 'qs';
-import { API_HOST } from '../config/constants';
-import { IS_PROD } from '../../config/constants';
+import { API_HOST, IS_PROD } from '../config/constants';
+
 
 /**
  * Handles making a POST request to the backend as a form submission
@@ -21,13 +21,14 @@ export async function apiCall(
   // add some meta data for context in backend
   const data = {
     __is_prod: IS_PROD,
+    __is_admin_site: true,
     ...dataToSend
   };
 
   const formData = new FormData();
   Object.keys(data).map(k => (formData.append(k, data[k])));
 
-  const response = await fetch(`${API_HOST}/v3/${destinationUrl}`, {
+  const response = await fetch(`${API_HOST}/v3${destinationUrl}`, {
     credentials: 'include',
     method: 'POST',
     body: formData
@@ -56,6 +57,13 @@ export async function apiCall(
 export async function apiCallFile(destinationUrl, dataToSend = {}, strictUrl = false) {
   const idToken = localStorage.getItem('idToken');
   const url = strictUrl ? `${API_HOST}${destinationUrl}` : `${API_HOST}/v3${destinationUrl}`;
+  // add some meta data for context in backend
+  const data = {
+    __is_prod: IS_PROD,
+    __is_admin_site: true,
+    ...dataToSend
+  };
+
   const response = await fetch(url, {
     credentials: 'include',
     method: 'POST',
@@ -63,7 +71,7 @@ export async function apiCallFile(destinationUrl, dataToSend = {}, strictUrl = f
       'Content-Type': 'application/x-www-form-urlencoded',
       Authorization: `Bearer ${idToken}`
     },
-    body: qs.stringify(dataToSend)
+    body: qs.stringify(data)
   });
 
   try {
@@ -72,7 +80,7 @@ export async function apiCallFile(destinationUrl, dataToSend = {}, strictUrl = f
     // endpoints that return non-JSON data will still send JSONs on errors
     if (contentType && contentType.indexOf('application/json') !== -1) {
       return response.json().then(json => {
-        if (json.error === 'Signature has expired') {
+        if (json.error === 'session_expired') {
           localStorage.removeItem('authUser');
           localStorage.removeItem('idToken');
           window.location.href = '/login';
