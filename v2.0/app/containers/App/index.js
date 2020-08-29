@@ -1,15 +1,18 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import firebase from 'firebase/app';
+import 'firebase/auth';
 import NotFound from 'containers/Pages/Standalone/NotFoundDedicated';
 import Application from './Application';
 import LoginDedicated from '../Pages/Standalone/LoginDedicated';
 import ThemeWrapper, { AppContext } from './ThemeWrapper';
-import firebase, { googleProvider, facebookProvider } from './fire-config';
+import { googleProvider, facebookProvider } from './fire-config';
 import Auth from './Auth';
 import { apiCall } from '../../utils/messenger';
 import { reduxSignOut, reduxCallIdToken, reduxLoadAuthAdmin } from '../../redux/redux-actions/adminActions';
+
 window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
 
 /*
@@ -48,8 +51,23 @@ class App extends React.Component {
     this.normalLogin = this.normalLogin.bind(this);
   }
 
-  componentDidMount() {
-    // this.authListener();
+  async componentDidMount() {
+    const { data } = await apiCall('/auth.whoami');
+
+    let user = null;
+    if (data) {
+      user = data;
+    } else if (firebase.auth().currentUser) {
+      const idToken = await firebase.auth().currentUser.getIdToken(/* forceRefresh */ true);
+      const newLoggedInUserResponse = await apiCall('auth.login', { idToken });
+      user = newLoggedInUserResponse.data;
+    }
+
+    if (user) {
+      // set the user in the redux state
+      this.props.reduxLoadAuthAdmin(user);
+      this.goHome();
+    }
   }
 
   signOut = () => {
@@ -57,9 +75,9 @@ class App extends React.Component {
   }
 
   loginWithFacebook = () => {
-    firebase.auth().signInWithPopup(facebookProvider).then(res => {
-      localStorage.setItem('authUser', JSON.stringify(res.user));
-      this.setState({ user: res.user });
+    firebase.auth().signInWithPopup(facebookProvider).then(async () => {
+      const token = await firebase.auth().currentUser.getIdToken(/* forceRefresh */ true);
+      this.requestMassToken(token);
     })
       .catch(err => {
         console.log('Error', err);
@@ -70,32 +88,37 @@ class App extends React.Component {
   requestMassToken = (fireToken) => {
     const me = this;
     const body = { idToken: fireToken };
-    apiCall('/auth.login', body).then(massToken => {
-      const { idToken } = massToken.data;
-      localStorage.setItem('idToken', idToken.toString());
-      this.getAuthenticatedUserProfile();
-    }).catch(err => {
-      console.log('Error MASS TOKEN: ', err);
-      me.setState({ error: 'Sorry, we could not sign you in!', started: false });
-    });
+    apiCall('/auth.login', body)
+      .then(res => {
+        const { data } = res;
+        if (data && data.id) {
+          me.props.reduxLoadAuthAdmin(data);
+        }
+      }).then(res => {
+        console.log(res);
+      })
+      .catch(err => {
+        console.log('sign_in_error: ', err);
+        me.setState({ error: 'Sorry, we could not sign you in!', started: false });
+      });
   }
 
   loginWithGoogle = () => {
     this.setState({ started: true });
-    const me = this;
-    firebase.auth().signInWithPopup(googleProvider).then(res => {
-      me.requestMassToken(res.user._lat);
+    firebase.auth().signInWithPopup(googleProvider).then(async () => {
+      const token = await firebase.auth().currentUser.getIdToken(/* forceRefresh */ true);
+      this.requestMassToken(token);
     })
       .catch(err => {
-        me.setState({ error: err.message, started: false });
+        this.setState({ error: err.message, started: false });
       });
   }
 
   normalLogin = (email, password) => {
     this.setState({ started: true });
-    const me = this;
-    firebase.auth().signInWithEmailAndPassword(email, password).then(res => {
-      me.requestMassToken(res.user._lat);
+    firebase.auth().signInWithEmailAndPassword(email, password).then(async () => {
+      const token = await firebase.auth().currentUser.getIdToken(/* forceRefresh */ true);
+      this.requestMassToken(token);
     })
       .catch(err => {
         console.log('Error:', err.message);
@@ -104,24 +127,35 @@ class App extends React.Component {
   }
 
   goHome = () => {
-    window.location = '/';
+    const { state } = this.props;
+    return (
+      <Redirect
+        push
+        to={{
+          pathname: '/',
+          state
+        }}
+      />
+    );
   }
+
 
   getAuthenticatedUserProfile = () => {
     const me = this;
     apiCall('/auth.whoami').then(userObj => {
       const user = userObj.data;
-      console.log(user);
       if (user && (user.is_community_admin || user.is_super_admin)) {
         localStorage.setItem('authUser', JSON.stringify(user));
         me.props.reduxLoadAuthAdmin(user);
         this.goHome();
-      } else {
+      } else if (user) {
         me.setState({ error: `Sorry ${user.preferred_name}, you are not an admin :(`, started: false });
+      } else {
+        me.setState({ error: 'Error occurred while signing you in', started: false });
       }
     })
       .catch(err => {
-        console.log('Error WHOAMI: ', err);
+        console.log('could_not_identify_user: ', err);
         me.setState({ error: 'Sorry, something went wrong, please try again!', started: false });
       });
   }
@@ -170,7 +204,6 @@ class App extends React.Component {
               />
 
 
-              {/* <Route path="/login" exact render={(props) => <LoginDedicated {...props} signOutFxn={this.signOut.bind(this)} user={this.state.user} error={this.state.error} normalLoginFxn={this.normalLogin.bind(this)} loginWithFacebookFxn={this.loginWithFacebook.bind(this)} loginWithGoogleFxn={this.loginWithGoogle.bind(this)} />} /> */}
               {user
                 && (
                   <Route
@@ -204,7 +237,6 @@ class App extends React.Component {
                 render={(props) => <Application {...props} changeMode={changeMode} signOut = {this.signOut}/>}
               /> */}
               <Route component={Auth} />
-              <Route component={NotFound} />
             </Switch>
           )}
         </AppContext.Consumer>
@@ -215,7 +247,8 @@ class App extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    auth: state.getIn(['auth'])
+    auth: state.getIn(['auth']),
+    state
   };
 }
 function mapDispatchToProps(dispatch) {

@@ -4,7 +4,6 @@
 import qs from 'qs';
 import { API_HOST, IS_PROD } from '../config/constants';
 
-
 /**
  * Handles making a POST request to the backend as a form submission
  * It also adds meta data for the BE to get context on the request coming in.
@@ -34,7 +33,6 @@ export async function apiCall(
     body: formData
   });
 
-
   try {
     const json = await response.json();
     if (relocationPage && json && json.success) {
@@ -42,9 +40,8 @@ export async function apiCall(
     } else if (!json.success) {
       if (json.error === 'session_expired') {
         window.location.href = window.location;
-      } else {
-        console.log(destinationUrl, json.error);
-        window.alert(json.error);
+      } else if (json !== 'undefined') {
+        console.log(json);
       }
     }
     return json;
@@ -82,8 +79,6 @@ export async function apiCallFile(destinationUrl, dataToSend = {}, strictUrl = f
       return response.json().then(json => {
         if (json.error === 'session_expired') {
           localStorage.removeItem('authUser');
-          localStorage.removeItem('idToken');
-          window.location.href = '/login';
         }
         return json;
       });

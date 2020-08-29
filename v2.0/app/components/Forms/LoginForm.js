@@ -188,12 +188,12 @@ class LoginForm extends React.Component {
               </div>
             </form>
             {IS_PROD && (
-              <Typography variant="p" className={classes.title} gutterBottom>
+              <Typography variant="body1" className={classes.title} gutterBottom>
                 Production Build {BUILD_VERSION}
               </Typography>
             )}
             {!IS_PROD && (
-              <Typography variant="p" className={classes.title} gutterBottom>
+              <Typography variant="body1" className={classes.title} gutterBottom>
                 Development Build {BUILD_VERSION}
               </Typography>
             )}
