@@ -68,6 +68,7 @@ export const vendorsReducer = (state = [], action = {}) => {
 };
 let localUser = localStorage.getItem('authUser');
 localUser = localUser ? JSON.parse(localUser) : null;
+
 export const authAdminReducer = (state = localUser, action = {}) => {
   switch (action.type) {
     case LOAD_AUTH_ADMIN:

@@ -3,14 +3,12 @@
  */
 
 const { IS_LOCAL, IS_PROD, BUILD_VERSION } = require('./config.json')
-console.log({ IS_LOCAL, IS_PROD, BUILD_VERSION });
-
 const APP_NAME = 'MassEnergize Administration';
 
 //  ---- setting  API routes
 let API_HOST = 'https://api.massenergize.org';
 if (IS_LOCAL) {
-  API_HOST = 'http://127.0.0.1:8000';
+  API_HOST = 'http://localhost:8000';
 } else if (IS_PROD) {
   API_HOST = 'https://api.massenergize.org';
 } else {
@@ -46,7 +44,7 @@ if (IS_PROD) {
 //  ---- setting  Community Portal routes
 let PORTAL_HOST = 'https://community.massenergize.org';
 if (IS_LOCAL) {
-  PORTAL_HOST = 'http://127.0.0.1:3000';
+  PORTAL_HOST = 'http://localhost:3000';
 } else if (IS_PROD) {
   PORTAL_HOST = 'https://community.massenergize.org';
 } else {
@@ -57,7 +55,7 @@ if (IS_LOCAL) {
 //  ---- setting Sandbox routes
 let SANDBOX_PORTAL_HOST = 'https://sandbox.community-dev.massenergize.org';
 if (IS_LOCAL) {
-  SANDBOX_PORTAL_HOST = 'http://127.0.0.1:3000';
+  SANDBOX_PORTAL_HOST = 'http://localhost:3000';
 } else if (IS_PROD) {
   SANDBOX_PORTAL_HOST = 'https://sandbox.community.massenergize.org';
 } else {

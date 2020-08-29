@@ -66,8 +66,8 @@ class CreateNewActionForm extends Component {
       await this.setStateAsync({ vendors });
     }
 
-    if (ccActionsResponse && ccActionsResponse.actions) {
-      const ccActions = (ccActionsResponse.actions || []).map(c => ({ ...c, displayName: c.description, id: '' + c.id }));
+    if (ccActionsResponse && ccActionsResponse.data && ccActionsResponse.data.actions) {
+      const ccActions = (ccActionsResponse.data.actions || []).map(c => ({ ...c, displayName: c.description, id: '' + c.id }));
       await this.setStateAsync({ ccActions });
     }
 
