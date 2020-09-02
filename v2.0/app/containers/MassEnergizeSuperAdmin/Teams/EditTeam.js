@@ -158,9 +158,21 @@ class EditTeam extends Component {
               dbName: 'tagline',
               readOnly: false
             },
+            {
+              name: 'is_published',
+              label: 'Should this team go live?',
+              fieldType: 'Radio',
+              isRequired: false,
+              defaultValue: '' + team.is_published,
+              dbName: 'is_published',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+            }
           ]
         },
-
         {
           name: 'logo',
           placeholder: 'Select a Logo for this team',
