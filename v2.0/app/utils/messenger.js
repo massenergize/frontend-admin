@@ -27,6 +27,10 @@ export async function apiCall(
   const formData = new FormData();
   Object.keys(data).map(k => (formData.append(k, data[k])));
 
+  if (!destinationUrl || destinationUrl.length < 2 ) {
+    return { success: false, error: "Invalid URL passed to apiCall"};
+  }
+  
   // make leading '/' optional
   if (destinationUrl.charAt(0) === '/') {
         destinationUrl = destinationUrl.substring(1);
@@ -51,7 +55,7 @@ export async function apiCall(
     }
     return json;
   } catch (error) {
-    return { success: false, error };
+    return { success: false, error: error.toString() };
   }
 }
 
