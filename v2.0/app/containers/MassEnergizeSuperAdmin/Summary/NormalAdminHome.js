@@ -24,6 +24,8 @@ import { reduxLoadSelectedCommunity, reduxCheckUser } from '../../../redux/redux
 import CommunitySwitch from './CommunitySwitch';
 import SummaryChart from './graph/ChartInfographic';
 import ActionsChartWidget from './graph/ActionsChartWidget';
+import { PORTAL_HOST } from '../../../config/constants';
+
 class NormalAdminHome extends PureComponent {
   constructor(props) {
     super(props);
@@ -111,7 +113,7 @@ class NormalAdminHome extends PureComponent {
                   <Typography variant="caption">
                     { n.subdomain }
                     <br />
-                    <a href={`http://community.massenergize.org/${n.subdomain}`} target="_blank" rel="noopener noreferrer" className={classes.downloadInvoice}>
+                    <a href={`${PORTAL_HOST}/${n.subdomain}`} target="_blank" rel="noopener noreferrer" className={classes.downloadInvoice}>
                       Visit Site
                     </a>
                   </Typography>

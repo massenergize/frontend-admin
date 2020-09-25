@@ -72,7 +72,8 @@ export const reduxGetAllCommunityVendors = (community_id) => dispatch => {
 };
 
 export const reduxGetAllCommunityTestimonials = (community_id) => dispatch => {
-  apiCall('/testimonials.listForCommunityAdmin', { community_id }).then(response => {
+  //apiCall('/testimonials.listForCommunityAdmin', { community_id }).then(response => {
+  apiCall('/testimonials.listForCommunityAdmin').then(response => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllTestimonials(response.data));
