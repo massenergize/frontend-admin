@@ -125,7 +125,7 @@ class LoginForm extends React.Component {
 
           </section>
           <section className={classes.formWrap}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={(e) => e.preventDefault()}>
               <div>
                 <FormControl className={classes.formControl}>
                   {err && (

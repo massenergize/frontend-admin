@@ -88,16 +88,14 @@ class App extends React.Component {
   requestMassToken = (fireToken) => {
     const me = this;
     const body = { idToken: fireToken };
+    console.log(body);
     apiCall('/auth.login', body)
       .then(res => {
         const { data } = res;
         if (data && data.id) {
           me.props.reduxLoadAuthAdmin(data);
         }
-      }).then(res => {
-        console.log(res);
-      })
-      .catch(err => {
+      }).catch(err => {
         console.log('sign_in_error: ', err);
         me.setState({ error: 'Sorry, we could not sign you in!', started: false });
       });

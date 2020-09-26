@@ -41,7 +41,7 @@ export async function apiCall(
       if (json.error === 'session_expired') {
         window.location.href = window.location;
       } else if (json !== 'undefined') {
-        console.log(json);
+        console.log(destinationUrl, data, json);
       }
     }
     return json;

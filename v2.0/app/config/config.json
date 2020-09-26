@@ -1,5 +1,5 @@
 {
-  "IS_LOCAL": false,
+  "IS_LOCAL": true,
   "IS_PROD": false,
-  "BUILD_VERSION": "2.9.16"
+  "BUILD_VERSION": "2.9.17"
 }
