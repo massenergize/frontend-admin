@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import firebase from 'firebase/app';
 import 'firebase/auth';
-import NotFound from 'containers/Pages/Standalone/NotFoundDedicated';
+// import NotFound from 'containers/Pages/Standalone/NotFoundDedicated';
 import Application from './Application';
 import LoginDedicated from '../Pages/Standalone/LoginDedicated';
 import ThemeWrapper, { AppContext } from './ThemeWrapper';
@@ -52,7 +52,7 @@ class App extends React.Component {
   }
 
   async componentDidMount() {
-    const { data } = await apiCall('/auth.whoami');
+    const { data } = await apiCall('auth.whoami');
 
     let user = null;
     if (data) {
@@ -88,8 +88,7 @@ class App extends React.Component {
   requestMassToken = (fireToken) => {
     const me = this;
     const body = { idToken: fireToken };
-    console.log(body);
-    apiCall('/auth.login', body)
+    apiCall('auth.login', body)
       .then(res => {
         const { data } = res;
         if (data && data.id) {
@@ -137,10 +136,9 @@ class App extends React.Component {
     );
   }
 
-
   getAuthenticatedUserProfile = () => {
     const me = this;
-    apiCall('/auth.whoami').then(userObj => {
+    apiCall('auth.whoami').then(userObj => {
       const user = userObj.data;
       if (user && (user.is_community_admin || user.is_super_admin)) {
         localStorage.setItem('authUser', JSON.stringify(user));
