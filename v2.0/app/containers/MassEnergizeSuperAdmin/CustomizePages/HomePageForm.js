@@ -93,21 +93,8 @@ class HomePageEditForm extends Component {
     const [iconBox1, iconBox2, iconBox3, iconBox4] = featured_links;
     const { goal } = homePageData;
     const selectedEvents = homePageData && featured_events ? featured_events.map(e => '' + e.id) : [];
-    let eventsToDisplay = [];
-    for (let f = 0; f < featured_events.length; f++) {
-      let found = false;
-      for (let e = 0; e < events.length; e++) {
-        if (featured_events[f].id === events[e].id) {
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        const c = featured_events[f];
-        eventsToDisplay.push({ ...c, displayName: '(Archived) ' + c.name, id: '' + c.id });
-      }
-    }
-    eventsToDisplay = [...eventsToDisplay, ...events];
+    const archivedEvents = featured_events.filter(f => !f.is_published).map(c => ({ ...c, displayName: '(Archived) ' + c.name, id: '' + c.id }));
+    const eventsToDisplay = [...archivedEvents, ...events];
 
     const formJson = {
       title: `Edit ${community ? community.name + '\'s' : 'Community\'s'} HomePage`,
