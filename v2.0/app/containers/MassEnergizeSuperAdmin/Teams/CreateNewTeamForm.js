@@ -101,18 +101,6 @@ class CreateNewTeamForm extends Component {
               data: communities
             },
             {
-              name: 'description',
-              label: 'Team Description',
-              placeholder: 'eg. Tell us more about this Team ...',
-              fieldType: 'TextField',
-              contentType: 'text',
-              isRequired: true,
-              isMultiline: true,
-              defaultValue: '',
-              dbName: 'description',
-              readOnly: false
-            },
-            {
               name: 'tagline',
               label: 'Team Tagline',
               placeholder: 'eg. A catchy slogan for your team...',
@@ -122,6 +110,18 @@ class CreateNewTeamForm extends Component {
               isMultiline: false,
               defaultValue: '',
               dbName: 'tagline',
+              readOnly: false
+            },
+            {
+              name: 'description',
+              label: 'Team Description',
+              placeholder: 'eg. Tell us more about this Team ...',
+              fieldType: 'HTMLField',
+              contentType: 'text',
+              isRequired: true,
+              isMultiline: true,
+              defaultValue: '',
+              dbName: 'description',
               readOnly: false
             },
           ]

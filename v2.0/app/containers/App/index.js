@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import firebase from 'firebase/app';
 import 'firebase/auth';
-import NotFound from 'containers/Pages/Standalone/NotFoundDedicated';
+// import NotFound from 'containers/Pages/Standalone/NotFoundDedicated';
 import Application from './Application';
 import LoginDedicated from '../Pages/Standalone/LoginDedicated';
 import ThemeWrapper, { AppContext } from './ThemeWrapper';
@@ -90,14 +90,14 @@ class App extends React.Component {
     const body = { idToken: fireToken };
     apiCall('auth.login', body)
       .then(res => {
-        const { data } = res;
-        if (data && data.id) {
-          me.props.reduxLoadAuthAdmin(data);
+        const { error } = res;
+        if (error) {
+          me.setState({ error, started: false });
+          window.location.href = '/login';
+          return;
         }
-      }).then(res => {
-        console.log(res);
-      })
-      .catch(err => {
+        window.location.href = '/';
+      }).catch(err => {
         console.log('sign_in_error: ', err);
         me.setState({ error: 'Sorry, we could not sign you in!', started: false });
       });

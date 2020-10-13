@@ -135,18 +135,6 @@ class EditTeam extends Component {
               data: parentTeamOptions
             },
             {
-              name: 'description',
-              label: 'Team Description',
-              placeholder: 'eg. Tell us more about this Team ...',
-              fieldType: 'TextField',
-              contentType: 'text',
-              isRequired: true,
-              isMultiline: true,
-              defaultValue: team.description,
-              dbName: 'description',
-              readOnly: false
-            },
-            {
               name: 'tagline',
               label: 'Team Tagline',
               placeholder: 'eg. A catchy slogan for your team...',
@@ -156,6 +144,18 @@ class EditTeam extends Component {
               isMultiline: false,
               defaultValue: team.tagline && team.tagline,
               dbName: 'tagline',
+              readOnly: false
+            },
+            {
+              name: 'description',
+              label: 'Team Description',
+              placeholder: 'eg. Tell us more about this Team ...',
+              fieldType: 'HTMLField',
+              contentType: 'text',
+              isRequired: true,
+              isMultiline: true,
+              defaultValue: team.description,
+              dbName: 'description',
               readOnly: false
             },
             {

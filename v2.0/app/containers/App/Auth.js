@@ -8,7 +8,7 @@ import {
   ComingSoon,
   Maintenance,
 } from '../pageListAsync';
-// import Application from './Application';
+import Application from './Application';
 class Auth extends React.Component {
   render() {
     return (
@@ -19,7 +19,7 @@ class Auth extends React.Component {
           <Route path="/reset-password" component={ResetPassword} />
           <Route path="/maintenance" component={Maintenance} />
           <Route path="/coming-soon" component={ComingSoon} />
-          {/* <Route path="/" component={Application} /> */}
+          <Route path="/" component={Application} />
         </Switch>
       </Outer>
     );
