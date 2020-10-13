@@ -39,7 +39,7 @@ class Cover extends React.Component {
   goLive = () => {
     const val = this.props.community.is_published;
     const {id} = this.props.community;
-    const body = { is_published: !val, is_dev: true, community_id: id };
+    const body = { is_published: !val, community_id: id };
     this.props.liveOrNotFxn(this.props.community);
     apiCall('/communities.update', body).then(res => {
       console.log('You are live!');

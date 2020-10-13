@@ -27,13 +27,13 @@ export async function apiCall(
   const formData = new FormData();
   Object.keys(data).map(k => (formData.append(k, data[k])));
 
-  if (!destinationUrl || destinationUrl.length < 2 ) {
-    return { success: false, error: "Invalid URL passed to apiCall"};
+  if (!destinationUrl || destinationUrl.length < 2) {
+    return { success: false, error: 'Invalid URL passed to apiCall' };
   }
-  
+
   // make leading '/' optional
   if (destinationUrl.charAt(0) === '/') {
-        destinationUrl = destinationUrl.substring(1);
+    destinationUrl = destinationUrl.substring(1);
   }
 
   const response = await fetch(`${API_HOST}/v3/${destinationUrl}`, {
@@ -48,9 +48,9 @@ export async function apiCall(
       window.location.href = relocationPage;
     } else if (!json.success) {
       if (json.error === 'session_expired') {
-        window.location.href = window.location;
+        window.location.href = '/login';
       } else if (json !== 'undefined') {
-        console.log(destinationUrl, data, json);
+        console.log(destinationUrl, json);
       }
     }
     return json;

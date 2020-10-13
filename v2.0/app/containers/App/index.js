@@ -90,10 +90,13 @@ class App extends React.Component {
     const body = { idToken: fireToken };
     apiCall('auth.login', body)
       .then(res => {
-        const { data } = res;
-        if (data && data.id) {
-          me.props.reduxLoadAuthAdmin(data);
+        const { error } = res;
+        if (error) {
+          me.setState({ error, started: false });
+          window.location.href = '/login';
+          return;
         }
+        window.location.href = '/';
       }).catch(err => {
         console.log('sign_in_error: ', err);
         me.setState({ error: 'Sorry, we could not sign you in!', started: false });

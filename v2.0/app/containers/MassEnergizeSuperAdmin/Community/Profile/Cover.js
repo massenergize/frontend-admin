@@ -38,7 +38,7 @@ class Cover extends React.Component {
     const { community, liveOrNotFxn } = this.props;
     const { is_published } = community;
     const { id } = community;
-    const body = { is_published: !is_published, is_dev: true, community_id: id };
+    const body = { is_published: !is_published, community_id: id };
     liveOrNotFxn(community);
     await apiCall('/communities.update', body);
   }

@@ -89,11 +89,26 @@ class HomePageEditForm extends Component {
       featured_links = [];
     }
 
+
     const [image1, image2, image3] = images;
     const [iconBox1, iconBox2, iconBox3, iconBox4] = featured_links;
     const { goal } = homePageData;
-    const selectedEvents = homePageData && featured_events ? featured_events.map(e => '' + e.id) : [];
-
+    const selectedEvents = (homePageData && featured_events) ? featured_events.map(e => '' + e.id) : [];
+    let eventsToDisplay = [];
+    for (let f = 0; f < featured_events.length; f++) {
+      let found = false;
+      for (let e = 0; e < events.length; e++) {
+        if (featured_events[f].id === events[e].id) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        const c = featured_events[f];
+        eventsToDisplay.push({ ...c, displayName: '(Archived) ' + c.name, id: '' + c.id });
+      }
+    }
+    eventsToDisplay = [...eventsToDisplay, ...events];
 
     const formJson = {
       title: `Edit ${community ? community.name + '\'s' : 'Community\'s'} HomePage`,
@@ -335,7 +350,7 @@ class HomePageEditForm extends Component {
                     selectMany: true,
                     defaultValue: selectedEvents,
                     dbName: 'featured_events',
-                    data: events
+                    data: eventsToDisplay
                   }
                 ]
               }
@@ -579,7 +594,7 @@ class HomePageEditForm extends Component {
   render() {
     const { classes } = this.props;
     const { formJson, noDataFound } = this.state;
-    console.log(this.state)
+    console.log(this.state);
     if (!formJson) return (<div>Hold tight! Retrieving your data ...</div>);
     if (noDataFound) return (<div>Sorry no Home Page data available for this community ...</div>);
     return (
