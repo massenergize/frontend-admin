@@ -2,7 +2,7 @@
  * This file contains code used to transmit data
  */
 import qs from 'qs';
-import { API_HOST, IS_PROD } from '../config/constants';
+import { API_HOST, IS_CANARY, IS_PROD } from '../config/constants';
 
 /**
  * Handles making a POST request to the backend as a form submission
@@ -19,7 +19,7 @@ export async function apiCall(
 ) {
   // add some meta data for context in backend
   const data = {
-    __is_prod: IS_PROD,
+    __is_prod: IS_PROD || IS_CANARY,
     __is_admin_site: true,
     ...dataToSend
   };
