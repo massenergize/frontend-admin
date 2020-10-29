@@ -1,5 +1,6 @@
 {
   "IS_LOCAL": true,
   "IS_PROD": false,
-  "BUILD_VERSION": "3.0.1"
+  "IS_CANARY": false,
+  "BUILD_VERSION": "3.0.3"
 }

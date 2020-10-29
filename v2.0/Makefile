@@ -16,6 +16,11 @@ deploy-prod:
 	npm run build && aws2 s3 sync build/ s3://admin.massenergize.org
 .PHONY: deploy-prod
 
+deploy-canary:
+	python deployment/prepare_to_deploy.py canary 0 1
+	npm run build && aws2 s3 sync build/ s3://admin-canary.massenergize.org
+.PHONY: deploy-prod
+
 deploy-dev:
 	python deployment/prepare_to_deploy.py dev 0 1
 	npm run build && aws2 s3 sync build/ s3://admin-dev.massenergize.org
@@ -30,3 +35,8 @@ run-prod:
 	python deployment/prepare_to_deploy.py prod $(local)
 	npm start
 .PHONY: run-prod
+
+run-canary:
+	python deployment/prepare_to_deploy.py canary $(local)
+	npm start
+.PHONY: run-canary
