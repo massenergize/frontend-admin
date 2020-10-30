@@ -216,28 +216,6 @@ module.exports = [
     link: '/admin/add-super-admin'
   },
   {
-    key: 'goals',
-    name: 'Goals',
-    icon: 'ios-checkmark-circle',
-    child: [
-      {
-        key: 'about-goals',
-        name: 'Goals',
-        title: true
-      },
-      {
-        key: 'add-goal',
-        name: 'Add New Goal',
-        link: '/admin/add/goal'
-      },
-      {
-        key: 'all-goals',
-        name: 'All Goals',
-        link: '/admin/read/goals'
-      },
-    ]
-  },
-  {
     key: 'tags-collections',
     name: 'Tag Collections',
     icon: 'md-reorder',
@@ -259,5 +237,4 @@ module.exports = [
       },
     ]
   },
-
 ];
