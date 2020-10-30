@@ -226,7 +226,7 @@ module.exports = [
         title: true
       },
       {
-        key: 'add-vendor',
+        key: 'add-category',
         name: 'Add New Category',
         link: '/admin/add/category'
       },
