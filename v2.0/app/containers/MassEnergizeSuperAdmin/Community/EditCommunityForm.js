@@ -86,7 +86,7 @@ class EditCommunityForm extends Component {
               readOnly: true
             },
             {
-              name: 'name',
+              name: 'community_name',
               label: 'Name of this Community',
               placeholder: 'eg. Wayland',
               fieldType: 'TextField',
