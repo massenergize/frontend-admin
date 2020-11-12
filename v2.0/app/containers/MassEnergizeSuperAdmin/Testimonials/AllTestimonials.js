@@ -7,7 +7,7 @@ import brand from 'dan-api/dummy/brand';
 import MUIDataTable from 'mui-datatables';
 import EditIcon from '@material-ui/icons/Edit';
 import { Link } from 'react-router-dom';
-import Avatar from '@material-ui/core/Avatar';
+import TextField from '@material-ui/core/TextField';
 
 import messageStyles from 'dan-styles/Messages.scss';
 import { connect } from 'react-redux';
@@ -50,7 +50,7 @@ class AllTestimonials extends React.Component {
       [
         d.id,
         `${d.title}...`.substring(0, 30), // limit to first 30 chars
-        d.rank,
+        { rank: d.rank, id: d.id },
         (d.community && d.community.name),
         (d.is_approved ? 'Yes' : 'No'),
         (d.is_approved && d.is_published ? 'Yes' : 'No'),
@@ -93,7 +93,25 @@ class AllTestimonials extends React.Component {
       key: 'rank',
       options: {
         filter: false,
-        filterType: 'textField'
+        customBodyRender: (d) => (
+          <TextField
+            required
+            name="rank"
+            variant="outlined"
+            onChange={async event => {
+              const { target } = event;
+              if (!target) return;
+              const { name, value } = target;
+              await apiCall('/testimonials.update', { testimonial_id: d && d.id, [name]: value });
+            }}
+            label="Rank"
+            InputLabelProps={{
+              shrink: true,
+              maxwidth: '10px'
+            }}
+            defaultValue={d && d.rank}
+          />
+        )
       }
     },
     {

@@ -269,7 +269,7 @@ class CreateNewEventForm extends Component {
               {
                 name: 'unit',
                 label: 'Unit Number',
-                placeholder: 'eg. wayland',
+                placeholder: 'eg. "2A"',
                 fieldType: 'TextField',
                 contentType: 'text',
                 isRequired: false,

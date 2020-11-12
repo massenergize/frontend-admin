@@ -125,7 +125,7 @@ class SummaryDashboard extends PureComponent {
             <Paper onClick={() => { !loadingCSVs.includes('users') && this.getCSV('users'); }} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
                 Download All Users CSV
-                    {' '}
+                  {' '}
                 <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
                 {loadingCSVs.includes('users') && <CircularProgress size={20} thickness={2} color="secondary" />}
               </Typography>

@@ -93,6 +93,8 @@ class HomePageEditForm extends Component {
     const [iconBox1, iconBox2, iconBox3, iconBox4] = featured_links;
     const { goal } = homePageData;
     const selectedEvents = homePageData && featured_events ? featured_events.map(e => '' + e.id) : [];
+    const archivedEvents = featured_events.filter(f => !f.is_published).map(c => ({ ...c, displayName: '(Archived) ' + c.name, id: '' + c.id }));
+    const eventsToDisplay = [...archivedEvents, ...events];
 
     const formJson = {
       title: `Edit ${community ? community.name + '\'s' : 'Community\'s'} HomePage`,
@@ -325,7 +327,7 @@ class HomePageEditForm extends Component {
                     selectMany: true,
                     defaultValue: selectedEvents,
                     dbName: 'featured_events',
-                    data: events
+                    data: eventsToDisplay
                   }
                 ]
               }
@@ -570,7 +572,6 @@ class HomePageEditForm extends Component {
   render() {
     const { classes } = this.props;
     const { formJson, noDataFound } = this.state;
-      console.log(this.state);
     if (!noDataFound) return (<div>Sorry no Home Page data available for this community ...</div>);
     if (!formJson) return (<div>Hold tight! Retrieving your data ...</div>);
     return (

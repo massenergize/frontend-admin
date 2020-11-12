@@ -7,21 +7,19 @@ import {
   ResetPassword,
   ComingSoon,
   Maintenance,
-  NotFound,
 } from '../pageListAsync';
-
+import Application from './Application';
 class Auth extends React.Component {
   render() {
     return (
       <Outer>
         <Switch>
-          {/* <Route path="/" component={Application} /> */}
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
           <Route path="/reset-password" component={ResetPassword} />
           <Route path="/maintenance" component={Maintenance} />
           <Route path="/coming-soon" component={ComingSoon} />
-          <Route component={NotFound} />
+          <Route path="/" component={Application} />
         </Switch>
       </Outer>
     );

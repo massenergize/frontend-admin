@@ -23,7 +23,7 @@ import logo from 'dan-images/logo.png';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { ContentDivider } from '../Divider';
 import styles from './user-jss';
-import { IS_PROD, BUILD_VERSION } from '../../config/constants';
+import { IS_PROD, BUILD_VERSION, IS_CANARY } from '../../config/constants';
 
 
 // validation functions
@@ -97,7 +97,12 @@ class LoginForm extends React.Component {
               Administrators - Sign In
             </Typography>
           )}
-          {!IS_PROD && (
+          {IS_CANARY && (
+            <Typography variant="h4" className={classes.title} gutterBottom>
+              Canary: Administrators - Sign In
+            </Typography>
+          )}
+          {!IS_PROD && !IS_CANARY && (
             <Typography variant="h4" className={classes.title} gutterBottom>
               DEV: Administrators - Sign In
             </Typography>
@@ -125,7 +130,7 @@ class LoginForm extends React.Component {
 
           </section>
           <section className={classes.formWrap}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={(e) => e.preventDefault()}>
               <div>
                 <FormControl className={classes.formControl}>
                   {err && (
@@ -181,19 +186,19 @@ class LoginForm extends React.Component {
               <div className={classes.btnArea}>
 
                 <Button variant="contained" onClick={() => normalLoginFxn(this.refs.email.value, this.refs.pass.value)} color="primary" size="large" type="submit">
-                  Finish
+                  Sign in
                   <ArrowForward className={classNames(classes.rightIcon, classes.iconSmall)} disabled={submitting || pristine} />
                 </Button>
                 {/* <button onClick = {(e)=>{e.preventDefault();this.props.signOutFxn()}}>signout</button> */}
               </div>
             </form>
             {IS_PROD && (
-              <Typography variant="p" className={classes.title} gutterBottom>
+              <Typography variant="body1" className={classes.title} gutterBottom>
                 Production Build {BUILD_VERSION}
               </Typography>
             )}
             {!IS_PROD && (
-              <Typography variant="p" className={classes.title} gutterBottom>
+              <Typography variant="body1" className={classes.title} gutterBottom>
                 Development Build {BUILD_VERSION}
               </Typography>
             )}
