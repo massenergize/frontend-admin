@@ -72,28 +72,6 @@ module.exports = [
     ]
   },
   {
-    key: 'tags-collections',
-    name: 'Tag Collections',
-    icon: 'md-reorder',
-    child: [
-      {
-        key: 'about-categories',
-        name: 'Tags & Tag Collections',
-        title: true
-      },
-      {
-        key: 'add-vendor',
-        name: 'Add New Category',
-        link: '/admin/add/category'
-      },
-      {
-        key: 'all-collections',
-        name: 'All Tag Collections',
-        link: '/admin/read/tag-collections'
-      },
-    ]
-  },
-  {
     key: 'messages',
     name: 'Messages',
     icon: 'md-reorder',
@@ -236,5 +214,27 @@ module.exports = [
     name: 'New Super admin',
     icon: 'ios-add-circle',
     link: '/admin/add-super-admin'
-  }
+  },
+  {
+    key: 'tags-collections',
+    name: 'Tag Collections',
+    icon: 'md-reorder',
+    child: [
+      {
+        key: 'about-categories',
+        name: 'Tags & Tag Collections',
+        title: true
+      },
+      {
+        key: 'add-category',
+        name: 'Add New Category',
+        link: '/admin/add/category'
+      },
+      {
+        key: 'all-collections',
+        name: 'All Tag Collections',
+        link: '/admin/read/tag-collections'
+      },
+    ]
+  },
 ];

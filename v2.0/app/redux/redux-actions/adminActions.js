@@ -1,9 +1,10 @@
 /* eslint-disable camelcase */
+import firebase from 'firebase/app';
+import 'firebase/auth';
 import {
   LOAD_ALL_COMMUNITIES, LOAD_GRAPH_DATA, LOAD_AUTH_ADMIN, LOAD_ID_TOKEN, SELECTED_COMMUNITY, SELECTED_COMMUNITY_FULL, GET_ALL_ACTIONS, GET_ALL_TAG_COLLECTIONS, GET_ALL_USERS, GET_ALL_SUBSCRIBERS, GET_ALL_EVENTS, GET_ALL_TEAMS, GET_ALL_GOALS, GET_ALL_TESTIMONIALS, GET_ALL_VENDORS, GET_ALL_POLICIES, LOAD_SUMMARY_DATA
 } from '../ReduxConstants';
-import { apiCall, fetchData } from '../../utils/messenger';
-import firebase from '../../containers/App/fire-config';
+import { apiCall } from '../../utils/messenger';
 import { getTagCollectionsData } from '../../api/data';
 
 export const loadAllPolicies = (data = null) => ({ type: GET_ALL_POLICIES, payload: data });
@@ -21,7 +22,7 @@ export const reduxLoadAccessToken = (data = []) => ({ type: 'LOAD_ACCESS_TOKEN',
 
 
 function redirectIfExpired(response) {
-  if (!response.data && response.error === 'Signature has expired') {
+  if (!response.data && response.error === 'session_expired') {
     window.location = '/login';
     localStorage.removeItem('authUser');
     localStorage.removeItem('idToken');
@@ -39,6 +40,10 @@ export const reduxSignOut = () => dispatch => {
       localStorage.removeItem('authUser');
       localStorage.removeItem('idToken');
       dispatch({ type: LOAD_AUTH_ADMIN, payload: null });
+    });
+
+    apiCall('/auth.logout').then(() => {
+      console.log('Signed Out');
     });
   }
 };
@@ -67,7 +72,8 @@ export const reduxGetAllCommunityVendors = (community_id) => dispatch => {
 };
 
 export const reduxGetAllCommunityTestimonials = (community_id) => dispatch => {
-  apiCall('/testimonials.listForCommunityAdmin', { community_id }).then(response => {
+  //apiCall('/testimonials.listForCommunityAdmin', { community_id }).then(response => {
+  apiCall('/testimonials.listForCommunityAdmin').then(response => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllTestimonials(response.data));
@@ -235,7 +241,7 @@ export const reduxGetAllActions = () => dispatch => {
 
 // try to put checkUser in a a more general area later
 export const reduxCheckUser = () => {
-  fetchData('/auth/whoami')
+  apiCall('/auth.whoami')
     .then(res => {
       if (!res.data) { // means the user token has expired, redirect to login
         localStorage.removeItem('idToken');
@@ -283,7 +289,7 @@ export const reduxCallIdToken = () => dispatch => {
 };
 
 export const reduxCallFullCommunity = (id) => dispatch => {
-  fetchData(`v2/community/${id}/full`).then(res => {
+  apiCall('/communities.info', { community_id: id }).then(res => {
     dispatch(reduxLoadFullSelectedCommunity(res.data));
   });
 };

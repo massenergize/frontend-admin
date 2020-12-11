@@ -8,6 +8,7 @@ export PapperBlock from './PapperBlock/PapperBlock';
 export SearchUi from './Search/SearchUi';
 // Guide
 export GuideSlider from './GuideSlider';
+export GuideModal from './GuideModal';
 // Form
 export LoginForm from './Forms/LoginForm';
 export FloatingPanel from './Panel/FloatingPanel';
@@ -51,7 +52,6 @@ export TimelineWidget from './Widget/TimelineWidget';
 export LatestTransactionWidget from './Widget/LatestTransactionWidget';
 export HistoryWidget from './Widget/HistoryWidget';
 
-export ProductCard from './CardPaper/ProductCard';
 
 
 export About from './Profile/About';

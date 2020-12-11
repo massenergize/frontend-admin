@@ -6,14 +6,11 @@ import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { LoginForm } from 'dan-components';
 import styles from 'dan-components/Forms/user-jss';
-import { sendJson } from '../../../utils/messenger';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import purple from '@material-ui/core/colors/purple';
-// import { bindActionCreators } from 'redux';
+import { apiCall } from '../../../utils/messenger';
 
 class Login extends React.Component {
-  submitForm = (values) => {
-    sendJson(values.entries(), '/v2/users', '/admin');
+  submitForm = async (values) => {
+    await apiCall('/auth.login', values.entries(), '/admin');
   }
 
 
@@ -57,9 +54,6 @@ Login.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 const mapDispatchToProps = dispatch => ({});
-const mapStateToProps = (store) => {
-  auth: store.getIn(['auth'])
-};
 
 const LoginMapped = connect(
   mapDispatchToProps

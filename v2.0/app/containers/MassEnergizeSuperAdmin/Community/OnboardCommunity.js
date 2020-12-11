@@ -5,7 +5,6 @@ import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
 import { PapperBlock } from 'dan-components';
 import CommunityOnboardingForm from './CommunityOnboardingForm';
-import { sendJson, cleanFormData, fetchData } from '../../../utils/messenger';
 import EditCommunityForm from './EditCommunityForm';
 
 class OnboardCommunity extends React.Component {

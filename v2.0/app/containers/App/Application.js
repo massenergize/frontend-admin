@@ -54,17 +54,17 @@ class Application extends React.Component {
     const user = auth || {};
 
     const communityAdminSpecialRoutes = [
-      <Route key="" exact path="/" render={(props) => <DashboardAdminSummaryPage {...props} signOut={signOut} />} />,
-      <Route key="" path="/admin/community/:id/edit" component={EditCommunityByCommunityAdmin} exact />,
-      <Route key="" exact path="/admin" render={(props) => <DashboardAdminSummaryPage {...props} signOut={signOut} />} />,
-      <Route key="" path="/admin/dashboard" render={(props) => <DashboardAdminSummaryPage {...props} signOut={signOut} />} />
+      <Route exact path="/" render={(props) => <DashboardAdminSummaryPage {...props} signOut={signOut} />} />,
+      <Route path="/admin/community/:id/edit" component={EditCommunityByCommunityAdmin} exact />,
+      <Route exact path="/admin" render={(props) => <DashboardAdminSummaryPage {...props} signOut={signOut} />} />,
+      <Route path="/admin/dashboard" render={(props) => <DashboardAdminSummaryPage {...props} signOut={signOut} />} />
     ];
 
     const superAdminSpecialRoutes = [
-      <Route key="" exact path="/" render={(props) => <DashboardSummaryPage {...props} signOut={signOut} />} />,
-      <Route key="" path="/admin/community/:id/edit" component={OnboardCommunity} exact />,
-      <Route key="" exact path="/admin" render={(props) => <DashboardSummaryPage {...props} signOut={signOut} />} />,
-      <Route key="" path="/admin/dashboard" render={(props) => <DashboardSummaryPage {...props} signOut={signOut} />} />
+      <Route exact path="/" render={(props) => <DashboardSummaryPage {...props} signOut={signOut} />} />,
+      <Route path="/admin/community/:id/edit" component={OnboardCommunity} exact />,
+      <Route exact path="/admin" render={(props) => <DashboardSummaryPage {...props} signOut={signOut} />} />,
+      <Route path="/admin/dashboard" render={(props) => <DashboardSummaryPage {...props} signOut={signOut} />} />
     ];
 
     return (
@@ -96,50 +96,38 @@ class Application extends React.Component {
           <Route path="/admin/add/:id/community-admins" component={AddRemoveAdmin} exact />
           <Route path="/admin/edit/:id/community-admins" component={AddRemoveAdmin} exact />
           <Route path="/admin/add-super-admin" component={AddRemoveSuperAdmin} exact />
-
           <Route path="/admin/read/actions" component={AllActions} />
           <Route path="/admin/read/actions" component={AllActions} />
           <Route path="/admin/add/action" component={AddAction} />
           <Route path="/admin/edit/:id/action" component={EditAction} exact />
           <Route path="/admin/add/action/:id" component={EditAction} />
-
           <Route path="/admin/read/categories" component={AllCategories} />
           <Route path="/admin/add/category" component={AddCategory} />
           <Route path="/admin/read/tag-collections" component={AllCategories} />
           <Route path="/admin/add/tag-collection" component={AddCategory} />
           <Route path="/admin/edit/:id/tag-collection" component={EditCategory} />
-
           <Route path="/admin/read/events" component={AllEvents} />
           <Route path="/admin/add/event" component={AddEvent} />
           <Route path="/admin/edit/:id/event" component={EditEvent} />
-
           <Route path="/admin/read/teams" exact component={AllTeams} />
           <Route path="/admin/add/team" component={AddTeam} />
           <Route path="/admin/edit/:id/team" component={EditTeam} />
           <Route path="/admin/edit/:id/team_members" component={TeamMembers} />
-
           <Route path="/admin/read/subscribers" component={AllSubscribers} />
-
           <Route path="/admin/read/policies" component={AllPolicies} />
           <Route path="/admin/add/policy" component={AddPolicy} />
           <Route path="/admin/edit/:id/policy" component={EditPolicy} />
-
           <Route path="/admin/read/goals" component={AllGoals} />
           <Route path="/admin/add/goal" component={AddGoal} />
           <Route path="/admin/edit/:id/goal" component={EditGoal} />
-
           <Route path="/admin/read/testimonials" component={AllTestimonials} />
           <Route path="/admin/add/testimonial" component={AddTestimonial} />
           <Route path="/admin/edit/:id/testimonial" component={EditTestimonial} />
-
           <Route path="/admin/read/vendors" component={AllVendors} />
           <Route path="/admin/add/vendor" component={AddVendor} />
           <Route path="/admin/edit/:id/vendor" component={EditVendor} />
-
           <Route path="/admin/export" component={Export} />
-
           <Route path="/admin/customize" component={CustomizePages} />
-
           <Route path="/admin/read/categories" component={AllCategories} />
           <Route path="/admin/add/category" component={AddCategory} />
           <Route path="/admin/form" component={Form} />

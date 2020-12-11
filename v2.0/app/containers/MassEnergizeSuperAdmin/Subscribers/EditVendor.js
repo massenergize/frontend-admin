@@ -112,8 +112,8 @@ class CreateNewVendorForm extends Component {
               readOnly: true
             },
             {
-              name: 'name',
-              label: 'Name of this Vendor',
+              name: 'vendor_name',
+              label: 'Name of this Vendor:',
               placeholder: 'eg. Solar Provider Inc.',
               fieldType: 'TextField',
               contentType: 'text',
@@ -134,7 +134,7 @@ class CreateNewVendorForm extends Component {
               readOnly: false
             },
             {
-              name: 'email',
+              name: 'vendor_email',
               label: 'Primary Email of this vendor',
               placeholder: 'eg. abc@gmail.com',
               fieldType: 'TextField',
@@ -146,7 +146,7 @@ class CreateNewVendorForm extends Component {
             },
             {
               name: 'description',
-              label: 'Tell us about what you do',
+              label: 'Tell us about the services this vendor provides',
               placeholder: 'Tell us more ...',
               fieldType: 'TextField',
               contentType: 'text',
@@ -185,9 +185,9 @@ class CreateNewVendorForm extends Component {
                 valueToCheck: 'true',
                 fields: [
                   {
-                    name: 'address',
+                    name: 'vendor_address',
                     label: 'Street Address',
-                    placeholder: 'eg. Wayland',
+                    placeholder: '',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: true,
@@ -198,7 +198,7 @@ class CreateNewVendorForm extends Component {
                   {
                     name: 'unit',
                     label: 'Unit Number',
-                    placeholder: 'eg. wayland',
+                    placeholder: '',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
@@ -209,7 +209,7 @@ class CreateNewVendorForm extends Component {
                   {
                     name: 'city',
                     label: 'City',
-                    placeholder: 'eg. wayland',
+                    placeholder: 'eg. Springfield',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: true,
@@ -220,7 +220,7 @@ class CreateNewVendorForm extends Component {
                   {
                     name: 'state',
                     label: 'State ',
-                    placeholder: 'eg. New York',
+                    placeholder: 'eg. Massachusetts',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: true,

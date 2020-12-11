@@ -1955,7 +1955,6 @@ class AdminEditHome extends React.Component {
       about_video_url: this.state.about_video_url
     };
     console.log('I am the form data', data);
-    // formForJokes(data);
   }
 
   openSummary = () => {

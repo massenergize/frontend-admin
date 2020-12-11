@@ -11,6 +11,7 @@ import Info from '@material-ui/icons/Info';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { withStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom';
+import { SANDBOX_PORTAL_HOST, PORTAL_HOST } from '../../config/constants'
 
 import styles from './jss/cover-jss';
 import { apiCall } from '../../utils/messenger';
@@ -38,7 +39,7 @@ class Cover extends React.Component {
   goLive = () => {
     const val = this.props.community.is_published;
     const {id} = this.props.community;
-    const body = { is_published: !val, is_dev: true, community_id: id };
+    const body = { is_published: !val, community_id: id };
     this.props.liveOrNotFxn(this.props.community);
     apiCall('/communities.update', body).then(res => {
       console.log('You are live!');
@@ -134,7 +135,7 @@ class Cover extends React.Component {
                 <a
                   style={{ fontSize: 14 }}
                   className={classes.leAnchor}
-                  href={community ? `http://sandbox.community-dev.massenergize.org/${community.subdomain}` : '#'}
+                  href={community ? `${SANDBOX_PORTAL_HOST}/${community.subdomain}` : '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   size="large"
@@ -146,7 +147,7 @@ class Cover extends React.Component {
                 <a
                   style={{ fontSize: 14 }}
                   className={classes.leAnchor}
-                  href={community ? `http://community-dev.massenergize.org/${community.subdomain}` : '#'}
+                  href={community ? `h${PORTAL_HOST}/${community.subdomain}` : '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   size="large"
