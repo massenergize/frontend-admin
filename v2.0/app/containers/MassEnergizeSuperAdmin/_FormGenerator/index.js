@@ -895,7 +895,7 @@ or more,
                 apiKey={TINY_MCE_API_KEY}
               />
 
-              <Button
+              {/* <Button
                 style={{ width: '100%' }}
                 color="default"
                 onClick={() => {
@@ -909,7 +909,7 @@ or more,
 Show Me A
                 Preview
                 {' '}
-              </Button>
+              </Button> */}
             </Grid>
             {this.state[name] && (
               <center>
