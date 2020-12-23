@@ -351,7 +351,7 @@ const styles = theme => ({
       display: 'flex',
     },
   },
-  imageFull: {
+  imageFull: { 
     position: 'relative',
     width: '100%',
     '&:hover': {

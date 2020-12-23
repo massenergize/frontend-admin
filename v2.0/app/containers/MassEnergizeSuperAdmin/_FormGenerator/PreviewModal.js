@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Button from "@material-ui/core/Button";
+// import classnames from "classnames";
 const styles = {
   container: {
     zIndex: 99,
@@ -15,7 +16,6 @@ const styles = {
     zIndex: 100,
     background: "white",
     border: "solid 1px white",
-
     borderRadius: 15,
     boxShadow: "0 12px 15px 0 rgba(0,0,0,.24),0 17px 50px 0 rgba(0,0,0,.19",
     marginTop: "-6%",
@@ -31,6 +31,12 @@ const styles = {
     fontWeight: "bold",
     float: "right",
   },
+  // previewContent: {
+  //   cursor: "pointer",
+  //   "&:hover": {
+  //     background: "red",
+  //   },
+  // },
 };
 class PreviewModal extends Component {
   constructor(props) {
@@ -40,7 +46,6 @@ class PreviewModal extends Component {
   }
 
   render() {
-    console.log("I AM THE WINDOW HEIGHT", window.innerHeight);
     return (
       <div>
         {/* <div style={styles.container} /> */}
@@ -49,8 +54,15 @@ class PreviewModal extends Component {
             <h3 style={{ marginBottom: 5 }}>
               This is what your content will look like when it gets to users
             </h3>
-            <p style={{ color: "gray" }}><b>"</b>{this.props.title}<b>"</b></p>
-            <div dangerouslySetInnerHTML={{__html:this.props.content}} />
+            <p style={{ color: "gray" }}>
+              <b>"</b>
+              {this.props.title}
+              <b>"</b>
+            </p>
+            <div
+              dangerouslySetInnerHTML={{ __html: this.props.content }}
+              className="preview-content"
+            />
           </div>
           <Button
             position="right"
