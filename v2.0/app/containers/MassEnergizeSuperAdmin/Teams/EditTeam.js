@@ -63,6 +63,10 @@ class EditTeam extends Component {
           parentTeamOptions = parentTeams.map(_team => ({ id: _team.id, displayName: _team.name }));
           parentTeamOptions.unshift({ id: null, displayName: 'NONE' });
         }
+        else
+        {
+          parentTeamOptions = false;
+        }
       }
       await this.setStateAsync({ team, parentTeamOptions });
     }
@@ -84,6 +88,7 @@ class EditTeam extends Component {
   }
 
   createFormJson = async () => {
+    console.log('createFormJson')
     const { communities, team, parentTeamOptions } = this.state;
     const formJson = {
       title: 'Edit Team Information',
@@ -126,11 +131,11 @@ class EditTeam extends Component {
               dbName: 'community_id',
               data: communities
             },
-            parentTeamOptions && {
+            {
               name: 'parent',
-              label: 'Parent Team',
+              label: parentTeamOptions && 'Parent Team'  || 'Parent Team (but this team is the parent of another team already)',
               fieldType: 'Dropdown',
-              defaultValue: team.parent && team.parent.id,
+              defaultValue: (team.parent && team.parent.id),
               dbName: 'parent_id',
               data: parentTeamOptions
             },
