@@ -169,32 +169,6 @@ class CreateNewCommunityForm extends Component {
                 ]
               }
             },
-            {
-              name: 'is_published',
-              label: 'Should this go live now?',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: 'false',
-              dbName: 'is_published',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ],
-            },
-            {
-              name: 'is_approved',
-              label: 'Do you approve this community? (Check yes after background check)',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: 'true',
-              dbName: 'is_approved',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ],
-            },
           ]
         },
         {
@@ -262,6 +236,33 @@ class CreateNewCommunityForm extends Component {
             { id: 'true', value: 'Yes' }
           ]
         },
+        {
+          name: 'is_approved',
+          label: 'Do you approve this community? (Check yes after background check)',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: 'true',
+          dbName: 'is_approved',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+        },
+        {
+          name: 'is_published',
+          label: 'Should this go live now?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: 'false',
+          dbName: 'is_published',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+        },
+
       ]
     };
     return formJson;

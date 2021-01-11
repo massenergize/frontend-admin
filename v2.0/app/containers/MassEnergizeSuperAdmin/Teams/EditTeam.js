@@ -137,7 +137,8 @@ class EditTeam extends Component {
               fieldType: 'Dropdown',
               defaultValue: (team.parent && team.parent.id),
               dbName: 'parent_id',
-              data: parentTeamOptions
+              data: parentTeamOptions,
+              readOnly: parentTeamOptions && false || true,
             },
             {
               name: 'tagline',
@@ -163,19 +164,6 @@ class EditTeam extends Component {
               dbName: 'description',
               readOnly: false
             },
-            {
-              name: 'is_published',
-              label: 'Should this team go live?',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: '' + team.is_published,
-              dbName: 'is_published',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ],
-            }
           ]
         },
         {
@@ -189,6 +177,19 @@ class EditTeam extends Component {
           isRequired: false,
           defaultValue: '',
           filesLimit: 1
+        },
+        {
+          name: 'is_published',
+          label: 'Should this team go live?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: '' + team.is_published,
+          dbName: 'is_published',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
         },
       ]
     };

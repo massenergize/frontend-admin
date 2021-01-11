@@ -138,7 +138,7 @@ class EditCommunityByCommunityAdmin extends Component {
                   {
                     name: 'address',
                     label: 'Street Address',
-                    placeholder: 'eg. Wayland',
+                    placeholder: 'Street address (not required)',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
@@ -160,7 +160,7 @@ class EditCommunityByCommunityAdmin extends Component {
                   {
                     name: 'city',
                     label: 'City',
-                    placeholder: 'eg. wayland',
+                    placeholder: 'eg. Springfield',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
@@ -182,7 +182,7 @@ class EditCommunityByCommunityAdmin extends Component {
                   {
                     name: 'state',
                     label: 'State ',
-                    placeholder: 'eg. New York',
+                    placeholder: 'eg. Massachusetts',
                     fieldType: 'Dropdown',
                     contentType: 'text',
                     isRequired: false,
@@ -193,19 +193,6 @@ class EditCommunityByCommunityAdmin extends Component {
                   },
                 ]
               }
-            },
-            {
-              name: 'is_published',
-              label: 'Should this go live now?',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: community.is_published ? 'true' : 'false',
-              dbName: 'is_published',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ],
             },
           ]
         },
@@ -259,7 +246,20 @@ class EditCommunityByCommunityAdmin extends Component {
           isRequired: false,
           defaultValue: '',
           filesLimit: 1
-        }
+        },
+        {
+          name: 'is_published',
+          label: 'Should this go live now?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: community.is_published ? 'true' : 'false',
+          dbName: 'is_published',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+        },
       ]
     };
 
