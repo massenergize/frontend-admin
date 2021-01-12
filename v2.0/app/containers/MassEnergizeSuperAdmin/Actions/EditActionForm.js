@@ -135,7 +135,6 @@ class CreateNewActionForm extends Component {
             {
               name: 'action_id',
               label: 'Action ID (Do not Edit)',
-              placeholder: 'Use Heat Pumps',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
@@ -191,19 +190,6 @@ class CreateNewActionForm extends Component {
                   },
                 ]
               }
-            },
-            {
-              name: 'is_published',
-              label: 'Should this action go live?',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: action.is_published ? 'true' : 'false',
-              dbName: 'is_published',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ],
             },
           ]
         },
@@ -281,6 +267,19 @@ class CreateNewActionForm extends Component {
           isRequired: false,
           defaultValue: '',
           filesLimit: 1
+        },
+        {
+          name: 'is_published',
+          label: 'Should this action go live?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: action.is_published ? 'true' : 'false',
+          dbName: 'is_published',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
         },
       ]
     };

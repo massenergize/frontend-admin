@@ -104,7 +104,7 @@ class CreateNewEventForm extends Component {
             {
               name: 'name',
               label: 'Name of Event or Campaign',
-              placeholder: 'Wayland Heatpump Event',
+              placeholder: 'Enter name of event or campaign',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
@@ -115,7 +115,7 @@ class CreateNewEventForm extends Component {
             {
               name: 'featured_summary',
               label: 'One sentence that describes this event',
-              placeholder: 'Wayland Heatpump Event',
+              placeholder: 'One sentence that describes this event',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
@@ -155,32 +155,6 @@ class CreateNewEventForm extends Component {
               defaultValue: '',
               dbName: 'end_date_and_time',
               readOnly: false
-            },
-            {
-              name: 'archive',
-              label: 'Archive this Event',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: 'false',
-              dbName: 'archive',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ],
-            },
-            {
-              name: 'is_published',
-              label: 'Should this event Go Live?',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: 'false',
-              dbName: 'is_published',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ],
             },
             {
               name: 'is_global',
@@ -229,7 +203,7 @@ class CreateNewEventForm extends Component {
               {
                 name: 'address',
                 label: 'Street Address',
-                placeholder: 'eg. Wayland',
+                placeholder: 'Street Address or Public Facility',
                 fieldType: 'TextField',
                 contentType: 'text',
                 isRequired: true,
@@ -251,7 +225,7 @@ class CreateNewEventForm extends Component {
               {
                 name: 'city',
                 label: 'City',
-                placeholder: 'eg. wayland',
+                placeholder: 'eg. Springfield',
                 fieldType: 'TextField',
                 contentType: 'text',
                 isRequired: true,
@@ -262,12 +236,11 @@ class CreateNewEventForm extends Component {
               {
                 name: 'state',
                 label: 'State ',
-                placeholder: 'eg. New York',
                 fieldType: 'Dropdown',
                 contentType: 'text',
                 isRequired: false,
                 data: states,
-                defaultValue: '',
+                defaultValue: 'Massachusetts',
                 dbName: 'state',
                 readOnly: false
               },
@@ -294,6 +267,33 @@ class CreateNewEventForm extends Component {
           defaultValue: '',
           filesLimit: 1
         },
+        {
+          name: 'archive',
+          label: 'Archive this Event',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: 'false',
+          dbName: 'archive',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+        },
+        {
+          name: 'is_published',
+          label: 'Should this event Go Live?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: 'false',
+          dbName: 'is_published',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+        },
+
       ]
     };
     return formJson;

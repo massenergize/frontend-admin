@@ -136,32 +136,6 @@ class CreateNewTestimonialForm extends Component {
               readOnly: false
             },
             {
-              name: 'is_approved',
-              label: 'Is this testimonial approved ?',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: 'true',
-              dbName: 'is_approved',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ]
-            },
-            {
-              name: 'is_published',
-              label: 'Should this go live ?',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: 'false',
-              dbName: 'is_published',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ]
-            },
-            {
               name: 'rank',
               label: 'Give this testimonial a number to determine which order it appears in.  Smaller appears first',
               placeholder: 'eg. 0',
@@ -249,6 +223,33 @@ class CreateNewTestimonialForm extends Component {
           defaultValue: '',
           filesLimit: 1
         },
+        {
+          name: 'is_approved',
+          label: 'Is this testimonial approved ?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: 'true',
+          dbName: 'is_approved',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ]
+        },
+        {
+          name: 'is_published',
+          label: 'Should this go live ?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: 'false',
+          dbName: 'is_published',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ]
+        },
+
       ]
     };
     return formJson;

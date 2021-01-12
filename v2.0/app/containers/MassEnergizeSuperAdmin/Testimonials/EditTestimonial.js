@@ -181,32 +181,6 @@ class EditTestimonial extends Component {
               readOnly: false
             },
             {
-              name: 'is_approved',
-              label: 'Do you approve this testimonial?',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: (testimonial && testimonial.is_approved) ? 'true' : 'false',
-              dbName: 'is_approved',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ]
-            },
-            {
-              name: 'is_published',
-              label: 'Should this go live ?',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: (testimonial && testimonial.is_published) ? 'true' : 'false',
-              dbName: 'is_published',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ]
-            },
-            {
               name: 'rank',
               label: 'Give this testimonial a number to determine which order it appears in.  Smaller appears first',
               placeholder: 'eg. 0',
@@ -273,6 +247,33 @@ class EditTestimonial extends Component {
           defaultValue: '',
           filesLimit: 1
         },
+        {
+          name: 'is_approved',
+          label: 'Do you approve this testimonial?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: (testimonial && testimonial.is_approved) ? 'true' : 'false',
+          dbName: 'is_approved',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ]
+        },
+        {
+          name: 'is_published',
+          label: 'Should this go live ?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: (testimonial && testimonial.is_published) ? 'true' : 'false',
+          dbName: 'is_published',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ]
+        },
+
       ]
     };
     return formJson;
