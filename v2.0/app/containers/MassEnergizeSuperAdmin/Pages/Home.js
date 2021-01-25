@@ -207,6 +207,17 @@ class HomePageEditForm extends Component {
                 valueToCheck: 'true',
                 fields: [
                   {
+                    name: 'featured_stats_description',
+                    label: 'Sub-title shown for summary stats',
+                    placeholder: 'eg. Help Us Meet Our Goals',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: false,
+                    defaultValue: `${homePageData.featured_stats_description}`,
+                    dbName: 'featured_stats_description',
+                    readOnly: false
+                  },
+                  {
                     name: 'attained_number_of_actions',
                     label: 'Manual Input: Attained Number of Actions',
                     placeholder: 'eg. 100',
@@ -329,6 +340,17 @@ class HomePageEditForm extends Component {
               child: {
                 valueToCheck: 'true',
                 fields: [
+                  {
+                    name: 'featured_events_description',
+                    label: 'Subtitle shown for selected events',
+                    placeholder: 'eg. Upcoming Events and Campaigns',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: false,
+                    defaultValue: `${homePageData.featured_events_description}`,
+                    dbName: 'featured_events_description',
+                    readOnly: false
+                  },
                   {
                     name: 'featured_events',
                     label: 'Select which events to show up on the home Page',
