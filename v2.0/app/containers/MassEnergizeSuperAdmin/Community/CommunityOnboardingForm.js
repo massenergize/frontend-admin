@@ -166,6 +166,17 @@ class CreateNewCommunityForm extends Component {
                     dbName: 'state',
                     readOnly: false
                   },
+                  {
+                    name: 'zipcodes',
+                    label: 'List of all zipcodes within the community, separated by commas ',
+                    placeholder: 'eg. 01020,01101,01102,01103,01104,01105,01106,01107,01108,01109,01111,01115,01118,01119,01128,01129,01138,01139,01144,01151,01152,01199',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: true,
+                    defaultValue: '',
+                    dbName: 'zipcodes',
+                    readOnly: false
+                  },
                 ]
               }
             },
