@@ -149,7 +149,7 @@ class HomePageEditForm extends Component {
               placeholder: 'eg. Energize Springfield is a volunteer led effort started in 2020',
               fieldType: 'TextField',
               contentType: 'text',
-              isRequired: true,
+              isRequired: false,
               defaultValue: `${homePageData.description}`,
               dbName: 'description',
               readOnly: false
