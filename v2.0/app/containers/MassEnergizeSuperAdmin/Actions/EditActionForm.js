@@ -182,7 +182,7 @@ class CreateNewActionForm extends Component {
                   {
                     name: 'community',
                     label: 'Primary Community',
-                    placeholder: 'eg. Wayland',
+                    placeholder: '',
                     fieldType: 'Dropdown',
                     defaultValue: action.community && '' + action.community.id,
                     dbName: 'community_id',
