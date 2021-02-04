@@ -204,7 +204,7 @@ class EditTestimonial extends Component {
               fieldType: 'Dropdown',
               defaultValue: testimonial && testimonial.community && '' + testimonial.community.id,
               dbName: 'community_id',
-              data: communities
+              data: ["--", ...communities]
             },
             {
               name: 'action',
@@ -213,7 +213,7 @@ class EditTestimonial extends Component {
               fieldType: 'Dropdown',
               defaultValue: testimonial && testimonial.action && '' + testimonial.action.id,
               dbName: 'action_id',
-              data: actions
+              data: ["--", ...actions],
             },
             {
               name: 'vendor',
@@ -222,7 +222,7 @@ class EditTestimonial extends Component {
               fieldType: 'Dropdown',
               defaultValue: testimonial && testimonial.vendor && testimonial && '' + testimonial.vendor.id,
               dbName: 'vendor_id',
-              data: vendors
+              data: ["--", ...vendors],
             },
             {
               name: 'other_vendor',
