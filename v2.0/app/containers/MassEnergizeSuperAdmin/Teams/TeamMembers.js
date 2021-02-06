@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import Paper from '@material-ui/core/Paper';
+import Icon from '@material-ui/core/Icon';
 import { Helmet } from 'react-helmet';
 import { bindActionCreators } from 'redux';
 import brand from 'dan-api/dummy/brand';
@@ -17,11 +19,13 @@ import PeopleIcon from '@material-ui/icons/People';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import messageStyles from 'dan-styles/Messages.scss';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import styles from '../../../components/Widget/widget-jss';
 import { reduxGetAllTeams, reduxGetAllCommunityTeams } from '../../../redux/redux-actions/adminActions';
-import { apiCall } from '../../../utils/messenger';
+import { apiCall, apiCallFile } from '../../../utils/messenger';
 import MassEnergizeForm from '../_FormGenerator';
+import { downloadFile } from '../../../utils/common';
 
 function TabContainer(props) {
   const { children } = props;
@@ -41,9 +45,36 @@ class TeamMembers extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: [], loading: true, team: null, columns: this.getColumns(), value: 0,
-
+      data: [], 
+      loading: true, 
+      team: null, 
+      columns: this.getColumns(), 
+      value: 0,
+      error: null,
+      loadingCSVs: [],
     };
+  }
+
+  // from About.js
+  async getCSV(endpoint) {
+    const { team } = this.state;
+    if (!team) {
+      return;
+    }
+    let oldLoadingCSVs = this.state.loadingCSVs;
+    this.setState({ loadingCSVs: oldLoadingCSVs.concat(endpoint) });
+
+    const csvResponse = await apiCallFile('/downloads.' + endpoint,
+      { team_id: team.id });
+
+    oldLoadingCSVs = this.state.loadingCSVs;
+    oldLoadingCSVs.splice(oldLoadingCSVs.indexOf(endpoint), 1);
+    if (csvResponse.success) {
+      downloadFile(csvResponse.file);
+    } else {
+      this.setState({ error: csvResponse.error });
+    }
+    this.setState({ loadingCSVs: oldLoadingCSVs });
   }
 
   async componentDidMount() {
@@ -55,7 +86,6 @@ class TeamMembers extends React.Component {
     }
 
     const allTeamMembersResponse = await apiCall('/teams.members', { team_id: id });
-    console.log(allTeamMembersResponse);
     if (allTeamMembersResponse && allTeamMembersResponse.success) {
       await this.setStateAsync({ loading: false, allTeamMembers: allTeamMembersResponse.data, data: this.fashionData(allTeamMembersResponse.data) });
     }
@@ -187,6 +217,7 @@ class TeamMembers extends React.Component {
       columns, data, team, formJson, value
     } = this.state;
     const { classes } = this.props;
+    const { error, loadingCSVs } = this.state;
     const options = {
       filterType: 'dropdown',
       responsive: 'stacked',
@@ -201,7 +232,28 @@ class TeamMembers extends React.Component {
       }
     };
     return (
+
+      /* Not bothering with the error handling for now
+      {error
+        && (
+          <div>
+            <Snackbar
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              open={error != null}
+              autoHideDuration={6000}
+              onClose={this.handleCloseStyle}
+            >
+              <MySnackbarContentWrapper
+                onClose={this.handleCloseStyle}
+                variant="error"
+                message={`Unable to download: ${error}`}
+              />
+            </Snackbar>
+          </div>
+        )}*/
+
       <div>
+
         <Helmet>
           <title>{title}</title>
           <meta name="description" content={description} />
@@ -249,6 +301,15 @@ class TeamMembers extends React.Component {
               NOTE: this page <i>does not</i> list members of sub-teams.
               On the community portal, parent team pages <i>do</i> list members of sub-teams.
             </p>
+            <br />
+            <Paper onClick={() => { !loadingCSVs.includes('users') && this.getCSV('users'); }} className={`${classes.pageCard}`} elevation={1}>
+              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                Download Users and Actions CSV
+                    {' '}
+                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
+                {loadingCSVs.includes('users') && <CircularProgress size={20} thickness={2} color="secondary" />}
+              </Typography>
+            </Paper>
           </Grid>
         </Grid>
         <div className={classes.root}>

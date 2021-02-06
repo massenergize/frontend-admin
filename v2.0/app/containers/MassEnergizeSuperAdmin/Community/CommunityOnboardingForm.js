@@ -62,9 +62,9 @@ class CreateNewCommunityForm extends Component {
           fieldType: 'Section',
           children: [
             {
-              name: 'name',
+              name: 'community_name',
               label: 'Name of this Community',
-              placeholder: 'eg. Wayland',
+              placeholder: 'eg. Energize Springfield',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
@@ -75,7 +75,7 @@ class CreateNewCommunityForm extends Component {
             {
               name: 'subdomain',
               label: 'Subdomain: Please Provide a short unique name.  (only letters and numbers) ',
-              placeholder: 'eg. wayland',
+              placeholder: 'eg. SpringfieldMA',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
@@ -111,9 +111,9 @@ class CreateNewCommunityForm extends Component {
                 valueToCheck: 'true',
                 fields: [
                   {
-                    name: 'address',
+                    name: 'community_address',
                     label: 'Street Address',
-                    placeholder: 'eg. Wayland',
+                    placeholder: '',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
@@ -124,7 +124,7 @@ class CreateNewCommunityForm extends Component {
                   {
                     name: 'unit',
                     label: 'Unit Number',
-                    placeholder: 'eg. Unit 904',
+                    placeholder: '',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
@@ -135,7 +135,7 @@ class CreateNewCommunityForm extends Component {
                   {
                     name: 'city',
                     label: 'City',
-                    placeholder: 'eg. wayland',
+                    placeholder: 'eg. Springfield',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
@@ -157,43 +157,17 @@ class CreateNewCommunityForm extends Component {
                   {
                     name: 'state',
                     label: 'State ',
-                    placeholder: 'eg. New York',
+                    placeholder: 'eg. Massachusetts',
                     fieldType: 'Dropdown',
                     contentType: 'text',
                     isRequired: false,
                     data: states,
-                    defaultValue: '',
+                    defaultValue: 'Massachusetts',
                     dbName: 'state',
                     readOnly: false
                   },
                 ]
               }
-            },
-            {
-              name: 'is_published',
-              label: 'Should this go live now?',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: 'false',
-              dbName: 'is_published',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ],
-            },
-            {
-              name: 'is_approved',
-              label: 'Do you approve this community? (Check yes after background check)',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: 'true',
-              dbName: 'is_approved',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ],
             },
           ]
         },
@@ -262,6 +236,33 @@ class CreateNewCommunityForm extends Component {
             { id: 'true', value: 'Yes' }
           ]
         },
+        {
+          name: 'is_approved',
+          label: 'Do you approve this community? (Check yes after background check)',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: 'true',
+          dbName: 'is_approved',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+        },
+        {
+          name: 'is_published',
+          label: 'Should this go live now?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: 'false',
+          dbName: 'is_published',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+        },
+
       ]
     };
     return formJson;
