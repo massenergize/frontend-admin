@@ -208,7 +208,7 @@ class CreateNewEventForm extends Component {
                     fieldType: 'Dropdown',
                     defaultValue: event.community && event.community.id,
                     dbName: 'community_id',
-                    data: ["--", ...communities],
+                    data: [{displayName:"--", id:"0"}, ...communities],
                   },
                 ]
               }

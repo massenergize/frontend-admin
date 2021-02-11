@@ -155,7 +155,7 @@ class CreateNewActionForm extends Component {
                     fieldType: 'Dropdown',
                     defaultValue: null,
                     dbName: 'community_id',
-                    data: ["--", ...communities],
+                    data: [{displayName:"--", id:"0"}, ...communities],
                   },
                 ]
               }

@@ -87,7 +87,7 @@ class CreateNewTeamForm extends Component {
               fieldType: 'Dropdown',
               defaultValue: null,
               dbName: 'community_id',
-              data: ["--", ...communities],
+              data: [{displayName:"--", id:"0"}, ...communities],
             },
             {
               name: 'admin_emails',

@@ -146,7 +146,7 @@ class EditPolicyForm extends Component {
                     fieldType: 'Dropdown',
                     defaultValue: policy && policy.community && '' + policy.community.id,
                     dbName: 'community_id',
-                    data: ["--", ...communities],
+                    data: [{displayName:"--", id:"0"}, ...communities],
                   },
                 ]
               }

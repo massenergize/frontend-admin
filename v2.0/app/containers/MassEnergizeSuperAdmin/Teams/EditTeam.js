@@ -129,7 +129,7 @@ class EditTeam extends Component {
               fieldType: 'Dropdown',
               defaultValue: team.community && team.community.id,
               dbName: 'community_id',
-              data: ["--", ...communities],
+              data: [{displayName:"--", id:"0"}, ...communities],
             },
             {
               name: 'parent',
