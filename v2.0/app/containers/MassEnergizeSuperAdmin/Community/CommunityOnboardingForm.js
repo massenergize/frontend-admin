@@ -39,7 +39,7 @@ class CreateNewCommunityForm extends Component {
 
 
   async componentDidMount() {
-    const formJson = await this.createFormJson();
+     const formJson = await this.createFormJson();
     await this.setStateAsync({ formJson });
   }
 
@@ -50,7 +50,18 @@ class CreateNewCommunityForm extends Component {
   }
 
   createFormJson = async () => {
-    console.log(states)
+
+    // quick and dirty - duplicated code - needs to be consistant between pages and with the API
+    // could read these options from the API or share the databaseFieldChoices json
+    const geography_types = [
+      { id: "ZIPCODE", value:"Community defined by one or more towns or zipcodes" },
+      { id: "CITY", value:"Community defined by one or more cities" },
+      //{ id: "COUNTY", value:"Community defined by one or more counties" },
+      { id: "STATE", value: "Community defined by one or more states" },
+      //{ id: "COUNTRY", value:"Community defined by a country" },
+      //{ id: "NON_GEOGRAPHIC", value:"A non-geographic community" },
+    ]
+  
     const formJson = {
       title: 'Create New Community',
       subTitle: '',
@@ -111,75 +122,87 @@ class CreateNewCommunityForm extends Component {
                 valueToCheck: 'true',
                 fields: [
                   {
-                    name: 'community_address',
-                    label: 'Street Address',
-                    placeholder: '',
-                    fieldType: 'TextField',
-                    contentType: 'text',
-                    isRequired: false,
-                    defaultValue: '',
-                    dbName: 'address',
-                    readOnly: false
+                    name: 'geography_type',
+                    label: 'Type of geographic community',
+                    fieldType: 'Radio',
+                    isRequired: true,
+                    defaultValue: 'ZIPCODE',
+                    dbName: 'geography_type',
+                    readOnly: false,
+                    data: geography_types,
                   },
                   {
-                    name: 'unit',
-                    label: 'Unit Number',
-                    placeholder: '',
-                    fieldType: 'TextField',
-                    contentType: 'text',
-                    isRequired: false,
-                    defaultValue: '',
-                    dbName: 'unit',
-                    readOnly: false
-                  },
-                  {
-                    name: 'city',
-                    label: 'City',
-                    placeholder: 'eg. Springfield',
-                    fieldType: 'TextField',
-                    contentType: 'text',
-                    isRequired: false,
-                    defaultValue: '',
-                    dbName: 'city',
-                    readOnly: false
-                  },
-                  {
-                    name: 'zipcode',
-                    label: 'Zip code ',
-                    placeholder: 'eg. 80202',
-                    fieldType: 'TextField',
-                    contentType: 'text',
-                    isRequired: false,
-                    defaultValue: '',
-                    dbName: 'zipcode',
-                    readOnly: false
-                  },
-                  {
-                    name: 'state',
-                    label: 'State ',
-                    placeholder: 'eg. Massachusetts',
-                    fieldType: 'Dropdown',
-                    contentType: 'text',
-                    isRequired: false,
-                    data: states,
-                    defaultValue: 'Massachusetts',
-                    dbName: 'state',
-                    readOnly: false
-                  },
-                  {
-                    name: 'zipcodes',
-                    label: 'List of all zipcodes within the community, separated by commas ',
-                    placeholder: 'eg. 01020,01101,01102,01103,01104,01105,01106,01107,01108,01109,01111,01115,01118,01119,01128,01129,01138,01139,01144,01151,01152,01199',
+                    name: 'location_set',
+                    label: 'List of all such regions (zipcodes or towns, cities, states) within the community, separated by commas ',
+                    placeholder: 'eg. 01101, 01102, 01103, 01104',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: true,
                     defaultValue: '',
-                    dbName: 'zipcodes',
+                    dbName: 'location_set',
                     readOnly: false
                   },
-                ]
-              }
-            },
+                ]}},
+                // these fields now duplicative - unless we want to use them as the community group address  
+                //  {
+                //    name: 'community_address',
+                //    label: 'Street Address',
+                //    placeholder: '',
+                //    fieldType: 'TextField',
+                //    contentType: 'text',
+                 //   isRequired: false,
+                //    defaultValue: '',
+                //    dbName: 'address',
+                //    readOnly: false
+                //  },
+                //  {
+                //    name: 'unit',
+                //    label: 'Unit Number',
+                //    placeholder: '',
+                //    fieldType: 'TextField',
+                //    contentType: 'text',
+                //    isRequired: false,
+                //    defaultValue: '',
+                //    dbName: 'unit',
+                //    readOnly: false
+                //  },
+                //  {
+                //    name: 'city',
+                //    label: 'City',
+                //    placeholder: 'eg. Springfield',
+                //    fieldType: 'TextField',
+                //    contentType: 'text',
+                //    isRequired: false,
+                //    defaultValue: '',
+                //    dbName: 'city',
+                //    readOnly: false
+                //  },
+                //  {
+                //    name: 'zipcode',
+                //    label: 'Zip code ',
+                //    placeholder: 'eg. 80202',
+                //    fieldType: 'TextField',
+                //    contentType: 'text',
+                //    isRequired: false,
+                //    defaultValue: '',
+                //    dbName: 'zipcode',
+                //    readOnly: false
+                //  },
+                //  {
+                //    name: 'state',
+                //    label: 'State ',
+                //    placeholder: 'eg. Massachusetts',
+                //    fieldType: 'Dropdown',
+                //    contentType: 'text',
+                //    isRequired: false,
+                //    data: states,
+                //    defaultValue: 'Massachusetts',
+                //    dbName: 'state',
+                //    readOnly: false
+                //  },
+                //]
+              //}
+            //},
           ]
         },
         {
