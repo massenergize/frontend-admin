@@ -159,7 +159,7 @@ class CreateNewTestimonialForm extends Component {
               fieldType: 'Dropdown',
               defaultValue: null,
               dbName: 'community_id',
-              data: communities
+              data: [{displayName:"--", id:""}, ...communities],
             },
             {
               name: 'action',
@@ -168,7 +168,7 @@ class CreateNewTestimonialForm extends Component {
               fieldType: 'Dropdown',
               defaultValue: null,
               dbName: 'action_id',
-              data: actions
+              data: [{displayName:"--", id:""}, ...actions],
             },
             {
               name: 'vendor',
@@ -177,7 +177,7 @@ class CreateNewTestimonialForm extends Component {
               fieldType: 'Dropdown',
               defaultValue: null,
               dbName: 'vendor_id',
-              data: vendors
+              data: [{displayName:"--", id:""}, ...vendors],
             },
             {
               name: 'other_vendor',
