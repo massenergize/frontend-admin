@@ -45,6 +45,7 @@ class AllUsers extends React.Component {
         d.full_name,
         d.preferred_name,
         d.email,
+        d.joined,
         `${d.communities.join(', ')} `,
         d.is_super_admin ? 'Super Admin' : d.is_community_admin ? 'Community Admin' : 'Member',
         d.id,
@@ -76,13 +77,21 @@ class AllUsers extends React.Component {
       }
     },
     {
+      name: 'Joined',
+      key: 'joined',
+      options: {
+        filter: true,
+        filterType: 'textField'
+      }
+    },
+    {
       name: 'Community',
       key: 'community',
       options: {
         filter: true,
         filterType: 'textField'
       }
-    },
+    },    
     {
       name: 'Membership',
       key: 'status',
