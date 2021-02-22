@@ -54,11 +54,11 @@ class CreateNewCommunityForm extends Component {
     // quick and dirty - duplicated code - needs to be consistant between pages and with the API
     // could read these options from the API or share the databaseFieldChoices json
     const geography_types = [
-      { id: "ZIPCODE", value:"Community defined by one or more towns or zipcodes" },
+      { id: "ZIPCODE", value:"Community defined by one or more towns or zipcodes (can have smaller communities within)" },
       { id: "CITY", value:"Community defined by one or more cities" },
       //{ id: "COUNTY", value:"Community defined by one or more counties" },
       { id: "STATE", value: "Community defined by one or more states" },
-      //{ id: "COUNTRY", value:"Community defined by a country" },
+      { id: "COUNTRY", value:"Community defined by a country" },
       //{ id: "NON_GEOGRAPHIC", value:"A non-geographic community" },
     ]
   
