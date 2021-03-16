@@ -206,7 +206,7 @@ class MassEnergizeForm extends Component {
   /**
    * Handles general input
    */
-  handleFormDataChange = (event) => {
+  handleFormDataChange = (event, field) => {
     const { target } = event;
     if (!target) return;
     const { name, value } = target;
@@ -214,6 +214,8 @@ class MassEnergizeForm extends Component {
     this.setState({
       formData: { ...formData, [name]: value },
     });
+    //--------------------------------------- fire some extra fxnality via onclick prop on field obj ----
+    if(field && field.onClick) field.onClick();
   };
 
   /**
@@ -699,7 +701,7 @@ class MassEnergizeForm extends Component {
               name={field.name}
               className={classes.group}
               value={this.getValue(field.name)}
-              onChange={this.handleFormDataChange}
+              onChange={(e)=> this.handleFormDataChange(e,field)}
             >
               {field.data.map((d) => (
                 <FormControlLabel

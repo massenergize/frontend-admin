@@ -62,7 +62,6 @@ class EditCommunityByCommunityAdmin extends Component {
 
   createFormJson = async () => {
     const { community } = this.state;
-    console.log(community);
     // if (!community) return {};
 
     const formJson = {
@@ -200,6 +199,20 @@ class EditCommunityByCommunityAdmin extends Component {
           label: 'Community Public Information (Will be displayed in the community portal\'s footer)',
           fieldType: 'Section',
           children: [
+            {
+              name: 'social_or_email',
+              label: "Choose What To Show (Email Or Social Media Links)",
+              fieldType: 'Radio',
+              isRequired: true,
+              // defaultValue: community.is_approved ? 'true' : 'false',
+              dbName: 'social_or_email',
+              readOnly: false,
+              data: [
+                { id: 'false', value: 'Email' },
+                { id: 'true', value: 'Social Media Links' }
+              ],
+              onClick: () =>{}
+            },
             {
               name: 'admin_full_name',
               label: 'Contact Person\'s Full Name',

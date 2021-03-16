@@ -62,7 +62,6 @@ class EditCommunityForm extends Component {
 
   createFormJson = async () => {
     const { community } = this.state;
-    console.log(community);
     // if (!community) return {};
     const formJson = {
       title: 'Edit your Community',

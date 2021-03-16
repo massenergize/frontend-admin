@@ -50,7 +50,6 @@ class CreateNewCommunityForm extends Component {
   }
 
   createFormJson = async () => {
-    console.log(states)
     const formJson = {
       title: 'Create New Community',
       subTitle: '',
