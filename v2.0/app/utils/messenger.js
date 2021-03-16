@@ -47,7 +47,8 @@ export async function apiCall(
     if (relocationPage && json && json.success) {
       window.location.href = relocationPage;
     } else if (!json.success) {
-      if (json.error === 'session_expired') {
+      if (json.error === 'session_expired' || 
+          json.error === 'permission_denied') {
         window.location.href = '/login';
       } else if (json !== 'undefined') {
         console.log(destinationUrl, json);

@@ -137,7 +137,7 @@ class EditCommunityForm extends Component {
                   {
                     name: 'address',
                     label: 'Street Address',
-                    placeholder: 'eg. Wayland',
+                    placeholder: 'Enter street address (not required)',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
@@ -159,7 +159,7 @@ class EditCommunityForm extends Component {
                   {
                     name: 'city',
                     label: 'City',
-                    placeholder: 'eg. wayland',
+                    placeholder: 'eg. Springfield',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
@@ -181,7 +181,7 @@ class EditCommunityForm extends Component {
                   {
                     name: 'state',
                     label: 'State ',
-                    placeholder: 'eg. New York',
+                    placeholder: 'eg. Massachusetts',
                     fieldType: 'Dropdown',
                     contentType: 'text',
                     isRequired: false,
@@ -192,32 +192,6 @@ class EditCommunityForm extends Component {
                   },
                 ]
               }
-            },
-            {
-              name: 'is_published',
-              label: 'Should this go live now?',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: community.is_published ? 'true' : 'false',
-              dbName: 'is_published',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ],
-            },
-            {
-              name: 'is_approved',
-              label: 'Do you approve this community? (Check yes after background check)',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: community.is_approved ? 'true' : 'false',
-              dbName: 'is_approved',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ],
             },
           ]
         },
@@ -271,7 +245,33 @@ class EditCommunityForm extends Component {
           isRequired: false,
           defaultValue: '',
           filesLimit: 1
-        }
+        },
+        {
+          name: 'is_approved',
+          label: 'Do you approve this community? (Check yes after background check)',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: community.is_approved ? 'true' : 'false',
+          dbName: 'is_approved',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+        },
+        {
+          name: 'is_published',
+          label: 'Should this go live now?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: community.is_published ? 'true' : 'false',
+          dbName: 'is_published',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+        },
       ]
     };
 

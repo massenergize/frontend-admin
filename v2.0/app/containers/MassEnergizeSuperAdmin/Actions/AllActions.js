@@ -27,7 +27,8 @@ class AllActions extends React.Component {
       columns: this.getColumns(),
       loading: true,
       allActions: [],
-      data: []
+      data: [],
+      error: null,
     };
   }
 
@@ -36,7 +37,10 @@ class AllActions extends React.Component {
     const allActionsResponse = await apiCall('/actions.listForCommunityAdmin');
     if (allActionsResponse && allActionsResponse.success) {
       loadAllActions(allActionsResponse.data);
-      await this.setStateAsync({ loading: false, allActions: allActionsResponse.data, data: this.fashionData(allActionsResponse.data) });
+      await this.setStateAsync({ loading: false, error: null, allActions: allActionsResponse.data, data: this.fashionData(allActionsResponse.data) });
+    }
+    else if (allActionsResponse && !allActionsResponse.success) {
+      await this.setStateAsync({loading: false, error: allActionsResponse.error})
     }
   }
 
@@ -193,10 +197,13 @@ class AllActions extends React.Component {
     const title = brand.name + ' - All Actions';
     const description = brand.desc;
     const { classes } = this.props;
-    const { columns, loading, data } = this.state;
+    const { columns, loading, data, error } = this.state;
 
     if (loading) {
       return <LinearBuffer />;
+    }
+    else if (error) {
+      return <div><h2>"Error"</h2></div>;
     }
 
     const options = {

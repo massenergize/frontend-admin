@@ -118,24 +118,38 @@ class HomePageEditForm extends Component {
           label: 'Welcome Title and Pictures',
           fieldType: 'Section',
           children: [
-            // {
-            //   name: 'title',
-            //   label: 'Main Title',
-            //   placeholder: 'eg. Welcome to Wayland!',
-            //   fieldType: 'TextField',
-            //   contentType: 'text',
-            //   isRequired: true,
-            //   defaultValue: `${homePageData.title}`,
-            //   dbName: 'title',
-            //   readOnly: false
-            // },
             {
-              name: 'description',
+              /* this won't show by default but be the tab title */
+              name: 'title',
+              label: 'Main Title: Displayed on browser tab',
+              placeholder: 'e.g. Energize Springfield',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: false,
+              defaultValue: `${homePageData.title}`,
+              dbName: 'title',
+              readOnly: false
+            },
+            {
+              /* this is the main tagline (which used to be called 'description' */
+              name: 'sub-title',
               label: 'Welcome Text: Displayed right below the three images',
               placeholder: 'eg. Join our effort to fight climate risks ...',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
+              defaultValue: `${homePageData.sub_title}`,
+              dbName: 'sub_title',
+              readOnly: false
+            },
+            {
+              /* this is now a description which can show on hover */
+              name: 'description',
+              label: 'Additional description, shown on hover or "more info"',
+              placeholder: 'eg. Energize Springfield is a volunteer led effort started in 2020',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: false,
               defaultValue: `${homePageData.description}`,
               dbName: 'description',
               readOnly: false
@@ -206,6 +220,28 @@ class HomePageEditForm extends Component {
               child: {
                 valueToCheck: 'true',
                 fields: [
+                  {
+                    name: 'featured_stats_subtitle',
+                    label: 'Custom title shown for summary stats (optional)',
+                    placeholder: 'eg. Help Us Meet Our Goals',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: false,
+                    defaultValue: `${homePageData.featured_stats_subtitle}`,
+                    dbName: 'featured_stats_subtitle',
+                    readOnly: false
+                  },
+                  {
+                    name: 'featured_stats_description',
+                    label: 'Additional information for goals and stats (optional)',
+                    placeholder: '',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: false,
+                    defaultValue: `${homePageData.featured_stats_description}`,
+                    dbName: 'featured_stats_description',
+                    readOnly: false
+                  },
                   {
                     name: 'attained_number_of_actions',
                     label: 'Manual Input: Attained Number of Actions',
@@ -329,6 +365,28 @@ class HomePageEditForm extends Component {
               child: {
                 valueToCheck: 'true',
                 fields: [
+                  {
+                    name: 'featured_events_subtitle',
+                    label: 'Custom title shown for selected events section (optional)',
+                    placeholder: 'eg. Upcoming Events and Campaigns',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: false,
+                    defaultValue: `${homePageData.featured_events_subtitle}`,
+                    dbName: 'featured_events_subtitle',
+                    readOnly: false
+                  },
+                  {
+                    name: 'featured_events_description',
+                    label: 'Additional information for selected events section (optional)',
+                    placeholder: '',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: false,
+                    defaultValue: `${homePageData.featured_events_description}`,
+                    dbName: 'featured_events_description',
+                    readOnly: false
+                  },
                   {
                     name: 'featured_events',
                     label: 'Select which events to show up on the home Page',

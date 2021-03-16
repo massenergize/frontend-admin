@@ -123,7 +123,6 @@ class CreateNewVendorForm extends Component {
             {
               name: 'communities',
               label: 'Which communities would this vendor service ?',
-              placeholder: 'eg. +1(571)-000-2231',
               fieldType: 'Checkbox',
               contentType: 'text',
               isRequired: true,
@@ -146,7 +145,7 @@ class CreateNewVendorForm extends Component {
             },
             {
               name: 'description',
-              label: 'Tell us about the services this vendor provides',
+              label: 'Tell us about what services this vendor provides',
               placeholder: 'Tell us more ...',
               fieldType: 'HTMLField',
               contentType: 'text',
@@ -155,32 +154,6 @@ class CreateNewVendorForm extends Component {
               defaultValue: '',
               dbName: 'description',
               readOnly: false
-            },
-            {
-              name: 'is_verified',
-              label: 'Have you verified this Vendor?',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: 'false',
-              dbName: 'is_verified',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ]
-            },
-            {
-              name: 'is_published',
-              label: 'Should this vendor go live?',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: 'false',
-              dbName: 'is_published',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ],
             },
             {
               name: 'website',
@@ -210,7 +183,7 @@ class CreateNewVendorForm extends Component {
                   {
                     name: 'address',
                     label: 'Street Address',
-                    placeholder: '',
+                    placeholder: 'Enter street address',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: true,
@@ -221,7 +194,7 @@ class CreateNewVendorForm extends Component {
                   {
                     name: 'unit',
                     label: 'Unit Number',
-                    placeholder: '',
+                    placeholder: 'eg. "2A"',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
@@ -243,12 +216,11 @@ class CreateNewVendorForm extends Component {
                   {
                     name: 'state',
                     label: 'State ',
-                    placeholder: 'eg. Massachusetts',
                     fieldType: 'Dropdown',
                     contentType: 'text',
                     isRequired: false,
                     data: states,
-                    defaultValue: '',
+                    defaultValue: 'Massachusetts',
                     dbName: 'state',
                     readOnly: false
                   },
@@ -264,7 +236,6 @@ class CreateNewVendorForm extends Component {
             {
               name: 'service_area',
               label: 'Please select your service Area',
-              placeholder: 'eg. Grace Tsu',
               fieldType: 'Radio',
               contentType: 'text',
               isRequired: true,
@@ -281,7 +252,7 @@ class CreateNewVendorForm extends Component {
                   {
                     name: 'service_area_states',
                     label: 'Which States? Separate them by commas',
-                    placeholder: 'eg. New York',
+                    placeholder: 'eg. Massachusetts',
                     fieldType: 'Checkbox',
                     contentType: 'text',
                     data: states,
@@ -362,6 +333,33 @@ class CreateNewVendorForm extends Component {
           defaultValue: '',
           filesLimit: 1
         },
+        {
+          name: 'is_verified',
+          label: 'Have you verified this Vendor?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: 'false',
+          dbName: 'is_verified',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ]
+        },
+        {
+          name: 'is_published',
+          label: 'Should this vendor go live?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: 'false',
+          dbName: 'is_published',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+        },
+
       ]
     };
     return formJson;

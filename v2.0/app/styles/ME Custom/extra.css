@@ -1,0 +1,10 @@
+
+.preview-content{
+    margin-left: 30px;
+}
+.preview-content ul > li{
+    list-style-type:  disc !important;
+}
+.preview-content ol > li{
+    list-style-type:  decimal !important;
+}

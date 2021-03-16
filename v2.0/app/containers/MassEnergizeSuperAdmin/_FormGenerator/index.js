@@ -1,41 +1,41 @@
-import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import InputLabel from '@material-ui/core/InputLabel';
-import Input from '@material-ui/core/Input';
-import Select from '@material-ui/core/Select';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
-import { DateTimePicker, MuiPickersUtilsProvider } from 'material-ui-pickers';
-import MomentUtils from '@date-io/moment';
-import FormControl from '@material-ui/core/FormControl';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormLabel from '@material-ui/core/FormLabel';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import Chip from '@material-ui/core/Chip';
-import { Link } from 'react-router-dom';
-import { MaterialDropZone } from 'dan-components';
-import Snackbar from '@material-ui/core/Snackbar';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { Editor as TinyEditor } from '@tinymce/tinymce-react';
-import { MenuItem } from '@material-ui/core';
-import TextField from '@material-ui/core/TextField';
-import Icon from '@material-ui/core/Icon';
-import moment from 'moment';
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import { EditorState } from 'draft-js';
-import { stateFromHTML } from 'draft-js-import-html';
-import { apiCall } from '../../../utils/messenger';
-import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
-import FieldTypes from './fieldTypes';
-import Modal from './Modal';
-import PreviewModal from './PreviewModal';
+import React, { Component, Fragment } from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import InputLabel from "@material-ui/core/InputLabel";
+import Input from "@material-ui/core/Input";
+import Select from "@material-ui/core/Select";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import Paper from "@material-ui/core/Paper";
+import Grid from "@material-ui/core/Grid";
+import { DateTimePicker, MuiPickersUtilsProvider } from "material-ui-pickers";
+import MomentUtils from "@date-io/moment";
+import FormControl from "@material-ui/core/FormControl";
+import Checkbox from "@material-ui/core/Checkbox";
+import FormLabel from "@material-ui/core/FormLabel";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import Chip from "@material-ui/core/Chip";
+import { Link } from "react-router-dom";
+import { MaterialDropZone } from "dan-components";
+import Snackbar from "@material-ui/core/Snackbar";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { Editor as TinyEditor } from "@tinymce/tinymce-react";
+import { MenuItem } from "@material-ui/core";
+import TextField from "@material-ui/core/TextField";
+import Icon from "@material-ui/core/Icon";
+import moment from "moment";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import { EditorState } from "draft-js";
+import { stateFromHTML } from "draft-js-import-html";
+import { apiCall } from "../../../utils/messenger";
+import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
+import FieldTypes from "./fieldTypes";
+import Modal from "./Modal";
+import PreviewModal from "./PreviewModal";
 
-const TINY_MCE_API_KEY = '3fpefbsmtkh71yhtjyykjwj5ezs3a5cac5ei018wvnlg2g0r';
+const TINY_MCE_API_KEY = "3fpefbsmtkh71yhtjyykjwj5ezs3a5cac5ei018wvnlg2g0r";
 
 const styles = (theme) => ({
   root: {
@@ -43,21 +43,21 @@ const styles = (theme) => ({
     padding: 30,
   },
   field: {
-    width: '100%',
+    width: "100%",
     marginBottom: 20,
   },
   fieldBasic: {
-    width: '100%',
+    width: "100%",
     marginBottom: 20,
     marginTop: 10,
   },
   inlineWrap: {
-    display: 'flex',
-    flexDirection: 'row',
+    display: "flex",
+    flexDirection: "row",
   },
   buttonInit: {
     margin: theme.spacing.unit * 4,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
 
@@ -71,8 +71,6 @@ const MenuProps = {
     },
   },
 };
-
-
 
 class MassEnergizeForm extends Component {
   constructor(props) {
@@ -154,7 +152,7 @@ class MassEnergizeForm extends Component {
   }
 
   initializeHtmlField = (content) => {
-    if (!content || content === '<p></p>\n') {
+    if (!content || content === "<p></p>\n") {
       return EditorState.createEmpty();
     }
     return EditorState.createWithContent(stateFromHTML(content));
@@ -424,7 +422,7 @@ class MassEnergizeForm extends Component {
   };
 
   handleCloseStyle = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     this.setState({ successMsg: null, error: null });
@@ -441,7 +439,7 @@ class MassEnergizeForm extends Component {
 
     const val = formData[fieldName];
     if (!val) {
-      return 'Please select an option';
+      return "Please select an option";
     }
     const searchRes = data.filter((d) => d.id === val);
     const [first] = searchRes;
@@ -449,7 +447,7 @@ class MassEnergizeForm extends Component {
     if (first) {
       return first.displayName;
     }
-    return 'Please select an option';
+    return "Please select an option";
   };
 
   /**
@@ -563,8 +561,8 @@ class MassEnergizeForm extends Component {
       // const initialFormData = this.initialFormData(formJson.fields);
       // await this.setStateAsync({ formJson, formData });
       await this.setStateAsync({
-        successMsg: `Successfully Created/Updated the Resource with Id: ${response.data
-          && response.data.id}.`,
+        successMsg: `Successfully Created/Updated the Resource with Id: ${response.data &&
+          response.data.id}.`,
         error: null,
         startCircularSpinner: false,
         // formData: initialFormData
@@ -692,15 +690,16 @@ class MassEnergizeForm extends Component {
                     <MenuItem key={t.id}>
                       <FormControlLabel
                         key={t.id}
-                        control={(
+                        control={
                           <Checkbox
                             checked={this.isThisSelectedOrNot(field.name, t.id)}
-                            onChange={(event) => this.handleCheckBoxSelect(event, field.selectMany)
+                            onChange={(event) =>
+                              this.handleCheckBoxSelect(event, field.selectMany)
                             }
                             value={t.id}
                             name={field.name}
                           />
-                        )}
+                        }
                         label={t.displayName}
                       />
                     </MenuItem>
@@ -723,7 +722,7 @@ class MassEnergizeForm extends Component {
                   await this.updateForm(field.name, newValue.target.value);
                 }}
                 inputProps={{
-                  id: 'age-native-simple',
+                  id: "age-native-simple",
                 }}
               >
                 <option value={this.getValue(field.name)}>
@@ -733,16 +732,16 @@ class MassEnergizeForm extends Component {
                     field.data
                   )}
                 </option>
-                {field.data
-                  && field.data.map((c) => (
+                {field.data &&
+                  field.data.map((c) => (
                     <option value={c.id} key={c.id}>
                       {c.displayName}
                     </option>
                   ))}
               </Select>
-              {field.child
-                && this.getValue(field.name) === field.child.valueToCheck
-                && this.renderFields(field.child.fields)}
+              {field.child &&
+                this.getValue(field.name) === field.child.valueToCheck &&
+                this.renderFields(field.child.fields)}
             </FormControl>
           </div>
         );
@@ -753,7 +752,7 @@ class MassEnergizeForm extends Component {
               <div>
                 <h6>Current Image:</h6>
                 <img
-                  style={{ maxWidth: '400px', maxHeight: '300px' }}
+                  style={{ maxWidth: "400px", maxHeight: "300px" }}
                   src={field.previewLink}
                   alt={field.label}
                 />
@@ -765,8 +764,8 @@ class MassEnergizeForm extends Component {
               <h6>Image Upload Instructions:</h6>
               <ul
                 style={{
-                  listStyleType: 'circle',
-                  paddingLeft: '30px',
+                  listStyleType: "circle",
+                  paddingLeft: "30px",
                   fontSize: 14,
                 }}
               >
@@ -778,10 +777,8 @@ class MassEnergizeForm extends Component {
                 <li>
                   {field.imageAspectRatio ? (
                     <span>
-                      The aspect ratio required for this image destination is
-                      {' '}
-                      <i>{field.imageAspectRatio}</i>
-                      . After selecting an image,
+                      The aspect ratio required for this image destination is{" "}
+                      <i>{field.imageAspectRatio}</i>. After selecting an image,
                       a cropping tool will open.
                     </span>
                   ) : (
@@ -791,8 +788,8 @@ class MassEnergizeForm extends Component {
                     </span>
                   )}
                 </li>
-                {field.extraInstructions
-                  && field.extraInstructions.map((instruction) => (
+                {field.extraInstructions &&
+                  field.extraInstructions.map((instruction) => (
                     <li>{instruction}</li>
                   ))}
               </ul>
@@ -801,11 +798,11 @@ class MassEnergizeForm extends Component {
             <Fragment>
               <MaterialDropZone
                 acceptedFiles={[
-                  'image/jpeg',
-                  'image/png',
-                  'image/jpg',
-                  'image/bmp',
-                  'image/svg',
+                  "image/jpeg",
+                  "image/png",
+                  "image/jpg",
+                  "image/bmp",
+                  "image/svg",
                 ]}
                 files={this.getValue(field.name, [])}
                 showPreviews
@@ -822,9 +819,10 @@ class MassEnergizeForm extends Component {
           </div>
         );
       case FieldTypes.HTMLField:
-        const previewStyle = this.state.activeModal === field.name
-          ? { display: 'block' }
-          : { display: 'none' };
+        const previewStyle =
+          this.state.activeModal === field.name
+            ? { display: "block" }
+            : { display: "none" };
         return (
           <div key={field.name + field.label}>
             <div style={previewStyle}>{this.showPreviewModal()}</div>
@@ -833,33 +831,24 @@ class MassEnergizeForm extends Component {
               item
               xs={12}
               style={{
-                borderColor: '#EAEAEA',
-                borderStyle: 'solid',
-                borderWidth: 'thin',
+                borderColor: "#EAEAEA",
+                borderStyle: "solid",
+                borderWidth: "thin",
               }}
             >
-              <div style={{ padding: 20, color: '#d28818' }}>
+              <div style={{ padding: 20, color: "#d28818" }}>
                 <Typography>{field.label}</Typography>
                 <small>
-                  <b>PLEASE NOTE:</b>
-                  {' '}
-the wide spacing between two lines in the
+                  <b>PLEASE NOTE:</b> the wide spacing between two lines in the
                   editor, is not what you will get when you content gets to
                   users.
                   <br />
-                  If you need a
-                  {' '}
+                  If you need a{" "}
                   <b>
                     <i>gap </i>
                   </b>
-                  between two lines, press your
-                  {' '}
-                  <b>Enter Key twice </b>
-                  {' '}
-or more,
-                  instead of
-                  {' '}
-                  <b>once</b>
+                  between two lines, press your <b>Enter Key twice </b> or more,
+                  instead of <b>once</b>
                   <br />
                   <b>
                     Pressing Once, will only show items right on the next line,
@@ -886,17 +875,18 @@ or more,
                   menubar: false,
 
                   plugins: [
-                    'advlist autolink lists link image charmap print preview anchor forecolor',
-                    'searchreplace visualblocks code fullscreen',
-                    'insertdatetime media table paste code help wordcount',
+                    "advlist autolink lists link image charmap print preview anchor forecolor",
+                    "searchreplace visualblocks code fullscreen",
+                    "insertdatetime media table paste code help wordcount",
                   ],
-                  toolbar: 'undo redo | formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent |  fontselect | fontsizeselect',
+                  toolbar:
+                    "undo redo | formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent |  fontselect | fontsizeselect",
                 }}
                 apiKey={TINY_MCE_API_KEY}
               />
 
-              {/* <Button
-                style={{ width: '100%' }}
+              <Button
+                style={{ width: "100%" }}
                 color="default"
                 onClick={() => {
                   this.setState({
@@ -906,10 +896,8 @@ or more,
                 }}
               >
                 <Icon style={{ marginRight: 6 }}>remove_red_eye</Icon>
-Show Me A
-                Preview
-                {' '}
-              </Button> */}
+                Show Me A Preview{" "}
+              </Button>
             </Grid>
             {this.state[name] && (
               <center>
@@ -959,9 +947,9 @@ Show Me A
               ))}
             </RadioGroup>
             <div>{field.description}</div>
-            {field.child
-              && this.getValue(field.name) === field.child.valueToCheck
-              && this.renderFields(field.child.fields)}
+            {field.child &&
+              this.getValue(field.name) === field.child.valueToCheck &&
+              this.renderFields(field.child.fields)}
           </div>
         );
       case FieldTypes.TextField:
@@ -992,7 +980,7 @@ Show Me A
             <br />
             <div
               style={{
-                border: '1px solid rgb(229, 238, 245)',
+                border: "1px solid rgb(229, 238, 245)",
                 padding: 15,
                 borderRadius: 6,
               }}
@@ -1010,16 +998,17 @@ Show Me A
             <Typography variant="button" className={classes.divider}>
               {field.label}
             </Typography>
-            <div className={classes.picker} style={{ width: '100%' }}>
+            <div className={classes.picker} style={{ width: "100%" }}>
               <MuiPickersUtilsProvider
                 utils={MomentUtils}
-                style={{ width: '100%' }}
+                style={{ width: "100%" }}
               >
                 <DateTimePicker
                   value={this.getValue(field.name, moment.now())}
-                  onChange={(date) => this.handleFormDataChange({
-                    target: { name: field.name, value: date },
-                  })
+                  onChange={(date) =>
+                    this.handleFormDataChange({
+                      target: { name: field.name, value: date },
+                    })
                   }
                   label={field.label}
                   format="MM/DD/YYYY, h:mm a"
@@ -1040,18 +1029,17 @@ Show Me A
    * Takes a list of fields and renders them one by depending on which type
    * by making use of a helper function
    */
-  renderFields = (fields) => fields.map((field) => (
-    <div>
-      {this.renderModalText(field)}
-      {this.renderField(field)}
-    </div>
-  ));
+  renderFields = (fields) =>
+    fields.map((field) => (
+      <div>
+        {this.renderModalText(field)}
+        {this.renderField(field)}
+      </div>
+    ));
 
   render() {
     const { classes } = this.props;
-    const {
-      formJson, error, successMsg, startCircularSpinner
-    } = this.state;
+    const { formJson, error, successMsg, startCircularSpinner } = this.state;
 
     if (!formJson) return <div />;
     return (
@@ -1073,7 +1061,7 @@ Show Me A
               {error && (
                 <div>
                   <Snackbar
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                     open={error != null}
                     autoHideDuration={6000}
                     onClose={this.handleCloseStyle}
@@ -1084,7 +1072,7 @@ Show Me A
                       message={`Error Occurred: ${error}`}
                     />
                   </Snackbar>
-                  <p style={{ color: 'red' }}>{error}</p>
+                  <p style={{ color: "red" }}>{error}</p>
                 </div>
               )}
 
@@ -1093,8 +1081,8 @@ Show Me A
                 <div>
                   <Snackbar
                     anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
+                      vertical: "bottom",
+                      horizontal: "right",
                     }}
                     open={successMsg != null}
                     autoHideDuration={6000}
@@ -1106,7 +1094,7 @@ Show Me A
                       message={successMsg}
                     />
                   </Snackbar>
-                  <p style={{ color: 'green' }}>{successMsg}</p>
+                  <p style={{ color: "green" }}>{successMsg}</p>
                 </div>
               )}
 
@@ -1126,7 +1114,7 @@ Show Me A
                   {formJson && formJson.cancelLink && (
                     <Link to={formJson.cancelLink}>Cancel</Link>
                   )}
-                  {'    '}
+                  {"    "}
                   <Button variant="contained" color="secondary" type="submit">
                     Submit
                   </Button>

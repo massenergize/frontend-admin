@@ -135,7 +135,6 @@ class CreateNewActionForm extends Component {
             {
               name: 'action_id',
               label: 'Action ID (Do not Edit)',
-              placeholder: 'Use Heat Pumps',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
@@ -183,27 +182,14 @@ class CreateNewActionForm extends Component {
                   {
                     name: 'community',
                     label: 'Primary Community',
-                    placeholder: 'eg. Wayland',
+                    placeholder: '',
                     fieldType: 'Dropdown',
                     defaultValue: action.community && '' + action.community.id,
                     dbName: 'community_id',
-                    data: communities
+                    data: [{displayName:"--", id:""}, ...communities],
                   },
                 ]
               }
-            },
-            {
-              name: 'is_published',
-              label: 'Should this action go live?',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: action.is_published ? 'true' : 'false',
-              dbName: 'is_published',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ],
             },
           ]
         },
@@ -218,7 +204,7 @@ class CreateNewActionForm extends Component {
               fieldType: 'Dropdown',
               defaultValue: action.calculator_action && '' + action.calculator_action.id,
               dbName: 'calculator_action',
-              data: ccActions,
+              data: [{displayName:"--", id:""}, ...ccActions],
               modalTitle: 'Carbon Action List & Instructions',
               modalText: 'Check out the instructions here: https://docs.google.com/document/d/1RisvrGJQifCq9c62etcwR1YCUffExz_T8lR2XDGmokQ/edit',
             },
@@ -281,6 +267,19 @@ class CreateNewActionForm extends Component {
           isRequired: false,
           defaultValue: '',
           filesLimit: 1
+        },
+        {
+          name: 'is_published',
+          label: 'Should this action go live?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: action.is_published ? 'true' : 'false',
+          dbName: 'is_published',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
         },
       ]
     };
