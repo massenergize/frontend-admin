@@ -22,7 +22,7 @@ import { MaterialDropZone } from "dan-components";
 import Snackbar from "@material-ui/core/Snackbar";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { Editor as TinyEditor } from "@tinymce/tinymce-react";
-import { MenuItem } from "@material-ui/core";
+import { FilledInput, MenuItem } from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import Icon from "@material-ui/core/Icon";
 import moment from "moment";
@@ -206,7 +206,7 @@ class MassEnergizeForm extends Component {
   /**
    * Handles general input
    */
-  handleFormDataChange = (event, field) => {
+  handleFormDataChange = (event) => {
     const { target } = event;
     if (!target) return;
     const { name, value } = target;
@@ -214,8 +214,6 @@ class MassEnergizeForm extends Component {
     this.setState({
       formData: { ...formData, [name]: value },
     });
-    //--------------------------------------- fire some extra fxnality via onclick prop on field obj ----
-    if(field && field.onClick) field.onClick();
   };
 
   /**
@@ -338,6 +336,22 @@ class MassEnergizeForm extends Component {
         }
       }
 
+      if (field.conditionalDisplays && field.conditionalDisplays.length) {
+        var selectedSet = field.conditionalDisplays.filter(
+          (f) => fieldValueInForm === f.valueToCheck
+        )[0];
+        let [childCleanValues, childHasMediaFiles] = this.cleanItUp(
+          formData,
+          selectedSet.fields || []
+        );
+        if (childHasMediaFiles) {
+          hasMediaFiles = childHasMediaFiles || hasMediaFiles;
+        }
+        Object.keys(childCleanValues).forEach((k) => {
+          cleanedValues[k] = childCleanValues[k];
+        });
+      }
+
       if (field.child) {
         const [childCleanValues, childHasMediaFiles] = this.cleanItUp(
           formData,
@@ -367,6 +381,7 @@ class MassEnergizeForm extends Component {
     return [cleanedValues, hasMediaFiles];
   };
 
+  takeContentFrom;
   /**
    * This handles the form data submission
    */
@@ -382,6 +397,10 @@ class MassEnergizeForm extends Component {
       formData,
       formJson.fields
     );
+
+    console.log("I am the cleaned values", cleanedValues);
+
+    return;
 
     // let's make an api call to send the data
     let response = null;
@@ -701,7 +720,7 @@ class MassEnergizeForm extends Component {
               name={field.name}
               className={classes.group}
               value={this.getValue(field.name)}
-              onChange={(e)=> this.handleFormDataChange(e,field)}
+              onChange={this.handleFormDataChange}
             >
               {field.data.map((d) => (
                 <FormControlLabel
@@ -717,6 +736,7 @@ class MassEnergizeForm extends Component {
             {field.child &&
               this.getValue(field.name) === field.child.valueToCheck &&
               this.renderFields(field.child.fields)}
+            {this.renderConditionalDisplays(field)}
           </div>
         );
       case FieldTypes.TextField:
@@ -792,6 +812,15 @@ class MassEnergizeForm extends Component {
     }
   };
 
+  renderConditionalDisplays = (field) => {
+    //use conditional displays to render other fields based on user's radio btn selection
+    //you can have as many conditions as possible defined in the user form json props
+    if (!field || !field.conditionalDisplays) return;
+    const toRender = field.conditionalDisplays.filter(
+      (f) => this.getValue(field.name) === f.valueToCheck
+    )[0];
+    if (toRender && toRender.fields) return this.renderFields(toRender.fields);
+  };
   /**
    * Takes a list of fields and renders them one by depending on which type
    * by making use of a helper function
