@@ -405,6 +405,8 @@ class MassEnergizeForm extends Component {
       cleanedValues = formJson.preflightFxn(cleanedValues);
     }
 
+    console.log("I am teh cleanded values", cleanedValues);
+
     // let's make an api call to send the data
     let response = null;
     if (hasMediaFiles) {

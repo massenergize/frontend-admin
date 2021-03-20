@@ -4,6 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import states from "dan-api/data/states";
 import MassEnergizeForm from "../_FormGenerator";
 import { apiCall } from "../../../utils/messenger";
+import { getMoreInfo, groupSocialMediaFields } from "./utils";
 
 const styles = (theme) => ({
   root: {
@@ -36,6 +37,7 @@ class EditCommunityByCommunityAdmin extends Component {
       formJson: null,
       community: null,
     };
+    this.preflightFxn = this.preflightFxn.bind(this);
   }
 
   async componentDidMount() {
@@ -60,51 +62,14 @@ class EditCommunityByCommunityAdmin extends Component {
     });
   }
 
-  groupSocialMediaFields = (formData) => {
-    if (!formData) return formData;
-    if (formData.wants_socials !== "true") return formData;
-    const clonedFormData = Object.assign({}, formData);
-    const dbNames = {
-      fb: "facebook_link",
-      tw: "twitter_link",
-      insta: "instagram_link",
-    };
-    const oldInfo = this.getMoreInfo();
-    var more_info = {
-      [dbNames.fb]: formData[dbNames.fb],
-      [dbNames.insta]: formData[dbNames.insta],
-      [dbNames.tw]: formData[dbNames.tw],
-      wants_socials: formData.wants_socials,
-    };
-    const dbArr = [dbNames.fb, dbNames.tw, dbNames.insta]
-    //keep old social media fields if they exist and have not been changed
-    dbArr.forEach( (name)=>{
-      let newVal = more_info[name]
-      if(!newVal) more_info[name] = oldInfo[name]
-    })
-    more_info = {...oldInfo, ...more_info} //still have to do this to retain other fields that are not related to social media
-    console.log("I am right here bro", more_info);
-    more_info = JSON.stringify(more_info);
-    
-    delete clonedFormData[dbNames.fb];
-    delete clonedFormData[dbNames.insta];
-    delete clonedFormData[dbNames.tw];
-    delete clonedFormData["wants_socials"];
-    return { ...clonedFormData, more_info };
-  };
   preflightFxn = (formData) => {
-    return this.groupSocialMediaFields(formData);
+    const { community } = this.state;
+    return groupSocialMediaFields(formData, getMoreInfo(community));
   };
 
-  getMoreInfo = () => {
-    const { community } = this.state;
-    const more_info =
-      community && community.more_info ? JSON.parse(community.more_info) : {};
-    return more_info;
-  };
   createFormJson = async () => {
     const { community } = this.state;
-    const more_info = this.getMoreInfo();
+    const more_info = getMoreInfo(community);
     // if (!community) return {};
     const formJson = {
       title: "Edit your Community",
@@ -257,7 +222,7 @@ class EditCommunityByCommunityAdmin extends Component {
               label: "Choose what to show (Email Or Social Media Links)",
               fieldType: "Radio",
               isRequired: true,
-              defaultValue: more_info && more_info.wants_socials,
+              defaultValue: more_info && more_info.wants_socials ==="true" ? "true" : "false",
               dbName: "wants_socials",
               readOnly: false,
               data: [

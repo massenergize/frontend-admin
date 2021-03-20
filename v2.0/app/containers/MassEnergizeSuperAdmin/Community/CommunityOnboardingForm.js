@@ -1,42 +1,42 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import states from 'dan-api/data/states';
-import { withStyles } from '@material-ui/core/styles';
-import MassEnergizeForm from '../_FormGenerator';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import states from "dan-api/data/states";
+import { withStyles } from "@material-ui/core/styles";
+import MassEnergizeForm from "../_FormGenerator";
+import { groupSocialMediaFields, getMoreInfo } from "./utils";
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     flexGrow: 1,
-    padding: 30
+    padding: 30,
   },
   field: {
-    width: '100%',
-    marginBottom: 20
+    width: "100%",
+    marginBottom: 20,
   },
   fieldBasic: {
-    width: '100%',
+    width: "100%",
     marginBottom: 20,
-    marginTop: 10
+    marginTop: 10,
   },
   inlineWrap: {
-    display: 'flex',
-    flexDirection: 'row'
+    display: "flex",
+    flexDirection: "row",
   },
   buttonInit: {
     margin: theme.spacing.unit * 4,
-    textAlign: 'center'
+    textAlign: "center",
   },
 });
-
 
 class CreateNewCommunityForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      formJson: null
+      formJson: null,
     };
+    this.preflightFxn = this.preflightFxn.bind(this);
   }
-
 
   async componentDidMount() {
     const formJson = await this.createFormJson();
@@ -48,236 +48,322 @@ class CreateNewCommunityForm extends Component {
       this.setState(state, resolve);
     });
   }
-
+  preflightFxn = (formData) => {
+    const { community } = this.state;
+    return groupSocialMediaFields(formData, getMoreInfo(community));
+  };
   createFormJson = async () => {
     const formJson = {
-      title: 'Create New Community',
-      subTitle: '',
-      method: '/communities.create',
-      successRedirectPage: '/admin/read/communities',
+      title: "Create New Community",
+      subTitle: "",
+      method: "/communities.create",
+      successRedirectPage: "/admin/read/communities",
+      preflightFxn: this.preflightFxn,
       fields: [
         {
-          label: 'About this Community',
-          fieldType: 'Section',
+          label: "About this Community",
+          fieldType: "Section",
           children: [
             {
-              name: 'community_name',
-              label: 'Name of this Community',
-              placeholder: 'eg. Energize Springfield',
-              fieldType: 'TextField',
-              contentType: 'text',
+              name: "community_name",
+              label: "Name of this Community",
+              placeholder: "eg. Energize Springfield",
+              fieldType: "TextField",
+              contentType: "text",
               isRequired: true,
-              defaultValue: '',
-              dbName: 'name',
-              readOnly: false
+              defaultValue: "",
+              dbName: "name",
+              readOnly: false,
             },
             {
-              name: 'subdomain',
-              label: 'Subdomain: Please Provide a short unique name.  (only letters and numbers) ',
-              placeholder: 'eg. SpringfieldMA',
-              fieldType: 'TextField',
-              contentType: 'text',
+              name: "subdomain",
+              label:
+                "Subdomain: Please Provide a short unique name.  (only letters and numbers) ",
+              placeholder: "eg. SpringfieldMA",
+              fieldType: "TextField",
+              contentType: "text",
               isRequired: true,
-              defaultValue: '',
-              dbName: 'subdomain',
-              readOnly: false
+              defaultValue: "",
+              dbName: "subdomain",
+              readOnly: false,
             },
             {
-              name: 'about',
-              label: 'Tell us about this community',
-              placeholder: 'Tell us more ...',
-              fieldType: 'TextField',
-              contentType: 'text',
+              name: "about",
+              label: "Tell us about this community",
+              placeholder: "Tell us more ...",
+              fieldType: "TextField",
+              contentType: "text",
               isRequired: true,
               isMultiline: true,
-              defaultValue: '',
-              dbName: 'about_community',
-              readOnly: false
+              defaultValue: "",
+              dbName: "about_community",
+              readOnly: false,
             },
             {
-              name: 'is_geographically_focused',
-              label: 'Is this community Geographically focused?',
-              fieldType: 'Radio',
+              name: "is_geographically_focused",
+              label: "Is this community Geographically focused?",
+              fieldType: "Radio",
               isRequired: false,
-              defaultValue: 'false',
-              dbName: 'is_geographically_focused',
+              defaultValue: "false",
+              dbName: "is_geographically_focused",
               readOnly: false,
               data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
+                { id: "false", value: "No" },
+                { id: "true", value: "Yes" },
               ],
               child: {
-                valueToCheck: 'true',
+                valueToCheck: "true",
                 fields: [
                   {
-                    name: 'community_address',
-                    label: 'Street Address',
-                    placeholder: '',
-                    fieldType: 'TextField',
-                    contentType: 'text',
+                    name: "community_address",
+                    label: "Street Address",
+                    placeholder: "",
+                    fieldType: "TextField",
+                    contentType: "text",
                     isRequired: false,
-                    defaultValue: '',
-                    dbName: 'address',
-                    readOnly: false
+                    defaultValue: "",
+                    dbName: "address",
+                    readOnly: false,
                   },
                   {
-                    name: 'unit',
-                    label: 'Unit Number',
-                    placeholder: '',
-                    fieldType: 'TextField',
-                    contentType: 'text',
+                    name: "unit",
+                    label: "Unit Number",
+                    placeholder: "",
+                    fieldType: "TextField",
+                    contentType: "text",
                     isRequired: false,
-                    defaultValue: '',
-                    dbName: 'unit',
-                    readOnly: false
+                    defaultValue: "",
+                    dbName: "unit",
+                    readOnly: false,
                   },
                   {
-                    name: 'city',
-                    label: 'City',
-                    placeholder: 'eg. Springfield',
-                    fieldType: 'TextField',
-                    contentType: 'text',
+                    name: "city",
+                    label: "City",
+                    placeholder: "eg. Springfield",
+                    fieldType: "TextField",
+                    contentType: "text",
                     isRequired: false,
-                    defaultValue: '',
-                    dbName: 'city',
-                    readOnly: false
+                    defaultValue: "",
+                    dbName: "city",
+                    readOnly: false,
                   },
                   {
-                    name: 'zipcode',
-                    label: 'Zip code ',
-                    placeholder: 'eg. 80202',
-                    fieldType: 'TextField',
-                    contentType: 'text',
+                    name: "zipcode",
+                    label: "Zip code ",
+                    placeholder: "eg. 80202",
+                    fieldType: "TextField",
+                    contentType: "text",
                     isRequired: false,
-                    defaultValue: '',
-                    dbName: 'zipcode',
-                    readOnly: false
+                    defaultValue: "",
+                    dbName: "zipcode",
+                    readOnly: false,
                   },
                   {
-                    name: 'state',
-                    label: 'State ',
-                    placeholder: 'eg. Massachusetts',
-                    fieldType: 'Dropdown',
-                    contentType: 'text',
+                    name: "state",
+                    label: "State ",
+                    placeholder: "eg. Massachusetts",
+                    fieldType: "Dropdown",
+                    contentType: "text",
                     isRequired: false,
                     data: states,
-                    defaultValue: 'Massachusetts',
-                    dbName: 'state',
-                    readOnly: false
+                    defaultValue: "Massachusetts",
+                    dbName: "state",
+                    readOnly: false,
                   },
-                ]
-              }
+                ],
+              },
             },
-          ]
+          ],
         },
         {
-          label: 'Community Public Information (Will be displayed in the community portal\'s footer)',
-          fieldType: 'Section',
+          label:
+            "Community Public Information (Will be displayed in the community portal's footer)",
+          fieldType: "Section",
           children: [
             {
-              name: 'admin_full_name',
-              label: 'Contact Person\'s Full Name',
-              placeholder: 'eg. Grace Tsu',
-              fieldType: 'TextField',
-              contentType: 'text',
+              name: "social_or_email",
+              label: "Choose what to show (Email Or Social Media Links)",
+              fieldType: "Radio",
               isRequired: true,
-              defaultValue: '',
-              dbName: 'owner_name',
-              readOnly: false
+              defaultValue:'false',
+              dbName: "wants_socials",
+              readOnly: false,
+              data: [
+                { id: "false", value: "Contact Person's Information" },
+                { id: "true", value: "Social Media Links" },
+              ],
+
+              conditionalDisplays: [
+                {
+                  valueToCheck: "true",
+                  fields: [
+                    {
+                      name: "com_facebook_link",
+                      label: "Provide a link to your community's Facebook page",
+                      placeholder: "www.facebook.com/your-community",
+                      fieldType: "TextField",
+                      contentType: "text",
+                      isRequired: false,
+                      dbName: "facebook_link",
+                      readOnly: false,
+                    },
+                    {
+                      name: "com_twitter_link",
+                      label: "Provide a link to your community's Twitter page",
+                      placeholder: "eg. www.twitter.com/your-community",
+                      fieldType: "TextField",
+                      contentType: "text",
+                      isRequired: false,
+
+                      dbName: "twitter_link",
+                      readOnly: false,
+                    },
+                    {
+                      name: "com_instagram_link",
+                      label:
+                        "Provide a link to your community's Instagram page",
+                      placeholder: "eg. www.instagram.com/your-community",
+                      fieldType: "TextField",
+                      contentType: "text",
+                      isRequired: false,
+
+                      dbName: "instagram_link",
+                      readOnly: false,
+                    },
+                  ],
+                },
+
+                {
+                  valueToCheck: "false",
+                  fields: [
+                    {
+                      name: "admin_full_name",
+                      label: "Contact Person's Full Name",
+                      placeholder: "eg. Grace Tsu",
+                      fieldType: "TextField",
+                      contentType: "text",
+                      isRequired: true,
+                      defaultValue: "",
+                      dbName: "owner_name",
+                      readOnly: false,
+                    },
+                    {
+                      name: "admin_email",
+                      label: "Community's Public Email",
+                      placeholder: "eg. johny.appleseed@gmail.com",
+                      fieldType: "TextField",
+                      contentType: "text",
+                      isRequired: true,
+                      defaultValue: "",
+                      dbName: "owner_email",
+                      readOnly: false,
+                    },
+                    {
+                      name: "admin_phone_number",
+                      label: "Community's Public Phone Number",
+                      placeholder: "eg. 571 222 4567",
+                      fieldType: "TextField",
+                      contentType: "text",
+                      isRequired: false,
+                      defaultValue: "",
+                      dbName: "owner_phone_number",
+                      readOnly: false,
+                    },
+                  ],
+                },
+              ],
             },
-            {
-              name: 'admin_email',
-              label: 'Community\'s Public Email',
-              placeholder: 'eg. johny.appleseed@gmail.com',
-              fieldType: 'TextField',
-              contentType: 'text',
-              isRequired: true,
-              defaultValue: '',
-              dbName: 'owner_email',
-              readOnly: false
-            },
-            {
-              name: 'admin_phone_number',
-              label: 'Community\'s Public Phone Number',
-              placeholder: 'eg. 571 222 4567',
-              fieldType: 'TextField',
-              contentType: 'text',
-              isRequired: false,
-              defaultValue: '',
-              dbName: 'owner_phone_number',
-              readOnly: false
-            },
-          ]
+            // {
+            //   name: 'admin_full_name',
+            //   label: 'Contact Person\'s Full Name',
+            //   placeholder: 'eg. Grace Tsu',
+            //   fieldType: 'TextField',
+            //   contentType: 'text',
+            //   isRequired: true,
+            //   defaultValue: '',
+            //   dbName: 'owner_name',
+            //   readOnly: false
+            // },
+            // {
+            //   name: 'admin_email',
+            //   label: 'Community\'s Public Email',
+            //   placeholder: 'eg. johny.appleseed@gmail.com',
+            //   fieldType: 'TextField',
+            //   contentType: 'text',
+            //   isRequired: true,
+            //   defaultValue: '',
+            //   dbName: 'owner_email',
+            //   readOnly: false
+            // },
+            // {
+            //   name: 'admin_phone_number',
+            //   label: 'Community\'s Public Phone Number',
+            //   placeholder: 'eg. 571 222 4567',
+            //   fieldType: 'TextField',
+            //   contentType: 'text',
+            //   isRequired: false,
+            //   defaultValue: '',
+            //   dbName: 'owner_phone_number',
+            //   readOnly: false
+            // },
+          ],
         },
         {
-          name: 'image',
-          placeholder: 'Upload a Logo',
-          fieldType: 'File',
-          dbName: 'image',
-          label: 'Upload a logo for this community',
+          name: "image",
+          placeholder: "Upload a Logo",
+          fieldType: "File",
+          dbName: "image",
+          label: "Upload a logo for this community",
           selectMany: false,
           isRequired: false,
-          defaultValue: '',
-          filesLimit: 1
+          defaultValue: "",
+          filesLimit: 1,
         },
         {
-          name: 'accepted_terms_and_conditions',
-          modalText: 'Terms and Conditions',
-          modalTitle: 'Terms and Conditions',
-          label: 'Accept Terms And Conditions',
-          fieldType: 'Radio',
+          name: "accepted_terms_and_conditions",
+          modalText: "Terms and Conditions",
+          modalTitle: "Terms and Conditions",
+          label: "Accept Terms And Conditions",
+          fieldType: "Radio",
           isRequired: false,
-          defaultValue: 'false',
-          dbName: 'accepted_terms_and_conditions',
+          defaultValue: "false",
+          dbName: "accepted_terms_and_conditions",
           readOnly: false,
-          data: [
-            { id: 'false', value: 'No' },
-            { id: 'true', value: 'Yes' }
-          ]
+          data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
         },
         {
-          name: 'is_approved',
-          label: 'Do you approve this community? (Check yes after background check)',
-          fieldType: 'Radio',
+          name: "is_approved",
+          label:
+            "Do you approve this community? (Check yes after background check)",
+          fieldType: "Radio",
           isRequired: false,
-          defaultValue: 'true',
-          dbName: 'is_approved',
+          defaultValue: "true",
+          dbName: "is_approved",
           readOnly: false,
-          data: [
-            { id: 'false', value: 'No' },
-            { id: 'true', value: 'Yes' }
-          ],
+          data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
         },
         {
-          name: 'is_published',
-          label: 'Should this go live now?',
-          fieldType: 'Radio',
+          name: "is_published",
+          label: "Should this go live now?",
+          fieldType: "Radio",
           isRequired: false,
-          defaultValue: 'false',
-          dbName: 'is_published',
+          defaultValue: "false",
+          dbName: "is_published",
           readOnly: false,
-          data: [
-            { id: 'false', value: 'No' },
-            { id: 'true', value: 'Yes' }
-          ],
+          data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
         },
-
-      ]
+      ],
     };
     return formJson;
-  }
-
+  };
 
   render() {
     const { classes } = this.props;
     const { formJson } = this.state;
-    if (!formJson) return (<div>Hold tight! Preparing your form ...</div>);
+    if (!formJson) return <div>Hold tight! Preparing your form ...</div>;
     return (
       <div>
-        <MassEnergizeForm
-          classes={classes}
-          formJson={formJson}
-        />
+        <MassEnergizeForm classes={classes} formJson={formJson} />
       </div>
     );
   }
@@ -286,6 +372,5 @@ class CreateNewCommunityForm extends Component {
 CreateNewCommunityForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
-
 
 export default withStyles(styles, { withTheme: true })(CreateNewCommunityForm);
