@@ -400,12 +400,10 @@ class MassEnergizeForm extends Component {
       formData,
       formJson.fields
     );
+
     if (formJson.preflightFxn) {
       cleanedValues = formJson.preflightFxn(cleanedValues);
     }
-    console.log("I am the cleaned values", cleanedValues);
-
-    return;
 
     // let's make an api call to send the data
     let response = null;

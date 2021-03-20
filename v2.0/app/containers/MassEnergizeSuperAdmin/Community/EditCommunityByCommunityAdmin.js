@@ -63,33 +63,55 @@ class EditCommunityByCommunityAdmin extends Component {
   groupSocialMediaFields = (formData) => {
     if (!formData) return formData;
     if (formData.wants_socials !== "true") return formData;
+    const clonedFormData = Object.assign({}, formData);
     const dbNames = {
       fb: "facebook_link",
       tw: "twitter_link",
       insta: "instagram_link",
     };
-    const more_info = {
+    const oldInfo = this.getMoreInfo();
+    var more_info = {
       [dbNames.fb]: formData[dbNames.fb],
       [dbNames.insta]: formData[dbNames.insta],
       [dbNames.tw]: formData[dbNames.tw],
-      "wants_socials":formData.wants_socials
+      wants_socials: formData.wants_socials,
     };
-    delete formData[dbNames.fb];
-    delete formData[dbNames.insta];
-    delete formData[dbNames.tw];
-    delete formData["wants_socials"]
-    return { ...formData, more_info };
+    const dbArr = [dbNames.fb, dbNames.tw, dbNames.insta]
+    //keep old social media fields if they exist and have not been changed
+    dbArr.forEach( (name)=>{
+      let newVal = more_info[name]
+      if(!newVal) more_info[name] = oldInfo[name]
+    })
+    more_info = {...oldInfo, ...more_info} //still have to do this to retain other fields that are not related to social media
+    console.log("I am right here bro", more_info);
+    more_info = JSON.stringify(more_info);
+    
+    delete clonedFormData[dbNames.fb];
+    delete clonedFormData[dbNames.insta];
+    delete clonedFormData[dbNames.tw];
+    delete clonedFormData["wants_socials"];
+    return { ...clonedFormData, more_info };
+  };
+  preflightFxn = (formData) => {
+    return this.groupSocialMediaFields(formData);
+  };
+
+  getMoreInfo = () => {
+    const { community } = this.state;
+    const more_info =
+      community && community.more_info ? JSON.parse(community.more_info) : {};
+    return more_info;
   };
   createFormJson = async () => {
     const { community } = this.state;
+    const more_info = this.getMoreInfo();
     // if (!community) return {};
-
     const formJson = {
       title: "Edit your Community",
       subTitle: "",
       method: "/communities.update",
       successRedirectPage: `/admin/community/${community.id}/edit`,
-      preflightFxn: this.groupSocialMediaFields,
+      preflightFxn: this.preflightFxn, // lets you modify the form content before the collected values in the form generator are submitted
       fields: [
         {
           label: "About this Community",
@@ -235,7 +257,7 @@ class EditCommunityByCommunityAdmin extends Component {
               label: "Choose what to show (Email Or Social Media Links)",
               fieldType: "Radio",
               isRequired: true,
-              defaultValue: "false",
+              defaultValue: more_info && more_info.wants_socials,
               dbName: "wants_socials",
               readOnly: false,
               data: [
@@ -254,7 +276,7 @@ class EditCommunityByCommunityAdmin extends Component {
                       fieldType: "TextField",
                       contentType: "text",
                       isRequired: false,
-                      // defaultValue: community.location && community.location.address,
+                      defaultValue: more_info && more_info.facebook_link,
                       dbName: "facebook_link",
                       readOnly: false,
                     },
@@ -265,7 +287,7 @@ class EditCommunityByCommunityAdmin extends Component {
                       fieldType: "TextField",
                       contentType: "text",
                       isRequired: false,
-                      // defaultValue: community.location && community.location.unit,
+                      defaultValue: more_info && more_info.twitter_link,
                       dbName: "twitter_link",
                       readOnly: false,
                     },
@@ -277,7 +299,7 @@ class EditCommunityByCommunityAdmin extends Component {
                       fieldType: "TextField",
                       contentType: "text",
                       isRequired: false,
-                      // defaultValue: community.location && community.location.unit,
+                      defaultValue: more_info && more_info.instagram_link,
                       dbName: "instagram_link",
                       readOnly: false,
                     },
