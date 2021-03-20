@@ -60,6 +60,26 @@ class EditCommunityByCommunityAdmin extends Component {
     });
   }
 
+  groupSocialMediaFields = (formData) => {
+    if (!formData) return formData;
+    if (formData.wants_socials !== "true") return formData;
+    const dbNames = {
+      fb: "facebook_link",
+      tw: "twitter_link",
+      insta: "instagram_link",
+    };
+    const more_info = {
+      [dbNames.fb]: formData[dbNames.fb],
+      [dbNames.insta]: formData[dbNames.insta],
+      [dbNames.tw]: formData[dbNames.tw],
+      "wants_socials":formData.wants_socials
+    };
+    delete formData[dbNames.fb];
+    delete formData[dbNames.insta];
+    delete formData[dbNames.tw];
+    delete formData["wants_socials"]
+    return { ...formData, more_info };
+  };
   createFormJson = async () => {
     const { community } = this.state;
     // if (!community) return {};
@@ -69,6 +89,7 @@ class EditCommunityByCommunityAdmin extends Component {
       subTitle: "",
       method: "/communities.update",
       successRedirectPage: `/admin/community/${community.id}/edit`,
+      preflightFxn: this.groupSocialMediaFields,
       fields: [
         {
           label: "About this Community",
@@ -215,25 +236,26 @@ class EditCommunityByCommunityAdmin extends Component {
               fieldType: "Radio",
               isRequired: true,
               defaultValue: "false",
-              dbName: "social_or_email",
+              dbName: "wants_socials",
               readOnly: false,
               data: [
-                { id: "false", value: "Contact Person's Iniformation" },
+                { id: "false", value: "Contact Person's Information" },
                 { id: "true", value: "Social Media Links" },
               ],
+
               conditionalDisplays: [
                 {
                   valueToCheck: "true",
                   fields: [
                     {
-                      name: "facebook_link",
+                      name: "com_facebook_link",
                       label: "Provide a link to your community's Facebook page",
                       placeholder: "www.facebook.com/your-community",
                       fieldType: "TextField",
                       contentType: "text",
                       isRequired: false,
                       // defaultValue: community.location && community.location.address,
-                      dbName: "fb_link",
+                      dbName: "facebook_link",
                       readOnly: false,
                     },
                     {
@@ -249,7 +271,8 @@ class EditCommunityByCommunityAdmin extends Component {
                     },
                     {
                       name: "com_instagram_link",
-                      label: "Provide a link to your community's Instagram page",
+                      label:
+                        "Provide a link to your community's Instagram page",
                       placeholder: "eg. www.instagram.com/your-community",
                       fieldType: "TextField",
                       contentType: "text",

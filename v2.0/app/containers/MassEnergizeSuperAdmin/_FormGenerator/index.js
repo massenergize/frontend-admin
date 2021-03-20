@@ -336,6 +336,9 @@ class MassEnergizeForm extends Component {
         }
       }
 
+      // field.conditional displays is just a way to display form items based on a selected
+      //radio buttons. Similar to the `field.child` but allows more options
+
       if (field.conditionalDisplays && field.conditionalDisplays.length) {
         var selectedSet = field.conditionalDisplays.filter(
           (f) => fieldValueInForm === f.valueToCheck
@@ -393,11 +396,13 @@ class MassEnergizeForm extends Component {
 
     // let's clean up the data
     const { formData, formJson } = this.state;
-    const [cleanedValues, hasMediaFiles] = this.cleanItUp(
+    var [cleanedValues, hasMediaFiles] = this.cleanItUp(
       formData,
       formJson.fields
     );
-
+    if (formJson.preflightFxn) {
+      cleanedValues = formJson.preflightFxn(cleanedValues);
+    }
     console.log("I am the cleaned values", cleanedValues);
 
     return;
