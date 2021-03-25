@@ -247,6 +247,18 @@ class EditCommunityForm extends Component {
           filesLimit: 1
         },
         {
+          name: 'favicon',
+          placeholder: 'Upload a Favicon (optional)',
+          fieldType: 'File',
+          dbName: 'image',
+          previewLink: `${community.favicon && community.favicon.url}`,
+          label: 'Upload a new favicon for this community',
+          selectMany: false,
+          isRequired: false,
+          defaultValue: '',
+          filesLimit: 1
+        },
+        {
           name: 'is_approved',
           label: 'Do you approve this community? (Check yes after background check)',
           fieldType: 'Radio',

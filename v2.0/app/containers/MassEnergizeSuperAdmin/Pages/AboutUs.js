@@ -101,7 +101,28 @@ class HomePageEditForm extends Component {
           defaultValue: `${aboutUsPageData.description}`,
           dbName: 'description',
           readOnly: false
-        }
+        },
+        {
+          name: 'featured_video_link',
+          label: 'Optional video Link',
+          placeholder: 'eg. https://www.youtube.com/?v=as122aas',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: false,
+          defaultValue: `${aboutUsPageData.featured_video_link}`,
+          dbName: 'featured_video_link',
+          readOnly: false
+        },
+        {
+          name: 'image',
+          placeholder: 'Select an Image',
+          fieldType: 'File',
+          dbName: 'image',
+          label: 'Upload File',
+          isRequired: false,
+          defaultValue: '',
+          filesLimit: 1
+        },
       ]
     };
     return formJson;
