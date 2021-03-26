@@ -157,14 +157,14 @@ class EditCommunityByCommunityAdmin extends Component {
                     data: geography_types,
                   },
                   {
-                    name: 'location_set',
+                    name: 'locations',
                     label: 'List of all such regions (zipcodes or town-state, city-state, states) within the community, separated by commas ',
                     placeholder: 'eg. 01101, 01102, 01103, 01104 or Springfield-MA',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: true,
-                    defaultValue: community.location_set || '',
-                    dbName: 'location_set',
+                    defaultValue: community.locations || '',
+                    dbName: 'locations',
                     readOnly: true
                   },
                 ]}},

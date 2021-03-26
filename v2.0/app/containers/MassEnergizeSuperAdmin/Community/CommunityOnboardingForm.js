@@ -132,14 +132,14 @@ class CreateNewCommunityForm extends Component {
                     data: geography_types,
                   },
                   {
-                    name: 'location_set',
+                    name: 'locations',
                     label: 'List of all such regions (zipcodes or towns, cities, states) within the community, separated by commas ',
                     placeholder: 'eg. 01101, 01102, 01103, 01104',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: true,
                     defaultValue: '',
-                    dbName: 'location_set',
+                    dbName: 'locations',
                     readOnly: false
                   },
                 ]}},
