@@ -68,6 +68,17 @@ class EditCommunityByCommunityAdmin extends Component {
   };
 
   createFormJson = async () => {
+
+    // quick and dirty - duplicated code - needs to be consistant between pages and with the API
+    // could read these options from the API or share the databaseFieldChoices json
+    const geography_types = [
+      { id: "ZIPCODE", value:"Community defined by one or more towns or zipcodes (can't be subdivided)" },
+      { id: "CITY", value:"Community defined by one or more larger cities (can have smaller communities within)" },
+      //{ id: "COUNTY", value:"Community defined by one or more counties" },
+      //{ id: "STATE", value: "Community defined by one or more states" },
+      //{ id: "COUNTRY", value:"Community defined by a country" },
+      //{ id: "NON_GEOGRAPHIC", value:"A non-geographic community" },
+    ]
     const { community } = this.state;
     const more_info = getMoreInfo(community);
     // if (!community) return {};
@@ -133,11 +144,9 @@ class EditCommunityByCommunityAdmin extends Component {
               label: "Is this community Geographically focused?",
               fieldType: "Radio",
               isRequired: false,
-              defaultValue: community.is_geographically_focused
-                ? "true"
-                : "false",
-              dbName: "is_geographically_focused",
-              readOnly: false,
+              defaultValue: community.is_geographically_focused ? 'true' : 'false',
+              dbName: 'is_geographically_focused',
+              readOnly: true,
               data: [
                 { id: "false", value: "No" },
                 { id: "true", value: "Yes" },
@@ -146,71 +155,28 @@ class EditCommunityByCommunityAdmin extends Component {
                 valueToCheck: "true",
                 fields: [
                   {
-                    name: "address",
-                    label: "Street Address",
-                    placeholder: "Street address (not required)",
-                    fieldType: "TextField",
-                    contentType: "text",
-                    isRequired: false,
-                    defaultValue:
-                      community.location && community.location.address,
-                    dbName: "address",
-                    readOnly: false,
+                    name: 'geography_type',
+                    label: 'Type of geographic community',
+                    fieldType: 'Radio',
+                    isRequired: true,
+                    defaultValue: community.geography_type || 'ZIPCODE',
+                    dbName: 'geography_type',
+                    readOnly: true,
+                    data: geography_types,
                   },
                   {
-                    name: "unit",
-                    label: "Unit Number",
-                    placeholder: "eg. Unit 904",
-                    fieldType: "TextField",
-                    contentType: "text",
-                    isRequired: false,
-                    defaultValue: community.location && community.location.unit,
-                    dbName: "unit",
-                    readOnly: false,
+                    name: 'locations',
+                    label: 'List of all such regions (zipcodes or town-state, city-state, states) within the community, separated by commas ',
+                    placeholder: 'eg. 01101, 01102, 01103, 01104 or Springfield-MA',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: true,
+                    defaultValue: community.locations || '',
+                    dbName: 'locations',
+                    readOnly: true
                   },
-                  {
-                    name: "city",
-                    label: "City",
-                    placeholder: "eg. Springfield",
-                    fieldType: "TextField",
-                    contentType: "text",
-                    isRequired: false,
-                    defaultValue: community.location && community.location.city,
-                    dbName: "city",
-                    readOnly: false,
-                  },
-                  {
-                    name: "zipcode",
-                    label: "Zip code ",
-                    placeholder: "eg. 80202",
-                    fieldType: "TextField",
-                    contentType: "text",
-                    isRequired: false,
-                    defaultValue:
-                      community.location && community.location.zipcode,
-                    dbName: "zipcode",
-                    readOnly: false,
-                  },
-                  {
-                    name: "state",
-                    label: "State ",
-                    placeholder: "eg. Massachusetts",
-                    fieldType: "Dropdown",
-                    contentType: "text",
-                    isRequired: false,
-                    data: states,
-                    defaultValue: `${
-                      community.location && community.location.state
-                        ? community.location.state
-                        : ""
-                    }`,
-                    dbName: "state",
-                    readOnly: false,
-                  },
-                ],
-              },
-            },
-          ],
+                ]}},
+          ]
         },
         {
           label:
