@@ -155,23 +155,10 @@ class CreateNewActionForm extends Component {
                     fieldType: 'Dropdown',
                     defaultValue: null,
                     dbName: 'community_id',
-                    data: communities
+                    data: [{displayName:"--", id:""}, ...communities],
                   },
                 ]
               }
-            },
-            {
-              name: 'is_published',
-              label: 'Should this action go live?',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: 'false',
-              dbName: 'is_published',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ],
             },
           ]
         },
@@ -249,6 +236,20 @@ class CreateNewActionForm extends Component {
           defaultValue: '',
           filesLimit: 1
         },
+        {
+          name: 'is_published',
+          label: 'Should this action go live?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: 'false',
+          dbName: 'is_published',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+        },
+
       ]
     };
     return formJson;

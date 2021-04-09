@@ -107,6 +107,7 @@ class CreateNewEventForm extends Component {
 
   createFormJson = async (event) => {
     const { communities } = this.state;
+    const statuses = ['Draft', 'Live', 'Archived']
     // const { pathname } = window.location;
 
     const formJson = {
@@ -133,7 +134,7 @@ class CreateNewEventForm extends Component {
             {
               name: 'name',
               label: 'Name of Event',
-              placeholder: 'Wayland Heatpump Event',
+              placeholder: 'Enter name of event or campaign',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
@@ -144,7 +145,7 @@ class CreateNewEventForm extends Component {
             {
               name: 'featured_summary',
               label: 'One sentence that describes this event',
-              placeholder: 'Wayland Heatpump Event',
+              placeholder: 'Enter a catchy summary',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
@@ -186,32 +187,6 @@ class CreateNewEventForm extends Component {
               readOnly: false
             },
             {
-              name: 'archive',
-              label: 'Archive this Event',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: '' + event.archive,
-              dbName: 'archive',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ],
-            },
-            {
-              name: 'is_published',
-              label: 'Should this event Go Live?',
-              fieldType: 'Radio',
-              isRequired: false,
-              defaultValue: '' + event.is_published,
-              dbName: 'is_published',
-              readOnly: false,
-              data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
-              ],
-            },
-            {
               name: 'is_global',
               label: 'Is this Event a Template?',
               fieldType: 'Radio',
@@ -229,11 +204,11 @@ class CreateNewEventForm extends Component {
                   {
                     name: 'community',
                     label: 'Primary Community',
-                    placeholder: 'eg. Wayland',
+                    placeholder: 'eg. Springfield',
                     fieldType: 'Dropdown',
                     defaultValue: event.community && event.community.id,
                     dbName: 'community_id',
-                    data: communities
+                    data: [{displayName:"--", id:""}, ...communities],
                   },
                 ]
               }
@@ -258,7 +233,7 @@ class CreateNewEventForm extends Component {
               {
                 name: 'address',
                 label: 'Street Address',
-                placeholder: 'eg. Wayland',
+                placeholder: 'Street address or public facility',
                 fieldType: 'TextField',
                 contentType: 'text',
                 isRequired: true,
@@ -280,7 +255,7 @@ class CreateNewEventForm extends Component {
               {
                 name: 'city',
                 label: 'City',
-                placeholder: 'eg. wayland',
+                placeholder: 'eg. Spriingfield',
                 fieldType: 'TextField',
                 contentType: 'text',
                 isRequired: true,
@@ -291,7 +266,7 @@ class CreateNewEventForm extends Component {
               {
                 name: 'state',
                 label: 'State ',
-                placeholder: 'eg. New York',
+                placeholder: 'eg. Massachusetts',
                 fieldType: 'Dropdown',
                 contentType: 'text',
                 isRequired: true,
@@ -324,6 +299,33 @@ class CreateNewEventForm extends Component {
           defaultValue: [],
           filesLimit: 1
         },
+        {
+          name: 'archive',
+          label: 'Archive this Event',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: '' + event.archive,
+          dbName: 'archive',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+        },
+        {
+          name: 'is_published',
+          label: 'Should this event Go Live?',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: '' + event.is_published,
+          dbName: 'is_published',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+        },
+
       ]
     };
     return formJson;

@@ -31,6 +31,9 @@ import 'file-loader?name=.htaccess!./.htaccess'; // eslint-disable-line
 
 import configureStore from './redux/configureStore';
 
+// Massenergize custom css 
+import "./styles/ME Custom/extra.css";
+
 // Import i18n messages
 import { translationMessages } from './i18n';
 
