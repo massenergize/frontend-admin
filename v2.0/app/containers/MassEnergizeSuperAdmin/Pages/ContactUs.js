@@ -29,7 +29,7 @@ const styles = theme => ({
 });
 
 
-class HomePageEditForm extends Component {
+class ContactUsPageEditForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -112,17 +112,6 @@ class HomePageEditForm extends Component {
           dbName: 'description',
           readOnly: false
         },
-        {
-          name: 'featured_video_link',
-          label: 'Video Link',
-          placeholder: 'eg. https://www.youtube.com/?v=as122aas',
-          fieldType: 'TextField',
-          contentType: 'text',
-          isRequired: false,
-          defaultValue: `${contactUsPageData.featured_video_link}`,
-          dbName: 'featured_video_link',
-          readOnly: false
-        },
       ]
     };
     return formJson;
@@ -144,9 +133,9 @@ class HomePageEditForm extends Component {
   }
 }
 
-HomePageEditForm.propTypes = {
+ContactUsPageEditForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
 
-export default withStyles(styles, { withTheme: true })(HomePageEditForm);
+export default withStyles(styles, { withTheme: true })(ContactUsPageEditForm);

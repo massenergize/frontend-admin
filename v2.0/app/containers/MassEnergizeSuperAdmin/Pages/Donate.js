@@ -29,7 +29,7 @@ const styles = theme => ({
 });
 
 
-class HomePageEditForm extends Component {
+class DonatePageEditForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -155,9 +155,9 @@ class HomePageEditForm extends Component {
   }
 }
 
-HomePageEditForm.propTypes = {
+DonatePageEditForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
 
-export default withStyles(styles, { withTheme: true })(HomePageEditForm);
+export default withStyles(styles, { withTheme: true })(DonatePageEditForm);
