@@ -21,6 +21,22 @@ export const SuperContactUs = loadable(() => import('./MassEnergizeSuperAdmin/Pa
 export const SuperAboutUs = loadable(() => import('./MassEnergizeSuperAdmin/Pages/AboutUs'), {
   fallback: <Loading />,
 });
+// Events page settings
+export const Events = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Events'), {
+  fallback: <Loading />,
+});
+// Vendors page settings
+export const Vendors = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Vendors'), {
+  fallback: <Loading />,
+});
+// Teams page settings
+export const Teams = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Teams'), {
+  fallback: <Loading />,
+});
+// Testimonials page settings
+export const Testimonials = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Testimonials'), {
+  fallback: <Loading />,
+});
 export const BlankPage = loadable(() => import('./Pages/BlankPage'), {
   fallback: <Loading />,
 });

@@ -81,12 +81,23 @@ class HomePageEditForm extends Component {
         {
           name: 'title',
           label: 'Main Title',
-          placeholder: 'eg. Welcome to Wayland!',
+          placeholder: 'eg. Help us reach our goal!',
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: true,
           defaultValue: `${donatePageData.title}`,
           dbName: 'title',
+          readOnly: false
+        },
+        {
+          name: 'sub-title',
+          label: 'Optional sub-title',
+          placeholder: 'Every donation counts',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: false,
+          defaultValue: `${donatePageData.sub_title}`,
+          dbName: 'sub_title',
           readOnly: false
         },
         {

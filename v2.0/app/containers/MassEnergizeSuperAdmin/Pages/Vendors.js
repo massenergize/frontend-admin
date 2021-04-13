@@ -29,12 +29,12 @@ const styles = theme => ({
 });
 
 
-class HomePageEditForm extends Component {
+class VendorsPageEditForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
       formJson: null,
-      contactUsPageData: null,
+      pageData: null,
     };
   }
 
@@ -42,12 +42,12 @@ class HomePageEditForm extends Component {
   async componentDidMount() {
     const { id } = this.props.match.params;
 
-    const contactUsPageResponse = await apiCall('/contact_us_page_settings.info', { community_id: id });
-    if (contactUsPageResponse && contactUsPageResponse.success) {
-      await this.setStateAsync({ contactUsPageData: contactUsPageResponse.data });
+    const pageData = await apiCall('/vendors_page_settings.info', { community_id: id });
+    if (pageData && pageData.success) {
+      await this.setStateAsync({ pageData: pageData.data });
     }
 
-    const formJson = await this.createFormJson(contactUsPageResponse.data);
+    const formJson = await this.createFormJson(pageData.data);
     await this.setStateAsync({ formJson });
   }
 
@@ -58,14 +58,15 @@ class HomePageEditForm extends Component {
   }
 
   createFormJson = async () => {
-    const { contactUsPageData } = this.state;
-    const { community } = contactUsPageData;
+    const { pageData } = this.state;
+    console.log(pageData);
+    const { community } = pageData;
 
     const formJson = {
-      title: `Edit ${community ? community.name + '\'s' : 'Community\'s'} Contact Us Page`,
+      title: `Edit ${community ? community.name + '\'s' : 'Community\'s'} - Vendors Page`,
       subTitle: '',
-      method: '/contact_us_page_settings.update',
-      // successRedirectPage: `/admin/edit/${community.id}/contact_us`,
+      method: '/vendors_page_settings.update',
+      // successRedirectPage: `/admin/edit/${community.id}/about_us`,
       fields: [
         {
           name: 'id',
@@ -74,54 +75,76 @@ class HomePageEditForm extends Component {
           fieldType: 'TextField',
           contentType: 'number',
           isRequired: true,
-          defaultValue: `${contactUsPageData.id}`,
+          defaultValue: `${pageData.id}`,
           dbName: 'id',
           readOnly: true
         },
         {
           name: 'title',
           label: 'Main Title',
-          placeholder: 'Contact the community administrator',
+          placeholder: 'eg. All Service Providers',
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: true,
-          defaultValue: `${contactUsPageData.title}`,
+          defaultValue: `${pageData.title}`,
           dbName: 'title',
           readOnly: false
         },
         {
           name: 'sub-title',
-          label: 'Optional sub-title',
-          placeholder: 'They will get back to you shortly.',
+          label: 'Optional Sub-title',
+          placeholder: '',
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: false,
-          defaultValue: `${contactUsPageData.sub_title}`,
+          defaultValue: `${pageData.sub_title}`,
           dbName: 'sub_title',
           readOnly: false
         },
-        {
+         {
           name: 'description',
           label: 'Paragraph to be displayed below the title',
           placeholder: 'Tell us more ...',
-          fieldType: 'TextField',
+          fieldType: 'HTMLField',
           contentType: 'text',
-          isRequired: false,
+          isRequired: true,
           isMultiline: true,
-          defaultValue: `${contactUsPageData.description}`,
+          defaultValue: `${pageData.description}`,
           dbName: 'description',
           readOnly: false
         },
         {
           name: 'featured_video_link',
-          label: 'Video Link',
+          label: 'Optional video Link',
           placeholder: 'eg. https://www.youtube.com/?v=as122aas',
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: false,
-          defaultValue: `${contactUsPageData.featured_video_link}`,
+          defaultValue: `${pageData.featured_video_link}`,
           dbName: 'featured_video_link',
           readOnly: false
+        },
+        {
+          name: 'image',
+          placeholder: 'Select an Image',
+          fieldType: 'File',
+          dbName: 'image',
+          label: 'Upload File',
+          isRequired: false,
+          defaultValue: '',
+          filesLimit: 1
+        },
+        {
+          name: 'enable',
+          fieldType: 'Radio',
+          dbName: 'is_published',
+          label: 'This page is enabled if checked',
+          isRequired: false,
+          defaultValue: `${pageData.is_published}`,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
         },
       ]
     };
@@ -144,9 +167,9 @@ class HomePageEditForm extends Component {
   }
 }
 
-HomePageEditForm.propTypes = {
+VendorsPageEditForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
 
-export default withStyles(styles, { withTheme: true })(HomePageEditForm);
+export default withStyles(styles, { withTheme: true })(VendorsPageEditForm);

@@ -11,7 +11,7 @@ import {
   AllCommunities,
   OnboardCommunity,
   CommunityProfile,
-  AllVendors, AddVendor,
+  Vendors, AllVendors, AddVendor,
   AllCategories,
   AddCategory,
   BlankPage,
@@ -19,14 +19,14 @@ import {
   Table,
   Error,
   NotFound,
-  AddAction, AllActions,
-  AllEvents, AddEvent,
-  AddTeam, AllTeams,
-  AllGoals, AddGoal,
+  SuperAllActions, AllActions, AddAction, EditAction,
+  Events, AllEvents, AddEvent, EditEvent,
+  Teams, AddTeam, AllTeams,
+  AllGoals, AddGoal, EditGoal,
   AddPolicy, AllPolicies,
   DashboardAdminSummaryPage,
-  AddTestimonial, AllTestimonials, Export, CustomizePages, EditAction,
-  SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditGoal, EditPolicy, EditEvent, UsersList, ImpactPage
+  Testimonials, AddTestimonial, AllTestimonials, Export, CustomizePages,
+  SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditPolicy, UsersList, ImpactPage
 } from '../pageListAsync';
 import EditVendor from '../MassEnergizeSuperAdmin/Vendors/EditVendor';
 import AddRemoveAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveAdmin';
@@ -139,6 +139,10 @@ class Application extends React.Component {
           <Route path="/admin/edit/:id/impact" component={ImpactPage} />
           <Route path="/admin/edit/:id/actions" component={SuperAllActions} />
           <Route path="/admin/edit/:id/all-actions" component={SuperAllActions} />
+          <Route path="/admin/edit/:id/events" component={Events} />
+          <Route path="/admin/edit/:id/teams" component={Teams} />
+          <Route path="/admin/edit/:id/vendors" component={Vendors} />
+          <Route path="/admin/edit/:id/testimonials" component={Testimonials} />
           <Route path="/admin/edit/:id/contact_us" component={SuperContactUs} />
           <Route path="/admin/edit/:id/donate" component={SuperDonate} />
           <Route path="/admin/edit/:id/about" component={SuperAboutUs} />

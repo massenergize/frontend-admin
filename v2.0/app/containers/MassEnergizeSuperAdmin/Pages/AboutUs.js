@@ -91,6 +91,17 @@ class HomePageEditForm extends Component {
           readOnly: false
         },
         {
+          name: 'sub-title',
+          label: 'Optional Sub-title',
+          placeholder: 'eg. Welcome to Wayland!',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: false,
+          defaultValue: `${aboutUsPageData.sub_title}`,
+          dbName: 'sub_title',
+          readOnly: false
+        },
+         {
           name: 'description',
           label: 'Paragraph to be displayed below the title',
           placeholder: 'Tell us more ...',
@@ -122,6 +133,18 @@ class HomePageEditForm extends Component {
           isRequired: false,
           defaultValue: '',
           filesLimit: 1
+        },
+        {
+          name: 'enable',
+          fieldType: 'Radio',
+          dbName: 'is_published',
+          label: 'This page is enabled if checked',
+          isRequired: false,
+          defaultValue: `${aboutUsPageData.is_published}`,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
         },
       ]
     };
