@@ -299,7 +299,7 @@ class MassEnergizeForm extends Component {
     let hasMediaFiles = false;
     fields.forEach((field) => {
       const fieldValueInForm = formData[field.name];
-      if (fieldValueInForm) {
+      if (fieldValueInForm || fieldValueInForm==='') {
         switch (field.fieldType) {
           case FieldTypes.HTMLField:
             // cleanedValues[field.dbName] = stateToHTML(
@@ -335,7 +335,6 @@ class MassEnergizeForm extends Component {
             cleanedValues[field.dbName] = fieldValueInForm;
         }
       }
-
       // field.conditional displays is just a way to display form items based on a selected
       //radio buttons. Similar to the `field.child` but allows more options
 
