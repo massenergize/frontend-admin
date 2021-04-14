@@ -5,7 +5,10 @@ import loadable from '../utils/loadable';
 export const SuperHome = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Home'), {
   fallback: <Loading />,
 });
-export const ImpactPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Impact'), {
+export const Impact = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Impact'), {
+  fallback: <Loading />,
+});
+export const ImpactPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/ImpactPage'), {
   fallback: <Loading />,
 });
 export const SuperAllActions = loadable(() => import('./MassEnergizeSuperAdmin/Pages/AllActions'), {
@@ -22,19 +25,19 @@ export const SuperAboutUs = loadable(() => import('./MassEnergizeSuperAdmin/Page
   fallback: <Loading />,
 });
 // Events page settings
-export const Events = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Events'), {
+export const EventsPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Events'), {
   fallback: <Loading />,
 });
 // Vendors page settings
-export const Vendors = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Vendors'), {
+export const VendorsPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Vendors'), {
   fallback: <Loading />,
 });
 // Teams page settings
-export const Teams = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Teams'), {
+export const TeamsPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Teams'), {
   fallback: <Loading />,
 });
 // Testimonials page settings
-export const Testimonials = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Testimonials'), {
+export const TestimonialsPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Testimonials'), {
   fallback: <Loading />,
 });
 export const BlankPage = loadable(() => import('./Pages/BlankPage'), {

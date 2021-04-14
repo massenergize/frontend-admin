@@ -59,7 +59,6 @@ class TeamsPageEditForm extends Component {
 
   createFormJson = async () => {
     const { pageData } = this.state;
-    console.log(pageData);
     const { community } = pageData;
 
     const formJson = {

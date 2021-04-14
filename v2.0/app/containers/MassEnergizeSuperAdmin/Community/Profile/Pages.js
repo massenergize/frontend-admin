@@ -19,6 +19,7 @@ class Pages extends React.Component {
     const contactUs = `/admin/edit/${community ? community.id: null}/contact_us`;
     const donate = `/admin/edit/${community ? community.id: null}/donate`;
     const impactPageLink = `/admin/edit/${community ? community.id: null}/impact`;
+    const impactsLink = `/admin/edit/${community ? community.id: null}/impacts`;
     const teams = `/admin/edit/${community ? community.id: null}/teams`;
     const events = `/admin/edit/${community ? community.id: null}/events`;
     const vendors = `/admin/edit/${community ? community.id: null}/vendors`;
@@ -42,6 +43,14 @@ class Pages extends React.Component {
                 HOME PAGE
                 {' '}
                 <Icon style={{paddingTop:3, color:"green"}}>forward</Icon>
+              </Typography>
+            </Paper>
+
+            <Paper onClick={() => this.goHere(impactsLink)} className={`${classes.pageCard}`} elevation={1}>
+              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                COMMUNITY IMPACT DATA
+                {' '}
+                <Icon style={{paddingTop:3, color:'green'}}>forward</Icon>
               </Typography>
             </Paper>
 
