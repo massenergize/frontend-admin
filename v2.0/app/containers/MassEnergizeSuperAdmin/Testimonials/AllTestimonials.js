@@ -48,11 +48,10 @@ class AllTestimonials extends React.Component {
   fashionData = (data) => {
     return data.map(d => (
       [
-        d.id,
+        d.created_at,
         `${d.title}...`.substring(0, 30), // limit to first 30 chars
         { rank: d.rank, id: d.id },
         (d.community && d.community.name),
-        (d.is_approved ? 'Yes' : 'No'),
         (d.is_approved && d.is_published ? 'Yes' : 'No'),
         `${d.user ? d.user.full_name : ''}...`.substring(0, 20), // limit to first 20 chars
         `${d.action ? d.action.title : ''} ${d.action && d.action.community ? ` -  (${d.action.community.name})` : ''}...`.substring(0, 20),
@@ -73,8 +72,8 @@ class AllTestimonials extends React.Component {
 
   getColumns = () => [
     {
-      name: 'ID',
-      key: 'id',
+      name: 'Date',
+      key: 'date',
       options: {
         filter: true,
         filterType: 'textField'
@@ -117,13 +116,6 @@ class AllTestimonials extends React.Component {
     {
       name: 'Community',
       key: 'community',
-      options: {
-        filter: true,
-      }
-    },
-    {
-      name: 'Is Approved?',
-      key: 'is_approved',
       options: {
         filter: true,
       }

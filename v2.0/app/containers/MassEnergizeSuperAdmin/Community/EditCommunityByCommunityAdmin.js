@@ -292,6 +292,18 @@ class EditCommunityByCommunityAdmin extends Component {
           filesLimit: 1,
         },
         {
+          name: 'favicon',
+          placeholder: 'Upload a favicon (optional)',
+          fieldType: 'File',
+          dbName: 'favicon',
+          previewLink: `${community.favicon && community.favicon.url}`,
+          label: 'Upload a favicon for this community',
+          selectMany: false,
+          isRequired: false,
+          defaultValue: '',
+          filesLimit: 1
+        },
+        {
           name: "is_published",
           label: "Should this go live now?",
           fieldType: "Radio",
