@@ -92,8 +92,9 @@ class AllTestimonials extends React.Component {
       key: 'rank',
       options: {
         filter: false,
-        customBodyRender: (d) => (
+        customBodyRender: (d) => d && (
           <TextField
+            key={d.id}
             required
             name="rank"
             variant="outlined"
