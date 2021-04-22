@@ -102,7 +102,7 @@ class AllTestimonials extends React.Component {
               const { target } = event;
               if (!target) return;
               const { name, value } = target;
-              await apiCall('/testimonials.update', { testimonial_id: d && d.id, [name]: value });
+              await apiCall('/testimonials.update', { community_id: d && d.community && d.community.id, testimonial_id: d && d.id, [name]: value });
             }}
             label="Rank"
             InputLabelProps={{
