@@ -140,7 +140,7 @@ class AllActions extends React.Component {
                 if (!target) return;
                 const { name, value } = target;
                 if (isNotEmpty(value) && value !== String(d.rank)) {
-                  await apiCall('/actions.update', {
+                  await apiCall('/actions.rank', {
                     action_id: d && d.id,
                     [name]: value,
                   });
