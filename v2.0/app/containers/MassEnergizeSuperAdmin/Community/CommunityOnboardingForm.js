@@ -353,6 +353,17 @@ class CreateNewCommunityForm extends Component {
           filesLimit: 1,
         },
         {
+          name: 'favicon',
+          placeholder: 'Upload a Favicon (optional)',
+          fieldType: 'File',
+          dbName: 'favicon',
+          label: 'Upload a favicon for this community',
+          selectMany: false,
+          isRequired: false,
+          defaultValue: '',
+          filesLimit: 1
+        },
+        {
           name: "accepted_terms_and_conditions",
           modalText: "Terms and Conditions",
           modalTitle: "Terms and Conditions",

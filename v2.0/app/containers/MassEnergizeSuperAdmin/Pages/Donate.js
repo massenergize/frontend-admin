@@ -29,7 +29,7 @@ const styles = theme => ({
 });
 
 
-class HomePageEditForm extends Component {
+class DonatePageEditForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -81,12 +81,23 @@ class HomePageEditForm extends Component {
         {
           name: 'title',
           label: 'Main Title',
-          placeholder: 'eg. Welcome to Wayland!',
+          placeholder: 'eg. Help us reach our goal!',
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: true,
           defaultValue: `${donatePageData.title}`,
           dbName: 'title',
+          readOnly: false
+        },
+        {
+          name: 'sub-title',
+          label: 'Optional sub-title',
+          placeholder: 'Every donation counts',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: false,
+          defaultValue: `${donatePageData.sub_title}`,
+          dbName: 'sub_title',
           readOnly: false
         },
         {
@@ -144,9 +155,9 @@ class HomePageEditForm extends Component {
   }
 }
 
-HomePageEditForm.propTypes = {
+DonatePageEditForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
 
-export default withStyles(styles, { withTheme: true })(HomePageEditForm);
+export default withStyles(styles, { withTheme: true })(DonatePageEditForm);

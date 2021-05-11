@@ -29,7 +29,7 @@ const styles = theme => ({
 });
 
 
-class HomePageEditForm extends Component {
+class ContactUsPageEditForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -81,12 +81,23 @@ class HomePageEditForm extends Component {
         {
           name: 'title',
           label: 'Main Title',
-          placeholder: 'eg. Welcome to Wayland!',
+          placeholder: 'Contact the community administrator',
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: true,
           defaultValue: `${contactUsPageData.title}`,
           dbName: 'title',
+          readOnly: false
+        },
+        {
+          name: 'sub-title',
+          label: 'Optional sub-title',
+          placeholder: 'They will get back to you shortly.',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: false,
+          defaultValue: `${contactUsPageData.sub_title}`,
+          dbName: 'sub_title',
           readOnly: false
         },
         {
@@ -99,17 +110,6 @@ class HomePageEditForm extends Component {
           isMultiline: true,
           defaultValue: `${contactUsPageData.description}`,
           dbName: 'description',
-          readOnly: false
-        },
-        {
-          name: 'featured_video_link',
-          label: 'Video Link',
-          placeholder: 'eg. https://www.youtube.com/?v=as122aas',
-          fieldType: 'TextField',
-          contentType: 'text',
-          isRequired: false,
-          defaultValue: `${contactUsPageData.featured_video_link}`,
-          dbName: 'featured_video_link',
           readOnly: false
         },
       ]
@@ -133,9 +133,9 @@ class HomePageEditForm extends Component {
   }
 }
 
-HomePageEditForm.propTypes = {
+ContactUsPageEditForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
 
-export default withStyles(styles, { withTheme: true })(HomePageEditForm);
+export default withStyles(styles, { withTheme: true })(ContactUsPageEditForm);
