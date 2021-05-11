@@ -92,8 +92,9 @@ class AllTestimonials extends React.Component {
       key: 'rank',
       options: {
         filter: false,
-        customBodyRender: (d) => (
+        customBodyRender: (d) => d && (
           <TextField
+            key={d.id}
             required
             name="rank"
             variant="outlined"
@@ -101,7 +102,7 @@ class AllTestimonials extends React.Component {
               const { target } = event;
               if (!target) return;
               const { name, value } = target;
-              await apiCall('/testimonials.update', { testimonial_id: d && d.id, [name]: value });
+              await apiCall('/testimonials.rank', { testimonial_id: d && d.id, [name]: value });
             }}
             label="Rank"
             InputLabelProps={{
