@@ -139,6 +139,13 @@ class EditCommunityByCommunityAdmin extends Component {
               dbName: "about_community",
               readOnly: false,
             },
+          ]
+        },
+
+        {
+          label: "Community Type - Contact a Super Admin to change these settings",
+          fieldType: "Section",
+          children: [
             {
               name: "is_geographically_focused",
               label: "Is this community Geographically focused?",
