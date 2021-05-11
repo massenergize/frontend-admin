@@ -725,12 +725,14 @@ class MassEnergizeForm extends Component {
               className={classes.group}
               value={this.getValue(field.name)}
               onChange={this.handleFormDataChange}
+              disabled={field.readOnly}
             >
               {field.data.map((d) => (
                 <FormControlLabel
                   key={d.id}
                   value={d.id}
                   name={field.name}
+                  disabled={field.readOnly}
                   control={<Radio />}
                   label={d.value}
                 />
