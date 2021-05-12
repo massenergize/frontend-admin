@@ -379,7 +379,6 @@ class MassEnergizeForm extends Component {
         });
       }
     });
-
     return [cleanedValues, hasMediaFiles];
   };
 
@@ -404,7 +403,7 @@ class MassEnergizeForm extends Component {
       cleanedValues = formJson.preflightFxn(cleanedValues);
     }
 
-    console.log("I am teh cleanded values", cleanedValues);
+    console.log("I am the cleaned values", cleanedValues);
 
     // let's make an api call to send the data
     let response = null;
