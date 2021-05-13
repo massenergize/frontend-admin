@@ -122,7 +122,7 @@ class AllTestimonials extends React.Component {
       }
     },
     {
-      name: 'Is Live?',
+      name: 'Live?',
       key: 'is_live',
       options: {
         filter: true,
