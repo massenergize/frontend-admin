@@ -100,8 +100,8 @@ class About extends React.Component {
     if (community !== 0) {
       const goal = community.goal ? community.goal : {};
       const targ = goal.target_number_of_actions;
+      if (!targ) return 0;      
       const att = goal.attained_number_of_actions + goal.organic_attained_number_of_actions;
-      if (!targ) return 0;
       return Math.round((att * 100) / targ);
     }
     return 0;
@@ -112,8 +112,8 @@ class About extends React.Component {
     if (community !== 0) {
       const goal = community.goal ? community.goal : {};
       const targ = goal.target_number_of_households;
-      const att = goal.attained_number_of_households + goal.organic_attained_number_of_households;
       if (!targ) return 0;
+      const att = goal.attained_number_of_households + goal.organic_attained_number_of_households;
       return Math.round((att * 100) / targ);
     }
     return 0;
@@ -124,8 +124,8 @@ class About extends React.Component {
     if (community !== 0) {
       const goal = community.goal ? community.goal : {};
       const targ = goal.target_carbon_footprint_reduction;
-      const att = goal.attained_carbon_footprint_reduction + goal.organic_attained_carbon_footprint_reduction;
       if (!targ) return 0;
+      const att = goal.attained_carbon_footprint_reduction + goal.organic_attained_carbon_footprint_reduction;
       return Math.round((att * 100) / targ);
     }
     return 0;
