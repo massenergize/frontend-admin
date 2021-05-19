@@ -141,6 +141,68 @@ class EditCommunityByCommunityAdmin extends Component {
             },
           ]
         },
+        {
+          label: "Contact Address",
+          fieldType: "Section",
+          children: [
+            {
+                 name: 'address',
+                 label: 'Street Address',
+                 placeholder: 'Enter street address (not required)',
+                 fieldType: 'TextField',
+                 contentType: 'text',
+                 isRequired: false,
+                 defaultValue: `${community.location && community.location.address ? community.location.address : ''}`,
+                dbName: 'address',
+                 readOnly: false
+            },
+            //{
+            //     name: 'unit',
+            //     label: 'Unit Number',
+            //     placeholder: 'eg. Unit 904',
+            //     fieldType: 'TextField',
+            //     contentType: 'text',
+            //     isRequired: false,
+            //     defaultValue: `${community.location && community.location.unit ? community.location.unit : ''}`,
+            //     dbName: 'unit',
+            //     readOnly: false
+            //},
+            {
+                 name: 'city',
+                 label: 'City',
+                 placeholder: 'eg. Springfield',
+                 fieldType: 'TextField',
+                 contentType: 'text',
+                 isRequired: true,
+                 defaultValue: `${community.location && community.location.city ? community.location.city : ''}`,
+                 dbName: 'city',
+                 readOnly: false
+            },
+            {
+                 name: 'zipcode',
+                 label: 'Zip code',
+                 placeholder: 'eg. 01020',
+                 fieldType: 'TextField',
+                 contentType: 'text',
+                 isRequired: true,
+                 defaultValue: community.location && community.location.zipcode,
+                 dbName: 'zipcode',
+                 readOnly: false
+            },
+            {
+                 name: 'state',
+                 label: 'State',
+                 placeholder: 'eg. Massachusetts',
+                 fieldType: 'Dropdown',
+                 contentType: 'text',
+                 isRequired: true,
+                 data: states,
+                 defaultValue: community.location && community.location.state,
+                 dbName: 'state',
+                 readOnly: false
+            },
+          ]
+        },
 
         {
           label: "Community Type - Contact a Super Admin to change these settings",
