@@ -109,6 +109,75 @@ class CreateNewCommunityForm extends Component {
               dbName: "about_community",
               readOnly: false,
             },
+          ]
+        },
+        {
+          label: "Contact Address",
+          fieldType: "Section",
+          children: [
+            {
+                 name: 'address',
+                 label: 'Street Address',
+                 placeholder: 'Enter street address (not required)',
+                 fieldType: 'TextField',
+                 contentType: 'text',
+                 isRequired: false,
+                 defaultValue: `${community.location && community.location.address ? community.location.address : ''}`,
+                dbName: 'address',
+                 readOnly: false
+            },
+            //{
+            //     name: 'unit',
+            //     label: 'Unit Number',
+            //     placeholder: 'eg. Unit 904',
+            //     fieldType: 'TextField',
+            //     contentType: 'text',
+            //     isRequired: false,
+            //     defaultValue: `${community.location && community.location.unit ? community.location.unit : ''}`,
+            //     dbName: 'unit',
+            //     readOnly: false
+            //},
+            {
+                 name: 'city',
+                 label: 'City',
+                 placeholder: 'eg. Springfield',
+                 fieldType: 'TextField',
+                 contentType: 'text',
+                 isRequired: true,
+                 defaultValue: `${community.location && community.location.city ? community.location.city : ''}`,
+                 dbName: 'city',
+                 readOnly: false
+            },
+            {
+                 name: 'zipcode',
+                 label: 'Zip code',
+                 placeholder: 'eg. 01020',
+                 fieldType: 'TextField',
+                 contentType: 'text',
+                 isRequired: true,
+                 defaultValue: community.location && community.location.zipcode,
+                 dbName: 'zipcode',
+                 readOnly: false
+            },
+            {
+                 name: 'state',
+                 label: 'State',
+                 placeholder: 'eg. Massachusetts',
+                 fieldType: 'Dropdown',
+                 contentType: 'text',
+                 isRequired: true,
+                 data: states,
+                 defaultValue: community.location && community.location.state,
+                 dbName: 'state',
+                 readOnly: false
+            },
+          ]
+        },
+
+        {
+          label: "Community Type",
+          fieldType: "Section",
+          children: [
             {
               name: "is_geographically_focused",
               label: "Is this community Geographically focused?",
@@ -145,67 +214,9 @@ class CreateNewCommunityForm extends Component {
                     dbName: 'locations',
                     readOnly: false
                   },
-                ]}},
-                // these fields now duplicative - unless we want to use them as the community group address  
-                //  {
-                //    name: 'community_address',
-                //    label: 'Street Address',
-                //    placeholder: '',
-                //    fieldType: 'TextField',
-                //    contentType: 'text',
-                 //   isRequired: false,
-                //    defaultValue: '',
-                //    dbName: 'address',
-                //    readOnly: false
-                //  },
-                //  {
-                //    name: 'unit',
-                //    label: 'Unit Number',
-                //    placeholder: '',
-                //    fieldType: 'TextField',
-                //    contentType: 'text',
-                //    isRequired: false,
-                //    defaultValue: '',
-                //    dbName: 'unit',
-                //    readOnly: false
-                //  },
-                //  {
-                //    name: 'city',
-                //    label: 'City',
-                //    placeholder: 'eg. Springfield',
-                //    fieldType: 'TextField',
-                //    contentType: 'text',
-                //    isRequired: false,
-                //    defaultValue: '',
-                //    dbName: 'city',
-                //    readOnly: false
-                //  },
-                //  {
-                //    name: 'zipcode',
-                //    label: 'Zip code ',
-                //    placeholder: 'eg. 80202',
-                //    fieldType: 'TextField',
-                //    contentType: 'text',
-                //    isRequired: false,
-                //    defaultValue: '',
-                //    dbName: 'zipcode',
-                //    readOnly: false
-                //  },
-                //  {
-                //    name: 'state',
-                //    label: 'State ',
-                //    placeholder: 'eg. Massachusetts',
-                //    fieldType: 'Dropdown',
-                //    contentType: 'text',
-                //    isRequired: false,
-                //    data: states,
-                //    defaultValue: 'Massachusetts',
-                //    dbName: 'state',
-                //    readOnly: false
-                //  },
-                //]
-              //}
-            //},
+                ]
+              }
+            },
           ]
         },
         {

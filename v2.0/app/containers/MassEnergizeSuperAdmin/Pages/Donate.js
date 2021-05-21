@@ -130,7 +130,7 @@ class DonatePageEditForm extends Component {
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: false,
-          defaultValue: `${donatePageData.featured_video_link}`,
+          defaultValue: `${donatePageData.donation_link}`,
           dbName: 'donation_link',
           readOnly: false
         },

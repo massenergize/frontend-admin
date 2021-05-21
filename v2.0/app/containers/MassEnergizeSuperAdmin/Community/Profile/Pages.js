@@ -64,7 +64,7 @@ class Pages extends React.Component {
 
             <Paper onClick={() => this.goHere(about)} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                ABOUT PAGE
+                ABOUT US PAGE
                 {' '}
                 <Icon style={{paddingTop:3, color:"green"}}>forward</Icon>
               </Typography>
