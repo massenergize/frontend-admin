@@ -122,21 +122,9 @@ class CreateNewCommunityForm extends Component {
                  fieldType: 'TextField',
                  contentType: 'text',
                  isRequired: false,
-                 defaultValue: `${community.location && community.location.address ? community.location.address : ''}`,
-                dbName: 'address',
+                 dbName: 'address',
                  readOnly: false
             },
-            //{
-            //     name: 'unit',
-            //     label: 'Unit Number',
-            //     placeholder: 'eg. Unit 904',
-            //     fieldType: 'TextField',
-            //     contentType: 'text',
-            //     isRequired: false,
-            //     defaultValue: `${community.location && community.location.unit ? community.location.unit : ''}`,
-            //     dbName: 'unit',
-            //     readOnly: false
-            //},
             {
                  name: 'city',
                  label: 'City',
@@ -144,7 +132,6 @@ class CreateNewCommunityForm extends Component {
                  fieldType: 'TextField',
                  contentType: 'text',
                  isRequired: true,
-                 defaultValue: `${community.location && community.location.city ? community.location.city : ''}`,
                  dbName: 'city',
                  readOnly: false
             },
@@ -154,8 +141,7 @@ class CreateNewCommunityForm extends Component {
                  placeholder: 'eg. 01020',
                  fieldType: 'TextField',
                  contentType: 'text',
-                 isRequired: true,
-                 defaultValue: community.location && community.location.zipcode,
+                 isRequired: false,
                  dbName: 'zipcode',
                  readOnly: false
             },
@@ -167,7 +153,6 @@ class CreateNewCommunityForm extends Component {
                  contentType: 'text',
                  isRequired: true,
                  data: states,
-                 defaultValue: community.location && community.location.state,
                  dbName: 'state',
                  readOnly: false
             },

@@ -184,7 +184,7 @@ class EditCommunityByCommunityAdmin extends Component {
                  placeholder: 'eg. 01020',
                  fieldType: 'TextField',
                  contentType: 'text',
-                 isRequired: true,
+                 isRequired: false,
                  defaultValue: community.location && community.location.zipcode,
                  dbName: 'zipcode',
                  readOnly: false
