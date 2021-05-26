@@ -43,9 +43,9 @@ class AllUsers extends React.Component {
     return data.map(d => (
       [
         d.full_name,
+        d.joined,        
         d.preferred_name,
         d.email,
-        d.joined,
         `${d.communities.join(', ')} `,
         d.is_super_admin ? 'Super Admin' : d.is_community_admin ? 'Community Admin' : 'Member',
         d.id,
@@ -62,6 +62,14 @@ class AllUsers extends React.Component {
       }
     },
     {
+      name: 'Joined',
+      key: 'joined',
+      options: {
+        filter: true,
+        filterType: 'textField'
+      }
+    },
+    {
       name: 'Preferred Name',
       key: 'preferred_name',
       options: {
@@ -71,14 +79,6 @@ class AllUsers extends React.Component {
     {
       name: 'Email',
       key: 'email',
-      options: {
-        filter: true,
-        filterType: 'textField'
-      }
-    },
-    {
-      name: 'Joined',
-      key: 'joined',
       options: {
         filter: true,
         filterType: 'textField'

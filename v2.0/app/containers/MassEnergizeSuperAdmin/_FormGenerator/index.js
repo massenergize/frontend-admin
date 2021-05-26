@@ -22,7 +22,7 @@ import { MaterialDropZone } from "dan-components";
 import Snackbar from "@material-ui/core/Snackbar";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { Editor as TinyEditor } from "@tinymce/tinymce-react";
-import { MenuItem } from "@material-ui/core";
+import { FilledInput, MenuItem } from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import Icon from "@material-ui/core/Icon";
 import moment from "moment";
@@ -460,7 +460,7 @@ class MassEnergizeForm extends Component {
     let hasMediaFiles = false;
     fields.forEach((field) => {
       const fieldValueInForm = formData[field.name];
-      if (fieldValueInForm) {
+      if (fieldValueInForm || fieldValueInForm==='') {
         switch (field.fieldType) {
           case FieldTypes.HTMLField:
             // check whether or not the old editor is what is in use
@@ -501,6 +501,24 @@ class MassEnergizeForm extends Component {
             cleanedValues[field.dbName] = fieldValueInForm;
         }
       }
+      // field.conditional displays is just a way to display form items based on a selected
+      //radio buttons. Similar to the `field.child` but allows more options
+
+      if (field.conditionalDisplays && field.conditionalDisplays.length) {
+        var selectedSet = field.conditionalDisplays.filter(
+          (f) => fieldValueInForm === f.valueToCheck
+        )[0];
+        let [childCleanValues, childHasMediaFiles] = this.cleanItUp(
+          formData,
+          selectedSet.fields || []
+        );
+        if (childHasMediaFiles) {
+          hasMediaFiles = childHasMediaFiles || hasMediaFiles;
+        }
+        Object.keys(childCleanValues).forEach((k) => {
+          cleanedValues[k] = childCleanValues[k];
+        });
+      }
 
       if (field.child) {
         const [childCleanValues, childHasMediaFiles] = this.cleanItUp(
@@ -527,10 +545,10 @@ class MassEnergizeForm extends Component {
         });
       }
     });
-
     return [cleanedValues, hasMediaFiles];
   };
 
+  takeContentFrom;
   /**
    * This handles the form data submission
    */
@@ -542,11 +560,16 @@ class MassEnergizeForm extends Component {
 
     // let's clean up the data
     const { formData, formJson } = this.state;
-    const [cleanedValues, hasMediaFiles] = this.cleanItUp(
+    var [cleanedValues, hasMediaFiles] = this.cleanItUp(
       formData,
       formJson.fields
     );
 
+    if (formJson.preflightFxn) {
+      cleanedValues = formJson.preflightFxn(cleanedValues);
+    }
+
+    console.log("I am the cleaned values", cleanedValues);
 
     // let's make an api call to send the data
     let response = null;
@@ -935,12 +958,14 @@ class MassEnergizeForm extends Component {
               className={classes.group}
               value={this.getValue(field.name)}
               onChange={this.handleFormDataChange}
+              disabled={field.readOnly}
             >
               {field.data.map((d) => (
                 <FormControlLabel
                   key={d.id}
                   value={d.id}
                   name={field.name}
+                  disabled={field.readOnly}
                   control={<Radio />}
                   label={d.value}
                 />
@@ -950,6 +975,7 @@ class MassEnergizeForm extends Component {
             {field.child &&
               this.getValue(field.name) === field.child.valueToCheck &&
               this.renderFields(field.child.fields)}
+            {this.renderConditionalDisplays(field)}
           </div>
         );
       case FieldTypes.TextField:
@@ -1025,6 +1051,15 @@ class MassEnergizeForm extends Component {
     }
   };
 
+  renderConditionalDisplays = (field) => {
+    //use conditional displays to render other fields based on user's radio btn selection
+    //you can have as many conditions as possible defined in the user form json props
+    if (!field || !field.conditionalDisplays) return;
+    const toRender = field.conditionalDisplays.filter(
+      (f) => this.getValue(field.name) === f.valueToCheck
+    )[0];
+    if (toRender && toRender.fields) return this.renderFields(toRender.fields);
+  };
   /**
    * Takes a list of fields and renders them one by depending on which type
    * by making use of a helper function

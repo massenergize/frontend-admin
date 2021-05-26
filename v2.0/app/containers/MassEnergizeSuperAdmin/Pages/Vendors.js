@@ -29,12 +29,12 @@ const styles = theme => ({
 });
 
 
-class AboutUsPageEditForm extends Component {
+class VendorsPageEditForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
       formJson: null,
-      aboutUsPageData: null,
+      pageData: null,
     };
   }
 
@@ -42,12 +42,12 @@ class AboutUsPageEditForm extends Component {
   async componentDidMount() {
     const { id } = this.props.match.params;
 
-    const aboutUsPageData = await apiCall('/about_us_page_settings.info', { community_id: id });
-    if (aboutUsPageData && aboutUsPageData.success) {
-      await this.setStateAsync({ aboutUsPageData: aboutUsPageData.data });
+    const pageData = await apiCall('/vendors_page_settings.info', { community_id: id });
+    if (pageData && pageData.success) {
+      await this.setStateAsync({ pageData: pageData.data });
     }
 
-    const formJson = await this.createFormJson(aboutUsPageData.data);
+    const formJson = await this.createFormJson(pageData.data);
     await this.setStateAsync({ formJson });
   }
 
@@ -58,14 +58,14 @@ class AboutUsPageEditForm extends Component {
   }
 
   createFormJson = async () => {
-    const { aboutUsPageData } = this.state;
-    console.log(aboutUsPageData);
-    const { community } = aboutUsPageData;
+    const { pageData } = this.state;
+    console.log(pageData);
+    const { community } = pageData;
 
     const formJson = {
-      title: `Edit ${community ? community.name + '\'s' : 'Community\'s'} - About Us Page`,
+      title: `Edit ${community ? community.name + '\'s' : 'Community\'s'} - Vendors Page`,
       subTitle: '',
-      method: '/about_us_page_settings.update',
+      method: '/vendors_page_settings.update',
       // successRedirectPage: `/admin/edit/${community.id}/about_us`,
       fields: [
         {
@@ -75,29 +75,29 @@ class AboutUsPageEditForm extends Component {
           fieldType: 'TextField',
           contentType: 'number',
           isRequired: true,
-          defaultValue: `${aboutUsPageData.id}`,
+          defaultValue: `${pageData.id}`,
           dbName: 'id',
           readOnly: true
         },
         {
           name: 'title',
           label: 'Main Title',
-          placeholder: 'eg. Welcome to Wayland!',
+          placeholder: 'eg. All Service Providers',
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: true,
-          defaultValue: `${aboutUsPageData.title}`,
+          defaultValue: `${pageData.title}`,
           dbName: 'title',
           readOnly: false
         },
         {
           name: 'sub-title',
           label: 'Optional Sub-title',
-          placeholder: 'eg. Welcome to Wayland!',
+          placeholder: '',
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: false,
-          defaultValue: `${aboutUsPageData.sub_title}`,
+          defaultValue: `${pageData.sub_title}`,
           dbName: 'sub_title',
           readOnly: false
         },
@@ -105,34 +105,13 @@ class AboutUsPageEditForm extends Component {
           name: 'description',
           label: 'Paragraph to be displayed below the title',
           placeholder: 'Tell us more ...',
-          fieldType: 'HTMLField',
-          contentType: 'text',
-          isRequired: true,
-          isMultiline: true,
-          defaultValue: `${aboutUsPageData.description}`,
-          dbName: 'description',
-          readOnly: false
-        },
-        {
-          name: 'featured_video_link',
-          label: 'Optional video Link',
-          placeholder: 'eg. https://www.youtube.com/?v=as122aas',
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: false,
-          defaultValue: `${aboutUsPageData.featured_video_link}`,
-          dbName: 'featured_video_link',
+          isMultiline: true,
+          defaultValue: `${pageData.description}`,
+          dbName: 'description',
           readOnly: false
-        },
-        {
-          name: 'image',
-          placeholder: 'Select an Image',
-          fieldType: 'File',
-          dbName: 'image',
-          label: 'Upload File',
-          isRequired: false,
-          defaultValue: '',
-          filesLimit: 1
         },
         {
           name: 'enable',
@@ -140,7 +119,7 @@ class AboutUsPageEditForm extends Component {
           dbName: 'is_published',
           label: 'This page is enabled if checked',
           isRequired: false,
-          defaultValue: `${aboutUsPageData.is_published}`,
+          defaultValue: `${pageData.is_published}`,
           data: [
             { id: 'false', value: 'No' },
             { id: 'true', value: 'Yes' }
@@ -167,9 +146,9 @@ class AboutUsPageEditForm extends Component {
   }
 }
 
-AboutUsPageEditForm.propTypes = {
+VendorsPageEditForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
 
-export default withStyles(styles, { withTheme: true })(AboutUsPageEditForm);
+export default withStyles(styles, { withTheme: true })(VendorsPageEditForm);

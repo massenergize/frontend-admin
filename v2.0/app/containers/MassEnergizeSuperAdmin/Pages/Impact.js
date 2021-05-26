@@ -29,7 +29,7 @@ const styles = theme => ({
 });
 
 
-class ImpactPage extends Component {
+class Impact extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -121,9 +121,9 @@ class ImpactPage extends Component {
   }
 }
 
-ImpactPage.propTypes = {
+Impact.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
 
-export default withStyles(styles, { withTheme: true })(ImpactPage);
+export default withStyles(styles, { withTheme: true })(Impact);

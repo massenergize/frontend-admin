@@ -14,10 +14,10 @@ import { apiCall } from '../../../../utils/messenger';
 import { SANDBOX_PORTAL_HOST, PORTAL_HOST } from '../../../../config/constants';
 
 
-const optionsOpt = [
-  'Edit Profile',
-  'Change Cover',
-];
+//const optionsOpt = [
+//  'Edit Profile',
+//  'Change Cover',
+//];
 
 const ITEM_HEIGHT = 48;
 
@@ -86,6 +86,7 @@ class Cover extends React.Component {
 
     return (
       <div className={classes.cover} style={coverStyle}>
+        {/*
         <div className={classes.opt}>
           <IconButton className={classes.button} aria-label="Delete">
             <Info style={{ color: '#585858' }} />
@@ -119,6 +120,7 @@ class Cover extends React.Component {
             ))}
           </Menu>
         </div>
+            */}
         <div className={classes.content} style={{ display: 'inline-block' }}>
           <div>
             <h2 style={contentStyle}>{name}</h2>

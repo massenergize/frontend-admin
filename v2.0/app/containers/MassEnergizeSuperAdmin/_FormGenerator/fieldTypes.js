@@ -6,5 +6,6 @@ export default {
   Radio: 'Radio',
   TextField: 'TextField',
   DateTime: 'DateTime',
-  Section: 'Section'
+  Section: 'Section',
+  Paragraph:'Paragraph'
 };

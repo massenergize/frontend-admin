@@ -45,7 +45,6 @@ class EditTestimonial extends Component {
   async componentDidMount() {
     const { id } = this.props.match.params;
     const testimonialResponse = await apiCall('/testimonials.info', { testimonial_id: id });
-    console.log(testimonialResponse)
     if (testimonialResponse && !testimonialResponse.success) {
       return;
     }
@@ -116,7 +115,6 @@ class EditTestimonial extends Component {
         res.push('' + s.id);
       }
     });
-    console.log(res);
     return res;
   }
 

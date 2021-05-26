@@ -145,7 +145,7 @@ class CreateNewVendorForm extends Component {
             },
             {
               name: 'description',
-              label: 'Tell us about what services this vendor provides',
+              label: 'Tell us about the services this vendor provides',
               placeholder: 'Tell us more ...',
               fieldType: 'HTMLField',
               contentType: 'text',
