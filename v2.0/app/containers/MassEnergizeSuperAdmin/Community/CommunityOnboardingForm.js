@@ -136,16 +136,6 @@ class CreateNewCommunityForm extends Component {
                  readOnly: false
             },
             {
-                 name: 'zipcode',
-                 label: 'Zip code',
-                 placeholder: 'eg. 01020',
-                 fieldType: 'TextField',
-                 contentType: 'text',
-                 isRequired: false,
-                 dbName: 'zipcode',
-                 readOnly: false
-            },
-            {
                  name: 'state',
                  label: 'State',
                  placeholder: 'eg. Massachusetts',
@@ -156,7 +146,17 @@ class CreateNewCommunityForm extends Component {
                  dbName: 'state',
                  readOnly: false
             },
-          ]
+            {
+              name: 'zipcode',
+              label: 'Zip code',
+              placeholder: 'eg. 01020',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              dbName: 'zipcode',
+              readOnly: false
+         },
+       ]
         },
 
         {
