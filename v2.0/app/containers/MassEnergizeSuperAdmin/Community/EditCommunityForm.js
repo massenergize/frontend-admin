@@ -159,17 +159,6 @@ class EditCommunityForm extends Component {
                 dbName: 'address',
                  readOnly: false
             },
-            //{
-            //     name: 'unit',
-            //     label: 'Unit Number',
-            //     placeholder: 'eg. Unit 904',
-            //     fieldType: 'TextField',
-            //     contentType: 'text',
-            //     isRequired: false,
-            //     defaultValue: `${community.location && community.location.unit ? community.location.unit : ''}`,
-            //     dbName: 'unit',
-            //     readOnly: false
-            //},
             {
                  name: 'city',
                  label: 'City',
@@ -182,17 +171,6 @@ class EditCommunityForm extends Component {
                  readOnly: false
             },
             {
-                 name: 'zipcode',
-                 label: 'Zip code',
-                 placeholder: 'eg. 01020',
-                 fieldType: 'TextField',
-                 contentType: 'text',
-                 isRequired: false,
-                 defaultValue: community.location && community.location.zipcode,
-                 dbName: 'zipcode',
-                 readOnly: false
-            },
-            {
                  name: 'state',
                  label: 'State',
                  placeholder: 'eg. Massachusetts',
@@ -202,6 +180,17 @@ class EditCommunityForm extends Component {
                  data: states,
                  defaultValue: community.location && community.location.state,
                  dbName: 'state',
+                 readOnly: false
+            },
+            {
+                 name: 'zipcode',
+                 label: 'Zip code',
+                 placeholder: 'eg. 01020',
+                 fieldType: 'TextField',
+                 contentType: 'text',
+                 isRequired: true,
+                 defaultValue: community.location && community.location.zipcode,
+                 dbName: 'zipcode',
                  readOnly: false
             },
           ]
