@@ -36,7 +36,7 @@ import Modal from "./Modal";
 import PreviewModal from "./PreviewModal";
 
 const TINY_MCE_API_KEY = "3fpefbsmtkh71yhtjyykjwj5ezs3a5cac5ei018wvnlg2g0r";
-
+const NEW_EDITOR_IDENTITY = "@_ME_NEW_CUSTOM_EDITOR_@";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
