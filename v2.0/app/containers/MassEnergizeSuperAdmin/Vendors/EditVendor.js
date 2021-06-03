@@ -224,17 +224,6 @@ class CreateNewVendorForm extends Component {
                     readOnly: false
                   },
                   {
-                    name: 'unit',
-                    label: 'Unit Number',
-                    placeholder: '',
-                    fieldType: 'TextField',
-                    contentType: 'text',
-                    isRequired: false,
-                    defaultValue: vendor.location && vendor.location.unit,
-                    dbName: 'unit',
-                    readOnly: false
-                  },
-                  {
                     name: 'city',
                     label: 'City',
                     placeholder: 'eg. Springfield',
@@ -257,7 +246,18 @@ class CreateNewVendorForm extends Component {
                     dbName: 'state',
                     readOnly: false
                   },
-                ]
+                  {
+                    name: 'zipcode',
+                    label: 'Zip code',
+                    placeholder: 'eg. 01020',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: true,
+                    defaultValue: vendor.location && vendor.location.zipcode,
+                    dbName: 'zipcode',
+                    readOnly: false
+               },
+                   ]
               }
             },
           ]

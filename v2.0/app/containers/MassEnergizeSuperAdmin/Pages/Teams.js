@@ -112,27 +112,6 @@ class TeamsPageEditForm extends Component {
           readOnly: false
         },
         {
-          name: 'featured_video_link',
-          label: 'Optional video Link',
-          placeholder: 'eg. https://www.youtube.com/?v=as122aas',
-          fieldType: 'TextField',
-          contentType: 'text',
-          isRequired: false,
-          defaultValue: `${pageData.featured_video_link}`,
-          dbName: 'featured_video_link',
-          readOnly: false
-        },
-        {
-          name: 'image',
-          placeholder: 'Select an Image',
-          fieldType: 'File',
-          dbName: 'image',
-          label: 'Upload File',
-          isRequired: false,
-          defaultValue: '',
-          filesLimit: 1
-        },
-        {
           name: 'enable',
           fieldType: 'Radio',
           dbName: 'is_published',
