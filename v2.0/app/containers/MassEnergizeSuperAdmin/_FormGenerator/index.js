@@ -28,7 +28,11 @@ import Icon from "@material-ui/core/Icon";
 import moment from "moment";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { EditorState } from "draft-js";
-import { stateFromHTML } from "draft-js-import-html";
+import {
+  stateFromHTML,
+  stateToHTML,
+  htmlLinkOptions,
+} from "draft-js-import-html";
 import { apiCall } from "../../../utils/messenger";
 import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
 import FieldTypes from "./fieldTypes";
@@ -233,9 +237,10 @@ class MassEnergizeForm extends Component {
   handleLightEditorChange = async (e, name) => {
     const data = await e.saver.save();
     const HTMLFromShop = await factory(data.blocks);
-    const blocksToString = `${NEW_EDITOR_IDENTITY}${JSON.stringify(
-      {...data,blocks:HTMLFromShop.blocks}
-    )}`;
+    const blocksToString = `${NEW_EDITOR_IDENTITY}${JSON.stringify({
+      ...data,
+      blocks: HTMLFromShop.blocks,
+    })}`;
     const { formData } = this.state;
     await this.setStateAsync({
       formData: { ...formData, [name]: blocksToString },
@@ -251,13 +256,13 @@ class MassEnergizeForm extends Component {
     return result.HTML;
   };
 
-  getLightEditorInitialData  =(name)=>{
+  getLightEditorInitialData = (name) => {
     const text = this.getValue(name);
-    if(!text) return null; 
+    if (!text) return null;
     var jsonText = text.split(NEW_EDITOR_IDENTITY)[1];
     var json = JSON.parse(jsonText);
     return json;
-  }
+  };
   newLightWeightEditor = (field) => {
     return (
       <div>
@@ -460,11 +465,12 @@ class MassEnergizeForm extends Component {
     let hasMediaFiles = false;
     fields.forEach((field) => {
       const fieldValueInForm = formData[field.name];
-      if (fieldValueInForm || fieldValueInForm==='') {
+      if (fieldValueInForm || fieldValueInForm === "") {
         switch (field.fieldType) {
           case FieldTypes.HTMLField:
             // check whether or not the old editor is what is in use
             const name = `use_new_editor_for_${field.name}`;
+            // cleanedValues[field.dbName] = fieldValueInForm;
             if (this.state[name]) {
               cleanedValues[field.dbName] = fieldValueInForm;
             } else {
@@ -501,7 +507,7 @@ class MassEnergizeForm extends Component {
             cleanedValues[field.dbName] = fieldValueInForm;
         }
       }
-      // field.conditional displays is just a way to display form items based on a selected
+      // field.conditional displays is just a way to display form items based on selected
       //radio buttons. Similar to the `field.child` but allows more options
 
       if (field.conditionalDisplays && field.conditionalDisplays.length) {
@@ -565,11 +571,13 @@ class MassEnergizeForm extends Component {
       formJson.fields
     );
 
-    if (formJson.preflightFxn) {
+    if (formJson.preflightFxn) { // 
       cleanedValues = formJson.preflightFxn(cleanedValues);
     }
 
     console.log("I am the cleaned values", cleanedValues);
+
+    // return;
 
     // let's make an api call to send the data
     let response = null;
@@ -656,8 +664,8 @@ class MassEnergizeForm extends Component {
           simplest ways possible. <br />
           You have access to{" "}
           <b>
-            Lists (bullets or numbers), Links, Headers, Normal Paragraph texts & Images
-            (via URL)
+            Lists (bullets or numbers), Links, Headers, Normal Paragraph texts &
+            Images (via URL)
           </b>
           <br />
           <a
