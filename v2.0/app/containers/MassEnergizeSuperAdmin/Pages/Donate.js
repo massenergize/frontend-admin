@@ -200,19 +200,11 @@ class DonatePageEditForm extends Component {
         //   readOnly: false
         // },
         {
-<<<<<<< HEAD
           name: "donation_link",
           label: "Donation Link",
           placeholder: "eg. https://www.paypal.com/massenergize",
           fieldType: "TextField",
           contentType: "text",
-=======
-          name: 'donation_link',
-          label: 'Community Donation Link',
-          placeholder: 'eg. https://www.your-org.org/your-donate-page',
-          fieldType: 'TextField',
-          contentType: 'text',
->>>>>>> dc6d62f40b192e1d6c6f360091a6e538077d2300
           isRequired: false,
           defaultValue: `${donatePageData.donation_link}`,
           dbName: "donation_link",
