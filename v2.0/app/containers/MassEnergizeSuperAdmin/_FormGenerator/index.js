@@ -299,7 +299,7 @@ class MassEnergizeForm extends Component {
     let hasMediaFiles = false;
     fields.forEach((field) => {
       const fieldValueInForm = formData[field.name];
-      if (fieldValueInForm || fieldValueInForm==='') {
+      if (fieldValueInForm || fieldValueInForm === "") {
         switch (field.fieldType) {
           case FieldTypes.HTMLField:
             // cleanedValues[field.dbName] = stateToHTML(
@@ -339,9 +339,10 @@ class MassEnergizeForm extends Component {
       //radio buttons. Similar to the `field.child` but allows more options
 
       if (field.conditionalDisplays && field.conditionalDisplays.length) {
-        var selectedSet = field.conditionalDisplays.filter(
-          (f) => fieldValueInForm === f.valueToCheck
-        )[0];
+        var selectedSet =
+          field.conditionalDisplays.filter(
+            (f) => fieldValueInForm === f.valueToCheck
+          )[0] || {};
         let [childCleanValues, childHasMediaFiles] = this.cleanItUp(
           formData,
           selectedSet.fields || []
@@ -402,8 +403,6 @@ class MassEnergizeForm extends Component {
     if (formJson.preflightFxn) {
       cleanedValues = formJson.preflightFxn(cleanedValues);
     }
-
-    console.log("I am the cleaned values", cleanedValues);
 
     // let's make an api call to send the data
     let response = null;
