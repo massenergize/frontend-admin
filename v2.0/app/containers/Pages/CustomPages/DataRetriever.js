@@ -7,15 +7,15 @@ const iconTextDefaults = {
   }, 
   service:{
     title:"Service Providers",
-    desc:" See all the community service providers who can help you take action"
+    desc:"See all the community service providers"
   }, 
   actions:{
     title:"Actions", 
-    desc:" See actions you can take to add to your community's impact"
+    desc:"See sustainable actions you can take"
   }, 
   testimonials:{
     title:"Testimonials",
-    desc:"Not sure about an action or Service Provider? Read these testimonials from other users to learn about their experience"
+    desc:"Read these testimonials from other users"
   }
 }
 
