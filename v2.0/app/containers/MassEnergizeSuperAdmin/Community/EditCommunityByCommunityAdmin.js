@@ -142,13 +142,13 @@ class EditCommunityByCommunityAdmin extends Component {
           ]
         },
         {
-          label: "Contact Address",
+          label: "Contact Address (seen as Location on ContactUs page)",
           fieldType: "Section",
           children: [
             {
                  name: 'address',
                  label: 'Street Address',
-                 placeholder: 'Enter street address (not required)',
+                 placeholder: 'Enter street address (optional)',
                  fieldType: 'TextField',
                  contentType: 'text',
                  isRequired: false,
