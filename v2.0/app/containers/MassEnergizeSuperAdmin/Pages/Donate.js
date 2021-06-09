@@ -125,8 +125,8 @@ class DonatePageEditForm extends Component {
         },
         {
           name: 'donation_link',
-          label: 'Donation Link',
-          placeholder: 'eg. https://www.paypal.com/massenergize',
+          label: 'Community Donation Link',
+          placeholder: 'eg. https://www.your-org.org/your-donate-page',
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: false,
