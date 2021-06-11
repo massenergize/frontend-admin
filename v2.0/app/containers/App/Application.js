@@ -26,7 +26,7 @@ import {
   AddPolicy, AllPolicies,
   DashboardAdminSummaryPage,
   AddTestimonial, AllTestimonials, Export, CustomizePages, EditAction,
-  SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditGoal, EditPolicy, EditEvent, UsersList, ImpactPage
+  SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditGoal, EditPolicy, EditEvent, UsersList, ImportContacts, ImpactPage
 } from '../pageListAsync';
 import EditVendor from '../MassEnergizeSuperAdmin/Vendors/EditVendor';
 import AddRemoveAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveAdmin';
@@ -40,6 +40,7 @@ import CommunityAdminMessages from '../MassEnergizeSuperAdmin/Messages/Community
 import MessageDetails from '../MassEnergizeSuperAdmin/Messages/MessageDetails';
 import TeamAdminMessages from '../MassEnergizeSuperAdmin/Messages/TeamAdminMessages';
 import TeamMembers from '../MassEnergizeSuperAdmin/Teams/TeamMembers';
+//import {ImportContacts} from '../MassEnergizeSuperAdmin/Users/ImportContacts';
 
 
 class Application extends React.Component {
@@ -54,6 +55,7 @@ class Application extends React.Component {
     const user = auth || {};
 
     const communityAdminSpecialRoutes = [
+      <Route path="/admin/importcontacts" component={ImportContacts}/>,
       <Route exact path="/" render={(props) => <DashboardAdminSummaryPage {...props} signOut={signOut} />} />,
       <Route path="/admin/community/:id/edit" component={EditCommunityByCommunityAdmin} exact />,
       <Route exact path="/admin" render={(props) => <DashboardAdminSummaryPage {...props} signOut={signOut} />} />,
@@ -61,6 +63,7 @@ class Application extends React.Component {
     ];
 
     const superAdminSpecialRoutes = [
+      <Route path="/admin/importcontacts" component={ImportContacts}/>,
       <Route exact path="/" render={(props) => <DashboardSummaryPage {...props} signOut={signOut} />} />,
       <Route path="/admin/community/:id/edit" component={OnboardCommunity} exact />,
       <Route exact path="/admin" render={(props) => <DashboardSummaryPage {...props} signOut={signOut} />} />,
