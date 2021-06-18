@@ -36,6 +36,7 @@ class HomePageEditForm extends Component {
       formJson: null,
       homePageData: null,
       events: null,
+      goal: null,
       noDataFound: false
     };
   }
@@ -57,6 +58,14 @@ class HomePageEditForm extends Component {
     if (eventsResponse && eventsResponse.data) {
       const events = eventsResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
       await this.setStateAsync({ events });
+    } else {
+      await this.setStateAsync({ noDataFound: true });
+      return;
+    }
+
+    const communityResponse = await apiCall('/communities.info', { community_id: id });
+    if (communityResponse && communityResponse.data) {
+      await this.setStateAsync({ goal: communityResponse.data.goal });
     } else {
       await this.setStateAsync({ noDataFound: true });
       return;
@@ -91,7 +100,7 @@ class HomePageEditForm extends Component {
 
     const [image1, image2, image3] = images;
     const [iconBox1, iconBox2, iconBox3, iconBox4] = featured_links;
-    const { goal } = homePageData;
+    const goal = this.state.goal;
     const selectedEvents = homePageData && featured_events ? featured_events.map(e => '' + e.id) : [];
     const archivedEvents = featured_events.filter(f => !f.is_published).map(c => ({ ...c, displayName: '(Archived) ' + c.name, id: '' + c.id }));
     const eventsToDisplay = [...archivedEvents, ...events];
@@ -588,6 +597,5 @@ class HomePageEditForm extends Component {
 HomePageEditForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
-
 
 export default withStyles(styles, { withTheme: true })(HomePageEditForm);
