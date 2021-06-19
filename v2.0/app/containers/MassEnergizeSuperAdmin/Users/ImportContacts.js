@@ -78,7 +78,7 @@ class ImportContacts extends React.Component {
                     <p>{this.state.error}</p>
                     <input
                         type="file"
-                        ref={(input) => { this.filesInput = input }}
+                        //ref={(input) => { this.filesInput = input }}
                         name="file"
                         icon='file text outline'
                         iconPosition='left'
