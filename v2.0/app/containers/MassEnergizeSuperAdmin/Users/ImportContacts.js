@@ -71,7 +71,6 @@ class ImportContacts extends React.Component {
 	};
 
     render() {
-
         return(
             <div>
                 <p>Hi friends!</p>
