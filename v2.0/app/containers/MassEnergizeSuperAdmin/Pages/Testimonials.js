@@ -85,7 +85,7 @@ class TestimonialsPageEditForm extends Component {
           placeholder: 'eg. Welcome to Wayland!',
           fieldType: 'TextField',
           contentType: 'text',
-          isRequired: true,
+          isRequired: false,
           defaultValue: `${pageData.title}`,
           dbName: 'title',
           readOnly: false
