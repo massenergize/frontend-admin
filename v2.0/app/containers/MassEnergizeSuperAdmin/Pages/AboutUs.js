@@ -85,7 +85,7 @@ class AboutUsPageEditForm extends Component {
           placeholder: 'eg. Welcome to Wayland!',
           fieldType: 'TextField',
           contentType: 'text',
-          isRequired: true,
+          isRequired: false,
           defaultValue: `${aboutUsPageData.title}`,
           dbName: 'title',
           readOnly: false

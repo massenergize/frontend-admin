@@ -83,7 +83,7 @@ class TeamsPageEditForm extends Component {
           placeholder: 'eg. All Teams in the Community',
           fieldType: 'TextField',
           contentType: 'text',
-          isRequired: true,
+          isRequired: false,
           defaultValue: `${pageData.title}`,
           dbName: 'title',
           readOnly: false

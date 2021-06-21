@@ -85,7 +85,7 @@ class VendorsPageEditForm extends Component {
           placeholder: 'eg. All Service Providers',
           fieldType: 'TextField',
           contentType: 'text',
-          isRequired: true,
+          isRequired: false,
           defaultValue: `${pageData.title}`,
           dbName: 'title',
           readOnly: false
