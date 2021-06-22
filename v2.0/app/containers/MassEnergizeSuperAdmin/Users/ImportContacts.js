@@ -10,6 +10,7 @@ import styles from './contact-jss';
 import { AddShoppingCartOutlined, PortraitSharp } from '@material-ui/icons';
 import { apiCall } from '../../../utils/messenger';
 import { isAsyncValidating } from 'redux-form';
+import {readString} from 'react-papaparse';
 
 class ImportContacts extends React.Component {
     constructor(props) {
