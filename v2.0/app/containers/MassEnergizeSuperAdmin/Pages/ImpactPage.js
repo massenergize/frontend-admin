@@ -83,7 +83,7 @@ class ImpactPage extends Component {
             placeholder: 'eg. Our Community Impact',
             fieldType: 'TextField',
             contentType: 'text',
-            isRequired: true,
+            isRequired: false,
             defaultValue: `${pageData.title}`,
             dbName: 'title',
             readOnly: false
