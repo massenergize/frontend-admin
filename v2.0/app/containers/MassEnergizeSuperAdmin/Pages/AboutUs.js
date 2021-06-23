@@ -82,7 +82,7 @@ class AboutUsPageEditForm extends Component {
         {
           name: 'title',
           label: 'Main Title',
-          placeholder: 'eg. Welcome to Wayland!',
+          placeholder: 'eg. About our community',
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: false,
@@ -93,7 +93,7 @@ class AboutUsPageEditForm extends Component {
         {
           name: 'sub-title',
           label: 'Optional Sub-title',
-          placeholder: 'eg. Welcome to Wayland!',
+          placeholder: 'eg. a tagline about our community',
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: false,
