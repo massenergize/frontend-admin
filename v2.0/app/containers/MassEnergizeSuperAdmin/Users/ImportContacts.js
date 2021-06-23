@@ -10,25 +10,38 @@ import styles from './contact-jss';
 import { AddShoppingCartOutlined, PortraitSharp } from '@material-ui/icons';
 import { apiCall } from '../../../utils/messenger';
 import { isAsyncValidating } from 'redux-form';
-import {readString} from 'react-papaparse';
+import {readString, CSVReader} from 'react-papaparse';
+
 
 class ImportContacts extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             csv: null, 
-            error: ""
+            error: "", 
+            headerFileRow: null,
+            formFields: ['First_Name', 'Last_Name', 'Email']
         };
+        //const myRef = React.createRef();
         this.handleChange = this.handleChange.bind(this);
+        this.handleFileLoad = this.handleFileLoad.bind(this);
         //this.handleSubmission = this.handleSubmission.bind(this);
     }
 
-    
+    handleFileLoad(data) {
+        console.log("file loaded");
+        console.log(data);
+        this.setState({
+            headerFileRow: data[0].data
+        });
+        console.log(this.state.headerFileRow);
+        
+    }
 
     handleChange(e) {
         this.setState({
             csv: e.target.files[0]
-          });
+            });
     }
 
     handleSubmission = (e) => {
@@ -47,9 +60,17 @@ class ImportContacts extends React.Component {
         }
         //csv file provided by user
         else {
+            let firstNamePicker = document.getElementById(this.state.formFields[0]);
+            let lastNamePicker = document.getElementById(this.state.formFields[1]);
+            let emailPicker = document.getElementById(this.state.formFields[2]);
             const body = {
-                csv: this.state.csv
+                csv: this.state.csv, 
+                first_name_field: firstNamePicker.value,
+                last_name_field: lastNamePicker.value,
+                email_field: emailPicker.value
             };
+            console.log('this is the body of the request');
+            console.log(body);
             apiCall("users.import", body)
             .then((json) => {
                 console.log("api call made");
@@ -60,6 +81,9 @@ class ImportContacts extends React.Component {
                     });
                 }
                 else {
+                    this.setState({
+                        error: json.error
+                    });
                     console.log(json.error);
                 }
             })
@@ -74,20 +98,59 @@ class ImportContacts extends React.Component {
     render() {
         return(
             <div>
-                <p>Hi friends!</p>
-                <form onSubmit={this.handleSubmission}>
-                    <p>{this.state.error}</p>
+                <p>Import new contact here by attaching a CSV file.</p>
+                <form onSubmit={this.handleSubmission}>                    
+                    <p>First, make sure to drag and drop a file to the dotted area. </p>
+                    <CSVReader
+                        onFileLoad={this.handleFileLoad}>
+                    </CSVReader>
+                    {(this.state.headerFileRow && this.state.headerFileRow.length > 0) ?
+                    <form>
+                        {this.state.formFields.map((item) => {
+                            return (<div>
+                                    <label for={item}>Select the column from your spreadsheet that corresponds to the required field {item}:</label>
+                                    <select name={item} id={item}>
+                                    {this.state.headerFileRow.map((x) => {
+                                        return <option value={x}>{x}</option>;
+                                    })}
+                                    </select>
+                                </div>);
+                            })}
+                            {/*<label for="firstName">Select the column from your spreadsheet that corresponds to First Name:</label>
+                            <select name="firstName" id="firstName">
+                            {this.state.headerFileRow.map((x) => {
+                                return <option value={x}>{x}</option>;
+                            })}
+                            </select>
+                            <label for="lastName">Select the column from your spreadsheet that corresponds to Last Name:</label>
+                            <select name="lastName" id="lastName">
+                            {this.state.headerFileRow.map((x) => {
+                                return <option value={x}>{x}</option>;
+                            })}
+                            </select>
+                            <label for="email">Select the column from your spreadsheet that corresponds to Email:</label>
+                            <select name="email" id="email">
+                            {this.state.headerFileRow.map((x) => {
+                                return <option value={x}>{x}</option>;
+                            })}
+                        </select>*/}
+                    </form> :
+                    <div>  
+                        <p>Nothing to see here! Did you import the right CSV file? Make sure the first row of the CSV is the header row.</p>
+                    </div>}
                     <input
+                        id="file"
                         type="file"
-                        //ref={(input) => { this.filesInput = input }}
                         name="file"
+                        ref={this.myRef}
                         icon='file text outline'
                         iconPosition='left'
                         label='Upload CSV'
                         labelPosition='right'
                         placeholder='UploadCSV...'
                         onChange={this.handleChange}
-                    />
+                        />
+                    <p style={{color:'red'}} >{this.state.error}</p>
                     <button>
                         <input type="submit"></input>
                     </button>
