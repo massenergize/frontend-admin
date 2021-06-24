@@ -145,7 +145,7 @@ class CreateNewVendorForm extends Component {
             },
             {
               name: 'description',
-              label: 'Tell us about what services this vendor provides',
+              label: 'Tell us about the services this vendor provides',
               placeholder: 'Tell us more ...',
               fieldType: 'HTMLField',
               contentType: 'text',
@@ -192,17 +192,6 @@ class CreateNewVendorForm extends Component {
                     readOnly: false
                   },
                   {
-                    name: 'unit',
-                    label: 'Unit Number',
-                    placeholder: 'eg. "2A"',
-                    fieldType: 'TextField',
-                    contentType: 'text',
-                    isRequired: false,
-                    defaultValue: '',
-                    dbName: 'unit',
-                    readOnly: false
-                  },
-                  {
                     name: 'city',
                     label: 'City',
                     placeholder: 'eg. Springfield',
@@ -222,6 +211,15 @@ class CreateNewVendorForm extends Component {
                     data: states,
                     defaultValue: 'Massachusetts',
                     dbName: 'state',
+                    readOnly: false
+                  },
+                  {
+                    name: 'zipcode',
+                    label: 'Zip code',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: true,
+                    dbName: 'zipcode',
                     readOnly: false
                   },
                 ]

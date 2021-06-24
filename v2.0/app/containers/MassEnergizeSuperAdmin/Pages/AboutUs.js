@@ -29,7 +29,7 @@ const styles = theme => ({
 });
 
 
-class HomePageEditForm extends Component {
+class AboutUsPageEditForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -85,12 +85,23 @@ class HomePageEditForm extends Component {
           placeholder: 'eg. Welcome to Wayland!',
           fieldType: 'TextField',
           contentType: 'text',
-          isRequired: true,
+          isRequired: false,
           defaultValue: `${aboutUsPageData.title}`,
           dbName: 'title',
           readOnly: false
         },
         {
+          name: 'sub-title',
+          label: 'Optional Sub-title',
+          placeholder: 'eg. Welcome to Wayland!',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: false,
+          defaultValue: `${aboutUsPageData.sub_title}`,
+          dbName: 'sub_title',
+          readOnly: false
+        },
+         {
           name: 'description',
           label: 'Paragraph to be displayed below the title',
           placeholder: 'Tell us more ...',
@@ -101,7 +112,40 @@ class HomePageEditForm extends Component {
           defaultValue: `${aboutUsPageData.description}`,
           dbName: 'description',
           readOnly: false
-        }
+        },
+        {
+          name: 'featured_video_link',
+          label: 'Optional video Link',
+          placeholder: 'eg. https://www.youtube.com/?v=as122aas',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: false,
+          defaultValue: `${aboutUsPageData.featured_video_link}`,
+          dbName: 'featured_video_link',
+          readOnly: false
+        },
+        {
+          name: 'image',
+          placeholder: 'Select an Image',
+          fieldType: 'File',
+          dbName: 'image',
+          label: 'Upload File',
+          isRequired: false,
+          defaultValue: '',
+          filesLimit: 1
+        },
+        {
+          name: 'enable',
+          fieldType: 'Radio',
+          dbName: 'is_published',
+          label: 'This page is enabled if checked',
+          isRequired: false,
+          defaultValue: `${aboutUsPageData.is_published}`,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+        },
       ]
     };
     return formJson;
@@ -123,9 +167,9 @@ class HomePageEditForm extends Component {
   }
 }
 
-HomePageEditForm.propTypes = {
+AboutUsPageEditForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
 
-export default withStyles(styles, { withTheme: true })(HomePageEditForm);
+export default withStyles(styles, { withTheme: true })(AboutUsPageEditForm);

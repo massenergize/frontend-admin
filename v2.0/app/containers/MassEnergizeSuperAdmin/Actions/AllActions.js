@@ -17,9 +17,13 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-import { reduxGetAllActions, reduxGetAllCommunityActions, loadAllActions } from '../../../redux/redux-actions/adminActions';
+import {
+  reduxGetAllActions,
+  reduxGetAllCommunityActions,
+  loadAllActions,
+} from '../../../redux/redux-actions/adminActions';
 import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
-
+import { isNotEmpty } from '../../../utils/common';
 class AllActions extends React.Component {
   constructor(props) {
     super(props);
@@ -32,15 +36,21 @@ class AllActions extends React.Component {
     };
   }
 
-
   async componentDidMount() {
     const allActionsResponse = await apiCall('/actions.listForCommunityAdmin');
     if (allActionsResponse && allActionsResponse.success) {
       loadAllActions(allActionsResponse.data);
-      await this.setStateAsync({ loading: false, error: null, allActions: allActionsResponse.data, data: this.fashionData(allActionsResponse.data) });
-    }
-    else if (allActionsResponse && !allActionsResponse.success) {
-      await this.setStateAsync({loading: false, error: allActionsResponse.error})
+      await this.setStateAsync({
+        loading: false,
+        error: null,
+        allActions: allActionsResponse.data,
+        data: this.fashionData(allActionsResponse.data),
+      });
+    } else if (allActionsResponse && !allActionsResponse.success) {
+      await this.setStateAsync({
+        loading: false,
+        error: allActionsResponse.error,
+      });
     }
   }
 
@@ -50,33 +60,31 @@ class AllActions extends React.Component {
     });
   }
 
-
   changeActions = async (id) => {
     const { allActions } = this.state;
-    const newData = allActions.filter(a => (a.community && (a.community.id === id)) || a.is_global);
+    const newData = allActions.filter(
+      (a) => (a.community && a.community.id === id) || a.is_global
+    );
     await this.setStateAsync({ data: this.fashionData(newData) });
-  }
+  };
 
-  fashionData =(data) => {
-    const fashioned = data.map(d => (
-      [
-        d.id,
-        {
-          id: d.id,
-          image: d.image,
-          initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`
-        },
-        `${d.title}...`.substring(0, 30), // limit to first 30 chars
-        { rank: d.rank, id: d.id },
-        `${d.tags.map(t => t.name).join(', ')} `,
-        (d.is_global ? 'Template' : (d.community && d.community.name)),
-        d.is_published ? 'Yes' : 'No',
-        d.id
-      ]
-    ));
+  fashionData = (data) => {
+    const fashioned = data.map((d) => [
+      d.id,
+      {
+        id: d.id,
+        image: d.image,
+        initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`,
+      },
+      `${d.title}...`.substring(0, 30), // limit to first 30 chars
+      { rank: d.rank, id: d.id },
+      `${d.tags.map((t) => t.name).join(', ')} `,
+      d.is_global ? 'Template' : d.community && d.community.name,
+      d.is_published ? 'Yes' : 'No',
+      d.id,
+    ]);
     return fashioned;
-  }
-
+  };
 
   getColumns = () => [
     {
@@ -84,8 +92,8 @@ class AllActions extends React.Component {
       key: 'id',
       options: {
         filter: true,
-        filterType: 'textField'
-      }
+        filterType: 'textField',
+      },
     },
     {
       name: 'Image',
@@ -95,72 +103,82 @@ class AllActions extends React.Component {
         download: false,
         customBodyRender: (d) => (
           <div>
-            {d.image
-              && <Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} />
-            }
-            {!d.image
-              && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
-            }
+            {d.image && (
+              <Avatar
+                alt={d.initials}
+                src={d.image.url}
+                style={{ margin: 10 }}
+              />
+            )}
+            {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
           </div>
-        )
-      }
+        ),
+      },
     },
     {
       name: 'Title',
       key: 'title',
       options: {
         filter: false,
-        filterType: 'textField'
-      }
+        filterType: 'textField',
+      },
     },
     {
       name: 'Rank',
       key: 'rank',
       options: {
         filter: false,
-        customBodyRender: (d) => (
-          <TextField
-            required
-            name="rank"
-            variant="outlined"
-            onChange={async event => {
-              const { target } = event;
-              if (!target) return;
-              const { name, value } = target;
-              await apiCall('/actions.update', { action_id: d && d.id, [name]: value });
-            }}
-            label="Rank"
-            InputLabelProps={{
-              shrink: true,
-              maxwidth: '10px'
-            }}
-            defaultValue={d && d.rank}
-          />
-        )
-      }
+        customBodyRender: (d) => {
+          return d && (
+            <TextField
+              key={d.id}
+              required
+              name="rank"
+              variant="outlined"
+              onChange={async (event) => {
+                const { target } = event;
+                if (!target) return;
+                const { name, value } = target;
+                if (isNotEmpty(value) && value !== String(d.rank)) {
+                  await apiCall('/actions.rank', {
+                    action_id: d && d.id,
+                    [name]: value,
+                  });
+                }
+              }}
+              label="Rank"
+              InputLabelProps={{
+                shrink: true,
+                maxwidth: '10px',
+              }}
+              defaultValue={d.rank}
+            />
+          );
+        },
+      },
     },
     {
       name: 'Tags',
       key: 'tags',
       options: {
         filter: true,
-        filterType: 'textField'
-      }
+        filterType: 'textField',
+      },
     },
     {
       name: 'Community',
       key: 'community',
       options: {
         filter: true,
-        filterType: 'multiselect'
-      }
+        filterType: 'multiselect',
+      },
     },
     {
       name: 'Is Live?',
       key: 'is_live',
       options: {
         filter: true,
-      }
+      },
     },
     {
       name: 'Edit? Copy?',
@@ -176,7 +194,9 @@ class AllActions extends React.Component {
             &nbsp;&nbsp;
             <Link
               onClick={async () => {
-                const copiedActionResponse = await apiCall('/actions.copy', { action_id: id });
+                const copiedActionResponse = await apiCall('/actions.copy', {
+                  action_id: id,
+                });
                 if (copiedActionResponse && copiedActionResponse.success) {
                   const newAction = copiedActionResponse && copiedActionResponse.data;
                   window.location.href = `/admin/edit/${newAction.id}/action`;
@@ -187,23 +207,28 @@ class AllActions extends React.Component {
               <FileCopy size="small" variant="outlined" color="secondary" />
             </Link>
           </div>
-        )
-      }
+        ),
+      },
     },
-  ]
-
+  ];
 
   render() {
     const title = brand.name + ' - All Actions';
     const description = brand.desc;
     const { classes } = this.props;
-    const { columns, loading, data, error } = this.state;
+    const {
+      columns, loading, data, error
+    } = this.state;
 
     if (loading) {
       return <LinearBuffer />;
     }
-    else if (error) {
-      return <div><h2>"Error"</h2></div>;
+    if (error) {
+      return (
+        <div>
+          <h2>Error</h2>
+        </div>
+      );
     }
 
     const options = {
@@ -213,11 +238,11 @@ class AllActions extends React.Component {
       rowsPerPage: 100,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach(async d => {
+        idsToDelete.forEach(async (d) => {
           const actionId = data[d.dataIndex][0];
           await apiCall('/actions.delete', { action_id: actionId });
         });
-      }
+      },
     };
     return (
       <div>
@@ -250,11 +275,17 @@ AllActions.propTypes = {
 const mapStateToProps = (state) => ({
   auth: state.getIn(['auth']),
   allActions: state.getIn(['allActions']),
-  community: state.getIn(['selected_community'])
+  community: state.getIn(['selected_community']),
 });
-const mapDispatchToProps = (dispatch) => bindActionCreators({
-  callAllActions: reduxGetAllActions,
-  callCommunityActions: reduxGetAllCommunityActions
-}, dispatch);
-const ActionsMapped = connect(mapStateToProps, mapDispatchToProps)(AllActions);
+const mapDispatchToProps = (dispatch) => bindActionCreators(
+  {
+    callAllActions: reduxGetAllActions,
+    callCommunityActions: reduxGetAllCommunityActions,
+  },
+  dispatch
+);
+const ActionsMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AllActions);
 export default withStyles(styles)(ActionsMapped);

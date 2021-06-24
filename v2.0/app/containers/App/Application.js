@@ -11,7 +11,7 @@ import {
   AllCommunities,
   OnboardCommunity,
   CommunityProfile,
-  AllVendors, AddVendor,
+  VendorsPage, AllVendors, AddVendor,
   AllCategories,
   AddCategory,
   BlankPage,
@@ -19,14 +19,15 @@ import {
   Table,
   Error,
   NotFound,
-  AddAction, AllActions,
-  AllEvents, AddEvent,
-  AddTeam, AllTeams,
-  AllGoals, AddGoal,
+  SuperAllActions, AllActions, AddAction, EditAction,
+  EventsPage, AllEvents, AddEvent, EditEvent,
+  TeamsPage, AddTeam, AllTeams,
+  AllGoals, AddGoal, EditGoal,
   AddPolicy, AllPolicies,
   DashboardAdminSummaryPage,
-  AddTestimonial, AllTestimonials, Export, CustomizePages, EditAction,
-  SuperAllActions, SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditGoal, EditPolicy, EditEvent, UsersList, ImportContacts, ImpactPage
+  TestimonialsPage, AddTestimonial, AllTestimonials, Export, CustomizePages,
+  SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditPolicy, UsersList, 
+  ImpactPage, Impact, ImportContacts
 } from '../pageListAsync';
 import EditVendor from '../MassEnergizeSuperAdmin/Vendors/EditVendor';
 import AddRemoveAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveAdmin';
@@ -139,9 +140,14 @@ class Application extends React.Component {
           <Route path="/admin/pages/not-found" component={NotFound} />
           <Route path="/admin/pages/error" component={Error} />
           <Route path="/admin/edit/:id/home" component={SuperHome} />
+          <Route path="/admin/edit/:id/impacts" component={Impact} />
           <Route path="/admin/edit/:id/impact" component={ImpactPage} />
           <Route path="/admin/edit/:id/actions" component={SuperAllActions} />
           <Route path="/admin/edit/:id/all-actions" component={SuperAllActions} />
+          <Route path="/admin/edit/:id/events" component={EventsPage} />
+          <Route path="/admin/edit/:id/teams" component={TeamsPage} />
+          <Route path="/admin/edit/:id/vendors" component={VendorsPage} />
+          <Route path="/admin/edit/:id/testimonials" component={TestimonialsPage} />
           <Route path="/admin/edit/:id/contact_us" component={SuperContactUs} />
           <Route path="/admin/edit/:id/donate" component={SuperDonate} />
           <Route path="/admin/edit/:id/about" component={SuperAboutUs} />

@@ -29,7 +29,7 @@ const styles = theme => ({
 });
 
 
-class EventsPageEditForm extends Component {
+class VendorsPageEditForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -42,7 +42,7 @@ class EventsPageEditForm extends Component {
   async componentDidMount() {
     const { id } = this.props.match.params;
 
-    const pageData = await apiCall('/events_page_settings.info', { community_id: id });
+    const pageData = await apiCall('/vendors_page_settings.info', { community_id: id });
     if (pageData && pageData.success) {
       await this.setStateAsync({ pageData: pageData.data });
     }
@@ -59,12 +59,13 @@ class EventsPageEditForm extends Component {
 
   createFormJson = async () => {
     const { pageData } = this.state;
+    console.log(pageData);
     const { community } = pageData;
 
     const formJson = {
-      title: `Edit ${community ? community.name + '\'s' : 'Community\'s'} - All Events Page`,
+      title: `Edit ${community ? community.name + '\'s' : 'Community\'s'} - Vendors Page`,
       subTitle: '',
-      method: '/events_page_settings.update',
+      method: '/vendors_page_settings.update',
       // successRedirectPage: `/admin/edit/${community.id}/about_us`,
       fields: [
         {
@@ -81,7 +82,7 @@ class EventsPageEditForm extends Component {
         {
           name: 'title',
           label: 'Main Title',
-          placeholder: 'eg. All Events and Campaigns',
+          placeholder: 'eg. All Service Providers',
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: false,
@@ -145,9 +146,9 @@ class EventsPageEditForm extends Component {
   }
 }
 
-EventsPageEditForm.propTypes = {
+VendorsPageEditForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
 
-export default withStyles(styles, { withTheme: true })(EventsPageEditForm);
+export default withStyles(styles, { withTheme: true })(VendorsPageEditForm);

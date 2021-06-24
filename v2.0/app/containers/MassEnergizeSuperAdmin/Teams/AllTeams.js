@@ -81,6 +81,7 @@ class AllTeams extends React.Component {
         `${d.name}...`.substring(0, 30), // limit to first 30 chars
         d.community && d.community.name,
         d.parent && d.parent.name,
+        `${d.is_published ? 'Yes' : 'No'}`,
         d.id,
         d.id
       ]
@@ -137,6 +138,13 @@ class AllTeams extends React.Component {
       options: {
         filter: true,
         filterType: 'multiselect'
+      }
+    },
+    {
+      name: 'Live?',
+      key: 'is_published',
+      options: {
+        filter: true,
       }
     },
     {
