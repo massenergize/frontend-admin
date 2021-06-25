@@ -63,11 +63,13 @@ class ImportContacts extends React.Component {
             let firstNamePicker = document.getElementById(this.state.formFields[0]);
             let lastNamePicker = document.getElementById(this.state.formFields[1]);
             let emailPicker = document.getElementById(this.state.formFields[2]);
+            let mess = document.getElementById("message");
             const body = {
                 csv: this.state.csv, 
                 first_name_field: firstNamePicker.value,
                 last_name_field: lastNamePicker.value,
-                email_field: emailPicker.value
+                email_field: emailPicker.value,
+                message: mess.value
             };
             console.log('this is the body of the request');
             console.log(body);
@@ -142,7 +144,6 @@ class ImportContacts extends React.Component {
                         id="file"
                         type="file"
                         name="file"
-                        ref={this.myRef}
                         icon='file text outline'
                         iconPosition='left'
                         label='Upload CSV'
@@ -150,6 +151,13 @@ class ImportContacts extends React.Component {
                         placeholder='UploadCSV...'
                         onChange={this.handleChange}
                         />
+                    <p>Optional: Personalize the email invitation that team members receive by adding your own text.</p>
+                    <input 
+                        id="message"
+                        type="text"
+                        name="message"
+                        />
+                    
                     <p style={{color:'red'}} >{this.state.error}</p>
                     <button>
                         <input type="submit"></input>
