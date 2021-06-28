@@ -20,13 +20,54 @@ class ImportContacts extends React.Component {
             csv: null, 
             error: "", 
             headerFileRow: null,
-            formFields: ['First_Name', 'Last_Name', 'Email']
+            formFields: ['First_Name', 'Last_Name', 'Email'], 
+            teamsList: null
         };
         //const myRef = React.createRef();
         this.handleChange = this.handleChange.bind(this);
         this.handleFileLoad = this.handleFileLoad.bind(this);
-        //this.handleSubmission = this.handleSubmission.bind(this);
+        this.handleSubmission = this.handleSubmission.bind(this);
+
+        apiCall("users.adminCommunity")
+        .then((json) => {
+            if (json.success) {
+                var communityId = json.data.id; 
+                if (communityId) {
+                    const body = {
+                        community_id: communityId
+                    }
+                    apiCall("users.listTeamsForCommunityAdmin", body)
+                    .then((json) => {
+                        console.log("api call made");
+                        if (json.success) {
+                            console.log("successful response");
+                            this.setState({
+                                teamsList: json.data
+                            });
+                        }
+                        else {
+                            console.log(json.error);
+                        }
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+                }
+                else {
+                    console.log("no communities were found for this user");
+                }
+            }
+            else {
+                console.log(json.error);
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+        
     }
+
+    
 
     handleFileLoad(data) {
         console.log("file loaded");
@@ -64,12 +105,14 @@ class ImportContacts extends React.Component {
             let lastNamePicker = document.getElementById(this.state.formFields[1]);
             let emailPicker = document.getElementById(this.state.formFields[2]);
             let mess = document.getElementById("message");
+            let teamPicker = document.getElementById("teamPicker");
             const body = {
                 csv: this.state.csv, 
                 first_name_field: firstNamePicker.value,
                 last_name_field: lastNamePicker.value,
                 email_field: emailPicker.value,
-                message: mess.value
+                message: mess.value,
+                team_name: teamPicker.value
             };
             console.log('this is the body of the request');
             console.log(body);
@@ -118,24 +161,6 @@ class ImportContacts extends React.Component {
                                     </select>
                                 </div>);
                             })}
-                            {/*<label for="firstName">Select the column from your spreadsheet that corresponds to First Name:</label>
-                            <select name="firstName" id="firstName">
-                            {this.state.headerFileRow.map((x) => {
-                                return <option value={x}>{x}</option>;
-                            })}
-                            </select>
-                            <label for="lastName">Select the column from your spreadsheet that corresponds to Last Name:</label>
-                            <select name="lastName" id="lastName">
-                            {this.state.headerFileRow.map((x) => {
-                                return <option value={x}>{x}</option>;
-                            })}
-                            </select>
-                            <label for="email">Select the column from your spreadsheet that corresponds to Email:</label>
-                            <select name="email" id="email">
-                            {this.state.headerFileRow.map((x) => {
-                                return <option value={x}>{x}</option>;
-                            })}
-                        </select>*/}
                     </form> :
                     <div>  
                         <p>Nothing to see here! Did you import the right CSV file? Make sure the first row of the CSV is the header row.</p>
@@ -157,7 +182,17 @@ class ImportContacts extends React.Component {
                         type="text"
                         name="message"
                         />
-                    
+                    {this.state.teamsList ? 
+                    <div>
+                        <p>Optional: Assign the new community members to a team.</p>
+                        <select id="teamPicker">
+                            {this.state.teamsList.map((team) => {
+                                return <option value={team}>{team}</option>;
+                            })}
+                            <option value="none">No team selected</option>
+                        </select>
+                    </div> :
+                        <></>}
                     <p style={{color:'red'}} >{this.state.error}</p>
                     <button>
                         <input type="submit"></input>
