@@ -165,6 +165,7 @@ class ImportContacts extends React.Component {
                     <div>  
                         <p>Nothing to see here! Did you import the right CSV file? Make sure the first row of the CSV is the header row.</p>
                     </div>}
+                    <p>Then, make sure to drag and drop the same file into this area.</p>
                     <input
                         id="file"
                         type="file"
