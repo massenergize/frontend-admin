@@ -36,10 +36,11 @@ class ImportContacts extends React.Component {
                     const body = {
                         community_id: communityId
                     }
-                    apiCall("users.listTeamsForCommunityAdmin", body)
+                    apiCall("teams.listForCommunityAdmin", body)
                     .then((json) => {
                         console.log("api call made");
                         if (json.success) {
+                            console.log(json.data);
                             console.log("successful response");
                             this.setState({
                                 teamsList: json.data
@@ -188,7 +189,7 @@ class ImportContacts extends React.Component {
                         <p>Optional: Assign the new community members to a team.</p>
                         <select id="teamPicker">
                             {this.state.teamsList.map((team) => {
-                                return <option value={team}>{team}</option>;
+                                return <option value={team.name}>{team.name}</option>;
                             })}
                             <option value="none">No team selected</option>
                         </select>
