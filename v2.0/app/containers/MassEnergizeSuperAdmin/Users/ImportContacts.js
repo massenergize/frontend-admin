@@ -125,6 +125,15 @@ class ImportContacts extends React.Component {
                     this.setState({
                         error: "CSV file uploaded successfully."
                     });
+                    if (json.data.invalidEmails.length > 0) {
+                        let lines = "Invalid email address on lines ";
+                        for (let i = 0; i < json.data.invalidEmails.length; i++) {
+                            lines += json.data.invalidEmails[i] + ", ";
+                        }
+                        this.setState({
+                            error: "CSV file uploaded successfully. " + lines
+                        });
+                    }
                 }
                 else {
                     this.setState({
