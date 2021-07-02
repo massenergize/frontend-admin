@@ -41,7 +41,6 @@ import CommunityAdminMessages from '../MassEnergizeSuperAdmin/Messages/Community
 import MessageDetails from '../MassEnergizeSuperAdmin/Messages/MessageDetails';
 import TeamAdminMessages from '../MassEnergizeSuperAdmin/Messages/TeamAdminMessages';
 import TeamMembers from '../MassEnergizeSuperAdmin/Teams/TeamMembers';
-//import {ImportContacts} from '../MassEnergizeSuperAdmin/Users/ImportContacts';
 
 
 class Application extends React.Component {

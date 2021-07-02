@@ -217,12 +217,7 @@ module.exports = [
         key: 'all-users', 
         name: 'All Users', 
         link: '/admin/read/users'
-      }, 
-      {
-        key: 'import-contacts', 
-        name: 'Import Contacts', 
-        link: '/admin/importcontacts'
-      },
+      }
     ]
   },
   {

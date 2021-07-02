@@ -5,9 +5,6 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Fab from '@material-ui/core/Fab';
 import Add from '@material-ui/icons/Add';
 import FloatingPanel from 'dan-components/Panel/FloatingPanel';
-import AddContactForm from './AddContactForm';
-import styles from './contact-jss';
-import { AddShoppingCartOutlined, PortraitSharp } from '@material-ui/icons';
 import { apiCall } from '../../../utils/messenger';
 import { isAsyncValidating } from 'redux-form';
 import {readString, CSVReader} from 'react-papaparse';
@@ -16,6 +13,8 @@ import {readString, CSVReader} from 'react-papaparse';
 class ImportContacts extends React.Component {
     constructor(props) {
         super(props);
+        console.log('these are props getting passed in');
+        console.log(this.props);
         this.state = {
             csv: null, 
             error: "", 
@@ -27,48 +26,33 @@ class ImportContacts extends React.Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleFileLoad = this.handleFileLoad.bind(this);
         this.handleSubmission = this.handleSubmission.bind(this);
-
-        apiCall("users.adminCommunity")
-        .then((json) => {
-            if (json.success) {
-                var communityId = json.data.id; 
-                if (communityId) {
-                    const body = {
-                        community_id: communityId
-                    }
-                    apiCall("teams.listForCommunityAdmin", body)
-                    .then((json) => {
-                        console.log("api call made");
-                        if (json.success) {
-                            console.log(json.data);
-                            console.log("successful response");
-                            this.setState({
-                                teamsList: json.data
-                            });
-                        }
-                        else {
-                            console.log(json.error);
-                        }
-                    })
-                    .catch((err) => {
-                        console.log(err);
+        if (this.props.location.communityId) {
+            const body = {
+                community_id: this.props.location.communityId
+            };
+            apiCall("teams.listForCommunityAdmin", body)
+            .then((json) => {
+                console.log("api call made");
+                if (json.success) {
+                    console.log(json.data);
+                    console.log("successful response");
+                    this.setState({
+                        teamsList: json.data
                     });
                 }
                 else {
-                    console.log("no communities were found for this user");
+                    console.log(json.error);
                 }
-            }
-            else {
-                console.log(json.error);
-            }
-        })
-        .catch((err) => {
-            console.log(err);
-        });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+        } else {
+            console.log("no communities were found for this user");
+        }
         
     }
 
-    
 
     handleFileLoad(data) {
         console.log("file loaded");
