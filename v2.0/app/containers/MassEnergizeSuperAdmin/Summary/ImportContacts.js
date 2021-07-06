@@ -13,8 +13,6 @@ import {readString, CSVReader} from 'react-papaparse';
 class ImportContacts extends React.Component {
     constructor(props) {
         super(props);
-        console.log('these are props getting passed in');
-        console.log(this.props);
         this.state = {
             csv: null, 
             error: "", 
@@ -32,10 +30,8 @@ class ImportContacts extends React.Component {
             };
             apiCall("teams.listForCommunityAdmin", body)
             .then((json) => {
-                console.log("api call made");
                 if (json.success) {
                     console.log(json.data);
-                    console.log("successful response");
                     this.setState({
                         teamsList: json.data
                     });
@@ -53,14 +49,10 @@ class ImportContacts extends React.Component {
         
     }
 
-
     handleFileLoad(data) {
-        console.log("file loaded");
-        console.log(data);
         this.setState({
             headerFileRow: data[0].data
         });
-        console.log(this.state.headerFileRow);
         
     }
 
@@ -99,13 +91,9 @@ class ImportContacts extends React.Component {
                 message: mess.value,
                 team_name: teamPicker.value
             };
-            console.log('this is the body of the request');
-            console.log(body);
             apiCall("users.import", body)
             .then((json) => {
-                console.log("api call made");
                 if (json.success) {
-                    console.log("from the frontend, it looks like the api for contact import pinged successfully!");
                     this.setState({
                         error: "CSV file uploaded successfully."
                     });
