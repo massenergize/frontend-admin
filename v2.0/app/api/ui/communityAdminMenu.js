@@ -175,6 +175,17 @@ module.exports = [
     key: 'users',
     name: 'Users',
     icon: 'ios-people',
-    link: '/admin/read/users'
+    child: [
+      {
+        key: 'about-users',
+        name: 'Users',
+        title: true
+      },
+      {
+        key: 'all-users', 
+        name: 'All Users', 
+        link: '/admin/read/users'
+      }
+    ]
   },
 ];
