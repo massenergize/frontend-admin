@@ -157,10 +157,88 @@ class CreateNewEventForm extends Component {
               readOnly: false
             },
             {
+              name: 'is_recurring', 
+              label: 'Make this a recurring event', 
+              fieldType: 'Radio', 
+              isRequired: true,
+              defaultValue: 'false', 
+              dbName: 'is_recurring', 
+              readOnly: false, 
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+              child: {
+                dbName: 'recurring_details',
+                valueToCheck: 'true', 
+                fields: [
+                  {
+                    name: 'separation_count', 
+                    label: 'Repeat every', 
+                    fieldType: 'Dropdown', 
+                    dbName: 'separation_count',
+                    contentType: 'number',
+                    defaultValue: 1,
+                    data: [
+                      { id: 1, displayName: '1'},
+                      { id: '', displayName: '2'},
+                      { id: '', displayName: '3'},
+                      { id: '', displayName: '4'},
+                      { id: '', displayName: '5'},
+                      { id: '', displayName: '6'}
+                    ]
+                  },
+                  {
+                    name: 'recurring_type', 
+                    label: '', 
+                    fieldType: 'Radio', 
+                    dbName: 'recurring_type',
+                    defaultValue: null, 
+                    //do we need a dbName here?
+                    data: [
+                      { id: 'week', value: 'weeks'}, 
+                      { id: 'month', value: 'months'}
+                    ]
+                  }, 
+                  {
+                    name: 'day_of_week', 
+                    label: 'If you selected "week", choose the day of the week on which you want the event to repeat.', 
+                    fieldType: 'Dropdown', 
+                    dbName: 'day_of_week', 
+                    defaultValue: '', 
+                    //do we need a dbName here?
+                    data: [
+                      { id: 'Monday', displayName: 'Monday'}, 
+                      { id: 'Tuesday', displayName: 'Tuesday'},
+                      { id: 'Wednesday', displayName: 'Wednesday'}, 
+                      { id: 'Thursday', displayName: 'Thursday'}, 
+                      { id: 'Friday', displayName: 'Friday'}, 
+                      { id: 'Saturday', displayName: 'Saturday'}, 
+                      { id: 'Sunday', displayName: 'Sunday'}, 
+                    ]
+                  }, 
+                  {
+                    name: 'month_of_year', 
+                    label: 'If you selected "month", choose the week of the month on which you want the event to repeat.', 
+                    fieldType: 'Dropdown',
+                    dbName: 'month_of_year',  
+                    defaultValue: '', 
+                    //do we need a dbName here?
+                    data: [
+                      { id: 'first', displayName: '1'}, 
+                      { id: 'second', displayName: '2'},
+                      { id: 'third', displayName: '3'}, 
+                      { id: 'fourth', displayName: '4'}
+                    ]
+                  }, 
+                ]
+              }
+            },
+            {
               name: 'is_global',
               label: 'Is this Event a Template?',
               fieldType: 'Radio',
-              isRequired: false,
+              isRequired: true,
               defaultValue: 'false',
               dbName: 'is_global',
               readOnly: false,
@@ -309,7 +387,9 @@ class CreateNewEventForm extends Component {
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
-        />
+        >
+          
+        </MassEnergizeForm>
       </div>
     );
   }
