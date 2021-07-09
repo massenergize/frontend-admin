@@ -176,6 +176,7 @@ class CreateNewEventForm extends Component {
                     name: 'separation_count', 
                     label: 'Repeat every', 
                     fieldType: 'Dropdown', 
+                    isRequired: true,
                     dbName: 'separation_count',
                     contentType: 'number',
                     defaultValue: 1,
@@ -202,8 +203,9 @@ class CreateNewEventForm extends Component {
                   }, 
                   {
                     name: 'day_of_week', 
-                    label: 'If you selected "week", choose the day of the week on which you want the event to repeat.', 
+                    label: 'Choose the day of the week on which you want the event to repeat.', 
                     fieldType: 'Dropdown', 
+                    isRequired: true,
                     dbName: 'day_of_week', 
                     defaultValue: '', 
                     //do we need a dbName here?
@@ -218,17 +220,17 @@ class CreateNewEventForm extends Component {
                     ]
                   }, 
                   {
-                    name: 'month_of_year', 
+                    name: 'week_of_month', 
                     label: 'If you selected "month", choose the week of the month on which you want the event to repeat.', 
                     fieldType: 'Dropdown',
-                    dbName: 'month_of_year',  
+                    dbName: 'week_of_month',  
                     defaultValue: '', 
                     //do we need a dbName here?
                     data: [
-                      { id: 'first', displayName: '1'}, 
-                      { id: 'second', displayName: '2'},
-                      { id: 'third', displayName: '3'}, 
-                      { id: 'fourth', displayName: '4'}
+                      { id: 'first', displayName: 'first'}, 
+                      { id: 'second', displayName: 'second'},
+                      { id: 'third', displayName: 'third'}, 
+                      { id: 'fourth', displayName: 'fourth'}
                     ]
                   }, 
                 ]
