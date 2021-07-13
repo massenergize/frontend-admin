@@ -182,11 +182,11 @@ class CreateNewEventForm extends Component {
                     defaultValue: 1,
                     data: [
                       { id: 1, displayName: '1'},
-                      { id: '', displayName: '2'},
-                      { id: '', displayName: '3'},
-                      { id: '', displayName: '4'},
-                      { id: '', displayName: '5'},
-                      { id: '', displayName: '6'}
+                      { id: 2, displayName: '2'},
+                      { id: 3, displayName: '3'},
+                      { id: 4, displayName: '4'},
+                      { id: 5, displayName: '5'},
+                      { id: 6, displayName: '6'}
                     ]
                   },
                   {

@@ -188,10 +188,10 @@ class CreateNewEventForm extends Component {
             },
             {
               name: 'is_recurring', 
-              label: 'Make this a recurring event', 
+              label: 'Make this a recurring event (if this is a rescheduled instance of a previous recurring event, you cannot make this recurring)', 
               fieldType: 'Radio', 
               isRequired: true,
-              defaultValue: 'false', 
+              defaultValue: event.is_recurring, 
               dbName: 'is_recurring', 
               readOnly: false, 
               data: [
@@ -203,13 +203,63 @@ class CreateNewEventForm extends Component {
                 valueToCheck: 'true', 
                 fields: [
                   {
+                    name: 'upcoming_is_cancelled',
+                    label: 'The event is recurring. Do you want to cancel the next instance of the event? (If you would like to reschedule this instance, cancel this instance and copy the event into another event on your desired rescheduled date.)',
+                    fieldType: 'Radio', 
+                    isRequired: false,
+                    defaultValue: 'false', 
+                    dbName: 'upcoming_is_cancelled', 
+                    readOnly: false, 
+                    data: [
+                      { id: 'false', value: 'No' },
+                      { id: 'true', value: 'Yes' }
+                    ]
+                  },
+                  {
+                    name: 'upcoming_is_rescheduled', 
+                    label: 'Do you want to reschedule the next instance of the event?', 
+                    fieldType: 'Radio', 
+                    isRequired: false, 
+                    defaultValue: 'false',
+                    dbName: 'upcoming_is_rescheduled', 
+                    readOnly: false, 
+                    data: [
+                      { id: 'false', value: 'No'}, 
+                      { id: 'true', value: 'Yes'}
+                    ], 
+                    child: {
+                      dbName: "rescheduled_details",
+                      valueToCheck: 'true',
+                      fields: [
+                        {
+                          name: 'rescheduled_start_datetime', 
+                          dbName: 'rescheduled_start_datetime', 
+                          label: 'Date and time you want your rescheduled event to take place (must occur before the next instance of the event; e.g., if your event is scheduled for every Friday, you cannot reschedule this Friday to next Saturday.',
+                          fieldType: 'DateTime', 
+                          contentType: 'text', 
+                          isRequired: true, 
+                          defaultValue: event.start_date_and_time
+                        },
+                        {
+                          name: 'rescheduled_end_datetime', 
+                          dbName: 'rescheduled_end_datetime', 
+                          label: 'Date and time you want your rescheduled event to end',
+                          fieldType: 'DateTime', 
+                          contentType: 'text', 
+                          isRequired: true, 
+                          defaultValue: event.end_date_and_time
+                        }
+                      ]
+                    }
+                  },
+                  {
                     name: 'separation_count', 
                     label: 'Repeat every', 
                     fieldType: 'Dropdown', 
                     isRequired: true,
                     dbName: 'separation_count',
                     contentType: 'number',
-                    defaultValue: 1,
+                    defaultValue: event.recurring_details.separation_count,
                     data: [
                       { id: 1, displayName: '1'},
                       { id: 2, displayName: '2'},
@@ -224,7 +274,7 @@ class CreateNewEventForm extends Component {
                     label: '', 
                     fieldType: 'Radio', 
                     dbName: 'recurring_type',
-                    defaultValue: null, 
+                    defaultValue: event.recurring_details.recurring_type,
                     //do we need a dbName here?
                     data: [
                       { id: 'week', value: 'weeks'}, 
@@ -237,7 +287,7 @@ class CreateNewEventForm extends Component {
                     fieldType: 'Dropdown', 
                     isRequired: true,
                     dbName: 'day_of_week', 
-                    defaultValue: '', 
+                    defaultValue: event.recurring_details.day_of_week, 
                     //do we need a dbName here?
                     data: [
                       { id: 'Monday', displayName: 'Monday'}, 
@@ -251,10 +301,10 @@ class CreateNewEventForm extends Component {
                   }, 
                   {
                     name: 'week_of_month', 
-                    label: 'If you selected "month", choose the week of the month on which you want the event to repeat.', 
+                    label: 'ONLY if you selected "month", choose the week of the month on which you want the event to repeat.', 
                     fieldType: 'Dropdown',
                     dbName: 'week_of_month',  
-                    defaultValue: '', 
+                    defaultValue: event.recurring_details.day_of_month, 
                     //do we need a dbName here?
                     data: [
                       { id: 'first', displayName: 'first'}, 
