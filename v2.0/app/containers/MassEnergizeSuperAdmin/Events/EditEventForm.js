@@ -191,7 +191,7 @@ class CreateNewEventForm extends Component {
               label: 'Make this a recurring event (if this is a rescheduled instance of a previous recurring event, you cannot make this recurring)', 
               fieldType: 'Radio', 
               isRequired: true,
-              defaultValue: event.is_recurring, 
+              defaultValue: event.is_recurring ? 'true' : 'false', 
               dbName: 'is_recurring', 
               readOnly: false, 
               data: [
@@ -207,14 +207,15 @@ class CreateNewEventForm extends Component {
                     label: 'The event is recurring. Do you want to cancel the next instance of the event? (If you would like to reschedule this instance, cancel this instance and copy the event into another event on your desired rescheduled date.)',
                     fieldType: 'Radio', 
                     isRequired: false,
-                    defaultValue: 'false', 
+                    defaultValue: event.recurring_details.is_cancelled ? 'true' : 'false',
                     dbName: 'upcoming_is_cancelled', 
                     readOnly: false, 
                     data: [
                       { id: 'false', value: 'No' },
                       { id: 'true', value: 'Yes' }
-                    ]
+                    ],
                   },
+
                   {
                     name: 'upcoming_is_rescheduled', 
                     label: 'Do you want to reschedule the next instance of the event?', 
