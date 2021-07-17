@@ -291,7 +291,6 @@ class CreateNewEventForm extends Component {
                     dbName: 'recurring_type',
                     isRequired: true,
                     defaultValue: event.recurring_details.recurring_type,
-                    //do we need a dbName here?
                     data: [
                       { id: 'week', value: 'weeks'}, 
                       { id: 'month', value: 'months'}
@@ -304,7 +303,6 @@ class CreateNewEventForm extends Component {
                     isRequired: true,
                     dbName: 'day_of_week', 
                     defaultValue: event.recurring_details.day_of_week, 
-                    //do we need a dbName here?
                     data: [
                       { id: 'Monday', displayName: 'Monday'}, 
                       { id: 'Tuesday', displayName: 'Tuesday'},
@@ -322,7 +320,6 @@ class CreateNewEventForm extends Component {
                     isRequired: true,
                     dbName: 'week_of_month',  
                     defaultValue: event.recurring_details.week_of_month, 
-                    //do we need a dbName here?
                     data: [
                       { id: 'first', displayName: 'first'}, 
                       { id: 'second', displayName: 'second'},

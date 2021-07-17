@@ -195,7 +195,6 @@ class CreateNewEventForm extends Component {
                     fieldType: 'Radio', 
                     dbName: 'recurring_type',
                     defaultValue: null, 
-                    //do we need a dbName here?
                     data: [
                       { id: 'week', value: 'weeks'}, 
                       { id: 'month', value: 'months'}
@@ -208,7 +207,6 @@ class CreateNewEventForm extends Component {
                     isRequired: true,
                     dbName: 'day_of_week', 
                     defaultValue: '', 
-                    //do we need a dbName here?
                     data: [
                       { id: 'Monday', displayName: 'Monday'}, 
                       { id: 'Tuesday', displayName: 'Tuesday'},
@@ -225,7 +223,6 @@ class CreateNewEventForm extends Component {
                     fieldType: 'Dropdown',
                     dbName: 'week_of_month',  
                     defaultValue: '', 
-                    //do we need a dbName here?
                     data: [
                       { id: 'first', displayName: 'first'}, 
                       { id: 'second', displayName: 'second'},
