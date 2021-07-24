@@ -168,6 +168,7 @@ class AllEvents extends React.Component {
     const { columns, loading } = this.state;
     const { classes } = this.props;
     const data = this.fashionData(this.props.allEvents);
+    console.log('events data', data);
     const options = {
       filterType: 'dropdown',
       responsive: 'stacked',
