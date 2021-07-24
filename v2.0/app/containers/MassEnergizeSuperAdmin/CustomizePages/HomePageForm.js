@@ -55,9 +55,7 @@ class HomePageEditForm extends Component {
 
 
     const eventsResponse = await apiCall('/events.list', { community_id: id });
-    console.log('EVENTS RESPONSE FROM HOME PAGE', eventsResponse);
     if (eventsResponse && eventsResponse.data) {
-      console.log('EVENTS RESPONSE FROM HOME PAGE', eventsResponse);
       const events = eventsResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
       await this.setStateAsync({ events });
     } else {

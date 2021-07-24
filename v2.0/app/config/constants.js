@@ -10,7 +10,6 @@ const APP_NAME = 'MassEnergize Administration';
 //  ---- setting  API routes
 let API_HOST = 'https://api.massenergize.org';
 if (IS_LOCAL) {
-  console.log("this is local");
   API_HOST = 'http://localhost:8000';
 } else if (IS_PROD) {
   API_HOST = 'https://api.massenergize.org';
@@ -35,7 +34,6 @@ if (IS_PROD || IS_CANARY) {
     measurementId: 'G-4FPTY0R9S6'
   };
 } else {
-  console.log("this is local");
   FIREBASE_CONFIG = {
     apiKey: 'AIzaSyBjcwjC_0H1bgGKqPyqKnbWaGmAtzc4BJQ',
     authDomain: 'massenergize-auth.firebaseapp.com',
