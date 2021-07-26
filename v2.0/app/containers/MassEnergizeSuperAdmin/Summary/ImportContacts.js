@@ -20,7 +20,6 @@ class ImportContacts extends React.Component {
             formFields: ['First_Name', 'Last_Name', 'Email'], 
             teamsList: null
         };
-        //const myRef = React.createRef();
         this.handleChange = this.handleChange.bind(this);
         this.handleFileLoad = this.handleFileLoad.bind(this);
         this.handleSubmission = this.handleSubmission.bind(this);
@@ -28,6 +27,7 @@ class ImportContacts extends React.Component {
             const body = {
                 community_id: this.props.location.communityId
             };
+            console.log('bodyodyodyody')
             apiCall("teams.listForCommunityAdmin", body)
             .then((json) => {
                 if (json.success) {
@@ -89,8 +89,10 @@ class ImportContacts extends React.Component {
                 last_name_field: lastNamePicker.value,
                 email_field: emailPicker.value,
                 message: mess.value,
-                team_name: teamPicker.value
+                team_name: teamPicker.value, 
+                community_id: this.props.location.communityId
             };
+            console.log('REQUEST BODY', body);
             apiCall("users.import", body)
             .then((json) => {
                 if (json.success) {
