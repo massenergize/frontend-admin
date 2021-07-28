@@ -289,6 +289,9 @@ class MassEnergizeForm extends Component {
     return "Please select an option";
   };
 
+  resetFileField(fieldName) {
+    this.updateForm(fieldName, "None");
+  }
   /**
    * This is a recursive function traversing all the fields and their children
    * and extracting their values from the form
@@ -299,7 +302,7 @@ class MassEnergizeForm extends Component {
     let hasMediaFiles = false;
     fields.forEach((field) => {
       const fieldValueInForm = formData[field.name];
-      if (fieldValueInForm || fieldValueInForm==='') {
+      if (fieldValueInForm || fieldValueInForm === "") {
         switch (field.fieldType) {
           case FieldTypes.HTMLField:
             // cleanedValues[field.dbName] = stateToHTML(
@@ -324,6 +327,11 @@ class MassEnergizeForm extends Component {
             break;
           case FieldTypes.File:
             hasMediaFiles = true;
+            if (fieldValueInForm === "None") {
+              // When we want to reset the value of an image field
+              cleanedValues[field.dbName] = fieldValueInForm;
+              break;
+            }
             if (field.filesLimit === 1 && fieldValueInForm.length > 0) {
               const [file] = fieldValueInForm;
               cleanedValues[field.dbName] = file;
@@ -336,7 +344,7 @@ class MassEnergizeForm extends Component {
         }
       }
       // field.conditional displays is just a way to display form items based on a selected
-      //radio buttons. Similar to the `field.child` but allows more options
+      //radio button. Similar to the `field.child` but allows more options
 
       if (field.conditionalDisplays && field.conditionalDisplays.length) {
         var selectedSet = field.conditionalDisplays.filter(
@@ -447,6 +455,7 @@ class MassEnergizeForm extends Component {
   };
 
   async updateForm(fieldName, value) {
+    console.log("I am right about here", fieldName, value);
     const { formData } = this.state;
     await this.setStateAsync({
       formData: {
@@ -558,9 +567,18 @@ class MassEnergizeForm extends Component {
           </div>
         );
       case FieldTypes.File:
+        let value = this.getValue(field.name, []);
+        let files = files && files !== "None" ? files : [];
         return (
           <div key={field.name}>
-            {field.previewLink && (
+            {value === "None" && (
+              <p style={{ color: "maroon" }}>
+                <i>
+                  Image will be completely removed after you submit your changes
+                </i>
+              </p>
+            )}
+            {field.previewLink && value !== "None" && (
               <div>
                 <h6>Current Image:</h6>
                 <img
@@ -569,6 +587,22 @@ class MassEnergizeForm extends Component {
                   alt={field.label}
                 />
                 <br />
+
+                {field.allowReset && (
+                  <>
+                    <a
+                      href="#void"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        this.resetFileField(field.name);
+                      }}
+                    >
+                      Remove Image
+                    </a>
+                    <br />
+                  </>
+                )}
+
                 <br />
               </div>
             )}
@@ -601,8 +635,8 @@ class MassEnergizeForm extends Component {
                   )}
                 </li>
                 {field.extraInstructions &&
-                  field.extraInstructions.map((instruction) => (
-                    <li>{instruction}</li>
+                  field.extraInstructions.map((instruction, key) => (
+                    <li key={key.toString()}>{instruction}</li>
                   ))}
               </ul>
             </div>
@@ -616,7 +650,7 @@ class MassEnergizeForm extends Component {
                   "image/bmp",
                   "image/svg",
                 ]}
-                files={this.getValue(field.name, [])}
+                files={files}
                 showPreviews
                 maxSize={5000000}
                 imageAspectRatio={
@@ -831,8 +865,8 @@ class MassEnergizeForm extends Component {
    * by making use of a helper function
    */
   renderFields = (fields) =>
-    fields.map((field) => (
-      <div>
+    fields.map((field, key) => (
+      <div key={`${field.name}-${key.toString()}`}>
         {this.renderModalText(field)}
         {this.renderField(field)}
       </div>
