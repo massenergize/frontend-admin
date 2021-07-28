@@ -84,22 +84,23 @@ class ContactUsPageEditForm extends Component {
           placeholder: 'Contact the community administrator',
           fieldType: 'TextField',
           contentType: 'text',
-          isRequired: true,
+          isRequired: false,
           defaultValue: `${contactUsPageData.title}`,
           dbName: 'title',
           readOnly: false
         },
-        {
-          name: 'sub-title',
-          label: 'Optional sub-title',
-          placeholder: 'They will get back to you shortly.',
-          fieldType: 'TextField',
-          contentType: 'text',
-          isRequired: false,
-          defaultValue: `${contactUsPageData.sub_title}`,
-          dbName: 'sub_title',
-          readOnly: false
-        },
+        //  -- not needed currently -- may change later
+        //{
+        //  name: 'sub-title',
+        //  label: 'Optional sub-title',
+        //  placeholder: 'They will get back to you shortly.',
+        //  fieldType: 'TextField',
+        //  contentType: 'text',
+        //  isRequired: false,
+        //  defaultValue: `${contactUsPageData.sub_title}`,
+        //  dbName: 'sub_title',
+        //  readOnly: false
+        //},
         {
           name: 'description',
           label: 'Paragraph to be displayed below the title',

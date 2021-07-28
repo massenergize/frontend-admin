@@ -82,12 +82,21 @@ class AboutUsPageEditForm extends Component {
           readOnly: true,
         },
         {
+<<<<<<< HEAD
           name: "title",
           label: "Main Title",
           placeholder: "eg. Welcome to Wayland!",
           fieldType: "TextField",
           contentType: "text",
           isRequired: true,
+=======
+          name: 'title',
+          label: 'Main Title',
+          placeholder: 'eg. Welcome to Wayland!',
+          fieldType: 'TextField',
+          contentType: 'text',
+          isRequired: false,
+>>>>>>> b2eb2d8019dfd822b4a7607dd7fda74aa5734b38
           defaultValue: `${aboutUsPageData.title}`,
           dbName: "title",
           readOnly: false,

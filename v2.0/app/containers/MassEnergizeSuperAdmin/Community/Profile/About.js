@@ -24,7 +24,7 @@ import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import IconButton from '@material-ui/core/IconButton';
 import InfoIcon from '@material-ui/icons/Info';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import Check from '@material-ui/icons/Check';
 import AcUnit from '@material-ui/icons/AcUnit';
 import Adb from '@material-ui/icons/Adb';
@@ -41,6 +41,7 @@ import MySnackbarContentWrapper from '../../../../components/SnackBar/SnackbarCo
 import { apiCallFile } from '../../../../utils/messenger';
 import { downloadFile } from '../../../../utils/common';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import ImportContacts from '../../Summary/ImportContacts.js';
 
 
 class About extends React.Component {
@@ -48,12 +49,14 @@ class About extends React.Component {
     super(props);
     this.state = {
       error: null,
-      loadingCSVs: []
+      loadingCSVs: [], 
+      wantImport: false
     };
   }
 
 
   async getCSV(endpoint) {
+    console.log(this.props);
     const { community } = this.props;
     if (!community) {
       return;
@@ -75,6 +78,8 @@ class About extends React.Component {
   }
 
   getTags = tags => (tags.map(t => (t.name))).join(', ');
+
+  
 
   getGoalPercentage() {
     const community = this.props.community ? this.props.community : 0;
@@ -131,6 +136,9 @@ class About extends React.Component {
     return 0;
   }
 
+  async importContacts() {
+    return <Redirect exact to="/admin/importcontacts"></Redirect>;
+  }
   render() {
     const { classes, community } = this.props;
     const goalsEditLink = `/admin/edit/${community ? community.id : null}/goal`;
@@ -138,8 +146,11 @@ class About extends React.Component {
     const addRemoveCommuntyAdminLink = `/admin/edit/${community ? community.id : null}/community-admins`;
 
     const { error, loadingCSVs } = this.state;
-
+    if (this.state.wantImport) {
+      return <Redirect exact to="/admin/importcontacts"></Redirect>;
+    }
     return (
+  
       <>
 
         {error
@@ -364,7 +375,20 @@ class About extends React.Component {
               </Typography>
             </Paper>
           </Grid>
+          <Grid item xs={4}>
+            <Paper className={`${classes.pageCard}`} elevation={1}>
+              <Link to={{pathname: "/admin/importcontacts", communityId: community.id}}>
+                <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                  Invite Users Through CSV Upload
+                      {' '}
+                  <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_upward</Icon>
+                  {loadingCSVs.includes('users') && <CircularProgress size={20} thickness={2} color="secondary" />}
+                </Typography>
+              </Link>
+            </Paper>
+          </Grid>
         </Grid>
+        
       </>
     );
   }

@@ -84,7 +84,7 @@ class EventsPageEditForm extends Component {
           placeholder: 'eg. All Events and Campaigns',
           fieldType: 'TextField',
           contentType: 'text',
-          isRequired: true,
+          isRequired: false,
           defaultValue: `${pageData.title}`,
           dbName: 'title',
           readOnly: false
