@@ -221,4 +221,7 @@ export const Parent = loadable(() => import('./Parent'), {
 });
 export const UsersList = loadable(() => import('./MassEnergizeSuperAdmin/Users/AllUsers'), {
   fallback: <Loading />,
+}); 
+export const ImportContacts = loadable(() => import('./MassEnergizeSuperAdmin/Summary/ImportContacts'), {
+  fallback: <Loading />,
 });
