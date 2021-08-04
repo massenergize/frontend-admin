@@ -60,8 +60,8 @@ class AboutUsPageEditForm extends Component {
   createFormJson = async () => {
     const { aboutUsPageData } = this.state;
     const { community } = aboutUsPageData;
-    const image =
-      aboutUsPageData && aboutUsPageData.image && aboutUsPageData.image.url;
+    const image = aboutUsPageData && aboutUsPageData.images && aboutUsPageData.images[0].url;
+    //  aboutUsPageData && aboutUsPageData.image && aboutUsPageData.image.url;
     const formJson = {
       title: `Edit ${
         community ? community.name + "'s" : "Community's"
@@ -84,7 +84,7 @@ class AboutUsPageEditForm extends Component {
         {
           name: "title",
           label: "Main Title",
-          placeholder: "eg. Welcome to Wayland!",
+          placeholder: "eg. About our community",
           fieldType: "TextField",
           contentType: "text",
           isRequired: true,
@@ -95,7 +95,7 @@ class AboutUsPageEditForm extends Component {
         {
           name: "sub-title",
           label: "Optional Sub-title",
-          placeholder: "eg. Welcome to Wayland!",
+          placeholder: "",
           fieldType: "TextField",
           contentType: "text",
           isRequired: false,
