@@ -1,13 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import Tooltip from '@material-ui/core/Tooltip';
-import Fab from '@material-ui/core/Fab';
-import Add from '@material-ui/icons/Add';
-import FloatingPanel from 'dan-components/Panel/FloatingPanel';
 import { apiCall } from '../../../utils/messenger';
-import { isAsyncValidating } from 'redux-form';
-import {readString, CSVReader} from 'react-papaparse';
+import {CSVReader} from 'react-papaparse';
 
 
 class ImportContacts extends React.Component {
@@ -20,7 +13,6 @@ class ImportContacts extends React.Component {
             formFields: ['First_Name', 'Last_Name', 'Email'], 
             teamsList: null
         };
-        //const myRef = React.createRef();
         this.handleChange = this.handleChange.bind(this);
         this.handleFileLoad = this.handleFileLoad.bind(this);
         this.handleSubmission = this.handleSubmission.bind(this);
@@ -28,7 +20,9 @@ class ImportContacts extends React.Component {
             const body = {
                 community_id: this.props.location.communityId
             };
-            apiCall("teams.listForCommunityAdmin", body)
+
+            // only list teams in the community
+            apiCall("teams.list", body)
             .then((json) => {
                 if (json.success) {
                     console.log(json.data);
@@ -89,8 +83,10 @@ class ImportContacts extends React.Component {
                 last_name_field: lastNamePicker.value,
                 email_field: emailPicker.value,
                 message: mess.value,
-                team_name: teamPicker.value
+                team_name: teamPicker.value, 
+                community_id: this.props.location.communityId
             };
+
             apiCall("users.import", body)
             .then((json) => {
                 if (json.success) {
@@ -125,9 +121,9 @@ class ImportContacts extends React.Component {
     render() {
         return(
             <div>
-                <p>Import new contact here by attaching a CSV file.</p>
+                <h1>Import new contact here by uploading a CSV file.</h1>
                 <form onSubmit={this.handleSubmission}>                    
-                    <p>First, make sure to drag and drop a file to the dotted area. </p>
+                    <p>First, click the dotted area to select a file to check the format. </p>
                     <CSVReader
                         onFileLoad={this.handleFileLoad}>
                     </CSVReader>
@@ -135,7 +131,7 @@ class ImportContacts extends React.Component {
                     <form>
                         {this.state.formFields.map((item) => {
                             return (<div>
-                                    <label for={item}>Select the column from your spreadsheet that corresponds to the required field {item}:</label>
+                                    <label for={item}>Select the column from your spreadsheet that corresponds to the required field: {item}:</label>
                                     <select name={item} id={item}>
                                     {this.state.headerFileRow.map((x) => {
                                         return <option value={x}>{x}</option>;
@@ -147,7 +143,7 @@ class ImportContacts extends React.Component {
                     <div>  
                         <p>Nothing to see here! Did you import the right CSV file? Make sure the first row of the CSV is the header row.</p>
                     </div>}
-                    <p>Then, make sure to drag and drop the same file into this area.</p>
+                    <p>Next, select the same file as before to upload it.</p>
                     <input
                         id="file"
                         type="file"
@@ -164,15 +160,17 @@ class ImportContacts extends React.Component {
                         id="message"
                         type="text"
                         name="message"
+                        style={{ width:"100%"}}
                         />
                     {this.state.teamsList ? 
                     <div>
+                        <br />
                         <p>Optional: Assign the new community members to a team.</p>
                         <select id="teamPicker">
+                            <option value="none">No team selected</option>
                             {this.state.teamsList.map((team) => {
                                 return <option value={team.name}>{team.name}</option>;
                             })}
-                            <option value="none">No team selected</option>
                         </select>
                     </div> :
                         <></>}
