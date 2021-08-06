@@ -20,7 +20,7 @@ class ImportContacts extends React.Component {
             const body = {
                 community_id: this.props.location.communityId
             };
-            console.log('bodyodyodyody')
+
             // only list teams in the community
             apiCall("teams.list", body)
             .then((json) => {
