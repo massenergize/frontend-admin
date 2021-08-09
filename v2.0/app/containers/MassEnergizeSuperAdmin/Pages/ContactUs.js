@@ -84,7 +84,7 @@ class ContactUsPageEditForm extends Component {
           placeholder: 'Contact the community administrator',
           fieldType: 'TextField',
           contentType: 'text',
-          isRequired: true,
+          isRequired: false,
           defaultValue: `${contactUsPageData.title}`,
           dbName: 'title',
           readOnly: false

@@ -84,7 +84,7 @@ class DonatePageEditForm extends Component {
           placeholder: 'eg. Help us reach our goal!',
           fieldType: 'TextField',
           contentType: 'text',
-          isRequired: true,
+          isRequired: false,
           defaultValue: `${donatePageData.title}`,
           dbName: 'title',
           readOnly: false

@@ -35,7 +35,8 @@ class CreateNewEventForm extends Component {
     super(props);
     this.state = {
       communities: [],
-      formJson: null
+      formJson: null, 
+      rescheduledEvent: null
     };
   }
 
@@ -47,6 +48,21 @@ class CreateNewEventForm extends Component {
       return;
     }
     const event = eventResponse.data;
+    apiCall('events.exceptions.list', {'event_id': event.id })
+    .then((json) => {
+      if (json.success) {
+        console.log(json);
+        this.setState({
+          rescheduledEvent: json.data[0]
+        });
+      } else {
+        console.log(json.error);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+    console.log("STATE RESCHEDULED", this.state.rescheduledEvent);
     const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
 
@@ -55,7 +71,7 @@ class CreateNewEventForm extends Component {
       await this.setStateAsync({ communities });
     }
 
-    const formJson = await this.createFormJson(event);
+    const formJson = await this.createFormJson(event, this.state.rescheduledEvent);
     if (tagCollectionsResponse && tagCollectionsResponse.data) {
       const section = {
         label: 'Please select tag(s) that apply to this event',
@@ -105,11 +121,11 @@ class CreateNewEventForm extends Component {
     });
   }
 
-  createFormJson = async (event) => {
+  createFormJson = async (event, rescheduledEvent) => {
     const { communities } = this.state;
     const statuses = ['Draft', 'Live', 'Archived']
+    
     // const { pathname } = window.location;
-
     const formJson = {
       title: 'Edit Event or Campaign',
       subTitle: '',
@@ -185,6 +201,134 @@ class CreateNewEventForm extends Component {
               defaultValue: event.end_date_and_time,
               dbName: 'end_date_and_time',
               readOnly: false
+            },
+            {
+              name: 'is_recurring', 
+              label: 'Make this a recurring event (if this is a rescheduled instance of a previous recurring event, you cannot make this recurring)', 
+              fieldType: 'Radio', 
+              isRequired: true,
+              defaultValue: event.is_recurring ? 'true' : 'false', 
+              dbName: 'is_recurring', 
+              readOnly: false, 
+              data: [
+                { id: 'false', value: 'No' },
+                { id: 'true', value: 'Yes' }
+              ],
+              child: {
+                dbName: 'recurring_details',
+                valueToCheck: 'true', 
+                fields: [
+                  {
+                    name: 'upcoming_is_cancelled',
+                    label: 'The event is recurring. Do you want to cancel the next instance of the event?',
+                    fieldType: 'Radio', 
+                    isRequired: false,
+                    defaultValue: event.recurring_details.is_cancelled ? 'true' : 'false',
+                    dbName: 'upcoming_is_cancelled', 
+                    readOnly: false, 
+                    data: [
+                      { id: 'false', value: 'No' },
+                      { id: 'true', value: 'Yes' }
+                    ],
+                  },
+
+                  {
+                    name: 'upcoming_is_rescheduled', 
+                    label: 'Do you want to reschedule the next instance of the event?', 
+                    fieldType: 'Radio', 
+                    isRequired: false, 
+                    defaultValue: rescheduledEvent ? 'true' : 'false',
+                    dbName: 'upcoming_is_rescheduled', 
+                    readOnly: false, 
+                    data: [
+                      { id: 'false', value: 'No'}, 
+                      { id: 'true', value: 'Yes'}
+                    ], 
+                    child: {
+                      dbName: "rescheduled_details",
+                      valueToCheck: 'true',
+                      fields: [
+                        {
+                          name: 'rescheduled_start_datetime', 
+                          dbName: 'rescheduled_start_datetime', 
+                          label: 'Date and time you want your rescheduled event to take place (must occur before the next instance of the event; e.g., if your event is scheduled for every Friday, you cannot reschedule this Friday to next Saturday.',
+                          fieldType: 'DateTime', 
+                          contentType: 'text', 
+                          isRequired: true
+                        },
+                        {
+                          name: 'rescheduled_end_datetime', 
+                          dbName: 'rescheduled_end_datetime', 
+                          label: 'Date and time you want your rescheduled event to end',
+                          fieldType: 'DateTime', 
+                          contentType: 'text', 
+                          isRequired: true
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    name: 'separation_count', 
+                    label: 'Repeat every', 
+                    fieldType: 'Dropdown', 
+                    isRequired: true,
+                    dbName: 'separation_count',
+                    contentType: 'number',
+                    defaultValue: event.recurring_details.separation_count,
+                    data: [
+                      { id: 1, displayName: '1'},
+                      { id: 2, displayName: '2'},
+                      { id: 3, displayName: '3'},
+                      { id: 4, displayName: '4'},
+                      { id: 5, displayName: '5'},
+                      { id: 6, displayName: '6'}
+                    ]
+                  },
+                  {
+                    name: 'recurring_type', 
+                    label: '', 
+                    fieldType: 'Radio', 
+                    dbName: 'recurring_type',
+                    isRequired: true,
+                    defaultValue: event.recurring_details.recurring_type,
+                    data: [
+                      { id: 'week', value: 'weeks'}, 
+                      { id: 'month', value: 'months'}
+                    ]
+                  }, 
+                  {
+                    name: 'day_of_week', 
+                    label: 'Choose the day of the week on which you want the event to repeat.', 
+                    fieldType: 'Dropdown', 
+                    isRequired: true,
+                    dbName: 'day_of_week', 
+                    defaultValue: event.recurring_details.day_of_week, 
+                    data: [
+                      { id: 'Monday', displayName: 'Monday'}, 
+                      { id: 'Tuesday', displayName: 'Tuesday'},
+                      { id: 'Wednesday', displayName: 'Wednesday'}, 
+                      { id: 'Thursday', displayName: 'Thursday'}, 
+                      { id: 'Friday', displayName: 'Friday'}, 
+                      { id: 'Saturday', displayName: 'Saturday'}, 
+                      { id: 'Sunday', displayName: 'Sunday'}, 
+                    ]
+                  }, 
+                  {
+                    name: 'week_of_month', 
+                    label: 'ONLY if you selected "month", choose the week of the month on which you want the event to repeat.', 
+                    fieldType: 'Dropdown',
+                    isRequired: true,
+                    dbName: 'week_of_month',  
+                    defaultValue: event.recurring_details.week_of_month, 
+                    data: [
+                      { id: 'first', displayName: 'first'}, 
+                      { id: 'second', displayName: 'second'},
+                      { id: 'third', displayName: 'third'}, 
+                      { id: 'fourth', displayName: 'fourth'}
+                    ]
+                  }, 
+                ]
+              }
             },
             {
               name: 'is_global',

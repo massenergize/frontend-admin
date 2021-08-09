@@ -85,7 +85,7 @@ class ActionsPageEditForm extends Component {
           placeholder: 'e.g. All Actions',
           fieldType: 'TextField',
           contentType: 'text',
-          isRequired: true,
+          isRequired: false,
           defaultValue: `${actionsPageData.title}`,
           dbName: 'title',
           readOnly: false
