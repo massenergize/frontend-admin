@@ -62,7 +62,6 @@ class CreateNewEventForm extends Component {
     .catch((err) => {
       console.log(err);
     });
-    console.log("STATE RESCHEDULED", this.state.rescheduledEvent);
     const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
 
@@ -223,7 +222,7 @@ class CreateNewEventForm extends Component {
                     label: 'The event is recurring. Do you want to cancel the next instance of the event?',
                     fieldType: 'Radio', 
                     isRequired: false,
-                    defaultValue: event.recurring_details.is_cancelled ? 'true' : 'false',
+                    defaultValue: event.recurring_details && event.recurring_details.is_cancelled ? 'true' : 'false',
                     dbName: 'upcoming_is_cancelled', 
                     readOnly: false, 
                     data: [
