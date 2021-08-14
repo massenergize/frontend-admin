@@ -10,6 +10,7 @@ import EditCommunityForm from './EditCommunityForm';
 class OnboardCommunity extends React.Component {
 
   render() {
+    const title = brand.name + ' - Edit Community Information';
     const description = brand.desc;
     const isEditForm = this.props.location.pathname.includes('edit');
     const formTitle = isEditform ? "Edit Community Infomation" : "Onboard New Community"
@@ -25,8 +26,8 @@ class OnboardCommunity extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <PapperBlock title={formTitle} desc="">
-          {isEditForm 
+        <PapperBlock title="Edit Community Information" desc="">
+          {isEditForm
             && <EditCommunityForm {...this.props} />
           }
           {!isEditForm

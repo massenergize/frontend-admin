@@ -103,7 +103,7 @@ class TestimonialsPageEditForm extends Component {
         },
          {
           name: 'description',
-          label: 'Paragraph to be displayed below the title',
+          label: 'Additional information shown when hovering on title',
           placeholder: 'Tell us more ...',
           fieldType: 'TextField',
           contentType: 'text',
