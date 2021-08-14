@@ -10,7 +10,6 @@ import EditCommunityForm from './EditCommunityForm';
 class OnboardCommunity extends React.Component {
 
   render() {
-    const title = brand.name + ' - Edit Community Information';
     const description = brand.desc;
     const isEditForm = this.props.location.pathname.includes('edit');
     const formTitle = isEditform ? "Edit Community Infomation" : "Onboard New Community"
