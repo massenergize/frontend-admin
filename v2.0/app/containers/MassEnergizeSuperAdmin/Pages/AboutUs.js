@@ -60,8 +60,7 @@ class AboutUsPageEditForm extends Component {
   createFormJson = async () => {
     const { aboutUsPageData } = this.state;
     const { community } = aboutUsPageData;
-    const image = aboutUsPageData && aboutUsPageData.images && aboutUsPageData.images[0].url;
-    //  aboutUsPageData && aboutUsPageData.image && aboutUsPageData.image.url;
+    const image = aboutUsPageData && aboutUsPageData.images[0] && aboutUsPageData.images[0].url;
     const formJson = {
       title: `Edit ${
         community ? community.name + "'s" : "Community's"

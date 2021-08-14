@@ -62,7 +62,6 @@ class CreateNewEventForm extends Component {
     .catch((err) => {
       console.log(err);
     });
-    console.log("STATE RESCHEDULED", this.state.rescheduledEvent);
     const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
 
