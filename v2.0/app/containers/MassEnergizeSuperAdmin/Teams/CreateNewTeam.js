@@ -5,7 +5,7 @@ import { PapperBlock } from 'dan-components';
 import CreateNewTeamForm from './CreateNewTeamForm';
 class Onboarding extends React.Component {
   render() {
-    const title = brand.name + ' - Onboard New Community';
+    const title = brand.name + ' - Create New Team';
     const description = brand.desc;
     return (
       <div>
