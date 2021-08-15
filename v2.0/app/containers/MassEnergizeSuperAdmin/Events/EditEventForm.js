@@ -62,7 +62,6 @@ class CreateNewEventForm extends Component {
     .catch((err) => {
       console.log(err);
     });
-    console.log("STATE RESCHEDULED", this.state.rescheduledEvent);
     const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
 
@@ -125,7 +124,6 @@ class CreateNewEventForm extends Component {
     const { communities } = this.state;
     const statuses = ['Draft', 'Live', 'Archived']
     
-    // const { pathname } = window.location;
     const formJson = {
       title: 'Edit Event or Campaign',
       subTitle: '',
@@ -220,10 +218,10 @@ class CreateNewEventForm extends Component {
                 fields: [
                   {
                     name: 'upcoming_is_cancelled',
-                    label: 'The event is recurring. Do you want to cancel the next instance of the event?',
+                    label: 'Do you want to cancel the next instance of this recurring event?',
                     fieldType: 'Radio', 
                     isRequired: false,
-                    defaultValue: event.recurring_details.is_cancelled ? 'true' : 'false',
+                    defaultValue: event.recurring_details && event.recurring_details.is_cancelled ? 'true' : 'false',
                     dbName: 'upcoming_is_cancelled', 
                     readOnly: false, 
                     data: [
@@ -274,7 +272,7 @@ class CreateNewEventForm extends Component {
                     isRequired: true,
                     dbName: 'separation_count',
                     contentType: 'number',
-                    defaultValue: event.recurring_details.separation_count,
+                    defaultValue: event.recurring_details && event.recurring_details.separation_count ? event.recurring_details.separation_count : '0',
                     data: [
                       { id: 1, displayName: '1'},
                       { id: 2, displayName: '2'},
@@ -290,7 +288,7 @@ class CreateNewEventForm extends Component {
                     fieldType: 'Radio', 
                     dbName: 'recurring_type',
                     isRequired: true,
-                    defaultValue: event.recurring_details.recurring_type,
+                    defaultValue: event.recurring_details && event.recurring_details.recurring_type ? event.recurring_details.recurring_type : 'none',
                     data: [
                       { id: 'week', value: 'weeks'}, 
                       { id: 'month', value: 'months'}
@@ -302,7 +300,7 @@ class CreateNewEventForm extends Component {
                     fieldType: 'Dropdown', 
                     isRequired: true,
                     dbName: 'day_of_week', 
-                    defaultValue: event.recurring_details.day_of_week, 
+                    defaultValue: event.recurring_details && event.recurring_details.day_of_week ? event.recurring_details.day_of_week : "none",
                     data: [
                       { id: 'Monday', displayName: 'Monday'}, 
                       { id: 'Tuesday', displayName: 'Tuesday'},
@@ -319,7 +317,7 @@ class CreateNewEventForm extends Component {
                     fieldType: 'Dropdown',
                     isRequired: true,
                     dbName: 'week_of_month',  
-                    defaultValue: event.recurring_details.week_of_month, 
+                    defaultValue: event.recurring_details && event.recurring_details.week_of_month ? event.recurring_details.week_of_month : "none",
                     data: [
                       { id: 'first', displayName: 'first'}, 
                       { id: 'second', displayName: 'second'},

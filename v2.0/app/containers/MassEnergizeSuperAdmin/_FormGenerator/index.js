@@ -833,7 +833,7 @@ class MassEnergizeForm extends Component {
                       target: { name: field.name, value: date },
                     })
                   }
-                  label={field.label}
+                  label= "" // don't put label in the box {field.label}
                   format="MM/DD/YYYY, h:mm a"
                 />
               </MuiPickersUtilsProvider>

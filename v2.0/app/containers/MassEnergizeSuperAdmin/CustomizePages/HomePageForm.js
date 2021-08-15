@@ -206,15 +206,26 @@ class HomePageEditForm extends Component {
                 valueToCheck: 'true',
                 fields: [
                   {
+                    name: 'initial_number_of_actions',
+                    label: 'Manual Input: Initial Number of Actions',
+                    placeholder: 'eg. 0',
+                    fieldType: 'TextField',
+                    contentType: 'number',
+                    isRequired: false,
+                    defaultValue: goal && goal.initial_number_of_actions,
+                    dbName: 'initial_number_of_actions',
+                    readOnly: false
+                  },
+                  {
                     name: 'attained_number_of_actions',
-                    label: 'Manual Input: Attained Number of Actions',
-                    placeholder: 'eg. 100',
+                    label: 'State/Vendor reported data: Attained Number of Actions',
+                    placeholder: '',
                     fieldType: 'TextField',
                     contentType: 'number',
                     isRequired: false,
                     defaultValue: goal && goal.attained_number_of_actions,
                     dbName: 'attained_number_of_actions',
-                    readOnly: false
+                    readOnly: true
                   },
                   {
                     name: 'organic_attained_number_of_actions',
@@ -239,15 +250,26 @@ class HomePageEditForm extends Component {
                     readOnly: false
                   },
                   {
+                    name: 'initial_number_of_households',
+                    label: 'Manual Input: Initial Number of Households',
+                    placeholder: 'eg. 0',
+                    fieldType: 'TextField',
+                    contentType: 'number',
+                    isRequired: false,
+                    defaultValue: goal && goal.initial_number_of_households,
+                    dbName: 'initial_number_of_households',
+                    readOnly: false
+                  },
+                  {
                     name: 'attained_number_of_households',
-                    label: 'Manual Input: How many households joined this community?',
-                    placeholder: 'eg. 100',
+                    label: 'State/Vendor reported: Estimated households from max action',
+                    placeholder: '',
                     fieldType: 'TextField',
                     contentType: 'number',
                     isRequired: false,
                     defaultValue: goal && goal.attained_number_of_households,
                     dbName: 'attained_number_of_households',
-                    readOnly: false
+                    readOnly: true
                   },
                   {
                     name: 'organic_attained_number_of_households',
@@ -272,15 +294,26 @@ class HomePageEditForm extends Component {
                     readOnly: false
                   },
                   {
+                    name: 'initial_carbon_footprint_reduction',
+                    label: 'Manual Input: Initial carbon footprint reduction previously attained (lbs)',
+                    placeholder: 'eg. 0',
+                    fieldType: 'TextField',
+                    contentType: 'number',
+                    isRequired: false,
+                    defaultValue: goal && goal.initial_carbon_footprint_reduction,
+                    dbName: 'initial_carbon_footprint_reduction',
+                    readOnly: false
+                  },
+                  {
                     name: 'attained_carbon_footprint_reduction',
-                    label: 'Manual Input: Community carbon footprint reduction previously attained (lbs)',
+                    label: 'State/Vendor reported: Carbon Footprint Reduction (lbs)',
                     placeholder: 'eg. 100',
                     fieldType: 'TextField',
                     contentType: 'number',
                     isRequired: false,
                     defaultValue: goal && goal.attained_carbon_footprint_reduction,
                     dbName: 'attained_carbon_footprint_reduction',
-                    readOnly: false
+                    readOnly: true
                   },
                   {
                     name: 'organic_attained_carbon_footprint_reduction',

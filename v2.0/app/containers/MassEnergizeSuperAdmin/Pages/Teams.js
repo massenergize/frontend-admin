@@ -101,7 +101,7 @@ class TeamsPageEditForm extends Component {
         },
          {
           name: 'description',
-          label: 'Paragraph to be displayed below the title',
+          label: 'Additional information shown by hovering on title',
           placeholder: 'Tell us more ...',
           fieldType: 'TextField',
           contentType: 'text',
