@@ -113,6 +113,15 @@ class ActionsPageEditForm extends Component {
           dbName: 'description',
           readOnly: false
         },
+        {
+          name: "enable",
+          fieldType: "Radio",
+          dbName: "is_published",
+          label: "This page is enabled if checked",
+          isRequired: false,
+          defaultValue: `${actionsPageData.is_published}`,
+          data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+        },
       ]
     };
     return formJson;
