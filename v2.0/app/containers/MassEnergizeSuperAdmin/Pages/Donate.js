@@ -134,6 +134,15 @@ class DonatePageEditForm extends Component {
           dbName: 'donation_link',
           readOnly: false
         },
+        {
+          name: "enable",
+          fieldType: "Radio",
+          dbName: "is_published",
+          label: "This page is enabled if checked",
+          isRequired: false,
+          defaultValue: `${donatePageData.is_published}`,
+          data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+        },
       ]
     };
     return formJson;
