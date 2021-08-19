@@ -34,16 +34,15 @@ class CreateNewTeamForm extends Component {
     super(props);
     this.state = {
       communities: [],
-      formJson: null
+      formJson: null,
     };
   }
 
 
   async componentDidMount() {
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
-
     if (communitiesResponse && communitiesResponse.data) {
-      const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name }));
+      const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
       await this.setStateAsync({ communities });
     }
 
@@ -81,13 +80,32 @@ class CreateNewTeamForm extends Component {
               readOnly: false
             },
             {
-              name: 'community',
+              name: 'primary_community',
               label: 'Primary Community',
-              placeholder: 'eg. Wayland',
+              placeholder: '',
               fieldType: 'Dropdown',
               defaultValue: null,
-              dbName: 'community_id',
+              dbName: 'primary_community_id',
               data: [{displayName:"--", id:""}, ...communities],
+            },
+            {
+              name: 'communities',
+              label: 'Communities which share this team',
+              placeholder: '',
+              fieldType: 'Checkbox',
+              selectMany: true,
+              defaultValue: null,
+              dbName: 'communities',
+              data: communities,
+            },
+            {
+              name: 'parent',
+              label: 'Parent Team (must be in the same primary community)',
+              fieldType: 'Dropdown',
+              defaultValue: null,
+              dbName: 'parent_id',
+              data: [{id: null, displayName: "Please choose a community and save the team.  Then edit it to set a parent team"}],
+              readOnly: true,
             },
             {
               name: 'admin_emails',
@@ -95,10 +113,8 @@ class CreateNewTeamForm extends Component {
               placeholder: 'eg. Provide email of valid registered users eg. teamadmin1@gmail.com, teamadmin2@gmail.com',
               fieldType: 'TextField',
               isRequired: true,
-
               defaultValue: null,
               dbName: 'admin_emails',
-              data: communities
             },
             {
               name: 'tagline',
