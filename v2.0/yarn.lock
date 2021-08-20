@@ -2555,6 +2555,7 @@
 
 "bowser@^1.7.3":
   "version" "1.9.4"
+  resolved "https://registry.yarnpkg.com/bowser/-/bowser-1.9.4.tgz#890c58a2813a9d3243704334fa81b96a5c150c9a"
 
 "brace-expansion@^1.1.7":
   "resolved" "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz"
@@ -2883,6 +2884,7 @@
 
 "chain-function@^1.0.0":
   "version" "1.0.1"
+  resolved "https://registry.yarnpkg.com/chain-function/-/chain-function-1.0.1.tgz#c63045e5b4b663fb86f1c6e186adaf1de402a1cc"
 
 "chainsaw@~0.1.0":
   "resolved" "https://registry.npmjs.org/chainsaw/-/chainsaw-0.1.0.tgz"
