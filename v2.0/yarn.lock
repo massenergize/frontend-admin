@@ -8715,9 +8715,9 @@
     "ansi-styles" "^3.2.0"
     "react-is" "^16.8.4"
 
-"prismjs@^1.22.0", "prismjs@^1.8.4":
-  "resolved" "https://registry.npmjs.org/prismjs/-/prismjs-1.23.0.tgz"
-  "version" "1.23.0"
+"prismjs@^1.24.0", "prismjs@^1.8.4":
+  "resolved" "https://registry.npmjs.org/prismjs/-/prismjs-1.24.0.tgz"
+  "version" "1.24.0"
 
 "prismjs@~1.15.0":
   "resolved" "https://registry.npmjs.org/prismjs/-/prismjs-1.15.0.tgz"
