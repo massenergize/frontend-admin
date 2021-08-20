@@ -4045,9 +4045,9 @@
   dependencies:
     "utila" "~0.3"
 
-"dom-helpers@^2.3.0 || ^3.0.0", "dom-helpers@^3.2.0", "dom-helpers@^3.2.1", "dom-helpers@^3.3.1":
-  "resolved" "https://registry.npmjs.org/dom-helpers/-/dom-helpers-3.3.1.tgz"
-  "version" "3.3.1"
+"dom-helpers@^2.3.0 || ^3.0.0", "dom-helpers@^3.2.0", "dom-helpers@^3.2.1", "dom-helpers@^3.3.1", "dom-helpers@^3.4.0":
+  "resolved" "https://registry.npmjs.org/dom-helpers/-/dom-helpers-3.4.0.tgz"
+  "version" "3.4.0"
 
 "dom-serializer@~0.1.0", "dom-serializer@0":
   "resolved" "https://registry.npmjs.org/dom-serializer/-/dom-serializer-0.1.0.tgz"
