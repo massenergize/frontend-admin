@@ -93,6 +93,18 @@ export const EditCategory = loadable(() => import('./MassEnergizeSuperAdmin/Cate
 export const AllCategories = loadable(() => import('./MassEnergizeSuperAdmin/Categories/AllCategories'), {
   fallback: <Loading />,
 });
+
+export const AddCarbonEquivalency = loadable(() => import('./MassEnergizeSuperAdmin/Categories/AddCarbonEquivalency'), {
+  fallback: <Loading />,
+});
+
+export const EditCarbonEquivalency = loadable(() => import('./MassEnergizeSuperAdmin/Categories/EditCarbonEquivalency'), {
+  fallback: <Loading />,
+});
+export const AllCarbonEquivalencies = loadable(() => import('./MassEnergizeSuperAdmin/Categories/AllCarbonEquivalencies'), {
+  fallback: <Loading />,
+});
+
 export const AllSubscribers = loadable(() => import('./MassEnergizeSuperAdmin/Subscribers/AllSubscribers'), {
   fallback: <Loading />,
 });

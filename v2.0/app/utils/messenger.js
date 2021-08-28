@@ -36,7 +36,7 @@ export async function apiCall(
     destinationUrl = destinationUrl.substring(1);
   }
 
-  const response = await fetch(`${API_HOST}/v3/${destinationUrl}`, {
+  const response = await fetch(`${API_HOST}/${destinationUrl}`, {
     credentials: 'include',
     method: 'POST',
     body: formData
@@ -63,7 +63,7 @@ export async function apiCall(
 
 export async function apiCallFile(destinationUrl, dataToSend = {}, strictUrl = false) {
   const idToken = localStorage.getItem('idToken');
-  const url = strictUrl ? `${API_HOST}${destinationUrl}` : `${API_HOST}/v3${destinationUrl}`;
+  const url = strictUrl ? `${API_HOST}${destinationUrl}` : `${API_HOST}/${destinationUrl}`;
   // add some meta data for context in backend
   const data = {
     __is_prod: IS_PROD,
