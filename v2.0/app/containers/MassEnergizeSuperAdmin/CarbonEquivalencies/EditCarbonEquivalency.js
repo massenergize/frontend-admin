@@ -29,11 +29,11 @@ const styles = theme => ({
 });
 
 
-class CreateNewTagCollectionForm extends Component {
+class EditCarbonEquivalencyForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tagCollection: null,
+      carbonEquivalency: null,
       loading: true,
       formJson: null
     };
@@ -42,10 +42,10 @@ class CreateNewTagCollectionForm extends Component {
 
   async componentDidMount() {
     const { id } = this.props.match.params;
-    const tagCollectionResponse = await apiCall('/tag_collections.info', { tag_collection_id: id });
+    const response = await apiCall('/data.carbonEquivalency.info', { id: id });
 
-    if (tagCollectionResponse && tagCollectionResponse.success) {
-      await this.setStateAsync({ tagCollection: tagCollectionResponse.data });
+    if (response && response.success) {
+      await this.setStateAsync({ carbonEquivalency: response.data });
     }
     const formJson = await this.createFormJson();
     await this.setStateAsync({ formJson, loading: false });
@@ -58,17 +58,16 @@ class CreateNewTagCollectionForm extends Component {
   }
 
   createFormJson = async () => {
-    const { tagCollection } = this.state;
-    const { pathname } = window.location;
+    const { carbonEquivalency } = this.state;
     const formJson = {
-      title: 'Edit Tag Collection',
+      title: 'Edit Carbon Equivalency',
       subTitle: '',
-      cancelLink: '/admin/read/categories',
-      method: '/tag_collections.update',
-      successRedirectPage: pathname || '/admin/read/categories',
+      cancelLink: '/admin/read/carbon-equivalencies',
+      method: '/data.carbonEquivalency.update',
+      successRedirectPage: `/admin/edit/${carbonEquivalency.id}/carbon-equivalency`, //pathname || '/admin/read/carbon-equivalencies',
       fields: [
         {
-          label: 'About this Tag Collection',
+          label: 'About this Carbon Equivalency',
           fieldType: 'Section',
           children: [
             {
@@ -78,104 +77,71 @@ class CreateNewTagCollectionForm extends Component {
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
-              defaultValue: tagCollection.id,
+              defaultValue: carbonEquivalency.id,
               dbName: 'id',
               readOnly: true
             },
             {
               name: 'name',
-              label: 'Name of Tag Collection',
+              label: 'Name of Carbon Equivalency',
               placeholder: 'eg. Category',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
-              defaultValue: tagCollection.name,
+              defaultValue: carbonEquivalency.name,
               dbName: 'name',
               readOnly: false
             },
             {
-              name: 'rank',
-              label: 'Rank of Category (Lower comes first)',
-              placeholder: 'eg. 1',
+              name: 'value',
+              label: 'Value',
+              placeholder: 'eg. 1.0',
               fieldType: 'TextField',
               contentType: 'number',
+              step: 'any',
               isRequired: true,
-              defaultValue: tagCollection.rank,
-              dbName: 'rank',
+              defaultValue: carbonEquivalency.value,
+              dbName: 'value',
+              readOnly: false
+            },
+            {
+              name: 'icon',
+              placeholder: 'Select an Image',
+              fieldType: 'Icon',
+              contentType: 'text',
+              dbName: 'icon',
+              label: 'Pick a FontAwesome icon',
+              isRequired: true,
+              defaultValue: carbonEquivalency.icon,
+            },
+            {
+              name: 'explanation',
+              label: 'Please explain this equivancy in clear terms',
+              placeholder: '',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              isMultiline: true,
+              defaultValue: carbonEquivalency.explanation,
+              dbName: 'explanation',
+              readOnly: false
+            },
+            {
+              name: 'reference',
+              label: 'Link to a trusted reference',
+              placeholder: '',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              isMultiline: true,
+              defaultValue: carbonEquivalency.reference,
+              dbName: 'reference',
               readOnly: false
             },
           ]
         },
       ]
     };
-
-    if (tagCollection && tagCollection.tags) {
-      const tagFields = [];
-      tagCollection.tags.forEach((t, i) => {
-        tagFields.push(
-          {
-            name: `tag_${t.id}`,
-            label: `Tag #${i + 1}`,
-            placeholder: 'eg. High',
-            fieldType: 'TextField',
-            contentType: 'text',
-            isRequired: false,
-            defaultValue: t.name,
-            dbName: `tag_${t.id}`,
-            readOnly: false
-          },
-          {
-            name: `tag_${t.id}_rank`,
-            label: `Tag #${i + 1} Rank`,
-            placeholder: 'eg. 1',
-            fieldType: 'TextField',
-            contentType: 'text',
-            isRequired: false,
-            defaultValue: t.order,
-            dbName: `tag_${t.id}_rank`,
-            readOnly: false
-          }
-        );
-      });
-
-      if (tagFields.length > 0) {
-        formJson.fields.push(
-          {
-            label: 'Individual Tags',
-            fieldType: 'Section',
-            children: tagFields
-          },
-        );
-      }
-
-      formJson.fields.push(
-        {
-          name: 'tags_to_add',
-          label: 'Type new tags here separated by commas',
-          placeholder: 'eg. High',
-          fieldType: 'TextField',
-          contentType: 'text',
-          isRequired: false,
-          defaultValue: '',
-          dbName: 'tags_to_add',
-          readOnly: false
-        },
-      );
-
-      formJson.fields.push(
-        {
-          name: 'tags_to_delete',
-          label: 'Want to delete some tags? Type their names here separated by commas',
-          placeholder: 'eg. Low, High',
-          fieldType: 'TextField',
-          contentType: 'text',
-          isRequired: false,
-          defaultValue: '',
-          dbName: 'tags_to_delete',
-          readOnly: false
-        },
-      );
-    }
 
     return formJson;
   }
@@ -195,9 +161,9 @@ class CreateNewTagCollectionForm extends Component {
   }
 }
 
-CreateNewTagCollectionForm.propTypes = {
+EditCarbonEquivalencyForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
 
-export default withStyles(styles, { withTheme: true })(CreateNewTagCollectionForm);
+export default withStyles(styles, { withTheme: true })(EditCarbonEquivalencyForm);

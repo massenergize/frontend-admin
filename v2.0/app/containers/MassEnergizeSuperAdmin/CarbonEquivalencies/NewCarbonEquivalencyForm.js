@@ -53,7 +53,7 @@ class NewCarbonEquivalencyForm extends Component {
       title: 'Create New Carbon Equivalency',
       subTitle: '',
       cancelLink: '/admin/read/carbon-equivalencies',
-      method: '/carbon_equivalency.create',
+      method: '/data.carbonEquivalency.create',
       successRedirectPage: '/admin/read/carbon-equivalencies',
       fields: [
         {
@@ -73,25 +73,25 @@ class NewCarbonEquivalencyForm extends Component {
             },
             {
               name: 'value',
-              label: 'Value (amount per ton of CO2)',
+              label: 'Value (number per metric Ton of CO2)',
               placeholder: 'eg. 1.0',
               fieldType: 'TextField',
               contentType: 'number',
               isRequired: true,
               defaultValue: '',
+              step: 'any',
               dbName: 'value',
               readOnly: false
             },
             {
               name: 'icon',
               placeholder: 'Select an Image',
-              fieldType: 'File',
+              fieldType: 'Icon',
+              contentType: 'text',
               dbName: 'icon',
-              label: 'Upload Files',
-              selectMany: false,
+              label: 'Pick a FontAwesome icon',
               isRequired: true,
-              defaultValue: [],
-              filesLimit: 1
+              defaultValue: 'fa-tree',
             },
             {
               name: 'explanation',

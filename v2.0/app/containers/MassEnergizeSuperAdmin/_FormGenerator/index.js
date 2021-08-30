@@ -87,6 +87,8 @@ class MassEnergizeForm extends Component {
     this.updateForm = this.updateForm.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
     this.closePreviewModal = this.closePreviewModal.bind(this);
+    const {ICON_FILES} = require('./icon_files.json');
+    this.iconFiles = ICON_FILES;
   }
 
   async componentDidMount() {
@@ -554,6 +556,40 @@ class MassEnergizeForm extends Component {
                   field.data.map((c) => (
                     <option value={c.id} key={c.id}>
                       {c.displayName}
+                    </option>
+                  ))}
+              </Select>
+              {field.child &&
+                this.getValue(field.name) === field.child.valueToCheck &&
+                this.renderFields(field.child.fields)}
+            </FormControl>
+          </div>
+        );
+      case FieldTypes.Icon:
+        return (
+          <div key={field.name}>
+            <FormControl className={classes.field}>
+              <InputLabel htmlFor={field.name}>{field.label}</InputLabel>
+              <Select
+                native
+                name={field.name}
+                onChange={async (newValue) => {
+                  await this.updateForm(field.name, newValue.target.value);
+                }}
+                inputProps={{
+                  id: "age-native-simple",
+                }}
+              >
+                <option value={this.getValue(field.name)}>
+                  {this.getDisplayName(
+                    field.name,
+                    this.getValue(field.name),
+                    this.iconFiles,
+                  )}
+                </option>
+                {this.iconFiles.map((c) => (
+                    <option value={c} key={c}>
+                      {c}
                     </option>
                   ))}
               </Select>

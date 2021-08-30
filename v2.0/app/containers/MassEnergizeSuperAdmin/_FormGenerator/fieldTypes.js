@@ -2,6 +2,7 @@ export default {
   Checkbox: 'Checkbox',
   Dropdown: 'Dropdown',
   File: 'File',
+  Icon: 'Icon',
   HTMLField: 'HTMLField',
   Radio: 'Radio',
   TextField: 'TextField',

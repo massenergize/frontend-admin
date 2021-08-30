@@ -3,14 +3,10 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
-import Typography from '@material-ui/core/Typography';
-import Icon from '@material-ui/core/Icon';
 
 import MUIDataTable from 'mui-datatables';
-//import CallMadeIcon from '@material-ui/icons/CallMade';
 import EditIcon from '@material-ui/icons/Edit';
 import { Link } from 'react-router-dom';
-//import Avatar from '@material-ui/core/Avatar';
 import Paper from '@material-ui/core/Paper';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Grid from '@material-ui/core/Grid';
@@ -98,7 +94,6 @@ class AllCarbonEquivalencies extends React.Component {
     const description = brand.desc;
     const { data, columns, loading } = this.state;
     const { classes } = this.props;
-    console.log(data)
     const options = {
       filterType: 'dropdown',
       responsive: 'stacked',
@@ -108,7 +103,7 @@ class AllCarbonEquivalencies extends React.Component {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {
           const rowId = data[d.dataIndex][0];
-          apiCall('/data.carbonEquivalency.delete', { tag_collection_id: tagCollectionId });
+          apiCall('/data.carbonEquivalency.delete', { id: rowId });
         });
       }
     };
