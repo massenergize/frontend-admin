@@ -28,6 +28,7 @@ class AllCarbonEquivalencies extends React.Component {
           d.id,
           `${d.name}...`.substring(0, 30), // limit to first 30 chars
           d.value,
+          d.id,
           //d.explanation,
           //d.reference,
         ]
