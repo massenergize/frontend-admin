@@ -248,4 +248,26 @@ module.exports = [
       },
     ]
   },
+  {
+    key: 'carbon-equivalancies',
+    name: 'Carbon',
+    icon: 'md-reorder',
+    child: [
+      {
+        key: 'about-equivalencies',
+        name: 'Carbon Equivalencies',
+        title: true
+      },
+      {
+        key: 'add-equivalency',
+        name: 'Add Carbon Equivalency',
+        link: '/admin/add/carbon-equivalency'
+      },
+      {
+        key: 'all-equivalencies',
+        name: 'All Carbon Equivalencies',
+        link: '/admin/read/carbon-equivalencies'
+      },
+    ]
+  },
 ];
