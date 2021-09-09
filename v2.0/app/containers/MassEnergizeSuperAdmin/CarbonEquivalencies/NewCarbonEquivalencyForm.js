@@ -72,6 +72,17 @@ class NewCarbonEquivalencyForm extends Component {
               readOnly: false
             },
             {
+              name: 'title',
+              label: 'Short title for display',
+              placeholder: 'eg. Number of trees',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: '',
+              dbName: 'title',
+              readOnly: false
+            },
+            {
               name: 'value',
               label: 'Value (number per metric Ton of CO2)',
               placeholder: 'eg. 1.0',

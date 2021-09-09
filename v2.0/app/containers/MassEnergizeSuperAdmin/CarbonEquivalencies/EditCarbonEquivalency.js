@@ -84,12 +84,23 @@ class EditCarbonEquivalencyForm extends Component {
             {
               name: 'name',
               label: 'Name of Carbon Equivalency',
-              placeholder: 'eg. Category',
+              placeholder: 'eg. Trees',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
               defaultValue: carbonEquivalency.name,
               dbName: 'name',
+              readOnly: false
+            },
+            {
+              name: 'title',
+              label: 'Short title for display',
+              placeholder: 'eg. Number of Trees',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: carbonEquivalency.title,
+              dbName: 'title',
               readOnly: false
             },
             {
