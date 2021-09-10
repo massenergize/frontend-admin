@@ -2,7 +2,7 @@
  * This file contains code used to transmit data
  */
 import qs from 'qs';
-import { API_HOST, IS_CANARY, IS_PROD } from '../config/constants';
+import { API_HOST, IS_CANARY, IS_PROD, IS_LOCAL } from '../config/constants';
 
 /**
  * Handles making a POST request to the backend as a form submission
@@ -36,6 +36,10 @@ export async function apiCall(
     destinationUrl = destinationUrl.substring(1);
   }
 
+  if (IS_LOCAL) {
+    destinationUrl = "api/" + destinationUrl;
+  }
+  
   const response = await fetch(`${API_HOST}/${destinationUrl}`, {
     credentials: 'include',
     method: 'POST',
@@ -61,8 +65,21 @@ export async function apiCall(
 }
 
 
-export async function apiCallFile(destinationUrl, dataToSend = {}, strictUrl = false) {
+export async function apiCallFile(destinationUrl, dataToSend = {}) {
   const idToken = localStorage.getItem('idToken');
+
+  // don't need this strictUrl optional arg?  Won't work with IS_LOCAL
+  const strictUrl = false;
+
+  // make leading '/' optional
+  if (destinationUrl.charAt(0) === '/') {
+    destinationUrl = destinationUrl.substring(1);
+  }
+  
+  if (IS_LOCAL) {
+    destinationUrl = "api/" + destinationUrl;
+  }
+
   const url = strictUrl ? `${API_HOST}${destinationUrl}` : `${API_HOST}/${destinationUrl}`;
   // add some meta data for context in backend
   const data = {
@@ -71,6 +88,7 @@ export async function apiCallFile(destinationUrl, dataToSend = {}, strictUrl = f
     ...dataToSend
   };
 
+  
   const response = await fetch(url, {
     credentials: 'include',
     method: 'POST',
