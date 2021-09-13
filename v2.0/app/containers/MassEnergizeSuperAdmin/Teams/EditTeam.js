@@ -145,7 +145,7 @@ class EditTeam extends Component {
             },
              {
               name: 'parent',
-              label: parentTeamOptions && 'Parent Team (must be in the same primary community)',
+              label: parentTeamOptions && 'Choose a Parent Team, if this team is part of a larger group (not the usual case)',
               fieldType: 'Dropdown',
               defaultValue: (team.parent && team.parent.id) || "0",
               dbName: 'parent_id',
