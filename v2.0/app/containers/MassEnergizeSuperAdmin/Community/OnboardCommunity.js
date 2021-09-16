@@ -12,7 +12,7 @@ class OnboardCommunity extends React.Component {
   render() {
     const description = brand.desc;
     const isEditForm = this.props.location.pathname.includes('edit');
-    const formTitle = isEditform ? "Edit Community Infomation" : "Onboard New Community"
+    const formTitle = isEditForm ? "Edit Community Infomation" : "Onboard New Community"
     const title = brand.name + ' - ' + formTitle;
 
     return (
