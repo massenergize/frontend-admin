@@ -36,9 +36,9 @@ export async function apiCall(
     destinationUrl = destinationUrl.substring(1);
   }
 
-  // if (IS_LOCAL) {
-  //   destinationUrl = "api/" + destinationUrl;
-  // }
+  if (IS_LOCAL) {
+    destinationUrl = "api/" + destinationUrl;
+  }
 
   const response = await fetch(`${API_HOST}/${destinationUrl}`, {
     credentials: "include",
