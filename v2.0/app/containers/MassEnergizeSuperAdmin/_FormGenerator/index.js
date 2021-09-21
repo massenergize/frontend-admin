@@ -26,9 +26,9 @@ import { FilledInput, MenuItem } from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import Icon from "@material-ui/core/Icon";
 import moment from "moment";
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import { EditorState } from "draft-js";
-import { stateFromHTML } from "draft-js-import-html";
+//import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+//import { EditorState } from "draft-js";
+//import { stateFromHTML } from "draft-js-import-html";
 import { apiCall } from "../../../utils/messenger";
 import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
 import FieldTypes from "./fieldTypes";
@@ -121,12 +121,13 @@ class MassEnergizeForm extends Component {
     this.setState({ activeModal: null });
   }
 
-  initializeHtmlField = (content) => {
-    if (!content || content === "<p></p>\n") {
-      return EditorState.createEmpty();
-    }
-    return EditorState.createWithContent(stateFromHTML(content));
-  };
+  // 0921
+  //initializeHtmlField = (content) => {
+  //  if (!content || content === "<p></p>\n") {
+  //    return EditorState.createEmpty();
+  //  }
+  //  return EditorState.createWithContent(stateFromHTML(content));
+  //};
 
   /**
    * Given the field, it renders the actual component
@@ -181,12 +182,13 @@ class MassEnergizeForm extends Component {
     });
   };
 
-  onEditorStateChange = async (name, editorState) => {
-    const { formData } = this.state;
-    await this.setStateAsync({
-      formData: { ...formData, [name]: editorState },
-    });
-  };
+  //0921
+  //onEditorStateChange = async (name, editorState) => {
+  //  const { formData } = this.state;
+  //  await this.setStateAsync({
+  //    formData: { ...formData, [name]: editorState },
+  //  });
+  //};
 
   /**
    * Handle multi select
@@ -743,8 +745,7 @@ class MassEnergizeForm extends Component {
               /> */}
 
               <TinyEditor
-                value={() => this.getValue(field.name, null)}
-                initialValue={this.getValue(field.name, null)}
+                value={this.getValue(field.name, null)}
                 onEditorChange={(content, editor) => {
                   this.handleEditorChange(content, editor, field.name);
                 }}
