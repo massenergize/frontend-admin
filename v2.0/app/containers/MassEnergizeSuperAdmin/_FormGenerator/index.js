@@ -87,7 +87,7 @@ class MassEnergizeForm extends Component {
     this.updateForm = this.updateForm.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
     this.closePreviewModal = this.closePreviewModal.bind(this);
-    const {ICON_FILES} = require('./icon_files.json');
+    const { ICON_FILES } = require("./icon_files.json");
     this.iconFiles = ICON_FILES;
   }
 
@@ -174,9 +174,9 @@ class MassEnergizeForm extends Component {
   /**
    * ============ HELPER FUNCTIONS FOR INPUTS
    */
-  handleEditorChange = async (content, editor, name) => {
+  handleEditorChange = (content, editor, name) => {
     const { formData } = this.state;
-    await this.setStateAsync({
+    this.setState({
       formData: { ...formData, [name]: content },
     });
   };
@@ -584,14 +584,14 @@ class MassEnergizeForm extends Component {
                   {this.getDisplayName(
                     field.name,
                     this.getValue(field.name),
-                    this.iconFiles,
+                    this.iconFiles
                   )}
                 </option>
                 {this.iconFiles.map((c) => (
-                    <option value={c} key={c}>
-                      {c}
-                    </option>
-                  ))}
+                  <option value={c} key={c}>
+                    {c}
+                  </option>
+                ))}
               </Select>
               {field.child &&
                 this.getValue(field.name) === field.child.valueToCheck &&
@@ -704,7 +704,7 @@ class MassEnergizeForm extends Component {
             : { display: "none" };
         return (
           <div key={field.name + field.label}>
-            <div style={previewStyle}>{this.showPreviewModal()}</div>
+            {/* <div style={previewStyle}>{this.showPreviewModal()}</div> */}
             <Grid
               item
               xs={12}
@@ -763,7 +763,7 @@ class MassEnergizeForm extends Component {
                 apiKey={TINY_MCE_API_KEY}
               />
 
-              <Button
+              {/* <Button
                 style={{ width: "100%" }}
                 color="default"
                 onClick={() => {
@@ -775,7 +775,7 @@ class MassEnergizeForm extends Component {
               >
                 <Icon style={{ marginRight: 6 }}>remove_red_eye</Icon>
                 Show Me A Preview{" "}
-              </Button>
+              </Button> */}
             </Grid>
             <br />
             <br />
@@ -869,7 +869,7 @@ class MassEnergizeForm extends Component {
                       target: { name: field.name, value: date },
                     })
                   }
-                  label= "" // don't put label in the box {field.label}
+                  label="" // don't put label in the box {field.label}
                   format="MM/DD/YYYY, h:mm a"
                 />
               </MuiPickersUtilsProvider>

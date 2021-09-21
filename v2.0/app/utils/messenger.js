@@ -1,8 +1,8 @@
 /**
  * This file contains code used to transmit data
  */
-import qs from 'qs';
-import { API_HOST, IS_CANARY, IS_PROD, IS_LOCAL } from '../config/constants';
+import qs from "qs";
+import { API_HOST, IS_CANARY, IS_PROD, IS_LOCAL } from "../config/constants";
 
 /**
  * Handles making a POST request to the backend as a form submission
@@ -21,29 +21,29 @@ export async function apiCall(
   const data = {
     __is_prod: IS_PROD || IS_CANARY,
     __is_admin_site: true,
-    ...dataToSend
+    ...dataToSend,
   };
 
   const formData = new FormData();
-  Object.keys(data).map(k => (formData.append(k, data[k])));
+  Object.keys(data).map((k) => formData.append(k, data[k]));
 
   if (!destinationUrl || destinationUrl.length < 2) {
-    return { success: false, error: 'Invalid URL passed to apiCall' };
+    return { success: false, error: "Invalid URL passed to apiCall" };
   }
 
   // make leading '/' optional
-  if (destinationUrl.charAt(0) === '/') {
+  if (destinationUrl.charAt(0) === "/") {
     destinationUrl = destinationUrl.substring(1);
   }
 
-  if (IS_LOCAL) {
-    destinationUrl = "api/" + destinationUrl;
-  }
-  
+  // if (IS_LOCAL) {
+  //   destinationUrl = "api/" + destinationUrl;
+  // }
+
   const response = await fetch(`${API_HOST}/${destinationUrl}`, {
-    credentials: 'include',
-    method: 'POST',
-    body: formData
+    credentials: "include",
+    method: "POST",
+    body: formData,
   });
 
   try {
@@ -51,10 +51,12 @@ export async function apiCall(
     if (relocationPage && json && json.success) {
       window.location.href = relocationPage;
     } else if (!json.success) {
-      if (json.error === 'session_expired' || 
-          json.error === 'permission_denied') {
-        window.location.href = '/login';
-      } else if (json !== 'undefined') {
+      if (
+        json.error === "session_expired" ||
+        json.error === "permission_denied"
+      ) {
+        window.location.href = "/login";
+      } else if (json !== "undefined") {
         console.log(destinationUrl, json);
       }
     }
@@ -64,62 +66,62 @@ export async function apiCall(
   }
 }
 
-
 export async function apiCallFile(destinationUrl, dataToSend = {}) {
-  const idToken = localStorage.getItem('idToken');
+  const idToken = localStorage.getItem("idToken");
 
   // don't need this strictUrl optional arg?  Won't work with IS_LOCAL
   const strictUrl = false;
 
   // make leading '/' optional
-  if (destinationUrl.charAt(0) === '/') {
+  if (destinationUrl.charAt(0) === "/") {
     destinationUrl = destinationUrl.substring(1);
   }
-  
-  if (IS_LOCAL) {
-    destinationUrl = "api/" + destinationUrl;
-  }
 
-  const url = strictUrl ? `${API_HOST}${destinationUrl}` : `${API_HOST}/${destinationUrl}`;
+  // if (IS_LOCAL) {
+  //   destinationUrl = "api/" + destinationUrl;
+  // }
+
+  const url = strictUrl
+    ? `${API_HOST}${destinationUrl}`
+    : `${API_HOST}/${destinationUrl}`;
   // add some meta data for context in backend
   const data = {
     __is_prod: IS_PROD,
     __is_admin_site: true,
-    ...dataToSend
+    ...dataToSend,
   };
 
-  
   const response = await fetch(url, {
-    credentials: 'include',
-    method: 'POST',
+    credentials: "include",
+    method: "POST",
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: `Bearer ${idToken}`
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: `Bearer ${idToken}`,
     },
-    body: qs.stringify(data)
+    body: qs.stringify(data),
   });
 
   try {
-    const contentType = response.headers.get('content-type');
+    const contentType = response.headers.get("content-type");
 
     // endpoints that return non-JSON data will still send JSONs on errors
-    if (contentType && contentType.indexOf('application/json') !== -1) {
-      return response.json().then(json => {
-        if (json.error === 'session_expired') {
-          localStorage.removeItem('authUser');
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+      return response.json().then((json) => {
+        if (json.error === "session_expired") {
+          localStorage.removeItem("authUser");
         }
         return json;
       });
     }
 
     // if no JSON response, it was a success
-    const contentDisposition = response.headers.get('content-disposition');
+    const contentDisposition = response.headers.get("content-disposition");
     const filename = contentDisposition
       ? contentDisposition.match(/filename="(.+)"/)[1]
-      : 'download.' + contentType.split('/')[1];
-    return response.blob().then(blob => ({
+      : "download." + contentType.split("/")[1];
+    return response.blob().then((blob) => ({
       success: true,
-      file: new File([blob], filename, { type: contentType })
+      file: new File([blob], filename, { type: contentType }),
     }));
   } catch (error) {
     return { success: false, error: error.toString() };
