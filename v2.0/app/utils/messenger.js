@@ -77,9 +77,9 @@ export async function apiCallFile(destinationUrl, dataToSend = {}) {
     destinationUrl = destinationUrl.substring(1);
   }
 
-  // if (IS_LOCAL) {
-  //   destinationUrl = "api/" + destinationUrl;
-  // }
+  if (IS_LOCAL) {
+    destinationUrl = "api/" + destinationUrl;
+  }
 
   const url = strictUrl
     ? `${API_HOST}${destinationUrl}`
