@@ -231,8 +231,16 @@ class MessageDetails extends Component {
               {message.email || (message.user && message.user.email) }
             </Typography>
             <br />
+            <Typography component="p">
+              Date:&nbsp;&nbsp;
+              {message.created_at}
+            </Typography>
+            <br />
+            <Typography component="p">
+              Message body:&nbsp;&nbsp;
+            </Typography>
+
             <Paper className={classes.root} elevation={4}>
-              Body:
               <Typography component="p">
                 {message.body}
               </Typography>
