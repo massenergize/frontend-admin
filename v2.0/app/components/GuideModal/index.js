@@ -41,11 +41,11 @@ class GuideModal extends React.Component {
           <Typography variant="h4" align="center">Need Help?</Typography>
           <Typography variant="body1" align="center">We have a variety of resources.</Typography>
           <Button className={classes.button}
-            href="https://docs.google.com/document/d/1ymEMIofhlk7gwsu46cjjm-ZSeY6thANXO_zaloKBFLg/edit?usp=sharing" target="_blank">
+            href="https://docs.google.com/document/d/1Xo7gn4wMRUpoTDlo7O2dfJL1THvMxl1jHFkH2OS7Vf8/edit?usp=sharing" target="_blank">
             <AssignmentIcon /> &nbsp; Written Guides
           </Button>
           <Button className={classes.button}
-            href="https://docs.google.com/document/d/16WXJ4VLdhgdP5e-2g2GFkX-PL8g3HlUz0h3AJNYT9vQ/edit?usp=sharing" target="_blank">
+            href="https://docs.google.com/document/d/1M4FZHv0PeXglXIS3esieDD330bCrg8wfK5Mju5FBt1w/edit?usp=sharing" target="_blank">
             <VideoLibraryIcon /> &nbsp; Video Tutorials
           </Button>
         </DialogContent>
