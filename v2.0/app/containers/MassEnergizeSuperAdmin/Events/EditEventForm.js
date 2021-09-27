@@ -51,7 +51,6 @@ class CreateNewEventForm extends Component {
     apiCall('events.exceptions.list', {'event_id': event.id })
     .then((json) => {
       if (json.success) {
-        console.log(json);
         this.setState({
           rescheduledEvent: json.data[0]
         });
@@ -250,7 +249,8 @@ class CreateNewEventForm extends Component {
                           name: 'rescheduled_start_datetime', 
                           dbName: 'rescheduled_start_datetime', 
                           label: 'Date and time you want your rescheduled event to take place (must occur before the next instance of the event; e.g., if your event is scheduled for every Friday, you cannot reschedule this Friday to next Saturday.',
-                          fieldType: 'DateTime', 
+                          fieldType: 'DateTime',
+                          defaultValue: null, 
                           contentType: 'text', 
                           isRequired: true
                         },
@@ -258,7 +258,8 @@ class CreateNewEventForm extends Component {
                           name: 'rescheduled_end_datetime', 
                           dbName: 'rescheduled_end_datetime', 
                           label: 'Date and time you want your rescheduled event to end',
-                          fieldType: 'DateTime', 
+                          fieldType: 'DateTime',
+                          defaultValue: null,  
                           contentType: 'text', 
                           isRequired: true
                         }
