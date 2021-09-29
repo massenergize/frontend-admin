@@ -1,25 +1,28 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import { Helmet } from 'react-helmet';
-import brand from 'dan-api/dummy/brand';
-import MUIDataTable from 'mui-datatables';
-import FileCopy from '@material-ui/icons/FileCopy';
-import EditIcon from '@material-ui/icons/Edit';
-import { Link } from 'react-router-dom';
-import Avatar from '@material-ui/core/Avatar';
-import Icon from '@material-ui/core/Icon';
-import Edit from '@material-ui/icons/Edit';
-import Language from '@material-ui/icons/Language';
-import PeopleIcon from '@material-ui/icons/People';
-import messageStyles from 'dan-styles/Messages.scss';
-import { connect } from 'react-redux';
-import { fetchData } from '../../../utils/messenger';
-import styles from '../../../components/Widget/widget-jss';
-import { bindActionCreators } from 'redux';
-import { reduxGetAllTeams, reduxGetAllCommunityTeams } from '../../../redux/redux-actions/adminActions';
+import React from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import { Helmet } from "react-helmet";
+import brand from "dan-api/dummy/brand";
+import MUIDataTable from "mui-datatables";
+import FileCopy from "@material-ui/icons/FileCopy";
+import EditIcon from "@material-ui/icons/Edit";
+import { Link } from "react-router-dom";
+import Avatar from "@material-ui/core/Avatar";
+import Icon from "@material-ui/core/Icon";
+import Edit from "@material-ui/icons/Edit";
+import Language from "@material-ui/icons/Language";
+import PeopleIcon from "@material-ui/icons/People";
+import messageStyles from "dan-styles/Messages.scss";
+import { connect } from "react-redux";
+import { fetchData } from "../../../utils/messenger";
+import styles from "../../../components/Widget/widget-jss";
+import { bindActionCreators } from "redux";
+import {
+  reduxGetAllTeams,
+  reduxGetAllCommunityTeams,
+} from "../../../redux/redux-actions/adminActions";
 import CommunitySwitch from "../Summary/CommunitySwitch";
-import { apiCall } from '../../../utils/messenger';
+import { apiCall } from "../../../utils/messenger";
 
 class AllTeams extends React.Component {
   constructor(props) {
@@ -40,116 +43,121 @@ class AllTeams extends React.Component {
     await this.setStateAsync({ loading: false });
   }
 
-
   setStateAsync(state) {
     return new Promise((resolve) => {
       this.setState(state, resolve);
     });
   }
 
-  getStatus = isApproved => {
+  getStatus = (isApproved) => {
     switch (isApproved) {
-      case false: return messageStyles.bgError;
-      case true: return messageStyles.bgSuccess;
-      default: return messageStyles.bgSuccess;
+      case false:
+        return messageStyles.bgError;
+      case true:
+        return messageStyles.bgSuccess;
+      default:
+        return messageStyles.bgSuccess;
     }
   };
 
   showCommunitySwitch = () => {
-    const user = this.props.auth ? this.props.auth: {};
+    const user = this.props.auth ? this.props.auth : {};
     if (user.is_community_admin) {
-      return (
-        <CommunitySwitch actionToPerform={this.handleCommunityChange} />
-      );
+      return <CommunitySwitch actionToPerform={this.handleCommunityChange} />;
     }
-  }
+  };
 
-  handleCommunityChange =(id) => {
+  handleCommunityChange = (id) => {
     this.props.callTeamsForNormalAdmin(id);
-  }
+  };
 
   fashionData = (data) => {
     if (!data) return [];
-    const fashioned = data.map(d => (
-      [
-        d.id,
-        {
-          id: d.id,
-          image: d.logo,
-          initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
-        },
-        `${d.name}...`.substring(0, 30), // limit to first 30 chars
-        d.community && d.community.name,
-        d.parent && d.parent.name,
-        `${d.is_published ? 'Yes' : 'No'}`,
-        d.id,
-        d.id
-      ]
-    ));
+    const fashioned = data.map((d) => [
+      d.id,
+      {
+        id: d.id,
+        image: d.logo,
+        initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`,
+      },
+      `${d.name}...`.substring(0, 30), // limit to first 30 chars
+      d.primary_community && d.primary_community.name,
+      d.parent && d.parent.name,
+      `${d.is_published ? "Yes" : "No"}`,
+      d.id,
+      d.id,
+    ]);
     return fashioned;
-  }
-
+  };
 
   getColumns = () => [
     {
-      name: 'ID',
-      key: 'id',
+      name: "ID",
+      key: "id",
       options: {
         filter: true,
-        filterType: 'textField'
-      }
+        filterType: "textField",
+      },
     },
     {
-      name: 'Team Logo',
-      key: 'id',
+      name: "Team Logo",
+      key: "id",
       options: {
         filter: false,
         download: false,
         customBodyRender: (d) => (
           <div>
-            {d.image
-              && <Link to={`/admin/edit/${d.id}/team`} target="_blank"><Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} /></Link>
-            }
-            {!d.image
-              && <Link to={`/admin/edit/${d.id}/team`} target="_blank"><Avatar style={{ margin: 10 }}>{d.initials}</Avatar></Link>
-            }
+            {d.image && (
+              <Link to={`/admin/edit/${d.id}/team`} target="_blank">
+                <Avatar
+                  alt={d.initials}
+                  src={d.image.url}
+                  style={{ margin: 10 }}
+                />
+              </Link>
+            )}
+            {!d.image && (
+              <Link to={`/admin/edit/${d.id}/team`} target="_blank">
+                <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
+              </Link>
+            )}
           </div>
-        )
-      }
+        ),
+      },
     },
     {
-      name: 'Name',
-      key: 'name',
+      name: "Name",
+      key: "name",
       options: {
         filter: false,
-      }
+      },
     },
     {
-      name: 'Community',
-      key: 'community',
+      name: "Community",
+      key: "community",
       options: {
         filter: true,
-        filterType: 'multiselect'
-      }
+        filterType: "multiselect",
+      },
     },
     {
-      name: 'Parent',
-      key: 'parent',
+      name: "Parent",
+      key: "parent",
       options: {
         filter: true,
-        filterType: 'multiselect'
-      }
+        filterType: "multiselect",
+      },
     },
     {
-      name: 'Live?',
-      key: 'is_published',
+      name: "Live?",
+      key: "is_published",
       options: {
         filter: true,
-      }
+      },
     },
     {
-      name: 'Team Members',
-      key: 'team_members',
+      name: "Team Members",
+      key: "team_members",
       options: {
         filter: false,
         download: false,
@@ -157,12 +165,12 @@ class AllTeams extends React.Component {
           <Link to={`/admin/edit/${id}/team_members`} target="_blank">
             <PeopleIcon size="small" variant="outlined" color="secondary" />
           </Link>
-        )
-      }
+        ),
+      },
     },
     {
-      name: 'Edit?',
-      key: 'edit_or_copy',
+      name: "Edit?",
+      key: "edit_or_copy",
       options: {
         filter: false,
         download: false,
@@ -170,30 +178,29 @@ class AllTeams extends React.Component {
           <Link to={`/admin/edit/${id}/team`}>
             <EditIcon size="small" variant="outlined" color="secondary" />
           </Link>
-        )
-      }
+        ),
+      },
     },
-  ]
-
+  ];
 
   render() {
-    const title = brand.name + ' - All Teams';
+    const title = brand.name + " - All Teams";
     const description = brand.desc;
     const { columns } = this.state;
     const data = this.fashionData(this.props.allTeams);
     const { classes } = this.props;
     const options = {
-      filterType: 'dropdown',
-      responsive: 'stacked',
+      filterType: "dropdown",
+      responsive: "stacked",
       print: true,
       rowsPerPage: 100,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach(d => {
+        idsToDelete.forEach((d) => {
           const teamId = data[d.dataIndex][0];
-          apiCall('/teams.delete', { team_id: teamId });
+          apiCall("/teams.delete", { team_id: teamId });
         });
-      }
+      },
     };
     return (
       <div>
@@ -224,17 +231,23 @@ AllTeams.propTypes = {
 };
 function mapStateToProps(state) {
   return {
-    auth: state.getIn(['auth']),
-    allTeams: state.getIn(['allTeams']),
-    community: state.getIn(['selected_community'])
+    auth: state.getIn(["auth"]),
+    allTeams: state.getIn(["allTeams"]),
+    community: state.getIn(["selected_community"]),
   };
 }
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-    callTeamsForSuperAdmin: reduxGetAllTeams,
-    callTeamsForNormalAdmin: reduxGetAllCommunityTeams
-  }, dispatch);
+  return bindActionCreators(
+    {
+      callTeamsForSuperAdmin: reduxGetAllTeams,
+      callTeamsForNormalAdmin: reduxGetAllCommunityTeams,
+    },
+    dispatch
+  );
 }
-const TeamsMapped = connect(mapStateToProps, mapDispatchToProps)(AllTeams);
+const TeamsMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AllTeams);
 
 export default withStyles(styles)(TeamsMapped);
