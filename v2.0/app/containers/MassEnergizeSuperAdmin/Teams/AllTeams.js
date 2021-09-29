@@ -79,7 +79,7 @@ class AllTeams extends React.Component {
           initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
         },
         `${d.name}...`.substring(0, 30), // limit to first 30 chars
-        d.community && d.community.name,
+        d.primary_community && d.primary_community.name,
         d.parent && d.parent.name,
         `${d.is_published ? 'Yes' : 'No'}`,
         d.id,
