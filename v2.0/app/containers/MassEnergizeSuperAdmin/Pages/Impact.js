@@ -102,20 +102,10 @@ class Impact extends Component {
               children: 
               [
     
-                //{
-                //  name: 'initial_number_of_actions',
-                //  label: 'Manual Input: Initial Number of Actions',
-                //  placeholder: 'eg. 0',
-                //  fieldType: 'TextField',
-                //  contentType: 'number',
-                //  isRequired: false,
-                //  defaultValue: goal && goal.initial_number_of_actions,
-                //  dbName: 'initial_number_of_actions',
-                //  readOnly: false
-                //},
+                // 9/2021 - eliminate initial_number_of_actions',
                 {
                   name: 'attained_number_of_actions',
-                  label: 'State/Vendor reported: Attained Number of Actions',
+                  label: 'State/Partner reported: Attained Number of Actions',
                   placeholder: '',
                   fieldType: 'TextField',
                   contentType: 'number',
@@ -126,7 +116,7 @@ class Impact extends Component {
                 },
                 {
                   name: 'organic_attained_number_of_actions',
-                  label: 'Organic Website Usage: Attained Number of Actions',
+                  label: 'User Reported: Number of Completed Actions',
                   placeholder: '',
                   fieldType: 'TextField',
                   contentType: 'number',
@@ -155,7 +145,7 @@ class Impact extends Component {
               [
                 {
                   name: 'attained_number_of_households',
-                  label: 'State/Vendor reported: Estimated number of households',
+                  label: 'State/Partner reported: Estimated number of households',
                   placeholder: '',
                   fieldType: 'TextField',
                   contentType: 'number',
@@ -166,7 +156,7 @@ class Impact extends Component {
                 },
                 {
                   name: 'organic_attained_number_of_households',
-                  label: 'Organic Website Usage: How many households joined this community',
+                  label: 'User Reported: How many households joined this community',
                   placeholder: '',
                   fieldType: 'TextField',
                   contentType: 'number',
@@ -204,20 +194,9 @@ class Impact extends Component {
               fieldType: 'Section',
               children: 
               [
-                //{
-                //  name: 'attained_carbon_footprint_reduction',
-                //  label: 'State/Vendor reported: Carbon Footprint Reduction (lbs)',
-                //  placeholder: '',
-                //  fieldType: 'TextField',
-                //  contentType: 'number',
-                //  isRequired: false,
-                //  defaultValue: goal && goal.attained_carbon_footprint_reduction,
-                //  dbName: 'attained_carbon_footprint_reduction',
-                //  readOnly: true
-                //},
                 {
                   name: 'organic_attained_carbon_footprint_reduction',
-                  label: 'Organic Website Usage: Carbon Footprint Reduction',
+                  label: 'User Reported: Carbon Footprint Reduction from Actions Completed',
                   placeholder: '',
                   fieldType: 'TextField',
                   contentType: 'number',

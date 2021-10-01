@@ -53,7 +53,6 @@ class HomePageEditForm extends Component {
       return;
     }
 
-
     const eventsResponse = await apiCall('/events.list', { community_id: id });
     if (eventsResponse && eventsResponse.data) {
       const events = eventsResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
@@ -62,14 +61,6 @@ class HomePageEditForm extends Component {
       await this.setStateAsync({ noDataFound: true, formJson: {} });
       return;
     }
-
-    //const communityResponse = await apiCall('/communities.info', { community_id: id });
-    //if (communityResponse && communityResponse.data) {
-    //  await this.setStateAsync({ goal: communityResponse.data.goal });
-    //} else {
-    //  await this.setStateAsync({ noDataFound: true });
-    //  return;
-    //}
 
     const formJson = await this.createFormJson(homePageResponse.data);
     await this.setStateAsync({ formJson, noDataFound: false });
@@ -102,7 +93,6 @@ class HomePageEditForm extends Component {
     const [image1, image2, image3] = images;
     const [iconBox1, iconBox2, iconBox3, iconBox4] = featured_links;
 
-    //const goal = this.state.goal;
     const selectedEvents = (homePageData && featured_events) ? featured_events.map(e => '' + e.id) : [];
     const archivedEvents = featured_events.filter(f => !f.is_published).map(c => ({ ...c, displayName: '(Archived) ' + c.name, id: '' + c.id }));
     const eventsToDisplay = [...archivedEvents, ...events];
@@ -252,138 +242,6 @@ class HomePageEditForm extends Component {
                     dbName: 'featured_stats_description',
                     readOnly: false
                   },
-                  //{
-                  //  name: 'initial_number_of_actions',
-                  //  label: 'Manual Input: Initial Number of Actions',
-                  //  placeholder: 'eg. 0',
-                  //  fieldType: 'TextField',
-                  //  contentType: 'number',
-                  //  isRequired: false,
-                  //  defaultValue: goal && goal.initial_number_of_actions,
-                  //  dbName: 'initial_number_of_actions',
-                  //  readOnly: false
-                  //},
-                  //{
-                  //  name: 'attained_number_of_actions',
-                  //  label: 'State/Vendor reported: Attained Number of Actions',
-                  //  placeholder: '',
-                  //  fieldType: 'TextField',
-                  //  contentType: 'number',
-                  //  isRequired: false,
-                  //  defaultValue: goal && goal.attained_number_of_actions,
-                  //  dbName: 'attained_number_of_actions',
-                  //  readOnly: true
-                  //},
-                  //{
-                  //  name: 'organic_attained_number_of_actions',
-                  //  label: 'Organic Website Usage: Attained Number of Actions',
-                  //  placeholder: '',
-                  //  fieldType: 'TextField',
-                  //  contentType: 'number',
-                  //  isRequired: false,
-                  //  defaultValue: goal && goal.organic_attained_number_of_actions,
-                  //  dbName: 'organic_attained_number_of_actions',
-                  //  readOnly: true
-                  //},
-                  //{
-                  //  name: 'target_number_of_actions',
-                  //  label: 'Target Number of Actions',
-                  //  placeholder: 'eg. 2000',
-                  //  fieldType: 'TextField',
-                  //  contentType: 'number',
-                  //  isRequired: false,
-                  //  defaultValue: goal && goal.target_number_of_actions,
-                  //  dbName: 'target_number_of_actions',
-                  //  readOnly: false
-                  //},
-                  //{
-                  //  name: 'initial_number_of_households',
-                  //  label: 'Manual Input: Initial number of households in this community?',
-                  //  placeholder: 'eg. 0',
-                  //  fieldType: 'TextField',
-                  //  contentType: 'number',
-                  //  isRequired: false,
-                  //  defaultValue: goal && goal.initial_number_of_households,
-                  //  dbName: 'initial_number_of_households',
-                  //  readOnly: false
-                  //},
-                  //{
-                  //  name: 'attained_number_of_households',
-                  //  label: 'State/Vendor reported: Estimated number of households',
-                  //  placeholder: '',
-                  //  fieldType: 'TextField',
-                  //  contentType: 'number',
-                  //  isRequired: false,
-                  //  defaultValue: goal && goal.attained_number_of_households,
-                  //  dbName: 'attained_number_of_households',
-                  //  readOnly: true
-                  //},
-                  //{
-                  //  name: 'organic_attained_number_of_households',
-                  //  label: 'Organic Website Usage: How many households joined this community',
-                  //  placeholder: '',
-                  //  fieldType: 'TextField',
-                  //  contentType: 'number',
-                  //  isRequired: false,
-                  //  defaultValue: goal && goal.organic_attained_number_of_households,
-                  //  dbName: 'organic_attained_number_of_households',
-                  //  readOnly: true
-                  //},
-                  //{
-                  //  name: 'target_number_of_households',
-                  //  label: 'How many households are expected to join this community?',
-                  //  placeholder: 'eg. 1000',
-                  //  fieldType: 'TextField',
-                  //  contentType: 'number',
-                  //  isRequired: false,
-                  //  defaultValue: goal && goal.target_number_of_households,
-                  //  dbName: 'target_number_of_households',
-                  //  readOnly: false
-                  //},
-                  //{
-                  //  name: 'initial_carbon_footprint_reduction',
-                  //  label: 'Manual Input: Initial carbon footprint reduction previously attained (lbs)',
-                  //  placeholder: 'eg. 0',
-                  //  fieldType: 'TextField',
-                  //  contentType: 'number',
-                  //  isRequired: false,
-                  //  defaultValue: goal && goal.initial_carbon_footprint_reduction,
-                  //  dbName: 'initial_carbon_footprint_reduction',
-                  //  readOnly: false
-                  //},
-                  //{
-                  //  name: 'attained_carbon_footprint_reduction',
-                  //  label: 'State/Vendor reported: Carbon Footprint Reduction (lbs)',
-                  //  placeholder: '',
-                  //  fieldType: 'TextField',
-                  //  contentType: 'number',
-                  //  isRequired: false,
-                  //  defaultValue: goal && goal.attained_carbon_footprint_reduction,
-                  //  dbName: 'attained_carbon_footprint_reduction',
-                  //  readOnly: true
-                  //},
-                  //{
-                  //  name: 'organic_attained_carbon_footprint_reduction',
-                  //  label: 'Organic Website Usage: Carbon Footprint Reduction (lbs)',
-                  //  placeholder: '',
-                  //  fieldType: 'TextField',
-                  //  contentType: 'number',
-                  //  isRequired: false,
-                  //  defaultValue: goal && goal.organic_attained_carbon_footprint_reduction,
-                  //  dbName: 'organic_attained_carbon_footprint_reduction',
-                  //  readOnly: true
-                  //},
-                  //{
-                  //  name: 'target_carbon_footprint_reduction',
-                  //  label: 'Goal for Carbon Footprint Reduction (lbs.)',
-                  //  placeholder: 'eg. 10000000',
-                  //  fieldType: 'TextField',
-                  //  contentType: 'number',
-                  //  isRequired: false,
-                  //  defaultValue: goal && goal.target_carbon_footprint_reduction,
-                  //  dbName: 'target_carbon_footprint_reduction',
-                  //  readOnly: false
-                  //},
                 ]
               }
             },
