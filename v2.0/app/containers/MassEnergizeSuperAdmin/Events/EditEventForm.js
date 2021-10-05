@@ -190,7 +190,7 @@ class CreateNewEventForm extends Component {
             },
             {
               name: 'end_date_and_time',
-              label: 'End Date And Time',
+              label: 'End Date And Time - Note: for recurring events, you can specify a final date w/ end time, otherwise events will recur for 1 year or until cancelled.',
               placeholder: 'YYYY-MM-DD HH:MM',
               fieldType: 'DateTime',
               contentType: 'text',

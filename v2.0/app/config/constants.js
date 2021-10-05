@@ -17,7 +17,7 @@ if (IS_LOCAL) {
   API_HOST = 'https://api-canary.massenergize.org';
 } else {
   // IS_DEV
-  API_HOST = 'https://api-dev.massenergize.org';
+  API_HOST = 'https://api.massenergize.dev';
 }
 
 //  ---- setting  Firebase Config routes
