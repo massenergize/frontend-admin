@@ -2,7 +2,7 @@
  * This file contains code used to transmit data
  */
 import qs from 'qs';
-import { API_HOST, IS_CANARY, IS_PROD, IS_LOCAL } from '../config/constants';
+import { API_HOST, IS_CANARY, IS_PROD, IS_LOCAL, CC_HOST } from '../config/constants';
 
 /**
  * Handles making a POST request to the backend as a form submission
@@ -36,11 +36,21 @@ export async function apiCall(
     destinationUrl = destinationUrl.substring(1);
   }
 
-  if (IS_LOCAL) {
-    destinationUrl = "api/" + destinationUrl;
+  // special case for carbon_calculator api
+  let host = API_HOST;
+  if (destinationUrl.substring(0, 1) === 'cc') {
+    host = CC_HOST;
+    if (!IS_LOCAL) {
+      destinationUrl = destinationUrl.substring(3);
+    }
   }
-  
-  const response = await fetch(`${API_HOST}/${destinationUrl}`, {
+  else if (IS_LOCAL) {
+    // not for cc api
+    destinationUrl = "api/" + destinationUrl;
+  }  
+  destinationUrl = `${host}/${destinationUrl}`
+
+  const response = await fetch(destinationUrl, {
     credentials: 'include',
     method: 'POST',
     body: formData

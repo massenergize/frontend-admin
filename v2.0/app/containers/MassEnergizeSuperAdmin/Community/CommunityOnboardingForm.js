@@ -98,6 +98,18 @@ class CreateNewCommunityForm extends Component {
               readOnly: false,
             },
             {
+              name: "website",
+              label:
+                "Custom website domain (optional): URL which would forward to the portal, that users will see.  Don't include 'https://' ",
+              placeholder: "eg. 'EnergizeYourTown.org'",
+              fieldType: "TextField",
+              contentType: "text",
+              isRequired: false,
+              defaultValue: "",
+              dbName: "website",
+              readOnly: false,
+            },
+            {
               name: "about",
               label: "Tell us about this community",
               placeholder: "Tell us more ...",
@@ -302,39 +314,6 @@ class CreateNewCommunityForm extends Component {
                 },
               ],
             },
-            // {
-            //   name: 'admin_full_name',
-            //   label: 'Contact Person\'s Full Name',
-            //   placeholder: 'eg. Grace Tsu',
-            //   fieldType: 'TextField',
-            //   contentType: 'text',
-            //   isRequired: true,
-            //   defaultValue: '',
-            //   dbName: 'owner_name',
-            //   readOnly: false
-            // },
-            // {
-            //   name: 'admin_email',
-            //   label: 'Community\'s Public Email',
-            //   placeholder: 'eg. johny.appleseed@gmail.com',
-            //   fieldType: 'TextField',
-            //   contentType: 'text',
-            //   isRequired: true,
-            //   defaultValue: '',
-            //   dbName: 'owner_email',
-            //   readOnly: false
-            // },
-            // {
-            //   name: 'admin_phone_number',
-            //   label: 'Community\'s Public Phone Number',
-            //   placeholder: 'eg. 571 222 4567',
-            //   fieldType: 'TextField',
-            //   contentType: 'text',
-            //   isRequired: false,
-            //   defaultValue: '',
-            //   dbName: 'owner_phone_number',
-            //   readOnly: false
-            // },
           ],
         },
         {

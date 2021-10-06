@@ -19,6 +19,7 @@ if (IS_LOCAL) {
   // IS_DEV
   API_HOST = 'https://api.massenergize.dev';
 }
+const CC_HOST = API_HOST.replace('//api', '//cc');  // local should stay the same
 
 //  ---- setting  Firebase Config routes
 let FIREBASE_CONFIG = {};
@@ -77,6 +78,7 @@ module.exports = {
   IS_PROD,
   IS_CANARY,
   API_HOST,
+  CC_HOST,
   APP_NAME,
   FIREBASE_CONFIG,
   PORTAL_HOST,
