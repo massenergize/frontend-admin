@@ -232,7 +232,7 @@ class CreateNewEventForm extends Component {
                   }, 
                   {
                     name: 'final_date',
-                    label: 'Final Date for recurring events, you can specify a final date, otherwise events will recur until cancelled.',
+                    label: 'Final Date for recurring events, you can specify a final date, otherwise events will recur until cancelled. The time is ignored.',
                     placeholder: 'YYYY-MM-DD',
                     fieldType: 'DateTime',
                     contentType: 'text',
