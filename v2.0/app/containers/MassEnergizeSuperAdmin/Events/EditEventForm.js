@@ -326,6 +326,17 @@ class CreateNewEventForm extends Component {
                       { id: 'fourth', displayName: 'fourth'}
                     ]
                   }, 
+                  {
+                    name: 'final_date',
+                    label: 'Final Date for recurring events, you can specify a final date, otherwise events will recur until cancelled.  The time is ignored.',
+                    placeholder: 'YYYY-MM-DD',
+                    fieldType: 'DateTime',
+                    contentType: 'text',
+                    isRequired: false,
+                    defaultValue: event.recurring_details && event.recurring_details.final_date ? event.recurring_details.final_date : "none",
+                    dbName: 'final_date',
+                    readOnly: false
+                  },
                 ]
               }
             },

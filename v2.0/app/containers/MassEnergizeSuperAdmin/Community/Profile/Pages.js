@@ -48,7 +48,7 @@ class Pages extends React.Component {
 
             <Paper onClick={() => this.goHere(impactsLink)} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                COMMUNITY IMPACT DATA
+                COMMUNITY GOALS AND IMPACT DATA
                 {' '}
                 <Icon style={{paddingTop:3, color:'green'}}>forward</Icon>
               </Typography>

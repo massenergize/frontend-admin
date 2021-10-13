@@ -131,6 +131,18 @@ class EditCommunityForm extends Component {
               readOnly: false,
             },
             {
+              name: "website",
+              label:
+                "Custom website domain (optional): URL which would forward to the portal, that users will see.  Don't include 'https://' ",
+              placeholder: "eg. 'EnergizeYourTown.org'",
+              fieldType: "TextField",
+              contentType: "text",
+              isRequired: false,
+              defaultValue: community.website,
+              dbName: "website",
+              readOnly: false,
+            },
+            {
               name: "about",
               label: "Tell us about this community",
               placeholder: "Tell us more ...",
