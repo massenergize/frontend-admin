@@ -102,7 +102,7 @@ class EventsPageEditForm extends Component {
         },
          {
           name: 'description',
-          label: 'Paragraph to be displayed below the title',
+          label: 'Additional information to show by hovering on title',
           placeholder: 'Tell us more ...',
           fieldType: 'TextField',
           contentType: 'text',

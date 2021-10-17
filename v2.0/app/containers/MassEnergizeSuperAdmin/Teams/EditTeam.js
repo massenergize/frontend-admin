@@ -41,31 +41,33 @@ class EditTeam extends Component {
       communities: [],
       formJson: null,
       addTeamAdminJson: null,
-      team: null
+      team: null,
+      parentTeamOptions: false,
     };
   }
 
 
   async componentDidMount() {
     const { id } = this.props.match.params;
+    let parentTeamOptions = "0";    
     const teamResponse = await apiCall('/teams.info', { team_id: id });
     if (teamResponse && teamResponse.data) {
       const team = teamResponse.data;
-      let parentTeamOptions;
-      if (team.community) {
+
+      if (team.primary_community) {
         // const teams = await this.props.callTeamsForNormalAdmin();
-        const teams = await apiCall('/teams.list', { community_id: team.community.id });
+        const teams = await apiCall('/teams.list', { community_id: team.primary_community.id });
         // if other teams have us as a parent, can't set a parent ourselves
         // from that point, can set parent teams that are not ourselves AND don't have parents themselves (i.e. aren't sub-teams)
         const parentTeams = teams.data.filter(_team => _team.parent && _team.parent.id === team.id).length === 0
           && teams.data.filter(_team => ((_team.id !== team.id) && !_team.parent));
         if (parentTeams) {
           parentTeamOptions = parentTeams.map(_team => ({ id: _team.id, displayName: _team.name }));
-          parentTeamOptions.unshift({ id: null, displayName: 'NONE' });
+          parentTeamOptions = [{displayName:"NONE", id:"0"}, ...parentTeamOptions]
         }
         else
         {
-          parentTeamOptions = false;
+          parentTeamOptions = [{displayName:"Team cannot have a parent, because it is a parent of another team", id:"0"}];
         }
       }
       await this.setStateAsync({ team, parentTeamOptions });
@@ -73,7 +75,7 @@ class EditTeam extends Component {
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
 
     if (communitiesResponse && communitiesResponse.data) {
-      const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name }));
+      const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
       await this.setStateAsync({ communities });
     }
 
@@ -88,8 +90,8 @@ class EditTeam extends Component {
   }
 
   createFormJson = async () => {
-    console.log('createFormJson')
     const { communities, team, parentTeamOptions } = this.state;
+    const selectedCommunities = team.communities ? team.communities.map(e => '' + e.id) : [];
     const formJson = {
       title: 'Edit Team Information',
       subTitle: '',
@@ -123,19 +125,29 @@ class EditTeam extends Component {
               readOnly: false
             },
             {
-              name: 'community',
+              name: 'primary_community',
               label: 'Primary Community',
-              placeholder: 'eg. Wayland',
+              placeholder: '',
               fieldType: 'Dropdown',
-              defaultValue: team.community && team.community.id,
-              dbName: 'community_id',
+              defaultValue: team.primary_community && team.primary_community.id,
+              dbName: 'primary_community_id',
               data: [{displayName:"--", id:""}, ...communities],
             },
             {
+              name: 'communities',
+              label: 'Communities which share this team',
+              placeholder: '',
+              fieldType: 'Checkbox',
+              selectMany: true,
+              defaultValue: selectedCommunities,
+              dbName: 'communities',
+              data: communities,
+            },
+             {
               name: 'parent',
-              label: parentTeamOptions && 'Parent Team'  || 'Parent Team (but this team is the parent of another team already)',
+              label: parentTeamOptions && 'Choose a Parent Team, if this team is part of a larger group (not the usual case)',
               fieldType: 'Dropdown',
-              defaultValue: (team.parent && team.parent.id),
+              defaultValue: (team.parent && team.parent.id) || "0",
               dbName: 'parent_id',
               data: parentTeamOptions,
               readOnly: parentTeamOptions && false || true,

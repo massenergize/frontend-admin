@@ -2,10 +2,10 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
 import { PapperBlock } from 'dan-components';
-import CreateNewTeamForm from './CreateNewTeamForm';
+import NewCarbonEquivalencyForm from './NewCarbonEquivalencyForm';
 class Onboarding extends React.Component {
   render() {
-    const title = brand.name + ' - Create New Team';
+    const title = brand.name + ' - Add Carbon Equivalency';
     const description = brand.desc;
     return (
       <div>
@@ -17,8 +17,8 @@ class Onboarding extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <PapperBlock title="Create New Team" desc="">
-          <CreateNewTeamForm />
+        <PapperBlock title="Add New Equivalency" desc="">
+          <NewCarbonEquivalencyForm />
         </PapperBlock>
       </div>
     );

@@ -58,6 +58,7 @@ class AllTeamAdminMessages extends React.Component {
     return data.map(d => (
       [
         d.id,
+        d.created_at,
         d.title,
         d.user_name || (d.user && d.user.full_name),
         d.email || (d.user && d.user.email),
@@ -77,6 +78,13 @@ class AllTeamAdminMessages extends React.Component {
       options: {
         filter: true,
         filterType: 'textField'
+      }
+    },
+    {
+      name: 'Date',
+      key: 'date',
+      options: {
+        filter: true,
       }
     },
     {

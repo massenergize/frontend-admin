@@ -27,13 +27,15 @@ import {
   DashboardAdminSummaryPage,
   TestimonialsPage, AddTestimonial, AllTestimonials, Export, CustomizePages,
   SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditPolicy, UsersList, 
-  ImpactPage, Impact
+  ImpactPage, Impact, ImportContacts,
+  AddCarbonEquivalency, AllCarbonEquivalencies, EditCarbonEquivalency,
 } from '../pageListAsync';
 import EditVendor from '../MassEnergizeSuperAdmin/Vendors/EditVendor';
 import AddRemoveAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveAdmin';
 import AddRemoveSuperAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveSuperAdmin';
 import EditCommunityByCommunityAdmin from '../MassEnergizeSuperAdmin/Community/EditCommunityByCommunityAdmin';
 import EditTeam from '../MassEnergizeSuperAdmin/Teams/EditTeam';
+//import EditCarbonEquivalency from '../MassEnergizeSuperAdmin/CarbonEquivalencies/EditCarbonEquivalency';
 import EditCategory from '../MassEnergizeSuperAdmin/Categories/EditCategory';
 import EditTestimonial from '../MassEnergizeSuperAdmin/Testimonials/EditTestimonial';
 import AllSubscribers from '../MassEnergizeSuperAdmin/Subscribers/AllSubscribers';
@@ -55,6 +57,7 @@ class Application extends React.Component {
     const user = auth || {};
 
     const communityAdminSpecialRoutes = [
+      <Route path="/admin/importcontacts" component={ImportContacts}/>,
       <Route exact path="/" render={(props) => <DashboardAdminSummaryPage {...props} signOut={signOut} />} />,
       <Route path="/admin/community/:id/edit" component={EditCommunityByCommunityAdmin} exact />,
       <Route exact path="/admin" render={(props) => <DashboardAdminSummaryPage {...props} signOut={signOut} />} />,
@@ -62,6 +65,7 @@ class Application extends React.Component {
     ];
 
     const superAdminSpecialRoutes = [
+      <Route path="/admin/importcontacts" component={ImportContacts}/>,
       <Route exact path="/" render={(props) => <DashboardSummaryPage {...props} signOut={signOut} />} />,
       <Route path="/admin/community/:id/edit" component={OnboardCommunity} exact />,
       <Route exact path="/admin" render={(props) => <DashboardSummaryPage {...props} signOut={signOut} />} />,
@@ -102,6 +106,9 @@ class Application extends React.Component {
           <Route path="/admin/add/action" component={AddAction} />
           <Route path="/admin/edit/:id/action" component={EditAction} exact />
           <Route path="/admin/add/action/:id" component={EditAction} />
+          <Route path="/admin/read/carbon-equivalencies" component={AllCarbonEquivalencies} />
+          <Route path="/admin/add/carbon-equivalency" component={AddCarbonEquivalency} />
+          <Route path="/admin/edit/:id/carbon-equivalency" component={EditCarbonEquivalency} exact />
           <Route path="/admin/read/categories" component={AllCategories} />
           <Route path="/admin/add/category" component={AddCategory} />
           <Route path="/admin/read/tag-collections" component={AllCategories} />

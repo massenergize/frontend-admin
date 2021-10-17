@@ -26,9 +26,9 @@ import { FilledInput, MenuItem } from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import Icon from "@material-ui/core/Icon";
 import moment from "moment";
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import { EditorState } from "draft-js";
-import { stateFromHTML } from "draft-js-import-html";
+//import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+//import { EditorState } from "draft-js";
+//import { stateFromHTML } from "draft-js-import-html";
 import { apiCall } from "../../../utils/messenger";
 import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
 import FieldTypes from "./fieldTypes";
@@ -87,6 +87,8 @@ class MassEnergizeForm extends Component {
     this.updateForm = this.updateForm.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
     this.closePreviewModal = this.closePreviewModal.bind(this);
+    const {ICON_FILES} = require('./icon_files.json');
+    this.iconFiles = ICON_FILES;
   }
 
   async componentDidMount() {
@@ -119,12 +121,13 @@ class MassEnergizeForm extends Component {
     this.setState({ activeModal: null });
   }
 
-  initializeHtmlField = (content) => {
-    if (!content || content === "<p></p>\n") {
-      return EditorState.createEmpty();
-    }
-    return EditorState.createWithContent(stateFromHTML(content));
-  };
+  // 0921
+  //initializeHtmlField = (content) => {
+  //  if (!content || content === "<p></p>\n") {
+  //    return EditorState.createEmpty();
+  //  }
+  //  return EditorState.createWithContent(stateFromHTML(content));
+  //};
 
   /**
    * Given the field, it renders the actual component
@@ -179,12 +182,13 @@ class MassEnergizeForm extends Component {
     });
   };
 
-  onEditorStateChange = async (name, editorState) => {
-    const { formData } = this.state;
-    await this.setStateAsync({
-      formData: { ...formData, [name]: editorState },
-    });
-  };
+  //0921
+  //onEditorStateChange = async (name, editorState) => {
+  //  const { formData } = this.state;
+  //  await this.setStateAsync({
+  //    formData: { ...formData, [name]: editorState },
+  //  });
+  //};
 
   /**
    * Handle multi select
@@ -289,6 +293,9 @@ class MassEnergizeForm extends Component {
     return "Please select an option";
   };
 
+  resetFileField(fieldName) {
+    this.updateForm(fieldName, "None");
+  }
   /**
    * This is a recursive function traversing all the fields and their children
    * and extracting their values from the form
@@ -299,7 +306,7 @@ class MassEnergizeForm extends Component {
     let hasMediaFiles = false;
     fields.forEach((field) => {
       const fieldValueInForm = formData[field.name];
-      if (fieldValueInForm || fieldValueInForm==='') {
+      if (fieldValueInForm || fieldValueInForm === "") {
         switch (field.fieldType) {
           case FieldTypes.HTMLField:
             // cleanedValues[field.dbName] = stateToHTML(
@@ -324,6 +331,11 @@ class MassEnergizeForm extends Component {
             break;
           case FieldTypes.File:
             hasMediaFiles = true;
+            if (fieldValueInForm === "None") {
+              // When we want to reset the value of an image field
+              cleanedValues[field.dbName] = fieldValueInForm;
+              break;
+            }
             if (field.filesLimit === 1 && fieldValueInForm.length > 0) {
               const [file] = fieldValueInForm;
               cleanedValues[field.dbName] = file;
@@ -336,7 +348,7 @@ class MassEnergizeForm extends Component {
         }
       }
       // field.conditional displays is just a way to display form items based on a selected
-      //radio buttons. Similar to the `field.child` but allows more options
+      //radio button. Similar to the `field.child` but allows more options
 
       if (field.conditionalDisplays && field.conditionalDisplays.length) {
         var selectedSet = field.conditionalDisplays.filter(
@@ -402,8 +414,6 @@ class MassEnergizeForm extends Component {
     if (formJson.preflightFxn) {
       cleanedValues = formJson.preflightFxn(cleanedValues);
     }
-
-    console.log("I am the cleaned values", cleanedValues);
 
     // let's make an api call to send the data
     let response = null;
@@ -557,10 +567,53 @@ class MassEnergizeForm extends Component {
             </FormControl>
           </div>
         );
-      case FieldTypes.File:
+      case FieldTypes.Icon:
         return (
           <div key={field.name}>
-            {field.previewLink && (
+            <FormControl className={classes.field}>
+              <InputLabel htmlFor={field.name}>{field.label}</InputLabel>
+              <Select
+                native
+                name={field.name}
+                onChange={async (newValue) => {
+                  await this.updateForm(field.name, newValue.target.value);
+                }}
+                inputProps={{
+                  id: "age-native-simple",
+                }}
+              >
+                <option value={this.getValue(field.name)}>
+                  {this.getDisplayName(
+                    field.name,
+                    this.getValue(field.name),
+                    this.iconFiles,
+                  )}
+                </option>
+                {this.iconFiles.map((c) => (
+                    <option value={c} key={c}>
+                      {c}
+                    </option>
+                  ))}
+              </Select>
+              {field.child &&
+                this.getValue(field.name) === field.child.valueToCheck &&
+                this.renderFields(field.child.fields)}
+            </FormControl>
+          </div>
+        );
+      case FieldTypes.File:
+        let value = this.getValue(field.name, []);
+        let files = files && files !== "None" ? files : [];
+        return (
+          <div key={field.name}>
+            {value === "None" && (
+              <p style={{ color: "maroon" }}>
+                <i>
+                  Image will be completely removed after you submit your changes
+                </i>
+              </p>
+            )}
+            {field.previewLink && value !== "None" && (
               <div>
                 <h6>Current Image:</h6>
                 <img
@@ -569,6 +622,22 @@ class MassEnergizeForm extends Component {
                   alt={field.label}
                 />
                 <br />
+
+                {field.allowReset && (
+                  <>
+                    <a
+                      href="#void"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        this.resetFileField(field.name);
+                      }}
+                    >
+                      Remove Image
+                    </a>
+                    <br />
+                  </>
+                )}
+
                 <br />
               </div>
             )}
@@ -601,8 +670,8 @@ class MassEnergizeForm extends Component {
                   )}
                 </li>
                 {field.extraInstructions &&
-                  field.extraInstructions.map((instruction) => (
-                    <li>{instruction}</li>
+                  field.extraInstructions.map((instruction, key) => (
+                    <li key={key.toString()}>{instruction}</li>
                   ))}
               </ul>
             </div>
@@ -616,7 +685,7 @@ class MassEnergizeForm extends Component {
                   "image/bmp",
                   "image/svg",
                 ]}
-                files={this.getValue(field.name, [])}
+                files={files}
                 showPreviews
                 maxSize={5000000}
                 imageAspectRatio={
@@ -676,8 +745,7 @@ class MassEnergizeForm extends Component {
               /> */}
 
               <TinyEditor
-                value={() => this.getValue(field.name, null)}
-                initialValue={this.getValue(field.name, null)}
+                value={this.getValue(field.name, null)}
                 onEditorChange={(content, editor) => {
                   this.handleEditorChange(content, editor, field.name);
                 }}
@@ -802,7 +870,7 @@ class MassEnergizeForm extends Component {
                       target: { name: field.name, value: date },
                     })
                   }
-                  label={field.label}
+                  label= "" // don't put label in the box {field.label}
                   format="MM/DD/YYYY, h:mm a"
                 />
               </MuiPickersUtilsProvider>
@@ -831,8 +899,8 @@ class MassEnergizeForm extends Component {
    * by making use of a helper function
    */
   renderFields = (fields) =>
-    fields.map((field) => (
-      <div>
+    fields.map((field, key) => (
+      <div key={`${field.name}-${key.toString()}`}>
         {this.renderModalText(field)}
         {this.renderField(field)}
       </div>

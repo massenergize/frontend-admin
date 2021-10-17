@@ -103,7 +103,7 @@ class ActionsPageEditForm extends Component {
         },
         {
           name: 'description',
-          label: 'Paragraph to be displayed below the title',
+          label: 'Additional information shown by hovering on title',
           placeholder: 'Tell us more ...',
           fieldType: 'TextField',
           contentType: 'text',
@@ -112,6 +112,15 @@ class ActionsPageEditForm extends Component {
           defaultValue: `${actionsPageData.description}`,
           dbName: 'description',
           readOnly: false
+        },
+        {
+          name: "enable",
+          fieldType: "Radio",
+          dbName: "is_published",
+          label: "This page is enabled if checked",
+          isRequired: false,
+          defaultValue: `${actionsPageData.is_published}`,
+          data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
         },
       ]
     };

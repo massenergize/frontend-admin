@@ -207,7 +207,18 @@ module.exports = [
     key: 'users',
     name: 'Users',
     icon: 'ios-people',
-    link: '/admin/read/users'
+    child: [
+      {
+        key: 'about-users',
+        name: 'Users',
+        title: true
+      },
+      {
+        key: 'all-users', 
+        name: 'All Users', 
+        link: '/admin/read/users'
+      }
+    ]
   },
   {
     key: 'add-new-super-admin',
@@ -234,6 +245,28 @@ module.exports = [
         key: 'all-collections',
         name: 'All Tag Collections',
         link: '/admin/read/tag-collections'
+      },
+    ]
+  },
+  {
+    key: 'carbon-equivalancies',
+    name: 'Carbon',
+    icon: 'md-reorder',
+    child: [
+      {
+        key: 'about-equivalencies',
+        name: 'Carbon Equivalencies',
+        title: true
+      },
+      {
+        key: 'add-equivalency',
+        name: 'Add Carbon Equivalency',
+        link: '/admin/add/carbon-equivalency'
+      },
+      {
+        key: 'all-equivalencies',
+        name: 'All Carbon Equivalencies',
+        link: '/admin/read/carbon-equivalencies'
       },
     ]
   },
