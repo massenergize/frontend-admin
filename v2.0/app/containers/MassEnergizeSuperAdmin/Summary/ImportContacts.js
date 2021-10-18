@@ -1,7 +1,8 @@
 import React from 'react';
 import { apiCall } from '../../../utils/messenger';
 import {CSVReader} from 'react-papaparse';
-
+import Button from '@material-ui/core/Button';
+import { PapperBlock } from 'dan-components';
 
 class ImportContacts extends React.Component {
     constructor(props) {
@@ -10,7 +11,7 @@ class ImportContacts extends React.Component {
             csv: null, 
             error: "", 
             headerFileRow: null,
-            formFields: ['First_Name', 'Last_Name', 'Email'], 
+            formFields: ['First Name', 'Last Name', 'Email'], 
             teamsList: null
         };
         this.handleChange = this.handleChange.bind(this);
@@ -120,10 +121,33 @@ class ImportContacts extends React.Component {
 
     render() {
         return(
-            <div>
-                <h1>Import new contact here by uploading a CSV file.</h1>
+            <PapperBlock title="Bulk Invite Large Number of Users" desc="">
+                <h6>Step 1: Prepare your CSV file.</h6>
+                    <ul
+                        style={{
+                        listStyleType: "circle",
+                        paddingLeft: "30px",
+                        fontSize: 14,
+                        marginBottom: "20px"
+                        }}
+                        >
+                        <li>Verify that the first row of your spreadsheet is the header row.</li>
+                        <li>Your file should contain at least three columns: first name, last name, and email."</li>
+                        <li>Include only one email address per user.</li>
+                        <li>Save your file as .csv (.xls or .xlsx extensions will not work).</li>
+                    </ul>
+                <h6>Step 2: Match your file’s columns with the required fields.</h6>
+                    <ul
+                        style={{
+                        listStyleType: "circle",
+                        paddingLeft: "30px",
+                        fontSize: 14,
+                        marginBottom: "20px"
+                        }}
+                        >
+                        <li>Click the dotted area below and select the file you would like to use.</li>
+                    </ul>
                 <form onSubmit={this.handleSubmission}>                    
-                    <p>First, click the dotted area to select a file to check the format. </p>
                     <CSVReader
                         onFileLoad={this.handleFileLoad}>
                     </CSVReader>
@@ -131,8 +155,8 @@ class ImportContacts extends React.Component {
                     <form>
                         {this.state.formFields.map((item) => {
                             return (<div>
-                                    <label for={item}>Select the column from your spreadsheet that corresponds to the required field: {item}:</label>
-                                    <select name={item} id={item}>
+                                    <label style={{fontSize: "14px"}} for={item}>Select the column that contains: <span style={{fontWeight: "bold"}}>{item}</span></label>
+                                    <select style={{fontSize: "14px"}} name={item} id={item}>
                                     {this.state.headerFileRow.map((x) => {
                                         return <option value={x}>{x}</option>;
                                     })}
@@ -140,10 +164,19 @@ class ImportContacts extends React.Component {
                                 </div>);
                             })}
                     </form> :
-                    <div>  
-                        <p>Nothing to see here! Did you import the right CSV file? Make sure the first row of the CSV is the header row.</p>
-                    </div>}
-                    <p>Next, select the same file as before to upload it.</p>
+                    <p style={{fontSize: "14px"}}>If nothing is displayed inside the dotted area, please verify that the first row of your spreadsheet is the header. Then select the file again.</p>
+                    }
+                <h6>Step 3: Upload the file.</h6>
+                    <ul
+                        style={{
+                        listStyleType: "circle",
+                        paddingLeft: "30px",
+                        fontSize: 14,
+                        marginBottom: "20px"
+                        }}
+                        >
+                        <li>Select the same file as before to upload it.</li>
+                    </ul>
                     <input
                         id="file"
                         type="file"
@@ -155,7 +188,7 @@ class ImportContacts extends React.Component {
                         placeholder='UploadCSV...'
                         onChange={this.handleChange}
                         />
-                    <p>Optional: Personalize the email invitation that team members receive by adding your own text.</p>
+                    <p style={{fontSize: "14px"}}>Optional: Write a short welcome message for the new community members. This text will be included in the email invitation.</p>
                     <input 
                         id="message"
                         type="text"
@@ -164,8 +197,8 @@ class ImportContacts extends React.Component {
                         />
                     {this.state.teamsList ? 
                     <div>
-                        <br />
-                        <p>Optional: Assign the new community members to a team.</p>
+                        <br/>
+                        <p style={{fontSize: "14px"}}>Optional: Assign the new community members to a team.</p>
                         <select id="teamPicker">
                             <option value="none">No team selected</option>
                             {this.state.teamsList.map((team) => {
@@ -175,11 +208,11 @@ class ImportContacts extends React.Component {
                     </div> :
                         <></>}
                     <p style={{color:'red'}} >{this.state.error}</p>
-                    <button>
-                        <input type="submit"></input>
-                    </button>
+                    <Button variant="contained" color="primary" type="submit">
+                        Submit
+                    </Button>
                 </form>
-            </div>
+            </PapperBlock>
         );
     }
 };
