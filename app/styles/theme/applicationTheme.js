@@ -296,23 +296,15 @@ const applicationTheme = (color, mode) => ({
     },
     MuiExpansionPanel: {
       root: {
-        '&:first-child': {
-          borderTopLeftRadius: 8,
-          borderTopRightRadius: 8
+        '&$expanded': {
+          borderRadius: 8,
+          boxShadow: '0px 0px 3px 0px #AB47BC, 0px 1px 1px 0px #EDE7F6, 0px 2px 1px -1px #EDE7F6',
+          '& + div': {
+            borderTopLeftRadius: 8,
+            borderTopRightRadius: 8
+          },
         },
-        '&:last-child': {
-          borderBottomLeftRadius: 8,
-          borderBottomRightRadius: 8
-        }
       },
-      expanded: {
-        borderRadius: 8,
-        boxShadow: mode === 'dark' ? `0px 0px 0px 1px ${themePalette(color, mode).palette.primary.main}` : `0px 0px 3px 0px ${themePalette(color, mode).palette.primary.main}, 0px 1px 1px 0px ${themePalette(color, mode).palette.primary.light}, 0px 2px 1px -1px ${themePalette(color, mode).palette.primary.light}`,
-        '& + div': {
-          borderTopLeftRadius: 8,
-          borderTopRightRadius: 8
-        },
-      }
     },
     MuiDialogTitle: {
       root: {
