@@ -83,7 +83,7 @@ class MassEnergizeForm extends Component {
     };
     this.updateForm = this.updateForm.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
-    this.closePreviewModal = this.closePreviewModal.bind(this);
+    //this.closePreviewModal = this.closePreviewModal.bind(this);
     const { ICON_FILES } = require('./icon_files.json');
     this.iconFiles = ICON_FILES;
   }
@@ -479,6 +479,8 @@ class MassEnergizeForm extends Component {
   renderField = (field) => {
     const { classes } = this.props;
     const value = this.getValue(field.name, []);
+    // just a guess what this is supposed to be
+    const files = []; //field.value !== 'None' ? [field.value] : [];
 
     switch (field.fieldType) {
       case FieldTypes.Checkbox:
@@ -688,7 +690,7 @@ class MassEnergizeForm extends Component {
                   'image/bmp',
                   'image/svg',
                 ]}
-
+                files={files}
                 showPreviews
                 maxSize={5000000}
                 imageAspectRatio={
@@ -699,7 +701,6 @@ class MassEnergizeForm extends Component {
                 text={field.label}
                 addToState={this.updateForm}
               />
-                {/* files={files} */}            
             </Fragment>
           </div>
         );
@@ -905,7 +906,6 @@ class MassEnergizeForm extends Component {
       (f) => this.getValue(field.name) === f.valueToCheck
     )[0];
     if (toRender && toRender.fields) this.renderFields(toRender.fields);
-    return;
   };
 
   /**
