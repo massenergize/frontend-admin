@@ -134,7 +134,7 @@ class EditCommunityForm extends Component {
               name: "website",
               label:
                 "Custom website domain (optional): URL which would forward to the portal, that users will see.  Don't include 'https://' ",
-              placeholder: "eg. 'EnergizeYourTown.org'",
+              placeholder: "eg. 'EnergizeYourTown.org' (or enter 'None' to remove website domain)",
               fieldType: "TextField",
               contentType: "text",
               isRequired: false,
