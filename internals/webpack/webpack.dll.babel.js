@@ -11,7 +11,7 @@
 const { join } = require('path');
 const defaults = require('lodash/defaultsDeep');
 const webpack = require('webpack');
-const pkg = require(join(process.cwd(), 'package.json')); // eslint-disable-line
+const pkg = require(join(process.cwd(), "package.json")); // eslint-disable-line
 const { dllPlugin } = require('../config');
 
 if (!pkg.dllPlugin) {

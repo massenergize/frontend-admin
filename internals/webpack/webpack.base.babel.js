@@ -5,16 +5,10 @@
 const path = require('path');
 const webpack = require('webpack');
 
-// Remove this line once the following warning goes away (it was meant for webpack loader authors not users):
-// 'DeprecationWarning: loaderUtils.parseQuery() received a non-string value which can be problematic,
-// see https://github.com/webpack/loader-utils/issues/56 parseQuery() will be replaced with getOptions()
-// in the next major version of loader-utils.'
-process.noDeprecation = true;
-
 const HappyPack = require('happypack');
 const happyThreadPool = HappyPack.ThreadPool({ size: 5 });
 
-module.exports = options => ({
+module.exports = (options) => ({
   mode: options.mode,
   entry: options.entry,
   output: Object.assign(
@@ -23,16 +17,16 @@ module.exports = options => ({
       path: path.resolve(process.cwd(), 'build'),
       publicPath: '/',
     },
-    options.output,
+    options.output
   ), // Merge with env dependent settings
   optimization: options.optimization,
   module: {
     rules: [
       /*
-        Disabled eslint by default.
-        You can enable it to maintain and keep clean your code.
-        NOTE: By enable eslint running app process at beginning will slower
-      */
+         Disabled eslint by default.
+         You can enable it to maintain and keep clean your code.
+         NOTE: By enable eslint running app process at beginning will slower
+       */
       //      {
       //        enforce: 'pre',
       //        test: /\.js?$/,
@@ -43,12 +37,17 @@ module.exports = options => ({
       //        }
       //      },
       {
-        test: /\.js$/, // Transform all .js files required somewhere with Babel
+        test: /\.jsx?$/, // Transform all .js and .jsx files required somewhere with Babel
         exclude: /node_modules/,
         use: {
           loader: 'happypack/loader?id=js',
           options: options.babelQuery,
         },
+      },
+      {
+        test: /\.js$/,
+        enforce: 'pre',
+        use: ['source-map-loader'],
       },
       {
         // Preprocess our own .css files
@@ -70,36 +69,39 @@ module.exports = options => ({
       },
       {
         test: /\.(scss)$/,
-        use: [{
-          loader: 'style-loader'
-        },
-        {
-          loader: 'css-loader',
-          options:
+        use: [
           {
-            sourceMap: false,
-            importLoaders: 2,
-            modules: true,
-            localIdentName: '[local]__[hash:base64:5]'
-          }
-        },
-        {
-          loader: 'postcss-loader',
-          options: {
-            sourceMap: false
-          }
-        },
-        {
-          loader: 'sass-loader',
-          options: {
-            outputStyle: 'expanded',
-            sourceMap: false
-          }
-        }],
+            loader: 'style-loader',
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: false,
+              importLoaders: 2,
+              modules: true,
+              localIdentName: '[local]__[hash:base64:5]',
+            },
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              sourceMap: false,
+            },
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              sassOptions: {
+                outputStyle: 'expanded',
+                sourceMap: false,
+              },
+            },
+          },
+        ],
       },
       {
         test: /\.md$/,
-        use: 'raw-loader'
+        use: 'raw-loader',
       },
       {
         test: /\.(jpg|png|gif|svg)$/,
@@ -112,12 +114,12 @@ module.exports = options => ({
             },
           },
           /*
-            Disabled image compression by default,
-            due error in windows 10 because libpng not available.
-            The libpng avaible on Linux and Mac system only.
-            NOTE: To enable this, first you need to install image-webpack-loader.
-            npm install -i image-webpack-loader --save
-          */
+             Disabled image compression by default,
+             due error in windows 10 because libpng not available.
+             The libpng avaible on Linux and Mac system only.
+             NOTE: To enable this, first you need to install image-webpack-loader.
+             npm install -i image-webpack-loader --save
+           */
           //  {
           //    loader: 'image-webpack-loader',
           //    options: {
@@ -158,7 +160,7 @@ module.exports = options => ({
     ],
   },
   node: {
-    fs: 'empty'
+    fs: 'empty',
   },
   plugins: options.plugins.concat([
     // Always expose NODE_ENV to webpack, in order to use `process.env.NODE_ENV`
@@ -167,25 +169,23 @@ module.exports = options => ({
     new HappyPack({
       id: 'js',
       threadPool: happyThreadPool,
-      loaders: ['babel-loader?cacheDirectory=true']
+      loaders: ['babel-loader?cacheDirectory=true'],
     }),
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify(process.env.NODE_ENV),
-      },
+    new webpack.EnvironmentPlugin({
+      NODE_ENV: 'development',
     }),
-    new webpack.ContextReplacementPlugin(/^\.\/locale$/, context => {
+    new webpack.ContextReplacementPlugin(/^\.\/locale$/, (context) => {
       if (!/\/moment\//.test(context.context)) {
         return;
       }
       // context needs to be modified in place
       Object.assign(context, {
-      // include only CJK
+        // include only CJK
         regExp: /^\.\/(ja|ko|zh)/,
         // point to the locale data folder relative to moment's src/lib/locale
-        request: '../../locale'
+        request: '../../locale',
       });
-    })
+    }),
   ]),
   resolve: {
     modules: ['node_modules', 'app'],
@@ -200,11 +200,12 @@ module.exports = options => ({
       'massenergize-vendor': path.resolve(__dirname, '../../node_modules/'),
       'dan-components': path.resolve(__dirname, '../../app/components/'),
       'dan-actions': path.resolve(__dirname, '../../app/actions/'),
+      'dan-redux': path.resolve(__dirname, '../../app/redux/'),
       'dan-styles': path.resolve(__dirname, '../../app/styles/components/'),
       'dan-api': path.resolve(__dirname, '../../app/api/'),
       'dan-images': path.resolve(__dirname, '../../public/images/'),
       'dan-vendor': path.resolve(__dirname, '../../node_modules/'),
-    }
+    },
   },
   devtool: options.devtool,
   target: 'web', // Make web variables accessible to webpack, e.g. window
