@@ -1,6 +1,5 @@
 init:
 	npm install
-	npm run build:dll
 .PHONY: init
 
 start:
@@ -8,6 +7,7 @@ start:
 .PHONY: start
 
 build:
+	npm rebuild node-sass
 	npm run build
 .PHONY: build
 

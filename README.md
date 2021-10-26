@@ -1,6 +1,6 @@
 # MassEnergize Admin Portal
 
-<img src="v2.0/public/images/logo.png" width="150"/>
+<img src="public/images/logo.png" width="150"/>
 
 This repository contains the frontend code for [MassEnergize Admin Portal](https://admin.massenergize.org). It's build with [React](https://reactjs.org/), [Redux](https://redux.js.org/), and [Material UI](https://material-ui.com/).
 
