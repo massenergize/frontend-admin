@@ -39,7 +39,7 @@ class MessageDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      formJson: {},
+      formJson: null,
       message: null,
     };
   }
