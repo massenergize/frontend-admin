@@ -39,10 +39,8 @@ class MessageDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      formData: {},
+      formJson: null,
       message: null,
-      communities: []
-
     };
   }
 
@@ -50,9 +48,10 @@ class MessageDetails extends Component {
   async componentDidMount() {
     const { id } = this.props.match.params;
     const messageInfoResponse = await apiCall('/messages.info', { message_id: id });
-
     if (messageInfoResponse && messageInfoResponse.success) {
       await this.setStateAsync({ message: messageInfoResponse.data });
+    } else {
+      return;
     }
 
     const { message } = this.state;
