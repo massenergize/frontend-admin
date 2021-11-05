@@ -1,38 +1,34 @@
 /* eslint-disable camelcase */
 import React from 'react';
 import PropTypes from 'prop-types';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
 import VerifiedUser from '@material-ui/icons/VerifiedUser';
-import Info from '@material-ui/icons/Info';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { withStyles } from '@material-ui/core/styles';
 import styles from './jss/cover-jss';
 import { apiCall } from '../../../../utils/messenger';
-import { SANDBOX_PORTAL_HOST, PORTAL_HOST } from '../../../../config/constants';
+import { PORTAL_HOST } from '../../../../config/constants';
 
 
-//const optionsOpt = [
+// const optionsOpt = [
 //  'Edit Profile',
 //  'Change Cover',
-//];
+// ];
 
-const ITEM_HEIGHT = 48;
+// const ITEM_HEIGHT = 48;
 
 class Cover extends React.Component {
-  state = {
-    anchorElOpt: null,
-  };
+  // leaving this here for now in case it was intended to be used
+  // state = {
+  //  anchorElOpt: null,
+  // };
 
-  handleClickOpt = event => {
-    this.setState({ anchorElOpt: event.currentTarget });
-  };
-
-  handleCloseOpt = () => {
-    this.setState({ anchorElOpt: null });
-  };
+  // handleClickOpt = event => {
+  //  this.setState({ anchorElOpt: event.currentTarget });
+  // };
+  //
+  // handleCloseOpt = () => {
+  //  this.setState({ anchorElOpt: null });
+  // };
 
   goLive = async () => {
     const { community, liveOrNotFxn } = this.props;
@@ -76,7 +72,7 @@ class Cover extends React.Component {
     } = this.props;
 
 
-    const { anchorElOpt } = this.state;
+    // const { anchorElOpt } = this.state;
     const coverStyle = {
       height: 250, textAlign: 'left', justifyContent: 'flex-start', backgroundImage: `url(${coverImg})`
     };
@@ -133,7 +129,7 @@ class Cover extends React.Component {
                 <a
                   style={{ fontSize: 14 }}
                   className={classes.leAnchor}
-                  href={community ? `${SANDBOX_PORTAL_HOST}/${community.subdomain}` : '#'}
+                  href={community ? `${PORTAL_HOST}/${community.subdomain}?sandbox=true` : '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   size="large"
