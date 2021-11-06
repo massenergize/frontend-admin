@@ -19,7 +19,7 @@ if (IS_LOCAL) {
   // IS_DEV
   API_HOST = 'https://api.massenergize.dev';
 }
-const CC_HOST = API_HOST.replace('//api', '//cc');  // local should stay the same
+const CC_HOST = API_HOST.replace('//api', '//cc'); // local should stay the same
 
 //  ---- setting  Firebase Config routes
 let FIREBASE_CONFIG = {};
@@ -49,29 +49,17 @@ if (IS_PROD || IS_CANARY) {
 //  ---- setting  Community Portal routes
 let PORTAL_HOST = 'https://community.massenergize.org';
 if (IS_LOCAL) {
-  PORTAL_HOST = 'http://localhost:3000';
+  PORTAL_HOST = 'http://community.massenergize.test:3000';
 } else if (IS_PROD) {
   PORTAL_HOST = 'https://community.massenergize.org';
 } else if (IS_CANARY) {
   PORTAL_HOST = 'https://community-canary.massenergize.org';
 } else {
   // IS_DEV
-  PORTAL_HOST = 'https://community-dev.massenergize.org';
+  PORTAL_HOST = 'https://community.massenergize.dev';
 }
 
-//  ---- setting Sandbox routes
-let SANDBOX_PORTAL_HOST = 'https://sandbox.community-dev.massenergize.org';
-if (IS_LOCAL) {
-  SANDBOX_PORTAL_HOST = 'http://localhost:3000';
-} else if (IS_PROD) {
-  SANDBOX_PORTAL_HOST = 'https://sandbox.community.massenergize.org';
-} else if (IS_CANARY) {
-  SANDBOX_PORTAL_HOST = 'https://sandbox.community-canary.massenergize.org';
-} else {
-  // IS_DEV
-  SANDBOX_PORTAL_HOST = 'https://sandbox.community-dev.massenergize.org';
-}
-
+//  ---- Sandbox routes now reached through URL parameter sandbox=true
 
 module.exports = {
   IS_LOCAL,
@@ -82,6 +70,5 @@ module.exports = {
   APP_NAME,
   FIREBASE_CONFIG,
   PORTAL_HOST,
-  SANDBOX_PORTAL_HOST,
   BUILD_VERSION
 };

@@ -1,7 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Avatar from '@material-ui/core/Avatar';
-import Typography from '@material-ui/core/Typography';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button';
@@ -10,8 +8,7 @@ import VerifiedUser from '@material-ui/icons/VerifiedUser';
 import Info from '@material-ui/icons/Info';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { withStyles } from '@material-ui/core/styles';
-import { Link } from 'react-router-dom';
-import { SANDBOX_PORTAL_HOST, PORTAL_HOST } from '../../config/constants'
+import { PORTAL_HOST } from '../../config/constants';
 
 import styles from './jss/cover-jss';
 import { apiCall } from '../../utils/messenger';
@@ -38,7 +35,7 @@ class Cover extends React.Component {
 
   goLive = () => {
     const val = this.props.community.is_published;
-    const {id} = this.props.community;
+    const { id } = this.props.community;
     const body = { is_published: !val, community_id: id };
     this.props.liveOrNotFxn(this.props.community);
     apiCall('/communities.update', body).then(res => {
@@ -55,27 +52,25 @@ class Cover extends React.Component {
     if (val) {
       return (
         <div>
-          <Button onClick={() => { this.goLive() }} variant="outlined" color="secondary" className={classes.publishBtn + " " + classes.raise}>
+          <Button onClick={() => { this.goLive(); }} variant="outlined" color="secondary" className={classes.publishBtn + ' ' + classes.raise}>
             Unpublish
           </Button>
         </div>
-      )
+      );
     }
-    
-      return (
-        <div>
-          <Button onClick={() => { this.goLive() }} variant="outlined" color="primary" className={classes.goLiveBtn + " " + classes.raise}>
+
+    return (
+      <div>
+        <Button onClick={() => { this.goLive(); }} variant="outlined" color="primary" className={classes.goLiveBtn + ' ' + classes.raise}>
             Go Live
         </Button>
-        </div>
-      )
-    
+      </div>
+    );
   }
 
   render() {
     const {
       classes,
-      avatar,
       name,
       desc,
       coverImg,
@@ -85,9 +80,12 @@ class Cover extends React.Component {
 
     const { anchorElOpt } = this.state;
     return (
-      <div className={classes.cover} style={{
-        height: 250, textAlign: 'left', justifyContent: 'flex-start', backgroundImage: `url(${coverImg})` 
-        }}>
+      <div
+        className={classes.cover}
+        style={{
+          height: 250, textAlign: 'left', justifyContent: 'flex-start', backgroundImage: `url(${coverImg})`
+        }}
+      >
         <div className={classes.opt}>
           <IconButton className={classes.button} aria-label="Delete">
             <Info style={{ color: '#585858' }} />
@@ -124,18 +122,21 @@ class Cover extends React.Component {
         <div className={classes.content} style={{ display: 'inline-block' }}>
           <div>
             <h2 style={{
-              display: 'inline-block', marginLeft: 20, marginBottom: 2, fontSize: '1.8rem', fontWeight: '500px', textTransform: 'capitalize' 
-              }}>{name}</h2>
-              {community.is_approved && 
-                <VerifiedUser style={{ color: '#0095ff', marginTop: -2, display: 'inline-block', }} className={classes.verified} />
-              }
+              display: 'inline-block', marginLeft: 20, marginBottom: 2, fontSize: '1.8rem', fontWeight: '500px', textTransform: 'capitalize'
+            }}
+            >
+              {name}
+            </h2>
+            {community.is_approved
+                && <VerifiedUser style={{ color: '#0095ff', marginTop: -2, display: 'inline-block', }} className={classes.verified} />
+            }
             <div style={{ float: 'right' }}>
               <center>
                 {this.showLiveBtn()}
                 <a
                   style={{ fontSize: 14 }}
                   className={classes.leAnchor}
-                  href={community ? `${SANDBOX_PORTAL_HOST}/${community.subdomain}` : '#'}
+                  href={community ? `${PORTAL_HOST}/${community.subdomain}?sandbox=true` : '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   size="large"
@@ -168,7 +169,6 @@ class Cover extends React.Component {
 
 Cover.propTypes = {
   classes: PropTypes.object.isRequired,
-  avatar: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   desc: PropTypes.string.isRequired,
   coverImg: PropTypes.string.isRequired,
