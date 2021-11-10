@@ -37,7 +37,6 @@ class EditCommunityForm extends Component {
       formJson: null,
       community: null,
     };
-
     this.preflightFxn = this.preflightFxn.bind(this);
   }
 
@@ -81,9 +80,10 @@ class EditCommunityForm extends Component {
     ];
 
     const { community } = this.state;
-
-    // if (!community) return {};
     const moreInfo = getMoreInfo(community);
+    // TODO: eliminate three versions of nearly identical code
+    // const superAdmin = this.props.superAdmin;
+
     const formJson = {
       title: 'Edit your Community',
       subTitle: '',
@@ -127,7 +127,7 @@ class EditCommunityForm extends Component {
               isRequired: true,
               defaultValue: community.subdomain,
               dbName: 'subdomain',
-              readOnly: false,
+              readOnly: false,  // !superAdmin - readonly if you are a Cadmin
             },
             {
               name: 'website',
@@ -156,6 +156,45 @@ class EditCommunityForm extends Component {
           ]
         },
         {
+          label: 'Primary contact (seen in community portal footer)',
+          fieldType: 'Section',
+          children: [
+            {
+              name: 'admin_full_name',
+              label: "Contact Person's Full Name",
+              placeholder: 'eg. Grace Tsu',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: community.owner_name,
+              dbName: 'owner_name',
+              readOnly: false,
+            },
+            {
+              name: 'admin_email',
+              label: "Community's Public Email",
+              placeholder: 'eg. johny.appleseed@gmail.com',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: true,
+              defaultValue: community.owner_email,
+              dbName: 'owner_email',
+              readOnly: false,
+            },
+            {
+              name: 'admin_phone_number',
+              label: "Community's Public Phone Number (optional)",
+              placeholder: 'eg. 571 222 4567',
+              fieldType: 'TextField',
+              contentType: 'text',
+              isRequired: false,
+              defaultValue: community.owner_phone_number,
+              dbName: 'owner_phone_number',
+              readOnly: false,
+            },
+          ],
+        },
+        {
           label: 'Contact Address (seen as Location on ContactUs page)',
           fieldType: 'Section',
           children: [
@@ -168,7 +207,7 @@ class EditCommunityForm extends Component {
               isRequired: false,
               defaultValue: `${community.location && community.location.address ? community.location.address : ''}`,
               dbName: 'address',
-              readOnly: false
+              readOnly: false,
             },
             {
               name: 'city',
@@ -179,7 +218,7 @@ class EditCommunityForm extends Component {
               isRequired: true,
               defaultValue: `${community.location && community.location.city ? community.location.city : ''}`,
               dbName: 'city',
-              readOnly: false
+              readOnly: false,
             },
             {
               name: 'state',
@@ -191,7 +230,7 @@ class EditCommunityForm extends Component {
               data: states,
               defaultValue: community.location && community.location.state,
               dbName: 'state',
-              readOnly: false
+              readOnly: false,
             },
             {
               name: 'zipcode',
@@ -202,7 +241,7 @@ class EditCommunityForm extends Component {
               isRequired: true,
               defaultValue: community.location && community.location.zipcode,
               dbName: 'zipcode',
-              readOnly: false
+              readOnly: false,
             },
           ]
         },
@@ -219,7 +258,7 @@ class EditCommunityForm extends Component {
                 ? 'true'
                 : 'false',
               dbName: 'is_geographically_focused',
-              readOnly: false,
+              readOnly: false,   // !superAdmin, readonly if just a cadmin
               data: [
                 { id: 'false', value: 'No' },
                 { id: 'true', value: 'Yes' },
@@ -234,7 +273,7 @@ class EditCommunityForm extends Component {
                     isRequired: true,
                     defaultValue: community.geography_type || 'ZIPCODE',
                     dbName: 'geography_type',
-                    readOnly: false,
+                    readOnly: false,   // !superAdmin, readonly if just a cadmin
                     data: geographyTypes,
                   },
                   {
@@ -246,7 +285,7 @@ class EditCommunityForm extends Component {
                     isRequired: true,
                     defaultValue: community.locations || '',
                     dbName: 'locations',
-                    readOnly: false
+                    readOnly: false, // !superAdmin, readonly if just a cadmin
                   },
                 ]
               }
@@ -255,100 +294,60 @@ class EditCommunityForm extends Component {
         },
         {
           label:
-            "Community Public Information (Will be displayed in the community portal's footer)",
+            "Social media or Newsletter subscription (displayed in the community portal footer)",
           fieldType: 'Section',
           children: [
             {
-              name: 'social_or_email',
-              label: 'Choose what to show (Email Or Social Media Links)',
+              name: 'social_or_newsletter',
+              label: 'Choose what to show (Social Media Links or Subscribe to Newsletter)',
               fieldType: 'Radio',
               isRequired: true,
               defaultValue: moreInfo && moreInfo.wants_socials === 'true' ? 'true' : 'false',
               dbName: 'wants_socials',
               readOnly: false,
               data: [
-                { id: 'false', value: "Contact Person's Information" },
                 { id: 'true', value: 'Social Media Links' },
+                { id: 'false', value: "Subscribe to Newsletter" },
               ],
-              conditionalDisplays: [
-                {
-                  valueToCheck: 'true',
-                  fields: [
-                    {
-                      name: 'com_facebook_link',
-                      label: "Provide a link to your community's Facebook page",
-                      placeholder: 'www.facebook.com/your-community',
-                      fieldType: 'TextField',
-                      contentType: 'text',
-                      isRequired: false,
-                      defaultValue: moreInfo && moreInfo.facebook_link,
-                      dbName: 'facebook_link',
-                      readOnly: false,
-                    },
-                    {
-                      name: 'com_twitter_link',
-                      label: "Provide a link to your community's Twitter page",
-                      placeholder: 'eg. www.twitter.com/your-community',
-                      fieldType: 'TextField',
-                      contentType: 'text',
-                      isRequired: false,
-                      defaultValue: moreInfo && moreInfo.twitter_link,
-                      dbName: 'twitter_link',
-                      readOnly: false,
-                    },
-                    {
-                      name: 'com_instagram_link',
-                      label:
-                        "Provide a link to your community's Instagram page",
-                      placeholder: 'eg. www.instagram.com/your-community',
-                      fieldType: 'TextField',
-                      contentType: 'text',
-                      isRequired: false,
-                      defaultValue: moreInfo && moreInfo.instagram_link,
-                      dbName: 'instagram_link',
-                      readOnly: false,
-                    },
-                  ],
-                },
-                {
-                  valueToCheck: 'false',
-                  fields: [
-                    {
-                      name: 'admin_full_name',
-                      label: "Contact Person's Full Name",
-                      placeholder: 'eg. Grace Tsu',
-                      fieldType: 'TextField',
-                      contentType: 'text',
-                      isRequired: true,
-                      defaultValue: community.owner_name,
-                      dbName: 'owner_name',
-                      readOnly: false,
-                    },
-                    {
-                      name: 'admin_email',
-                      label: "Community's Public Email",
-                      placeholder: 'eg. johny.appleseed@gmail.com',
-                      fieldType: 'TextField',
-                      contentType: 'text',
-                      isRequired: true,
-                      defaultValue: community.owner_email,
-                      dbName: 'owner_email',
-                      readOnly: false,
-                    },
-                    {
-                      name: 'admin_phone_number',
-                      label: "Community's Public Phone Number",
-                      placeholder: 'eg. 571 222 4567',
-                      fieldType: 'TextField',
-                      contentType: 'text',
-                      isRequired: false,
-                      defaultValue: community.owner_phone_number,
-                      dbName: 'owner_phone_number',
-                      readOnly: false,
-                    },
-                  ],
-                },
-              ],
+              child: {
+                valueToCheck: 'true',
+                fields: [
+                  {
+                    name: 'com_facebook_link',
+                    label: "Provide a link to your community's Facebook page",
+                    placeholder: 'www.facebook.com/your-community',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: false,
+                    defaultValue: moreInfo && moreInfo.facebook_link,
+                    dbName: 'facebook_link',
+                    readOnly: false,
+                  },
+                  {
+                    name: 'com_twitter_link',
+                    label: "Provide a link to your community's Twitter page",
+                    placeholder: 'eg. www.twitter.com/your-community',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: false,
+                    defaultValue: moreInfo && moreInfo.twitter_link,
+                    dbName: 'twitter_link',
+                    readOnly: false,
+                  },
+                  {
+                    name: 'com_instagram_link',
+                    label:
+                      "Provide a link to your community's Instagram page",
+                    placeholder: 'eg. www.instagram.com/your-community',
+                    fieldType: 'TextField',
+                    contentType: 'text',
+                    isRequired: false,
+                    defaultValue: moreInfo && moreInfo.instagram_link,
+                    dbName: 'instagram_link',
+                    readOnly: false,
+                  },
+                ],
+              },
             },
           ],
         },
@@ -364,18 +363,6 @@ class EditCommunityForm extends Component {
           defaultValue: '',
           filesLimit: 1,
         },
-        // {
-        //  name: 'favicon',
-        //  placeholder: 'Upload a Favicon (optional)',
-        //  fieldType: 'File',
-        //  dbName: 'image',
-        //  previewLink: `${community.favicon && community.favicon.url}`,
-        //  label: 'Upload a new favicon for this community',
-        //  selectMany: false,
-        //  isRequired: false,
-        //  defaultValue: '',
-        //  filesLimit: 1
-        // },
         {
           name: 'is_approved',
           label:
@@ -384,7 +371,7 @@ class EditCommunityForm extends Component {
           isRequired: false,
           defaultValue: community.is_approved ? 'true' : 'false',
           dbName: 'is_approved',
-          readOnly: false,
+          readOnly: false,  // !superAdmin, readonly if just a cadmin
           data: [{ id: 'false', value: 'No' }, { id: 'true', value: 'Yes' }],
         },
         {
