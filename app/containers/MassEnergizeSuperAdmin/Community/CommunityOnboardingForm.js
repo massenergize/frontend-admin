@@ -124,6 +124,45 @@ class CreateNewCommunityForm extends Component {
           ]
         },
         {
+          label: 'Primary contact (seen in community portal footer)',
+          fieldType: 'Section',
+          children: [
+            {
+              name: "admin_full_name",
+              label: "Contact Person's Full Name",
+              placeholder: "eg. Grace Tsu",
+              fieldType: "TextField",
+              contentType: "text",
+              isRequired: true,
+              defaultValue: "",
+              dbName: "owner_name",
+              readOnly: false,
+            },
+            {
+              name: "admin_email",
+              label: "Community's Public Email",
+              placeholder: "eg. johny.appleseed@gmail.com",
+              fieldType: "TextField",
+              contentType: "text",
+              isRequired: true,
+              defaultValue: "",
+              dbName: "owner_email",
+              readOnly: false,
+            },
+            {
+              name: "admin_phone_number",
+              label: "Community's Public Phone Number",
+              placeholder: "eg. 571 222 4567",
+              fieldType: "TextField",
+              contentType: "text",
+              isRequired: false,
+              defaultValue: "",
+              dbName: "owner_phone_number",
+              readOnly: false,
+            },
+          ],
+        },
+        {
           label: "Contact Address (seen as Location on ContactUs page)",
           fieldType: "Section",
           children: [
@@ -167,10 +206,9 @@ class CreateNewCommunityForm extends Component {
               isRequired: true,
               dbName: 'zipcode',
               readOnly: false
-         },
-       ]
+            },
+          ]
         },
-
         {
           label: "Community Type",
           fieldType: "Section",
@@ -218,101 +256,59 @@ class CreateNewCommunityForm extends Component {
         },
         {
           label:
-            "Community Public Information (Will be displayed in the community portal's footer)",
+            "Social media or Newsletter subscription (displayed in the community portal footer)",
           fieldType: "Section",
           children: [
             {
-              name: "social_or_email",
-              label: "Choose what to show (Email Or Social Media Links)",
+              name: "social_or_newsletter",
+              label: "Choose what to show (Social Media Links or Subscribe to Newsletter)",
               fieldType: "Radio",
               isRequired: true,
               defaultValue:'false',
               dbName: "wants_socials",
               readOnly: false,
               data: [
-                { id: "false", value: "Contact Person's Information" },
                 { id: "true", value: "Social Media Links" },
+                { id: "false", value: "Subscribe to Newsletter" },
               ],
+              child:  {
+                valueToCheck: "true",
+                fields: [
+                  {
+                    name: "com_facebook_link",
+                    label: "Provide a link to your community's Facebook page",
+                    placeholder: "www.facebook.com/your-community",
+                    fieldType: "TextField",
+                    contentType: "text",
+                    isRequired: false,
+                    dbName: "facebook_link",
+                    readOnly: false,
+                  },
+                  {
+                    name: "com_twitter_link",
+                    label: "Provide a link to your community's Twitter page",
+                    placeholder: "eg. www.twitter.com/your-community",
+                    fieldType: "TextField",
+                    contentType: "text",
+                    isRequired: false,
 
-              conditionalDisplays: [
-                {
-                  valueToCheck: "true",
-                  fields: [
-                    {
-                      name: "com_facebook_link",
-                      label: "Provide a link to your community's Facebook page",
-                      placeholder: "www.facebook.com/your-community",
-                      fieldType: "TextField",
-                      contentType: "text",
-                      isRequired: false,
-                      dbName: "facebook_link",
-                      readOnly: false,
-                    },
-                    {
-                      name: "com_twitter_link",
-                      label: "Provide a link to your community's Twitter page",
-                      placeholder: "eg. www.twitter.com/your-community",
-                      fieldType: "TextField",
-                      contentType: "text",
-                      isRequired: false,
+                    dbName: "twitter_link",
+                    readOnly: false,
+                  },
+                  {
+                    name: "com_instagram_link",
+                    label:
+                      "Provide a link to your community's Instagram page",
+                    placeholder: "eg. www.instagram.com/your-community",
+                    fieldType: "TextField",
+                    contentType: "text",
+                    isRequired: false,
 
-                      dbName: "twitter_link",
-                      readOnly: false,
-                    },
-                    {
-                      name: "com_instagram_link",
-                      label:
-                        "Provide a link to your community's Instagram page",
-                      placeholder: "eg. www.instagram.com/your-community",
-                      fieldType: "TextField",
-                      contentType: "text",
-                      isRequired: false,
-
-                      dbName: "instagram_link",
-                      readOnly: false,
-                    },
-                  ],
-                },
-
-                {
-                  valueToCheck: "false",
-                  fields: [
-                    {
-                      name: "admin_full_name",
-                      label: "Contact Person's Full Name",
-                      placeholder: "eg. Grace Tsu",
-                      fieldType: "TextField",
-                      contentType: "text",
-                      isRequired: true,
-                      defaultValue: "",
-                      dbName: "owner_name",
-                      readOnly: false,
-                    },
-                    {
-                      name: "admin_email",
-                      label: "Community's Public Email",
-                      placeholder: "eg. johny.appleseed@gmail.com",
-                      fieldType: "TextField",
-                      contentType: "text",
-                      isRequired: true,
-                      defaultValue: "",
-                      dbName: "owner_email",
-                      readOnly: false,
-                    },
-                    {
-                      name: "admin_phone_number",
-                      label: "Community's Public Phone Number",
-                      placeholder: "eg. 571 222 4567",
-                      fieldType: "TextField",
-                      contentType: "text",
-                      isRequired: false,
-                      defaultValue: "",
-                      dbName: "owner_phone_number",
-                      readOnly: false,
-                    },
-                  ],
-                },
-              ],
+                    dbName: "instagram_link",
+                    readOnly: false,
+                  },
+                ],
+              },
             },
           ],
         },
@@ -327,17 +323,6 @@ class CreateNewCommunityForm extends Component {
           defaultValue: "",
           filesLimit: 1,
         },
-        //{
-        //  name: 'favicon',
-        //  placeholder: 'Upload a Favicon (optional)',
-        //  fieldType: 'File',
-        //  dbName: 'favicon',
-        //  label: 'Upload a favicon for this community',
-        //  selectMany: false,
-        //  isRequired: false,
-        //  defaultValue: '',
-        //  filesLimit: 1
-        //},
         {
           name: "accepted_terms_and_conditions",
           modalText: "Terms and Conditions",
