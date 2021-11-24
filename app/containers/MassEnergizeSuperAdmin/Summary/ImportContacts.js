@@ -9,9 +9,11 @@ class ImportContacts extends React.Component {
         super(props);
         this.state = {
             csv: null, 
-            error: "", 
+            error: "",
+            message: "", 
             headerFileRow: null,
-            formFields: ['First Name', 'Last Name', 'Email'], 
+            formFields: ['First Name', 'Last Name', 'Email'],
+            dataRows: null, 
             teamsList: null
         };
         this.handleChange = this.handleChange.bind(this);
@@ -26,7 +28,6 @@ class ImportContacts extends React.Component {
             apiCall("teams.list", body)
             .then((json) => {
                 if (json.success) {
-                    console.log(json.data);
                     this.setState({
                         teamsList: json.data
                     });
@@ -44,11 +45,20 @@ class ImportContacts extends React.Component {
         
     }
 
+    arrayColumn(arr, n) {
+        return arr.map(x=> x[n]);
+    }
+      
     handleFileLoad(data) {
-        this.setState({
-            headerFileRow: data[0].data
-        });
-        
+        if (data.length>1) {
+            const dataRows = data.slice(1).map((row) => {
+                return row.data;
+            });
+            this.setState({
+                headerFileRow: data[0].data,
+                dataRows: dataRows,
+            });
+         }
     }
 
     handleChange(e) {
@@ -59,30 +69,31 @@ class ImportContacts extends React.Component {
 
     handleSubmission = (e) => {
         e.preventDefault();
-        //no file provided by user
-        if (this.state.csv == null) {
+        // no file provided by user
+        if (this.state.dataRows == null) {
             this.setState({
                 error: "Must select a csv file to upload."
             });
         }
-        //file provided by user is not a csv
-        else if (!isCSV(this.state.csv.name)) {
-            this.setState({
-                error: "Your file is not a CSV file. Please select a CSV (Excel, Google Sheets) file to upload."
-            });
-        }
-        //csv file provided by user
         else {
             let firstNamePicker = document.getElementById(this.state.formFields[0]);
+            const firstNameCol = this.state.headerFileRow.indexOf(firstNamePicker.value);
+            const firstNames = this.arrayColumn(this.state.dataRows, firstNameCol);
+
             let lastNamePicker = document.getElementById(this.state.formFields[1]);
+            const lastNameCol = this.state.headerFileRow.indexOf(lastNamePicker.value);
+            const lastNames = this.arrayColumn(this.state.dataRows, lastNameCol);
+
             let emailPicker = document.getElementById(this.state.formFields[2]);
+            const emailCol = this.state.headerFileRow.indexOf(emailPicker.value);
+            const emails = this.arrayColumn(this.state.dataRows, emailCol);
+
             let mess = document.getElementById("message");
             let teamPicker = document.getElementById("teamPicker");
             const body = {
-                csv: this.state.csv, 
-                first_name_field: firstNamePicker.value,
-                last_name_field: lastNamePicker.value,
-                email_field: emailPicker.value,
+                first_names: firstNames,
+                last_names: lastNames,
+                emails: emails,
                 message: mess.value,
                 team_name: teamPicker.value, 
                 community_id: this.props.location.communityId
@@ -92,36 +103,34 @@ class ImportContacts extends React.Component {
             .then((json) => {
                 if (json.success) {
                     this.setState({
-                        error: "CSV file uploaded successfully."
+                        message: "CSV file uploaded successfully."
                     });
                     if (json.data.invalidEmails.length > 0) {
-                        let lines = "Invalid email address on lines ";
+                        let lines = "Invalid email address on lines:\r\n";
                         for (let i = 0; i < json.data.invalidEmails.length; i++) {
-                            lines += json.data.invalidEmails[i] + ", ";
+                            let row = json.data.invalidEmails[i];
+                            lines += row.line + ": " + row.email + ", ";
                         }
                         this.setState({
-                            error: "CSV file uploaded successfully. " + lines
+                            message: "CSV file uploaded successfully. " + lines
                         });
                     }
                 }
                 else {
                     this.setState({
-                        error: json.error
+                        error: "Error encountered: " + json.error
                     });
-                    console.log(json.error);
                 }
             })
             .catch((err) => {
                 console.log(err);
             });
         }
-        console.log("error: " + this.state.error);
-		
 	};
 
     render() {
         return(
-            <PapperBlock title="Bulk Invite Large Number of Users" desc="">
+            <PapperBlock title="Invite Users through CSV upload" desc="">
                 <h6>Step 1: Prepare your CSV file.</h6>
                     <ul
                         style={{
@@ -149,7 +158,9 @@ class ImportContacts extends React.Component {
                     </ul>
                 <form onSubmit={this.handleSubmission}>                    
                     <CSVReader
-                        onFileLoad={this.handleFileLoad}>
+                        onFileLoad={this.handleFileLoad}
+                    >
+                        <span>Drop CSV file here or click to upload.</span>
                     </CSVReader>
                     {(this.state.headerFileRow && this.state.headerFileRow.length > 0) ?
                     <form>
@@ -166,28 +177,7 @@ class ImportContacts extends React.Component {
                     </form> :
                     <p style={{fontSize: "14px"}}>If nothing is displayed inside the dotted area, please verify that the first row of your spreadsheet is the header. Then select the file again.</p>
                     }
-                <h6>Step 3: Upload the file.</h6>
-                    <ul
-                        style={{
-                        listStyleType: "circle",
-                        paddingLeft: "30px",
-                        fontSize: 14,
-                        marginBottom: "20px"
-                        }}
-                        >
-                        <li>Select the same file as before to upload it.</li>
-                    </ul>
-                    <input
-                        id="file"
-                        type="file"
-                        name="file"
-                        icon='file text outline'
-                        iconPosition='left'
-                        label='Upload CSV'
-                        labelPosition='right'
-                        placeholder='UploadCSV...'
-                        onChange={this.handleChange}
-                        />
+
                     <p style={{fontSize: "14px"}}>Optional: Write a short welcome message for the new community members. This text will be included in the email invitation.</p>
                     <input 
                         id="message"
@@ -207,7 +197,12 @@ class ImportContacts extends React.Component {
                         </select>
                     </div> :
                         <></>}
-                    <p style={{color:'red'}} >{this.state.error}</p>
+                    {this.state.error ? (
+                        <p style={{color:'red'}} >{this.state.error}</p>
+                    ):(
+                        <p style={{color:'green'}} >{this.state.message}</p>
+                    )}
+
                     <Button variant="contained" color="primary" type="submit">
                         Submit
                     </Button>
@@ -216,15 +211,5 @@ class ImportContacts extends React.Component {
         );
     }
 };
-
-//checks if the filename f represents a CSV or not
-function isCSV(f) {
-    //get extension of file
-    let parts = f.split(".");
-    if (parts[parts.length-1].toLowerCase() != "csv") {
-        return false;
-    }
-    return true; 
-}
 
 export default ImportContacts; 
