@@ -64,8 +64,14 @@ class About extends React.Component {
     let oldLoadingCSVs = this.state.loadingCSVs;
     this.setState({ loadingCSVs: oldLoadingCSVs.concat(endpoint) });
 
-    const csvResponse = await apiCallFile('/downloads.' + endpoint,
-      { community_id: community.id });
+    const body = {};
+    const dot = endpoint.indexOf('.');
+    if (dot > 0) {
+      endpoint = endpoint.substring(0,dot)
+    } else {
+      body.community_id = community.id;
+    }
+    const csvResponse = await apiCallFile('/downloads.' + endpoint, body);
 
     oldLoadingCSVs = this.state.loadingCSVs;
     oldLoadingCSVs.splice(oldLoadingCSVs.indexOf(endpoint), 1);
@@ -387,6 +393,17 @@ class About extends React.Component {
               </Link>
             </Paper>
           </Grid>
+          <Grid item xs={4}>
+            <Paper onClick={() => { !loadingCSVs.includes('actions.all') && this.getCSV('actions.all'); }} className={`${classes.pageCard}`} elevation={1}>
+              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                Download All Actions CSV
+                    {' '}
+                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
+                {loadingCSVs.includes('actions.all') && <CircularProgress size={20} thickness={2} color="secondary" />}
+              </Typography>
+            </Paper>
+          </Grid>
+           
         </Grid>
         
       </>
