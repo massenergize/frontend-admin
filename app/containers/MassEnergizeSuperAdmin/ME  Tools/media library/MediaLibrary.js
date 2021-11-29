@@ -1,17 +1,13 @@
-import React, {
-  Suspense, useRef, useState, useEffect
-} from 'react';
-import PropTypes from 'prop-types';
-import './MediaLibrary.css';
-import MLButton from './shared/components/button/MLButton';
-import MediaLibraryModal from './shared/components/library modal/MediaLibraryModal';
-import ImageThumbnail from './shared/components/thumbnail/ImageThumbnail';
-import { libraryImage } from './shared/utils/values';
+import React, { useState } from "react";
+import PropTypes from "prop-types";
+import "./MediaLibrary.css";
+import MLButton from "./shared/components/button/MLButton";
+import MediaLibraryModal from "./shared/components/library modal/MediaLibraryModal";
+import ImageThumbnail from "./shared/components/thumbnail/ImageThumbnail";
+import { libraryImage } from "./shared/utils/values";
 
 function MediaLibrary(props) {
-  const {
-    actionText, selected, sourceExtractor, onInsert, multiple
-  } = props;
+  const { actionText, selected, sourceExtractor, onInsert, multiple } = props;
 
   const [show, setShow] = useState(false);
   const [imageTray, setTrayImages] = useState(selected);
@@ -29,15 +25,15 @@ function MediaLibrary(props) {
 
   const remove = (id) => {
     if (!multiple) return setTrayImages(null);
-    const rest = imageTray?.filter((itm) => itm.id !== id);
+    const rest = imageTray.filter((itm) => itm.id !== id);
     setTrayImages(rest);
-    transfer(rest, state?.resetor);
+    transfer(rest, state.resetor);
   };
 
   return (
     <React.Fragment>
       {show && (
-        <div style={{ position: 'fixed' }}>
+        <div style={{ position: "fixed" }}>
           <MediaLibraryModal
             {...props}
             close={() => setShow(false)}
@@ -49,17 +45,17 @@ function MediaLibrary(props) {
 
       <div
         style={{
-          width: '100%',
+          width: "100%",
           minHeight: 300,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          border: 'dashed 2px #e3e3e3',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          border: "dashed 2px #e3e3e3",
           borderRadius: 10,
         }}
       >
-        {!imageTray || imageTray?.length === 0 ? (
+        {!imageTray || imageTray.length === 0 ? (
           <img src={libraryImage} style={{ height: 150 }} />
         ) : (
           <ImageTray
@@ -74,7 +70,7 @@ function MediaLibrary(props) {
           onClick={() => {
             setShow(true);
           }}
-          style={{ borderRadius: 5, marginTop: 20, padding: '15px 40px' }}
+          style={{ borderRadius: 5, marginTop: 20, padding: "15px 40px" }}
         >
           {actionText}
         </MediaLibrary.Button>
@@ -83,14 +79,12 @@ function MediaLibrary(props) {
   );
 }
 
-const ImageTray = ({
-  sourceExtractor, remove, content, multiple
-}) => {
+const ImageTray = ({ sourceExtractor, remove, content, multiple }) => {
   if (!multiple) {
     return (
       <TrayImage
-        src={sourceExtractor ? sourceExtractor(content) : content?.url}
-        id={content?.id}
+        src={sourceExtractor ? sourceExtractor(content) : content.url}
+        id={content.id}
         remove={remove}
       />
     );
@@ -98,18 +92,18 @@ const ImageTray = ({
   return (
     <div
       style={{
-        display: 'flex',
-        overflowX: 'scroll',
-        width: '100%',
-        alignItems: 'center',
-        justifyContent: 'center',
+        display: "flex",
+        overflowX: "scroll",
+        width: "100%",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      {content?.map((img, index) => {
+      {content.map((img, index) => {
         const src = sourceExtractor ? sourceExtractor(img) : img.url;
         return (
           <React.Fragment key={index.toString()}>
-            <TrayImage src={src} id={img?.id} remove={remove} />
+            <TrayImage src={src} id={img.id} remove={remove} />
           </React.Fragment>
         );
       })}
@@ -120,15 +114,15 @@ const ImageTray = ({
 const TrayImage = ({ src, remove, id }) => (
   <div
     style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexDirection: 'column',
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "column",
     }}
   >
     <img src={src} className="ml-preview-image elevate-float" />
     <small className="ml-prev-el-remove" onClick={() => remove(id)}>
-        Remove
+      Remove
     </small>
   </div>
 );
@@ -180,6 +174,6 @@ MediaLibrary.defaultProps = {
   images: [],
   defaultTab: MediaLibrary.LIBRARY_TAB,
   selected: [],
-  actionText: 'Choose From Library',
+  actionText: "Choose From Library",
 };
 export default MediaLibrary;

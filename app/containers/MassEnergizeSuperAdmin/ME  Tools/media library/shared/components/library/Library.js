@@ -16,16 +16,16 @@ function Library({
     setShowSidePane(true);
     if (!multiple) return setSelectedContent(image);
     const images = content || [];
-    const found = images?.find((img) => img.id === image.id);
-    let rest = images?.filter((img) => img.id !== image.id);
+    const found = images.find((img) => img.id === image.id);
+    let rest = images.filter((img) => img.id !== image.id);
     if (!found) rest = [...rest, image];
     setSelectedContent(rest);
   };
 
   const checkIfSelected = (image) => {
-    if (!multiple) return image?.id === content?.id;
+    if (!multiple) return image.id === content.id;
     const images = content || [];
-    return images?.find((img) => img.id === image.id);
+    return images.find((img) => img.id === image.id);
   };
 
   const getImageSource = (image) => {
@@ -33,7 +33,7 @@ function Library({
     return image.url;
   };
 
-  if (!images || images?.length == 0) {
+  if (!images || images.length == 0) {
     return (
       <div
         style={{

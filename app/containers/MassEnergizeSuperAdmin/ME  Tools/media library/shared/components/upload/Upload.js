@@ -3,6 +3,7 @@ import "./Upload.css";
 import PropTypes from "prop-types";
 import uploadDummy from "./up_img.png";
 import {
+  EXTENSIONS,
   getFilesFromTransfer,
   getFileSize,
   getRandomStringKey,
@@ -11,13 +12,6 @@ import {
 } from "../../utils/utils";
 import { spinner } from "../../utils/values";
 import MLButton from "../button/MLButton";
-
-export const EXTENSIONS = [
-  "image/jpg",
-  "image/png",
-  "image/jpeg",
-  "application/pdf",
-];
 
 function Upload({
   files,
@@ -32,14 +26,13 @@ function Upload({
   const fileOpenerRef = useRef(null);
 
   const processForPreview = async (_files) => {
-    for (let i = 0; i < _files?.length; i++) {
+    for (let i = 0; i < _files.length; i++) {
       const fileObj = _files[i];
-      // const baseImage = await readContentOfSelectedFile(fileObj?.file);
-      readContentOfSelectedFile(fileObj?.file).then((baseImage) => {
+      readContentOfSelectedFile(fileObj.file).then((baseImage) => {
         const obj = {
           ...fileObj,
           src: baseImage,
-          sizeText: getFileSize(fileObj?.file),
+          sizeText: getFileSize(fileObj.file),
         };
         if (multiple) setPreviews((previous) => [...previous, obj]);
         else setPreviews([obj]);
@@ -64,7 +57,7 @@ function Upload({
   const handleDroppedFile = (e) => {
     e.preventDefault();
     dragBoxRef.current.classList.remove("ml-drag-over");
-    let _files = getFilesFromTransfer(e?.dataTransfer?.items);
+    let _files = getFilesFromTransfer(e.dataTransfer.items);
     if (!multiple) _files = [_files[0]]; // if multiple is set to false, just choose the first item from the lot the user dragged in
     const arr = [];
     for (let i = 0; i < _files.length; i++) {
@@ -116,11 +109,11 @@ function Upload({
         }}
         onDrop={(e) => handleDroppedFile(e)}
       >
-        {files?.length > 0 ? (
+        {files.length > 0 ? (
           <>
             <p>
-              Upload ({files?.length}) File
-              {files?.length === 1 ? "" : "s"}
+              Upload ({files.length}) File
+              {files.length === 1 ? "" : "s"}
             </p>
             {uploading ? (
               <img src={spinner} style={{ height: 70 }} alt="" />
@@ -161,8 +154,8 @@ function Upload({
       </div>
       {/* ----------------- PREVIEW AREA --------------- */}
       <div className="ml-preview-area">
-        {previews?.map((prev) => (
-          <React.Fragment key={prev?.id?.toString()}>
+        {previews.map((prev) => (
+          <React.Fragment key={prev.id.toString()}>
             <PreviewElement
               {...prev}
               remove={removeAnImage}
@@ -186,7 +179,7 @@ const PreviewElement = ({ file, id, src, sizeText, remove, uploading }) => (
     }}
   >
     <img src={src} className="ml-preview-image" alt="" />
-    <small>{smartString(file?.name)}</small>
+    <small>{smartString(file.name)}</small>
     <small role="button">
       Size: <b>{sizeText}</b>
     </small>

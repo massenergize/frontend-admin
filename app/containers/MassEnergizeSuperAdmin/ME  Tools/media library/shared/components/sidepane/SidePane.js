@@ -10,13 +10,13 @@ export default function SidePane({ activeImage, setShowSidePane }) {
         <h5 style={{ margin: 0, marginBottom: 10 }}>IMAGE DETAILS</h5>
         <ImageThumbnail
           style={{ width: '100%', height: 200, objectFit: 'contain' }}
-          imageSource={activeImage?.url}
+          imageSource={activeImage.url}
           key={getRandomStringKey()}
         />
 
         <h6 style={{ margin: 0 }}>URL</h6>
         <a href="#" style={{ fontSize: 13, color: 'cornflowerblue' }}>
-          {activeImage?.url}
+          {activeImage.url}
         </a>
 
         <MLButton

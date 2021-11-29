@@ -1,5 +1,10 @@
-import { EXTENSIONS } from '../components/upload/Upload';
 
+export const EXTENSIONS = [
+  "image/jpg",
+  "image/png",
+  "image/jpeg",
+  "application/pdf",
+];
 export const getRandomInteger = (limit = 9999999) => Math.floor(Math.random() * limit);
 
 export const getRandomItem = (arr = []) => arr[getRandomInteger(arr.length - 1)];
@@ -11,9 +16,9 @@ export const getFilesFromTransfer = (transferItems) => {
   for (let i = 0; i < transferItems.length; i++) {
     const item = transferItems[i];
     if (item.kind === 'file') {
-      const file = item?.getAsFile();
-      if (EXTENSIONS.includes(file?.type)) arr.push(file);
-      else console.log(`Sorry file type ${file?.type} isnt supported`);
+      const file = item.getAsFile();
+      if (EXTENSIONS.includes(file.type)) arr.push(file);
+      else console.log(`Sorry file type ${file.type} isnt supported`);
     }
   }
   return arr;
