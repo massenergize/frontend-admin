@@ -1,22 +1,22 @@
-import React, { useRef } from 'react';
-import './Upload.css';
-import PropTypes from 'prop-types';
-import uploadDummy from './up_img.png';
+import React, { useRef } from "react";
+import "./Upload.css";
+import PropTypes from "prop-types";
+import uploadDummy from "./up_img.png";
 import {
   getFilesFromTransfer,
   getFileSize,
   getRandomStringKey,
   readContentOfSelectedFile,
   smartString,
-} from '../../utils/utils';
-import { spinner } from '../../utils/values';
-import MLButton from '../button/MLButton';
+} from "../../utils/utils";
+import { spinner } from "../../utils/values";
+import MLButton from "../button/MLButton";
 
 export const EXTENSIONS = [
-  'image/jpg',
-  'image/png',
-  'image/jpeg',
-  'application/pdf',
+  "image/jpg",
+  "image/png",
+  "image/jpeg",
+  "application/pdf",
 ];
 
 function Upload({
@@ -63,7 +63,7 @@ function Upload({
 
   const handleDroppedFile = (e) => {
     e.preventDefault();
-    dragBoxRef.current.classList.remove('ml-drag-over');
+    dragBoxRef.current.classList.remove("ml-drag-over");
     let _files = getFilesFromTransfer(e?.dataTransfer?.items);
     if (!multiple) _files = [_files[0]]; // if multiple is set to false, just choose the first item from the lot the user dragged in
     const arr = [];
@@ -89,12 +89,12 @@ function Upload({
   return (
     <div
       style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
         padding: 40,
       }}
     >
@@ -103,33 +103,31 @@ function Upload({
         ref={fileOpenerRef}
         style={{ width: 0, height: 0 }}
         onChange={(e) => handleSelectedFiles(e)}
-        accept={EXTENSIONS.join(', ')}
+        accept={EXTENSIONS.join(", ")}
         multiple={multiple}
       />
       <div
         ref={dragBoxRef}
         className="ml-drag-box"
-        onDragLeave={() => dragBoxRef.current.classList.remove('ml-drag-over')}
+        onDragLeave={() => dragBoxRef.current.classList.remove("ml-drag-over")}
         onDragOver={(e) => {
           e.preventDefault();
-          dragBoxRef.current.classList.add('ml-drag-over');
+          dragBoxRef.current.classList.add("ml-drag-over");
         }}
         onDrop={(e) => handleDroppedFile(e)}
       >
         {files?.length > 0 ? (
           <>
             <p>
-              Upload (
-              {files?.length}
-) File
-              {files?.length === 1 ? '' : 's'}
+              Upload ({files?.length}) File
+              {files?.length === 1 ? "" : "s"}
             </p>
             {uploading ? (
               <img src={spinner} style={{ height: 70 }} alt="" />
             ) : (
               <MLButton
                 style={{
-                  height: 'auto',
+                  height: "auto",
                   borderRadius: 4,
                 }}
                 backColor="green"
@@ -145,11 +143,10 @@ function Upload({
           </>
         )}
         {uploading ? (
-          <p style={{ color: '#de8b28' }}>Uploading, please be patient...</p>
+          <p style={{ color: "#de8b28" }}>Uploading, please be patient...</p>
         ) : (
           <p>
-            Drag and drop image here or
-            {' '}
+            Drag and drop image here or{" "}
             <a
               href="#void"
               onClick={(e) => {
@@ -178,24 +175,20 @@ function Upload({
   );
 }
 
-const PreviewElement = ({
-  file, id, src, sizeText, remove, uploading
-}) => (
+const PreviewElement = ({ file, id, src, sizeText, remove, uploading }) => (
   <div
     style={{
-      flexDirection: 'column',
-      display: 'flex',
+      flexDirection: "column",
+      display: "flex",
       margin: 10,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: "center",
+      alignItems: "center",
     }}
   >
     <img src={src} className="ml-preview-image" alt="" />
     <small>{smartString(file?.name)}</small>
     <small role="button">
-      Size:
-      {' '}
-      <b>{sizeText}</b>
+      Size: <b>{sizeText}</b>
     </small>
     {!uploading && (
       <small className="ml-prev-el-remove" onClick={() => remove(id)}>
@@ -204,7 +197,6 @@ const PreviewElement = ({
     )}
   </div>
 );
-
 PreviewElement.propTypes = {
   file: PropTypes.object.isRequired,
   id: PropTypes.oneOf(PropTypes.string, PropTypes.number).isRequired,
