@@ -28,7 +28,7 @@ import {
   TestimonialsPage, AddTestimonial, AllTestimonials, Export, CustomizePages,
   SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditPolicy, UsersList, 
   ImpactPage, Impact, ImportContacts,
-  AddCarbonEquivalency, AllCarbonEquivalencies, EditCarbonEquivalency,
+  AddCarbonEquivalency, AllCarbonEquivalencies, EditCarbonEquivalency, GalleryPage, AddToGallery,
 } from '../pageListAsync';
 import EditVendor from '../MassEnergizeSuperAdmin/Vendors/EditVendor';
 import AddRemoveAdmin from '../MassEnergizeSuperAdmin/Community/AddRemoveAdmin';
@@ -160,6 +160,8 @@ class Application extends React.Component {
           <Route path="/admin/add/donate" component={SuperDonate} />
           <Route path="/admin/read/contact-us" component={SuperContactUs} />
           <Route path="/admin/read/all-actions" component={SuperAllActions} />
+          <Route exact path="/admin/gallery/" component={GalleryPage} />
+          <Route exact path="/admin/gallery/add" component={AddToGallery} />
           <Route component={NotFound} />
         </Switch>
       </Dashboard>
