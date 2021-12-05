@@ -56,18 +56,20 @@ class About extends React.Component {
 
 
   async getCSV(endpoint) {
-    console.log(this.props);
     const { community } = this.props;
     if (!community) {
       return;
     }
+
     let oldLoadingCSVs = this.state.loadingCSVs;
     this.setState({ loadingCSVs: oldLoadingCSVs.concat(endpoint) });
 
+    // csv downloads can be for a particular community, or they can be for all communities in which case the endpoint ends with '.all'.  
+    // In that case need to remove the '.all' from the endpoint to the API and not send the community ID in the body
     const body = {};
-    const dot = endpoint.indexOf('.');
-    if (dot > 0) {
-      endpoint = endpoint.substring(0,dot)
+    const dotAll = endpoint.indexOf('.all');
+    if (dotAll > 0) {
+      endpoint = endpoint.substring(0,dotAll)
     } else {
       body.community_id = community.id;
     }
