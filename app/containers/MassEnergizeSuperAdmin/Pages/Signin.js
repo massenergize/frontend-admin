@@ -29,7 +29,7 @@ const styles = theme => ({
 });
 
 
-class VendorsPageEditForm extends Component {
+class SigninPageEditForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
