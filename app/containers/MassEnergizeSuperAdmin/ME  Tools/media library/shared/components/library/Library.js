@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState } from "react";
+import PropTypes from "prop-types";
 
-import ImageThumbnail from '../thumbnail/ImageThumbnail';
-import { blank } from '../../utils/values';
+import ImageThumbnail from "../thumbnail/ImageThumbnail";
+import { blank } from "../../utils/values";
 
 function Library({
   multiple,
@@ -37,15 +37,16 @@ function Library({
     return (
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          height: '100%',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          height: "100%",
+          marginTop: "10%",
         }}
       >
         <img src={blank} style={{ height: 180 }} />
-        <p style={{ color: 'grey' }}>No images available to choose from</p>
+        <p style={{ color: "grey" }}>No images available to choose from</p>
       </div>
     );
   }
@@ -55,7 +56,7 @@ function Library({
         {images.map((image, index) => {
           const selected = checkIfSelected(image);
           return (
-            <div key={index.toString()} style={{ position: 'relative' }}>
+            <div key={index.toString()} style={{ position: "relative" }}>
               <ImageThumbnail
                 imageSource={getImageSource(image)}
                 onClick={() => handleSelection(image)}

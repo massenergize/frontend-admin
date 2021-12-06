@@ -3,6 +3,7 @@ import Modal from "./../modal/Modal";
 import SidePane from "../sidepane/SidePane";
 import Upload from "../upload/Upload";
 import MLButton from "../button/MLButton";
+import { object } from "prop-types";
 const Library = React.lazy(() => import("../library/Library")); // so that library component only loads when needed
 
 function MediaLibraryModal({
@@ -16,7 +17,6 @@ function MediaLibraryModal({
   getSelected,
   uploadMultiple,
 }) {
-  
   const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
   const [previews, setPreviews] = useState([]);
@@ -24,10 +24,15 @@ function MediaLibraryModal({
   const [content, setSelectedContent] = useState(selected);
   const [state, setState] = useState({});
 
+  const clean = (files) => {
+    // just a function that retrieves only the FileObject from the file jsons provided
+    if (!files) return files;
+    return files.map((obj) => obj.file);
+  };
   const handleUpload = () => {
     if (!onUpload) return;
     setState((prev) => ({ ...prev, uploading: true }));
-    onUpload(files, setCurrentTab, reset);
+    onUpload(clean(files), setCurrentTab, reset);
   };
 
   const handleInsert = () => {
@@ -99,7 +104,7 @@ function MediaLibraryModal({
           )}
           <div className="m-inner-container">
             <div className="m-title-bar">
-              <h3>Media Library</h3>
+              <h3 style={{ marginBottom: 0 }}>Media Library</h3>
               {/* --------------------- TAB HEADER AREA -------------- */}
               <div className="m-tab-header-area">
                 {Tabs.map((tab) => {
@@ -115,7 +120,7 @@ function MediaLibraryModal({
                         setShowSidePane(false);
                       }}
                     >
-                      <p>{tab.headerName}</p>
+                      <p style={{ margin: "15px 0px" }}>{tab.headerName}</p>
                     </div>
                   );
                 })}

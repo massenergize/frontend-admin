@@ -15,6 +15,7 @@
   padding: 20px 40px;
   height: 100%;
   border: 0px;
+  border-radius: 0px;
   cursor: pointer;
   background-color: var(--btn-background);
   color: var(--btn-color);

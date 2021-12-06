@@ -403,6 +403,8 @@ class MassEnergizeForm extends Component {
       formJson.fields
     );
 
+    console.log("I am teh cleaned values", cleanedValues);
+    return;
     if (formJson.preflightFxn) {
       cleanedValues = formJson.preflightFxn(cleanedValues);
     }
@@ -605,7 +607,14 @@ class MassEnergizeForm extends Component {
           </div>
         );
       case FieldTypes.MediaLibrary:
-        return <MediaLibrary />;
+        return (
+          <MediaLibrary
+            {...field}
+            onInsert={(content, reset) => {
+              this.updateForm(field.name, content);
+            }}
+          />
+        );
       case FieldTypes.File:
         // Linter caught this: what is this supposed to be?
         // const files = files && files !== 'None' ? files : [];

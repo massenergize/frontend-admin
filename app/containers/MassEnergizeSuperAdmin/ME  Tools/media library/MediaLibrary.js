@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import PropTypes from "prop-types";
+import PropTypes, { object } from "prop-types";
 import "./MediaLibrary.css";
 import MLButton from "./shared/components/button/MLButton";
 import MediaLibraryModal from "./shared/components/library modal/MediaLibraryModal";
@@ -33,7 +33,7 @@ function MediaLibrary(props) {
   return (
     <React.Fragment>
       {show && (
-        <div style={{ position: "fixed" }}>
+        <div style={{ position: "fixed", top: 0, left: 0 }}>
           <MediaLibraryModal
             {...props}
             close={() => setShow(false)}
@@ -67,7 +67,8 @@ function MediaLibrary(props) {
         )}
 
         <MediaLibrary.Button
-          onClick={() => {
+          onClick={(e) => {
+            e.preventDefault();
             setShow(true);
           }}
           style={{ borderRadius: 5, marginTop: 20, padding: "15px 40px" }}
@@ -171,6 +172,7 @@ MediaLibrary.Button = MLButton;
 MediaLibrary.ThumbnailImage = ImageThumbnail;
 MediaLibrary.defaultProps = {
   multiple: true,
+  uploadMultiple:false,
   images: [],
   defaultTab: MediaLibrary.LIBRARY_TAB,
   selected: [],

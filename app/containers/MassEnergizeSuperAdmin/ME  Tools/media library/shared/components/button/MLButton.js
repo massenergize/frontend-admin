@@ -16,7 +16,7 @@ export default function MLButton({
         '--btn-background': backColor,
         ...style,
       }}
-      onClick={() => (onClick ? onClick() : null)}
+      onClick={(e) => (onClick ? onClick(e) : null)}
     >
       {children}
     </button>
