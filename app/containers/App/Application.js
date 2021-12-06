@@ -25,6 +25,7 @@ import {
   AllGoals, AddGoal, EditGoal,
   AddPolicy, AllPolicies,
   DashboardAdminSummaryPage,
+  RegisterPage, SigninPage,
   TestimonialsPage, AddTestimonial, AllTestimonials, Export, CustomizePages,
   SuperContactUs, SuperHome, SuperAboutUs, SuperDonate, EditPolicy, UsersList, 
   ImpactPage, Impact, ImportContacts,
@@ -152,6 +153,8 @@ class Application extends React.Component {
           <Route path="/admin/edit/:id/teams" component={TeamsPage} />
           <Route path="/admin/edit/:id/vendors" component={VendorsPage} />
           <Route path="/admin/edit/:id/testimonials" component={TestimonialsPage} />
+          <Route path="/admin/edit/:id/registration" component={RegisterPage} />
+          <Route path="/admin/edit/:id/signin" component={SigninPage} />
           <Route path="/admin/edit/:id/contact_us" component={SuperContactUs} />
           <Route path="/admin/edit/:id/donate" component={SuperDonate} />
           <Route path="/admin/edit/:id/about" component={SuperAboutUs} />

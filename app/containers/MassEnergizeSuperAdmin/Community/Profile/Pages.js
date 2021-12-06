@@ -24,6 +24,8 @@ class Pages extends React.Component {
     const events = `/admin/edit/${community ? community.id: null}/events`;
     const vendors = `/admin/edit/${community ? community.id: null}/vendors`;
     const testimonials = `/admin/edit/${community ? community.id: null}/testimonials`;
+    const registration = `/admin/edit/${community ? community.id: null}/registration`;
+    const signin = `/admin/edit/${community ? community.id: null}/signin`;
 
     return (
       <Grid
@@ -121,6 +123,22 @@ class Pages extends React.Component {
             <Paper onClick={() => this.goHere(vendors)} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
                 ALL SERVICE PROVIDERS PAGE 
+                {' '}
+                <Icon style={{paddingTop:3, color:'green'}}>forward</Icon>
+              </Typography>
+            </Paper>
+
+            <Paper onClick={() => this.goHere(registration)} className={`${classes.pageCard}`} elevation={1}>
+              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                REGISTRATION PAGE 
+                {' '}
+                <Icon style={{paddingTop:3, color:'green'}}>forward</Icon>
+              </Typography>
+            </Paper>
+
+            <Paper onClick={() => this.goHere(signin)} className={`${classes.pageCard}`} elevation={1}>
+              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
+                SIGNIN PAGE 
                 {' '}
                 <Icon style={{paddingTop:3, color:'green'}}>forward</Icon>
               </Typography>
