@@ -137,6 +137,7 @@ MediaLibrary.propTypes = {
   /**
    * @param files
    * @reset Provides a function that will reset the component
+   * @close Provides a function to close the modal
    * @tabChanger Provides a function that will allow you to change tab outside the component
    * Function that should run to upload selected files to backend */
   onUpload: PropTypes.func,

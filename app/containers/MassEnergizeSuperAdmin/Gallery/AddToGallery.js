@@ -8,6 +8,7 @@ import FormGenerator from "./../_FormGenerator/index";
 import LightAutoComplete from "./tools/LightAutoComplete";
 import { Radio } from "@material-ui/core";
 import { FormControlLabel } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 const styles = (theme) => {
   const spacing = theme.spacing.unit;
   const error = {
@@ -41,40 +42,75 @@ const styles = (theme) => {
 
 const UPLOAD_URL = "/gallery.add";
 const CHOICES = { MINE: "MINE", ALL: "ALL", SPECIFIC: "SPECIFIC" };
+const defaultState = {
+  notification_msg: null,
+  notification_type: null,
+  title: null,
+};
+
 function AddToGallery(props) {
   const { auth, classes, communities = [] } = props;
 
   const [chosenComs, setChosenComs] = useState([]);
   const [scope, setScope] = useState(CHOICES.SPECIFIC);
-  const [state, setState] = useState({ error: false, success: false});
+  const [state, setState] = useState(defaultState);
   const superAdmin = auth.is_super_admin;
+
   const getCommunityList = () => {
     if (auth.is_super_admin) return communities;
     if (auth.is_community_admin) return auth.communities;
     return [];
   };
 
+  const resetThisComponent = () => {
+    setChosenComs([]);
+    setScope(CHOICES.SPECIFIC);
+    setState({ title: null });
+  };
+
   const list = getCommunityList();
   const cleanCommunities = () => {
     var coms = chosenComs || [];
+    if (scope === CHOICES.MINE) coms = auth.admin_at;
     return coms.map((com) => com.id);
   };
-  const onUpload = (files, reset) => {
+
+  const notify = (message, type) => {
+    setState((prev) => ({
+      ...prev,
+      notification_type: type,
+      notification_msg: message && message.toString(),
+    }));
+  };
+
+  const onUpload = (files, reset, closeModal) => {
     const apiJson = {
       user_id: auth.id,
       file: files[0] || null, // TODO: allow multiple
       community_ids: cleanCommunities(),
       is_universal: scope === CHOICES.ALL,
       scope: scope,
+      title: state.title,
     };
+
     apiCall(UPLOAD_URL, apiJson)
       .then((response) => {
         if (!response.success) {
           console.log("UPLOADRESPONSEERROR:", response.error);
+          notify(response.error.message, "error");
           return;
         }
+        resetThisComponent();
+        notify("Upload to library was successful!", "success");
+        reset();
+        closeModal();
       })
       .catch((e) => console.log("UPLOADERROR: ", e));
+  };
+
+  const handleOnChange = (e, name) => {
+    const value = e.target.value;
+    setState((state) => ({ ...state, [name]: value }));
   };
 
   return (
@@ -116,6 +152,7 @@ function AddToGallery(props) {
             valueExtractor={(com) => com.id}
             labelExtractor={(com) => com.name}
             onChange={(communities) => setChosenComs(communities)}
+            defaultSelected={auth.admin_at}
           />
           <Typography style={{ color: "gray" }}>
             <i>
@@ -126,12 +163,35 @@ function AddToGallery(props) {
           </Typography>
         </div>
       )}
+
+      <TextField
+        name="title"
+        style={{ width: "100%" }}
+        label="Any descriptive text for this upload? (optional) (30 chars)"
+        onChange={(e) => handleOnChange(e, "title")}
+        margin="normal"
+        variant="outlined"
+        autoComplete="off"
+        value={state.title || ""}
+        inputProps={{ maxLength: 30 }}
+      />
       <MediaLibrary
         onUpload={onUpload}
         actionText="Add to library"
         defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
       />
-      <p className={classes.success}>This is the error</p>
+      {state.notification_type && (
+        <p
+          className={
+            state.notification_type === "error"
+              ? classes.error
+              : classes.success
+          }
+          onClick={() => notify()}
+        >
+          {state.notification_msg}
+        </p>
+      )}
     </Paper>
   );
 }

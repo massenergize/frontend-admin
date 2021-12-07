@@ -3,7 +3,6 @@ import Modal from "./../modal/Modal";
 import SidePane from "../sidepane/SidePane";
 import Upload from "../upload/Upload";
 import MLButton from "../button/MLButton";
-import { object } from "prop-types";
 const Library = React.lazy(() => import("../library/Library")); // so that library component only loads when needed
 
 function MediaLibraryModal({
@@ -33,7 +32,7 @@ function MediaLibraryModal({
   const handleUpload = () => {
     if (!onUpload) return;
     setState((prev) => ({ ...prev, uploading: true }));
-    onUpload(clean(files), reset, setCurrentTab);
+    onUpload(clean(files), reset, close, setCurrentTab);
   };
 
   const handleInsert = () => {

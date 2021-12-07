@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { Chip, Paper, TextField, withStyles } from "@material-ui/core";
 import { pop } from "../../../../utils/common";
@@ -55,11 +55,12 @@ function LightAutoComplete(props) {
     classes,
     labelExtractor,
     valueExtractor,
+    defaultSelected,
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [selected, setSelected] = useState([]); // keeps a list of all selected items
+  const [selected, setSelected] = useState(defaultSelected); // keeps a list of all selected items
 
   const getValue = (item) => {
     if (valueExtractor) return valueExtractor(item);
@@ -159,5 +160,6 @@ LightAutoComplete.defaultProps = {
   id: "light-auto",
   label: "Search for community...",
   data: ["Option1", "Option2", "Option3"],
+  defaultSelected: [],
 };
 export default withStyles(styles)(LightAutoComplete);
