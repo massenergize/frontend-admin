@@ -153,7 +153,7 @@ const Footer = ({ content, multiple, cancel, insert }) => {
         style={{
           margin: 0,
           marginLeft: 10,
-          color: "#ffebd2",
+          color: "rgb(128 103 71)",
           fontSize: 12,
         }}
       >
@@ -168,6 +168,7 @@ const Footer = ({ content, multiple, cancel, insert }) => {
           className="ml-footer-btn"
           style={{ "--btn-color": "white", "--btn-background": "green" }}
           onClick={() => insert()}
+          disabled={!len}
         >
           INSERT {len > 0 ? `(${len})` : ""}
         </button>
@@ -176,12 +177,10 @@ const Footer = ({ content, multiple, cancel, insert }) => {
   );
 };
 
-MediaLibraryModal.UPLOAD_TAB = "upload";
-MediaLibraryModal.LIBRARY_TAB = "library";
 MediaLibraryModal.defaultProps = {
   multiple: true,
   images: [],
-  defaultTab: MediaLibraryModal.LIBRARY_TAB,
+  defaultTab: "library",
   selected: [],
 };
 export default MediaLibraryModal;

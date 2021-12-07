@@ -33,7 +33,7 @@ function MediaLibrary(props) {
   return (
     <React.Fragment>
       {show && (
-        <div style={{ position: "fixed", top: 0, left: 0 }}>
+        <div style={{ position: "fixed", top: 0, left: 0, zIndex: 5 }}>
           <MediaLibraryModal
             {...props}
             close={() => setShow(false)}
@@ -170,11 +170,12 @@ MediaLibrary.propTypes = {
 
 MediaLibrary.Button = MLButton;
 MediaLibrary.ThumbnailImage = ImageThumbnail;
+MediaLibrary.Tabs = { UPLOAD_TAB: "upload", LIBRARY_TAB: "library" };
 MediaLibrary.defaultProps = {
   multiple: true,
-  uploadMultiple:false,
+  uploadMultiple: false,
   images: [],
-  defaultTab: MediaLibrary.LIBRARY_TAB,
+  defaultTab: MediaLibrary.Tabs.LIBRARY_TAB,
   selected: [],
   actionText: "Choose From Library",
 };

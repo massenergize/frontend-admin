@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Chip, Paper, TextField, withStyles } from "@material-ui/core";
 import { pop } from "../../../../utils/common";
+import Typography from "material-ui/styles/typography";
 
 const styles = (theme) => {
   const spacing = theme.spacing.unit;
@@ -28,6 +29,8 @@ const styles = (theme) => {
       zIndex: 105,
       minHeight: 50,
       boxShadow: theme.shadows[7],
+      maxHeight: 500,
+      overflowY: "scroll",
     },
     dropdownItem: {
       padding: spacing * 2,
@@ -54,11 +57,9 @@ function LightAutoComplete(props) {
     valueExtractor,
   } = props;
 
-  const [optionsToDisplay, setOptionsToDisplay] = useState([]);
+  const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selected, setSelected] = useState([]); // keeps a list of all selected items
-
-  console.log("I am teh selected", selected);
 
   const getValue = (item) => {
     if (valueExtractor) return valueExtractor(item);
@@ -77,7 +78,7 @@ function LightAutoComplete(props) {
   const handleSelection = (item) => {
     var value = getValue(item);
     var [found, rest] = pop(selected, value, getValue);
-    // setShowDropdown(false);
+    setShowDropdown(false);
     if (found) {
       setSelected(rest);
       return transfer(rest);
@@ -88,12 +89,11 @@ function LightAutoComplete(props) {
   };
 
   const handleOnChange = (e) => {
-    const value = e.target.value;
+    const value = e.target.value.trim().toLowerCase();
     setShowDropdown(true);
-    if (!value || value.trim() === "") return;
     const filtered = data.filter((item) => {
       var label = getLabel(item);
-      if (label.includes(value)) return item;
+      if (label && label.toLowerCase().includes(value)) return item;
     });
     setOptionsToDisplay(filtered);
   };
@@ -102,9 +102,10 @@ function LightAutoComplete(props) {
     <div style={{ position: "relative", width: "100%" }}>
       {selected && selected.length > 0 && (
         <div>
-          {selected.map((option) => {
+          {selected.map((option, index) => {
             return (
               <Chip
+                key={index.toString()}
                 label={getLabel(option)}
                 onDelete={() => handleSelection(option)}
                 className={classes.chips}
@@ -114,12 +115,14 @@ function LightAutoComplete(props) {
         </div>
       )}
       <TextField
+        onClick={() => setShowDropdown(true)}
         id={id}
         label={label}
         className={classes.textbox}
         onChange={handleOnChange}
         margin="normal"
         variant="outlined"
+        autoComplete="off"
       />
       {showDropdown && (
         <>
@@ -128,6 +131,11 @@ function LightAutoComplete(props) {
             onClick={() => setShowDropdown(false)}
           />
           <Paper className={classes.dropdown}>
+            {optionsToDisplay.length === 0 && (
+              <p style={{ padding: 10, color: "lightgray" }}>
+                No results found...
+              </p>
+            )}
             {optionsToDisplay.map((op, index) => {
               return (
                 <div
@@ -150,6 +158,6 @@ LightAutoComplete.propTypes = {};
 LightAutoComplete.defaultProps = {
   id: "light-auto",
   label: "Search for community...",
-  data: ["him", "here", "hise"],
+  data: ["Option1", "Option2", "Option3"],
 };
 export default withStyles(styles)(LightAutoComplete);
