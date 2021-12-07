@@ -10,6 +10,15 @@ import { Radio } from "@material-ui/core";
 import { FormControlLabel } from "@material-ui/core";
 const styles = (theme) => {
   const spacing = theme.spacing.unit;
+  const error = {
+    background: "rgb(255, 214, 214)",
+    color: "rgb(170, 28, 28)",
+    width: "100%",
+    marginTop: 6,
+    padding: "16px 25px",
+    borderRadius: 5,
+    cursor: "pointer",
+  };
   return {
     container: {
       padding: spacing * 3,
@@ -21,6 +30,12 @@ const styles = (theme) => {
     dropdownArea: {
       marginBottom: spacing * 1,
     },
+    error: error,
+    success: {
+      ...error,
+      background: "rgb(174, 223, 174)",
+      color: "rgb(12, 131, 30)",
+    },
   };
 };
 
@@ -31,6 +46,7 @@ function AddToGallery(props) {
 
   const [chosenComs, setChosenComs] = useState([]);
   const [scope, setScope] = useState(CHOICES.SPECIFIC);
+  const [state, setState] = useState({ error: false, success: false});
   const superAdmin = auth.is_super_admin;
   const getCommunityList = () => {
     if (auth.is_super_admin) return communities;
@@ -43,7 +59,7 @@ function AddToGallery(props) {
     var coms = chosenComs || [];
     return coms.map((com) => com.id);
   };
-  const onUpload = (files) => {
+  const onUpload = (files, reset) => {
     const apiJson = {
       user_id: auth.id,
       file: files[0] || null, // TODO: allow multiple
@@ -51,9 +67,14 @@ function AddToGallery(props) {
       is_universal: scope === CHOICES.ALL,
       scope: scope,
     };
-
-    console.log("I am the API BODY", apiJson);
-    // apiCall(UPLOAD_URL, apiJson);
+    apiCall(UPLOAD_URL, apiJson)
+      .then((response) => {
+        if (!response.success) {
+          console.log("UPLOADRESPONSEERROR:", response.error);
+          return;
+        }
+      })
+      .catch((e) => console.log("UPLOADERROR: ", e));
   };
 
   return (
@@ -110,6 +131,7 @@ function AddToGallery(props) {
         actionText="Add to library"
         defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
       />
+      <p className={classes.success}>This is the error</p>
     </Paper>
   );
 }

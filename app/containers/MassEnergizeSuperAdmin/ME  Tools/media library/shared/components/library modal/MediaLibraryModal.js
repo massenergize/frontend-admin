@@ -16,13 +16,14 @@ function MediaLibraryModal({
   selected,
   getSelected,
   uploadMultiple,
+  uploading,
 }) {
   const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
   const [previews, setPreviews] = useState([]);
   const [files, setFiles] = useState([]);
   const [content, setSelectedContent] = useState(selected);
-  const [state, setState] = useState({});
+  const [state, setState] = useState({ uploading: uploading });
 
   const clean = (files) => {
     // just a function that retrieves only the FileObject from the file jsons provided
@@ -32,7 +33,7 @@ function MediaLibraryModal({
   const handleUpload = () => {
     if (!onUpload) return;
     setState((prev) => ({ ...prev, uploading: true }));
-    onUpload(clean(files), setCurrentTab, reset);
+    onUpload(clean(files), reset, setCurrentTab);
   };
 
   const handleInsert = () => {

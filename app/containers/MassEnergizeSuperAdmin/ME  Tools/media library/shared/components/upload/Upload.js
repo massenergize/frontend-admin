@@ -122,6 +122,8 @@ function Upload({
                 style={{
                   height: "auto",
                   borderRadius: 4,
+                  padding: "17px 40px",
+                  marginBottom: 5,
                 }}
                 backColor="green"
                 onClick={() => upload()}
