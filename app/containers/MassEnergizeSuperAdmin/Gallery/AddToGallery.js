@@ -54,6 +54,7 @@ function AddToGallery(props) {
   const [chosenComs, setChosenComs] = useState([]);
   const [scope, setScope] = useState(CHOICES.SPECIFIC);
   const [state, setState] = useState(defaultState);
+  const [resetAutoComplete, setResetorForAutoComplete] = useState(null);
   const superAdmin = auth.is_super_admin;
 
   const getCommunityList = () => {
@@ -66,6 +67,7 @@ function AddToGallery(props) {
     setChosenComs([]);
     setScope(CHOICES.SPECIFIC);
     setState({ title: null });
+    if (resetAutoComplete) resetAutoComplete();
   };
 
   const list = getCommunityList();
@@ -153,6 +155,7 @@ function AddToGallery(props) {
             labelExtractor={(com) => com.name}
             onChange={(communities) => setChosenComs(communities)}
             defaultSelected={auth.admin_at}
+            onMount={(reset) => setResetorForAutoComplete(() => reset)}
           />
           <Typography style={{ color: "gray" }}>
             <i>

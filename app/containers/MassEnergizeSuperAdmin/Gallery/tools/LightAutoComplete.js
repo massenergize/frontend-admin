@@ -56,12 +56,17 @@ function LightAutoComplete(props) {
     labelExtractor,
     valueExtractor,
     defaultSelected,
+    onMount,
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selected, setSelected] = useState(defaultSelected); // keeps a list of all selected items
 
+  const mount = () => {
+    if (!onMount) return;
+    onMount(() => setSelected([]));
+  };
   const getValue = (item) => {
     if (valueExtractor) return valueExtractor(item);
     return item;
@@ -98,6 +103,8 @@ function LightAutoComplete(props) {
     });
     setOptionsToDisplay(filtered);
   };
+
+  useEffect(() => mount(), []);
 
   return (
     <div style={{ position: "relative", width: "100%" }}>
