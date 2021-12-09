@@ -40,6 +40,14 @@ export const TeamsPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/T
 export const TestimonialsPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Testimonials'), {
   fallback: <Loading />,
 });
+// Register page settings
+export const RegisterPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Register'), {
+  fallback: <Loading />,
+});
+// Testimonials page settings
+export const SigninPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Signin'), {
+  fallback: <Loading />,
+});
 export const BlankPage = loadable(() => import('./Pages/BlankPage'), {
   fallback: <Loading />,
 });
