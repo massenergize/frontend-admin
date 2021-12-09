@@ -1,6 +1,6 @@
 import { RadioGroup, Typography, withStyles } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
@@ -9,6 +9,11 @@ import LightAutoComplete from "./tools/LightAutoComplete";
 import { Radio } from "@material-ui/core";
 import { FormControlLabel } from "@material-ui/core";
 import { TextField } from "@material-ui/core";
+import { bindActionCreators } from "redux";
+import {
+  reduxFetchImages,
+  reduxLoadGalleryImages,
+} from "../../../redux/redux-actions/adminActions";
 const styles = (theme) => {
   const spacing = theme.spacing.unit;
   const error = {
@@ -49,7 +54,13 @@ const defaultState = {
 };
 
 function AddToGallery(props) {
-  const { auth, classes, communities = [] } = props;
+  const {
+    auth,
+    classes,
+    communities = [],
+    fetchGalleryImages,
+    insertImagesInRedux,
+  } = props;
 
   const [chosenComs, setChosenComs] = useState([]);
   const [scope, setScope] = useState(CHOICES.SPECIFIC);
@@ -71,6 +82,7 @@ function AddToGallery(props) {
   };
 
   const list = getCommunityList();
+
   const cleanCommunities = () => {
     var coms = chosenComs || [];
     if (scope === CHOICES.MINE) coms = auth.admin_at;
@@ -115,6 +127,16 @@ function AddToGallery(props) {
     setState((state) => ({ ...state, [name]: value }));
   };
 
+  const initialiseComponent = () => {
+    useEffect(() => {
+      fetchGalleryImages([3], (data) =>
+        console.log("I am the galleryData", data)
+      );
+    }, []);
+  };
+
+  initialiseComponent();
+
   return (
     <Paper className={classes.container}>
       <Typography variant="h5" className={classes.header}>
@@ -154,7 +176,7 @@ function AddToGallery(props) {
             valueExtractor={(com) => com.id}
             labelExtractor={(com) => com.name}
             onChange={(communities) => setChosenComs(communities)}
-            defaultSelected={auth.admin_at}
+            // defaultSelected={auth.admin_at}
             onMount={(reset) => setResetorForAutoComplete(() => reset)}
           />
           <Typography style={{ color: "gray" }}>
@@ -203,5 +225,17 @@ const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   communities: state.getIn(["communities"]),
 });
-const GalleryWithProps = connect(mapStateToProps)(AddToGallery);
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      fetchGalleryImages: reduxFetchImages,
+      insertImagesInRedux: reduxLoadGalleryImages,
+    },
+    dispatch
+  );
+};
+const GalleryWithProps = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AddToGallery);
 export default withStyles(styles)(GalleryWithProps);
