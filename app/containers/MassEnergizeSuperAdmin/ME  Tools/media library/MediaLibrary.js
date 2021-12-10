@@ -170,7 +170,7 @@ MediaLibrary.propTypes = {
 };
 
 MediaLibrary.Button = MLButton;
-MediaLibrary.ThumbnailImage = ImageThumbnail;
+MediaLibrary.Image = ImageThumbnail;
 MediaLibrary.Tabs = { UPLOAD_TAB: "upload", LIBRARY_TAB: "library" };
 MediaLibrary.defaultProps = {
   multiple: true,

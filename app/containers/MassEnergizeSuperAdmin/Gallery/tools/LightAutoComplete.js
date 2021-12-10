@@ -17,7 +17,7 @@ const styles = (theme) => {
       width: "100vw",
       height: "100vh",
       background: "white",
-      opacity: 0.1,
+      opacity: 0,
       zIndex: 100,
     },
     dropdown: {
@@ -29,7 +29,7 @@ const styles = (theme) => {
       zIndex: 105,
       minHeight: 50,
       boxShadow: theme.shadows[7],
-      maxHeight: 500,
+      maxHeight: 330,
       overflowY: "scroll",
     },
     dropdownItem: {
@@ -51,6 +51,7 @@ function LightAutoComplete(props) {
     data,
     onChange,
     label,
+    placeholder,
     id,
     classes,
     labelExtractor,
@@ -122,10 +123,16 @@ function LightAutoComplete(props) {
           })}
         </div>
       )}
+      <GhostDropdown
+        show={showDropdown}
+        close={() => setShowDropdown(false)}
+        style={{ top: -500, height: 500 }}
+        classes={classes}
+      />
       <TextField
         onClick={() => setShowDropdown(true)}
         id={id}
-        label={label}
+        label={placeholder || label}
         className={classes.textbox}
         onChange={handleOnChange}
         margin="normal"
@@ -134,9 +141,10 @@ function LightAutoComplete(props) {
       />
       {showDropdown && (
         <>
-          <div
-            className={classes.ghostCurtain}
-            onClick={() => setShowDropdown(false)}
+          <GhostDropdown
+            show={showDropdown}
+            classes={classes}
+            close={() => setShowDropdown(false)}
           />
           <Paper className={classes.dropdown}>
             {optionsToDisplay.length === 0 && (
@@ -162,6 +170,16 @@ function LightAutoComplete(props) {
   );
 }
 
+const GhostDropdown = ({ classes, close, show, style = {} }) => {
+  if (!show) return <></>;
+  return (
+    <div
+      className={classes.ghostCurtain}
+      onClick={() => close()}
+      style={style}
+    />
+  );
+};
 LightAutoComplete.propTypes = {};
 LightAutoComplete.defaultProps = {
   id: "light-auto",

@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import broken from './img_broken.png';
-import loadingGif from './loading-gif.gif';
-import { getRandomItem, getRandomStringKey } from '../../utils/utils';
-const animations = ['animate-img', 'animate-img-slow', 'animate-img-slowest'];
+import React, { useState } from "react";
+import PropTypes from "prop-types";
+import broken from "./img_broken.png";
+import loadingGif from "./loading-gif.gif";
+import { getRandomItem, getRandomStringKey } from "../../utils/utils";
+const animations = ["animate-img", "animate-img-slow", "animate-img-slowest"];
 
 function ImageThumbnail({ onClick, imageSource, style = {} }) {
   const [showImage, setShowImage] = useState(false);
   const [src, setSrc] = useState(null);
   const noSelectionStyle = !onClick
-    ? { boxShadow: '0 0 0', borderColor: 'white' }
+    ? { boxShadow: "0 0 0", borderColor: "white" }
     : {};
   return (
     <div className="m-thumbnail">
@@ -30,7 +30,10 @@ function ImageThumbnail({ onClick, imageSource, style = {} }) {
         <img
           src={loadingGif}
           style={{
-            objectFit: 'contain', height: 60, width: 60, margin: 20
+            objectFit: "contain",
+            height: 60,
+            width: 60,
+            margin: 20,
           }}
           onError={(e) => (e.target.src = broken)}
         />
@@ -48,5 +51,7 @@ function ImageThumbnail({ onClick, imageSource, style = {} }) {
   );
 }
 ImageThumbnail.propTypes = {};
-
+ImageThumbnail.defaultProps = {
+  imageSource: "https://i.pravatar.cc/150",
+};
 export default ImageThumbnail;

@@ -135,7 +135,7 @@ function AddToGallery(props) {
     }, []);
   };
 
-  initialiseComponent();
+  // initialiseComponent();
 
   return (
     <Paper className={classes.container}>
