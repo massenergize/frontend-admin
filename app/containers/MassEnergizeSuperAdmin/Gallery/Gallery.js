@@ -1,4 +1,5 @@
 import {
+  Button,
   Checkbox,
   CircularProgress,
   Fab,
@@ -15,34 +16,11 @@ import {
 } from "../../../redux/redux-actions/adminActions";
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import { SideSheet } from "./SideSheet";
+import { styles } from "./styles";
 import LightAutoComplete from "./tools/LightAutoComplete";
 
-const styles = () => {
-  return {
-    title: { color: "white" },
-    container: { minHeight: 400, padding: 20, marginTop: 15 },
-    thumbnailContainer: {
-      display: "flex",
-      flexWrap: "wrap",
-      flexDirection: "row",
-    },
-    filterBox: {
-      border: "solid 0px #fafafa",
-      borderBottomWidth: 2,
-      marginBottom: 10,
-    },
-    button: {
-      padding: "10px 40px",
-      margin: 10,
-    },
-    sideSheetContainer: { 
-
-    }
-  };
-};
-
+const ALL_COMMUNITIES = "all-communities";
 const filters = [
-  { name: "All", value: "all" },
   { name: "Actions", value: "actions" },
   { name: "Events", value: "events" },
   { name: "Testimonials", value: "testimonials" },
@@ -52,13 +30,16 @@ function Gallery(props) {
   const { classes, auth, communities } = props;
 
   const getCommunityList = () => {
-    if (auth.is_super_admin) return communities;
-    if (auth.is_community_admin) return auth.communities;
+    if (auth.is_super_admin) return communities || [];
+    if (auth.is_community_admin) return auth.communities || [];
     return [];
   };
 
-  const [searchData, setSearchData] = useState({});
+  const [targetComs, setTargetComs] = useState([]);
+  const [targetAllComs, setTargetAllComs] = useState(false);
+  const [useAllFilters, setAllAsFilter] = useState(false);
   const [filterOptions, setFilterOptions] = useState([]);
+  const [showMoreInfo, setShowMoreInfo] = useState(false);
 
   const setOptions = (option) => {
     const isIn = filterOptions.includes(option);
@@ -67,26 +48,35 @@ function Gallery(props) {
     setFilterOptions((prev) => [...prev, option]);
   };
 
-  const setState = (name, data = null) => {
-    if (!name) return;
-    setSearchData((prev) => ({ ...prev, [name]: data }));
-  };
-
   return (
     <div>
-      <SideSheet classes={classes} />
+      {showMoreInfo && (
+        <SideSheet classes={classes} hide={() => setShowMoreInfo(false)} />
+      )}
       <Typography variant="h5" className={classes.title}>
         Manage images for your community
       </Typography>
       <Paper className={classes.container}>
         <div className={classes.filterBox}>
           <Typography variant="h6">Filter</Typography>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={targetAllComs}
+                onChange={(e) => setTargetAllComs((prev) => !prev)}
+                value={ALL_COMMUNITIES}
+                color="primary"
+              />
+            }
+            label="All communities"
+          />
           <LightAutoComplete
-            onChange={(coms) => setState("communities", coms)}
+            onChange={(coms) => setTargetComs(coms)}
             placeholder="Specify community..."
             data={getCommunityList()}
             labelExtractor={(com) => com.name}
             valueExtractor={(com) => com.id}
+            disabled={targetAllComs}
           />
           <div
             style={{
@@ -96,6 +86,17 @@ function Gallery(props) {
               alignItems: "center",
             }}
           >
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={useAllFilters}
+                  onChange={() => setAllAsFilter((prev) => !prev)}
+                  value="all"
+                  color="primary"
+                />
+              }
+              label="All"
+            />
             {filters.map((opt, ind) => {
               return (
                 <FormControlLabel
@@ -111,28 +112,28 @@ function Gallery(props) {
                     />
                   }
                   label={opt.name}
+                  disabled={useAllFilters}
                 />
               );
             })}
-
-            <Fab
-              variant="extended"
+            <Button
+              variant="contained"
               color="secondary"
-              aria-label="Delete"
-              className={classes.button}
+              style={{ fontSize: 13, textTransform: "capitalize" }}
             >
-              <Icon>search</Icon>
+              <Icon style={{ fontSize: 15 }}>search</Icon>
               Search
-            </Fab>
+            </Button>
           </div>
         </div>
         <div>
           {/* <ProgressCircleWithLabel label="We are fetching your data..." /> */}
           <div classesName={classes.thumbnailContainer}>
-            {[1, 2, 3, 4, 5].map((itm, index) => {
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 2, 3, 4, 5].map((itm, index) => {
               return (
                 <div key={index} style={{ display: "inline-block" }}>
                   <MediaLibrary.Image
+                    onClick={() => setShowMoreInfo(true)}
                     imageSource={`https://i.pravatar.cc/100?${index}`}
                   />
                 </div>

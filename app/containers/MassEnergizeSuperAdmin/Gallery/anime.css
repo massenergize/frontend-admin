@@ -1,0 +1,16 @@
+@keyframes show-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(200px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+}
+
+.anime-slide-in {
+  animation: show-from-right;
+  animation-duration: 0.2s;
+  animation-fill-mode: forwards;
+}

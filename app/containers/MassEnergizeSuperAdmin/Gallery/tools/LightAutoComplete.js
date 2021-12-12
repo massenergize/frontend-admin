@@ -58,6 +58,7 @@ function LightAutoComplete(props) {
     valueExtractor,
     defaultSelected,
     onMount,
+    disabled,
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
@@ -130,7 +131,10 @@ function LightAutoComplete(props) {
         classes={classes}
       />
       <TextField
-        onClick={() => setShowDropdown(true)}
+        disabled={disabled}
+        onClick={() => {
+          !disabled && setShowDropdown(true);
+        }}
         id={id}
         label={placeholder || label}
         className={classes.textbox}

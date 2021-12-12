@@ -142,7 +142,10 @@
 }
 
 .m-thumbnail {
-  display: inline-block;
+  /* display: inline-block; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   /* height: 170px;
   width: 170px;
