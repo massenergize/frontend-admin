@@ -20,6 +20,7 @@ import {
   GET_ALL_POLICIES,
   LOAD_SUMMARY_DATA,
   LOAD_GALLERY_IMAGES,
+  LOAD_SEARCHED_IMAGES,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -75,6 +76,17 @@ export const reduxLoadAccessToken = (data = []) => ({
   payload: data,
 });
 
+export const reduxLoadSearchedImages = ({ data, old }) => {
+  console.log("I am the old data", old);
+  const images = [...((old && old.data) || []), ...data.images];
+  const upper_limit = Math.max(data.upper_limit || 0, old.upper_limit || 0);
+  const lower_limit = Math.max(data.lower_limit || 0, old.lower_limit || 0);
+  return {
+    type: LOAD_SEARCHED_IMAGES,
+    payload: { images, upper_limit, lower_limit },
+  };
+};
+
 function redirectIfExpired(response) {
   if (!response.data && response.error === "session_expired") {
     window.location = "/login";
@@ -99,6 +111,18 @@ export const reduxLoadGraphData = (data = []) => ({
   type: LOAD_GRAPH_DATA,
   payload: data,
 });
+
+export const reduxSearchForImages = (body) => {
+  // apiCall("/gallery.search", body)
+  //   .then((response) => {
+  //     if (!response.success)
+  //       return console.log("SEARCHERROR_BE", response && response.error);
+  //     reduxLoadSearchedImages(response.data);
+  //   })
+  //   .catch((e) => {
+  //     console.log("SEARCHERROR_SYNT: ", e.toString());
+  //   });
+};
 
 export const reduxFetchImages = (community_ids = [], callback) => {
   apiCall("gallery.fetch", { community_ids })

@@ -59,11 +59,12 @@ function LightAutoComplete(props) {
     defaultSelected,
     onMount,
     disabled,
+    allowChipRemove,
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [selected, setSelected] = useState(defaultSelected); // keeps a list of all selected items
+  const [selected, setSelected] = useState([]); // keeps a list of all selected items
 
   const mount = () => {
     if (!onMount) return;
@@ -108,17 +109,24 @@ function LightAutoComplete(props) {
 
   useEffect(() => mount(), []);
 
+  useEffect(() => {
+    setSelected(defaultSelected);
+  }, [defaultSelected]);
+
   return (
     <div style={{ position: "relative", width: "100%" }}>
       {selected && selected.length > 0 && (
         <div>
           {selected.map((option, index) => {
+            var deleteOptions = { onDelete: () => handleSelection(option) };
+            deleteOptions = allowChipRemove ? deleteOptions : {};
             return (
               <Chip
                 key={index.toString()}
                 label={getLabel(option)}
-                onDelete={() => handleSelection(option)}
+                {...deleteOptions}
                 className={classes.chips}
+                disabled
               />
             );
           })}
@@ -190,5 +198,6 @@ LightAutoComplete.defaultProps = {
   label: "Search for community...",
   data: ["Option1", "Option2", "Option3"],
   defaultSelected: [],
+  allowChipRemove: true,
 };
 export default withStyles(styles)(LightAutoComplete);

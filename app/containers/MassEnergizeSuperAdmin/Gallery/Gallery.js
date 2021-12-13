@@ -7,13 +7,16 @@ import {
   Icon,
 } from "@material-ui/core";
 import { Paper, Typography, withStyles } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import {
   reduxFetchImages,
   reduxLoadGalleryImages,
+  reduxLoadSearchedImages,
+  reduxSearchForImages,
 } from "../../../redux/redux-actions/adminActions";
+import { apiCall } from "../../../utils/messenger";
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import { SideSheet } from "./SideSheet";
 import { styles } from "./styles";
@@ -24,10 +27,19 @@ const filters = [
   { name: "Actions", value: "actions" },
   { name: "Events", value: "events" },
   { name: "Testimonials", value: "testimonials" },
+  { name: "My Uploads", value: "uploads" },
 ];
 
 function Gallery(props) {
-  const { classes, auth, communities } = props;
+  const fetchController = new AbortController();
+  const { signal } = fetchController;
+  const {
+    classes,
+    auth,
+    communities,
+    searchResults = {},
+    putSearchResultsInRedux,
+  } = props;
 
   const getCommunityList = () => {
     if (auth.is_super_admin) return communities || [];
@@ -40,13 +52,73 @@ function Gallery(props) {
   const [useAllFilters, setAllAsFilter] = useState(false);
   const [filterOptions, setFilterOptions] = useState([]);
   const [showMoreInfo, setShowMoreInfo] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const [loadMore, setLoadMore] = useState(false);
+  const [queryHasChanged, setQueryHasChanged] = useState(true); //
+
+  const fetchContent = (body = {}) => {
+    setSearching(true);
+    apiCall("/gallery.search", { ...body, signal })
+      .then((response) => {
+        if (!response.success)
+          return console.log("SEARCHERROR_BE", response && response.error);
+        setSearching(false);
+        putSearchResultsInRedux({ data: response.data, old: searchResults });
+        console.log("i am the search response data", response.data);
+      })
+      .catch((e) => {
+        if (e.name === "AbortError")
+          console.log("Image search api call was cancelled...");
+        setSearching(false);
+        console.log("SEARCHERROR_SYNT: ", e.toString());
+      });
+  };
+
+  const runSearch = () => {
+    const form = {
+      any_community: targetAllComs,
+      target_communities: targetComs,
+      filters: filterOptions,
+    };
+    fetchContent(form);
+  };
+
+  const selectAllCommunities = () => {
+    // set all an admins community as target community if they are a community. Leave things empty if superadmin though
+    if (auth.is_super_admin) setTargetComs([]);
+    else if (auth.is_community_admin) setTargetComs(getCommunityList());
+    setTargetAllComs((prev) => !prev);
+  };
+
+  const selectAllFilters = () => {
+    setFilterOptions(filters.map((f) => f.value));
+    setAllAsFilter((prev) => !prev);
+  };
 
   const setOptions = (option) => {
     const isIn = filterOptions.includes(option);
     if (isIn)
       return setFilterOptions(filterOptions.filter((op) => op !== option));
     setFilterOptions((prev) => [...prev, option]);
+    setQueryHasChanged(true);
   };
+
+  useEffect(() => {
+    //preselect "all" communities and "all" filters
+    selectAllFilters();
+    selectAllCommunities();
+  }, []);
+
+  useEffect(() => {
+    // run a general query to retrieve images onload
+    fetchContent({
+      any_community: true,
+      target_communities: getCommunityList(),
+      filters: filters.map((f) => f.value),
+    });
+
+    return () => fetchController.abort();
+  }, []);
 
   return (
     <div>
@@ -63,7 +135,7 @@ function Gallery(props) {
             control={
               <Checkbox
                 checked={targetAllComs}
-                onChange={(e) => setTargetAllComs((prev) => !prev)}
+                onChange={() => selectAllCommunities()}
                 value={ALL_COMMUNITIES}
                 color="primary"
               />
@@ -71,12 +143,17 @@ function Gallery(props) {
             label="All communities"
           />
           <LightAutoComplete
-            onChange={(coms) => setTargetComs(coms)}
+            onChange={(coms) => {
+              setQueryHasChanged(true);
+              setTargetComs(coms);
+            }}
             placeholder="Specify community..."
             data={getCommunityList()}
             labelExtractor={(com) => com.name}
             valueExtractor={(com) => com.id}
             disabled={targetAllComs}
+            defaultSelected={targetComs}
+            allowChipRemove={!targetAllComs}
           />
           <div
             style={{
@@ -90,7 +167,7 @@ function Gallery(props) {
               control={
                 <Checkbox
                   checked={useAllFilters}
-                  onChange={() => setAllAsFilter((prev) => !prev)}
+                  onChange={() => selectAllFilters()}
                   value="all"
                   color="primary"
                 />
@@ -120,6 +197,8 @@ function Gallery(props) {
               variant="contained"
               color="secondary"
               style={{ fontSize: 13, textTransform: "capitalize" }}
+              onClick={() => runSearch()}
+              disabled={searching}
             >
               <Icon style={{ fontSize: 15 }}>search</Icon>
               Search
@@ -127,25 +206,38 @@ function Gallery(props) {
           </div>
         </div>
         <div>
-          {/* <ProgressCircleWithLabel label="We are fetching your data..." /> */}
-          <div classesName={classes.thumbnailContainer}>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 2, 3, 4, 5].map((itm, index) => {
-              return (
-                <div key={index} style={{ display: "inline-block" }}>
-                  <MediaLibrary.Image
-                    onClick={() => setShowMoreInfo(true)}
-                    imageSource={`https://i.pravatar.cc/100?${index}`}
-                  />
-                </div>
-              );
-            })}
-          </div>
-          <ProgressCircleWithLabel />
+          {/*------------------------------- IMAGES --------------------------  */}
+          <ImageCollectionTray
+            searching={searching}
+            images={(searchResults && searchResults.images) || []}
+            classes={classes}
+          />
+          {/* <ProgressCircleWithLabel /> */}
         </div>
       </Paper>
     </div>
   );
 }
+
+const ImageCollectionTray = ({ images = [], classes, searching }) => {
+  if (searching)
+    return <ProgressCircleWithLabel label="We are fetching your data..." />;
+
+  return (
+    <div classesName={classes.thumbnailContainer}>
+      {(images || []).map((image, index) => {
+        return (
+          <div key={index} style={{ display: "inline-block" }}>
+            <MediaLibrary.Image
+              onClick={() => setShowMoreInfo(true)}
+              imageSource={image && image.url}
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 const ProgressCircleWithLabel = ({ label }) => {
   return (
@@ -167,12 +259,14 @@ const ProgressCircleWithLabel = ({ label }) => {
 const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   communities: state.getIn(["communities"]),
+  searchResults: state.getIn(["searchedImages"]),
 });
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       fetchGalleryImages: reduxFetchImages,
       insertImagesInRedux: reduxLoadGalleryImages,
+      putSearchResultsInRedux: reduxLoadSearchedImages,
     },
     dispatch
   );
