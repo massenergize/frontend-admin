@@ -76,9 +76,10 @@ export const reduxLoadAccessToken = (data = []) => ({
   payload: data,
 });
 
-export const reduxLoadSearchedImages = ({ data, old }) => {
-  console.log("I am the old data", old);
-  const images = [...((old && old.data) || []), ...data.images];
+export const reduxLoadSearchedImages = ({ data, old, append = true }) => {
+  var images;
+  if (append) images = [...((old && old.images) || []), ...data.images];
+  else images = data.images;
   const upper_limit = Math.max(data.upper_limit || 0, old.upper_limit || 0);
   const lower_limit = Math.max(data.lower_limit || 0, old.lower_limit || 0);
   return {

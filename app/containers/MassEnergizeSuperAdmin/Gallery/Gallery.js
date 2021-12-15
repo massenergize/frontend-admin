@@ -21,6 +21,7 @@ import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import { SideSheet } from "./SideSheet";
 import { styles } from "./styles";
 import LightAutoComplete from "./tools/LightAutoComplete";
+import no_data from "./no_data.png";
 
 const ALL_COMMUNITIES = "all-communities";
 const filters = [
@@ -54,32 +55,47 @@ function Gallery(props) {
   const [showMoreInfo, setShowMoreInfo] = useState(false);
   const [searching, setSearching] = useState(false);
   const [loadMore, setLoadMore] = useState(false);
-  const [queryHasChanged, setQueryHasChanged] = useState(true); //
+  const [queryHasChanged, setQueryHasChanged] = useState(false); 
+  const [noResults, setNoResults] = useState(false);
 
-  const fetchContent = (body = {}) => {
-    setSearching(true);
+  const fetchContent = (body = {}, cb) => {
+    setSearching(true); // activate circular spinner to show loading to user
+    setNoResults(false); // remove the "No results" text if it was showing from previous search
     apiCall("/gallery.search", { ...body, signal })
       .then((response) => {
         if (!response.success)
           return console.log("SEARCHERROR_BE", response && response.error);
-        setSearching(false);
-        putSearchResultsInRedux({ data: response.data, old: searchResults });
-        console.log("i am the search response data", response.data);
+
+        putSearchResultsInRedux({
+          data: response.data,
+          old: searchResults,
+          append: queryHasChanged ? false : true,
+        });
+        setSearching(false); // remove loading spinner
+        setQueryHasChanged(false); // reset the query has changed field
+        if (response.data.images.length === 0) setNoResults(true);
+        if (cb) cb(response.data);
       })
       .catch((e) => {
         if (e.name === "AbortError")
           console.log("Image search api call was cancelled...");
-        setSearching(false);
+        setSearching(false); // remove loading spinner
         console.log("SEARCHERROR_SYNT: ", e.toString());
+        setQueryHasChanged(false); // reset the query has changed field
+        if (cb) cb(null);
       });
   };
 
-  const runSearch = () => {
-    const form = {
+  const makeRequestBody = (extraParams = {}) => {
+    return {
       any_community: targetAllComs,
       target_communities: targetComs,
       filters: filterOptions,
+      ...extraParams,
     };
+  };
+  const runSearch = () => {
+    const form = makeRequestBody();
     fetchContent(form);
   };
 
@@ -97,10 +113,10 @@ function Gallery(props) {
 
   const setOptions = (option) => {
     const isIn = filterOptions.includes(option);
+    setQueryHasChanged(true);
     if (isIn)
       return setFilterOptions(filterOptions.filter((op) => op !== option));
     setFilterOptions((prev) => [...prev, option]);
-    setQueryHasChanged(true);
   };
 
   useEffect(() => {
@@ -120,6 +136,14 @@ function Gallery(props) {
     return () => fetchController.abort();
   }, []);
 
+  const loadMoreImages = () => {
+    setLoadMore(true);
+    const limits = {
+      upper_limit: searchResults && searchResults.upper_limit,
+      lower_limit: searchResults && searchResults.lower_limit,
+    };
+    fetchContent(makeRequestBody(limits), () => setLoadMore(false));
+  };
   return (
     <div>
       {showMoreInfo && (
@@ -198,7 +222,7 @@ function Gallery(props) {
               color="secondary"
               style={{ fontSize: 13, textTransform: "capitalize" }}
               onClick={() => runSearch()}
-              disabled={searching}
+              disabled={searching || !queryHasChanged}
             >
               <Icon style={{ fontSize: 15 }}>search</Icon>
               Search
@@ -211,25 +235,54 @@ function Gallery(props) {
             searching={searching}
             images={(searchResults && searchResults.images) || []}
             classes={classes}
+            showMoreInfo={setShowMoreInfo}
           />
-          {/* <ProgressCircleWithLabel /> */}
+          {noResults && (
+            <Typography
+              style={{ margin: 10, width: "100%", textAlign: "center" }}
+            >
+              No images were found in last search...
+            </Typography>
+          )}
+          <LoadMoreContainer
+            loading={loadMore}
+            loadMoreFunction={loadMoreImages}
+          />
         </div>
       </Paper>
     </div>
   );
 }
 
-const ImageCollectionTray = ({ images = [], classes, searching }) => {
+const LoadMoreContainer = ({ loadMoreFunction, loading }) => {
+  if (loading) return <ProgressCircleWithLabel />;
+  return (
+    <Button
+      variant="contained"
+      color="secondary"
+      style={{ width: "100%", margin: 6, borderRadius: 4, marginTop: 20 }}
+      onClick={() => loadMoreFunction()}
+    >
+      Load More
+    </Button>
+  );
+};
+
+const ImageCollectionTray = ({
+  images = [],
+  classes,
+  searching,
+  showMoreInfo,
+}) => {
   if (searching)
     return <ProgressCircleWithLabel label="We are fetching your data..." />;
-
   return (
     <div classesName={classes.thumbnailContainer}>
       {(images || []).map((image, index) => {
         return (
           <div key={index} style={{ display: "inline-block" }}>
             <MediaLibrary.Image
-              onClick={() => setShowMoreInfo(true)}
+              onClick={() => showMoreInfo(true)}
               imageSource={image && image.url}
             />
           </div>
