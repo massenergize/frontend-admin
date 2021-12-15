@@ -6,16 +6,10 @@ import MediaLibrary from "./../ME  Tools/media library/MediaLibrary";
 import "./anime.css";
 import { ProgressCircleWithLabel } from "./Gallery";
 
-const imageInfo = [
-  { name: "event", data: [], plural: "events" },
-  { name: "action", data: [], plural: "actions" },
-  { name: "testimonial", data: [], plural: "testimonials" },
-  { name: "community", data: [], plural: "communities" },
-];
-
 export const SideSheet = (props) => {
-  const { classes, hide, infos, data } = props;
+  const { classes, hide, infos, data, deleteImage } = props;
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const info = (data && data.info) || {};
 
   const getContent = () => {
@@ -45,17 +39,33 @@ export const SideSheet = (props) => {
               borderWidth: 0,
               padding: 0,
               borderRadius: 0,
+              objectFit: "contain",
             }}
             imageSource={data.url}
           />
           <DeleteVerificationBox
             active={isDeleting}
+            close={() => setIsDeleting(false)}
             onDelete={() => setIsDeleting(true)}
+            loading={deleteLoading}
+            onConfirm={() => {
+              setDeleteLoading(true);
+              deleteImage(data && data.id, () => {
+                setIsDeleting(false);
+                hide();
+                console.log(`Your image(${data && data.id}) was deleted...`);
+              });
+            }}
           />
-          {Object.keys(info).map((info, ind) => {
+          {Object.keys(info).map((key, index) => {
+            const imageInfo = {
+              name: key,
+              data: info[key] || {},
+            };
+
             return (
-              <React.Fragment key={ind}>
-                <ImageInfoArea {...info} />
+              <React.Fragment key={index.toString()}>
+                <ImageInfoArea {...imageInfo} />
               </React.Fragment>
             );
           })}
@@ -104,7 +114,7 @@ const DeleteVerificationBox = ({
     );
 
   return (
-    <div>
+    <div style={{ marginBottom: 10 }}>
       <Typography style={{ padding: "5px 15px" }}>
         Are you sure you want to delete this image?
       </Typography>
@@ -135,12 +145,11 @@ const DeleteVerificationBox = ({
   );
 };
 
-const ImageInfoArea = ({ name, data = [], plural }) => {
-  name = data.length === 1 ? name : plural;
+const ImageInfoArea = ({ name, data = [] }) => {
   const desc =
-    data.length > 0
-      ? `This image is used in ${data.length} ${name}`
-      : `No ${plural} use this image`;
+    data.length === 0
+      ? `No ${name} use this image`
+      : `${name} that use this image : (${data.length})`;
   return (
     <div style={{}}>
       <div>
@@ -166,22 +175,18 @@ const ImageInfoArea = ({ name, data = [], plural }) => {
             return (
               <div style={{ width: "100%" }} key={index.toString()}>
                 <small>
-                  This is some community that you can view and go do something
-                  there...
+                  {index + 1}. {item.title || item.name}
                 </small>
-                <div
+                {/* <div
                   style={{
                     display: "flex",
                     flexDirection: "row",
                   }}
                 >
                   <a href="#void">
-                    <small>See in admin</small>
+                    <small>View in admin</small>
                   </a>
-                  <a href="#void" style={{ marginLeft: "auto" }}>
-                    <small>See on portal</small>
-                  </a>
-                </div>
+                </div> */}
               </div>
             );
           })}

@@ -45,8 +45,8 @@ function Gallery(props) {
   } = props;
 
   const getCommunityList = () => {
-    if (auth.is_super_admin) return communities || [];
-    if (auth.is_community_admin) return auth.communities || [];
+    if (auth && auth.is_super_admin) return communities || [];
+    if (auth && auth.is_community_admin) return auth.communities || [];
     return [];
   };
 
@@ -61,6 +61,27 @@ function Gallery(props) {
   const [noResults, setNoResults] = useState(false);
   const [oneImageInfo, setOneImageInfo] = useState(null);
 
+  const deleteImage = (id, cb) => {
+    if (!id) return;
+    apiCall("/gallery.remove", { media_id: id })
+      .then((response) => {
+        if (!response.success)
+          return console.log("REMOVE IMAGE ERROR_BE", response.error);
+        const images = (searchResults && searchResults.images) || [];
+        const rem = images.filter((img) => img.id !== id);
+        putSearchResultsInRedux({
+          data: { ...(searchResults || {}), images: rem },
+          old: searchResults,
+          append: false,
+        });
+        if (cb) cb();
+      })
+      .catch((e) => {
+        console.log("REMOVE IMAGE ERROR_SYNT", e.toString());
+        if (cb) cb();
+      });
+  };
+
   const getMoreInfoOnImage = (id) => {
     if (!id) return console.log("The image id provided is invalid...", id);
     setOneImageInfo("loading");
@@ -70,7 +91,6 @@ function Gallery(props) {
           setOneImageInfo(null);
           return console.log("IMAGE INFO REQ BE: ", response.error);
         }
-        console.log("I gath teh info", response.data);
         setOneImageInfo(response.data);
         putImageInfoInRedux({
           oldInfos: imageInfos,
@@ -143,6 +163,7 @@ function Gallery(props) {
     setFilterOptions((prev) => [...prev, option]);
   };
 
+  // ------------------------------------------------------
   useEffect(() => {
     //preselect "all" communities and "all" filters
     selectAllFilters();
@@ -150,15 +171,19 @@ function Gallery(props) {
   }, []);
 
   useEffect(() => {
-    // run a general query to retrieve images onload
-    fetchContent({
-      any_community: true,
-      target_communities: getCommunityList(),
-      filters: filters.map((f) => f.value),
-    });
+    // run a general query to retrieve images onload, if there is no content yet
+    if (!searchResults || !searchResults.images)
+      fetchContent({
+        any_community: true,
+        target_communities: getCommunityList(),
+        filters: filters.map((f) => f.value),
+      });
 
     return () => fetchController.abort();
   }, []);
+
+  useEffect(() => {}, [searchResults]);
+  // -------------------------------------------------------
 
   const loadMoreImages = () => {
     setLoadMore(true);
@@ -177,6 +202,7 @@ function Gallery(props) {
           hide={() => setShowMoreInfo(false)}
           infos={imageInfos}
           data={oneImageInfo}
+          deleteImage={deleteImage}
         />
       )}
       <Typography variant="h5" className={classes.title}>
@@ -306,7 +332,6 @@ const ImageCollectionTray = ({
   classes,
   searching,
   showMoreInfo,
-  // findImageInfo
 }) => {
   if (searching)
     return <ProgressCircleWithLabel label="We are fetching your data..." />;
