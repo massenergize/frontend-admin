@@ -21,6 +21,7 @@ import {
   LOAD_SUMMARY_DATA,
   LOAD_GALLERY_IMAGES,
   LOAD_SEARCHED_IMAGES,
+  KEEP_LOADED_IMAGE_INFO,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -74,6 +75,10 @@ export const reduxLoadIdToken = (token = null) => ({
 export const reduxLoadAccessToken = (data = []) => ({
   type: "LOAD_ACCESS_TOKEN",
   payload: data,
+});
+export const reduxLoadImageInfos = ({ oldInfos, newInfo }) => ({
+  type: KEEP_LOADED_IMAGE_INFO,
+  payload: { ...(oldInfos || {}), [newInfo.id]: newInfo },
 });
 
 export const reduxLoadSearchedImages = ({ data, old, append = true }) => {

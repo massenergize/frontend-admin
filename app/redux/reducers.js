@@ -30,6 +30,7 @@ import app, {
   policiesReducer,
   galleryImagesReducer,
   searchedImagesReducer,
+  imageInfosReducer,
 } from "./modules/appReducer";
 
 /**
@@ -39,6 +40,7 @@ export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
     galleryImages: galleryImagesReducer,
     searchedImages: searchedImagesReducer,
+    imageInfos: imageInfosReducer,
     app,
     form,
     login,

@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { Button, CircularProgress, Paper, Typography } from "@material-ui/core";
 import MediaLibrary from "./../ME  Tools/media library/MediaLibrary";
 import "./anime.css";
+import { ProgressCircleWithLabel } from "./Gallery";
 
 const imageInfo = [
   { name: "event", data: [], plural: "events" },
@@ -13,14 +14,26 @@ const imageInfo = [
 ];
 
 export const SideSheet = (props) => {
-  const { classes, hide } = props;
-
+  const { classes, hide, infos, data } = props;
   const [isDeleting, setIsDeleting] = useState(false);
+  const info = (data && data.info) || {};
 
-  return (
-    <Paper
-      className={`${classes.sideSheetWrapper} elevate-float anime-slide-in`}
-    >
+  const getContent = () => {
+    const isLoading = data && data === "loading";
+    if (isLoading)
+      return (
+        <div className={classes.sideSheetInnerContainer}>
+          <ProgressCircleWithLabel label="Loading info..." />
+        </div>
+      );
+    if (!data)
+      return (
+        <div className={classes.sideSheetInnerContainer}>
+          <Typography>No image info was found...</Typography>
+        </div>
+      );
+
+    return (
       <div style={{ position: "relative", height: "100%" }}>
         <div className={classes.sideSheetContainer}>
           <HideButton hide={hide} />
@@ -33,12 +46,13 @@ export const SideSheet = (props) => {
               padding: 0,
               borderRadius: 0,
             }}
+            imageSource={data.url}
           />
           <DeleteVerificationBox
             active={isDeleting}
             onDelete={() => setIsDeleting(true)}
           />
-          {imageInfo.map((info, ind) => {
+          {Object.keys(info).map((info, ind) => {
             return (
               <React.Fragment key={ind}>
                 <ImageInfoArea {...info} />
@@ -51,6 +65,15 @@ export const SideSheet = (props) => {
           style={{ position: "absolute", bottom: 0, width: "100%" }}
         />
       </div>
+    );
+  };
+
+  return (
+    <Paper
+      className={`${classes.sideSheetWrapper} elevate-float anime-slide-in`}
+      style={{ borderRadius: 0 }}
+    >
+      {getContent()}
     </Paper>
   );
 };

@@ -34,5 +34,14 @@ export const styles = (theme) => {
       flexDirection: "column",
       overflowY: "scroll",
     },
+
+    sideSheetInnerContainer: {
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      width: "100%",
+    },
   };
 };

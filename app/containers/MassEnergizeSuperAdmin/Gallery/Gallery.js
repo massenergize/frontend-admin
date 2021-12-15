@@ -13,6 +13,7 @@ import { bindActionCreators } from "redux";
 import {
   reduxFetchImages,
   reduxLoadGalleryImages,
+  reduxLoadImageInfos,
   reduxLoadSearchedImages,
   reduxSearchForImages,
 } from "../../../redux/redux-actions/adminActions";
@@ -21,7 +22,6 @@ import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import { SideSheet } from "./SideSheet";
 import { styles } from "./styles";
 import LightAutoComplete from "./tools/LightAutoComplete";
-import no_data from "./no_data.png";
 
 const ALL_COMMUNITIES = "all-communities";
 const filters = [
@@ -40,6 +40,8 @@ function Gallery(props) {
     communities,
     searchResults = {},
     putSearchResultsInRedux,
+    putImageInfoInRedux,
+    imageInfos,
   } = props;
 
   const getCommunityList = () => {
@@ -55,8 +57,31 @@ function Gallery(props) {
   const [showMoreInfo, setShowMoreInfo] = useState(false);
   const [searching, setSearching] = useState(false);
   const [loadMore, setLoadMore] = useState(false);
-  const [queryHasChanged, setQueryHasChanged] = useState(false); 
+  const [queryHasChanged, setQueryHasChanged] = useState(false);
   const [noResults, setNoResults] = useState(false);
+  const [oneImageInfo, setOneImageInfo] = useState(null);
+
+  const getMoreInfoOnImage = (id) => {
+    if (!id) return console.log("The image id provided is invalid...", id);
+    setOneImageInfo("loading");
+    apiCall("/gallery.image.info", { media_id: id })
+      .then((response) => {
+        if (response && !response.success) {
+          setOneImageInfo(null);
+          return console.log("IMAGE INFO REQ BE: ", response.error);
+        }
+        console.log("I gath teh info", response.data);
+        setOneImageInfo(response.data);
+        putImageInfoInRedux({
+          oldInfos: imageInfos,
+          newInfo: response.data,
+        });
+      })
+      .catch((e) => {
+        setOneImageInfo(null);
+        console.log("IMAGE INFO REQ SYNTAX: ", e.toString());
+      });
+  };
 
   const fetchContent = (body = {}, cb) => {
     setSearching(true); // activate circular spinner to show loading to user
@@ -65,7 +90,6 @@ function Gallery(props) {
       .then((response) => {
         if (!response.success)
           return console.log("SEARCHERROR_BE", response && response.error);
-
         putSearchResultsInRedux({
           data: response.data,
           old: searchResults,
@@ -144,10 +168,16 @@ function Gallery(props) {
     };
     fetchContent(makeRequestBody(limits), () => setLoadMore(false));
   };
+
   return (
     <div>
       {showMoreInfo && (
-        <SideSheet classes={classes} hide={() => setShowMoreInfo(false)} />
+        <SideSheet
+          classes={classes}
+          hide={() => setShowMoreInfo(false)}
+          infos={imageInfos}
+          data={oneImageInfo}
+        />
       )}
       <Typography variant="h5" className={classes.title}>
         Manage images for your community
@@ -235,7 +265,10 @@ function Gallery(props) {
             searching={searching}
             images={(searchResults && searchResults.images) || []}
             classes={classes}
-            showMoreInfo={setShowMoreInfo}
+            showMoreInfo={(id) => {
+              setShowMoreInfo(true);
+              getMoreInfoOnImage(id);
+            }}
           />
           {noResults && (
             <Typography
@@ -273,6 +306,7 @@ const ImageCollectionTray = ({
   classes,
   searching,
   showMoreInfo,
+  // findImageInfo
 }) => {
   if (searching)
     return <ProgressCircleWithLabel label="We are fetching your data..." />;
@@ -282,7 +316,7 @@ const ImageCollectionTray = ({
         return (
           <div key={index} style={{ display: "inline-block" }}>
             <MediaLibrary.Image
-              onClick={() => showMoreInfo(true)}
+              onClick={() => showMoreInfo(image && image.id)}
               imageSource={image && image.url}
             />
           </div>
@@ -292,7 +326,7 @@ const ImageCollectionTray = ({
   );
 };
 
-const ProgressCircleWithLabel = ({ label }) => {
+export const ProgressCircleWithLabel = ({ label }) => {
   return (
     <div
       style={{
@@ -313,6 +347,7 @@ const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   communities: state.getIn(["communities"]),
   searchResults: state.getIn(["searchedImages"]),
+  imageInfos: state.getIn(["imageInfos"]),
 });
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
@@ -320,6 +355,7 @@ const mapDispatchToProps = (dispatch) => {
       fetchGalleryImages: reduxFetchImages,
       insertImagesInRedux: reduxLoadGalleryImages,
       putSearchResultsInRedux: reduxLoadSearchedImages,
+      putImageInfoInRedux: reduxLoadImageInfos,
     },
     dispatch
   );
