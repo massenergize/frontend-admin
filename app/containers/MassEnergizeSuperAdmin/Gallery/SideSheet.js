@@ -174,7 +174,7 @@ const ImageInfoArea = ({ name, data = [] }) => {
           {data.map((item, index) => {
             return (
               <div style={{ width: "100%" }} key={index.toString()}>
-                <small>
+                <small style={{ color: "#00BCD4", fontWeight: "bold" }}>
                   {index + 1}. {item.title || item.name}
                 </small>
                 {/* <div

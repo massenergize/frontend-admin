@@ -215,7 +215,10 @@ function Gallery(props) {
             control={
               <Checkbox
                 checked={targetAllComs}
-                onChange={() => selectAllCommunities()}
+                onChange={() => {
+                  selectAllCommunities();
+                  setQueryHasChanged(true);
+                }}
                 value={ALL_COMMUNITIES}
                 color="primary"
               />
@@ -247,7 +250,10 @@ function Gallery(props) {
               control={
                 <Checkbox
                   checked={useAllFilters}
-                  onChange={() => selectAllFilters()}
+                  onChange={() => {
+                    selectAllFilters();
+                    setQueryHasChanged(true);
+                  }}
                   value="all"
                   color="primary"
                 />
