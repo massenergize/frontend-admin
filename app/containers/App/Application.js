@@ -44,6 +44,7 @@ import CommunityAdminMessages from '../MassEnergizeSuperAdmin/Messages/Community
 import MessageDetails from '../MassEnergizeSuperAdmin/Messages/MessageDetails';
 import TeamAdminMessages from '../MassEnergizeSuperAdmin/Messages/TeamAdminMessages';
 import TeamMembers from '../MassEnergizeSuperAdmin/Teams/TeamMembers';
+import EventRSVPs from '../MassEnergizeSuperAdmin/Events/EventRSVPs';
 
 
 class Application extends React.Component {
@@ -118,6 +119,7 @@ class Application extends React.Component {
           <Route path="/admin/read/events" component={AllEvents} />
           <Route path="/admin/add/event" component={AddEvent} />
           <Route path="/admin/edit/:id/event" component={EditEvent} />
+          <Route path="/admin/edit/:id/event_rsvps" component={EventRSVPs} />
           <Route path="/admin/read/teams" exact component={AllTeams} />
           <Route path="/admin/add/team" component={AddTeam} />
           <Route path="/admin/edit/:id/team" component={EditTeam} />
