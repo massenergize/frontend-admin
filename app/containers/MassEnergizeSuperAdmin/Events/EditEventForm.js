@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import states from 'dan-api/data/states';
+import { Link } from 'react-router-dom';
+import { Paper } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { apiCall } from '../../../utils/messenger';
 import MassEnergizeForm from '../_FormGenerator';
@@ -35,7 +37,8 @@ class CreateNewEventForm extends Component {
     super(props);
     this.state = {
       communities: [],
-      formJson: null, 
+      formJson: null,
+      event: null,
       rescheduledEvent: null
     };
   }
@@ -99,7 +102,7 @@ class CreateNewEventForm extends Component {
       formJson.fields.splice(1, 0, section);
     }
 
-    await this.setStateAsync({ formJson });
+    await this.setStateAsync({ event, formJson });
   }
 
   getSelectedIds = (selected, dataToCrossCheck) => {
@@ -488,10 +491,17 @@ class CreateNewEventForm extends Component {
 
   render() {
     const { classes } = this.props;
-    const { formJson } = this.state;
+    const { formJson, event } = this.state;
     if (!formJson) return (<div style={{ color: 'white' }}><h1>Loading ...</h1></div>);
     return (
       <div>
+        <Paper>
+          <Link to={`/admin/edit/${event && event.id}/event_rsvps`}>Event RSVP list</Link>
+        </Paper>
+
+
+        <br />
+
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
