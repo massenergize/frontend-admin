@@ -31,6 +31,7 @@ import app, {
   galleryImagesReducer,
   searchedImagesReducer,
   imageInfosReducer,
+  modalLibraryReducer,
 } from "./modules/appReducer";
 
 /**
@@ -41,6 +42,7 @@ export default function createReducer(injectedReducers = {}) {
     galleryImages: galleryImagesReducer,
     searchedImages: searchedImagesReducer,
     imageInfos: imageInfosReducer,
+    modalLibraryImages: modalLibraryReducer,
     app,
     form,
     login,

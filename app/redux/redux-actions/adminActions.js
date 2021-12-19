@@ -22,6 +22,7 @@ import {
   LOAD_GALLERY_IMAGES,
   LOAD_SEARCHED_IMAGES,
   KEEP_LOADED_IMAGE_INFO,
+  LOAD_MODAL_LIBRARY,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -117,18 +118,6 @@ export const reduxLoadGraphData = (data = []) => ({
   type: LOAD_GRAPH_DATA,
   payload: data,
 });
-
-export const reduxSearchForImages = (body) => {
-  // apiCall("/gallery.search", body)
-  //   .then((response) => {
-  //     if (!response.success)
-  //       return console.log("SEARCHERROR_BE", response && response.error);
-  //     reduxLoadSearchedImages(response.data);
-  //   })
-  //   .catch((e) => {
-  //     console.log("SEARCHERROR_SYNT: ", e.toString());
-  //   });
-};
 
 export const reduxFetchImages = (community_ids = [], callback) => {
   apiCall("gallery.fetch", { community_ids })
@@ -371,6 +360,40 @@ export const reduxIfExpired = (errorMsg) => {
   if (errorMsg === "Signature has expired") {
     reduxSignOut();
   }
+};
+
+export const reduxLoadLibraryModalData = (props) => {
+  let { data = {}, old, append = false } = props;
+  var images;
+  if (append) images = [...(old.images || []), ...(data.images || [])];
+  else images = data.images || [];
+
+  const upper_limit = Math.max(data.upper_limit || 0, old.upper_limit || 0);
+  const lower_limit = Math.max(data.lower_limit || 0, old.lower_limit || 0);
+  return {
+    type: LOAD_MODAL_LIBRARY,
+    payload: { images, lower_limit, upper_limit },
+  };
+};
+
+export const reduxCallLibraryModalImages = (props) => {
+  let { community_ids, old = {} } = props;
+  community_ids = community_ids || [];
+  const upper_limit = old.upper_limit || 0;
+  const lower_limit = old.lower_limit || 0;
+  return (dispatch) => {
+    apiCall("/gallery.fetch", { upper_limit, lower_limit, community_ids })
+      .then((response) => {
+        if (!response || !response.success)
+          return console.log(" FETCH ERROR_BE: ", response.error);
+        return dispatch(
+          reduxLoadLibraryModalData({ data: response.data, old })
+        );
+      })
+      .catch((e) => {
+        console.log("FETCH ERROR_SYNT: ", e.toString());
+      });
+  };
 };
 
 export const reduxCallCommunities = () => (dispatch) => {

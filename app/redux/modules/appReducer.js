@@ -20,6 +20,7 @@ import {
   LOAD_GALLERY_IMAGES,
   LOAD_SEARCHED_IMAGES,
   KEEP_LOADED_IMAGE_INFO,
+  LOAD_MODAL_LIBRARY,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -37,6 +38,15 @@ export default function reducer(state = initialImmutableState, action = {}) {
   }
 }
 
+export const modalLibraryReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case LOAD_MODAL_LIBRARY:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
 export const imageInfosReducer = (state = {}, action = {}) => {
   switch (action.type) {
     case KEEP_LOADED_IMAGE_INFO:

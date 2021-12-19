@@ -128,7 +128,9 @@ function MediaLibraryModal({
             </div>
 
             {/* ------------------------ MAIN TAB DISPLAY AREA ------------------- */}
-            <div>{TabComponent}</div>
+            <div style={{ maxHeight: 530, overflowY: "scroll" }}>
+              {TabComponent}
+            </div>
           </div>
           <Footer
             files={files}

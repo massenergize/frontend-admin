@@ -60,6 +60,7 @@ function AddToGallery(props) {
     communities = [],
     fetchGalleryImages,
     insertImagesInRedux,
+    modalImages,
   } = props;
 
   const [chosenComs, setChosenComs] = useState([]);
@@ -204,6 +205,8 @@ function AddToGallery(props) {
         onUpload={onUpload}
         actionText="Add to library"
         defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
+        images={modalImages && modalImages.images}
+        sourceExtractor={(item) => item.url}
       />
       {state.notification_type && (
         <p
@@ -224,6 +227,7 @@ function AddToGallery(props) {
 const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   communities: state.getIn(["communities"]),
+  modalImages: state.getIn(["modalLibraryImages"]),
 });
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
