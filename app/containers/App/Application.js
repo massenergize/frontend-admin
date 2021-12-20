@@ -78,16 +78,14 @@ import TeamMembers from "../MassEnergizeSuperAdmin/Teams/TeamMembers";
 
 class Application extends React.Component {
   componentWillMount() {
-    const {
-      reduxCallCommunities,
-      loadModalImages,
-      modalLibraryImages,
-    } = this.props;
-    reduxCallCommunities();
-    loadModalImages({
-      old: modalLibraryImages,
-      community_ids: this.getCommunityList(),
-    });
+    this.props.reduxCallCommunities();
+  }
+  componentDidMount() {
+    // const { loadModalImages, modalLibraryImages } = this.props;
+    // loadModalImages({
+    //   old: modalLibraryImages,
+    //   community_ids: this.getCommunityList(),
+    // });
   }
 
   getCommunityList() {

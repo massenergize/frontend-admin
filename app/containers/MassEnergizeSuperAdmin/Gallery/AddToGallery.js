@@ -11,6 +11,7 @@ import { FormControlLabel } from "@material-ui/core";
 import { TextField } from "@material-ui/core";
 import { bindActionCreators } from "redux";
 import {
+  reduxCallLibraryModalImages,
   reduxFetchImages,
   reduxLoadGalleryImages,
 } from "../../../redux/redux-actions/adminActions";
@@ -60,6 +61,8 @@ function AddToGallery(props) {
     communities = [],
     fetchGalleryImages,
     insertImagesInRedux,
+    loadMoreModalImages,
+    loadModalImages,
     modalImages,
   } = props;
 
@@ -85,7 +88,7 @@ function AddToGallery(props) {
   const list = getCommunityList();
 
   const cleanCommunities = () => {
-    var coms = chosenComs || [];
+    var coms = coms || chosenComs || [];
     if (scope === CHOICES.MINE) coms = auth.admin_at;
     return coms.map((com) => com.id);
   };
@@ -128,15 +131,31 @@ function AddToGallery(props) {
     setState((state) => ({ ...state, [name]: value }));
   };
 
-  const initialiseComponent = () => {
-    useEffect(() => {
-      fetchGalleryImages([3], (data) =>
-        console.log("I am the galleryData", data)
-      );
-    }, []);
+  const makeCommunityListParamsForFetch = () => {
+    const obj = { community_ids: [], from_all_communities: false };
+    if (!auth) return obj;
+    if (auth.is_super_admin) return { ...obj, from_all_communities: true };
+    if (auth.is_community_admin) {
+      const coms = (auth.admin_at || []).map((com) => com.id);
+      return { ...obj, community_ids: coms };
+    }
+    return obj;
   };
 
-  // initialiseComponent();
+  const makeLoadMoreFunction = (cb) => {
+    loadMoreModalImages({
+      old: modalImages,
+      ...makeCommunityListParamsForFetch(),
+      cb,
+    });
+  };
+
+  useEffect(() => {
+    loadModalImages({
+      old: modalImages,
+      ...makeCommunityListParamsForFetch(),
+    });
+  }, []);
 
   return (
     <Paper className={classes.container}>
@@ -206,7 +225,8 @@ function AddToGallery(props) {
         actionText="Add to library"
         defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
         images={modalImages && modalImages.images}
-        sourceExtractor={(item) => item.url}
+        sourceExtractor={(item) => item && item.url}
+        loadMoreFunction={makeLoadMoreFunction}
       />
       {state.notification_type && (
         <p
@@ -232,8 +252,9 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
-      fetchGalleryImages: reduxFetchImages,
+      loadModalImages: reduxCallLibraryModalImages,
       insertImagesInRedux: reduxLoadGalleryImages,
+      loadMoreModalImages: reduxCallLibraryModalImages,
     },
     dispatch
   );

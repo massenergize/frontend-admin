@@ -1,21 +1,27 @@
-import React from 'react';
-import ImageThumbnail from '../thumbnail/ImageThumbnail';
-import { getRandomStringKey } from '../../utils/utils';
-import MLButton from '../button/MLButton';
+import React from "react";
+import ImageThumbnail from "../thumbnail/ImageThumbnail";
+import { getRandomStringKey } from "../../utils/utils";
+import MLButton from "../button/MLButton";
 
-export default function SidePane({ activeImage, setShowSidePane }) {
+export default function SidePane({
+  activeImage,
+  setShowSidePane,
+  sourceExtractor,
+}) {
   return (
     <div className="ml-sidepane-container elevate-float side-pane-slide-animation">
-      <div style={{ position: 'relative', height: '100%', padding: 15 }}>
+      <div style={{ position: "relative", height: "100%", padding: 15 }}>
         <h5 style={{ margin: 0, marginBottom: 10 }}>IMAGE DETAILS</h5>
         <ImageThumbnail
-          style={{ width: '100%', height: 200, objectFit: 'contain' }}
-          imageSource={activeImage.url}
+          style={{ width: "100%", height: 200, objectFit: "contain" }}
+          imageSource={() =>
+            sourceExtractor && sourceExtractor(activeImage.url)
+          }
           key={getRandomStringKey()}
         />
 
         <h6 style={{ margin: 0 }}>URL</h6>
-        <a href="#" style={{ fontSize: 13, color: 'cornflowerblue' }}>
+        <a href="#" style={{ fontSize: 13, color: "cornflowerblue" }}>
           {activeImage.url}
         </a>
 
@@ -23,12 +29,12 @@ export default function SidePane({ activeImage, setShowSidePane }) {
           onClick={() => setShowSidePane(false)}
           backColor="#245a93"
           style={{
-            position: 'absolute',
+            position: "absolute",
             bottom: 0,
             left: 0,
-            width: '100%',
-            height: 'auto',
-            padding: '15px 40px',
+            width: "100%",
+            height: "auto",
+            padding: "15px 40px",
           }}
         >
           HIDE

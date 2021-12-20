@@ -319,14 +319,24 @@ function Gallery(props) {
   );
 }
 
-const LoadMoreContainer = ({ loadMoreFunction, loading }) => {
+export const LoadMoreContainer = ({
+  loadMoreFunction,
+  loading,
+  style = {},
+}) => {
   if (loading) return <ProgressCircleWithLabel />;
   return (
     <Button
       variant="contained"
       color="secondary"
-      style={{ width: "100%", margin: 6, borderRadius: 4, marginTop: 20 }}
-      onClick={() => loadMoreFunction()}
+      style={{
+        width: "100%",
+        margin: 6,
+        borderRadius: 4,
+        marginTop: 20,
+        ...style,
+      }}
+      onClick={() => loadMoreFunction && loadMoreFunction()}
     >
       Load More
     </Button>

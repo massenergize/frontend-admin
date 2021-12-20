@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {  useState } from "react";
 import PropTypes, { object } from "prop-types";
 import "./MediaLibrary.css";
 import MLButton from "./shared/components/button/MLButton";
@@ -30,6 +30,7 @@ function MediaLibrary(props) {
     transfer(rest, state.resetor);
   };
 
+  
   return (
     <React.Fragment>
       {show && (
@@ -167,6 +168,11 @@ MediaLibrary.propTypes = {
    * Custom text that should show on media library modal trigger button
    */
   actionText: PropTypes.string,
+
+  /**
+   * A function to load more images into library
+   */
+  loadMoreFunction: PropTypes.func,
 };
 
 MediaLibrary.Button = MLButton;

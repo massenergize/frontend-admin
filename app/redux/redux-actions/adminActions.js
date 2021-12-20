@@ -363,34 +363,53 @@ export const reduxIfExpired = (errorMsg) => {
 };
 
 export const reduxLoadLibraryModalData = (props) => {
-  let { data = {}, old, append = false } = props;
-  var images;
-  if (append) images = [...(old.images || []), ...(data.images || [])];
-  else images = data.images || [];
+  let { data = {}, old } = props;
+  var images = data.images || [];
 
   const upper_limit = Math.max(data.upper_limit || 0, old.upper_limit || 0);
-  const lower_limit = Math.max(data.lower_limit || 0, old.lower_limit || 0);
+  var lower_limit = old.lower_limit || 0;
+  lower_limit = lower_limit
+    ? Math.min(lower_limit, data.lower_limit)
+    : data.lower_limit;
+  const payload = { images, lower_limit, upper_limit };
+  console.log("Then I was the payload", payload);
   return {
     type: LOAD_MODAL_LIBRARY,
-    payload: { images, lower_limit, upper_limit },
+    payload,
   };
 };
 
 export const reduxCallLibraryModalImages = (props) => {
-  let { community_ids, old = {} } = props;
+  let { community_ids, old = {}, cb } = props;
+  old = old || {};
   community_ids = community_ids || [];
-  const upper_limit = old.upper_limit || 0;
-  const lower_limit = old.lower_limit || 0;
+  var requestBody = { community_ids };
+  if (old.upper_limit)
+    requestBody = { ...requestBody, upper_limit: old.upper_limit };
+  if (old.lower_limit)
+    requestBody = { ...requestBody, lower_limit: old.lower_limit };
   return (dispatch) => {
-    apiCall("/gallery.fetch", { upper_limit, lower_limit, community_ids })
+    console.log("Iam the requestBody", requestBody);
+    apiCall("/gallery.fetch", requestBody)
       .then((response) => {
+        if (cb) cb(response);
         if (!response || !response.success)
           return console.log(" FETCH ERROR_BE: ", response.error);
+        const newData = [
+          ...((old && old.images) || []),
+          ...((response.data && response.data.images) || []),
+        ];
+        console.log(response);
         return dispatch(
-          reduxLoadLibraryModalData({ data: response.data, old })
+          reduxLoadLibraryModalData({
+            data: { ...response.data, images: newData },
+            old,
+            append: true,
+          })
         );
       })
       .catch((e) => {
+        if (cb) cb(repsonse);
         console.log("FETCH ERROR_SYNT: ", e.toString());
       });
   };

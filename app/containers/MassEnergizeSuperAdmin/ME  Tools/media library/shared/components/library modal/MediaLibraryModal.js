@@ -1,4 +1,4 @@
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import Modal from "./../modal/Modal";
 import SidePane from "../sidepane/SidePane";
 import Upload from "../upload/Upload";
@@ -16,6 +16,7 @@ function MediaLibraryModal({
   getSelected,
   uploadMultiple,
   uploading,
+  loadMoreFunction,
 }) {
   const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -23,6 +24,7 @@ function MediaLibraryModal({
   const [files, setFiles] = useState([]);
   const [content, setSelectedContent] = useState(selected);
   const [state, setState] = useState({ uploading: uploading });
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const clean = (files) => {
     // just a function that retrieves only the FileObject from the file jsons provided
@@ -44,6 +46,12 @@ function MediaLibraryModal({
     setPreviews([]);
     setFiles([]);
     setState({});
+  };
+
+  const fireLoadMoreFunction = () => {
+    if (!loadMoreFunction) return;
+    setLoadingMore(true);
+    loadMoreFunction(() => setLoadingMore(false));
   };
 
   const Tabs = [
@@ -74,15 +82,20 @@ function MediaLibraryModal({
             setShowSidePane={setShowSidePane}
             multiple={multiple}
             images={images}
+            loadingMore={loadingMore}
+            loadMoreFunction={fireLoadMoreFunction}
           />
         </Suspense>
       ),
     },
   ];
 
+  useEffect(() => {}, [images]);
+
   const TabComponent = Tabs.find((tab) => tab.key === currentTab).component;
   const last = content.length - 1;
   const activeImage = multiple ? (content || [])[last] : content; // if multiple selection is active, just show the last selected item in the side pane
+
   return (
     <React.Fragment>
       <Modal
@@ -100,6 +113,7 @@ function MediaLibraryModal({
             <SidePane
               activeImage={activeImage}
               setShowSidePane={setShowSidePane}
+              sourceExtractor={sourceExtractor}
             />
           )}
           <div className="m-inner-container">

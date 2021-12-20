@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 import ImageThumbnail from "../thumbnail/ImageThumbnail";
 import { blank } from "../../utils/values";
+import { LoadMoreContainer } from "../../../../../Gallery/Gallery";
 
 function Library({
   multiple,
@@ -11,6 +12,8 @@ function Library({
   setShowSidePane,
   images,
   sourceExtractor,
+  loadMoreFunction,
+  loadingMore,
 }) {
   const handleSelection = (image) => {
     setShowSidePane(true);
@@ -32,6 +35,8 @@ function Library({
     if (sourceExtractor) return sourceExtractor(image);
     return image.url;
   };
+
+  // useEffect(() => {}, [loadingMore]);
 
   if (!images || images.length == 0) {
     return (
@@ -67,6 +72,13 @@ function Library({
             </div>
           );
         })}
+      </div>
+      <div className="" style={{ width: "100%", textAlign: "center" }}>
+        <LoadMoreContainer
+          loading={loadingMore}
+          style={{ width: "80%" }}
+          loadMoreFunction={loadMoreFunction}
+        />
       </div>
     </div>
   );
