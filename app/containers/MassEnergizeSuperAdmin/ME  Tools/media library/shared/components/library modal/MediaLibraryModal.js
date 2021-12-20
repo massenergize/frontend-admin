@@ -19,6 +19,8 @@ function MediaLibraryModal({
   loadMoreFunction,
   limited,
   excludeTabs,
+  useAwait,
+  awaitSeconds,
 }) {
   const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -27,6 +29,7 @@ function MediaLibraryModal({
   const [content, setSelectedContent] = useState(selected);
   const [state, setState] = useState({ uploading: uploading });
   const [loadingMore, setLoadingMore] = useState(false);
+  const [shouldWait, setShouldWait] = useState(useAwait);
 
   console.log("I am the content bro", content);
   const clean = (files) => {
@@ -88,6 +91,9 @@ function MediaLibraryModal({
             loadingMore={loadingMore}
             loadMoreFunction={fireLoadMoreFunction}
             limited={limited}
+            shouldWait={shouldWait}
+            setShouldWait={setShouldWait}
+            awaitSeconds={awaitSeconds}
           />
         </Suspense>
       ),
@@ -96,7 +102,7 @@ function MediaLibraryModal({
 
   Tabs = Tabs.filter((tab) => !(excludeTabs || []).includes(tab.key));
 
-  useEffect(() => {}, [images]);
+  useEffect(() => {}, [images, shouldWait]);
 
   const TabComponent = Tabs.find((tab) => tab.key === currentTab).component;
   const last = content.length - 1;
@@ -189,7 +195,10 @@ const Footer = ({ content, multiple, cancel, insert }) => {
         <button
           className="ml-footer-btn"
           style={{ "--btn-color": "white", "--btn-background": "green" }}
-          onClick={() => insert()}
+          onClick={(e) => {
+            e.preventDefault();
+            insert();
+          }}
           disabled={!len}
         >
           INSERT {len > 0 ? `(${len})` : ""}

@@ -15,16 +15,35 @@ export default function SidePane({
   return (
     <div className="ml-sidepane-container elevate-float side-pane-slide-animation">
       <div style={{ position: "relative", height: "100%", padding: 15 }}>
-        <h5 style={{ margin: 0, marginBottom: 10 }}>IMAGE DETAILS</h5>
+        <h5 style={{ margin: 0, marginBottom: 10, fontSize: 18 }}>
+          IMAGE DETAILS
+        </h5>
         <ImageThumbnail
           style={{ width: "100%", height: 200, objectFit: "contain" }}
           imageSource={url}
           key={getRandomStringKey()}
         />
 
-        <h6 style={{ margin: 0 }}>URL</h6>
-        <a href="#void" style={{ fontSize: 13, color: "cornflowerblue" }}>
+        <h6 style={{ margin: 0, fontSize: 18 }}>URL</h6>
+        <textarea
+          style={{
+            padding: 10,
+            width: "100%",
+            border: "solid 0px cornflowerblue",
+            borderBottomWidth: 2,
+            borderRadius: 0,
+            fontSize: "medium",
+          }}
+          rows="4"
+        >
           {url}
+        </textarea>
+        <a
+          href={url}
+          target="_blank"
+          style={{ fontSize: 13, color: "cornflowerblue" }}
+        >
+          See Full Image
         </a>
 
         <MLButton

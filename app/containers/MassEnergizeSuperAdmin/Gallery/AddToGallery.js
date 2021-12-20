@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
-import FormGenerator from "./../_FormGenerator/index";
 import LightAutoComplete from "./tools/LightAutoComplete";
 import { Radio } from "@material-ui/core";
 import { FormControlLabel } from "@material-ui/core";
@@ -12,7 +11,6 @@ import { TextField } from "@material-ui/core";
 import { bindActionCreators } from "redux";
 import {
   reduxCallLibraryModalImages,
-  reduxFetchImages,
   reduxLoadGalleryImages,
 } from "../../../redux/redux-actions/adminActions";
 const styles = (theme) => {
@@ -142,45 +140,21 @@ function AddToGallery(props) {
     return obj;
   };
 
-  // const makeLoadMoreFunction = (cb) => {
-  //   loadMoreModalImages({
-  //     old: modalImages,
-  //     ...makeCommunityListParamsForFetch(),
-  //     cb,
-  //   });
-  // };
-
-  // useEffect(() => {
-  //   loadModalImages({
-  //     old: modalImages,
-  //     ...makeCommunityListParamsForFetch(),
-  //   });
-  // }, []);
-
-  const json = {
-    fields: [
-      {
-        label: "Testing Library In Form Generator",
-        fieldType: "Section",
-        children: [
-          {
-            name: "le Image",
-            label: "Choose community images",
-            actionText: "Choose Image from here bro....",
-            fieldType: FormGenerator.FieldTypes.MediaLibrary,
-            dbName: "le_images",
-          },
-        ],
-      },
-    ],
+  const makeLoadMoreFunction = (cb) => {
+    loadMoreModalImages({
+      old: modalImages,
+      ...makeCommunityListParamsForFetch(),
+      cb,
+    });
   };
-  return (
-    <Paper className={classes.container}>
-      <Typography variant="h5" className={classes.header}>
-        <FormGenerator classes={classes} formJson={json} />
-      </Typography>
-    </Paper>
-  );
+
+  useEffect(() => {
+    loadModalImages({
+      old: modalImages,
+      ...makeCommunityListParamsForFetch(),
+    });
+  }, []);
+
   return (
     <Paper className={classes.container}>
       <Typography variant="h5" className={classes.header}>
@@ -220,7 +194,6 @@ function AddToGallery(props) {
             valueExtractor={(com) => com.id}
             labelExtractor={(com) => com.name}
             onChange={(communities) => setChosenComs(communities)}
-            // defaultSelected={auth.admin_at}
             onMount={(reset) => setResetorForAutoComplete(() => reset)}
           />
           <Typography style={{ color: "gray" }}>
@@ -246,11 +219,12 @@ function AddToGallery(props) {
       />
       <MediaLibrary
         onUpload={onUpload}
-        actionText="Add to library"
+        actionText="Add to Library"
         defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
         images={modalImages && modalImages.images}
         sourceExtractor={(item) => item && item.url}
         loadMoreFunction={makeLoadMoreFunction}
+        excludeTabs={["library"]}
       />
       {state.notification_type && (
         <p

@@ -31,7 +31,6 @@ import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarConte
 import FieldTypes from "./fieldTypes";
 import Modal from "./Modal";
 // import PreviewModal from './PreviewModal';
-import MediaLibrary from "./../ME  Tools/media library/MediaLibrary.js";
 import MEMediaLibraryImplementation from "../Gallery/tools/MEMediaLibraryImplementation";
 const TINY_MCE_API_KEY = "3fpefbsmtkh71yhtjyykjwj5ezs3a5cac5ei018wvnlg2g0r";
 
@@ -157,7 +156,7 @@ class MassEnergizeForm extends Component {
           break;
         }
         default:
-          formData[field.name] = field.defaultValue || null;
+          formData[field.name] = field.defaultValue || field.value || null;
           break;
       }
       if (field.child) {
@@ -399,6 +398,7 @@ class MassEnergizeForm extends Component {
 
     // let's clean up the data
     const { formData, formJson } = this.state;
+    console.log("I WAS THE FORM DAA", formData);
     let [cleanedValues, hasMediaFiles] = this.cleanItUp(
       formData,
       formJson.fields
@@ -609,7 +609,14 @@ class MassEnergizeForm extends Component {
         );
       case FieldTypes.MediaLibrary:
         return (
-          <MEMediaLibraryImplementation {...field} />
+          <MEMediaLibraryImplementation
+            {...field}
+            selected={this.getValue(field.name) || []}
+            onInsert={(files) => {
+              const formData = this.state.formData || {};
+              this.setState({ formData: { ...formData, [field.name]: files } });
+            }}
+          />
         );
       case FieldTypes.File:
         // Linter caught this: what is this supposed to be?

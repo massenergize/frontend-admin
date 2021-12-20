@@ -175,7 +175,7 @@ function Gallery(props) {
     if (!searchResults || !searchResults.images)
       fetchContent({
         any_community: true,
-        target_communities: getCommunityList(),
+        target_communities: getCommunityList().map((com) => com.id),
         filters: filters.map((f) => f.value),
       });
 

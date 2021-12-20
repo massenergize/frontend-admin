@@ -181,6 +181,15 @@ MediaLibrary.propTypes = {
    * Keys of tabs to exclude from media library modal dialog
    */
   excludeTabs: PropTypes.arrayOf(PropTypes.string),
+
+  /**
+   * Rendering images and animating modal causes lag. This boolean value tells the library to wait before rendering the images
+   */
+  useAwait: PropTypes.bool,
+  /**
+   * Milliseconds to wait before rendering images
+   */
+  awaitSeconds: PropTypes.number,
 };
 
 MediaLibrary.Button = MLButton;
@@ -195,5 +204,7 @@ MediaLibrary.defaultProps = {
   actionText: "Choose From Library",
   limited: false,
   excludeTabs: [],
+  useAwait: false,
+  awaitSeconds: 500,
 };
 export default MediaLibrary;

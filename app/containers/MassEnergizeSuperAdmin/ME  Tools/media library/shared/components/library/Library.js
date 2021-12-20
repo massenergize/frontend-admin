@@ -3,7 +3,10 @@ import PropTypes from "prop-types";
 
 import ImageThumbnail from "../thumbnail/ImageThumbnail";
 import { blank } from "../../utils/values";
-import { LoadMoreContainer } from "../../../../../Gallery/Gallery";
+import {
+  LoadMoreContainer,
+  ProgressCircleWithLabel,
+} from "../../../../../Gallery/Gallery";
 
 function Library({
   multiple,
@@ -15,6 +18,9 @@ function Library({
   loadMoreFunction,
   loadingMore,
   limited,
+  shouldWait,
+  setShouldWait,
+  awaitSeconds,
 }) {
   const handleSelection = (image) => {
     if (!multiple) {
@@ -41,7 +47,12 @@ function Library({
     return image && image.url;
   };
 
-  // useEffect(() => {}, [loadingMore]);
+  if (shouldWait) {
+    setTimeout(() => {
+      setShouldWait(false);
+    }, awaitSeconds || 500);
+    return <ProgressCircleWithLabel loading="loading images..." />;
+  }
 
   if (!images || images.length == 0) {
     return (

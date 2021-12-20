@@ -1,5 +1,4 @@
 
-
 export const getMoreInfo = (community) => {
   // const { community } = this.state;
   const more_info =

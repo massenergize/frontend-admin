@@ -6,7 +6,7 @@ import MediaLibrary from "../../ME  Tools/media library/MediaLibrary";
 import { reduxCallLibraryModalImages } from "../../../../redux/redux-actions/adminActions";
 
 export const MEMediaLibraryImplementation = (props) => {
-  const { auth, modalImageResponse, loadModalImages } = props;
+  const { auth, modalImageResponse, loadModalImages, onInsert } = props;
 
   const makeCommunityListParamsForFetch = () => {
     const obj = { community_ids: [], from_all_communities: false };
@@ -17,6 +17,11 @@ export const MEMediaLibraryImplementation = (props) => {
       return { ...obj, community_ids: coms };
     }
     return obj;
+  };
+
+  const handleInsert = (files) => {
+    if (!onInsert) return;
+    onInsert((files || []).map((img) => img.id));
   };
 
   const makeLoadMoreFunction = (cb) => {
@@ -39,9 +44,11 @@ export const MEMediaLibraryImplementation = (props) => {
       <MediaLibrary
         images={(modalImageResponse && modalImageResponse.images) || []}
         actionText="Choose From Library"
-        defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
         sourceExtractor={(item) => item && item.url}
+        excludeTabs={["upload"]}
+        useAwait={true}
         {...props}
+        onInsert={handleInsert}
         loadMoreFunction={makeLoadMoreFunction}
       />
     </div>
