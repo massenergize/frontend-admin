@@ -80,13 +80,6 @@ class Application extends React.Component {
   componentWillMount() {
     this.props.reduxCallCommunities();
   }
-  componentDidMount() {
-    // const { loadModalImages, modalLibraryImages } = this.props;
-    // loadModalImages({
-    //   old: modalLibraryImages,
-    //   community_ids: this.getCommunityList(),
-    // });
-  }
 
   getCommunityList() {
     const { auth } = this.props;
