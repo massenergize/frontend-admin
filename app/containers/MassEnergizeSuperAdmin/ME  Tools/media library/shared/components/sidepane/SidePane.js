@@ -8,21 +8,23 @@ export default function SidePane({
   setShowSidePane,
   sourceExtractor,
 }) {
+  const url =
+    (sourceExtractor && sourceExtractor(activeImage)) ||
+    (activeImage && activeImage.url) ||
+    "...";
   return (
     <div className="ml-sidepane-container elevate-float side-pane-slide-animation">
       <div style={{ position: "relative", height: "100%", padding: 15 }}>
         <h5 style={{ margin: 0, marginBottom: 10 }}>IMAGE DETAILS</h5>
         <ImageThumbnail
           style={{ width: "100%", height: 200, objectFit: "contain" }}
-          imageSource={() =>
-            sourceExtractor && sourceExtractor(activeImage.url)
-          }
+          imageSource={url}
           key={getRandomStringKey()}
         />
 
         <h6 style={{ margin: 0 }}>URL</h6>
-        <a href="#" style={{ fontSize: 13, color: "cornflowerblue" }}>
-          {activeImage.url}
+        <a href="#void" style={{ fontSize: 13, color: "cornflowerblue" }}>
+          {url}
         </a>
 
         <MLButton

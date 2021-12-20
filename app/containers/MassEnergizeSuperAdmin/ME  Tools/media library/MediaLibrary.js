@@ -1,4 +1,4 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import PropTypes, { object } from "prop-types";
 import "./MediaLibrary.css";
 import MLButton from "./shared/components/button/MLButton";
@@ -30,7 +30,6 @@ function MediaLibrary(props) {
     transfer(rest, state.resetor);
   };
 
-  
   return (
     <React.Fragment>
       {show && (
@@ -152,7 +151,7 @@ MediaLibrary.propTypes = {
    */
   uploadMultiple: PropTypes.bool,
   /**
-   * Sets whether multiple images should be selected for upload.
+   * Sets whether multiple images should be selected for upload. select multiple images from the library
    */
   multiple: PropTypes.bool,
   /**
@@ -173,6 +172,15 @@ MediaLibrary.propTypes = {
    * A function to load more images into library
    */
   loadMoreFunction: PropTypes.func,
+
+  /**
+   *  Determines whether or not "load more " functionality should be allowed
+   */
+  limited: PropTypes.bool,
+  /**
+   * Keys of tabs to exclude from media library modal dialog
+   */
+  excludeTabs: PropTypes.arrayOf(PropTypes.string),
 };
 
 MediaLibrary.Button = MLButton;
@@ -185,5 +193,7 @@ MediaLibrary.defaultProps = {
   defaultTab: MediaLibrary.Tabs.LIBRARY_TAB,
   selected: [],
   actionText: "Choose From Library",
+  limited: false,
+  excludeTabs: [],
 };
 export default MediaLibrary;

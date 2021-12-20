@@ -14,14 +14,19 @@ function Library({
   sourceExtractor,
   loadMoreFunction,
   loadingMore,
+  limited,
 }) {
   const handleSelection = (image) => {
-    setShowSidePane(true);
-    if (!multiple) return setSelectedContent(image);
+    if (!multiple) {
+      setSelectedContent(image);
+      setShowSidePane(true);
+      return;
+    }
     const images = content || [];
     const found = images.find((img) => img.id === image.id);
     let rest = images.filter((img) => img.id !== image.id);
     if (!found) rest = [...rest, image];
+    setShowSidePane(rest && rest.length > 0);
     setSelectedContent(rest);
   };
 
@@ -33,7 +38,7 @@ function Library({
 
   const getImageSource = (image) => {
     if (sourceExtractor) return sourceExtractor(image);
-    return image.url;
+    return image && image.url;
   };
 
   // useEffect(() => {}, [loadingMore]);
@@ -73,13 +78,15 @@ function Library({
           );
         })}
       </div>
-      <div className="" style={{ width: "100%", textAlign: "center" }}>
-        <LoadMoreContainer
-          loading={loadingMore}
-          style={{ width: "80%" }}
-          loadMoreFunction={loadMoreFunction}
-        />
-      </div>
+      {!limited && (
+        <div className="" style={{ width: "100%", textAlign: "center" }}>
+          <LoadMoreContainer
+            loading={loadingMore}
+            style={{ width: "80%" }}
+            loadMoreFunction={loadMoreFunction}
+          />
+        </div>
+      )}
     </div>
   );
 }

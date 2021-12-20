@@ -32,6 +32,7 @@ import FieldTypes from "./fieldTypes";
 import Modal from "./Modal";
 // import PreviewModal from './PreviewModal';
 import MediaLibrary from "./../ME  Tools/media library/MediaLibrary.js";
+import MEMediaLibraryImplementation from "../Gallery/tools/MEMediaLibraryImplementation";
 const TINY_MCE_API_KEY = "3fpefbsmtkh71yhtjyykjwj5ezs3a5cac5ei018wvnlg2g0r";
 
 const styles = (theme) => ({
@@ -608,12 +609,7 @@ class MassEnergizeForm extends Component {
         );
       case FieldTypes.MediaLibrary:
         return (
-          <MediaLibrary
-            {...field}
-            onInsert={(content, reset) => {
-              this.updateForm(field.name, content);
-            }}
-          />
+          <MEMediaLibraryImplementation {...field} />
         );
       case FieldTypes.File:
         // Linter caught this: what is this supposed to be?

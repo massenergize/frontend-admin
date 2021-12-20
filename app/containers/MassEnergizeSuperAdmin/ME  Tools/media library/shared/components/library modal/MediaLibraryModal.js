@@ -17,6 +17,8 @@ function MediaLibraryModal({
   uploadMultiple,
   uploading,
   loadMoreFunction,
+  limited,
+  excludeTabs,
 }) {
   const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -26,6 +28,7 @@ function MediaLibraryModal({
   const [state, setState] = useState({ uploading: uploading });
   const [loadingMore, setLoadingMore] = useState(false);
 
+  console.log("I am the content bro", content);
   const clean = (files) => {
     // just a function that retrieves only the FileObject from the file jsons provided
     if (!files) return files;
@@ -54,7 +57,7 @@ function MediaLibraryModal({
     loadMoreFunction(() => setLoadingMore(false));
   };
 
-  const Tabs = [
+  var Tabs = [
     {
       headerName: "Upload",
       key: "upload",
@@ -84,11 +87,14 @@ function MediaLibraryModal({
             images={images}
             loadingMore={loadingMore}
             loadMoreFunction={fireLoadMoreFunction}
+            limited={limited}
           />
         </Suspense>
       ),
     },
   ];
+
+  Tabs = Tabs.filter((tab) => !(excludeTabs || []).includes(tab.key));
 
   useEffect(() => {}, [images]);
 
