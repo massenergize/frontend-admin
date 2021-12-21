@@ -1,0 +1,54 @@
+.ml-drag-box {
+  margin: 25px;
+  border: dashed 2px rgb(223 223 223);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 250px;
+  width: 100%;
+  flex-direction: column;
+}
+
+.ml-drag-over {
+  border-color: green;
+  background: #f8fff8;
+  transition: 0.2s ease-out;
+}
+
+.ml-preview-area {
+  display: flex;
+  flex-direction: row;
+  /* flex-wrap: wrap; */
+  align-items: center;
+  width: 100%;
+  overflow-x: scroll;
+  justify-content: center;
+}
+
+.ml-preview-image {
+  height: 80px;
+  width: 100px;
+  object-fit: cover;
+  margin: 10px;
+  border-radius: 5px;
+  box-shadow: var(--elevate-float);
+  cursor: pointer;
+}
+/* .ml-preview-element {
+  margin: 10px;
+} */
+
+.ml-preview-image:active {
+  transform: scale(1.5);
+  transition: 0.2s ease-out;
+}
+.ml-prev-el-remove {
+  cursor: pointer;
+  color: maroon;
+}
+.ml-prev-el-remove:hover {
+  color: green;
+  transition: 0.2s ease-out;
+}
