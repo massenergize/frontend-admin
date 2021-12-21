@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { Button, CircularProgress, Paper, Typography } from "@material-ui/core";
 import MediaLibrary from "./../ME  Tools/media library/MediaLibrary";
 import "./anime.css";
-import { ProgressCircleWithLabel } from "./Gallery";
+import { ProgressCircleWithLabel } from "./utils";
 
 export const SideSheet = (props) => {
   const { classes, hide, infos, data, deleteImage } = props;

@@ -6,7 +6,7 @@ import { blank } from "../../utils/values";
 import {
   LoadMoreContainer,
   ProgressCircleWithLabel,
-} from "../../../../../Gallery/Gallery";
+} from "../../../../../Gallery/utils";
 
 function Library({
   multiple,

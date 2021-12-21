@@ -1,8 +1,6 @@
 import {
   Button,
   Checkbox,
-  CircularProgress,
-  Fab,
   FormControlLabel,
   Icon,
 } from "@material-ui/core";
@@ -22,6 +20,7 @@ import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import { SideSheet } from "./SideSheet";
 import { styles } from "./styles";
 import LightAutoComplete from "./tools/LightAutoComplete";
+import { ProgressCircleWithLabel } from "./utils";
 
 const ALL_COMMUNITIES = "all-communities";
 const filters = [
@@ -367,22 +366,6 @@ const ImageCollectionTray = ({
   );
 };
 
-export const ProgressCircleWithLabel = ({ label }) => {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "column",
-        padding: 20,
-      }}
-    >
-      <CircularProgress thickness={5} />
-      {label && <Typography style={{ marginTop: 10 }}>{label}</Typography>}
-    </div>
-  );
-};
 
 const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
