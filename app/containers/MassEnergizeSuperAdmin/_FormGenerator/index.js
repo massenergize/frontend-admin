@@ -398,14 +398,11 @@ class MassEnergizeForm extends Component {
 
     // let's clean up the data
     const { formData, formJson } = this.state;
-    console.log("I WAS THE FORM DAA", formData);
     let [cleanedValues, hasMediaFiles] = this.cleanItUp(
       formData,
       formJson.fields
     );
 
-    console.log("I am teh cleaned values", cleanedValues);
-    return;
     if (formJson.preflightFxn) {
       cleanedValues = formJson.preflightFxn(cleanedValues);
     }
