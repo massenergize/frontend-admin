@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import states from 'dan-api/data/states';
 import { Link } from 'react-router-dom';
 import { Paper } from '@material-ui/core';
@@ -32,20 +33,22 @@ const styles = theme => ({
 });
 
 
-class CreateNewEventForm extends Component {
+class EditEventForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
       communities: [],
       formJson: null,
       event: null,
-      rescheduledEvent: null
+      rescheduledEvent: null,
+      readOnly: false,
     };
   }
 
 
   async componentDidMount() {
     const { id } = this.props.match.params;
+    const superAdmin = this.props.auth.is_super_admin;
     const eventResponse = await apiCall('/events.info', { event_id: id });
     if (eventResponse && !eventResponse.success) {
       return;
@@ -102,7 +105,10 @@ class CreateNewEventForm extends Component {
       formJson.fields.splice(1, 0, section);
     }
 
-    await this.setStateAsync({ event, formJson });
+
+    // Template events are read-only unless user is a super-admin
+    const readOnly = event.is_global && !superAdmin;      
+    await this.setStateAsync({ event, formJson, readOnly });
   }
 
   getSelectedIds = (selected, dataToCrossCheck) => {
@@ -491,7 +497,7 @@ class CreateNewEventForm extends Component {
 
   render() {
     const { classes } = this.props;
-    const { formJson, event } = this.state;
+    const { formJson, event, readOnly } = this.state;
     if (!formJson) return (<div style={{ color: 'white' }}><h1>Loading ...</h1></div>);
     return (
       <div>
@@ -505,15 +511,21 @@ class CreateNewEventForm extends Component {
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
+          readOnly={readOnly}
         />
       </div>
     );
   }
 }
 
-CreateNewEventForm.propTypes = {
+const mapStateToProps = (state) => ({
+  auth: state.getIn(['auth']),
+  community: state.getIn(['selected_community'])
+});
+
+EditEventForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-
-export default withStyles(styles, { withTheme: true })(CreateNewEventForm);
+const EditEventMapped = connect(mapStateToProps, )(EditEventForm);
+export default withStyles(styles, { withTheme: true })(EditEventMapped);

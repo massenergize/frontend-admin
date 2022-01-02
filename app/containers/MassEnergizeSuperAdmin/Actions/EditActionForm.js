@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { apiCall } from '../../../utils/messenger';
 import MassEnergizeForm from '../_FormGenerator';
@@ -29,7 +30,7 @@ const styles = theme => ({
 });
 
 
-class CreateNewActionForm extends Component {
+class EditActionForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -37,20 +38,27 @@ class CreateNewActionForm extends Component {
       action: null,
       vendors: [],
       ccActions: [],
-      formJson: null
+      formJson: null,
+      readOnly: false,
     };
   }
 
 
   async componentDidMount() {
     const { id } = this.props.match.params;
+    const superAdmin = this.props.auth.is_super_admin;
     const actionResponse = await apiCall('/actions.info', { action_id: id });
     if (actionResponse && !actionResponse.success) {
       return;
     }
     if (actionResponse && actionResponse.success) {
-      await this.setStateAsync({ action: actionResponse.data });
+      const action = actionResponse.data;
+
+      // Template actions are read-only unless user is a super-admin
+      const readOnly = action.is_global && !superAdmin;      
+      await this.setStateAsync({ action, readOnly });
     }
+
     const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
     const vendorsResponse = await apiCall('/vendors.listForCommunityAdmin');
@@ -134,7 +142,7 @@ class CreateNewActionForm extends Component {
           children: [
             {
               name: 'action_id',
-              label: 'Action ID (Do not Edit)',
+              label: 'Action ID',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
@@ -151,7 +159,7 @@ class CreateNewActionForm extends Component {
               isRequired: true,
               defaultValue: action.title,
               dbName: 'title',
-              readOnly: false
+              readOnly: false,
             },
             {
               name: 'rank',
@@ -162,7 +170,7 @@ class CreateNewActionForm extends Component {
               isRequired: true,
               defaultValue: action.rank,
               dbName: 'rank',
-              readOnly: false
+              readOnly: false,
             },
             {
               name: 'is_global',
@@ -219,6 +227,7 @@ class CreateNewActionForm extends Component {
           isRequired: false,
           defaultValue: action.featured_summary,
           dbName: 'featured_summary',
+          readOnly: false,
         },
         {
           name: 'about',
@@ -228,6 +237,7 @@ class CreateNewActionForm extends Component {
           isRequired: true,
           defaultValue: action.about,
           dbName: 'about',
+          readOnly: false,
         },
         {
           name: 'steps_to_take',
@@ -237,6 +247,7 @@ class CreateNewActionForm extends Component {
           isRequired: true,
           defaultValue: action.steps_to_take,
           dbName: 'steps_to_take',
+          readOnly: false,
         },
         {
           name: 'deep_dive',
@@ -246,6 +257,7 @@ class CreateNewActionForm extends Component {
           isRequired: true,
           defaultValue: action.deep_dive,
           dbName: 'deep_dive',
+          readOnly: false,
         },
         {
           name: 'vendors',
@@ -289,22 +301,28 @@ class CreateNewActionForm extends Component {
 
   render() {
     const { classes } = this.props;
-    const { formJson } = this.state;
+    const { formJson, readOnly } = this.state;
     if (!formJson) return (<div />);
     return (
       <div>
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
+          readOnly={readOnly}
         />
       </div>
     );
   }
 }
 
-CreateNewActionForm.propTypes = {
+const mapStateToProps = (state) => ({
+  auth: state.getIn(['auth']),
+  community: state.getIn(['selected_community'])
+});
+
+EditActionForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-
-export default withStyles(styles, { withTheme: true })(CreateNewActionForm);
+const EditActionMapped = connect(mapStateToProps, )(EditActionForm);
+export default withStyles(styles, { withTheme: true })(EditActionMapped);

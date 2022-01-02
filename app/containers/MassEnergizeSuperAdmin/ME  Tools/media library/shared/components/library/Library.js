@@ -3,10 +3,8 @@ import PropTypes from "prop-types";
 
 import ImageThumbnail from "../thumbnail/ImageThumbnail";
 import { blank } from "../../utils/values";
-import {
-  LoadMoreContainer,
-  ProgressCircleWithLabel,
-} from "../../../../../Gallery/utils";
+import { LoadMoreContainer } from "../../../../../Gallery/Gallery";
+import {  ProgressCircleWithLabel } from "../../../../../Gallery/utils";
 
 function Library({
   multiple,
