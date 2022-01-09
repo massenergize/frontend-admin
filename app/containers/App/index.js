@@ -55,7 +55,7 @@ class App extends React.Component {
     const { data } = await apiCall('auth.whoami');
 
     let user = null;
-    if (data) {
+    if (data && Object.keys(data).length > 0) {
       user = data;
     } else if (firebase.auth().currentUser) {
       const idToken = await firebase.auth().currentUser.getIdToken(/* forceRefresh */ true);
@@ -147,9 +147,10 @@ class App extends React.Component {
         localStorage.setItem('authUser', JSON.stringify(user));
         me.props.reduxLoadAuthAdmin(user);
         this.goHome();
-      } else if (user) {
+      } else if (user && Object.keys(user).length > 0 ) {
         me.setState({ error: `Sorry ${user.preferred_name}, you are not an admin :(`, started: false });
       } else {
+        console.log("error occurred while signing you in")
         me.setState({ error: 'Error occurred while signing you in', started: false });
       }
     })
