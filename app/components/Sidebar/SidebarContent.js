@@ -79,7 +79,7 @@ class SidebarContent extends React.Component {
             <img src={logo} alt={brand.name} />
             {brand.name}
           </NavLink>
-          {isLogin && user && (
+          {isLogin && user && Object.keys(user).length>0 && (
             <div
               className={classNames(classes.profile, classes.user)}
               style={{ opacity: 1 - (transform / 100), marginTop: transform * -0.3 }}

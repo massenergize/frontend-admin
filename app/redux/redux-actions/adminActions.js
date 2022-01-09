@@ -242,7 +242,7 @@ export const reduxGetAllActions = () => dispatch => {
 export const reduxCheckUser = () => {
   apiCall('/auth.whoami')
     .then(res => {
-      if (!res.data) { // means the user token has expired, redirect to login
+      if (!res.data || Object.keys(res.data).length === 0 ) { // means the user token has expired, redirect to login
         localStorage.removeItem('idToken');
         localStorage.removeItem('authUser');
         window.location = '/login';
