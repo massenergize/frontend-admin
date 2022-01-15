@@ -111,7 +111,7 @@ class CreateNewCommunityForm extends Component {
             },
             {
               name: "about",
-              label: "Very short intro about this community for new users - 100 char max",
+              label: "Short intro about this community for new users - 100 char max",
               placeholder: "Welcome to Energize xxx, a project of ....",
               fieldType: "TextField",
               contentType: "text",
