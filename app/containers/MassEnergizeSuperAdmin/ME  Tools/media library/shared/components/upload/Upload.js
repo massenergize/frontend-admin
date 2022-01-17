@@ -194,7 +194,7 @@ const PreviewElement = ({ file, id, src, sizeText, remove, uploading }) => (
 );
 PreviewElement.propTypes = {
   file: PropTypes.object.isRequired,
-  id: PropTypes.oneOf(PropTypes.string, PropTypes.number).isRequired,
+  id: PropTypes.oneOf([PropTypes.string, PropTypes.number]).isRequired,
   src: PropTypes.string.isRequired,
   sizeText: PropTypes.string.isRequired,
   remove: PropTypes.func.isRequired,

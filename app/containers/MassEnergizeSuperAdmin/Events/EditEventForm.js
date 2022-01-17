@@ -457,6 +457,19 @@ class CreateNewEventForm extends Component {
           filesLimit: 1
         },
         {
+          name: 'rsvp_enabled',
+          label: 'Enable RSVPs for this Event',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: '' + event.rsvp_enabled,
+          dbName: 'rsvp_enabled',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ],
+        },
+        {
           name: 'archive',
           label: 'Archive this Event',
           fieldType: 'Radio',
