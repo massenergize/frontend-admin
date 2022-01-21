@@ -86,7 +86,7 @@ export const TestimonialsPage = loadable(() => import('./MassEnergizeSuperAdmin/
 export const RegisterPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Register'), {
   fallback: <Loading />,
 });
-// Testimonials page settings
+// Signin page settings
 export const SigninPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Signin'), {
   fallback: <Loading />,
 });
