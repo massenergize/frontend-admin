@@ -1,10 +1,18 @@
+.preview-content {
+  margin-left: 30px;
+}
+.preview-content ul > li {
+  list-style-type: disc !important;
+}
+.preview-content ol > li {
+  list-style-type: decimal !important;
+}
 
-.preview-content{
-    margin-left: 30px;
+.touchable-opacity {
+  cursor: pointer;
 }
-.preview-content ul > li{
-    list-style-type:  disc !important;
-}
-.preview-content ol > li{
-    list-style-type:  decimal !important;
+
+.touchable-opacity:hover {
+  opacity: 0.7;
+  transition: 0.2s ease-out;
 }

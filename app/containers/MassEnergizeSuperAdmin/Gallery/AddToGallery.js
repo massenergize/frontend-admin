@@ -57,8 +57,6 @@ function AddToGallery(props) {
     auth,
     classes,
     communities = [],
-    fetchGalleryImages,
-    insertImagesInRedux,
     loadMoreModalImages,
     loadModalImages,
     modalImages,
@@ -68,7 +66,7 @@ function AddToGallery(props) {
   const [scope, setScope] = useState(CHOICES.SPECIFIC);
   const [state, setState] = useState(defaultState);
   const [resetAutoComplete, setResetorForAutoComplete] = useState(null);
-  const superAdmin = auth.is_super_admin;
+  const superAdmin = auth && auth.is_super_admin;
 
   const getCommunityList = () => {
     if (auth.is_super_admin) return communities;

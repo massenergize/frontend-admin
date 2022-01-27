@@ -345,7 +345,8 @@ export const reduxGetAllActions = () => (dispatch) => {
 // try to put checkUser in a a more general area later
 export const reduxCheckUser = () => {
   apiCall("/auth.whoami").then((res) => {
-      if (!res.data || Object.keys(res.data).length === 0 ) { // means the user token has expired, redirect to login
+    if (!res.data || Object.keys(res.data).length === 0) {
+      // means the user token has expired, redirect to login
       // means the user token has expired, redirect to login
       localStorage.removeItem("idToken");
       localStorage.removeItem("authUser");
@@ -372,7 +373,6 @@ export const reduxLoadLibraryModalData = (props) => {
     ? Math.min(lower_limit, data.lower_limit)
     : data.lower_limit;
   const payload = { images, lower_limit, upper_limit };
-  console.log("Then I was the payload", payload);
   return {
     type: LOAD_MODAL_LIBRARY,
     payload,
@@ -384,12 +384,13 @@ export const reduxCallLibraryModalImages = (props) => {
   old = old || {};
   community_ids = community_ids || [];
   var requestBody = { community_ids };
+
   if (old.upper_limit)
     requestBody = { ...requestBody, upper_limit: old.upper_limit };
   if (old.lower_limit)
     requestBody = { ...requestBody, lower_limit: old.lower_limit };
+    
   return (dispatch) => {
-    console.log("Iam the requestBody", requestBody);
     apiCall("/gallery.fetch", requestBody)
       .then((response) => {
         if (cb) cb(response);

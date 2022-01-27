@@ -1,43 +1,22 @@
 /* eslint-disable camelcase */
-import React from 'react';
-import PropTypes from 'prop-types';
-import Button from '@material-ui/core/Button';
-import VerifiedUser from '@material-ui/icons/VerifiedUser';
-import { withStyles } from '@material-ui/core/styles';
-import styles from './jss/cover-jss';
-import { apiCall } from '../../../../utils/messenger';
-import { PORTAL_HOST } from '../../../../config/constants';
-
-
-// const optionsOpt = [
-//  'Edit Profile',
-//  'Change Cover',
-// ];
-
-// const ITEM_HEIGHT = 48;
+import React from "react";
+import PropTypes from "prop-types";
+import Button from "@material-ui/core/Button";
+import VerifiedUser from "@material-ui/icons/VerifiedUser";
+import { withStyles } from "@material-ui/core/styles";
+import styles from "./jss/cover-jss";
+import { apiCall } from "../../../../utils/messenger";
+import { PORTAL_HOST } from "../../../../config/constants";
 
 class Cover extends React.Component {
-  // leaving this here for now in case it was intended to be used
-  // state = {
-  //  anchorElOpt: null,
-  // };
-
-  // handleClickOpt = event => {
-  //  this.setState({ anchorElOpt: event.currentTarget });
-  // };
-  //
-  // handleCloseOpt = () => {
-  //  this.setState({ anchorElOpt: null });
-  // };
-
   goLive = async () => {
     const { community, liveOrNotFxn } = this.props;
     const { is_published } = community;
     const { id } = community;
     const body = { is_published: !is_published, community_id: id };
     liveOrNotFxn(community);
-    await apiCall('/communities.update', body);
-  }
+    await apiCall("/communities.update", body);
+  };
 
   showLiveBtn = () => {
     const { community } = this.props;
@@ -45,8 +24,15 @@ class Cover extends React.Component {
     const { classes } = this.props;
     if (is_published) {
       return (
-        <div>
-          <Button onClick={() => { this.goLive(); }} variant="outlined" color="secondary" className={classes.publishBtn + ' ' + classes.raise}>
+        <div style={{ flex: "1" }}>
+          <Button
+            onClick={() => {
+              this.goLive();
+            }}
+            variant="outlined"
+            color="secondary"
+            className={classes.publishBtn}
+          >
             Unpublish
           </Button>
         </div>
@@ -55,29 +41,37 @@ class Cover extends React.Component {
 
     return (
       <div>
-        <Button onClick={() => { this.goLive(); }} variant="outlined" color="primary" className={classes.goLiveBtn + ' ' + classes.raise}>
+        <Button
+          onClick={() => {
+            this.goLive();
+          }}
+          variant="outlined"
+          color="primary"
+          className={classes.goLiveBtn + " " + classes.raise}
+        >
           Go Live
         </Button>
       </div>
     );
-  }
+  };
 
   render() {
-    const {
-      classes,
-      name,
-      desc,
-      coverImg,
-      community
-    } = this.props;
-
+    const { classes, name, desc, coverImg, community } = this.props;
 
     // const { anchorElOpt } = this.state;
     const coverStyle = {
-      height: 250, textAlign: 'left', justifyContent: 'flex-start', backgroundImage: `url(${coverImg})`
+      height: 250,
+      textAlign: "left",
+      justifyContent: "flex-start",
+      backgroundImage: `url(${coverImg})`,
     };
     const contentStyle = {
-      display: 'inline-block', marginLeft: 20, marginBottom: 2, fontSize: '1.8rem', fontWeight: '500px', textTransform: 'capitalize'
+      display: "inline-block",
+      marginLeft: 20,
+      marginBottom: 2,
+      fontSize: "1.8rem",
+      fontWeight: "500px",
+      textTransform: "capitalize",
     };
 
     return (
@@ -117,31 +111,44 @@ class Cover extends React.Component {
           </Menu>
         </div>
             */}
-        <div className={classes.content} style={{ display: 'inline-block' }}>
+        <div className={classes.content} style={{ display: "inline-block" }}>
           <div>
             <h2 style={contentStyle}>{name}</h2>
-            {community.is_approved
-                && <VerifiedUser style={{ color: '#0095ff', marginTop: -2, display: 'inline-block', }} className={classes.verified} />
-            }
-            <div style={{ float: 'right' }}>
-              <center>
+            {community.is_approved && (
+              <VerifiedUser
+                style={{
+                  color: "#0095ff",
+                  marginTop: -2,
+                  display: "inline-block",
+                }}
+                className={classes.verified}
+              />
+            )}
+            <div style={{ float: "right" }}>
+              <center style={{ display: "flex", flex: "3" }}>
                 {this.showLiveBtn()}
                 <a
-                  style={{ fontSize: 14 }}
+                  style={{ fontSize: 14, flex: "1" }}
                   className={classes.leAnchor}
-                  href={community ? `${PORTAL_HOST}/${community.subdomain}?sandbox=true` : '#'}
+                  href={
+                    community
+                      ? `${PORTAL_HOST}/${community.subdomain}?sandbox=true`
+                      : "#"
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
                   size="large"
                   variant="contained"
                   color="secondary"
                 >
-                  Preview Site
+                  Preview
                 </a>
                 <a
-                  style={{ fontSize: 14 }}
+                  style={{ fontSize: 14, flex: "1" }}
                   className={classes.leAnchor}
-                  href={community ? `${PORTAL_HOST}/${community.subdomain}` : '#'}
+                  href={
+                    community ? `${PORTAL_HOST}/${community.subdomain}` : "#"
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
                   size="large"
@@ -153,7 +160,7 @@ class Cover extends React.Component {
               </center>
             </div>
           </div>
-          <p style={{ marginLeft: 20, color: 'darkgray' }}>{desc}</p>
+          <p style={{ marginLeft: 20, color: "darkgray" }}>{desc}</p>
         </div>
       </div>
     );
@@ -166,7 +173,7 @@ Cover.propTypes = {
   desc: PropTypes.string.isRequired,
   coverImg: PropTypes.string.isRequired,
   community: PropTypes.object.isRequired,
-  liveOrNotFxn: PropTypes.func.isRequired
+  liveOrNotFxn: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(Cover);
