@@ -1,53 +1,31 @@
 import { fade, darken } from "@material-ui/core/styles/colorManipulator";
 import CustomJss from "../../../../../utils/jss/Custom-jss";
+const common = {
+  textDecoration: "none !important",
+  padding: "10px 30px",
+  color: "white",
+  minWidth: "160px",
+  borderRadius: 0,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  "&:hover": {
+    background: "#d8e4e8 !important",
+    color: "#5d7488 !important",
+    transition: ".2s ease-in-out",
+  },
+};
 const custom = {
   goLiveBtn: {
-    padding: "9px 44px",
-    background: "white",
-    color: "#282828",
-    marginBottom: 12,
-    textTransform: "capitalize",
-    borderRadius: 55,
-    borderWidth: "0px !important",
-    "&:hover": {
-      background: "green",
-      color: "white",
-      transition: ".4s ease-in-out",
-    },
+    ...common,
   },
   publishBtn: {
-    padding: "10px 30px",
+    ...common,
     background: "crimson",
-    color: "white",
-    marginBottom: 10,
-    textTransform: "capitalize",
-    minWidth: "160px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: "0px !important",
-    borderWidth: "0px !important",
-    "&:hover": {
-      background: "black",
-      color: "white",
-      transition: ".4s ease-in-out",
-    },
   },
   leAnchor: {
-    textDecoration: "none !important",
-    padding: "10px 30px",
-    background: "green",
-    color: "white",
-    // borderRadius:55,
-    minWidth: "160px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    "&:hover": {
-      background: "#d8e4e8",
-      color: "#5d7488",
-      transition: ".4s ease-in-out",
-    },
+    ...common,
+    background: "#9d58c0",
   },
   inline: {
     display: "inline-block",

@@ -1,19 +1,18 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import TextField from '@material-ui/core/TextField';
-import { withStyles } from '@material-ui/core/styles';
-import { connect } from 'react-redux';
-import MenuItem from '@material-ui/core/MenuItem';
-import { bindActionCreators } from 'redux';
-import { reduxLoadSelectedCommunity } from '../../redux/redux-actions/adminActions';
-import styles from './header-jss';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
+import TextField from "@material-ui/core/TextField";
+import { withStyles } from "@material-ui/core/styles";
+import { connect } from "react-redux";
+import MenuItem from "@material-ui/core/MenuItem";
+import { bindActionCreators } from "redux";
+import { reduxLoadSelectedCommunity } from "../../redux/redux-actions/adminActions";
+import styles from "./header-jss";
 
 class CommunitySwitch extends PureComponent {
-  constructor(props) {
+constructor(props) {
     super(props);
-    this.state = { };
+    this.state = {};
   }
-
 
   findCommunityObj = (name) => {
     const { auth } = this.props;
@@ -24,19 +23,19 @@ class CommunitySwitch extends PureComponent {
       }
     }
     return null;
-  }
+  };
 
   chooseCommunity = (event) => {
     const obj = this.findCommunityObj(event.target.value);
     this.props.selectCommunity(obj);
     this.props.actionToPerform(obj.id);
-  }
-
+  };
 
   render() {
     const { classes, auth, selected_community } = this.props;
-    const communities = auth ? auth.admin_at : {};
-    const firstCom = auth ? auth.admin_at[0].name : 'Choose Community';
+    const communities = auth ? auth.admin_at : [];
+    const firstCom =
+      communities && communities[0] ? communities[0].name : "Choose Community";
     const community = selected_community ? selected_community.name : firstCom;
     return (
       <div>
@@ -47,7 +46,9 @@ class CommunitySwitch extends PureComponent {
           className={classes.textField}
           value={community}
           fullWidth
-          onChange={option => { this.chooseCommunity(option); }}
+          onChange={(option) => {
+            this.chooseCommunity(option);
+          }}
           SelectProps={{
             MenuProps: {
               className: classes.menu,
@@ -57,7 +58,7 @@ class CommunitySwitch extends PureComponent {
           margin="normal"
           variant="outlined"
         >
-          {communities.map(option => (
+          {communities.map((option) => (
             <MenuItem key={option.id.toString()} value={option.name}>
               {option.name}
             </MenuItem>
@@ -73,14 +74,21 @@ CommunitySwitch.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  auth: state.getIn(['auth']),
+  auth: state.getIn(["auth"]),
   // communities: state.getIn(['communities']),
-  selected_community: state.getIn(['selected_community'])
+  selected_community: state.getIn(["selected_community"]),
 });
 
-const mapDispatchToProps = (dispatch) => bindActionCreators({
-  selectCommunity: reduxLoadSelectedCommunity
-}, dispatch);
-const summaryMapped = connect(mapStateToProps, mapDispatchToProps)(CommunitySwitch);
+const mapDispatchToProps = (dispatch) =>
+  bindActionCreators(
+    {
+      selectCommunity: reduxLoadSelectedCommunity,
+    },
+    dispatch
+  );
+const summaryMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CommunitySwitch);
 
 export default withStyles(styles)(summaryMapped);

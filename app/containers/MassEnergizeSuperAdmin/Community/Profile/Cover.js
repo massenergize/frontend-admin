@@ -45,9 +45,9 @@ class Cover extends React.Component {
           onClick={() => {
             this.goLive();
           }}
-          variant="outlined"
-          color="primary"
-          className={classes.goLiveBtn + " " + classes.raise}
+          variant="contained"
+          color="secondary"
+          className={classes.goLiveBtn}
         >
           Go Live
         </Button>
@@ -144,7 +144,7 @@ class Cover extends React.Component {
                   Preview
                 </a>
                 <a
-                  style={{ fontSize: 14, flex: "1" }}
+                  style={{ fontSize: 14, flex: "1", background: "green" }}
                   className={classes.leAnchor}
                   href={
                     community ? `${PORTAL_HOST}/${community.subdomain}` : "#"
