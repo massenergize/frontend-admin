@@ -152,6 +152,7 @@ class MassEnergizeForm extends Component {
           formData[field.name] = field.defaultValue;
           break;
         case FieldTypes.Section: {
+          if (!field.children) break;
           const cFormData = this.initialFormData(field.children);
           Object.keys(cFormData).forEach((k) => {
             formData[k] = cFormData[k];
@@ -248,7 +249,20 @@ class MassEnergizeForm extends Component {
     });
   };
 
-  /**
+   /**
+   * toggle a single Checkbox
+   */
+    handleCheckboxToggle = (event) => {
+      const { target } = event;
+      if (!target) return;
+      const { name, value } = target;
+      const { formData } = this.state;
+      formData[name] = (formData[name] === "true") ? "false" : "true";
+      this.setState({
+        formData: { ...formData },
+      });
+    };
+   /**
    * Returns what value was entered in the form for this fieldName
    */
   getValue = (name, defaultValue = null) => {
@@ -481,63 +495,90 @@ class MassEnergizeForm extends Component {
   renderField = (field) => {
     const { classes } = this.props;
     const value = this.getValue(field.name, []);
+
     // just a guess what this is supposed to be
     const files = []; //field.value !== 'None' ? [field.value] : [];
 
     switch (field.fieldType) {
       case FieldTypes.Checkbox:
-        return (
-          <div key={field.name}>
-            <div className={classes.field}>
-              <FormControl component="fieldset">
-                <FormLabel component="legend">{field.label}</FormLabel>
-                <Select
-                  multiple
-                  displayEmpty
-                  name={field.name}
-                  value={this.getValue(field.name)}
-                  input={<Input id="select-multiple-chip" />}
-                  renderValue={(selected) => (
-                    <div className={classes.chips}>
-                      {selected.map((id) => (
-                        <Chip
-                          key={id}
-                          label={this.getDisplayName(
-                            field.name,
-                            id,
-                            field.data
-                          )}
-                          className={classes.chip}
-                        />
-                      ))}
-                    </div>
-                  )}
-                  MenuProps={MenuProps}
-                >
-                  {field.data.map((t) => (
-                    <MenuItem key={t.id}>
-                      <FormControlLabel
-                        key={t.id}
-                        control={
-                          <Checkbox
-                            checked={this.isThisSelectedOrNot(field.name, t.id)}
-                            onChange={(event) =>
-                              this.handleCheckBoxSelect(event, field.selectMany)
-                            }
-                            value={t.id}
-                            name={field.name}
+        if (field.data) {
+          return (
+            <div key={field.name}>
+              <div className={classes.field}>
+                <FormControl component="fieldset">
+                  <FormLabel component="legend">{field.label}</FormLabel>
+                  <Select
+                    multiple
+                    displayEmpty
+                    name={field.name}
+                    value={this.getValue(field.name)}
+                    input={<Input id="select-multiple-chip" />}
+                    renderValue={(selected) => (
+                      <div className={classes.chips}>
+                        {selected.map((id) => (
+                          <Chip
+                            key={id}
+                            label={this.getDisplayName(
+                              field.name,
+                              id,
+                              field.data
+                            )}
+                            className={classes.chip}
                           />
-                        }
-                        label={t.displayName}
-                      />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <br />
+                        ))}
+                      </div>
+                    )}
+                    MenuProps={MenuProps}
+                  >
+                    {field.data.map((t) => (
+                      <MenuItem key={t.id}>
+                        <FormControlLabel
+                          key={t.id}
+                          control={
+                            <Checkbox
+                              checked={this.isThisSelectedOrNot(field.name, t.id)}
+                              onChange={(event) =>
+                                this.handleCheckBoxSelect(event, field.selectMany)
+                              }
+                              value={t.id}
+                              name={field.name}
+                            />
+                          }
+                          label={t.displayName}
+                        />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <br />
+              </div>
             </div>
-          </div>
-        );
+          );
+  
+        }
+        else {
+          // single checkbox
+          const checked = (typeof value == "string") ? (value === "true") : value;
+          return (
+            <div key={field.name + field.label}>
+
+            <FormControlLabel 
+              label={field.label} 
+              control=
+              {
+                <Checkbox
+                  checked={checked} //{field.isRequired}
+                  label={field.label}
+                  name={field.name}
+                  onChange={this.handleCheckboxToggle}
+                  disabled={field.readOnly}
+                />
+              }
+              />
+            </div>
+          );
+  
+        }
       case FieldTypes.Dropdown:
         return (
           <div key={field.name}>
@@ -807,7 +848,7 @@ class MassEnergizeForm extends Component {
               aria-label={field.label}
               name={field.name}
               className={classes.group}
-              value={this.getValue(field.name)}
+              value={value}
               onChange={this.handleFormDataChange}
               disabled={field.readOnly  || this.state.readOnly}
             >
@@ -863,7 +904,7 @@ class MassEnergizeForm extends Component {
               }}
             >
               <p>{field.label}</p>
-              {this.renderFields(field.children)}
+              {field.children && this.renderFields(field.children)}
             </div>
             <br />
             <br />
