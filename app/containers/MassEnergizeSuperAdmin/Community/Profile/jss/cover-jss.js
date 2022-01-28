@@ -9,6 +9,7 @@ const common = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  textTransform: "capitalize",
   "&:hover": {
     background: "#d8e4e8 !important",
     color: "#5d7488 !important",

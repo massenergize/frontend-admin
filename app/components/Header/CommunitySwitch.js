@@ -9,7 +9,7 @@ import { reduxLoadSelectedCommunity } from "../../redux/redux-actions/adminActio
 import styles from "./header-jss";
 
 class CommunitySwitch extends PureComponent {
-constructor(props) {
+  constructor(props) {
     super(props);
     this.state = {};
   }

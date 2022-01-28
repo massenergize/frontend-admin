@@ -29,7 +29,7 @@ class Cover extends React.Component {
             onClick={() => {
               this.goLive();
             }}
-            variant="outlined"
+            variant="contained"
             color="secondary"
             className={classes.publishBtn}
           >
@@ -57,8 +57,6 @@ class Cover extends React.Component {
 
   render() {
     const { classes, name, desc, coverImg, community } = this.props;
-
-    // const { anchorElOpt } = this.state;
     const coverStyle = {
       height: 250,
       textAlign: "left",
@@ -72,59 +70,27 @@ class Cover extends React.Component {
       fontSize: "1.8rem",
       fontWeight: "500px",
       textTransform: "capitalize",
+      flex: "1",
     };
 
     return (
       <div className={classes.cover} style={coverStyle}>
-        {/*
-        <div className={classes.opt}>
-          <IconButton className={classes.button} aria-label="Delete">
-            <Info style={{ color: '#585858' }} />
-          </IconButton>
-          <IconButton
-            aria-label="More"
-            aria-owns={anchorElOpt ? 'long-menu' : null}
-            aria-haspopup="true"
-            className={classes.button}
-            onClick={this.handleClickOpt}
-          >
-            <MoreVertIcon style={{ color: '#585858' }} />
-          </IconButton>
-          <Menu
-            id="long-menu"
-            anchorEl={anchorElOpt}
-            open={Boolean(anchorElOpt)}
-            onClose={this.handleCloseOpt}
-            PaperProps={{
-              style: {
-                maxHeight: ITEM_HEIGHT * 4.5,
-                width: 200,
-
-              },
-            }}
-          >
-            {optionsOpt.map(option => (
-              <MenuItem key={option} selected={option === 'Edit Profile'} onClick={this.handleCloseOpt}>
-                {option}
-              </MenuItem>
-            ))}
-          </Menu>
-        </div>
-            */}
-        <div className={classes.content} style={{ display: "inline-block" }}>
-          <div>
-            <h2 style={contentStyle}>{name}</h2>
-            {community.is_approved && (
-              <VerifiedUser
-                style={{
-                  color: "#0095ff",
-                  marginTop: -2,
-                  display: "inline-block",
-                }}
-                className={classes.verified}
-              />
-            )}
-            <div style={{ float: "right" }}>
+        <div className={classes.content}>
+          <div style={{ display: "flex", flex: "2", alignItems: "center" }}>
+            <h2 style={contentStyle}>
+              {name}
+              {community.is_approved && (
+                <VerifiedUser
+                  style={{
+                    color: "#0095ff",
+                    marginTop: -2,
+                    display: "inline-block",
+                  }}
+                  className={classes.verified}
+                />
+              )}
+            </h2>
+            <div style={{ flex: "1", marginLeft: "auto" }}>
               <center style={{ display: "flex", flex: "3" }}>
                 {this.showLiveBtn()}
                 <a
@@ -160,7 +126,6 @@ class Cover extends React.Component {
               </center>
             </div>
           </div>
-          <p style={{ marginLeft: 20, color: "darkgray" }}>{desc}</p>
         </div>
       </div>
     );
