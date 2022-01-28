@@ -49,7 +49,6 @@ class AddRemoveAdmin extends Component {
   async componentDidMount() {
     const { id } = this.props.match.params;
     const communityAdminResponse = await apiCall('/admins.community.list', { community_id: id });
-    console.log(communityAdminResponse);
     if (communityAdminResponse && communityAdminResponse.data) {
       const members = communityAdminResponse.data.members || [];
       const pending = communityAdminResponse.data.pending_members || [];

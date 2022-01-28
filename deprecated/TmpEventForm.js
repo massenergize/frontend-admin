@@ -172,7 +172,6 @@ class CreateNewEventForm extends Component {
 
   isThisSelectedOrNot = (formData, fieldName, value) => {
     const fieldValues = formData[fieldName];
-    console.log(fieldValues);
     if (!fieldValues) return false;
     // if (!Array.isArray(fieldValues)) return false;
     return fieldValues.indexOf(value) > -1;
@@ -221,7 +220,6 @@ class CreateNewEventForm extends Component {
       formData: { ...formData, [name]: theList }
     });
 
-    console.log(this.state.formData);
   };
 
   async updateForm(fieldName, value) {
