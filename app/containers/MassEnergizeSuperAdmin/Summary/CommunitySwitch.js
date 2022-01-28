@@ -16,8 +16,7 @@ class CommunitySwitch extends PureComponent {
   }
 
   findCommunityObj = (name) => {
-    const { auth } = this.props;
-    const section = auth ? auth.admin_at : [];
+    const [section] = this.getDropdownCommunities();
     for (let i = 0; i < section.length; i++) {
       if (section[i].name === name) {
         return section[i];
@@ -32,16 +31,24 @@ class CommunitySwitch extends PureComponent {
     this.props.actionToPerform(obj && obj.id);
   };
 
+  getDropdownCommunities() {
+    var { auth, communities } = this.props;
+    communities = communities || [];
+    var firstCom = communities[0] || {};
+    if (!auth) return [];
+    if (auth.is_super_admin) return [communities, communities[0] || firstCom];
+    communities = (auth && auth.admin_at) || [];
+    var firstCom = communities[0] || {};
+    if (auth.is_community_admin) return [communities, firstCom];
+    return [[], {}];
+  }
+
   render() {
-    const { classes, auth, selected_community } = this.props;
-    const communities = auth ? auth.admin_at : [];
-    const firstCom =
-      communities && communities[0]
-        ? communities[0].name
-        : "--- Please Select a Community ---";
+    const { classes, selected_community } = this.props;
+    const [communities, first] = this.getDropdownCommunities();
     const communityName = selected_community
       ? selected_community.name
-      : firstCom;
+      : (first && first.name) || "-------";
     return (
       <div>
         <Paper style={{ padding: 20, marginBottom: 10 }}>
@@ -63,7 +70,7 @@ class CommunitySwitch extends PureComponent {
                 className: classes.menu,
               },
             }}
-            helperText="Choose from list"
+            helperText="Use the dropdown to switch between communities you manage"
             margin="normal"
             variant="outlined"
           >
@@ -84,6 +91,7 @@ CommunitySwitch.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
+  communities: state.getIn(["communities"]),
   auth: state.getIn(["auth"]),
   selected_community:
     state.getIn(["selected_community"]) ||

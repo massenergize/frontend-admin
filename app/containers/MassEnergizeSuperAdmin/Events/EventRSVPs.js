@@ -163,7 +163,7 @@ class EventRSVPs extends React.Component {
             }}
           >
             <Typography variant="h5" style={{ marginBottom: 5 }}>
-              ${event && event.name}
+              {event && event.name}
             </Typography>
             <Typography
               // variant="small"
