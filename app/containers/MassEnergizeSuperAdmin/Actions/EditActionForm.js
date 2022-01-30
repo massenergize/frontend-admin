@@ -59,11 +59,13 @@ class EditActionForm extends Component {
     const readOnlyTemplate = !superAdmin && action.is_global;
 
     // check whether this actions community is one that user is admin for
-    var correctCommunity = user.admin_at.filter(comm => {
-      return comm.id === action.community.id
-    })
-
-    const readOnlyWrongCommunity = !superAdmin && (correctCommunity.length < 1);
+    var readOnlyWrongCommunity = false;
+    if (action.community && action.community.id) {
+      var correctCommunity = user.admin_at.filter(comm => {
+          return comm.id === action.community.id
+        })
+      readOnlyWrongCommunity = !superAdmin && (correctCommunity.length < 1);
+    }
     const readOnly = readOnlyTemplate || readOnlyWrongCommunity;      
     await this.setStateAsync({ action, readOnly });    
 
