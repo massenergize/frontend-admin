@@ -1,10 +1,9 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import brand from 'dan-api/dummy/brand';
-import { Helmet } from 'react-helmet';
 import { withStyles } from '@material-ui/core/styles';
+import { Helmet } from 'react-helmet';
+import brand from 'dan-api/dummy/brand';
 
 import MUIDataTable from 'mui-datatables';
 import FileCopy from '@material-ui/icons/FileCopy';
@@ -14,37 +13,47 @@ import Avatar from '@material-ui/core/Avatar';
 import TextField from '@material-ui/core/TextField';
 
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-import {
-  reduxGetAllActions,
-  reduxGetAllCommunityActions,
-  loadAllActions,
-} from '../../../redux/redux-actions/adminActions';
 import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
+import { loadAllActions } from '../../../redux/redux-actions/adminActions';
 import { isNotEmpty } from '../../../utils/common';
+//import { bindActionCreators } from 'redux';
+
 class AllActions extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      columns: this.getColumns(),
       loading: true,
       allActions: [],
+      communityFilterList: [],
       data: [],
       error: null,
     };
   }
 
   async componentDidMount() {
-    const allActionsResponse = await apiCall('/actions.listForCommunityAdmin');
+    // flag to return actions from all communities    
+    const allActionsResponse = await apiCall('/actions.listForCommunityAdmin', {'community_id': 0});
     if (allActionsResponse && allActionsResponse.success) {
+      const user = this.props.auth;
+      const communityFilterList = [];
+      const community = this.props.community;
+      if (community) {
+        communityFilterList.push(community.name)
+      }
+      else if (user && user.admin_at) {
+        user.admin_at.forEach((comm) => communityFilterList.push(comm.name));
+      }
+      communityFilterList.push("Template")
+
       loadAllActions(allActionsResponse.data);
       await this.setStateAsync({
         loading: false,
         error: null,
         allActions: allActionsResponse.data,
         data: this.fashionData(allActionsResponse.data),
+        communityFilterList,
       });
     } else if (allActionsResponse && !allActionsResponse.success) {
       await this.setStateAsync({
@@ -170,6 +179,7 @@ class AllActions extends React.Component {
       key: 'community',
       options: {
         filter: true,
+        filterList: this.state.communityFilterList,
         filterType: 'multiselect',
       },
     },
@@ -216,9 +226,7 @@ class AllActions extends React.Component {
     const title = brand.name + ' - All Actions';
     const description = brand.desc;
     const { classes } = this.props;
-    const {
-      columns, loading, data, error
-    } = this.state;
+    const { loading, data, error } = this.state;
 
     if (loading) {
       return <LinearBuffer />;
@@ -231,6 +239,7 @@ class AllActions extends React.Component {
       );
     }
 
+    const columns = this.getColumns();
     const options = {
       filterType: 'dropdown',
       responsive: 'stacked',
@@ -277,15 +286,16 @@ const mapStateToProps = (state) => ({
   allActions: state.getIn(['allActions']),
   community: state.getIn(['selected_community']),
 });
-const mapDispatchToProps = (dispatch) => bindActionCreators(
-  {
-    callAllActions: reduxGetAllActions,
-    callCommunityActions: reduxGetAllCommunityActions,
-  },
-  dispatch
-);
+//const mapDispatchToProps = (dispatch) => bindActionCreators(
+//  {
+//    callAllActions: reduxGetAllActions,
+//    callCommunityActions: reduxGetAllCommunityActions,
+//  },
+//  dispatch
+//);
+
 const ActionsMapped = connect(
   mapStateToProps,
-  mapDispatchToProps
+  //mapDispatchToProps
 )(AllActions);
 export default withStyles(styles)(ActionsMapped);

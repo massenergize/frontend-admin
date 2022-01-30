@@ -10,33 +10,56 @@ import EditIcon from '@material-ui/icons/Edit';
 import { Link } from 'react-router-dom';
 import Avatar from '@material-ui/core/Avatar';
 
-import Paper from '@material-ui/core/Paper';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import Grid from '@material-ui/core/Grid';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-import { reduxGetAllEvents, reduxGetAllCommunityEvents } from '../../../redux/redux-actions/adminActions';
-import CommunitySwitch from '../Summary/CommunitySwitch';
+import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
+//import { bindActionCreators } from 'redux';
+import { loadAllEvents } from '../../../redux/redux-actions/adminActions';
+//import CommunitySwitch from '../Summary/CommunitySwitch';
 
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { data: [], loading: true, columns: this.getColumns() };
+    this.state = { 
+      loading: true,
+      allItems: [],
+      communityFilterList: [],
+      data: [],  
+      error: null,
+    };
   }
 
   async componentDidMount() {
-    const user = this.props.auth ? this.props.auth : {};
-    const community = this.props.community ? this.props.community :{};
-    if (user.is_super_admin) {
-      this.props.callForSuperAdminEvents();
+    // flag to return actions from all communities
+    const itemsListUrl = '/events.listForCommunityAdmin';
+    const allItemsResponse = await apiCall(itemsListUrl, {'community_id': 0});
+    if (allItemsResponse && allItemsResponse.success) {
+      const user = this.props.auth;
+      const communityFilterList = [];
+      const community = this.props.community;
+      if (community) {
+        communityFilterList.push(community.name)
+      }
+      else if (user && user.admin_at) {
+        user.admin_at.forEach((comm) => communityFilterList.push(comm.name));
+      }
+      communityFilterList.push("Template")
+
+      loadAllEvents(allItemsResponse.data);
+      await this.setStateAsync({
+        loading: false,
+        error: null,
+        allItems: allItemsResponse.data,
+        data: this.fashionData(allItemsResponse.data),
+        communityFilterList,
+      });
+    } else if (allItemsResponse && !allItemssResponse.success) {
+      await this.setStateAsync({
+        loading: false,
+        error: allItemsResponse.error,
+      });
     }
-    if (user.is_community_admin) {
-      let com = community || user.admin_at[0];
-      this.props.callForNormalAdminEvents(com.id);
-    }
-    await this.setStateAsync({ loading: false });
   }
 
   setStateAsync(state) {
@@ -45,6 +68,13 @@ class AllEvents extends React.Component {
     });
   }
 
+  changeItems = async (id) => {
+    const { allItems } = this.state;
+    const newData = allItems.filter(
+      (a) => (a.community && a.community.id === id) || a.is_global
+    );
+    await this.setStateAsync({ data: this.fashionData(newData) });
+  };
 
   fashionData = (data) => {
     const fashioned = data.map(d => (
@@ -121,6 +151,7 @@ class AllEvents extends React.Component {
       key: 'community',
       options: {
         filter: true,
+        filterList: this.state.communityFilterList,
         filterType: 'multiselect'
       }
     },
@@ -132,7 +163,7 @@ class AllEvents extends React.Component {
       }
     },
     {
-      name: 'Edit?',
+      name: 'Edit? Copy?',
       key: 'edit_or_copy',
       options: {
         filter: false,
@@ -165,9 +196,21 @@ class AllEvents extends React.Component {
   render() {
     const title = brand.name + ' - All Events';
     const description = brand.desc;
-    const { columns, loading } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.allEvents);
+    const { loading, data, error } = this.state;
+
+    if (loading) {
+      return <LinearBuffer />;
+    }
+    if (error) {
+      return (
+        <div>
+          <h2>Error</h2>
+        </div>
+      );
+    }
+
+    const columns = this.getColumns();
     const options = {
       filterType: 'dropdown',
       responsive: 'stacked',
@@ -181,25 +224,6 @@ class AllEvents extends React.Component {
         });
       }
     };
-
-    if (loading) {
-      return (
-        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
-              <div className={classes.root}>
-                <LinearProgress />
-                <h1>Fetching all Events.  This may take a while...</h1>
-                <br />
-                <LinearProgress color="secondary" />
-              </div>
-            </Paper>
-          </Grid>
-        </Grid>
-      );
-    }
-
-
     return (
       <div>
         <Helmet>
@@ -231,17 +255,20 @@ AllEvents.propTypes = {
 function mapStateToProps(state) {
   return {
     auth: state.getIn(['auth']),
-    allEvents: state.getIn(['allEvents']),
+    allItems: state.getIn(['allEvents']),
     community: state.getIn(['selected_community'])
   };
 }
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-    callForSuperAdminEvents: reduxGetAllEvents,
-    callForNormalAdminEvents: reduxGetAllCommunityEvents
+//function mapDispatchToProps(dispatch) {
+//  return bindActionCreators({
+//    callForSuperAdminEvents: reduxGetAllEvents,
+//    callForNormalAdminEvents: reduxGetAllCommunityEvents
+//
+//  }, dispatch);
+//}
 
-  }, dispatch);
-}
-
-const EventsMapped = connect(mapStateToProps, mapDispatchToProps)(AllEvents);
+const EventsMapped = connect(
+  mapStateToProps, 
+  //mapDispatchToProps
+)(AllEvents);
 export default withStyles(styles)(EventsMapped);

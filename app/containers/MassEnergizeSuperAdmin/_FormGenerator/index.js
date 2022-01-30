@@ -988,7 +988,7 @@ class MassEnergizeForm extends Component {
               {readOnly ? (
 
                 <Typography variant="h7" component="h3">
-                  <em>ReadOnly : This content is a Template and can only be changed by a super-Admin</em>
+                  <em>ReadOnly : This content is a Template or shared from a community you are not an admin of.</em>
                 </Typography>
                 ) : null
               }

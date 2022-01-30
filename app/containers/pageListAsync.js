@@ -33,7 +33,7 @@ export const ImpactPage = loadable(
   }
 );
 export const SuperAllActions = loadable(
-  () => import("./MassEnergizeSuperAdmin/Pages/AllActions"),
+  () => import("./MassEnergizeSuperAdmin/Pages/Actions"),
   {
     fallback: <Loading />,
   }

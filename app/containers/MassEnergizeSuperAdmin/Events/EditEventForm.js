@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import states from 'dan-api/data/states';
-import { Link } from 'react-router-dom';
-import { Paper } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { apiCall } from '../../../utils/messenger';
 import MassEnergizeForm from '../_FormGenerator';
+import states from 'dan-api/data/states';
+import { Link } from 'react-router-dom';
+import { Paper } from '@material-ui/core';
 
 const styles = theme => ({
   root: {
@@ -39,7 +39,6 @@ class EditEventForm extends Component {
     this.state = {
       communities: [],
       formJson: null,
-      event: null,
       rescheduledEvent: null,
       readOnly: false,
     };
@@ -48,25 +47,42 @@ class EditEventForm extends Component {
 
   async componentDidMount() {
     const { id } = this.props.match.params;
-    const superAdmin = this.props.auth.is_super_admin;
+    const user = this.props.auth;
+    const superAdmin = user.is_super_admin;
     const eventResponse = await apiCall('/events.info', { event_id: id });
-    if (eventResponse && !eventResponse.success) {
+    if (!eventResponse && !eventResponse.success) {
       return;
     }
     const event = eventResponse.data;
-    apiCall('events.exceptions.list', {'event_id': event.id })
-    .then((json) => {
-      if (json.success) {
-        this.setState({
-          rescheduledEvent: json.data[0]
-        });
-      } else {
-        console.log(json.error);
-      }
+
+    // Template actions are read-only unless user is a super-admin
+    const readOnlyTemplate = !superAdmin && event.is_global;
+
+    // check whether this actions community is one that user is admin for
+    var correctCommunity = user.admin_at.filter(comm => {
+      return comm.id === event.community.id
     })
-    .catch((err) => {
-      console.log(err);
-    });
+
+    const readOnlyWrongCommunity = !superAdmin && (correctCommunity.length < 1);
+    const readOnly = readOnlyTemplate || readOnlyWrongCommunity;       
+    await this.setStateAsync({ event, readOnly });
+
+    if (!readOnly) {
+      apiCall('events.exceptions.list', {'event_id': event.id })
+      .then((json) => {
+        if (json.success) {
+          this.setState({
+            rescheduledEvent: json.data[0]
+          });
+        } else {
+          console.log(json.error);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });  
+    }
+
     const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
 
@@ -104,11 +120,7 @@ class EditEventForm extends Component {
       // want this to be the 2nd field
       formJson.fields.splice(1, 0, section);
     }
-
-
-    // Template events are read-only unless user is a super-admin
-    const readOnly = event.is_global && !superAdmin;      
-    await this.setStateAsync({ event, formJson, readOnly });
+    await this.setStateAsync({ formJson });
   }
 
   getSelectedIds = (selected, dataToCrossCheck) => {
@@ -514,12 +526,15 @@ class EditEventForm extends Component {
     if (!formJson) return (<div style={{ color: 'white' }}><h1>Loading ...</h1></div>);
     return (
       <div>
-        <Paper>
-          <Link to={`/admin/edit/${event && event.id}/event_rsvps`}>Event RSVP list</Link>
-        </Paper>
-
-
-        <br />
+        {!readOnly ? (
+          <div>
+            <Paper>
+              <Link to={`/admin/edit/${event && event.id}/event_rsvps`}>Event RSVP list</Link>
+            </Paper>
+            <br />
+          </div>
+          ) : null
+        }
 
         <MassEnergizeForm
           classes={classes}

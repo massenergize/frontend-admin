@@ -46,18 +46,26 @@ class EditActionForm extends Component {
 
   async componentDidMount() {
     const { id } = this.props.match.params;
-    const superAdmin = this.props.auth.is_super_admin;
+    const user = this.props.auth;
+    const superAdmin = user.is_super_admin;
     const actionResponse = await apiCall('/actions.info', { action_id: id });
-    if (actionResponse && !actionResponse.success) {
+    if (!actionResponse || !actionResponse.success) {
       return;
     }
-    if (actionResponse && actionResponse.success) {
-      const action = actionResponse.data;
 
-      // Template actions are read-only unless user is a super-admin
-      const readOnly = action.is_global && !superAdmin;      
-      await this.setStateAsync({ action, readOnly });
-    }
+    const action = actionResponse.data;
+
+    // Template actions are read-only unless user is a super-admin
+    const readOnlyTemplate = !superAdmin && action.is_global;
+
+    // check whether this actions community is one that user is admin for
+    var correctCommunity = user.admin_at.filter(comm => {
+      return comm.id === action.community.id
+    })
+
+    const readOnlyWrongCommunity = !superAdmin && (correctCommunity.length < 1);
+    const readOnly = readOnlyTemplate || readOnlyWrongCommunity;      
+    await this.setStateAsync({ action, readOnly });    
 
     const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
