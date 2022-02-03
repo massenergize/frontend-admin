@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import states from 'dan-api/data/states';
-import { Link } from 'react-router-dom';
-import { Paper } from '@material-ui/core';
+import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { apiCall } from '../../../utils/messenger';
 import MassEnergizeForm from '../_FormGenerator';
+import states from 'dan-api/data/states';
+import { Link } from 'react-router-dom';
+import { Paper } from '@material-ui/core';
 
 const styles = theme => ({
   root: {
@@ -32,38 +33,58 @@ const styles = theme => ({
 });
 
 
-class CreateNewEventForm extends Component {
+class EditEventForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
       communities: [],
       formJson: null,
-      event: null,
-      rescheduledEvent: null
+      rescheduledEvent: null,
+      readOnly: false,
     };
   }
 
 
   async componentDidMount() {
     const { id } = this.props.match.params;
+    const user = this.props.auth;
+    const superAdmin = user.is_super_admin;
     const eventResponse = await apiCall('/events.info', { event_id: id });
-    if (eventResponse && !eventResponse.success) {
+    if (!eventResponse && !eventResponse.success) {
       return;
     }
     const event = eventResponse.data;
-    apiCall('events.exceptions.list', {'event_id': event.id })
-    .then((json) => {
-      if (json.success) {
-        this.setState({
-          rescheduledEvent: json.data[0]
-        });
-      } else {
-        console.log(json.error);
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+
+    // Template actions are read-only unless user is a super-admin
+    const readOnlyTemplate = !superAdmin && event.is_global;
+
+    // check whether this actions community is one that user is admin for
+    var readOnlyWrongCommunity = false;
+    if (action.community && action.community.id) {
+      var correctCommunity = user.admin_at.filter(comm => {
+        return comm.id === event.community.id
+      })
+      readOnlyWrongCommunity = !superAdmin && (correctCommunity.length < 1);
+    }
+    const readOnly = readOnlyTemplate || readOnlyWrongCommunity;       
+    await this.setStateAsync({ event, readOnly });
+
+    if (!readOnly) {
+      apiCall('events.exceptions.list', {'event_id': event.id })
+      .then((json) => {
+        if (json.success) {
+          this.setState({
+            rescheduledEvent: json.data[0]
+          });
+        } else {
+          console.log(json.error);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });  
+    }
+
     const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
 
@@ -101,8 +122,7 @@ class CreateNewEventForm extends Component {
       // want this to be the 2nd field
       formJson.fields.splice(1, 0, section);
     }
-
-    await this.setStateAsync({ event, formJson });
+    await this.setStateAsync({ formJson });
   }
 
   getSelectedIds = (selected, dataToCrossCheck) => {
@@ -504,29 +524,38 @@ class CreateNewEventForm extends Component {
 
   render() {
     const { classes } = this.props;
-    const { formJson, event } = this.state;
+    const { formJson, event, readOnly } = this.state;
     if (!formJson) return (<div style={{ color: 'white' }}><h1>Loading ...</h1></div>);
     return (
       <div>
-        <Paper>
-          <Link to={`/admin/edit/${event && event.id}/event_rsvps`}>Event RSVP list</Link>
-        </Paper>
-
-
-        <br />
+        {!readOnly ? (
+          <div>
+            <Paper>
+              <Link to={`/admin/edit/${event && event.id}/event_rsvps`}>Event RSVP list</Link>
+            </Paper>
+            <br />
+          </div>
+          ) : null
+        }
 
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
+          readOnly={readOnly}
         />
       </div>
     );
   }
 }
 
-CreateNewEventForm.propTypes = {
+const mapStateToProps = (state) => ({
+  auth: state.getIn(['auth']),
+  community: state.getIn(['selected_community'])
+});
+
+EditEventForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-
-export default withStyles(styles, { withTheme: true })(CreateNewEventForm);
+const EditEventMapped = connect(mapStateToProps, )(EditEventForm);
+export default withStyles(styles, { withTheme: true })(EditEventMapped);

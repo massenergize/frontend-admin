@@ -33,7 +33,7 @@ export const ImpactPage = loadable(
   }
 );
 export const SuperAllActions = loadable(
-  () => import("./MassEnergizeSuperAdmin/Pages/AllActions"),
+  () => import("./MassEnergizeSuperAdmin/Pages/Actions"),
   {
     fallback: <Loading />,
   }
@@ -86,7 +86,7 @@ export const TestimonialsPage = loadable(() => import('./MassEnergizeSuperAdmin/
 export const RegisterPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Register'), {
   fallback: <Loading />,
 });
-// Testimonials page settings
+// Signin page settings
 export const SigninPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Signin'), {
   fallback: <Loading />,
 });

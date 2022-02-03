@@ -78,6 +78,7 @@ class MassEnergizeForm extends Component {
       successMsg: null,
       error: null,
       formJson: null,
+      readOnly: false,
       // activeModal: null,
       // activeModalTitle: null,
     };
@@ -91,7 +92,9 @@ class MassEnergizeForm extends Component {
   async componentDidMount() {
     const { formJson } = this.props;
     const formData = this.initialFormData(formJson.fields);
-    await this.setStateAsync({ formJson, formData });
+
+    const readOnly = this.props.readOnly;
+    await this.setStateAsync({ formJson, formData, readOnly: readOnly });
   }
 
   setStateAsync(state) {
@@ -847,14 +850,14 @@ class MassEnergizeForm extends Component {
               className={classes.group}
               value={value}
               onChange={this.handleFormDataChange}
-              disabled={field.readOnly}
+              disabled={field.readOnly  || this.state.readOnly}
             >
               {field.data.map((d) => (
                 <FormControlLabel
                   key={d.id}
                   value={d.id}
                   name={field.name}
-                  disabled={field.readOnly}
+                  disabled={field.readOnly || this.state.readOnly }
                   control={<Radio />}
                   label={d.value}
                 />
@@ -883,7 +886,7 @@ class MassEnergizeForm extends Component {
               InputLabelProps={{
                 shrink: true,
               }}
-              disabled={field.readOnly}
+              disabled={field.readOnly || this.state.readOnly }
               defaultValue={field.defaultValue}
               maxLength={field.maxLength}
             />
@@ -964,7 +967,7 @@ class MassEnergizeForm extends Component {
 
   render() {
     const { classes } = this.props;
-    const { formJson, error, successMsg, startCircularSpinner } = this.state;
+    const { formJson, error, successMsg, startCircularSpinner, readOnly } = this.state;
 
     if (!formJson) return <div />;
     return (
@@ -978,9 +981,17 @@ class MassEnergizeForm extends Component {
         >
           <Grid item xs={12} md={12}>
             <Paper className={classes.root}>
-              <Typography variant="h5" component="h3">
+            <Typography variant="h5" component="h3">
                 {formJson.title}
               </Typography>
+
+              {readOnly ? (
+
+                <Typography variant="h7" component="h3">
+                  <em>ReadOnly : This content is a Template or shared from a community you are not an admin of.</em>
+                </Typography>
+                ) : null
+              }
 
               {/* Code to display error messages in case submission causes errors */}
               {error && (
@@ -1040,7 +1051,7 @@ class MassEnergizeForm extends Component {
                     <Link to={formJson.cancelLink}>Cancel</Link>
                   )}
                   {"    "}
-                  <Button variant="contained" color="secondary" type="submit">
+                  <Button variant="contained" color="secondary" type="submit" disabled={this.state.readOnly}>
                     Submit
                   </Button>
                 </div>
@@ -1058,5 +1069,8 @@ MassEnergizeForm.propTypes = {
   classes: PropTypes.object.isRequired,
   formJson: PropTypes.object.isRequired,
 };
+MassEnergizeForm.defaultProps ={
+  readOnly : false,
+}
 
 export default withStyles(styles, { withTheme: true })(MassEnergizeForm);
