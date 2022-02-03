@@ -102,7 +102,7 @@ class AllUsers extends React.Component {
   ]
 
   render() {
-    const title = brand.name + ' - Community Admin Messages';
+    const title = brand.name + ' - Users';
     const description = brand.desc;
     const { columns, data } = this.state;
     const { classes } = this.props;

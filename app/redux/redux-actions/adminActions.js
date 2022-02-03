@@ -332,6 +332,7 @@ export const reduxGetAllTags = () => (dispatch) => {
 };
 
 export const reduxGetAllActions = () => (dispatch) => {
+  console.log("reduxGetAllActions calls actions.listForCommunityAdmin")
   apiCall("/actions.listForCommunityAdmin").then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
@@ -462,6 +463,6 @@ export const reduxLoadSelectedCommunity = (data = null) => ({
   payload: data,
 });
 export const reduxLoadAuthAdmin = (data = null) => {
-  reduxCallCommunities();
+  //reduxCallCommunities();
   return { type: LOAD_AUTH_ADMIN, payload: data };
 };
