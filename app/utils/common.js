@@ -1,6 +1,7 @@
 /** *
  * All utility Functions
  */
+import qs from 'qs';
 
 /**
  * The function retrieves a particular value from an array , and returns it with the remaining items of the array
@@ -81,3 +82,20 @@ export function downloadFile(file) {
     window.URL.revokeObjectURL(URL);
   }
 }
+
+// TODO: be aware of filter choices
+export const updateFilterChoices = () => {
+  return null;
+}
+
+export const getUrlParamsForFilterInputs = (filterChoices) => {
+  if (!filterChoices) return "";
+  return "";
+}
+
+export const getFilterInputsFromURL = (location) => {
+  if (!location || !location.search) return "";
+  const { filterInputs } = qs.parse(location.search, { ignoreQueryPrefix: true });
+  return filterInputs;
+};
+

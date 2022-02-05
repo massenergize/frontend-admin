@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import ImageThumbnail from "../thumbnail/ImageThumbnail";
 import { blank } from "../../utils/values";
 import { LoadMoreContainer } from "../../../../../Gallery/Gallery";
-import { ProgressCircleWithLabel } from "../../../../../Gallery/utils";
+import {  ProgressCircleWithLabel } from "../../../../../Gallery/utils";
 
 function Library({
   multiple,
