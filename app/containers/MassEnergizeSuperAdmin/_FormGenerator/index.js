@@ -249,20 +249,20 @@ class MassEnergizeForm extends Component {
     });
   };
 
-   /**
+  /**
    * toggle a single Checkbox
    */
-    handleCheckboxToggle = (event) => {
-      const { target } = event;
-      if (!target) return;
-      const { name, value } = target;
-      const { formData } = this.state;
-      formData[name] = (formData[name] === "true") ? "false" : "true";
-      this.setState({
-        formData: { ...formData },
-      });
-    };
-   /**
+  handleCheckboxToggle = (event) => {
+    const { target } = event;
+    if (!target) return;
+    const { name, value } = target;
+    const { formData } = this.state;
+    formData[name] = formData[name] === "true" ? "false" : "true";
+    this.setState({
+      formData: { ...formData },
+    });
+  };
+  /**
    * Returns what value was entered in the form for this fieldName
    */
   getValue = (name, defaultValue = null) => {
@@ -536,9 +536,15 @@ class MassEnergizeForm extends Component {
                           key={t.id}
                           control={
                             <Checkbox
-                              checked={this.isThisSelectedOrNot(field.name, t.id)}
+                              checked={this.isThisSelectedOrNot(
+                                field.name,
+                                t.id
+                              )}
                               onChange={(event) =>
-                                this.handleCheckBoxSelect(event, field.selectMany)
+                                this.handleCheckBoxSelect(
+                                  event,
+                                  field.selectMany
+                                )
                               }
                               value={t.id}
                               name={field.name}
@@ -554,30 +560,25 @@ class MassEnergizeForm extends Component {
               </div>
             </div>
           );
-  
-        }
-        else {
+        } else {
           // single checkbox
-          const checked = (typeof value == "string") ? (value === "true") : value;
+          const checked = typeof value == "string" ? value === "true" : value;
           return (
             <div key={field.name + field.label}>
-
-            <FormControlLabel 
-              label={field.label} 
-              control=
-              {
-                <Checkbox
-                  checked={checked} //{field.isRequired}
-                  label={field.label}
-                  name={field.name}
-                  onChange={this.handleCheckboxToggle}
-                  disabled={field.readOnly}
-                />
-              }
+              <FormControlLabel
+                label={field.label}
+                control={
+                  <Checkbox
+                    checked={checked} //{field.isRequired}
+                    label={field.label}
+                    name={field.name}
+                    onChange={this.handleCheckboxToggle}
+                    disabled={field.readOnly}
+                  />
+                }
               />
             </div>
           );
-  
         }
       case FieldTypes.Dropdown:
         return (

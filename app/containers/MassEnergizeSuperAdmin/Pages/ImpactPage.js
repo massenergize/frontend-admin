@@ -270,7 +270,6 @@ class ImpactPage extends Component {
     const { classes } = this.props;
     const { formJson } = this.state;
     if (!formJson) return (<div>Hold tight! Fetching Data ...</div>);
-    console.log(formJson)
     return (
       <div>
         <MassEnergizeForm

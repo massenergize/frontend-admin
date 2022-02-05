@@ -79,23 +79,35 @@ export const TeamsPage = loadable(
   }
 );
 // Testimonials page settings
-export const TestimonialsPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Testimonials'), {
-  fallback: <Loading />,
-});
+export const TestimonialsPage = loadable(
+  () => import("./MassEnergizeSuperAdmin/Pages/Testimonials"),
+  {
+    fallback: <Loading />,
+  }
+);
 // Register page settings
-export const RegisterPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Register'), {
-  fallback: <Loading />,
-});
+export const RegisterPage = loadable(
+  () => import("./MassEnergizeSuperAdmin/Pages/Register"),
+  {
+    fallback: <Loading />,
+  }
+);
 // Signin page settings
-export const SigninPage = loadable(() => import('./MassEnergizeSuperAdmin/Pages/Signin'), {
+export const SigninPage = loadable(
+  () => import("./MassEnergizeSuperAdmin/Pages/Signin"),
+  {
+    fallback: <Loading />,
+  }
+);
+export const BlankPage = loadable(() => import("./Pages/BlankPage"), {
   fallback: <Loading />,
 });
-export const BlankPage = loadable(() => import('./Pages/BlankPage'), {
-  fallback: <Loading />,
-});
-export const DashboardSummaryPage = loadable(() => import('./MassEnergizeSuperAdmin/Summary'), {
-  fallback: <Loading />,
-}); 
+export const DashboardSummaryPage = loadable(
+  () => import("./MassEnergizeSuperAdmin/Summary"),
+  {
+    fallback: <Loading />,
+  }
+);
 
 export const DashboardAdminSummaryPage = loadable(
   () => import("./MassEnergizeSuperAdmin/Summary/NormalAdminHome"),

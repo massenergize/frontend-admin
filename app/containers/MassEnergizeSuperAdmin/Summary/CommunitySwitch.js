@@ -1,13 +1,13 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import TextField from '@material-ui/core/TextField';
-import { withStyles } from '@material-ui/core/styles';
-import { connect } from 'react-redux';
-import MenuItem from '@material-ui/core/MenuItem';
-import Paper from '@material-ui/core/Paper';
-import { bindActionCreators } from 'redux';
-import { reduxLoadSelectedCommunity } from '../../../redux/redux-actions/adminActions';
-import styles from './dashboard-jss';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
+import TextField from "@material-ui/core/TextField";
+import { withStyles } from "@material-ui/core/styles";
+import { connect } from "react-redux";
+import MenuItem from "@material-ui/core/MenuItem";
+import Paper from "@material-ui/core/Paper";
+import { bindActionCreators } from "redux";
+import { reduxLoadSelectedCommunity } from "../../../redux/redux-actions/adminActions";
+import styles from "./dashboard-jss";
 
 class CommunitySwitch extends PureComponent {
   constructor(props) {
@@ -15,35 +15,46 @@ class CommunitySwitch extends PureComponent {
     this.state = {};
   }
 
-
   findCommunityObj = (name) => {
-    const { auth } = this.props;
-    const section = auth ? auth.admin_at : [];
+    const [section] = this.getDropdownCommunities();
     for (let i = 0; i < section.length; i++) {
       if (section[i].name === name) {
         return section[i];
       }
     }
     return null;
-  }
+  };
 
   chooseCommunity = (event) => {
     const obj = this.findCommunityObj(event.target.value);
     this.props.selectCommunity(obj);
     this.props.actionToPerform(obj && obj.id);
+  };
+
+  getDropdownCommunities() {
+    var { auth, communities } = this.props;
+    communities = communities || [];
+    var firstCom = communities[0] || {};
+    if (!auth) return [];
+    if (auth.is_super_admin) return [communities, communities[0] || firstCom];
+    communities = (auth && auth.admin_at) || [];
+    var firstCom = communities[0] || {};
+    if (auth.is_community_admin) return [communities, firstCom];
+    return [[], {}];
   }
 
-
   render() {
-    const { classes, auth, selected_community } = this.props;
-    const communities = auth ? auth.admin_at : [];
-
-    const firstCom = auth ? auth.admin_at[0].name : '--- Please Select a Community ---';
-    const communityName = selected_community ? selected_community.name : firstCom;
+    const { classes, selected_community } = this.props;
+    const [communities, first] = this.getDropdownCommunities();
+    const communityName = selected_community
+      ? selected_community.name
+      : (first && first.name) || "-------";
     return (
       <div>
         <Paper style={{ padding: 20, marginBottom: 10 }}>
-          <h4 style={{ fontWeight: '400', marginBottom: 2 }}>Switch Community</h4>
+          <h4 style={{ fontWeight: "400", marginBottom: 2 }}>
+            Switch Community
+          </h4>
           <TextField
             id="outlined-select-currency"
             select
@@ -51,17 +62,19 @@ class CommunitySwitch extends PureComponent {
             className={classes.textField}
             value={communityName}
             fullWidth
-            onChange={option => { this.chooseCommunity(option); }}
+            onChange={(option) => {
+              this.chooseCommunity(option);
+            }}
             SelectProps={{
               MenuProps: {
                 className: classes.menu,
               },
             }}
-            helperText="Choose from list"
+            helperText="Use the dropdown to switch between communities you manage"
             margin="normal"
             variant="outlined"
           >
-            {communities.map(option => (
+            {communities.map((option) => (
               <MenuItem key={option.id.toString()} value={option.name}>
                 {option.name}
               </MenuItem>
@@ -78,13 +91,23 @@ CommunitySwitch.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  auth: state.getIn(['auth']),
-  selected_community: (state.getIn(['selected_community']) || state.getIn(['full_selected_community'])),
+  communities: state.getIn(["communities"]),
+  auth: state.getIn(["auth"]),
+  selected_community:
+    state.getIn(["selected_community"]) ||
+    state.getIn(["full_selected_community"]),
 });
 
-const mapDispatchToProps = (dispatch) => bindActionCreators({
-  selectCommunity: reduxLoadSelectedCommunity
-}, dispatch);
-const summaryMapped = connect(mapStateToProps, mapDispatchToProps)(CommunitySwitch);
+const mapDispatchToProps = (dispatch) =>
+  bindActionCreators(
+    {
+      selectCommunity: reduxLoadSelectedCommunity,
+    },
+    dispatch
+  );
+const summaryMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CommunitySwitch);
 
 export default withStyles(styles)(summaryMapped);

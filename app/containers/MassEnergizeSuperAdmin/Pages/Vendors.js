@@ -59,7 +59,6 @@ class VendorsPageEditForm extends Component {
 
   createFormJson = async () => {
     const { pageData } = this.state;
-    console.log(pageData);
     const { community } = pageData;
 
     const formJson = {

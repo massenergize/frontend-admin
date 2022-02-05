@@ -62,7 +62,6 @@ class CommunityData extends Component {
 
   createFormJson = async () => {
     const { graph } = this.state;
-    console.log(graph);
     // if (!community) return {};
 
     const formJson = {
