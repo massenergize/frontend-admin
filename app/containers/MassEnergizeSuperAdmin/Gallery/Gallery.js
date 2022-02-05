@@ -13,7 +13,6 @@ import {
   reduxLoadGalleryImages,
   reduxLoadImageInfos,
   reduxLoadSearchedImages,
-  reduxSearchForImages,
 } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";

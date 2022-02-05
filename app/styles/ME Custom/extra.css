@@ -1,10 +1,23 @@
+:root { 
+  --app-cyan: #579ece;
+}
 
-.preview-content{
-    margin-left: 30px;
+
+.preview-content {
+  margin-left: 30px;
 }
-.preview-content ul > li{
-    list-style-type:  disc !important;
+.preview-content ul > li {
+  list-style-type: disc !important;
 }
-.preview-content ol > li{
-    list-style-type:  decimal !important;
+.preview-content ol > li {
+  list-style-type: decimal !important;
+}
+
+.touchable-opacity {
+  cursor: pointer;
+}
+
+.touchable-opacity:hover {
+  opacity: 0.7;
+  transition: 0.2s ease-out;
 }

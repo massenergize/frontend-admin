@@ -31,7 +31,6 @@ function MediaLibraryModal({
   const [loadingMore, setLoadingMore] = useState(false);
   const [shouldWait, setShouldWait] = useState(useAwait);
 
-  console.log("I am the content bro", content);
   const clean = (files) => {
     // just a function that retrieves only the FileObject from the file jsons provided
     if (!files) return files;

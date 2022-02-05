@@ -176,7 +176,7 @@ const styles = theme => ({
     listStyle: 'none',
   },
   primary: {
-    whiteSpace: 'nowrap'
+    whiteSpace: 'pre-wrap'
   },
   icon: {
     marginRight: theme.spacing.unit / 2,

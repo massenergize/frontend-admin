@@ -32,7 +32,6 @@ const email = value => (
 );
 
 const passwordsMatch = (value, allValues) => {
-  console.log(value, allValues.get('password'));
   if (value !== allValues.get('password')) {
     return 'Passwords dont match';
   }

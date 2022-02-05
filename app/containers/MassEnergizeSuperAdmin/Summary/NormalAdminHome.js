@@ -37,7 +37,6 @@ class NormalAdminHome extends PureComponent {
     const { auth } = this.props;
     const section = auth ? auth.admin_at : [];
     for (let i = 0; i < section.length; i++) {
-      console.log(section[i].id, id);
       if (section[i].id === id) {
         return section[i];
       }

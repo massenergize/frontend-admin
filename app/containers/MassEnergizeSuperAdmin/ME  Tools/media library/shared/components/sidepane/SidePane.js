@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ImageThumbnail from "../thumbnail/ImageThumbnail";
 import { getRandomStringKey } from "../../utils/utils";
 import MLButton from "../button/MLButton";
@@ -12,6 +12,9 @@ export default function SidePane({
     (sourceExtractor && sourceExtractor(activeImage)) ||
     (activeImage && activeImage.url) ||
     "...";
+
+  useEffect(() => {}, [activeImage]);
+
   return (
     <div className="ml-sidepane-container elevate-float side-pane-slide-animation">
       <div style={{ position: "relative", height: "100%", padding: 15 }}>
@@ -31,19 +34,31 @@ export default function SidePane({
             width: "100%",
             border: "solid 0px cornflowerblue",
             borderBottomWidth: 2,
-            borderRadius: 0,
+            borderRadius: 3,
             fontSize: "medium",
+            marginTop: 5,
+            background: "#fafeff",
+            resize: "none",
+            marginBottom: 0,
           }}
           rows="4"
-        >
-          {url}
-        </textarea>
+          value={url}
+        />
         <a
           href={url}
           target="_blank"
-          style={{ fontSize: 13, color: "cornflowerblue" }}
+          className="touchable-opacity"
+          style={{
+            fontSize: 13,
+            color: "cornflowerblue",
+            padding: "10px 15px",
+            background: "rgb(241 248 255)",
+            textDecoration: "none",
+            display: "block",
+            width: "100%",
+          }}
         >
-          See Full Image
+          See Full Image Here
         </a>
 
         <MLButton

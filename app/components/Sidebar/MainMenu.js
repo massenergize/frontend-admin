@@ -110,7 +110,7 @@ class MainMenu extends React.Component {
               <Ionicon icon={item.icon} />
             </ListItemIcon>
           )}
-          <ListItemText classes={{ primary: classes.primary }} inset primary={item.name} />
+          <ListItemText classes={{ primary: classes.primary }} inset primary={item.name}  />
           {item.badge && (
             <Chip color="primary" label={item.badge} className={classes.badge} />
           )}

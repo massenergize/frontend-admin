@@ -12,7 +12,6 @@ class ProtectedRoutes extends Component {
 
   render() {
     const { user } = this.props;
-    console.log("lets try", user);
     return (
       <Route
         render={(props) => user ? <Application {...props} /> :<Redirect to="/login"/>  }
