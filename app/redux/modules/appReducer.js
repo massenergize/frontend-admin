@@ -1,15 +1,32 @@
-import { Map, fromJS } from 'immutable';
-import { START_UP } from '../../actions/actionConstants';
+import { Map, fromJS } from "immutable";
+import { START_UP } from "../../actions/actionConstants";
 import {
-  LOAD_ALL_COMMUNITIES, LOAD_AUTH_ADMIN, LOAD_ID_TOKEN, SELECTED_COMMUNITY, SELECTED_COMMUNITY_FULL, GET_ALL_ACTIONS, GET_ALL_TESTIMONIALS, GET_ALL_EVENTS, GET_ALL_USERS, GET_ALL_TAG_COLLECTIONS, GET_ALL_TEAMS, GET_ALL_GOALS, GET_ALL_VENDORS, GET_ALL_POLICIES, LOAD_SUMMARY_DATA, LOAD_GRAPH_DATA
-} from '../ReduxConstants';
+  LOAD_ALL_COMMUNITIES,
+  LOAD_AUTH_ADMIN,
+  LOAD_ID_TOKEN,
+  SELECTED_COMMUNITY,
+  SELECTED_COMMUNITY_FULL,
+  GET_ALL_ACTIONS,
+  GET_ALL_TESTIMONIALS,
+  GET_ALL_EVENTS,
+  GET_ALL_USERS,
+  GET_ALL_TAG_COLLECTIONS,
+  GET_ALL_TEAMS,
+  GET_ALL_GOALS,
+  GET_ALL_VENDORS,
+  GET_ALL_POLICIES,
+  LOAD_SUMMARY_DATA,
+  LOAD_GRAPH_DATA,
+  LOAD_GALLERY_IMAGES,
+  LOAD_SEARCHED_IMAGES,
+  KEEP_LOADED_IMAGE_INFO,
+  LOAD_MODAL_LIBRARY,
+} from "../ReduxConstants";
 
 const initialState = Map({
-  constants: {
-  },
-  profile: null
+  constants: {},
+  profile: null,
 });
-
 
 const initialImmutableState = fromJS(initialState);
 export default function reducer(state = initialImmutableState, action = {}) {
@@ -21,6 +38,42 @@ export default function reducer(state = initialImmutableState, action = {}) {
   }
 }
 
+export const modalLibraryReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case LOAD_MODAL_LIBRARY:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+export const imageInfosReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case KEEP_LOADED_IMAGE_INFO:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+export const searchedImagesReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case LOAD_SEARCHED_IMAGES:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+export const galleryImagesReducer = (state = [], action = {}) => {
+  switch (action.type) {
+    case LOAD_GALLERY_IMAGES:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
 export const communitiesReducer = (state = [], action = {}) => {
   switch (action.type) {
     case LOAD_ALL_COMMUNITIES:
@@ -66,7 +119,7 @@ export const vendorsReducer = (state = [], action = {}) => {
       return state;
   }
 };
-let localUser = localStorage.getItem('authUser');
+let localUser = localStorage.getItem("authUser");
 localUser = localUser ? JSON.parse(localUser) : null;
 
 export const authAdminReducer = (state = localUser, action = {}) => {
@@ -93,7 +146,6 @@ export const allActionsReducer = (state = [], action = {}) => {
       return state;
   }
 };
-
 
 export const allGoalsReducer = (state = [], action = {}) => {
   switch (action.type) {
@@ -161,7 +213,6 @@ export const fullSelectedCommunityReducer = (state = null, action = {}) => {
   }
 };
 
-
 export const allReducers = {
-  communities: communitiesReducer
+  communities: communitiesReducer,
 };

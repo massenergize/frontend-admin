@@ -1,22 +1,23 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import { Helmet } from 'react-helmet';
-import brand from 'dan-api/dummy/brand';
-import MUIDataTable from 'mui-datatables';
-import Typography from '@material-ui/core/Typography';
-import { Link } from 'react-router-dom';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import classNames from 'classnames';
+import React from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import { Helmet } from "react-helmet";
+import brand from "dan-api/dummy/brand";
+import MUIDataTable from "mui-datatables";
+import Typography from "@material-ui/core/Typography";
+import { Link } from "react-router-dom";
+import AppBar from "@material-ui/core/AppBar";
+import Tabs from "@material-ui/core/Tabs";
+import classNames from "classnames";
 import Grid from "@material-ui/core/Grid";
-import Tab from '@material-ui/core/Tab';
-import PeopleIcon from '@material-ui/icons/People';
-import messageStyles from 'dan-styles/Messages.scss';
-import SnackbarContent from '@material-ui/core/SnackbarContent';
+import Tab from "@material-ui/core/Tab";
+import PeopleIcon from "@material-ui/icons/People";
+import messageStyles from "dan-styles/Messages.scss";
+import SnackbarContent from "@material-ui/core/SnackbarContent";
 
-import styles from '../../../components/Widget/widget-jss';
-import { apiCall } from '../../../utils/messenger';
+import styles from "../../../components/Widget/widget-jss";
+import { apiCall } from "../../../utils/messenger";
+import { Paper } from "@material-ui/core";
 
 function TabContainer(props) {
   const { children } = props;
@@ -31,15 +32,14 @@ TabContainer.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-
 class EventRSVPs extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: [], 
-      loading: true, 
-      event: null, 
-      columns: this.getColumns(), 
+      data: [],
+      loading: true,
+      event: null,
+      columns: this.getColumns(),
       value: 0,
       error: null,
     };
@@ -47,20 +47,25 @@ class EventRSVPs extends React.Component {
 
   async componentDidMount() {
     const { id } = this.props.match.params;
-    const eventResponse = await apiCall('/events.info', { event_id: id });
+    const eventResponse = await apiCall("/events.info", { event_id: id });
     if (eventResponse && eventResponse.data) {
       const event = eventResponse.data;
       await this.setStateAsync({ event });
     }
 
-    const allRSVPsResponse = await apiCall('/events.rsvp.list', { event_id: id });
+    const allRSVPsResponse = await apiCall("/events.rsvp.list", {
+      event_id: id,
+    });
     if (allRSVPsResponse && allRSVPsResponse.success) {
-      await this.setStateAsync({ loading: false, allRSVPs: allRSVPsResponse.data, data: this.fashionData(allRSVPsResponse.data) });
+      await this.setStateAsync({
+        loading: false,
+        allRSVPs: allRSVPsResponse.data,
+        data: this.fashionData(allRSVPsResponse.data),
+      });
     }
 
     await this.setStateAsync({ loading: false });
   }
-
 
   setStateAsync(state) {
     return new Promise((resolve) => {
@@ -68,87 +73,79 @@ class EventRSVPs extends React.Component {
     });
   }
 
-
   fashionData = (data) => {
     if (!data) return [];
-    const fashioned = data.map(d => (
-      [
-        d.id,
-        d.user && d.user.full_name,
-        d.user && d.user.email,
-        d.status,
-        d.id
-      ]
-    ));
+    const fashioned = data.map((d) => [
+      d.id,
+      d.user && d.user.full_name,
+      d.user && d.user.email,
+      d.status,
+      d.id,
+    ]);
     return fashioned;
-  }
-
+  };
 
   getColumns = () => [
     {
-      name: 'ID',
-      key: 'id',
+      name: "ID",
+      key: "id",
       options: {
         filter: true,
-        filterType: 'textField'
-      }
+        filterType: "textField",
+      },
     },
     {
-      name: 'User Name',
-      key: 'user',
+      name: "User Name",
+      key: "user",
       options: {
         filter: true,
-        filterType: 'textField'
-      }
+        filterType: "textField",
+      },
     },
     {
-      name: 'User Email',
-      key: 'user',
+      name: "User Email",
+      key: "user",
       options: {
         filter: true,
-        filterType: 'textField'
-      }
+        filterType: "textField",
+      },
     },
     {
-      name: 'Status',
-      key: 'status',
+      name: "Status",
+      key: "status",
       options: {
         filter: true,
-      }
+      },
     },
-  ]
-
+  ];
 
   handleTabChange = (event, value) => {
     this.setState({ value });
   };
 
-
   render() {
-    const title = brand.name + ' - All Events';
+    const title = brand.name + " - All Events";
     const description = brand.desc;
-    const {
-      columns, data, event, value
-    } = this.state;
+    const { columns, data, event, value } = this.state;
     const { classes } = this.props;
     const options = {
-      filterType: 'dropdown',
-      responsive: 'stacked',
+      filterType: "dropdown",
+      responsive: "stacked",
       print: true,
       rowsPerPage: 100,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach(d => {
+        idsToDelete.forEach((d) => {
           const rsvp = data[d.dataIndex][0];
-          apiCall('/events.rsvp.remove', { rsvp_id: rsvp.id, event_id: event.id });
+          apiCall("/events.rsvp.remove", {
+            rsvp_id: rsvp.id,
+            event_id: event.id,
+          });
         });
-      }
+      },
     };
     return (
-
-
       <div>
-
         <Helmet>
           <title>{title}</title>
           <meta name="description" content={description} />
@@ -157,73 +154,39 @@ class EventRSVPs extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <Grid container>
-          <Grid item xs={8}>
-            <SnackbarContent
-              className={classNames(classes.snackbar, messageStyles.bgSuccess)}
-              message={`Event: ${event && event.name}`}
-              action={() => (
-                <Link color="secondary" size="small">
-                  Action
-                </Link>
-              )}
-            />
-            <br />
-            <SnackbarContent
-              className={classNames(classes.snackbar, messageStyles.bgWarning)}
-              message={`Community: ${event && event.community && event.community.name}`}
-              action={() => (
-                <Link color="secondary" size="small">
-                  Action
-                </Link>
-              )}
-            />
-            <br />
-            <Link to="/admin/read/events">
-              <SnackbarContent
-                className={classNames(classes.snackbar, messageStyles.bgInfo)}
-                message="<<< Go Back to All Events"
-                action={() => (
-                  <Link color="secondary" size="small">
-                    Action
-                  </Link>
-                )}
-              />
-            </Link>
-          </Grid>
-        </Grid>
-        <div className={classes.root}>
-          <AppBar position="static" color="default">
-            <Tabs
-              value={value}
-              onChange={this.handleTabChange}
-              variant="scrollable"
-              scrollButtons="on"
-              indicatorColor="primary"
-              textColor="secondary"
+        <div style={{ padding: 20 }}>
+          <Paper
+            style={{
+              padding: 20,
+              marginBottom: 15,
+              boxShadow: "var(--elevate-float)",
+            }}
+          >
+            <Typography variant="h5" style={{ marginBottom: 5 }}>
+              {event && event.name}
+            </Typography>
+            <Typography
+              // variant="small"
+              style={{
+                paddingBottom: 5,
+                display: "block",
+              }}
             >
-              <Tab label="Event RSVPs" icon={<PeopleIcon />} />
+              {event && event.community && event.community.name}
+            </Typography>
 
-            </Tabs>
-          </AppBar>
-          {value === 0 && (
-            <TabContainer>
+            <Link to="/admin/read/events" style={{ color: "var(--app-cyan)" }}>
+              Go Back to All Events
+            </Link>
+          </Paper>
 
-              <div className={classes.table}>
-                <MUIDataTable
-                  title="Event RSVPs"
-                  data={data}
-                  columns={columns}
-                  options={options}
-                />
-              </div>
-
-
-            </TabContainer>
-          )}
+          <MUIDataTable
+            title="Event RSVPs"
+            data={data}
+            columns={columns}
+            options={options}
+          />
         </div>
-
-
       </div>
     );
   }

@@ -8,5 +8,6 @@ export default {
   TextField: 'TextField',
   DateTime: 'DateTime',
   Section: 'Section',
-  Paragraph:'Paragraph'
+  Paragraph:'Paragraph',
+  MediaLibrary: "media-library"
 };

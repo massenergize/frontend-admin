@@ -5,7 +5,6 @@ import classNames from 'classnames';
 class AppSpinner extends Component {
   render() {
     const { classes } = this.props;
-    console.log("I am the classes",classes)
     return (
       <div>
         <CircularProgress className={classes.progress} color="secondary" />

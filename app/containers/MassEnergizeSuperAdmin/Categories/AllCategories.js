@@ -126,7 +126,6 @@ class AllTagCollections extends React.Component {
     const description = brand.desc;
     const { data, columns, loading } = this.state;
     const { classes } = this.props;
-    console.log(data)
     const options = {
       filterType: 'dropdown',
       responsive: 'stacked',
