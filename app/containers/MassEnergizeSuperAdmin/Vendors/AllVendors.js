@@ -41,10 +41,11 @@ class AllVendors extends React.Component {
       this.props.callVendorsForSuperAdmin();
     }
     if (user.is_community_admin) {
-      const com = this.props.community
-        ? this.props.community
-        : user.admin_at[0];
-      this.props.callVendorsForNormalAdmin(null);
+      //const com = this.props.community
+      //  ? this.props.community
+      //  : user.admin_at[0];
+      // quick fix - pass back all vendors
+      this.props.callVendorsForNormalAdmin(0);
     }
   }
 
