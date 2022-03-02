@@ -15,29 +15,17 @@ class Pages extends React.Component {
   render() {
     const { classes, community } = this.props;
     const homeLink = `/admin/edit/${community ? community.id : null}/home`;
-    const allActions = `/admin/edit/${
-      community ? community.id : null
-    }/all-actions`;
+    const allActions = `/admin/edit/${community ? community.id : null}/all-actions`;
     const about = `/admin/edit/${community ? community.id : null}/about`;
-    const contactUs = `/admin/edit/${
-      community ? community.id : null
-    }/contact_us`;
+    const contactUs = `/admin/edit/${community ? community.id : null}/contact_us`;
     const donate = `/admin/edit/${community ? community.id : null}/donate`;
-    const impactPageLink = `/admin/edit/${
-      community ? community.id : null
-    }/impact`;
-    const impactsLink = `/admin/edit/${
-      community ? community.id : null
-    }/impacts`;
+    const impactPageLink = `/admin/edit/${community ? community.id : null}/impact`;
+    const impactsLink = `/admin/edit/${community ? community.id : null}/impacts`;
     const teams = `/admin/edit/${community ? community.id : null}/teams`;
     const events = `/admin/edit/${community ? community.id : null}/events`;
     const vendors = `/admin/edit/${community ? community.id : null}/vendors`;
-    const testimonials = `/admin/edit/${
-      community ? community.id : null
-    }/testimonials`;
-    const registration = `/admin/edit/${
-      community ? community.id : null
-    }/registration`;
+    const testimonials = `/admin/edit/${community ? community.id : null}/testimonials`;
+    //const registration = `/admin/edit/${community ? community.id : null}/registration`;
     const signin = `/admin/edit/${community ? community.id : null}/signin`;
 
     // @TODO : If number of items in this array increases, a dropdown is probably a better Idea
@@ -51,12 +39,13 @@ class Pages extends React.Component {
       { name: "Impact Page", key: "homepage", link: impactPageLink },
       { name: "About Us Page", key: "homepage", link: about },
       { name: "Donate Page", key: "homepage", link: donate },
-      { name: "Contact Us Page", key: "homepage", link: homeLink },
+      { name: "Contact Us Page", key: "homepage", link: contactUs },
       { name: "All Actions Page", key: "homepage", link: allActions },
       { name: "All Events Page", key: "homepage", link: events },
       { name: "All Teams Page", key: "homepage", link: teams },
+      { name: "All Testimonials Page", key: "homepage", link: testimonials },
       { name: "All Services Page", key: "homepage", link: vendors },
-      { name: "Regsitration Page", key: "homepage", link: registration },
+      //{ name: "Registration Page", key: "homepage", link: registration },
       { name: "Sign In Page", key: "homepage", link: signin },
     ];
 
