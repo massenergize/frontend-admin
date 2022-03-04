@@ -32,6 +32,8 @@ import app, {
   searchedImagesReducer,
   imageInfosReducer,
   modalLibraryReducer,
+  adminMessagesReducer,
+  teamMessagesReducer,
 } from "./modules/appReducer";
 
 /**
@@ -39,6 +41,8 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    teamMessages: teamMessagesReducer,
+    messages: adminMessagesReducer,
     galleryImages: galleryImagesReducer,
     searchedImages: searchedImagesReducer,
     imageInfos: imageInfosReducer,

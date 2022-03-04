@@ -1,27 +1,33 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import { Helmet } from 'react-helmet';
-import brand from 'dan-api/dummy/brand';
+import React from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import { Helmet } from "react-helmet";
+import brand from "dan-api/dummy/brand";
 
-import MUIDataTable from 'mui-datatables';
-import EditIcon from '@material-ui/icons/Edit';
-import { Link } from 'react-router-dom';
-import TextField from '@material-ui/core/TextField';
+import MUIDataTable from "mui-datatables";
+import EditIcon from "@material-ui/icons/Edit";
+import { Link } from "react-router-dom";
+import TextField from "@material-ui/core/TextField";
 
-import messageStyles from 'dan-styles/Messages.scss';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { apiCall } from '../../../utils/messenger';
-import styles from '../../../components/Widget/widget-jss';
-import { reduxGetAllCommunityTestimonials, reduxGetAllTestimonials } from '../../../redux/redux-actions/adminActions';
+import messageStyles from "dan-styles/Messages.scss";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { apiCall } from "../../../utils/messenger";
+import styles from "../../../components/Widget/widget-jss";
+import {
+  reduxGetAllCommunityTestimonials,
+  reduxGetAllTestimonials,
+} from "../../../redux/redux-actions/adminActions";
+import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import { getHumanFriendlyDate, smartString } from "../../../utils/common";
+import { Chip } from "@material-ui/core";
 
 class AllTestimonials extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       columns: this.getColumns(),
-      loading: true
+      loading: true,
     };
   }
 
@@ -31,7 +37,9 @@ class AllTestimonials extends React.Component {
       await this.props.callTestimonialsForSuperAdmin();
     }
     if (user.is_community_admin) {
-      const com = this.props.community ? this.props.community : user.admin_at[0];
+      const com = this.props.community
+        ? this.props.community
+        : user.admin_at[0];
       if (com) {
         await this.props.callTestimonialsForNormalAdmin(com.id);
       }
@@ -44,156 +52,160 @@ class AllTestimonials extends React.Component {
     });
   }
 
-
   fashionData = (data) => {
-    return data.map(d => (
-      [
-        d.created_at,
-        `${d.title}...`.substring(0, 30), // limit to first 30 chars
-        { rank: d.rank, id: d.id },
-        (d.community && d.community.name),
-        (d.is_approved && d.is_published ? 'Yes' : 'No'),
-        `${d.user ? d.user.full_name : ''}...`.substring(0, 20), // limit to first 20 chars
-        `${d.action ? d.action.title : ''} ${d.action && d.action.community ? ` -  (${d.action.community.name})` : ''}...`.substring(0, 20),
-        d.id
-      ]
-    ));
-  }
+    return data.map((d) => [
+      getHumanFriendlyDate(d.created_at, true),
+      smartString(d.title), // limit to first 30 chars
+      { rank: d.rank, id: d.id },
+      d.community && d.community.name,
+      d.is_approved && d.is_published,
+      smartString(d.user ? d.user.full_name : "", 20), // limit to first 20 chars
+      smartString((d.action && d.action.title) || "", 30),
+      d.id,
+    ]);
+  };
 
-
-  getStatus = isApproved => {
+  getStatus = (isApproved) => {
     switch (isApproved) {
-      case false: return messageStyles.bgError;
-      case true: return messageStyles.bgSuccess;
-      default: return messageStyles.bgSuccess;
+      case false:
+        return messageStyles.bgError;
+      case true:
+        return messageStyles.bgSuccess;
+      default:
+        return messageStyles.bgSuccess;
     }
   };
 
-
-  getColumns = () => [
-    {
-      name: 'Date',
-      key: 'date',
-      options: {
-        filter: true,
-        filterType: 'textField'
-      }
-    },
-    {
-      name: 'Title',
-      key: 'title',
-      options: {
-        filter: true,
-        filterType: 'textField'
-      }
-    },
-    {
-      name: 'Rank',
-      key: 'rank',
-      options: {
-        filter: false,
-        customBodyRender: (d) => d && (
-          <TextField
-            key={d.id}
-            required
-            name="rank"
-            variant="outlined"
-            onChange={async event => {
-              const { target } = event;
-              if (!target) return;
-              const { name, value } = target;
-              await apiCall('/testimonials.rank', { testimonial_id: d && d.id, [name]: value });
-            }}
-            label="Rank"
-            InputLabelProps={{
-              shrink: true,
-              maxwidth: '10px'
-            }}
-            defaultValue={d && d.rank}
-          />
-        )
-      }
-    },
-    {
-      name: 'Community',
-      key: 'community',
-      options: {
-        filter: true,
-      }
-    },
-    {
-      name: 'Live?',
-      key: 'is_live',
-      options: {
-        filter: true,
-      }
-    },
-    {
-      name: 'User',
-      key: 'user',
-      options: {
-        filter: true,
-        filterType: 'textField'
-      }
-    },
-    {
-      name: 'Action',
-      key: 'action',
-      options: {
-        filter: true,
-        filterType: 'textField'
-      }
-    },
-    {
-      name: 'Edit',
-      key: 'edit_or_copy',
-      options: {
-        filter: false,
-        download: false,
-        customBodyRender: (id) => (
-          <div>
-            <Link to={`/admin/edit/${id}/testimonial`} target="_blank">
-              <EditIcon size="small" variant="outlined" color="secondary" />
-            </Link>
-            &nbsp;&nbsp;
-            {/* <Link
-              onClick={async () => {
-                const copiedActionResponse = await apiCall('/actions.copy', { action_id: id });
-                if (copiedActionResponse && copiedActionResponse.success) {
-                  const newAction = copiedActionResponse && copiedActionResponse.data;
-                  window.location.href = `/admin/edit/${newAction.id}/action`;
-                }
-              }}
-              to="/admin/read/actions"
-            >
-              <FileCopy size="small" variant="outlined" color="secondary" />
-            </Link> */}
-          </div>
-        )
-      }
-    },
-  ]
-
+  getColumns = () => {
+    const { classes } = this.props;
+    return [
+      {
+        name: "Date",
+        key: "date",
+        options: {
+          filter: true,
+          filterType: "textField",
+        },
+      },
+      {
+        name: "Title",
+        key: "title",
+        options: {
+          filter: true,
+          filterType: "textField",
+        },
+      },
+      {
+        name: "Rank",
+        key: "rank",
+        options: {
+          filter: false,
+          customBodyRender: (d) =>
+            d && (
+              <TextField
+                key={d.id}
+                style={{ width: 50, textAlign: "center" }}
+                required
+                name="rank"
+                variant="outlined"
+                onChange={async (event) => {
+                  const { target } = event;
+                  if (!target) return;
+                  const { name, value } = target;
+                  await apiCall("/testimonials.rank", {
+                    testimonial_id: d && d.id,
+                    [name]: value,
+                  });
+                }}
+                label="Rank"
+                InputLabelProps={{
+                  shrink: true,
+                  maxwidth: "10px",
+                }}
+                defaultValue={d && d.rank}
+              />
+            ),
+        },
+      },
+      {
+        name: "Community",
+        key: "community",
+        options: {
+          filter: true,
+        },
+      },
+      {
+        name: "Live?",
+        key: "is_live",
+        options: {
+          filter: true,
+          customBodyRender: (d) => {
+            return (
+              <Chip
+                label={d ? "Yes" : "No"}
+                className={d ? classes.yesLabel : classes.noLabel}
+              />
+            );
+          },
+        },
+      },
+      {
+        name: "User",
+        key: "user",
+        options: {
+          filter: true,
+          filterType: "textField",
+        },
+      },
+      {
+        name: "Action",
+        key: "action",
+        options: {
+          filter: true,
+          filterType: "textField",
+        },
+      },
+      {
+        name: "Edit",
+        key: "edit_or_copy",
+        options: {
+          filter: false,
+          download: false,
+          customBodyRender: (id) => (
+            <div>
+              <Link to={`/admin/edit/${id}/testimonial`} target="_blank">
+                <EditIcon size="small" variant="outlined" color="secondary" />
+              </Link>
+            </div>
+          ),
+        },
+      },
+    ];
+  };
 
   render() {
-    const title = brand.name + ' - All Testimonials';
+    const title = brand.name + " - All Testimonials";
     const description = brand.desc;
     const { columns, loading } = this.state;
     const { classes } = this.props;
     const data = this.fashionData(this.props.allTestimonials);
     const options = {
-      filterType: 'dropdown',
-      responsive: 'stacked',
+      filterType: "dropdown",
+      responsive: "stacked",
       print: true,
-      rowsPerPage: 100,
+      rowsPerPage: 15,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach(d => {
+        idsToDelete.forEach((d) => {
           const testimonialId = data[d.dataIndex][0];
-          apiCall('/testimonials.delete', { testimonial_id: testimonialId });
+          apiCall("/testimonials.delete", { testimonial_id: testimonialId });
         });
-      }
+      },
     };
+
+    if (loading && (!data || !data.length)) {
+      return <LinearBuffer />;
+    }
 
     return (
       <div>
@@ -225,17 +237,23 @@ AllTestimonials.propTypes = {
 
 function mapStateToProps(state) {
   return {
-    auth: state.getIn(['auth']),
-    allTestimonials: state.getIn(['allTestimonials']),
-    community: state.getIn(['selected_community'])
+    auth: state.getIn(["auth"]),
+    allTestimonials: state.getIn(["allTestimonials"]),
+    community: state.getIn(["selected_community"]),
   };
 }
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-    callTestimonialsForSuperAdmin: reduxGetAllTestimonials,
-    callTestimonialsForNormalAdmin: reduxGetAllCommunityTestimonials
-  }, dispatch);
+  return bindActionCreators(
+    {
+      callTestimonialsForSuperAdmin: reduxGetAllTestimonials,
+      callTestimonialsForNormalAdmin: reduxGetAllCommunityTestimonials,
+    },
+    dispatch
+  );
 }
-const TestimonialsMapped = connect(mapStateToProps, mapDispatchToProps)(AllTestimonials);
+const TestimonialsMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AllTestimonials);
 
 export default withStyles(styles)(TestimonialsMapped);

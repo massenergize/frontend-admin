@@ -220,7 +220,6 @@ class Application extends React.Component {
             exact
           />
           <Route path="/admin/read/actions" component={AllActions} />
-          <Route path="/admin/read/actions" component={AllActions} />
           <Route path="/admin/add/action" component={AddAction} />
           <Route path="/admin/edit/:id/action" component={EditAction} exact />
           <Route path="/admin/add/action/:id" component={EditAction} />

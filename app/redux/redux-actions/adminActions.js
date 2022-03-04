@@ -23,6 +23,8 @@ import {
   LOAD_SEARCHED_IMAGES,
   KEEP_LOADED_IMAGE_INFO,
   LOAD_MODAL_LIBRARY,
+  GET_ADMIN_MESSAGES,
+  GET_TEAM_MESSAGES,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -32,6 +34,14 @@ export const reduxLoadGalleryImages = (data = []) => ({
   payload: data,
 });
 
+export const loadTeamMessages = (data = null) => ({
+  type: GET_TEAM_MESSAGES,
+  payload: data,
+});
+export const loadAllAdminMessages = (data = null) => ({
+  type: GET_ADMIN_MESSAGES,
+  payload: data,
+});
 export const loadAllPolicies = (data = null) => ({
   type: GET_ALL_POLICIES,
   payload: data,

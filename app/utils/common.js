@@ -1,14 +1,27 @@
 /** *
  * All utility Functions
  */
-import qs from 'qs';
+import moment from "moment";
+import qs from "qs";
 
+export const getHumanFriendlyDate = (dateString, includeTime = false) => {
+  if (!dateString) return null;
+  return moment(dateString).format(
+    `MMMM Do YYYY ${includeTime ? "hh:mm a" : ""}`
+  );
+};
+export const smartString = (string, charLimit = 60) => {
+  if (!string) return "";
+  if (!charLimit) return string;
+  if (string.length > charLimit) return string.substr(0, charLimit) + "...";
+  return string;
+};
 /**
  * The function retrieves a particular value from an array , and returns it with the remaining items of the array
- * @param {*} arr 
- * @param {*} value 
+ * @param {*} arr
+ * @param {*} value
  * @param {*} finder  A function that should be used to extract the content to be compared to the "value" parameter  (In case an array of object is passed instead of strings)
- * @returns 
+ * @returns
  */
 export const pop = (arr = [], value, finder) => {
   if (!arr) return [];
@@ -86,16 +99,17 @@ export function downloadFile(file) {
 // TODO: be aware of filter choices
 export const updateFilterChoices = () => {
   return null;
-}
+};
 
 export const getUrlParamsForFilterInputs = (filterChoices) => {
   if (!filterChoices) return "";
   return "";
-}
+};
 
 export const getFilterInputsFromURL = (location) => {
   if (!location || !location.search) return "";
-  const { filterInputs } = qs.parse(location.search, { ignoreQueryPrefix: true });
+  const { filterInputs } = qs.parse(location.search, {
+    ignoreQueryPrefix: true,
+  });
   return filterInputs;
 };
-

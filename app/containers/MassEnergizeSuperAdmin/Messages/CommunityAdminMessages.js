@@ -15,8 +15,11 @@ import messageStyles from 'dan-styles/Messages.scss';
 import { connect } from 'react-redux';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-import { reduxGetAllVendors, reduxGetAllCommunityVendors } from '../../../redux/redux-actions/adminActions';
+import { reduxGetAllVendors, reduxGetAllCommunityVendors, loadAllAdminMessages } from '../../../redux/redux-actions/adminActions';
 import CommunitySwitch from '../Summary/CommunitySwitch';
+import { getHumanFriendlyDate, smartString } from '../../../utils/common';
+import { Chip } from '@material-ui/core';
+import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
 class AllCommunityAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -30,10 +33,7 @@ class AllCommunityAdminMessages extends React.Component {
   async componentDidMount() {
     const allMessagesResponse = await apiCall('/messages.listForCommunityAdmin');
     if (allMessagesResponse && allMessagesResponse.success) {
-      await this.setStateAsync({
-        loading: false,
-        data: this.fashionData(allMessagesResponse.data)
-      });
+      this.props.putMessagesInRedux(allMessagesResponse.data)
     }
   }
 
@@ -57,28 +57,18 @@ class AllCommunityAdminMessages extends React.Component {
   fashionData = (data) => {
     return data.map(d => (
       [
-        d.id,
-        d.created_at,
-        d.title,
-        d.user_name || (d.user && d.user.full_name),
-        d.email || (d.user && d.user.email),
+        getHumanFriendlyDate(d.created_at, true),
+        smartString(d.title,30),
+        d.user_name || (d.user && d.user.full_name) || "",
+        d.email || (d.user && d.user.email) ||"",
         d.community && d.community.name,
-        d.have_replied ? 'Yes' : 'No',
-        d.id
+        d.have_replied,
       ]
     ));
   }
 
 
   getColumns = (classes) => [
-    {
-      name: 'ID',
-      key: 'id',
-      options: {
-        filter: true,
-        filterType: 'textField'
-      }
-    },
     {
       name: 'Date',
       key: 'date',
@@ -122,6 +112,14 @@ class AllCommunityAdminMessages extends React.Component {
       key: 'replied?',
       options: {
         filter: true,
+        customBodyRender: (d) => {
+          return (
+            <Chip
+              label={d ? "Yes" : "No"}
+              className={d ? classes.yesLabel : classes.noLabel}
+            />
+          );
+        },
       }
     },
     {
@@ -144,9 +142,9 @@ class AllCommunityAdminMessages extends React.Component {
   render() {
     const title = brand.name + ' - Community Admin Messages';
     const description = brand.desc;
-    const { columns, data } = this.state;
+    const { columns, loading } = this.state;
     const { classes } = this.props;
-
+    const data = this.fashionData(this.props.messages)
     const options = {
       filterType: 'dropdown',
       responsive: 'stacked',
@@ -160,7 +158,11 @@ class AllCommunityAdminMessages extends React.Component {
         });
       }
     };
+    
 
+    if (loading && (!data || !data.length)) {
+      return <LinearBuffer />;
+    }
 
     return (
       <div>
@@ -192,11 +194,13 @@ AllCommunityAdminMessages.propTypes = {
 function mapStateToProps(state) {
   return {
     auth: state.getIn(['auth']),
-    community: state.getIn(['selected_community'])
+    community: state.getIn(['selected_community']),
+    messages: state.getIn(["messages"])
   };
 }
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
+    putMessagesInRedux: loadAllAdminMessages
   }, dispatch);
 }
 const VendorsMapped = connect(mapStateToProps, mapDispatchToProps)(AllCommunityAdminMessages);

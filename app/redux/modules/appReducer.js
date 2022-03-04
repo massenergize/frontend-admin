@@ -21,6 +21,8 @@ import {
   LOAD_SEARCHED_IMAGES,
   KEEP_LOADED_IMAGE_INFO,
   LOAD_MODAL_LIBRARY,
+  GET_ADMIN_MESSAGES,
+  GET_TEAM_MESSAGES,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -38,6 +40,24 @@ export default function reducer(state = initialImmutableState, action = {}) {
   }
 }
 
+export const teamMessagesReducer = (state = [], action = {}) => {
+  switch (action.type) {
+    case GET_TEAM_MESSAGES:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+export const adminMessagesReducer = (state = [], action = {}) => {
+  switch (action.type) {
+    case GET_ADMIN_MESSAGES:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
 export const modalLibraryReducer = (state = {}, action = {}) => {
   switch (action.type) {
     case LOAD_MODAL_LIBRARY:
