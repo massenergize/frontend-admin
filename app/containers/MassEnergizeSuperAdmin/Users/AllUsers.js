@@ -1,15 +1,18 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import { Helmet } from 'react-helmet';
-import brand from 'dan-api/dummy/brand';
-import Typography from '@material-ui/core/Typography';
-import Avatar from '@material-ui/core/Avatar';
-import { bindActionCreators } from 'redux';
-import MUIDataTable from 'mui-datatables';
-import { connect } from 'react-redux';
-import { apiCall } from '../../../utils/messenger';
-import styles from '../../../components/Widget/widget-jss';
+import React from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import { Helmet } from "react-helmet";
+import brand from "dan-api/dummy/brand";
+import Typography from "@material-ui/core/Typography";
+import Avatar from "@material-ui/core/Avatar";
+import { bindActionCreators } from "redux";
+import MUIDataTable from "mui-datatables";
+import { connect } from "react-redux";
+import { apiCall } from "../../../utils/messenger";
+import styles from "../../../components/Widget/widget-jss";
+import { loadAllUsers } from "../../../redux/redux-actions/adminActions";
+import { getHumanFriendlyDate, smartString } from "../../../utils/common";
+import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 
 class AllUsers extends React.Component {
   constructor(props) {
@@ -17,20 +20,20 @@ class AllUsers extends React.Component {
     this.state = {
       data: [],
       loading: true,
-      columns: this.getColumns(props.classes)
+      columns: this.getColumns(props.classes),
     };
   }
 
   async componentDidMount() {
-    const allUsersResponse = await apiCall('/users.listForCommunityAdmin');
+    const allUsersResponse = await apiCall("/users.listForCommunityAdmin");
     if (allUsersResponse && allUsersResponse.success) {
+      this.props.putUsersInRedux(allUsersResponse.data);
       await this.setStateAsync({
         loading: false,
-        data: this.fashionData(allUsersResponse.data)
+        // data: this.fashionData(allUsersResponse.data)
       });
-    }
+    } else this.setState({ loading: false });
   }
-
 
   setStateAsync(state) {
     return new Promise((resolve) => {
@@ -38,91 +41,94 @@ class AllUsers extends React.Component {
     });
   }
 
-
   fashionData = (data) => {
-    return data.map(d => (
-      [
-        d.full_name,
-        d.joined,        
-        d.preferred_name,
-        d.email,
-        `${d.communities.join(', ')} `,
-        d.is_super_admin ? 'Super Admin' : d.is_community_admin ? 'Community Admin' : 'Member',
-        d.id,
-      ]
-    ));
-  }
+    return data.map((d) => [
+      d.full_name,
+      getHumanFriendlyDate(d.joined),
+      d.preferred_name,
+      d.email,
+      smartString(d.communities.join(", "), 30),
+      d.is_super_admin
+        ? "Super Admin"
+        : d.is_community_admin
+        ? "Community Admin"
+        : "Member",
+      d.id,
+    ]);
+  };
 
   getColumns = (classes) => [
     {
-      name: 'Full Name',
-      key: 'full_name',
+      name: "Full Name",
+      key: "full_name",
       options: {
         filter: true,
-      }
+      },
     },
     {
-      name: 'Joined',
-      key: 'joined',
+      name: "Joined",
+      key: "joined",
       options: {
         filter: true,
-        filterType: 'textField'
-      }
+        filterType: "textField",
+      },
     },
     {
-      name: 'Preferred Name',
-      key: 'preferred_name',
+      name: "Preferred Name",
+      key: "preferred_name",
       options: {
         filter: true,
-      }
+      },
     },
     {
-      name: 'Email',
-      key: 'email',
+      name: "Email",
+      key: "email",
       options: {
         filter: true,
-        filterType: 'textField'
-      }
+        filterType: "textField",
+      },
     },
     {
-      name: 'Community',
-      key: 'community',
+      name: "Community",
+      key: "community",
       options: {
         filter: true,
-        filterType: 'textField'
-      }
-    },    
+        filterType: "textField",
+      },
+    },
     {
-      name: 'Membership',
-      key: 'status',
+      name: "Membership",
+      key: "status",
       options: {
         filter: true,
-      }
-    }
-  ]
+      },
+    },
+  ];
 
   render() {
-    const title = brand.name + ' - Users';
+    const title = brand.name + " - Users";
     const description = brand.desc;
-    const { columns, data } = this.state;
+    const { columns, loading } = this.state;
     const { classes } = this.props;
-
+    const data = this.fashionData(this.props.allUsers);
     const options = {
-      filterType: 'dropdown',
-      responsive: 'stacked',
+      filterType: "dropdown",
+      responsive: "stacked",
       print: true,
-      rowsPerPage: 100,
+      rowsPerPage: 50,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach(d => {
-          const idField = data[d.dataIndex].length - 1
+        idsToDelete.forEach((d) => {
+          const idField = data[d.dataIndex].length - 1;
           const userId = data[d.dataIndex][idField];
-          apiCall('/users.delete', { id: userId });
+          apiCall("/users.delete", { id: userId });
         });
-      }
+      },
     };
 
-
+    if (loading && (!data || !data.length)) {
+      return <LinearBuffer />;
+    }
     return (
       <div>
         <Helmet>
@@ -141,7 +147,6 @@ class AllUsers extends React.Component {
             options={options}
           />
         </div>
-
       </div>
     );
   }
@@ -152,14 +157,22 @@ AllUsers.propTypes = {
 };
 function mapStateToProps(state) {
   return {
-    auth: state.getIn(['auth']),
-    community: state.getIn(['selected_community'])
+    auth: state.getIn(["auth"]),
+    community: state.getIn(["selected_community"]),
+    allUsers: state.getIn(["allUsers"]),
   };
 }
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-  }, dispatch);
+  return bindActionCreators(
+    {
+      putUsersInRedux: loadAllUsers,
+    },
+    dispatch
+  );
 }
-const VendorsMapped = connect(mapStateToProps, mapDispatchToProps)(AllUsers);
+const VendorsMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AllUsers);
 
 export default withStyles(styles)(VendorsMapped);

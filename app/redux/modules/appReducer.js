@@ -23,6 +23,7 @@ import {
   LOAD_MODAL_LIBRARY,
   GET_ADMIN_MESSAGES,
   GET_TEAM_MESSAGES,
+  GET_ALL_SUBSCRIBERS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -40,6 +41,15 @@ export default function reducer(state = initialImmutableState, action = {}) {
   }
 }
 
+export const subscribersReducer = (state = [], action = {}) => {
+  switch (action.type) {
+    case GET_ALL_SUBSCRIBERS:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
 export const teamMessagesReducer = (state = [], action = {}) => {
   switch (action.type) {
     case GET_TEAM_MESSAGES:

@@ -16,6 +16,8 @@ import { connect } from 'react-redux';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
 import CommunitySwitch from '../Summary/CommunitySwitch';
+import { loadAllSubscribers } from '../../../redux/redux-actions/adminActions';
+import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
 
 
 class AllSubscribers extends React.Component {
@@ -36,8 +38,7 @@ class AllSubscribers extends React.Component {
     }
 
     if (allSubscribersResponse && allSubscribersResponse.data) {
-      const { data } = allSubscribersResponse;
-      await this.setStateAsync({ data, dataFiltered: data });
+      this.props.putSubscribersInRedux(allSubscribersResponse.data)
     }
 
     await this.setStateAsync({ loading: false });
@@ -124,9 +125,9 @@ class AllSubscribers extends React.Component {
   render() {
     const title = brand.name + ' - All Subscribers';
     const description = brand.desc;
-    const { columns, dataFiltered } = this.state;
+    const { columns, dataFiltered, loading } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(dataFiltered);
+    const data = this.fashionData(this.props.subscribers);
 
     const options = {
       filterType: 'dropdown',
@@ -141,6 +142,9 @@ class AllSubscribers extends React.Component {
         });
       }
     };
+    if (loading && (!data || !data.length)) {
+      return <LinearBuffer />;
+    }
 
     return (
       <div>
@@ -173,11 +177,13 @@ function mapStateToProps(state) {
   return {
     auth: state.getIn(['auth']),
     allVendors: state.getIn(['allVendors']),
-    community: state.getIn(['selected_community'])
+    community: state.getIn(['selected_community']),
+    subscribers: state.getIn(['subscribers'])
   };
 }
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
+    putSubscribersInRedux: loadAllSubscribers
   }, dispatch);
 }
 const VendorsMapped = connect(mapStateToProps, mapDispatchToProps)(AllSubscribers);

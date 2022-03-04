@@ -34,6 +34,7 @@ import app, {
   modalLibraryReducer,
   adminMessagesReducer,
   teamMessagesReducer,
+  subscribersReducer,
 } from "./modules/appReducer";
 
 /**
@@ -41,6 +42,7 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    subscribers: subscribersReducer,
     teamMessages: teamMessagesReducer,
     messages: adminMessagesReducer,
     galleryImages: galleryImagesReducer,
