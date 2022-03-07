@@ -25,6 +25,7 @@ import {
   LOAD_MODAL_LIBRARY,
   GET_ADMIN_MESSAGES,
   GET_TEAM_MESSAGES,
+  UPDATE_HEAP,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -101,6 +102,10 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadAllVendors(vendors.data));
   });
 };
+export const reduxUpdateHeap = (heap ={}) => ({
+  type: UPDATE_HEAP,
+  payload: heap,
+});
 export const reduxLoadGalleryImages = (data = []) => ({
   type: LOAD_GALLERY_IMAGES,
   payload: data,

@@ -22,6 +22,7 @@ import styles from "../../../components/Widget/widget-jss";
 import {
   reduxGetAllTeams,
   reduxGetAllCommunityTeams,
+  reduxUpdateHeap,
 } from "../../../redux/redux-actions/adminActions";
 import { apiCall, apiCallFile } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
@@ -47,7 +48,7 @@ class TeamMembers extends React.Component {
     this.state = {
       data: [],
       loading: true,
-      team: null,
+      team: undefined,
       columns: this.getColumns(),
       value: 0,
       error: null,
@@ -78,8 +79,19 @@ class TeamMembers extends React.Component {
     this.setState({ loadingCSVs: oldLoadingCSVs });
   }
 
+  static getDerivedStateFromProps(props, state) {
+    const { teams, match, members } = props;
+    const { id } = match.params;
+    if (state.team === undefined) {
+      const team = (teams || []).find((t) => t.id === id);
+      return { team, allTeamMembers: (members || {})[id] };
+    }
+
+    return null;
+  }
   async componentDidMount() {
     const { id } = this.props.match.params;
+    const { heap, addToHeap } = this.props;
     const teamResponse = await apiCall("/teams.info", { team_id: id });
     if (teamResponse && teamResponse.data) {
       const team = teamResponse.data;
@@ -94,6 +106,10 @@ class TeamMembers extends React.Component {
         loading: false,
         allTeamMembers: allTeamMembersResponse.data,
         data: this.fashionData(allTeamMembersResponse.data),
+      });
+      addToHeap({
+        ...heap,
+        teamMembers: { [id]: allTeamMembersResponse.data },
       });
     }
 
@@ -321,9 +337,13 @@ TeamMembers.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 function mapStateToProps(state) {
+  const heap = state.getIn(["heap"]);
   return {
+    teams: state.getIn(["allTeams"]),
     auth: state.getIn(["auth"]),
     community: state.getIn(["selected_community"]),
+    members: (heap && heap.teamMembers) || {},
+    heap,
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -331,6 +351,7 @@ function mapDispatchToProps(dispatch) {
     {
       callTeamsForSuperAdmin: reduxGetAllTeams,
       callTeamsForNormalAdmin: reduxGetAllCommunityTeams,
+      addToHeap: reduxUpdateHeap,
     },
     dispatch
   );

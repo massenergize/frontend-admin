@@ -24,6 +24,7 @@ import {
   GET_ADMIN_MESSAGES,
   GET_TEAM_MESSAGES,
   GET_ALL_SUBSCRIBERS,
+  UPDATE_HEAP,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -41,6 +42,15 @@ export default function reducer(state = initialImmutableState, action = {}) {
   }
 }
 
+export const reducerForHeap = (state = {}, action = {}) => {
+  switch (action.type) {
+    case UPDATE_HEAP:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
 export const subscribersReducer = (state = [], action = {}) => {
   switch (action.type) {
     case GET_ALL_SUBSCRIBERS:
