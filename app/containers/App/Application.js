@@ -8,6 +8,7 @@ import {
   reduxCallCommunities,
   reduxCallLibraryModalImages,
   reduxCheckUser,
+  reduxFetchInitialContent,
 } from "../../redux/redux-actions/adminActions";
 import {
   Parent,
@@ -82,6 +83,9 @@ import EventRSVPs from "../MassEnergizeSuperAdmin/Events/EventRSVPs";
 class Application extends React.Component {
   componentWillMount() {
     this.props.reduxCallCommunities();
+  }
+  componentDidMount() {
+    this.props.fetchInitialContent(this.props.auth);
   }
 
   getCommunityList() {
@@ -163,12 +167,12 @@ class Application extends React.Component {
           <Route exact path="/blank" component={BlankPage} />
           <Route path="/admin/read/users" component={UsersList} />
           <Route
-            path="/admin/read/community_admin_messages"
+            path="/admin/read/community-admin-messages"
             exact
             component={CommunityAdminMessages}
           />
           <Route
-            path="/admin/read/team_admin_messages"
+            path="/admin/read/team-admin-messages"
             exact
             component={TeamAdminMessages}
           />
@@ -290,7 +294,10 @@ class Application extends React.Component {
           <Route path="/admin/edit/:id/vendors" component={VendorsPage} />
           <Route path="/admin/edit/:id/signin" component={SigninPage} />
           <Route path="/admin/edit/:id/registration" component={RegisterPage} />
-          <Route path="/admin/edit/:id/testimonials" component={TestimonialsPage} />
+          <Route
+            path="/admin/edit/:id/testimonials"
+            component={TestimonialsPage}
+          />
           <Route path="/admin/edit/:id/contact_us" component={SuperContactUs} />
           <Route path="/admin/edit/:id/donate" component={SuperDonate} />
           <Route path="/admin/edit/:id/about" component={SuperAboutUs} />
@@ -299,7 +306,7 @@ class Application extends React.Component {
           <Route path="/admin/add/donate" component={SuperDonate} />
           <Route path="/admin/read/contact-us" component={SuperContactUs} />
           <Route path="/admin/read/all-actions" component={SuperAllActions} />
-           <Route exact path="/admin/gallery/" component={GalleryPage} />
+          <Route exact path="/admin/gallery/" component={GalleryPage} />
           <Route exact path="/admin/gallery/add" component={AddToGallery} />
           <Route component={NotFound} />
         </Switch>
@@ -325,6 +332,7 @@ function mapDispatchToProps(dispatch) {
       reduxCallCommunities,
       checkUser: reduxCheckUser,
       loadModalImages: reduxCallLibraryModalImages,
+      fetchInitialContent: reduxFetchInitialContent,
     },
     dispatch
   );

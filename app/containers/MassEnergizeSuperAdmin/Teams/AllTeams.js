@@ -85,6 +85,8 @@ class AllTeams extends React.Component {
       d.primary_community && d.primary_community.name,
       smartString(d.parent && d.parent.name, 30),
       d.is_published,
+      d.id, 
+      d.id
     ]);
     return fashioned;
   };
@@ -163,7 +165,7 @@ class AllTeams extends React.Component {
           filter: false,
           download: false,
           customBodyRender: (id) => (
-            <Link to={`/admin/edit/${id}/team_members`} target="_blank">
+            <Link to={`/admin/edit/${id}/team_members`}>
               <PeopleIcon size="small" variant="outlined" color="secondary" />
             </Link>
           ),

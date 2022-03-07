@@ -25,7 +25,11 @@ class AllUsers extends React.Component {
   }
 
   async componentDidMount() {
-    const allUsersResponse = await apiCall("/users.listForCommunityAdmin");
+    const { auth } = this.props;
+    var url; 
+    if(auth.is_super_admin) url = "/users.listForSuperAdmin"; 
+    else if ( auth.is_community_admin) url = "/users.listForCommunityAdmin"
+    const allUsersResponse = await apiCall(url);
     if (allUsersResponse && allUsersResponse.success) {
       this.props.putUsersInRedux(allUsersResponse.data);
       await this.setStateAsync({

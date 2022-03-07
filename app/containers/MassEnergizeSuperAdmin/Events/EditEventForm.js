@@ -566,7 +566,7 @@ class EditEventForm extends Component {
       );
     return (
       <div>
-        <Paper style={{ padding: 20 }}>
+        <Paper style={{ padding: 20, marginBottom:15 }}>
           <Typography>
             Would you like to see a list of users who have RSVP-ed for this
             event?

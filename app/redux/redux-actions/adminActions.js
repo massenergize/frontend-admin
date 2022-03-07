@@ -29,6 +29,78 @@ import {
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
 
+export const reduxFetchInitialContent = (auth) => (dispatch) => {
+  if (!auth) return;
+  const isSuperAdmin = auth && auth.is_super_admin;
+  Promise.all([
+    apiCall(
+      isSuperAdmin
+        ? "/communities.listForSuperAdmin"
+        : "/communities.listForCommunityAdmin"
+    ),
+    apiCall(
+      isSuperAdmin
+        ? "/actions.listForSuperAdmin"
+        : "/actions.listForCommunityAdmin"
+    ),
+    apiCall(
+      isSuperAdmin
+        ? "/events.listForSuperAdmin"
+        : "/events.listForCommunityAdmin"
+    ),
+    apiCall(
+      isSuperAdmin
+        ? "/messages.listForSuperAdmin"
+        : "/messages.listForCommunityAdmin"
+    ),
+    apiCall("/messages.listTeamAdminMessages"),
+    apiCall(
+      isSuperAdmin ? "/teams.listForSuperAdmin" : "/teams.listForCommunityAdmin"
+    ),
+    apiCall(
+      isSuperAdmin
+        ? "/subscribers.listForSuperAdmin"
+        : "/subscribers.listForCommunityAdmin"
+    ),
+    apiCall(
+      isSuperAdmin
+        ? "/testimonials.listForSuperAdmin"
+        : "/testimonials.listForCommunityAdmin"
+    ),
+    apiCall(
+      isSuperAdmin ? "/users.listForSuperAdmin" : "/users.listForCommunityAdmin"
+    ),
+    apiCall(
+      isSuperAdmin
+        ? "/vendors.listForSuperAdmin"
+        : "/vendors.listForCommunityAdmin"
+    ),
+  ]).then((response) => {
+    const [
+      communities,
+      actions,
+      events,
+      messages,
+      teamMessages,
+      teams,
+      subscribers,
+      testimonials,
+      users,
+      vendors,
+    ] = response;
+
+    dispatch(reduxLoadAllCommunities(communities.data));
+    dispatch(loadAllActions(actions.data));
+    dispatch(loadAllEvents(events.data));
+    dispatch(loadAllVendors(messages.data));
+    dispatch(loadTeamMessages(teamMessages.data));
+    dispatch(loadAllTeams(teams.data));
+    dispatch(loadAllSubscribers(subscribers.data));
+    dispatch(loadAllTestimonials(testimonials.data));
+    dispatch(loadAllUsers(users.data));
+    dispatch(loadAllVendors(vendors.data));
+  });
+};
 export const reduxLoadGalleryImages = (data = []) => ({
   type: LOAD_GALLERY_IMAGES,
   payload: data,
@@ -241,7 +313,7 @@ export const reduxGetAllCommunityEvents = (community_id) => (dispatch) => {
 };
 
 export const reduxGetAllVendors = () => (dispatch) => {
-  apiCall("/vendors.listForCommunityAdmin").then((response) => {
+  apiCall("/vendors.listForSuperAdmin").then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllVendors(response.data));
@@ -307,7 +379,7 @@ export const reduxGetAllUsers = () => (dispatch) => {
 };
 
 export const reduxGetAllTestimonials = () => (dispatch) => {
-  apiCall("/testimonials.listForCommunityAdmin").then((response) => {
+  apiCall("/testimonials.listForSuperAdmin").then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllTestimonials(response.data));
@@ -342,7 +414,7 @@ export const reduxGetAllTags = () => (dispatch) => {
 };
 
 export const reduxGetAllActions = () => (dispatch) => {
-  console.log("reduxGetAllActions calls actions.listForCommunityAdmin")
+  console.log("reduxGetAllActions calls actions.listForCommunityAdmin");
   apiCall("/actions.listForCommunityAdmin").then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
@@ -400,7 +472,7 @@ export const reduxCallLibraryModalImages = (props) => {
     requestBody = { ...requestBody, upper_limit: old.upper_limit };
   if (old.lower_limit)
     requestBody = { ...requestBody, lower_limit: old.lower_limit };
-    
+
   return (dispatch) => {
     apiCall("/gallery.fetch", requestBody)
       .then((response) => {

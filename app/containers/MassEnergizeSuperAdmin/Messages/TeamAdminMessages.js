@@ -55,6 +55,7 @@ class AllTeamAdminMessages extends React.Component {
       d.community && d.community.name,
       d.team && d.team.name,
       d.have_forwarded,
+      d.id
     ]);
   };
 
@@ -128,7 +129,7 @@ class AllTeamAdminMessages extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/message`} target="_blank">
+            <Link to={`/admin/edit/${id}/message`}>
               <DetailsIcon size="small" variant="outlined" color="secondary" />
             </Link>
           </div>

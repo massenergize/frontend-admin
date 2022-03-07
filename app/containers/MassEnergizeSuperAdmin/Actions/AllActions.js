@@ -9,7 +9,7 @@ import { withStyles } from "@material-ui/core/styles";
 import MUIDataTable from "mui-datatables";
 import FileCopy from "@material-ui/icons/FileCopy";
 import EditIcon from "@material-ui/icons/Edit";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
 import TextField from "@material-ui/core/TextField";
 
@@ -39,8 +39,11 @@ class AllActions extends React.Component {
   }
 
   async componentDidMount() {
-    const { putActionsInRedux } = this.props;
-    const allActionsResponse = await apiCall("/actions.listForCommunityAdmin");
+    const { putActionsInRedux, auth } = this.props;
+    var url;
+    if (auth.is_super_admin) url = "/actions.listForSuperAdmin";
+    else if (auth.is_community_admin) url = "/actions.listForCommunityAdmin";
+    const allActionsResponse = await apiCall(url);
     if (allActionsResponse && allActionsResponse.success) {
       putActionsInRedux(allActionsResponse.data);
     } else if (allActionsResponse && !allActionsResponse.success) {
@@ -172,7 +175,7 @@ class AllActions extends React.Component {
           download: false,
           customBodyRender: (id) => (
             <div>
-              <Link to={`/admin/edit/${id}/action`} target="_blank">
+              <Link to={`/admin/edit/${id}/action`}>
                 <EditIcon size="small" variant="outlined" color="secondary" />
               </Link>
               &nbsp;&nbsp;
@@ -184,7 +187,9 @@ class AllActions extends React.Component {
                   if (copiedActionResponse && copiedActionResponse.success) {
                     const newAction =
                       copiedActionResponse && copiedActionResponse.data;
-                    window.location.href = `/admin/edit/${newAction.id}/action`;
+                    this.props.history.push(
+                      `/admin/edit/${newAction.id}/action`
+                    );
                   }
                 }}
                 to="/admin/read/actions"
@@ -220,7 +225,6 @@ class AllActions extends React.Component {
     const description = brand.desc;
     const { classes } = this.props;
     const { columns, loading, error } = this.state;
-    const { allActions } = this.props;
     const data = this.fashionData(this.props.allActions);
     if (loading && (!data || !data.length)) {
       return <LinearBuffer />;
@@ -292,4 +296,4 @@ const ActionsMapped = connect(
   mapStateToProps,
   mapDispatchToProps
 )(AllActions);
-export default withStyles(styles)(ActionsMapped);
+export default withStyles(styles)(withRouter(ActionsMapped));

@@ -31,7 +31,12 @@ class AllCommunityAdminMessages extends React.Component {
   }
 
   async componentDidMount() {
-    const allMessagesResponse = await apiCall('/messages.listForCommunityAdmin');
+    const { auth } = this.props;
+    var url; 
+    if(auth.is_super_admin) url = "/messages.listForSuperAdmin"; 
+    else if (auth.is_community_admin) url = "/messages.listForCommunityAdmin";
+   
+    const allMessagesResponse = await apiCall(url);
     if (allMessagesResponse && allMessagesResponse.success) {
       this.props.putMessagesInRedux(allMessagesResponse.data)
     }
@@ -63,6 +68,7 @@ class AllCommunityAdminMessages extends React.Component {
         d.email || (d.user && d.user.email) ||"",
         d.community && d.community.name,
         d.have_replied,
+        d.id
       ]
     ));
   }
@@ -130,7 +136,7 @@ class AllCommunityAdminMessages extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/message`} target="_blank">
+            <Link to={`/admin/edit/${id}/message`}>
               <DetailsIcon size="small" variant="outlined" color="secondary" />
             </Link>
           </div>

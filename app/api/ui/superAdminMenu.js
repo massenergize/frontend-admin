@@ -84,12 +84,12 @@ module.exports = [
       {
         key: "all-team-admin-messages",
         name: "Team Admin Messages",
-        link: "/admin/read/team_admin_messages",
+        link: "/admin/read/team-admin-messages",
       },
       {
         key: "all-community-admin-messages",
         name: "Community Admin Messages",
-        link: "/admin/read/community_admin_messages",
+        link: "/admin/read/community-admin-messages",
       },
     ],
   },

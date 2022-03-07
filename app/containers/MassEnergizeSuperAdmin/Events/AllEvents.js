@@ -7,7 +7,7 @@ import brand from "dan-api/dummy/brand";
 import MUIDataTable from "mui-datatables";
 import FileCopy from "@material-ui/icons/FileCopy";
 import EditIcon from "@material-ui/icons/Edit";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
 
 import Paper from "@material-ui/core/Paper";
@@ -144,7 +144,7 @@ class AllEvents extends React.Component {
           download: false,
           customBodyRender: (id) => (
             <div>
-              <Link to={`/admin/edit/${id}/event`} target="_blank">
+              <Link to={`/admin/edit/${id}/event`}>
                 <EditIcon size="small" variant="outlined" color="secondary" />
               </Link>
               &nbsp;&nbsp;
@@ -156,7 +156,7 @@ class AllEvents extends React.Component {
                   if (copiedEventResponse && copiedEventResponse.success) {
                     const newEvent =
                       copiedEventResponse && copiedEventResponse.data;
-                    window.location.href = `/admin/edit/${newEvent.id}/event`;
+                    this.props.history.push(`/admin/edit/${newEvent.id}/event`);
                   }
                 }}
                 to="/admin/read/events"
@@ -262,4 +262,4 @@ const EventsMapped = connect(
   mapStateToProps,
   mapDispatchToProps
 )(AllEvents);
-export default withStyles(styles)(EventsMapped);
+export default withStyles(styles)(withRouter(EventsMapped));

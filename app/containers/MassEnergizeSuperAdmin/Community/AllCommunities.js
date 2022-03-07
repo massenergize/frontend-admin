@@ -31,9 +31,12 @@ class AllCommunities extends React.Component {
   }
 
   async componentDidMount() {
-    const allCommunitiesResponse = await apiCall(
-      "/communities.listForCommunityAdmin"
-    );
+    const { auth } = this.props;
+    var url;
+    if (auth.is_super_admin) url = "/communities.listForSuperAdmin";
+    else if (auth.is_community_admin)
+      url = "/communities.listForCommunityAdmin";
+    const allCommunitiesResponse = await apiCall(url);
 
     if (allCommunitiesResponse && allCommunitiesResponse.success) {
       this.props.putCommunitiesInRedux(allCommunitiesResponse.data);
@@ -68,6 +71,7 @@ class AllCommunities extends React.Component {
             ? "Geographically Focused"
             : "Geographically Dispersed"
         }`,
+        d.id,
       ])
     );
   }
@@ -239,6 +243,7 @@ AllCommunities.propTypes = {
 const mapStateToProps = (state) => {
   return {
     communities: state.getIn(["communities"]),
+    auth: state.getIn(["auth"]),
   };
 };
 

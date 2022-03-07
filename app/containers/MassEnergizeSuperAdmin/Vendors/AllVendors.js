@@ -10,7 +10,7 @@ import { bindActionCreators } from "redux";
 import MUIDataTable from "mui-datatables";
 import FileCopy from "@material-ui/icons/FileCopy";
 import EditIcon from "@material-ui/icons/Edit";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 
 import Email from "@material-ui/icons/Email";
 import messageStyles from "dan-styles/Messages.scss";
@@ -55,7 +55,12 @@ class AllVendors extends React.Component {
         initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`,
       },
       smartString(d.name), // limit to first 30 chars
-      d.key_contact, // limit to first 20 chars
+      smartString(
+        `${(d.key_contact && d.key_contact.name) || ""} (${(d.key_contact &&
+          d.key_contact.email) ||
+          ""})`,
+        40
+      ), // limit to first 20 chars
       smartString(
         d.communities &&
           d.communities
@@ -65,6 +70,7 @@ class AllVendors extends React.Component {
         30
       ),
       d.service_area,
+      d.id,
       d.id,
     ]);
     return data;
@@ -121,23 +127,6 @@ class AllVendors extends React.Component {
       key: "key_contact",
       options: {
         filter: false,
-        customBodyRender: (n) => (
-          <div className={classes.flex}>
-            <div>
-              <Typography variant="small">{n && n.name}</Typography>
-              <Typography variant="caption">
-                <a
-                  href={`mailto:${n && n.email}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={classes.downloadInvoice}
-                >
-                  {n && n.email}
-                </a>
-              </Typography>
-            </div>
-          </div>
-        ),
       },
     },
     {
@@ -163,7 +152,7 @@ class AllVendors extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/vendor`} target="_blank">
+            <Link to={`/admin/edit/${id}/vendor`} >
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
             &nbsp;&nbsp;
@@ -175,7 +164,7 @@ class AllVendors extends React.Component {
                 if (copiedVendorResponse && copiedVendorResponse.success) {
                   const newVendor =
                     copiedVendorResponse && copiedVendorResponse.data;
-                  window.location.href = `/admin/edit/${newVendor.id}/vendor`;
+                  this.props.history.push(`/admin/edit/${newVendor.id}/vendor`);
                 }
               }}
               to="/admin/read/vendors"
@@ -260,4 +249,4 @@ const VendorsMapped = connect(
   mapDispatchToProps
 )(AllVendors);
 
-export default withStyles(styles)(VendorsMapped);
+export default withStyles(styles)(withRouter(VendorsMapped));

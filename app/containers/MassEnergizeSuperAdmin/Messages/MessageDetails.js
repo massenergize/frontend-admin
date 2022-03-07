@@ -78,7 +78,7 @@ class MessageDetails extends Component {
       title: 'Reply to Message',
       subTitle: '',
       method: '/messages.replyFromCommunityAdmin',
-      successRedirectPage: pathname || '/admin/read/community_admin_messages',
+      successRedirectPage: pathname || '/admin/read/community-admin-messages',
       fields: [
         {
           name: 'ID',
@@ -147,7 +147,7 @@ class MessageDetails extends Component {
       title: 'Forward to Team Admins',
       subTitle: '',
       method: '/messages.forwardToTeamAdmins',
-      successRedirectPage: pathname || '/admin/read/team_admin_messages',
+      successRedirectPage: pathname || '/admin/read/team-admin-messages',
       fields: [
         {
           name: 'ID',
