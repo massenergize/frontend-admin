@@ -160,12 +160,12 @@ class AllTeams extends React.Component {
       },
       {
         name: "Team Members",
-        key: "team_members",
+        key: "team-members",
         options: {
           filter: false,
           download: false,
           customBodyRender: (id) => (
-            <Link to={`/admin/edit/${id}/team_members`}>
+            <Link to={`/admin/edit/${id}/team-members`}>
               <PeopleIcon size="small" variant="outlined" color="secondary" />
             </Link>
           ),

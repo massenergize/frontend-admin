@@ -299,13 +299,14 @@ export const reduxGetAllCommunityUsers = (community_id) => (dispatch) => {
   return { type: "DO_NOTHING", payload: null };
 };
 
-export const reduxGetAllCommunityEvents = (community_id) => (dispatch) => {
+export const reduxGetAllCommunityEvents = (community_id, cb) => (dispatch) => {
   apiCall("/events.listForCommunityAdmin", { community_id }).then(
     (response) => {
       if (response && response.success) {
         redirectIfExpired(response);
         dispatch(loadAllEvents(response.data));
       }
+      cb && cb();
       return { type: "DO_NOTHING", payload: null };
     }
   );
@@ -356,12 +357,13 @@ export const reduxGetAllPolicies = () => (dispatch) => {
   return { type: "DO_NOTHING", payload: null };
 };
 
-export const reduxGetAllEvents = () => (dispatch) => {
+export const reduxGetAllEvents = (cb) => (dispatch) => {
   apiCall("/events.listForCommunityAdmin").then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllEvents(response.data));
     }
+    cb && cb();
     return { type: "DO_NOTHING", payload: null };
   });
   return { type: "DO_NOTHING", payload: null };

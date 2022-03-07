@@ -31,17 +31,20 @@ class AllEvents extends React.Component {
     this.state = { data: [], loading: true, columns: this.getColumns() };
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const user = this.props.auth ? this.props.auth : {};
     const community = this.props.community ? this.props.community : {};
     if (user.is_super_admin) {
-      this.props.callForSuperAdminEvents();
+      this.props.callForSuperAdminEvents(() =>
+        this.setState({ loading: false })
+      );
     }
     if (user.is_community_admin) {
       let com = community || user.admin_at[0];
-      this.props.callForNormalAdminEvents(com.id);
+      this.props.callForNormalAdminEvents(com.id, () =>
+        this.setState({ loading: false })
+      );
     }
-    await this.setStateAsync({ loading: false });
   }
 
   setStateAsync(state) {

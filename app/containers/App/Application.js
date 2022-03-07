@@ -255,7 +255,7 @@ class Application extends React.Component {
           <Route path="/admin/read/teams" exact component={AllTeams} />
           <Route path="/admin/add/team" component={AddTeam} />
           <Route path="/admin/edit/:id/team" component={EditTeam} />
-          <Route path="/admin/edit/:id/team_members" component={TeamMembers} />
+          <Route path="/admin/edit/:id/team-members" component={TeamMembers} />
           <Route path="/admin/read/subscribers" component={AllSubscribers} />
           <Route path="/admin/read/policies" component={AllPolicies} />
           <Route path="/admin/add/policy" component={AddPolicy} />

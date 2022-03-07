@@ -215,7 +215,7 @@ class EditTeam extends Component {
     return (
       <div>
         <Paper>
-          <Link to={`/admin/edit/${team && team.id}/team_members`}>Team Members and Admins</Link>
+          <Link to={`/admin/edit/${team && team.id}/team-members`}>Team Members and Admins</Link>
         </Paper>
 
 

@@ -19,6 +19,9 @@ const tableLabel = {
   height: 21,
 };
 const styles = (theme) => ({
+  tableShadowReset: { 
+    boxShadow:"0px 0px !important",
+  },
   yesLabel: {
     ...tableLabel,
   },

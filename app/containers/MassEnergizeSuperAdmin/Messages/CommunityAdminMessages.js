@@ -201,7 +201,8 @@ function mapStateToProps(state) {
   return {
     auth: state.getIn(['auth']),
     community: state.getIn(['selected_community']),
-    messages: state.getIn(["messages"])
+    messages: state.getIn(["messages"]), 
+    teamMessages:state.getIn(["messages"]), 
   };
 }
 function mapDispatchToProps(dispatch) {
