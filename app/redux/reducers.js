@@ -36,6 +36,7 @@ import app, {
   teamMessagesReducer,
   subscribersReducer,
   reducerForHeap,
+  reducerForCCAction,
 } from "./modules/appReducer";
 
 /**
@@ -43,6 +44,7 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    ccActions: reducerForCCAction,
     heap:reducerForHeap,
     subscribers: subscribersReducer,
     teamMessages: teamMessagesReducer,

@@ -26,6 +26,7 @@ import {
   GET_ADMIN_MESSAGES,
   GET_TEAM_MESSAGES,
   UPDATE_HEAP,
+  LOAD_CC_ACTIONS,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -76,6 +77,12 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
         ? "/vendors.listForSuperAdmin"
         : "/vendors.listForCommunityAdmin"
     ),
+    apiCall("/cc/info/actions"),
+    apiCall(
+      isSuperAdmin
+        ? "/tag_collections.listForSuperAdmin"
+        : "/tag_collections.listForCommunityAdmin"
+    ),
   ]).then((response) => {
     const [
       communities,
@@ -88,6 +95,8 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       testimonials,
       users,
       vendors,
+      ccActions,
+      tagCollections
     ] = response;
 
     dispatch(reduxLoadAllCommunities(communities.data));
@@ -100,9 +109,15 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadAllTestimonials(testimonials.data));
     dispatch(loadAllUsers(users.data));
     dispatch(loadAllVendors(vendors.data));
+    dispatch(reduxLoadCCActions(ccActions.data.actions));
+    dispatch(loadAllTags(tagCollections.data));
   });
 };
-export const reduxUpdateHeap = (heap ={}) => ({
+export const reduxLoadCCActions = (data = []) => ({
+  type: LOAD_CC_ACTIONS,
+  payload: data,
+});
+export const reduxUpdateHeap = (heap = {}) => ({
   type: UPDATE_HEAP,
   payload: heap,
 });

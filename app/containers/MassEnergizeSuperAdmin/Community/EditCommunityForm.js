@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import MassEnergizeForm from '../_FormGenerator';
 import { apiCall } from '../../../utils/messenger';
 import { getMoreInfo, groupSocialMediaFields } from './utils';
-
+// @NB: Looks like this file isnt being used anymore
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -30,6 +30,9 @@ const styles = (theme) => ({
   },
 });
 
+/**
+ * @deprecated
+ */
 class EditCommunityForm extends Component {
   constructor(props) {
     super(props);

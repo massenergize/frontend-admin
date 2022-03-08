@@ -25,6 +25,7 @@ import {
   GET_TEAM_MESSAGES,
   GET_ALL_SUBSCRIBERS,
   UPDATE_HEAP,
+  LOAD_CC_ACTIONS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -42,6 +43,15 @@ export default function reducer(state = initialImmutableState, action = {}) {
   }
 }
 
+export const reducerForCCAction = (state = [], action = {}) => {
+  switch (action.type) {
+    case LOAD_CC_ACTIONS:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
 export const reducerForHeap = (state = {}, action = {}) => {
   switch (action.type) {
     case UPDATE_HEAP:

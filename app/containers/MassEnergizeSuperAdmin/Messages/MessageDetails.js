@@ -205,8 +205,7 @@ class MessageDetails extends Component {
   render() {
     const { classes } = this.props;
     const { formJson, message, loading } = this.state;
-    if (!formJson) return <div />;
-    if (loading) return <Loading />;
+    if (loading || !formJson) return <Loading />;
     return (
       <div>
         <div>
@@ -237,7 +236,7 @@ class MessageDetails extends Component {
               </Typography>
               <br />
 
-              <Typography variant="small" color="textSecondary">
+              <Typography variant="small" color="textPrimary">
                 <b>
                   {(message && message.community && message.community.name) ||
                     "..."}
@@ -247,7 +246,7 @@ class MessageDetails extends Component {
           </Paper>
         </div>
         <br />
-        <br/>
+        <br />
 
         <MassEnergizeForm classes={classes} formJson={formJson} />
       </div>
