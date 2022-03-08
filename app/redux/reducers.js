@@ -45,7 +45,7 @@ import app, {
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
     ccActions: reducerForCCAction,
-    heap:reducerForHeap,
+    heap:reducerForHeap, // an object that is used to temporarily hold all kinds of random data. 
     subscribers: subscribersReducer,
     teamMessages: teamMessagesReducer,
     messages: adminMessagesReducer,
