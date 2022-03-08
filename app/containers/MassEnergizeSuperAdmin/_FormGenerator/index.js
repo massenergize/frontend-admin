@@ -17,7 +17,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import Chip from "@material-ui/core/Chip";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { MaterialDropZone } from "dan-components";
 import Snackbar from "@material-ui/core/Snackbar";
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -415,6 +415,7 @@ class MassEnergizeForm extends Component {
 
     // let's clean up the data
     const { formData, formJson } = this.state;
+    const { onComplete } = this.props;
     let [cleanedValues, hasMediaFiles] = this.cleanItUp(
       formData,
       formJson.fields
@@ -443,9 +444,10 @@ class MassEnergizeForm extends Component {
         startCircularSpinner: false,
         // formData: initialFormData
       });
-
+      if (onComplete) onComplete(response.data);
       if (formJson.successRedirectPage) {
-        window.location.href = formJson.successRedirectPage;
+        this.props.history.push(formJson.successRedirectPage);
+        // window.location.href = formJson.successRedirectPage;
       }
     } else if (response && !response.success) {
       // we got an error from the backend so let's set it so the snackbar can pick it up
@@ -851,14 +853,14 @@ class MassEnergizeForm extends Component {
               className={classes.group}
               value={value}
               onChange={this.handleFormDataChange}
-              disabled={field.readOnly  || this.state.readOnly}
+              disabled={field.readOnly || this.state.readOnly}
             >
               {field.data.map((d) => (
                 <FormControlLabel
                   key={d.id}
                   value={d.id}
                   name={field.name}
-                  disabled={field.readOnly || this.state.readOnly }
+                  disabled={field.readOnly || this.state.readOnly}
                   control={<Radio />}
                   label={d.value}
                 />
@@ -887,7 +889,7 @@ class MassEnergizeForm extends Component {
               InputLabelProps={{
                 shrink: true,
               }}
-              disabled={field.readOnly || this.state.readOnly }
+              disabled={field.readOnly || this.state.readOnly}
               defaultValue={field.defaultValue}
               maxLength={field.maxLength}
             />
@@ -967,8 +969,14 @@ class MassEnergizeForm extends Component {
     ));
 
   render() {
-    const { classes } = this.props;
-    const { formJson, error, successMsg, startCircularSpinner, readOnly } = this.state;
+    const { classes, enableCancel, cancel } = this.props;
+    const {
+      formJson,
+      error,
+      successMsg,
+      startCircularSpinner,
+      readOnly,
+    } = this.state;
 
     if (!formJson) return <div />;
     return (
@@ -982,17 +990,18 @@ class MassEnergizeForm extends Component {
         >
           <Grid item xs={12} md={12}>
             <Paper className={classes.root}>
-            <Typography variant="h5" component="h3">
+              <Typography variant="h5" component="h3">
                 {formJson.title}
               </Typography>
 
               {readOnly ? (
-
                 <Typography variant="h7" component="h3">
-                  <em>ReadOnly : This content is a Template or shared from a community you are not an admin of.</em>
+                  <em>
+                    ReadOnly : This content is a Template or shared from a
+                    community you are not an admin of.
+                  </em>
                 </Typography>
-                ) : null
-              }
+              ) : null}
 
               {/* Code to display error messages in case submission causes errors */}
               {error && (
@@ -1052,7 +1061,26 @@ class MassEnergizeForm extends Component {
                     <Link to={formJson.cancelLink}>Cancel</Link>
                   )}
                   {"    "}
-                  <Button variant="contained" color="secondary" type="submit" disabled={this.state.readOnly}>
+                  {this.props.enableCancel && (
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (cancel) return cancel();
+                        this.props.history.goBack();
+                      }}
+                      style={{ marginRight: 15, background: "#cf4949" }}
+                    >
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    type="submit"
+                    disabled={this.state.readOnly}
+                  >
                     Submit
                   </Button>
                 </div>
@@ -1069,9 +1097,18 @@ MassEnergizeForm.FieldTypes = FieldTypes;
 MassEnergizeForm.propTypes = {
   classes: PropTypes.object.isRequired,
   formJson: PropTypes.object.isRequired,
+  enableCancel: PropTypes.bool,
+  cancel: PropTypes.func,
+  /**
+   * Any function you want to run when the form successfully does its job
+   */
+  onComplete: PropTypes.func
 };
-MassEnergizeForm.defaultProps ={
-  readOnly : false,
-}
+MassEnergizeForm.defaultProps = {
+  readOnly: false,
+  enableCancel: false,
+};
 
-export default withStyles(styles, { withTheme: true })(MassEnergizeForm);
+export default withStyles(styles, { withTheme: true })(
+  withRouter(MassEnergizeForm)
+);

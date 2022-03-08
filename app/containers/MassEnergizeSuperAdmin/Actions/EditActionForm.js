@@ -29,7 +29,7 @@ const styles = (theme) => ({
   },
 });
 
-const getSelectedIds = (selected, dataToCrossCheck) => {
+export const getSelectedIds = (selected, dataToCrossCheck) => {
   const res = [];
   selected.forEach((s) => {
     if (dataToCrossCheck.filter((d) => d.id === s.id).length > 0) {
@@ -39,7 +39,7 @@ const getSelectedIds = (selected, dataToCrossCheck) => {
   return res;
 };
 
-const makeActionReadOnly = (action, user) => {
+export const checkIfReadOnly = (action, user) => {
   if (!action || !user) return;
   if (action.community && action.community.id) {
     var correctCommunity = user.admin_at.filter((comm) => {
@@ -50,7 +50,7 @@ const makeActionReadOnly = (action, user) => {
   }
   return (action.is_global && !user.is_super_admin) || readOnlyWrongCommunity;
 };
-const makeTagSection = ({ collections, action }) => {
+export const makeTagSection = ({ collections, action }) => {
   const section = {
     label: "Please select tag(s) that apply to this action",
     fieldType: "Section",
@@ -110,7 +110,7 @@ class EditActionForm extends Component {
 
     const { id } = match.params;
     const shouldNotRunAnymore = !(
-      state.action !== undefined &&
+      // state.action !== undefined &&
       actions &&
       actions.length &&
       ccActions &&
@@ -124,7 +124,7 @@ class EditActionForm extends Component {
     const action = (actions || []).find(
       (a) => a.id.toString() === id.toString()
     );
-    const readOnly = makeActionReadOnly(action, auth);
+    const readOnly = checkIfReadOnly(action, auth);
     const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
@@ -162,15 +162,15 @@ class EditActionForm extends Component {
   }
 
   async componentDidMount() {
-    const { id } = this.props.match.params;
-    const user = this.props.auth;
-    const superAdmin = user.is_super_admin;
-    const actionResponse = await apiCall("/actions.info", { action_id: id });
-    if (!actionResponse || !actionResponse.success) {
-      return;
-    }
+    // const { id } = this.props.match.params;
+    // const user = this.props.auth;
+    // const superAdmin = user.is_super_admin;
+    // const actionResponse = await apiCall("/actions.info", { action_id: id });
+    // if (!actionResponse || !actionResponse.success) {
+    //   return;
+    // }
 
-    const action = actionResponse.data;
+    // const action = actionResponse.data;
 
     // Template actions are read-only unless user is a super-admin
 
@@ -185,15 +185,15 @@ class EditActionForm extends Component {
     //   readOnlyWrongCommunity = !superAdmin && (correctCommunity.length < 1);
     // }
     // const readOnly = readOnlyTemplate || readOnlyWrongCommunity;
-    await this.setStateAsync({
-      action,
-      readOnly: makeActionReadOnly(action, user),
-    });
+    // await this.setStateAsync({
+    //   action,
+    //   readOnly: makeActionReadOnly(action, user),
+    // });
 
     // const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
     // const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
     // const vendorsResponse = await apiCall('/vendors.listForCommunityAdmin');
-    const ccActionsResponse = await apiCall("/cc/info/actions", {}, null, true);
+    // const ccActionsResponse = await apiCall("/cc/info/actions", {}, null, true);
 
     // if (communitiesResponse && communitiesResponse.data) {
     //   const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
@@ -205,18 +205,18 @@ class EditActionForm extends Component {
     //   await this.setStateAsync({ vendors });
     // }
 
-    if (
-      ccActionsResponse &&
-      ccActionsResponse.data &&
-      ccActionsResponse.data.actions
-    ) {
-      const ccActions = (ccActionsResponse.data.actions || []).map((c) => ({
-        ...c,
-        displayName: c.description,
-        id: "" + c.id,
-      }));
-      await this.setStateAsync({ ccActions });
-    }
+    // if (
+    //   ccActionsResponse &&
+    //   ccActionsResponse.data &&
+    //   ccActionsResponse.data.actions
+    // ) {
+    //   const ccActions = (ccActionsResponse.data.actions || []).map((c) => ({
+    //     ...c,
+    //     displayName: c.description,
+    //     id: "" + c.id,
+    //   }));
+    //   await this.setStateAsync({ ccActions });
+    // }
 
     // const formJson = this.createFormJson();
     // if (tagCollectionsResponse && tagCollectionsResponse.data) {
@@ -266,6 +266,7 @@ class EditActionForm extends Component {
           classes={classes}
           formJson={formJson}
           readOnly={readOnly}
+          enableCancel
         />
       </div>
     );
@@ -295,7 +296,8 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
     title: "Update Action",
     subTitle: "",
     method: "/actions.update",
-    successRedirectPage: `/admin/edit/${action.id}/action`,
+    // successRedirectPage: `/admin/edit/${action.id}/action`,
+    successRedirectPage: `/admin/read/actions`,
     fields: [
       {
         label: "About this Action",
