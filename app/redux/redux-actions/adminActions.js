@@ -96,7 +96,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       users,
       vendors,
       ccActions,
-      tagCollections
+      tagCollections,
     ] = response;
 
     dispatch(reduxLoadAllCommunities(communities.data));
@@ -117,6 +117,13 @@ export const reduxLoadCCActions = (data = []) => ({
   type: LOAD_CC_ACTIONS,
   payload: data,
 });
+export const reduxAddToHeap = (data = {}) => (dispatch, getState) => {
+  const heap = getState().heap || {};
+  dispatch({
+    type: UPDATE_HEAP,
+    payload: { ...heap, ...data },
+  });
+};
 export const reduxUpdateHeap = (heap = {}) => ({
   type: UPDATE_HEAP,
   payload: heap,

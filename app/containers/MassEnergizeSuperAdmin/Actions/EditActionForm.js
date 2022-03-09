@@ -31,7 +31,7 @@ const styles = (theme) => ({
 
 export const getSelectedIds = (selected, dataToCrossCheck) => {
   const res = [];
-  selected.forEach((s) => {
+  (selected || []).forEach((s) => {
     if (dataToCrossCheck.filter((d) => d.id === s.id).length > 0) {
       res.push("" + s.id);
     }
@@ -109,17 +109,18 @@ class EditActionForm extends Component {
     } = props;
 
     const { id } = match.params;
-    const shouldNotRunAnymore = !(
-      // state.action !== undefined &&
+    const readyToRunPageFirstTime =
       actions &&
       actions.length &&
       ccActions &&
       ccActions.length &&
       tags &&
-      tags.length
-    );
+      tags.length;
 
-    if (shouldNotRunAnymore) return null;
+    const jobsDoneDontRunWhatsBelowEverAgain =
+      !readyToRunPageFirstTime || state.mounted;
+
+    if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
     const action = (actions || []).find(
       (a) => a.id.toString() === id.toString()
@@ -169,13 +170,9 @@ class EditActionForm extends Component {
     // if (!actionResponse || !actionResponse.success) {
     //   return;
     // }
-
     // const action = actionResponse.data;
-
     // Template actions are read-only unless user is a super-admin
-
     // const readOnlyTemplate = !superAdmin && action.is_global;
-
     // check whether this actions community is one that user is admin for
     // var readOnlyWrongCommunity = false;
     // if (action.community && action.community.id) {
@@ -189,22 +186,18 @@ class EditActionForm extends Component {
     //   action,
     //   readOnly: makeActionReadOnly(action, user),
     // });
-
     // const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
     // const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
     // const vendorsResponse = await apiCall('/vendors.listForCommunityAdmin');
     // const ccActionsResponse = await apiCall("/cc/info/actions", {}, null, true);
-
     // if (communitiesResponse && communitiesResponse.data) {
     //   const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
     //   await this.setStateAsync({ communities });
     // }
-
     // if (vendorsResponse && vendorsResponse.data) {
     //   const vendors = vendorsResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
     //   await this.setStateAsync({ vendors });
     // }
-
     // if (
     //   ccActionsResponse &&
     //   ccActionsResponse.data &&
@@ -217,7 +210,6 @@ class EditActionForm extends Component {
     //   }));
     //   await this.setStateAsync({ ccActions });
     // }
-
     // const formJson = this.createFormJson();
     // if (tagCollectionsResponse && tagCollectionsResponse.data) {
     //   const section = {
@@ -225,7 +217,6 @@ class EditActionForm extends Component {
     //     fieldType: 'Section',
     //     children: []
     //   };
-
     //   Object.values(tagCollectionsResponse.data).forEach(tCol => {
     //     const { action } = this.state;
     //     const newField = {
@@ -238,15 +229,12 @@ class EditActionForm extends Component {
     //       dbName: 'tags',
     //       data: tCol.tags.map(t => ({ ...t, displayName: t.name, id: '' + t.id }))
     //     };
-
     //     // want this to be the 5th field
     //     section.children.push(newField);
     //   });
-
     //   // want this to be the 2nd field
     //   formJson.fields.splice(1, 0, section);
     // }
-
     // await this.setStateAsync({ formJson });
   }
 

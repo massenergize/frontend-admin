@@ -36,14 +36,12 @@ const styles = (theme) => ({
   },
 });
 
-const makeTagSection = ({ collections, event }) => {
+export const makeTagSection = ({ collections, event, title }) => {
   const section = {
-    label: "Please select tag(s) that apply to this event",
+    label: title ||  "Please select tag(s) that apply to this event",
     fieldType: "Section",
     children: [],
   };
-
-  console.log("tCOL", collections);
 
   (collections || []).forEach((tCol) => {
     const newField = {
@@ -93,15 +91,17 @@ class EditEventForm extends Component {
     const readOnly = checkIfReadOnly(event, auth);
     const thereIsNothingInEventsExceptionsList = rescheduledEvent === null;
 
-    const shouldNotRunAnymore = !(
+    const readyToRenderPageFirstTime =
       events &&
       events.length &&
       tags &&
       tags.length &&
-      (readOnly || rescheduledEvent || thereIsNothingInEventsExceptionsList)
-    );
+      (readOnly || rescheduledEvent || thereIsNothingInEventsExceptionsList);
 
-    if (shouldNotRunAnymore) return null;
+    const jobsDoneDontRunWhatsBelowEverAgain =
+      !readyToRenderPageFirstTime || state.mounted;
+
+    if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
     const coms = (communities || []).map((c) => ({
       ...c,
@@ -118,7 +118,14 @@ class EditEventForm extends Component {
 
     if (formJson) formJson.fields.splice(1, 0, section);
 
-    return { event, events, readOnly, communities: coms, formJson };
+    return {
+      event,
+      events,
+      readOnly,
+      communities: coms,
+      formJson,
+      mounted: true,
+    };
   };
 
   componentDidMount() {
