@@ -32,8 +32,9 @@ import FieldTypes from "./fieldTypes";
 import Modal from "./Modal";
 // import PreviewModal from './PreviewModal';
 import MEMediaLibraryImplementation from "../Gallery/tools/MEMediaLibraryImplementation";
-const TINY_MCE_API_KEY = "3fpefbsmtkh71yhtjyykjwj5ezs3a5cac5ei018wvnlg2g0r";
+import Loading from "dan-components/Loading";
 
+const TINY_MCE_API_KEY = "3fpefbsmtkh71yhtjyykjwj5ezs3a5cac5ei018wvnlg2g0r";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -969,7 +970,7 @@ class MassEnergizeForm extends Component {
     ));
 
   render() {
-    const { classes, enableCancel, cancel } = this.props;
+    const { classes, enableCancel, cancel, noBack } = this.props;
     const {
       formJson,
       error,
@@ -978,7 +979,7 @@ class MassEnergizeForm extends Component {
       readOnly,
     } = this.state;
 
-    if (!formJson) return <div />;
+    if (!formJson) return <Loading />;
     return (
       <div>
         <Grid
@@ -993,6 +994,17 @@ class MassEnergizeForm extends Component {
               <Typography variant="h5" component="h3">
                 {formJson.title}
               </Typography>
+              {!noBack && (
+                <Link
+                  to="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    this.props.history.goBack();
+                  }}
+                >
+                  Go Back
+                </Link>
+              )}
 
               {readOnly ? (
                 <Typography variant="h7" component="h3">
@@ -1061,7 +1073,7 @@ class MassEnergizeForm extends Component {
                     <Link to={formJson.cancelLink}>Cancel</Link>
                   )}
                   {"    "}
-                  {this.props.enableCancel && (
+                  {enableCancel && (
                     <Button
                       variant="contained"
                       color="secondary"
@@ -1102,11 +1114,16 @@ MassEnergizeForm.propTypes = {
   /**
    * Any function you want to run when the form successfully does its job
    */
-  onComplete: PropTypes.func
+  onComplete: PropTypes.func,
+  /**
+   * Enable or disable back button on form generator
+   */
+  noBack: PropTypes.bool,
 };
 MassEnergizeForm.defaultProps = {
   readOnly: false,
   enableCancel: false,
+  noBack: false,
 };
 
 export default withStyles(styles, { withTheme: true })(
