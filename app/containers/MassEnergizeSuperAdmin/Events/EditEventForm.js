@@ -311,7 +311,6 @@ const EditEventMapped = connect(
 export default withStyles(styles, { withTheme: true })(EditEventMapped);
 
 const createFormJson = ({ event, rescheduledEvent, communities }) => {
-  // const { communities } = this.state;
   const statuses = ["Draft", "Live", "Archived"];
   if (!event || !communities) return;
   const formJson = {

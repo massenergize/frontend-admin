@@ -7,6 +7,8 @@ import Loading from "dan-components/Loading";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { getSelectedIds } from "../Actions/EditActionForm";
+import { makeTagSection } from "../Events/EditEventForm";
+import { Paper, Typography } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {
@@ -32,39 +34,6 @@ const styles = (theme) => ({
   },
 });
 
-const makeTagSection = ({ collections, testimonial }) => {
-  const section = {
-    label: "Please select tag(s) that apply to this event",
-    fieldType: "Section",
-    children: [],
-  };
-
-  (collections || []).forEach((tCol) => {
-    const newField = {
-      name: tCol.name,
-      label: `${tCol.name} ${
-        tCol.allow_multiple
-          ? "(You can select multiple)"
-          : "(Only one selection allowed)"
-      }`,
-      placeholder: "",
-      fieldType: "Checkbox",
-      selectMany: tCol.allow_multiple,
-      defaultValue: getSelectedIds(testimonial.tags, tCol.tags),
-      dbName: "tags",
-      data: tCol.tags.map((t) => ({
-        ...t,
-        displayName: t.name,
-        id: "" + t.id,
-      })),
-    };
-
-    if (tCol.name === "Category") {
-      section.children.push(newField);
-    }
-  });
-  return section;
-};
 class EditTestimonial extends Component {
   constructor(props) {
     super(props);
@@ -116,7 +85,11 @@ class EditTestimonial extends Component {
 
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
-    const section = makeTagSection({ collections: tags, testimonial });
+    const section = makeTagSection({
+      collections: tags,
+      event: testimonial,
+      title: "Please select tag(s) that apply to this testimonial",
+    });
     const formJson = createFormJson({
       communities: coms,
       actions: acts,
@@ -233,19 +206,21 @@ class EditTestimonial extends Component {
     const { formJson, testimonial } = this.state;
     if (!formJson) return <Loading />;
     return (
-      <div>
-        {testimonial.user && (
-          <p>
-            Created By:&nbsp;
-            {testimonial.user.full_name}
-            ,&nbsp;
-            {testimonial.user.email}
-          </p>
-        )}
-        {!testimonial.user && <p>Created By: Community Admin</p>}
+      <>
+        <Paper style={{ padding: 15 }}>
+          <Typography variant="h6">Created By</Typography>
+          {testimonial.user && (
+            <Typography>
+              {testimonial.user.full_name}
+              ,&nbsp;
+              {testimonial.user.email}
+            </Typography>
+          )}
+          {!testimonial.user && <p>Created By: Community Admin</p>}
+        </Paper>
         <br />
         <MassEnergizeForm classes={classes} formJson={formJson} />
-      </div>
+      </>
     );
   }
 }
@@ -272,7 +247,6 @@ const Wrapped = connect(mapStateToProps)(EditTestimonial);
 export default withStyles(styles, { withTheme: true })(Wrapped);
 
 const createFormJson = ({ communities, actions, vendors, testimonial }) => {
-
   const formJson = {
     title: "Edit Testimonial",
     subTitle: "",
