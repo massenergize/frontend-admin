@@ -1027,7 +1027,11 @@ class MassEnergizeForm extends Component {
                     <MySnackbarContentWrapper
                       onClose={this.handleCloseStyle}
                       variant="error"
-                      message={`Error Occurred: ${error}`}
+                      message={
+                        <small style={{ marginLeft: 15, fontSize: 15 }}>
+                          {error}
+                        </small>
+                      }
                     />
                   </Snackbar>
                   <p style={{ color: "red" }}>{error}</p>
@@ -1049,7 +1053,11 @@ class MassEnergizeForm extends Component {
                     <MySnackbarContentWrapper
                       onClose={this.handleCloseStyle}
                       variant="success"
-                      message={successMsg}
+                      message={
+                        <small style={{ marginLeft: 15, fontSize: 14 }}>
+                          {successMsg}
+                        </small>
+                      }
                     />
                   </Snackbar>
                   <p style={{ color: "green" }}>{successMsg}</p>

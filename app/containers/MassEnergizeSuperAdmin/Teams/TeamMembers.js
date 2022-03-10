@@ -275,8 +275,17 @@ class TeamMembers extends React.Component {
             sub-teams.
           </Typography>
 
+          <Link
+            onClick={(e) => {
+              e.preventDefault();
+              this.props.history.goBack();
+            }}
+            style={{ marginRight: 20 }}
+          >
+            Go back
+          </Link>
           <Link onClick={() => this.props.history.push("/admin/read/teams")}>
-            Go back to all teams
+            Go to all teams
           </Link>
           <Link
             onClick={(e) => {

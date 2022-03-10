@@ -44,7 +44,6 @@ class AllPolicies extends React.Component {
   }
 
   fashionData =(data) => {
-    console.log(data)
     const fashioned = data.map(d => (
       [
         d.id,

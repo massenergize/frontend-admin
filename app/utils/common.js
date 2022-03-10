@@ -75,7 +75,8 @@ export function convertBoolean(b) {
   return `${b === true || b === "true" ? "Yes" : "No"}`;
 }
 
-export function goHere(link) {
+export function goHere(link, history) {
+  if(history) return history.push(link)
   window.location = link;
 }
 

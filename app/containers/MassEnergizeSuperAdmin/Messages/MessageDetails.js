@@ -206,6 +206,7 @@ class MessageDetails extends Component {
     const { classes } = this.props;
     const { formJson, message, loading } = this.state;
     if (loading || !formJson) return <Loading />;
+    console.log("I am the message bro", message);
     return (
       <div>
         <div>
@@ -213,7 +214,11 @@ class MessageDetails extends Component {
             <div className={classes.mainHead}>
               <div>
                 <Typography variant="h6" style={{ marginBottom: 3 }}>
-                  <b>{(message && message.user_name) || "..."}</b>
+                  <b>
+                    {(message && message.user_name) ||
+                      (message.user && message.user.full_name) ||
+                      "..."}
+                  </b>
                 </Typography>
 
                 <Typography variant="small" style={{}} color="primary">
@@ -236,11 +241,28 @@ class MessageDetails extends Component {
               </Typography>
               <br />
 
-              <Typography variant="small" color="textPrimary">
+              <Typography
+                variant="small"
+                color="primary"
+                style={{ display: "flex", alignItems: "center" }}
+              >
                 <b>
                   {(message && message.community && message.community.name) ||
                     "..."}
                 </b>
+                {message && message.is_team_admin_message && (
+                  <Typography
+                    color="primary"
+                    style={{ marginLeft: "auto" }}
+                    variant="small"
+                  >
+                    <small style={{ marginRight: 10 }}>Message from Team</small>
+                    <br />
+                    <b>
+                      {(message && message.team && message.team.name) || "..."}
+                    </b>
+                  </Typography>
+                )}
               </Typography>
             </div>
           </Paper>
