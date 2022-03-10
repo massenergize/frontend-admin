@@ -36,9 +36,14 @@ const styles = (theme) => ({
   },
 });
 
-export const makeTagSection = ({ collections, event, title, defaults = true }) => {
+export const makeTagSection = ({
+  collections,
+  event,
+  title,
+  defaults = true,
+}) => {
   const section = {
-    label: title ||  "Please select tag(s) that apply to this event",
+    label: title || "Please select tag(s) that apply to this event",
     fieldType: "Section",
     children: [],
   };
@@ -132,27 +137,7 @@ class EditEventForm extends Component {
     const { id } = this.props.match.params;
     var { event } = this.state;
     const { auth, events, addExceptionsToHeap, heap, exceptions } = this.props;
-    // const user = this.props.auth;
-    // const superAdmin = user.is_super_admin;
-    // const eventResponse = await apiCall("/events.info", { event_id: id });
-    // if (!eventResponse && !eventResponse.success) {
-    //   return;
-    // }
-    // const event = eventResponse.data;
 
-    // // Template actions are read-only unless user is a super-admin
-    // const readOnlyTemplate = !superAdmin && event.is_global;
-
-    // // check whether this actions community is one that user is admin for
-    // var readOnlyWrongCommunity = false;
-    // if (event.community && event.community.id) {
-    //   var correctCommunity = user.admin_at.filter((comm) => {
-    //     return comm.id === event.community.id;
-    //   });
-    //   readOnlyWrongCommunity = !superAdmin && correctCommunity.length < 1;
-    // }
-    // const readOnly = readOnlyTemplate || readOnlyWrongCommunity;
-    // await this.setStateAsync({ event, readOnly });
     event =
       event || (events || []).find((e) => e.id.toString() === id.toString());
 
@@ -178,71 +163,7 @@ class EditEventForm extends Component {
           console.log(err);
         });
     }
-
-    // const tagCollectionsResponse = await apiCall(
-    //   "/tag_collections.listForCommunityAdmin"
-    // );
-    // const communitiesResponse = await apiCall(
-    //   "/communities.listForCommunityAdmin"
-    // );
-
-    // if (communitiesResponse && communitiesResponse.data) {
-    //   const communities = communitiesResponse.data.map((c) => ({
-    //     ...c,
-    //     displayName: c.name,
-    //   }));
-    //   await this.setStateAsync({ communities });
-    // }
-
-    // // const formJson = createFormJson({ event, rescheduledEvent, communities });
-    // if (tagCollectionsResponse && tagCollectionsResponse.data) {
-    //   const section = {
-    //     label: "Please select tag(s) that apply to this event",
-    //     fieldType: "Section",
-    //     children: [],
-    //   };
-
-    //   Object.values(tagCollectionsResponse.data).forEach((tCol) => {
-    //     const newField = {
-    //       name: tCol.name,
-    //       label: `${tCol.name} ${
-    //         tCol.allow_multiple
-    //           ? "(You can select multiple)"
-    //           : "(Only one selection allowed)"
-    //       }`,
-    //       placeholder: "",
-    //       fieldType: "Checkbox",
-    //       selectMany: tCol.allow_multiple,
-    //       defaultValue: this.getSelectedIds(event.tags, tCol.tags),
-    //       dbName: "tags",
-    //       data: tCol.tags.map((t) => ({
-    //         ...t,
-    //         displayName: t.name,
-    //         id: "" + t.id,
-    //       })),
-    //     };
-
-    //     // want this to be the 5th field
-    //     if (tCol.name === "Category") {
-    //       section.children.push(newField);
-    //     }
-    //   });
-
-    //   // want this to be the 2nd field
-    //   formJson.fields.splice(1, 0, section);
-    // }
-    // await this.setStateAsync({ formJson });
   }
-
-  // getSelectedIds = (selected, dataToCrossCheck) => {
-  //   const res = [];
-  //   selected.forEach((s) => {
-  //     if (dataToCrossCheck.filter((d) => d.id === s.id).length > 0) {
-  //       res.push("" + s.id);
-  //     }
-  //   });
-  //   return res;
-  // };
 
   setStateAsync(state) {
     return new Promise((resolve) => {
@@ -291,8 +212,6 @@ const mapStateToProps = (state) => {
     exceptions: (heap && heap.exceptions) || {},
   };
 };
-
-
 
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
