@@ -36,7 +36,7 @@ const styles = (theme) => ({
   },
 });
 
-export const makeTagSection = ({ collections, event, title }) => {
+export const makeTagSection = ({ collections, event, title, defaults = true }) => {
   const section = {
     label: title ||  "Please select tag(s) that apply to this event",
     fieldType: "Section",
@@ -54,7 +54,7 @@ export const makeTagSection = ({ collections, event, title }) => {
       placeholder: "",
       fieldType: "Checkbox",
       selectMany: tCol.allow_multiple,
-      defaultValue: getSelectedIds(event.tags, tCol.tags),
+      defaultValue: defaults && getSelectedIds(event.tags, tCol.tags),
       dbName: "tags",
       data: tCol.tags.map((t) => ({
         ...t,
@@ -292,9 +292,7 @@ const mapStateToProps = (state) => {
   };
 };
 
-EditEventForm.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
+
 
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
@@ -308,6 +306,10 @@ const EditEventMapped = connect(
   mapStateToProps,
   mapDispatchToProps
 )(EditEventForm);
+
+EditEventForm.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
 export default withStyles(styles, { withTheme: true })(EditEventMapped);
 
 const createFormJson = ({ event, rescheduledEvent, communities }) => {

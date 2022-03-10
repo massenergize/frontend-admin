@@ -238,9 +238,7 @@ const mapStateToProps = (state) => {
     communities: state.getIn(["communities"]),
   };
 };
-const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({}, dispatch);
-};
+
 
 const Wrapped = connect(mapStateToProps)(EditTestimonial);
 

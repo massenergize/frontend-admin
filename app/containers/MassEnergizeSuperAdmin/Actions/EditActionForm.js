@@ -50,7 +50,7 @@ export const checkIfReadOnly = (action, user) => {
   }
   return (action.is_global && !user.is_super_admin) || readOnlyWrongCommunity;
 };
-export const makeTagSection = ({ collections, action }) => {
+export const makeTagSection = ({ collections, action, defaults = true }) => {
   const section = {
     label: "Please select tag(s) that apply to this action",
     fieldType: "Section",
@@ -68,7 +68,8 @@ export const makeTagSection = ({ collections, action }) => {
       placeholder: "",
       fieldType: "Checkbox",
       selectMany: tCol.allow_multiple,
-      defaultValue: getSelectedIds(action.tags || [], tCol.tags || []),
+      defaultValue:
+        defaults && getSelectedIds(action.tags || [], tCol.tags || []),
       dbName: "tags",
       data: (tCol.tags || []).map((t) => ({
         ...t,
@@ -271,11 +272,12 @@ const mapStateToProps = (state) => ({
   actions: state.getIn(["allActions"]),
 });
 
+const EditActionMapped = connect(mapStateToProps)(EditActionForm);
+
 EditActionForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-const EditActionMapped = connect(mapStateToProps)(EditActionForm);
 export default withStyles(styles, { withTheme: true })(EditActionMapped);
 
 const createFormJson = ({ action, communities, ccActions, vendors }) => {

@@ -80,7 +80,7 @@ class EditTeam extends Component {
   static getDerivedStateFromProps(props, state) {
     var { match, communities, teams, teamsInfos } = props;
     const { id } = match.params;
-    communities = communities.map((c) => ({
+    communities = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
