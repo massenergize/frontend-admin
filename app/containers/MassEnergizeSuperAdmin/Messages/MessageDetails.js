@@ -206,7 +206,6 @@ class MessageDetails extends Component {
     const { classes } = this.props;
     const { formJson, message, loading } = this.state;
     if (loading || !formJson) return <Loading />;
-    console.log("I am the message bro", message);
     return (
       <div>
         <div>

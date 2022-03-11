@@ -50,11 +50,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
         ? "/events.listForSuperAdmin"
         : "/events.listForCommunityAdmin"
     ),
-    apiCall(
-      isSuperAdmin
-        ? "/messages.listForSuperAdmin"
-        : "/messages.listForCommunityAdmin"
-    ),
+    apiCall("/messages.listForCommunityAdmin"),
     apiCall("/messages.listTeamAdminMessages"),
     apiCall(
       isSuperAdmin ? "/teams.listForSuperAdmin" : "/teams.listForCommunityAdmin"

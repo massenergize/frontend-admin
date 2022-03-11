@@ -1,121 +1,108 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import { Helmet } from 'react-helmet';
-import brand from 'dan-api/dummy/brand';
-import Typography from '@material-ui/core/Typography';
-import Avatar from '@material-ui/core/Avatar';
-import { bindActionCreators } from 'redux';
-import MUIDataTable from 'mui-datatables';
-import FileCopy from '@material-ui/icons/FileCopy';
-import EditIcon from '@material-ui/icons/Edit';
-import { Link } from 'react-router-dom';
-import DetailsIcon from '@material-ui/icons/Details';
-import messageStyles from 'dan-styles/Messages.scss';
-import { connect } from 'react-redux';
-import { apiCall } from '../../../utils/messenger';
-import styles from '../../../components/Widget/widget-jss';
-import { reduxGetAllVendors, reduxGetAllCommunityVendors, loadAllAdminMessages } from '../../../redux/redux-actions/adminActions';
-import CommunitySwitch from '../Summary/CommunitySwitch';
-import { getHumanFriendlyDate, smartString } from '../../../utils/common';
-import { Chip } from '@material-ui/core';
-import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
+import React from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import { Helmet } from "react-helmet";
+import brand from "dan-api/dummy/brand";
+import Typography from "@material-ui/core/Typography";
+import Avatar from "@material-ui/core/Avatar";
+import { bindActionCreators } from "redux";
+import MUIDataTable from "mui-datatables";
+import FileCopy from "@material-ui/icons/FileCopy";
+import EditIcon from "@material-ui/icons/Edit";
+import { Link } from "react-router-dom";
+import DetailsIcon from "@material-ui/icons/Details";
+import messageStyles from "dan-styles/Messages.scss";
+import { connect } from "react-redux";
+import { apiCall } from "../../../utils/messenger";
+import styles from "../../../components/Widget/widget-jss";
+import {
+  reduxGetAllVendors,
+  reduxGetAllCommunityVendors,
+  loadAllAdminMessages,
+} from "../../../redux/redux-actions/adminActions";
+import CommunitySwitch from "../Summary/CommunitySwitch";
+import { getHumanFriendlyDate, smartString } from "../../../utils/common";
+import { Chip } from "@material-ui/core";
+import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 class AllCommunityAdminMessages extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       data: [],
       loading: true,
-      columns: this.getColumns(props.classes)
+      columns: this.getColumns(props.classes),
     };
   }
 
-  async componentDidMount() {
-    const { auth } = this.props;
-    var url; 
-    if(auth.is_super_admin) url = "/messages.listForSuperAdmin"; 
-    else if (auth.is_community_admin) url = "/messages.listForCommunityAdmin";
-   
-    const allMessagesResponse = await apiCall(url);
-    if (allMessagesResponse && allMessagesResponse.success) {
-      this.props.putMessagesInRedux(allMessagesResponse.data)
-    }
-  }
-
-
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
+  componentDidMount() {
+    apiCall("/messages.listForCommunityAdmin").then((allMessagesResponse) => {
+      if (allMessagesResponse && allMessagesResponse.success) {
+        this.props.putMessagesInRedux(allMessagesResponse.data);
+      }
     });
   }
 
   showCommunitySwitch = () => {
     const user = this.props.auth ? this.props.auth : {};
     if (user.is_community_admin) {
-      return (
-        <CommunitySwitch actionToPerform={this.handleCommunityChange} />
-      );
+      return <CommunitySwitch actionToPerform={this.handleCommunityChange} />;
     }
-  }
-
+  };
 
   fashionData = (data) => {
-    return data.map(d => (
-      [
-        getHumanFriendlyDate(d.created_at, true),
-        smartString(d.title,30),
-        d.user_name || (d.user && d.user.full_name) || "",
-        d.email || (d.user && d.user.email) ||"",
-        d.community && d.community.name,
-        d.have_replied,
-        d.id
-      ]
-    ));
-  }
-
+    return data.map((d) => [
+      getHumanFriendlyDate(d.created_at, true),
+      smartString(d.title, 30),
+      d.user_name || (d.user && d.user.full_name) || "",
+      d.email || (d.user && d.user.email) || "",
+      d.community && d.community.name,
+      d.have_replied,
+      d.id,
+    ]);
+  };
 
   getColumns = (classes) => [
     {
-      name: 'Date',
-      key: 'date',
+      name: "Date",
+      key: "date",
       options: {
         filter: true,
-      }
+      },
     },
     {
-      name: 'Title',
-      key: 'title',
+      name: "Title",
+      key: "title",
       options: {
         filter: true,
-      }
+      },
     },
     {
-      name: 'User Name',
-      key: 'user_name',
+      name: "User Name",
+      key: "user_name",
       options: {
         filter: true,
-        filterType: 'textField'
-      }
+        filterType: "textField",
+      },
     },
     {
-      name: 'Email',
-      key: 'email',
+      name: "Email",
+      key: "email",
       options: {
         filter: true,
-        filterType: 'textField'
-      }
+        filterType: "textField",
+      },
     },
     {
-      name: 'Community',
-      key: 'community',
+      name: "Community",
+      key: "community",
       options: {
         filter: true,
-        filterType: 'multiselect'
-      }
+        filterType: "multiselect",
+      },
     },
     {
-      name: 'Replied?',
-      key: 'replied?',
+      name: "Replied?",
+      key: "replied?",
       options: {
         filter: true,
         customBodyRender: (d) => {
@@ -126,11 +113,11 @@ class AllCommunityAdminMessages extends React.Component {
             />
           );
         },
-      }
+      },
     },
     {
-      name: 'See Details',
-      key: 'edit_or_copy',
+      name: "See Details",
+      key: "edit_or_copy",
       options: {
         filter: false,
         download: false,
@@ -140,33 +127,32 @@ class AllCommunityAdminMessages extends React.Component {
               <DetailsIcon size="small" variant="outlined" color="secondary" />
             </Link>
           </div>
-        )
-      }
+        ),
+      },
     },
-  ]
+  ];
 
   render() {
-    const title = brand.name + ' - Community Admin Messages';
+    const title = brand.name + " - Community Admin Messages";
     const description = brand.desc;
-    const { columns, loading } = this.state;
+    const { columns } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.messages)
+    const data = this.fashionData(this.props.messages);
     const options = {
-      filterType: 'dropdown',
-      responsive: 'stacked',
+      filterType: "dropdown",
+      responsive: "stacked",
       print: true,
-      rowsPerPage: 100,
+      rowsPerPage: 50,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach(d => {
+        idsToDelete.forEach((d) => {
           const messageId = data[d.dataIndex][0];
-          apiCall('/messages.delete', { message_id: messageId });
+          apiCall("/messages.delete", { message_id: messageId });
         });
-      }
+      },
     };
-    
 
-    if (loading && (!data || !data.length)) {
+    if (!data || !data.length) {
       return <LinearBuffer />;
     }
 
@@ -188,7 +174,6 @@ class AllCommunityAdminMessages extends React.Component {
             options={options}
           />
         </div>
-
       </div>
     );
   }
@@ -199,17 +184,23 @@ AllCommunityAdminMessages.propTypes = {
 };
 function mapStateToProps(state) {
   return {
-    auth: state.getIn(['auth']),
-    community: state.getIn(['selected_community']),
-    messages: state.getIn(["messages"]), 
-    teamMessages:state.getIn(["messages"]), 
+    auth: state.getIn(["auth"]),
+    community: state.getIn(["selected_community"]),
+    messages: state.getIn(["messages"]),
+    teamMessages: state.getIn(["messages"]),
   };
 }
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-    putMessagesInRedux: loadAllAdminMessages
-  }, dispatch);
+  return bindActionCreators(
+    {
+      putMessagesInRedux: loadAllAdminMessages,
+    },
+    dispatch
+  );
 }
-const VendorsMapped = connect(mapStateToProps, mapDispatchToProps)(AllCommunityAdminMessages);
+const VendorsMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AllCommunityAdminMessages);
 
 export default withStyles(styles)(VendorsMapped);

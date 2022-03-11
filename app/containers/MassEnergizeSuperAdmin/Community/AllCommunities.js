@@ -20,6 +20,7 @@ import { bindActionCreators } from "redux";
 import { reduxLoadAllCommunities } from "../../../redux/redux-actions/adminActions";
 import { smartString } from "../../../utils/common";
 import { Chip, Typography } from "@material-ui/core";
+import ThemeModal from "../../../components/Widget/ThemeModal";
 
 class AllCommunities extends React.Component {
   constructor(props) {
@@ -33,8 +34,8 @@ class AllCommunities extends React.Component {
   componentDidMount() {
     const { auth } = this.props;
     var url;
-    if (auth.is_super_admin) url = "/communities.listForSuperAdmin";
-    else if (auth.is_community_admin)
+    if (auth && auth.is_super_admin) url = "/communities.listForSuperAdmin";
+    else if (auth && auth.is_community_admin)
       url = "/communities.listForCommunityAdmin";
     apiCall(url).then((allCommunitiesResponse) => {
       if (allCommunitiesResponse && allCommunitiesResponse.success) {
@@ -161,10 +162,23 @@ class AllCommunities extends React.Component {
     },
   ];
 
+  nowDelete({ idsToDelete, data }) {
+    const { communities, putCommunitiesInRedux } = this.props;
+    const ids = [];
+    idsToDelete.forEach((d) => {
+      const communityId = data[d.dataIndex][0];
+      ids.push(communityId.id);
+      // apiCall("/communities.delete", { community_id: communityId });
+    });
+    const rem = (communities || []).filter((com) => !ids.includes(com.id));
+    this.setState({ showDeleteConfirmation: false, idsToDelete: null });
+    putCommunitiesInRedux(rem);
+  }
+
   render() {
     const title = brand.name + " - All Communities";
     const description = brand.desc;
-    const { columns, loading } = this.state;
+    const { columns } = this.state;
     const { classes } = this.props;
     const data = this.fashionData(this.props.communities || []);
 
@@ -175,10 +189,12 @@ class AllCommunities extends React.Component {
       rowsPerPage: 50,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach((d) => {
-          const communityId = data[d.dataIndex][0];
-          apiCall("/communities.delete", { community_id: communityId });
-        });
+        this.setState({ showDeleteConfirmation: true, idsToDelete });
+        return false;
+        // idsToDelete.forEach((d) => {
+        //   const communityId = data[d.dataIndex][0];
+        //   apiCall("/communities.delete", { community_id: communityId });
+        // });
       },
     };
 
@@ -205,6 +221,8 @@ class AllCommunities extends React.Component {
       );
     }
 
+    const { idsToDelete } = this.state;
+    const len = (idsToDelete && idsToDelete.length) || 0;
     return (
       <div>
         <Helmet>
@@ -216,6 +234,20 @@ class AllCommunities extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         {/* {this.renderTable(communities, classes)} */}
+
+        <ThemeModal
+          open={this.state.showDeleteConfirmation}
+          onCancel={() =>
+            this.setState({ showDeleteConfirmation: false, idsToDelete: [] })
+          }
+          onConfirm={() => this.nowDelete({ idsToDelete, data })}
+        >
+          <Typography>
+            Are you sure you want to delete (
+            {(idsToDelete && idsToDelete.length) || ""})
+            {len === 1 ? " community? " : " communities? "}
+          </Typography>
+        </ThemeModal>
 
         <div className={classes.table}>
           <MUIDataTable

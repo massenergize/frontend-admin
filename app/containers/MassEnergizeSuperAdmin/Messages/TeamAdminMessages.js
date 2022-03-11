@@ -24,18 +24,11 @@ class AllTeamAdminMessages extends React.Component {
     };
   }
 
-  async componentDidMount() {
-    const allMessagesResponse = await apiCall(
-      "/messages.listTeamAdminMessages"
-    );
-    if (allMessagesResponse && allMessagesResponse.success) {
-      this.props.putTeamMessagesInRedux(allMessagesResponse.data);
-    } else this.setState({ loading: false });
-  }
-
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
+  componentDidMount() {
+    apiCall("/messages.listTeamAdminMessages").then((allMessagesResponse) => {
+      if (allMessagesResponse && allMessagesResponse.success) {
+        this.props.putTeamMessagesInRedux(allMessagesResponse.data);
+      }
     });
   }
 
@@ -55,7 +48,7 @@ class AllTeamAdminMessages extends React.Component {
       d.community && d.community.name,
       d.team && d.team.name,
       d.have_forwarded,
-      d.id
+      d.id,
     ]);
   };
 
@@ -141,7 +134,7 @@ class AllTeamAdminMessages extends React.Component {
   render() {
     const title = brand.name + " - Team Admin Messages";
     const description = brand.desc;
-    const { columns, loading } = this.state;
+    const { columns } = this.state;
     const { classes } = this.props;
     const data = this.fashionData(this.props.teamMessages);
     const options = {
@@ -158,7 +151,7 @@ class AllTeamAdminMessages extends React.Component {
       },
     };
 
-    if (loading && (!data || !data.length)) {
+    if (!data || !data.length) {
       return <LinearBuffer />;
     }
 
