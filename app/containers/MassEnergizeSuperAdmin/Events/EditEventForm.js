@@ -194,6 +194,7 @@ class EditEventForm extends Component {
           classes={classes}
           formJson={formJson}
           readOnly={readOnly}
+          enableCancel
         />
       </div>
     );

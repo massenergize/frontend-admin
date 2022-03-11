@@ -384,13 +384,12 @@ export const reduxGetAllPolicies = () => (dispatch) => {
   return { type: "DO_NOTHING", payload: null };
 };
 
-export const reduxGetAllEvents = (cb) => (dispatch) => {
+export const reduxGetAllEvents = () => (dispatch) => {
   apiCall("/events.listForCommunityAdmin").then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllEvents(response.data));
     }
-    cb && cb();
     return { type: "DO_NOTHING", payload: null };
   });
   return { type: "DO_NOTHING", payload: null };

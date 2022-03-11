@@ -68,53 +68,6 @@ class CreateNewEventForm extends Component {
     };
   };
 
-  // async componentDidMount() {
-  //   const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
-  //   const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
-
-  //   if (communitiesResponse && communitiesResponse.data) {
-  //     const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name }));
-  //     await this.setStateAsync({ communities });
-  //   }
-
-  //   const formJson = await this.createFormJson();
-  //   if (tagCollectionsResponse && tagCollectionsResponse.data) {
-  //     const section = {
-  //       label: 'Please select tag(s) that apply to this event',
-  //       fieldType: 'Section',
-  //       children: []
-  //     };
-
-  //     Object.values(tagCollectionsResponse.data).forEach(tCol => {
-  //       const newField = {
-  //         name: tCol.name,
-  //         label: `${tCol.name} ${tCol.allow_multiple ? '(You can select multiple)' : '(Only one selection allowed)'}`,
-  //         placeholder: '',
-  //         fieldType: 'Checkbox',
-  //         selectMany: tCol.allow_multiple,
-  //         defaultValue: [],
-  //         dbName: 'tags',
-  //         data: tCol.tags.map(t => ({ ...t, displayName: t.name, id: '' + t.id }))
-  //       };
-
-  //       // want this to be the 5th field
-  //       if (tCol.name === 'Category') {
-  //         section.children.push(newField);
-  //       }
-  //     });
-
-  //     // want this to be the 2nd field
-  //     formJson.fields.splice(1, 0, section);
-  //   }
-
-  //   await this.setStateAsync({ formJson, loading: false });
-  // }
-
-  // setStateAsync(state) {
-  //   return new Promise((resolve) => {
-  //     this.setState(state, resolve);
-  //   });
-  // }
 
   render() {
     const { classes } = this.props;

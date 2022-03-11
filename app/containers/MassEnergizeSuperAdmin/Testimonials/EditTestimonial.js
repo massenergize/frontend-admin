@@ -137,7 +137,7 @@ class EditTestimonial extends Component {
           {!testimonial.user && <p>Created By: Community Admin</p>}
         </Paper>
         <br />
-        <MassEnergizeForm classes={classes} formJson={formJson} />
+        <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
       </>
     );
   }

@@ -121,7 +121,7 @@ class CreateNewVendorForm extends Component {
     if (!formJson) return <Loading />;
     return (
       <div>
-        <MassEnergizeForm classes={classes} formJson={formJson} />
+        <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
       </div>
     );
   }

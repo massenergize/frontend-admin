@@ -191,7 +191,7 @@ class EditTeam extends Component {
         </Paper>
 
         <br />
-        <MassEnergizeForm classes={classes} formJson={formJson} />
+        <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
       </div>
     );
   }

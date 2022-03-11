@@ -136,7 +136,7 @@ class CreateNewActionForm extends Component {
     if (!formJson) return <Loading />;
     return (
       <div key={this.state.reRenderKey}>
-        <MassEnergizeForm classes={classes} formJson={formJson} />
+        <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
       </div>
     );
   }
