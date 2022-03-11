@@ -30,23 +30,16 @@ class AllCommunities extends React.Component {
     };
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const { auth } = this.props;
     var url;
     if (auth.is_super_admin) url = "/communities.listForSuperAdmin";
     else if (auth.is_community_admin)
       url = "/communities.listForCommunityAdmin";
-    const allCommunitiesResponse = await apiCall(url);
-
-    if (allCommunitiesResponse && allCommunitiesResponse.success) {
-      this.props.putCommunitiesInRedux(allCommunitiesResponse.data);
-      await this.setStateAsync({ loading: false });
-    } else this.setState({ loading: false });
-  }
-
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
+    apiCall(url).then((allCommunitiesResponse) => {
+      if (allCommunitiesResponse && allCommunitiesResponse.success) {
+        this.props.putCommunitiesInRedux(allCommunitiesResponse.data);
+      }
     });
   }
 
@@ -173,7 +166,7 @@ class AllCommunities extends React.Component {
     const description = brand.desc;
     const { columns, loading } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.communities);
+    const data = this.fashionData(this.props.communities || []);
 
     const options = {
       filterType: "dropdown",
@@ -189,7 +182,7 @@ class AllCommunities extends React.Component {
       },
     };
 
-    if (loading && (!data || !data.length)) {
+    if (!data || !data.length) {
       return (
         <Grid
           container

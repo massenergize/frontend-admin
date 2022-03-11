@@ -33,22 +33,14 @@ class AllTeams extends React.Component {
     this.state = { data: [], loading: true, columns: this.getColumns() };
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const user = this.props.auth ? this.props.auth : {};
-
     if (user.is_super_admin) {
       this.props.callTeamsForSuperAdmin();
     }
     if (user.is_community_admin) {
       this.props.callTeamsForNormalAdmin();
     }
-    this.setStateAsync({ loading: false });
-  }
-
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
-    });
   }
 
   getStatus = (isApproved) => {
@@ -85,8 +77,8 @@ class AllTeams extends React.Component {
       d.primary_community && d.primary_community.name,
       smartString(d.parent && d.parent.name, 30),
       d.is_published,
-      d.id, 
-      d.id
+      d.id,
+      d.id,
     ]);
     return fashioned;
   };
@@ -190,7 +182,7 @@ class AllTeams extends React.Component {
   render() {
     const title = brand.name + " - All Teams";
     const description = brand.desc;
-    const { columns, loading } = this.state;
+    const { columns } = this.state;
     const data = this.fashionData(this.props.allTeams);
     const { classes } = this.props;
     const options = {
@@ -207,7 +199,7 @@ class AllTeams extends React.Component {
       },
     };
 
-    if (loading && (!data || !data.length)) {
+    if (!data || !data.length) {
       return <LinearBuffer />;
     }
     return (

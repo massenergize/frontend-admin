@@ -24,24 +24,15 @@ class AllUsers extends React.Component {
     };
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const { auth } = this.props;
-    var url; 
-    if(auth.is_super_admin) url = "/users.listForSuperAdmin"; 
-    else if ( auth.is_community_admin) url = "/users.listForCommunityAdmin"
-    const allUsersResponse = await apiCall(url);
-    if (allUsersResponse && allUsersResponse.success) {
-      this.props.putUsersInRedux(allUsersResponse.data);
-      await this.setStateAsync({
-        loading: false,
-        // data: this.fashionData(allUsersResponse.data)
-      });
-    } else this.setState({ loading: false });
-  }
-
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
+    var url;
+    if (auth.is_super_admin) url = "/users.listForSuperAdmin";
+    else if (auth.is_community_admin) url = "/users.listForCommunityAdmin";
+    apiCall(url).then((allUsersResponse) => {
+      if (allUsersResponse && allUsersResponse.success) {
+        this.props.putUsersInRedux(allUsersResponse.data);
+      }
     });
   }
 
@@ -112,9 +103,9 @@ class AllUsers extends React.Component {
   render() {
     const title = brand.name + " - Users";
     const description = brand.desc;
-    const { columns, loading } = this.state;
+    const { columns } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.allUsers);
+    const data = this.fashionData(this.props.allUsers || []);
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
@@ -130,7 +121,7 @@ class AllUsers extends React.Component {
       },
     };
 
-    if (loading && (!data || !data.length)) {
+    if (!data || !data.length) {
       return <LinearBuffer />;
     }
     return (

@@ -48,7 +48,6 @@ class AllActions extends React.Component {
       putActionsInRedux(allActionsResponse.data);
     } else if (allActionsResponse && !allActionsResponse.success) {
       await this.setStateAsync({
-        loading: false,
         error: allActionsResponse.error,
       });
     }
@@ -224,9 +223,9 @@ class AllActions extends React.Component {
     const title = brand.name + " - All Actions";
     const description = brand.desc;
     const { classes } = this.props;
-    const { columns, loading, error } = this.state;
-    const data = this.fashionData(this.props.allActions);
-    if (loading && (!data || !data.length)) {
+    const { columns, error } = this.state;
+    const data = this.fashionData(this.props.allActions || []);
+    if (!data || !data.length) {
       return <LinearBuffer />;
     }
     if (error) {

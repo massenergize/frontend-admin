@@ -31,25 +31,19 @@ class AllTestimonials extends React.Component {
     };
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const user = this.props.auth ? this.props.auth : {};
     if (user.is_super_admin) {
-      await this.props.callTestimonialsForSuperAdmin();
+      this.props.callTestimonialsForSuperAdmin();
     }
     if (user.is_community_admin) {
       const com = this.props.community
         ? this.props.community
         : user.admin_at[0];
       if (com) {
-        await this.props.callTestimonialsForNormalAdmin(com.id);
+        this.props.callTestimonialsForNormalAdmin(com.id);
       }
     }
-  }
-
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
-    });
   }
 
   fashionData = (data) => {
@@ -188,7 +182,7 @@ class AllTestimonials extends React.Component {
     const description = brand.desc;
     const { columns, loading } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.allTestimonials);
+    const data = this.fashionData(this.props.allTestimonials ||[]);
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
@@ -203,7 +197,7 @@ class AllTestimonials extends React.Component {
       },
     };
 
-    if (loading && (!data || !data.length)) {
+    if (!data || !data.length) {
       return <LinearBuffer />;
     }
 

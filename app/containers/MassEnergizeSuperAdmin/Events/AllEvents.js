@@ -28,29 +28,19 @@ import { Chip } from "@material-ui/core";
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { data: [], loading: true, columns: this.getColumns() };
+    this.state = { columns: this.getColumns() };
   }
 
   componentDidMount() {
     const user = this.props.auth ? this.props.auth : {};
     const community = this.props.community ? this.props.community : {};
     if (user.is_super_admin) {
-      this.props.callForSuperAdminEvents(() =>
-        this.setState({ loading: false })
-      );
+      this.props.callForSuperAdminEvents();
     }
     if (user.is_community_admin) {
       let com = community || user.admin_at[0];
-      this.props.callForNormalAdminEvents(com.id, () =>
-        this.setState({ loading: false })
-      );
+      this.props.callForNormalAdminEvents(com.id);
     }
-  }
-
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
-    });
   }
 
   fashionData = (data) => {
@@ -176,9 +166,9 @@ class AllEvents extends React.Component {
   render() {
     const title = brand.name + " - All Events";
     const description = brand.desc;
-    const { columns, loading } = this.state;
+    const { columns } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.allEvents);
+    const data = this.fashionData(this.props.allEvents ||[]);
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
@@ -193,7 +183,7 @@ class AllEvents extends React.Component {
       },
     };
 
-    if (loading && (!data || !data.length)) {
+    if (!data || !data.length) {
       return (
         <Grid
           container

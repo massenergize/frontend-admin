@@ -28,7 +28,6 @@ class AllVendors extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: true,
       columns: this.getColumns(props.classes),
     };
   }
@@ -37,7 +36,7 @@ class AllVendors extends React.Component {
     this.props.callVendorsForNormalAdmin(id);
   };
 
-  async componentDidMount() {
+  componentDidMount() {
     const user = this.props.auth ? this.props.auth : {};
     if (user.is_super_admin) {
       this.props.callVendorsForSuperAdmin();
@@ -75,12 +74,6 @@ class AllVendors extends React.Component {
     ]);
     return data;
   };
-
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
-    });
-  }
 
   getStatus = (isApproved) => {
     switch (isApproved) {
@@ -152,7 +145,7 @@ class AllVendors extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/vendor`} >
+            <Link to={`/admin/edit/${id}/vendor`}>
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
             &nbsp;&nbsp;
@@ -180,9 +173,9 @@ class AllVendors extends React.Component {
   render() {
     const title = brand.name + " - All Vendors";
     const description = brand.desc;
-    const { columns, loading } = this.state;
+    const { columns } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.allVendors);
+    const data = this.fashionData(this.props.allVendors ||[]);
 
     const options = {
       filterType: "dropdown",
@@ -198,7 +191,7 @@ class AllVendors extends React.Component {
       },
     };
 
-    if (loading && (!data || !data.length)) {
+    if (!data || !data.length) {
       return <LinearBuffer />;
     }
 
