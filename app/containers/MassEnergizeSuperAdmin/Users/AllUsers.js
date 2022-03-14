@@ -10,7 +10,7 @@ import MUIDataTable from "mui-datatables";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
-import { loadAllUsers } from "../../../redux/redux-actions/adminActions";
+import { loadAllUsers, reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 
@@ -100,6 +100,31 @@ class AllUsers extends React.Component {
     },
   ];
 
+
+  nowDelete({ idsToDelete, data }) {
+    const { allUsers, putUsersInRedux } = this.props;
+    const itemsInRedux = allUsers;
+    const ids = [];
+    idsToDelete.forEach((d) => {
+      const found = data[d.dataIndex][6];
+      ids.push(found);
+      apiCall("/users.delete", { id: found });
+ 
+    });
+    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
+    putUsersInRedux(rem);
+  }
+
+  makeDeleteUI({ idsToDelete }) {
+    const len = (idsToDelete && idsToDelete.length) || 0;
+    return (
+      <Typography>
+        Are you sure you want to delete (
+        {(idsToDelete && idsToDelete.length) || ""})
+        {len === 1 ? " user? " : " userrs? "}
+      </Typography>
+    );
+  }
   render() {
     const title = brand.name + " - Users";
     const description = brand.desc;
@@ -113,11 +138,19 @@ class AllUsers extends React.Component {
       rowsPerPage: 50,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach((d) => {
-          const idField = data[d.dataIndex].length - 1;
-          const userId = data[d.dataIndex][idField];
-          apiCall("/users.delete", { id: userId });
+        this.props.toggleDeleteConfirmation({
+          show: true,
+          component: this.makeDeleteUI({ idsToDelete }),
+          onConfirm: () => this.nowDelete({ idsToDelete, data }),
+          closeAfterConfirmation: true,
         });
+        return false;
+        // const idsToDelete = rowsDeleted.data;
+        // idsToDelete.forEach((d) => {
+        //   const idField = data[d.dataIndex].length - 1;
+        //   const userId = data[d.dataIndex][idField];
+        //   apiCall("/users.delete", { id: userId });
+        // });
       },
     };
 
@@ -161,6 +194,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
       putUsersInRedux: loadAllUsers,
+      toggleDeleteConfirmation: reduxToggleUniversalModal
     },
     dispatch
   );

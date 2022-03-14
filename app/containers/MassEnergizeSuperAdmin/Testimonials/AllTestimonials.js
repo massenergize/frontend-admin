@@ -15,12 +15,14 @@ import { bindActionCreators } from "redux";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import {
+  loadAllTestimonials,
   reduxGetAllCommunityTestimonials,
   reduxGetAllTestimonials,
+  reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
-import { Chip } from "@material-ui/core";
+import { Chip, Typography } from "@material-ui/core";
 
 class AllTestimonials extends React.Component {
   constructor(props) {
@@ -177,12 +179,35 @@ class AllTestimonials extends React.Component {
     ];
   };
 
+  nowDelete({ idsToDelete, data }) {
+    const { allTestimonials, putTestimonialsInRedux } = this.props;
+    const itemsInRedux = allTestimonials;
+    const ids = [];
+    idsToDelete.forEach((d) => {
+      const found = data[d.dataIndex][7];
+      ids.push(found);
+      apiCall("/testimonials.delete", { testimonial_id: found });
+    });
+    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
+    putTestimonialsInRedux(rem);
+  }
+
+  makeDeleteUI({ idsToDelete }) {
+    const len = (idsToDelete && idsToDelete.length) || 0;
+    return (
+      <Typography>
+        Are you sure you want to delete (
+        {(idsToDelete && idsToDelete.length) || ""})
+        {len === 1 ? " testimonial? " : " testimonials? "}
+      </Typography>
+    );
+  }
   render() {
     const title = brand.name + " - All Testimonials";
     const description = brand.desc;
     const { columns, loading } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.allTestimonials ||[]);
+    const data = this.fashionData(this.props.allTestimonials || []);
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
@@ -190,10 +215,18 @@ class AllTestimonials extends React.Component {
       rowsPerPage: 15,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach((d) => {
-          const testimonialId = data[d.dataIndex][0];
-          apiCall("/testimonials.delete", { testimonial_id: testimonialId });
+        this.props.toggleDeleteConfirmation({
+          show: true,
+          component: this.makeDeleteUI({ idsToDelete }),
+          onConfirm: () => this.nowDelete({ idsToDelete, data }),
+          closeAfterConfirmation: true,
         });
+        return false;
+        // const idsToDelete = rowsDeleted.data;
+        // idsToDelete.forEach((d) => {
+        //   const testimonialId = data[d.dataIndex][0];
+        //   apiCall("/testimonials.delete", { testimonial_id: testimonialId });
+        // });
       },
     };
 
@@ -241,6 +274,8 @@ function mapDispatchToProps(dispatch) {
     {
       callTestimonialsForSuperAdmin: reduxGetAllTestimonials,
       callTestimonialsForNormalAdmin: reduxGetAllCommunityTestimonials,
+      putTestimonialsInRedux: loadAllTestimonials,
+      toggleDeleteConfirmation: reduxToggleUniversalModal,
     },
     dispatch
   );

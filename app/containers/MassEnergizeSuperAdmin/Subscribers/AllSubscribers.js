@@ -1,30 +1,35 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import { Helmet } from 'react-helmet';
-import brand from 'dan-api/dummy/brand';
-import Typography from '@material-ui/core/Typography';
-import Avatar from '@material-ui/core/Avatar';
-import { bindActionCreators } from 'redux';
-import MUIDataTable from 'mui-datatables';
-import FileCopy from '@material-ui/icons/FileCopy';
-import EditIcon from '@material-ui/icons/Edit';
-import { Link } from 'react-router-dom';
-import Email from '@material-ui/icons/Email';
-import messageStyles from 'dan-styles/Messages.scss';
-import { connect } from 'react-redux';
-import { apiCall } from '../../../utils/messenger';
-import styles from '../../../components/Widget/widget-jss';
-import CommunitySwitch from '../Summary/CommunitySwitch';
-import { loadAllSubscribers } from '../../../redux/redux-actions/adminActions';
-import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
-
+import React from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import { Helmet } from "react-helmet";
+import brand from "dan-api/dummy/brand";
+import Typography from "@material-ui/core/Typography";
+import Avatar from "@material-ui/core/Avatar";
+import { bindActionCreators } from "redux";
+import MUIDataTable from "mui-datatables";
+import FileCopy from "@material-ui/icons/FileCopy";
+import EditIcon from "@material-ui/icons/Edit";
+import { Link } from "react-router-dom";
+import Email from "@material-ui/icons/Email";
+import messageStyles from "dan-styles/Messages.scss";
+import { connect } from "react-redux";
+import { apiCall } from "../../../utils/messenger";
+import styles from "../../../components/Widget/widget-jss";
+import CommunitySwitch from "../Summary/CommunitySwitch";
+import {
+  loadAllSubscribers,
+  reduxToggleUniversalModal,
+} from "../../../redux/redux-actions/adminActions";
+import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 
 class AllSubscribers extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: [], dataFiltered: [], loading: true, columns: this.getColumns(props.classes) 
+      data: [],
+      dataFiltered: [],
+      loading: true,
+      columns: this.getColumns(props.classes),
     };
   }
 
@@ -32,34 +37,27 @@ class AllSubscribers extends React.Component {
     const user = this.props.auth ? this.props.auth : {};
     let allSubscribersResponse = null;
     if (user.is_super_admin) {
-      allSubscribersResponse = await apiCall('/subscribers.listForCommunityAdmin');
+      allSubscribersResponse = await apiCall("/subscribers.listForSuperAdmin");
     } else if (user.is_community_admin) {
-      allSubscribersResponse = await apiCall('/subscribers.listForCommunityAdmin', { community_id: null });
+      allSubscribersResponse = await apiCall(
+        "/subscribers.listForCommunityAdmin",
+        { community_id: null }
+      );
     }
 
     if (allSubscribersResponse && allSubscribersResponse.data) {
-      this.props.putSubscribersInRedux(allSubscribersResponse.data)
+      this.props.putSubscribersInRedux(allSubscribersResponse.data);
     }
-
-    await this.setStateAsync({ loading: false });
   }
 
-
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
-    });
-  }
-
+ 
   showCommunitySwitch = () => {
     const user = this.props.auth ? this.props.auth : {};
     if (user.is_community_admin) {
-      return (
-        <CommunitySwitch actionToPerform={this.handleCommunityChange} />
-      );
+      return <CommunitySwitch actionToPerform={this.handleCommunityChange} />;
     }
     return <div />;
-  }
+  };
 
   handleCommunityChange = async (id) => {
     const { data } = this.state;
@@ -67,82 +65,104 @@ class AllSubscribers extends React.Component {
       await this.setStateAsync({ dataFiltered: data });
       return;
     }
-    const filteredData = (data || []) && data.filter(d => d.community && d.community.id === id);
+    const filteredData =
+      (data || []) && data.filter((d) => d.community && d.community.id === id);
     console.log(data, filteredData, id);
     await this.setStateAsync({ dataFiltered: filteredData });
-  }
+  };
 
+  fashionData = (data) =>
+    data.map((d) => [d.id, d.name, d.email, d.community && d.community.name]);
 
-  fashionData = (data) => data.map(d => (
-    [
-      d.id,
-      d.name,
-      d.email,
-      d.community && d.community.name,
-    ]
-  ))
-
-
-  getStatus = isApproved => {
+  getStatus = (isApproved) => {
     switch (isApproved) {
-      case false: return messageStyles.bgError;
-      case true: return messageStyles.bgSuccess;
-      default: return messageStyles.bgSuccess;
+      case false:
+        return messageStyles.bgError;
+      case true:
+        return messageStyles.bgSuccess;
+      default:
+        return messageStyles.bgSuccess;
     }
   };
 
   getColumns = (classes) => [
     {
-      name: 'ID',
-      key: 'id',
+      name: "ID",
+      key: "id",
       options: {
         filter: false,
-      }
+      },
     },
     {
-      name: 'Name',
-      key: 'name',
+      name: "Name",
+      key: "name",
       options: {
         filter: false,
-      }
+      },
     },
     {
-      name: 'Email',
-      key: 'email',
+      name: "Email",
+      key: "email",
       options: {
         filter: false,
-      }
+      },
     },
     {
-      name: 'Community',
-      key: 'community',
+      name: "Community",
+      key: "community",
       options: {
         filter: true,
-      }
+      },
     },
-  ]
+  ];
+
+  nowDelete({ idsToDelete, data }) {
+    const { subscribers, putSubscribersInRedux } = this.props;
+    const itemsInRedux = subscribers;
+    const ids = [];
+    idsToDelete.forEach((d) => {
+      const found = data[d.dataIndex][0];
+      ids.push(found);
+      apiCall("/subscribers.delete", { subscriber_id: found });
+    });
+    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
+    putSubscribersInRedux(rem);
+  }
+
+  makeDeleteUI({ idsToDelete }) {
+    const len = (idsToDelete && idsToDelete.length) || 0;
+    return (
+      <Typography>
+        Are you sure you want to delete (
+        {(idsToDelete && idsToDelete.length) || ""})
+        {len === 1 ? " subscriber? " : " subscribers? "}
+      </Typography>
+    );
+  }
 
   render() {
-    const title = brand.name + ' - All Subscribers';
+    const title = brand.name + " - All Subscribers";
     const description = brand.desc;
-    const { columns, dataFiltered, loading } = this.state;
+    const { columns, dataFiltered } = this.state;
     const { classes } = this.props;
     const data = this.fashionData(this.props.subscribers);
 
     const options = {
-      filterType: 'dropdown',
-      responsive: 'stacked',
+      filterType: "dropdown",
+      responsive: "stacked",
       print: true,
       rowsPerPage: 100,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach(async d => {
-          const subscriberId = dataFiltered[d.index].id;
-          await apiCall('/subscribers.delete', { subscriber_id: subscriberId });
+        this.props.toggleDeleteConfirmation({
+          show: true,
+          component: this.makeDeleteUI({ idsToDelete }),
+          onConfirm: () => this.nowDelete({ idsToDelete, data }),
+          closeAfterConfirmation: true,
         });
-      }
+      },
     };
-    if (loading && (!data || !data.length)) {
+    if (!data || !data.length) {
       return <LinearBuffer />;
     }
 
@@ -175,17 +195,24 @@ AllSubscribers.propTypes = {
 };
 function mapStateToProps(state) {
   return {
-    auth: state.getIn(['auth']),
-    allVendors: state.getIn(['allVendors']),
-    community: state.getIn(['selected_community']),
-    subscribers: state.getIn(['subscribers'])
+    auth: state.getIn(["auth"]),
+    allVendors: state.getIn(["allVendors"]),
+    community: state.getIn(["selected_community"]),
+    subscribers: state.getIn(["subscribers"]),
   };
 }
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-    putSubscribersInRedux: loadAllSubscribers
-  }, dispatch);
+  return bindActionCreators(
+    {
+      putSubscribersInRedux: loadAllSubscribers,
+      toggleDeleteConfirmation: reduxToggleUniversalModal,
+    },
+    dispatch
+  );
 }
-const VendorsMapped = connect(mapStateToProps, mapDispatchToProps)(AllSubscribers);
+const VendorsMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AllSubscribers);
 
 export default withStyles(styles)(VendorsMapped);

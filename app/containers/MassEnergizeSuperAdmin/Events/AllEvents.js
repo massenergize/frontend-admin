@@ -170,9 +170,9 @@ class AllEvents extends React.Component {
     const itemsInRedux = allEvents;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][0];
-      ids.push(found.id);
-      apiCall("/events.delete", { event_id: found.id });
+      const found = data[d.dataIndex][6];
+      ids.push(found);
+      apiCall("/events.delete", { event_id: found });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putEventsInRedux(rem);
@@ -184,7 +184,7 @@ class AllEvents extends React.Component {
       <Typography>
         Are you sure you want to delete (
         {(idsToDelete && idsToDelete.length) || ""})
-        {len === 1 ? " event? " : " eve ts? "}
+        {len === 1 ? " event? " : " events? "}
       </Typography>
     );
   }
@@ -209,11 +209,6 @@ class AllEvents extends React.Component {
           closeAfterConfirmation: true,
         });
         return false;
-        // const idsToDelete = rowsDeleted.data;
-        // idsToDelete.forEach((d) => {
-        //   const eventId = data[d.dataIndex][0];
-        //   apiCall("/events.delete", { event_id: eventId });
-        // });
       },
     };
 

@@ -148,7 +148,7 @@ export const loadAllPolicies = (data = null) => ({
 });
 export const loadAllVendors = (data = null) => ({
   type: GET_ALL_VENDORS,
-  payload: data,
+  payload: data, 
 });
 export const loadAllTestimonials = (data = null) => ({
   type: GET_ALL_TESTIMONIALS,

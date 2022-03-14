@@ -20,6 +20,8 @@ import styles from "../../../components/Widget/widget-jss";
 import {
   reduxGetAllVendors,
   reduxGetAllCommunityVendors,
+  reduxToggleUniversalModal,
+  loadAllVendors,
 } from "../../../redux/redux-actions/adminActions";
 import { smartString } from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
@@ -170,12 +172,36 @@ class AllVendors extends React.Component {
     },
   ];
 
+  nowDelete({ idsToDelete, data }) {
+    const { allVendors, putVendorsInRedux } = this.props;
+    const itemsInRedux = allVendors;
+    const ids = [];
+    idsToDelete.forEach((d) => {
+      const found = data[d.dataIndex][6];
+      ids.push(found);
+      apiCall("/vendors.delete", { vendor_id: found });
+    });
+    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
+    putVendorsInRedux(rem);
+  }
+
+  makeDeleteUI({ idsToDelete }) {
+    const len = (idsToDelete && idsToDelete.length) || 0;
+    return (
+      <Typography>
+        Are you sure you want to delete (
+        {(idsToDelete && idsToDelete.length) || ""})
+        {len === 1 ? " vendor? " : " vendors? "}
+      </Typography>
+    );
+  }
+
   render() {
     const title = brand.name + " - All Vendors";
     const description = brand.desc;
     const { columns } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.allVendors ||[]);
+    const data = this.fashionData(this.props.allVendors || []);
 
     const options = {
       filterType: "dropdown",
@@ -184,10 +210,15 @@ class AllVendors extends React.Component {
       rowsPerPage: 30,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach((d) => {
-          const vendorId = data[d.dataIndex][0];
-          apiCall("/vendors.delete", { vendor_id: vendorId });
+        this.props.toggleDeleteConfirmation({
+          show: true,
+          component: this.makeDeleteUI({ idsToDelete }),
+          onConfirm: () => this.nowDelete({ idsToDelete, data }),
+          closeAfterConfirmation: true,
         });
+        return false;
+        // const vendorId = data[d.dataIndex][0];
+        // apiCall("/vendors.delete", { vendor_id: vendorId });
       },
     };
 
@@ -233,6 +264,8 @@ function mapDispatchToProps(dispatch) {
     {
       callVendorsForSuperAdmin: reduxGetAllVendors,
       callVendorsForNormalAdmin: reduxGetAllCommunityVendors,
+      putVendorsInRedux: loadAllVendors,
+      toggleDeleteConfirmation: reduxToggleUniversalModal,
     },
     dispatch
   );

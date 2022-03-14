@@ -225,9 +225,9 @@ class AllActions extends React.Component {
     const itemsInRedux = allActions;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][0];
-      ids.push(found.id);
-      apiCall("/actions.delete", { action_id: found.id });
+      const found = data[d.dataIndex][6];
+      ids.push(found);
+      apiCall("/actions.delete", { action_id: found });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putActionsInRedux(rem);

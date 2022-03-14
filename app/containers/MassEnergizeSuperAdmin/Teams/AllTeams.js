@@ -20,11 +20,13 @@ import { bindActionCreators } from "redux";
 import {
   reduxGetAllTeams,
   reduxGetAllCommunityTeams,
+  loadAllTeams,
+  reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { apiCall } from "../../../utils/messenger";
 import { smartString } from "../../../utils/common";
-import { Chip } from "@material-ui/core";
+import { Chip, Typography } from "@material-ui/core";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 
 class AllTeams extends React.Component {
@@ -179,6 +181,30 @@ class AllTeams extends React.Component {
     ];
   };
 
+  nowDelete({ idsToDelete, data }) {
+    const { allTeams, putTeamsInRedux } = this.props;
+    const itemsInRedux = allTeams;
+    const ids = [];
+    idsToDelete.forEach((d) => {
+      const found = data[d.dataIndex][6];
+      ids.push(found);
+      apiCall("/teams.delete", { team_id: found });
+    });
+    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
+    putTeamsInRedux(rem);
+  }
+
+  makeDeleteUI({ idsToDelete }) {
+    const len = (idsToDelete && idsToDelete.length) || 0;
+    return (
+      <Typography>
+        Are you sure you want to delete (
+        {(idsToDelete && idsToDelete.length) || ""})
+        {len === 1 ? " team? " : " teams? "}
+      </Typography>
+    );
+  }
+
   render() {
     const title = brand.name + " - All Teams";
     const description = brand.desc;
@@ -192,9 +218,11 @@ class AllTeams extends React.Component {
       rowsPerPage: 30,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach((d) => {
-          const teamId = data[d.dataIndex][0];
-          apiCall("/teams.delete", { team_id: teamId });
+        this.props.toggleDeleteConfirmation({
+          show: true,
+          component: this.makeDeleteUI({ idsToDelete }),
+          onConfirm: () => this.nowDelete({ idsToDelete, data }),
+          closeAfterConfirmation: true,
         });
       },
     };
@@ -241,6 +269,8 @@ function mapDispatchToProps(dispatch) {
     {
       callTeamsForSuperAdmin: reduxGetAllTeams,
       callTeamsForNormalAdmin: reduxGetAllCommunityTeams,
+      putTeamsInRedux: loadAllTeams,
+      toggleDeleteConfirmation: reduxToggleUniversalModal,
     },
     dispatch
   );

@@ -19,6 +19,7 @@ import {
   reduxGetAllVendors,
   reduxGetAllCommunityVendors,
   loadAllAdminMessages,
+  reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
@@ -132,6 +133,30 @@ class AllCommunityAdminMessages extends React.Component {
     },
   ];
 
+  nowDelete({ idsToDelete, data }) {
+    const { messages, putMessagesInRedux } = this.props;
+    const itemsInRedux = messages;
+    const ids = [];
+    idsToDelete.forEach((d) => {
+      const found = data[d.dataIndex][6];
+      ids.push(found);
+      apiCall("/messages.delete", { message_id: found });
+    });
+    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
+    putMessagesInRedux(rem);
+  }
+
+  makeDeleteUI({ idsToDelete }) {
+    const len = (idsToDelete && idsToDelete.length) || 0;
+    return (
+      <Typography>
+      
+        Are you sure you want to delete (
+        {(idsToDelete && idsToDelete.length) || ""})
+        {len === 1 ? " message? " : " messages? "}
+      </Typography>
+    );
+  }
   render() {
     const title = brand.name + " - Community Admin Messages";
     const description = brand.desc;
@@ -145,10 +170,18 @@ class AllCommunityAdminMessages extends React.Component {
       rowsPerPage: 50,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach((d) => {
-          const messageId = data[d.dataIndex][0];
-          apiCall("/messages.delete", { message_id: messageId });
+        this.props.toggleDeleteConfirmation({
+          show: true,
+          component: this.makeDeleteUI({ idsToDelete }),
+          onConfirm: () => this.nowDelete({ idsToDelete, data }),
+          closeAfterConfirmation: true,
         });
+        return false;
+        // const idsToDelete = rowsDeleted.data;
+        // idsToDelete.forEach((d) => {
+        //   const messageId = data[d.dataIndex][0];
+        //   apiCall("/messages.delete", { message_id: messageId });
+        // });
       },
     };
 
@@ -194,6 +227,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
       putMessagesInRedux: loadAllAdminMessages,
+      toggleDeleteConfirmation: reduxToggleUniversalModal
     },
     dispatch
   );
