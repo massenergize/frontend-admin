@@ -6,25 +6,37 @@ import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import Icon from "@material-ui/core/Icon";
 import styles from "./profile-jss";
+import { withRouter } from "react-router-dom";
 
 class Pages extends React.Component {
   goHere = (link) => {
-    window.location = link;
+    // window.location = link;
+    this.props.history.push(link);
   };
 
   render() {
     const { classes, community } = this.props;
     const homeLink = `/admin/edit/${community ? community.id : null}/home`;
-    const allActions = `/admin/edit/${community ? community.id : null}/all-actions`;
+    const allActions = `/admin/edit/${
+      community ? community.id : null
+    }/all-actions`;
     const about = `/admin/edit/${community ? community.id : null}/about`;
-    const contactUs = `/admin/edit/${community ? community.id : null}/contact_us`;
+    const contactUs = `/admin/edit/${
+      community ? community.id : null
+    }/contact_us`;
     const donate = `/admin/edit/${community ? community.id : null}/donate`;
-    const impactPageLink = `/admin/edit/${community ? community.id : null}/impact`;
-    const impactsLink = `/admin/edit/${community ? community.id : null}/impacts`;
+    const impactPageLink = `/admin/edit/${
+      community ? community.id : null
+    }/impact`;
+    const impactsLink = `/admin/edit/${
+      community ? community.id : null
+    }/impacts`;
     const teams = `/admin/edit/${community ? community.id : null}/teams`;
     const events = `/admin/edit/${community ? community.id : null}/events`;
     const vendors = `/admin/edit/${community ? community.id : null}/vendors`;
-    const testimonials = `/admin/edit/${community ? community.id : null}/testimonials`;
+    const testimonials = `/admin/edit/${
+      community ? community.id : null
+    }/testimonials`;
     //const registration = `/admin/edit/${community ? community.id : null}/registration`;
     const signin = `/admin/edit/${community ? community.id : null}/signin`;
 
@@ -90,4 +102,4 @@ Pages.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Pages);
+export default withStyles(styles)(withRouter(Pages));

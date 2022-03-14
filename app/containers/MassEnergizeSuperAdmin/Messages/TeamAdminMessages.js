@@ -1,175 +1,193 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import { Helmet } from 'react-helmet';
-import brand from 'dan-api/dummy/brand';
-import Typography from '@material-ui/core/Typography';
-import Avatar from '@material-ui/core/Avatar';
-import { bindActionCreators } from 'redux';
-import MUIDataTable from 'mui-datatables';
-import FileCopy from '@material-ui/icons/FileCopy';
-import EditIcon from '@material-ui/icons/Edit';
-import { Link } from 'react-router-dom';
-import DetailsIcon from '@material-ui/icons/Details';
-import messageStyles from 'dan-styles/Messages.scss';
-import { connect } from 'react-redux';
-import { apiCall } from '../../../utils/messenger';
-import styles from '../../../components/Widget/widget-jss';
-import { reduxGetAllVendors, reduxGetAllCommunityVendors } from '../../../redux/redux-actions/adminActions';
-import CommunitySwitch from '../Summary/CommunitySwitch';
+import React from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import { Helmet } from "react-helmet";
+import brand from "dan-api/dummy/brand";
+import { bindActionCreators } from "redux";
+import MUIDataTable from "mui-datatables";
+import { Link } from "react-router-dom";
+import DetailsIcon from "@material-ui/icons/Details";
+import { connect } from "react-redux";
+import { apiCall } from "../../../utils/messenger";
+import styles from "../../../components/Widget/widget-jss";
+import CommunitySwitch from "../Summary/CommunitySwitch";
+import { getHumanFriendlyDate, smartString } from "../../../utils/common";
+import { Chip, Typography } from "@material-ui/core";
+import {
+  loadTeamMessages,
+  reduxToggleUniversalModal,
+} from "../../../redux/redux-actions/adminActions";
+import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 class AllTeamAdminMessages extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: [],
       loading: true,
-      columns: this.getColumns(props.classes)
+      columns: this.getColumns(props.classes),
     };
   }
 
-  async componentDidMount() {
-    const allMessagesResponse = await apiCall('/messages.listTeamAdminMessages');
-    if (allMessagesResponse && allMessagesResponse.success) {
-      await this.setStateAsync({
-        loading: false,
-        data: this.fashionData(allMessagesResponse.data)
-      });
-    }
-  }
-
-
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
+  componentDidMount() {
+    apiCall("/messages.listTeamAdminMessages").then((allMessagesResponse) => {
+      if (allMessagesResponse && allMessagesResponse.success) {
+        this.props.putTeamMessagesInRedux(allMessagesResponse.data);
+      }
     });
   }
 
   showCommunitySwitch = () => {
     const user = this.props.auth ? this.props.auth : {};
     if (user.is_community_admin) {
-      return (
-        <CommunitySwitch actionToPerform={this.handleCommunityChange} />
-      );
+      return <CommunitySwitch actionToPerform={this.handleCommunityChange} />;
     }
-  }
-
+  };
 
   fashionData = (data) => {
-    return data.map(d => (
-      [
-        d.id,
-        d.created_at,
-        d.title,
-        d.user_name || (d.user && d.user.full_name),
-        d.email || (d.user && d.user.email),
-        d.community && d.community.name,
-        d.team && d.team.name,
-        d.have_forwarded ? 'Yes' : 'No',
-        d.id
-      ]
-    ));
-  }
-
+    return data.map((d) => [
+      getHumanFriendlyDate(d.created_at, true),
+      smartString(d.title),
+      d.user_name || (d.user && d.user.full_name) || "",
+      d.email || (d.user && d.user.email),
+      d.community && d.community.name,
+      d.team && d.team.name,
+      d.have_forwarded,
+      d.id,
+    ]);
+  };
 
   getColumns = (classes) => [
     {
-      name: 'ID',
-      key: 'id',
+      name: "Date",
+      key: "date",
       options: {
         filter: true,
-        filterType: 'textField'
-      }
+      },
     },
     {
-      name: 'Date',
-      key: 'date',
+      name: "Title",
+      key: "title",
       options: {
         filter: true,
-      }
+      },
     },
     {
-      name: 'Title',
-      key: 'title',
+      name: "Provided Name",
+      key: "user_name",
       options: {
         filter: true,
-      }
+        filterType: "textField",
+      },
     },
     {
-      name: 'Provided Name',
-      key: 'user_name',
+      name: "Provided Email",
+      key: "email",
       options: {
         filter: true,
-        filterType: 'textField'
-      }
+        filterType: "textField",
+      },
     },
     {
-      name: 'Provided Email',
-      key: 'email',
+      name: "Community",
+      key: "community",
       options: {
         filter: true,
-        filterType: 'textField'
-      }
+        filterType: "multiselect",
+      },
     },
     {
-      name: 'Community',
-      key: 'community',
+      name: "Team",
+      key: "team",
       options: {
         filter: true,
-        filterType: 'multiselect'
-      }
+        filterType: "multiselect",
+      },
     },
     {
-      name: 'Team',
-      key: 'team',
+      name: "Forwarded to Team Admin?",
+      key: "replied?",
       options: {
         filter: true,
-        filterType: 'multiselect'
-      }
+        customBodyRender: (d) => {
+          return (
+            <Chip
+              label={d ? "Yes" : "No"}
+              className={d ? classes.yesLabel : classes.noLabel}
+            />
+          );
+        },
+      },
     },
     {
-      name: 'Forwarded to Team Admin?',
-      key: 'replied?',
-      options: {
-        filter: true,
-      }
-    },
-    {
-      name: 'See Details',
-      key: 'edit_or_copy',
+      name: "Details",
+      key: "edit_or_copy",
       options: {
         filter: false,
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/message`} target="_blank">
+            <Link to={`/admin/edit/${id}/message`}>
               <DetailsIcon size="small" variant="outlined" color="secondary" />
             </Link>
           </div>
-        )
-      }
+        ),
+      },
     },
-  ]
+  ];
 
+  nowDelete({ idsToDelete, data }) {
+    const { teamMessages, putTeamMessagesInRedux } = this.props;
+    const itemsInRedux = teamMessages;
+    const ids = [];
+    idsToDelete.forEach((d) => {
+      const found = data[d.dataIndex][7];
+      ids.push(found);
+      apiCall("/messages.delete", { message_id: found });
+    });
+    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
+    putTeamMessagesInRedux(rem);
+  }
+
+  makeDeleteUI({ idsToDelete }) {
+    const len = (idsToDelete && idsToDelete.length) || 0;
+    return (
+      <Typography>
+        Are you sure you want to delete (
+        {(idsToDelete && idsToDelete.length) || ""})
+        {len === 1 ? " message? " : " messages? "}
+      </Typography>
+    );
+  }
   render() {
-    const title = brand.name + ' - Team Admin Messages';
+    const title = brand.name + " - Team Admin Messages";
     const description = brand.desc;
-    const { columns, data } = this.state;
+    const { columns } = this.state;
     const { classes } = this.props;
-
+    const data = this.fashionData(this.props.teamMessages);
     const options = {
-      filterType: 'dropdown',
-      responsive: 'stacked',
+      filterType: "dropdown",
+      responsive: "stacked",
       print: true,
-      rowsPerPage: 100,
+      rowsPerPage: 50,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach(d => {
-          const messageId = data[d.dataIndex][0];
-          apiCall('/messages.delete', { message_id: messageId });
+        this.props.toggleDeleteConfirmation({
+          show: true,
+          component: this.makeDeleteUI({ idsToDelete }),
+          onConfirm: () => this.nowDelete({ idsToDelete, data }),
+          closeAfterConfirmation: true,
         });
-      }
+        return false;
+        // const idsToDelete = rowsDeleted.data;
+        // idsToDelete.forEach((d) => {
+        //   const messageId = data[d.dataIndex][0];
+        //   apiCall("/messages.delete", { message_id: messageId });
+        // });
+      },
     };
 
+    if (!data || !data.length) {
+      return <LinearBuffer />;
+    }
 
     return (
       <div>
@@ -189,7 +207,6 @@ class AllTeamAdminMessages extends React.Component {
             options={options}
           />
         </div>
-
       </div>
     );
   }
@@ -200,14 +217,23 @@ AllTeamAdminMessages.propTypes = {
 };
 function mapStateToProps(state) {
   return {
-    auth: state.getIn(['auth']),
-    community: state.getIn(['selected_community'])
+    auth: state.getIn(["auth"]),
+    community: state.getIn(["selected_community"]),
+    teamMessages: state.getIn(["teamMessages"]),
   };
 }
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-  }, dispatch);
+  return bindActionCreators(
+    {
+      putTeamMessagesInRedux: loadTeamMessages,
+      toggleDeleteConfirmation: reduxToggleUniversalModal,
+    },
+    dispatch
+  );
 }
-const VendorsMapped = connect(mapStateToProps, mapDispatchToProps)(AllTeamAdminMessages);
+const VendorsMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AllTeamAdminMessages);
 
 export default withStyles(styles)(VendorsMapped);

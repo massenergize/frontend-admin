@@ -1,29 +1,38 @@
 /* eslint-disable react/prop-types */
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-import brand from 'dan-api/dummy/brand';
-import { Helmet } from 'react-helmet';
-import { withStyles } from '@material-ui/core/styles';
+import brand from "dan-api/dummy/brand";
+import { Helmet } from "react-helmet";
+import { withStyles } from "@material-ui/core/styles";
 
-import MUIDataTable from 'mui-datatables';
-import FileCopy from '@material-ui/icons/FileCopy';
-import EditIcon from '@material-ui/icons/Edit';
-import { Link } from 'react-router-dom';
-import Avatar from '@material-ui/core/Avatar';
-import TextField from '@material-ui/core/TextField';
+import MUIDataTable from "mui-datatables";
+import FileCopy from "@material-ui/icons/FileCopy";
+import EditIcon from "@material-ui/icons/Edit";
+import { Link, withRouter } from "react-router-dom";
+import Avatar from "@material-ui/core/Avatar";
+import TextField from "@material-ui/core/TextField";
 
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { apiCall } from '../../../utils/messenger';
-import styles from '../../../components/Widget/widget-jss';
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { apiCall } from "../../../utils/messenger";
+import styles from "../../../components/Widget/widget-jss";
 import {
   reduxGetAllActions,
   reduxGetAllCommunityActions,
   loadAllActions,
-} from '../../../redux/redux-actions/adminActions';
-import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
-import { isNotEmpty } from '../../../utils/common';
+  reduxToggleUniversalModal,
+} from "../../../redux/redux-actions/adminActions";
+import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import { isNotEmpty, smartString } from "../../../utils/common";
+import {
+  Chip,
+  Grid,
+  LinearProgress,
+  Paper,
+  Typography,
+} from "@material-ui/core";
+
 class AllActions extends React.Component {
   constructor(props) {
     super(props);
@@ -37,18 +46,15 @@ class AllActions extends React.Component {
   }
 
   async componentDidMount() {
-    const allActionsResponse = await apiCall('/actions.listForCommunityAdmin');
+    const { putActionsInRedux, auth } = this.props;
+    var url;
+    if (auth.is_super_admin) url = "/actions.listForSuperAdmin";
+    else if (auth.is_community_admin) url = "/actions.listForCommunityAdmin";
+    const allActionsResponse = await apiCall(url);
     if (allActionsResponse && allActionsResponse.success) {
-      loadAllActions(allActionsResponse.data);
-      await this.setStateAsync({
-        loading: false,
-        error: null,
-        allActions: allActionsResponse.data,
-        data: this.fashionData(allActionsResponse.data),
-      });
+      putActionsInRedux(allActionsResponse.data);
     } else if (allActionsResponse && !allActionsResponse.success) {
       await this.setStateAsync({
-        loading: false,
         error: allActionsResponse.error,
       });
     }
@@ -65,183 +71,278 @@ class AllActions extends React.Component {
     const newData = allActions.filter(
       (a) => (a.community && a.community.id === id) || a.is_global
     );
-    await this.setStateAsync({ data: this.fashionData(newData) });
+    await this.setStateAsync({ data: fashionData(newData) });
   };
 
+  getColumns = () => {
+    const { classes } = this.props;
+    return [
+      {
+        name: "Image",
+        key: "image",
+        options: {
+          filter: false,
+          download: false,
+          customBodyRender: (d) => (
+            <div>
+              {d.image && (
+                <Avatar
+                  alt={d.initials}
+                  src={d.image.url}
+                  style={{ margin: 10 }}
+                />
+              )}
+              {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
+            </div>
+          ),
+        },
+      },
+      {
+        name: "Title",
+        key: "title",
+        options: {
+          filter: false,
+          filterType: "textField",
+        },
+      },
+      {
+        name: "Rank",
+        key: "rank",
+        options: {
+          filter: false,
+          customBodyRender: (d) => {
+            return (
+              d && (
+                <TextField
+                  style={{ width: 50, textAlign: "center" }}
+                  key={d.id}
+                  required
+                  name="rank"
+                  variant="outlined"
+                  onChange={async (event) => {
+                    const { target } = event;
+                    if (!target) return;
+                    const { name, value } = target;
+                    if (isNotEmpty(value) && value !== String(d.rank)) {
+                      await apiCall("/actions.rank", {
+                        action_id: d && d.id,
+                        [name]: value,
+                      });
+                    }
+                  }}
+                  label="Rank"
+                  InputLabelProps={{
+                    shrink: true,
+                    maxwidth: "10px",
+                  }}
+                  defaultValue={d.rank}
+                />
+              )
+            );
+          },
+        },
+      },
+      {
+        name: "Tags",
+        key: "tags",
+        options: {
+          filter: true,
+          filterType: "textField",
+        },
+      },
+      {
+        name: "Community",
+        key: "community",
+        options: {
+          filter: true,
+          filterType: "multiselect",
+        },
+      },
+      {
+        name: "Live?",
+        key: "is_live",
+        options: {
+          filter: true,
+          customBodyRender: (d) => {
+            return (
+              <Chip
+                onClick={() =>
+                  this.props.toggleLive({
+                    show: true,
+                    component: this.makeLiveUI({ data: d.item }),
+                    onConfirm: () => this.makeLiveOrNot(d.item),
+                    closeAfterConfirmation: true,
+                  })
+                }
+                label={d.isLive ? "Yes" : "No"}
+                className={`${
+                  d.isLive ? classes.yesLabel : classes.noLabel
+                } touchable-opacity`}
+              />
+            );
+          },
+        },
+      },
+      {
+        name: "Edit",
+        key: "edit_or_copy",
+        options: {
+          filter: false,
+          download: false,
+          customBodyRender: (id) => (
+            <div>
+              <Link to={`/admin/edit/${id}/action`}>
+                <EditIcon size="small" variant="outlined" color="secondary" />
+              </Link>
+              &nbsp;&nbsp;
+              <Link
+                onClick={async () => {
+                  const copiedActionResponse = await apiCall("/actions.copy", {
+                    action_id: id,
+                  });
+                  if (copiedActionResponse && copiedActionResponse.success) {
+                    const newAction =
+                      copiedActionResponse && copiedActionResponse.data;
+                    this.props.history.push(
+                      `/admin/edit/${newAction.id}/action`
+                    );
+                  }
+                }}
+                to="/admin/read/actions"
+              >
+                <FileCopy size="small" variant="outlined" color="secondary" />
+              </Link>
+            </div>
+          ),
+        },
+      },
+    ];
+  };
   fashionData = (data) => {
     const fashioned = data.map((d) => [
-      d.id,
+      // d.id,
       {
         id: d.id,
         image: d.image,
         initials: `${d.title && d.title.substring(0, 2).toUpperCase()}`,
       },
-      `${d.title}...`.substring(0, 30), // limit to first 30 chars
+      smartString(d.title), // limit to first 30 chars
       { rank: d.rank, id: d.id },
-      `${d.tags.map((t) => t.name).join(', ')} `,
-      d.is_global ? 'Template' : d.community && d.community.name,
-      d.is_published ? 'Yes' : 'No',
+      `${smartString(d.tags.map((t) => t.name).join(", "), 30)} `,
+      d.is_global ? "Template" : d.community && d.community.name,
+      { isLive: d.is_published, item: d },
       d.id,
     ]);
     return fashioned;
   };
 
-  getColumns = () => [
-    {
-      name: 'ID',
-      key: 'id',
-      options: {
-        filter: true,
-        filterType: 'textField',
-      },
-    },
-    {
-      name: 'Image',
-      key: 'image',
-      options: {
-        filter: false,
-        download: false,
-        customBodyRender: (d) => (
-          <div>
-            {d.image && (
-              <Avatar
-                alt={d.initials}
-                src={d.image.url}
-                style={{ margin: 10 }}
-              />
-            )}
-            {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
-          </div>
-        ),
-      },
-    },
-    {
-      name: 'Title',
-      key: 'title',
-      options: {
-        filter: false,
-        filterType: 'textField',
-      },
-    },
-    {
-      name: 'Rank',
-      key: 'rank',
-      options: {
-        filter: false,
-        customBodyRender: (d) => {
-          return d && (
-            <TextField
-              key={d.id}
-              required
-              name="rank"
-              variant="outlined"
-              onChange={async (event) => {
-                const { target } = event;
-                if (!target) return;
-                const { name, value } = target;
-                if (isNotEmpty(value) && value !== String(d.rank)) {
-                  await apiCall('/actions.rank', {
-                    action_id: d && d.id,
-                    [name]: value,
-                  });
-                }
-              }}
-              label="Rank"
-              InputLabelProps={{
-                shrink: true,
-                maxwidth: '10px',
-              }}
-              defaultValue={d.rank}
-            />
-          );
-        },
-      },
-    },
-    {
-      name: 'Tags',
-      key: 'tags',
-      options: {
-        filter: true,
-        filterType: 'textField',
-      },
-    },
-    {
-      name: 'Community',
-      key: 'community',
-      options: {
-        filter: true,
-        filterType: 'multiselect',
-      },
-    },
-    {
-      name: 'Is Live?',
-      key: 'is_live',
-      options: {
-        filter: true,
-      },
-    },
-    {
-      name: 'Edit? Copy?',
-      key: 'edit_or_copy',
-      options: {
-        filter: false,
-        download: false,
-        customBodyRender: (id) => (
-          <div>
-            <Link to={`/admin/edit/${id}/action`} target="_blank">
-              <EditIcon size="small" variant="outlined" color="secondary" />
-            </Link>
-            &nbsp;&nbsp;
-            <Link
-              onClick={async () => {
-                const copiedActionResponse = await apiCall('/actions.copy', {
-                  action_id: id,
-                });
-                if (copiedActionResponse && copiedActionResponse.success) {
-                  const newAction = copiedActionResponse && copiedActionResponse.data;
-                  window.location.href = `/admin/edit/${newAction.id}/action`;
-                }
-              }}
-              to="/admin/read/actions"
-            >
-              <FileCopy size="small" variant="outlined" color="secondary" />
-            </Link>
-          </div>
-        ),
-      },
-    },
-  ];
+  makeLiveOrNot(item) {
+    const putInRedux = this.props.putActionsInRedux;
+    const data = this.props.allActions || [];
+    const status = item.is_published;
+    const index = data.findIndex((a) => a.id === item.id);
+    item.is_published = !status;
+    data.splice(index, 1, item);
+    putInRedux([...data]);
+    apiCall("/actions.update", {
+      action_id: item.id,
+      is_published: !status,
+    });
+  }
+
+  makeLiveUI({ data }) {
+    const name = data && data.title;
+    const isON = data.is_published;
+    return (
+      <div>
+        <Typography>
+          <b>{name}</b> is {isON ? "live, " : "not live, "}
+          would you like {isON ? " to take it offline" : " to take it live"}?
+        </Typography>
+      </div>
+    );
+  }
+
+  nowDelete({ idsToDelete, data }) {
+    const { allActions, putActionsInRedux } = this.props;
+    const itemsInRedux = allActions;
+    const ids = [];
+    idsToDelete.forEach((d) => {
+      const found = data[d.dataIndex][6];
+      ids.push(found);
+      apiCall("/actions.delete", { action_id: found });
+    });
+    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
+    putActionsInRedux(rem);
+  }
+
+  makeDeleteUI({ idsToDelete }) {
+    const len = (idsToDelete && idsToDelete.length) || 0;
+    return (
+      <Typography>
+        Are you sure you want to delete (
+        {(idsToDelete && idsToDelete.length) || ""})
+        {len === 1 ? " action? " : " actions? "}
+      </Typography>
+    );
+  }
 
   render() {
-    const title = brand.name + ' - All Actions';
+    const title = brand.name + " - All Actions";
     const description = brand.desc;
     const { classes } = this.props;
-    const {
-      columns, loading, data, error
-    } = this.state;
-
-    if (loading) {
-      return <LinearBuffer />;
+    const { columns, error } = this.state;
+    const data = this.fashionData(this.props.allActions || []);
+    if (!data || !data.length) {
+      return (
+        <Grid
+          container
+          spacing={24}
+          alignItems="flex-start"
+          direction="row"
+          justify="center"
+        >
+          <Grid item xs={12} md={6}>
+            <Paper className={classes.root} style={{ padding: 15 }}>
+              <div className={classes.root}>
+                <LinearProgress />
+                <h1>Fetching all Actions. This may take a while...</h1>
+                <br />
+                <LinearProgress color="secondary" />
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      );
     }
+
     if (error) {
       return (
-        <div>
+        <Paper style={{ padding: 15 }}>
           <h2>Error</h2>
-        </div>
+        </Paper>
       );
     }
 
     const options = {
-      filterType: 'dropdown',
-      responsive: 'stacked',
+      filterType: "dropdown",
+      responsive: "stacked",
       print: true,
-      rowsPerPage: 100,
+      rowsPerPage: 15,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach(async (d) => {
-          const actionId = data[d.dataIndex][0];
-          await apiCall('/actions.delete', { action_id: actionId });
+        this.props.toggleDeleteConfirmation({
+          show: true,
+          component: this.makeDeleteUI({ idsToDelete }),
+          onConfirm: () => this.nowDelete({ idsToDelete, data }),
+          closeAfterConfirmation: true,
         });
+        return false;
+        // const idsToDelete = rowsDeleted.data;
+        // idsToDelete.forEach(async (d) => {
+        //   const actionId = data[d.dataIndex][0];
+        //   await apiCall("/actions.delete", { action_id: actionId });
+        // });
       },
     };
     return (
@@ -273,19 +374,23 @@ AllActions.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  auth: state.getIn(['auth']),
-  allActions: state.getIn(['allActions']),
-  community: state.getIn(['selected_community']),
+  auth: state.getIn(["auth"]),
+  allActions: state.getIn(["allActions"]),
+  community: state.getIn(["selected_community"]),
 });
-const mapDispatchToProps = (dispatch) => bindActionCreators(
-  {
-    callAllActions: reduxGetAllActions,
-    callCommunityActions: reduxGetAllCommunityActions,
-  },
-  dispatch
-);
+const mapDispatchToProps = (dispatch) =>
+  bindActionCreators(
+    {
+      callAllActions: reduxGetAllActions,
+      callCommunityActions: reduxGetAllCommunityActions,
+      putActionsInRedux: loadAllActions,
+      toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleLive: reduxToggleUniversalModal,
+    },
+    dispatch
+  );
 const ActionsMapped = connect(
   mapStateToProps,
   mapDispatchToProps
 )(AllActions);
-export default withStyles(styles)(ActionsMapped);
+export default withStyles(styles)(withRouter(ActionsMapped));
