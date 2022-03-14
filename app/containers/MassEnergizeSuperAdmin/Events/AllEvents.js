@@ -20,10 +20,12 @@ import styles from "../../../components/Widget/widget-jss";
 import {
   reduxGetAllEvents,
   reduxGetAllCommunityEvents,
+  loadAllEvents,
+  reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { smartString } from "../../../utils/common";
-import { Chip } from "@material-ui/core";
+import { Chip, Typography } from "@material-ui/core";
 
 class AllEvents extends React.Component {
   constructor(props) {
@@ -163,12 +165,36 @@ class AllEvents extends React.Component {
     ];
   };
 
+  nowDelete({ idsToDelete, data }) {
+    const { allEvents, putEventsInRedux } = this.props;
+    const itemsInRedux = allEvents;
+    const ids = [];
+    idsToDelete.forEach((d) => {
+      const found = data[d.dataIndex][0];
+      ids.push(found.id);
+      apiCall("/events.delete", { event_id: found.id });
+    });
+    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
+    putEventsInRedux(rem);
+  }
+
+  makeDeleteUI({ idsToDelete }) {
+    const len = (idsToDelete && idsToDelete.length) || 0;
+    return (
+      <Typography>
+        Are you sure you want to delete (
+        {(idsToDelete && idsToDelete.length) || ""})
+        {len === 1 ? " event? " : " eve ts? "}
+      </Typography>
+    );
+  }
+
   render() {
     const title = brand.name + " - All Events";
     const description = brand.desc;
     const { columns } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.allEvents ||[]);
+    const data = this.fashionData(this.props.allEvents || []);
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
@@ -176,10 +202,18 @@ class AllEvents extends React.Component {
       rowsPerPage: 15,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach((d) => {
-          const eventId = data[d.dataIndex][0];
-          apiCall("/events.delete", { event_id: eventId });
+        this.props.toggleDeleteConfirmation({
+          show: true,
+          component: this.makeDeleteUI({ idsToDelete }),
+          onConfirm: () => this.nowDelete({ idsToDelete, data }),
+          closeAfterConfirmation: true,
         });
+        return false;
+        // const idsToDelete = rowsDeleted.data;
+        // idsToDelete.forEach((d) => {
+        //   const eventId = data[d.dataIndex][0];
+        //   apiCall("/events.delete", { event_id: eventId });
+        // });
       },
     };
 
@@ -246,6 +280,8 @@ function mapDispatchToProps(dispatch) {
     {
       callForSuperAdminEvents: reduxGetAllEvents,
       callForNormalAdminEvents: reduxGetAllCommunityEvents,
+      putEventsInRedux: loadAllEvents,
+      toggleDeleteConfirmation: reduxToggleUniversalModal,
     },
     dispatch
   );

@@ -17,7 +17,10 @@ import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { reduxLoadAllCommunities } from "../../../redux/redux-actions/adminActions";
+import {
+  reduxLoadAllCommunities,
+  reduxToggleUniversalModal,
+} from "../../../redux/redux-actions/adminActions";
 import { smartString } from "../../../utils/common";
 import { Chip, Typography } from "@material-ui/core";
 import ThemeModal from "../../../components/Widget/ThemeModal";
@@ -165,21 +168,41 @@ class AllCommunities extends React.Component {
   nowDelete({ idsToDelete, data }) {
     const { communities, putCommunitiesInRedux } = this.props;
     const ids = [];
+    /**
+     * TODO: We should probably let the backend accept an array of items to remove instead of looping api calls....
+     */
     idsToDelete.forEach((d) => {
       const communityId = data[d.dataIndex][0];
       ids.push(communityId.id);
-      // apiCall("/communities.delete", { community_id: communityId });
+      apiCall("/communities.delete", { community_id: communityId.id });
     });
     const rem = (communities || []).filter((com) => !ids.includes(com.id));
-    this.setState({ showDeleteConfirmation: false, idsToDelete: null });
     putCommunitiesInRedux(rem);
+  }
+
+  makeDeleteUI({ idsToDelete }) {
+    const len = (idsToDelete && idsToDelete.length) || 0;
+    return (
+      <Typography>
+        Are you sure you want to delete (
+        {(idsToDelete && idsToDelete.length) || ""})
+        {len === 1 ? " community? " : " communities? "}
+        <Typography style={{ color: "#8f0707" }}>
+          <b>
+            {" "}
+            Please note that you will not be able to delete a community you did
+            not create
+          </b>
+        </Typography>
+      </Typography>
+    );
   }
 
   render() {
     const title = brand.name + " - All Communities";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes } = this.props;
+    const { classes, toggleDeleteConfirmation } = this.props;
     const data = this.fashionData(this.props.communities || []);
 
     const options = {
@@ -189,7 +212,12 @@ class AllCommunities extends React.Component {
       rowsPerPage: 50,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        this.setState({ showDeleteConfirmation: true, idsToDelete });
+        toggleDeleteConfirmation({
+          show: true,
+          component: this.makeDeleteUI({ idsToDelete }),
+          onConfirm: () => this.nowDelete({ idsToDelete, data }),
+          closeAfterConfirmation: true,
+        });
         return false;
         // idsToDelete.forEach((d) => {
         //   const communityId = data[d.dataIndex][0];
@@ -234,21 +262,6 @@ class AllCommunities extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         {/* {this.renderTable(communities, classes)} */}
-
-        <ThemeModal
-          open={this.state.showDeleteConfirmation}
-          onCancel={() =>
-            this.setState({ showDeleteConfirmation: false, idsToDelete: [] })
-          }
-          onConfirm={() => this.nowDelete({ idsToDelete, data })}
-        >
-          <Typography>
-            Are you sure you want to delete (
-            {(idsToDelete && idsToDelete.length) || ""})
-            {len === 1 ? " community? " : " communities? "}
-          </Typography>
-        </ThemeModal>
-
         <div className={classes.table}>
           <MUIDataTable
             title="All Communities"
@@ -276,6 +289,7 @@ const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       putCommunitiesInRedux: reduxLoadAllCommunities,
+      toggleDeleteConfirmation: reduxToggleUniversalModal,
     },
     dispatch
   );

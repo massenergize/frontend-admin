@@ -27,6 +27,7 @@ import {
   GET_TEAM_MESSAGES,
   UPDATE_HEAP,
   LOAD_CC_ACTIONS,
+  TOGGLE_UNIVERSAL_MODAL,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -109,6 +110,10 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadAllTags(tagCollections.data));
   });
 };
+export const reduxToggleUniversalModal = (data = {}) => ({
+  type: TOGGLE_UNIVERSAL_MODAL,
+  payload: data,
+});
 export const reduxLoadCCActions = (data = []) => ({
   type: LOAD_CC_ACTIONS,
   payload: data,

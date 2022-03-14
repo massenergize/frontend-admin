@@ -37,6 +37,7 @@ import app, {
   subscribersReducer,
   reducerForHeap,
   reducerForCCAction,
+  reducerForUniversalModal,
 } from "./modules/appReducer";
 
 /**
@@ -44,8 +45,9 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    modalOptions: reducerForUniversalModal,
     ccActions: reducerForCCAction,
-    heap:reducerForHeap, // an object that is used to temporarily hold all kinds of random data. 
+    heap: reducerForHeap, // an object that is used to temporarily hold all kinds of random data.
     subscribers: subscribersReducer,
     teamMessages: teamMessagesReducer,
     messages: adminMessagesReducer,

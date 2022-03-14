@@ -9,6 +9,7 @@ import {
   reduxCallLibraryModalImages,
   reduxCheckUser,
   reduxFetchInitialContent,
+  reduxToggleUniversalModal,
 } from "../../redux/redux-actions/adminActions";
 import {
   Parent,
@@ -79,6 +80,7 @@ import MessageDetails from "../MassEnergizeSuperAdmin/Messages/MessageDetails";
 import TeamAdminMessages from "../MassEnergizeSuperAdmin/Messages/TeamAdminMessages";
 import TeamMembers from "../MassEnergizeSuperAdmin/Teams/TeamMembers";
 import EventRSVPs from "../MassEnergizeSuperAdmin/Events/EventRSVPs";
+import ThemeModal from "../../components/Widget/ThemeModal";
 
 class Application extends React.Component {
   componentWillMount() {
@@ -97,7 +99,12 @@ class Application extends React.Component {
   render() {
     const { auth, signOut } = this.props;
 
-    const { changeMode, history } = this.props;
+    const {
+      changeMode,
+      history,
+      modalOptions,
+      toggleUniversalModal,
+    } = this.props;
     const user = auth || {};
 
     const communityAdminSpecialRoutes = [
@@ -157,9 +164,27 @@ class Application extends React.Component {
         )}
       />,
     ];
-
+    const {
+      component,
+      show,
+      onConfirm,
+      onCancel,
+      closeAfterConfirmation,
+    } = modalOptions;
     return (
       <Dashboard history={history} changeMode={changeMode}>
+        <ThemeModal
+          open={show}
+          onConfirm={onConfirm}
+          onCancel={() => {
+            if (onCancel) onCancel();
+          }}
+          close={() => toggleUniversalModal({ show: false, component: null })}
+          closeAfterConfirmation={closeAfterConfirmation}
+        >
+          {component}
+        </ThemeModal>
+
         <Switch>
           {user.is_community_admin && communityAdminSpecialRoutes}
           {user.is_super_admin && superAdminSpecialRoutes}
@@ -324,6 +349,7 @@ function mapStateToProps(state) {
   return {
     auth: state.getIn(["auth"]),
     modalLibraryImages: state.getIn(["modalLibraryImages"]),
+    modalOptions: state.getIn(["modalOptions"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -333,6 +359,7 @@ function mapDispatchToProps(dispatch) {
       checkUser: reduxCheckUser,
       loadModalImages: reduxCallLibraryModalImages,
       fetchInitialContent: reduxFetchInitialContent,
+      toggleUniversalModal: reduxToggleUniversalModal,
     },
     dispatch
   );

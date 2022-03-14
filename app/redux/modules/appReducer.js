@@ -26,6 +26,7 @@ import {
   GET_ALL_SUBSCRIBERS,
   UPDATE_HEAP,
   LOAD_CC_ACTIONS,
+  TOGGLE_UNIVERSAL_MODAL,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -43,6 +44,15 @@ export default function reducer(state = initialImmutableState, action = {}) {
   }
 }
 
+export const reducerForUniversalModal = (state = {}, action = {}) => {
+  switch (action.type) {
+    case TOGGLE_UNIVERSAL_MODAL:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
 export const reducerForCCAction = (state = [], action = {}) => {
   switch (action.type) {
     case LOAD_CC_ACTIONS:

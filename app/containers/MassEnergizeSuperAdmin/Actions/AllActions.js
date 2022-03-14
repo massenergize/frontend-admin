@@ -21,10 +21,11 @@ import {
   reduxGetAllActions,
   reduxGetAllCommunityActions,
   loadAllActions,
+  reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { isNotEmpty, smartString } from "../../../utils/common";
-import { Chip } from "@material-ui/core";
+import { Chip, Typography } from "@material-ui/core";
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -219,6 +220,30 @@ class AllActions extends React.Component {
     return fashioned;
   };
 
+  nowDelete({ idsToDelete, data }) {
+    const { allActions, putActionsInRedux } = this.props;
+    const itemsInRedux = allActions;
+    const ids = [];
+    idsToDelete.forEach((d) => {
+      const found = data[d.dataIndex][0];
+      ids.push(found.id);
+      apiCall("/actions.delete", { action_id: found.id });
+    });
+    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
+    putActionsInRedux(rem);
+  }
+
+  makeDeleteUI({ idsToDelete }) {
+    const len = (idsToDelete && idsToDelete.length) || 0;
+    return (
+      <Typography>
+        Are you sure you want to delete (
+        {(idsToDelete && idsToDelete.length) || ""})
+        {len === 1 ? " action? " : " actions? "}
+      </Typography>
+    );
+  }
+
   render() {
     const title = brand.name + " - All Actions";
     const description = brand.desc;
@@ -243,10 +268,18 @@ class AllActions extends React.Component {
       rowsPerPage: 15,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach(async (d) => {
-          const actionId = data[d.dataIndex][0];
-          await apiCall("/actions.delete", { action_id: actionId });
+        this.props.toggleDeleteConfirmation({
+          show: true,
+          component: this.makeDeleteUI({ idsToDelete }),
+          onConfirm: () => this.nowDelete({ idsToDelete, data }),
+          closeAfterConfirmation: true,
         });
+        return false;
+        // const idsToDelete = rowsDeleted.data;
+        // idsToDelete.forEach(async (d) => {
+        //   const actionId = data[d.dataIndex][0];
+        //   await apiCall("/actions.delete", { action_id: actionId });
+        // });
       },
     };
     return (
@@ -288,6 +321,7 @@ const mapDispatchToProps = (dispatch) =>
       callAllActions: reduxGetAllActions,
       callCommunityActions: reduxGetAllCommunityActions,
       putActionsInRedux: loadAllActions,
+      toggleDeleteConfirmation: reduxToggleUniversalModal,
     },
     dispatch
   );
