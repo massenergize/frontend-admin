@@ -26,7 +26,13 @@ import {
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { apiCall } from "../../../utils/messenger";
 import { smartString } from "../../../utils/common";
-import { Chip, Typography } from "@material-ui/core";
+import {
+  Chip,
+  Grid,
+  LinearProgress,
+  Paper,
+  Typography,
+} from "@material-ui/core";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 
 class AllTeams extends React.Component {
@@ -78,7 +84,7 @@ class AllTeams extends React.Component {
       smartString(d.name), // limit to first 30 chars
       d.primary_community && d.primary_community.name,
       smartString(d.parent && d.parent.name, 30),
-      d.is_published,
+      { isLive: d.is_published, item: d },
       d.id,
       d.id,
     ]);
@@ -145,8 +151,18 @@ class AllTeams extends React.Component {
           customBodyRender: (d) => {
             return (
               <Chip
-                label={d ? "Yes" : "No"}
-                className={d ? classes.yesLabel : classes.noLabel}
+                onClick={() =>
+                  this.props.toggleLive({
+                    show: true,
+                    component: this.makeLiveUI({ data: d.item }),
+                    onConfirm: () => this.makeLiveOrNot(d.item),
+                    closeAfterConfirmation: true,
+                  })
+                }
+                label={d.isLive ? "Yes" : "No"}
+                className={`${
+                  d.isLive ? classes.yesLabel : classes.noLabel
+                } touchable-opacity`}
               />
             );
           },
@@ -180,6 +196,33 @@ class AllTeams extends React.Component {
       },
     ];
   };
+
+  makeLiveOrNot(item) {
+    const putInRedux = this.props.putTeamsInRedux;
+    const data = this.props.allTeams || [];
+    const status = item.is_published;
+    const index = data.findIndex((a) => a.id === item.id);
+    item.is_published = !status;
+    data.splice(index, 1, item);
+    putInRedux([...data]);
+    apiCall("/teams.update", {
+      id: item.id,
+      is_published: !status,
+    });
+  }
+
+  makeLiveUI({ data }) {
+    const name = data && data.name;
+    const isON = data.is_published;
+    return (
+      <div>
+        <Typography>
+          <b>{name}</b> is {isON ? "live, " : "not live, "}
+          would you like {isON ? " to take it offline" : " to take it live"}?
+        </Typography>
+      </div>
+    );
+  }
 
   nowDelete({ idsToDelete, data }) {
     const { allTeams, putTeamsInRedux } = this.props;
@@ -228,8 +271,28 @@ class AllTeams extends React.Component {
     };
 
     if (!data || !data.length) {
-      return <LinearBuffer />;
+      return (
+        <Grid
+          container
+          spacing={24}
+          alignItems="flex-start"
+          direction="row"
+          justify="center"
+        >
+          <Grid item xs={12} md={6}>
+            <Paper className={classes.root} style={{ padding: 15 }}>
+              <div className={classes.root}>
+                <LinearProgress />
+                <h1>Fetching all Teams. This may take a while...</h1>
+                <br />
+                <LinearProgress color="secondary" />
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      );
     }
+
     return (
       <div>
         <Helmet>
@@ -271,6 +334,7 @@ function mapDispatchToProps(dispatch) {
       callTeamsForNormalAdmin: reduxGetAllCommunityTeams,
       putTeamsInRedux: loadAllTeams,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleLive: reduxToggleUniversalModal,
     },
     dispatch
   );

@@ -57,7 +57,7 @@ class AllEvents extends React.Component {
       d.rank,
       `${smartString(d.tags.map((t) => t.name).join(", "), 30)}`,
       d.is_global ? "Template" : d.community && d.community.name,
-      d.is_published,
+      { isLive: d.is_published, item: d },
       d.id,
     ]);
     return fashioned;
@@ -124,8 +124,18 @@ class AllEvents extends React.Component {
           customBodyRender: (d) => {
             return (
               <Chip
-                label={d ? "Yes" : "No"}
-                className={d ? classes.yesLabel : classes.noLabel}
+                onClick={() =>
+                  this.props.toggleLive({
+                    show: true,
+                    component: this.makeLiveUI({ data: d.item }),
+                    onConfirm: () => this.makeLiveOrNot(d.item),
+                    closeAfterConfirmation: true,
+                  })
+                }
+                label={d.isLive ? "Yes" : "No"}
+                className={`${
+                  d.isLive ? classes.yesLabel : classes.noLabel
+                } touchable-opacity`}
               />
             );
           },
@@ -165,6 +175,33 @@ class AllEvents extends React.Component {
     ];
   };
 
+  makeLiveOrNot(item) {
+    const putInRedux = this.props.putEventsInRedux;
+    const data = this.props.allEvents || [];
+    const status = item.is_published;
+    const index = data.findIndex((a) => a.id === item.id);
+    item.is_published = !status;
+    data.splice(index, 1, item);
+    putInRedux([...data]);
+    apiCall("/events.update", {
+      event_id: item.id,
+      is_published: !status,
+      name: item.name,
+    });
+  }
+
+  makeLiveUI({ data }) {
+    const name = data && data.name;
+    const isON = data.is_published;
+    return (
+      <div>
+        <Typography>
+          <b>{name}</b> is {isON ? "live, " : "not live, "}
+          would you like {isON ? " to take it offline" : " to take it live"}?
+        </Typography>
+      </div>
+    );
+  }
   nowDelete({ idsToDelete, data }) {
     const { allEvents, putEventsInRedux } = this.props;
     const itemsInRedux = allEvents;
@@ -222,7 +259,7 @@ class AllEvents extends React.Component {
           justify="center"
         >
           <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
+            <Paper className={classes.root} style={{ padding: 15 }}>
               <div className={classes.root}>
                 <LinearProgress />
                 <h1>Fetching all Events. This may take a while...</h1>
@@ -277,6 +314,7 @@ function mapDispatchToProps(dispatch) {
       callForNormalAdminEvents: reduxGetAllCommunityEvents,
       putEventsInRedux: loadAllEvents,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleLive: reduxToggleUniversalModal,
     },
     dispatch
   );

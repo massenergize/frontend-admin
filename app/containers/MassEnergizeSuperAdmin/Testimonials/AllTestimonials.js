@@ -22,7 +22,13 @@ import {
 } from "../../../redux/redux-actions/adminActions";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
-import { Chip, Typography } from "@material-ui/core";
+import {
+  Chip,
+  Grid,
+  LinearProgress,
+  Paper,
+  Typography,
+} from "@material-ui/core";
 
 class AllTestimonials extends React.Component {
   constructor(props) {
@@ -54,7 +60,7 @@ class AllTestimonials extends React.Component {
       smartString(d.title), // limit to first 30 chars
       { rank: d.rank, id: d.id },
       d.community && d.community.name,
-      d.is_approved && d.is_published,
+      { isLive: d.is_approved && d.is_published, item: d },
       smartString(d.user ? d.user.full_name : "", 20), // limit to first 20 chars
       smartString((d.action && d.action.title) || "", 30),
       d.id,
@@ -138,8 +144,18 @@ class AllTestimonials extends React.Component {
           customBodyRender: (d) => {
             return (
               <Chip
-                label={d ? "Yes" : "No"}
-                className={d ? classes.yesLabel : classes.noLabel}
+                onClick={() =>
+                  this.props.toggleLive({
+                    show: true,
+                    component: this.makeLiveUI({ data: d.item }),
+                    onConfirm: () => this.makeLiveOrNot(d.item),
+                    closeAfterConfirmation: true,
+                  })
+                }
+                label={d.isLive ? "Yes" : "No"}
+                className={`${
+                  d.isLive ? classes.yesLabel : classes.noLabel
+                } touchable-opacity`}
               />
             );
           },
@@ -178,6 +194,33 @@ class AllTestimonials extends React.Component {
       },
     ];
   };
+
+  makeLiveOrNot(item) {
+    const putInRedux = this.props.putTestimonialsInRedux;
+    const data = this.props.allTestimonials || [];
+    const status = item.is_published;
+    const index = data.findIndex((a) => a.id === item.id);
+    item.is_published = !status;
+    data.splice(index, 1, item);
+    putInRedux([...data]);
+    apiCall("/testimonials.update", {
+      testimonial_id: item.id,
+      is_published: !status,
+    });
+  }
+
+  makeLiveUI({ data }) {
+    const name = data && data.title;
+    const isON = data.is_published;
+    return (
+      <div>
+        <Typography>
+          <b>{name}</b> is {isON ? "live, " : "not live, "}
+          would you like {isON ? " to take it offline" : " to take it live"}?
+        </Typography>
+      </div>
+    );
+  }
 
   nowDelete({ idsToDelete, data }) {
     const { allTestimonials, putTestimonialsInRedux } = this.props;
@@ -222,16 +265,30 @@ class AllTestimonials extends React.Component {
           closeAfterConfirmation: true,
         });
         return false;
-        // const idsToDelete = rowsDeleted.data;
-        // idsToDelete.forEach((d) => {
-        //   const testimonialId = data[d.dataIndex][0];
-        //   apiCall("/testimonials.delete", { testimonial_id: testimonialId });
-        // });
       },
     };
 
     if (!data || !data.length) {
-      return <LinearBuffer />;
+      return (
+        <Grid
+          container
+          spacing={24}
+          alignItems="flex-start"
+          direction="row"
+          justify="center"
+        >
+          <Grid item xs={12} md={6}>
+            <Paper className={classes.root} style={{ padding: 15 }}>
+              <div className={classes.root}>
+                <LinearProgress />
+                <h1>Fetching all Events. This may take a while...</h1>
+                <br />
+                <LinearProgress color="secondary" />
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      );
     }
 
     return (
@@ -276,6 +333,7 @@ function mapDispatchToProps(dispatch) {
       callTestimonialsForNormalAdmin: reduxGetAllCommunityTestimonials,
       putTestimonialsInRedux: loadAllTestimonials,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleLive: reduxToggleUniversalModal,
     },
     dispatch
   );

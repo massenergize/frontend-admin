@@ -62,7 +62,7 @@ class AllCommunities extends React.Component {
           // limit to first 20 chars
           d.is_approved ? "Verified" : "Not Verified"
         }`,
-        d.is_published && d.is_approved,
+        { isLive: d.is_published && d.is_approved, item: d },
         `${
           d.is_geographically_focused
             ? "Geographically Focused"
@@ -130,8 +130,18 @@ class AllCommunities extends React.Component {
         customBodyRender: (d) => {
           return (
             <Chip
-              label={d ? "Live" : "Not Live"}
-              className={d ? classes.yesLabel : classes.noLabel}
+              onClick={() =>
+                this.props.toggleLive({
+                  show: true,
+                  component: this.makeLiveUI({ data: d.item }),
+                  onConfirm: () => this.makeLiveOrNot(d.item),
+                  closeAfterConfirmation: true,
+                })
+              }
+              label={d.isLive ? "Live" : "Not Live"}
+              className={`${
+                d.isLive ? classes.yesLabel : classes.noLabel
+              } touchable-opacity`}
             />
           );
         },
@@ -164,6 +174,33 @@ class AllCommunities extends React.Component {
       },
     },
   ];
+
+  makeLiveOrNot(item) {
+    const putInRedux = this.props.putCommunitiesInRedux;
+    const data = this.props.communities || [];
+    const status = item.is_published;
+    const index = data.findIndex((a) => a.id === item.id);
+    item.is_published = !status;
+    data.splice(index, 1, item);
+    putInRedux([...data]);
+    apiCall("/communities.update", {
+      community_id: item.id,
+      is_published: !status,
+    });
+  }
+  // TODO: make this DRY in future
+  makeLiveUI({ data }) {
+    const name = data && data.name;
+    const isON = data.is_published;
+    return (
+      <div>
+        <Typography>
+          <b>{name}</b> is {isON ? "live, " : "not live, "}
+          would you like {isON ? " to take it offline" : " to take it live"}?
+        </Typography>
+      </div>
+    );
+  }
 
   nowDelete({ idsToDelete, data }) {
     const { communities, putCommunitiesInRedux } = this.props;
@@ -219,10 +256,6 @@ class AllCommunities extends React.Component {
           closeAfterConfirmation: true,
         });
         return false;
-        // idsToDelete.forEach((d) => {
-        //   const communityId = data[d.dataIndex][0];
-        //   apiCall("/communities.delete", { community_id: communityId });
-        // });
       },
     };
 
@@ -250,7 +283,6 @@ class AllCommunities extends React.Component {
     }
 
     const { idsToDelete } = this.state;
-    const len = (idsToDelete && idsToDelete.length) || 0;
     return (
       <div>
         <Helmet>
@@ -290,6 +322,7 @@ const mapDispatchToProps = (dispatch) => {
     {
       putCommunitiesInRedux: reduxLoadAllCommunities,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleLive: reduxToggleUniversalModal,
     },
     dispatch
   );
