@@ -1,34 +1,41 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import { Helmet } from 'react-helmet';
-import brand from 'dan-api/dummy/brand';
+import React from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import { Helmet } from "react-helmet";
+import brand from "dan-api/dummy/brand";
 
-import MUIDataTable from 'mui-datatables';
-import FileCopy from '@material-ui/icons/FileCopy';
-import EditIcon from '@material-ui/icons/Edit';
-import { Link } from 'react-router-dom';
-import Avatar from '@material-ui/core/Avatar';
+import MUIDataTable from "mui-datatables";
+import FileCopy from "@material-ui/icons/FileCopy";
+import EditIcon from "@material-ui/icons/Edit";
+import { Link, withRouter } from "react-router-dom";
+import Avatar from "@material-ui/core/Avatar";
 
-import Paper from '@material-ui/core/Paper';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import Grid from '@material-ui/core/Grid';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { apiCall } from '../../../utils/messenger';
-import styles from '../../../components/Widget/widget-jss';
-import { reduxGetAllEvents, reduxGetAllCommunityEvents } from '../../../redux/redux-actions/adminActions';
-import CommunitySwitch from '../Summary/CommunitySwitch';
+import Paper from "@material-ui/core/Paper";
+import LinearProgress from "@material-ui/core/LinearProgress";
+import Grid from "@material-ui/core/Grid";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { apiCall } from "../../../utils/messenger";
+import styles from "../../../components/Widget/widget-jss";
+import {
+  reduxGetAllEvents,
+  reduxGetAllCommunityEvents,
+  loadAllEvents,
+  reduxToggleUniversalModal,
+} from "../../../redux/redux-actions/adminActions";
+import CommunitySwitch from "../Summary/CommunitySwitch";
+import { smartString } from "../../../utils/common";
+import { Chip, Typography } from "@material-ui/core";
 
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { data: [], loading: true, columns: this.getColumns() };
+    this.state = { columns: this.getColumns() };
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const user = this.props.auth ? this.props.auth : {};
-    const community = this.props.community ? this.props.community :{};
+    const community = this.props.community ? this.props.community : {};
     if (user.is_super_admin) {
       this.props.callForSuperAdminEvents();
     }
@@ -36,160 +43,226 @@ class AllEvents extends React.Component {
       let com = community || user.admin_at[0];
       this.props.callForNormalAdminEvents(com.id);
     }
-    await this.setStateAsync({ loading: false });
   }
 
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
+  fashionData = (data) => {
+    const fashioned = data.map((d) => [
+      // d.id,
+      {
+        id: d.id,
+        image: d.image,
+        initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`,
+      },
+      smartString(d.name), // limit to first 30 chars
+      d.rank,
+      `${smartString(d.tags.map((t) => t.name).join(", "), 30)}`,
+      d.is_global ? "Template" : d.community && d.community.name,
+      { isLive: d.is_published, item: d },
+      d.id,
+    ]);
+    return fashioned;
+  };
+
+  getColumns = () => {
+    const { classes } = this.props;
+    return [
+      {
+        name: "Event",
+        key: "event",
+        options: {
+          filter: false,
+          download: false,
+          customBodyRender: (d) => (
+            <div>
+              {d.image && (
+                <Avatar
+                  alt={d.initials}
+                  src={d.image.url}
+                  style={{ margin: 10 }}
+                />
+              )}
+              {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
+            </div>
+          ),
+        },
+      },
+      {
+        name: "Name",
+        key: "name",
+        options: {
+          filter: false,
+        },
+      },
+      {
+        name: "Rank",
+        key: "rank",
+        options: {
+          filter: false,
+        },
+      },
+      {
+        name: "Tags",
+        key: "tags",
+        options: {
+          filter: true,
+          filterType: "textField",
+        },
+      },
+      {
+        name: "Community",
+        key: "community",
+        options: {
+          filter: true,
+          filterType: "multiselect",
+        },
+      },
+      {
+        name: "Live?",
+        key: "is_live",
+        options: {
+          filter: true,
+          customBodyRender: (d) => {
+            return (
+              <Chip
+                onClick={() =>
+                  this.props.toggleLive({
+                    show: true,
+                    component: this.makeLiveUI({ data: d.item }),
+                    onConfirm: () => this.makeLiveOrNot(d.item),
+                    closeAfterConfirmation: true,
+                  })
+                }
+                label={d.isLive ? "Yes" : "No"}
+                className={`${
+                  d.isLive ? classes.yesLabel : classes.noLabel
+                } touchable-opacity`}
+              />
+            );
+          },
+        },
+      },
+      {
+        name: "Edit",
+        key: "edit_or_copy",
+        options: {
+          filter: false,
+          download: false,
+          customBodyRender: (id) => (
+            <div>
+              <Link to={`/admin/edit/${id}/event`}>
+                <EditIcon size="small" variant="outlined" color="secondary" />
+              </Link>
+              &nbsp;&nbsp;
+              <Link
+                onClick={async () => {
+                  const copiedEventResponse = await apiCall("/events.copy", {
+                    event_id: id,
+                  });
+                  if (copiedEventResponse && copiedEventResponse.success) {
+                    const newEvent =
+                      copiedEventResponse && copiedEventResponse.data;
+                    this.props.history.push(`/admin/edit/${newEvent.id}/event`);
+                  }
+                }}
+                to="/admin/read/events"
+              >
+                <FileCopy size="small" variant="outlined" color="secondary" />
+              </Link>
+            </div>
+          ),
+        },
+      },
+    ];
+  };
+
+  makeLiveOrNot(item) {
+    const putInRedux = this.props.putEventsInRedux;
+    const data = this.props.allEvents || [];
+    const status = item.is_published;
+    const index = data.findIndex((a) => a.id === item.id);
+    item.is_published = !status;
+    data.splice(index, 1, item);
+    putInRedux([...data]);
+    apiCall("/events.update", {
+      event_id: item.id,
+      is_published: !status,
+      name: item.name,
     });
   }
 
-
-  fashionData = (data) => {
-    const fashioned = data.map(d => (
-      [
-        d.id,
-        {
-          id: d.id,
-          image: d.image,
-          initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
-        },
-        `${d.name}...`.substring(0, 30), // limit to first 30 chars
-        d.rank,
-        `${d.tags.map(t => t.name).join(', ')}`,
-        (d.is_global ? 'Template' : (d.community && d.community.name)),
-        d.is_published ? 'Yes' : 'No',
-        d.id
-      ]
-    ));
-    return fashioned;
+  makeLiveUI({ data }) {
+    const name = data && data.name;
+    const isON = data.is_published;
+    return (
+      <div>
+        <Typography>
+          <b>{name}</b> is {isON ? "live, " : "not live, "}
+          would you like {isON ? " to take it offline" : " to take it live"}?
+        </Typography>
+      </div>
+    );
+  }
+  nowDelete({ idsToDelete, data }) {
+    const { allEvents, putEventsInRedux } = this.props;
+    const itemsInRedux = allEvents;
+    const ids = [];
+    idsToDelete.forEach((d) => {
+      const found = data[d.dataIndex][6];
+      ids.push(found);
+      apiCall("/events.delete", { event_id: found });
+    });
+    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
+    putEventsInRedux(rem);
   }
 
-
-  getColumns = () => [
-    {
-      name: 'ID',
-      key: 'id',
-      options: {
-        filter: false,
-        filterType: 'textField'
-      }
-    },
-    {
-      name: 'Event',
-      key: 'event',
-      options: {
-        filter: false,
-        download: false,
-        customBodyRender: (d) => (
-          <div>
-            {d.image
-              && <Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} />
-            }
-            {!d.image
-              && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
-            }
-          </div>
-        )
-      }
-    },
-    {
-      name: 'Name',
-      key: 'name',
-      options: {
-        filter: false,
-      }
-    },
-    {
-      name: 'Rank',
-      key: 'rank',
-      options: {
-        filter: false,
-      }
-    },
-    {
-      name: 'Tags',
-      key: 'tags',
-      options: {
-        filter: true,
-        filterType: 'textField'
-      }
-    },
-    {
-      name: 'Community',
-      key: 'community',
-      options: {
-        filter: true,
-        filterType: 'multiselect'
-      }
-    },
-    {
-      name: 'Is Live',
-      key: 'is_live',
-      options: {
-        filter: true,
-      }
-    },
-    {
-      name: 'Edit?',
-      key: 'edit_or_copy',
-      options: {
-        filter: false,
-        download: false,
-        customBodyRender: (id) => (
-          <div>
-            <Link to={`/admin/edit/${id}/event`} target="_blank">
-              <EditIcon size="small" variant="outlined" color="secondary" />
-            </Link>
-            &nbsp;&nbsp;
-            <Link
-              onClick={async () => {
-                const copiedEventResponse = await apiCall('/events.copy', { event_id: id });
-                if (copiedEventResponse && copiedEventResponse.success) {
-                  const newEvent = copiedEventResponse && copiedEventResponse.data;
-                  window.location.href = `/admin/edit/${newEvent.id}/event`;
-                }
-              }}
-              to="/admin/read/events"
-            >
-              <FileCopy size="small" variant="outlined" color="secondary" />
-            </Link>
-          </div>
-        )
-      }
-    },
-  ]
-
+  makeDeleteUI({ idsToDelete }) {
+    const len = (idsToDelete && idsToDelete.length) || 0;
+    return (
+      <Typography>
+        Are you sure you want to delete (
+        {(idsToDelete && idsToDelete.length) || ""})
+        {len === 1 ? " event? " : " events? "}
+      </Typography>
+    );
+  }
 
   render() {
-    const title = brand.name + ' - All Events';
+    const title = brand.name + " - All Events";
     const description = brand.desc;
-    const { columns, loading } = this.state;
+    const { columns } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.allEvents);
+    const data = this.fashionData(this.props.allEvents || []);
     const options = {
-      filterType: 'dropdown',
-      responsive: 'stacked',
+      filterType: "dropdown",
+      responsive: "stacked",
       print: true,
-      rowsPerPage: 100,
+      rowsPerPage: 15,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach(d => {
-          const eventId = data[d.dataIndex][0];
-          apiCall('/events.delete', { event_id: eventId });
+        this.props.toggleDeleteConfirmation({
+          show: true,
+          component: this.makeDeleteUI({ idsToDelete }),
+          onConfirm: () => this.nowDelete({ idsToDelete, data }),
+          closeAfterConfirmation: true,
         });
-      }
+        return false;
+      },
     };
 
-    if (loading) {
+    if (!data || !data.length) {
       return (
-        <Grid container spacing={24} alignItems="flex-start" direction="row" justify="center">
+        <Grid
+          container
+          spacing={24}
+          alignItems="flex-start"
+          direction="row"
+          justify="center"
+        >
           <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
+            <Paper className={classes.root} style={{ padding: 15 }}>
               <div className={classes.root}>
                 <LinearProgress />
-                <h1>Fetching all Events.  This may take a while...</h1>
+                <h1>Fetching all Events. This may take a while...</h1>
                 <br />
                 <LinearProgress color="secondary" />
               </div>
@@ -198,7 +271,6 @@ class AllEvents extends React.Component {
         </Grid>
       );
     }
-
 
     return (
       <div>
@@ -230,18 +302,26 @@ AllEvents.propTypes = {
 
 function mapStateToProps(state) {
   return {
-    auth: state.getIn(['auth']),
-    allEvents: state.getIn(['allEvents']),
-    community: state.getIn(['selected_community'])
+    auth: state.getIn(["auth"]),
+    allEvents: state.getIn(["allEvents"]),
+    community: state.getIn(["selected_community"]),
   };
 }
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-    callForSuperAdminEvents: reduxGetAllEvents,
-    callForNormalAdminEvents: reduxGetAllCommunityEvents
-
-  }, dispatch);
+  return bindActionCreators(
+    {
+      callForSuperAdminEvents: reduxGetAllEvents,
+      callForNormalAdminEvents: reduxGetAllCommunityEvents,
+      putEventsInRedux: loadAllEvents,
+      toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleLive: reduxToggleUniversalModal,
+    },
+    dispatch
+  );
 }
 
-const EventsMapped = connect(mapStateToProps, mapDispatchToProps)(AllEvents);
-export default withStyles(styles)(EventsMapped);
+const EventsMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AllEvents);
+export default withStyles(styles)(withRouter(EventsMapped));
