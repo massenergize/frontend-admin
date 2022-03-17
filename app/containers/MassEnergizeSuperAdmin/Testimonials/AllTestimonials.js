@@ -20,15 +20,10 @@ import {
   reduxGetAllTestimonials,
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
-import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
-import {
-  Chip,
-  Grid,
-  LinearProgress,
-  Paper,
-  Typography,
-} from "@material-ui/core";
+import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
+import MEChip from "../../../components/MECustom/MEChip";
 
 class AllTestimonials extends React.Component {
   constructor(props) {
@@ -143,7 +138,7 @@ class AllTestimonials extends React.Component {
           filter: true,
           customBodyRender: (d) => {
             return (
-              <Chip
+              <MEChip
                 onClick={() =>
                   this.props.toggleLive({
                     show: true,

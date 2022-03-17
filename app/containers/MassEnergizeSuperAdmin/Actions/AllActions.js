@@ -23,15 +23,10 @@ import {
   loadAllActions,
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
-import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+
 import { isNotEmpty, smartString } from "../../../utils/common";
-import {
-  Chip,
-  Grid,
-  LinearProgress,
-  Paper,
-  Typography,
-} from "@material-ui/core";
+import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
+import MEChip from "../../../components/MECustom/MEChip";
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -165,7 +160,7 @@ class AllActions extends React.Component {
           filter: true,
           customBodyRender: (d) => {
             return (
-              <Chip
+              <MEChip
                 onClick={() =>
                   this.props.toggleLive({
                     show: true,
