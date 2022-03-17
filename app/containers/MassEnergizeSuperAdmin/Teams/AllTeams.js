@@ -14,7 +14,6 @@ import Language from "@material-ui/icons/Language";
 import PeopleIcon from "@material-ui/icons/People";
 import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";
-import { fetchData } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import { bindActionCreators } from "redux";
 import {
@@ -26,14 +25,9 @@ import {
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { apiCall } from "../../../utils/messenger";
 import { smartString } from "../../../utils/common";
-import {
-  Chip,
-  Grid,
-  LinearProgress,
-  Paper,
-  Typography,
-} from "@material-ui/core";
+import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import MEChip from "../../../components/MECustom/MEChip";
 
 class AllTeams extends React.Component {
   constructor(props) {
@@ -150,7 +144,7 @@ class AllTeams extends React.Component {
           filter: true,
           customBodyRender: (d) => {
             return (
-              <Chip
+              <MEChip
                 onClick={() =>
                   this.props.toggleLive({
                     show: true,

@@ -26,6 +26,7 @@ import {
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { smartString } from "../../../utils/common";
 import { Chip, Typography } from "@material-ui/core";
+import MEChip from "../../../components/MECustom/MEChip";
 
 class AllEvents extends React.Component {
   constructor(props) {
@@ -123,7 +124,7 @@ class AllEvents extends React.Component {
           filter: true,
           customBodyRender: (d) => {
             return (
-              <Chip
+              <MEChip
                 onClick={() =>
                   this.props.toggleLive({
                     show: true,

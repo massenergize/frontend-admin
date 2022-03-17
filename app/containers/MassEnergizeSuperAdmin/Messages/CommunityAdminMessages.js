@@ -150,7 +150,6 @@ class AllCommunityAdminMessages extends React.Component {
     const len = (idsToDelete && idsToDelete.length) || 0;
     return (
       <Typography>
-      
         Are you sure you want to delete (
         {(idsToDelete && idsToDelete.length) || ""})
         {len === 1 ? " message? " : " messages? "}
@@ -177,11 +176,6 @@ class AllCommunityAdminMessages extends React.Component {
           closeAfterConfirmation: true,
         });
         return false;
-        // const idsToDelete = rowsDeleted.data;
-        // idsToDelete.forEach((d) => {
-        //   const messageId = data[d.dataIndex][0];
-        //   apiCall("/messages.delete", { message_id: messageId });
-        // });
       },
     };
 
@@ -227,7 +221,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
       putMessagesInRedux: loadAllAdminMessages,
-      toggleDeleteConfirmation: reduxToggleUniversalModal
+      toggleDeleteConfirmation: reduxToggleUniversalModal,
     },
     dispatch
   );
