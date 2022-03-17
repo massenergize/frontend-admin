@@ -22,8 +22,8 @@ import {
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 import { smartString } from "../../../utils/common";
-import { Chip, Typography } from "@material-ui/core";
-import ThemeModal from "../../../components/Widget/ThemeModal";
+import { Typography } from "@material-ui/core";
+import MEChip from "../../../components/MECustom/MEChip";
 
 class AllCommunities extends React.Component {
   constructor(props) {
@@ -129,7 +129,7 @@ class AllCommunities extends React.Component {
         filter: true,
         customBodyRender: (d) => {
           return (
-            <Chip
+            <MEChip
               onClick={() =>
                 this.props.toggleLive({
                   show: true,
@@ -142,6 +142,7 @@ class AllCommunities extends React.Component {
               className={`${
                 d.isLive ? classes.yesLabel : classes.noLabel
               } touchable-opacity`}
+              style={{ borderRadius: 55 }}
             />
           );
         },
