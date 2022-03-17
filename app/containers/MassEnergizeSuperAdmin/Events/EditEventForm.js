@@ -598,6 +598,41 @@ const createFormJson = ({ event, rescheduledEvent, communities }) => {
         dbName: "rsvp_enabled",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+        child: {
+          dbName: "rsvp_communication",
+          valueToCheck: "true",
+          fields: [
+            {
+              name: "send_rsvp_email",
+              label:
+                "Send an email with Zoom link or other details when user RSVPs they are coming?",
+              fieldType: "Radio",
+              isRequired: false,
+              defaultValue: "" + event.rsvp_email,
+              dbName: "rsvp_email",
+              readOnly: false,
+              data: [
+                { id: "false", value: "No" },
+                { id: "true", value: "Yes" },
+              ],
+              child: {
+                dbName: "rsvp_details",
+                valueToCheck: "true",
+                fields: [
+                  {
+                    name: 'rsvp_message_text',
+                    label: 'Message to send to RSVP',
+                    placeholder: 'eg. This event is happening in ...',
+                    fieldType: 'HTMLField',
+                    isRequired: true,
+                    defaultValue: event.rsvp_message,
+                    dbName: 'rsvp_message',
+                  },
+                ]
+              },
+            },
+          ]
+        },
       },
       {
         name: "archive",
