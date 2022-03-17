@@ -14,7 +14,7 @@
 }
 
 .touchable-opacity {
-  cursor: pointer;
+  cursor: pointer !important;
 }
 
 .touchable-opacity:hover {
