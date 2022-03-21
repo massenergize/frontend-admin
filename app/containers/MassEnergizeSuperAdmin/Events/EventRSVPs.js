@@ -90,7 +90,7 @@ class EventRSVPs extends React.Component {
       name: "ID",
       key: "id",
       options: {
-        filter: true,
+        filter: false,
         filterType: "textField",
       },
     },
@@ -98,7 +98,7 @@ class EventRSVPs extends React.Component {
       name: "User Name",
       key: "user",
       options: {
-        filter: true,
+        filter: false,
         filterType: "textField",
       },
     },
@@ -106,7 +106,7 @@ class EventRSVPs extends React.Component {
       name: "User Email",
       key: "user",
       options: {
-        filter: true,
+        filter: false,
         filterType: "textField",
       },
     },

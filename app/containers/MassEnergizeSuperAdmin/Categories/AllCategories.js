@@ -80,14 +80,14 @@ class AllTagCollections extends React.Component {
         name: "Name",
         key: "name",
         options: {
-          filter: true,
+          filter: false,
         },
       },
       {
         name: "Rank",
         key: "rank",
         options: {
-          filter: true,
+          filter: false,
         },
       },
       {

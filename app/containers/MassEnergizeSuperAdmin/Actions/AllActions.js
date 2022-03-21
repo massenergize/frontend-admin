@@ -157,7 +157,7 @@ class AllActions extends React.Component {
         name: "Live?",
         key: "is_live",
         options: {
-          filter: true,
+          filter: false,
           customBodyRender: (d) => {
             return (
               <MEChip

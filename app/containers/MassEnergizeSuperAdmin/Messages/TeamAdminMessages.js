@@ -60,21 +60,21 @@ class AllTeamAdminMessages extends React.Component {
       name: "Date",
       key: "date",
       options: {
-        filter: true,
+        filter: false,
       },
     },
     {
       name: "Title",
       key: "title",
       options: {
-        filter: true,
+        filter: false,
       },
     },
     {
       name: "Provided Name",
       key: "user_name",
       options: {
-        filter: true,
+        filter: false,
         filterType: "textField",
       },
     },
@@ -82,7 +82,7 @@ class AllTeamAdminMessages extends React.Component {
       name: "Provided Email",
       key: "email",
       options: {
-        filter: true,
+        filter: false,
         filterType: "textField",
       },
     },
