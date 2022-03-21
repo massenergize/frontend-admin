@@ -67,21 +67,21 @@ class AllCommunityAdminMessages extends React.Component {
       name: "Date",
       key: "date",
       options: {
-        filter: true,
+        filter: false,
       },
     },
     {
       name: "Title",
       key: "title",
       options: {
-        filter: true,
+        filter: false,
       },
     },
     {
       name: "User Name",
       key: "user_name",
       options: {
-        filter: true,
+        filter: false,
         filterType: "textField",
       },
     },
@@ -89,7 +89,7 @@ class AllCommunityAdminMessages extends React.Component {
       name: "Email",
       key: "email",
       options: {
-        filter: true,
+        filter: false,
         filterType: "textField",
       },
     },
@@ -98,7 +98,7 @@ class AllCommunityAdminMessages extends React.Component {
       key: "community",
       options: {
         filter: true,
-        filterType: "multiselect",
+        filterType: "multiSelect",
       },
     },
     {

@@ -104,15 +104,15 @@ class AllCommunities extends React.Component {
       key: "name",
       options: {
         filter: true,
-        filterType: "textField",
+        filterType: "multiselect",
       },
     },
     {
       name: "Admin Name & Email",
       key: "admin_name_and_email",
       options: {
-        filter: true,
-        filterType: "textField",
+        filter: false,
+        //filterType: "textField",
       },
     },
     {
@@ -126,7 +126,7 @@ class AllCommunities extends React.Component {
       name: "Is it Live? (Published & Approved)",
       key: "is_published",
       options: {
-        filter: true,
+        filter: false,
         customBodyRender: (d) => {
           return (
             <MEChip
@@ -150,7 +150,7 @@ class AllCommunities extends React.Component {
     },
     {
       name: "Geography",
-      key: "is_published",
+      key: "geography",
       options: {
         filter: true,
       },

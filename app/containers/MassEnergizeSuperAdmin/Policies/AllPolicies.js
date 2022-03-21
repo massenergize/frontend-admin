@@ -63,14 +63,14 @@ class AllPolicies extends React.Component {
       name: "ID",
       key: "id",
       options: {
-        filter: true,
+        filter: false,
       },
     },
     {
       name: "Name",
       key: "name",
       options: {
-        filter: true,
+        filter: false,
       },
     },
     {
@@ -91,7 +91,7 @@ class AllPolicies extends React.Component {
       name: "Actions",
       key: "actions",
       options: {
-        filter: true,
+        filter: false,
         customBodyRender: (id) => (
           <div>
             <Link to={`/admin/edit/${id}/policy`}>

@@ -104,14 +104,14 @@ class AllGoals extends React.Component {
       name: 'ID',
       key: 'id',
       options: {
-        filter: true,
+        filter: false,
       }
     },
     {
       name: 'Name',
       key: 'name',
       options: {
-        filter: true,
+        filter: false,
       }
     },
     {

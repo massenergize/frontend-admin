@@ -113,7 +113,7 @@ class AllVendors extends React.Component {
       name: "Name",
       key: "name",
       options: {
-        filter: true,
+        filter: false,
         filterType: "textField",
       },
     },

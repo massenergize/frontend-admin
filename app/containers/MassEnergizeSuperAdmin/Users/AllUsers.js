@@ -57,14 +57,14 @@ class AllUsers extends React.Component {
       name: "Full Name",
       key: "full_name",
       options: {
-        filter: true,
+        filter: false,
       },
     },
     {
       name: "Joined",
       key: "joined",
       options: {
-        filter: true,
+        filter: false,
         filterType: "textField",
       },
     },
@@ -72,14 +72,14 @@ class AllUsers extends React.Component {
       name: "Preferred Name",
       key: "preferred_name",
       options: {
-        filter: true,
+        filter: false,
       },
     },
     {
       name: "Email",
       key: "email",
       options: {
-        filter: true,
+        filter: false,
         filterType: "textField",
       },
     },
@@ -88,7 +88,7 @@ class AllUsers extends React.Component {
       key: "community",
       options: {
         filter: true,
-        filterType: "textField",
+        filterType: "multiselect",
       },
     },
     {
