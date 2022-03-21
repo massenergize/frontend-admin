@@ -7,6 +7,7 @@ import Dashboard from "../Templates/Dashboard";
 import {
   reduxCallCommunities,
   reduxCallLibraryModalImages,
+  reduxCheckCookieState,
   reduxCheckUser,
   reduxFetchInitialContent,
   reduxToggleUniversalModal,
@@ -88,6 +89,7 @@ class Application extends React.Component {
   }
   componentDidMount() {
     this.props.fetchInitialContent(this.props.auth);
+    this.props.checkCookieState();
   }
 
   getCommunityList() {
@@ -360,6 +362,7 @@ function mapDispatchToProps(dispatch) {
       loadModalImages: reduxCallLibraryModalImages,
       fetchInitialContent: reduxFetchInitialContent,
       toggleUniversalModal: reduxToggleUniversalModal,
+      checkCookieState: reduxCheckCookieState,
     },
     dispatch
   );

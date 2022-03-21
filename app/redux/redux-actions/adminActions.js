@@ -28,9 +28,22 @@ import {
   UPDATE_HEAP,
   LOAD_CC_ACTIONS,
   TOGGLE_UNIVERSAL_MODAL,
+  SET_SESSION_EXPIRED,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
+
+const TIME = 300000; // 30 mintues
+export const reduxCheckCookieState = () => {
+  setInterval(() => {
+    try {
+      if (sessionHasExpired) return;
+      apiCall("/check.cookie.is.active");
+    } catch {
+      console.log("An error occured while checking cookie state");
+    }
+  }, TIME);
+};
 
 export const reduxFetchInitialContent = (auth) => (dispatch) => {
   if (!auth) return;
@@ -148,7 +161,7 @@ export const loadAllPolicies = (data = null) => ({
 });
 export const loadAllVendors = (data = null) => ({
   type: GET_ALL_VENDORS,
-  payload: data, 
+  payload: data,
 });
 export const loadAllTestimonials = (data = null) => ({
   type: GET_ALL_TESTIMONIALS,

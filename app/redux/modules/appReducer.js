@@ -27,6 +27,7 @@ import {
   UPDATE_HEAP,
   LOAD_CC_ACTIONS,
   TOGGLE_UNIVERSAL_MODAL,
+  SET_SESSION_EXPIRED,
 } from "../ReduxConstants";
 
 const initialState = Map({
