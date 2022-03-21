@@ -34,7 +34,7 @@ import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
 
 const TIME = 300000; // 30 mintues
-export const reduxCheckCookieState = () => {
+export const reduxCheckCookieState = () => () => {
   setInterval(() => {
     try {
       if (sessionHasExpired) return;
