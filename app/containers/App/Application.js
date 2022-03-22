@@ -8,6 +8,8 @@ import {
   reduxCallCommunities,
   reduxCallLibraryModalImages,
   reduxCheckUser,
+  reduxFetchInitialContent,
+  reduxToggleUniversalModal,
 } from "../../redux/redux-actions/adminActions";
 import {
   Parent,
@@ -78,10 +80,14 @@ import MessageDetails from "../MassEnergizeSuperAdmin/Messages/MessageDetails";
 import TeamAdminMessages from "../MassEnergizeSuperAdmin/Messages/TeamAdminMessages";
 import TeamMembers from "../MassEnergizeSuperAdmin/Teams/TeamMembers";
 import EventRSVPs from "../MassEnergizeSuperAdmin/Events/EventRSVPs";
+import ThemeModal from "../../components/Widget/ThemeModal";
 
 class Application extends React.Component {
   componentWillMount() {
     this.props.reduxCallCommunities();
+  }
+  componentDidMount() {
+    this.props.fetchInitialContent(this.props.auth);
   }
 
   getCommunityList() {
@@ -93,7 +99,12 @@ class Application extends React.Component {
   render() {
     const { auth, signOut } = this.props;
 
-    const { changeMode, history } = this.props;
+    const {
+      changeMode,
+      history,
+      modalOptions,
+      toggleUniversalModal,
+    } = this.props;
     const user = auth || {};
 
     const communityAdminSpecialRoutes = [
@@ -153,9 +164,27 @@ class Application extends React.Component {
         )}
       />,
     ];
-
+    const {
+      component,
+      show,
+      onConfirm,
+      onCancel,
+      closeAfterConfirmation,
+    } = modalOptions;
     return (
       <Dashboard history={history} changeMode={changeMode}>
+        <ThemeModal
+          open={show}
+          onConfirm={onConfirm}
+          onCancel={() => {
+            if (onCancel) onCancel();
+          }}
+          close={() => toggleUniversalModal({ show: false, component: null })}
+          closeAfterConfirmation={closeAfterConfirmation}
+        >
+          {component}
+        </ThemeModal>
+
         <Switch>
           {user.is_community_admin && communityAdminSpecialRoutes}
           {user.is_super_admin && superAdminSpecialRoutes}
@@ -163,12 +192,12 @@ class Application extends React.Component {
           <Route exact path="/blank" component={BlankPage} />
           <Route path="/admin/read/users" component={UsersList} />
           <Route
-            path="/admin/read/community_admin_messages"
+            path="/admin/read/community-admin-messages"
             exact
             component={CommunityAdminMessages}
           />
           <Route
-            path="/admin/read/team_admin_messages"
+            path="/admin/read/team-admin-messages"
             exact
             component={TeamAdminMessages}
           />
@@ -220,7 +249,6 @@ class Application extends React.Component {
             exact
           />
           <Route path="/admin/read/actions" component={AllActions} />
-          <Route path="/admin/read/actions" component={AllActions} />
           <Route path="/admin/add/action" component={AddAction} />
           <Route path="/admin/edit/:id/action" component={EditAction} exact />
           <Route path="/admin/add/action/:id" component={EditAction} />
@@ -252,7 +280,7 @@ class Application extends React.Component {
           <Route path="/admin/read/teams" exact component={AllTeams} />
           <Route path="/admin/add/team" component={AddTeam} />
           <Route path="/admin/edit/:id/team" component={EditTeam} />
-          <Route path="/admin/edit/:id/team_members" component={TeamMembers} />
+          <Route path="/admin/edit/:id/team-members" component={TeamMembers} />
           <Route path="/admin/read/subscribers" component={AllSubscribers} />
           <Route path="/admin/read/policies" component={AllPolicies} />
           <Route path="/admin/add/policy" component={AddPolicy} />
@@ -291,7 +319,10 @@ class Application extends React.Component {
           <Route path="/admin/edit/:id/vendors" component={VendorsPage} />
           <Route path="/admin/edit/:id/signin" component={SigninPage} />
           <Route path="/admin/edit/:id/registration" component={RegisterPage} />
-          <Route path="/admin/edit/:id/testimonials" component={TestimonialsPage} />
+          <Route
+            path="/admin/edit/:id/testimonials"
+            component={TestimonialsPage}
+          />
           <Route path="/admin/edit/:id/contact_us" component={SuperContactUs} />
           <Route path="/admin/edit/:id/donate" component={SuperDonate} />
           <Route path="/admin/edit/:id/about" component={SuperAboutUs} />
@@ -300,7 +331,7 @@ class Application extends React.Component {
           <Route path="/admin/add/donate" component={SuperDonate} />
           <Route path="/admin/read/contact-us" component={SuperContactUs} />
           <Route path="/admin/read/all-actions" component={SuperAllActions} />
-           <Route exact path="/admin/gallery/" component={GalleryPage} />
+          <Route exact path="/admin/gallery/" component={GalleryPage} />
           <Route exact path="/admin/gallery/add" component={AddToGallery} />
           <Route component={NotFound} />
         </Switch>
@@ -318,6 +349,7 @@ function mapStateToProps(state) {
   return {
     auth: state.getIn(["auth"]),
     modalLibraryImages: state.getIn(["modalLibraryImages"]),
+    modalOptions: state.getIn(["modalOptions"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -326,6 +358,8 @@ function mapDispatchToProps(dispatch) {
       reduxCallCommunities,
       checkUser: reduxCheckUser,
       loadModalImages: reduxCallLibraryModalImages,
+      fetchInitialContent: reduxFetchInitialContent,
+      toggleUniversalModal: reduxToggleUniversalModal,
     },
     dispatch
   );
