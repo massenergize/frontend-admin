@@ -80,7 +80,7 @@ class AllTestimonials extends React.Component {
         name: "Date",
         key: "date",
         options: {
-          filter: true,
+          filter: false,
           filterType: "textField",
         },
       },
@@ -88,7 +88,7 @@ class AllTestimonials extends React.Component {
         name: "Title",
         key: "title",
         options: {
-          filter: true,
+          filter: false,
           filterType: "textField",
         },
       },
@@ -135,7 +135,7 @@ class AllTestimonials extends React.Component {
         name: "Live?",
         key: "is_live",
         options: {
-          filter: true,
+          filter: false,
           customBodyRender: (d) => {
             return (
               <MEChip
@@ -160,7 +160,7 @@ class AllTestimonials extends React.Component {
         name: "User",
         key: "user",
         options: {
-          filter: true,
+          filter: false,
           filterType: "textField",
         },
       },
