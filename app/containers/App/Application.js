@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { PropTypes } from "prop-types";
 import { Switch, Route } from "react-router-dom";
 import { connect } from "react-redux";
@@ -7,10 +7,10 @@ import Dashboard from "../Templates/Dashboard";
 import {
   reduxCallCommunities,
   reduxCallLibraryModalImages,
-  reduxCheckCookieState,
-  reduxCheckUser,
   reduxFetchInitialContent,
+  reduxLoadAuthAdmin,
   reduxToggleUniversalModal,
+  trackFirebaseAuthenticationChanges,
 } from "../../redux/redux-actions/adminActions";
 import {
   Parent,
@@ -82,20 +82,67 @@ import TeamAdminMessages from "../MassEnergizeSuperAdmin/Messages/TeamAdminMessa
 import TeamMembers from "../MassEnergizeSuperAdmin/Teams/TeamMembers";
 import EventRSVPs from "../MassEnergizeSuperAdmin/Events/EventRSVPs";
 import ThemeModal from "../../components/Widget/ThemeModal";
+import { Typography } from "@material-ui/core";
+import firebase from "firebase/app";
+import { apiCall } from "../../utils/messenger";
 
+const TIME_BEFORE_NOTIFICATION = 10 * 60; // 10 minutes in seconds
 class Application extends React.Component {
   componentWillMount() {
     this.props.reduxCallCommunities();
   }
   componentDidMount() {
     this.props.fetchInitialContent(this.props.auth);
-    this.props.checkCookieState();
+    this.props.trackFirebaseAuthenticationChanges();
+    this.trackSessionTimeAndNotify();
   }
 
   getCommunityList() {
     const { auth } = this.props;
     const list = (auth && auth.admin_at) || [];
     return list.map((com) => com.id);
+  }
+
+  async requestTokenRefresh(thread) {
+    const { putAdminBackInRedux, fireAuth } = this.props;
+    const err = "Sorry, we could not reset your session";
+    try {
+      const token = fireAuth && fireAuth.getIdToken(true);
+      if (!token) return alert(err);
+      const response = await apiCall("/auth.token.refresh", {
+        idToken: fireAuth._lat,
+      });
+
+      if (!response || !response.success) {
+        console.log("ERROR_REFRESHING_SESSION:", response);
+        return alert(err);
+      }
+
+      clearTimeout(thread);
+      putAdminBackInRedux(response.data);
+      this.trackSessionTimeAndNotify(response.data);
+    } catch (e) {
+      console.log(e.toString());
+    }
+  }
+  trackSessionTimeAndNotify(user) {
+    const { auth, toggleUniversalModal } = this.props;
+    user = user || auth;
+    if (!auth) return;
+    const sessionTime =
+      (user.cookie_expiration_in_seconds - TIME_BEFORE_NOTIFICATION) * 1000; //time in milliseconds
+
+    if (!sessionTime) return;
+    const counterThread = setTimeout(() => {
+      toggleUniversalModal({
+        show: true,
+        component: <SessionExpiredNotification />,
+        noCancel: true,
+        okText: "Yes, keep my session active",
+        closeAfterConfirmation: true,
+        onConfirm: () => this.requestTokenRefresh(counterThread),
+      });
+    }, sessionTime);
   }
 
   render() {
@@ -173,15 +220,17 @@ class Application extends React.Component {
       onCancel,
       closeAfterConfirmation,
     } = modalOptions;
+
     return (
       <Dashboard history={history} changeMode={changeMode}>
         <ThemeModal
+          {...modalOptions || {}}
           open={show}
           onConfirm={onConfirm}
           onCancel={() => {
             if (onCancel) onCancel();
           }}
-          close={() => toggleUniversalModal({ show: false, component: null })}
+          close={() => toggleUniversalModal({ show: false })}
           closeAfterConfirmation={closeAfterConfirmation}
         >
           {component}
@@ -352,17 +401,18 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     modalLibraryImages: state.getIn(["modalLibraryImages"]),
     modalOptions: state.getIn(["modalOptions"]),
+    fireAuth: state.getIn(["fireAuth"]),
   };
 }
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
       reduxCallCommunities,
-      checkUser: reduxCheckUser,
       loadModalImages: reduxCallLibraryModalImages,
       fetchInitialContent: reduxFetchInitialContent,
       toggleUniversalModal: reduxToggleUniversalModal,
-      checkCookieState: reduxCheckCookieState,
+      putAdminBackInRedux: reduxLoadAuthAdmin,
+      trackFirebaseAuthenticationChanges,
     },
     dispatch
   );
@@ -371,3 +421,25 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(Application);
+
+const SessionExpiredNotification = () => {
+  const [time, setTime] = useState(9);
+  const EACH_MINUTE = 60000;
+  setInterval(() => {
+    const diff = time - 1;
+    if (diff === 0) window.location = "/login"; // Redirect to login at the end of the alloted time
+    setTime(diff);
+  }, EACH_MINUTE);
+
+  return (
+    <div>
+      <Typography>
+        Your session is almost about to expire. You have{" "}
+        <b>
+          {time} minute{time === 1 ? "" : "s"}
+        </b>{" "}
+        left, would you like to keep this session active?
+      </Typography>
+    </div>
+  );
+};

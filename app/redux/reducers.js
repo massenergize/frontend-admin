@@ -38,6 +38,7 @@ import app, {
   reducerForHeap,
   reducerForCCAction,
   reducerForUniversalModal,
+  reducerForFireAuth,
 } from "./modules/appReducer";
 
 /**
@@ -45,6 +46,7 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    fireAuth:reducerForFireAuth,
     modalOptions: reducerForUniversalModal,
     ccActions: reducerForCCAction,
     heap: reducerForHeap, // an object that is used to temporarily hold all kinds of random data.

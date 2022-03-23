@@ -13,30 +13,38 @@ function ThemeModal({
   open,
   closeAfterConfirmation,
   close,
+  noCancel,
+  noOk,
+  okText,
+  cancelText,
 }) {
   // const [open, setopen] = useState(second)
   return (
     <Dialog open={open}>
       <DialogContent>{children}</DialogContent>
       <DialogActions>
-        <Button
-          color="default"
-          onClick={() => {
-            onCancel && onCancel();
-            if (close) close();
-          }}
-        >
-          No
-        </Button>
-        <Button
-          color="primary"
-          onClick={() => {
-            onConfirm && onConfirm();
-            if (closeAfterConfirmation) close && close();
-          }}
-        >
-          Yes
-        </Button>
+        {!noCancel && (
+          <Button
+            color="default"
+            onClick={() => {
+              onCancel && onCancel();
+              if (close) close();
+            }}
+          >
+            {cancelText || "No"}
+          </Button>
+        )}
+        {!noOk && (
+          <Button
+            color="primary"
+            onClick={() => {
+              onConfirm && onConfirm();
+              if (closeAfterConfirmation) close && close();
+            }}
+          >
+            {okText || "Yes"}
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );

@@ -28,6 +28,7 @@ import {
   LOAD_CC_ACTIONS,
   TOGGLE_UNIVERSAL_MODAL,
   SET_SESSION_EXPIRED,
+  SET_FIRE_AUTH,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -45,6 +46,15 @@ export default function reducer(state = initialImmutableState, action = {}) {
   }
 }
 
+export const reducerForFireAuth = (state = {}, action = {}) => {
+  switch (action.type) {
+    case SET_FIRE_AUTH:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
 export const reducerForUniversalModal = (state = {}, action = {}) => {
   switch (action.type) {
     case TOGGLE_UNIVERSAL_MODAL:

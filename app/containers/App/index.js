@@ -62,9 +62,8 @@ class App extends React.Component {
       const newLoggedInUserResponse = await apiCall('auth.login', { idToken });
       user = newLoggedInUserResponse.data;
     }
-
     if (user) {
-      // set the user in the redux state
+     // set the user in the redux state
       this.props.reduxLoadAuthAdmin(user);
       this.goHome();
     }
@@ -255,7 +254,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     reduxCallIdToken,
     reduxLoadAuthAdmin,
-    reduxSignOut
+    reduxSignOut,
   }, dispatch);
 }
 
