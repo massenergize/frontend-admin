@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PropTypes } from "prop-types";
 import { Switch, Route } from "react-router-dom";
 import { connect } from "react-redux";
@@ -127,7 +127,7 @@ class Application extends React.Component {
   trackSessionTimeAndNotify(user) {
     const { auth, toggleUniversalModal } = this.props;
     user = user || auth;
-    if (!auth) return;
+    if (!user) return;
     const diff = user.cookie_expiration_in_seconds - TIME_BEFORE_NOTIFICATION;
     const remainingSessionTimeIsLessThanTenMinutes = diff <= 0;
     const sessionTime = remainingSessionTimeIsLessThanTenMinutes
@@ -138,7 +138,13 @@ class Application extends React.Component {
     const counterThread = setTimeout(() => {
       toggleUniversalModal({
         show: true,
-        component: <SessionExpiredNotification />,
+        component: (
+          <SessionExpiredNotification
+            timeRemaining={
+              remainingSessionTimeIsLessThanTenMinutes && diff < 0 ? 0 : diff
+            }
+          />
+        ),
         noCancel: true,
         okText: "Yes, keep my session active",
         closeAfterConfirmation: true,
@@ -424,14 +430,17 @@ export default connect(
   mapDispatchToProps
 )(Application);
 
-const SessionExpiredNotification = () => {
-  const [time, setTime] = useState(9);
-  const EACH_MINUTE = 60000;
+const SessionExpiredNotification = ({ timeRemaining }) => {
+  const [time, setTime] = useState(null);
   setInterval(() => {
     const diff = time - 1;
     if (diff === 0) window.location = "/login"; // Redirect to login at the end of the alloted time
     setTime(diff);
-  }, EACH_MINUTE);
+  }, 60000);
+
+  useEffect(() => {
+    setTime(timeRemaining || 9);
+  }, []);
 
   return (
     <div>
