@@ -83,7 +83,6 @@ import TeamMembers from "../MassEnergizeSuperAdmin/Teams/TeamMembers";
 import EventRSVPs from "../MassEnergizeSuperAdmin/Events/EventRSVPs";
 import ThemeModal from "../../components/Widget/ThemeModal";
 import { Typography } from "@material-ui/core";
-import firebase from "firebase/app";
 import { apiCall } from "../../utils/messenger";
 
 const TIME_BEFORE_NOTIFICATION = 10 * 60; // 10 minutes in seconds
@@ -129,8 +128,11 @@ class Application extends React.Component {
     const { auth, toggleUniversalModal } = this.props;
     user = user || auth;
     if (!auth) return;
-    const sessionTime =
-      (user.cookie_expiration_in_seconds - TIME_BEFORE_NOTIFICATION) * 1000; //time in milliseconds
+    const diff = user.cookie_expiration_in_seconds - TIME_BEFORE_NOTIFICATION;
+    const remainingSessionTimeIsLessThanTenMinutes = diff <= 0;
+    const sessionTime = remainingSessionTimeIsLessThanTenMinutes
+      ? user.cookie_expiration_in_seconds * 1000
+      : diff * 1000; //time in milliseconds
 
     if (!sessionTime) return;
     const counterThread = setTimeout(() => {
