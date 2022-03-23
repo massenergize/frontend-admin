@@ -67,6 +67,5 @@ PapperBlock.defaultProps = {
 };
 
 export default compose(
-  withTheme(),
   withStyles(styles)
-)(PapperBlock);
+)(withTheme(PapperBlock));

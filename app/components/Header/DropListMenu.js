@@ -169,4 +169,4 @@ const MainMenuMapped = connect(
   mapDispatchToProps
 )(MainMenu);
 
-export default withTheme()(withStyles(styles)(MainMenuMapped));
+export default withTheme((withStyles(styles)(MainMenuMapped)));

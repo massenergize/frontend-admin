@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers';
+// import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers';
+import { DatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
 import { withStyles } from '@material-ui/core/styles';
 import TableCell from '@material-ui/core/TableCell';

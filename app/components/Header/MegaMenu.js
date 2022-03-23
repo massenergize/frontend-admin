@@ -186,4 +186,4 @@ const MegaMenuMapped = connect(
   mapDispatchToProps
 )(MegaMenu);
 
-export default withTheme()(withStyles(styles)(MegaMenuMapped));
+export default withTheme((withStyles(styles)(MegaMenuMapped)));

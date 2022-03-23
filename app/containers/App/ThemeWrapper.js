@@ -110,4 +110,4 @@ const ThemeWrapperMapped = connect(
   dispatchToProps
 )(ThemeWrapper);
 
-export default withTheme()(withStyles(styles)(ThemeWrapperMapped));
+export default withTheme((withStyles(styles)(ThemeWrapperMapped)));
