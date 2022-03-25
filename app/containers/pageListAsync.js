@@ -182,6 +182,8 @@ export const AddCategory = loadable(
   }
 );
 
+
+
 export const EditCategory = loadable(
   () => import("./MassEnergizeSuperAdmin/Categories/EditCategory"),
   {
@@ -445,6 +447,13 @@ export const UsersList = loadable(
 );
 export const ImportContacts = loadable(
   () => import("./MassEnergizeSuperAdmin/Summary/ImportContacts"),
+  {
+    fallback: <Loading />,
+  }
+);
+
+export const AddTask = loadable(
+  () => import("./MassEnergizeSuperAdmin/Tasks/CreateTask"),
   {
     fallback: <Loading />,
   }

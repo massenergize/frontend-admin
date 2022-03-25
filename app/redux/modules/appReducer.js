@@ -27,6 +27,7 @@ import {
   UPDATE_HEAP,
   LOAD_CC_ACTIONS,
   TOGGLE_UNIVERSAL_MODAL,
+  LOAD_ALL_TASK_FUNCTIONS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -267,6 +268,14 @@ export const selectedCommunityReducer = (state = null, action = {}) => {
 export const fullSelectedCommunityReducer = (state = null, action = {}) => {
   switch (action.type) {
     case SELECTED_COMMUNITY_FULL:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const allTaskFunctionsReducer = (state = [], action = {}) => {
+  switch (action.type) {
+    case LOAD_ALL_TASK_FUNCTIONS:
       return action.payload;
     default:
       return state;

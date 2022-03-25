@@ -65,6 +65,7 @@ import {
   EditCarbonEquivalency,
   GalleryPage,
   AddToGallery,
+  AddTask,
 } from "../pageListAsync";
 import EditVendor from "../MassEnergizeSuperAdmin/Vendors/EditVendor";
 import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
@@ -333,6 +334,7 @@ class Application extends React.Component {
           <Route path="/admin/read/all-actions" component={SuperAllActions} />
           <Route exact path="/admin/gallery/" component={GalleryPage} />
           <Route exact path="/admin/gallery/add" component={AddToGallery} />
+          <Route exact path="/admin/tasks/add" component={AddTask} />
           <Route component={NotFound} />
         </Switch>
       </Dashboard>
