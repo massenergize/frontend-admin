@@ -2,13 +2,19 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import MUIDataTable from "mui-datatables";
+import { Helmet } from "react-helmet";
+import brand from "dan-api/dummy/brand";
 
 import { connect } from "react-redux";
 import styles from "../../../components/Widget/widget-jss";
 import { apiCall } from "../../../utils/messenger";
 import { smartString } from "../../../utils/common";
 import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
-
+import {
+  reduxToggleUniversalModal,
+  loadTasksAction,
+} from "../../../redux/redux-actions/adminActions";
+import { bindActionCreators } from "redux";
 class AllTasks extends React.Component {
   constructor(props) {
     super(props);
@@ -28,12 +34,23 @@ class AllTasks extends React.Component {
   fashionData = (data) => {
     if (!data) return [];
     const fashioned = data.map((d) => [
-      {
-        id: d.id,
-        image: d.logo,
-        initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`,
-      },
-      smartString(d.name), // limit to first 30 chars
+      smartString(d.creator),
+      smartString(d.name),
+      smartString(
+        d.job_name
+          ?.toLowerCase()
+          ?.split("_")
+          ?.join(" ")
+      ),
+      smartString(
+        d.recurring_interval
+          ?.toLowerCase()
+          ?.split("_")
+          ?.join(" ")
+      ),
+      smartString(d.status),
+
+      // limit to first 30 chars
     ]);
     return fashioned;
   };
@@ -48,14 +65,21 @@ class AllTasks extends React.Component {
     },
     {
       name: "Name",
-      key: "task_name",
+      key: "name",
+      options: {
+        filter: false,
+      },
+    },
+    {
+      name: "Function Name",
+      key: "job_name",
       options: {
         filter: false,
       },
     },
     {
       name: "Recurring",
-      key: "recurring",
+      key: "recurring_interval",
       options: {
         filter: false,
         filterType: "textField",
@@ -73,16 +97,15 @@ class AllTasks extends React.Component {
   ];
 
   nowDelete({ idsToDelete, data }) {
-    const { allTeams, putTeamsInRedux } = this.props;
-    const itemsInRedux = allTeams;
+    const { tasks, putTasksInRedux } = this.props;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][6];
+      const found = tasks[d.dataIndex]?.id
       ids.push(found);
-      apiCall("/tasks.delete", { team_id: found });
+      apiCall("/tasks.delete", { id: found });
     });
-    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putTeamsInRedux(rem);
+    const rem = (tasks || []).filter((com) => !ids.includes(com.id));
+    putTasksInRedux(rem);
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -97,6 +120,8 @@ class AllTasks extends React.Component {
   }
 
   render() {
+    const title = brand.name + " - All Tasks";
+    const description = brand.desc;
     const { columns } = this.state;
     const data = this.fashionData(this.props.tasks);
     const { classes } = this.props;
@@ -105,6 +130,7 @@ class AllTasks extends React.Component {
       responsive: "stacked",
       print: true,
       rowsPerPage: 30,
+
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
@@ -141,6 +167,14 @@ class AllTasks extends React.Component {
 
     return (
       <div>
+        <Helmet>
+          <title>{title}</title>
+          <meta name="description" content={description} />
+          <meta property="og:title" content={title} />
+          <meta property="og:description" content={description} />
+          <meta property="twitter:title" content={title} />
+          <meta property="twitter:description" content={description} />
+        </Helmet>
         <div className={classes.table}>
           <MUIDataTable
             title="All Tasks"
@@ -163,9 +197,19 @@ function mapStateToProps(state) {
     user: state.getIn(["auth"]),
   };
 }
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(
+    {
+      toggleDeleteConfirmation: reduxToggleUniversalModal,
+      putTasksInRedux: loadTasksAction,
+    },
+    dispatch
+  );
+}
 const TasksMapped = connect(
   mapStateToProps,
-  null
+  mapDispatchToProps
 )(AllTasks);
 
 export default withStyles(styles)(TasksMapped);
