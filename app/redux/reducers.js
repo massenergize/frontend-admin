@@ -38,7 +38,8 @@ import app, {
   reducerForHeap,
   reducerForCCAction,
   reducerForUniversalModal,
-  allTaskFunctionsReducer
+  allTaskFunctionsReducer,
+  allTasksReducer
 } from "./modules/appReducer";
 
 /**
@@ -81,7 +82,8 @@ export default function createReducer(injectedReducers = {}) {
     language: languageProviderReducer,
     router: connectRouter(history),
     ...injectedReducers,
-    taskFunctions: allTaskFunctionsReducer
+    taskFunctions: allTaskFunctionsReducer,
+    tasks:allTasksReducer,
   });
 
   // Wrap the root reducer and return a new root reducer with router state

@@ -458,3 +458,10 @@ export const AddTask = loadable(
     fallback: <Loading />,
   }
 );
+
+export const ListTasks = loadable(
+  () => import("./MassEnergizeSuperAdmin/Tasks/AllTasks"),
+  {
+    fallback: <Loading />,
+  }
+);

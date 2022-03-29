@@ -1,8 +1,8 @@
 export const TASK_INTERVALS = {
-    DAILY: "Daily",
-    WEEKLY: "Weekly",
-    MONTHLY: "Monthly",
-    YEARLY: "Yearly",
-    QUARTERLY: "Quarterly",
+    EVERY_DAY: "Daily",
+    EVERY_WEEK: "Weekly",
+    EVERY_MONTH: "Monthly",
+    EVERY_YEAR: "Yearly",
+    EVERY_QUARTER: "Quarterly",
     ONE_TIME: "One-off",
 }

@@ -28,7 +28,8 @@ import {
   UPDATE_HEAP,
   LOAD_CC_ACTIONS,
   TOGGLE_UNIVERSAL_MODAL,
-  LOAD_ALL_TASK_FUNCTIONS
+  LOAD_ALL_TASK_FUNCTIONS,
+  LOAD_ALL_TASKS,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -86,6 +87,11 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
         ? "/tasks.functions.list"
         : "/tasks.functions.list"
     ),
+    apiCall(
+      isSuperAdmin
+        ? "/tasks.list"
+        : "/tasks.list"
+    ),
   ]).then((response) => {
     const [
       communities,
@@ -100,7 +106,8 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       vendors,
       ccActions,
       tagCollections,
-      tasksFunctions
+      tasksFunctions,
+      tasks,
     ] = response;
     
     dispatch(reduxLoadAllCommunities(communities.data));
@@ -116,6 +123,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(reduxLoadCCActions(ccActions.data.actions));
     dispatch(loadAllTags(tagCollections.data));
     dispatch(loadTaskFunctionsAction(tasksFunctions.data));
+    dispatch(loadTasksAction(tasks.data));
  
   });
 };
@@ -592,6 +600,12 @@ export const reduxLoadAuthAdmin = (data = null) => {
 export const loadTaskFunctionsAction = (data = []) => {
   return {
   type: LOAD_ALL_TASK_FUNCTIONS,
+  payload: data,
+  }
+};
+export const loadTasksAction = (data = []) => {
+  return {
+  type: LOAD_ALL_TASKS,
   payload: data,
   }
 };
