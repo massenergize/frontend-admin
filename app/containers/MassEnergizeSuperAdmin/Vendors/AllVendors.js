@@ -1,32 +1,35 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import { Helmet } from 'react-helmet';
-import brand from 'dan-api/dummy/brand';
-import Typography from '@material-ui/core/Typography';
-import Avatar from '@material-ui/core/Avatar';
-import { bindActionCreators } from 'redux';
+import React from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import { Helmet } from "react-helmet";
+import brand from "dan-api/dummy/brand";
+import Typography from "@material-ui/core/Typography";
+import Avatar from "@material-ui/core/Avatar";
+import { bindActionCreators } from "redux";
 
-import MUIDataTable from 'mui-datatables';
-import FileCopy from '@material-ui/icons/FileCopy';
-import EditIcon from '@material-ui/icons/Edit';
-import { Link } from 'react-router-dom';
+import MUIDataTable from "mui-datatables";
+import FileCopy from "@material-ui/icons/FileCopy";
+import EditIcon from "@material-ui/icons/Edit";
+import { Link, withRouter } from "react-router-dom";
 
-import Email from '@material-ui/icons/Email';
-import messageStyles from 'dan-styles/Messages.scss';
-import { connect } from 'react-redux';
-import { apiCall } from '../../../utils/messenger';
-import styles from '../../../components/Widget/widget-jss';
+import Email from "@material-ui/icons/Email";
+import messageStyles from "dan-styles/Messages.scss";
+import { connect } from "react-redux";
+import { apiCall } from "../../../utils/messenger";
+import styles from "../../../components/Widget/widget-jss";
 import {
   reduxGetAllVendors,
   reduxGetAllCommunityVendors,
-} from '../../../redux/redux-actions/adminActions';
+  reduxToggleUniversalModal,
+  loadAllVendors,
+} from "../../../redux/redux-actions/adminActions";
+import { smartString } from "../../../utils/common";
+import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 
 class AllVendors extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: true,
       columns: this.getColumns(props.classes),
     };
   }
@@ -35,46 +38,44 @@ class AllVendors extends React.Component {
     this.props.callVendorsForNormalAdmin(id);
   };
 
-  async componentDidMount() {
+  componentDidMount() {
     const user = this.props.auth ? this.props.auth : {};
     if (user.is_super_admin) {
       this.props.callVendorsForSuperAdmin();
     }
     if (user.is_community_admin) {
-      //const com = this.props.community
-      //  ? this.props.community
-      //  : user.admin_at[0];
-      // quick fix - pass back all vendors
       this.props.callVendorsForNormalAdmin(0);
     }
   }
 
   fashionData = (data) => {
     data = data.map((d) => [
-      d.id,
       {
         id: d.id,
         image: d.logo,
         initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`,
       },
-      `${d.name}...`.substring(0, 30), // limit to first 30 chars
-      d.key_contact, // limit to first 20 chars
-      d.communities &&
-        d.communities
-          .slice(0, 5)
-          .map((c) => c.name)
-          .join(', '),
+      smartString(d.name), // limit to first 30 chars
+      smartString(
+        `${(d.key_contact && d.key_contact.name) || ""} (${(d.key_contact &&
+          d.key_contact.email) ||
+          ""})`,
+        40
+      ), // limit to first 20 chars
+      smartString(
+        d.communities &&
+          d.communities
+            .slice(0, 5)
+            .map((c) => c.name)
+            .join(", "),
+        30
+      ),
       d.service_area,
+      d.id,
       d.id,
     ]);
     return data;
   };
-
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
-    });
-  }
 
   getStatus = (isApproved) => {
     switch (isApproved) {
@@ -89,16 +90,8 @@ class AllVendors extends React.Component {
 
   getColumns = (classes) => [
     {
-      name: 'ID',
-      key: 'id',
-      options: {
-        filter: true,
-        filterType: 'textField',
-      },
-    },
-    {
-      name: 'Image',
-      key: 'image',
+      name: "Image",
+      key: "image",
       options: {
         filter: false,
         download: false,
@@ -117,75 +110,56 @@ class AllVendors extends React.Component {
       },
     },
     {
-      name: 'Name',
-      key: 'name',
-      options: {
-        filter: true,
-        filterType: 'textField',
-      },
-    },
-    {
-      name: 'Key Contact',
-      key: 'key_contact',
+      name: "Name",
+      key: "name",
       options: {
         filter: false,
-        customBodyRender: (n) => (
-          <div className={classes.flex}>
-            <div>
-              <Typography>{n && n.name}</Typography>
-              <Typography variant="caption">
-                <a
-                  href={`mailto:${n && n.email}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={classes.downloadInvoice}
-                >
-                  <Email />
-                  &nbsp;
-                  {n && n.email}
-                </a>
-                &nbsp;
-              </Typography>
-            </div>
-          </div>
-        ),
+        filterType: "textField",
       },
     },
     {
-      name: 'Communities Serviced',
-      key: 'communities',
+      name: "Key Contact",
+      key: "key_contact",
+      options: {
+        filter: false,
+      },
+    },
+    {
+      name: "Communities Serviced",
+      key: "communities",
       options: {
         filter: true,
-        filterType: 'textField',
+        filterType: "textField",
       },
     },
     {
-      name: 'Service Area',
-      key: 'service_area',
+      name: "Service Area",
+      key: "service_area",
       options: {
         filter: true,
       },
     },
     {
-      name: 'Edit? Copy?',
-      key: 'edit_or_copy',
+      name: "Edit? Copy?",
+      key: "edit_or_copy",
       options: {
         filter: false,
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/vendor`} target="_blank">
+            <Link to={`/admin/edit/${id}/vendor`}>
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
             &nbsp;&nbsp;
             <Link
               onClick={async () => {
-                const copiedVendorResponse = await apiCall('/vendors.copy', {
+                const copiedVendorResponse = await apiCall("/vendors.copy", {
                   vendor_id: id,
                 });
                 if (copiedVendorResponse && copiedVendorResponse.success) {
-                  const newVendor = copiedVendorResponse && copiedVendorResponse.data;
-                  window.location.href = `/admin/edit/${newVendor.id}/vendor`;
+                  const newVendor =
+                    copiedVendorResponse && copiedVendorResponse.data;
+                  this.props.history.push(`/admin/edit/${newVendor.id}/vendor`);
                 }
               }}
               to="/admin/read/vendors"
@@ -198,26 +172,59 @@ class AllVendors extends React.Component {
     },
   ];
 
+  nowDelete({ idsToDelete, data }) {
+    const { allVendors, putVendorsInRedux } = this.props;
+    const itemsInRedux = allVendors;
+    const ids = [];
+    idsToDelete.forEach((d) => {
+      const found = data[d.dataIndex][6];
+      ids.push(found);
+      apiCall("/vendors.delete", { vendor_id: found });
+    });
+    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
+    putVendorsInRedux(rem);
+  }
+
+  makeDeleteUI({ idsToDelete }) {
+    const len = (idsToDelete && idsToDelete.length) || 0;
+    return (
+      <Typography>
+        Are you sure you want to delete (
+        {(idsToDelete && idsToDelete.length) || ""})
+        {len === 1 ? " vendor? " : " vendors? "}
+      </Typography>
+    );
+  }
+
   render() {
-    const title = brand.name + ' - All Vendors';
+    const title = brand.name + " - All Vendors";
     const description = brand.desc;
-    const { columns, loading } = this.state;
+    const { columns } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.allVendors);
+    const data = this.fashionData(this.props.allVendors || []);
 
     const options = {
-      filterType: 'dropdown',
-      responsive: 'stacked',
+      filterType: "dropdown",
+      responsive: "stacked",
       print: true,
-      rowsPerPage: 100,
+      rowsPerPage: 30,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
-        idsToDelete.forEach((d) => {
-          const vendorId = data[d.dataIndex][0];
-          apiCall('/vendors.delete', { vendor_id: vendorId });
+        this.props.toggleDeleteConfirmation({
+          show: true,
+          component: this.makeDeleteUI({ idsToDelete }),
+          onConfirm: () => this.nowDelete({ idsToDelete, data }),
+          closeAfterConfirmation: true,
         });
+        return false;
+        // const vendorId = data[d.dataIndex][0];
+        // apiCall("/vendors.delete", { vendor_id: vendorId });
       },
     };
+
+    if (!data || !data.length) {
+      return <LinearBuffer />;
+    }
 
     return (
       <div>
@@ -247,9 +254,9 @@ AllVendors.propTypes = {
 };
 function mapStateToProps(state) {
   return {
-    auth: state.getIn(['auth']),
-    allVendors: state.getIn(['allVendors']),
-    community: state.getIn(['selected_community']),
+    auth: state.getIn(["auth"]),
+    allVendors: state.getIn(["allVendors"]),
+    community: state.getIn(["selected_community"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -257,6 +264,8 @@ function mapDispatchToProps(dispatch) {
     {
       callVendorsForSuperAdmin: reduxGetAllVendors,
       callVendorsForNormalAdmin: reduxGetAllCommunityVendors,
+      putVendorsInRedux: loadAllVendors,
+      toggleDeleteConfirmation: reduxToggleUniversalModal,
     },
     dispatch
   );
@@ -266,4 +275,4 @@ const VendorsMapped = connect(
   mapDispatchToProps
 )(AllVendors);
 
-export default withStyles(styles)(VendorsMapped);
+export default withStyles(styles)(withRouter(VendorsMapped));

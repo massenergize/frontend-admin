@@ -136,14 +136,14 @@ class AddRemoveSuperAdmin extends Component {
       name: 'Name',
       key: 'name',
       options: {
-        filter: true,
+        filter: false,
       }
     },
     {
       name: 'Preferred Name',
       key: 'preferred_name',
       options: {
-        filter: true,
+        filter: false,
       }
     },
     {
