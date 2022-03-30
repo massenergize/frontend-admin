@@ -15,6 +15,10 @@ import {
   loadTasksAction,
 } from "../../../redux/redux-actions/adminActions";
 import { bindActionCreators } from "redux";
+import EditIcon from "@material-ui/icons/Edit";
+import PauseOutlinedIcon from "@material-ui/icons/PauseOutlined";
+import PlayArrowOutlinedIcon from "@material-ui/icons/PlayArrowOutlined";
+import { Link } from "react-router-dom";
 class AllTasks extends React.Component {
   constructor(props) {
     super(props);
@@ -29,6 +33,36 @@ class AllTasks extends React.Component {
     if (user.is_community_admin) {
       this.props.callTeamsForNormalAdmin();
     }
+  }
+
+  pauseTask = (id) => {
+     let { tasks, putTasksInRedux } = this.props;
+    apiCall("/tasks.deactivate", { id: id?.id }).then((res) => {
+    if(res?.success){
+      let index = tasks.findIndex((x) => x.id === id?.id);
+      const filteredTasks = (tasks || []).filter((task) => task.id !== id?.id);
+      filteredTasks.splice(index, 0, res.data);
+      putTasksInRedux(filteredTasks);
+    }
+    });
+  };
+
+  resumeTask = (id) => {
+   let { tasks, putTasksInRedux } = this.props;
+    apiCall("/tasks.activate", { id: id?.id }).then((res) => {
+      if(res?.success){
+        let index = tasks.findIndex((x) => x.id === id?.id);
+        const filteredTasks = (tasks || []).filter((task) => task.id !== id?.id);
+       filteredTasks.splice(index, 0, res.data);
+        putTasksInRedux(filteredTasks);
+      }
+    });
+  };
+
+  getTaskWithID = (id)=>{
+    const { tasks } = this.props;
+    const task = tasks.find(task=>task.id===id);
+    return task;
   }
 
   fashionData = (data) => {
@@ -49,8 +83,7 @@ class AllTasks extends React.Component {
           ?.join(" ")
       ),
       smartString(d.status),
-
-      // limit to first 30 chars
+      { id: d.id },
     ]);
     return fashioned;
   };
@@ -67,11 +100,11 @@ class AllTasks extends React.Component {
       name: "Name",
       key: "name",
       options: {
-        filter: false,
+        filter: true,
       },
     },
     {
-      name: "Function Name",
+      name: "Function",
       key: "job_name",
       options: {
         filter: false,
@@ -87,11 +120,45 @@ class AllTasks extends React.Component {
     },
 
     {
-      name: "status",
+      name: "Status",
       key: "status",
       options: {
         filter: false,
         filterType: "textField",
+      },
+    },
+    {
+      name: "Actions",
+      key: "task_actions",
+      options: {
+        filter: false,
+        download: false,
+        customBodyRender: (d) => {
+
+          return (
+            <div style={{ display: "flex" }}>
+              <div>
+                <Link to={`/admin/edit/${d}/action`}>
+                  <EditIcon size="small" variant="outlined" />
+                </Link>
+              </div>
+
+              {this.getTaskWithID(d?.id)?.is_active ? (
+                <div style={{ marginLeft: 10 }}>
+                  <Link onClick={() => this.pauseTask(d)}>
+                     <PauseOutlinedIcon size="small" variant="outlined" />
+                  </Link>
+                </div>
+              ) : (
+                <div style={{ marginLeft: 10 }}>
+                  <Link onClick={() => this.resumeTask(d)}>
+                    <PlayArrowOutlinedIcon size="small" variant="outlined" />
+                  </Link>
+                </div>
+              )}
+            </div>
+          );
+        },
       },
     },
   ];
@@ -100,7 +167,7 @@ class AllTasks extends React.Component {
     const { tasks, putTasksInRedux } = this.props;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = tasks[d.dataIndex]?.id
+      const found = tasks[d.dataIndex]?.id;
       ids.push(found);
       apiCall("/tasks.delete", { id: found });
     });

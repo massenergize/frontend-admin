@@ -286,7 +286,7 @@ module.exports = [
   {
     key: "tasks",
     name: "Tasks",
-    icon: "ios-people",
+    icon: "md-reorder",
     child: [
       {
         key: "create-tasks",
