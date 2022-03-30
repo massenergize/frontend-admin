@@ -21,6 +21,12 @@ import {
   LOAD_SEARCHED_IMAGES,
   KEEP_LOADED_IMAGE_INFO,
   LOAD_MODAL_LIBRARY,
+  GET_ADMIN_MESSAGES,
+  GET_TEAM_MESSAGES,
+  GET_ALL_SUBSCRIBERS,
+  UPDATE_HEAP,
+  LOAD_CC_ACTIONS,
+  TOGGLE_UNIVERSAL_MODAL,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -38,6 +44,60 @@ export default function reducer(state = initialImmutableState, action = {}) {
   }
 }
 
+export const reducerForUniversalModal = (state = {}, action = {}) => {
+  switch (action.type) {
+    case TOGGLE_UNIVERSAL_MODAL:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+export const reducerForCCAction = (state = [], action = {}) => {
+  switch (action.type) {
+    case LOAD_CC_ACTIONS:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+export const reducerForHeap = (state = {}, action = {}) => {
+  switch (action.type) {
+    case UPDATE_HEAP:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+export const subscribersReducer = (state = [], action = {}) => {
+  switch (action.type) {
+    case GET_ALL_SUBSCRIBERS:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+export const teamMessagesReducer = (state = [], action = {}) => {
+  switch (action.type) {
+    case GET_TEAM_MESSAGES:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+export const adminMessagesReducer = (state = [], action = {}) => {
+  switch (action.type) {
+    case GET_ADMIN_MESSAGES:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
 export const modalLibraryReducer = (state = {}, action = {}) => {
   switch (action.type) {
     case LOAD_MODAL_LIBRARY:

@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import MassEnergizeForm from '../_FormGenerator';
 import { apiCall } from '../../../utils/messenger';
 import { getMoreInfo, groupSocialMediaFields } from './utils';
-
+// @NB: Looks like this file isnt being used anymore
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -30,6 +30,9 @@ const styles = (theme) => ({
   },
 });
 
+/**
+ * @deprecated
+ */
 class EditCommunityForm extends Component {
   constructor(props) {
     super(props);
@@ -73,7 +76,7 @@ class EditCommunityForm extends Component {
     const geographyTypes = [
       { id: 'ZIPCODE', value: "Community defined by one or more towns or zipcodes (can't be subdivided)" },
       { id: 'CITY', value: 'Community defined by one or more cities (can have smaller communities within)' },
-      // { id: "COUNTY", value:"Community defined by one or more counties" },
+      { id: "COUNTY", value:"Community defined by one or more counties" },
       { id: 'STATE', value: 'Community defined by one or more states' },
       { id: 'COUNTRY', value: 'Community defined by a country' },
       // { id: "NON_GEOGRAPHIC", value:"A non-geographic community" },
