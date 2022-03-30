@@ -97,11 +97,11 @@ class NormalAdminHome extends PureComponent {
             {data.map(n => ([
               <TableRow key={n.id}>
                 <TableCell padding="dense">
-                  <div className={classes.flex}>
+                  <div className={classes.flex} style={{flexDirection:"row", display:"flex", alignItems:"center"}}>
                     <Link to={`/admin/community/${n.id}/profile`}>
                       <Avatar alt={n.name} src={n.logo ? n.logo.url : imgApi[21]} className={classes.productPhoto} />
                     </Link>
-                    <Link to={`/admin/community/${n.id}/profile`}>
+                    <Link to={`/admin/community/${n.id}/profile`} style={{marginLeft:15}}>
                       <Typography variant="subtitle1">
                         {n.name || ''}
                       </Typography>
@@ -118,7 +118,7 @@ class NormalAdminHome extends PureComponent {
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  <Chip label={n.is_approved ? 'Verified' : 'Not Verified'} className={classNames(classes.chip, this.getStatus(n.is_approved))} />
+                  <Chip style={{color:"white"}} label={n.is_approved ? 'Verified' : 'Not Verified'} className={classNames(classes.chip, this.getStatus(n.is_approved))} />
                 </TableCell>
               </TableRow>
             ]))}
@@ -151,7 +151,7 @@ class NormalAdminHome extends PureComponent {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <h1>
+        <h1 style={{color:"white"}}>
           Howdy Community Admin
           <span role="img" aria-label="smiley">
             😊
@@ -167,9 +167,9 @@ class NormalAdminHome extends PureComponent {
         }
         <br />
         <br />
-        <Grid item className={classes.root} md={12} xs={12}>
+        {auth && !auth.is_super_admin && <Grid item className={classes.root} md={12} xs={12}>
           {this.renderTable(auth.admin_at || [], classes)}
-        </Grid>
+        </Grid>}
 
       </div>
     );
