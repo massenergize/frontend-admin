@@ -32,6 +32,12 @@ import app, {
   searchedImagesReducer,
   imageInfosReducer,
   modalLibraryReducer,
+  adminMessagesReducer,
+  teamMessagesReducer,
+  subscribersReducer,
+  reducerForHeap,
+  reducerForCCAction,
+  reducerForUniversalModal,
 } from "./modules/appReducer";
 
 /**
@@ -39,6 +45,12 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    modalOptions: reducerForUniversalModal,
+    ccActions: reducerForCCAction,
+    heap: reducerForHeap, // an object that is used to temporarily hold all kinds of random data.
+    subscribers: subscribersReducer,
+    teamMessages: teamMessagesReducer,
+    messages: adminMessagesReducer,
     galleryImages: galleryImagesReducer,
     searchedImages: searchedImagesReducer,
     imageInfos: imageInfosReducer,
