@@ -58,7 +58,7 @@ class CreateNewCommunityForm extends Component {
     const geography_types = [
       { id: "ZIPCODE", value:"Community defined by one or more towns or zipcodes (can have smaller communities within)" },
       { id: "CITY", value:"Community defined by one or more cities" },
-      //{ id: "COUNTY", value:"Community defined by one or more counties" },
+      { id: "COUNTY", value:"Community defined by one or more counties" },
       { id: "STATE", value: "Community defined by one or more states" },
       { id: "COUNTRY", value:"Community defined by a country" },
       //{ id: "NON_GEOGRAPHIC", value:"A non-geographic community" },

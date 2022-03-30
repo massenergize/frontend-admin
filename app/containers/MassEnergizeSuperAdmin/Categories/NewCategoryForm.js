@@ -53,7 +53,7 @@ class CreateNewTagCollectionForm extends Component {
     const formJson = {
       title: 'Create New Tag Collection',
       subTitle: '',
-      cancelLink: '/admin/read/categories',
+      // cancelLink: '/admin/read/categories',
       method: '/tag_collections.create',
       successRedirectPage: '/admin/read/categories',
       fields: [
@@ -112,6 +112,7 @@ class CreateNewTagCollectionForm extends Component {
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
+          enableCancel
         />
       </div>
     );

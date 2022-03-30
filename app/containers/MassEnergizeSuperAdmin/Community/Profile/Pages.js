@@ -6,10 +6,12 @@ import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import Icon from "@material-ui/core/Icon";
 import styles from "./profile-jss";
+import { withRouter } from "react-router-dom";
 
 class Pages extends React.Component {
   goHere = (link) => {
-    window.location = link;
+    // window.location = link;
+    this.props.history.push(link);
   };
 
   render() {
@@ -35,9 +37,7 @@ class Pages extends React.Component {
     const testimonials = `/admin/edit/${
       community ? community.id : null
     }/testimonials`;
-    const registration = `/admin/edit/${
-      community ? community.id : null
-    }/registration`;
+    //const registration = `/admin/edit/${community ? community.id : null}/registration`;
     const signin = `/admin/edit/${community ? community.id : null}/signin`;
 
     // @TODO : If number of items in this array increases, a dropdown is probably a better Idea
@@ -51,12 +51,13 @@ class Pages extends React.Component {
       { name: "Impact Page", key: "homepage", link: impactPageLink },
       { name: "About Us Page", key: "homepage", link: about },
       { name: "Donate Page", key: "homepage", link: donate },
-      { name: "Contact Us Page", key: "homepage", link: homeLink },
+      { name: "Contact Us Page", key: "homepage", link: contactUs },
       { name: "All Actions Page", key: "homepage", link: allActions },
       { name: "All Events Page", key: "homepage", link: events },
       { name: "All Teams Page", key: "homepage", link: teams },
+      { name: "All Testimonials Page", key: "homepage", link: testimonials },
       { name: "All Services Page", key: "homepage", link: vendors },
-      { name: "Regsitration Page", key: "homepage", link: registration },
+      //{ name: "Registration Page", key: "homepage", link: registration },
       { name: "Sign In Page", key: "homepage", link: signin },
     ];
 
@@ -101,4 +102,4 @@ Pages.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Pages);
+export default withStyles(styles)(withRouter(Pages));

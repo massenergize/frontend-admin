@@ -58,14 +58,14 @@ class AllCarbonEquivalencies extends React.Component {
         name: 'Name',
         key: 'name',
         options: {
-          filter: true,
+          filter: false,
         }
       },
       {
         name: 'Value',
         key: 'value',
         options: {
-          filter: true,
+          filter: false,
         }
       },
       {
