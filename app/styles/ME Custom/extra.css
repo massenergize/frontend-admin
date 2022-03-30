@@ -1,7 +1,6 @@
-:root { 
+:root {
   --app-cyan: #579ece;
 }
-
 
 .preview-content {
   margin-left: 30px;
@@ -14,10 +13,32 @@
 }
 
 .touchable-opacity {
-  cursor: pointer;
+  cursor: pointer !important;
 }
 
 .touchable-opacity:hover {
   opacity: 0.7;
   transition: 0.2s ease-out;
 }
+
+.me-chip {
+  border-radius: 55px;
+  display: flex;
+  padding: 0px 16px;
+  text-align: center;
+  font-size: 11px;
+  align-items: center;
+  justify-content: center;
+}
+
+.me-chip-container {
+  min-width: 60px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+/* .me-chip small {
+  font-size: 11px;
+} */

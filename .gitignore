@@ -7,3 +7,5 @@ app/config/config.json
 node_modules/
 
 build/
+
+.env
