@@ -65,6 +65,19 @@ class AllTasks extends React.Component {
     return task;
   }
 
+   pauseAndResumeTaskModal = (type, id) => {
+       this.props.toggleDeleteConfirmation({
+         show: true,
+         component:  <Typography>
+        Are you sure you want to 
+        {type === 'pause' ? " pause " : " resume "} this task?
+      </Typography>,
+         onConfirm: () => type==='pause'?this.pauseTask(id):this.resumeTask(id),
+         closeAfterConfirmation: true,
+       })
+  }
+  
+
   fashionData = (data) => {
     if (!data) return [];
     const fashioned = data.map((d) => [
@@ -88,7 +101,7 @@ class AllTasks extends React.Component {
     return fashioned;
   };
 
-  getColumns = (classes) => [
+  getColumns = () => [
     {
       name: "Creator",
       key: "creator",
@@ -144,16 +157,16 @@ class AllTasks extends React.Component {
               </div>
 
               {this.getTaskWithID(d?.id)?.is_active ? (
-                <div style={{ marginLeft: 10 }}>
-                  <Link onClick={() => this.pauseTask(d)}>
+                <div style={{ marginLeft: 10, color:'#2196f3', cursor:'pointer' }}>
+                  <div onClick={() =>  this.pauseAndResumeTaskModal("pause", d)}>
                      <PauseOutlinedIcon size="small" variant="outlined" />
-                  </Link>
+                  </div>
                 </div>
               ) : (
-                <div style={{ marginLeft: 10 }}>
-                  <Link onClick={() => this.resumeTask(d)}>
+                <div style={{ marginLeft: 10, color:'#2196f3', cursor:'pointer' }}>
+                  <div onClick={() => this.pauseAndResumeTaskModal("resume", d)}>
                     <PlayArrowOutlinedIcon size="small" variant="outlined" />
-                  </Link>
+                  </div>
                 </div>
               )}
             </div>
