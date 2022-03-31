@@ -25,22 +25,12 @@ class AllTasks extends React.Component {
     this.state = { data: [], loading: true, columns: this.getColumns() };
   }
 
-  componentDidMount() {
-    const user = this.props.auth ? this.props.auth : {};
-    if (user.is_super_admin) {
-      this.props.callTeamsForSuperAdmin();
-    }
-    if (user.is_community_admin) {
-      this.props.callTeamsForNormalAdmin();
-    }
-  }
-
   pauseTask = (id) => {
      let { tasks, putTasksInRedux } = this.props;
-    apiCall("/tasks.deactivate", { id: id?.id }).then((res) => {
+    apiCall("/tasks.deactivate", { id: id }).then((res) => {
     if(res?.success){
-      let index = tasks.findIndex((x) => x.id === id?.id);
-      const filteredTasks = (tasks || []).filter((task) => task.id !== id?.id);
+      let index = tasks.findIndex((x) => x.id === id);
+      const filteredTasks = (tasks || []).filter((task) => task.id !== id);
       filteredTasks.splice(index, 0, res.data);
       putTasksInRedux(filteredTasks);
     }
@@ -49,10 +39,10 @@ class AllTasks extends React.Component {
 
   resumeTask = (id) => {
    let { tasks, putTasksInRedux } = this.props;
-    apiCall("/tasks.activate", { id: id?.id }).then((res) => {
+    apiCall("/tasks.activate", { id: id }).then((res) => {
       if(res?.success){
-        let index = tasks.findIndex((x) => x.id === id?.id);
-        const filteredTasks = (tasks || []).filter((task) => task.id !== id?.id);
+        let index = tasks.findIndex((x) => x.id === id);
+        const filteredTasks = (tasks || []).filter((task) => task.id !== id);
        filteredTasks.splice(index, 0, res.data);
         putTasksInRedux(filteredTasks);
       }
@@ -72,7 +62,7 @@ class AllTasks extends React.Component {
         Are you sure you want to 
         {type === 'pause' ? " pause " : " resume "} this task?
       </Typography>,
-         onConfirm: () => type==='pause'?this.pauseTask(id):this.resumeTask(id),
+         onConfirm: () => type==='pause'? this.pauseTask(id):this.resumeTask(id),
          closeAfterConfirmation: true,
        })
   }
@@ -146,26 +136,51 @@ class AllTasks extends React.Component {
       options: {
         filter: false,
         download: false,
-        customBodyRender: (d) => {
-
+        customBodyRender: ({id}) => {
           return (
             <div style={{ display: "flex" }}>
               <div>
-                <Link to={`/admin/edit/${d}/action`}>
+                <Link to={`/admin/edit/${id}/task`}>
                   <EditIcon size="small" variant="outlined" />
                 </Link>
               </div>
 
-              {this.getTaskWithID(d?.id)?.is_active ? (
-                <div style={{ marginLeft: 10, color:'#2196f3', cursor:'pointer' }}>
-                  <div onClick={() =>  this.pauseAndResumeTaskModal("pause", d)}>
-                     <PauseOutlinedIcon size="small" variant="outlined" />
+              {this.getTaskWithID(id)?.is_active ? (
+                <div
+                  style={{
+                    marginLeft: 10,
+                    color: "#2196f3",
+                    cursor: "pointer",
+                  }}
+                >
+                  <div
+                    onClick={() =>
+                      this.pauseAndResumeTaskModal("pause", id)
+                    }
+                  >
+                    <PauseOutlinedIcon
+                      size="small"
+                      variant="outlined"
+                    />
                   </div>
                 </div>
               ) : (
-                <div style={{ marginLeft: 10, color:'#2196f3', cursor:'pointer' }}>
-                  <div onClick={() => this.pauseAndResumeTaskModal("resume", d)}>
-                    <PlayArrowOutlinedIcon size="small" variant="outlined" />
+                <div
+                  style={{
+                    marginLeft: 10,
+                    color: "#2196f3",
+                    cursor: "pointer",
+                  }}
+                >
+                  <div
+                    onClick={() =>
+                      this.pauseAndResumeTaskModal("resume", id)
+                    }
+                  >
+                    <PlayArrowOutlinedIcon
+                      size="small"
+                      variant="outlined"
+                    />
                   </div>
                 </div>
               )}

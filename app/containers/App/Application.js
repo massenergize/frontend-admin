@@ -373,6 +373,7 @@ class Application extends React.Component {
           <Route exact path="/admin/gallery/" component={GalleryPage} />
           <Route exact path="/admin/gallery/add" component={AddToGallery} />
           <Route exact path="/admin/tasks/add" component={AddTask} />
+          <Route exact path="/admin/edit/:id/task" component={AddTask} />
           <Route exact path="/admin/read/tasks" component={ListTasks} />
           <Route component={NotFound} />
         </Switch>

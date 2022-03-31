@@ -19,7 +19,7 @@ class CreateTask extends React.Component {
                     <meta property="twitter:title" content={title} />
                     <meta property="twitter:description" content={description} />
                 </Helmet>
-                <PapperBlock title="Create New Task" desc="">
+                <PapperBlock title="" desc="">
                     <CreateTaskForm />
                 </PapperBlock>
             </div>
