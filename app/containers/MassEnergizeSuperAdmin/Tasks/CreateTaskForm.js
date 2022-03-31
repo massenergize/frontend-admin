@@ -124,8 +124,8 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
       actual: values.recurring_details,
     });
 
-    if(toEdit.id){
-      values.id =  toEdit.id
+    if (toEdit &&  toEdit.id) {
+      values.id = toEdit.id;
     }
 
     values.recurring_details = recurring_details;
@@ -134,9 +134,9 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
   };
 
   const formJson = {
-    title: `${toEdit.id ? "Update" : "Create New"}  Task`,
+    title: `${toEdit && toEdit.id ? "Update" : "Create New"}  Task`,
     subTitle: "",
-    method: toEdit.id ? "/tasks.update" : "/tasks.create",
+    method: toEdit &&  toEdit.id ? "/tasks.update" : "/tasks.create",
     successRedirectPage: "/admin/read/tasks",
     preflightFxn: preflightFxn,
     fields: [
