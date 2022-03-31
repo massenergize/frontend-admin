@@ -74,16 +74,10 @@ class AllTasks extends React.Component {
       smartString(d.creator),
       smartString(d.name),
       smartString(
-        d.job_name
-          ?.toLowerCase()
-          ?.split("_")
-          ?.join(" ")
+        d.job_name && d.job_name.toLowerCase().split("_").join(" ")
       ),
       smartString(
-        d.recurring_interval
-          ?.toLowerCase()
-          ?.split("_")
-          ?.join(" ")
+        d.recurring_interval && d.recurring_interval.toLowerCase().split("_").join(" ")
       ),
       smartString(d.status),
       { id: d.id },
