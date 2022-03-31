@@ -44,7 +44,7 @@ class CreateTaskForm extends Component {
   static getDerivedStateFromProps(props, state) {
     let { taskFunctions, tasks } = props;
     let  taskID  = props.match.params.id;
-    let toEditTask = (tasks||[])?.find((task) => task?.id?.toString() === taskID);
+    let toEditTask = (tasks||[]).find((task) => task.id.toString() === taskID);
 
     taskFunctions = (taskFunctions || []).map((c) => ({
       id: c,
