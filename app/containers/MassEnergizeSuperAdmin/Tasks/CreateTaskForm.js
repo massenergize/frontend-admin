@@ -103,15 +103,15 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
 
 
   const getDateFromEditData = toEdit=>{
-    if(!toEdit?.id) return
-    let {actual} = JSON.parse(toEdit?.recurring_details);
+    if(!toEdit.id) return
+    let {actual} = JSON.parse(toEdit.recurring_details);
     return actual;
     
   }
 
 
   const preflightFxn = (values) => {
-    let details = values?.recurring_details;
+    let details = values && values.recurring_details;
     const d = new Date(details);
 
     let recurring_details = JSON.stringify({
@@ -121,11 +121,11 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
       minute: d.getMinutes(),
       hour: d.getHours(),
       year: d.getFullYear(),
-      actual: values?.recurring_details,
+      actual: values.recurring_details,
     });
 
-    if(toEdit?.id){
-      values.id =  toEdit?.id
+    if(toEdit.id){
+      values.id =  toEdit.id
     }
 
     values.recurring_details = recurring_details;
@@ -134,9 +134,9 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
   };
 
   const formJson = {
-    title: `${toEdit?.id ? "Update" : "Create New"}  Task`,
+    title: `${toEdit.id ? "Update" : "Create New"}  Task`,
     subTitle: "",
-    method: toEdit?.id ? "/tasks.update" : "/tasks.create",
+    method: toEdit.id ? "/tasks.update" : "/tasks.create",
     successRedirectPage: "/admin/read/tasks",
     preflightFxn: preflightFxn,
     fields: [
@@ -147,7 +147,7 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
         fieldType: "TextField",
         contentType: "text",
         isRequired: true,
-        defaultValue: toEdit && toEdit?.id ? toEdit?.name : "",
+        defaultValue: toEdit && toEdit.id ? toEdit.name : "",
         dbName: "name",
         readOnly: false,
       },
@@ -156,7 +156,7 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
         label: "Function Name",
         placeholder: "",
         fieldType: "Dropdown",
-        defaultValue: toEdit && toEdit?.id ? toEdit?.job_name : "",
+        defaultValue: toEdit && toEdit.id ? toEdit.job_name : "",
         dbName: "job_name",
         data: [{ displayName: "--", id: "" }, ...taskFunctions],
       },
@@ -167,7 +167,7 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
         fieldType: "Dropdown",
         defaultValue: null,
         dbName: "recurring_interval",
-        defaultValue: toEdit && toEdit?.id ? toEdit?.recurring_interval : "",
+        defaultValue: toEdit && toEdit.id ? toEdit.recurring_interval : "",
         data: [{ displayName: "--", id: "" }, ...createTaskIntervalList()],
       },
       {
@@ -175,7 +175,7 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
         label: "Recurring Details",
         placeholder: "",
         fieldType: "DateTime",
-        defaultValue: toEdit && toEdit?.id ? getDateFromEditData(toEdit) : "",
+        defaultValue: toEdit && toEdit.id ? getDateFromEditData(toEdit) : "",
         dbName: "recurring_details",
       },
     ],

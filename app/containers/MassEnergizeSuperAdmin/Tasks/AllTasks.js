@@ -28,7 +28,7 @@ class AllTasks extends React.Component {
   pauseTask = (id) => {
      let { tasks, putTasksInRedux } = this.props;
     apiCall("/tasks.deactivate", { id: id }).then((res) => {
-    if(res?.success){
+    if(res && res.success){
       let index = tasks.findIndex((x) => x.id === id);
       const filteredTasks = (tasks || []).filter((task) => task.id !== id);
       filteredTasks.splice(index, 0, res.data);
@@ -40,7 +40,7 @@ class AllTasks extends React.Component {
   resumeTask = (id) => {
    let { tasks, putTasksInRedux } = this.props;
     apiCall("/tasks.activate", { id: id }).then((res) => {
-      if(res?.success){
+      if(res && res.success){
         let index = tasks.findIndex((x) => x.id === id);
         const filteredTasks = (tasks || []).filter((task) => task.id !== id);
        filteredTasks.splice(index, 0, res.data);
@@ -145,7 +145,7 @@ class AllTasks extends React.Component {
                 </Link>
               </div>
 
-              {this.getTaskWithID(id)?.is_active ? (
+              {this.getTaskWithID(id).is_active ? (
                 <div
                   style={{
                     marginLeft: 10,
@@ -195,7 +195,7 @@ class AllTasks extends React.Component {
     const { tasks, putTasksInRedux } = this.props;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = tasks[d.dataIndex]?.id;
+      const found = tasks[d.dataIndex].id;
       ids.push(found);
       apiCall("/tasks.delete", { id: found });
     });
