@@ -3,6 +3,9 @@
  */
 import qs from 'qs';
 import { API_HOST, IS_CANARY, IS_PROD, IS_LOCAL, CC_HOST } from '../config/constants';
+import { reducerForSessionDuration } from '../redux/modules/appReducer';
+import store from "./../redux/configureStore";
+
 
 /**
  * Handles making a POST request to the backend as a form submission
@@ -55,7 +58,6 @@ export async function apiCall(
     method: 'POST',
     body: formData
   });
-
   try {
     const json = await response.json();
     if (relocationPage && json && json.success) {
@@ -68,6 +70,7 @@ export async function apiCall(
         console.log(destinationUrl, json);
       }
     }
+
     return json;
   } catch (error) {
     return { success: false, error: error.toString() };
@@ -135,3 +138,5 @@ export async function apiCallFile(destinationUrl, dataToSend = {}) {
     return { success: false, error: error.toString() };
   }
 }
+
+

@@ -96,6 +96,7 @@ class Application extends React.Component {
     this.trackSessionTimeAndNotify();
   }
 
+
   getCommunityList() {
     const { auth } = this.props;
     const list = (auth && auth.admin_at) || [];
@@ -125,7 +126,7 @@ class Application extends React.Component {
     }
   }
   trackSessionTimeAndNotify(user) {
-    const { auth, toggleUniversalModal } = this.props;
+    const { auth } = this.props;
     user = user || auth;
     if (!user) return;
     const diff = user.cookie_expiration_in_seconds - TIME_BEFORE_NOTIFICATION;
@@ -135,24 +136,26 @@ class Application extends React.Component {
       : diff * 1000; //time in milliseconds
 
     if (!sessionTime) return;
+    if (remainingSessionTimeIsLessThanTenMinutes)
+      return this.startSessionCountDown({ timeRemainingInMinutes: diff / 60 }); // session is less than 10 so notify user of expiration right away
     const counterThread = setTimeout(() => {
-      toggleUniversalModal({
-        show: true,
-        component: (
-          <SessionExpiredNotification
-            timeRemaining={
-              remainingSessionTimeIsLessThanTenMinutes && diff < 0 ? 0 : diff
-            }
-          />
-        ),
-        noCancel: true,
-        okText: "Yes, keep my session active",
-        closeAfterConfirmation: true,
-        onConfirm: () => this.requestTokenRefresh(counterThread),
-      });
+      this.startSessionCountDown({ counterThread, timeRemainingInMinutes: 9 });
     }, sessionTime);
   }
 
+  startSessionCountDown({ counterThread, timeRemainingInMinutes }) {
+    const { toggleUniversalModal } = this.props;
+    toggleUniversalModal({
+      show: true,
+      component: (
+        <SessionExpiredNotification timeRemaining={timeRemainingInMinutes} />
+      ),
+      noCancel: true,
+      okText: "Yes, keep my session active",
+      closeAfterConfirmation: true,
+      onConfirm: () => this.requestTokenRefresh(counterThread),
+    });
+  }
   render() {
     const { auth, signOut } = this.props;
 
@@ -431,16 +434,17 @@ export default connect(
 )(Application);
 
 const SessionExpiredNotification = ({ timeRemaining }) => {
-  const [time, setTime] = useState(null);
+  timeRemaining = timeRemaining < 0 ? 0 : timeRemaining;
+  const [time, setTime] = useState(timeRemaining);
   setInterval(() => {
     const diff = time - 1;
-    if (diff === 0) window.location = "/login"; // Redirect to login at the end of the alloted time
+    if (diff <= 0) window.location = "/login"; // Redirect to login at the end of the alloted time
     setTime(diff);
   }, 60000);
 
-  useEffect(() => {
-    setTime(timeRemaining || 9);
-  }, []);
+  // useEffect(() => {
+  //   setTime(timeRemaining || 9);
+  // }, []);
 
   return (
     <div>

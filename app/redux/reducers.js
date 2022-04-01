@@ -39,6 +39,7 @@ import app, {
   reducerForCCAction,
   reducerForUniversalModal,
   reducerForFireAuth,
+  reducerForSessionDuration,
 } from "./modules/appReducer";
 
 /**
@@ -46,6 +47,7 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    sessionDuration: reducerForSessionDuration,
     fireAuth:reducerForFireAuth,
     modalOptions: reducerForUniversalModal,
     ccActions: reducerForCCAction,

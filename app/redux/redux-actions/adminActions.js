@@ -29,10 +29,17 @@ import {
   LOAD_CC_ACTIONS,
   TOGGLE_UNIVERSAL_MODAL,
   SET_FIRE_AUTH,
+  SET_SESSION_DURATION,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
 
+export const reduxSetSession = (sessionDuration) => (dispatch) => {
+  dispatch(setSessionDuration(sessionDuration));
+};
+export const setSessionDuration = (sessionDuration) => {
+  return { type: SET_SESSION_DURATION, payload: sessionDuration };
+};
 export const trackFirebaseAuthenticationChanges = () => (dispatch) => {
   firebase.auth().onAuthStateChanged((fireAuth) => {
     dispatch(reduxSetFireAuth(fireAuth));
