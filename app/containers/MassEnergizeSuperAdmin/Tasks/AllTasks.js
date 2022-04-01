@@ -26,58 +26,80 @@ class AllTasks extends React.Component {
   }
 
   pauseTask = (id) => {
-     let { tasks, putTasksInRedux } = this.props;
+    let { tasks, putTasksInRedux } = this.props;
     apiCall("/tasks.deactivate", { id: id }).then((res) => {
-    if(res && res.success){
-      let index = tasks.findIndex((x) => x.id === id);
-      const filteredTasks = (tasks || []).filter((task) => task.id !== id);
-      filteredTasks.splice(index, 0, res.data);
-      putTasksInRedux(filteredTasks);
-    }
-    });
-  };
-
-  resumeTask = (id) => {
-   let { tasks, putTasksInRedux } = this.props;
-    apiCall("/tasks.activate", { id: id }).then((res) => {
-      if(res && res.success){
+      if (res && res.success) {
         let index = tasks.findIndex((x) => x.id === id);
         const filteredTasks = (tasks || []).filter((task) => task.id !== id);
-       filteredTasks.splice(index, 0, res.data);
+        filteredTasks.splice(index, 0, res.data);
         putTasksInRedux(filteredTasks);
       }
     });
   };
 
-  getTaskWithID = (id)=>{
-    const { tasks } = this.props;
-    const task = tasks.find(task=>task.id===id);
-    return task;
-  }
+  resumeTask = (id) => {
+    let { tasks, putTasksInRedux } = this.props;
+    apiCall("/tasks.activate", { id: id }).then((res) => {
+      if (res && res.success) {
+        let index = tasks.findIndex((x) => x.id === id);
+        const filteredTasks = (tasks || []).filter((task) => task.id !== id);
+        filteredTasks.splice(index, 0, res.data);
+        putTasksInRedux(filteredTasks);
+      }
+    });
+  };
 
-   pauseAndResumeTaskModal = (type, id) => {
-       this.props.toggleDeleteConfirmation({
-         show: true,
-         component:  <Typography>
-        Are you sure you want to 
-        {type === 'pause' ? " pause " : " resume "} this task?
-      </Typography>,
-         onConfirm: () => type==='pause'? this.pauseTask(id):this.resumeTask(id),
-         closeAfterConfirmation: true,
-       })
-  }
-  
+  getTaskWithID = (id) => {
+    const { tasks } = this.props;
+    const task = tasks.find((task) => task.id === id);
+    return task;
+  };
+
+  pauseAndResumeTaskModal = (type, id) => {
+    this.props.toggleDeleteConfirmation({
+      show: true,
+      component: (
+        <Typography>
+          Are you sure you want to
+          {type === "pause" ? " pause " : " resume "} this task?
+        </Typography>
+      ),
+      onConfirm: () =>
+        type === "pause" ? this.pauseTask(id) : this.resumeTask(id),
+      closeAfterConfirmation: true,
+    });
+  };
 
   fashionData = (data) => {
     if (!data) return [];
     const fashioned = data.map((d) => [
       smartString(d.creator),
+
       smartString(d.name),
       smartString(
-        d.job_name && d.job_name.toLowerCase().split("_").join(" ")
+        new Date(
+          JSON.parse(d && d.recurring_details).actual
+        ).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+        })
       ),
       smartString(
-        d.recurring_interval && d.recurring_interval.toLowerCase().split("_").join(" ")
+        d.job_name &&
+          d.job_name
+            .toLowerCase()
+            .split("_")
+            .join(" ")
+      ),
+      smartString(
+        d.recurring_interval &&
+          d.recurring_interval
+            .toLowerCase()
+            .split("_")
+            .join(" ")
       ),
       smartString(d.status),
       { id: d.id },
@@ -93,11 +115,20 @@ class AllTasks extends React.Component {
         filter: false,
       },
     },
+
     {
       name: "Name",
       key: "name",
       options: {
         filter: true,
+      },
+    },
+    {
+      name: "Started At",
+      key: "recurring_interval",
+      options: {
+        filter: false,
+        filterType: "textField",
       },
     },
     {
@@ -108,14 +139,13 @@ class AllTasks extends React.Component {
       },
     },
     {
-      name: "Recurring",
+      name: "Frequency",
       key: "recurring_interval",
       options: {
         filter: false,
         filterType: "textField",
       },
     },
-
     {
       name: "Status",
       key: "status",
@@ -130,7 +160,7 @@ class AllTasks extends React.Component {
       options: {
         filter: false,
         download: false,
-        customBodyRender: ({id}) => {
+        customBodyRender: ({ id }) => {
           return (
             <div style={{ display: "flex" }}>
               <div>
@@ -148,14 +178,9 @@ class AllTasks extends React.Component {
                   }}
                 >
                   <div
-                    onClick={() =>
-                      this.pauseAndResumeTaskModal("pause", id)
-                    }
+                    onClick={() => this.pauseAndResumeTaskModal("pause", id)}
                   >
-                    <PauseOutlinedIcon
-                      size="small"
-                      variant="outlined"
-                    />
+                    <PauseOutlinedIcon size="small" variant="outlined" />
                   </div>
                 </div>
               ) : (
@@ -167,14 +192,9 @@ class AllTasks extends React.Component {
                   }}
                 >
                   <div
-                    onClick={() =>
-                      this.pauseAndResumeTaskModal("resume", id)
-                    }
+                    onClick={() => this.pauseAndResumeTaskModal("resume", id)}
                   >
-                    <PlayArrowOutlinedIcon
-                      size="small"
-                      variant="outlined"
-                    />
+                    <PlayArrowOutlinedIcon size="small" variant="outlined" />
                   </div>
                 </div>
               )}

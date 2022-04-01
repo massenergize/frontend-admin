@@ -153,7 +153,7 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
       },
       {
         name: "job_name",
-        label: "Function Name",
+        label: "Function",
         placeholder: "",
         fieldType: "Dropdown",
         defaultValue: toEdit && toEdit.id ? toEdit.job_name : "",
@@ -162,7 +162,7 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
       },
       {
         name: "recurring_interval",
-        label: "Recurring Interval",
+        label: "Frequency",
         placeholder: "How should this task be run?",
         fieldType: "Dropdown",
         defaultValue: null,
@@ -172,7 +172,7 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
       },
       {
         name: "recurring_details",
-        label: "Recurring Details",
+        label: "Starting Date",
         placeholder: "",
         fieldType: "DateTime",
         defaultValue: toEdit && toEdit.id ? getDateFromEditData(toEdit) : "",

@@ -4,5 +4,5 @@ export const TASK_INTERVALS = {
     EVERY_MONTH: "Monthly",
     EVERY_YEAR: "Yearly",
     EVERY_QUARTER: "Quarterly",
-    ONE_OFF: "One-off",
+    ONE_OFF: "Once",
 }
