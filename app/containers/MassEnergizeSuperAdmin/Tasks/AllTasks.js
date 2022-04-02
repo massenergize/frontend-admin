@@ -87,6 +87,16 @@ class AllTasks extends React.Component {
           minute: "numeric",
         })
       ),
+      d && d.last_run_at ?
+      smartString(
+        new Date(d.last_run_at).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+        })
+      ) : "-",
       smartString(
         d.job_name &&
           d.job_name
@@ -126,6 +136,14 @@ class AllTasks extends React.Component {
     {
       name: "Started At",
       key: "recurring_interval",
+      options: {
+        filter: false,
+        filterType: "textField",
+      },
+    },
+    {
+      name: "Last Run",
+      key: "last_run_at",
       options: {
         filter: false,
         filterType: "textField",

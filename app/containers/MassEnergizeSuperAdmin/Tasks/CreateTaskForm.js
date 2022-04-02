@@ -6,6 +6,8 @@ import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
 import { TASK_INTERVALS } from "./taskConstants";
 import { withRouter } from "react-router-dom";
+import { loadTasksAction } from "../../../redux/redux-actions/adminActions";
+import { bindActionCreators } from "redux";
 
 const styles = (theme) => ({
   root: {
@@ -37,14 +39,16 @@ class CreateTaskForm extends Component {
     this.state = {
       taskFunctions: [],
       formJson: null,
-      toEdit:{}
+      toEdit: {},
     };
   }
 
   static getDerivedStateFromProps(props, state) {
     let { taskFunctions, tasks } = props;
-    let  taskID  = props.match && props.match.params && props.match.params.id;
-    let toEditTask = (tasks||[]).find((task) => task.id.toString() === taskID);
+    let taskID = props.match && props.match.params && props.match.params.id;
+    let toEditTask = (tasks || []).find(
+      (task) => task.id.toString() === taskID
+    );
 
     taskFunctions = (taskFunctions || []).map((c) => ({
       id: c,
@@ -65,13 +69,25 @@ class CreateTaskForm extends Component {
     };
   }
 
+  onSuccess =(response)=>{
+    let {tasks}= this.props
+     let newTasks = (tasks|| []).filter((task) => task.id !== response.id);
+      newTasks.unshift(response);
+    this.props.putTasksInRedux(newTasks);
+  }
+
   render() {
     const { classes } = this.props;
     const { formJson } = this.state;
     if (!formJson) return <Loading />;
     return (
       <div>
-        <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+          enableCancel
+          onComplete={this.onSuccess}
+        />
       </div>
     );
   }
@@ -87,8 +103,16 @@ const mapStateToProps = (state) => {
     tasks: state.getIn(["tasks"]),
   };
 };
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(
+    {
+      putTasksInRedux: loadTasksAction,
+    },
+    dispatch
+  );
+}
 
-const NewTaskMapped = withRouter(connect(mapStateToProps)(CreateTaskForm));
+const NewTaskMapped = withRouter(connect(mapStateToProps, mapDispatchToProps)(CreateTaskForm));
 export default withStyles(styles, { withTheme: true })(NewTaskMapped);
 
 const createFormJson = ({ taskFunctions, toEdit }) => {
@@ -136,13 +160,13 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
   const formJson = {
     title: `${toEdit && toEdit.id ? "Update" : "Create New"}  Task`,
     subTitle: "",
-    method: toEdit &&  toEdit.id ? "/tasks.update" : "/tasks.create",
+    method: toEdit && toEdit.id ? "/tasks.update" : "/tasks.create",
     successRedirectPage: "/admin/read/tasks",
     preflightFxn: preflightFxn,
     fields: [
       {
         name: "name",
-        label: "Name of the Task",
+        label: "Name of the Task (a unique identifier for this task)",
         placeholder: "eg. Send monthly  newsletter",
         fieldType: "TextField",
         contentType: "text",
@@ -153,7 +177,7 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
       },
       {
         name: "job_name",
-        label: "Function",
+        label: "Choose an automatic process that we should run when its time",
         placeholder: "",
         fieldType: "Dropdown",
         defaultValue: toEdit && toEdit.id ? toEdit.job_name : "",
@@ -163,7 +187,7 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
       {
         name: "recurring_interval",
         label: "Frequency",
-        placeholder: "How should this task be run?",
+        placeholder: "",
         fieldType: "Dropdown",
         defaultValue: null,
         dbName: "recurring_interval",
@@ -173,7 +197,7 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
       {
         name: "recurring_details",
         label: "Starting Date",
-        placeholder: "",
+        placeholder: "When should this task run?",
         fieldType: "DateTime",
         defaultValue: toEdit && toEdit.id ? getDateFromEditData(toEdit) : "",
         dbName: "recurring_details",
