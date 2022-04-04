@@ -83,13 +83,16 @@ import EventRSVPs from "../MassEnergizeSuperAdmin/Events/EventRSVPs";
 import ThemeModal from "../../components/Widget/ThemeModal";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 const THIRTY_MINUTES = 1000 * 60 * 30;
+const TWENTY_THREE_HOURS = 1000 * 60 * 60 * 23;
 class Application extends React.Component {
   componentWillMount() {
     this.props.reduxCallCommunities();
   }
   componentDidMount() {
     this.props.fetchInitialContent(this.props.auth);
-    this.runAdminStatusCheck();
+    setTimeout(() => {
+      this.runAdminStatusCheck();
+    }, TWENTY_THREE_HOURS);
   }
 
   getCommunityList() {
