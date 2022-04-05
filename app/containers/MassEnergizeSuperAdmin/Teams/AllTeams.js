@@ -28,6 +28,8 @@ import { smartString } from "../../../utils/common";
 import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import MEChip from "../../../components/MECustom/MEChip";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import METable from "../ME  Tools/table /METable";
 
 class AllTeams extends React.Component {
   constructor(props) {
@@ -298,14 +300,16 @@ class AllTeams extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         {/* {this.showCommunitySwitch()} */}
-        <div className={classes.table}>
-          <MUIDataTable
-            title="All Teams"
-            data={data}
-            columns={columns}
-            options={options}
-          />
-        </div>
+        <METable
+          classes={classes}
+          page={PAGE_PROPERTIES.ALL_TEAMS}
+          tableProps={{
+            title: "All Teams",
+            data: data,
+            columns: columns,
+            options: options,
+          }}
+        />
       </div>
     );
   }

@@ -27,6 +27,8 @@ import {
 import { isNotEmpty, smartString } from "../../../utils/common";
 import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
+import METable from "../ME  Tools/table /METable";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -333,13 +335,9 @@ class AllActions extends React.Component {
           closeAfterConfirmation: true,
         });
         return false;
-        // const idsToDelete = rowsDeleted.data;
-        // idsToDelete.forEach(async (d) => {
-        //   const actionId = data[d.dataIndex][0];
-        //   await apiCall("/actions.delete", { action_id: actionId });
-        // });
       },
     };
+
     return (
       <div>
         <Helmet>
@@ -350,15 +348,16 @@ class AllActions extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <div className={classes.table}>
-          {/* {this.showCommunitySwitch()} */}
-          <MUIDataTable
-            title="All Actions"
-            data={data}
-            columns={columns}
-            options={options}
-          />
-        </div>
+        <METable
+          classes={classes}
+          page={PAGE_PROPERTIES.ALL_ACTIONS}
+          tableProps={{
+            title: "All Actions",
+            data: data,
+            columns: columns,
+            options: options,
+          }}
+        />
       </div>
     );
   }

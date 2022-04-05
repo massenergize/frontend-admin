@@ -24,6 +24,8 @@ import {
 import { smartString } from "../../../utils/common";
 import { Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
+import METable from "../ME  Tools/table /METable";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 
 class AllCommunities extends React.Component {
   constructor(props) {
@@ -248,6 +250,7 @@ class AllCommunities extends React.Component {
       responsive: "stacked",
       print: true,
       rowsPerPage: 50,
+
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         toggleDeleteConfirmation({
@@ -294,15 +297,24 @@ class AllCommunities extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        {/* {this.renderTable(communities, classes)} */}
-        <div className={classes.table}>
+        <METable
+          classes={classes}
+          page={PAGE_PROPERTIES.ALL_COMMUNITIES}
+          tableProps={{
+            title: "All Communities",
+            data: data,
+            columns: columns,
+            options: options,
+          }}
+        />
+        {/* <div className={classes.table}>
           <MUIDataTable
             title="All Communities"
             data={data}
             columns={columns}
             options={options}
           />
-        </div>
+        </div> */}
       </div>
     );
   }
