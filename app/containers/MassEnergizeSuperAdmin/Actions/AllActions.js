@@ -72,7 +72,14 @@ class AllActions extends React.Component {
   getColumns = () => {
     const { classes } = this.props;
     return [
-      {
+        {
+          name: 'ID',
+          key: 'id',
+          options: {
+            filter: false,
+          },
+        },
+        {
         name: "Image",
         key: "image",
         options: {
@@ -215,7 +222,7 @@ class AllActions extends React.Component {
   };
   fashionData = (data) => {
     const fashioned = data.map((d) => [
-      // d.id,
+      d.id,
       {
         id: d.id,
         image: d.image,

@@ -51,7 +51,8 @@ class AllTestimonials extends React.Component {
 
   fashionData = (data) => {
     return data.map((d) => [
-      getHumanFriendlyDate(d.created_at, true),
+      d.id,
+      getHumanFriendlyDate(d.created_at, false),
       smartString(d.title), // limit to first 30 chars
       { rank: d.rank, id: d.id },
       d.community && d.community.name,
@@ -76,6 +77,13 @@ class AllTestimonials extends React.Component {
   getColumns = () => {
     const { classes } = this.props;
     return [
+      {
+        name: 'ID',
+        key: 'id',
+        options: {
+          filter: false,
+        },
+      },
       {
         name: "Date",
         key: "date",

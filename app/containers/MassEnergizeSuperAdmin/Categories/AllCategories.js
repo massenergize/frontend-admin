@@ -69,13 +69,13 @@ class AllTagCollections extends React.Component {
     const { classes } = this.props;
 
     const cols = [
-      // {
-      //   name: 'id',
-      //   key: 'id',
-      //   options: {
-      //     filter: false
-      //   }
-      // },
+      {
+        name: 'ID',
+        key: 'id',
+        options: {
+          filter: false,
+        },
+      },
       {
         name: "Name",
         key: "name",
@@ -132,7 +132,7 @@ class AllTagCollections extends React.Component {
 
   fashionData(data) {
     return (data || []).map((d) => [
-      // d.id,
+      d.id,
       `${d.name}...`.substring(0, 30), // limit to first 30 chars
       d.rank,
       d.tags,

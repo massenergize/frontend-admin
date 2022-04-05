@@ -151,7 +151,7 @@ class AddRemoveAdmin extends Component {
   getColumns = () => [
     {
       name: 'Image',
-      key: 'id',
+      key: 'image',
       options: {
         filter: false,
         download: false,

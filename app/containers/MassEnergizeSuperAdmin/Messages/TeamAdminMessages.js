@@ -44,6 +44,7 @@ class AllTeamAdminMessages extends React.Component {
 
   fashionData = (data) => {
     return data.map((d) => [
+      d.id,
       getHumanFriendlyDate(d.created_at, true),
       smartString(d.title),
       d.user_name || (d.user && d.user.full_name) || "",
@@ -56,6 +57,13 @@ class AllTeamAdminMessages extends React.Component {
   };
 
   getColumns = (classes) => [
+    {
+      name: 'ID',
+      key: 'id',
+      options: {
+        filter: false,
+      },
+    },
     {
       name: "Date",
       key: "date",

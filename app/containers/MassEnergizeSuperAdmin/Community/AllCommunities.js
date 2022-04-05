@@ -51,6 +51,7 @@ class AllCommunities extends React.Component {
     return (
       data &&
       data.map((d) => [
+        d.id,
         {
           id: d.id,
           image: d.logo,
@@ -73,6 +74,13 @@ class AllCommunities extends React.Component {
     );
   }
   getColumns = (classes) => [
+    {
+      name: 'ID',
+      key: 'id',
+      options: {
+        filter: false,
+      },
+    },
     {
       name: "Logo",
       key: "logo",

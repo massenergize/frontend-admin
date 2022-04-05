@@ -50,6 +50,7 @@ class AllVendors extends React.Component {
 
   fashionData = (data) => {
     data = data.map((d) => [
+      d.id,
       {
         id: d.id,
         image: d.logo,
@@ -89,6 +90,13 @@ class AllVendors extends React.Component {
   };
 
   getColumns = (classes) => [
+    {
+      name: 'ID',
+      key: 'id',
+      options: {
+        filter: false,
+      },
+    },
     {
       name: "Image",
       key: "image",
