@@ -24,7 +24,7 @@ import {
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 import CommunitySwitch from "../Summary/CommunitySwitch";
-import { smartString } from "../../../utils/common";
+import { getHumanFriendlyDate, smartString } from "../../../utils/common";
 import { Chip, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 
@@ -48,7 +48,8 @@ class AllEvents extends React.Component {
 
   fashionData = (data) => {
     const fashioned = data.map((d) => [
-      // d.id,
+      d.id,
+      getHumanFriendlyDate(d.start_date_and_time, true),
       {
         id: d.id,
         image: d.image,
@@ -67,6 +68,20 @@ class AllEvents extends React.Component {
   getColumns = () => {
     const { classes } = this.props;
     return [
+      {
+        name: 'ID',
+        key: 'id',
+        options: {
+          filter: false,
+        },
+      },
+      {
+        name: "Date",
+        key: "date",
+        options: {
+          filter: false,
+        },
+      },
       {
         name: "Event",
         key: "event",
@@ -237,7 +252,8 @@ class AllEvents extends React.Component {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
-      rowsPerPage: 15,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({

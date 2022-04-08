@@ -70,6 +70,7 @@ class AllTeams extends React.Component {
   fashionData = (data) => {
     if (!data) return [];
     const fashioned = data.map((d) => [
+      d.id,
       {
         id: d.id,
         image: d.logo,
@@ -88,6 +89,13 @@ class AllTeams extends React.Component {
   getColumns = () => {
     const { classes } = this.props;
     return [
+      {
+        name: 'ID',
+        key: 'id',
+        options: {
+          filter: false,
+        },
+      },
       {
         name: "Team Logo",
         key: "id",
@@ -252,7 +260,8 @@ class AllTeams extends React.Component {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
-      rowsPerPage: 30,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
