@@ -7,12 +7,9 @@ import Typography from "@material-ui/core/Typography";
 import Avatar from "@material-ui/core/Avatar";
 import { bindActionCreators } from "redux";
 
-import MUIDataTable from "mui-datatables";
 import FileCopy from "@material-ui/icons/FileCopy";
 import EditIcon from "@material-ui/icons/Edit";
 import { Link, withRouter } from "react-router-dom";
-
-import Email from "@material-ui/icons/Email";
 import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
@@ -25,6 +22,8 @@ import {
 } from "../../../redux/redux-actions/adminActions";
 import { smartString } from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import METable from "../ME  Tools/table /METable";
 
 class AllVendors extends React.Component {
   constructor(props) {
@@ -226,8 +225,6 @@ class AllVendors extends React.Component {
           closeAfterConfirmation: true,
         });
         return false;
-        // const vendorId = data[d.dataIndex][0];
-        // apiCall("/vendors.delete", { vendor_id: vendorId });
       },
     };
 
@@ -245,14 +242,16 @@ class AllVendors extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <div className={classes.table}>
-          <MUIDataTable
-            title="All Vendors"
-            data={data}
-            columns={columns}
-            options={options}
-          />
-        </div>
+        <METable
+          classes={classes}
+          page={PAGE_PROPERTIES.ALL_VENDORS}
+          tableProps={{
+            title: "All Vendors",
+            data: data,
+            columns: columns,
+            options: options,
+          }}
+        />
       </div>
     );
   }
