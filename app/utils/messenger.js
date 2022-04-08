@@ -3,7 +3,8 @@
  */
 import qs from 'qs';
 import { API_HOST, IS_CANARY, IS_PROD, IS_LOCAL, CC_HOST } from '../config/constants';
-
+export const PERMISSION_DENIED = "permission_denied"; 
+export const SESSION_EXPIRED = "session_expired";
 /**
  * Handles making a POST request to the backend as a form submission
  * It also adds meta data for the BE to get context on the request coming in.
@@ -61,8 +62,8 @@ export async function apiCall(
     if (relocationPage && json && json.success) {
       window.location.href = relocationPage;
     } else if (!json.success) {
-      if (json.error === 'session_expired' || 
-          json.error === 'permission_denied') {
+      if (json.error === SESSION_EXPIRED || 
+          json.error === PERMISSION_DENIED) {
         window.location.href = '/login';
       } else if (json !== 'undefined') {
         console.log(destinationUrl, json);
@@ -115,7 +116,7 @@ export async function apiCallFile(destinationUrl, dataToSend = {}) {
     // endpoints that return non-JSON data will still send JSONs on errors
     if (contentType && contentType.indexOf('application/json') !== -1) {
       return response.json().then(json => {
-        if (json.error === 'session_expired') {
+        if (json.error === SESSION_EXPIRED) {
           localStorage.removeItem('authUser');
         }
         return json;
