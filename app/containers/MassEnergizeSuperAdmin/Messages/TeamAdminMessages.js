@@ -18,6 +18,8 @@ import {
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import METable from "../ME  Tools/table /METable";
 class AllTeamAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -186,11 +188,6 @@ class AllTeamAdminMessages extends React.Component {
           closeAfterConfirmation: true,
         });
         return false;
-        // const idsToDelete = rowsDeleted.data;
-        // idsToDelete.forEach((d) => {
-        //   const messageId = data[d.dataIndex][0];
-        //   apiCall("/messages.delete", { message_id: messageId });
-        // });
       },
     };
 
@@ -208,14 +205,16 @@ class AllTeamAdminMessages extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <div className={classes.table}>
-          <MUIDataTable
-            title="All Team Admin Messages"
-            data={data}
-            columns={columns}
-            options={options}
-          />
-        </div>
+        <METable
+          classes={classes}
+          page={PAGE_PROPERTIES.ALL_TEAM_MESSAGES}
+          tableProps={{
+            title: "All Team Admin Messages",
+            data: data,
+            columns: columns,
+            options: options,
+          }}
+        />
       </div>
     );
   }

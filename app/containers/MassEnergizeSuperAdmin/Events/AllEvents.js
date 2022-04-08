@@ -27,6 +27,8 @@ import CommunitySwitch from "../Summary/CommunitySwitch";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
 import { Chip, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
+import METable from "../ME  Tools/table /METable";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 
 class AllEvents extends React.Component {
   constructor(props) {
@@ -299,15 +301,17 @@ class AllEvents extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <div className={classes.table}>
-          {/* {this.showCommunitySwitch()} */}
-          <MUIDataTable
-            title="All Events"
-            data={data}
-            columns={columns}
-            options={options}
-          />
-        </div>
+
+        <METable
+          classes={classes}
+          page={PAGE_PROPERTIES.ALL_EVENTS}
+          tableProps={{
+            title: "All Events",
+            data: data,
+            columns: columns,
+            options: options,
+          }}
+        />
       </div>
     );
   }

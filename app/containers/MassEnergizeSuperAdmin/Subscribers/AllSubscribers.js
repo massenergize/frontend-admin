@@ -4,13 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 import Typography from "@material-ui/core/Typography";
-import Avatar from "@material-ui/core/Avatar";
 import { bindActionCreators } from "redux";
-import MUIDataTable from "mui-datatables";
-import FileCopy from "@material-ui/icons/FileCopy";
-import EditIcon from "@material-ui/icons/Edit";
-import { Link } from "react-router-dom";
-import Email from "@material-ui/icons/Email";
 import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
@@ -21,6 +15,8 @@ import {
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import METable from "../ME  Tools/table /METable";
 
 class AllSubscribers extends React.Component {
   constructor(props) {
@@ -50,7 +46,6 @@ class AllSubscribers extends React.Component {
     }
   }
 
- 
   showCommunitySwitch = () => {
     const user = this.props.auth ? this.props.auth : {};
     if (user.is_community_admin) {
@@ -177,15 +172,17 @@ class AllSubscribers extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <div className={classes.table}>
-          {/* {this.showCommunitySwitch()} */}
-          <MUIDataTable
-            title="All Subscribers"
-            data={data}
-            columns={columns}
-            options={options}
-          />
-        </div>
+
+        <METable
+          classes={classes}
+          page={PAGE_PROPERTIES.ALL_SUBSCRIBERS}
+          tableProps={{
+            title: "All Team Admin Messages Pro",
+            data: data,
+            columns: columns,
+            options: options,
+          }}
+        />
       </div>
     );
   }
