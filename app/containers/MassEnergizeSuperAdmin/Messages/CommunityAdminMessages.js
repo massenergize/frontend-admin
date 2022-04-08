@@ -54,6 +54,7 @@ class AllCommunityAdminMessages extends React.Component {
 
   fashionData = (data) => {
     return data.map((d) => [
+      d.id,
       getHumanFriendlyDate(d.created_at, true),
       smartString(d.title, 30),
       d.user_name || (d.user && d.user.full_name) || "",
@@ -65,6 +66,13 @@ class AllCommunityAdminMessages extends React.Component {
   };
 
   getColumns = (classes) => [
+    {
+      name: 'ID',
+      key: 'id',
+      options: {
+        filter: false,
+      },
+    },
     {
       name: "Date",
       key: "date",
@@ -168,7 +176,8 @@ class AllCommunityAdminMessages extends React.Component {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
-      rowsPerPage: 50,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({

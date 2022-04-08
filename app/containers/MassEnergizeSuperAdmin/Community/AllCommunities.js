@@ -53,6 +53,7 @@ class AllCommunities extends React.Component {
     return (
       data &&
       data.map((d) => [
+        d.id,
         {
           id: d.id,
           image: d.logo,
@@ -75,6 +76,13 @@ class AllCommunities extends React.Component {
     );
   }
   getColumns = (classes) => [
+    {
+      name: 'ID',
+      key: 'id',
+      options: {
+        filter: false,
+      },
+    },
     {
       name: "Logo",
       key: "logo",
@@ -249,8 +257,8 @@ class AllCommunities extends React.Component {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
-      rowsPerPage: 50,
-
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         toggleDeleteConfirmation({

@@ -7,7 +7,9 @@ import qs from "qs";
 export const getHumanFriendlyDate = (dateString, includeTime = false) => {
   if (!dateString) return null;
   return moment(dateString).format(
-    `MMMM Do, YYYY ${includeTime ? "hh:mm a" : ""}`
+    // make it a bit less human friendly, so it sorts properly
+    `YYYY-MM-DD ${includeTime ? "hh:mm a" : ""}`
+    //`MMMM Do, YYYY ${includeTime ? "hh:mm a" : ""}`
   );
 };
 export const smartString = (string, charLimit = 60) => {

@@ -46,6 +46,7 @@ class AllTeamAdminMessages extends React.Component {
 
   fashionData = (data) => {
     return data.map((d) => [
+      d.id,
       getHumanFriendlyDate(d.created_at, true),
       smartString(d.title),
       d.user_name || (d.user && d.user.full_name) || "",
@@ -58,6 +59,13 @@ class AllTeamAdminMessages extends React.Component {
   };
 
   getColumns = (classes) => [
+    {
+      name: 'ID',
+      key: 'id',
+      options: {
+        filter: false,
+      },
+    },
     {
       name: "Date",
       key: "date",
@@ -169,7 +177,8 @@ class AllTeamAdminMessages extends React.Component {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
-      rowsPerPage: 50,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({

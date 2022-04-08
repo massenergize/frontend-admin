@@ -49,6 +49,7 @@ class AllVendors extends React.Component {
 
   fashionData = (data) => {
     data = data.map((d) => [
+      d.id,
       {
         id: d.id,
         image: d.logo,
@@ -88,6 +89,13 @@ class AllVendors extends React.Component {
   };
 
   getColumns = (classes) => [
+    {
+      name: 'ID',
+      key: 'id',
+      options: {
+        filter: false,
+      },
+    },
     {
       name: "Image",
       key: "image",
@@ -206,7 +214,8 @@ class AllVendors extends React.Component {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
-      rowsPerPage: 30,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
