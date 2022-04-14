@@ -517,7 +517,14 @@ class MassEnergizeForm extends Component {
                     value={this.getValue(field.name)}
                     input={<Input id="select-multiple-chip" />}
                     renderValue={(selected) => (
-                      <div className={classes.chips}>
+                      <div
+                        className={classes.chips}
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          flexWrap: "wrap",
+                        }}
+                      >
                         {selected.map((id) => (
                           <Chip
                             key={id}
@@ -527,6 +534,7 @@ class MassEnergizeForm extends Component {
                               field.data
                             )}
                             className={classes.chip}
+                            style={{margin:5}}
                           />
                         ))}
                       </div>
