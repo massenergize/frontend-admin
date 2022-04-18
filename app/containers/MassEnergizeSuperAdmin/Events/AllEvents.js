@@ -68,11 +68,11 @@ class AllEvents extends React.Component {
   };
 
   getColumns = () => {
-    const { classes } = this.props;
+    const { classes, putEventsInRedux, allEvents } = this.props;
     return [
       {
-        name: 'ID',
-        key: 'id',
+        name: "ID",
+        key: "id",
         options: {
           filter: false,
         },
@@ -180,6 +180,8 @@ class AllEvents extends React.Component {
                     const newEvent =
                       copiedEventResponse && copiedEventResponse.data;
                     this.props.history.push(`/admin/edit/${newEvent.id}/event`);
+                    console.log("I am the copied stuff you konw", newEvent);
+                    putEventsInRedux([newEvent, ...(allEvents || [])]);
                   }
                 }}
                 to="/admin/read/events"

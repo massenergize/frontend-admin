@@ -118,7 +118,6 @@ class EditActionForm extends Component {
       ccActions.length &&
       tags &&
       tags.length;
-
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRunPageFirstTime || state.mounted;
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;

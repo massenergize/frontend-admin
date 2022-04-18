@@ -72,7 +72,7 @@ class AllActions extends React.Component {
   };
 
   getColumns = () => {
-    const { classes } = this.props;
+    const { classes, putActionsInRedux, allActions } = this.props;
     return [
       {
         name: "ID",
@@ -204,9 +204,11 @@ class AllActions extends React.Component {
                   const copiedActionResponse = await apiCall("/actions.copy", {
                     action_id: id,
                   });
+
                   if (copiedActionResponse && copiedActionResponse.success) {
                     const newAction =
                       copiedActionResponse && copiedActionResponse.data;
+                    putActionsInRedux([newAction, ...(allActions || [])]);
                     this.props.history.push(
                       `/admin/edit/${newAction.id}/action`
                     );
@@ -223,10 +225,10 @@ class AllActions extends React.Component {
     ];
   };
   /**
-   * NOTE: If you add or remove a field in here, make sure your changes reflect in nowDelete. 
+   * NOTE: If you add or remove a field in here, make sure your changes reflect in nowDelete.
    * Deleting heavily relies on the index arrangement of the items in here. Merci!
-   * @param {*} data 
-   * @returns 
+   * @param {*} data
+   * @returns
    */
   fashionData = (data) => {
     const fashioned = data.map((d) => [
@@ -286,7 +288,6 @@ class AllActions extends React.Component {
       );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    console.log("I think this was the remainder", rem);
     putActionsInRedux(rem);
   }
 
