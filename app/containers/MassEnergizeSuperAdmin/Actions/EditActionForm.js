@@ -69,7 +69,8 @@ export const makeTagSection = ({ collections, action, defaults = true }) => {
       fieldType: "Checkbox",
       selectMany: tCol.allow_multiple,
       defaultValue:
-        defaults && getSelectedIds(action.tags || [], tCol.tags || []),
+        defaults &&
+        getSelectedIds((action && action.tags) || [], tCol.tags || []),
       dbName: "tags",
       data: (tCol.tags || []).map((t) => ({
         ...t,
@@ -120,7 +121,6 @@ class EditActionForm extends Component {
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRunPageFirstTime || state.mounted;
-
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
     const action = (actions || []).find(
@@ -162,7 +162,6 @@ class EditActionForm extends Component {
       readOnly,
     };
   }
-
 
   render() {
     const { classes } = this.props;

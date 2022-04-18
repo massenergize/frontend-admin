@@ -74,14 +74,14 @@ class AllActions extends React.Component {
   getColumns = () => {
     const { classes } = this.props;
     return [
-        {
-          name: 'ID',
-          key: 'id',
-          options: {
-            filter: false,
-          },
+      {
+        name: "ID",
+        key: "id",
+        options: {
+          filter: false,
         },
-        {
+      },
+      {
         name: "Image",
         key: "image",
         options: {
@@ -222,6 +222,12 @@ class AllActions extends React.Component {
       },
     ];
   };
+  /**
+   * NOTE: If you add or remove a field in here, make sure your changes reflect in nowDelete. 
+   * Deleting heavily relies on the index arrangement of the items in here. Merci!
+   * @param {*} data 
+   * @returns 
+   */
   fashionData = (data) => {
     const fashioned = data.map((d) => [
       d.id,
@@ -272,11 +278,15 @@ class AllActions extends React.Component {
     const itemsInRedux = allActions;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][6];
+      const found = data[d.dataIndex][0];
+      console.log("I think I am the found", found);
       ids.push(found);
-      apiCall("/actions.delete", { action_id: found });
+      apiCall("/actions.delete", { action_id: found }).catch((e) =>
+        console.log("ACTION_DELETE_ERRO:", e)
+      );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
+    console.log("I think this was the remainder", rem);
     putActionsInRedux(rem);
   }
 
@@ -334,7 +344,7 @@ class AllActions extends React.Component {
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
-        onRowsDelete: (rowsDeleted) => {
+      onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
           show: true,

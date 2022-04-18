@@ -149,7 +149,7 @@ class AllTeamAdminMessages extends React.Component {
     const itemsInRedux = teamMessages;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][7];
+      const found = data[d.dataIndex][1];
       ids.push(found);
       apiCall("/messages.delete", { message_id: found });
     });

@@ -225,7 +225,7 @@ class AllEvents extends React.Component {
     const itemsInRedux = allEvents;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][6];
+      const found = data[d.dataIndex][0];
       ids.push(found);
       apiCall("/events.delete", { event_id: found });
     });
