@@ -281,7 +281,6 @@ class AllActions extends React.Component {
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
-      console.log("I think I am the found", found);
       ids.push(found);
       apiCall("/actions.delete", { action_id: found }).catch((e) =>
         console.log("ACTION_DELETE_ERRO:", e)
