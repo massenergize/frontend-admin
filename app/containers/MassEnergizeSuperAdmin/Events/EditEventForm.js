@@ -59,7 +59,8 @@ export const makeTagSection = ({
       placeholder: "",
       fieldType: "Checkbox",
       selectMany: tCol.allow_multiple,
-      defaultValue: defaults && getSelectedIds(event.tags, tCol.tags),
+      defaultValue:
+        defaults && getSelectedIds((event && event.tags) || [], tCol.tags),
       dbName: "tags",
       data: tCol.tags.map((t) => ({
         ...t,
@@ -620,18 +621,18 @@ const createFormJson = ({ event, rescheduledEvent, communities }) => {
                 valueToCheck: "true",
                 fields: [
                   {
-                    name: 'rsvp_message_text',
-                    label: 'Message to send to RSVP',
-                    placeholder: 'eg. This event is happening in ...',
-                    fieldType: 'HTMLField',
+                    name: "rsvp_message_text",
+                    label: "Message to send to RSVP",
+                    placeholder: "eg. This event is happening in ...",
+                    fieldType: "HTMLField",
                     isRequired: true,
                     defaultValue: event.rsvp_message,
-                    dbName: 'rsvp_message',
+                    dbName: "rsvp_message",
                   },
-                ]
+                ],
               },
             },
-          ]
+          ],
         },
       },
       {

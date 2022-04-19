@@ -184,7 +184,7 @@ class AllVendors extends React.Component {
     const itemsInRedux = allVendors;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][6];
+      const found = data[d.dataIndex][1];
       ids.push(found);
       apiCall("/vendors.delete", { vendor_id: found });
     });
