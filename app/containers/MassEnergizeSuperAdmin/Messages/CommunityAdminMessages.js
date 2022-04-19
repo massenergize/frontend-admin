@@ -148,7 +148,7 @@ class AllCommunityAdminMessages extends React.Component {
     const itemsInRedux = messages;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][6];
+      const found = data[d.dataIndex][1];
       ids.push(found);
       apiCall("/messages.delete", { message_id: found });
     });

@@ -26,7 +26,6 @@ import CommunitySwitch from "../Summary/CommunitySwitch";
 import { apiCall } from "../../../utils/messenger";
 import { smartString } from "../../../utils/common";
 import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
-import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
@@ -233,7 +232,7 @@ class AllTeams extends React.Component {
     const itemsInRedux = allTeams;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][6];
+      const found = data[d.dataIndex][1];
       ids.push(found);
       apiCall("/teams.delete", { team_id: found });
     });
