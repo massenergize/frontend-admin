@@ -1,21 +1,30 @@
 import React, { useState } from "react";
 import "./IconDialog.css";
+import debounce from "lodash.debounce";
 const ICONS = require("./icon_files.json");
-
+const RECENT_ICONS_KEY = "RECENT_ICONS_KEY";
+const MAX_RECENTS = 10; // number of icons that should be kept in the recent list
 function IconDialog({
   perPage = 50,
   placeholder,
   onIconSelected,
   defaultValue,
   value,
+  maxRecents,
+  recentItemsStorageKey,
 }) {
   const icons = ICONS.ICON_FILES;
   const [iconSet, setIconSet] = useState(icons.slice(0, perPage));
   const [searched, setSearched] = useState([]);
+  const [text, setText] = useState("");
   const pages = Math.round(icons.length / perPage);
   const [page, setPage] = useState(1);
   const [show, setShow] = useState(false);
   const [selected, setSelected] = useState(defaultValue || value || null);
+  const maximumNumberOfRecentItems = maxRecents || MAX_RECENTS;
+  const iconsStorageKey = recentItemsStorageKey || RECENT_ICONS_KEY;
+  const storedRecents = JSON.parse(localStorage.getItem(iconsStorageKey));
+  const [recents, setRecents] = useState(storedRecents || []);
 
   const nextPage = () => {
     if (page >= pages) return;
@@ -35,18 +44,30 @@ function IconDialog({
     setPage(page - 1);
   };
 
-  const search = (e) => {
-    const text = e.target.value.trim();
+  const search = (text) => {
+    setText(text);
     if (!text) return setSearched([]);
     const found = icons.filter((name) => name.includes(text));
     setSearched(found);
   };
 
+  const addToRecents = (iconName) => {
+    const rem = recents.filter((ic) => ic !== iconName);
+    var content = [iconName, ...rem];
+    if (content.length > maximumNumberOfRecentItems)
+      content = content.slice(0, maximumNumberOfRecentItems);
+    setRecents(content);
+    localStorage.setItem(iconsStorageKey, JSON.stringify(content));
+  };
+
   const selectIcon = (iconName) => {
     setSelected(iconName);
     onIconSelected && onIconSelected(iconName);
+    iconName && addToRecents(iconName);
     setShow(false);
   };
+
+  const searchForIconWhenUserPausesTyping = debounce(search, 200);
 
   const isLastPage = page >= pages;
   const isFirstPage = page <= 1;
@@ -95,9 +116,11 @@ function IconDialog({
       {show && (
         <Dialog
           {...{
+            recents,
+            text,
             data,
             searched,
-            search,
+            search: (e) => searchForIconWhenUserPausesTyping(e.target.value),
             isLastPage,
             isFirstPage,
             prevPage,
@@ -115,7 +138,10 @@ function IconDialog({
 
 export default IconDialog;
 
+// --------------------------------------------------------------------------------------
 const Dialog = ({
+  recents,
+  text,
   data,
   searched,
   isFirstPage,
@@ -128,31 +154,58 @@ const Dialog = ({
   close,
   selectIcon,
 }) => {
+  const userSearchedAnThereAreNoIcons = text && !searched.length;
+
+  const renderIcons = (iconSet) => {
+    return (iconSet || []).map((ic, index) => {
+      return (
+        <span
+          className="d-icon-span"
+          key={index.toString()}
+          onClick={() => selectIcon(ic)}
+        >
+          <i className={` d-icon ${ic}`} />
+        </span>
+      );
+    });
+  };
   return (
     <>
       <div className="icon-d-ghost-curtain" onClick={close} />
       <div className="anime-load-in icon-d-main-wrapper">
         <div>
           <input
-            placeholder="Enter text that describes icon..."
+            placeholder="Enter text that describes the icon..."
             className="icon-d-textbox"
             onChange={search}
           />
         </div>
+        {recents && recents.length ? (
+          <div className="recents-container">
+            <div style={{ padding: "0px 15px" }}>
+              <small style={{ fontSize: 8, color: "#bbbbbb" }}>
+                RECENTLY USED
+              </small>
+            </div>
+            <div className="content">{renderIcons(recents)}</div>
+          </div>
+        ) : (
+          <></>
+        )}
         <div className="icon-container">
-          {data.map((ic, index) => {
-            return (
-              <span
-                className="d-icon-span"
-                key={index.toString()}
-                onClick={() => selectIcon("fa " + ic)}
-              >
-                <i className={` fa d-icon ${ic}`} />
-              </span>
-            );
-          })}
+          {userSearchedAnThereAreNoIcons ? (
+            <div className="no-icons-found">
+              <i className="fas fa-search" />
+              <small>
+                Sorry, no icons were found with the{" "}
+                <b style={{ color: "black" }}>"{text}"</b> description...
+              </small>
+            </div>
+          ) : (
+            renderIcons(data)
+          )}
         </div>
-        {!searched.length && (
+        {!searched.length && !userSearchedAnThereAreNoIcons && (
           <div className="icon-d-footer">
             <span
               className={`d-icon-control ${isFirstPage ? "disabled" : ""}`}

@@ -1,11 +1,39 @@
-@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css");
-@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
+@import url("https://pro.fontawesome.com/releases/v5.10.0/css/all.css");
+
+.recents-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border: solid 0px rgb(238, 238, 238);
+  border-bottom-width: 1px;
+}
+
+.recents-container .content {
+  display: flex;
+  flex-direction: row;
+  padding: 0px 2px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.no-icons-found {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  color: grey;
+}
+
+.no-icons-found i {
+  margin-right: 11px;
+}
 .icon-d-textbox {
+  font-size: 13px;
   padding: 15px 20px;
   width: 100%;
   border-radius: 5px;
   border: solid 0px rgb(231, 231, 231);
-  border-bottom-width: 2px;
+  border-bottom-width: 1px;
   border-bottom-right-radius: 0px;
   border-bottom-left-radius: 0px;
 }
@@ -56,7 +84,7 @@
   position: relative;
 }
 
-.default-trigger p { 
+.default-trigger p {
   margin: 0px 5px;
 }
 .default-trigger {
@@ -104,7 +132,7 @@
 }
 
 .d-icon-span {
-  padding: 8px 10px;
+  padding: 5px 10px;
   border-radius: 4px;
   cursor: pointer;
 }
@@ -131,11 +159,12 @@
 }
 
 .d-icon-control {
-  padding: 4px 10px;
-  border: solid 2px black;
+  padding: 0px 10px;
+  border: solid 1px black;
   margin: 0px 10px;
   border-radius: 3px;
   cursor: pointer;
+  text-align: center;
 }
 
 .d-icon-control:hover {
