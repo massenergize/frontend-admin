@@ -77,7 +77,7 @@ class Impact extends Component {
       title: 'Community Goals and Reported Data',
       subTitle: '',
       method: '/graphs.data.update',
-      successRedirectPage: window.location.href,
+      //successRedirectPage: window.location.href,
       fields: 
       [
         {

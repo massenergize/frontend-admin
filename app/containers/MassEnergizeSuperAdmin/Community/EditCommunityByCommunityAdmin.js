@@ -174,9 +174,9 @@ const createFormJson = (community) => {
           {
             name: "website",
             label:
-              "Custom website domain (optional): URL which would forward to the portal, that users will see.  Don't include 'https://' ",
+              "Custom website domain (optional): URL which would forward to the portal, that users will see.  Start with 'www.' but don't include 'https://'",
             placeholder:
-              "eg. 'EnergizeYourTown.org' (leave blank or enter 'None' to remove website domain)",
+              "eg. 'www.EnergizeYourTown.org' (leave blank or enter 'None' to remove website domain)",
             fieldType: "TextField",
             contentType: "text",
             isRequired: false,

@@ -25,6 +25,8 @@ import CommunitySwitch from "../Summary/CommunitySwitch";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
 import { Chip } from "@material-ui/core";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import METable from "../ME  Tools/table /METable";
 class AllCommunityAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -52,6 +54,7 @@ class AllCommunityAdminMessages extends React.Component {
 
   fashionData = (data) => {
     return data.map((d) => [
+      d.id,
       getHumanFriendlyDate(d.created_at, true),
       smartString(d.title, 30),
       d.user_name || (d.user && d.user.full_name) || "",
@@ -63,6 +66,13 @@ class AllCommunityAdminMessages extends React.Component {
   };
 
   getColumns = (classes) => [
+    {
+      name: 'ID',
+      key: 'id',
+      options: {
+        filter: false,
+      },
+    },
     {
       name: "Date",
       key: "date",
@@ -138,7 +148,7 @@ class AllCommunityAdminMessages extends React.Component {
     const itemsInRedux = messages;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][6];
+      const found = data[d.dataIndex][1];
       ids.push(found);
       apiCall("/messages.delete", { message_id: found });
     });
@@ -166,7 +176,8 @@ class AllCommunityAdminMessages extends React.Component {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
-      rowsPerPage: 50,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
@@ -193,14 +204,16 @@ class AllCommunityAdminMessages extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <div className={classes.table}>
-          <MUIDataTable
-            title="All Community Admin Messages"
-            data={data}
-            columns={columns}
-            options={options}
-          />
-        </div>
+        <METable
+          classes={classes}
+          page={PAGE_PROPERTIES.ALL_ADMIN_MESSAGES}
+          tableProps={{
+            title: "All Community Admin Messages",
+            data: data,
+            columns: columns,
+            options: options,
+          }}
+        />
       </div>
     );
   }
