@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import MassEnergizeForm from '../_FormGenerator';
 import { apiCall } from '../../../utils/messenger';
+import fieldTypes from '../_FormGenerator/fieldTypes';
 
 const styles = theme => ({
   root: {
@@ -339,9 +340,9 @@ class HomePageEditForm extends Component {
                       },
                       {
                         name: 'icon_box_1_icon',
-                        label: 'Put an icon Name: (select from ...)',
+                        label: 'Pick an icon',
                         placeholder: 'eg. 100',
-                        fieldType: 'TextField',
+                        fieldType: fieldTypes.Icon,
                         contentType: 'text',
                         isRequired: false,
                         defaultValue: `${iconBox1 && iconBox1.icon}`,
@@ -389,9 +390,9 @@ class HomePageEditForm extends Component {
                       },
                       {
                         name: 'icon_box_2_icon',
-                        label: 'Put an icon Name: (select from ...)',
+                        label: 'Pick an icon',
                         placeholder: 'eg. 100',
-                        fieldType: 'TextField',
+                        fieldType: fieldTypes.Icon,
                         contentType: 'text',
                         isRequired: false,
                         defaultValue: `${iconBox2 && iconBox2.icon}`,
@@ -439,9 +440,9 @@ class HomePageEditForm extends Component {
                       },
                       {
                         name: 'icon_box_3_icon',
-                        label: 'Put an icon Name: (select from ...)',
+                        label: 'Pick an icon',
                         placeholder: 'eg. 100',
-                        fieldType: 'TextField',
+                        fieldType: fieldTypes.Icon,
                         contentType: 'text',
                         isRequired: false,
                         defaultValue: `${iconBox3 && iconBox3.icon}`,
@@ -489,9 +490,9 @@ class HomePageEditForm extends Component {
                       },
                       {
                         name: 'icon_box_4_icon',
-                        label: 'Put an icon Name: (select from ...)',
+                        label: 'Pick an icon',
                         placeholder: 'eg. 100',
-                        fieldType: 'TextField',
+                        fieldType: fieldTypes.Icon,
                         contentType: 'text',
                         isRequired: false,
                         defaultValue: `${iconBox4 && iconBox4.icon}`,
