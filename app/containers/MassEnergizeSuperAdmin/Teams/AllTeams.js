@@ -26,8 +26,9 @@ import CommunitySwitch from "../Summary/CommunitySwitch";
 import { apiCall } from "../../../utils/messenger";
 import { smartString } from "../../../utils/common";
 import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
-import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import MEChip from "../../../components/MECustom/MEChip";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import METable from "../ME  Tools/table /METable";
 
 class AllTeams extends React.Component {
   constructor(props) {
@@ -70,6 +71,7 @@ class AllTeams extends React.Component {
   fashionData = (data) => {
     if (!data) return [];
     const fashioned = data.map((d) => [
+      d.id,
       {
         id: d.id,
         image: d.logo,
@@ -88,6 +90,13 @@ class AllTeams extends React.Component {
   getColumns = () => {
     const { classes } = this.props;
     return [
+      {
+        name: 'ID',
+        key: 'id',
+        options: {
+          filter: false,
+        },
+      },
       {
         name: "Team Logo",
         key: "id",
@@ -223,7 +232,7 @@ class AllTeams extends React.Component {
     const itemsInRedux = allTeams;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][6];
+      const found = data[d.dataIndex][1];
       ids.push(found);
       apiCall("/teams.delete", { team_id: found });
     });
@@ -252,7 +261,8 @@ class AllTeams extends React.Component {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
-      rowsPerPage: 30,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
@@ -298,14 +308,16 @@ class AllTeams extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         {/* {this.showCommunitySwitch()} */}
-        <div className={classes.table}>
-          <MUIDataTable
-            title="All Teams"
-            data={data}
-            columns={columns}
-            options={options}
-          />
-        </div>
+        <METable
+          classes={classes}
+          page={PAGE_PROPERTIES.ALL_TEAMS}
+          tableProps={{
+            title: "All Teams",
+            data: data,
+            columns: columns,
+            options: options,
+          }}
+        />
       </div>
     );
   }

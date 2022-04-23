@@ -83,20 +83,38 @@ import TeamAdminMessages from "../MassEnergizeSuperAdmin/Messages/TeamAdminMessa
 import TeamMembers from "../MassEnergizeSuperAdmin/Teams/TeamMembers";
 import EventRSVPs from "../MassEnergizeSuperAdmin/Events/EventRSVPs";
 import ThemeModal from "../../components/Widget/ThemeModal";
-// import AllTasks from "../MassEnergizeSuperAdmin/Tasks/AllTasks";
-
+import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
+const THIRTY_MINUTES = 1000 * 60 * 30;
+const TWENTY_FOUR_HOURS = 1000 * 60 * 60 * 24;
 class Application extends React.Component {
   componentWillMount() {
     this.props.reduxCallCommunities();
   }
   componentDidMount() {
     this.props.fetchInitialContent(this.props.auth);
+    setTimeout(() => {
+      this.runAdminStatusCheck();
+    }, TWENTY_FOUR_HOURS);
   }
 
   getCommunityList() {
     const { auth } = this.props;
     const list = (auth && auth.admin_at) || [];
     return list.map((com) => com.id);
+  }
+
+  runAdminStatusCheck() {
+    setInterval(async () => {
+      try {
+        const response = await apiCall("auth.whoami");
+        if (response.success) return;
+
+        if (response.error === PERMISSION_DENIED)
+          return (window.location = "/login");
+      } catch (e) {
+        console.log("ADMIN_SESSION_STATUS_ERROR:", e.toString());
+      }
+    }, THIRTY_MINUTES);
   }
 
   render() {

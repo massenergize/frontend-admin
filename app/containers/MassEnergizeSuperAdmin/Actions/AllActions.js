@@ -27,6 +27,8 @@ import {
 import { isNotEmpty, smartString } from "../../../utils/common";
 import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
+import METable from "../ME  Tools/table /METable";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -70,8 +72,15 @@ class AllActions extends React.Component {
   };
 
   getColumns = () => {
-    const { classes } = this.props;
+    const { classes, putActionsInRedux, allActions } = this.props;
     return [
+      {
+        name: "ID",
+        key: "id",
+        options: {
+          filter: false,
+        },
+      },
       {
         name: "Image",
         key: "image",
@@ -195,9 +204,11 @@ class AllActions extends React.Component {
                   const copiedActionResponse = await apiCall("/actions.copy", {
                     action_id: id,
                   });
+
                   if (copiedActionResponse && copiedActionResponse.success) {
                     const newAction =
                       copiedActionResponse && copiedActionResponse.data;
+                    putActionsInRedux([newAction, ...(allActions || [])]);
                     this.props.history.push(
                       `/admin/edit/${newAction.id}/action`
                     );
@@ -213,9 +224,15 @@ class AllActions extends React.Component {
       },
     ];
   };
+  /**
+   * NOTE: If you add or remove a field in here, make sure your changes reflect in nowDelete.
+   * Deleting heavily relies on the index arrangement of the items in here. Merci!
+   * @param {*} data
+   * @returns
+   */
   fashionData = (data) => {
     const fashioned = data.map((d) => [
-      // d.id,
+      d.id,
       {
         id: d.id,
         image: d.image,
@@ -263,9 +280,11 @@ class AllActions extends React.Component {
     const itemsInRedux = allActions;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][6];
+      const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/actions.delete", { action_id: found });
+      apiCall("/actions.delete", { action_id: found }).catch((e) =>
+        console.log("ACTION_DELETE_ERRO:", e)
+      );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putActionsInRedux(rem);
@@ -323,7 +342,8 @@ class AllActions extends React.Component {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
-      rowsPerPage: 15,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
@@ -333,13 +353,9 @@ class AllActions extends React.Component {
           closeAfterConfirmation: true,
         });
         return false;
-        // const idsToDelete = rowsDeleted.data;
-        // idsToDelete.forEach(async (d) => {
-        //   const actionId = data[d.dataIndex][0];
-        //   await apiCall("/actions.delete", { action_id: actionId });
-        // });
       },
     };
+
     return (
       <div>
         <Helmet>
@@ -350,15 +366,16 @@ class AllActions extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <div className={classes.table}>
-          {/* {this.showCommunitySwitch()} */}
-          <MUIDataTable
-            title="All Actions"
-            data={data}
-            columns={columns}
-            options={options}
-          />
-        </div>
+        <METable
+          classes={classes}
+          page={PAGE_PROPERTIES.ALL_ACTIONS}
+          tableProps={{
+            title: "All Actions",
+            data: data,
+            columns: columns,
+            options: options,
+          }}
+        />
       </div>
     );
   }

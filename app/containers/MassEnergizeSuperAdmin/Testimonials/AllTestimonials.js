@@ -24,6 +24,8 @@ import {
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
 import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import METable from "../ME  Tools/table /METable";
 
 class AllTestimonials extends React.Component {
   constructor(props) {
@@ -51,7 +53,8 @@ class AllTestimonials extends React.Component {
 
   fashionData = (data) => {
     return data.map((d) => [
-      getHumanFriendlyDate(d.created_at, true),
+      d.id,
+      getHumanFriendlyDate(d.created_at, false),
       smartString(d.title), // limit to first 30 chars
       { rank: d.rank, id: d.id },
       d.community && d.community.name,
@@ -76,6 +79,13 @@ class AllTestimonials extends React.Component {
   getColumns = () => {
     const { classes } = this.props;
     return [
+      {
+        name: 'ID',
+        key: 'id',
+        options: {
+          filter: false,
+        },
+      },
       {
         name: "Date",
         key: "date",
@@ -222,7 +232,7 @@ class AllTestimonials extends React.Component {
     const itemsInRedux = allTestimonials;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][7];
+      const found = data[d.dataIndex][1];
       ids.push(found);
       apiCall("/testimonials.delete", { testimonial_id: found });
     });
@@ -250,7 +260,8 @@ class AllTestimonials extends React.Component {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
-      rowsPerPage: 15,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
@@ -296,15 +307,16 @@ class AllTestimonials extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <div className={classes.table}>
-          {/* {this.showCommunitySwitch()} */}
-          <MUIDataTable
-            title="All Testimonials"
-            data={data}
-            columns={columns}
-            options={options}
-          />
-        </div>
+        <METable
+          classes={classes}
+          page={PAGE_PROPERTIES.ALL_TESTIMONIALS}
+          tableProps={{
+            title: "All Testimonials",
+            data: data,
+            columns: columns,
+            options: options,
+          }}
+        />
       </div>
     );
   }
