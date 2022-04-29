@@ -35,7 +35,7 @@ import MEMediaLibraryImplementation from "../Gallery/tools/MEMediaLibraryImpleme
 import Loading from "dan-components/Loading";
 import IconDialog from "../ME  Tools/icon dialog/IconDialog";
 
-const TINY_MCE_API_KEY = "3fpefbsmtkh71yhtjyykjwj5ezs3a5cac5ei018wvnlg2g0r";
+const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
