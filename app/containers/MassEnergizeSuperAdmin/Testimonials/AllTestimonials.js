@@ -287,7 +287,7 @@ class AllTestimonials extends React.Component {
             <Paper className={classes.root} style={{ padding: 15 }}>
               <div className={classes.root}>
                 <LinearProgress />
-                <h1>Fetching all Events. This may take a while...</h1>
+                <h1>Fetching all Testimonials. This may take a while...</h1>
                 <br />
                 <LinearProgress color="secondary" />
               </div>
