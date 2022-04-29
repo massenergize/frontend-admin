@@ -33,8 +33,9 @@ import Modal from "./Modal";
 // import PreviewModal from './PreviewModal';
 import MEMediaLibraryImplementation from "../Gallery/tools/MEMediaLibraryImplementation";
 import Loading from "dan-components/Loading";
+import IconDialog from "../ME  Tools/icon dialog/IconDialog";
 
-const TINY_MCE_API_KEY = "3fpefbsmtkh71yhtjyykjwj5ezs3a5cac5ei018wvnlg2g0r";
+const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -86,8 +87,6 @@ class MassEnergizeForm extends Component {
     this.updateForm = this.updateForm.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
     //this.closePreviewModal = this.closePreviewModal.bind(this);
-    const { ICON_FILES } = require("./icon_files.json");
-    this.iconFiles = ICON_FILES;
   }
 
   async componentDidMount() {
@@ -534,7 +533,7 @@ class MassEnergizeForm extends Component {
                               field.data
                             )}
                             className={classes.chip}
-                            style={{margin:5}}
+                            style={{ margin: 5 }}
                           />
                         ))}
                       </div>
@@ -629,34 +628,18 @@ class MassEnergizeForm extends Component {
       case FieldTypes.Icon:
         return (
           <div key={field.name}>
-            <FormControl className={classes.field}>
-              <InputLabel htmlFor={field.name}>{field.label}</InputLabel>
-              <Select
-                native
-                name={field.name}
-                onChange={async (newValue) => {
-                  await this.updateForm(field.name, newValue.target.value);
-                }}
-                inputProps={{
-                  id: "age-native-simple",
-                }}
-              >
-                <option value={this.getValue(field.name)}>
-                  {this.getDisplayName(
-                    field.name,
-                    this.getValue(field.name),
-                    this.iconFiles
-                  )}
-                </option>
-                {this.iconFiles.map((c) => (
-                  <option value={c} key={c}>
-                    {c}
-                  </option>
-                ))}
-              </Select>
-              {field.child &&
-                this.getValue(field.name) === field.child.valueToCheck &&
-                this.renderFields(field.child.fields)}
+            <InputLabel htmlFor={field.name} style={{ marginBottom: 8 }}>
+              {field.label}
+            </InputLabel>
+            <FormControl className={classes.field} style={{ marginTop: 10 }}>
+              <div>
+                <IconDialog
+                  {...field}
+                  onIconSelected={(iconName) => {
+                    this.updateForm(field.name, iconName);
+                  }}
+                />
+              </div>
             </FormControl>
           </div>
         );
