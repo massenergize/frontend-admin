@@ -106,8 +106,8 @@ class AllTasks extends React.Component {
             .join(" ")
       ),
       smartString(
-        d.recurring_interval &&
-          d.recurring_interval
+        d.frequency &&
+          d.frequency
             .toLowerCase()
             .split("_")
             .join(" ")

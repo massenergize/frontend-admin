@@ -128,7 +128,7 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
   const createTaskFunctionList = () => {
     let functions = [];
     taskFunctions.forEach((c) => {
-      let x = { id: c, displayName: c && c.displayName.replace("_", " ") };
+      let x = { id: c.id, displayName: c && c.displayName.replace("_", " ") };
       functions.push(x);
     });
     return functions;
