@@ -87,16 +87,17 @@ class AllTasks extends React.Component {
           minute: "numeric",
         })
       ),
-      d && d.last_run_at ?
-      smartString(
-        new Date(d.last_run_at).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-          hour: "numeric",
-          minute: "numeric",
-        })
-      ) : "-",
+      d && d.last_run_at
+        ? smartString(
+            new Date(d.last_run_at).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+              hour: "numeric",
+              minute: "numeric",
+            })
+          )
+        : "-",
       smartString(
         d.job_name &&
           d.job_name
@@ -158,7 +159,7 @@ class AllTasks extends React.Component {
     },
     {
       name: "Frequency",
-      key: "recurring_interval",
+      key: "frequency",
       options: {
         filter: false,
         filterType: "textField",

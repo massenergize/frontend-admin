@@ -539,7 +539,7 @@ export const reduxCallLibraryModalImages = (props) => {
         );
       })
       .catch((e) => {
-        if (cb) cb(repsonse);
+        if (cb) cb(response);
         console.log("FETCH ERROR_SYNT: ", e.toString());
       });
   };

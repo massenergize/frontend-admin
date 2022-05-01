@@ -125,6 +125,15 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
     return intervals;
   };
 
+  const createTaskFunctionList = () => {
+    let functions = [];
+    taskFunctions.forEach((c) => {
+      let x = { id: c, displayName: c && c.displayName.replace("_", " ") };
+      functions.push(x);
+    });
+    return functions;
+  }
+
 
   const getDateFromEditData = toEdit=>{
     if(!toEdit.id) return
@@ -182,16 +191,16 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
         fieldType: "Dropdown",
         defaultValue: toEdit && toEdit.id ? toEdit.job_name : "",
         dbName: "job_name",
-        data: [{ displayName: "--", id: "" }, ...taskFunctions],
+        data: [{ displayName: "--", id: "" }, ...createTaskFunctionList()],
       },
       {
-        name: "recurring_interval",
+        name: "frequency",
         label: "Frequency",
         placeholder: "",
         fieldType: "Dropdown",
         defaultValue: null,
-        dbName: "recurring_interval",
-        defaultValue: toEdit && toEdit.id ? toEdit.recurring_interval : "",
+        dbName: "frequency",
+        defaultValue: toEdit && toEdit.id ? toEdit.frequency : "",
         data: [{ displayName: "--", id: "" }, ...createTaskIntervalList()],
       },
       {
