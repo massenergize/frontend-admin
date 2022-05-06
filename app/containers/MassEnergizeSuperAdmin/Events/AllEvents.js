@@ -23,7 +23,6 @@ import {
   loadAllEvents,
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
-import CommunitySwitch from "../Summary/CommunitySwitch";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
 import { Chip, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
@@ -180,7 +179,6 @@ class AllEvents extends React.Component {
                     const newEvent =
                       copiedEventResponse && copiedEventResponse.data;
                     this.props.history.push(`/admin/edit/${newEvent.id}/event`);
-                    console.log("I am the copied stuff you konw", newEvent);
                     putEventsInRedux([newEvent, ...(allEvents || [])]);
                   }
                 }}
@@ -203,10 +201,12 @@ class AllEvents extends React.Component {
     item.is_published = !status;
     data.splice(index, 1, item);
     putInRedux([...data]);
+    const community =item.community;
     apiCall("/events.update", {
       event_id: item.id,
       is_published: !status,
       name: item.name,
+      community_id: (community && community.id) || null,
     });
   }
 
