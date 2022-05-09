@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./IconDialog.css";
 import debounce from "lodash.debounce";
+import { smartString } from "../../../../utils/common";
 const ICONS = require("./icon_files.json");
 const RECENT_ICONS_KEY = "RECENT_ICONS_KEY";
 const MAX_RECENTS = 10; // number of icons that should be kept in the recent list
@@ -158,13 +159,19 @@ const Dialog = ({
 
   const renderIcons = (iconSet) => {
     return (iconSet || []).map((ic, index) => {
+      var name = ic.split(" ") || [];
+      name = (name[1] || "").split("-") || [];
+      name = name.slice(1).join(" ") || "";
       return (
-        <span
-          className="d-icon-span"
-          key={index.toString()}
-          onClick={() => selectIcon(ic)}
-        >
-          <i className={` d-icon ${ic}`} />
+        <span style={{ display: "flex", flexDirection: "column" }}>
+          <span
+            className="d-icon-span"
+            key={index.toString()}
+            onClick={() => selectIcon(ic)}
+          >
+            <i className={` d-icon ${ic}`} />
+          </span>
+          <small style={{ fontSize: 9 }}>{smartString(name, 12)}</small>
         </span>
       );
     });
