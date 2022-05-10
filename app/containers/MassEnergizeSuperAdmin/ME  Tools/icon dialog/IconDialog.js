@@ -173,7 +173,6 @@ const Dialog = ({
           }}
         >
           <span
-            // className="d-icon-span"
             key={index.toString()}
             onClick={() => selectIcon(ic)}
             style={{ textAlign: "center" }}
