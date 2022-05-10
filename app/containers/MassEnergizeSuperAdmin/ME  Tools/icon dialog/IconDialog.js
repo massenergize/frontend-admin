@@ -163,15 +163,26 @@ const Dialog = ({
       name = (name[1] || "").split("-") || [];
       name = name.slice(1).join(" ") || "";
       return (
-        <span style={{ display: "flex", flexDirection: "column" }}>
+        <span
+        className="d-icon-span"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+         
+          }}
+        >
           <span
-            className="d-icon-span"
+            // className="d-icon-span"
             key={index.toString()}
             onClick={() => selectIcon(ic)}
+            style={{ textAlign: "center" }}
           >
             <i className={` d-icon ${ic}`} />
           </span>
-          <small style={{ fontSize: 9 }}>{smartString(name, 12)}</small>
+          <small style={{ fontSize: 9, textAlign: "center" }}>
+            {smartString(name, 12)}
+          </small>
         </span>
       );
     });
