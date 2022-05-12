@@ -34,6 +34,8 @@ import Modal from "./Modal";
 import MEMediaLibraryImplementation from "../Gallery/tools/MEMediaLibraryImplementation";
 import Loading from "dan-components/Loading";
 import IconDialog from "../ME  Tools/icon dialog/IconDialog";
+import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
+import FormMediaLibraryImplementation from "./FormMediaLibraryImplementation";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY
 const styles = (theme) => ({
@@ -645,7 +647,7 @@ class MassEnergizeForm extends Component {
         );
       case FieldTypes.MediaLibrary:
         return (
-          <MEMediaLibraryImplementation
+          <FormMediaLibraryImplementation
             {...field}
             selected={this.getValue(field.name) || []}
             onInsert={(files) => {

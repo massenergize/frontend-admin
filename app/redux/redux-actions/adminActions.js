@@ -80,6 +80,11 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
         ? "/tag_collections.listForSuperAdmin"
         : "/tag_collections.listForCommunityAdmin"
     ),
+    apiCall("/gallery.search", {
+      any_community: true,
+      filters: ["uploads", "actions", "events", "testimonials"],
+      target_communities: [],
+    }),
   ]).then((response) => {
     const [
       communities,
@@ -94,6 +99,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       vendors,
       ccActions,
       tagCollections,
+      galleryImages,
     ] = response;
 
     dispatch(reduxLoadAllCommunities(communities.data));
@@ -108,6 +114,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadAllVendors(vendors.data));
     dispatch(reduxLoadCCActions(ccActions.data.actions));
     dispatch(loadAllTags(tagCollections.data));
+    dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
   });
 };
 export const reduxToggleUniversalModal = (data = {}) => ({
@@ -129,10 +136,15 @@ export const reduxUpdateHeap = (heap = {}) => ({
   type: UPDATE_HEAP,
   payload: heap,
 });
-export const reduxLoadGalleryImages = (data = []) => ({
-  type: LOAD_GALLERY_IMAGES,
-  payload: data,
-});
+export const reduxLoadGalleryImages = ({ data = {}, old = {} }) => {
+  var images = data.images;
+  const upper_limit = Math.max(data.upper_limit || 0, old.upper_limit || 0);
+  const lower_limit = Math.max(data.lower_limit || 0, old.lower_limit || 0);
+  return {
+    type: LOAD_GALLERY_IMAGES,
+    payload: { images, upper_limit, lower_limit },
+  };
+};
 
 export const loadTeamMessages = (data = null) => ({
   type: GET_TEAM_MESSAGES,
@@ -148,7 +160,7 @@ export const loadAllPolicies = (data = null) => ({
 });
 export const loadAllVendors = (data = null) => ({
   type: GET_ALL_VENDORS,
-  payload: data, 
+  payload: data,
 });
 export const loadAllTestimonials = (data = null) => ({
   type: GET_ALL_TESTIMONIALS,

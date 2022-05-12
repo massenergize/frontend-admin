@@ -7,6 +7,7 @@ import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
 import { checkIfReadOnly, makeTagSection } from "./EditActionForm";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
+import fieldTypes from "../_FormGenerator/fieldTypes";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -287,7 +288,8 @@ const createFormJson = ({ communities, ccActions, vendors }) => {
       {
         name: "image",
         placeholder: "Select an Image",
-        fieldType: "File",
+        // fieldType: "File",
+        fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload Files",
         isRequired: false,
