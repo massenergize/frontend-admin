@@ -136,15 +136,26 @@ export const reduxUpdateHeap = (heap = {}) => ({
   type: UPDATE_HEAP,
   payload: heap,
 });
-export const reduxLoadGalleryImages = ({ data = {}, old = {} }) => {
-  var images = data.images;
-  const upper_limit = Math.max(data.upper_limit || 0, old.upper_limit || 0);
-  const lower_limit = Math.max(data.lower_limit || 0, old.lower_limit || 0);
+export const reduxLoadGalleryImages = ({
+  data = {},
+  old = {},
+  append = false,
+}) => {
+  var images;
+  if (append) images = [...((old && old.images) || []), ...data.images];
+  else images = data.images;
+  var upper_limit = data.upper_limit;
+  var lower_limit = data.lower_limit;
+  if (old.upper_limit)
+    upper_limit = Math.max(data.upper_limit || 0, old.upper_limit || 0);
+  if (old.lower_limit)
+    lower_limit = Math.min(data.lower_limit || 0, old.lower_limit || 0);
   return {
     type: LOAD_GALLERY_IMAGES,
     payload: { images, upper_limit, lower_limit },
   };
 };
+
 
 export const loadTeamMessages = (data = null) => ({
   type: GET_TEAM_MESSAGES,
@@ -208,8 +219,12 @@ export const reduxLoadSearchedImages = ({ data, old, append = true }) => {
   var images;
   if (append) images = [...((old && old.images) || []), ...data.images];
   else images = data.images;
-  const upper_limit = Math.max(data.upper_limit || 0, old.upper_limit || 0);
-  const lower_limit = Math.max(data.lower_limit || 0, old.lower_limit || 0);
+  var upper_limit = data.upper_limit;
+  var lower_limit = data.lower_limit;
+  if (old.upper_limit)
+    upper_limit = Math.max(data.upper_limit || 0, old.upper_limit || 0);
+  if (old.lower_limit)
+    lower_limit = Math.min(data.lower_limit || 0, old.lower_limit || 0);
   return {
     type: LOAD_SEARCHED_IMAGES,
     payload: { images, upper_limit, lower_limit },
@@ -503,6 +518,46 @@ export const reduxLoadLibraryModalData = (props) => {
   };
 };
 
+export const universalFetchFromGallery = (props) => {
+  let {
+    body = {},
+    community_ids,
+    old = {},
+    cb,
+    url = "/gallery.search",
+    reduxFunction = reduxLoadGalleryImages,
+    append,
+  } = props;
+  old = old || {};
+  community_ids = community_ids || [];
+  var requestBody = { community_ids, ...body };
+  if (old.upper_limit)
+    requestBody = { ...requestBody, upper_limit: old.upper_limit };
+  if (old.lower_limit)
+    requestBody = { ...requestBody, lower_limit: old.lower_limit };
+
+  console.log("LA REQUEST DE BODY", requestBody);
+  return (dispatch) => {
+    apiCall(url, requestBody)
+      .then((response) => {
+        if (cb) cb(response);
+        if (!response || !response.success)
+          return console.log(" FETCH ERROR_BE: ", response.error);
+        console.log("FOLLOWING RESPONSE", response.data);
+        return dispatch(
+          reduxFunction({
+            data: response.data,
+            old,
+            append,
+          })
+        );
+      })
+      .catch((e) => {
+        if (cb) cb(repsonse);
+        console.log("FETCH ERROR_SYNT: ", e.toString());
+      });
+  };
+};
 export const reduxCallLibraryModalImages = (props) => {
   let { community_ids, old = {}, cb } = props;
   old = old || {};

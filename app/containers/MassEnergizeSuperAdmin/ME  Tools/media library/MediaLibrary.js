@@ -201,7 +201,7 @@ MediaLibrary.defaultProps = {
   images: [],
   defaultTab: MediaLibrary.Tabs.LIBRARY_TAB,
   selected: [],
-  actionText: "Choose From Library",
+  actionText: "Select From Library",
   limited: false,
   excludeTabs: [],
   useAwait: false,

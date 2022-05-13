@@ -158,6 +158,7 @@ function MediaLibraryModal({
             </div>
           </div>
           <Footer
+            images={images}
             files={files}
             content={content}
             multiple={multiple}
@@ -170,7 +171,7 @@ function MediaLibraryModal({
   );
 }
 
-const Footer = ({ content, multiple, cancel, insert }) => {
+const Footer = ({ content, multiple, cancel, insert, images }) => {
   let len = content && 1;
   if (multiple) len = content.length;
 
@@ -186,6 +187,11 @@ const Footer = ({ content, multiple, cancel, insert }) => {
       >
         @massenergize
       </h3>
+      {images && images.length && (
+        <small style={{ fontWeight: "bold", marginLeft: 15 }}>
+          [{(images && images.length) || 0} items]
+        </small>
+      )}
       <div style={{ marginLeft: "auto" }}>
         <MLButton backColor="maroon" btnColor="white" onClick={cancel}>
           CANCEL

@@ -4,26 +4,37 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
+import {
+  reduxFetchImagesFromGallery,
+  universalFetchFromGallery,
+} from "../../../redux/redux-actions/adminActions";
 
 export const FormMediaLibraryImplementation = (props) => {
-  const {
-    auth,
-    modalImageResponse,
-    loadModalImages,
-    onInsert,
-    imagesObject,
-    handleInsert,
-  } = props;
+  const { fetchImages, auth, onInsert, imagesObject, handleInsert } = props;
+  console.log("I am the image object I think", imagesObject);
+  const loadMoreImages = (cb) => {
+    if (!auth) return;
+    fetchImages({
+      body: {
+        any_community: true,
+        filters: ["uploads", "actions", "events", "testimonials"],
+        target_communities: [],
+      },
+      old: imagesObject,
+      cb,
+      append: true,
+    });
+  };
   return (
     <div>
       <MediaLibrary
         images={(imagesObject && imagesObject.images) || []}
-        actionText="Choose From Library"
+        actionText="Select From Library"
         sourceExtractor={(item) => item && item.url}
-        excludeTabs={["upload"]}
         useAwait={true}
         {...props}
         onInsert={handleInsert}
+        loadMoreFunction={loadMoreImages}
       />
     </div>
   );
@@ -39,7 +50,12 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({}, dispatch);
+  return bindActionCreators(
+    {
+      fetchImages: universalFetchFromGallery,
+    },
+    dispatch
+  );
 };
 
 export default connect(
