@@ -28,10 +28,15 @@ import {
   UPDATE_HEAP,
   LOAD_CC_ACTIONS,
   TOGGLE_UNIVERSAL_MODAL,
+  TEST_REDUX,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
 
+// TODO: REOMVE THIS FUNCTiON
+export const testRedux = (value) => {
+  return { type: TEST_REDUX, payload: value };
+};
 export const reduxFetchInitialContent = (auth) => (dispatch) => {
   if (!auth) return;
   const isSuperAdmin = auth && auth.is_super_admin;
@@ -140,10 +145,14 @@ export const reduxLoadGalleryImages = ({
   data = {},
   old = {},
   append = false,
+  prepend = false
 }) => {
   var images;
-  if (append) images = [...((old && old.images) || []), ...data.images];
-  else images = data.images;
+  if (append) {
+    if (prepend) images = [...data.images, ...((old && old.images) || [])];
+    else images = [...((old && old.images) || []), ...data.images];
+  } else images = data.images;
+
   var upper_limit = data.upper_limit;
   var lower_limit = data.lower_limit;
   if (old.upper_limit)
@@ -155,7 +164,6 @@ export const reduxLoadGalleryImages = ({
     payload: { images, upper_limit, lower_limit },
   };
 };
-
 
 export const loadTeamMessages = (data = null) => ({
   type: GET_TEAM_MESSAGES,
@@ -536,14 +544,12 @@ export const universalFetchFromGallery = (props) => {
   if (old.lower_limit)
     requestBody = { ...requestBody, lower_limit: old.lower_limit };
 
-  console.log("LA REQUEST DE BODY", requestBody);
   return (dispatch) => {
     apiCall(url, requestBody)
       .then((response) => {
         if (cb) cb(response);
         if (!response || !response.success)
           return console.log(" FETCH ERROR_BE: ", response.error);
-        console.log("FOLLOWING RESPONSE", response.data);
         return dispatch(
           reduxFunction({
             data: response.data,
@@ -553,7 +559,7 @@ export const universalFetchFromGallery = (props) => {
         );
       })
       .catch((e) => {
-        if (cb) cb(repsonse);
+        if (cb) cb();
         console.log("FETCH ERROR_SYNT: ", e.toString());
       });
   };

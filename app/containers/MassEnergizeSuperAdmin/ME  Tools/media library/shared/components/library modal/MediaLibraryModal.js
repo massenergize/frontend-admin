@@ -21,6 +21,7 @@ function MediaLibraryModal({
   excludeTabs,
   useAwait,
   awaitSeconds,
+  accept,
 }) {
   const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -56,7 +57,7 @@ function MediaLibraryModal({
   const fireLoadMoreFunction = () => {
     if (!loadMoreFunction) return;
     setLoadingMore(true);
-    loadMoreFunction(() => setLoadingMore(false));
+    loadMoreFunction(() => setLoadingMore(false), close);
   };
 
   var Tabs = [
@@ -72,6 +73,7 @@ function MediaLibraryModal({
           multiple={uploadMultiple}
           uploading={state.uploading}
           upload={handleUpload}
+          accept={accept}
         />
       ),
     },
@@ -105,7 +107,7 @@ function MediaLibraryModal({
 
   const TabComponent = Tabs.find((tab) => tab.key === currentTab).component;
   const last = content.length - 1;
-  const activeImage = multiple ? (content || [])[last] : content; // if multiple selection is active, just show the last selected item in the side pane
+  const activeImage = (content || [])[last]; // if multiple selection is active, just show the last selected item in the side pane
 
   return (
     <React.Fragment>
@@ -171,10 +173,8 @@ function MediaLibraryModal({
   );
 }
 
-const Footer = ({ content, multiple, cancel, insert, images }) => {
-  let len = content && 1;
-  if (multiple) len = content.length;
-
+const Footer = ({ content, cancel, insert, images }) => {
+  const len = content && content.length;
   return (
     <div className="ml-footer">
       <h3

@@ -21,6 +21,7 @@ function Upload({
   multiple,
   uploading,
   upload, // the upload function
+  accept
 }) {
   const dragBoxRef = useRef(null);
   const fileOpenerRef = useRef(null);
@@ -96,7 +97,7 @@ function Upload({
         ref={fileOpenerRef}
         style={{ width: 0, height: 0 }}
         onChange={(e) => handleSelectedFiles(e)}
-        accept={EXTENSIONS.join(", ")}
+        accept={ accept || EXTENSIONS.join(", ")}
         multiple={multiple}
       />
       <div
@@ -194,7 +195,7 @@ const PreviewElement = ({ file, id, src, sizeText, remove, uploading }) => (
 );
 PreviewElement.propTypes = {
   file: PropTypes.object.isRequired,
-  id: PropTypes.oneOf([PropTypes.string, PropTypes.number]).isRequired,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   src: PropTypes.string.isRequired,
   sizeText: PropTypes.string.isRequired,
   remove: PropTypes.func.isRequired,

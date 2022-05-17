@@ -22,7 +22,7 @@ function Library({
 }) {
   const handleSelection = (image) => {
     if (!multiple) {
-      setSelectedContent(image);
+      setSelectedContent([image]);
       setShowSidePane(true);
       return;
     }
@@ -35,7 +35,7 @@ function Library({
   };
 
   const checkIfSelected = (image) => {
-    if (!multiple) return image.id === content.id;
+    // if (!multiple) return image.id === content.id;
     const images = content || [];
     return images.find((img) => img.id === image.id);
   };

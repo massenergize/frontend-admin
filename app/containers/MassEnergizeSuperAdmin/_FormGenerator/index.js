@@ -37,7 +37,7 @@ import IconDialog from "../ME  Tools/icon dialog/IconDialog";
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import FormMediaLibraryImplementation from "./FormMediaLibraryImplementation";
 
-const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY
+const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -652,8 +652,11 @@ class MassEnergizeForm extends Component {
             selected={this.getValue(field.name) || []}
             onInsert={(files) => {
               const formData = this.state.formData || {};
-              this.setState({ formData: { ...formData, [field.name]: files } });
+              console.log("I think I am the files innit", files);
+              var ids = files.map((img) => img.id);
+              this.setState({ formData: { ...formData, [field.name]: ids } });
             }}
+           
           />
         );
       case FieldTypes.File:

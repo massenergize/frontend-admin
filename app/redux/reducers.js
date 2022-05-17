@@ -38,13 +38,16 @@ import app, {
   reducerForHeap,
   reducerForCCAction,
   reducerForUniversalModal,
+  testReduxReducer,
 } from "./modules/appReducer";
+
 
 /**
  * Creates the main reducer with the dynamically injected ones
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    testRedux: testReduxReducer,
     modalOptions: reducerForUniversalModal,
     ccActions: reducerForCCAction,
     heap: reducerForHeap, // an object that is used to temporarily hold all kinds of random data.

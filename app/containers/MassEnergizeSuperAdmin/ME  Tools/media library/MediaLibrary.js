@@ -1,17 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes, { object } from "prop-types";
 import "./MediaLibrary.css";
 import MLButton from "./shared/components/button/MLButton";
 import MediaLibraryModal from "./shared/components/library modal/MediaLibraryModal";
 import ImageThumbnail from "./shared/components/thumbnail/ImageThumbnail";
 import { libraryImage } from "./shared/utils/values";
+import { EXTENSIONS } from "./shared/utils/utils";
 
 function MediaLibrary(props) {
-  const { actionText, selected, sourceExtractor, onInsert, multiple } = props;
+  const {
+    actionText,
+    selected,
+    sourceExtractor,
+    onInsert,
+    multiple,
+    openState,
+    onStateChange,
+  } = props;
 
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(openState);
   const [imageTray, setTrayImages] = useState(selected);
   const [state, setState] = useState({});
+  const [hasMounted, setHasMountedTo] = useState(undefined);
 
   const transfer = (content, reset) => {
     if (onInsert) return onInsert(content, reset);
@@ -29,6 +39,16 @@ function MediaLibrary(props) {
     setTrayImages(rest);
     transfer(rest, state.resetor);
   };
+
+  useEffect(() => {
+    const isMountingForTheFirstTime = hasMounted === undefined;
+    if (!onStateChange || isMountingForTheFirstTime) return;
+    onStateChange({ show, state });
+  }, [show, state]);
+
+  useEffect(() => {
+    setHasMountedTo(true);
+  }, []);
 
   return (
     <React.Fragment>
@@ -80,16 +100,7 @@ function MediaLibrary(props) {
   );
 }
 
-const ImageTray = ({ sourceExtractor, remove, content, multiple }) => {
-  if (!multiple) {
-    return (
-      <TrayImage
-        src={sourceExtractor ? sourceExtractor(content) : content.url}
-        id={content.id}
-        remove={remove}
-      />
-    );
-  }
+const ImageTray = ({ sourceExtractor, remove, content }) => {
   return (
     <div
       style={{
@@ -136,9 +147,9 @@ MediaLibrary.propTypes = {
 
   /**
    * @param files
-   * @reset Provides a function that will reset the component
-   * @close Provides a function to close the modal
-   * @tabChanger Provides a function that will allow you to change tab outside the component
+   * @param reset Provides a function that will reset the component
+   * @param close Provides a function to close the modal
+   * @param tabChanger Provides a function that will allow you to change tab outside the component
    * Function that should run to upload selected files to backend */
   onUpload: PropTypes.func,
   /**
@@ -190,11 +201,22 @@ MediaLibrary.propTypes = {
    * Milliseconds to wait before rendering images
    */
   awaitSeconds: PropTypes.number,
+
+  /**
+   * Exports the internal state of the component, everytime the state changes
+   * @param stateObject  E.g { show: false, state, }
+   */
+
+  onStateChange: PropTypes.func,
 };
 
 MediaLibrary.Button = MLButton;
 MediaLibrary.Image = ImageThumbnail;
 MediaLibrary.Tabs = { UPLOAD_TAB: "upload", LIBRARY_TAB: "library" };
+MediaLibrary.AcceptedFileTypes = {
+  Images: ["image/jpg", "image/png", "image/jpeg"].join(", "),
+  All: EXTENSIONS.join(", "),
+};
 MediaLibrary.defaultProps = {
   multiple: true,
   uploadMultiple: false,

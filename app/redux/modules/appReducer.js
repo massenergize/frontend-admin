@@ -27,6 +27,7 @@ import {
   UPDATE_HEAP,
   LOAD_CC_ACTIONS,
   TOGGLE_UNIVERSAL_MODAL,
+  TEST_REDUX,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -35,6 +36,16 @@ const initialState = Map({
 });
 
 const initialImmutableState = fromJS(initialState);
+
+// TODO: REMOVE THIS
+export function testReduxReducer(state = null, action = {}) {
+  switch (action.type) {
+    case TEST_REDUX:
+      return state;
+    default:
+      return state;
+  }
+}
 export default function reducer(state = initialImmutableState, action = {}) {
   switch (action.type) {
     case START_UP:
