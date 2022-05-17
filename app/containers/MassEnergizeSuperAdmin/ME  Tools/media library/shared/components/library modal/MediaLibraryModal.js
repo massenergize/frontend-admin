@@ -22,6 +22,7 @@ function MediaLibraryModal({
   useAwait,
   awaitSeconds,
   accept,
+  extras,
 }) {
   const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -74,6 +75,7 @@ function MediaLibraryModal({
           uploading={state.uploading}
           upload={handleUpload}
           accept={accept}
+          extras={extras}
         />
       ),
     },

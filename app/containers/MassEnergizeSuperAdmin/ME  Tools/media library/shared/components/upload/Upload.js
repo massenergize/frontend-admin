@@ -21,11 +21,13 @@ function Upload({
   multiple,
   uploading,
   upload, // the upload function
-  accept
+  accept,
+  extras,
 }) {
   const dragBoxRef = useRef(null);
   const fileOpenerRef = useRef(null);
 
+  const htmlContent = (extras || {})["upload"] || null; // This is just html content that devs can pass to show, grouped by tabs
   const processForPreview = async (_files) => {
     for (let i = 0; i < _files.length; i++) {
       const fileObj = _files[i];
@@ -97,9 +99,10 @@ function Upload({
         ref={fileOpenerRef}
         style={{ width: 0, height: 0 }}
         onChange={(e) => handleSelectedFiles(e)}
-        accept={ accept || EXTENSIONS.join(", ")}
+        accept={accept || EXTENSIONS.join(", ")}
         multiple={multiple}
       />
+      {htmlContent}
       <div
         ref={dragBoxRef}
         className="ml-drag-box"

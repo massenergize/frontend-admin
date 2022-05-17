@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -10,10 +10,12 @@ import {
   universalFetchFromGallery,
 } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
+import { Checkbox, FormControlLabel } from "@material-ui/core";
 
 export const FormMediaLibraryImplementation = (props) => {
   const { fetchImages, auth, imagesObject, putImagesInRedux } = props;
- 
+  const [available, setAvailable] = useState(false);
+
   const loadMoreImages = (cb) => {
     if (!auth) return console.log("It does not look like you are signed in...");
     fetchImages({
@@ -29,10 +31,12 @@ export const FormMediaLibraryImplementation = (props) => {
   };
 
   const handleUpload = (files, reset, _, changeTabTo) => {
+    const isUniversal = available ? { is_universal: true } : {};
     const apiJson = {
       user_id: auth.id,
       community_ids: ((auth && auth.admin_at) || []).map((com) => com.id),
       title: "Media library upload",
+      ...isUniversal,
     };
     /**
      * Upload all selected files to the backend,
@@ -67,6 +71,16 @@ export const FormMediaLibraryImplementation = (props) => {
       });
   };
 
+  const extras = {
+    [MediaLibrary.Tabs.UPLOAD_TAB]: (
+      <UploadIntroductionComponent
+        auth={auth}
+        available={available}
+        setAvailableTo={setAvailable}
+      />
+    ),
+  };
+
   return (
     <div>
       <MediaLibrary
@@ -78,6 +92,7 @@ export const FormMediaLibraryImplementation = (props) => {
         uploadMultiple
         accept={MediaLibrary.AcceptedFileTypes.Images}
         multiple={false}
+        extras={extras}
         {...props}
         loadMoreFunction={loadMoreImages}
       />
@@ -109,3 +124,28 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(FormMediaLibraryImplementation);
+
+const UploadIntroductionComponent = ({ auth, setAvailableTo, available }) => {
+  const comms = (auth.admin_at || []).map((c) => c.name).join(", ");
+  return (
+    <div>
+      {comms && (
+        <>
+          {" "}
+          <div>
+            The images you upload here will be available to <b>{comms}</b>{" "}
+          </div>
+          <FormControlLabel
+            label="Make the image(s) available to other communities"
+            control={
+              <Checkbox
+                checked={available}
+                onChange={() => setAvailableTo(!available)}
+              />
+            }
+          />
+        </>
+      )}
+    </div>
+  );
+};
