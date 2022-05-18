@@ -11,7 +11,6 @@ class EditCommunityByCommunityAdmin extends React.Component {
 
   render() {
     const description = brand.desc;
-    console.log(this.props)
     auth = this.props.auth;
     const formTitle = "Edit Community Infomation";
     const title = brand.name + ' - ' + formTitle;
