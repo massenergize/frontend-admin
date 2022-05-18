@@ -35,7 +35,6 @@ function MediaLibrary(props) {
   };
 
   const remove = (id) => {
-    if (!multiple) return setTrayImages(null);
     const rest = imageTray.filter((itm) => itm.id !== id);
     setTrayImages(rest);
     transfer(rest, state.resetor);

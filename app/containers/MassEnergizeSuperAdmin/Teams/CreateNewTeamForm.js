@@ -6,6 +6,7 @@ import MassEnergizeForm from "../_FormGenerator";
 import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
+import fieldTypes from "../_FormGenerator/fieldTypes";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -182,13 +183,10 @@ const createFormJson = ({ communities }) => {
       {
         name: "logo",
         placeholder: "Select a Logo for this team",
-        fieldType: "File",
+        fieldType: fieldTypes.MediaLibrary,
         dbName: "logo",
         label: "Select a Logo for this team",
-        selectMany: false,
         isRequired: false,
-        defaultValue: "",
-        filesLimit: 1,
       },
       {
         name: "is_published",

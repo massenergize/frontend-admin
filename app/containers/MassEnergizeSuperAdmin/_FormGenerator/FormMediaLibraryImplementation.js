@@ -97,7 +97,6 @@ export const FormMediaLibraryImplementation = (props) => {
         multiple={false}
         extras={extras}
         {...props}
-        // selected={preselectDefaultImages()}
         loadMoreFunction={loadMoreImages}
       />
     </div>

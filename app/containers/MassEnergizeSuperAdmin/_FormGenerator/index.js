@@ -646,13 +646,48 @@ class MassEnergizeForm extends Component {
       case FieldTypes.MediaLibrary:
         return (
           <>
+            <div className="imageUploadInstructions">
+              <h6>Image Upload Instructions:</h6>
+              <ul
+                style={{
+                  listStyleType: "circle",
+                  paddingLeft: "30px",
+                  fontSize: 14,
+                }}
+              >
+                <p>
+                  You have access to all the images that are in use in the
+                  communities you manage. Your library contains images that have
+                  either been uploaded by you, or other admins of your
+                  community. You may also see images that are not from any of
+                  your communities, but have been made public by admins of
+                  different communities.
+                </p>
+                <li>Pick an image from the library, or add a new one.</li>
+                <li>
+                  <b>The final upload size must not exceed 5MB.</b>
+                </li>
+
+                {field.extraInstructions &&
+                  field.extraInstructions.map((instruction, key) => (
+                    <li key={key.toString()}>{instruction}</li>
+                  ))}
+              </ul>
+            </div>
+            <br />
             <FormMediaLibraryImplementation
               {...field}
-              // selected={this.getValue(field.name) || []}
+              actionText={field.placeholder}
               onInsert={(files) => {
                 const formData = this.state.formData || {};
+                const isEmpty = !files || !files.length;
                 var ids = files.map((img) => img.id);
-                this.setState({ formData: { ...formData, [field.name]: ids } });
+                this.setState({
+                  formData: {
+                    ...formData,
+                    [field.name]: isEmpty ? ["reset"] : ids, // so that the backend can know exactly when an existing image needs to be removed, and when the image field is just not available
+                  },
+                });
               }}
             />
           </>
