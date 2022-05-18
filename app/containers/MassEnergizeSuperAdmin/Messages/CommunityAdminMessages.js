@@ -171,7 +171,7 @@ class AllCommunityAdminMessages extends React.Component {
     const description = brand.desc;
     const { columns } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.messages);
+    const data = this.fashionData(this.props.messages && this.props.messages.filter(item=>item.parent===null));
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
