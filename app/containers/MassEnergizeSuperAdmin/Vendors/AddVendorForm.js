@@ -7,6 +7,7 @@ import { apiCall } from "../../../utils/messenger";
 import { makeTagSection } from "../Events/EditEventForm";
 import { connect } from "react-redux";
 import Loading from "dan-components/Loading";
+import fieldTypes from "../_FormGenerator/fieldTypes";
 
 
 const styles = (theme) => ({
@@ -382,14 +383,12 @@ const createFormJson = ({ communities }) => {
       },
       {
         name: "image",
-        placeholder: "Upload a Logo",
-        fieldType: "File",
+        placeholder: "Add a Logo",
+        fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload a logo for this Vendor",
-        selectMany: false,
         isRequired: false,
-        defaultValue: "",
-        filesLimit: 1,
+    
       },
       {
         name: "is_verified",
