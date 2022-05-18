@@ -40,7 +40,6 @@ class CreateNewActionForm extends Component {
       ccActions: [],
       vendors: [],
       formJson: null,
-      reRenderKey: "x-initial-key-x",
     };
   }
 
@@ -56,7 +55,7 @@ class CreateNewActionForm extends Component {
       ccActions &&
       ccActions.length;
 
-    if (!fullyMountedNeverRunThisAgain && !state.mounted) return;
+    if (!fullyMountedNeverRunThisAgain && !state.mounted) return null;
     const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
@@ -88,7 +87,6 @@ class CreateNewActionForm extends Component {
       ccActions: modifiedCCActions,
       vendors: vends,
       formJson,
-      // reRenderKey: getRandomStringKey(), // forces re-render when the prop data is actually available
     };
   }
 

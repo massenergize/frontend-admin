@@ -5,6 +5,7 @@ import { withStyles } from "@material-ui/core/styles";
 import { apiCall } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
 import Loading from "dan-components/Loading";
+import fieldTypes from "../_FormGenerator/fieldTypes";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -342,16 +343,26 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
         dbName: "vendors",
         data: vendors,
       },
+      // {
+      //   name: "image",
+      //   placeholder: "Select an Image",
+      //   fieldType: "File",
+      //   previewLink: action.image && action.image.url,
+      //   dbName: "image",
+      //   label: "Upload Files",
+      //   isRequired: false,
+      //   defaultValue: "",
+      //   filesLimit: 1,
+      // },
       {
         name: "image",
         placeholder: "Select an Image",
-        fieldType: "File",
-        previewLink: action.image && action.image.url,
+        fieldType: fieldTypes.MediaLibrary,
+        selected: [action.image],
         dbName: "image",
         label: "Upload Files",
         isRequired: false,
         defaultValue: "",
-        filesLimit: 1,
       },
       {
         name: "is_published",

@@ -4,6 +4,20 @@
 import moment from "moment";
 import qs from "qs";
 
+export const makeLimitsFromImageArray = (images) => {
+  if (images.length === 1)
+    return {
+      lower_limit: images[0].id,
+      upper_limit: images[0].id,
+      images,
+    };
+  images = images.sort((a, b) => (a.id > b.id ? 1 : -1));
+  return {
+    lower_limit: images[0].id || 0,
+    upper_limit: images[images.length - 1].id || 0,
+    images: images || [],
+  };
+};
 export const getHumanFriendlyDate = (dateString, includeTime = false) => {
   if (!dateString) return null;
   return moment(dateString).format(
@@ -78,7 +92,7 @@ export function convertBoolean(b) {
 }
 
 export function goHere(link, history) {
-  if(history) return history.push(link)
+  if (history) return history.push(link);
   window.location = link;
 }
 

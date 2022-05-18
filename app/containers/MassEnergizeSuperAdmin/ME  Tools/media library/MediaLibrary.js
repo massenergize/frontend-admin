@@ -16,6 +16,7 @@ function MediaLibrary(props) {
     multiple,
     openState,
     onStateChange,
+    images,
   } = props;
 
   const [show, setShow] = useState(openState);
@@ -50,12 +51,23 @@ function MediaLibrary(props) {
     setHasMountedTo(true);
   }, []);
 
+  const preselectDefaultImages = () => {
+    if (!selected || !selected.length) return images;
+    var bank = (images || []).map((img) => img.id);
+    // sometimes an image that is preselected, my not be in the library's first load
+    // in that case just add it to the library's list
+    var isNotThere = selected.filter((img) => !bank.includes(img.id));
+    if (!isNotThere.length) return images;
+
+    return [...isNotThere, ...images];
+  };
   return (
     <React.Fragment>
       {show && (
         <div style={{ position: "fixed", top: 0, left: 0, zIndex: 5 }}>
           <MediaLibraryModal
             {...props}
+            images={preselectDefaultImages()}
             close={() => setShow(false)}
             getSelected={handleSelected}
             selected={imageTray}

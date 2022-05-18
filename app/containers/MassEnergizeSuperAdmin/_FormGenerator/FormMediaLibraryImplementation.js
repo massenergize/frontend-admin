@@ -11,9 +11,10 @@ import {
 } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
 import { Checkbox, FormControlLabel } from "@material-ui/core";
+import { makeLimitsFromImageArray } from "../../../utils/common";
 
 export const FormMediaLibraryImplementation = (props) => {
-  const { fetchImages, auth, imagesObject, putImagesInRedux } = props;
+  const { fetchImages, auth, imagesObject, putImagesInRedux, selected } = props;
   const [available, setAvailable] = useState(false);
 
   const loadMoreImages = (cb) => {
@@ -29,6 +30,7 @@ export const FormMediaLibraryImplementation = (props) => {
       append: true,
     });
   };
+ 
 
   const handleUpload = (files, reset, _, changeTabTo) => {
     const isUniversal = available ? { is_universal: true } : {};
@@ -51,14 +53,15 @@ export const FormMediaLibraryImplementation = (props) => {
         var images = response.map(
           (res) => (res.data && res.data.image) || null
         );
-        images = images.sort((a, b) => (a.id > b.id ? 1 : -1));
-        const data = {
-          lower_limit: images[0].id,
-          upper_limit: images[images.length - 1].id,
-          images,
-        };
+        // const { lower_limit, upper_limit, images } = makeLimitsFromImageArray(images);
+        // images = images.sort((a, b) => (a.id > b.id ? 1 : -1));
+        // const data = {
+        //   lower_limit: images[0].id,
+        //   upper_limit: images[images.length - 1].id,
+        //   images,
+        // };
         putImagesInRedux({
-          data,
+          data: makeLimitsFromImageArray(images),
           old: imagesObject,
           append: true,
           prepend: true,
@@ -94,6 +97,7 @@ export const FormMediaLibraryImplementation = (props) => {
         multiple={false}
         extras={extras}
         {...props}
+        // selected={preselectDefaultImages()}
         loadMoreFunction={loadMoreImages}
       />
     </div>
@@ -131,7 +135,6 @@ const UploadIntroductionComponent = ({ auth, setAvailableTo, available }) => {
     <div>
       {comms && (
         <>
-          {" "}
           <div>
             The images you upload here will be available to <b>{comms}</b>{" "}
           </div>

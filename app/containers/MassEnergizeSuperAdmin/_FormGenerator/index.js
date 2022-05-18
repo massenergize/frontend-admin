@@ -31,10 +31,8 @@ import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarConte
 import FieldTypes from "./fieldTypes";
 import Modal from "./Modal";
 // import PreviewModal from './PreviewModal';
-import MEMediaLibraryImplementation from "../Gallery/tools/MEMediaLibraryImplementation";
 import Loading from "dan-components/Loading";
 import IconDialog from "../ME  Tools/icon dialog/IconDialog";
-import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import FormMediaLibraryImplementation from "./FormMediaLibraryImplementation";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
@@ -647,17 +645,17 @@ class MassEnergizeForm extends Component {
         );
       case FieldTypes.MediaLibrary:
         return (
-          <FormMediaLibraryImplementation
-            {...field}
-            selected={this.getValue(field.name) || []}
-            onInsert={(files) => {
-              const formData = this.state.formData || {};
-              console.log("I think I am the files innit", files);
-              var ids = files.map((img) => img.id);
-              this.setState({ formData: { ...formData, [field.name]: ids } });
-            }}
-           
-          />
+          <>
+            <FormMediaLibraryImplementation
+              {...field}
+              // selected={this.getValue(field.name) || []}
+              onInsert={(files) => {
+                const formData = this.state.formData || {};
+                var ids = files.map((img) => img.id);
+                this.setState({ formData: { ...formData, [field.name]: ids } });
+              }}
+            />
+          </>
         );
       case FieldTypes.File:
         // Linter caught this: what is this supposed to be?
