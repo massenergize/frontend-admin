@@ -28,8 +28,10 @@
 }
 
 .ml-preview-image {
-  height: 80px;
-  width: 100px;
+  /* height: 80px; */
+  /* width: 100px; */
+  height: 190px;
+  width: 230px;
   object-fit: cover;
   margin: 10px;
   border-radius: 5px;
