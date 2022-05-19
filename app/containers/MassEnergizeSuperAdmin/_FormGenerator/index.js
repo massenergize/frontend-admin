@@ -921,7 +921,8 @@ class MassEnergizeForm extends Component {
               }}
               disabled={field.readOnly || this.state.readOnly}
               defaultValue={field.defaultValue}
-              maxLength={field.maxLength}
+              inputProps={{ maxLength: field.maxLength }}
+              // maxLength={field.maxLength}
             />
           </div>
         );

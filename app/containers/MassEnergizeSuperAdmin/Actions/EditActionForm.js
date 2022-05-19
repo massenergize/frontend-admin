@@ -231,6 +231,7 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
             defaultValue: action.title,
             dbName: "title",
             readOnly: false,
+            maxLength:40
           },
           {
             name: "rank",

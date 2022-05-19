@@ -53,13 +53,6 @@ export const FormMediaLibraryImplementation = (props) => {
         var images = response.map(
           (res) => (res.data && res.data.image) || null
         );
-        // const { lower_limit, upper_limit, images } = makeLimitsFromImageArray(images);
-        // images = images.sort((a, b) => (a.id > b.id ? 1 : -1));
-        // const data = {
-        //   lower_limit: images[0].id,
-        //   upper_limit: images[images.length - 1].id,
-        //   images,
-        // };
         putImagesInRedux({
           data: makeLimitsFromImageArray(images),
           old: imagesObject,
