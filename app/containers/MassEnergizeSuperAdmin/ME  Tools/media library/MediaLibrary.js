@@ -24,6 +24,7 @@ function MediaLibrary(props) {
   const [state, setState] = useState({});
   const [hasMounted, setHasMountedTo] = useState(undefined);
 
+
   const transfer = (content, reset) => {
     if (onInsert) return onInsert(content, reset);
   };
@@ -223,7 +224,7 @@ MediaLibrary.propTypes = {
 
 MediaLibrary.Button = MLButton;
 MediaLibrary.Image = ImageThumbnail;
-MediaLibrary.Tabs = { UPLOAD_TAB: "upload", LIBRARY_TAB: "library" };
+MediaLibrary.Tabs = { UPLOAD_TAB: "upload", LIBRARY_TAB: "library", CROPPING_TAB: "crop" };
 MediaLibrary.AcceptedFileTypes = {
   Images: ["image/jpg", "image/png", "image/jpeg"].join(", "),
   All: EXTENSIONS.join(", "),
@@ -241,3 +242,23 @@ MediaLibrary.defaultProps = {
   awaitSeconds: 500,
 };
 export default MediaLibrary;
+
+/**
+ *
+ * Convert a base64 String back to a file object
+ * @param {base64String} base64String
+ * @param {String} filename
+ * @returns {File} image File Object
+ *
+ */
+const base64StringtoFile = (base64String, filename) => {
+  var arr = base64String.split(","),
+    mime = arr[0].match(/:(.*?);/)[1],
+    bstr = atob(arr[1]),
+    n = bstr.length,
+    u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
+};

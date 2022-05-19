@@ -3,6 +3,7 @@ import Modal from "./../modal/Modal";
 import SidePane from "../sidepane/SidePane";
 import Upload from "../upload/Upload";
 import MLButton from "../button/MLButton";
+import Cropping from "../cropping/Cropping";
 const Library = React.lazy(() => import("../library/Library")); // so that library component only loads when needed
 
 function MediaLibraryModal({
@@ -101,6 +102,7 @@ function MediaLibraryModal({
         </Suspense>
       ),
     },
+    { headerName: "Crop", key: "crop", component: <Cropping /> },
   ];
 
   Tabs = Tabs.filter((tab) => !(excludeTabs || []).includes(tab.key));
