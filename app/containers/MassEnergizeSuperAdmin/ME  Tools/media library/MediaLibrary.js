@@ -77,7 +77,7 @@ function MediaLibrary(props) {
       <div
         style={{
           width: "100%",
-          minHeight: 300,
+          minHeight: 380,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
