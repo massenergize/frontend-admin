@@ -23,6 +23,8 @@ function Upload({
   upload, // the upload function
   accept,
   extras,
+  setCurrentTab,
+  switchToCropping,
 }) {
   const dragBoxRef = useRef(null);
   const fileOpenerRef = useRef(null);
@@ -166,6 +168,8 @@ function Upload({
               {...prev}
               remove={removeAnImage}
               uploading={uploading}
+              setCurrentTab={setCurrentTab}
+              switchToCropping={switchToCropping}
             />
           </React.Fragment>
         ))}
@@ -174,7 +178,16 @@ function Upload({
   );
 }
 
-const PreviewElement = ({ file, id, src, sizeText, remove, uploading }) => (
+const PreviewElement = ({
+  file,
+  id,
+  src,
+  sizeText,
+  remove,
+  uploading,
+  setCurrentTab,
+  switchToCropping,
+}) => (
   <div
     style={{
       flexDirection: "column",
@@ -184,15 +197,33 @@ const PreviewElement = ({ file, id, src, sizeText, remove, uploading }) => (
       alignItems: "center",
     }}
   >
-    <img src={src} className="ml-preview-image" alt="" />
+    <img
+      src={src}
+      className="ml-preview-image"
+      style={{ height: 80, width: 100 }}
+      alt=""
+    />
     <small>{smartString(file.name)}</small>
     <small role="button">
       Size: <b>{sizeText}</b>
     </small>
     {!uploading && (
-      <small className="ml-prev-el-remove" onClick={() => remove(id)}>
-        Remove
-      </small>
+      <div
+        style={{
+          display: "inline",
+        }}
+      >
+        <small className="ml-prev-el-remove" onClick={() => remove(id)}>
+          Remove
+        </small>
+        <small
+          className="ml-prev-el-remove"
+          style={{ color: "blue", height: 80, width: 100, marginLeft: 10 }}
+          onClick={() => switchToCropping({ file, id, src })}
+        >
+          Crop
+        </small>
+      </div>
     )}
   </div>
 );

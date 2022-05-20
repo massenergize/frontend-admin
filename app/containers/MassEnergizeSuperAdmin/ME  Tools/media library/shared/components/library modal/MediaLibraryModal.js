@@ -12,9 +12,8 @@ function MediaLibraryModal({
   onUpload,
   images,
   sourceExtractor,
-  defaultTab,
   selected,
-  getSelected,
+  getSelected, // the function that is used to retrieve all selected items out of the modal
   uploadMultiple,
   uploading,
   loadMoreFunction,
@@ -24,12 +23,17 @@ function MediaLibraryModal({
   awaitSeconds,
   accept,
   extras,
+  cropLoot,
+  currentTab,
+  setCurrentTab,
+  switchToCropping,
+  files, setFiles,
 }) {
-  const [currentTab, setCurrentTab] = useState(defaultTab);
+  // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
   const [previews, setPreviews] = useState([]);
-  const [files, setFiles] = useState([]);
-  const [content, setSelectedContent] = useState(selected);
+  
+  const [content, setSelectedContent] = useState(selected); // all the selected items in the library will always be available in an array here
   const [state, setState] = useState({ uploading: uploading });
   const [loadingMore, setLoadingMore] = useState(false);
   const [shouldWait, setShouldWait] = useState(useAwait);
@@ -77,6 +81,8 @@ function MediaLibraryModal({
           upload={handleUpload}
           accept={accept}
           extras={extras}
+          setCurrentTab={setCurrentTab}
+          switchToCropping={switchToCropping}
         />
       ),
     },
@@ -102,7 +108,11 @@ function MediaLibraryModal({
         </Suspense>
       ),
     },
-    { headerName: "Crop", key: "crop", component: <Cropping /> },
+    {
+      headerName: "Crop",
+      key: "crop",
+      component: <Cropping setCurrentTab={setCurrentTab} cropLoot={cropLoot} />,
+    },
   ];
 
   Tabs = Tabs.filter((tab) => !(excludeTabs || []).includes(tab.key));

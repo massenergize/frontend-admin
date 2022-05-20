@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import PropTypes, { object } from "prop-types";
+import PropTypes from "prop-types";
 import "./MediaLibrary.css";
 import MLButton from "./shared/components/button/MLButton";
 import MediaLibraryModal from "./shared/components/library modal/MediaLibraryModal";
@@ -17,13 +17,25 @@ function MediaLibrary(props) {
     openState,
     onStateChange,
     images,
+    defaultTab,
   } = props;
 
   const [show, setShow] = useState(openState);
   const [imageTray, setTrayImages] = useState(selected);
   const [state, setState] = useState({});
   const [hasMounted, setHasMountedTo] = useState(undefined);
+  const [cropped, setCropped] = useState({}); // all items that have been cropped are saved in this object, E.g. idOfParentImage: CroppedContent
+  const [cropLoot, setCropLoot] = useState(null); // Where item to be cropped is temporarily stored and managed in  the cropping tab
+  const [currentTab, setCurrentTab] = useState(defaultTab);
+  const [files, setFiles] = useState([]); // all items that have been selected from user's device
 
+  const switchToCropping = (content) => {
+    const loot = { source: content, image: content && content.src };
+
+    setCropLoot(loot);
+    setShow(true);
+    setCurrentTab("crop");
+  };
 
   const transfer = (content, reset) => {
     if (onInsert) return onInsert(content, reset);
@@ -71,6 +83,12 @@ function MediaLibrary(props) {
             close={() => setShow(false)}
             getSelected={handleSelected}
             selected={imageTray}
+            cropLoot={cropLoot}
+            currentTab={currentTab}
+            setCurrentTab={setCurrentTab}
+            switchToCropping={switchToCropping}
+            files={files}
+            setFiles={setFiles}
           />
         </div>
       )}
@@ -78,7 +96,7 @@ function MediaLibrary(props) {
       <div
         style={{
           width: "100%",
-          minHeight: 300,
+          minHeight: 380,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -95,6 +113,7 @@ function MediaLibrary(props) {
             content={imageTray}
             remove={remove}
             multiple={multiple}
+            // switchToCropping={switchToCropping}
           />
         )}
 
@@ -112,7 +131,7 @@ function MediaLibrary(props) {
   );
 }
 
-const ImageTray = ({ sourceExtractor, remove, content }) => {
+const ImageTray = ({ sourceExtractor, remove, content, switchToCropping }) => {
   return (
     <div
       style={{
@@ -127,7 +146,12 @@ const ImageTray = ({ sourceExtractor, remove, content }) => {
         const src = sourceExtractor ? sourceExtractor(img) : img.url;
         return (
           <React.Fragment key={index.toString()}>
-            <TrayImage src={src} id={img.id} remove={remove} />
+            <TrayImage
+              src={src}
+              id={img.id}
+              remove={remove}
+              // switchToCropping={switchToCropping}
+            />
           </React.Fragment>
         );
       })}
@@ -135,7 +159,7 @@ const ImageTray = ({ sourceExtractor, remove, content }) => {
   );
 };
 
-const TrayImage = ({ src, remove, id }) => (
+const TrayImage = ({ src, remove, id, switchToCropping }) => (
   <div
     style={{
       display: "flex",
@@ -148,6 +172,13 @@ const TrayImage = ({ src, remove, id }) => (
     <small className="ml-prev-el-remove" onClick={() => remove(id)}>
       Remove
     </small>
+    {/* <small
+      className="ml-prev-el-remove"
+      style={{ color: "blue" }}
+      onClick={() => switchToCropping(id, "library-content")}
+    >
+      Crop
+    </small> */}
   </div>
 );
 
@@ -224,7 +255,11 @@ MediaLibrary.propTypes = {
 
 MediaLibrary.Button = MLButton;
 MediaLibrary.Image = ImageThumbnail;
-MediaLibrary.Tabs = { UPLOAD_TAB: "upload", LIBRARY_TAB: "library", CROPPING_TAB: "crop" };
+MediaLibrary.Tabs = {
+  UPLOAD_TAB: "upload",
+  LIBRARY_TAB: "library",
+  CROPPING_TAB: "crop",
+};
 MediaLibrary.AcceptedFileTypes = {
   Images: ["image/jpg", "image/png", "image/jpeg"].join(", "),
   All: EXTENSIONS.join(", "),
@@ -242,23 +277,3 @@ MediaLibrary.defaultProps = {
   awaitSeconds: 500,
 };
 export default MediaLibrary;
-
-/**
- *
- * Convert a base64 String back to a file object
- * @param {base64String} base64String
- * @param {String} filename
- * @returns {File} image File Object
- *
- */
-const base64StringtoFile = (base64String, filename) => {
-  var arr = base64String.split(","),
-    mime = arr[0].match(/:(.*?);/)[1],
-    bstr = atob(arr[1]),
-    n = bstr.length,
-    u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-  return new File([u8arr], filename, { type: mime });
-};
