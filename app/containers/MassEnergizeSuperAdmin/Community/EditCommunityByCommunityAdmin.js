@@ -11,7 +11,8 @@ class EditCommunityByCommunityAdmin extends React.Component {
 
   render() {
     const description = brand.desc;
-    auth = this.props.auth;
+    const auth = this.props.auth;
+    const superAdmin = auth & auth !== undefined ? auth.is_super_admin : false;
     const formTitle = "Edit Community Infomation";
     const title = brand.name + ' - ' + formTitle;
 
@@ -26,7 +27,7 @@ class EditCommunityByCommunityAdmin extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <PapperBlock title="Edit Community Information" desc="">
-          <EditCommunityForm {...this.props} superAdmin={auth && auth.is_super_admin} />
+          <EditCommunityForm {...this.props} superAdmin={superAdmin} />
         </PapperBlock>
       </div>
     );
