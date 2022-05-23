@@ -118,6 +118,7 @@ function MediaLibrary(props) {
           flexDirection: "column",
           border: "dashed 2px #e3e3e3",
           borderRadius: 10,
+          marginBottom:20
         }}
       >
         {!imageTray || imageTray.length === 0 ? (
@@ -286,5 +287,6 @@ MediaLibrary.defaultProps = {
   excludeTabs: [],
   useAwait: false,
   awaitSeconds: 500,
+  allowCropping: true
 };
 export default MediaLibrary;

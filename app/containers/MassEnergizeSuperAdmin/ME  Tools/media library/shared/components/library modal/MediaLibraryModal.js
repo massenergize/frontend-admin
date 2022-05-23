@@ -35,6 +35,7 @@ function MediaLibraryModal({
   finaliseCropping,
   croppedSource,
   setCroppedSource,
+  allowCropping,
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -45,6 +46,10 @@ function MediaLibraryModal({
   const [loadingMore, setLoadingMore] = useState(false);
   const [shouldWait, setShouldWait] = useState(useAwait);
 
+  excludeTabs = [
+    ...(excludeTabs || []),
+    (!allowCropping && TABS.CROPPING_TAB) || "", // if allowCropping is false, exclude it from the tabs
+  ];
   const clean = (files) => {
     // just a function that retrieves only the FileObject from the file jsons provided
     // the function also checks if the file has been cropped, and returns the cropped version instead of the main
@@ -99,6 +104,7 @@ function MediaLibraryModal({
           setCurrentTab={setCurrentTab}
           switchToCropping={switchToCropping}
           cropped={cropped}
+          allowCropping={allowCropping}
         />
       ),
     },
@@ -238,7 +244,7 @@ const Footer = ({
       >
         @massenergize
       </h3>
-      {images && images.length && (
+      {!isCropping && images && images.length && (
         <small style={{ fontWeight: "bold", marginLeft: 15 }}>
           [{(images && images.length) || 0} items]
         </small>

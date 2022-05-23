@@ -26,6 +26,7 @@ function Upload({
   setCurrentTab,
   switchToCropping,
   cropped,
+  allowCropping,
 }) {
   const dragBoxRef = useRef(null);
   const fileOpenerRef = useRef(null);
@@ -178,6 +179,7 @@ function Upload({
                 uploading={uploading}
                 setCurrentTab={setCurrentTab}
                 switchToCropping={switchToCropping}
+                allowCropping={allowCropping}
               />
             </React.Fragment>
           );
@@ -196,6 +198,7 @@ const PreviewElement = ({
   uploading,
   switchToCropping,
   parentSource,
+  allowCropping,
 }) => {
   return (
     <div
@@ -226,13 +229,15 @@ const PreviewElement = ({
           <small className="ml-prev-el-remove" onClick={() => remove(id)}>
             Remove
           </small>
-          <small
-            className="ml-prev-el-remove"
-            style={{ color: "blue", height: 80, width: 100, marginLeft: 10 }}
-            onClick={() => switchToCropping({ file, id, src: parentSource })}
-          >
-            Crop
-          </small>
+          {allowCropping && (
+            <small
+              className="ml-prev-el-remove"
+              style={{ color: "blue", height: 80, width: 100, marginLeft: 10 }}
+              onClick={() => switchToCropping({ file, id, src: parentSource })}
+            >
+              Crop
+            </small>
+          )}
         </div>
       )}
     </div>
