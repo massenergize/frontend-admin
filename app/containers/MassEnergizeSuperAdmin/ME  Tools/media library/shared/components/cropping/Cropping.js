@@ -6,17 +6,20 @@ function Cropping({
   cropLoot,
   maxWidth,
   maxHeight,
-  ratioHeight = 3,
-  ratioWidth = 4,
+  ratioWidth, 
+  ratioHeight, 
+  setCroppedSource,
 }) {
   const crop = {
     aspect: ratioWidth / ratioHeight,
     unit: "%",
-    x: 5,
-    y: 5,
+    width: 50,
+    height: 50,
+    x: 25,
+    y: 25,
   };
   const [dimensions, setDimensions] = useState(crop);
-  const [croppedSource, setCroppedSource] = useState(null);
+
   const imageRef = useRef(null);
 
   /**
@@ -67,11 +70,12 @@ function Cropping({
 export default Cropping;
 
 /**
- * Return a base64 version of an image file provided, based on a crop frame
+ * This is the function that creates the new image from the cutout that users make with the 
+ * cropping frame
  * @param {HTMLImageElement} image - Image File Object
  * @param {Object} crop - crop Object
  * @param {String} fileName - Name of the returned file in Promise
- * @returns {base64String} Image
+ * @returns {object} {src, file} src = base64String img representation of the cropped image, and a Blob file representation as well
  */
 const getCroppedImg = (image, crop) => {
   const canvas = document.createElement("canvas");

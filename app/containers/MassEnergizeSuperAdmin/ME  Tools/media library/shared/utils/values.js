@@ -15,3 +15,9 @@ export const dummyImages = [
   { url: 'https://i.pravatar.cc/300?img=30', id: 11 },
   { url: 'https://i.pravatar.cc/300?img=8', id: 32 },
 ];
+
+export const TABS = {
+  UPLOAD_TAB: "upload",
+  LIBRARY_TAB: "library",
+  CROPPING_TAB: "crop",
+};
