@@ -36,6 +36,7 @@ function MediaLibraryModal({
   croppedSource,
   setCroppedSource,
   allowCropping,
+  fileLimit
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -105,6 +106,7 @@ function MediaLibraryModal({
           switchToCropping={switchToCropping}
           cropped={cropped}
           allowCropping={allowCropping}
+          fileLimit = {fileLimit}
         />
       ),
     },
@@ -126,6 +128,7 @@ function MediaLibraryModal({
             shouldWait={shouldWait}
             setShouldWait={setShouldWait}
             awaitSeconds={awaitSeconds}
+            fileLimit = {fileLimit}
           />
         </Suspense>
       ),

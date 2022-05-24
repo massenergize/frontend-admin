@@ -425,6 +425,7 @@ class MassEnergizeForm extends Component {
       cleanedValues = formJson.preflightFxn(cleanedValues);
     }
 
+    // return console.log("I am the returned values innit", cleanedValues)
 
     // let's make an api call to send the data
     let response = null;

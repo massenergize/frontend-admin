@@ -21,3 +21,5 @@ export const TABS = {
   LIBRARY_TAB: "library",
   CROPPING_TAB: "crop",
 };
+
+export const DEFAULT_FILE_LIMIT = 10; // There is no significant reason for 10 as the default number. We can change it to anything later...

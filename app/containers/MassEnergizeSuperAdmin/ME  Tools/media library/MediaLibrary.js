@@ -118,7 +118,8 @@ function MediaLibrary(props) {
           flexDirection: "column",
           border: "dashed 2px #e3e3e3",
           borderRadius: 10,
-          marginBottom:20
+          marginBottom: 20,
+          padding: 20,
         }}
       >
         {!imageTray || imageTray.length === 0 ? (
@@ -152,7 +153,7 @@ const ImageTray = ({ sourceExtractor, remove, content }) => {
     <div
       style={{
         display: "flex",
-        overflowX: "scroll",
+        flexWrap: "wrap",
         width: "100%",
         alignItems: "center",
         justifyContent: "center",
@@ -176,14 +177,7 @@ const ImageTray = ({ sourceExtractor, remove, content }) => {
 };
 
 const TrayImage = ({ src, remove, id }) => (
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      flexDirection: "column",
-    }}
-  >
+  <div className="ml-tray-image">
     <img src={src} className="ml-preview-image elevate-float" />
     <small className="ml-prev-el-remove" onClick={() => remove(id)}>
       Remove
@@ -267,6 +261,15 @@ MediaLibrary.propTypes = {
    */
 
   onStateChange: PropTypes.func,
+
+  /**
+   * The number of images that can be selected from the library
+   */
+  fileLimit: PropTypes.number,
+  /**
+   * Determines whether or not cropping should be enabled on images. (That are freshly being uploaded)
+   */
+  allowCropping: PropTypes.bool,
 };
 
 MediaLibrary.Button = MLButton;
@@ -287,6 +290,6 @@ MediaLibrary.defaultProps = {
   excludeTabs: [],
   useAwait: false,
   awaitSeconds: 500,
-  allowCropping: true
+  allowCropping: true,
 };
 export default MediaLibrary;
