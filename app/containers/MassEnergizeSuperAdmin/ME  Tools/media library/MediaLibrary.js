@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import PropTypes, { object } from "prop-types";
+import PropTypes from "prop-types";
 import "./MediaLibrary.css";
 import MLButton from "./shared/components/button/MLButton";
 import MediaLibraryModal from "./shared/components/library modal/MediaLibraryModal";
 import ImageThumbnail from "./shared/components/thumbnail/ImageThumbnail";
-import { libraryImage } from "./shared/utils/values";
+import { libraryImage, TABS } from "./shared/utils/values";
 import { EXTENSIONS } from "./shared/utils/utils";
 
 function MediaLibrary(props) {
@@ -17,12 +17,33 @@ function MediaLibrary(props) {
     openState,
     onStateChange,
     images,
+    defaultTab,
   } = props;
 
   const [show, setShow] = useState(openState);
   const [imageTray, setTrayImages] = useState(selected);
   const [state, setState] = useState({});
   const [hasMounted, setHasMountedTo] = useState(undefined);
+  const [cropped, setCropped] = useState({}); // all items that have been cropped are saved in this object, E.g. idOfParentImage: CroppedContent
+  const [cropLoot, setCropLoot] = useState(null); // Where item to be cropped is temporarily stored and managed in  the cropping tab
+  const [currentTab, setCurrentTab] = useState(defaultTab);
+  const [files, setFiles] = useState([]); // all files that have been selected from user's device [Schema: {id, file}]
+  const [croppedSource, setCroppedSource] = useState();
+
+  const finaliseCropping = () => {
+    if (!cropLoot) return;
+    const { source } = cropLoot;
+    setCropped({ ...(cropped || {}), [source.id.toString()]: croppedSource });
+    setCurrentTab(TABS.UPLOAD_TAB);
+    // Then you should look into displaying the cropped preview instead of the main content innit
+  };
+
+  const switchToCropping = (content) => {
+    const loot = { source: content, image: content && content.src };
+    setCropLoot(loot);
+    setShow(true);
+    setCurrentTab("crop");
+  };
 
   const transfer = (content, reset) => {
     if (onInsert) return onInsert(content, reset);
@@ -50,6 +71,8 @@ function MediaLibrary(props) {
     setHasMountedTo(true);
   }, []);
 
+  useEffect(() => {}, [cropped]);
+
   const preselectDefaultImages = () => {
     if (!selected || !selected.length) return images;
     var bank = (images || []).map((img) => img.id);
@@ -70,6 +93,17 @@ function MediaLibrary(props) {
             close={() => setShow(false)}
             getSelected={handleSelected}
             selected={imageTray}
+            cropLoot={cropLoot}
+            currentTab={currentTab}
+            setCurrentTab={setCurrentTab}
+            switchToCropping={switchToCropping}
+            files={files}
+            setFiles={setFiles}
+            cropped={cropped}
+            setCropped={setCropped}
+            setCroppedSource={setCroppedSource}
+            croppedSource={croppedSource}
+            finaliseCropping={finaliseCropping}
           />
         </div>
       )}
@@ -84,6 +118,8 @@ function MediaLibrary(props) {
           flexDirection: "column",
           border: "dashed 2px #e3e3e3",
           borderRadius: 10,
+          marginBottom: 20,
+          padding: 20,
         }}
       >
         {!imageTray || imageTray.length === 0 ? (
@@ -94,6 +130,7 @@ function MediaLibrary(props) {
             content={imageTray}
             remove={remove}
             multiple={multiple}
+            // switchToCropping={switchToCropping}
           />
         )}
 
@@ -116,7 +153,7 @@ const ImageTray = ({ sourceExtractor, remove, content }) => {
     <div
       style={{
         display: "flex",
-        overflowX: "scroll",
+        flexWrap: "wrap",
         width: "100%",
         alignItems: "center",
         justifyContent: "center",
@@ -126,7 +163,12 @@ const ImageTray = ({ sourceExtractor, remove, content }) => {
         const src = sourceExtractor ? sourceExtractor(img) : img.url;
         return (
           <React.Fragment key={index.toString()}>
-            <TrayImage src={src} id={img.id} remove={remove} />
+            <TrayImage
+              src={src}
+              id={img.id}
+              remove={remove}
+              // switchToCropping={switchToCropping}
+            />
           </React.Fragment>
         );
       })}
@@ -135,18 +177,18 @@ const ImageTray = ({ sourceExtractor, remove, content }) => {
 };
 
 const TrayImage = ({ src, remove, id }) => (
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      flexDirection: "column",
-    }}
-  >
+  <div className="ml-tray-image">
     <img src={src} className="ml-preview-image elevate-float" />
     <small className="ml-prev-el-remove" onClick={() => remove(id)}>
       Remove
     </small>
+    {/* <small
+      className="ml-prev-el-remove"
+      style={{ color: "blue" }}
+      onClick={() => switchToCropping(id, "library-content")}
+    >
+      Crop
+    </small> */}
   </div>
 );
 
@@ -219,11 +261,20 @@ MediaLibrary.propTypes = {
    */
 
   onStateChange: PropTypes.func,
+
+  /**
+   * The number of images that can be selected from the library
+   */
+  fileLimit: PropTypes.number,
+  /**
+   * Determines whether or not cropping should be enabled on images. (That are freshly being uploaded)
+   */
+  allowCropping: PropTypes.bool,
 };
 
 MediaLibrary.Button = MLButton;
 MediaLibrary.Image = ImageThumbnail;
-MediaLibrary.Tabs = { UPLOAD_TAB: "upload", LIBRARY_TAB: "library" };
+MediaLibrary.Tabs = TABS;
 MediaLibrary.AcceptedFileTypes = {
   Images: ["image/jpg", "image/png", "image/jpeg"].join(", "),
   All: EXTENSIONS.join(", "),
@@ -239,5 +290,6 @@ MediaLibrary.defaultProps = {
   excludeTabs: [],
   useAwait: false,
   awaitSeconds: 500,
+  allowCropping: true,
 };
 export default MediaLibrary;

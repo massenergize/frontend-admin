@@ -9,6 +9,7 @@ import { connect } from "react-redux";
 import { getSelectedIds } from "../Actions/EditActionForm";
 import { makeTagSection } from "../Events/EditEventForm";
 import { Paper, Typography } from "@material-ui/core";
+import fieldTypes from "../_FormGenerator/fieldTypes";
 
 const styles = (theme) => ({
   root: {
@@ -286,14 +287,14 @@ const createFormJson = ({ communities, actions, vendors, testimonial }) => {
       {
         name: "image",
         placeholder: "Select an Image",
-        fieldType: "File",
+        fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
-        previewLink: testimonial && testimonial.image && testimonial.image.url,
+        selected: testimonial && testimonial.file ? [testimonial.file] :[],
         label: "Upload a file for this testimonial",
-        selectMany: false,
+        uploadMultiple: false, 
+        multiple: false,
         isRequired: true,
-        defaultValue: "",
-        filesLimit: 1,
+       
       },
       {
         name: "is_approved",

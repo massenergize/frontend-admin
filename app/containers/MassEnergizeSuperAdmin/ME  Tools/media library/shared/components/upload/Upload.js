@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import "./Upload.css";
 import PropTypes from "prop-types";
 import uploadDummy from "./up_img.png";
@@ -23,6 +23,10 @@ function Upload({
   upload, // the upload function
   accept,
   extras,
+  setCurrentTab,
+  switchToCropping,
+  cropped,
+  allowCropping,
 }) {
   const dragBoxRef = useRef(null);
   const fileOpenerRef = useRef(null);
@@ -160,42 +164,86 @@ function Upload({
       </div>
       {/* ----------------- PREVIEW AREA --------------- */}
       <div className="ml-preview-area">
-        {previews.map((prev) => (
-          <React.Fragment key={prev.id.toString()}>
-            <PreviewElement
-              {...prev}
-              remove={removeAnImage}
-              uploading={uploading}
-            />
-          </React.Fragment>
-        ))}
+        {previews.map((prev) => {
+          const croppedVersion = (cropped || {})[prev.id];
+          return (
+            <React.Fragment key={prev.id.toString()}>
+              <PreviewElement
+                {...prev}
+                src={(croppedVersion && croppedVersion.src) || prev.src}
+                parentSource={prev.src}
+                sizeText={getFileSize(
+                  (croppedVersion && croppedVersion.file) || prev.file
+                )}
+                remove={removeAnImage}
+                uploading={uploading}
+                setCurrentTab={setCurrentTab}
+                switchToCropping={switchToCropping}
+                allowCropping={allowCropping}
+              />
+            </React.Fragment>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-const PreviewElement = ({ file, id, src, sizeText, remove, uploading }) => (
-  <div
-    style={{
-      flexDirection: "column",
-      display: "flex",
-      margin: 10,
-      justifyContent: "center",
-      alignItems: "center",
-    }}
-  >
-    <img src={src} className="ml-preview-image" alt="" />
-    <small>{smartString(file.name)}</small>
-    <small role="button">
-      Size: <b>{sizeText}</b>
-    </small>
-    {!uploading && (
-      <small className="ml-prev-el-remove" onClick={() => remove(id)}>
-        Remove
+const PreviewElement = ({
+  file,
+  id,
+  src,
+  sizeText,
+  remove,
+  uploading,
+  switchToCropping,
+  parentSource,
+  allowCropping,
+}) => {
+  return (
+    <div
+      style={{
+        flexDirection: "column",
+        display: "flex",
+        margin: 10,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <img
+        src={src}
+        className="ml-preview-image"
+        style={{ height: 80, width: 100 }}
+        alt=""
+      />
+      <small>{smartString(file.name)}</small>
+      <small role="button">
+        Size: <b>{sizeText}</b>
       </small>
-    )}
-  </div>
-);
+      {!uploading && (
+        <div
+          style={{
+            display: "inline",
+          }}
+        >
+          <small className="ml-prev-el-remove" onClick={() => remove(id)}>
+            Remove
+          </small>
+          {allowCropping && (
+            <small
+              className="ml-prev-el-remove"
+              style={{ color: "blue", height: 80, width: 100, marginLeft: 10 }}
+              onClick={() => switchToCropping({ file, id, src: parentSource })}
+            >
+              Crop
+            </small>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 PreviewElement.propTypes = {
   file: PropTypes.object.isRequired,
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,

@@ -8,6 +8,7 @@ import { apiCall } from "../../../utils/messenger";
 import { getMoreInfo, groupSocialMediaFields } from "./utils";
 import { connect } from "react-redux";
 import Loading from "dan-components/Loading";
+import fieldTypes from "../_FormGenerator/fieldTypes";
 
 const styles = (theme) => ({
   root: {
@@ -65,7 +66,7 @@ class EditCommunityByCommunityAdmin extends Component {
     const community = communityResponse.data;
     await this.setStateAsync({ community });
 
-    const formJson =  createFormJson(community);
+    const formJson = createFormJson(community);
     await this.setStateAsync({ formJson });
   }
 
@@ -188,6 +189,7 @@ const createFormJson = (community) => {
             name: "about",
             label:
               "Short intro about this community for new users - 100 char max",
+            maxLength: 100,
             placeholder: "Welcome to Energize xxx, a project of ....",
             fieldType: "TextField",
             contentType: "text",
@@ -406,14 +408,12 @@ const createFormJson = (community) => {
       {
         name: "image",
         placeholder: "Upload a Logo",
-        fieldType: "File",
+        fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
-        previewLink: `${community.logo && community.logo.url}`,
+        selected: community && community.logo ? [community.logo] : [],
         label: "Upload a new logo for this community",
-        selectMany: false,
-        isRequired: false,
-        defaultValue: "",
-        filesLimit: 1,
+        uploadMultiple: false,
+        multiple: false,
       },
       {
         name: "is_published",

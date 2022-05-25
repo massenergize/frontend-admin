@@ -3,6 +3,8 @@ import Modal from "./../modal/Modal";
 import SidePane from "../sidepane/SidePane";
 import Upload from "../upload/Upload";
 import MLButton from "../button/MLButton";
+import Cropping from "../cropping/Cropping";
+import { TABS } from "../../utils/values";
 const Library = React.lazy(() => import("../library/Library")); // so that library component only loads when needed
 
 function MediaLibraryModal({
@@ -11,9 +13,8 @@ function MediaLibraryModal({
   onUpload,
   images,
   sourceExtractor,
-  defaultTab,
   selected,
-  getSelected,
+  getSelected, // the function that is used to retrieve all selected items out of the modal
   uploadMultiple,
   uploading,
   loadMoreFunction,
@@ -23,20 +24,43 @@ function MediaLibraryModal({
   awaitSeconds,
   accept,
   extras,
+  cropLoot,
+  currentTab,
+  setCurrentTab,
+  switchToCropping,
+  files,
+  setFiles,
+  cropped,
+  setCropped,
+  finaliseCropping,
+  croppedSource,
+  setCroppedSource,
+  allowCropping,
+  fileLimit
 }) {
-  const [currentTab, setCurrentTab] = useState(defaultTab);
+  // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
   const [previews, setPreviews] = useState([]);
-  const [files, setFiles] = useState([]);
-  const [content, setSelectedContent] = useState(selected);
+
+  const [content, setSelectedContent] = useState(selected); // all the selected items in the library will always be available in an array here
   const [state, setState] = useState({ uploading: uploading });
   const [loadingMore, setLoadingMore] = useState(false);
   const [shouldWait, setShouldWait] = useState(useAwait);
 
+  excludeTabs = [
+    ...(excludeTabs || []),
+    (!allowCropping && TABS.CROPPING_TAB) || "", // if allowCropping is false, exclude it from the tabs
+  ];
   const clean = (files) => {
     // just a function that retrieves only the FileObject from the file jsons provided
+    // the function also checks if the file has been cropped, and returns the cropped version instead of the main
+    // file
     if (!files) return files;
-    return files.map((obj) => obj.file);
+    return files.map((obj) => {
+      var file = obj.file;
+      if ((cropped || {})[obj.id]) file = cropped[obj.id].file;
+      return file;
+    });
   };
   const handleUpload = () => {
     if (!onUpload) return;
@@ -53,6 +77,8 @@ function MediaLibraryModal({
     setPreviews([]);
     setFiles([]);
     setState({});
+    setCroppedSource(null);
+    setCropped({});
   };
 
   const fireLoadMoreFunction = () => {
@@ -76,6 +102,11 @@ function MediaLibraryModal({
           upload={handleUpload}
           accept={accept}
           extras={extras}
+          setCurrentTab={setCurrentTab}
+          switchToCropping={switchToCropping}
+          cropped={cropped}
+          allowCropping={allowCropping}
+          fileLimit = {fileLimit}
         />
       ),
     },
@@ -97,8 +128,23 @@ function MediaLibraryModal({
             shouldWait={shouldWait}
             setShouldWait={setShouldWait}
             awaitSeconds={awaitSeconds}
+            fileLimit = {fileLimit}
           />
         </Suspense>
+      ),
+    },
+    {
+      headerName: "Crop",
+      key: "crop",
+      component: (
+        <Cropping
+          setCurrentTab={setCurrentTab}
+          cropLoot={cropLoot}
+          cropped={cropped}
+          setCropped={setCropped}
+          setCroppedSource={setCroppedSource}
+          croppedSource={croppedSource}
+        />
       ),
     },
   ];
@@ -168,6 +214,9 @@ function MediaLibraryModal({
             multiple={multiple}
             cancel={close}
             insert={handleInsert}
+            currentTab={currentTab}
+            cropLoot={cropLoot}
+            finaliseCropping={finaliseCropping}
           />
         </div>
       </Modal>
@@ -175,7 +224,16 @@ function MediaLibraryModal({
   );
 }
 
-const Footer = ({ content, cancel, insert, images }) => {
+const Footer = ({
+  content,
+  cancel,
+  insert,
+  images,
+  currentTab,
+  cropLoot,
+  finaliseCropping,
+}) => {
+  const isCropping = currentTab === TABS.CROPPING_TAB;
   const len = content && content.length;
   return (
     <div className="ml-footer">
@@ -189,7 +247,7 @@ const Footer = ({ content, cancel, insert, images }) => {
       >
         @massenergize
       </h3>
-      {images && images.length && (
+      {!isCropping && images && images.length && (
         <small style={{ fontWeight: "bold", marginLeft: 15 }}>
           [{(images && images.length) || 0} items]
         </small>
@@ -199,17 +257,28 @@ const Footer = ({ content, cancel, insert, images }) => {
           CANCEL
         </MLButton>
 
-        <button
-          className="ml-footer-btn"
-          style={{ "--btn-color": "white", "--btn-background": "green" }}
-          onClick={(e) => {
-            e.preventDefault();
-            insert();
-          }}
-          disabled={!len}
-        >
-          INSERT {len > 0 ? `(${len})` : ""}
-        </button>
+        {isCropping ? (
+          <button
+            className="ml-footer-btn"
+            style={{ "--btn-color": "white", "--btn-background": "green" }}
+            onClick={finaliseCropping}
+            disabled={!cropLoot}
+          >
+            CROP
+          </button>
+        ) : (
+          <button
+            className="ml-footer-btn"
+            style={{ "--btn-color": "white", "--btn-background": "green" }}
+            onClick={(e) => {
+              e.preventDefault();
+              insert();
+            }}
+            disabled={!len}
+          >
+            INSERT {len > 0 ? `(${len})` : ""}
+          </button>
+        )}
       </div>
     </div>
   );
