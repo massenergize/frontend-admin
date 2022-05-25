@@ -77,12 +77,25 @@ class EditCommunityByCommunityAdmin extends Component {
   }
 
   render() {
-    const { classes } = this.props;
-    const { formJson, community } = this.state;
-    if (!community || !formJson) return <Loading />;
+    const description = brand.desc;
+    const auth = this.props.auth;
+    const superAdmin = auth & auth !== undefined ? auth.is_super_admin : false;
+    const formTitle = "Edit Community Infomation";
+    const title = brand.name + ' - ' + formTitle;
+
     return (
       <div>
-        <MassEnergizeForm classes={classes} formJson={formJson} />
+        <Helmet>
+          <title>{title}</title>
+          <meta name="description" content={description} />
+          <meta property="og:title" content={title} />
+          <meta property="og:description" content={description} />
+          <meta property="twitter:title" content={title} />
+          <meta property="twitter:description" content={description} />
+        </Helmet>
+        <PapperBlock title="Edit Community Information" desc="">
+          <EditCommunityForm {...this.props} superAdmin={superAdmin} />
+        </PapperBlock>
       </div>
     );
   }
@@ -430,3 +443,4 @@ const createFormJson = (community) => {
 
   return formJson;
 };
+

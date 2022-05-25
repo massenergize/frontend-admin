@@ -1,11 +1,25 @@
 import React, { useState } from "react";
 import "./IconDialog.css";
 import debounce from "lodash.debounce";
+import { smartString } from "../../../../utils/common";
+
 const ICONS = require("./icon_files.json");
 const RECENT_ICONS_KEY = "RECENT_ICONS_KEY";
 const MAX_RECENTS = 10; // number of icons that should be kept in the recent list
+const COMMONLY_USED = [
+  "fa fa-leaf",
+  "fa fa-calendar",
+  "fa fa-quote-left",
+  "fa fa-map-pin",
+  "fa fa-exclamation",
+  "fas fa-asterisk",
+  "fa fa-home",
+  "fa fa-book",
+  "fa fa-sun",
+  "fa fa-calendar",
+];
 function IconDialog({
-  perPage = 50,
+  perPage = 200,
   placeholder,
   onIconSelected,
   defaultValue,
@@ -73,21 +87,19 @@ function IconDialog({
   const isFirstPage = page <= 1;
 
   const data = searched.length ? searched : iconSet;
+
+  const showDialog = () => {
+    setShow(true);
+  };
   return (
     <div className="icon-d-root">
       <div className="icon-d-trigger-area">
-        <div className="default-trigger" onClick={() => setShow(true)}>
+        <div className="default-trigger" onClick={() => showDialog()}>
           {selected ? (
-            <>
-              <i
-                className={`fa ${selected}`}
-                style={{
-                  border: "solid 2px black",
-                  borderRadius: 3,
-                  padding: "8px",
-                }}
-              />
-            </>
+            <div className="icon-d-selected-area">
+              <i className={`fa ${selected}`} />
+              <small>{makeNameFromIcon(selected)}</small>
+            </div>
           ) : (
             <>
               <i className="fa fa-search" />
@@ -154,35 +166,42 @@ const Dialog = ({
   close,
   selectIcon,
 }) => {
-  const userSearchedAnThereAreNoIcons = text && !searched.length;
+  const userSearchedAndThereAreNoIcons = text && !searched.length;
 
-  const renderIcons = (iconSet) => {
+  const renderIcons = (iconSet, classes = "") => {
     return (iconSet || []).map((ic, index) => {
       return (
         <span
-          className="d-icon-span"
-          key={index.toString()}
+          className={`d-icon-span ${classes}`}
           onClick={() => selectIcon(ic)}
         >
-          <i className={` d-icon ${ic}`} />
+          <span key={index.toString()} style={{ textAlign: "center" }}>
+            <i className={` d-icon ${ic}`} />
+          </span>
+          <small>{smartString(makeNameFromIcon(ic), 40)}</small>
         </span>
       );
     });
   };
+
   return (
     <>
       <div className="icon-d-ghost-curtain" onClick={close} />
-      <div className="anime-load-in icon-d-main-wrapper">
-        <div>
+      <div
+        className={`anime-load-in icon-d-main-wrapper`}
+        id="icon-d-main-wrapper"
+      >
+        <div className="icon-d-search-wrapper">
+          <i className="fa fa-search" />
           <input
-            placeholder="Enter text that describes the icon..."
+            placeholder="Search for icon by name"
             className="icon-d-textbox"
             onChange={search}
           />
         </div>
-        {recents && recents.length ? (
+        {/* {recents && recents.length ? (
           <div className="recents-container">
-            <div style={{ padding: "0px 15px" }}>
+            <div style={{ padding: "0px 55px" }}>
               <small style={{ fontSize: 8, color: "#bbbbbb" }}>
                 RECENTLY USED
               </small>
@@ -191,9 +210,10 @@ const Dialog = ({
           </div>
         ) : (
           <></>
-        )}
+        )} */}
+
         <div className="icon-container">
-          {userSearchedAnThereAreNoIcons ? (
+          {userSearchedAndThereAreNoIcons ? (
             <div className="no-icons-found">
               <i className="fas fa-search" />
               <small>
@@ -202,10 +222,28 @@ const Dialog = ({
               </small>
             </div>
           ) : (
-            renderIcons(data)
+            <>
+              {isFirstPage && !searched.length && (
+                <div
+                  style={{
+                    border: "solid 0px rgb(246 246 246)",
+                    borderBottomWidth: 2,
+                    marginBottom: 15,
+                  }}
+                >
+                  <small style={{ fontSize: 11, color: "#bbbbbb" }}>
+                    COMMONLY USED ICONS
+                  </small>
+                  <div className="commons-container">
+                    {renderIcons(COMMONLY_USED, "commonly-used-color")}
+                  </div>
+                </div>
+              )}
+              {renderIcons(data)}
+            </>
           )}
         </div>
-        {!searched.length && !userSearchedAnThereAreNoIcons && (
+        {!searched.length && !userSearchedAndThereAreNoIcons && (
           <div className="icon-d-footer">
             <span
               className={`d-icon-control ${isFirstPage ? "disabled" : ""}`}
@@ -227,4 +265,12 @@ const Dialog = ({
       </div>
     </>
   );
+};
+
+const makeNameFromIcon = (ic) => {
+  var name = ic.split(" ") || [];
+  name = (name[1] || "").split("-") || [];
+  name = name.slice(1).join(" ") || "";
+
+  return name;
 };
