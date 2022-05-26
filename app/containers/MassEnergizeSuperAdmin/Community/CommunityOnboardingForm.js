@@ -181,7 +181,7 @@ class CreateNewCommunityForm extends Component {
                  placeholder: 'eg. Springfield',
                  fieldType: 'TextField',
                  contentType: 'text',
-                 isRequired: true,
+                 isRequired: false,
                  dbName: 'city',
                  readOnly: false
             },
@@ -191,7 +191,7 @@ class CreateNewCommunityForm extends Component {
                  placeholder: 'eg. Massachusetts',
                  fieldType: 'Dropdown',
                  contentType: 'text',
-                 isRequired: true,
+                 isRequired: false,
                  data: states,
                  dbName: 'state',
                  readOnly: false
@@ -202,7 +202,7 @@ class CreateNewCommunityForm extends Component {
               placeholder: 'eg. 01020',
               fieldType: 'TextField',
               contentType: 'text',
-              isRequired: true,
+              isRequired: false,
               dbName: 'zipcode',
               readOnly: false
             },
