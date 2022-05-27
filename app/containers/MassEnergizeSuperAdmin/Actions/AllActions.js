@@ -255,10 +255,12 @@ class AllActions extends React.Component {
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
+    const community =item.community;
     putInRedux([...data]);
     apiCall("/actions.update", {
       action_id: item.id,
       is_published: !status,
+      community_id: (community && community.id) || null
     });
   }
 

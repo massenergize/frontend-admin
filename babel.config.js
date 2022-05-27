@@ -15,9 +15,13 @@ module.exports = {
     "@babel/plugin-proposal-export-default-from",
   ],
   env: {
+    development: {
+      plugins: [["inline-dotenv"]],
+    },
     production: {
       only: ["app"],
       plugins: [
+        ["inline-dotenv"],
         "lodash",
         "transform-react-remove-prop-types",
         "@babel/plugin-transform-react-inline-elements",
