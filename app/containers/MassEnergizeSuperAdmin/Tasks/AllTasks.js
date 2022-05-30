@@ -270,7 +270,7 @@ class AllTasks extends React.Component {
       },
     };
 
-    if (!data || !data.length) {
+    if (!data) {
       return (
         <Grid
           container
@@ -286,6 +286,27 @@ class AllTasks extends React.Component {
                 <h1>Fetching all Tasks. This may take a while...</h1>
                 <br />
                 <LinearProgress color="secondary" />
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      );
+    }
+    
+    if (!data.length) {
+      return (
+        <Grid
+          container
+          spacing={24}
+          alignItems="flex-start"
+          direction="row"
+          justify="center"
+        >
+          <Grid item xs={12} md={6}>
+            <Paper className={classes.root} style={{ padding: 15 }}>
+              <div className={classes.root}>
+                <h1>No tasks currently to display</h1>
+                <br />
               </div>
             </Paper>
           </Grid>
