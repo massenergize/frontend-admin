@@ -80,8 +80,8 @@ class AllTestimonials extends React.Component {
     const { classes } = this.props;
     return [
       {
-        name: 'ID',
-        key: 'id',
+        name: "ID",
+        key: "id",
         options: {
           filter: false,
         },
@@ -208,9 +208,11 @@ class AllTestimonials extends React.Component {
     item.is_published = !status;
     data.splice(index, 1, item);
     putInRedux([...data]);
+    const community = item.community;
     apiCall("/testimonials.update", {
       testimonial_id: item.id,
       is_published: !status,
+      community_id: (community && community.id) || null,
     });
   }
 

@@ -113,7 +113,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(reduxLoadAllCommunities(communities.data));
     dispatch(loadAllActions(actions.data));
     dispatch(loadAllEvents(events.data));
-    dispatch(loadAllVendors(messages.data));
+    dispatch(loadAllAdminMessages(messages.data));
     dispatch(loadTeamMessages(teamMessages.data));
     dispatch(loadAllTeams(teams.data));
     dispatch(loadAllSubscribers(subscribers.data));

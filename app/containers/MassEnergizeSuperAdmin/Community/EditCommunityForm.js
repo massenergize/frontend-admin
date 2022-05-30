@@ -30,9 +30,6 @@ const styles = (theme) => ({
   },
 });
 
-/**
- * @deprecated
- */
 class EditCommunityForm extends Component {
   constructor(props) {
     super(props);
@@ -73,20 +70,22 @@ class EditCommunityForm extends Component {
   createFormJson = async () => {
     // quick and dirty - duplicated code - needs to be consistant between pages and with the API
     // could read these options from the API or share the databaseFieldChoices json
-    const geographyTypes = [
+    const superAdmin = this.props.superAdmin ? this.props.superAdmin : false;
+    const geographyTypes = superAdmin ? [
       { id: 'ZIPCODE', value: "Community defined by one or more towns or zipcodes (can't be subdivided)" },
       { id: 'CITY', value: 'Community defined by one or more cities (can have smaller communities within)' },
       { id: "COUNTY", value:"Community defined by one or more counties" },
       { id: 'STATE', value: 'Community defined by one or more states' },
       { id: 'COUNTRY', value: 'Community defined by a country' },
       // { id: "NON_GEOGRAPHIC", value:"A non-geographic community" },
+    ] : [
+      { id: 'ZIPCODE', value: "Community defined by one or more towns or zipcodes (can't be subdivided)" },
+      { id: 'CITY', value: 'Community defined by one or more cities (can have smaller communities within)' },
     ];
 
     const { community } = this.state;
     const moreInfo = getMoreInfo(community);
-    // TODO: eliminate three versions of nearly identical code
-    // const superAdmin = this.props.superAdmin;
-
+ 
     const formJson = {
       title: 'Edit your Community',
       subTitle: '',
@@ -130,7 +129,7 @@ class EditCommunityForm extends Component {
               isRequired: true,
               defaultValue: community.subdomain,
               dbName: 'subdomain',
-              readOnly: false,  // !superAdmin - readonly if you are a Cadmin
+              readOnly: !superAdmin,  // readonly if you are a Cadmin
             },
             {
               name: 'website',
@@ -217,7 +216,7 @@ class EditCommunityForm extends Component {
               placeholder: 'eg. Springfield',
               fieldType: 'TextField',
               contentType: 'text',
-              isRequired: true,
+              isRequired: false,
               defaultValue: `${community.location && community.location.city ? community.location.city : ''}`,
               dbName: 'city',
               readOnly: false,
@@ -228,7 +227,7 @@ class EditCommunityForm extends Component {
               placeholder: 'eg. Massachusetts',
               fieldType: 'Dropdown',
               contentType: 'text',
-              isRequired: true,
+              isRequired: false,
               data: states,
               defaultValue: community.location && community.location.state,
               dbName: 'state',
@@ -240,7 +239,7 @@ class EditCommunityForm extends Component {
               placeholder: 'eg. 01020',
               fieldType: 'TextField',
               contentType: 'text',
-              isRequired: true,
+              isRequired: false,
               defaultValue: community.location && community.location.zipcode,
               dbName: 'zipcode',
               readOnly: false,
@@ -260,7 +259,7 @@ class EditCommunityForm extends Component {
                 ? 'true'
                 : 'false',
               dbName: 'is_geographically_focused',
-              readOnly: false,   // !superAdmin, readonly if just a cadmin
+              readOnly: !superAdmin,   // readonly if just a cadmin
               data: [
                 { id: 'false', value: 'No' },
                 { id: 'true', value: 'Yes' },
@@ -275,7 +274,7 @@ class EditCommunityForm extends Component {
                     isRequired: true,
                     defaultValue: community.geography_type || 'ZIPCODE',
                     dbName: 'geography_type',
-                    readOnly: false,   // !superAdmin, readonly if just a cadmin
+                    readOnly: !superAdmin,   // readonly if just a cadmin
                     data: geographyTypes,
                   },
                   {
@@ -287,7 +286,7 @@ class EditCommunityForm extends Component {
                     isRequired: true,
                     defaultValue: community.locations || '',
                     dbName: 'locations',
-                    readOnly: false, // !superAdmin, readonly if just a cadmin
+                    readOnly: !superAdmin, // readonly if just a cadmin
                   },
                 ]
               }
@@ -365,7 +364,7 @@ class EditCommunityForm extends Component {
           defaultValue: '',
           filesLimit: 1,
         },
-        {
+        superAdmin && {
           name: 'is_approved',
           label:
             'Do you approve this community? (Check yes after background check)',
@@ -373,7 +372,7 @@ class EditCommunityForm extends Component {
           isRequired: false,
           defaultValue: community.is_approved ? 'true' : 'false',
           dbName: 'is_approved',
-          readOnly: false,  // !superAdmin, readonly if just a cadmin
+          readOnly: !superAdmin,  // readonly if just a cadmin
           data: [{ id: 'false', value: 'No' }, { id: 'true', value: 'Yes' }],
         },
         {
