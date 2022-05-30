@@ -200,5 +200,5 @@ module.exports = [
         link: "/admin/read/users",
       },
     ],
-  },
+  }
 ];

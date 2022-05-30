@@ -283,4 +283,21 @@ module.exports = [
       },
     ],
   },
+  {
+    key: "tasks",
+    name: "Tasks",
+    icon: "md-reorder",
+    child: [
+      {
+        key: "create-tasks",
+        name: "Add New task",
+        link: "/admin/tasks/add",
+      },
+      {
+        key: "all-tasks",
+        name: "All Tasks",
+        link: "/admin/read/tasks",
+      },
+    ],
+  },
 ];
