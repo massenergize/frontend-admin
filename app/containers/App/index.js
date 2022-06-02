@@ -86,6 +86,7 @@ class App extends React.Component {
   }
 
   requestMassToken = (fireToken) => {
+    this.setState({error:null})
     const me = this;
     const body = { idToken: fireToken };
     apiCall('auth.login', body)
@@ -93,7 +94,7 @@ class App extends React.Component {
         const { error } = res;
         if (error) {
           me.setState({ error, started: false });
-          window.location.href = '/login';
+          // window.location.href = '/login';
           return;
         }
         window.location.href = '/';
