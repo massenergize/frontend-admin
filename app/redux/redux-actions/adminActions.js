@@ -28,6 +28,8 @@ import {
   UPDATE_HEAP,
   LOAD_CC_ACTIONS,
   TOGGLE_UNIVERSAL_MODAL,
+  LOAD_ALL_TASK_FUNCTIONS,
+  LOAD_ALL_TASKS,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -80,6 +82,16 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
         ? "/tag_collections.listForSuperAdmin"
         : "/tag_collections.listForCommunityAdmin"
     ),
+    apiCall(
+      isSuperAdmin
+        ? "/tasks.functions.list"
+        : "/tasks.functions.list"
+    ),
+    apiCall(
+      isSuperAdmin
+        ? "/tasks.list"
+        : "/tasks.list"
+    ),
   ]).then((response) => {
     const [
       communities,
@@ -94,8 +106,10 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       vendors,
       ccActions,
       tagCollections,
+      tasksFunctions,
+      tasks,
     ] = response;
-
+    
     dispatch(reduxLoadAllCommunities(communities.data));
     dispatch(loadAllActions(actions.data));
     dispatch(loadAllEvents(events.data));
@@ -108,6 +122,9 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadAllVendors(vendors.data));
     dispatch(reduxLoadCCActions(ccActions.data.actions));
     dispatch(loadAllTags(tagCollections.data));
+    dispatch(loadTaskFunctionsAction(tasksFunctions.data));
+    dispatch(loadTasksAction(tasks.data));
+ 
   });
 };
 export const reduxToggleUniversalModal = (data = {}) => ({
@@ -522,7 +539,7 @@ export const reduxCallLibraryModalImages = (props) => {
         );
       })
       .catch((e) => {
-        if (cb) cb(repsonse);
+        if (cb) cb(response);
         console.log("FETCH ERROR_SYNT: ", e.toString());
       });
   };
@@ -577,4 +594,18 @@ export const reduxLoadSelectedCommunity = (data = null) => ({
 export const reduxLoadAuthAdmin = (data = null) => {
   //reduxCallCommunities();
   return { type: LOAD_AUTH_ADMIN, payload: data };
+};
+
+
+export const loadTaskFunctionsAction = (data = []) => {
+  return {
+  type: LOAD_ALL_TASK_FUNCTIONS,
+  payload: data,
+  }
+};
+export const loadTasksAction = (data = []) => {
+  return {
+  type: LOAD_ALL_TASKS,
+  payload: data,
+  }
 };
