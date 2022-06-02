@@ -171,7 +171,7 @@ class AllCommunityAdminMessages extends React.Component {
     const description = brand.desc;
     const { columns } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.messages && this.props.messages.filter(item=>item.parent===null));
+    const data = this.fashionData(this.props.messages); // not ready for this yet: && this.props.messages.filter(item=>item.parent===null));
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
@@ -189,7 +189,6 @@ class AllCommunityAdminMessages extends React.Component {
         return false;
       },
     };
-
     if (!data || !data.length) {
       return <LinearBuffer />;
     }
@@ -227,7 +226,6 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     community: state.getIn(["selected_community"]),
     messages: state.getIn(["messages"]),
-    teamMessages: state.getIn(["messages"]),
   };
 }
 function mapDispatchToProps(dispatch) {

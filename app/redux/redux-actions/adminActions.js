@@ -29,6 +29,8 @@ import {
   LOAD_CC_ACTIONS,
   TOGGLE_UNIVERSAL_MODAL,
   TEST_REDUX,
+  LOAD_ALL_TASK_FUNCTIONS,
+  LOAD_ALL_TASKS,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -90,6 +92,16 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       filters: ["uploads", "actions", "events", "testimonials"],
       target_communities: [],
     }),
+    apiCall(
+      isSuperAdmin
+        ? "/tasks.functions.list"
+        : "/tasks.functions.list"
+    ),
+    apiCall(
+      isSuperAdmin
+        ? "/tasks.list"
+        : "/tasks.list"
+    ),
   ]).then((response) => {
     const [
       communities,
@@ -105,12 +117,14 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       ccActions,
       tagCollections,
       galleryImages,
+      tasksFunctions,
+      tasks,
     ] = response;
-
+    
     dispatch(reduxLoadAllCommunities(communities.data));
     dispatch(loadAllActions(actions.data));
     dispatch(loadAllEvents(events.data));
-    dispatch(loadAllVendors(messages.data));
+    dispatch(loadAllAdminMessages(messages.data));
     dispatch(loadTeamMessages(teamMessages.data));
     dispatch(loadAllTeams(teams.data));
     dispatch(loadAllSubscribers(subscribers.data));
@@ -120,6 +134,9 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(reduxLoadCCActions(ccActions.data.actions));
     dispatch(loadAllTags(tagCollections.data));
     dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
+    dispatch(loadTaskFunctionsAction(tasksFunctions.data));
+    dispatch(loadTasksAction(tasks.data));
+ 
   });
 };
 export const reduxToggleUniversalModal = (data = {}) => ({
@@ -595,7 +612,7 @@ export const reduxCallLibraryModalImages = (props) => {
         );
       })
       .catch((e) => {
-        if (cb) cb(repsonse);
+        if (cb) cb(response);
         console.log("FETCH ERROR_SYNT: ", e.toString());
       });
   };
@@ -650,4 +667,18 @@ export const reduxLoadSelectedCommunity = (data = null) => ({
 export const reduxLoadAuthAdmin = (data = null) => {
   //reduxCallCommunities();
   return { type: LOAD_AUTH_ADMIN, payload: data };
+};
+
+
+export const loadTaskFunctionsAction = (data = []) => {
+  return {
+  type: LOAD_ALL_TASK_FUNCTIONS,
+  payload: data,
+  }
+};
+export const loadTasksAction = (data = []) => {
+  return {
+  type: LOAD_ALL_TASKS,
+  payload: data,
+  }
 };

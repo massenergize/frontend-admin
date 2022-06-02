@@ -5,6 +5,7 @@ v2.0/build/
 app/config/config.json
 .DS_Store
 node_modules/
+
 build/
 
 .env
