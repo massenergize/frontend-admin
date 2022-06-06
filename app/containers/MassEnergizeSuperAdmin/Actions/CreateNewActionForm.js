@@ -7,6 +7,7 @@ import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
 import { checkIfReadOnly, makeTagSection } from "./EditActionForm";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
+import fieldTypes from "../_FormGenerator/fieldTypes";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -39,13 +40,22 @@ class CreateNewActionForm extends Component {
       ccActions: [],
       vendors: [],
       formJson: null,
-      reRenderKey: "x-initial-key-x",
     };
   }
 
-  static getDerivedStateFromProps(props) {
+  static getDerivedStateFromProps(props, state) {
     const { communities, tags, vendors, ccActions } = props;
+    const fullyMountedNeverRunThisAgain =
+      communities &&
+      communities.length &&
+      tags &&
+      tags.length &&
+      vendors &&
+      vendors.length &&
+      ccActions &&
+      ccActions.length;
 
+    if (!fullyMountedNeverRunThisAgain && !state.mounted) return null;
     const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
@@ -72,63 +82,15 @@ class CreateNewActionForm extends Component {
     if (formJson) formJson.fields.splice(1, 0, section);
 
     return {
+      mounted: true,
       communities: coms,
       ccActions: modifiedCCActions,
       vendors: vends,
       formJson,
-      reRenderKey: getRandomStringKey(), // forces re-render when the prop data is actually available
     };
   }
 
-  componentDidMount() {
-    // const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
-    // const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
-    // const vendorsResponse = await apiCall('/vendors.listForCommunityAdmin');
-    // const ccActionsResponse = await apiCall('/cc/info/actions', {}, null, true);
-    // if (communitiesResponse && communitiesResponse.data) {
-    //   const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
-    //   await this.setStateAsync({ communities });
-    // }
-    // if (vendorsResponse && vendorsResponse.data) {
-    //   const vendors = vendorsResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
-    //   await this.setStateAsync({ vendors });
-    // }
-    // if (ccActionsResponse && ccActionsResponse.data && ccActionsResponse.data.actions) {
-    //   const ccActions = (ccActionsResponse.data.actions || []).map(c => ({ ...c, displayName: c.description, id: '' + c.id }));
-    //   await this.setStateAsync({ ccActions });
-    // }
-    // const formJson = await this.createFormJson();
-    // if (tagCollectionsResponse && tagCollectionsResponse.data) {
-    //   const section = {
-    //     label: 'Please select tag(s) that apply to this action',
-    //     fieldType: 'Section',
-    //     children: []
-    //   };
-    //   Object.values(tagCollectionsResponse.data).forEach(tCol => {
-    //     const newField = {
-    //       name: tCol.name,
-    //       label: `${tCol.name} ${tCol.allow_multiple ? '(You can select multiple)' : '(Only one selection allowed)'}`,
-    //       placeholder: '',
-    //       fieldType: 'Checkbox',
-    //       selectMany: tCol.allow_multiple,
-    //       defaultValue: [],
-    //       dbName: 'tags',
-    //       data: tCol.tags.map(t => ({ ...t, displayName: t.name, id: '' + t.id }))
-    //     };
-    //     // want this to be the 5th field
-    //     section.children.push(newField);
-    //   });
-    //   // want this to be the 2nd field
-    //   formJson.fields.splice(1, 0, section);
-    // }
-    // await this.setStateAsync({ formJson });
-  }
-
-  // setStateAsync(state) {
-  //   return new Promise((resolve) => {
-  //     this.setState(state, resolve);
-  //   });
-  // }
+  
 
   render() {
     const { classes } = this.props;
@@ -158,7 +120,6 @@ const NewActionMapped = connect(mapStateToProps)(CreateNewActionForm);
 export default withStyles(styles, { withTheme: true })(NewActionMapped);
 
 const createFormJson = ({ communities, ccActions, vendors }) => {
-  // const { communities, ccActions, vendors } = this.state;
   const formJson = {
     title: "Create a New Action",
     subTitle: "",
@@ -179,6 +140,7 @@ const createFormJson = ({ communities, ccActions, vendors }) => {
             defaultValue: "",
             dbName: "title",
             readOnly: false,
+            maxLength:40
           },
           {
             name: "rank",
@@ -287,7 +249,8 @@ const createFormJson = ({ communities, ccActions, vendors }) => {
       {
         name: "image",
         placeholder: "Select an Image",
-        fieldType: "File",
+        // fieldType: "File",
+        fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload Files",
         isRequired: false,

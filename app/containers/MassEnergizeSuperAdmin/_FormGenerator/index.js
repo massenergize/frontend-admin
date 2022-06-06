@@ -31,11 +31,11 @@ import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarConte
 import FieldTypes from "./fieldTypes";
 import Modal from "./Modal";
 // import PreviewModal from './PreviewModal';
-import MEMediaLibraryImplementation from "../Gallery/tools/MEMediaLibraryImplementation";
 import Loading from "dan-components/Loading";
 import IconDialog from "../ME  Tools/icon dialog/IconDialog";
+import FormMediaLibraryImplementation from "./FormMediaLibraryImplementation";
 
-const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY
+const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -425,6 +425,8 @@ class MassEnergizeForm extends Component {
       cleanedValues = formJson.preflightFxn(cleanedValues);
     }
 
+    // return console.log("I am the returned values innit", cleanedValues)
+
     // let's make an api call to send the data
     let response = null;
     if (hasMediaFiles) {
@@ -645,14 +647,52 @@ class MassEnergizeForm extends Component {
         );
       case FieldTypes.MediaLibrary:
         return (
-          <MEMediaLibraryImplementation
-            {...field}
-            selected={this.getValue(field.name) || []}
-            onInsert={(files) => {
-              const formData = this.state.formData || {};
-              this.setState({ formData: { ...formData, [field.name]: files } });
-            }}
-          />
+          <>
+            <div className="imageUploadInstructions">
+              <h6>Image Upload Instructions:</h6>
+              <ul
+                style={{
+                  listStyleType: "circle",
+                  paddingLeft: "30px",
+                  fontSize: 14,
+                }}
+              >
+                <p>
+                  You have access to all the images that are in use in the
+                  communities you manage. Your library contains images that have
+                  either been uploaded by you, or other admins of your
+                  community. You may also see images that are not from any of
+                  your communities, but have been made public by admins of
+                  different communities.
+                </p>
+                <li>Pick an image from the library, or add a new one.</li>
+                <li>
+                  <b>The final upload size must not exceed 5MB.</b>
+                </li>
+
+                {field.extraInstructions &&
+                  field.extraInstructions.map((instruction, key) => (
+                    <li key={key.toString()}>{instruction}</li>
+                  ))}
+              </ul>
+            </div>
+            <br />
+            <FormMediaLibraryImplementation
+              {...field}
+              actionText={field.placeholder}
+              onInsert={(files) => {
+                const formData = this.state.formData || {};
+                const isEmpty = !files || !files.length;
+                var ids = files.map((img) => img.id);
+                this.setState({
+                  formData: {
+                    ...formData,
+                    [field.name]: isEmpty ? ["reset"] : ids, // so that the backend can know exactly when an existing image needs to be removed, and when the image field is just not available
+                  },
+                });
+              }}
+            />
+          </>
         );
       case FieldTypes.File:
         // Linter caught this: what is this supposed to be?
@@ -883,7 +923,8 @@ class MassEnergizeForm extends Component {
               }}
               disabled={field.readOnly || this.state.readOnly}
               defaultValue={field.defaultValue}
-              maxLength={field.maxLength}
+              inputProps={{ maxLength: field.maxLength }}
+              // maxLength={field.maxLength}
             />
           </div>
         );
