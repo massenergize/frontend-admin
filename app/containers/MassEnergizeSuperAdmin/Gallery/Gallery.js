@@ -1,16 +1,10 @@
-import {
-  Button,
-  Checkbox,
-  FormControlLabel,
-  Icon,
-} from "@material-ui/core";
+import { Button, Checkbox, FormControlLabel, Icon } from "@material-ui/core";
 import { Paper, Typography, withStyles } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import {
   reduxFetchImages,
-  reduxLoadGalleryImages,
   reduxLoadImageInfos,
   reduxLoadSearchedImages,
 } from "../../../redux/redux-actions/adminActions";
@@ -365,7 +359,6 @@ const ImageCollectionTray = ({
   );
 };
 
-
 const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   communities: state.getIn(["communities"]),
@@ -375,8 +368,6 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
-      fetchGalleryImages: reduxFetchImages,
-      insertImagesInRedux: reduxLoadGalleryImages,
       putSearchResultsInRedux: reduxLoadSearchedImages,
       putImageInfoInRedux: reduxLoadImageInfos,
     },

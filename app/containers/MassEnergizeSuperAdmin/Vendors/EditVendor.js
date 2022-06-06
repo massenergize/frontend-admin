@@ -9,6 +9,7 @@ import { makeTagSection } from "../Events/EditEventForm";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { reduxAddToHeap } from "../../../redux/redux-actions/adminActions";
+import fieldTypes from "../_FormGenerator/fieldTypes";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -88,9 +89,7 @@ class CreateNewVendorForm extends Component {
       addVendorToHeap({
         vendorsInfos: { ...vendorsInfos, [id.toString()]: vendorResponse.data },
       });
-     
     }
-   
   }
   getSelectedIds = (selected, dataToCrossCheck) => {
     const res = [];
@@ -409,14 +408,12 @@ const createFormJson = ({ vendor, communities }) => {
       {
         name: "image",
         placeholder: "Upload a Logo",
-        fieldType: "File",
+        fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload a logo for this Vendor",
-        previewLink: vendor.logo && vendor.logo.url,
-        selectMany: false,
+        selected: vendor.logo ? [vendor.logo] : [],
+
         isRequired: false,
-        defaultValue: "",
-        filesLimit: 1,
       },
       {
         name: "is_verified",
