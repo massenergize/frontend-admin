@@ -3,13 +3,14 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import states from "dan-api/data/states";
-import MassEnergizeForm from "../_FormGenerator";
 import { apiCall } from "../../../utils/messenger";
 import { getMoreInfo, groupSocialMediaFields } from "./utils";
 import { connect } from "react-redux";
-import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
-
+import brand from "dan-api/dummy/brand";
+import { Helmet } from "react-helmet";
+import { PapperBlock } from 'dan-components';
+import EditCommunityForm from "./EditCommunityForm";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -79,9 +80,10 @@ class EditCommunityByCommunityAdmin extends Component {
   render() {
     const description = brand.desc;
     const auth = this.props.auth;
-    const superAdmin = auth & auth !== undefined ? auth.is_super_admin : false;
+    const superAdmin =
+      auth & (auth !== undefined) ? auth.is_super_admin : false;
     const formTitle = "Edit Community Infomation";
-    const title = brand.name + ' - ' + formTitle;
+    const title = brand.name + " - " + formTitle;
 
     return (
       <div>
@@ -443,4 +445,3 @@ const createFormJson = (community) => {
 
   return formJson;
 };
-
