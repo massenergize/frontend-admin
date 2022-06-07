@@ -158,7 +158,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
           is_super_admin
             ? {
                 name: "is_global",
-                label: "Is this Action a Temπplate?",
+                label: "Is this Action a Template?",
                 fieldType: "Radio",
                 isRequired: false,
                 defaultValue: "false",
