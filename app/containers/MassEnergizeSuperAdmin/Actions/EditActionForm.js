@@ -147,6 +147,7 @@ class EditActionForm extends Component {
       communities: coms,
       vendors: vends,
       ccActions: modifiedCCActions,
+      auth
     });
 
     const section = makeTagSection({ collections: tags, action });

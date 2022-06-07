@@ -119,6 +119,7 @@ class EditEventForm extends Component {
       event,
       communities: coms,
       rescheduledEvent,
+      auth,
     });
 
     const section = makeTagSection({ collections: tags, event });
