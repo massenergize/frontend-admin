@@ -11,7 +11,6 @@ import { TextField } from "@material-ui/core";
 import { bindActionCreators } from "redux";
 import {
   reduxCallLibraryModalImages,
-  reduxLoadGalleryImages,
 } from "../../../redux/redux-actions/adminActions";
 const styles = (theme) => {
   const spacing = theme.spacing.unit;
@@ -249,7 +248,6 @@ const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       loadModalImages: reduxCallLibraryModalImages,
-      insertImagesInRedux: reduxLoadGalleryImages,
       loadMoreModalImages: reduxCallLibraryModalImages,
     },
     dispatch
