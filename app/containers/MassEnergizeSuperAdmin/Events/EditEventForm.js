@@ -119,6 +119,7 @@ class EditEventForm extends Component {
       event,
       communities: coms,
       rescheduledEvent,
+      auth,
     });
 
     const section = makeTagSection({ collections: tags, event });
@@ -234,9 +235,10 @@ EditEventForm.propTypes = {
 };
 export default withStyles(styles, { withTheme: true })(EditEventMapped);
 
-const createFormJson = ({ event, rescheduledEvent, communities }) => {
+const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
   const statuses = ["Draft", "Live", "Archived"];
   if (!event || !communities) return;
+  const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Edit Event or Campaign",
     subTitle: "",
@@ -484,30 +486,35 @@ const createFormJson = ({ event, rescheduledEvent, communities }) => {
               ],
             },
           },
-          {
-            name: "is_global",
-            label: "Is this Event a Template?",
-            fieldType: "Radio",
-            isRequired: false,
-            defaultValue: "" + event.is_global,
-            dbName: "is_global",
-            readOnly: false,
-            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-            child: {
-              valueToCheck: "false",
-              fields: [
-                {
-                  name: "community",
-                  label: "Primary Community",
-                  placeholder: "eg. Springfield",
-                  fieldType: "Dropdown",
-                  defaultValue: event.community && event.community.id,
-                  dbName: "community_id",
-                  data: [{ displayName: "--", id: "" }, ...communities],
+          is_super_admin
+            ? {
+                name: "is_global",
+                label: "Is this Event a Template?",
+                fieldType: "Radio",
+                isRequired: false,
+                defaultValue: "" + event.is_global,
+                dbName: "is_global",
+                readOnly: false,
+                data: [
+                  { id: "false", value: "No" },
+                  { id: "true", value: "Yes" },
+                ],
+                child: {
+                  valueToCheck: "false",
+                  fields: [
+                    {
+                      name: "community",
+                      label: "Primary Community",
+                      placeholder: "eg. Springfield",
+                      fieldType: "Dropdown",
+                      defaultValue: event.community && event.community.id,
+                      dbName: "community_id",
+                      data: [{ displayName: "--", id: "" }, ...communities],
+                    },
+                  ],
                 },
-              ],
-            },
-          },
+              }
+            : {},
         ],
       },
       {
@@ -586,7 +593,7 @@ const createFormJson = ({ event, rescheduledEvent, communities }) => {
         dbName: "image",
         label: "Upload Files",
         isRequired: true,
-        selected: event.image ? [event.image] :[]
+        selected: event.image ? [event.image] : [],
       },
       {
         name: "rsvp_enabled",

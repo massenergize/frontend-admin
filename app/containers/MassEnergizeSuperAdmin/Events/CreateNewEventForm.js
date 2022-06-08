@@ -46,7 +46,7 @@ class CreateNewEventForm extends Component {
   }
 
   static getDerivedStateFromProps = (props) => {
-    const { communities, tags } = props;
+    const { communities, tags, auth } = props;
 
     const coms = (communities || []).map((c) => ({
       ...c,
@@ -56,6 +56,7 @@ class CreateNewEventForm extends Component {
 
     const formJson = createFormJson({
       communities: coms,
+      auth,
     });
 
     const section = makeTagSection({ collections: tags, defaults: false });
@@ -89,6 +90,7 @@ const mapStateToProps = (state) => {
   return {
     tags: state.getIn(["allTags"]),
     communities: state.getIn(["communities"]),
+    auth: state.getIn(["auth"]),
   };
 };
 
@@ -96,8 +98,9 @@ const CreateEventMapped = connect(mapStateToProps)(CreateNewEventForm);
 
 export default withStyles(styles, { withTheme: true })(CreateEventMapped);
 
-const createFormJson = ({ communities }) => {
+const createFormJson = ({ communities, auth }) => {
   // const { communities } = this.state;
+  const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Create New Event or Campaign",
     subTitle: "",
@@ -252,30 +255,35 @@ const createFormJson = ({ communities }) => {
               ],
             },
           },
-          {
-            name: "is_global",
-            label: "Is this Event a Template?",
-            fieldType: "Radio",
-            isRequired: true,
-            defaultValue: "false",
-            dbName: "is_global",
-            readOnly: false,
-            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-            child: {
-              valueToCheck: "false",
-              fields: [
-                {
-                  name: "community",
-                  label: "Primary Community",
-                  placeholder: "eg. Wayland",
-                  fieldType: "Dropdown",
-                  defaultValue: null,
-                  dbName: "community_id",
-                  data: [{ displayName: "--", id: "" }, ...communities],
+          is_super_admin
+            ? {
+                name: "is_global",
+                label: "Is this Event a Template?",
+                fieldType: "Radio",
+                isRequired: true,
+                defaultValue: "false",
+                dbName: "is_global",
+                readOnly: false,
+                data: [
+                  { id: "false", value: "No" },
+                  { id: "true", value: "Yes" },
+                ],
+                child: {
+                  valueToCheck: "false",
+                  fields: [
+                    {
+                      name: "community",
+                      label: "Primary Community",
+                      placeholder: "eg. Wayland",
+                      fieldType: "Dropdown",
+                      defaultValue: null,
+                      dbName: "community_id",
+                      data: [{ displayName: "--", id: "" }, ...communities],
+                    },
+                  ],
                 },
-              ],
-            },
-          },
+              }
+            : {},
         ],
       },
       {

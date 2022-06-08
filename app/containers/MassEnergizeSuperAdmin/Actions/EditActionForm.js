@@ -147,6 +147,7 @@ class EditActionForm extends Component {
       communities: coms,
       vendors: vends,
       ccActions: modifiedCCActions,
+      auth
     });
 
     const section = makeTagSection({ collections: tags, action });
@@ -198,8 +199,9 @@ EditActionForm.propTypes = {
 
 export default withStyles(styles, { withTheme: true })(EditActionMapped);
 
-const createFormJson = ({ action, communities, ccActions, vendors }) => {
+const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
   if (!action || !ccActions || !vendors || !communities) return;
+  const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Update Action",
     subTitle: "",
@@ -231,7 +233,7 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
             defaultValue: action.title,
             dbName: "title",
             readOnly: false,
-            maxLength:40
+            maxLength: 40,
           },
           {
             name: "rank",
@@ -245,7 +247,7 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
             dbName: "rank",
             readOnly: false,
           },
-          {
+          is_super_admin ? {
             name: "is_global",
             label: "Is this Action a Template?",
             fieldType: "Radio",
@@ -268,7 +270,7 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
                 },
               ],
             },
-          },
+          }:{},
         ],
       },
       {
