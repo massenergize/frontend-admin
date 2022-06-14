@@ -210,7 +210,7 @@ class AllTeams extends React.Component {
         key: "live_or_not_for_download",
         options: {
           display: false,
-          filter: false,
+          filter: true,
           searchable: false,
           download: true,
         },

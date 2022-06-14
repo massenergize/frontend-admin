@@ -167,6 +167,7 @@ class AllActions extends React.Component {
         key: "is_live",
         options: {
           filter: false,
+          download: false,
           customBodyRender: (d) => {
             return (
               <MEChip
@@ -222,6 +223,16 @@ class AllActions extends React.Component {
           ),
         },
       },
+      {
+        name: "Live",
+        key: "hidden_live_or_not",
+        options: {
+          display: false,
+          filter: true,
+          searchable: false,
+          download: true,
+        },
+      },
     ];
   };
   /**
@@ -244,6 +255,7 @@ class AllActions extends React.Component {
       d.is_global ? "Template" : d.community && d.community.name,
       { isLive: d.is_published, item: d },
       d.id,
+      d.is_published ? "Yes" : "No",
     ]);
     return fashioned;
   };
@@ -255,12 +267,12 @@ class AllActions extends React.Component {
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
-    const community =item.community;
+    const community = item.community;
     putInRedux([...data]);
     apiCall("/actions.update", {
       action_id: item.id,
       is_published: !status,
-      community_id: (community && community.id) || null
+      community_id: (community && community.id) || null,
     });
   }
 
