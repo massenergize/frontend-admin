@@ -62,6 +62,7 @@ class AllEvents extends React.Component {
       d.is_global ? "Template" : d.community && d.community.name,
       { isLive: d.is_published, item: d },
       d.id,
+      d.is_published ? "Yes" : "No",
     ]);
     return fashioned;
   };
@@ -138,6 +139,7 @@ class AllEvents extends React.Component {
         key: "is_live",
         options: {
           filter: false,
+          download: false,
           customBodyRender: (d) => {
             return (
               <MEChip
@@ -190,6 +192,16 @@ class AllEvents extends React.Component {
           ),
         },
       },
+      {
+        name: "Live",
+        key: "hidden_live_or_not",
+        options: {
+          display: false,
+          filter: true,
+          searchable: false,
+          download:true
+        },
+      },
     ];
   };
 
@@ -201,7 +213,7 @@ class AllEvents extends React.Component {
     item.is_published = !status;
     data.splice(index, 1, item);
     putInRedux([...data]);
-    const community =item.community;
+    const community = item.community;
     apiCall("/events.update", {
       event_id: item.id,
       is_published: !status,
