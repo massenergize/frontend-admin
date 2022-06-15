@@ -62,6 +62,7 @@ class AllTestimonials extends React.Component {
       smartString(d.user ? d.user.full_name : "", 20), // limit to first 20 chars
       smartString((d.action && d.action.title) || "", 30),
       d.id,
+      d.is_published ? "Yes": "No"
     ]);
   };
 
@@ -146,6 +147,7 @@ class AllTestimonials extends React.Component {
         key: "is_live",
         options: {
           filter: false,
+          download:false,
           customBodyRender: (d) => {
             return (
               <MEChip
@@ -197,6 +199,16 @@ class AllTestimonials extends React.Component {
           ),
         },
       },
+      {
+        name: "Live",
+        key: "hidden_live_or_not",
+        options: {
+          display: false,
+          filter: true,
+          searchable: false,
+          download:true
+        },
+      }
     ];
   };
 

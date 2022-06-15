@@ -4,6 +4,14 @@
 import moment from "moment";
 import qs from "qs";
 
+export const objArrayToString = (data, func) => {
+  var s = "";
+  (data || []).forEach((d, index) => {
+    if (!s) s += func(d);
+    else s += ", " + func(d);
+  });
+  return s;
+};
 export const makeLimitsFromImageArray = (images) => {
   if (images.length === 1)
     return {
