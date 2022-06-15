@@ -36,11 +36,26 @@ import "./styles/ME Custom/extra.css";
 
 // Import i18n messages
 import { translationMessages } from './i18n';
+import { IS_CANARY, IS_PROD } from './config/constants';
+
+import * as Sentry from "@sentry/react";
+import { BrowserTracing } from "@sentry/tracing";
+
+const SENTRY_DSN =
+  IS_PROD || IS_CANARY
+    ? "https://24efee7f2801430c99913cd39a99259b@o415460.ingest.sentry.io/5306644"
+    : "https://f2e6d5eedbc744ff821b6a98f73914ef@o415460.ingest.sentry.io/5306645";
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  integrations: [new BrowserTracing()],
+});
 
 // Create redux store with history
 const initialState = {};
 const store = configureStore(initialState, history);
 const MOUNT_NODE = document.getElementById('app');
+
 
 const render = messages => {
   ReactDOM.render(
