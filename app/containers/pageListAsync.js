@@ -2,6 +2,12 @@ import React from "react";
 import Loading from "dan-components/Loading";
 import loadable from "../utils/loadable";
 
+export const Settings = loadable(
+  () => import("./MassEnergizeSuperAdmin/Settings/Settings"),
+  {
+    fallback: <Loading />,
+  }
+);
 export const AddToGallery = loadable(
   () => import("./MassEnergizeSuperAdmin/Gallery/AddToGallery"),
   {

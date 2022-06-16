@@ -120,7 +120,6 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       tasksFunctions,
       tasks,
     ] = response;
-    
     dispatch(reduxLoadAllCommunities(communities.data));
     dispatch(loadAllActions(actions.data));
     dispatch(loadAllEvents(events.data));
