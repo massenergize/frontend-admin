@@ -50,6 +50,8 @@ class AllUsers extends React.Component {
         ? "Super Admin"
         : d.is_community_admin
         ? "Community Admin"
+        : d.is_guest
+        ? "Guest"
         : "Member",
       d.id,
     ]);
