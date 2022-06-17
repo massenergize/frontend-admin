@@ -51,7 +51,6 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
   if (!auth) return;
   const isSuperAdmin = auth && auth.is_super_admin;
   Promise.all([
-    apiCall("/settings.list"),
     apiCall(
       isSuperAdmin
         ? "/communities.listForSuperAdmin"
@@ -103,9 +102,9 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     }),
     apiCall(isSuperAdmin ? "/tasks.functions.list" : "/tasks.functions.list"),
     apiCall(isSuperAdmin ? "/tasks.list" : "/tasks.list"),
+    apiCall("/settings.list"),
   ]).then((response) => {
     const [
-      settings,
       communities,
       actions,
       events,
@@ -121,6 +120,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       galleryImages,
       tasksFunctions,
       tasks,
+      settings,
     ] = response;
     dispatch(reduxLoadAllCommunities(communities.data));
     dispatch(loadAllActions(actions.data));
