@@ -121,18 +121,28 @@ const RenderCheckboxes = ({
   auth,
   communities,
 }) => {
-  const list = auth.is_super_admin ? communities : auth.admin_at;
-  if (expectedDataSource === LIST_OF_COMMUNITIES)
-    values = (list || []).map((community) => [community.id, community]);
-  // If items are more than 10, make the checkboxes into a dropdown
+  var list, labelExt, valueExt;
+  if (expectedDataSource === LIST_OF_COMMUNITIES) {
+    list = auth.is_super_admin ? communities : auth.admin_at;
+    list = (list || []).map((community) => [
+      community.id.toString(),
+      community,
+    ]);
+    list = [["all", { id: "all", name: "All" }], ...list];
+    console.log("The list bruhv", list);
+    labelExt = ([_, com]) => com.name;
+    valueExt = ([id, _]) => id;
+  } else {
+    list = values;
+    labelExt = ([_, val]) => val;
+    valueExt = ([key]) => key;
+  }
+  // If items are more than 10, change the checkboxes into a dropdown
   if (list.length > 10) {
-    //In future we can modifiy the labelExt, and valueExt depending on the "expectedDataSource" when we have more "list-like" value types to cater for in settings
-    const labelExt = (com) => com.name;
-    const valueExt = (com) => com.id;
     return (
       <MEDropdown
         multiple
-        data={[{ id: "all", name: "All" }, ...communities]}
+        data={list}
         labelExtractor={labelExt}
         valueExtractor={valueExt}
       />
