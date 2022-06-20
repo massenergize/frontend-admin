@@ -10,8 +10,10 @@ function MEDropdown({
   multiple,
   data,
   placeholder,
+  defaultValue,
+  value,
 }) {
-  const [selected, setSelected] = useState([]);
+  const [selected, setSelected] = useState(defaultValue || value || []);
   const valueOf = (item) => {
     if (!item) return;
     if (valueExtractor) return valueExtractor(item);

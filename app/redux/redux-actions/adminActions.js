@@ -41,7 +41,6 @@ export const testRedux = (value) => {
   return { type: TEST_REDUX, payload: value };
 };
 export const loadSettings = (data = {}) => {
-  console.log("This is the data bruh", data);
   return {
     type: LOAD_SETTINGS,
     payload: data,

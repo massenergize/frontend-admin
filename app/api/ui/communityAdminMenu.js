@@ -205,6 +205,6 @@ module.exports = [
     key: "settings",
     name: "Settings",
     icon: "md-cog",
-    link: "/admin/settings/"
+    link: "/admin/profile/settings"
   },
 ];

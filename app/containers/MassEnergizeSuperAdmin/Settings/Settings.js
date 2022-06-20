@@ -16,21 +16,66 @@ import styles from "dan-components/SocialMedia/jss/cover-jss";
 import { connect } from "react-redux";
 import Loading from "dan-components/Loading";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
+import { bindActionCreators } from "redux";
+import {
+  loadSettings,
+  reduxLoadAuthAdmin,
+} from "../../../redux/redux-actions/adminActions";
+import { apiCall } from "../../../utils/messenger";
 
 const CHECKBOX = "checkbox";
 const LIST_OF_COMMUNITIES = "list-of-communities";
-function Settings({ settings, auth, communities }) {
-  const [currentTab, setCurrentTab] = useState(0); // an integer
+
+function Settings({ settings, auth, communities, updateAdminObject }) {
+  const [currentTab, setCurrentTab] = useState(0);
+  const adminNudgeSettings =
+    (auth.preferences || {}).admin_nudge_settings || {};
+
   if (!settings) return <Loading />;
-  const settingsCategories = Object.entries(settings);
+
+  const settingsCategories = Object.entries(settings).filter(
+    ([_, { live }]) => live
+  );
   const [categoryKey, { name, options }] = settingsCategories[currentTab];
   const optionsArray = Object.entries(options);
+  var optionInUserSettings = adminNudgeSettings[categoryKey] || {};
+
+  const updateSettings = (data) => {
+    var newSettings = {
+      ...adminNudgeSettings,
+      [categoryKey]: data,
+    };
+    newSettings = {
+      ...(auth.preferences || {}),
+      admin_nudge_settings: newSettings,
+    };
+    updateAdminObject({
+      ...auth,
+      preferences: newSettings,
+    });
+    sendUpdatesToBackend(newSettings);
+  };
+
+  const sendUpdatesToBackend = (newSettings) => {
+    apiCall("/users.update", {
+      preferences: JSON.stringify(newSettings),
+      id: auth.id,
+    })
+      .then((response) => {
+        if (!response.success)
+          return console.log("Error updating user settings: ", response.error);
+      })
+      .catch((e) =>
+        console.log("Error updating user settings: ", response.error)
+      );
+  };
+
   return (
     <div>
       <Paper>
         {" "}
         <Typography variant="p" style={{ padding: 20, margin: 20 }}>
-          Use the toggles provided to customise the application in a way that
+          Use the toggles provided to customise the application in any way that
           bests suits you.
         </Typography>
         <Tabs
@@ -41,15 +86,19 @@ function Settings({ settings, auth, communities }) {
           textColor="primary"
           centered
         >
+
           {settingsCategories.map(([key, { name }]) => (
             <Tab label={name || "..."} key={key} />
           ))}
         </Tabs>
       </Paper>
       <Paper style={{ marginTop: 10, padding: 40 }}>
+        {/* ---------------- SETTINGS OPTION DISPLAY LEVEL --------------- */}
         {optionsArray.map(
           ([optionKey, { live, text, type, values, expected_data_source }]) => {
-            // if (!live) return <></>;
+            const availableOptionsForCurrentLevel =
+              (optionInUserSettings || {})[optionKey] || {};
+            if (!live) return <></>;
             const usesCheckboxes = type === CHECKBOX;
             values = Object.entries(values);
             return (
@@ -63,22 +112,30 @@ function Settings({ settings, auth, communities }) {
                     expectedDataSource={expected_data_source}
                     auth={auth}
                     communities={communities}
+                    selectedItemsFromUserObj={availableOptionsForCurrentLevel}
+                    userSettings={adminNudgeSettings}
+                    updateSettings={(data) =>
+                      updateSettings({
+                        ...optionInUserSettings,
+                        [optionKey]: data,
+                      })
+                    }
                   />
                 ) : (
-                  <RenderRadioButtons values={values} auth={auth} />
+                  <RenderRadioButtons
+                    values={values}
+                    auth={auth}
+                    selectedItemsFromUserObj={availableOptionsForCurrentLevel}
+                    userSettings={adminNudgeSettings}
+                    optionLevelKey={optionKey}
+                    updateSettings={(data) =>
+                      updateSettings({
+                        ...optionInUserSettings,
+                        [optionKey]: data,
+                      })
+                    }
+                  />
                 )}
-                {/* <RadioGroup>
-                {values.map(([valueKey, answer]) => {
-                  return (
-                    <FormControlLabel
-                      key={valueKey}
-                      control={<Radio />}
-                      label={answer.name}
-                      value={answer.value}
-                    />
-                  );
-                })}
-              </RadioGroup> */}
               </div>
             );
           }
@@ -95,19 +152,43 @@ const mapStateToProps = (state) => {
     communities: state.getIn(["communities"]),
   };
 };
-const Mapped = connect(mapStateToProps)(Settings);
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    { updateAdminObject: reduxLoadAuthAdmin },
+    dispatch
+  );
+};
+const Mapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Settings);
 export default withStyles(styles)(Mapped);
 
-const RenderRadioButtons = ({ values }) => {
+// -------- DISPLAY LEVEL FOR POSSIBLE CHOICES FOR EACH SETTING ---------
+const RenderRadioButtons = ({
+  values,
+  selectedItemsFromUserObj,
+  updateSettings,
+  optionLevelKey,
+}) => {
+  // console.log("CURRENT ON LEVEL", selectedItemsFromUserObj);
   return (
     <RadioGroup>
       {values.map(([valueKey, answer]) => {
+        const valueFromUserSettings =
+          (selectedItemsFromUserObj || {})[valueKey] || {};
+        const checked = valueFromUserSettings.value || answer.value;
+
         return (
           <FormControlLabel
+            onClick={() =>
+              updateSettings({
+                [valueKey]: { value: !checked },
+              })
+            }
             key={valueKey}
-            control={<Radio />}
+            control={<Radio checked={checked} />}
             label={answer.name}
-            value={answer.value}
           />
         );
       })}
@@ -120,16 +201,23 @@ const RenderCheckboxes = ({
   expectedDataSource,
   auth,
   communities,
+  selectedItemsFromUserObj,
+  updateSettings,
 }) => {
-  var list, labelExt, valueExt;
+  var list,
+    labelExt,
+    valueExt,
+    selected = [];
+
   if (expectedDataSource === LIST_OF_COMMUNITIES) {
     list = auth.is_super_admin ? communities : auth.admin_at;
-    list = (list || []).map((community) => [
-      community.id.toString(),
-      community,
-    ]);
+    list = (list || []).map((community) => {
+      const id = community.id.toString();
+      const isCheckedByUser = selectedItemsFromUserObj[id];
+      if (isCheckedByUser && isCheckedByUser.value === true) selected.push(id);
+      return [community.id.toString(), community];
+    });
     list = [["all", { id: "all", name: "All" }], ...list];
-    console.log("The list bruhv", list);
     labelExt = ([_, com]) => com.name;
     valueExt = ([id, _]) => id;
   } else {
@@ -137,6 +225,13 @@ const RenderCheckboxes = ({
     labelExt = ([_, val]) => val;
     valueExt = ([key]) => key;
   }
+
+  const dropdownOnChange = (items) => {
+    if (!items || !items.length) return updateSettings({});
+    items = (items || []).map((it) => [it, { value: true }]);
+    items = Object.fromEntries(items);
+    updateSettings(items);
+  };
   // If items are more than 10, change the checkboxes into a dropdown
   if (list.length > 10) {
     return (
@@ -145,18 +240,29 @@ const RenderCheckboxes = ({
         data={list}
         labelExtractor={labelExt}
         valueExtractor={valueExt}
+        defaultValue={selected}
+        onItemSelected={dropdownOnChange}
       />
     );
   }
+
   return (
     <RadioGroup>
       {values.map(([valueKey, answer]) => {
+        const valueFromUserSettings =
+          (selectedItemsFromUserObj || {})[valueKey] || {};
+        const checked = valueFromUserSettings.value || answer.value;
         return (
           <FormControlLabel
+            onClick={() =>
+              updateSettings({
+                ...selectedItemsFromUserObj,
+                [valueKey]: { value: !checked },
+              })
+            }
             key={valueKey}
-            control={<Checkbox />}
+            control={<Checkbox checked={checked} />}
             label={answer.name}
-            value={answer.value}
           />
         );
       })}
