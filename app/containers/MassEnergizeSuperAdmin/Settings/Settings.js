@@ -17,10 +17,7 @@ import { connect } from "react-redux";
 import Loading from "dan-components/Loading";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import { bindActionCreators } from "redux";
-import {
-  loadSettings,
-  reduxLoadAuthAdmin,
-} from "../../../redux/redux-actions/adminActions";
+import { reduxLoadAuthAdmin } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
 
 const CHECKBOX = "checkbox";
@@ -28,15 +25,16 @@ const LIST_OF_COMMUNITIES = "list-of-communities";
 
 function Settings({ settings, auth, communities, updateAdminObject }) {
   const [currentTab, setCurrentTab] = useState(0);
+
   const adminNudgeSettings =
-    (auth.preferences || {}).admin_nudge_settings || {};
+    ((auth && auth.preferences) || {}).admin_portal_settings || {};
 
   if (!settings) return <Loading />;
 
   const settingsCategories = Object.entries(settings).filter(
     ([_, { live }]) => live
   );
-  const [categoryKey, { name, options }] = settingsCategories[currentTab];
+  const [categoryKey, { options }] = settingsCategories[currentTab];
   const optionsArray = Object.entries(options);
   var optionInUserSettings = adminNudgeSettings[categoryKey] || {};
 
@@ -47,7 +45,7 @@ function Settings({ settings, auth, communities, updateAdminObject }) {
     };
     newSettings = {
       ...(auth.preferences || {}),
-      admin_nudge_settings: newSettings,
+      admin_portal_settings: newSettings,
     };
     updateAdminObject({
       ...auth,
@@ -66,7 +64,7 @@ function Settings({ settings, auth, communities, updateAdminObject }) {
           return console.log("Error updating user settings: ", response.error);
       })
       .catch((e) =>
-        console.log("Error updating user settings: ", response.error)
+        console.log("Error updating admin settings: ", e.toString())
       );
   };
 
@@ -86,7 +84,6 @@ function Settings({ settings, auth, communities, updateAdminObject }) {
           textColor="primary"
           centered
         >
-
           {settingsCategories.map(([key, { name }]) => (
             <Tab label={name || "..."} key={key} />
           ))}
@@ -171,7 +168,6 @@ const RenderRadioButtons = ({
   updateSettings,
   optionLevelKey,
 }) => {
-  // console.log("CURRENT ON LEVEL", selectedItemsFromUserObj);
   return (
     <RadioGroup>
       {values.map(([valueKey, answer]) => {

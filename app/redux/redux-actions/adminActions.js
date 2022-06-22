@@ -136,7 +136,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
     dispatch(loadTaskFunctionsAction(tasksFunctions.data));
     dispatch(loadTasksAction(tasks.data));
-    dispatch(loadSettings(settings.data));
+    dispatch(loadSettings(settings.data ||{}));
   });
 };
 
