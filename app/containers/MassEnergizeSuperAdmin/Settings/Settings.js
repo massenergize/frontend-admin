@@ -71,8 +71,8 @@ function Settings({ settings, auth, communities, updateAdminObject }) {
   return (
     <div>
       <Paper>
-        {" "}
-        <Typography variant="p" style={{ padding: 20, margin: 20 }}>
+        {/*  TODO: The text here is just a placeholder. Text description from Kaat or Brad will be used here... */}
+        <Typography variant="body1" style={{ padding: 20, margin: 20 }}>
           Use the toggles provided to customise the application in any way that
           bests suits you.
         </Typography>
