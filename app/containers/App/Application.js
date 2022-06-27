@@ -93,11 +93,13 @@ class Application extends React.Component {
   componentDidMount() {
     this.props.fetchInitialContent(this.props.auth);
     setInterval(() => {
-      const expirationTime = localStorage.getItem(TIME_UNTIL_EXPIRATION) || 0;
+      const expirationTime = Number(
+        localStorage.getItem(TIME_UNTIL_EXPIRATION) || 0
+      );
       const currentDateTime = Date.now();
       const itsPassedADaySinceLogin = currentDateTime > expirationTime;
       if (itsPassedADaySinceLogin) this.runAdminStatusCheck();
-    }, THREE_MINUTES);
+    }, 2000||THREE_MINUTES);
   }
 
   getCommunityList() {
