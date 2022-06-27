@@ -109,7 +109,7 @@ class Application extends React.Component {
   async runAdminStatusCheck() {
     try {
       const response = await apiCall("/auth.whoami");
-      if (response.success) return
+      if (response.success) return;
 
       if (response.error === PERMISSION_DENIED)
         return (window.location = "/login");
