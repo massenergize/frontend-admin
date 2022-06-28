@@ -2,6 +2,11 @@
   --app-cyan: #579ece;
 }
 
+.not-approved { 
+  width:110px; 
+  background: #bf0e0e !important; 
+  color:white !important; 
+}
 .preview-content {
   margin-left: 30px;
 }
