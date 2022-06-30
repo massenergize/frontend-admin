@@ -504,6 +504,9 @@ class MassEnergizeForm extends Component {
     const files = []; //field.value !== 'None' ? [field.value] : [];
 
     switch (field.fieldType) {
+      case FieldTypes.Button:
+        return (<button key={field.name} type="button" onClick={field.onClick}>{field.label}</button>);
+      
       case FieldTypes.Checkbox:
         if (field.data) {
           return (

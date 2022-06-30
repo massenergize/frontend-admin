@@ -8,6 +8,7 @@ import { connect } from "react-redux";
 import { checkIfReadOnly, makeTagSection } from "./EditActionForm";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
 import fieldTypes from "../_FormGenerator/fieldTypes";
+import useDrivePicker from 'react-google-drive-picker';
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -42,6 +43,29 @@ class CreateNewActionForm extends Component {
       formJson: null,
     };
   }
+
+//   importDoc() {
+//     console.log("in importDoc");
+    
+//     const [openPicker, data, authResponse] = useDrivePicker();
+//     openPicker({
+//       developerKey: "AIzaSyDIYBEGFnV4CFKQlTJH_1s5Q3hsymg47Kw", //just an API key
+//       viewId: "DOCS",
+//       showUploadView: true,
+//       showUploadFolders: true,
+//       supportDrives: true,
+//       multiselect: true,
+//       callbackFunction: (data) => {
+//         if (data.action === 'cancel') {
+//           clientId: "380900231684-tlj3p0j9polj7n0jni9rqu87o0c18at1.apps.googleusercontent.com", // web app client id
+//           console.log('User clicked cancel/close button');
+//           return;
+//         }
+//         console.log(data);
+//         // data["docs"][0]["id"] holds the document ID which should be passed to the backend
+//       }
+//     });
+//   }
 
   static getDerivedStateFromProps(props, state) {
     const { communities, tags, vendors, ccActions, auth } = props;
@@ -119,7 +143,7 @@ const mapStateToProps = (state) => ({
 const NewActionMapped = connect(mapStateToProps)(CreateNewActionForm);
 export default withStyles(styles, { withTheme: true })(NewActionMapped);
 
-const createFormJson = ({ communities, ccActions, vendors, auth }) => {
+const createFormJson = ({ communities, ccActions, vendors, auth, }) => {
   const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Create a New Action",
@@ -127,6 +151,33 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
     method: "/actions.create",
     successRedirectPage: "/admin/read/actions",
     fields: [
+      {
+        name: "import",
+        label: "Import Action",
+        fieldType: "Button",
+        onClick: () => {
+            console.log("in importDoc");
+    
+            const [openPicker, data, authResponse] = useDrivePicker();
+            openPicker({
+              developerKey: "AIzaSyDIYBEGFnV4CFKQlTJH_1s5Q3hsymg47Kw", //just an API key
+              viewId: "DOCS",
+              showUploadView: true,
+              showUploadFolders: true,
+              supportDrives: true,
+              multiselect: true,
+              callbackFunction: (data) => {
+                if (data.action === 'cancel') {
+                  clientId: "380900231684-tlj3p0j9polj7n0jni9rqu87o0c18at1.apps.googleusercontent.com", // web app client id
+                  console.log('User clicked cancel/close button');
+                  return;
+                }
+                console.log(data);
+                // data["docs"][0]["id"] holds the document ID which should be passed to the backend
+              }
+            });            
+        },
+      },
       {
         label: "About this Action",
         fieldType: "Section",

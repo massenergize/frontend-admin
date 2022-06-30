@@ -159,6 +159,7 @@
     "react-draft-wysiwyg": "^1.14.7",
     "react-dropzone": "^4.3.0",
     "react-event-listener": "^0.6.6",
+    "react-google-drive-picker": "^1.2.0",
     "react-google-maps": "^9.4.5",
     "react-helmet": "6.0.0-beta",
     "react-image-crop": "^8.6.12",
