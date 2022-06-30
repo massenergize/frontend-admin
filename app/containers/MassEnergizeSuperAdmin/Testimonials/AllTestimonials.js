@@ -77,6 +77,15 @@ class AllTestimonials extends React.Component {
     }
   };
 
+  updateTestimonials = (data) => {
+    let allTestimonials =this.props.allTestimonials || [];
+    const index = allTestimonials.findIndex((a) => a.id === data.id);
+    const updateItems =allTestimonials.filter((a)=> a.id !== data.id);
+    updateItems.splice(index, 0, data);
+    this.props.putTestimonialsInRedux(updateItems);
+  }
+
+
   getColumns = () => {
     const { classes } = this.props;
     return [
@@ -117,13 +126,18 @@ class AllTestimonials extends React.Component {
                 name="rank"
                 variant="outlined"
                 onChange={async (event) => {
-                  const { target } = event;
+                  const { target, key } = event;
                   if (!target) return;
                   const { name, value } = target;
                   await apiCall("/testimonials.rank", {
                     testimonial_id: d && d.id,
                     [name]: value,
-                  });
+                  }).then((res) => {
+                    if (res && res.success) {
+                       this.updateTestimonials(res && res.data)
+                    }
+
+                  })
                 }}
                 label="Rank"
                 InputLabelProps={{
