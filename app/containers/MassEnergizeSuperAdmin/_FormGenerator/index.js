@@ -34,6 +34,7 @@ import Modal from "./Modal";
 import Loading from "dan-components/Loading";
 import IconDialog from "../ME  Tools/icon dialog/IconDialog";
 import FormMediaLibraryImplementation from "./FormMediaLibraryImplementation";
+import ImportButton from "../Actions/ImportButton.js"
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 const styles = (theme) => ({
@@ -81,6 +82,7 @@ class MassEnergizeForm extends Component {
       error: null,
       formJson: null,
       readOnly: false,
+      gDocsData: {},
       // activeModal: null,
       // activeModalTitle: null,
     };
@@ -504,8 +506,10 @@ class MassEnergizeForm extends Component {
     const files = []; //field.value !== 'None' ? [field.value] : [];
 
     switch (field.fieldType) {
-      case FieldTypes.Button:
-        return (<button key={field.name} type="button" onClick={field.onClick}>{field.label}</button>);
+      case FieldTypes.ImportButton:
+        return (<ImportButton type="Action" onGetDocData={(fields) => {
+            this.setState({gDocsData: fields});
+        }} />);
       
       case FieldTypes.Checkbox:
         if (field.data) {

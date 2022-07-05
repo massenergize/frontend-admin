@@ -10,5 +10,5 @@ export default {
   Section: 'Section',
   Paragraph:'Paragraph',
   MediaLibrary: "media-library",
-  Button: "Button",
+  ImportButton: "ImportButton",
 };
