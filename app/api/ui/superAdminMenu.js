@@ -304,6 +304,18 @@ module.exports = [
     key: "settings",
     name: "Settings",
     icon: "md-cog",
-    link: "/admin/profile/settings"
+    child: [ 
+      {
+        key:"settings-page",
+        link: "/admin/profile/settings",
+        name:"Settings"
+      },
+      {
+        key: "feature-flags",
+        link: "/admin/settings/feature-flags",
+        name:"Feature Flags"
+      },
+    ]
+   
   },
 ];

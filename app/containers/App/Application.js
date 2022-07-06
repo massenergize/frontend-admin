@@ -68,6 +68,7 @@ import {
   AddTask,
   ListTasks,
   Settings,
+  FeatureFlags,
 } from "../pageListAsync";
 import EditVendor from "../MassEnergizeSuperAdmin/Vendors/EditVendor";
 import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
@@ -213,6 +214,7 @@ class Application extends React.Component {
 
           <Route exact path="/blank" component={BlankPage} />
           <Route exact path="/admin/profile/settings" component={Settings} />
+          <Route exact path="/admin/settings/feature-flags" component={FeatureFlags} />
           <Route path="/admin/read/users" component={UsersList} />
           <Route
             path="/admin/read/community-admin-messages"
