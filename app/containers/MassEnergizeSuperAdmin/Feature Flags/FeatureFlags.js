@@ -5,18 +5,20 @@ import styles from "../../../components/Widget/widget-jss";
 import AddOrEditFeatureFlags from "./AddOrEditFeatureFlags";
 import ManageFeatureFlags from "./ManageFeatureFlags";
 
-function FeatureFlags({ classes }) {
-  const [currentTab, setCurrentTab] = useState(0);
+function FeatureFlags({ classes, featureFlags, communities }) {
+  const [currentTab, setCurrentTab] = useState(1);
   const TABS = {
     0: {
       key: "manage-flags",
       name: "Manage Feature Flags",
-      component: <ManageFeatureFlags classes={classes} />,
+      component: <ManageFeatureFlags classes={classes} flags={featureFlags} />,
     },
     1: {
       key: "add-new-flag",
       name: "New Feature Flag",
-      component: <AddOrEditFeatureFlags classes={classes} />,
+      component: (
+        <AddOrEditFeatureFlags classes={classes} communities={communities} />
+      ),
     },
   };
   const tab = TABS[currentTab];
@@ -50,7 +52,10 @@ function FeatureFlags({ classes }) {
   );
 }
 const mapStateToProps = (state) => {
-  return {};
+  return {
+    featureFlags: state.getIn(["featureFlags"]),
+    communities: state.getIn(["communities"]),
+  };
 };
 const Mapped = connect(mapStateToProps)(FeatureFlags);
 export default withStyles(styles)(Mapped);

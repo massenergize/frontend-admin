@@ -31,6 +31,7 @@ import {
   LOAD_ALL_TASK_FUNCTIONS,
   LOAD_ALL_TASKS,
   LOAD_SETTINGS,
+  LOAD_FEATURE_FLAGS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -58,6 +59,14 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+export const reducerForFeatureFlags = (state = null, action = {}) => {
+  switch (action.type) {
+    case LOAD_FEATURE_FLAGS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForSettings = (state = null, action = {}) => {
   switch (action.type) {
     case LOAD_SETTINGS:
