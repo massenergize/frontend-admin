@@ -986,7 +986,7 @@ class MassEnergizeForm extends Component {
     const toRender = field.conditionalDisplays.filter(
       (f) => this.getValue(field.name) === f.valueToCheck
     )[0];
-    if (toRender && toRender.fields) this.renderFields(toRender.fields);
+    if (toRender && toRender.fields) return this.renderFields(toRender.fields);
   };
 
   /**
