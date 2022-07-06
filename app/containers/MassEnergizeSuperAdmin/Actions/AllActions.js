@@ -63,6 +63,14 @@ class AllActions extends React.Component {
     });
   }
 
+  updateRedux = (data) => {
+    const { putActionsInRedux, allActions } = this.props;
+    const index = allActions.findIndex((a) => a.id === data.id);
+    const updateItems = allActions.filter((a) => a.id !== data.id);
+    updateItems.splice(index, 0, data);
+    putActionsInRedux(updateItems);
+  }
+
   changeActions = async (id) => {
     const { allActions } = this.state;
     const newData = allActions.filter(
@@ -131,6 +139,10 @@ class AllActions extends React.Component {
                       await apiCall("/actions.rank", {
                         action_id: d && d.id,
                         [name]: value,
+                      }).then((res) => {
+                        if (res && res.success) {
+                          this.updateRedux(res && res.data);
+                        }
                       });
                     }
                   }}
