@@ -82,7 +82,6 @@ class MassEnergizeForm extends Component {
       error: null,
       formJson: null,
       readOnly: false,
-      gDocsData: {},
       // activeModal: null,
       // activeModalTitle: null,
     };
@@ -508,7 +507,12 @@ class MassEnergizeForm extends Component {
     switch (field.fieldType) {
       case FieldTypes.ImportButton:
         return (<ImportButton type="Action" onGetDocData={(fields) => {
-            this.setState({gDocsData: fields});
+            console.log(fields);
+            console.log(this.state.formData);
+            // this.setState({formData: {...this.state.formData, ...fields}});
+            this.setState({formData: {...this.state.formData, 'title': fields['title']}});
+
+            console.log(this.state.formData);
         }} />);
       
       case FieldTypes.Checkbox:
