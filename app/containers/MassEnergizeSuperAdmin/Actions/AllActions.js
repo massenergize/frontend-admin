@@ -9,6 +9,7 @@ import { withStyles } from "@material-ui/core/styles";
 import MUIDataTable from "mui-datatables";
 import FileCopy from "@material-ui/icons/FileCopy";
 import EditIcon from "@material-ui/icons/Edit";
+// import DownloadIcon from '@material-ui/icons/Download';
 import { Link, withRouter } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
 import TextField from "@material-ui/core/TextField";
@@ -70,6 +71,11 @@ class AllActions extends React.Component {
     );
     await this.setStateAsync({ data: fashionData(newData) });
   };
+
+  exportAction = async (id) => {
+    console.log("exporting!", id);
+    await apiCall("actions.export", {id: id});
+  }
 
   getColumns = () => {
     const { classes, putActionsInRedux, allActions } = this.props;
@@ -219,6 +225,7 @@ class AllActions extends React.Component {
               >
                 <FileCopy size="small" variant="outlined" color="secondary" />
               </Link>
+              <FileCopy color="secondary" onClick={() => {this.exportAction(id)}}/>
             </div>
           ),
         },
