@@ -1,25 +1,27 @@
-import { keyBy } from "lodash";
 import React from "react";
 import MassEnergizeForm from "../_FormGenerator";
 import fieldTypes from "../_FormGenerator/fieldTypes";
+import Loading from "dan-components/Loading";
 
 function AddOrEditFeatureFlags({ classes, communities, flagKeys }) {
+  if (!flagKeys || !flagKeys.audience) return <Loading />;
   const formJson = createFormJson({ communities, flagKeys });
   return <MassEnergizeForm formJson={formJson} />;
 }
 
 var createFormJson = ({ communities, flagKeys }) => {
-  const audienceKeys = flagKeys.audience;
+  const audienceKeys = flagKeys.audience || {};
   const audienceKeysArr = Object.entries(flagKeys.audience || {});
   communities = (communities || []).map((com) => ({
     displayName: com.name,
     id: com.id,
+    value: com.id,
   }));
-  const scopeArr = Object.entries(flagKeys.scope);
+  const scopeArr = Object.entries(flagKeys.scope || {});
   const json = {
     title: "Add a new feature flag",
     subTitle: "",
-    // method: "/actions.create",
+    method: "/featureFlags.add",
     // successRedirectPage: "/admin/read/actions",
     fields: [
       {
@@ -63,11 +65,11 @@ var createFormJson = ({ communities, flagKeys }) => {
             disabled: true,
           },
           {
-            name: "target",
+            name: "scope",
             label: "Which platform is this feature related to? ",
             fieldType: fieldTypes.Checkbox,
             isRequired: true,
-            dbName: "target",
+            dbName: "scope",
             readOnly: false,
             data: scopeArr.map(([_, { name, key }]) => ({
               id: key,
@@ -103,10 +105,12 @@ var createFormJson = ({ communities, flagKeys }) => {
                     label:
                       "Select all communities that should have this feature activated",
                     placeholder: "eg. Wayland",
-                    fieldType: fieldTypes.Dropdown,
-                    defaultValue: null,
+                    fieldType: fieldTypes.Checkbox,
+                    selectMany: true,
+                    contentType: "text",
+                    defaultValue: [],
                     dbName: "community_ids",
-                    data: [{ displayName: "--", id: "" }, ...communities],
+                    data: communities,
                   },
                 ],
               },
@@ -118,10 +122,12 @@ var createFormJson = ({ communities, flagKeys }) => {
                     label:
                       "Select all communities that should NOT have this feature",
                     placeholder: "eg. Wayland",
-                    fieldType: fieldTypes.Dropdown,
-                    defaultValue: null,
+                    fieldType: fieldTypes.Checkbox,
+                    selectMany: true,
+                    contentType: "text",
+                    defaultValue: [],
                     dbName: "community_ids",
-                    data: [{ displayName: "--", id: "" }, ...communities],
+                    data:communities,
                   },
                 ],
               },
@@ -155,9 +161,11 @@ var createFormJson = ({ communities, flagKeys }) => {
                     label:
                       "Select all users that should have this feature activated",
                     placeholder: "eg. Wayland",
-                    fieldType: fieldTypes.Dropdown,
-                    defaultValue: null,
-                    dbName: "community_ids",
+                    fieldType: fieldTypes.Checkbox,
+                    selectMany: true,
+                    defaultValue: [],
+                    contentType: "text",
+                    dbName: "user_ids",
                     data: [{ displayName: "--", id: "" }, ...communities],
                   },
                 ],
@@ -167,11 +175,15 @@ var createFormJson = ({ communities, flagKeys }) => {
                 fields: [
                   {
                     name: "community",
+
                     label: "Select all users that should NOT have this feature",
                     placeholder: "eg. Wayland",
-                    fieldType: fieldTypes.Dropdown,
-                    defaultValue: null,
-                    dbName: "community_ids",
+                    fieldType: fieldTypes.Checkbox,
+                    selectMany: true,
+                    contentType: "text",
+
+                    defaultValue: [],
+                    dbName: "user_ids",
                     data: [{ displayName: "--", id: "" }, ...communities],
                   },
                 ],
