@@ -36,17 +36,60 @@ var createFormJson = ({ communities }) => {
           },
 
           {
-            name: "everyone",
+            name: "notes",
+            label: "Briefly describe this feature",
+            placeholder:
+              "Eg. This feature allows guests to use all platform functionalities without....",
+            fieldType: fieldTypes.TextField,
+            contentType: "text",
+            isRequired: true,
+            defaultValue: "",
+            dbName: "notes",
+            readOnly: false,
+          },
+          {
+            name: "key",
+            label: "unique-identifier",
+            fieldType: fieldTypes.TextField,
+            contentType: "text",
+            isRequired: true,
+            defaultValue: "some-unique-identifier",
+            dbName: "notes",
+            readOnly: true,
+            disabled:true
+          },
+          {
+            name: "target",
+            label: "Which platform is this feature related to? ",
+            fieldType: fieldTypes.Checkbox,
+            isRequired: true,
+            dbName: "target",
+            readOnly: false,
+            data: [
+              { id: "user_frontend", displayName: "User Frontend" },
+              { id: "admin_frontend", displayName: "Admin Frontend" },
+              { id: "backend", displayName: "Backend" },
+            ],
+          },
+        ],
+      },
+
+      {
+        label: "Community Audience",
+        fieldType: "Section",
+        children: [
+          {
+            name: "audience",
             label: "Should this feature be available to every community?",
             fieldType: fieldTypes.Radio,
             isRequired: true,
             defaultValue: "true",
-            dbName: "on_for_everyone",
+            dbName: "audience",
             readOnly: false,
             data: [
               { id: "true", value: "Yes" },
               { id: "specific", value: "Only Specific Communities" },
-              { id: "except", value: "Everyone Except" },
+              { id: "except", value: "Every Community Except" },
             ],
             conditionalDisplays: [
               {
@@ -81,47 +124,62 @@ var createFormJson = ({ communities }) => {
               },
             ],
           },
-
+        ],
+      },
+      // -------------------------------------
+      {
+        label: "User Audience",
+        fieldType: "Section",
+        children: [
           {
-            name: "description",
-            label: "Briefly describe this feature",
-            placeholder:
-              "Eg. This feature allows guests to use all platform functionalities without....",
-            fieldType: fieldTypes.TextField,
-            contentType: "text",
+            name: "user_audience",
+            label: "Should this feature be available to every user?",
+            fieldType: fieldTypes.Radio,
             isRequired: true,
-            defaultValue: "",
-            dbName: "description",
-            readOnly: false,
-          },
-          {
-            name: "target",
-            label: "Which platform is this feature related to? ",
-            fieldType: fieldTypes.Checkbox,
-            isRequired: true,
-            dbName: "target",
+            defaultValue: "true",
+            dbName: "user_audience",
             readOnly: false,
             data: [
-              { id: "user_frontend", displayName: "User Frontend" },
-              { id: "admin_frontend", displayName: "Admin Frontend" },
-              { id: "backend", displayName: "Backend" },
+              { id: "true", value: "Yes" },
+              { id: "specific", value: "Only Specific Users" },
+              { id: "except", value: "Everyone Except" },
             ],
-          },
-          {
-            name: "notes",
-            label: "Notes (Optional)",
-            placeholder:
-              "Eg. 'Any other information related to this feature...'",
-            fieldType: fieldTypes.TextField,
-            contentType: "text",
-            isRequired: true,
-            defaultValue: "",
-            dbName: "notes",
-            readOnly: false,
-            maxLength: 60,
+            conditionalDisplays: [
+              {
+                valueToCheck: "specific",
+                fields: [
+                  {
+                    name: "community",
+                    label:
+                      "Select all users that should have this feature activated",
+                    placeholder: "eg. Wayland",
+                    fieldType: fieldTypes.Dropdown,
+                    defaultValue: null,
+                    dbName: "community_ids",
+                    data: [{ displayName: "--", id: "" }, ...communities],
+                  },
+                ],
+              },
+              {
+                valueToCheck: "except",
+                fields: [
+                  {
+                    name: "community",
+                    label:
+                      "Select all users that should NOT have this feature",
+                    placeholder: "eg. Wayland",
+                    fieldType: fieldTypes.Dropdown,
+                    defaultValue: null,
+                    dbName: "community_ids",
+                    data: [{ displayName: "--", id: "" }, ...communities],
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
+      // ------------------------------------
       {
         label: "Feature Deactivation",
         fieldType: "Section",
@@ -136,7 +194,6 @@ var createFormJson = ({ communities }) => {
             defaultValue: "",
             dbName: "expires_on",
             readOnly: false,
-            // maxLength: 40,
           },
         ],
       },
