@@ -41,7 +41,7 @@ const styles = (theme) => {
       },
     },
     chips: {
-      margin: "0px 6px",
+      margin: "2px",
     },
   };
 };

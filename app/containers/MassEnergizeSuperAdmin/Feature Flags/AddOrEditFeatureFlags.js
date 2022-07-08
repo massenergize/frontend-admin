@@ -3,13 +3,15 @@ import MassEnergizeForm from "../_FormGenerator";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import Loading from "dan-components/Loading";
 
-function AddOrEditFeatureFlags({ classes, communities, flagKeys }) {
+function AddOrEditFeatureFlags({ classes, communities, flagKeys, users }) {
   if (!flagKeys || !flagKeys.audience) return <Loading />;
-  const formJson = createFormJson({ communities, flagKeys });
+  const formJson = createFormJson({ communities, flagKeys, users });
   return <MassEnergizeForm formJson={formJson} />;
 }
 
-var createFormJson = ({ communities, flagKeys }) => {
+var createFormJson = ({ communities, flagKeys, users }) => {
+  const labelExt = (user) => `${user.preferred_name} - (${user.email})`;
+  const valueExt = (user) => user.id;
   const audienceKeys = flagKeys.audience || {};
   const audienceKeysArr = Object.entries(flagKeys.audience || {});
   communities = (communities || []).map((com) => ({
@@ -110,6 +112,7 @@ var createFormJson = ({ communities, flagKeys }) => {
                     contentType: "text",
                     defaultValue: [],
                     dbName: "community_ids",
+
                     data: communities,
                   },
                 ],
@@ -127,7 +130,7 @@ var createFormJson = ({ communities, flagKeys }) => {
                     contentType: "text",
                     defaultValue: [],
                     dbName: "community_ids",
-                    data:communities,
+                    data: communities,
                   },
                 ],
               },
@@ -157,16 +160,16 @@ var createFormJson = ({ communities, flagKeys }) => {
                 valueToCheck: audienceKeys.SPECIFIC.key,
                 fields: [
                   {
-                    name: "community",
+                    name: "users",
                     label:
                       "Select all users that should have this feature activated",
-                    placeholder: "eg. Wayland",
-                    fieldType: fieldTypes.Checkbox,
-                    selectMany: true,
+                    placeholder: "Search with their username, or email.. Eg. 'Mademoiselle Kaat'",
+                    fieldType: fieldTypes.AutoComplete,
                     defaultValue: [],
-                    contentType: "text",
                     dbName: "user_ids",
-                    data: [{ displayName: "--", id: "" }, ...communities],
+                    data: users || [],
+                    labelExtractor: labelExt,
+                    valueExtractor: valueExt,
                   },
                 ],
               },
@@ -174,17 +177,18 @@ var createFormJson = ({ communities, flagKeys }) => {
                 valueToCheck: audienceKeys.ALL_EXCEPT.key,
                 fields: [
                   {
-                    name: "community",
-
+                    name: "users",
                     label: "Select all users that should NOT have this feature",
-                    placeholder: "eg. Wayland",
-                    fieldType: fieldTypes.Checkbox,
+                    placeholder: "Search with their username, or email.. Eg. 'Monsieur Brad'",
+                    fieldType: fieldTypes.AutoComplete,
                     selectMany: true,
                     contentType: "text",
 
                     defaultValue: [],
                     dbName: "user_ids",
-                    data: [{ displayName: "--", id: "" }, ...communities],
+                    labelExtractor: labelExt,
+                    valueExtractor: valueExt,
+                    data: users || [],
                   },
                 ],
               },

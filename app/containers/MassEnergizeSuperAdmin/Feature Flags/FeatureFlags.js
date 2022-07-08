@@ -5,7 +5,7 @@ import styles from "../../../components/Widget/widget-jss";
 import AddOrEditFeatureFlags from "./AddOrEditFeatureFlags";
 import ManageFeatureFlags from "./ManageFeatureFlags";
 
-function FeatureFlags({ classes, featureFlags, communities }) {
+function FeatureFlags({ classes, featureFlags, communities, users }) {
   const [currentTab, setCurrentTab] = useState(1);
   const TABS = {
     0: {
@@ -26,6 +26,7 @@ function FeatureFlags({ classes, featureFlags, communities }) {
           classes={classes}
           communities={communities}
           flagKeys={(featureFlags && featureFlags.keys) || {}}
+          users = { users}
         />
       ),
     },
@@ -64,6 +65,7 @@ const mapStateToProps = (state) => {
   return {
     featureFlags: state.getIn(["featureFlags"]),
     communities: state.getIn(["communities"]),
+    users: state.getIn(["allUsers"])
   };
 };
 const Mapped = connect(mapStateToProps)(FeatureFlags);
