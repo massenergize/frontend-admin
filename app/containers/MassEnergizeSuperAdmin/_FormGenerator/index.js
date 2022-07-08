@@ -34,6 +34,7 @@ import Modal from "./Modal";
 import Loading from "dan-components/Loading";
 import IconDialog from "../ME  Tools/icon dialog/IconDialog";
 import FormMediaLibraryImplementation from "./FormMediaLibraryImplementation";
+import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 const styles = (theme) => ({
@@ -361,10 +362,11 @@ class MassEnergizeForm extends Component {
       // radio button. Similar to the `field.child` but allows more options
 
       if (field.conditionalDisplays && field.conditionalDisplays.length) {
-        const selectedSet = field.conditionalDisplays.find(
-          (f) => fieldValueInForm === f.valueToCheck
-        )||{};
-        console.log("This is the selec", selectedSet,fieldValueInForm)
+        const selectedSet =
+          field.conditionalDisplays.find(
+            (f) => fieldValueInForm === f.valueToCheck
+          ) || {};
+        console.log("This is the selec", selectedSet, fieldValueInForm);
         const [childCleanValues, childHasMediaFiles] = this.cleanItUp(
           formData,
           selectedSet.fields || []
@@ -422,7 +424,7 @@ class MassEnergizeForm extends Component {
       formJson.fields
     );
 
-    return console.log("I am the cleaned Values", cleanedValues)
+    return console.log("I am the cleaned Values", cleanedValues);
 
     if (formJson.preflightFxn) {
       cleanedValues = formJson.preflightFxn(cleanedValues);
@@ -529,7 +531,7 @@ class MassEnergizeForm extends Component {
                           flexWrap: "wrap",
                         }}
                       >
-                        {(selected ||[]).map((id) => (
+                        {(selected || []).map((id) => (
                           <Chip
                             key={id}
                             label={this.getDisplayName(
@@ -975,6 +977,21 @@ class MassEnergizeForm extends Component {
 
             <br />
             <br />
+          </div>
+        );
+      case FieldTypes.AutoComplete:
+        return (
+          <div key={field.name}>
+            <FormLabel component="label">{field.label}</FormLabel>
+            <LightAutoComplete
+              {...field}
+              defaultSelected={this.getValue(field.name) || []}
+              onChange={(selected) =>
+                this.handleFormDataChange({
+                  target: { value: selected, name: field.name },
+                })
+              }
+            />
           </div>
         );
       default:
