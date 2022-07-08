@@ -22,7 +22,11 @@ function FeatureFlags({ classes, featureFlags, communities }) {
       key: "add-new-flag",
       name: "New Feature Flag",
       component: (
-        <AddOrEditFeatureFlags classes={classes} communities={communities} />
+        <AddOrEditFeatureFlags
+          classes={classes}
+          communities={communities}
+          flagKeys={(featureFlags && featureFlags.keys) || {}}
+        />
       ),
     },
   };

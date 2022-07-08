@@ -1,17 +1,21 @@
+import { keyBy } from "lodash";
 import React from "react";
 import MassEnergizeForm from "../_FormGenerator";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 
-function AddOrEditFeatureFlags({ classes, communities }) {
-  const formJson = createFormJson({ communities });
+function AddOrEditFeatureFlags({ classes, communities, flagKeys }) {
+  const formJson = createFormJson({ communities, flagKeys });
   return <MassEnergizeForm formJson={formJson} />;
 }
 
-var createFormJson = ({ communities }) => {
+var createFormJson = ({ communities, flagKeys }) => {
+  const audienceKeys = flagKeys.audience;
+  const audienceKeysArr = Object.entries(flagKeys.audience || {});
   communities = (communities || []).map((com) => ({
     displayName: com.name,
     id: com.id,
   }));
+  const scopeArr = Object.entries(flagKeys.scope);
   const json = {
     title: "Add a new feature flag",
     subTitle: "",
@@ -56,7 +60,7 @@ var createFormJson = ({ communities }) => {
             defaultValue: "some-unique-identifier",
             dbName: "notes",
             readOnly: true,
-            disabled:true
+            disabled: true,
           },
           {
             name: "target",
@@ -65,11 +69,10 @@ var createFormJson = ({ communities }) => {
             isRequired: true,
             dbName: "target",
             readOnly: false,
-            data: [
-              { id: "user_frontend", displayName: "User Frontend" },
-              { id: "admin_frontend", displayName: "Admin Frontend" },
-              { id: "backend", displayName: "Backend" },
-            ],
+            data: scopeArr.map(([_, { name, key }]) => ({
+              id: key,
+              displayName: name,
+            })),
           },
         ],
       },
@@ -86,14 +89,14 @@ var createFormJson = ({ communities }) => {
             defaultValue: "true",
             dbName: "audience",
             readOnly: false,
-            data: [
-              { id: "true", value: "Yes" },
-              { id: "specific", value: "Only Specific Communities" },
-              { id: "except", value: "Every Community Except" },
-            ],
+            data: audienceKeysArr.map(([_, { name, key }]) => ({
+              id: key,
+              value: name,
+            })),
+
             conditionalDisplays: [
               {
-                valueToCheck: "specific",
+                valueToCheck: audienceKeys.SPECIFIC.key,
                 fields: [
                   {
                     name: "community",
@@ -108,7 +111,7 @@ var createFormJson = ({ communities }) => {
                 ],
               },
               {
-                valueToCheck: "except",
+                valueToCheck: audienceKeys.ALL_EXCEPT.key,
                 fields: [
                   {
                     name: "community",
@@ -139,14 +142,13 @@ var createFormJson = ({ communities }) => {
             defaultValue: "true",
             dbName: "user_audience",
             readOnly: false,
-            data: [
-              { id: "true", value: "Yes" },
-              { id: "specific", value: "Only Specific Users" },
-              { id: "except", value: "Everyone Except" },
-            ],
+            data: audienceKeysArr.map(([_, { name, key }]) => ({
+              id: key,
+              value: name,
+            })),
             conditionalDisplays: [
               {
-                valueToCheck: "specific",
+                valueToCheck: audienceKeys.SPECIFIC.key,
                 fields: [
                   {
                     name: "community",
@@ -161,12 +163,11 @@ var createFormJson = ({ communities }) => {
                 ],
               },
               {
-                valueToCheck: "except",
+                valueToCheck: audienceKeys.ALL_EXCEPT.key,
                 fields: [
                   {
                     name: "community",
-                    label:
-                      "Select all users that should NOT have this feature",
+                    label: "Select all users that should NOT have this feature",
                     placeholder: "eg. Wayland",
                     fieldType: fieldTypes.Dropdown,
                     defaultValue: null,
