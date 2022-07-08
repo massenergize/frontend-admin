@@ -507,12 +507,10 @@ class MassEnergizeForm extends Component {
     switch (field.fieldType) {
       case FieldTypes.ImportButton:
         return (<ImportButton type="Action" onGetDocData={(fields) => {
-            console.log(fields);
-            console.log(this.state.formData);
-            // this.setState({formData: {...this.state.formData, ...fields}});
-            this.setState({formData: {...this.state.formData, 'title': fields['title']}});
+            console.log('fields', fields)
+            this.setState({formData: {...this.state.formData, ...fields}});
 
-            console.log(this.state.formData);
+            console.log('formData', this.state.formData);
         }} />);
       
       case FieldTypes.Checkbox:
@@ -934,6 +932,7 @@ class MassEnergizeForm extends Component {
               }}
               disabled={field.readOnly || this.state.readOnly}
               defaultValue={field.defaultValue}
+              value={this.getValue(field.name)}
               inputProps={{ maxLength: field.maxLength }}
               // maxLength={field.maxLength}
             />
