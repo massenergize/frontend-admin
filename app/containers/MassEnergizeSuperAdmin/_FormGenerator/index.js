@@ -361,9 +361,10 @@ class MassEnergizeForm extends Component {
       // radio button. Similar to the `field.child` but allows more options
 
       if (field.conditionalDisplays && field.conditionalDisplays.length) {
-        const selectedSet = field.conditionalDisplays.filter(
+        const selectedSet = field.conditionalDisplays.find(
           (f) => fieldValueInForm === f.valueToCheck
-        )[0];
+        )||{};
+        console.log("This is the selec", selectedSet,fieldValueInForm)
         const [childCleanValues, childHasMediaFiles] = this.cleanItUp(
           formData,
           selectedSet.fields || []
@@ -420,6 +421,8 @@ class MassEnergizeForm extends Component {
       formData,
       formJson.fields
     );
+
+    return console.log("I am the cleaned Values", cleanedValues)
 
     if (formJson.preflightFxn) {
       cleanedValues = formJson.preflightFxn(cleanedValues);
@@ -515,7 +518,7 @@ class MassEnergizeForm extends Component {
                     multiple
                     displayEmpty
                     name={field.name}
-                    value={this.getValue(field.name)}
+                    value={this.getValue(field.name) || []}
                     input={<Input id="select-multiple-chip" />}
                     renderValue={(selected) => (
                       <div
@@ -526,7 +529,7 @@ class MassEnergizeForm extends Component {
                           flexWrap: "wrap",
                         }}
                       >
-                        {selected.map((id) => (
+                        {(selected ||[]).map((id) => (
                           <Chip
                             key={id}
                             label={this.getDisplayName(
