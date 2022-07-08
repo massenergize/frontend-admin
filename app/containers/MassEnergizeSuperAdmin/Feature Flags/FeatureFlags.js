@@ -11,7 +11,12 @@ function FeatureFlags({ classes, featureFlags, communities }) {
     0: {
       key: "manage-flags",
       name: "Manage Feature Flags",
-      component: <ManageFeatureFlags classes={classes} flags={featureFlags} />,
+      component: (
+        <ManageFeatureFlags
+          classes={classes}
+          flags={featureFlags && featureFlags.features}
+        />
+      ),
     },
     1: {
       key: "add-new-flag",

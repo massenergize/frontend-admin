@@ -7,11 +7,14 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import Loading from "dan-components/Loading";
 import { Link } from "react-router-dom";
-
+const hasExpired = (date) => {
+  const now = new Date().getTime();
+  date = new Date(date).getTime();
+  return date < now;
+};
 function ManageFeatureFlags({ classes, flags }) {
   if (!flags) return <Loading />;
   flags = Object.entries(flags || {});
-  console.log("I think I am the flags bro", flags);
   const columns = () => {
     return [
       {
@@ -24,6 +27,7 @@ function ManageFeatureFlags({ classes, flags }) {
       {
         name: "Feature Name",
         key: "feature-name",
+        options: { filter: false },
       },
       {
         name: "Is For Everyone",
@@ -45,18 +49,22 @@ function ManageFeatureFlags({ classes, flags }) {
       {
         name: "Communities",
         key: "selected-communities",
+        options: { filter: false },
       },
       {
         name: "Status",
         key: "status",
         options: {
-          filter: false,
-          customBodyRender: (expired) => {
+          filter: true,
+          customBodyRender: (status) => {
+            const expired = status === "Expired"; // This is intentional
             return (
               <MEChip
-                label={expired ? "Expired" : "Active"}
+                label={status}
                 style={
-                  expired ? { background: "#c04f4f" } : { padding: "0px 12" }
+                  expired
+                    ? { background: "#c04f4f", padding: "0px 9px" }
+                    : { padding: "0px 12px" }
                 }
                 className={`${
                   expired ? classes.yesLabel : classes.yesLabel
@@ -69,6 +77,7 @@ function ManageFeatureFlags({ classes, flags }) {
       {
         name: "Expires On",
         key: "expiry-date",
+        options: { filter: false },
       },
       {
         name: "Manage",
@@ -97,7 +106,7 @@ function ManageFeatureFlags({ classes, flags }) {
         feature.name,
         feature.on_for_everyone,
         smartString(comNames) || "---",
-        feature.is_expired,
+        hasExpired(feature.expires_on) ? "Expired" : "Active",
         getHumanFriendlyDate(feature.expires_on, false, false),
         feature.id,
       ];
@@ -107,10 +116,11 @@ function ManageFeatureFlags({ classes, flags }) {
   const options = {
     filterType: "dropdown",
     responsive: "stacked",
-    print: true,
+    print: false,
     rowsPerPage: 25,
     rowsPerPageOptions: [10, 25, 100],
   };
+
   return (
     <div>
       <METable
