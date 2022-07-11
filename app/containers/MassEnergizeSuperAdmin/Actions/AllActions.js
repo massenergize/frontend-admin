@@ -73,7 +73,7 @@ class AllActions extends React.Component {
   };
 
   exportAction = async (id) => {
-    console.log("exporting!", id);
+    console.log("exporting action with id: ", id);
     await apiCall("actions.export", {id: id});
   }
 
@@ -225,6 +225,7 @@ class AllActions extends React.Component {
               >
                 <FileCopy size="small" variant="outlined" color="secondary" />
               </Link>
+              {/* CHANGE ICON */}
               <FileCopy color="secondary" onClick={() => {this.exportAction(id)}}/>
             </div>
           ),
