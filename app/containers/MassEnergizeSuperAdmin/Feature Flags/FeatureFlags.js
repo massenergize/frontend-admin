@@ -1,12 +1,21 @@
 import { Paper, Tab, Tabs, Typography, withStyles } from "@material-ui/core";
 import React, { useState } from "react";
 import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import styles from "../../../components/Widget/widget-jss";
+import { loadFeatureFlags } from "../../../redux/redux-actions/adminActions";
 import AddOrEditFeatureFlags from "./AddOrEditFeatureFlags";
 import ManageFeatureFlags from "./ManageFeatureFlags";
 
-function FeatureFlags({ classes, featureFlags, communities, users }) {
+function FeatureFlags({
+  classes,
+  featureFlags,
+  communities,
+  users,
+  putFlagsInRedux,
+}) {
   const [currentTab, setCurrentTab] = useState(1);
+  const [featureToEdit, setFeatureToEdit] = useState(null);
   const TABS = {
     0: {
       key: "manage-flags",
@@ -15,6 +24,10 @@ function FeatureFlags({ classes, featureFlags, communities, users }) {
         <ManageFeatureFlags
           classes={classes}
           flags={featureFlags && featureFlags.features}
+          editFeature={(data) => {
+            setFeatureToEdit(data);
+            setCurrentTab(1);
+          }}
         />
       ),
     },
@@ -26,7 +39,11 @@ function FeatureFlags({ classes, featureFlags, communities, users }) {
           classes={classes}
           communities={communities}
           flagKeys={(featureFlags && featureFlags.keys) || {}}
-          users = { users}
+          users={users}
+          switchTabs={() => setCurrentTab(0)}
+          featureFlags={featureFlags}
+          putFlagsInRedux={putFlagsInRedux}
+          featureToEdit={featureToEdit}
         />
       ),
     },
@@ -65,8 +82,15 @@ const mapStateToProps = (state) => {
   return {
     featureFlags: state.getIn(["featureFlags"]),
     communities: state.getIn(["communities"]),
-    users: state.getIn(["allUsers"])
+    users: state.getIn(["allUsers"]),
   };
 };
-const Mapped = connect(mapStateToProps)(FeatureFlags);
+
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators({ putFlagsInRedux: loadFeatureFlags }, dispatch);
+};
+const Mapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(FeatureFlags);
 export default withStyles(styles)(Mapped);

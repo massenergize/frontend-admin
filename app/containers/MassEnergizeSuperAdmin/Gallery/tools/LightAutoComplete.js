@@ -81,7 +81,8 @@ function LightAutoComplete(props) {
   };
 
   const transfer = (content) => {
-    if (onChange) return onChange(content);
+    if (onChange)
+      return onChange(content);
   };
 
   const handleSelection = (item) => {
