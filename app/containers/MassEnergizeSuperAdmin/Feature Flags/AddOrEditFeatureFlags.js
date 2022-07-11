@@ -3,13 +3,75 @@ import MassEnergizeForm from "../_FormGenerator";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import Loading from "dan-components/Loading";
 
-function AddOrEditFeatureFlags({ classes, communities, flagKeys, users }) {
+function AddOrEditFeatureFlags({
+  communities,
+  flagKeys,
+  users,
+  switchTabs,
+  putFlagsInRedux,
+  featureFlags,
+  featureToEdit,
+}) {
+  const inEditMode = featureToEdit;
   if (!flagKeys || !flagKeys.audience) return <Loading />;
-  const formJson = createFormJson({ communities, flagKeys, users });
-  return <MassEnergizeForm formJson={formJson} />;
+  const ifApiIsSuccessful = (data, yes) => {
+    if (!yes) return;
+    const features = (featureFlags && featureFlags.features) || [];
+    putFlagsInRedux({ ...(featureFlags || {}), features: [data, ...features] });
+    switchTabs();
+  };
+  const formJson = createFormJson({
+    communities,
+    flagKeys,
+    users,
+    putFlagsInRedux,
+    ifApiIsSuccessful,
+    inEditMode,
+    featureToEdit,
+  });
+  return (
+    <MassEnergizeForm formJson={formJson} onComplete={ifApiIsSuccessful} />
+  );
 }
 
-var createFormJson = ({ communities, flagKeys, users }) => {
+const preflight = (data) => {
+  const user_ids = data.user_ids || [];
+  var [scope] = data.scope || [] || null;
+  return {
+    ...(data || {}),
+    user_ids: user_ids.map((u) => u.id),
+    scope,
+    key: uniqueIdentifier(data.name),
+  };
+};
+const uniqueIdentifier = (text) => {
+  if (!text || !text.trim()) return "";
+  var arr = text.split(" ");
+  return arr.join("-") + "-feature";
+};
+
+const parseFeatureForEditMode = (feature) => {
+  console.log("I think I am the feature", feature);
+  const comIds = ((feature && feature.communities) || []).map((c) =>
+    c.id.toString()
+  );
+  const userIds = ((feature && feature.communities) || []).map((u) =>
+    u.id.toString()
+  );
+  return {
+    ...(feature || {}),
+    comIds,
+    userIds,
+    userAudience: feature && feature.user_audience,
+  };
+};
+var createFormJson = ({
+  communities,
+  flagKeys,
+  users,
+  inEditMode,
+  featureToEdit,
+}) => {
   const labelExt = (user) => `${user.preferred_name} - (${user.email})`;
   const valueExt = (user) => user.id;
   const audienceKeys = flagKeys.audience || {};
@@ -17,13 +79,25 @@ var createFormJson = ({ communities, flagKeys, users }) => {
   communities = (communities || []).map((com) => ({
     displayName: com.name,
     id: com.id,
-    value: com.id,
+    value: com.id.toString(),
   }));
   const scopeArr = Object.entries(flagKeys.scope || {});
+  const {
+    scope,
+    name,
+    userIds,
+    comIds,
+    notes,
+    audience,
+    expires_on,
+    userAudience
+  } = parseFeatureForEditMode(featureToEdit);
+
   const json = {
-    title: "Add a new feature flag",
+    title: inEditMode ? "Update a featuer flag" : "Add a new feature flag",
     subTitle: "",
-    method: "/featureFlags.add",
+    method: inEditMode ? "/featureFlags.update" : "/featureFlags.add",
+    preflightFxn: preflight,
     // successRedirectPage: "/admin/read/actions",
     fields: [
       {
@@ -37,7 +111,7 @@ var createFormJson = ({ communities, flagKeys, users }) => {
             fieldType: fieldTypes.TextField,
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            defaultValue:name || "",
             dbName: "name",
             readOnly: false,
             maxLength: 60,
@@ -51,20 +125,9 @@ var createFormJson = ({ communities, flagKeys, users }) => {
             fieldType: fieldTypes.TextField,
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            defaultValue: notes || "",
             dbName: "notes",
             readOnly: false,
-          },
-          {
-            name: "key",
-            label: "unique-identifier",
-            fieldType: fieldTypes.TextField,
-            contentType: "text",
-            isRequired: true,
-            defaultValue: "some-unique-identifier",
-            dbName: "notes",
-            readOnly: true,
-            disabled: true,
           },
           {
             name: "scope",
@@ -73,6 +136,7 @@ var createFormJson = ({ communities, flagKeys, users }) => {
             isRequired: true,
             dbName: "scope",
             readOnly: false,
+            defaultValue: scope || scope,
             data: scopeArr.map(([_, { name, key }]) => ({
               id: key,
               displayName: name,
@@ -90,7 +154,7 @@ var createFormJson = ({ communities, flagKeys, users }) => {
             label: "Should this feature be available to every community?",
             fieldType: fieldTypes.Radio,
             isRequired: true,
-            defaultValue: "true",
+            defaultValue: audience || audienceKeys.EVERYONE.key,
             dbName: "audience",
             readOnly: false,
             data: audienceKeysArr.map(([_, { name, key }]) => ({
@@ -103,16 +167,14 @@ var createFormJson = ({ communities, flagKeys, users }) => {
                 valueToCheck: audienceKeys.SPECIFIC.key,
                 fields: [
                   {
-                    name: "community",
+                    name: "community_ids",
                     label:
                       "Select all communities that should have this feature activated",
                     placeholder: "eg. Wayland",
                     fieldType: fieldTypes.Checkbox,
                     selectMany: true,
-                    contentType: "text",
-                    defaultValue: [],
+                    defaultValue: comIds || [],
                     dbName: "community_ids",
-
                     data: communities,
                   },
                 ],
@@ -121,14 +183,13 @@ var createFormJson = ({ communities, flagKeys, users }) => {
                 valueToCheck: audienceKeys.ALL_EXCEPT.key,
                 fields: [
                   {
-                    name: "community",
+                    name: "community_ids",
                     label:
                       "Select all communities that should NOT have this feature",
                     placeholder: "eg. Wayland",
                     fieldType: fieldTypes.Checkbox,
                     selectMany: true,
-                    contentType: "text",
-                    defaultValue: [],
+                    defaultValue: comIds || [],
                     dbName: "community_ids",
                     data: communities,
                   },
@@ -148,7 +209,7 @@ var createFormJson = ({ communities, flagKeys, users }) => {
             label: "Should this feature be available to every user?",
             fieldType: fieldTypes.Radio,
             isRequired: true,
-            defaultValue: "true",
+            defaultValue: userAudience || audienceKeys.ALL_EXCEPT.key,
             dbName: "user_audience",
             readOnly: false,
             data: audienceKeysArr.map(([_, { name, key }]) => ({
@@ -163,9 +224,10 @@ var createFormJson = ({ communities, flagKeys, users }) => {
                     name: "users",
                     label:
                       "Select all users that should have this feature activated",
-                    placeholder: "Search with their username, or email.. Eg. 'Mademoiselle Kaat'",
+                    placeholder:
+                      "Search with their username, or email.. Eg. 'Mademoiselle Kaat'",
                     fieldType: fieldTypes.AutoComplete,
-                    defaultValue: [],
+                    defaultValue: userIds || [],
                     dbName: "user_ids",
                     data: users || [],
                     labelExtractor: labelExt,
@@ -179,12 +241,13 @@ var createFormJson = ({ communities, flagKeys, users }) => {
                   {
                     name: "users",
                     label: "Select all users that should NOT have this feature",
-                    placeholder: "Search with their username, or email.. Eg. 'Monsieur Brad'",
+                    placeholder:
+                      "Search with their username, or email.. Eg. 'Monsieur Brad'",
                     fieldType: fieldTypes.AutoComplete,
                     selectMany: true,
                     contentType: "text",
 
-                    defaultValue: [],
+                    defaultValue: userIds || [],
                     dbName: "user_ids",
                     labelExtractor: labelExt,
                     valueExtractor: valueExt,
@@ -208,9 +271,9 @@ var createFormJson = ({ communities, flagKeys, users }) => {
             fieldType: fieldTypes.DateTime,
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            defaultValue: expires_on || "",
             dbName: "expires_on",
-            readOnly: false,
+            minDate: new Date(),
           },
         ],
       },

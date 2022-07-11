@@ -287,7 +287,7 @@ class MassEnergizeForm extends Component {
   getDisplayName = (fieldName, id, data) => {
     const { formData } = this.state;
     if (id) {
-      const [result] = data.filter((d) => d.id === id);
+      const [result] = data.filter((d) => d.id.toString() === id.toString());
       if (result) {
         return result.displayName;
       }
@@ -366,7 +366,7 @@ class MassEnergizeForm extends Component {
           field.conditionalDisplays.find(
             (f) => fieldValueInForm === f.valueToCheck
           ) || {};
-        console.log("This is the selec", selectedSet, fieldValueInForm);
+        // console.log("This is the selec", selectedSet, fieldValueInForm);
         const [childCleanValues, childHasMediaFiles] = this.cleanItUp(
           formData,
           selectedSet.fields || []
@@ -407,6 +407,9 @@ class MassEnergizeForm extends Component {
     return [cleanedValues, hasMediaFiles];
   };
 
+  setError(error) {
+    this.setState({ error: error, startCircularSpinner: false });
+  }
   /**
    * This handles the form data submission
    */
@@ -424,11 +427,13 @@ class MassEnergizeForm extends Component {
       formJson.fields
     );
 
-    return console.log("I am the cleaned Values", cleanedValues);
-
     if (formJson.preflightFxn) {
-      cleanedValues = formJson.preflightFxn(cleanedValues);
+      cleanedValues = formJson.preflightFxn(
+        cleanedValues,
+        this.setError.bind(this)
+      );
     }
+    // return console.log("I am the cleaned Values", cleanedValues);
 
     // return console.log("I am the returned values innit", cleanedValues)
 
@@ -451,7 +456,7 @@ class MassEnergizeForm extends Component {
         startCircularSpinner: false,
         // formData: initialFormData
       });
-      if (onComplete) onComplete(response.data);
+      if (onComplete) onComplete(response.data, response && response.success);
       if (formJson.successRedirectPage) {
         this.props.history.push(formJson.successRedirectPage);
         // window.location.href = formJson.successRedirectPage;
@@ -471,7 +476,7 @@ class MassEnergizeForm extends Component {
     const fieldValues = formData[fieldName];
     if (!fieldValues) return false;
     // if (!Array.isArray(fieldValues)) return false;
-    return fieldValues.indexOf(value) > -1;
+    return fieldValues.indexOf(value.toString()) > -1;
   };
 
   // what does this do?
@@ -522,29 +527,31 @@ class MassEnergizeForm extends Component {
                     name={field.name}
                     value={this.getValue(field.name) || []}
                     input={<Input id="select-multiple-chip" />}
-                    renderValue={(selected) => (
-                      <div
-                        className={classes.chips}
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        {(selected || []).map((id) => (
-                          <Chip
-                            key={id}
-                            label={this.getDisplayName(
-                              field.name,
-                              id,
-                              field.data
-                            )}
-                            className={classes.chip}
-                            style={{ margin: 5 }}
-                          />
-                        ))}
-                      </div>
-                    )}
+                    renderValue={(selected) => {
+                      return (
+                        <div
+                          className={classes.chips}
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          {(selected || []).map((id) => (
+                            <Chip
+                              key={id}
+                              label={this.getDisplayName(
+                                field.name,
+                                id,
+                                field.data
+                              )}
+                              className={classes.chip}
+                              style={{ margin: 5 }}
+                            />
+                          ))}
+                        </div>
+                      );
+                    }}
                     MenuProps={MenuProps}
                   >
                     {field.data.map((t) => (
@@ -963,6 +970,7 @@ class MassEnergizeForm extends Component {
                 style={{ width: "100%" }}
               >
                 <DateTimePicker
+                {...field}
                   value={this.getValue(field.name, moment.now())}
                   onChange={(date) =>
                     this.handleFormDataChange({

@@ -12,7 +12,7 @@ const hasExpired = (date) => {
   date = new Date(date).getTime();
   return date < now;
 };
-function ManageFeatureFlags({ classes, flags }) {
+function ManageFeatureFlags({ classes, flags, editFeature }) {
   if (!flags) return <Loading />;
   flags = Object.entries(flags || {});
   const columns = () => {
@@ -87,7 +87,13 @@ function ManageFeatureFlags({ classes, flags }) {
           customBodyRender: (data) => {
             return (
               <>
-                <Link to={`/google.com`}>
+                <Link
+                  to={`/#void`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    editFeature(data.item);
+                  }}
+                >
                   <EditIcon size="small" variant="outlined" color="secondary" />
                 </Link>
               </>
@@ -108,7 +114,7 @@ function ManageFeatureFlags({ classes, flags }) {
         smartString(comNames) || "---",
         hasExpired(feature.expires_on) ? "Expired" : "Active",
         getHumanFriendlyDate(feature.expires_on, false, false),
-        feature.id,
+        { id: feature.id, item: feature },
       ];
     });
   };
