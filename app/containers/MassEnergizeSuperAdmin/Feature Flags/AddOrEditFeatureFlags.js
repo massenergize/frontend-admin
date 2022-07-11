@@ -13,6 +13,7 @@ function AddOrEditFeatureFlags({
   featureToEdit,
 }) {
   const inEditMode = featureToEdit;
+  console.log("LE FLAGS", featureFlags);
   if (!flagKeys || !flagKeys.audience) return <Loading />;
   const ifApiIsSuccessful = (data, yes) => {
     if (!yes) return;
@@ -44,6 +45,7 @@ const preflight = (data) => {
     key: uniqueIdentifier(data.name),
   };
 };
+
 const uniqueIdentifier = (text) => {
   if (!text || !text.trim()) return "";
   var arr = text.split(" ");
@@ -51,19 +53,21 @@ const uniqueIdentifier = (text) => {
 };
 
 const parseFeatureForEditMode = (feature) => {
-  console.log("I think I am the feature", feature);
   const comIds = ((feature && feature.communities) || []).map((c) =>
     c.id.toString()
   );
-  const userIds = ((feature && feature.communities) || []).map((u) =>
+  const userIds = ((feature && feature.users) || []).map((u) =>
     u.id.toString()
   );
-  return {
+  const json = {
     ...(feature || {}),
     comIds,
     userIds,
     userAudience: feature && feature.user_audience,
+    scope: feature && feature.scope ? [feature.scope] : [],
   };
+  console.log("FEATURE IN EDIT", json, feature)
+  return json;
 };
 var createFormJson = ({
   communities,
@@ -90,9 +94,10 @@ var createFormJson = ({
     notes,
     audience,
     expires_on,
-    userAudience
+    userAudience,
   } = parseFeatureForEditMode(featureToEdit);
 
+  console.log("this is the scope bro", scope);
   const json = {
     title: inEditMode ? "Update a featuer flag" : "Add a new feature flag",
     subTitle: "",
@@ -111,7 +116,7 @@ var createFormJson = ({
             fieldType: fieldTypes.TextField,
             contentType: "text",
             isRequired: true,
-            defaultValue:name || "",
+            defaultValue: name || "",
             dbName: "name",
             readOnly: false,
             maxLength: 60,
@@ -121,7 +126,7 @@ var createFormJson = ({
             name: "notes",
             label: "Briefly describe this feature",
             placeholder:
-              "Eg. This feature allows guests to use all platform functionalities without....",
+              "Eg. This feature allows guests to use all platform functionalities without...",
             fieldType: fieldTypes.TextField,
             contentType: "text",
             isRequired: true,
@@ -136,7 +141,7 @@ var createFormJson = ({
             isRequired: true,
             dbName: "scope",
             readOnly: false,
-            defaultValue: scope || scope,
+            defaultValue: scope || [],
             data: scopeArr.map(([_, { name, key }]) => ({
               id: key,
               displayName: name,

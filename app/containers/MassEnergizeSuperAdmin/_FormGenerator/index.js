@@ -170,6 +170,14 @@ class MassEnergizeForm extends Component {
           formData[k] = cFormData[k];
         });
       }
+      if (field.conditionalDisplays) {
+        (field.conditionalDisplays || []).forEach((item) => {
+          const cFormData = this.initialFormData(item.fields);
+          Object.keys(cFormData).forEach((k) => {
+            formData[k] = cFormData[k];
+          });
+        });
+      }
     });
     return formData;
   };
@@ -366,7 +374,6 @@ class MassEnergizeForm extends Component {
           field.conditionalDisplays.find(
             (f) => fieldValueInForm === f.valueToCheck
           ) || {};
-        // console.log("This is the selec", selectedSet, fieldValueInForm);
         const [childCleanValues, childHasMediaFiles] = this.cleanItUp(
           formData,
           selectedSet.fields || []
@@ -435,7 +442,7 @@ class MassEnergizeForm extends Component {
     }
     // return console.log("I am the cleaned Values", cleanedValues);
 
-    // return console.log("I am the returned values innit", cleanedValues)
+    return console.log("I am the returned values innit", cleanedValues)
 
     // let's make an api call to send the data
     let response = null;
@@ -970,7 +977,7 @@ class MassEnergizeForm extends Component {
                 style={{ width: "100%" }}
               >
                 <DateTimePicker
-                {...field}
+                  {...field}
                   value={this.getValue(field.name, moment.now())}
                   onChange={(date) =>
                     this.handleFormDataChange({
