@@ -13,14 +13,16 @@ function AddOrEditFeatureFlags({
   featureToEdit,
 }) {
   const inEditMode = featureToEdit;
-  console.log("LE FLAGS", featureFlags);
   if (!flagKeys || !flagKeys.audience) return <Loading />;
+
   const ifApiIsSuccessful = (data, yes) => {
     if (!yes) return;
-    const features = (featureFlags && featureFlags.features) || [];
+    var features = (featureFlags && featureFlags.features) || [];
+    features = features.filter((f) => f.id.toString() !== data.id.toString());
     putFlagsInRedux({ ...(featureFlags || {}), features: [data, ...features] });
     switchTabs();
   };
+
   const formJson = createFormJson({
     communities,
     flagKeys,
@@ -30,20 +32,24 @@ function AddOrEditFeatureFlags({
     inEditMode,
     featureToEdit,
   });
+
   return (
     <MassEnergizeForm formJson={formJson} onComplete={ifApiIsSuccessful} />
   );
 }
+// -----------------------------------------------------------------------------------
 
 const preflight = (data) => {
   const user_ids = data.user_ids || [];
   var [scope] = data.scope || [] || null;
-  return {
+  // console.log("LE DATA", data);
+  const json = {
     ...(data || {}),
     user_ids: user_ids.map((u) => u.id),
     scope,
     key: uniqueIdentifier(data.name),
   };
+  return json;
 };
 
 const uniqueIdentifier = (text) => {
@@ -66,9 +72,9 @@ const parseFeatureForEditMode = (feature) => {
     userAudience: feature && feature.user_audience,
     scope: feature && feature.scope ? [feature.scope] : [],
   };
-  console.log("FEATURE IN EDIT", json, feature)
   return json;
 };
+
 var createFormJson = ({
   communities,
   flagKeys,
@@ -95,13 +101,13 @@ var createFormJson = ({
     audience,
     expires_on,
     userAudience,
+    id,
   } = parseFeatureForEditMode(featureToEdit);
 
-  console.log("this is the scope bro", scope);
   const json = {
-    title: inEditMode ? "Update a featuer flag" : "Add a new feature flag",
+    title: inEditMode ? "Update a feature flag" : "Add a new feature flag",
     subTitle: "",
-    method: inEditMode ? "/featureFlags.update" : "/featureFlags.add",
+    method: inEditMode ? "/featureFlags.info.update" : "/featureFlags.add",
     preflightFxn: preflight,
     // successRedirectPage: "/admin/read/actions",
     fields: [
@@ -109,6 +115,19 @@ var createFormJson = ({
         label: "About this feature",
         fieldType: "Section",
         children: [
+          inEditMode
+            ? {
+                name: "id",
+                label: "Id of feature",
+                fieldType: fieldTypes.TextField,
+                contentType: "text",
+                isRequired: true,
+                defaultValue: id || "",
+                dbName: "id",
+                readOnly: true,
+                disabled: true,
+              }
+            : {},
           {
             name: "name",
             label: "Name of the feature (60 Chars)",
