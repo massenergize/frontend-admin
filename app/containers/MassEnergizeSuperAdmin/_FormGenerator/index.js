@@ -440,9 +440,6 @@ class MassEnergizeForm extends Component {
         this.setError.bind(this)
       );
     }
-    // return console.log("I am the cleaned Values", cleanedValues);
-
-    // return console.log("I am the returned values innit", cleanedValues)
 
     // let's make an api call to send the data
     let response = null;
