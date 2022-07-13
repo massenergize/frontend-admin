@@ -196,12 +196,16 @@ class Application extends React.Component {
     return (
       <Dashboard history={history} changeMode={changeMode}>
         <ThemeModal
+          {...modalOptions || {}}
           open={show}
           onConfirm={onConfirm}
           onCancel={() => {
             if (onCancel) onCancel();
           }}
-          close={() => toggleUniversalModal({ show: false, component: null })}
+          close={() => {
+            toggleUniversalModal({ show: false, component: null });
+            return false;
+          }}
           closeAfterConfirmation={closeAfterConfirmation}
         >
           {component}
