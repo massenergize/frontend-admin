@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import MassEnergizeForm from "../_FormGenerator";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import Loading from "dan-components/Loading";
@@ -11,6 +11,7 @@ function AddOrEditFeatureFlags({
   putFlagsInRedux,
   featureFlags,
   featureToEdit,
+  setFeatureToEdit,
 }) {
   const inEditMode = featureToEdit;
   if (!flagKeys || !flagKeys.audience) return <Loading />;
@@ -53,21 +54,18 @@ const preflight = (data) => {
 
 const uniqueIdentifier = (text) => {
   if (!text || !text.trim()) return "";
-  var arr = text.split(" ").toLowerCase();
-  return arr.join("_") + "_feature";
+  var arr = text.split(" ");
+  return arr.join("_").toLowerCase() + "_feature";
 };
 
 const parseFeatureForEditMode = (feature) => {
   const comIds = ((feature && feature.communities) || []).map((c) =>
     c.id.toString()
   );
-  const userIds = ((feature && feature.users) || []).map((u) =>
-    u.id.toString()
-  );
   const json = {
     ...(feature || {}),
     comIds,
-    userIds,
+    selectedUsers: (feature && feature.users) || [],
     userAudience: feature && feature.user_audience,
     scope: feature && feature.scope ? [feature.scope] : [],
   };
@@ -93,8 +91,8 @@ var createFormJson = ({
   const scopeArr = Object.entries(flagKeys.scope || {});
   const {
     scope,
+    selectedUsers,
     name,
-    userIds,
     comIds,
     notes,
     audience,
@@ -108,7 +106,6 @@ var createFormJson = ({
     subTitle: "",
     method: inEditMode ? "/featureFlags.info.update" : "/featureFlags.add",
     preflightFxn: preflight,
-    // successRedirectPage: "/admin/read/actions",
     fields: [
       {
         label: "About this feature",
@@ -232,7 +229,7 @@ var createFormJson = ({
             label: "Should this feature be available to every user?",
             fieldType: fieldTypes.Radio,
             isRequired: true,
-            defaultValue: userAudience || audienceKeys.ALL_EXCEPT.key,
+            defaultValue: userAudience || audienceKeys.EVERYONE.key,
             dbName: "user_audience",
             readOnly: false,
             data: audienceKeysArr.map(([_, { name, key }]) => ({
@@ -250,7 +247,7 @@ var createFormJson = ({
                     placeholder:
                       "Search with their username, or email.. Eg. 'Mademoiselle Kaat'",
                     fieldType: fieldTypes.AutoComplete,
-                    defaultValue: userIds || [],
+                    defaultValue: selectedUsers || [],
                     dbName: "user_ids",
                     data: users || [],
                     labelExtractor: labelExt,
@@ -270,7 +267,7 @@ var createFormJson = ({
                     selectMany: true,
                     contentType: "text",
 
-                    defaultValue: userIds || [],
+                    defaultValue: selectedUsers || [],
                     dbName: "user_ids",
                     labelExtractor: labelExt,
                     valueExtractor: valueExt,

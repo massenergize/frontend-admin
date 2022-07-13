@@ -22,10 +22,11 @@ function ManageFeatureFlags({
   putFlagsInRedux,
   featureFlags,
 }) {
-
   if (!flags) return <Loading />;
 
   flags = Object.entries(flags || {});
+  const flagKeys = (featureFlags && featureFlags.keys) || {};
+
   const columns = () => {
     return [
       {
@@ -41,10 +42,10 @@ function ManageFeatureFlags({
         options: { filter: false },
       },
       {
-        name: "Is For Everyone",
-        key: "is-for-everyone",
+        name: "Is For Every Community",
+        key: "is-for-every-community",
         options: {
-          filter: false,
+          filter: true,
           customBodyRender: (isForEveryone) => {
             return (
               <MEChip
@@ -58,9 +59,21 @@ function ManageFeatureFlags({
         },
       },
       {
-        name: "Communities",
-        key: "selected-communities",
-        options: { filter: false },
+        name: "Is For Every User",
+        key: "is-for-every-user",
+        options: {
+          filter: true,
+          customBodyRender: (isForEveryone) => {
+            return (
+              <MEChip
+                label={isForEveryone ? "Yes" : "No"}
+                className={`${
+                  isForEveryone ? classes.yesLabel : classes.noLabel
+                } touchable-opacity`}
+              />
+            );
+          },
+        },
       },
       {
         name: "Status",
@@ -117,13 +130,11 @@ function ManageFeatureFlags({
 
   const fashionData = (data) => {
     return (data || []).map(([_, feature]) => {
-      var comNames = (feature.communities || []).map((c) => c.name);
-      comNames = comNames.join(", ");
       return [
         feature.id,
         feature.name,
-        feature.on_for_everyone,
-        smartString(comNames) || "---",
+        feature.audience === flagKeys.audience.EVERYONE.key,
+        feature.user_audience === flagKeys.audience.EVERYONE.key,
         hasExpired(feature.expires_on) ? "Expired" : "Active",
         getHumanFriendlyDate(feature.expires_on, false, false),
         { id: feature.id, item: feature },
@@ -163,7 +174,7 @@ function ManageFeatureFlags({
   const options = {
     filterType: "dropdown",
     responsive: "stacked",
-    download:false,
+    download: false,
     print: false,
     rowsPerPage: 25,
     rowsPerPageOptions: [50, 100],

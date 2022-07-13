@@ -51,6 +51,7 @@ function FeatureFlags({
           featureFlags={featureFlags}
           putFlagsInRedux={putFlagsInRedux}
           featureToEdit={featureToEdit}
+          setFeatureToEdit = {setFeatureToEdit}
         />
       ),
     },
