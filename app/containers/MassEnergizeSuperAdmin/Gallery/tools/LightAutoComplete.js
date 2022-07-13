@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { Chip, Paper, TextField, withStyles } from "@material-ui/core";
 import { pop } from "../../../../utils/common";
@@ -65,7 +65,7 @@ function LightAutoComplete(props) {
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selected, setSelected] = useState([]); // keeps a list of all selected items
-
+  const chipWrapperRef = useRef();
   const mount = () => {
     if (!onMount) return;
     onMount(() => setSelected([]));
@@ -81,8 +81,7 @@ function LightAutoComplete(props) {
   };
 
   const transfer = (content) => {
-    if (onChange)
-      return onChange(content);
+    if (onChange) return onChange(content);
   };
 
   const handleSelection = (item) => {
@@ -114,10 +113,16 @@ function LightAutoComplete(props) {
     setSelected(defaultSelected);
   }, [defaultSelected]);
 
+  const increasedRatio = () => {
+    const height = chipWrapperRef.current
+      ? chipWrapperRef.current.clientHeight
+      : 0;
+    return height;
+  };
   return (
     <div style={{ position: "relative", width: "100%" }}>
       {selected && selected.length > 0 && (
-        <div>
+        <div ref={chipWrapperRef}>
           {selected.map((option, index) => {
             var deleteOptions = { onDelete: () => handleSelection(option) };
             deleteOptions = allowChipRemove ? deleteOptions : {};
@@ -139,46 +144,51 @@ function LightAutoComplete(props) {
         style={{ top: -500, height: 500 }}
         classes={classes}
       />
-      <TextField
-        disabled={disabled}
-        onClick={() => {
-          !disabled && setShowDropdown(true);
-        }}
-        id={id}
-        label={placeholder || label}
-        className={classes.textbox}
-        onChange={handleOnChange}
-        margin="normal"
-        variant="outlined"
-        autoComplete="off"
-      />
-      {showDropdown && (
-        <>
-          <GhostDropdown
-            show={showDropdown}
-            classes={classes}
-            close={() => setShowDropdown(false)}
-          />
-          <Paper className={classes.dropdown}>
-            {optionsToDisplay.length === 0 && (
-              <p style={{ padding: 10, color: "lightgray" }}>
-                No results found...
-              </p>
-            )}
-            {optionsToDisplay.map((op, index) => {
-              return (
-                <div
-                  key={index.toString()}
-                  className={classes.dropdownItem}
-                  onClick={() => handleSelection(op)}
-                >
-                  {getLabel(op)}
-                </div>
-              );
-            })}
-          </Paper>
-        </>
-      )}
+      <div style={{}}>
+        <TextField
+          disabled={disabled}
+          onClick={() => {
+            !disabled && setShowDropdown(true);
+          }}
+          id={id}
+          label={placeholder || label}
+          className={classes.textbox}
+          onChange={handleOnChange}
+          margin="normal"
+          variant="outlined"
+          autoComplete="off"
+        />
+        {showDropdown && (
+          <>
+            <GhostDropdown
+              show={showDropdown}
+              classes={classes}
+              close={() => setShowDropdown(false)}
+            />
+            <Paper
+              className={classes.dropdown}
+              style={{ top: 70 + increasedRatio() }}
+            >
+              {optionsToDisplay.length === 0 && (
+                <p style={{ padding: 10, color: "lightgray" }}>
+                  No results found...
+                </p>
+              )}
+              {optionsToDisplay.map((op, index) => {
+                return (
+                  <div
+                    key={index.toString()}
+                    className={classes.dropdownItem}
+                    onClick={() => handleSelection(op)}
+                  >
+                    {getLabel(op)}
+                  </div>
+                );
+              })}
+            </Paper>
+          </>
+        )}
+      </div>
     </div>
   );
 }

@@ -42,7 +42,6 @@ function AddOrEditFeatureFlags({
 const preflight = (data) => {
   const user_ids = data.user_ids || [];
   var [scope] = data.scope || [] || null;
-  // console.log("LE DATA", data);
   const json = {
     ...(data || {}),
     user_ids: user_ids.map((u) => u.id),
@@ -54,8 +53,8 @@ const preflight = (data) => {
 
 const uniqueIdentifier = (text) => {
   if (!text || !text.trim()) return "";
-  var arr = text.split(" ");
-  return arr.join("-") + "-feature";
+  var arr = text.split(" ").toLowerCase();
+  return arr.join("_") + "_feature";
 };
 
 const parseFeatureForEditMode = (feature) => {
