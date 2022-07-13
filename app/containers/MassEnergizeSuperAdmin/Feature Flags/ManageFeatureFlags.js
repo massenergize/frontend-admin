@@ -7,13 +7,24 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import Loading from "dan-components/Loading";
 import { Link } from "react-router-dom";
+import { Typography } from "@material-ui/core";
+import { apiCall } from "../../../utils/messenger";
 const hasExpired = (date) => {
   const now = new Date().getTime();
   date = new Date(date).getTime();
   return date < now;
 };
-function ManageFeatureFlags({ classes, flags, editFeature }) {
+function ManageFeatureFlags({
+  classes,
+  flags,
+  editFeature,
+  toggleDeleteConfirmation,
+  putFlagsInRedux,
+  featureFlags,
+}) {
+
   if (!flags) return <Loading />;
+
   flags = Object.entries(flags || {});
   const columns = () => {
     return [
@@ -75,7 +86,7 @@ function ManageFeatureFlags({ classes, flags, editFeature }) {
         },
       },
       {
-        name: "Expires On",
+        name: "Expiry Date",
         key: "expiry-date",
         options: { filter: false },
       },
@@ -103,6 +114,7 @@ function ManageFeatureFlags({ classes, flags, editFeature }) {
       },
     ];
   };
+
   const fashionData = (data) => {
     return (data || []).map(([_, feature]) => {
       var comNames = (feature.communities || []).map((c) => c.name);
@@ -118,13 +130,53 @@ function ManageFeatureFlags({ classes, flags, editFeature }) {
       ];
     });
   };
+  const dataForTable = fashionData(flags);
 
+  const nowDelete = ({ idsToDelete, data }) => {
+    const itemsInRedux = flags;
+    const ids = [];
+    idsToDelete.forEach((d) => {
+      const found = data[d.dataIndex][0];
+      ids.push(found);
+      apiCall("/featureFlags.delete", { id: found }).catch((e) =>
+        console.log("FEATURE_DELETE_ERROR:", e)
+      );
+    });
+    var rem = (itemsInRedux || []).filter(
+      ([_, com]) => !ids.includes(Number(com.id))
+    );
+    rem = Object.fromEntries(rem);
+    putFlagsInRedux({ ...(featureFlags || {}), features: rem });
+  };
+
+  const makeDeleteUI = ({ idsToDelete }) => {
+    const len = (idsToDelete && idsToDelete.length) || 0;
+    return (
+      <Typography>
+        Are you sure you want to delete (
+        {(idsToDelete && idsToDelete.length) || ""})
+        {len === 1 ? " feature flag? " : " flags? "}
+        Functionalities linked to this may be deactivated
+      </Typography>
+    );
+  };
   const options = {
     filterType: "dropdown",
     responsive: "stacked",
+    download:false,
     print: false,
     rowsPerPage: 25,
-    rowsPerPageOptions: [10, 25, 100],
+    rowsPerPageOptions: [50, 100],
+    onRowsDelete: (rowsDeleted) => {
+      const idsToDelete = rowsDeleted.data;
+      toggleDeleteConfirmation({
+        show: true,
+        component: makeDeleteUI({ idsToDelete }),
+        onConfirm: () => nowDelete({ idsToDelete, data: dataForTable }),
+        closeAfterConfirmation: true,
+      });
+      return false;
+    },
   };
 
   return (
@@ -134,7 +186,7 @@ function ManageFeatureFlags({ classes, flags, editFeature }) {
         classes={classes}
         tableProps={{
           title: "All Features",
-          data: fashionData(flags),
+          data: dataForTable,
           columns: columns,
           options: options,
         }}

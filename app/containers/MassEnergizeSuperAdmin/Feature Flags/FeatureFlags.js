@@ -3,7 +3,10 @@ import React, { useState } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from "../../../components/Widget/widget-jss";
-import { loadFeatureFlags } from "../../../redux/redux-actions/adminActions";
+import {
+  loadFeatureFlags,
+  reduxToggleUniversalModal,
+} from "../../../redux/redux-actions/adminActions";
 import AddOrEditFeatureFlags from "./AddOrEditFeatureFlags";
 import ManageFeatureFlags from "./ManageFeatureFlags";
 
@@ -13,8 +16,9 @@ function FeatureFlags({
   communities,
   users,
   putFlagsInRedux,
+  toggleDeleteConfirmation,
 }) {
-  const [currentTab, setCurrentTab] = useState(1);
+  const [currentTab, setCurrentTab] = useState(0);
   const [featureToEdit, setFeatureToEdit] = useState(null);
   const TABS = {
     0: {
@@ -23,11 +27,14 @@ function FeatureFlags({
       component: (
         <ManageFeatureFlags
           classes={classes}
+          featureFlags={featureFlags}
           flags={featureFlags && featureFlags.features}
           editFeature={(data) => {
             setFeatureToEdit(data);
             setCurrentTab(1);
           }}
+          toggleDeleteConfirmation={toggleDeleteConfirmation}
+          putFlagsInRedux={putFlagsInRedux}
         />
       ),
     },
@@ -55,8 +62,10 @@ function FeatureFlags({
       <Paper>
         <div style={{ padding: 20 }}>
           <Typography variant="body">
-            Thisi s the page for feature flags, feel free to toggle anything
-            that needs to be done
+            Feature flags help you control which functionalities are available
+            to different audiences. Here, you can create flags that can be used
+            to narrow a functionality to a group of communities, a group of
+            users, or a particular platform. Like (User portal, or admin portal)
           </Typography>
         </div>
 
@@ -87,7 +96,13 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({ putFlagsInRedux: loadFeatureFlags }, dispatch);
+  return bindActionCreators(
+    {
+      putFlagsInRedux: loadFeatureFlags,
+      toggleDeleteConfirmation: reduxToggleUniversalModal,
+    },
+    dispatch
+  );
 };
 const Mapped = connect(
   mapStateToProps,
