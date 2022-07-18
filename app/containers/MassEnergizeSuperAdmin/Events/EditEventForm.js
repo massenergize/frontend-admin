@@ -504,8 +504,7 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
                   fields: [
                     {
                       name: "community",
-                      label: "Primary Community",
-                      placeholder: "eg. Springfield",
+                      label: "Primary Community (select one)",
                       fieldType: "Dropdown",
                       defaultValue: event.community && event.community.id,
                       dbName: "community_id",
@@ -514,7 +513,14 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
                   ],
                 },
               }
-            : {},
+            : {
+              name: "community",
+              label: "Primary Community (select one)",
+              fieldType: "Dropdown",
+              defaultValue: event.community && event.community.id,
+              dbName: "community_id",
+              data: [{ displayName: "--", id: "" }, ...communities],
+            },
         ],
       },
       {
