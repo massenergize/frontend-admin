@@ -121,7 +121,6 @@ export default withStyles(styles, { withTheme: true })(NewActionMapped);
 
 const createFormJson = ({ communities, ccActions, vendors, auth }) => {
   const is_super_admin = auth && auth.is_super_admin;
-  console.log(communities[0])
   const formJson = {
     title: "Create a New Action",
     subTitle: "",
