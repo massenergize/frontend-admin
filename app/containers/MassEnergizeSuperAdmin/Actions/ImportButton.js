@@ -8,13 +8,12 @@ export default function ImportButton(props) {
   const handleOnClick = () => {
     openPicker({
       clientId: "941856327176-691hf1ndva0423cch73k9ok0a6do0gs8.apps.googleusercontent.com", // web client credentials
-    //   developerKey: DOCS_API_KEY, // Import/Export Docs API Key
-      developerKey: "AIzaSyAgag7ZozlhKwCWMZ57j9BBxWgFT6oz6yc",
+      developerKey: DOCS_API_KEY,
       viewId: "DOCS",
       showUploadView: true,
       showUploadFolders: true,
       supportDrives: true,
-          ultiselect: true,
+    //   multiselect: true,
       supportsAllDrives: true,
       setIncludeFolders: true,
       callbackFunction: async (data) => {

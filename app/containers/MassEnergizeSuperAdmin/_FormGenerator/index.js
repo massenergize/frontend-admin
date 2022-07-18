@@ -410,6 +410,7 @@ class MassEnergizeForm extends Component {
    */
   submitForm = async (event) => {
     event.preventDefault();
+    console.log(this.state.formData)
 
     // lets set the startCircularSpinner Value so the spinner starts spinning
     await this.setStateAsync({ startCircularSpinner: true });
@@ -507,7 +508,9 @@ class MassEnergizeForm extends Component {
     switch (field.fieldType) {
       case FieldTypes.ImportButton:
         return (<ImportButton type="Action" onGetDocData={(fields) => {
+            console.log(this.state);
             this.setState({formData: {...this.state.formData, ...fields}});
+            console.log(this.state);
         }} />);
       
       case FieldTypes.Checkbox:
