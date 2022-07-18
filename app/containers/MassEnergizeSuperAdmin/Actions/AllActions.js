@@ -228,11 +228,8 @@ class AllActions extends React.Component {
               >
                 <FileCopy size="small" variant="outlined" color="secondary" />
               </Link>
-              {/* CHANGE ICON */}
-              {/* <FileCopy color="secondary" onClick={() => {this.exportAction(id)}}/> */}
-              <ExportButton onSelectFolder={async (folder, action_id) => {
-                console.log("exporting action with id: ", action_id);
-                await apiCall("actions.export", {id: id, exporter: "TESTING", folder: folder});
+              <ExportButton id={id} onSelectFolder={async (folder, action_id) => {
+                await apiCall("actions.export", {id: action_id, exporter_name:this.props.auth['full_name'], exporter_id: this.props.auth['id'], folder: folder});
               }}/>
             </div>
           ),
