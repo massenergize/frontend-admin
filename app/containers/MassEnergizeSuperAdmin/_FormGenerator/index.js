@@ -507,7 +507,7 @@ class MassEnergizeForm extends Component {
 
     switch (field.fieldType) {
       case FieldTypes.ImportButton:
-        return (<ImportButton type="Action" onGetDocData={(fields) => {
+        return (<ImportButton type="Action" auth={field.auth} onGetDocData={(fields) => {
             console.log(this.state);
             this.setState({formData: {...this.state.formData, ...fields}});
             console.log(this.state);

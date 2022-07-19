@@ -22,9 +22,14 @@ export default function ImportButton(props) {
           console.log('User clicked cancel/close button');
           return;
         }
-
         if (data.action === 'picked') {
-          await apiCall("/actions.import", {documentID: data['docs'][0]['id']}).then(json => {
+          let comm_ids = []
+          for (let i=0; i < props.auth.communities.length; i++){
+            comm_ids.push(props.auth.communities[i]['id'])
+          }
+          comm_ids = comm_ids.join(",")
+
+          await apiCall("/actions.import", {documentID: data['docs'][0]['id'], communities: comm_ids}).then(json => {
             if (json.success) props.onGetDocData(json.data);
             else {
               console.log(json.error);

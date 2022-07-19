@@ -137,7 +137,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth, }) => {
         label: "Import an action from a populated Google Docs Template",
         fieldType: "Section",
         children: [
-            {fieldType: "ImportButton",},
+            {fieldType: "ImportButton", auth: auth},
         ]
       },
       {
