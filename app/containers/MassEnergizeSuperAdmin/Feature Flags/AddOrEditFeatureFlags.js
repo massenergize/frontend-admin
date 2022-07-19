@@ -104,7 +104,7 @@ var createFormJson = ({
   const json = {
     title: inEditMode ? "Update a feature flag" : "Add a new feature flag",
     subTitle: "",
-    method: inEditMode ? "/featureFlags.info.update" : "/featureFlags.add",
+    method: inEditMode ? "/featureFlag.update" : "/featureFlags.add",
     preflightFxn: preflight,
     fields: [
       {

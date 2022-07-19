@@ -149,7 +149,7 @@ function ManageFeatureFlags({
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/featureFlags.delete", { id: found }).catch((e) =>
+      apiCall("/featureFlag.delete", { id: found }).catch((e) =>
         console.log("FEATURE_DELETE_ERROR:", e)
       );
     });
