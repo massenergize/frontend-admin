@@ -30,6 +30,7 @@ import {
   TEST_REDUX,
   LOAD_ALL_TASK_FUNCTIONS,
   LOAD_ALL_TASKS,
+  LOAD_SETTINGS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -48,6 +49,7 @@ export function testReduxReducer(state = null, action = {}) {
       return state;
   }
 }
+
 export default function reducer(state = initialImmutableState, action = {}) {
   switch (action.type) {
     case START_UP:
@@ -56,6 +58,14 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+export const reducerForSettings = (state = null, action = {}) => {
+  switch (action.type) {
+    case LOAD_SETTINGS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 
 export const reducerForUniversalModal = (state = {}, action = {}) => {
   switch (action.type) {

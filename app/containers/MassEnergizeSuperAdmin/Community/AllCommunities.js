@@ -252,7 +252,6 @@ class AllCommunities extends React.Component {
     const { columns } = this.state;
     const { classes, toggleDeleteConfirmation } = this.props;
     const data = this.fashionData(this.props.communities || []);
-
     const options = {
       filterType: "dropdown",
       responsive: "stacked",

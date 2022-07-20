@@ -74,7 +74,7 @@ module.exports = [
   {
     key: "messages",
     name: "Messages",
-    icon: "md-reorder",
+    icon: "md-text",
     child: [
       {
         key: "all-messages",
@@ -118,7 +118,7 @@ module.exports = [
   {
     key: "subscribers",
     name: "Subscribers",
-    icon: "md-reorder",
+    icon: "md-notifications",
     child: [
       {
         key: "about-subscribers",
@@ -219,7 +219,7 @@ module.exports = [
   {
     key: "users",
     name: "Users",
-    icon: "ios-people",
+    icon: "md-people",
     child: [
       {
         key: "about-users",
@@ -264,7 +264,7 @@ module.exports = [
   {
     key: "carbon-equivalancies",
     name: "Carbon",
-    icon: "md-reorder",
+    icon: "md-leaf",
     child: [
       {
         key: "about-equivalencies",
@@ -286,7 +286,7 @@ module.exports = [
   {
     key: "tasks",
     name: "Tasks",
-    icon: "md-reorder",
+    icon: "md-refresh",
     child: [
       {
         key: "create-tasks",
@@ -299,5 +299,11 @@ module.exports = [
         link: "/admin/read/tasks",
       },
     ],
+  },
+  {
+    key: "settings",
+    name: "Settings",
+    icon: "md-cog",
+    link: "/admin/profile/settings"
   },
 ];
