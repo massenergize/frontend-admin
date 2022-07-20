@@ -84,17 +84,20 @@ import TeamMembers from "../MassEnergizeSuperAdmin/Teams/TeamMembers";
 import EventRSVPs from "../MassEnergizeSuperAdmin/Events/EventRSVPs";
 import ThemeModal from "../../components/Widget/ThemeModal";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
-const THIRTY_MINUTES = 1000 * 60 * 30;
-const TWENTY_FOUR_HOURS = 1000 * 60 * 60 * 24;
+import { THREE_MINUTES, TIME_UNTIL_EXPIRATION } from "../../utils/constants";
+
 class Application extends React.Component {
   componentWillMount() {
     this.props.reduxCallCommunities();
   }
   componentDidMount() {
     this.props.fetchInitialContent(this.props.auth);
-    setTimeout(() => {
-      this.runAdminStatusCheck();
-    }, TWENTY_FOUR_HOURS);
+    setInterval(() => {
+      const expirationTime = localStorage.getItem(TIME_UNTIL_EXPIRATION) || 0;
+      const currentDateTime = Date.now();
+      const itsPassedADaySinceLogin = currentDateTime > expirationTime;
+      if (itsPassedADaySinceLogin) this.runAdminStatusCheck();
+    }, THREE_MINUTES);
   }
 
   getCommunityList() {
@@ -103,23 +106,20 @@ class Application extends React.Component {
     return list.map((com) => com.id);
   }
 
-  runAdminStatusCheck() {
-    setInterval(async () => {
-      try {
-        const response = await apiCall("auth.whoami");
-        if (response.success) return;
+  async runAdminStatusCheck() {
+    try {
+      const response = await apiCall("/auth.whoami");
+      if (response.success) return
 
-        if (response.error === PERMISSION_DENIED)
-          return (window.location = "/login");
-      } catch (e) {
-        console.log("ADMIN_SESSION_STATUS_ERROR:", e.toString());
-      }
-    }, THIRTY_MINUTES);
+      if (response.error === PERMISSION_DENIED)
+        return (window.location = "/login");
+    } catch (e) {
+      console.log("ADMIN_SESSION_STATUS_ERROR:", e.toString());
+    }
   }
 
   render() {
     const { auth, signOut } = this.props;
-
     const {
       changeMode,
       history,
