@@ -228,6 +228,7 @@ class AllActions extends React.Component {
               >
                 <FileCopy size="small" variant="outlined" color="secondary" />
               </Link>
+              &nbsp;&nbsp;
               <ExportButton id={id} onSelectFolder={async (folder, action_id) => {
                 await apiCall("actions.export", {id: action_id, exporter_name:this.props.auth['full_name'], exporter_id: this.props.auth['id'], folder: folder});
               }}/>

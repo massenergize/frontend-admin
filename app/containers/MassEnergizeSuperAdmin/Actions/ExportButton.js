@@ -24,6 +24,6 @@ export default function ExportButton(props) {
         })
     }
 
-    return <i className="fab fa-google material-ui" color="secondary" onClick={() => handleOnClick(action_id)} /> 
+    return <i className="fab fa-google material-ui" onClick={() => handleOnClick(action_id)} /> 
     // return <FileCopy color="secondary" onClick={() => handleOnClick(action_id)}>Ion-logo-google</FileCopy>
 }
