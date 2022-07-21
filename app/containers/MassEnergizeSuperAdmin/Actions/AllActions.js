@@ -75,7 +75,7 @@ class AllActions extends React.Component {
     const updateItems = allActions.filter((a) => a.id !== data.id);
     updateItems.splice(index, 0, data);
     putActionsInRedux(updateItems);
-  }
+  };
 
   changeActions = async (id) => {
     const { allActions } = this.state;
@@ -399,6 +399,14 @@ class AllActions extends React.Component {
           noOk: !noTemplatesSelectedGoAhead,
         });
         return false;
+      },
+      customSort: (data, colIndex, order) => {
+        return data.sort((a, b) => {
+          return (
+            (a.data[colIndex].rank < b.data[colIndex].rank ? -1 : 1) *
+            (order === "desc" ? 1 : -1)
+          );
+        });
       },
     };
 
