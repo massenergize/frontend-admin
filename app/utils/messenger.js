@@ -5,6 +5,7 @@ import qs from 'qs';
 import { API_HOST, IS_CANARY, IS_PROD, IS_LOCAL, CC_HOST } from '../config/constants';
 export const PERMISSION_DENIED = "permission_denied"; 
 export const SESSION_EXPIRED = "session_expired";
+import * as Sentry from "@sentry/react";
 /**
  * Handles making a POST request to the backend as a form submission
  * It also adds meta data for the BE to get context on the request coming in.
@@ -71,13 +72,16 @@ export async function apiCall(
     }
     return json;
   } catch (error) {
-    const responseText = response.text();
-    if (responseText.isValidJson()) {
-      return { success: false, error: error.toString() };
+    const errorText = error.toString();
+    if (errorText.search("JSON")>-1) {
+      const errorMessage = "Invalid response to "+destinationUrl+" Data: "+JSON.stringify(formData);
+      // this will send message to Sentry Slack channel
+      Sentry.captureMessage(errorMessage);
+      return { success: false, error: errorMessage };
     }
     else {
-      const errorText = "Invalid response: "+destinationUrl+" Formdata:"+JSON.stringify(FormData);
-      return { success: false, error: errorText };
+      Sentry.captureException(error);
+      return { success: false, error: error.toString() };
     }
   }
 }
