@@ -71,7 +71,14 @@ export async function apiCall(
     }
     return json;
   } catch (error) {
-    return { success: false, error: error.toString() };
+    const responseText = response.text();
+    if (responseText.isValidJson()) {
+      return { success: false, error: error.toString() };
+    }
+    else {
+      const errorText = "Invalid response: "+destinationUrl+" Formdata:"+JSON.stringify(FormData);
+      return { success: false, error: errorText };
+    }
   }
 }
 
