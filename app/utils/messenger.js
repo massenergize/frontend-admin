@@ -74,7 +74,7 @@ export async function apiCall(
   } catch (error) {
     const errorText = error.toString();
     if (errorText.search("JSON")>-1) {
-      const errorMessage = "Invalid response to "+destinationUrl+" Data: "+JSON.stringify(formData);
+      const errorMessage = "Invalid response to "+destinationUrl+" Data: "+JSON.stringify(data);
       // this will send message to Sentry Slack channel
       Sentry.captureMessage(errorMessage);
       return { success: false, error: errorMessage };
