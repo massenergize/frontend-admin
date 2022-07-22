@@ -75,7 +75,7 @@ class AllActions extends React.Component {
     const updateItems = allActions.filter((a) => a.id !== data.id);
     updateItems.splice(index, 0, data);
     putActionsInRedux(updateItems);
-  }
+  };
 
   changeActions = async (id) => {
     const { allActions } = this.state;
@@ -332,6 +332,20 @@ class AllActions extends React.Component {
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putActionsInRedux(rem);
   }
+  getTimeStamp = () => {
+    const today = new Date();
+    let newDate = today;
+    let options = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    };
+
+    return Intl.DateTimeFormat("en-US", options).format(newDate);
+  };
 
   render() {
     const title = brand.name + " - All Actions";
@@ -399,6 +413,23 @@ class AllActions extends React.Component {
           noOk: !noTemplatesSelectedGoAhead,
         });
         return false;
+      },
+
+      downloadOptions: {
+        filename: `All Actions (${this.getTimeStamp()}).csv`,
+        separator: ",",
+      },
+      onDownload: (buildHead, buildBody, columns, data) => {
+        let alteredData = data.map((d) => {
+          let content = [...d.data];
+          content[3] = d.data[3].rank;
+          return {
+            data: content,
+            index: d.index,
+          };
+        });
+        let csv = buildHead(columns) + buildBody(alteredData);
+        return csv;
       },
     };
 
