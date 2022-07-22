@@ -414,7 +414,14 @@ class AllActions extends React.Component {
         });
         return false;
       },
-
+      customSort: (data, colIndex, order) => {
+        return data.sort((a, b) => {
+          return (
+            (a.data[colIndex].rank < b.data[colIndex].rank ? -1 : 1) *
+            (order === "desc" ? 1 : -1)
+          );
+        });
+      },
       downloadOptions: {
         filename: `All Actions (${this.getTimeStamp()}).csv`,
         separator: ",",
