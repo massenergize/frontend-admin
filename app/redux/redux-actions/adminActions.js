@@ -99,9 +99,9 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       filters: ["uploads", "actions", "events", "testimonials"],
       target_communities: [],
     }),
-    apiCall(isSuperAdmin ? "/tasks.functions.list" : "/tasks.functions.list"),
-    apiCall(isSuperAdmin ? "/tasks.list" : "/tasks.list"),
-    apiCall("/settings.list"),
+    //apiCall(isSuperAdmin ? "/tasks.functions.list" : "/tasks.functions.list"),
+    //apiCall(isSuperAdmin ? "/tasks.list" : "/tasks.list"),
+    //apiCall("/settings.list"),
   ]).then((response) => {
     const [
       communities,
@@ -117,9 +117,9 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       ccActions,
       tagCollections,
       galleryImages,
-      tasksFunctions,
-      tasks,
-      settings,
+      //tasksFunctions,
+      //tasks,
+      //settings,
     ] = response;
     dispatch(reduxLoadAllCommunities(communities.data));
     dispatch(loadAllActions(actions.data));
@@ -134,9 +134,9 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(reduxLoadCCActions(ccActions.data.actions));
     dispatch(loadAllTags(tagCollections.data));
     dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
-    dispatch(loadTaskFunctionsAction(tasksFunctions.data));
-    dispatch(loadTasksAction(tasks.data));
-    dispatch(loadSettings(settings.data ||{}));
+    //dispatch(loadTaskFunctionsAction(tasksFunctions.data));
+    //dispatch(loadTasksAction(tasks.data));
+    //dispatch(loadSettings(settings.data ||{}));
   });
 };
 
