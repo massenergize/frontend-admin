@@ -8,6 +8,7 @@ import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/util
 import { makeTagSection } from "./EditEventForm";
 import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
+import fieldTypes from "../_FormGenerator/fieldTypes";
 
 const styles = (theme) => ({
   root: {
@@ -45,7 +46,7 @@ class CreateNewEventForm extends Component {
   }
 
   static getDerivedStateFromProps = (props) => {
-    const { communities, tags } = props;
+    const { communities, tags, auth } = props;
 
     const coms = (communities || []).map((c) => ({
       ...c,
@@ -55,6 +56,7 @@ class CreateNewEventForm extends Component {
 
     const formJson = createFormJson({
       communities: coms,
+      auth,
     });
 
     const section = makeTagSection({ collections: tags, defaults: false });
@@ -68,13 +70,12 @@ class CreateNewEventForm extends Component {
     };
   };
 
-
   render() {
     const { classes } = this.props;
     const { formJson } = this.state;
     if (!formJson) return <Loading />;
     return (
-      <div key = {this.state.reRenderKey}>
+      <div key={this.state.reRenderKey}>
         <MassEnergizeForm classes={classes} formJson={formJson} />
       </div>
     );
@@ -89,6 +90,7 @@ const mapStateToProps = (state) => {
   return {
     tags: state.getIn(["allTags"]),
     communities: state.getIn(["communities"]),
+    auth: state.getIn(["auth"]),
   };
 };
 
@@ -96,8 +98,9 @@ const CreateEventMapped = connect(mapStateToProps)(CreateNewEventForm);
 
 export default withStyles(styles, { withTheme: true })(CreateEventMapped);
 
-const createFormJson = ({ communities }) => {
+const createFormJson = ({ communities, auth }) => {
   // const { communities } = this.state;
+  const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Create New Event or Campaign",
     subTitle: "",
@@ -252,30 +255,41 @@ const createFormJson = ({ communities }) => {
               ],
             },
           },
-          {
-            name: "is_global",
-            label: "Is this Event a Template?",
-            fieldType: "Radio",
-            isRequired: true,
-            defaultValue: "false",
-            dbName: "is_global",
-            readOnly: false,
-            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-            child: {
-              valueToCheck: "false",
-              fields: [
-                {
-                  name: "community",
-                  label: "Primary Community",
-                  placeholder: "eg. Wayland",
-                  fieldType: "Dropdown",
-                  defaultValue: null,
-                  dbName: "community_id",
-                  data: [{ displayName: "--", id: "" }, ...communities],
+          is_super_admin
+            ? {
+                name: "is_global",
+                label: "Is this Event a Template?",
+                fieldType: "Radio",
+                isRequired: true,
+                defaultValue: "false",
+                dbName: "is_global",
+                readOnly: false,
+                data: [
+                  { id: "false", value: "No" },
+                  { id: "true", value: "Yes" },
+                ],
+                child: {
+                  valueToCheck: "false",
+                  fields: [
+                    {
+                      name: "community",
+                      label: "Primary Community (select one)",
+                      fieldType: "Dropdown",
+                      defaultValue: null,
+                      dbName: "community_id",
+                      data: [{ displayName: "--", id: "" }, ...communities],
+                    },
+                  ],
                 },
-              ],
+              }
+            : {
+              name: "community",
+              label: "Primary Community (select one)",
+              fieldType: "Dropdown",
+              defaultValue: communities[0].id,
+              dbName: "community_id",
+              data: [{ displayName: "--", id: "" }, ...communities],
             },
-          },
         ],
       },
       {
@@ -349,13 +363,10 @@ const createFormJson = ({ communities }) => {
       {
         name: "image",
         placeholder: "Select an Image",
-        fieldType: "File",
+        fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload Files",
-        selectMany: false,
         isRequired: false,
-        defaultValue: "",
-        filesLimit: 1,
       },
       {
         name: "rsvp_enabled",
@@ -365,10 +376,7 @@ const createFormJson = ({ communities }) => {
         defaultValue: "false",
         dbName: "rsvp_enabled",
         readOnly: false,
-        data: [
-          { id: 'false', value: 'No' },
-          { id: 'true', value: 'Yes' }
-        ],
+        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
         child: {
           dbName: "rsvp_communication",
           valueToCheck: "true",
@@ -379,7 +387,7 @@ const createFormJson = ({ communities }) => {
                 "Send an email with Zoom link or other details when user RSVPs they are coming?",
               fieldType: "Radio",
               isRequired: false,
-              defaultValue: 'false',
+              defaultValue: "false",
               dbName: "rsvp_email",
               readOnly: false,
               data: [
@@ -391,18 +399,18 @@ const createFormJson = ({ communities }) => {
                 valueToCheck: "true",
                 fields: [
                   {
-                    name: 'rsvp_message_text',
-                    label: 'Message to send to RSVP',
-                    placeholder: 'eg. This event is happening in ...',
-                    fieldType: 'HTMLField',
+                    name: "rsvp_message_text",
+                    label: "Message to send to RSVP",
+                    placeholder: "eg. This event is happening in ...",
+                    fieldType: "HTMLField",
                     isRequired: true,
                     defaultValue: null,
-                    dbName: 'rsvp_message',
+                    dbName: "rsvp_message",
                   },
-                ]
+                ],
               },
             },
-          ]
+          ],
         },
       },
       {

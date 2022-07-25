@@ -5,6 +5,7 @@ import { withStyles } from "@material-ui/core/styles";
 import { apiCall } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
 import Loading from "dan-components/Loading";
+import fieldTypes from "../_FormGenerator/fieldTypes";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -146,6 +147,7 @@ class EditActionForm extends Component {
       communities: coms,
       vendors: vends,
       ccActions: modifiedCCActions,
+      auth
     });
 
     const section = makeTagSection({ collections: tags, action });
@@ -197,8 +199,9 @@ EditActionForm.propTypes = {
 
 export default withStyles(styles, { withTheme: true })(EditActionMapped);
 
-const createFormJson = ({ action, communities, ccActions, vendors }) => {
+const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
   if (!action || !ccActions || !vendors || !communities) return;
+  const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Update Action",
     subTitle: "",
@@ -230,6 +233,7 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
             defaultValue: action.title,
             dbName: "title",
             readOnly: false,
+            maxLength: 40,
           },
           {
             name: "rank",
@@ -243,7 +247,7 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
             dbName: "rank",
             readOnly: false,
           },
-          {
+          is_super_admin ? {
             name: "is_global",
             label: "Is this Action a Template?",
             fieldType: "Radio",
@@ -257,7 +261,7 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
               fields: [
                 {
                   name: "community",
-                  label: "Primary Community",
+                  label: "Primary Community (Select one)",
                   placeholder: "",
                   fieldType: "Dropdown",
                   defaultValue: action.community && "" + action.community.id,
@@ -266,6 +270,14 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
                 },
               ],
             },
+          } : {
+            name: "community",
+            label: "Primary Community (Select one)",
+            placeholder: "",
+            fieldType: "Dropdown",
+            defaultValue: action.community && "" + action.community.id,
+            dbName: "community_id",
+            data: [{ displayName: "--", id: "" }, ...communities],
           },
         ],
       },
@@ -345,13 +357,12 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
       {
         name: "image",
         placeholder: "Select an Image",
-        fieldType: "File",
-        previewLink: action.image && action.image.url,
+        fieldType: fieldTypes.MediaLibrary,
+        selected: action.image ? [action.image] : [],
         dbName: "image",
         label: "Upload Files",
         isRequired: false,
         defaultValue: "",
-        filesLimit: 1,
       },
       {
         name: "is_published",

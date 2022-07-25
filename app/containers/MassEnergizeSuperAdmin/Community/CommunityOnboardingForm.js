@@ -4,6 +4,7 @@ import states from "dan-api/data/states";
 import { withStyles } from "@material-ui/core/styles";
 import MassEnergizeForm from "../_FormGenerator";
 import { groupSocialMediaFields, getMoreInfo } from "./utils";
+import fieldTypes from "../_FormGenerator/fieldTypes";
 
 const styles = (theme) => ({
   root: {
@@ -39,7 +40,7 @@ class CreateNewCommunityForm extends Component {
   }
 
   async componentDidMount() {
-     const formJson = await this.createFormJson();
+    const formJson = await this.createFormJson();
     await this.setStateAsync({ formJson });
   }
 
@@ -56,13 +57,17 @@ class CreateNewCommunityForm extends Component {
     // quick and dirty - duplicated code - needs to be consistant between pages and with the API
     // could read these options from the API or share the databaseFieldChoices json
     const geography_types = [
-      { id: "ZIPCODE", value:"Community defined by one or more towns or zipcodes (can have smaller communities within)" },
-      { id: "CITY", value:"Community defined by one or more cities" },
-      { id: "COUNTY", value:"Community defined by one or more counties" },
+      {
+        id: "ZIPCODE",
+        value:
+          "Community defined by one or more towns or zipcodes (can have smaller communities within)",
+      },
+      { id: "CITY", value: "Community defined by one or more cities" },
+      { id: "COUNTY", value: "Community defined by one or more counties" },
       { id: "STATE", value: "Community defined by one or more states" },
-      { id: "COUNTRY", value:"Community defined by a country" },
+      { id: "COUNTRY", value: "Community defined by a country" },
       //{ id: "NON_GEOGRAPHIC", value:"A non-geographic community" },
-    ]  
+    ];
     const formJson = {
       title: "Create New Community",
       subTitle: "",
@@ -111,7 +116,8 @@ class CreateNewCommunityForm extends Component {
             },
             {
               name: "about",
-              label: "Short intro about this community for new users - 100 char max",
+              label:
+                "Short intro about this community for new users - 100 char max",
               placeholder: "Welcome to Energize xxx, a project of ....",
               fieldType: "TextField",
               contentType: "text",
@@ -120,11 +126,11 @@ class CreateNewCommunityForm extends Component {
               dbName: "about_community",
               readOnly: false,
             },
-          ]
+          ],
         },
         {
-          label: 'Primary contact (seen in community portal footer)',
-          fieldType: 'Section',
+          label: "Primary contact (seen in community portal footer)",
+          fieldType: "Section",
           children: [
             {
               name: "admin_full_name",
@@ -166,14 +172,14 @@ class CreateNewCommunityForm extends Component {
           fieldType: "Section",
           children: [
             {
-                 name: 'address',
-                 label: 'Street Address',
-                 placeholder: 'Enter street address (optional)',
-                 fieldType: 'TextField',
-                 contentType: 'text',
-                 isRequired: false,
-                 dbName: 'address',
-                 readOnly: false
+              name: "address",
+              label: "Street Address",
+              placeholder: "Enter street address (optional)",
+              fieldType: "TextField",
+              contentType: "text",
+              isRequired: false,
+              dbName: "address",
+              readOnly: false,
             },
             {
                  name: 'city',
@@ -206,7 +212,7 @@ class CreateNewCommunityForm extends Component {
               dbName: 'zipcode',
               readOnly: false
             },
-          ]
+          ],
         },
         {
           label: "Community Type",
@@ -228,30 +234,31 @@ class CreateNewCommunityForm extends Component {
                 valueToCheck: "true",
                 fields: [
                   {
-                    name: 'geography_type',
-                    label: 'Type of geographic community',
-                    fieldType: 'Radio',
+                    name: "geography_type",
+                    label: "Type of geographic community",
+                    fieldType: "Radio",
                     isRequired: true,
-                    defaultValue: 'ZIPCODE',
-                    dbName: 'geography_type',
+                    defaultValue: "ZIPCODE",
+                    dbName: "geography_type",
                     readOnly: false,
                     data: geography_types,
                   },
                   {
-                    name: 'locations',
-                    label: 'List of all such regions (zipcodes or towns, cities, states) within the community, separated by commas ',
-                    placeholder: 'eg. 01101, 01102, 01103, 01104',
-                    fieldType: 'TextField',
-                    contentType: 'text',
+                    name: "locations",
+                    label:
+                      "List of all such regions (zipcodes or towns, cities, states) within the community, separated by commas ",
+                    placeholder: "eg. 01101, 01102, 01103, 01104",
+                    fieldType: "TextField",
+                    contentType: "text",
                     isRequired: true,
-                    defaultValue: '',
-                    dbName: 'locations',
-                    readOnly: false
+                    defaultValue: "",
+                    dbName: "locations",
+                    readOnly: false,
                   },
-                ]
-              }
+                ],
+              },
             },
-          ]
+          ],
         },
         {
           label:
@@ -260,17 +267,18 @@ class CreateNewCommunityForm extends Component {
           children: [
             {
               name: "social_or_newsletter",
-              label: "Choose what to show (Social Media Links or Subscribe to Newsletter)",
+              label:
+                "Choose what to show (Social Media Links or Subscribe to Newsletter)",
               fieldType: "Radio",
               isRequired: true,
-              defaultValue:'false',
+              defaultValue: "false",
               dbName: "wants_socials",
               readOnly: false,
               data: [
                 { id: "true", value: "Social Media Links" },
                 { id: "false", value: "Subscribe to Newsletter" },
               ],
-              child:  {
+              child: {
                 valueToCheck: "true",
                 fields: [
                   {
@@ -296,8 +304,7 @@ class CreateNewCommunityForm extends Component {
                   },
                   {
                     name: "com_instagram_link",
-                    label:
-                      "Provide a link to your community's Instagram page",
+                    label: "Provide a link to your community's Instagram page",
                     placeholder: "eg. www.instagram.com/your-community",
                     fieldType: "TextField",
                     contentType: "text",
@@ -314,13 +321,11 @@ class CreateNewCommunityForm extends Component {
         {
           name: "image",
           placeholder: "Upload a Logo",
-          fieldType: "File",
+          fieldType: fieldTypes.MediaLibrary,
           dbName: "image",
           label: "Upload a logo for this community",
-          selectMany: false,
-          isRequired: false,
-          defaultValue: "",
-          filesLimit: 1,
+          uploadMultiple: false,
+          multiple: false,
         },
         {
           name: "accepted_terms_and_conditions",

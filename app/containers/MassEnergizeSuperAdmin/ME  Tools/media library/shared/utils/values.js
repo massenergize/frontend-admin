@@ -15,3 +15,11 @@ export const dummyImages = [
   { url: 'https://i.pravatar.cc/300?img=30', id: 11 },
   { url: 'https://i.pravatar.cc/300?img=8', id: 32 },
 ];
+
+export const TABS = {
+  UPLOAD_TAB: "upload",
+  LIBRARY_TAB: "library",
+  CROPPING_TAB: "crop",
+};
+
+export const DEFAULT_FILE_LIMIT = 10; // There is no significant reason for 10 as the default number. We can change it to anything later...

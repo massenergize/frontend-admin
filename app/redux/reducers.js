@@ -38,6 +38,10 @@ import app, {
   reducerForHeap,
   reducerForCCAction,
   reducerForUniversalModal,
+  testReduxReducer,
+  allTaskFunctionsReducer,
+  allTasksReducer,
+  reducerForSettings,
 } from "./modules/appReducer";
 
 /**
@@ -45,6 +49,8 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    settings: reducerForSettings,
+    testRedux: testReduxReducer,
     modalOptions: reducerForUniversalModal,
     ccActions: reducerForCCAction,
     heap: reducerForHeap, // an object that is used to temporarily hold all kinds of random data.
@@ -80,6 +86,8 @@ export default function createReducer(injectedReducers = {}) {
     language: languageProviderReducer,
     router: connectRouter(history),
     ...injectedReducers,
+    taskFunctions: allTaskFunctionsReducer,
+    tasks: allTasksReducer,
   });
 
   // Wrap the root reducer and return a new root reducer with router state

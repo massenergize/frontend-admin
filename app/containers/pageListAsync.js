@@ -2,6 +2,12 @@ import React from "react";
 import Loading from "dan-components/Loading";
 import loadable from "../utils/loadable";
 
+export const Settings = loadable(
+  () => import("./MassEnergizeSuperAdmin/Settings/Settings"),
+  {
+    fallback: <Loading />,
+  }
+);
 export const AddToGallery = loadable(
   () => import("./MassEnergizeSuperAdmin/Gallery/AddToGallery"),
   {
@@ -181,6 +187,8 @@ export const AddCategory = loadable(
     fallback: <Loading />,
   }
 );
+
+
 
 export const EditCategory = loadable(
   () => import("./MassEnergizeSuperAdmin/Categories/EditCategory"),
@@ -445,6 +453,20 @@ export const UsersList = loadable(
 );
 export const ImportContacts = loadable(
   () => import("./MassEnergizeSuperAdmin/Summary/ImportContacts"),
+  {
+    fallback: <Loading />,
+  }
+);
+
+export const AddTask = loadable(
+  () => import("./MassEnergizeSuperAdmin/Tasks/CreateTask"),
+  {
+    fallback: <Loading />,
+  }
+);
+
+export const ListTasks = loadable(
+  () => import("./MassEnergizeSuperAdmin/Tasks/AllTasks"),
   {
     fallback: <Loading />,
   }
