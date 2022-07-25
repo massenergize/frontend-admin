@@ -36,7 +36,7 @@ function MediaLibraryModal({
   croppedSource,
   setCroppedSource,
   allowCropping,
-  fileLimit
+  fileLimit,
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -106,7 +106,7 @@ function MediaLibraryModal({
           switchToCropping={switchToCropping}
           cropped={cropped}
           allowCropping={allowCropping}
-          fileLimit = {fileLimit}
+          fileLimit={fileLimit}
         />
       ),
     },
@@ -128,7 +128,7 @@ function MediaLibraryModal({
             shouldWait={shouldWait}
             setShouldWait={setShouldWait}
             awaitSeconds={awaitSeconds}
-            fileLimit = {fileLimit}
+            fileLimit={fileLimit}
           />
         </Suspense>
       ),
@@ -284,6 +284,7 @@ const Footer = ({
   );
 };
 
+// For more information on available props for the media library, checkout the MediaLibrary.js file itself
 MediaLibraryModal.defaultProps = {
   multiple: true,
   images: [],

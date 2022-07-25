@@ -18,6 +18,7 @@ function MediaLibrary(props) {
     onStateChange,
     images,
     defaultTab,
+    showLatestChoicesFirst
   } = props;
 
   const [show, setShow] = useState(openState);
@@ -130,7 +131,6 @@ function MediaLibrary(props) {
             content={imageTray}
             remove={remove}
             multiple={multiple}
-            // switchToCropping={switchToCropping}
           />
         )}
 

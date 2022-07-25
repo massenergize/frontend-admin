@@ -30,10 +30,11 @@ function Library({
     const images = content || [];
     const found = images.find((img) => img.id === image.id);
     let rest = images.filter((img) => img.id !== image.id);
-    if (!found) rest = [image, ...rest];
+    if (!found) rest = [...rest, image];
     setShowSidePane(rest && rest.length > 0);
     const limit = fileLimit || DEFAULT_FILE_LIMIT;
-    setSelectedContent(rest.slice(0, limit));
+    rest = rest.reverse().slice(0, limit).reverse()
+    setSelectedContent(rest);
   };
 
   const checkIfSelected = (image) => {
