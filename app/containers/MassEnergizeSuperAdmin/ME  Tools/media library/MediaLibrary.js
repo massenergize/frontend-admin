@@ -18,7 +18,7 @@ function MediaLibrary(props) {
     onStateChange,
     images,
     defaultTab,
-    showLatestChoicesFirst
+    showLatestChoicesFirst,
   } = props;
 
   const [show, setShow] = useState(openState);
@@ -123,6 +123,11 @@ function MediaLibrary(props) {
           padding: 20,
         }}
       >
+        {multiple && (
+          <small style={{ color: "grey" }}>
+            Images will appear in the exact sequence as selected
+          </small>
+        )}
         {!imageTray || imageTray.length === 0 ? (
           <img src={libraryImage} style={{ height: 150 }} />
         ) : (
