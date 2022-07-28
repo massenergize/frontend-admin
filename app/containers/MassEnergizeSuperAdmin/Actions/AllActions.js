@@ -405,7 +405,8 @@ class AllActions extends React.Component {
             noTemplates: noTemplatesSelectedGoAhead,
           }),
           onConfirm: () =>
-            noTemplatesSelectedGoAhead && this.nowDelete({ idsToDelete, data }),
+            noTemplatesSelectedGoAhead &&
+            this.nowDelete({ idsToDelete, data }),
           closeAfterConfirmation: true,
           cancelText: noTemplatesSelectedGoAhead
             ? "No"
@@ -416,10 +417,17 @@ class AllActions extends React.Component {
       },
       customSort: (data, colIndex, order) => {
         return data.sort((a, b) => {
-          return (
-            (a.data[colIndex].rank < b.data[colIndex].rank ? -1 : 1) *
-            (order === "desc" ? 1 : -1)
-          );
+          if (colIndex === 3) {
+            return (
+              (a.data[colIndex].rank < b.data[colIndex].rank ? -1 : 1) *
+              (order === "desc" ? 1 : -1)
+            );
+          } else {
+            return (
+              (a.data[colIndex] < b.data[colIndex] ? -1 : 1) *
+              (order === "desc" ? 1 : -1)
+            );
+          }
         });
       },
       downloadOptions: {
