@@ -92,7 +92,7 @@ class MassEnergizeForm extends Component {
   async componentDidMount() {
     const { formJson } = this.props;
     const formData = this.initialFormData(formJson.fields);
-
+    console.log("debug create action, formData:", formData);
     const readOnly = this.props.readOnly;
     await this.setStateAsync({ formJson, formData, readOnly: readOnly });
   }
@@ -1010,7 +1010,7 @@ class MassEnergizeForm extends Component {
       startCircularSpinner,
       readOnly,
     } = this.state;
-
+    console.log("debug creeat action in MassEnergizeForm, state:", this.state);
     if (!formJson) return <Loading />;
     return (
       <div>
