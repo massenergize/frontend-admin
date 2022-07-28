@@ -92,7 +92,6 @@ class MassEnergizeForm extends Component {
   async componentDidMount() {
     const { formJson } = this.props;
     const formData = this.initialFormData(formJson.fields);
-
     const readOnly = this.props.readOnly;
     await this.setStateAsync({ formJson, formData, readOnly: readOnly });
   }
@@ -424,8 +423,6 @@ class MassEnergizeForm extends Component {
     if (formJson.preflightFxn) {
       cleanedValues = formJson.preflightFxn(cleanedValues);
     }
-
-    // return console.log("I am the returned values innit", cleanedValues)
 
     // let's make an api call to send the data
     let response = null;
@@ -1010,7 +1007,6 @@ class MassEnergizeForm extends Component {
       startCircularSpinner,
       readOnly,
     } = this.state;
-
     if (!formJson) return <Loading />;
     return (
       <div>
