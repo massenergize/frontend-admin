@@ -45,14 +45,13 @@ class CreateNewActionForm extends Component {
 
   static getDerivedStateFromProps(props, state) {
     const { communities, tags, vendors, ccActions, auth } = props;
-    console.log("getDerivedStatefromProps, props:", props)
     const fullyMountedNeverRunThisAgain =
       communities &&
       communities.length &&
       tags &&
       tags.length &&
-      vendors &&
-      vendors.length &&
+      //vendors &&         
+      //vendors.length &&    communities without vendors need to be able to create
       ccActions &&
       ccActions.length;
 
@@ -78,7 +77,6 @@ class CreateNewActionForm extends Component {
       ccActions: modifiedCCActions,
       auth,
     });
-    console.log("debug create action, formJson:", formJson);
 
     const section = makeTagSection({ collections: tags, defaults: false });
 
@@ -95,7 +93,6 @@ class CreateNewActionForm extends Component {
 
   render() {
     const { classes } = this.props;
-    console.log("debug create action, state:", this.state);
     const { formJson } = this.state;
     if (!formJson) return <Loading />;
     return (
@@ -124,7 +121,6 @@ export default withStyles(styles, { withTheme: true })(NewActionMapped);
 
 const createFormJson = ({ communities, ccActions, vendors, auth }) => {
   const is_super_admin = auth && auth.is_super_admin;
-  console.log("debug create action, auth:", auth);
   const formJson = {
     title: "Create a New Action",
     subTitle: "",
