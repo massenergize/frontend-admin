@@ -283,27 +283,27 @@ module.exports = [
       },
     ],
   },
-  {
-    key: "tasks",
-    name: "Tasks",
-    icon: "md-refresh",
-    child: [
-      {
-        key: "create-tasks",
-        name: "Add New task",
-        link: "/admin/tasks/add",
-      },
-      {
-        key: "all-tasks",
-        name: "All Tasks",
-        link: "/admin/read/tasks",
-      },
-    ],
-  },
-  {
-    key: "settings",
-    name: "Settings",
-    icon: "md-cog",
-    link: "/admin/profile/settings"
-  },
+  //{
+  //  key: "tasks",
+  //  name: "Tasks",
+  //  icon: "md-refresh",
+  //  child: [
+  //    {
+  //      key: "create-tasks",
+  //      name: "Add New task",
+  //      link: "/admin/tasks/add",
+  //    },
+  //    {
+  //      key: "all-tasks",
+  //      name: "All Tasks",
+  //      link: "/admin/read/tasks",
+  //    },
+  //  ],
+  //},
+  //{
+  //  key: "settings",
+  //  name: "Settings",
+  //  icon: "md-cog",
+  //  link: "/admin/profile/settings"
+  //},
 ];

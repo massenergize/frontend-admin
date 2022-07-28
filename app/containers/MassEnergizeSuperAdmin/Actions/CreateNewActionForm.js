@@ -77,6 +77,7 @@ class CreateNewActionForm extends Component {
       ccActions: modifiedCCActions,
       auth,
     });
+    console.log("debug create action, formJson:", formJson);
 
     const section = makeTagSection({ collections: tags, defaults: false });
 
@@ -93,6 +94,7 @@ class CreateNewActionForm extends Component {
 
   render() {
     const { classes } = this.props;
+    console.log("debug create action, state:", this.state);
     const { formJson } = this.state;
     if (!formJson) return <Loading />;
     return (
@@ -121,6 +123,7 @@ export default withStyles(styles, { withTheme: true })(NewActionMapped);
 
 const createFormJson = ({ communities, ccActions, vendors, auth }) => {
   const is_super_admin = auth && auth.is_super_admin;
+  console.log("debug create action, auth:", auth);
   const formJson = {
     title: "Create a New Action",
     subTitle: "",
