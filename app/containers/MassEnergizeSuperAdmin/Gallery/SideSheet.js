@@ -10,7 +10,11 @@ export const SideSheet = (props) => {
   const { classes, hide, infos, data, deleteImage } = props;
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const info = (data && data.info) || {};
+  const info = (data && data.relations) || {};
+  var informationAboutImage = (data && data.information) || {};
+  var uploader = informationAboutImage.user;
+  informationAboutImage = informationAboutImage.info || {};
+  const { size_text, description } = informationAboutImage;
 
   const getContent = () => {
     const isLoading = data && data === "loading";
@@ -57,6 +61,32 @@ export const SideSheet = (props) => {
               });
             }}
           />
+          {(size_text || description || uploader) && (
+            <div style={{ marginBottom: 5, padding: 15 }}>
+              <Typography variant="body2" style={{ marginBottom: 5 }}>
+                <i>
+                  Uploaded by <b>{(uploader && uploader.full_name) || "..."}</b>
+                </i>
+              </Typography>
+              {size_text && (
+                <Typography
+                  variant="h6"
+                  color="primary"
+                  style={{ marginBottom: 6, fontSize: "medium" }}
+                >
+                  Size: {size_text}
+                </Typography>
+              )}
+              {description && (
+                <>
+                  <Typography variant="body2">
+                    <b>Description</b>
+                  </Typography>
+                  <Typography variant="body2">{description}</Typography>
+                </>
+              )}
+            </div>
+          )}
           {Object.keys(info).map((key, index) => {
             const imageInfo = {
               name: key,

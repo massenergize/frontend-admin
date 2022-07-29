@@ -9,9 +9,11 @@ import { Radio } from "@material-ui/core";
 import { FormControlLabel } from "@material-ui/core";
 import { TextField } from "@material-ui/core";
 import { bindActionCreators } from "redux";
+import { reduxCallLibraryModalImages } from "../../../redux/redux-actions/adminActions";
 import {
-  reduxCallLibraryModalImages,
-} from "../../../redux/redux-actions/adminActions";
+  getFileSize,
+  smartString,
+} from "../ME  Tools/media library/shared/utils/utils";
 const styles = (theme) => {
   const spacing = theme.spacing.unit;
   const error = {
@@ -97,13 +99,17 @@ function AddToGallery(props) {
   };
 
   const onUpload = (files, reset, closeModal) => {
+    const file = files[0] || null;
     const apiJson = {
       user_id: auth.id,
-      file: files[0] || null, // TODO: allow multiple
+      file, // TODO: allow multiple
       community_ids: cleanCommunities(),
       is_universal: scope === CHOICES.ALL,
       scope: scope,
-      title: state.title,
+      title: smartString(state.title, 27),
+      size: (file && file.size) || null,
+      size_text: getFileSize(file),
+      description: state.title,
     };
 
     apiCall(UPLOAD_URL, apiJson)
@@ -212,7 +218,7 @@ function AddToGallery(props) {
         variant="outlined"
         autoComplete="off"
         value={state.title || ""}
-        inputProps={{ maxLength: 30 }}
+        // inputProps={{ maxLength: 30 }}
       />
       <MediaLibrary
         onUpload={onUpload}

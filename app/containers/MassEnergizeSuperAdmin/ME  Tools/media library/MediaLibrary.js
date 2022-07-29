@@ -35,7 +35,7 @@ function MediaLibrary(props) {
     const { source } = cropLoot;
     setCropped({ ...(cropped || {}), [source.id.toString()]: croppedSource });
     setCurrentTab(TABS.UPLOAD_TAB);
-    // Then you should look into displaying the cropped preview instead of the main content innit
+    return false
   };
 
   const switchToCropping = (content) => {
@@ -270,6 +270,11 @@ MediaLibrary.propTypes = {
    * Determines whether or not cropping should be enabled on images. (That are freshly being uploaded)
    */
   allowCropping: PropTypes.bool,
+  /**
+   * Lets you render another component in the sidepanel of modal in case a situation needs more specific content
+   * @param props
+   */
+  sideExtraComponent: PropTypes.func
 };
 
 MediaLibrary.Button = MLButton;

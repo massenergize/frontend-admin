@@ -6,12 +6,15 @@ import { bindActionCreators } from "redux";
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import {
   reduxLoadGalleryImages,
+  reduxLoadImageInfos,
   testRedux,
   universalFetchFromGallery,
 } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
-import { Checkbox, FormControlLabel } from "@material-ui/core";
+import { Checkbox, FormControlLabel, Typography } from "@material-ui/core";
 import { makeLimitsFromImageArray } from "../../../utils/common";
+import { ProgressCircleWithLabel } from "../Gallery/utils";
+import { getMoreInfoOnImage } from "../Gallery/Gallery";
 
 export const FormMediaLibraryImplementation = (props) => {
   const { fetchImages, auth, imagesObject, putImagesInRedux, selected } = props;
@@ -30,7 +33,6 @@ export const FormMediaLibraryImplementation = (props) => {
       append: true,
     });
   };
- 
 
   const handleUpload = (files, reset, _, changeTabTo) => {
     const isUniversal = available ? { is_universal: true } : {};
@@ -89,6 +91,7 @@ export const FormMediaLibraryImplementation = (props) => {
         accept={MediaLibrary.AcceptedFileTypes.Images}
         multiple={false}
         extras={extras}
+        sideExtraComponent={(props) => <SideExtraComponent {...props} />}
         {...props}
         loadMoreFunction={loadMoreImages}
       />
@@ -144,3 +147,70 @@ const UploadIntroductionComponent = ({ auth, setAvailableTo, available }) => {
     </div>
   );
 };
+
+// ------------------------------------
+const ComponentForSidePane = ({ image, imageInfos, putImageInfoInRedux }) => {
+  const [imageInfo, setImageInfo] = useState("loading");
+  useEffect(() => {
+    getMoreInfoOnImage({
+      id: image && image.id,
+      updateStateWith: setImageInfo,
+      updateReduxWith: putImageInfoInRedux,
+      imageInfos,
+    });
+  }, []);
+  if (imageInfo === "loading") return <ProgressCircleWithLabel />;
+  if (!imageInfo) return <></>;
+  var informationAboutImage = (imageInfo && imageInfo.information) || {};
+  var uploader = informationAboutImage.user;
+  informationAboutImage = informationAboutImage.info || {};
+  const { size_text, description } = informationAboutImage;
+
+  return (
+    <>
+      {(size_text || description || uploader) && (
+        <div style={{ marginBottom: 15 }}>
+          <Typography variant="body2" style={{ marginBottom: 5 }}>
+            <i>
+              Uploaded by <b>{(uploader && uploader.full_name) || "..."}</b>
+            </i>
+          </Typography>
+          {size_text && (
+            <Typography
+              variant="h6"
+              color="primary"
+              style={{ marginBottom: 6, fontSize: "medium" }}
+            >
+              Size: {size_text}
+            </Typography>
+          )}
+          {description && (
+            <>
+              <Typography variant="body2">
+                <b>Description</b>
+              </Typography>
+              <Typography variant="body2">{description}</Typography>
+            </>
+          )}
+        </div>
+      )}
+    </>
+  );
+};
+
+const stateToProps = (state) => {
+  return {
+    imageInfos: state.getIn(["imageInfos"]),
+  };
+};
+
+const dispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    { putImageInfoInRedux: reduxLoadImageInfos },
+    dispatch
+  );
+};
+const SideExtraComponent = connect(
+  stateToProps,
+  dispatchToProps
+)(ComponentForSidePane);

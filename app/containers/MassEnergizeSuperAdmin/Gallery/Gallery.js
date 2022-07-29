@@ -23,6 +23,34 @@ const filters = [
   { name: "My Uploads", value: "uploads" },
 ];
 
+export const getMoreInfoOnImage = ({
+  id,
+  updateStateWith,
+  updateReduxWith,
+  imageInfos,
+}) => {
+  if (!id) return console.log("The image id provided is invalid...", id);
+  const found = (imageInfos || {})[id];
+  if (found) return updateStateWith(found);
+  updateStateWith("loading");
+  apiCall("/gallery.image.info", { media_id: id })
+    .then((response) => {
+      if (response && !response.success) {
+        updateStateWith(null);
+        return console.log("IMAGE INFO REQ BE: ", response.error);
+      }
+      updateStateWith(response.data);
+      updateReduxWith({
+        oldInfos: imageInfos,
+        newInfo: response.data,
+      });
+    })
+    .catch((e) => {
+      updateStateWith(null);
+      console.log("IMAGE INFO REQ SYNTAX: ", e.toString());
+    });
+};
+// ----------------------------------------
 function Gallery(props) {
   const fetchController = new AbortController();
   const { signal } = fetchController;
@@ -74,27 +102,6 @@ function Gallery(props) {
       });
   };
 
-  const getMoreInfoOnImage = (id) => {
-    if (!id) return console.log("The image id provided is invalid...", id);
-    setOneImageInfo("loading");
-    apiCall("/gallery.image.info", { media_id: id })
-      .then((response) => {
-        if (response && !response.success) {
-          setOneImageInfo(null);
-          return console.log("IMAGE INFO REQ BE: ", response.error);
-        }
-        setOneImageInfo(response.data);
-        putImageInfoInRedux({
-          oldInfos: imageInfos,
-          newInfo: response.data,
-        });
-      })
-      .catch((e) => {
-        setOneImageInfo(null);
-        console.log("IMAGE INFO REQ SYNTAX: ", e.toString());
-      });
-  };
-
   const fetchContent = (body = {}, cb) => {
     setSearching(true); // activate circular spinner to show loading to user
     setNoResults(false); // remove the "No results" text if it was showing from previous search
@@ -137,8 +144,8 @@ function Gallery(props) {
 
   const selectAllCommunities = () => {
     // set all an admins community as target community if they are a community. Leave things empty if superadmin though
-    if (auth.is_super_admin) setTargetComs([]);
-    else if (auth.is_community_admin) setTargetComs(getCommunityList());
+    if (auth && auth.is_super_admin) setTargetComs([]);
+    else if (auth && auth.is_community_admin) setTargetComs(getCommunityList());
     setTargetAllComs((prev) => !prev);
   };
 
@@ -291,7 +298,12 @@ function Gallery(props) {
             classes={classes}
             showMoreInfo={(id) => {
               setShowMoreInfo(true);
-              getMoreInfoOnImage(id);
+              getMoreInfoOnImage({
+                id,
+                imageInfos,
+                updateStateWith: setOneImageInfo,
+                updateReduxWith: putImageInfoInRedux,
+              });
             }}
           />
           {noResults && (

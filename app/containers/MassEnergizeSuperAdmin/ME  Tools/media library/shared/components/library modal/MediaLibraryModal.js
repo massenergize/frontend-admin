@@ -36,7 +36,8 @@ function MediaLibraryModal({
   croppedSource,
   setCroppedSource,
   allowCropping,
-  fileLimit
+  fileLimit,
+  sideExtraComponent
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -49,7 +50,7 @@ function MediaLibraryModal({
 
   excludeTabs = [
     ...(excludeTabs || []),
-    (!allowCropping && TABS.CROPPING_TAB) || "", // if allowCropping is false, exclude it from the tabs
+    allowCropping ? "" : TABS.CROPPING_TAB, // if allowCropping is false, exclude it from the tabs
   ];
   const clean = (files) => {
     // just a function that retrieves only the FileObject from the file jsons provided
@@ -106,7 +107,7 @@ function MediaLibraryModal({
           switchToCropping={switchToCropping}
           cropped={cropped}
           allowCropping={allowCropping}
-          fileLimit = {fileLimit}
+          fileLimit={fileLimit}
         />
       ),
     },
@@ -128,7 +129,7 @@ function MediaLibraryModal({
             shouldWait={shouldWait}
             setShouldWait={setShouldWait}
             awaitSeconds={awaitSeconds}
-            fileLimit = {fileLimit}
+            fileLimit={fileLimit}
           />
         </Suspense>
       ),
@@ -175,6 +176,7 @@ function MediaLibraryModal({
               activeImage={activeImage}
               setShowSidePane={setShowSidePane}
               sourceExtractor={sourceExtractor}
+              sideExtraComponent = {sideExtraComponent}
             />
           )}
           <div className="m-inner-container">
@@ -261,7 +263,10 @@ const Footer = ({
           <button
             className="ml-footer-btn"
             style={{ "--btn-color": "white", "--btn-background": "green" }}
-            onClick={finaliseCropping}
+            onClick={(e) => {
+              e.preventDefault();
+              finaliseCropping && finaliseCropping();
+            }}
             disabled={!cropLoot}
           >
             CROP
