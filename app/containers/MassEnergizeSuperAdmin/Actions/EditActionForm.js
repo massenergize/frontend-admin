@@ -60,6 +60,7 @@ export const makeTagSection = ({ collections, action, defaults = true }) => {
 
   (collections || []).forEach((tCol) => {
     const newField = {
+      isRequired: true,
       name: tCol.name,
       label: `${tCol.name} ${
         tCol.allow_multiple
@@ -147,7 +148,7 @@ class EditActionForm extends Component {
       communities: coms,
       vendors: vends,
       ccActions: modifiedCCActions,
-      auth
+      auth,
     });
 
     const section = makeTagSection({ collections: tags, action });
@@ -218,7 +219,7 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
             label: "Action ID",
             fieldType: "TextField",
             contentType: "text",
-            isRequired: true,
+            isRequired: false,
             defaultValue: action.id,
             dbName: "action_id",
             readOnly: true,
@@ -247,38 +248,44 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
             dbName: "rank",
             readOnly: false,
           },
-          is_super_admin ? {
-            name: "is_global",
-            label: "Is this Action a Template?",
-            fieldType: "Radio",
-            isRequired: false,
-            defaultValue: action.is_global ? "true" : "false",
-            dbName: "is_global",
-            readOnly: false,
-            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-            child: {
-              valueToCheck: "false",
-              fields: [
-                {
-                  name: "community",
-                  label: "Primary Community (Select one)",
-                  placeholder: "",
-                  fieldType: "Dropdown",
-                  defaultValue: action.community && "" + action.community.id,
-                  dbName: "community_id",
-                  data: [{ displayName: "--", id: "" }, ...communities],
+          is_super_admin
+            ? {
+                name: "is_global",
+                label: "Is this Action a Template?",
+                fieldType: "Radio",
+                isRequired: false,
+                defaultValue: action.is_global ? "true" : "false",
+                dbName: "is_global",
+                readOnly: false,
+                data: [
+                  { id: "false", value: "No" },
+                  { id: "true", value: "Yes" },
+                ],
+                child: {
+                  valueToCheck: "false",
+                  fields: [
+                    {
+                      name: "community",
+                      label: "Primary Community (Select one)",
+                      placeholder: "",
+                      fieldType: "Dropdown",
+                      defaultValue:
+                        action.community && "" + action.community.id,
+                      dbName: "community_id",
+                      data: [{ displayName: "--", id: "" }, ...communities],
+                    },
+                  ],
                 },
-              ],
-            },
-          } : {
-            name: "community",
-            label: "Primary Community (Select one)",
-            placeholder: "",
-            fieldType: "Dropdown",
-            defaultValue: action.community && "" + action.community.id,
-            dbName: "community_id",
-            data: [{ displayName: "--", id: "" }, ...communities],
-          },
+              }
+            : {
+                name: "community",
+                label: "Primary Community (Select one)",
+                placeholder: "",
+                fieldType: "Dropdown",
+                defaultValue: action.community && "" + action.community.id,
+                dbName: "community_id",
+                data: [{ displayName: "--", id: "" }, ...communities],
+              },
         ],
       },
       {
