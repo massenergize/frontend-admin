@@ -4,3 +4,4 @@ export const ONCE_TILL_UNMOUNT = '@@saga-injector/once-till-unmount';
 
 
 export const LAST_VISITED = "LAST_VISITED";
+export const LOADING = "LOADING";

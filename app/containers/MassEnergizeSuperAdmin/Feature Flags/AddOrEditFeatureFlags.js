@@ -2,19 +2,28 @@ import React, { useEffect } from "react";
 import MassEnergizeForm from "../_FormGenerator";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import Loading from "dan-components/Loading";
+import { LOADING } from "../../../utils/constants";
+import { Paper } from "@material-ui/core";
 
 function AddOrEditFeatureFlags({
   communities,
-  flagKeys,
   users,
   switchTabs,
   putFlagsInRedux,
   featureFlags,
   featureToEdit,
-  setFeatureToEdit,
 }) {
   const inEditMode = featureToEdit;
-  if (!flagKeys || !flagKeys.audience) return <Loading />;
+
+  if (featureFlags === LOADING) return <Loading />;
+
+  const flagKeys = (featureFlags && featureFlags.keys) || {};
+  if (!Object.keys(flagKeys).length)
+    return (
+      <Paper style={{ padding: 40 }}>
+        Sorry, something happened. Please try again later.
+      </Paper>
+    );
 
   const ifApiIsSuccessful = (data, yes) => {
     if (!yes) return;
@@ -49,6 +58,7 @@ const preflight = (data) => {
     scope,
     key: uniqueIdentifier(data.name),
   };
+  if (json.should_expire === "false") json.expires_on = null;
   return json;
 };
 
@@ -285,16 +295,44 @@ var createFormJson = ({
         fieldType: "Section",
         children: [
           {
-            name: "expires_on",
+            name: "should_expire",
             label: "When should this feature expire?",
-            placeholder: "Eg. 'Guest Authentication Feature'",
-            fieldType: fieldTypes.DateTime,
-            contentType: "text",
+            fieldType: fieldTypes.Radio,
             isRequired: true,
-            defaultValue: expires_on || "",
-            dbName: "expires_on",
-            minDate: new Date(),
+            defaultValue: expires_on ? "true" : "false",
+            dbName: "should_expire",
+            readOnly: false,
+            data: [
+              { id: "false", value: "Does not expire" },
+              { id: "true", value: "Should expire on" },
+            ],
+            child: {
+              valueToCheck: "true",
+              fields: [
+                {
+                  name: "expires_on",
+                  label: "Set Date",
+                  placeholder: "Eg. 'Guest Authentication Feature'",
+                  fieldType: fieldTypes.DateTime,
+                  contentType: "text",
+                  defaultValue: expires_on || "",
+                  dbName: "expires_on",
+                  minDate: new Date(),
+                },
+              ],
+            },
           },
+          // {
+          //   name: "expires_on",
+          //   label: "When should this feature expire?",
+          //   placeholder: "Eg. 'Guest Authentication Feature'",
+          //   fieldType: fieldTypes.DateTime,
+          //   contentType: "text",
+          //   isRequired: true,
+          //   defaultValue: expires_on || "",
+          //   dbName: "expires_on",
+          //   minDate: new Date(),
+          // },
         ],
       },
     ],
