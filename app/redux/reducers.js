@@ -42,6 +42,7 @@ import app, {
   allTaskFunctionsReducer,
   allTasksReducer,
   reducerForSettings,
+  reducerForFeatureFlags,
 } from "./modules/appReducer";
 
 /**
@@ -49,6 +50,7 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    featureFlags: reducerForFeatureFlags,
     settings: reducerForSettings,
     testRedux: testReduxReducer,
     modalOptions: reducerForUniversalModal,
