@@ -261,7 +261,7 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
               fields: [
                 {
                   name: "community",
-                  label: "Primary Community",
+                  label: "Primary Community (Select one)",
                   placeholder: "",
                   fieldType: "Dropdown",
                   defaultValue: action.community && "" + action.community.id,
@@ -270,7 +270,15 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
                 },
               ],
             },
-          }:{},
+          } : {
+            name: "community",
+            label: "Primary Community (Select one)",
+            placeholder: "",
+            fieldType: "Dropdown",
+            defaultValue: action.community && "" + action.community.id,
+            dbName: "community_id",
+            data: [{ displayName: "--", id: "" }, ...communities],
+          },
         ],
       },
       {

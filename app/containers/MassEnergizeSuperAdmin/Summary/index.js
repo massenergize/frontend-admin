@@ -19,7 +19,6 @@ import Icon from '@material-ui/core/Icon';
 import Snackbar from '@material-ui/core/Snackbar';
 import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
 import { apiCallFile } from '../../../utils/messenger';
-import { downloadFile } from '../../../utils/common';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 // import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
@@ -73,7 +72,8 @@ class SummaryDashboard extends PureComponent {
       window.location = `/admin/community/${obj.id}/profile`;
     }
   }
-   handleClose = (event, reason) => {
+  
+  handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
@@ -153,7 +153,7 @@ class SummaryDashboard extends PureComponent {
                 style={{ fontWeight: "600", fontSize: "1rem" }}
                 component="h3"
               >
-                Download All Users CSV{" "}
+                Request All Users CSV{" "}
                 <Icon style={{ paddingTop: 3, color: "green" }}>
                   arrow_downward
                 </Icon>
@@ -180,7 +180,7 @@ class SummaryDashboard extends PureComponent {
                 style={{ fontWeight: "600", fontSize: "1rem" }}
                 component="h3"
               >
-                Download All Actions CSV{" "}
+                Request All Actions CSV{" "}
                 <Icon style={{ paddingTop: 3, color: "green" }}>
                   arrow_downward
                 </Icon>
@@ -208,7 +208,7 @@ class SummaryDashboard extends PureComponent {
                 style={{ fontWeight: "600", fontSize: "1rem" }}
                 component="h3"
               >
-                Download All Communities CSV{" "}
+                Request All Communities CSV{" "}
                 <Icon style={{ paddingTop: 3, color: "green" }}>
                   arrow_downward
                 </Icon>

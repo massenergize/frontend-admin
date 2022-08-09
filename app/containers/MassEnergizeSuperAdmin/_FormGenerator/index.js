@@ -860,7 +860,7 @@ class MassEnergizeForm extends Component {
                 init={{
                   height: 350,
                   menubar: false,
-
+                  default_link_target: "_blank",
                   plugins: [
                     "advlist autolink lists link image charmap print preview anchor forecolor",
                     "searchreplace visualblocks code fullscreen",

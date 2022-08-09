@@ -173,8 +173,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
                   fields: [
                     {
                       name: "community",
-                      label: "Primary Community",
-                      placeholder: "eg. Wayland",
+                      label: "Primary Community (select one)",
                       fieldType: "Dropdown",
                       defaultValue: null,
                       dbName: "community_id",
@@ -183,7 +182,14 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
                   ],
                 },
               }
-            : {},
+            : {
+                name: "community",
+                label: "Primary Community (select one)",
+                fieldType: "Dropdown",
+                defaultValue: communities[0].id,    // for a cadmin default to first of their communities.  Need one.
+                dbName: "community_id",
+                data: [{ displayName: "--", id: "" }, ...communities],      
+              },
         ],
       },
       {

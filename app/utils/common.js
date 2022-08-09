@@ -1,8 +1,23 @@
 /** *
  * All utility Functions
  */
+import { Typography } from "@material-ui/core";
 import moment from "moment";
 import qs from "qs";
+import React from 'react';
+
+export function makeDeleteUI({ idsToDelete, templates }) {
+  const len = (idsToDelete && idsToDelete.length) || 0;
+  var text = `Are you sure you want to delete (
+    ${(idsToDelete && idsToDelete.length) || ""})
+    ${len === 1 ? " action? " : " actions? "}`;
+
+  if (templates && templates.length)
+    text = `Sorry, (${templates.length}) template${
+      templates.length === 1 ? "" : "s"
+    } selected. You can't delete templates. `;
+  return <Typography>{text}</Typography>;
+}
 
 export const objArrayToString = (data, func) => {
   var s = "";
@@ -65,6 +80,18 @@ export const pop = (arr = [], value, finder) => {
 
   return [found, rest];
 };
+
+export const findMatchesAndRest = (arr = [], finder) => {
+  if (!arr) return [];
+  const rest = [];
+  const found = [];
+  arr.forEach((item) => {
+    if (finder(item)) found.push(item);
+    else rest.push(item);
+  });
+
+  return [found, rest];
+};
 export function notNull(d) {
   try {
     return d && d !== "null" && d.trim() !== "";
@@ -108,23 +135,6 @@ export function convertBoolean(b) {
 export function goHere(link, history) {
   if (history) return history.push(link);
   window.location = link;
-}
-
-export function downloadFile(file) {
-  if (!file) return;
-
-  if (window.navigator.msSaveOrOpenBlob) {
-    window.navigator.msSaveBlob(file, file.name);
-  } else {
-    const elem = window.document.createElement("a");
-    const URL = window.URL.createObjectURL(file);
-    elem.href = URL;
-    elem.download = file.name;
-    document.body.appendChild(elem);
-    elem.click();
-    document.body.removeChild(elem);
-    window.URL.revokeObjectURL(URL);
-  }
 }
 
 // TODO: be aware of filter choices

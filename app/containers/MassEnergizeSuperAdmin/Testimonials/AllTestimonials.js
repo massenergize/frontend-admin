@@ -62,7 +62,7 @@ class AllTestimonials extends React.Component {
       smartString(d.user ? d.user.full_name : "", 20), // limit to first 20 chars
       smartString((d.action && d.action.title) || "", 30),
       d.id,
-      d.is_published ? "Yes": "No"
+      d.is_published ? "Yes" : "No",
     ]);
   };
 
@@ -78,13 +78,12 @@ class AllTestimonials extends React.Component {
   };
 
   updateTestimonials = (data) => {
-    let allTestimonials =this.props.allTestimonials || [];
+    let allTestimonials = this.props.allTestimonials || [];
     const index = allTestimonials.findIndex((a) => a.id === data.id);
-    const updateItems =allTestimonials.filter((a)=> a.id !== data.id);
+    const updateItems = allTestimonials.filter((a) => a.id !== data.id);
     updateItems.splice(index, 0, data);
     this.props.putTestimonialsInRedux(updateItems);
-  }
-
+  };
 
   getColumns = () => {
     const { classes } = this.props;
@@ -134,10 +133,9 @@ class AllTestimonials extends React.Component {
                     [name]: value,
                   }).then((res) => {
                     if (res && res.success) {
-                       this.updateTestimonials(res && res.data)
+                      this.updateTestimonials(res && res.data);
                     }
-
-                  })
+                  });
                 }}
                 label="Rank"
                 InputLabelProps={{
@@ -161,7 +159,7 @@ class AllTestimonials extends React.Component {
         key: "is_live",
         options: {
           filter: false,
-          download:false,
+          download: false,
           customBodyRender: (d) => {
             return (
               <MEChip
@@ -220,9 +218,9 @@ class AllTestimonials extends React.Component {
           display: false,
           filter: true,
           searchable: false,
-          download:true
+          download: true,
         },
-      }
+      },
     ];
   };
 
@@ -278,6 +276,22 @@ class AllTestimonials extends React.Component {
       </Typography>
     );
   }
+ getTimeStamp =  () => {
+  const today = new Date();
+  let newDate = today;
+  let options = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  };
+
+  return Intl.DateTimeFormat("en-US", options).format(newDate);
+ }
+
+
   render() {
     const title = brand.name + " - All Testimonials";
     const description = brand.desc;
@@ -299,6 +313,30 @@ class AllTestimonials extends React.Component {
           closeAfterConfirmation: true,
         });
         return false;
+      },
+      customSort: (data, colIndex, order) => {
+        return data.sort((a, b) => {
+          return (
+            (a.data[colIndex].rank < b.data[colIndex].rank ? -1 : 1) *
+            (order === "desc" ? 1 : -1)
+          );
+        });
+      },
+      downloadOptions: {
+        filename: `All Testimonials (${this.getTimeStamp()}).csv`,
+        separator: ",",
+      },
+      onDownload: (buildHead, buildBody, columns, data) => {
+        let alteredData = data.map((d) => {
+          let content = [...d.data];
+          content[3] = d.data[3].rank;
+          return {
+            data: content,
+            index: d.index,
+          };
+        });
+        let csv = buildHead(columns) + buildBody(alteredData);
+        return csv;
       },
     };
 
