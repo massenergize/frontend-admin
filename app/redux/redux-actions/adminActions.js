@@ -36,6 +36,7 @@ import {
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
+import { LOADING } from "../../utils/constants";
 
 // TODO: REOMVE THIS FUNCTiON
 export const testRedux = (value) => {
@@ -103,7 +104,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     apiCall(isSuperAdmin ? "/tasks.functions.list" : "/tasks.functions.list"),
     apiCall(isSuperAdmin ? "/tasks.list" : "/tasks.list"),
     apiCall("/settings.list"),
-    apiCall("/featureFlags.list_for_super_admins"),
+    apiCall("/featureFlags.listForSuperAdmins"),
   ]).then((response) => {
     const [
       communities,
@@ -144,7 +145,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
   });
 };
 
-export const loadFeatureFlags = (data = null) => ({
+export const loadFeatureFlags = (data = LOADING) => ({
   type: LOAD_FEATURE_FLAGS,
   payload: data,
 });

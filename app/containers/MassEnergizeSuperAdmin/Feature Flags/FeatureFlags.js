@@ -28,7 +28,7 @@ function FeatureFlags({
         <ManageFeatureFlags
           classes={classes}
           featureFlags={featureFlags}
-          flags={featureFlags && featureFlags.features}
+          // flags={featureFlags && featureFlags.features}
           editFeature={(data) => {
             setFeatureToEdit(data);
             setCurrentTab(1);
@@ -45,7 +45,7 @@ function FeatureFlags({
         <AddOrEditFeatureFlags
           classes={classes}
           communities={communities}
-          flagKeys={(featureFlags && featureFlags.keys) || {}}
+          // flagKeys={(featureFlags && featureFlags.keys) || {}}
           users={users}
           switchTabs={() => setCurrentTab(0)}
           featureFlags={featureFlags}

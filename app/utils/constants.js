@@ -7,3 +7,4 @@ export const TWENTY_FOUR_HOURS = 1000 * 60 * 60 * 24;
 export const TIME_UNTIL_EXPIRATION = "TIME_UNTIL_EXPIRATION";
 export const THREE_MINUTES = 1000 * 60 * 3;
  
+export const LOADING = "LOADING";

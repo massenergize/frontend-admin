@@ -7,22 +7,30 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import Loading from "dan-components/Loading";
 import { Link } from "react-router-dom";
-import { Typography } from "@material-ui/core";
+import { Paper, Typography } from "@material-ui/core";
 import { apiCall } from "../../../utils/messenger";
+import { LOADING } from "../../../utils/constants";
 const hasExpired = (date) => {
+  if (!date) return false; // features do do not expire dont have dates so...
   const now = new Date().getTime();
   date = new Date(date).getTime();
   return date < now;
 };
 function ManageFeatureFlags({
   classes,
-  flags,
   editFeature,
   toggleDeleteConfirmation,
   putFlagsInRedux,
   featureFlags,
 }) {
-  if (!flags) return <Loading />;
+  if (featureFlags === LOADING) return <Loading />;
+  var flags = featureFlags && featureFlags.features;
+  if (!flags)
+    return (
+      <Paper style={{ padding: 40 }}>
+        No flags are available yet. Create one
+      </Paper>
+    );
 
   flags = Object.entries(flags || {});
   const flagKeys = (featureFlags && featureFlags.keys) || {};
@@ -136,7 +144,9 @@ function ManageFeatureFlags({
         feature.audience === flagKeys.audience.EVERYONE.key,
         feature.user_audience === flagKeys.audience.EVERYONE.key,
         hasExpired(feature.expires_on) ? "Expired" : "Active",
-        getHumanFriendlyDate(feature.expires_on, false, false),
+        feature.expires_on
+          ? getHumanFriendlyDate(feature.expires_on, false, false)
+          : "Not Set",
         { id: feature.id, item: feature },
       ];
     });

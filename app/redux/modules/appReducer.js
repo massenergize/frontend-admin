@@ -1,5 +1,6 @@
 import { Map, fromJS } from "immutable";
 import { START_UP } from "../../actions/actionConstants";
+import { LOADING } from "../../utils/constants";
 import {
   LOAD_ALL_COMMUNITIES,
   LOAD_AUTH_ADMIN,
@@ -59,7 +60,7 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
-export const reducerForFeatureFlags = (state = null, action = {}) => {
+export const reducerForFeatureFlags = (state = LOADING, action = {}) => {
   switch (action.type) {
     case LOAD_FEATURE_FLAGS:
       return action.payload;
