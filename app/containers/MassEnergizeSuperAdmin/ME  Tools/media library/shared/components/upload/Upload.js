@@ -3,6 +3,7 @@ import "./Upload.css";
 import PropTypes from "prop-types";
 import uploadDummy from "./up_img.png";
 import {
+  createLowResolutionImage,
   EXTENSIONS,
   getFilesFromTransfer,
   getFileSize,
@@ -10,7 +11,7 @@ import {
   readContentOfSelectedFile,
   smartString,
 } from "../../utils/utils";
-import { spinner } from "../../utils/values";
+import { IMAGE_QUALITY, spinner } from "../../utils/values";
 import MLButton from "../button/MLButton";
 
 function Upload({
@@ -27,26 +28,64 @@ function Upload({
   switchToCropping,
   cropped,
   allowCropping,
+  compress,
+  compressedQuality,
+  maximumImageSize,
 }) {
   const dragBoxRef = useRef(null);
   const fileOpenerRef = useRef(null);
 
   const htmlContent = (extras || {})["upload"] || null; // This is just html content that devs can pass to show, grouped by tabs
+  /**
+   * This is where all the selected files are looped over, and previews are built and saved in the
+   * state, so that users can see what they have chosen
+   * @param {*} _files
+   */
   const processForPreview = async (_files) => {
+    const quality = IMAGE_QUALITY[compressedQuality].value;
     for (let i = 0; i < _files.length; i++) {
+      // For each of the files that the user has selected
       const fileObj = _files[i];
+      const imageIsTooLarge = fileObj.file.size > maximumImageSize;
       readContentOfSelectedFile(fileObj.file).then((baseImage) => {
-        const obj = {
+        var obj = {
           ...fileObj,
           src: baseImage,
           sizeText: getFileSize(fileObj.file),
         };
-        if (multiple) setPreviews((previous) => [...previous, obj]);
-        else setPreviews([obj]);
+        if (imageIsTooLarge) {
+          console.log("Did you come here gee");
+          createLowResolutionImage(baseImage, { quality }, (response) => {
+            console.log("I think I am the response", response);
+            obj = {
+              ...obj,
+              src: response.source,
+              sizeText: getFileSize(response.file),
+            };
+          });
+          replaceFile(obj); // replaces the original version of the file with the compressed version in the state
+          addItToPreviews(obj);
+        } else {
+          addItToPreviews(obj);
+          console.log("it doesnt happen like that", fileObj.size);
+        }
+        // if (multiple) setPreviews((previous) => [...previous, obj]);
+        // else setPreviews([obj]);
       });
     }
   };
 
+  const addItToPreviews = (obj) => {
+    if (multiple) setPreviews((previous) => [...previous, obj]);
+    else setPreviews([obj]);
+  };
+
+  /**
+   * Used as the onChange function in the file input. It goes over all selected files
+   * and puts each file into an object with a unique Id
+   * something like this: {file:...., id:'something-unique'}
+   * @param {*} e
+   */
   const handleSelectedFiles = (e) => {
     e.preventDefault();
     const arr = [];
@@ -61,6 +100,13 @@ function Upload({
     processForPreview(arr);
   };
 
+  const replaceFile = (fileObj) => {
+    if (!multiple) return setFiles([fileObj]);
+    setFiles((prevFiles) => {
+      const rem = (prevFiles || []).filter((f) => f.id !== fileObj.id);
+      return [...rem, fileObj];
+    });
+  };
   const handleDroppedFile = (e) => {
     e.preventDefault();
     dragBoxRef.current.classList.remove("ml-drag-over");

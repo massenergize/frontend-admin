@@ -36,7 +36,10 @@ function MediaLibraryModal({
   croppedSource,
   setCroppedSource,
   allowCropping,
-  fileLimit
+  fileLimit,
+  maximumImageSize,
+  compress,
+  compressedQuality,
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -93,6 +96,9 @@ function MediaLibraryModal({
       key: "upload",
       component: (
         <Upload
+          maximumImageSize={maximumImageSize}
+          compress={compress}
+          compressedQuality={compressedQuality}
           previews={previews}
           setPreviews={setPreviews}
           files={files}
@@ -106,7 +112,7 @@ function MediaLibraryModal({
           switchToCropping={switchToCropping}
           cropped={cropped}
           allowCropping={allowCropping}
-          fileLimit = {fileLimit}
+          fileLimit={fileLimit}
         />
       ),
     },
@@ -128,7 +134,7 @@ function MediaLibraryModal({
             shouldWait={shouldWait}
             setShouldWait={setShouldWait}
             awaitSeconds={awaitSeconds}
-            fileLimit = {fileLimit}
+            fileLimit={fileLimit}
           />
         </Suspense>
       ),
