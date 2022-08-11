@@ -42,33 +42,37 @@ function Upload({
    * @param {*} _files
    */
   const processForPreview = async (_files) => {
+    const compressionIsEnabled = compress;
     const quality = IMAGE_QUALITY[compressedQuality].value;
     for (let i = 0; i < _files.length; i++) {
       // For each of the files that the user has selected
       const fileObj = _files[i];
       const imageIsTooLarge = fileObj.file.size > maximumImageSize;
+
       readContentOfSelectedFile(fileObj.file).then((baseImage) => {
         var obj = {
           ...fileObj,
           src: baseImage,
           sizeText: getFileSize(fileObj.file),
         };
-        if (imageIsTooLarge) {
-          console.log("Did you come here gee");
-          createLowResolutionImage(baseImage, { quality }, (response) => {
-            console.log("I think I am the response", response);
-            obj = {
-              ...obj,
-              src: response.source,
-              sizeText: getFileSize(response.file),
-            };
-          });
-          replaceFile(obj); // replaces the original version of the file with the compressed version in the state
-          addItToPreviews(obj);
-        } else {
-          addItToPreviews(obj);
-          console.log("it doesnt happen like that", fileObj.size);
-        }
+
+        if (imageIsTooLarge && compressionIsEnabled) {
+          createLowResolutionImage(
+            baseImage,
+            { quality, file: fileObj.file },
+            (response) => {
+              obj = {
+                ...obj,
+                file: response.file,
+                src: response.source,
+                sizeText: getFileSize(response.file),
+              };
+              replaceFile(obj); // replaces the original version of the file with the compressed version in the state
+              addItToPreviews(obj);
+            }
+          );
+        } else addItToPreviews(obj);
+
         // if (multiple) setPreviews((previous) => [...previous, obj]);
         // else setPreviews([obj]);
       });
@@ -194,7 +198,7 @@ function Upload({
         {uploading ? (
           <p style={{ color: "#de8b28" }}>Uploading, please be patient...</p>
         ) : (
-          <p>
+          <p style={{ textAlign: "center" }}>
             Drag and drop image here or{" "}
             <a
               href="#void"
@@ -205,6 +209,18 @@ function Upload({
             >
               browse
             </a>
+            {compress && (
+              <>
+                <br />
+                <small style={{ fontWeight: "bold" }}>
+                  NB: All images that exceed{" "}
+                  <span style={{ color: "#de8b28" }}>
+                    {getFileSize({ size: maximumImageSize }) || "..."}
+                  </span>{" "}
+                  will be reduced to a lower quality{" "}
+                </small>
+              </>
+            )}
           </p>
         )}
       </div>

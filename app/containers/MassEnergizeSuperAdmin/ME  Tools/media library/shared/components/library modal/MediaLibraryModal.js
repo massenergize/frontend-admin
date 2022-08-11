@@ -45,7 +45,7 @@ function MediaLibraryModal({
   const [showSidePane, setShowSidePane] = useState(false);
   const [previews, setPreviews] = useState([]);
 
-  const [content, setSelectedContent] = useState(selected); // all the selected items in the library will always be available in an array here
+  const [content, setSelectedContent] = useState(selected); // all the selected items from library will always be available in an array here
   const [state, setState] = useState({ uploading: uploading });
   const [loadingMore, setLoadingMore] = useState(false);
   const [shouldWait, setShouldWait] = useState(useAwait);

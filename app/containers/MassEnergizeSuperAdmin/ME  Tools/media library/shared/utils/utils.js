@@ -56,14 +56,14 @@ export const smartString = (string, limit = 15) => {
 };
 /**
  * Rebuilds a low resolution version of a given image source
- * @param {*} source  base64 image string
- * @param {*} options  Eg. {quality:0.5}
- * @param {*} cb function that will receive the rebuilt image in "source"
+ * @param {string} source  base64 image string
+ * @param {object} options  Eg. {quality:0.5}
+ * @param {func} cb function that will receive the rebuilt image in "source"
  *
  * returns an object { source:...., canvas:...}
  */
 export const createLowResolutionImage = (source, options, cb) => {
-  const { quality } = options || {};
+  const { quality, file } = options || {}; //"file" here is the "File Blob" representation of the same image source you are passing
   const image = new Image();
   image.src = source;
   const canvas = document.createElement("canvas");
@@ -74,15 +74,18 @@ export const createLowResolutionImage = (source, options, cb) => {
     ctx.drawImage(image, 0, 0, image.width, image.height);
     const source = canvas.toDataURL("image/jpeg", quality || 0.5);
 
-    cb && cb({ source, canvas, file: toFile(source) });
+    cb &&
+      cb({ source, canvas, file: toFile(source, { name: file && file.name }) });
   };
 };
 /**
  * rebuilds a base64String image to a file object
- * @param {*} base64String
+ * @param {string} base64String
+ * @param {object} options contains info like the name to be given to the new file Blob created
  * @returns
  */
-const toFile = (base64String) => {
+const toFile = (base64String, options = {}) => {
+  const { name } = options || {};
   var arr = base64String.split(","),
     mime = arr[0].match(/:(.*?);/)[1],
     bstr = atob(arr[1]),
@@ -91,5 +94,7 @@ const toFile = (base64String) => {
   while (n--) {
     u8arr[n] = bstr.charCodeAt(n);
   }
-  return new File([u8arr], "New File Meerhn", { type: mime });
+  return new File([u8arr], name || "New Image File - " + getRandomStringKey(), {
+    type: mime,
+  });
 };
