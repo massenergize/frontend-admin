@@ -41,7 +41,7 @@ export default function ImportButton(props) {
     });            
   }
 
-  return <button type="button" onClick={handleOnClick}>Import {props.type}</button>
+  return <button type="button" onClick={() => handleOnClick()}>Import {props.type}</button>
 }
 
 
