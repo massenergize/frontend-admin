@@ -258,7 +258,7 @@ class AllTestimonials extends React.Component {
     const itemsInRedux = allTestimonials;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][1];
+      const found = data[d.dataIndex][0];
       ids.push(found);
       apiCall("/testimonials.delete", { testimonial_id: found });
     });
