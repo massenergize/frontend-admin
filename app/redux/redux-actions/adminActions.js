@@ -101,9 +101,13 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       filters: ["uploads", "actions", "events", "testimonials"],
       target_communities: [],
     }),
-    apiCall(isSuperAdmin ? "/tasks.functions.list" : "/tasks.functions.list"),
-    apiCall(isSuperAdmin ? "/tasks.list" : "/tasks.list"),
-    apiCall("/settings.list"),
+    /**
+     * Not Need for now
+     * 
+     */
+    // apiCall(isSuperAdmin ? "/tasks.functions.list" : "/tasks.functions.list"),
+    // apiCall(isSuperAdmin ? "/tasks.list" : "/tasks.list"),
+    // apiCall("/settings.list"),
     apiCall("/featureFlags.listForSuperAdmins"),
   ]).then((response) => {
     const [
@@ -120,9 +124,11 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       ccActions,
       tagCollections,
       galleryImages,
-      tasksFunctions,
-      tasks,
-      settings,
+      // ========= Not Need for now: Don't Remove =========
+      // tasksFunctions,
+      // tasks,
+      // settings,
+      // ===============================
       featureFlags,
     ] = response;
     dispatch(reduxLoadAllCommunities(communities.data));
@@ -138,9 +144,11 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(reduxLoadCCActions(ccActions.data.actions));
     dispatch(loadAllTags(tagCollections.data));
     dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
-    dispatch(loadTaskFunctionsAction(tasksFunctions.data));
-    dispatch(loadTasksAction(tasks.data));
-    dispatch(loadSettings(settings.data || {}));
+    // ========== DON'T REMOVE THESE =================
+    // dispatch(loadTaskFunctionsAction(tasksFunctions.data));
+    // dispatch(loadTasksAction(tasks.data));
+    // dispatch(loadSettings(settings.data || {}));
+    // ===============================================
     dispatch(loadFeatureFlags(featureFlags.data || {}));
   });
 };
