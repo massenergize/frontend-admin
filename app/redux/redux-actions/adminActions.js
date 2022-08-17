@@ -31,13 +31,22 @@ import {
   TEST_REDUX,
   LOAD_ALL_TASK_FUNCTIONS,
   LOAD_ALL_TASKS,
+  LOAD_SETTINGS,
+  LOAD_FEATURE_FLAGS,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
+import { LOADING } from "../../utils/constants";
 
 // TODO: REOMVE THIS FUNCTiON
 export const testRedux = (value) => {
   return { type: TEST_REDUX, payload: value };
+};
+export const loadSettings = (data = {}) => {
+  return {
+    type: LOAD_SETTINGS,
+    payload: data,
+  };
 };
 export const reduxFetchInitialContent = (auth) => (dispatch) => {
   if (!auth) return;
@@ -92,16 +101,10 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       filters: ["uploads", "actions", "events", "testimonials"],
       target_communities: [],
     }),
-    apiCall(
-      isSuperAdmin
-        ? "/tasks.functions.list"
-        : "/tasks.functions.list"
-    ),
-    apiCall(
-      isSuperAdmin
-        ? "/tasks.list"
-        : "/tasks.list"
-    ),
+    apiCall(isSuperAdmin ? "/tasks.functions.list" : "/tasks.functions.list"),
+    apiCall(isSuperAdmin ? "/tasks.list" : "/tasks.list"),
+    apiCall("/settings.list"),
+    apiCall("/featureFlags.listForSuperAdmins"),
   ]).then((response) => {
     const [
       communities,
@@ -119,8 +122,9 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       galleryImages,
       tasksFunctions,
       tasks,
+      settings,
+      featureFlags,
     ] = response;
-    
     dispatch(reduxLoadAllCommunities(communities.data));
     dispatch(loadAllActions(actions.data));
     dispatch(loadAllEvents(events.data));
@@ -136,9 +140,15 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
     dispatch(loadTaskFunctionsAction(tasksFunctions.data));
     dispatch(loadTasksAction(tasks.data));
- 
+    dispatch(loadSettings(settings.data || {}));
+    dispatch(loadFeatureFlags(featureFlags.data || {}));
   });
 };
+
+export const loadFeatureFlags = (data = LOADING) => ({
+  type: LOAD_FEATURE_FLAGS,
+  payload: data,
+});
 export const reduxToggleUniversalModal = (data = {}) => ({
   type: TOGGLE_UNIVERSAL_MODAL,
   payload: data,
@@ -162,7 +172,7 @@ export const reduxLoadGalleryImages = ({
   data = {},
   old = {},
   append = false,
-  prepend = false
+  prepend = false,
 }) => {
   var images;
   if (append) {
@@ -602,7 +612,6 @@ export const reduxCallLibraryModalImages = (props) => {
           ...((old && old.images) || []),
           ...((response.data && response.data.images) || []),
         ];
-        console.log(response);
         return dispatch(
           reduxLoadLibraryModalData({
             data: { ...response.data, images: newData },
@@ -669,16 +678,15 @@ export const reduxLoadAuthAdmin = (data = null) => {
   return { type: LOAD_AUTH_ADMIN, payload: data };
 };
 
-
 export const loadTaskFunctionsAction = (data = []) => {
   return {
-  type: LOAD_ALL_TASK_FUNCTIONS,
-  payload: data,
-  }
+    type: LOAD_ALL_TASK_FUNCTIONS,
+    payload: data,
+  };
 };
 export const loadTasksAction = (data = []) => {
   return {
-  type: LOAD_ALL_TASKS,
-  payload: data,
-  }
+    type: LOAD_ALL_TASKS,
+    payload: data,
+  };
 };

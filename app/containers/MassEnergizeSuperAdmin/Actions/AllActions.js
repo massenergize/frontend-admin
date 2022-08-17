@@ -24,7 +24,13 @@ import {
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 
-import { isNotEmpty, smartString } from "../../../utils/common";
+import {
+  findMatchesAndRest,
+  isNotEmpty,
+  makeDeleteUI,
+  pop,
+  smartString,
+} from "../../../utils/common";
 import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
@@ -62,6 +68,14 @@ class AllActions extends React.Component {
       this.setState(state, resolve);
     });
   }
+
+  updateRedux = (data) => {
+    const { putActionsInRedux, allActions } = this.props;
+    const index = allActions.findIndex((a) => a.id === data.id);
+    const updateItems = allActions.filter((a) => a.id !== data.id);
+    updateItems.splice(index, 0, data);
+    putActionsInRedux(updateItems);
+  };
 
   changeActions = async (id) => {
     const { allActions } = this.state;
@@ -131,6 +145,10 @@ class AllActions extends React.Component {
                       await apiCall("/actions.rank", {
                         action_id: d && d.id,
                         [name]: value,
+                      }).then((res) => {
+                        if (res && res.success) {
+                          this.updateRedux(res && res.data);
+                        }
                       });
                     }
                   }}
@@ -233,6 +251,16 @@ class AllActions extends React.Component {
           download: true,
         },
       },
+      {
+        name: "Live",
+        key: "is_a_template",
+        options: {
+          display: false,
+          filter: false,
+          searchable: false,
+          download: false,
+        },
+      },
     ];
   };
   /**
@@ -256,6 +284,7 @@ class AllActions extends React.Component {
       { isLive: d.is_published, item: d },
       d.id,
       d.is_published ? "Yes" : "No",
+      d.is_global,
     ]);
     return fashioned;
   };
@@ -303,17 +332,20 @@ class AllActions extends React.Component {
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putActionsInRedux(rem);
   }
+  getTimeStamp = () => {
+    const today = new Date();
+    let newDate = today;
+    let options = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    };
 
-  makeDeleteUI({ idsToDelete }) {
-    const len = (idsToDelete && idsToDelete.length) || 0;
-    return (
-      <Typography>
-        Are you sure you want to delete (
-        {(idsToDelete && idsToDelete.length) || ""})
-        {len === 1 ? " action? " : " actions? "}
-      </Typography>
-    );
-  }
+    return Intl.DateTimeFormat("en-US", options).format(newDate);
+  };
 
   render() {
     const title = brand.name + " - All Actions";
@@ -360,13 +392,51 @@ class AllActions extends React.Component {
       rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
+        const [found] = findMatchesAndRest(idsToDelete, (it) => {
+          const f = data[it.dataIndex];
+          return f[9]; // this index should be changed if anyone modifies (adds/removes) an item in fashioData()
+        });
+        const noTemplatesSelectedGoAhead = !found || !found.length;
         this.props.toggleDeleteConfirmation({
           show: true,
-          component: this.makeDeleteUI({ idsToDelete }),
-          onConfirm: () => this.nowDelete({ idsToDelete, data }),
+          component: makeDeleteUI({
+            idsToDelete,
+            templates: found,
+            noTemplates: noTemplatesSelectedGoAhead,
+          }),
+          onConfirm: () =>
+            noTemplatesSelectedGoAhead && this.nowDelete({ idsToDelete, data }),
           closeAfterConfirmation: true,
+          cancelText: noTemplatesSelectedGoAhead
+            ? "No"
+            : "Go Back and Remove Templates",
+          noOk: !noTemplatesSelectedGoAhead,
         });
         return false;
+      },
+      customSort: (data, colIndex, order) => {
+        return data.sort((a, b) => {
+          return (
+            (a.data[colIndex].rank < b.data[colIndex].rank ? -1 : 1) *
+            (order === "desc" ? 1 : -1)
+          );
+        });
+      },
+      downloadOptions: {
+        filename: `All Actions (${this.getTimeStamp()}).csv`,
+        separator: ",",
+      },
+      onDownload: (buildHead, buildBody, columns, data) => {
+        let alteredData = data.map((d) => {
+          let content = [...d.data];
+          content[3] = d.data[3].rank;
+          return {
+            data: content,
+            index: d.index,
+          };
+        });
+        let csv = buildHead(columns) + buildBody(alteredData);
+        return csv;
       },
     };
 
