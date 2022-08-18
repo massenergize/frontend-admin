@@ -6,7 +6,7 @@ import brand from "dan-api/dummy/brand";
 
 import MUIDataTable from "mui-datatables";
 import EditIcon from "@material-ui/icons/Edit";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import TextField from "@material-ui/core/TextField";
 
 import messageStyles from "dan-styles/Messages.scss";
@@ -58,11 +58,15 @@ class AllTestimonials extends React.Component {
       smartString(d.title), // limit to first 30 chars
       { rank: d.rank, id: d.id },
       d.community && d.community.name,
-      { isLive: d.is_approved && d.is_published, item: d },
+      {
+        isLive: d.is_approved && d.is_published,
+        is_approved: d.is_approved,
+        item: d,
+      },
       smartString(d.user ? d.user.full_name : "", 20), // limit to first 20 chars
       smartString((d.action && d.action.title) || "", 30),
       d.id,
-      d.is_published ? "Yes" : "No",
+      d.is_approved ? (d.is_published ? "Yes" : "No") : "Not Approved",
     ]);
   };
 
@@ -163,17 +167,24 @@ class AllTestimonials extends React.Component {
           customBodyRender: (d) => {
             return (
               <MEChip
-                onClick={() =>
+                onClick={() => {
+                  if (!d.item.is_approved)
+                    return this.props.history.push(
+                      `/admin/edit/${d.item.id}/testimonial`
+                    );
                   this.props.toggleLive({
                     show: true,
                     component: this.makeLiveUI({ data: d.item }),
                     onConfirm: () => this.makeLiveOrNot(d.item),
                     closeAfterConfirmation: true,
-                  })
+                  });
+                }}
+                style={{ width: !d.is_approved ? 110 : "auto" }}
+                label={
+                  d.is_approved ? (d.isLive ? "Yes" : "No") : "Not Approved"
                 }
-                label={d.isLive ? "Yes" : "No"}
-                className={`${
-                  d.isLive ? classes.yesLabel : classes.noLabel
+                className={`${d.isLive ? classes.yesLabel : classes.noLabel}  ${
+                  !d.is_approved ? "not-approved" : ""
                 } touchable-opacity`}
               />
             );
@@ -414,6 +425,6 @@ function mapDispatchToProps(dispatch) {
 const TestimonialsMapped = connect(
   mapStateToProps,
   mapDispatchToProps
-)(AllTestimonials);
+)(withRouter(AllTestimonials));
 
 export default withStyles(styles)(TestimonialsMapped);
