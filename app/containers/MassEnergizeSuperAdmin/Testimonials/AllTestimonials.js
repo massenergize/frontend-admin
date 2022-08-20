@@ -21,7 +21,11 @@ import {
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 
-import { getHumanFriendlyDate, smartString } from "../../../utils/common";
+import {
+  getHumanFriendlyDate,
+  isNotEmpty,
+  smartString,
+} from "../../../utils/common";
 import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -128,18 +132,21 @@ class AllTestimonials extends React.Component {
                 required
                 name="rank"
                 variant="outlined"
-                onChange={async (event) => {
+                onBlur={async (event) => {
                   const { target, key } = event;
                   if (!target) return;
                   const { name, value } = target;
-                  await apiCall("/testimonials.rank", {
-                    testimonial_id: d && d.id,
-                    [name]: value,
-                  }).then((res) => {
-                    if (res && res.success) {
-                      this.updateTestimonials(res && res.data);
-                    }
-                  });
+                  if (isNotEmpty(value) && value !== String(d.rank)) {
+                    await apiCall("/testimonials.rank", {
+                      testimonial_id: d && d.id,
+                      [name]: value,
+                    }).then((res) => {
+                      if (res && res.success) {
+                 
+                        this.updateTestimonials(res && res.data);
+                      }
+                    });
+                  }
                 }}
                 label="Rank"
                 InputLabelProps={{
@@ -287,21 +294,20 @@ class AllTestimonials extends React.Component {
       </Typography>
     );
   }
- getTimeStamp =  () => {
-  const today = new Date();
-  let newDate = today;
-  let options = {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
+  getTimeStamp = () => {
+    const today = new Date();
+    let newDate = today;
+    let options = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    };
+
+    return Intl.DateTimeFormat("en-US", options).format(newDate);
   };
-
-  return Intl.DateTimeFormat("en-US", options).format(newDate);
- }
-
 
   render() {
     const title = brand.name + " - All Testimonials";

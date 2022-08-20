@@ -137,7 +137,7 @@ class AllActions extends React.Component {
                   required
                   name="rank"
                   variant="outlined"
-                  onChange={async (event) => {
+                  onBlur={async (event) => {
                     const { target } = event;
                     if (!target) return;
                     const { name, value } = target;
