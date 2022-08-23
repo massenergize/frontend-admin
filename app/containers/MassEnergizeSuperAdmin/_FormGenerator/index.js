@@ -274,7 +274,7 @@ class MassEnergizeForm extends Component {
   /**
    * Returns what value was entered in the form for this fieldName
    */
-  getValue = (name, defaultValue = null) => {
+  getValue = (name, defaultValue = null, field = null) => {
     let { formData } = this.state;
     let val = formData[name];
     if (!val) {
@@ -282,6 +282,10 @@ class MassEnergizeForm extends Component {
       // this.setState({ formData });
       val = defaultValue;
     }
+    // If valueExtractor is passed into any field object, it means we want to step in the middle
+    // and process the value before it shows.
+    if (field && field.valueExtractor)
+      return field.valueExtractor(formData, field);
     return val;
   };
 
@@ -428,7 +432,7 @@ class MassEnergizeForm extends Component {
 
     // let's clean up the data
     const { formData, formJson } = this.state;
-    const { onComplete } = this.props;
+    const { onComplete, validator } = this.props;
     let [cleanedValues, hasMediaFiles] = this.cleanItUp(
       formData,
       formJson.fields
@@ -439,6 +443,17 @@ class MassEnergizeForm extends Component {
         cleanedValues,
         this.setError.bind(this)
       );
+    }
+
+    // if validator is provided, it means we want to make some form of unique custom validation first
+    // before submiting the form
+    if (validator) {
+      const [validationPassed, _err] = validator(
+        cleanedValues,
+        formJson.fields,
+        this.setError.bind(this)
+      );
+      if (!validationPassed) return this.setError(_err);
     }
 
     // let's make an api call to send the data
@@ -975,7 +990,7 @@ class MassEnergizeForm extends Component {
               >
                 <DateTimePicker
                   {...field}
-                  value={this.getValue(field.name, moment.now())}
+                  value={this.getValue(field.name, field.defaultValue, field)}
                   onChange={(date) =>
                     this.handleFormDataChange({
                       target: { name: field.name, value: date },
