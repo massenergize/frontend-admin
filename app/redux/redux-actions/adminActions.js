@@ -48,6 +48,7 @@ export const loadSettings = (data = {}) => {
     payload: data,
   };
 };
+
 export const reduxFetchInitialContent = (auth) => (dispatch) => {
   if (!auth) return;
   const isSuperAdmin = auth && auth.is_super_admin;
@@ -101,11 +102,12 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       filters: ["uploads", "actions", "events", "testimonials"],
       target_communities: [],
     }),
-    apiCall(isSuperAdmin ? "/tasks.functions.list" : "/tasks.functions.list"),
-    apiCall(isSuperAdmin ? "/tasks.list" : "/tasks.list"),
+    isSuperAdmin && apiCall("/tasks.functions.list"),
+    isSuperAdmin && apiCall("/tasks.list"),
     apiCall("/settings.list"),
     isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
   ]).then((response) => {
+
     const [
       communities,
       actions,
