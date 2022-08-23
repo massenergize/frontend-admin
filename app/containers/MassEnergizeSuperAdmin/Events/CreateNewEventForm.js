@@ -119,8 +119,7 @@ const prefillEndDate = (formData, field) => {
   const end = formData["end_date_and_time"] || "";
   const endValueIsStillDefault =
     end.toString() === field.defaultValue.toString();
-
-  if (endValueIsStillDefault) return start;
+  if (endValueIsStillDefault) return moment(start).add(1, "hours");
   return end;
 };
 const createFormJson = ({ communities, auth }) => {
@@ -177,9 +176,9 @@ const createFormJson = ({ communities, auth }) => {
             fieldType: "DateTime",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            defaultValue: moment.utc(moment().startOf("hour")),
             dbName: "start_date_and_time",
-            minDate: moment.utc(moment.now()),
+            minDate: moment.utc(moment().startOf("hour")),
             readOnly: false,
           },
           {
