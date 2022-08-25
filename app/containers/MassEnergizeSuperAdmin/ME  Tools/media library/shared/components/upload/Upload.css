@@ -34,16 +34,17 @@
   margin: 10px;
   border-radius: 5px;
   box-shadow: var(--elevate-float);
-  cursor: pointer;
+  cursor: var(--mouse-type);
+  /* cursor: pointer; */
 }
 /* .ml-preview-element {
   margin: 10px;
 } */
 
-.ml-preview-image:active {
+/* .ml-preview-image:active {
   transform: scale(1.5);
   transition: 0.2s ease-out;
-}
+} */
 .ml-prev-el-remove {
   cursor: pointer;
   color: maroon;

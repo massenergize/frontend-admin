@@ -34,6 +34,7 @@ import Modal from "./Modal";
 import Loading from "dan-components/Loading";
 import IconDialog from "../ME  Tools/icon dialog/IconDialog";
 import FormMediaLibraryImplementation from "./FormMediaLibraryImplementation";
+import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 const styles = (theme) => ({
@@ -169,6 +170,14 @@ class MassEnergizeForm extends Component {
           formData[k] = cFormData[k];
         });
       }
+      if (field.conditionalDisplays) {
+        (field.conditionalDisplays || []).forEach((item) => {
+          const cFormData = this.initialFormData(item.fields);
+          Object.keys(cFormData).forEach((k) => {
+            formData[k] = cFormData[k];
+          });
+        });
+      }
     });
     return formData;
   };
@@ -265,7 +274,7 @@ class MassEnergizeForm extends Component {
   /**
    * Returns what value was entered in the form for this fieldName
    */
-  getValue = (name, defaultValue = null) => {
+  getValue = (name, defaultValue = null, field = null) => {
     let { formData } = this.state;
     let val = formData[name];
     if (!val) {
@@ -273,6 +282,10 @@ class MassEnergizeForm extends Component {
       // this.setState({ formData });
       val = defaultValue;
     }
+    // If valueExtractor is passed into any field object, it means we want to step in the middle
+    // and process the value before it shows.
+    if (field && field.valueExtractor)
+      return field.valueExtractor(formData, field);
     return val;
   };
 
@@ -286,7 +299,7 @@ class MassEnergizeForm extends Component {
   getDisplayName = (fieldName, id, data) => {
     const { formData } = this.state;
     if (id) {
-      const [result] = data.filter((d) => d.id === id);
+      const [result] = data.filter((d) => d.id.toString() === id.toString());
       if (result) {
         return result.displayName;
       }
@@ -361,9 +374,10 @@ class MassEnergizeForm extends Component {
       // radio button. Similar to the `field.child` but allows more options
 
       if (field.conditionalDisplays && field.conditionalDisplays.length) {
-        const selectedSet = field.conditionalDisplays.filter(
-          (f) => fieldValueInForm === f.valueToCheck
-        )[0];
+        const selectedSet =
+          field.conditionalDisplays.find(
+            (f) => fieldValueInForm === f.valueToCheck
+          ) || {};
         const [childCleanValues, childHasMediaFiles] = this.cleanItUp(
           formData,
           selectedSet.fields || []
@@ -404,6 +418,9 @@ class MassEnergizeForm extends Component {
     return [cleanedValues, hasMediaFiles];
   };
 
+  setError(error) {
+    this.setState({ error: error, startCircularSpinner: false });
+  }
   /**
    * This handles the form data submission
    */
@@ -415,17 +432,29 @@ class MassEnergizeForm extends Component {
 
     // let's clean up the data
     const { formData, formJson } = this.state;
-    const { onComplete } = this.props;
+    const { onComplete, validator } = this.props;
     let [cleanedValues, hasMediaFiles] = this.cleanItUp(
       formData,
       formJson.fields
     );
 
     if (formJson.preflightFxn) {
-      cleanedValues = formJson.preflightFxn(cleanedValues);
+      cleanedValues = formJson.preflightFxn(
+        cleanedValues,
+        this.setError.bind(this)
+      );
     }
 
-    // return console.log("I am the returned values innit", cleanedValues)
+    // if validator is provided, it means we want to make some form of unique custom validation first
+    // before submiting the form
+    if (validator) {
+      const [validationPassed, _err] = validator(
+        cleanedValues,
+        formJson.fields,
+        this.setError.bind(this)
+      );
+      if (!validationPassed) return this.setError(_err);
+    }
 
     // let's make an api call to send the data
     let response = null;
@@ -446,7 +475,7 @@ class MassEnergizeForm extends Component {
         startCircularSpinner: false,
         // formData: initialFormData
       });
-      if (onComplete) onComplete(response.data);
+      if (onComplete) onComplete(response.data, response && response.success);
       if (formJson.successRedirectPage) {
         this.props.history.push(formJson.successRedirectPage);
         // window.location.href = formJson.successRedirectPage;
@@ -466,7 +495,7 @@ class MassEnergizeForm extends Component {
     const fieldValues = formData[fieldName];
     if (!fieldValues) return false;
     // if (!Array.isArray(fieldValues)) return false;
-    return fieldValues.indexOf(value) > -1;
+    return fieldValues.indexOf(value.toString()) > -1;
   };
 
   // what does this do?
@@ -515,31 +544,33 @@ class MassEnergizeForm extends Component {
                     multiple
                     displayEmpty
                     name={field.name}
-                    value={this.getValue(field.name)}
+                    value={this.getValue(field.name) || []}
                     input={<Input id="select-multiple-chip" />}
-                    renderValue={(selected) => (
-                      <div
-                        className={classes.chips}
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        {selected.map((id) => (
-                          <Chip
-                            key={id}
-                            label={this.getDisplayName(
-                              field.name,
-                              id,
-                              field.data
-                            )}
-                            className={classes.chip}
-                            style={{ margin: 5 }}
-                          />
-                        ))}
-                      </div>
-                    )}
+                    renderValue={(selected) => {
+                      return (
+                        <div
+                          className={classes.chips}
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          {(selected || []).map((id) => (
+                            <Chip
+                              key={id}
+                              label={this.getDisplayName(
+                                field.name,
+                                id,
+                                field.data
+                              )}
+                              className={classes.chip}
+                              style={{ margin: 5 }}
+                            />
+                          ))}
+                        </div>
+                      );
+                    }}
                     MenuProps={MenuProps}
                   >
                     {field.data.map((t) => (
@@ -958,7 +989,8 @@ class MassEnergizeForm extends Component {
                 style={{ width: "100%" }}
               >
                 <DateTimePicker
-                  value={this.getValue(field.name, moment.now())}
+                  {...field}
+                  value={this.getValue(field.name, field.defaultValue, field)}
                   onChange={(date) =>
                     this.handleFormDataChange({
                       target: { name: field.name, value: date },
@@ -974,6 +1006,21 @@ class MassEnergizeForm extends Component {
             <br />
           </div>
         );
+      case FieldTypes.AutoComplete:
+        return (
+          <div key={field.name}>
+            <FormLabel component="label">{field.label}</FormLabel>
+            <LightAutoComplete
+              {...field}
+              defaultSelected={this.getValue(field.name) || []}
+              onChange={(selected) =>
+                this.handleFormDataChange({
+                  target: { value: selected, name: field.name },
+                })
+              }
+            />
+          </div>
+        );
       default:
         return <div key={field.name + field.label} />;
     }
@@ -986,7 +1033,7 @@ class MassEnergizeForm extends Component {
     const toRender = field.conditionalDisplays.filter(
       (f) => this.getValue(field.name) === f.valueToCheck
     )[0];
-    if (toRender && toRender.fields) this.renderFields(toRender.fields);
+    if (toRender && toRender.fields) return this.renderFields(toRender.fields);
   };
 
   /**
