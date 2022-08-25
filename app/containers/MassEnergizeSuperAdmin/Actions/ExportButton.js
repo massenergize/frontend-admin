@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import useDrivePicker from 'react-google-drive-picker';
-import FileCopy from "@material-ui/icons/FileCopy";
 
 export default function ExportButton(props) {
     const [openPicker, data, authResponse] = useDrivePicker();
@@ -18,13 +17,12 @@ export default function ExportButton(props) {
             setSelectFolderEnabled: true,
             setParentFolder: "root",
             callbackFunction: async (data) => {
-            if (data.action === "picked") {
-                props.onSelectFolder(data['docs'][0]['id'], action_id);
-            }
+                if (data.action === "picked") {
+                    props.onSelectFolder(data['docs'][0]['id'], action_id);
+                }
             }
         })
     }
 
     return <i className="fab fa-google-drive" onClick={() => handleOnClick(action_id)} /> 
-    // return <FileCopy color="secondary" onClick={() => handleOnClick(action_id)}>Ion-logo-google</FileCopy>
 }
