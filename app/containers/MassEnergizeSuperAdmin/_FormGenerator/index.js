@@ -455,7 +455,6 @@ class MassEnergizeForm extends Component {
     // lets set the startCircularSpinner Value so the spinner starts spinning
     await this.setStateAsync({ startCircularSpinner: true });
     // let's clean up the data
-    const { formData, formJson } = this.state;
     const { onComplete, validator } = this.props;
     let [cleanedValues, hasMediaFiles] = this.cleanItUp(
       formData,
