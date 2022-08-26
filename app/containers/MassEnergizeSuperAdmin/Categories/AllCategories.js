@@ -145,7 +145,7 @@ class AllTagCollections extends React.Component {
     const itemsInRedux = tags;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][6];
+      const found = data[d.dataIndex][0];
       ids.push(found);
       apiCall("/tag_collections.delete", { tag_collection_id: found });
     });
