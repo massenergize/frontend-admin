@@ -274,7 +274,7 @@ class MassEnergizeForm extends Component {
   /**
    * Returns what value was entered in the form for this fieldName
    */
-  getValue = (name, defaultValue = null) => {
+  getValue = (name, defaultValue = null, field = null) => {
     let { formData } = this.state;
     let val = formData[name];
     if (!val) {
@@ -282,6 +282,10 @@ class MassEnergizeForm extends Component {
       // this.setState({ formData });
       val = defaultValue;
     }
+    // If valueExtractor is passed into any field object, it means we want to step in the middle
+    // and process the value before it shows.
+    if (field && field.valueExtractor)
+      return field.valueExtractor(formData, field);
     return val;
   };
 
@@ -315,6 +319,27 @@ class MassEnergizeForm extends Component {
     return "Please select an option";
   };
 
+  requiredValuesAreProvided(formData, fields) {
+    formData = formData || {};
+    var culprits = {};
+    fields.forEach((field) => {
+      if (field.children) {
+        const result = this.requiredValuesAreProvided(formData, field.children);
+        culprits = { ...culprits, ...result[1] };
+      } else {
+        const value = formData[field.name]; //field.name is what is used to set value, b4 cleaned up onSubmit
+        if (field.isRequired && (!value || !value.length)) {
+          culprits = {
+            ...culprits,
+            [field.name]: { name: field.name, dbName: field.dbName },
+          };
+        }
+      }
+    });
+
+    return [Object.keys(culprits).length, culprits];
+  }
+
   /**
    * This is a recursive function traversing all the fields and their children
    * and extracting their values from the form
@@ -328,10 +353,6 @@ class MassEnergizeForm extends Component {
       if (fieldValueInForm || fieldValueInForm === "") {
         switch (field.fieldType) {
           case FieldTypes.HTMLField:
-            // cleanedValues[field.dbName] = stateToHTML(
-            //   fieldValueInForm.getCurrentContent(),
-            //   htmlLinkOptions
-            // );
             cleanedValues[field.dbName] = fieldValueInForm;
             break;
           case FieldTypes.DateTime:
@@ -340,6 +361,7 @@ class MassEnergizeForm extends Component {
             ).format();
             break;
           case FieldTypes.Checkbox:
+            // If two or more items have the same dbName, the get combined into an array
             if (cleanedValues[field.dbName]) {
               cleanedValues[field.dbName] = cleanedValues[field.dbName].concat(
                 fieldValueInForm
@@ -422,13 +444,18 @@ class MassEnergizeForm extends Component {
    */
   submitForm = async (event) => {
     event.preventDefault();
+    const { formData, formJson } = this.state;
+    this.setState({ requiredFields: {} });
+    const [No, culprits] = this.requiredValuesAreProvided(
+      formData,
+      formJson.fields
+    );
+    if (No) return this.setState({ requiredFields: culprits });
 
     // lets set the startCircularSpinner Value so the spinner starts spinning
     await this.setStateAsync({ startCircularSpinner: true });
-
     // let's clean up the data
-    const { formData, formJson } = this.state;
-    const { onComplete } = this.props;
+    const { onComplete, validator } = this.props;
     let [cleanedValues, hasMediaFiles] = this.cleanItUp(
       formData,
       formJson.fields
@@ -439,6 +466,17 @@ class MassEnergizeForm extends Component {
         cleanedValues,
         this.setError.bind(this)
       );
+    }
+
+    // if validator is provided, it means we want to make some form of unique custom validation first
+    // before submiting the form
+    if (validator) {
+      const [validationPassed, _err] = validator(
+        cleanedValues,
+        formJson.fields,
+        this.setError.bind(this)
+      );
+      if (!validationPassed) return this.setError(_err);
     }
 
     // let's make an api call to send the data
@@ -507,6 +545,21 @@ class MassEnergizeForm extends Component {
     return <div />;
   };
 
+  renderGeneralContent(field) {
+    const requiredFields = this.state.requiredFields || {};
+    const isRequiredButEmpty = requiredFields[field.name];
+    if (isRequiredButEmpty) {
+      return (
+        <small
+          className="error-notifications"
+          style={{ color: "red", fontWeight: "bold" }}
+        >
+          The field below is required but no value is provided *
+        </small>
+      );
+    }
+    return <></>;
+  }
   /**
    * Given the field, it renders the actual component
    */
@@ -524,7 +577,9 @@ class MassEnergizeForm extends Component {
             <div key={field.name}>
               <div className={classes.field}>
                 <FormControl component="fieldset">
+                  {this.renderGeneralContent(field)}
                   <FormLabel component="legend">{field.label}</FormLabel>
+
                   <Select
                     multiple
                     displayEmpty
@@ -612,7 +667,9 @@ class MassEnergizeForm extends Component {
         return (
           <div key={field.name}>
             <FormControl className={classes.field}>
+              {this.renderGeneralContent(field)}
               <InputLabel htmlFor={field.name}>{field.label}</InputLabel>
+
               <Select
                 native
                 name={field.name}
@@ -646,6 +703,7 @@ class MassEnergizeForm extends Component {
       case FieldTypes.Icon:
         return (
           <div key={field.name}>
+            {this.renderGeneralContent(field)}
             <InputLabel htmlFor={field.name} style={{ marginBottom: 8 }}>
               {field.label}
             </InputLabel>
@@ -665,6 +723,7 @@ class MassEnergizeForm extends Component {
         return (
           <>
             <div className="imageUploadInstructions">
+              {this.renderGeneralContent(field)}
               <h6>Image Upload Instructions:</h6>
               <ul
                 style={{
@@ -715,6 +774,7 @@ class MassEnergizeForm extends Component {
         // const files = files && files !== 'None' ? files : [];
         return (
           <div key={field.name}>
+            {this.renderGeneralContent(field)}
             {value === "None" && (
               <p style={{ color: "maroon" }}>
                 <i>
@@ -814,7 +874,7 @@ class MassEnergizeForm extends Component {
         //  : { display: 'none' };
         return (
           <div key={field.name + field.label}>
-            {/* <div style={previewStyle}>{this.showPreviewModal()}</div> */}
+            {this.renderGeneralContent(field)}
             <Grid
               item
               xs={12}
@@ -871,21 +931,6 @@ class MassEnergizeForm extends Component {
                 }}
                 apiKey={TINY_MCE_API_KEY}
               />
-
-              {/* <Button
-                style={{ width: '100%' }}
-                color="default"
-                onClick={() => {
-                  this.setState({
-                    activeModal: field.name,
-                    activeModalTitle: field.label,
-                  });
-                }}
-              >
-                <Icon style={{ marginRight: 6 }}>remove_red_eye</Icon>
-                Show Me A Preview
-                {' '}
-              </Button> */}
             </Grid>
             <br />
             <br />
@@ -894,6 +939,7 @@ class MassEnergizeForm extends Component {
       case FieldTypes.Radio:
         return (
           <div className={classes.fieldBasic} key={field.name + field.label}>
+            {this.renderGeneralContent(field)}
             <FormLabel component="label">{field.label}</FormLabel>
             <RadioGroup
               aria-label={field.label}
@@ -924,6 +970,7 @@ class MassEnergizeForm extends Component {
       case FieldTypes.TextField:
         return (
           <div key={field.name + field.label}>
+            {this.renderGeneralContent(field)}
             <TextField
               required={field.isRequired}
               name={field.name}
@@ -947,6 +994,7 @@ class MassEnergizeForm extends Component {
       case FieldTypes.Section:
         return (
           <div key={field.label}>
+            {this.renderGeneralContent(field)}
             <br />
             <div
               style={{
@@ -965,6 +1013,7 @@ class MassEnergizeForm extends Component {
       case FieldTypes.DateTime:
         return (
           <div key={field.label}>
+            {this.renderGeneralContent(field)}
             <Typography variant="button" className={classes.divider}>
               {field.label}
             </Typography>
@@ -975,7 +1024,7 @@ class MassEnergizeForm extends Component {
               >
                 <DateTimePicker
                   {...field}
-                  value={this.getValue(field.name, moment.now())}
+                  value={this.getValue(field.name, field.defaultValue, field)}
                   onChange={(date) =>
                     this.handleFormDataChange({
                       target: { name: field.name, value: date },

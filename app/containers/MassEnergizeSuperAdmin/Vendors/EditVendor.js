@@ -160,7 +160,7 @@ const createFormJson = ({ vendor, communities }) => {
             placeholder: "eg. 100",
             fieldType: "TextField",
             contentType: "text",
-            isRequired: true,
+            isRequired: false,
             defaultValue: vendor.id,
             dbName: "vendor_id",
             readOnly: true,
