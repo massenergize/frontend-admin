@@ -50,8 +50,6 @@ class CreateNewActionForm extends Component {
       communities.length &&
       tags &&
       tags.length &&
-      vendors &&
-      vendors.length &&
       ccActions &&
       ccActions.length;
 

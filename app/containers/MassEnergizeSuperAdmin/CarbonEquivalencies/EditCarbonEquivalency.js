@@ -76,7 +76,7 @@ class EditCarbonEquivalencyForm extends Component {
               placeholder: 'eg. 2',
               fieldType: 'TextField',
               contentType: 'text',
-              isRequired: true,
+              isRequired: false,
               defaultValue: carbonEquivalency.id,
               dbName: 'id',
               readOnly: true
