@@ -50,8 +50,6 @@ class CreateNewActionForm extends Component {
       communities.length &&
       tags &&
       tags.length &&
-      //vendors &&         
-      //vendors.length &&    communities without vendors need to be able to create
       ccActions &&
       ccActions.length;
 
