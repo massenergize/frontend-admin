@@ -36,13 +36,16 @@ function MediaLibraryModal({
   croppedSource,
   setCroppedSource,
   allowCropping,
-  fileLimit
+  fileLimit,
+  maximumImageSize,
+  compress,
+  compressedQuality,
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
   const [previews, setPreviews] = useState([]);
 
-  const [content, setSelectedContent] = useState(selected); // all the selected items in the library will always be available in an array here
+  const [content, setSelectedContent] = useState(selected); // all the selected items from library will always be available in an array here
   const [state, setState] = useState({ uploading: uploading });
   const [loadingMore, setLoadingMore] = useState(false);
   const [shouldWait, setShouldWait] = useState(useAwait);
@@ -93,6 +96,9 @@ function MediaLibraryModal({
       key: "upload",
       component: (
         <Upload
+          maximumImageSize={maximumImageSize}
+          compress={compress}
+          compressedQuality={compressedQuality}
           previews={previews}
           setPreviews={setPreviews}
           files={files}
@@ -106,7 +112,7 @@ function MediaLibraryModal({
           switchToCropping={switchToCropping}
           cropped={cropped}
           allowCropping={allowCropping}
-          fileLimit = {fileLimit}
+          fileLimit={fileLimit}
         />
       ),
     },
@@ -128,7 +134,7 @@ function MediaLibraryModal({
             shouldWait={shouldWait}
             setShouldWait={setShouldWait}
             awaitSeconds={awaitSeconds}
-            fileLimit = {fileLimit}
+            fileLimit={fileLimit}
           />
         </Suspense>
       ),
