@@ -41,12 +41,18 @@ export const makeLimitsFromImageArray = (images) => {
     images: images || [],
   };
 };
-export const getHumanFriendlyDate = (dateString, includeTime = false) => {
+export const getHumanFriendlyDate = (
+  dateString,
+  includeTime = false,
+  forSorting = true
+) => {
   if (!dateString) return null;
+  var format = "";
+  if (forSorting) format = `YYYY-MM-DD ${includeTime ? "hh:mm a" : ""}`;
+  else format = `MMMM Do, YYYY ${includeTime ? "hh:mm a" : ""}`;
   return moment(dateString).format(
     // make it a bit less human friendly, so it sorts properly
-    `YYYY-MM-DD ${includeTime ? "hh:mm a" : ""}`
-    //`MMMM Do, YYYY ${includeTime ? "hh:mm a" : ""}`
+    format
   );
 };
 export const smartString = (string, charLimit = 60) => {

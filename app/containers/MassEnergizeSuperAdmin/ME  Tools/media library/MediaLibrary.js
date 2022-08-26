@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import "./MediaLibrary.css";
 import MLButton from "./shared/components/button/MLButton";
 import MediaLibraryModal from "./shared/components/library modal/MediaLibraryModal";
 import ImageThumbnail from "./shared/components/thumbnail/ImageThumbnail";
-import { libraryImage, TABS } from "./shared/utils/values";
+import {
+  DEFFAULT_MAX_SIZE,
+  IMAGE_QUALITY,
+  libraryImage,
+  TABS,
+} from "./shared/utils/values";
 import { EXTENSIONS } from "./shared/utils/utils";
 
 function MediaLibrary(props) {
@@ -18,6 +23,7 @@ function MediaLibrary(props) {
     onStateChange,
     images,
     defaultTab,
+    dragToOrder,
   } = props;
 
   const [show, setShow] = useState(openState);
@@ -29,13 +35,16 @@ function MediaLibrary(props) {
   const [currentTab, setCurrentTab] = useState(defaultTab);
   const [files, setFiles] = useState([]); // all files that have been selected from user's device [Schema: {id, file}]
   const [croppedSource, setCroppedSource] = useState();
+  // --------------------------------------------------
+  const oldPosition = useRef(null);
+  const newPosition = useRef(null);
+  // --------------------------------------------------
 
   const finaliseCropping = () => {
     if (!cropLoot) return;
     const { source } = cropLoot;
     setCropped({ ...(cropped || {}), [source.id.toString()]: croppedSource });
     setCurrentTab(TABS.UPLOAD_TAB);
-    // Then you should look into displaying the cropped preview instead of the main content innit
   };
 
   const switchToCropping = (content) => {
@@ -83,6 +92,20 @@ function MediaLibrary(props) {
 
     return [...isNotThere, ...images];
   };
+  const close = () => {
+    setShow(false);
+    setFiles([]);
+  };
+
+  const swapPositions = () => {
+    const prev = oldPosition.current;
+    const next = newPosition.current;
+    if (prev === null || next === null) return;
+    const images = [...(imageTray || [])];
+    const image = images.splice(prev, 1)[0];
+    images.splice(next, 0, image);
+    handleSelected(images);
+  };
   return (
     <React.Fragment>
       {show && (
@@ -90,7 +113,7 @@ function MediaLibrary(props) {
           <MediaLibraryModal
             {...props}
             images={preselectDefaultImages()}
-            close={() => setShow(false)}
+            close={close}
             getSelected={handleSelected}
             selected={imageTray}
             cropLoot={cropLoot}
@@ -130,6 +153,11 @@ function MediaLibrary(props) {
             content={imageTray}
             remove={remove}
             multiple={multiple}
+            dragToOrder={dragToOrder}
+            oldPosition={oldPosition}
+            newPosition={newPosition}
+            swapPositions={swapPositions}
+
             // switchToCropping={switchToCropping}
           />
         )}
@@ -148,49 +176,96 @@ function MediaLibrary(props) {
   );
 }
 
-const ImageTray = ({ sourceExtractor, remove, content }) => {
+const ImageTray = ({
+  sourceExtractor,
+  remove,
+  content,
+  dragToOrder,
+  newPosition,
+  oldPosition,
+  swapPositions,
+}) => {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        width: "100%",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      {content.map((img, index) => {
-        const src = sourceExtractor ? sourceExtractor(img) : img.url;
-        return (
-          <React.Fragment key={index.toString()}>
-            <TrayImage
-              src={src}
-              id={img.id}
-              remove={remove}
-              // switchToCropping={switchToCropping}
-            />
-          </React.Fragment>
-        );
-      })}
-    </div>
+    <>
+      {dragToOrder && (
+        <center>
+          <small>
+            Rearrange selected images in your preferred order, by dragging them
+          </small>
+        </center>
+      )}
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {content.map((img, index) => {
+          const src = sourceExtractor ? sourceExtractor(img) : img.url;
+          return (
+            <React.Fragment key={index.toString()}>
+              <TrayImage
+                src={src}
+                id={img.id}
+                remove={remove}
+                index={index}
+                setOldPosition={() => (oldPosition.current = index)}
+                setNewPosition={() => (newPosition.current = index)}
+                onDragEnd={() => swapPositions()}
+                dragToOrder={dragToOrder}
+                // switchToCropping={switchToCropping}
+              />
+            </React.Fragment>
+          );
+        })}
+      </div>
+    </>
   );
 };
 
-const TrayImage = ({ src, remove, id }) => (
-  <div className="ml-tray-image">
-    <img src={src} className="ml-preview-image elevate-float" />
-    <small className="ml-prev-el-remove" onClick={() => remove(id)}>
-      Remove
-    </small>
-    {/* <small
+/**
+ *
+ * Component that shows a preview of the image that a user has selected
+ * @returns
+ */
+const TrayImage = ({
+  src,
+  remove,
+  id,
+  setOldPosition,
+  setNewPosition,
+  onDragEnd,
+  dragToOrder,
+}) => {
+  const cssOptions = dragToOrder ? {} : { pointerEvents: "none" };
+  return (
+    <div className="ml-tray-image">
+      <img
+        src={src}
+        className="ml-preview-image elevate-float"
+        style={{ "--mouse-type": "move", ...cssOptions }}
+        draggable
+        onDragStart={() => setOldPosition()}
+        onDragEnter={() => setNewPosition()}
+        onDragOver={(e) => e.preventDefault()}
+        onDragEnd={onDragEnd}
+      />
+      <small className="ml-prev-el-remove" onClick={() => remove(id)}>
+        Remove
+      </small>
+      {/* <small
       className="ml-prev-el-remove"
       style={{ color: "blue" }}
       onClick={() => switchToCropping(id, "library-content")}
     >
       Crop
     </small> */}
-  </div>
-);
+    </div>
+  );
+};
 
 MediaLibrary.propTypes = {
   /**
@@ -270,6 +345,24 @@ MediaLibrary.propTypes = {
    * Determines whether or not cropping should be enabled on images. (That are freshly being uploaded)
    */
   allowCropping: PropTypes.bool,
+  dragToOrder: PropTypes.bool,
+
+  /**
+   * This boolean turned on will force large images to be resized by slightly reducing the image quality
+   *
+   */
+  compress: PropTypes.bool,
+
+  /**
+   * This string could be "LOW,MEDIUM or HGH" and indicates the extent that images should be compressed
+   * when compression is turned on. Default value is set to MEDIUM quality
+   */
+  compressedQuality: PropTypes.string,
+  /**
+   * Maximum size that an image should be. If a selected image exceeds this number, and the "compress" value
+   * is true, the image will be reduced to a lower quality before uploading
+   */
+  maximumImageSize: PropTypes.number,
 };
 
 MediaLibrary.Button = MLButton;
@@ -279,6 +372,7 @@ MediaLibrary.AcceptedFileTypes = {
   Images: ["image/jpg", "image/png", "image/jpeg"].join(", "),
   All: EXTENSIONS.join(", "),
 };
+MediaLibrary.CompressedQuality = IMAGE_QUALITY;
 MediaLibrary.defaultProps = {
   multiple: true,
   uploadMultiple: false,
@@ -291,5 +385,9 @@ MediaLibrary.defaultProps = {
   useAwait: false,
   awaitSeconds: 500,
   allowCropping: true,
+  dragToOrder: true,
+  compress: true,
+  compressedQuality: IMAGE_QUALITY.MEDIUM.key,
+  maximumImageSize: DEFFAULT_MAX_SIZE,
 };
 export default MediaLibrary;
