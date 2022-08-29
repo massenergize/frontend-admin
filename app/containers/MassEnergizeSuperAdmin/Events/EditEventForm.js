@@ -597,7 +597,7 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
         fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload Files",
-        isRequired: true,
+        isRequired: false,
         selected: event.image ? [event.image] : [],
       },
       {
