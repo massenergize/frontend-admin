@@ -74,7 +74,6 @@ class TestimonialsPageEditForm extends Component {
           placeholder: 'eg. 1',
           fieldType: 'TextField',
           contentType: 'number',
-          isRequired: true,
           defaultValue: `${pageData.id}`,
           dbName: 'id',
           readOnly: true

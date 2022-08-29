@@ -106,7 +106,6 @@ class CreateNewVendorForm extends Component {
               placeholder: 'eg. 100',
               fieldType: 'TextField',
               contentType: 'text',
-              isRequired: true,
               defaultValue: vendor.id,
               dbName: 'id',
               readOnly: true
@@ -324,7 +323,7 @@ class CreateNewVendorForm extends Component {
           isRequired: true,
           defaultValue: vendor && vendor.onboarding_contact && vendor.onboarding_contact.email,
           dbName: 'onboarding_contact_email',
-          readOnly: true
+          readOnly: false
         },
         {
           name: 'image',

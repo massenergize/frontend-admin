@@ -255,7 +255,6 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
             placeholder: "Event ID",
             fieldType: "TextField",
             contentType: "number",
-            isRequired: true,
             defaultValue: event.id,
             dbName: "event_id",
             readOnly: true,

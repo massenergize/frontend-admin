@@ -327,7 +327,8 @@ class MassEnergizeForm extends Component {
         culprits = { ...culprits, ...result[1] };
       } else {
         const value = formData[field.name]; //field.name is what is used to set value, b4 cleaned up onSubmit
-        if (field.isRequired && (!value || !value.length)) {
+        // if field is readOnly - ignore the isRequired if present
+        if (field.isRequired && !field.readOnly && (!value || !value.length)) {
           culprits = {
             ...culprits,
             [field.name]: { name: field.name, dbName: field.dbName },

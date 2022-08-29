@@ -259,7 +259,6 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
       {
         name: "image",
         placeholder: "Select an Image",
-        // fieldType: "File",
         fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload Files",
