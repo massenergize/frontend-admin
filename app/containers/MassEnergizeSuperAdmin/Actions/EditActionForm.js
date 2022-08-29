@@ -60,7 +60,7 @@ export const makeTagSection = ({ collections, action, defaults = true }) => {
 
   (collections || []).forEach((tCol) => {
     const newField = {
-      isRequired: true,
+      isRequired: false,
       name: tCol.name,
       label: `${tCol.name} ${
         tCol.allow_multiple
@@ -311,7 +311,7 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
       {
         name: "featured_summary",
         label: "Featured Summary",
-        placeholder: "eg. This event is happening in ...",
+        placeholder: "Short sentence promoting the action",
         fieldType: "TextField",
         isMulti: true,
         isRequired: false,
@@ -322,7 +322,7 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
       {
         name: "about",
         label: "Write some detailed description about this action",
-        placeholder: "eg. Write some detailed description about this action",
+        placeholder: "Key information people should know about the action",
         fieldType: "HTMLField",
         isRequired: true,
         defaultValue: action.about,
@@ -332,7 +332,7 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
       {
         name: "steps_to_take",
         label: "Please outline steps to take for your users",
-        placeholder: "eg. Please outline steps to take for your users",
+        placeholder: "Easy to follow steps to accomplish the action",
         fieldType: "HTMLField",
         isRequired: false,
         defaultValue: action.steps_to_take,
@@ -341,8 +341,8 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
       },
       {
         name: "deep_dive",
-        label: "Deep dive into all the details",
-        placeholder: "eg. This action ...",
+        label: "Deep dive into all the details (optional)",
+        placeholder: "Further information some users might want to know",
         fieldType: "HTMLField",
         isRequired: false,
         defaultValue: action.deep_dive,
@@ -352,7 +352,6 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
       {
         name: "vendors",
         label: "Select which vendors provide services for this action",
-        placeholder: "eg. Solarize Wayland",
         fieldType: "Checkbox",
         selectMany: true,
         defaultValue: action.vendors
