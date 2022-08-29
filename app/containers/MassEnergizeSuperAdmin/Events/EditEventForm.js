@@ -180,6 +180,7 @@ class EditEventForm extends Component {
     if (!formJson) return <Loading />;
     return (
       <div>
+        {event.rsvp_enabled ? (
         <Paper style={{ padding: 20, marginBottom: 15 }}>
           <Typography>
             Would you like to see a list of users who have RSVP-ed for this
@@ -192,7 +193,8 @@ class EditEventForm extends Component {
             See A Full List Here
           </Link>
         </Paper>
-
+        ): null}
+        
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
