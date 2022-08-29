@@ -180,6 +180,7 @@ class EditEventForm extends Component {
     if (!formJson) return <Loading />;
     return (
       <div>
+        {event.rsvp_enabled ? (
         <Paper style={{ padding: 20, marginBottom: 15 }}>
           <Typography>
             Would you like to see a list of users who have RSVP-ed for this
@@ -192,7 +193,8 @@ class EditEventForm extends Component {
             See A Full List Here
           </Link>
         </Paper>
-
+        ): null}
+        
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
@@ -288,7 +290,7 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
             placeholder: "eg. 1",
             fieldType: "TextField",
             contentType: "number",
-            isRequired: true,
+            isRequired: false,
             defaultValue: event.rank,
             dbName: "rank",
             readOnly: false,
@@ -299,7 +301,6 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
             placeholder: "YYYY-MM-DD HH:MM",
             fieldType: "DateTime",
             contentType: "text",
-            isRequired: true,
             defaultValue: event.start_date_and_time,
             dbName: "start_date_and_time",
             readOnly: false,
@@ -310,7 +311,6 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
             placeholder: "YYYY-MM-DD HH:MM",
             fieldType: "DateTime",
             contentType: "text",
-            isRequired: true,
             defaultValue: event.end_date_and_time,
             dbName: "end_date_and_time",
             readOnly: false,
@@ -597,7 +597,7 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
         fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload Files",
-        isRequired: true,
+        isRequired: false,
         selected: event.image ? [event.image] : [],
       },
       {

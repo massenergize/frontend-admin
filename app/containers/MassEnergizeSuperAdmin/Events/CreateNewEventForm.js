@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import states from "dan-api/data/states";
 import { withStyles } from "@material-ui/core/styles";
-import { apiCall } from "../../../utils/messenger";
 import moment from "moment";
 import MassEnergizeForm from "../_FormGenerator";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
@@ -106,6 +105,7 @@ export default withStyles(styles, { withTheme: true })(CreateEventMapped);
 const validator = (cleaned) => {
   const start = (cleaned || {})["start_date_and_time"];
   const end = (cleaned || {})["end_date_and_time"];
+  console.log(start, end)
   const endDateComesLater = new Date(end) > new Date(start);
   return [
     endDateComesLater,
@@ -175,10 +175,9 @@ const createFormJson = ({ communities, auth }) => {
             placeholder: "YYYY-MM-DD HH:MM",
             fieldType: "DateTime",
             contentType: "text",
-            isRequired: true,
-            defaultValue: moment.utc(moment().startOf("hour")),
+            defaultValue: moment().startOf("hour"),
             dbName: "start_date_and_time",
-            minDate: moment.utc(moment().startOf("hour")),
+            minDate: moment().startOf("hour"),
             readOnly: false,
           },
           {
@@ -187,11 +186,10 @@ const createFormJson = ({ communities, auth }) => {
             placeholder: "YYYY-MM-DD HH:MM",
             fieldType: "DateTime",
             contentType: "text",
-            isRequired: true,
             valueExtractor: prefillEndDate,
-            defaultValue: moment.utc(moment.now()),
+            defaultValue: moment().startOf("hour").add(1,"hours"),
             dbName: "end_date_and_time",
-            minDate: moment.utc(moment.now()),
+            minDate: moment().startOf("hour"),
             readOnly: false,
           },
           {
