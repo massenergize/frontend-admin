@@ -156,7 +156,7 @@ class CreateNewCommunityForm extends Component {
             },
             {
               name: "admin_phone_number",
-              label: "Community's Public Phone Number",
+              label: "Community's Public Phone Number (optional)",
               placeholder: "eg. 571 222 4567",
               fieldType: "TextField",
               contentType: "text",

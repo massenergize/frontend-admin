@@ -180,7 +180,6 @@ const createFormJson = ({ communities, actions, vendors, testimonial }) => {
             placeholder: "0",
             fieldType: "TextField",
             contentType: "text",
-            isRequired: false,
             defaultValue: testimonial && testimonial.id,
             dbName: "testimonial_id",
             readOnly: true,

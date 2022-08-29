@@ -350,7 +350,6 @@ const createFormJson = (community) => {
                     "eg. 01101, 01102, 01103, 01104 or Springfield-MA",
                   fieldType: "TextField",
                   contentType: "text",
-                  isRequired: true,
                   defaultValue: community.locations || "",
                   dbName: "locations",
                   readOnly: true,

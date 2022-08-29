@@ -186,7 +186,6 @@ class TeamMembers extends React.Component {
               placeholder: "eg. id",
               fieldType: "TextField",
               contentType: "text",
-              isRequired: true,
               defaultValue: team.id,
               dbName: "team_id",
               readOnly: true,

@@ -128,7 +128,6 @@ var createFormJson = ({
                 label: "Id of feature",
                 fieldType: fieldTypes.TextField,
                 contentType: "text",
-                isRequired: true,
                 defaultValue: id || "",
                 dbName: "id",
                 readOnly: true,

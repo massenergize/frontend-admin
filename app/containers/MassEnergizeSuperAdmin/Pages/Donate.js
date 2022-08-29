@@ -73,7 +73,6 @@ class DonatePageEditForm extends Component {
           placeholder: 'eg. 1',
           fieldType: 'TextField',
           contentType: 'number',
-          isRequired: true,
           defaultValue: `${donatePageData.id}`,
           dbName: 'id',
           readOnly: true

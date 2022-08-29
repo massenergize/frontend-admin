@@ -25,7 +25,6 @@ function MediaLibrary(props) {
     defaultTab,
     dragToOrder,
   } = props;
-
   const [show, setShow] = useState(openState);
   const [imageTray, setTrayImages] = useState(selected);
   const [state, setState] = useState({});
@@ -385,7 +384,7 @@ MediaLibrary.defaultProps = {
   useAwait: false,
   awaitSeconds: 500,
   allowCropping: true,
-  dragToOrder: true,
+  dragToOrder: false,
   compress: true,
   compressedQuality: IMAGE_QUALITY.MEDIUM.key,
   maximumImageSize: DEFFAULT_MAX_SIZE,
