@@ -121,7 +121,7 @@ class CreateNewCommunityForm extends Component {
               placeholder: "Welcome to Energize xxx, a project of ....",
               fieldType: "TextField",
               contentType: "text",
-              isRequired: true,
+              isRequired: false,
               defaultValue: "",
               dbName: "about_community",
               readOnly: false,

@@ -292,7 +292,7 @@ const createFormJson = ({ communities, actions, vendors, testimonial }) => {
         label: "Upload a file for this testimonial",
         uploadMultiple: false, 
         multiple: false,
-        isRequired: true,
+        isRequired: false,
        
       },
       {
