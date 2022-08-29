@@ -177,6 +177,7 @@ class HomePageEditForm extends Component {
               dbName: "images",
               uploadMultiple: true,
               multiple: true,
+              dragToOrder: true,              
               allowCropping: true,
               fileLimit: 3,
               selected: images,
