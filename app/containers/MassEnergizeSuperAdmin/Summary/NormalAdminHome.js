@@ -198,7 +198,7 @@ class NormalAdminHome extends PureComponent {
         </Grid>
         <Divider className={classes.divider} />
         {graph_data && <ActionsChartWidget data={graph_data || {}} />}
-        <br />
+      
         <br />
         <Grid md={12} style={{ display: "flex" }}>
           {auth && !auth.is_super_admin && (

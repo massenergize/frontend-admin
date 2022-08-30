@@ -6,7 +6,12 @@ import { Paper, Typography } from "@material-ui/core";
 import { LOADING } from "../../../utils/constants";
 import Loading from "dan-components/Loading";
 import { makeTimeAgo } from "../../../utils/common";
-function ReportingActivities({ activities, style }) {
+function ReportingActivities({
+  activities,
+  style,
+  super_admin_mode,
+  community_admin_mode,
+}) {
   if (activities === LOADING)
     return (
       <PapperBlock
@@ -40,6 +45,7 @@ function ReportingActivities({ activities, style }) {
                 {...act}
                 activityTypes={activities.activityTypes} // Signed in, Deleted, Updated etc
                 itemTypes={activities.types} // A record of Action/event, testimonial etc
+                super_admin_mode={super_admin_mode}
               />
             </React.Fragment>
           );
@@ -64,12 +70,22 @@ const OneActivity = ({
   activity_type,
   notes,
   created_at,
+  super_admin_mode,
+  by_super_admin,
 }) => {
   const activityType = (activityTypes || {})[activity_type] || {};
-  const name = actor.full_name || "...";
-  console.log;
+  const name = actor.preferred_name || actor.full_name || "...";
+
+  const extra = super_admin_mode ? { fontSize: 15 } : {};
+  const byASadmin = !super_admin_mode && by_super_admin; // To mark activities that show what superadmins have been doing to your community
   return (
-    <Typography variant="caption">
+    <Typography variant="caption" style={{ marginBottom: 5, ...extra }}>
+      {byASadmin && (
+        <i
+          className="fas fa-shield"
+          style={{ marginRight: 4, color: "#fb8c00" }}
+        />
+      )}
       <span>
         <b>{name}</b>
       </span>
@@ -93,6 +109,8 @@ const OneActivity = ({
           </>
         )}
       </span>
+
+      {byASadmin && <i style={{ color: "#e47f00" }}> - Super Admin</i>}
     </Typography>
   );
 };
