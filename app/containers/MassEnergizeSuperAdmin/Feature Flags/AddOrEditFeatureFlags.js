@@ -66,7 +66,7 @@ const preflight = (data) => {
 const uniqueIdentifier = (text) => {
   if (!text || !text.trim()) return "";
   var arr = text.split(" ");
-  return arr.join("_").toLowerCase() + "_feature";
+  return arr.join("-").toLowerCase() + "-feature-flag";
 };
 
 const parseFeatureForEditMode = (feature) => {
@@ -137,7 +137,7 @@ var createFormJson = ({
           {
             name: "name",
             label: "Name of the feature (60 Chars)",
-            placeholder: "Eg. 'Guest Authentication Feature '",
+            placeholder: "Eg. 'Guest Authentication'",
             fieldType: fieldTypes.TextField,
             contentType: "text",
             isRequired: true,
