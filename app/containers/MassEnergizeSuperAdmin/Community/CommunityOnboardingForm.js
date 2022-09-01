@@ -121,7 +121,7 @@ class CreateNewCommunityForm extends Component {
               placeholder: "Welcome to Energize xxx, a project of ....",
               fieldType: "TextField",
               contentType: "text",
-              isRequired: true,
+              isRequired: false,
               defaultValue: "",
               dbName: "about_community",
               readOnly: false,
@@ -156,7 +156,7 @@ class CreateNewCommunityForm extends Component {
             },
             {
               name: "admin_phone_number",
-              label: "Community's Public Phone Number",
+              label: "Community's Public Phone Number (optional)",
               placeholder: "eg. 571 222 4567",
               fieldType: "TextField",
               contentType: "text",

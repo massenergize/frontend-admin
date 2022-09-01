@@ -32,9 +32,11 @@ import {
   LOAD_ALL_TASK_FUNCTIONS,
   LOAD_ALL_TASKS,
   LOAD_SETTINGS,
+  LOAD_FEATURE_FLAGS,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
+import { LOADING } from "../../utils/constants";
 
 // TODO: REOMVE THIS FUNCTiON
 export const testRedux = (value) => {
@@ -46,6 +48,7 @@ export const loadSettings = (data = {}) => {
     payload: data,
   };
 };
+
 export const reduxFetchInitialContent = (auth) => (dispatch) => {
   if (!auth) return;
   const isSuperAdmin = auth && auth.is_super_admin;
@@ -99,10 +102,12 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       filters: ["uploads", "actions", "events", "testimonials"],
       target_communities: [],
     }),
-    //apiCall(isSuperAdmin ? "/tasks.functions.list" : "/tasks.functions.list"),
-    //apiCall(isSuperAdmin ? "/tasks.list" : "/tasks.list"),
-    //apiCall("/settings.list"),
+    isSuperAdmin && apiCall("/tasks.functions.list"),
+    isSuperAdmin && apiCall("/tasks.list"),
+    apiCall("/settings.list"),
+    isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
   ]).then((response) => {
+
     const [
       communities,
       actions,
@@ -117,9 +122,10 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       ccActions,
       tagCollections,
       galleryImages,
-      //tasksFunctions,
-      //tasks,
-      //settings,
+      tasksFunctions,
+      tasks,
+      settings,
+      featureFlags,
     ] = response;
     dispatch(reduxLoadAllCommunities(communities.data));
     dispatch(loadAllActions(actions.data));
@@ -134,12 +140,17 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(reduxLoadCCActions(ccActions.data.actions));
     dispatch(loadAllTags(tagCollections.data));
     dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
-    //dispatch(loadTaskFunctionsAction(tasksFunctions.data));
-    //dispatch(loadTasksAction(tasks.data));
-    //dispatch(loadSettings(settings.data ||{}));
+    dispatch(loadTaskFunctionsAction(tasksFunctions.data));
+    dispatch(loadTasksAction(tasks.data));
+    dispatch(loadSettings(settings.data || {}));
+    dispatch(loadFeatureFlags(featureFlags.data || {}));
   });
 };
 
+export const loadFeatureFlags = (data = LOADING) => ({
+  type: LOAD_FEATURE_FLAGS,
+  payload: data,
+});
 export const reduxToggleUniversalModal = (data = {}) => ({
   type: TOGGLE_UNIVERSAL_MODAL,
   payload: data,
@@ -603,7 +614,6 @@ export const reduxCallLibraryModalImages = (props) => {
           ...((old && old.images) || []),
           ...((response.data && response.data.images) || []),
         ];
-        console.log(response);
         return dispatch(
           reduxLoadLibraryModalData({
             data: { ...response.data, images: newData },
