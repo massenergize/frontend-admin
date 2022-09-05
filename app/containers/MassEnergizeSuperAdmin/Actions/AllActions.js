@@ -346,13 +346,29 @@ class AllActions extends React.Component {
 
     return Intl.DateTimeFormat("en-US", options).format(newDate);
   };
+ callMoreData= (page)=>{
+  apiCall("/actions.listForSuperAdmin", {
+    page:page
+  }).then(res=>{
+    if(res.success){
+      let existing = [...this.props.allActions.items]
+      let newList = existing.concat(res.data.items)
+      this.props.putActionsInRedux({
+        items: newList,
+        meta: res.data.meta,
+      });
+    }
+  })
+      
+    }
 
   render() {
     const title = brand.name + " - All Actions";
     const description = brand.desc;
     const { classes } = this.props;
     const { columns, error } = this.state;
-    const data = this.fashionData(this.props.allActions || []);
+    const data = this.fashionData(this.props.allActions.items || []);
+  const metaData = this.props.allActions.meta
     if (!data || !data.length) {
       return (
         <Grid
@@ -389,7 +405,15 @@ class AllActions extends React.Component {
       responsive: "stacked",
       print: true,
       rowsPerPage: 25,
+      count: metaData.count,
       rowsPerPageOptions: [10, 25, 100],
+      onTableChange: (action, tableState) => {
+        if (action === "changePage") {
+          if(tableState.rowsPerPage* tableState.page === data.length){
+            this.callMoreData(metaData.next)
+          }
+        }
+      },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         const [found] = findMatchesAndRest(idsToDelete, (it) => {
