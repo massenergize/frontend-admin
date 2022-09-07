@@ -71,15 +71,18 @@ class AllActions extends React.Component {
 
   updateRedux = (data) => {
     const { putActionsInRedux, allActions } = this.props;
-    const index = allActions.findIndex((a) => a.id === data.id);
-    const updateItems = allActions.filter((a) => a.id !== data.id);
+    const index = allActions.items.findIndex((a) => a.id === data.id);
+    const updateItems = allActions.items.filter((a) => a.id !== data.id);
     updateItems.splice(index, 0, data);
-    putActionsInRedux(updateItems);
+    putActionsInRedux({
+      items:updateItems,
+      meta:allActions.meta
+    });
   };
 
   changeActions = async (id) => {
     const { allActions } = this.state;
-    const newData = allActions.filter(
+    const newData = allActions.items.filter(
       (a) => (a.community && a.community.id === id) || a.is_global
     );
     await this.setStateAsync({ data: fashionData(newData) });
@@ -227,7 +230,13 @@ class AllActions extends React.Component {
                   if (copiedActionResponse && copiedActionResponse.success) {
                     const newAction =
                       copiedActionResponse && copiedActionResponse.data;
-                    putActionsInRedux([newAction, ...(allActions || [])]);
+                    putActionsInRedux({
+                      items: [
+                        newAction,
+                        ...(allActions.items || []),
+                      ],
+                      meta:allActions.meta
+                    });
                     this.props.history.push(
                       `/admin/edit/${newAction.id}/action`
                     );
@@ -291,13 +300,16 @@ class AllActions extends React.Component {
 
   makeLiveOrNot(item) {
     const putInRedux = this.props.putActionsInRedux;
-    const data = this.props.allActions || [];
+    const data = this.props.allActions.items || [];
     const status = item.is_published;
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
     const community = item.community;
-    putInRedux([...data]);
+    putInRedux({
+      items: [...data],
+      meta:this.props.allActions.meta
+    });
     apiCall("/actions.update", {
       action_id: item.id,
       is_published: !status,
@@ -320,7 +332,7 @@ class AllActions extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { allActions, putActionsInRedux } = this.props;
-    const itemsInRedux = allActions;
+    const itemsInRedux = allActions.items;
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
@@ -346,21 +358,26 @@ class AllActions extends React.Component {
 
     return Intl.DateTimeFormat("en-US", options).format(newDate);
   };
- callMoreData= (page)=>{
-  apiCall("/actions.listForSuperAdmin", {
-    page:page
-  }).then(res=>{
-    if(res.success){
-      let existing = [...this.props.allActions.items]
-      let newList = existing.concat(res.data.items)
-      this.props.putActionsInRedux({
-        items: newList,
-        meta: res.data.meta,
-      });
-    }
-  })
-      
-    }
+
+
+  callMoreData = (page) => {
+    let { auth, putActionsInRedux } = this.props;
+    var url;
+    if (auth.is_super_admin) url = "/actions.listForSuperAdmin";
+    else if (auth.is_community_admin) url = "/actions.listForCommunityAdmin";
+    apiCall(url, {
+      page: page,
+    }).then((res) => {
+      if (res.success) {
+        let existing = [...this.props.allActions.items];
+        let newList = existing.concat(res.data.items);
+        putActionsInRedux({
+          items: newList,
+          meta: res.data.meta,
+        });
+      }
+    });
+  };
 
   render() {
     const title = brand.name + " - All Actions";
@@ -368,7 +385,7 @@ class AllActions extends React.Component {
     const { classes } = this.props;
     const { columns, error } = this.state;
     const data = this.fashionData(this.props.allActions.items || []);
-  const metaData = this.props.allActions.meta
+    const metaData = this.props.allActions.meta;
     if (!data || !data.length) {
       return (
         <Grid
@@ -409,8 +426,8 @@ class AllActions extends React.Component {
       rowsPerPageOptions: [10, 25, 100],
       onTableChange: (action, tableState) => {
         if (action === "changePage") {
-          if(tableState.rowsPerPage* tableState.page === data.length){
-            this.callMoreData(metaData.next)
+          if (tableState.rowsPerPage * tableState.page === data.length) {
+            this.callMoreData(metaData.next);
           }
         }
       },
@@ -429,8 +446,7 @@ class AllActions extends React.Component {
             noTemplates: noTemplatesSelectedGoAhead,
           }),
           onConfirm: () =>
-            noTemplatesSelectedGoAhead &&
-            this.nowDelete({ idsToDelete, data }),
+            noTemplatesSelectedGoAhead && this.nowDelete({ idsToDelete, data }),
           closeAfterConfirmation: true,
           cancelText: noTemplatesSelectedGoAhead
             ? "No"

@@ -58,7 +58,7 @@ export const makeTagSection = ({ collections, action, defaults = true }) => {
     children: [],
   };
 
-  (collections || []).forEach((tCol) => {
+  (collections.items || []).forEach((tCol) => {
     const newField = {
       isRequired: false,
       name: tCol.name,
@@ -101,6 +101,17 @@ class EditActionForm extends Component {
     };
   }
 
+  async componentDidMount() {
+    const { id } = this.props.match.params;
+    const actionResponse = await apiCall("/actions.info", {
+      id: id,
+    });
+    if (actionResponse && !actionResponse.success) {
+      return;
+    }
+    await this.setStateAsync({ action: actionResponse.data });
+  }
+
   static getDerivedStateFromProps(props, state) {
     const {
       match,
@@ -115,25 +126,31 @@ class EditActionForm extends Component {
     const { id } = match.params;
     const readyToRunPageFirstTime =
       actions &&
-      actions.length &&
+      actions.items &&
+      actions.items.length &&
       ccActions &&
       ccActions.length &&
       tags &&
-      tags.length;
+      tags.items &&
+      tags.items.length;
+
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRunPageFirstTime || state.mounted;
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
+    let action = state.action;
+    if (!action) {
+      action = ((actions && actions.items) || []).find(
+        (a) => a.id.toString() === id.toString()
+      );
+    }
 
-    const action = (actions || []).find(
-      (a) => a.id.toString() === id.toString()
-    );
     const readOnly = checkIfReadOnly(action, auth);
-    const coms = (communities || []).map((c) => ({
+    const coms = (communities.items || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
     }));
-    const vends = (vendors || []).map((c) => ({
+    const vends = (vendors.items || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
@@ -143,6 +160,7 @@ class EditActionForm extends Component {
       displayName: c.description,
       id: "" + c.id,
     }));
+
     const formJson = createFormJson({
       action,
       communities: coms,
@@ -163,6 +181,11 @@ class EditActionForm extends Component {
       formJson,
       readOnly,
     };
+  }
+  setStateAsync(state) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve);
+    });
   }
 
   render() {

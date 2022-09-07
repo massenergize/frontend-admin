@@ -77,8 +77,8 @@ class AllCommunities extends React.Component {
   }
   getColumns = (classes) => [
     {
-      name: 'ID',
-      key: 'id',
+      name: "ID",
+      key: "id",
       options: {
         filter: false,
       },
@@ -188,12 +188,15 @@ class AllCommunities extends React.Component {
 
   makeLiveOrNot(item) {
     const putInRedux = this.props.putCommunitiesInRedux;
-    const data = this.props.communities || [];
+    const data = this.props.communities.items || [];
     const status = item.is_published;
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
-    putInRedux([...data]);
+    putInRedux({
+      items: [...data],
+      meta: this.props.communities.meta,
+    });
     apiCall("/communities.update", {
       community_id: item.id,
       is_published: !status,
@@ -225,7 +228,10 @@ class AllCommunities extends React.Component {
       apiCall("/communities.delete", { community_id: communityId });
     });
     const rem = (communities || []).filter((com) => !ids.includes(com.id));
-    putCommunitiesInRedux(rem);
+    putCommunitiesInRedux({
+      items: rem,
+      meta: communities.meta,
+    });
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -245,18 +251,39 @@ class AllCommunities extends React.Component {
       </Typography>
     );
   }
+  callMoreData = (page) => {
+    let { auth, putCommunitiesInRedux } = this.props;
+    var url;
+    if (auth.is_super_admin) url = "/communities.listForSuperAdmin";
+    else if (auth.is_community_admin)
+      url = "/communities.listForCommunityAdmin";
+    apiCall(url, {
+      page: page,
+    }).then((res) => {
+      if (res.success) {
+        let existing = [...this.props.communities.items];
+        let newList = existing.concat(res.data.items);
+        putCommunitiesInRedux({
+          items: newList,
+          meta: res.data.meta,
+        });
+      }
+    });
+  };
 
   render() {
     const title = brand.name + " - All Communities";
     const description = brand.desc;
     const { columns } = this.state;
     const { classes, toggleDeleteConfirmation } = this.props;
-    const data = this.fashionData(this.props.communities || []);
+    const data = this.fashionData(this.props.communities.items || []);
+    const metaData = this.props.communities.meta;
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
       rowsPerPage: 25,
+      count: metaData && metaData.count,
       rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
@@ -267,6 +294,13 @@ class AllCommunities extends React.Component {
           closeAfterConfirmation: true,
         });
         return false;
+      },
+      onTableChange: (action, tableState) => {
+        if (action === "changePage") {
+          if (tableState.rowsPerPage * tableState.page === data.length) {
+            this.callMoreData(metaData.next);
+          }
+        }
       },
     };
 

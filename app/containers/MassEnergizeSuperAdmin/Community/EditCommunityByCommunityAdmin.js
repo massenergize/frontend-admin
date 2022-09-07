@@ -49,7 +49,7 @@ class EditCommunityByCommunityAdmin extends Component {
     const { communities, match } = props;
     const { id } = match.params;
     if (state.community === undefined) {
-      const community = (communities || []).find((c) => c.id.toString() === id);
+      const community = (communities.items || []).find((c) => c.id.toString() === id);
       const formJson = createFormJson(community);
       return { community, formJson };
     }
