@@ -13,6 +13,7 @@ import {
   reduxUpdateHeap,
 } from "../../../redux/redux-actions/adminActions";
 import Loading from "dan-components/Loading";
+import fieldTypes from "../_FormGenerator/fieldTypes";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -107,66 +108,6 @@ class EditTeam extends Component {
     addTeamInfoToHeap({
       teamsInfos: { ...teamsInfos, [id.toString()]: teamResponse.data },
     });
-    /**
-     * Comments Will Be REmoved as soon as this is approved, re-tested, and deployed
-     */
-    // if (teamResponse && teamResponse.data) {
-    // const team = (teams || []).find((t) => t.id.toString() === id.toString());
-    // if (team && team.primary_community) {
-    //   // const teams = await this.props.callTeamsForNormalAdmin();
-    //   const comTeams = await apiCall("/teams.list", {
-    //     community_id: team.primary_community.id,
-    //   });
-    //   console.log("and then you get this", comTeams);
-    //   addTeamsToHeap({
-    //     ...heap,
-    //     communitySpecificTeams: {
-    //       ...comTeamsObj,
-    //       [id.toString()]: comTeams.data,
-    //     },
-    //   });
-    // }
-    // if other teams have us as a parent, can't set a parent ourselves
-    // from that point, can set parent teams that are not ourselves AND don't have parents themselves (i.e. aren't sub-teams)
-    // const parentTeams =
-    //   teams.data.filter(
-    //     (_team) => _team.parent && _team.parent.id === team.id
-    //   ).length === 0 &&
-    //   teams.data.filter((_team) => _team.id !== team.id && !_team.parent);
-    // if (parentTeams) {
-    //   parentTeamOptions = parentTeams.map((_team) => ({
-    //     id: _team.id,
-    //     displayName: _team.name,
-    //   }));
-    //   parentTeamOptions = [
-    //     { displayName: "NONE", id: "0" },
-    //     ...parentTeamOptions,
-    //   ];
-    // } else {
-    //   parentTeamOptions = [
-    //     {
-    //       displayName:
-    //         "Team cannot have a parent, because it is a parent of another team",
-    //       id: "0",
-    //     },
-    //   ];
-    // }
-    // }
-    // await this.setStateAsync({ team, parentTeamOptions });
-    // }
-    // const communitiesResponse = await apiCall(
-    //   "/communities.listForCommunityAdmin"
-    // );
-    // if (communitiesResponse && communitiesResponse.data) {
-    // const communities = communitiesResponse.data.map((c) => ({
-    //   ...c,
-    //   displayName: c.name,
-    //   id: "" + c.id,
-    // }));
-    //   await this.setStateAsync({ communities });
-    // }
-    // const formJson = await this.createFormJson();
-    // await this.setStateAsync({ formJson });
   }
 
   setStateAsync(state) {
@@ -247,7 +188,6 @@ const createFormJson = ({ communities, team, parentTeamOptions }) => {
             placeholder: "eg. id",
             fieldType: "TextField",
             contentType: "text",
-            isRequired: true,
             defaultValue: team.id,
             dbName: "id",
             readOnly: true,
@@ -324,14 +264,11 @@ const createFormJson = ({ communities, team, parentTeamOptions }) => {
       {
         name: "logo",
         placeholder: "Select a Logo for this team",
-        fieldType: "File",
-        previewLink: team.logo && team.logo.url,
+        fieldType: fieldTypes.MediaLibrary,
+        selected: team.logo ? [team.logo] : [],
         dbName: "logo",
         label: "Select a Logo for this team",
-        selectMany: false,
         isRequired: false,
-        defaultValue: "",
-        filesLimit: 1,
       },
       {
         name: "is_published",

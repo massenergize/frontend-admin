@@ -1,13 +1,58 @@
 /** *
  * All utility Functions
  */
+import { Typography } from "@material-ui/core";
 import moment from "moment";
 import qs from "qs";
+import React from 'react';
 
-export const getHumanFriendlyDate = (dateString, includeTime = false) => {
+export function makeDeleteUI({ idsToDelete, templates }) {
+  const len = (idsToDelete && idsToDelete.length) || 0;
+  var text = `Are you sure you want to delete (
+    ${(idsToDelete && idsToDelete.length) || ""})
+    ${len === 1 ? " action? " : " actions? "}`;
+
+  if (templates && templates.length)
+    text = `Sorry, (${templates.length}) template${
+      templates.length === 1 ? "" : "s"
+    } selected. You can't delete templates. `;
+  return <Typography>{text}</Typography>;
+}
+
+export const objArrayToString = (data, func) => {
+  var s = "";
+  (data || []).forEach((d, index) => {
+    if (!s) s += func(d);
+    else s += ", " + func(d);
+  });
+  return s;
+};
+export const makeLimitsFromImageArray = (images) => {
+  if (images.length === 1)
+    return {
+      lower_limit: images[0].id,
+      upper_limit: images[0].id,
+      images,
+    };
+  images = images.sort((a, b) => (a.id > b.id ? 1 : -1));
+  return {
+    lower_limit: images[0].id || 0,
+    upper_limit: images[images.length - 1].id || 0,
+    images: images || [],
+  };
+};
+export const getHumanFriendlyDate = (
+  dateString,
+  includeTime = false,
+  forSorting = true
+) => {
   if (!dateString) return null;
+  var format = "";
+  if (forSorting) format = `YYYY-MM-DD ${includeTime ? "hh:mm a" : ""}`;
+  else format = `MMMM Do, YYYY ${includeTime ? "hh:mm a" : ""}`;
   return moment(dateString).format(
-    `MMMM Do, YYYY ${includeTime ? "hh:mm a" : ""}`
+    // make it a bit less human friendly, so it sorts properly
+    format
   );
 };
 export const smartString = (string, charLimit = 60) => {
@@ -30,6 +75,18 @@ export const pop = (arr = [], value, finder) => {
   arr.forEach((item) => {
     const val = finder ? finder(item) : item;
     if (val === value) found = item;
+    else rest.push(item);
+  });
+
+  return [found, rest];
+};
+
+export const findMatchesAndRest = (arr = [], finder) => {
+  if (!arr) return [];
+  const rest = [];
+  const found = [];
+  arr.forEach((item) => {
+    if (finder(item)) found.push(item);
     else rest.push(item);
   });
 
@@ -76,25 +133,8 @@ export function convertBoolean(b) {
 }
 
 export function goHere(link, history) {
-  if(history) return history.push(link)
+  if (history) return history.push(link);
   window.location = link;
-}
-
-export function downloadFile(file) {
-  if (!file) return;
-
-  if (window.navigator.msSaveOrOpenBlob) {
-    window.navigator.msSaveBlob(file, file.name);
-  } else {
-    const elem = window.document.createElement("a");
-    const URL = window.URL.createObjectURL(file);
-    elem.href = URL;
-    elem.download = file.name;
-    document.body.appendChild(elem);
-    elem.click();
-    document.body.removeChild(elem);
-    window.URL.revokeObjectURL(URL);
-  }
 }
 
 // TODO: be aware of filter choices

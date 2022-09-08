@@ -24,9 +24,17 @@ import {
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 
-import { isNotEmpty, smartString } from "../../../utils/common";
+import {
+  findMatchesAndRest,
+  isNotEmpty,
+  makeDeleteUI,
+  pop,
+  smartString,
+} from "../../../utils/common";
 import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
+import METable from "../ME  Tools/table /METable";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -61,6 +69,14 @@ class AllActions extends React.Component {
     });
   }
 
+  updateRedux = (data) => {
+    const { putActionsInRedux, allActions } = this.props;
+    const index = allActions.findIndex((a) => a.id === data.id);
+    const updateItems = allActions.filter((a) => a.id !== data.id);
+    updateItems.splice(index, 0, data);
+    putActionsInRedux(updateItems);
+  };
+
   changeActions = async (id) => {
     const { allActions } = this.state;
     const newData = allActions.filter(
@@ -70,8 +86,15 @@ class AllActions extends React.Component {
   };
 
   getColumns = () => {
-    const { classes } = this.props;
+    const { classes, putActionsInRedux, allActions } = this.props;
     return [
+      {
+        name: "ID",
+        key: "id",
+        options: {
+          filter: false,
+        },
+      },
       {
         name: "Image",
         key: "image",
@@ -114,7 +137,7 @@ class AllActions extends React.Component {
                   required
                   name="rank"
                   variant="outlined"
-                  onChange={async (event) => {
+                  onBlur={async (event) => {
                     const { target } = event;
                     if (!target) return;
                     const { name, value } = target;
@@ -122,6 +145,10 @@ class AllActions extends React.Component {
                       await apiCall("/actions.rank", {
                         action_id: d && d.id,
                         [name]: value,
+                      }).then((res) => {
+                        if (res && res.success) {
+                          this.updateRedux(res && res.data);
+                        }
                       });
                     }
                   }}
@@ -158,6 +185,7 @@ class AllActions extends React.Component {
         key: "is_live",
         options: {
           filter: false,
+          download: false,
           customBodyRender: (d) => {
             return (
               <MEChip
@@ -195,9 +223,11 @@ class AllActions extends React.Component {
                   const copiedActionResponse = await apiCall("/actions.copy", {
                     action_id: id,
                   });
+
                   if (copiedActionResponse && copiedActionResponse.success) {
                     const newAction =
                       copiedActionResponse && copiedActionResponse.data;
+                    putActionsInRedux([newAction, ...(allActions || [])]);
                     this.props.history.push(
                       `/admin/edit/${newAction.id}/action`
                     );
@@ -211,11 +241,37 @@ class AllActions extends React.Component {
           ),
         },
       },
+      {
+        name: "Live",
+        key: "hidden_live_or_not",
+        options: {
+          display: false,
+          filter: true,
+          searchable: false,
+          download: true,
+        },
+      },
+      {
+        name: "Live",
+        key: "is_a_template",
+        options: {
+          display: false,
+          filter: false,
+          searchable: false,
+          download: false,
+        },
+      },
     ];
   };
+  /**
+   * NOTE: If you add or remove a field in here, make sure your changes reflect in nowDelete.
+   * Deleting heavily relies on the index arrangement of the items in here. Merci!
+   * @param {*} data
+   * @returns
+   */
   fashionData = (data) => {
     const fashioned = data.map((d) => [
-      // d.id,
+      d.id,
       {
         id: d.id,
         image: d.image,
@@ -227,6 +283,8 @@ class AllActions extends React.Component {
       d.is_global ? "Template" : d.community && d.community.name,
       { isLive: d.is_published, item: d },
       d.id,
+      d.is_published ? "Yes" : "No",
+      d.is_global,
     ]);
     return fashioned;
   };
@@ -238,10 +296,12 @@ class AllActions extends React.Component {
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
+    const community = item.community;
     putInRedux([...data]);
     apiCall("/actions.update", {
       action_id: item.id,
       is_published: !status,
+      community_id: (community && community.id) || null,
     });
   }
 
@@ -263,24 +323,29 @@ class AllActions extends React.Component {
     const itemsInRedux = allActions;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][6];
+      const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/actions.delete", { action_id: found });
+      apiCall("/actions.delete", { action_id: found }).catch((e) =>
+        console.log("ACTION_DELETE_ERRO:", e)
+      );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putActionsInRedux(rem);
   }
+  getTimeStamp = () => {
+    const today = new Date();
+    let newDate = today;
+    let options = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    };
 
-  makeDeleteUI({ idsToDelete }) {
-    const len = (idsToDelete && idsToDelete.length) || 0;
-    return (
-      <Typography>
-        Are you sure you want to delete (
-        {(idsToDelete && idsToDelete.length) || ""})
-        {len === 1 ? " action? " : " actions? "}
-      </Typography>
-    );
-  }
+    return Intl.DateTimeFormat("en-US", options).format(newDate);
+  };
 
   render() {
     const title = brand.name + " - All Actions";
@@ -323,23 +388,66 @@ class AllActions extends React.Component {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
-      rowsPerPage: 15,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
+        const [found] = findMatchesAndRest(idsToDelete, (it) => {
+          const f = data[it.dataIndex];
+          return f[9]; // this index should be changed if anyone modifies (adds/removes) an item in fashioData()
+        });
+        const noTemplatesSelectedGoAhead = !found || !found.length;
         this.props.toggleDeleteConfirmation({
           show: true,
-          component: this.makeDeleteUI({ idsToDelete }),
-          onConfirm: () => this.nowDelete({ idsToDelete, data }),
+          component: makeDeleteUI({
+            idsToDelete,
+            templates: found,
+            noTemplates: noTemplatesSelectedGoAhead,
+          }),
+          onConfirm: () =>
+            noTemplatesSelectedGoAhead &&
+            this.nowDelete({ idsToDelete, data }),
           closeAfterConfirmation: true,
+          cancelText: noTemplatesSelectedGoAhead
+            ? "No"
+            : "Go Back and Remove Templates",
+          noOk: !noTemplatesSelectedGoAhead,
         });
         return false;
-        // const idsToDelete = rowsDeleted.data;
-        // idsToDelete.forEach(async (d) => {
-        //   const actionId = data[d.dataIndex][0];
-        //   await apiCall("/actions.delete", { action_id: actionId });
-        // });
+      },
+      customSort: (data, colIndex, order) => {
+        return data.sort((a, b) => {
+          if (colIndex === 3) {
+            return (
+              (a.data[colIndex].rank < b.data[colIndex].rank ? -1 : 1) *
+              (order === "desc" ? 1 : -1)
+            );
+          } else {
+            return (
+              (a.data[colIndex] < b.data[colIndex] ? -1 : 1) *
+              (order === "desc" ? 1 : -1)
+            );
+          }
+        });
+      },
+      downloadOptions: {
+        filename: `All Actions (${this.getTimeStamp()}).csv`,
+        separator: ",",
+      },
+      onDownload: (buildHead, buildBody, columns, data) => {
+        let alteredData = data.map((d) => {
+          let content = [...d.data];
+          content[3] = d.data[3].rank;
+          return {
+            data: content,
+            index: d.index,
+          };
+        });
+        let csv = buildHead(columns) + buildBody(alteredData);
+        return csv;
       },
     };
+
     return (
       <div>
         <Helmet>
@@ -350,15 +458,16 @@ class AllActions extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <div className={classes.table}>
-          {/* {this.showCommunitySwitch()} */}
-          <MUIDataTable
-            title="All Actions"
-            data={data}
-            columns={columns}
-            options={options}
-          />
-        </div>
+        <METable
+          classes={classes}
+          page={PAGE_PROPERTIES.ALL_ACTIONS}
+          tableProps={{
+            title: "All Actions",
+            data: data,
+            columns: columns,
+            options: options,
+          }}
+        />
       </div>
     );
   }

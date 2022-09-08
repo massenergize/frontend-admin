@@ -69,13 +69,13 @@ class AllTagCollections extends React.Component {
     const { classes } = this.props;
 
     const cols = [
-      // {
-      //   name: 'id',
-      //   key: 'id',
-      //   options: {
-      //     filter: false
-      //   }
-      // },
+      {
+        name: 'ID',
+        key: 'id',
+        options: {
+          filter: false,
+        },
+      },
       {
         name: "Name",
         key: "name",
@@ -132,7 +132,7 @@ class AllTagCollections extends React.Component {
 
   fashionData(data) {
     return (data || []).map((d) => [
-      // d.id,
+      d.id,
       `${d.name}...`.substring(0, 30), // limit to first 30 chars
       d.rank,
       d.tags,
@@ -145,7 +145,7 @@ class AllTagCollections extends React.Component {
     const itemsInRedux = tags;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][6];
+      const found = data[d.dataIndex][0];
       ids.push(found);
       apiCall("/tag_collections.delete", { tag_collection_id: found });
     });
@@ -174,7 +174,8 @@ class AllTagCollections extends React.Component {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
-      rowsPerPage: 100,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({

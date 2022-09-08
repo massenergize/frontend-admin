@@ -27,7 +27,7 @@ class OnboardCommunity extends React.Component {
         </Helmet>
         <PapperBlock title="Edit Community Information" desc="">
           {isEditForm
-            && <EditCommunityForm {...this.props} />
+            && <EditCommunityForm {...this.props} superAdmin={true} />
           }
           {!isEditForm
             && <CommunityOnboardingForm />

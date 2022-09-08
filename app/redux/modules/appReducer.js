@@ -1,5 +1,6 @@
 import { Map, fromJS } from "immutable";
 import { START_UP } from "../../actions/actionConstants";
+import { LOADING } from "../../utils/constants";
 import {
   LOAD_ALL_COMMUNITIES,
   LOAD_AUTH_ADMIN,
@@ -27,6 +28,11 @@ import {
   UPDATE_HEAP,
   LOAD_CC_ACTIONS,
   TOGGLE_UNIVERSAL_MODAL,
+  TEST_REDUX,
+  LOAD_ALL_TASK_FUNCTIONS,
+  LOAD_ALL_TASKS,
+  LOAD_SETTINGS,
+  LOAD_FEATURE_FLAGS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -35,6 +41,17 @@ const initialState = Map({
 });
 
 const initialImmutableState = fromJS(initialState);
+
+// TODO: REMOVE THIS
+export function testReduxReducer(state = null, action = {}) {
+  switch (action.type) {
+    case TEST_REDUX:
+      return state;
+    default:
+      return state;
+  }
+}
+
 export default function reducer(state = initialImmutableState, action = {}) {
   switch (action.type) {
     case START_UP:
@@ -43,6 +60,22 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+export const reducerForFeatureFlags = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_FEATURE_FLAGS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForSettings = (state = null, action = {}) => {
+  switch (action.type) {
+    case LOAD_SETTINGS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 
 export const reducerForUniversalModal = (state = {}, action = {}) => {
   switch (action.type) {
@@ -267,6 +300,22 @@ export const selectedCommunityReducer = (state = null, action = {}) => {
 export const fullSelectedCommunityReducer = (state = null, action = {}) => {
   switch (action.type) {
     case SELECTED_COMMUNITY_FULL:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const allTaskFunctionsReducer = (state = [], action = {}) => {
+  switch (action.type) {
+    case LOAD_ALL_TASK_FUNCTIONS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const allTasksReducer = (state = [], action = {}) => {
+  switch (action.type) {
+    case LOAD_ALL_TASKS:
       return action.payload;
     default:
       return state;
