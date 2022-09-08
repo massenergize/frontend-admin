@@ -77,7 +77,6 @@ class CreateNewTagCollectionForm extends Component {
               placeholder: 'eg. 2',
               fieldType: 'TextField',
               contentType: 'text',
-              isRequired: true,
               defaultValue: tagCollection.id,
               dbName: 'id',
               readOnly: true

@@ -1,8 +1,9 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import "./Upload.css";
 import PropTypes from "prop-types";
 import uploadDummy from "./up_img.png";
 import {
+  createLowResolutionImage,
   EXTENSIONS,
   getFilesFromTransfer,
   getFileSize,
@@ -10,7 +11,7 @@ import {
   readContentOfSelectedFile,
   smartString,
 } from "../../utils/utils";
-import { spinner } from "../../utils/values";
+import { IMAGE_QUALITY, spinner } from "../../utils/values";
 import MLButton from "../button/MLButton";
 
 function Upload({
@@ -21,25 +22,74 @@ function Upload({
   multiple,
   uploading,
   upload, // the upload function
+  accept,
+  extras,
+  setCurrentTab,
+  switchToCropping,
+  cropped,
+  allowCropping,
+  compress,
+  compressedQuality,
+  maximumImageSize,
 }) {
   const dragBoxRef = useRef(null);
   const fileOpenerRef = useRef(null);
 
+  const htmlContent = (extras || {})["upload"] || null; // This is just html content that devs can pass to show, grouped by tabs
+  /**
+   * This is where all the selected files are looped over, and previews are built and saved in the
+   * state, so that users can see what they have chosen
+   * @param {*} _files
+   */
   const processForPreview = async (_files) => {
+    const compressionIsEnabled = compress;
+    const quality = IMAGE_QUALITY[compressedQuality].value;
     for (let i = 0; i < _files.length; i++) {
+      // For each of the files that the user has selected
       const fileObj = _files[i];
+      const imageIsTooLarge = fileObj.file.size > maximumImageSize;
+
       readContentOfSelectedFile(fileObj.file).then((baseImage) => {
-        const obj = {
+        var obj = {
           ...fileObj,
           src: baseImage,
           sizeText: getFileSize(fileObj.file),
         };
-        if (multiple) setPreviews((previous) => [...previous, obj]);
-        else setPreviews([obj]);
+
+        if (imageIsTooLarge && compressionIsEnabled) {
+          createLowResolutionImage(
+            baseImage,
+            { quality, file: fileObj.file },
+            (response) => {
+              obj = {
+                ...obj,
+                file: response.file,
+                src: response.source,
+                sizeText: getFileSize(response.file),
+              };
+              replaceFile(obj); // replaces the original version of the file with the compressed version in the state
+              addItToPreviews(obj);
+            }
+          );
+        } else addItToPreviews(obj);
+
+        // if (multiple) setPreviews((previous) => [...previous, obj]);
+        // else setPreviews([obj]);
       });
     }
   };
 
+  const addItToPreviews = (obj) => {
+    if (multiple) setPreviews((previous) => [...previous, obj]);
+    else setPreviews([obj]);
+  };
+
+  /**
+   * Used as the onChange function in the file input. It goes over all selected files
+   * and puts each file into an object with a unique Id
+   * something like this: {file:...., id:'something-unique'}
+   * @param {*} e
+   */
   const handleSelectedFiles = (e) => {
     e.preventDefault();
     const arr = [];
@@ -54,6 +104,13 @@ function Upload({
     processForPreview(arr);
   };
 
+  const replaceFile = (fileObj) => {
+    if (!multiple) return setFiles([fileObj]);
+    setFiles((prevFiles) => {
+      const rem = (prevFiles || []).filter((f) => f.id !== fileObj.id);
+      return [...rem, fileObj];
+    });
+  };
   const handleDroppedFile = (e) => {
     e.preventDefault();
     dragBoxRef.current.classList.remove("ml-drag-over");
@@ -96,9 +153,10 @@ function Upload({
         ref={fileOpenerRef}
         style={{ width: 0, height: 0 }}
         onChange={(e) => handleSelectedFiles(e)}
-        accept={EXTENSIONS.join(", ")}
+        accept={accept || EXTENSIONS.join(", ")}
         multiple={multiple}
       />
+      {htmlContent}
       <div
         ref={dragBoxRef}
         className="ml-drag-box"
@@ -140,7 +198,7 @@ function Upload({
         {uploading ? (
           <p style={{ color: "#de8b28" }}>Uploading, please be patient...</p>
         ) : (
-          <p>
+          <p style={{ textAlign: "center" }}>
             Drag and drop image here or{" "}
             <a
               href="#void"
@@ -151,50 +209,106 @@ function Upload({
             >
               browse
             </a>
+            {compress && (
+              <>
+                <br />
+                <small style={{ fontWeight: "bold" }}>
+                  NB: All images that exceed{" "}
+                  <span style={{ color: "#de8b28" }}>
+                    {getFileSize({ size: maximumImageSize }) || "..."}
+                  </span>{" "}
+                  will be reduced to a lower quality{" "}
+                </small>
+              </>
+            )}
           </p>
         )}
       </div>
       {/* ----------------- PREVIEW AREA --------------- */}
       <div className="ml-preview-area">
-        {previews.map((prev) => (
-          <React.Fragment key={prev.id.toString()}>
-            <PreviewElement
-              {...prev}
-              remove={removeAnImage}
-              uploading={uploading}
-            />
-          </React.Fragment>
-        ))}
+        {previews.map((prev) => {
+          const croppedVersion = (cropped || {})[prev.id];
+          return (
+            <React.Fragment key={prev.id.toString()}>
+              <PreviewElement
+                {...prev}
+                src={(croppedVersion && croppedVersion.src) || prev.src}
+                parentSource={prev.src}
+                sizeText={getFileSize(
+                  (croppedVersion && croppedVersion.file) || prev.file
+                )}
+                remove={removeAnImage}
+                uploading={uploading}
+                setCurrentTab={setCurrentTab}
+                switchToCropping={switchToCropping}
+                allowCropping={allowCropping}
+              />
+            </React.Fragment>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-const PreviewElement = ({ file, id, src, sizeText, remove, uploading }) => (
-  <div
-    style={{
-      flexDirection: "column",
-      display: "flex",
-      margin: 10,
-      justifyContent: "center",
-      alignItems: "center",
-    }}
-  >
-    <img src={src} className="ml-preview-image" alt="" />
-    <small>{smartString(file.name)}</small>
-    <small role="button">
-      Size: <b>{sizeText}</b>
-    </small>
-    {!uploading && (
-      <small className="ml-prev-el-remove" onClick={() => remove(id)}>
-        Remove
+const PreviewElement = ({
+  file,
+  id,
+  src,
+  sizeText,
+  remove,
+  uploading,
+  switchToCropping,
+  parentSource,
+  allowCropping,
+}) => {
+  return (
+    <div
+      style={{
+        flexDirection: "column",
+        display: "flex",
+        margin: 10,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <img
+        src={src}
+        className="ml-preview-image"
+        style={{ height: 80, width: 100 }}
+        alt=""
+      />
+      <small>{smartString(file.name)}</small>
+      <small role="button">
+        Size: <b>{sizeText}</b>
       </small>
-    )}
-  </div>
-);
+      {!uploading && (
+        <div
+          style={{
+            display: "inline",
+          }}
+        >
+          <small className="ml-prev-el-remove" onClick={() => remove(id)}>
+            Remove
+          </small>
+          {allowCropping && (
+            <small
+              className="ml-prev-el-remove"
+              style={{ color: "blue", height: 80, width: 100, marginLeft: 10 }}
+              onClick={() => switchToCropping({ file, id, src: parentSource })}
+            >
+              Crop
+            </small>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 PreviewElement.propTypes = {
   file: PropTypes.object.isRequired,
-  id: PropTypes.oneOf([PropTypes.string, PropTypes.number]).isRequired,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   src: PropTypes.string.isRequired,
   sizeText: PropTypes.string.isRequired,
   remove: PropTypes.func.isRequired,

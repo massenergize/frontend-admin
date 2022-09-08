@@ -77,7 +77,7 @@ class Impact extends Component {
       title: 'Community Goals and Reported Data',
       subTitle: '',
       method: '/graphs.data.update',
-      successRedirectPage: window.location.href,
+      //successRedirectPage: window.location.href,
       fields: 
       [
         {
@@ -86,7 +86,6 @@ class Impact extends Component {
           placeholder: "eg. 10",
           fieldType: "TextField",
           contentType: "number",
-          isRequired: true,
           defaultValue: community.id,
           dbName: "community_id",
           readOnly: true,
@@ -245,7 +244,7 @@ class Impact extends Component {
             placeholder: 'eg. 10',
             fieldType: 'TextField',
             contentType: 'number',
-            isRequired: true,
+            isRequired: false,
             defaultValue: d.reported_value,
             dbName: `reported_value_${d.id}`,
             readOnly: false
@@ -256,7 +255,7 @@ class Impact extends Component {
             placeholder: 'eg. 10',
             fieldType: 'TextField',
             contentType: 'number',
-            isRequired: true,
+            isRequired: false,
             defaultValue: d.value,
             dbName: `value_${d.id}`,
             readOnly: true
