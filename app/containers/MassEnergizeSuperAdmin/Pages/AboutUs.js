@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import MassEnergizeForm from "../_FormGenerator";
+// TODO: change image to use MediaLibrary
+//import fieldTypes from "../_FormGenerator/fieldTypes";
 import { apiCall } from "../../../utils/messenger";
 
 const styles = (theme) => ({
@@ -75,7 +77,6 @@ class AboutUsPageEditForm extends Component {
           placeholder: "eg. 1",
           fieldType: "TextField",
           contentType: "number",
-          isRequired: true,
           defaultValue: `${aboutUsPageData.id}`,
           dbName: "id",
           readOnly: true,
@@ -128,6 +129,8 @@ class AboutUsPageEditForm extends Component {
         {
           name: "image",
           placeholder: "Select an Image",
+          // TODO: change to use media library (backend changes required)
+          //fieldType: fieldTypes.MediaLibrary,
           fieldType: "File",
           dbName: "image",
           label: "Upload File",

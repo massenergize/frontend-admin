@@ -5,6 +5,7 @@ import { withStyles } from "@material-ui/core/styles";
 import { apiCall } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
 import Loading from "dan-components/Loading";
+import fieldTypes from "../_FormGenerator/fieldTypes";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -59,6 +60,7 @@ export const makeTagSection = ({ collections, action, defaults = true }) => {
 
   (collections || []).forEach((tCol) => {
     const newField = {
+      isRequired: false,
       name: tCol.name,
       label: `${tCol.name} ${
         tCol.allow_multiple
@@ -146,6 +148,7 @@ class EditActionForm extends Component {
       communities: coms,
       vendors: vends,
       ccActions: modifiedCCActions,
+      auth,
     });
 
     const section = makeTagSection({ collections: tags, action });
@@ -197,8 +200,9 @@ EditActionForm.propTypes = {
 
 export default withStyles(styles, { withTheme: true })(EditActionMapped);
 
-const createFormJson = ({ action, communities, ccActions, vendors }) => {
+const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
   if (!action || !ccActions || !vendors || !communities) return;
+  const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Update Action",
     subTitle: "",
@@ -215,7 +219,7 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
             label: "Action ID",
             fieldType: "TextField",
             contentType: "text",
-            isRequired: true,
+            isRequired: false,
             defaultValue: action.id,
             dbName: "action_id",
             readOnly: true,
@@ -230,6 +234,7 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
             defaultValue: action.title,
             dbName: "title",
             readOnly: false,
+            maxLength: 40,
           },
           {
             name: "rank",
@@ -243,30 +248,44 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
             dbName: "rank",
             readOnly: false,
           },
-          {
-            name: "is_global",
-            label: "Is this Action a Template?",
-            fieldType: "Radio",
-            isRequired: false,
-            defaultValue: action.is_global ? "true" : "false",
-            dbName: "is_global",
-            readOnly: false,
-            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-            child: {
-              valueToCheck: "false",
-              fields: [
-                {
-                  name: "community",
-                  label: "Primary Community",
-                  placeholder: "",
-                  fieldType: "Dropdown",
-                  defaultValue: action.community && "" + action.community.id,
-                  dbName: "community_id",
-                  data: [{ displayName: "--", id: "" }, ...communities],
+          is_super_admin
+            ? {
+                name: "is_global",
+                label: "Is this Action a Template?",
+                fieldType: "Radio",
+                isRequired: false,
+                defaultValue: action.is_global ? "true" : "false",
+                dbName: "is_global",
+                readOnly: false,
+                data: [
+                  { id: "false", value: "No" },
+                  { id: "true", value: "Yes" },
+                ],
+                child: {
+                  valueToCheck: "false",
+                  fields: [
+                    {
+                      name: "community",
+                      label: "Primary Community (Select one)",
+                      placeholder: "",
+                      fieldType: "Dropdown",
+                      defaultValue:
+                        action.community && "" + action.community.id,
+                      dbName: "community_id",
+                      data: [{ displayName: "--", id: "" }, ...communities],
+                    },
+                  ],
                 },
-              ],
-            },
-          },
+              }
+            : {
+                name: "community",
+                label: "Primary Community (Select one)",
+                placeholder: "",
+                fieldType: "Dropdown",
+                defaultValue: action.community && "" + action.community.id,
+                dbName: "community_id",
+                data: [{ displayName: "--", id: "" }, ...communities],
+              },
         ],
       },
       {
@@ -292,7 +311,7 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
       {
         name: "featured_summary",
         label: "Featured Summary",
-        placeholder: "eg. This event is happening in ...",
+        placeholder: "Short sentence promoting the action",
         fieldType: "TextField",
         isMulti: true,
         isRequired: false,
@@ -303,7 +322,7 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
       {
         name: "about",
         label: "Write some detailed description about this action",
-        placeholder: "eg. Write some detailed description about this action",
+        placeholder: "Key information people should know about the action",
         fieldType: "HTMLField",
         isRequired: true,
         defaultValue: action.about,
@@ -313,19 +332,19 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
       {
         name: "steps_to_take",
         label: "Please outline steps to take for your users",
-        placeholder: "eg. Please outline steps to take for your users",
+        placeholder: "Easy to follow steps to accomplish the action",
         fieldType: "HTMLField",
-        isRequired: true,
+        isRequired: false,
         defaultValue: action.steps_to_take,
         dbName: "steps_to_take",
         readOnly: false,
       },
       {
         name: "deep_dive",
-        label: "Deep dive into all the details",
-        placeholder: "eg. This action ...",
+        label: "Deep dive into all the details (optional)",
+        placeholder: "Further information some users might want to know",
         fieldType: "HTMLField",
-        isRequired: true,
+        isRequired: false,
         defaultValue: action.deep_dive,
         dbName: "deep_dive",
         readOnly: false,
@@ -333,7 +352,6 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
       {
         name: "vendors",
         label: "Select which vendors provide services for this action",
-        placeholder: "eg. Solarize Wayland",
         fieldType: "Checkbox",
         selectMany: true,
         defaultValue: action.vendors
@@ -345,13 +363,12 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
       {
         name: "image",
         placeholder: "Select an Image",
-        fieldType: "File",
-        previewLink: action.image && action.image.url,
+        fieldType: fieldTypes.MediaLibrary,
+        selected: action.image ? [action.image] : [],
         dbName: "image",
         label: "Upload Files",
         isRequired: false,
         defaultValue: "",
-        filesLimit: 1,
       },
       {
         name: "is_published",

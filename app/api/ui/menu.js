@@ -231,4 +231,5 @@ module.exports = [
     icon: 'ios-people',
     link: '/admin/read/users'
   },
+  
 ];

@@ -10,7 +10,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import moment from 'moment';
 import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import LocalPhone from '@material-ui/icons/LocalPhone';
 import Icon from '@material-ui/core/Icon';
@@ -19,37 +18,25 @@ import LocationOn from '@material-ui/icons/LocationOn';
 import Divider from '@material-ui/core/Divider';
 import Chip from '@material-ui/core/Chip';
 import Email from '@material-ui/icons/Email';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-import GridListTileBar from '@material-ui/core/GridListTileBar';
-import IconButton from '@material-ui/core/IconButton';
-import InfoIcon from '@material-ui/icons/Info';
 import { Link, Redirect, withRouter } from 'react-router-dom';
 import Check from '@material-ui/icons/Check';
 import AcUnit from '@material-ui/icons/AcUnit';
-import Adb from '@material-ui/icons/Adb';
-import AllInclusive from '@material-ui/icons/AllInclusive';
-import AssistantPhoto from '@material-ui/icons/AssistantPhoto';
-import imgData from 'dan-api/images/imgData';
 import Type from 'dan-styles/Typography.scss';
-// import Timeline from 'dan-components/SocialMedia/Timeline';
 import PapperBlock from 'dan-components/PapperBlock/PapperBlock';
 import styles from './profile-jss';
-import { convertBoolean, getAddress, goHere } from '../../../../utils/common';
+import { getAddress, goHere } from '../../../../utils/common';
 import Snackbar from '@material-ui/core/Snackbar';
 import MySnackbarContentWrapper from '../../../../components/SnackBar/SnackbarContentWrapper';
 import { apiCallFile } from '../../../../utils/messenger';
-import { downloadFile } from '../../../../utils/common';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import ImportContacts from '../../Summary/ImportContacts.js';
-
 
 class About extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       error: null,
-      loadingCSVs: [], 
+      loadingCSVs: [],
+      success: false,
       wantImport: false
     };
   }
@@ -78,11 +65,12 @@ class About extends React.Component {
     oldLoadingCSVs = this.state.loadingCSVs;
     oldLoadingCSVs.splice(oldLoadingCSVs.indexOf(endpoint), 1);
     if (csvResponse.success) {
-      downloadFile(csvResponse.file);
+      this.setState({success: true});
     } else {
       this.setState({ error: csvResponse.error });
     }
     this.setState({ loadingCSVs: oldLoadingCSVs });
+    this.forceUpdate();
   }
 
   getTags = tags => (tags.map(t => (t.name))).join(', ');
@@ -106,6 +94,13 @@ class About extends React.Component {
       return;
     }
     this.setState({ error: null });
+  };
+
+  handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    this.setState({ success: false });
   };
 
   actionsGoalPercentage() {
@@ -153,7 +148,7 @@ class About extends React.Component {
     const communityEditLink = `/admin/edit/${community ? community.id : null}/community/community-admin`;
     const addRemoveCommuntyAdminLink = `/admin/edit/${community ? community.id : null}/community-admins`;
 
-    const { error, loadingCSVs } = this.state;
+    const { error, loadingCSVs, success } = this.state;
     if (this.state.wantImport) {
       return <Redirect exact to="/admin/importcontacts"></Redirect>;
     }
@@ -161,23 +156,38 @@ class About extends React.Component {
   
       <>
 
-        {error
-          && (
-            <div>
-              <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={error != null}
-                autoHideDuration={6000}
+        {error && (
+          <div>
+            <Snackbar
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              open={error != null}
+              autoHideDuration={6000}
+              onClose={this.handleCloseStyle}
+            >
+              <MySnackbarContentWrapper
                 onClose={this.handleCloseStyle}
-              >
-                <MySnackbarContentWrapper
-                  onClose={this.handleCloseStyle}
-                  variant="error"
-                  message={`Unable to download: ${error}`}
-                />
-              </Snackbar>
-            </div>
-          )}
+                variant="error"
+                message={`Unable to download: ${error}`}
+              />
+            </Snackbar>
+          </div>
+        )}
+        {success && (
+          <div style={{ marginBottom: 20 }}>
+            <Snackbar
+              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+              open={success}
+              autoHideDuration={3000}
+              onClose={this.handleClose}
+            >
+              <MySnackbarContentWrapper
+                onClose={this.handleClose}
+                variant="success"
+                message={`Your request has been received. Please check your email for the file.`}
+              />
+            </Snackbar>
+          </div>
+        )}
 
         <Grid
           container
@@ -356,7 +366,7 @@ class About extends React.Component {
           <Grid item xs={4}>
             <Paper onClick={() => { !loadingCSVs.includes('users') && this.getCSV('users'); }} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                Download Users CSV
+                Request Users CSV
                     {' '}
                 <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
                 {loadingCSVs.includes('users') && <CircularProgress size={20} thickness={2} color="secondary" />}
@@ -366,7 +376,7 @@ class About extends React.Component {
           <Grid item xs={4}>
             <Paper onClick={() => { !loadingCSVs.includes('actions') && this.getCSV('actions'); }} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                Download Actions CSV
+                Request Actions CSV
                     {' '}
                 <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
                 {loadingCSVs.includes('actions') && <CircularProgress size={20} thickness={2} color="secondary" />}
@@ -376,7 +386,7 @@ class About extends React.Component {
           <Grid item xs={4}>
             <Paper onClick={() => { !loadingCSVs.includes('teams') && this.getCSV('teams'); }} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                Download Teams CSV
+                Request Teams CSV
                     {' '}
                 <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
                 {loadingCSVs.includes('teams') && <CircularProgress size={20} thickness={2} color="secondary" />}
@@ -398,7 +408,7 @@ class About extends React.Component {
           <Grid item xs={4}>
             <Paper onClick={() => { !loadingCSVs.includes('actions.all') && this.getCSV('actions.all'); }} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                Download All Actions CSV
+                Request All Actions CSV
                     {' '}
                 <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
                 {loadingCSVs.includes('actions.all') && <CircularProgress size={20} thickness={2} color="secondary" />}
@@ -408,7 +418,7 @@ class About extends React.Component {
           <Grid item xs={4}>
             <Paper onClick={() => { !loadingCSVs.includes('metrics') && this.getCSV('metrics'); }} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem'}} component="h3">
-                Download Metrics CSV
+                Request Metrics CSV
                     {' '}
                 <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
                 {loadingCSVs.includes('metrics') && <CircularProgress size={20} thickness={2} color="secondary" />}

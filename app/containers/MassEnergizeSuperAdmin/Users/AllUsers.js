@@ -30,6 +30,8 @@ class AllUsers extends React.Component {
   componentDidMount() {
     const { auth } = this.props;
     var url;
+    if (!auth) return;
+    
     if (auth.is_super_admin) url = "/users.listForSuperAdmin";
     else if (auth.is_community_admin) url = "/users.listForCommunityAdmin";
     apiCall(url).then((allUsersResponse) => {
@@ -50,6 +52,8 @@ class AllUsers extends React.Component {
         ? "Super Admin"
         : d.is_community_admin
         ? "Community Admin"
+        : d.is_guest
+        ? "Guest"
         : "Member",
       d.id,
     ]);

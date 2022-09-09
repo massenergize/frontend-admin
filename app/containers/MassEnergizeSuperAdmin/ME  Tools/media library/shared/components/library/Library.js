@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 import ImageThumbnail from "../thumbnail/ImageThumbnail";
-import { blank } from "../../utils/values";
+import { blank, DEFAULT_FILE_LIMIT } from "../../utils/values";
 import { LoadMoreContainer } from "../../../../../Gallery/Gallery";
-import {  ProgressCircleWithLabel } from "../../../../../Gallery/utils";
+import { ProgressCircleWithLabel } from "../../../../../Gallery/utils";
 
 function Library({
   multiple,
@@ -19,23 +19,25 @@ function Library({
   shouldWait,
   setShouldWait,
   awaitSeconds,
+  fileLimit,
 }) {
   const handleSelection = (image) => {
     if (!multiple) {
-      setSelectedContent(image);
+      setSelectedContent([image]);
       setShowSidePane(true);
       return;
     }
     const images = content || [];
     const found = images.find((img) => img.id === image.id);
     let rest = images.filter((img) => img.id !== image.id);
-    if (!found) rest = [...rest, image];
+    if (!found) rest = [image, ...rest];
     setShowSidePane(rest && rest.length > 0);
-    setSelectedContent(rest);
+    const limit = fileLimit || DEFAULT_FILE_LIMIT;
+    setSelectedContent(rest.slice(0, limit));
   };
 
   const checkIfSelected = (image) => {
-    if (!multiple) return image.id === content.id;
+    // if (!multiple) return image.id === content.id;
     const images = content || [];
     return images.find((img) => img.id === image.id);
   };
@@ -71,6 +73,14 @@ function Library({
   }
   return (
     <div>
+      {fileLimit && (
+        <div style={{ padding: "10px 25px", fontWeight: "bold" }}>
+          <small>
+            You can select up to ({fileLimit}){" "}
+            {fileLimit === 1 ? "image" : "images"}
+          </small>
+        </div>
+      )}
       <div className="m-content-area" style={{ padding: 15 }}>
         {images.map((image, index) => {
           const selected = checkIfSelected(image);

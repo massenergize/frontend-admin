@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import MassEnergizeForm from '../_FormGenerator';
-import { apiCall } from '../../../utils/messenger';
+import MassEnergizeForm from '../containers/MassEnergizeSuperAdmin/_FormGenerator';
+import { apiCall } from '../utils/messenger';
 
 const styles = theme => ({
   root: {
@@ -73,7 +73,6 @@ class RegisterPageEditForm extends Component {
           placeholder: 'eg. 1',
           fieldType: 'TextField',
           contentType: 'number',
-          isRequired: true,
           defaultValue: `${pageData.id}`,
           dbName: 'id',
           readOnly: true

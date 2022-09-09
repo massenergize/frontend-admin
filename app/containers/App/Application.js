@@ -56,8 +56,6 @@ import {
   EditPolicy,
   UsersList,
   ImpactPage,
-  RegisterPage,
-  SigninPage,
   Impact,
   ImportContacts,
   AddCarbonEquivalency,
@@ -65,6 +63,10 @@ import {
   EditCarbonEquivalency,
   GalleryPage,
   AddToGallery,
+  AddTask,
+  ListTasks,
+  Settings,
+  FeatureFlags,
 } from "../pageListAsync";
 import EditVendor from "../MassEnergizeSuperAdmin/Vendors/EditVendor";
 import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
@@ -82,17 +84,22 @@ import TeamMembers from "../MassEnergizeSuperAdmin/Teams/TeamMembers";
 import EventRSVPs from "../MassEnergizeSuperAdmin/Events/EventRSVPs";
 import ThemeModal from "../../components/Widget/ThemeModal";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
-const THIRTY_MINUTES = 1000 * 60 * 30;
-const TWENTY_FOUR_HOURS = 1000 * 60 * 60 * 24;
+import { THREE_MINUTES, TIME_UNTIL_EXPIRATION } from "../../utils/constants";
+
 class Application extends React.Component {
   componentWillMount() {
     this.props.reduxCallCommunities();
   }
   componentDidMount() {
     this.props.fetchInitialContent(this.props.auth);
-    setTimeout(() => {
-      this.runAdminStatusCheck();
-    }, TWENTY_FOUR_HOURS);
+    setInterval(() => {
+      const expirationTime = Number(
+        localStorage.getItem(TIME_UNTIL_EXPIRATION) || 0
+      );
+      const currentDateTime = Date.now();
+      const itsPassedADaySinceLogin = currentDateTime > expirationTime;
+      if (itsPassedADaySinceLogin) this.runAdminStatusCheck();
+    }, THREE_MINUTES);
   }
 
   getCommunityList() {
@@ -101,23 +108,20 @@ class Application extends React.Component {
     return list.map((com) => com.id);
   }
 
-  runAdminStatusCheck() {
-    setInterval(async () => {
-      try {
-        const response = await apiCall("auth.whoami");
-        if (response.success) return;
+  async runAdminStatusCheck() {
+    try {
+      const response = await apiCall("/auth.whoami");
+      if (response.success) return;
 
-        if (response.error === PERMISSION_DENIED)
-          return (window.location = "/login");
-      } catch (e) {
-        console.log("ADMIN_SESSION_STATUS_ERROR:", e.toString());
-      }
-    }, THIRTY_MINUTES);
+      if (response.error === PERMISSION_DENIED)
+        return (window.location = "/login");
+    } catch (e) {
+      console.log("ADMIN_SESSION_STATUS_ERROR:", e.toString());
+    }
   }
 
   render() {
     const { auth, signOut } = this.props;
-
     const {
       changeMode,
       history,
@@ -193,12 +197,17 @@ class Application extends React.Component {
     return (
       <Dashboard history={history} changeMode={changeMode}>
         <ThemeModal
+          {...modalOptions || {}}
           open={show}
           onConfirm={onConfirm}
           onCancel={() => {
             if (onCancel) onCancel();
           }}
-          close={() => toggleUniversalModal({ show: false, component: null })}
+
+          close={() => {
+            toggleUniversalModal({ show: false, component: null });
+            return false;
+          }}
           closeAfterConfirmation={closeAfterConfirmation}
         >
           {component}
@@ -209,6 +218,8 @@ class Application extends React.Component {
           {user.is_super_admin && superAdminSpecialRoutes}
 
           <Route exact path="/blank" component={BlankPage} />
+          <Route exact path="/admin/profile/settings" component={Settings} />
+          <Route exact path="/admin/settings/feature-flags" component={FeatureFlags} />
           <Route path="/admin/read/users" component={UsersList} />
           <Route
             path="/admin/read/community-admin-messages"
@@ -336,8 +347,6 @@ class Application extends React.Component {
           <Route path="/admin/edit/:id/events" component={EventsPage} />
           <Route path="/admin/edit/:id/teams" component={TeamsPage} />
           <Route path="/admin/edit/:id/vendors" component={VendorsPage} />
-          <Route path="/admin/edit/:id/signin" component={SigninPage} />
-          <Route path="/admin/edit/:id/registration" component={RegisterPage} />
           <Route
             path="/admin/edit/:id/testimonials"
             component={TestimonialsPage}
@@ -352,6 +361,9 @@ class Application extends React.Component {
           <Route path="/admin/read/all-actions" component={SuperAllActions} />
           <Route exact path="/admin/gallery/" component={GalleryPage} />
           <Route exact path="/admin/gallery/add" component={AddToGallery} />
+          <Route exact path="/admin/tasks/add" component={AddTask} />
+          <Route exact path="/admin/edit/:id/task" component={AddTask} />
+          <Route exact path="/admin/read/tasks" component={ListTasks} />
           <Route component={NotFound} />
         </Switch>
       </Dashboard>
