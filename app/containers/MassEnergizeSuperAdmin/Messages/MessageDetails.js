@@ -49,6 +49,7 @@ class MessageDetails extends Component {
       formJson: null,
       message: undefined,
       loading: true,
+      showMore:false
     };
   }
 
@@ -110,7 +111,6 @@ class MessageDetails extends Component {
           placeholder: "eg. 1",
           fieldType: "TextField",
           contentType: "text",
-          isRequired: true,
           defaultValue: message && message.id,
           dbName: "message_id",
           readOnly: true,
@@ -169,7 +169,6 @@ class MessageDetails extends Component {
           placeholder: "eg. 1",
           fieldType: "TextField",
           contentType: "text",
-          isRequired: true,
           defaultValue: message && message.id,
           dbName: "message_id",
           readOnly: true,
@@ -268,6 +267,74 @@ class MessageDetails extends Component {
         </div>
         <br />
         <br />
+
+        {message && message.replies && message.replies.length ? (
+          <div style={{ marginBottom: "2rem", maxHeight:'75vh', overflowY:'auto'}}>
+            <Paper className={classes.root} elevation={4}>
+              <h2>Reply History</h2>
+
+              {message.replies.map((reply, index) => {
+                return (
+                  <div
+                    style={{
+                      paddingBottom: "1rem",
+                      paddingTop: "1rem",
+                      borderTop: "1px solid #EBEBEB",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      <Typography
+                        variant="h7"
+                        style={{ marginBottom: 3 }}
+                      >
+                        <b>
+                          {(reply && reply.user_name) ||
+                            (reply.user &&
+                              reply.user.full_name) ||
+                            "..."}
+                        </b>
+                      </Typography>
+                      <div>
+                        <Typography
+                          variant="small"
+                          color="textSecondary"
+                        >
+                          {/* {getHumanFriendlyDate( */}
+                          {reply && reply.created_at}
+                          {/* )} */}
+                        </Typography>
+                      </div>
+                    </div>
+                    <div>
+                      <Typography
+                        variant="h9"
+                        style={{ fontWeight: "bold" }}
+                      >
+                        {reply && reply.title}
+                      </Typography>
+                    </div>
+
+                    <div>
+                      <Typography
+                        variant="paragraph"
+                        color="textPrimary"
+                        style={{ textAlign: "justify", marginTop:'15px' }}
+                      >
+                        {reply && reply.body}
+                      </Typography>
+                    </div>
+                  </div>
+                );
+              })}
+            </Paper>
+          </div>
+        ) : null}
 
         <MassEnergizeForm classes={classes} formJson={formJson} />
       </div>

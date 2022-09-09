@@ -154,7 +154,8 @@ class AllPolicies extends React.Component {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
-      rowsPerPage: 100,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       page: 1,
       indexColumn: "id",
       onRowsDelete: (rowsDeleted) => {

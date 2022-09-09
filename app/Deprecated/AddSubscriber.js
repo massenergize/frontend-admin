@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
 import states from 'dan-api/data/states';
-import MassEnergizeForm from '../_FormGenerator';
-import { apiCall } from '../../../utils/messenger';
+import { withStyles } from '@material-ui/core/styles';
+import MassEnergizeForm from '../containers/MassEnergizeSuperAdmin/_FormGenerator';
+import { apiCall } from '../utils/messenger';
 
 const styles = theme => ({
   root: {
@@ -34,38 +34,35 @@ class CreateNewVendorForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      formJson: null,
-      loading: true,
-      vendor: null
+      formJson: null, communities: []
     };
   }
 
 
   async componentDidMount() {
-    const { id } = this.props.match.params;
-    const vendorResponse = await apiCall('/vendors.info', { vendor_id: id });
-    if (vendorResponse && vendorResponse.success) {
-      await this.setStateAsync({ vendor: vendorResponse.data, loading: false });
+    const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
+    const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
+    if (communitiesResponse && communitiesResponse.data) {
+      const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
+      await this.setStateAsync({ communities });
     }
 
     const formJson = await this.createFormJson();
-    const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
     if (tagCollectionsResponse && tagCollectionsResponse.data) {
       const section = {
-        label: 'Please select tag(s) that apply to this service provider',
+        label: 'Please select tag(s) that apply to this subscriber',
         fieldType: 'Section',
         children: []
       };
 
       Object.values(tagCollectionsResponse.data).forEach(tCol => {
-        const { vendor } = this.state;
         const newField = {
           name: tCol.name,
           label: `${tCol.name} ${tCol.allow_multiple ? '(You can select multiple)' : '(Only one selection allowed)'}`,
           placeholder: '',
           fieldType: 'Checkbox',
           selectMany: tCol.allow_multiple,
-          defaultValue: this.getSelectedIds(vendor.tags, tCol.tags),
+          defaultValue: [],
           dbName: 'tags',
           data: tCol.tags.map(t => ({ ...t, displayName: t.name, id: '' + t.id }))
         };
@@ -79,7 +76,8 @@ class CreateNewVendorForm extends Component {
       // want this to be the 2nd field
       formJson.fields.splice(1, 0, section);
     }
-    await this.setStateAsync({ formJson, loading: false });
+
+    await this.setStateAsync({ formJson });
   }
 
   setStateAsync(state) {
@@ -89,11 +87,11 @@ class CreateNewVendorForm extends Component {
   }
 
   createFormJson = async () => {
-    const { vendor } = this.state;
+    const { communities } = this.state;
     const formJson = {
-      title: 'Update Vendor',
+      title: 'Create New Vendor',
       subTitle: '',
-      method: '/vendors.update',
+      method: '/vendors.create',
       successRedirectPage: '/admin/read/vendors',
       fields: [
         {
@@ -101,24 +99,13 @@ class CreateNewVendorForm extends Component {
           fieldType: 'Section',
           children: [
             {
-              name: 'id',
-              label: 'ID',
-              placeholder: 'eg. 100',
-              fieldType: 'TextField',
-              contentType: 'text',
-              isRequired: true,
-              defaultValue: vendor.id,
-              dbName: 'id',
-              readOnly: true
-            },
-            {
-              name: 'vendor_name',
-              label: 'Name of this Vendor:',
+              name: 'name',
+              label: 'Name of this Vendor',
               placeholder: 'eg. Solar Provider Inc.',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
-              defaultValue: vendor.name,
+              defaultValue: '',
               dbName: 'name',
               readOnly: false
             },
@@ -129,30 +116,43 @@ class CreateNewVendorForm extends Component {
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
-              defaultValue: vendor.phone_number,
+              defaultValue: '',
               dbName: 'phone_number',
               readOnly: false
             },
             {
-              name: 'vendor_email',
+              name: 'communities',
+              label: 'Which communities would this vendor service ?',
+              placeholder: 'eg. +1(571)-000-2231',
+              fieldType: 'Checkbox',
+              contentType: 'text',
+              isRequired: true,
+              selectMany: true,
+              defaultValue: [],
+              dbName: 'communities',
+              readOnly: false,
+              data: communities || [],
+            },
+            {
+              name: 'email',
               label: 'Primary Email of this vendor',
               placeholder: 'eg. abc@gmail.com',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
-              defaultValue: vendor.email,
+              defaultValue: '',
               dbName: 'email',
               readOnly: false
             },
             {
               name: 'description',
-              label: 'Tell us about the services this vendor provides',
+              label: 'Tell us about what you do',
               placeholder: 'Tell us more ...',
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
               isMultiline: true,
-              defaultValue: vendor.description,
+              defaultValue: '',
               dbName: 'description',
               readOnly: false
             },
@@ -161,7 +161,7 @@ class CreateNewVendorForm extends Component {
               label: 'Have you verified this Vendor?',
               fieldType: 'Radio',
               isRequired: false,
-              defaultValue: vendor.is_verified ? 'true' : 'false',
+              defaultValue: 'false',
               dbName: 'is_verified',
               readOnly: false,
               data: [
@@ -174,7 +174,7 @@ class CreateNewVendorForm extends Component {
               label: 'Do you have an address?',
               fieldType: 'Radio',
               isRequired: false,
-              defaultValue: vendor.location ? 'true' : 'false',
+              defaultValue: 'false',
               dbName: 'have_address',
               readOnly: false,
               data: [
@@ -185,47 +185,47 @@ class CreateNewVendorForm extends Component {
                 valueToCheck: 'true',
                 fields: [
                   {
-                    name: 'vendor_address',
+                    name: 'address',
                     label: 'Street Address',
-                    placeholder: '',
+                    placeholder: 'eg. Wayland',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: true,
-                    defaultValue: vendor.location && vendor.location.address,
+                    defaultValue: '',
                     dbName: 'address',
                     readOnly: false
                   },
                   {
                     name: 'unit',
                     label: 'Unit Number',
-                    placeholder: '',
+                    placeholder: 'eg. "2A"',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: false,
-                    defaultValue: vendor.location && vendor.location.unit,
+                    defaultValue: '',
                     dbName: 'unit',
                     readOnly: false
                   },
                   {
                     name: 'city',
                     label: 'City',
-                    placeholder: 'eg. Springfield',
+                    placeholder: 'eg. wayland',
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: true,
-                    defaultValue: vendor.location && vendor.location.city,
+                    defaultValue: '',
                     dbName: 'city',
                     readOnly: false
                   },
                   {
                     name: 'state',
                     label: 'State ',
-                    placeholder: 'eg. Massachusetts',
-                    fieldType: 'TextField',
+                    placeholder: 'eg. New York',
+                    fieldType: 'Dropdown',
                     contentType: 'text',
-                    isRequired: true,
+                    isRequired: false,
                     data: states,
-                    defaultValue: vendor.location && vendor.location.state,
+                    defaultValue: '',
                     dbName: 'state',
                     readOnly: false
                   },
@@ -240,12 +240,12 @@ class CreateNewVendorForm extends Component {
           children: [
             {
               name: 'service_area',
-              label: 'Please select your service sector(s)',
+              label: 'Please select your service Area',
               placeholder: 'eg. Grace Tsu',
               fieldType: 'Radio',
               contentType: 'text',
               isRequired: true,
-              defaultValue: vendor.service_area,
+              defaultValue: 'national',
               dbName: 'service_area',
               readOnly: false,
               data: [
@@ -262,7 +262,7 @@ class CreateNewVendorForm extends Component {
                     fieldType: 'TextField',
                     contentType: 'text',
                     isRequired: true,
-                    defaultValue: vendor.service_area_states && vendor.service_area_states.join(', '),
+                    defaultValue: '',
                     dbName: 'service_area_states',
                     readOnly: false
                   },
@@ -277,7 +277,7 @@ class CreateNewVendorForm extends Component {
               contentType: 'text',
               isRequired: true,
               selectMany: true,
-              defaultValue: vendor.properties_serviced || [],
+              defaultValue: [],
               dbName: 'properties_serviced',
               readOnly: false,
               data: [
@@ -298,7 +298,7 @@ class CreateNewVendorForm extends Component {
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
-              defaultValue: vendor.key_contact && vendor.key_contact.name,
+              defaultValue: '',
               dbName: 'key_contact_name',
               readOnly: false
             },
@@ -309,7 +309,7 @@ class CreateNewVendorForm extends Component {
               fieldType: 'TextField',
               contentType: 'text',
               isRequired: true,
-              defaultValue: vendor.key_contact && vendor.key_contact.email,
+              defaultValue: '',
               dbName: 'key_contact_email',
               readOnly: false
             },
@@ -322,9 +322,9 @@ class CreateNewVendorForm extends Component {
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: true,
-          defaultValue: vendor && vendor.onboarding_contact && vendor.onboarding_contact.email,
+          defaultValue: '',
           dbName: 'onboarding_contact_email',
-          readOnly: true
+          readOnly: false
         },
         {
           name: 'image',
@@ -332,11 +332,23 @@ class CreateNewVendorForm extends Component {
           fieldType: 'File',
           dbName: 'image',
           label: 'Upload a logo for this Vendor',
-          previewLink: vendor.logo && vendor.logo.url,
           selectMany: false,
           isRequired: false,
           defaultValue: '',
           filesLimit: 1
+        },
+        {
+          name: 'accepted_terms_and_conditions',
+          label: 'Accept Terms And Conditions',
+          fieldType: 'Radio',
+          isRequired: false,
+          defaultValue: 'false',
+          dbName: 'accepted_terms_and_conditions',
+          readOnly: false,
+          data: [
+            { id: 'false', value: 'No' },
+            { id: 'true', value: 'Yes' }
+          ]
         },
       ]
     };

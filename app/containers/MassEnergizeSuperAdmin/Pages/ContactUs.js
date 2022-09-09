@@ -73,7 +73,6 @@ class ContactUsPageEditForm extends Component {
           placeholder: 'eg. 1',
           fieldType: 'TextField',
           contentType: 'number',
-          isRequired: true,
           defaultValue: `${contactUsPageData.id}`,
           dbName: 'id',
           readOnly: true

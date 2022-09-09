@@ -23,10 +23,11 @@ import {
   loadAllEvents,
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
-import CommunitySwitch from "../Summary/CommunitySwitch";
-import { smartString } from "../../../utils/common";
+import { findMatchesAndRest, getHumanFriendlyDate, makeDeleteUI, smartString } from "../../../utils/common";
 import { Chip, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
+import METable from "../ME  Tools/table /METable";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 
 class AllEvents extends React.Component {
   constructor(props) {
@@ -48,7 +49,8 @@ class AllEvents extends React.Component {
 
   fashionData = (data) => {
     const fashioned = data.map((d) => [
-      // d.id,
+      d.id,
+      getHumanFriendlyDate(d.start_date_and_time, true),
       {
         id: d.id,
         image: d.image,
@@ -60,13 +62,29 @@ class AllEvents extends React.Component {
       d.is_global ? "Template" : d.community && d.community.name,
       { isLive: d.is_published, item: d },
       d.id,
+      d.is_published ? "Yes" : "No",
+      d.is_global,
     ]);
     return fashioned;
   };
 
   getColumns = () => {
-    const { classes } = this.props;
+    const { classes, putEventsInRedux, allEvents } = this.props;
     return [
+      {
+        name: "ID",
+        key: "id",
+        options: {
+          filter: false,
+        },
+      },
+      {
+        name: "Date",
+        key: "date",
+        options: {
+          filter: false,
+        },
+      },
       {
         name: "Event",
         key: "event",
@@ -122,6 +140,7 @@ class AllEvents extends React.Component {
         key: "is_live",
         options: {
           filter: false,
+          download: false,
           customBodyRender: (d) => {
             return (
               <MEChip
@@ -163,6 +182,7 @@ class AllEvents extends React.Component {
                     const newEvent =
                       copiedEventResponse && copiedEventResponse.data;
                     this.props.history.push(`/admin/edit/${newEvent.id}/event`);
+                    putEventsInRedux([newEvent, ...(allEvents || [])]);
                   }
                 }}
                 to="/admin/read/events"
@@ -171,6 +191,26 @@ class AllEvents extends React.Component {
               </Link>
             </div>
           ),
+        },
+      },
+      {
+        name: "Live",
+        key: "hidden_live_or_not",
+        options: {
+          display: false,
+          filter: true,
+          searchable: false,
+          download:true
+        },
+      },
+      {
+        name: "Live",
+        key: "is_a_template",
+        options: {
+          display: false,
+          filter: false,
+          searchable: false,
+          download: false,
         },
       },
     ];
@@ -184,10 +224,12 @@ class AllEvents extends React.Component {
     item.is_published = !status;
     data.splice(index, 1, item);
     putInRedux([...data]);
+    const community = item.community;
     apiCall("/events.update", {
       event_id: item.id,
       is_published: !status,
       name: item.name,
+      community_id: (community && community.id) || null,
     });
   }
 
@@ -208,23 +250,12 @@ class AllEvents extends React.Component {
     const itemsInRedux = allEvents;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][6];
+      const found = data[d.dataIndex][0];
       ids.push(found);
       apiCall("/events.delete", { event_id: found });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putEventsInRedux(rem);
-  }
-
-  makeDeleteUI({ idsToDelete }) {
-    const len = (idsToDelete && idsToDelete.length) || 0;
-    return (
-      <Typography>
-        Are you sure you want to delete (
-        {(idsToDelete && idsToDelete.length) || ""})
-        {len === 1 ? " event? " : " events? "}
-      </Typography>
-    );
   }
 
   render() {
@@ -237,14 +268,29 @@ class AllEvents extends React.Component {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
-      rowsPerPage: 15,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
+        const [found] = findMatchesAndRest(idsToDelete, (it) => {
+          const f = data[it.dataIndex];
+          return f[10]; // this index should be changed if anyone modifies (adds/removes) an item in fashioData()
+        });
+        const noTemplatesSelectedGoAhead = !found || !found.length;
         this.props.toggleDeleteConfirmation({
           show: true,
-          component: this.makeDeleteUI({ idsToDelete }),
-          onConfirm: () => this.nowDelete({ idsToDelete, data }),
+          component: makeDeleteUI({
+            idsToDelete,
+            templates: found,
+            noTemplates: noTemplatesSelectedGoAhead,
+          }),
+          onConfirm: () =>
+            noTemplatesSelectedGoAhead && this.nowDelete({ idsToDelete, data }),
           closeAfterConfirmation: true,
+          cancelText: noTemplatesSelectedGoAhead
+            ? "No"
+            : "Go Back and Remove Templates",
+          noOk: !noTemplatesSelectedGoAhead,
         });
         return false;
       },
@@ -283,15 +329,17 @@ class AllEvents extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <div className={classes.table}>
-          {/* {this.showCommunitySwitch()} */}
-          <MUIDataTable
-            title="All Events"
-            data={data}
-            columns={columns}
-            options={options}
-          />
-        </div>
+
+        <METable
+          classes={classes}
+          page={PAGE_PROPERTIES.ALL_EVENTS}
+          tableProps={{
+            title: "All Events",
+            data: data,
+            columns: columns,
+            options: options,
+          }}
+        />
       </div>
     );
   }

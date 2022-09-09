@@ -7,6 +7,7 @@ import Loading from "dan-components/Loading";
 import { makeTagSection } from "../Events/EditEventForm";
 import { connect } from "react-redux";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
+import fieldTypes from "../_FormGenerator/fieldTypes";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -221,7 +222,7 @@ const createFormJson = ({ communities, actions, vendors }) => {
             placeholder: "User name",
             fieldType: "TextField",
             contentType: "text",
-            isRequired: true,
+            isRequired: false,
             defaultValue: "",
             dbName: "preferred_name",
             readOnly: false,
@@ -231,13 +232,13 @@ const createFormJson = ({ communities, actions, vendors }) => {
       {
         name: "image",
         placeholder: "Select an Image",
-        fieldType: "File",
+        fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload a file for this testimonial",
-        selectMany: false,
-        isRequired: true,
-        defaultValue: "",
-        filesLimit: 1,
+        uploadMultiple: false, 
+        multiple: false,
+        isRequired: false,
+      
       },
       {
         name: "is_approved",

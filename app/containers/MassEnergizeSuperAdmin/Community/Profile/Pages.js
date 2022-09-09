@@ -58,7 +58,7 @@ class Pages extends React.Component {
       { name: "All Testimonials Page", key: "homepage", link: testimonials },
       { name: "All Services Page", key: "homepage", link: vendors },
       //{ name: "Registration Page", key: "homepage", link: registration },
-      { name: "Sign In Page", key: "homepage", link: signin },
+      // { name: "Sign In Page", key: "homepage", link: signin },
     ];
 
     return (

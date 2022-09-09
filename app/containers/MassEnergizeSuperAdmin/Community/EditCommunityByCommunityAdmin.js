@@ -3,12 +3,14 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import states from "dan-api/data/states";
-import MassEnergizeForm from "../_FormGenerator";
 import { apiCall } from "../../../utils/messenger";
 import { getMoreInfo, groupSocialMediaFields } from "./utils";
 import { connect } from "react-redux";
-import Loading from "dan-components/Loading";
-
+import fieldTypes from "../_FormGenerator/fieldTypes";
+import brand from "dan-api/dummy/brand";
+import { Helmet } from "react-helmet";
+import { PapperBlock } from 'dan-components';
+import EditCommunityForm from "./EditCommunityForm";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -65,7 +67,7 @@ class EditCommunityByCommunityAdmin extends Component {
     const community = communityResponse.data;
     await this.setStateAsync({ community });
 
-    const formJson =  createFormJson(community);
+    const formJson = createFormJson(community);
     await this.setStateAsync({ formJson });
   }
 
@@ -76,12 +78,26 @@ class EditCommunityByCommunityAdmin extends Component {
   }
 
   render() {
-    const { classes } = this.props;
-    const { formJson, community } = this.state;
-    if (!community || !formJson) return <Loading />;
+    const description = brand.desc;
+    const auth = this.props.auth;
+    const superAdmin =
+      auth & (auth !== undefined) ? auth.is_super_admin : false;
+    const formTitle = "Edit Community Infomation";
+    const title = brand.name + " - " + formTitle;
+
     return (
       <div>
-        <MassEnergizeForm classes={classes} formJson={formJson} />
+        <Helmet>
+          <title>{title}</title>
+          <meta name="description" content={description} />
+          <meta property="og:title" content={title} />
+          <meta property="og:description" content={description} />
+          <meta property="twitter:title" content={title} />
+          <meta property="twitter:description" content={description} />
+        </Helmet>
+        <PapperBlock title="Edit Community Information" desc="">
+          <EditCommunityForm {...this.props} superAdmin={superAdmin} />
+        </PapperBlock>
       </div>
     );
   }
@@ -143,7 +159,6 @@ const createFormJson = (community) => {
             placeholder: "eg. 10",
             fieldType: "TextField",
             contentType: "number",
-            isRequired: true,
             defaultValue: community.id,
             dbName: "community_id",
             readOnly: true,
@@ -174,9 +189,9 @@ const createFormJson = (community) => {
           {
             name: "website",
             label:
-              "Custom website domain (optional): URL which would forward to the portal, that users will see.  Don't include 'https://' ",
+              "Custom website domain (optional): URL which would forward to the portal, that users will see.  Start with 'www.' but don't include 'https://'",
             placeholder:
-              "eg. 'EnergizeYourTown.org' (leave blank or enter 'None' to remove website domain)",
+              "eg. 'www.EnergizeYourTown.org' (leave blank or enter 'None' to remove website domain)",
             fieldType: "TextField",
             contentType: "text",
             isRequired: false,
@@ -188,10 +203,11 @@ const createFormJson = (community) => {
             name: "about",
             label:
               "Short intro about this community for new users - 100 char max",
+            maxLength: 100,
             placeholder: "Welcome to Energize xxx, a project of ....",
             fieldType: "TextField",
             contentType: "text",
-            isRequired: true,
+            isRequired: false,
             defaultValue: community.about_community,
             dbName: "about_community",
             readOnly: false,
@@ -333,7 +349,6 @@ const createFormJson = (community) => {
                     "eg. 01101, 01102, 01103, 01104 or Springfield-MA",
                   fieldType: "TextField",
                   contentType: "text",
-                  isRequired: true,
                   defaultValue: community.locations || "",
                   dbName: "locations",
                   readOnly: true,
@@ -406,14 +421,12 @@ const createFormJson = (community) => {
       {
         name: "image",
         placeholder: "Upload a Logo",
-        fieldType: "File",
+        fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
-        previewLink: `${community.logo && community.logo.url}`,
+        selected: community && community.logo ? [community.logo] : [],
         label: "Upload a new logo for this community",
-        selectMany: false,
-        isRequired: false,
-        defaultValue: "",
-        filesLimit: 1,
+        uploadMultiple: false,
+        multiple: false,
       },
       {
         name: "is_published",
