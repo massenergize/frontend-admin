@@ -5,6 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import MassEnergizeForm from '../_FormGenerator';
 import { apiCall } from '../../../utils/messenger';
 import { getMoreInfo, groupSocialMediaFields } from './utils';
+import fieldTypes from '../_FormGenerator/fieldTypes';
 // @NB: Looks like this file isnt being used anymore
 const styles = (theme) => ({
   root: {
@@ -103,7 +104,7 @@ class EditCommunityForm extends Component {
               placeholder: 'eg. 10',
               fieldType: 'TextField',
               contentType: 'number',
-              isRequired: true,
+              isRequired: false,
               defaultValue: community.id,
               dbName: 'community_id',
               readOnly: true,
@@ -149,7 +150,7 @@ class EditCommunityForm extends Component {
               placeholder: "Welcome to Energize xxx, a project of ....",
               fieldType: 'TextField',
               contentType: 'text',
-              isRequired: true,
+              isRequired: false,
               defaultValue: community.about_community,
               dbName: 'about_community',
               readOnly: false,
@@ -353,16 +354,14 @@ class EditCommunityForm extends Component {
           ],
         },
         {
-          name: 'image',
-          placeholder: 'Upload a Logo',
-          fieldType: 'File',
-          dbName: 'image',
-          previewLink: `${community.logo && community.logo.url}`,
-          label: 'Upload a new logo for this community',
-          selectMany: false,
-          isRequired: false,
-          defaultValue: '',
-          filesLimit: 1,
+          name: "image",
+          placeholder: "Upload a Logo",
+          fieldType: fieldTypes.MediaLibrary,
+          dbName: "image",
+          selected: community && community.logo ? [community.logo] : [],
+          label: "Upload a new logo for this community",
+          uploadMultiple: false,
+          multiple: false,
         },
         superAdmin && {
           name: 'is_approved',

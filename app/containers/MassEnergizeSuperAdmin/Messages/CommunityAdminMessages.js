@@ -145,10 +145,11 @@ class AllCommunityAdminMessages extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { messages, putMessagesInRedux } = this.props;
+    // return
     const itemsInRedux = messages;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][1];
+      const found = data[d.dataIndex][0];
       ids.push(found);
       apiCall("/messages.delete", { message_id: found });
     });

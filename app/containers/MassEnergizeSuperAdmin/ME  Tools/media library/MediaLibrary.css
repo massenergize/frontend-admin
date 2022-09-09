@@ -1,5 +1,12 @@
 @import url(./../shared/css/universal.css);
 
+.ml-tray-image { 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+}
 .ml-thumb-checkmark {
   display: inline;
   background: green;
