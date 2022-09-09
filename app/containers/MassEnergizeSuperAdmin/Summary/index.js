@@ -19,7 +19,6 @@ import Icon from '@material-ui/core/Icon';
 import Snackbar from '@material-ui/core/Snackbar';
 import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
 import { apiCallFile } from '../../../utils/messenger';
-import { downloadFile } from '../../../utils/common';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 // import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
@@ -28,7 +27,8 @@ class SummaryDashboard extends PureComponent {
     super(props);
     this.state = {
       error: null,
-      loadingCSVs: []
+      loadingCSVs: [],
+      success: false,
     };
   }
 
@@ -40,8 +40,8 @@ class SummaryDashboard extends PureComponent {
     oldLoadingCSVs = this.state.loadingCSVs;
     oldLoadingCSVs.splice(oldLoadingCSVs.indexOf(endpoint), 1);
     if (csvResponse.success) {
-      downloadFile(csvResponse.file);
-    } else {
+      this.setState({success: true});
+     } else {
       this.setState({ error: csvResponse.error });
     }
     this.setState({ loadingCSVs: oldLoadingCSVs });
@@ -72,6 +72,13 @@ class SummaryDashboard extends PureComponent {
       window.location = `/admin/community/${obj.id}/profile`;
     }
   }
+  
+  handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    this.setState({ success: false });
+  };
 
 
   render() {
@@ -80,28 +87,42 @@ class SummaryDashboard extends PureComponent {
     const {
       classes, communities, selected_community, auth, summary_data, graph_data
     } = this.props;
-    const { error, loadingCSVs } = this.state;
+    const { error, loadingCSVs, success } = this.state;
 
     return (
       <div>
-        {error
-          && (
-            <div>
-              <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={error != null}
-                autoHideDuration={6000}
+        {error && (
+          <div>
+            <Snackbar
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              open={error != null}
+              autoHideDuration={6000}
+              onClose={this.handleCloseStyle}
+            >
+              <MySnackbarContentWrapper
                 onClose={this.handleCloseStyle}
-              >
-                <MySnackbarContentWrapper
-                  onClose={this.handleCloseStyle}
-                  variant="error"
-                  message={`Unable to download: ${error}`}
-                />
-              </Snackbar>
-            </div>
-          )}
-
+                variant="error"
+                message={`Unable to download: ${error}`}
+              />
+            </Snackbar>
+          </div>
+        )}
+        {success && (
+          <div style={{ marginBottom: 20 }}>
+            <Snackbar
+              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+              open={success}
+              autoHideDuration={3000}
+              onClose={this.handleClose}
+            >
+              <MySnackbarContentWrapper
+                onClose={this.handleClose}
+                variant="success"
+                message={`Your request has been received. Please check your email for the file.`}
+              />
+            </Snackbar>
+          </div>
+        )}
 
         <Helmet>
           <title>{title}</title>
@@ -117,44 +138,93 @@ class SummaryDashboard extends PureComponent {
         </Grid>
         <Divider className={classes.divider} />
 
-        {graph_data
-          && <ActionsChartWidget data={graph_data || {}} />
-        }
+        {graph_data && <ActionsChartWidget data={graph_data || {}} />}
         <Grid container className={classes.colList}>
           <Grid item xs={4}>
-            <Paper onClick={() => { !loadingCSVs.includes('users') && this.getCSV('users'); }} className={`${classes.pageCard}`} elevation={1}>
-              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                Download All Users CSV
-                  {' '}
-                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
-                {loadingCSVs.includes('users') && <CircularProgress size={20} thickness={2} color="secondary" />}
+            <Paper
+              onClick={() => {
+                !loadingCSVs.includes("users") && this.getCSV("users");
+              }}
+              className={`${classes.pageCard}`}
+              elevation={1}
+            >
+              <Typography
+                variant="h5"
+                style={{ fontWeight: "600", fontSize: "1rem" }}
+                component="h3"
+              >
+                Request All Users CSV{" "}
+                <Icon style={{ paddingTop: 3, color: "green" }}>
+                  arrow_downward
+                </Icon>
+                {loadingCSVs.includes("users") && (
+                  <CircularProgress
+                    size={20}
+                    thickness={2}
+                    color="secondary"
+                  />
+                )}
               </Typography>
             </Paper>
           </Grid>
           <Grid item xs={4}>
-            <Paper onClick={() => { !loadingCSVs.includes('actions') && this.getCSV('actions'); }} className={`${classes.pageCard}`} elevation={1}>
-              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                Download All Actions CSV
-                    {' '}
-                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
-                {loadingCSVs.includes('actions') && <CircularProgress size={20} thickness={2} color="secondary" />}
+            <Paper
+              onClick={() => {
+                !loadingCSVs.includes("actions") && this.getCSV("actions");
+              }}
+              className={`${classes.pageCard}`}
+              elevation={1}
+            >
+              <Typography
+                variant="h5"
+                style={{ fontWeight: "600", fontSize: "1rem" }}
+                component="h3"
+              >
+                Request All Actions CSV{" "}
+                <Icon style={{ paddingTop: 3, color: "green" }}>
+                  arrow_downward
+                </Icon>
+                {loadingCSVs.includes("actions") && (
+                  <CircularProgress
+                    size={20}
+                    thickness={2}
+                    color="secondary"
+                  />
+                )}
               </Typography>
             </Paper>
           </Grid>
           <Grid item xs={4}>
-            <Paper onClick={() => { !loadingCSVs.includes('communities') && this.getCSV('communities'); }} className={`${classes.pageCard}`} elevation={1}>
-              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                Download All Communities CSV
-                    {' '}
-                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
-                {loadingCSVs.includes('communities') && <CircularProgress size={20} thickness={2} color="secondary" />}
+            <Paper
+              onClick={() => {
+                !loadingCSVs.includes("communities") &&
+                  this.getCSV("communities");
+              }}
+              className={`${classes.pageCard}`}
+              elevation={1}
+            >
+              <Typography
+                variant="h5"
+                style={{ fontWeight: "600", fontSize: "1rem" }}
+                component="h3"
+              >
+                Request All Communities CSV{" "}
+                <Icon style={{ paddingTop: 3, color: "green" }}>
+                  arrow_downward
+                </Icon>
+                {loadingCSVs.includes("communities") && (
+                  <CircularProgress
+                    size={20}
+                    thickness={2}
+                    color="secondary"
+                  />
+                )}
               </Typography>
             </Paper>
           </Grid>
         </Grid>
         <br />
         <br />
-
       </div>
     );
   }

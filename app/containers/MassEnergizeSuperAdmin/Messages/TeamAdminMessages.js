@@ -12,18 +12,21 @@ import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
-import { Chip, Typography } from "@material-ui/core";
+import { Chip, Typography, Grid, Paper} from "@material-ui/core";
 import {
   loadTeamMessages,
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import METable from "../ME  Tools/table /METable";
 class AllTeamAdminMessages extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
       columns: this.getColumns(props.classes),
+      hasNoItems: false,
     };
   }
 
@@ -31,6 +34,8 @@ class AllTeamAdminMessages extends React.Component {
     apiCall("/messages.listTeamAdminMessages").then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
         this.props.putTeamMessagesInRedux(allMessagesResponse.data);
+        let hasItems = allMessagesResponse.data && allMessagesResponse.data.length>0;
+        this.setState({ hasNoItems: !hasItems });
       }
     });
   }
@@ -44,6 +49,7 @@ class AllTeamAdminMessages extends React.Component {
 
   fashionData = (data) => {
     return data.map((d) => [
+      d.id,
       getHumanFriendlyDate(d.created_at, true),
       smartString(d.title),
       d.user_name || (d.user && d.user.full_name) || "",
@@ -56,6 +62,13 @@ class AllTeamAdminMessages extends React.Component {
   };
 
   getColumns = (classes) => [
+    {
+      name: 'ID',
+      key: 'id',
+      options: {
+        filter: false,
+      },
+    },
     {
       name: "Date",
       key: "date",
@@ -139,7 +152,7 @@ class AllTeamAdminMessages extends React.Component {
     const itemsInRedux = teamMessages;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][7];
+      const found = data[d.dataIndex][0];
       ids.push(found);
       apiCall("/messages.delete", { message_id: found });
     });
@@ -167,7 +180,8 @@ class AllTeamAdminMessages extends React.Component {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
-      rowsPerPage: 50,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
@@ -177,15 +191,30 @@ class AllTeamAdminMessages extends React.Component {
           closeAfterConfirmation: true,
         });
         return false;
-        // const idsToDelete = rowsDeleted.data;
-        // idsToDelete.forEach((d) => {
-        //   const messageId = data[d.dataIndex][0];
-        //   apiCall("/messages.delete", { message_id: messageId });
-        // });
       },
     };
 
     if (!data || !data.length) {
+      if(this.state.hasNoItems){
+        return (
+          <Grid
+            container
+            spacing={24}
+            alignItems="flex-start"
+            direction="row"
+            justify="center"
+          >
+            <Grid item xs={12} md={6}>
+              <Paper className={classes.root} style={{ padding: 15 }}>
+                <div className={classes.root}>
+                  <h1>No messages currently to display</h1>
+                  <br />
+                </div>
+              </Paper>
+            </Grid>
+          </Grid>
+        );
+      }
       return <LinearBuffer />;
     }
 
@@ -199,14 +228,16 @@ class AllTeamAdminMessages extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <div className={classes.table}>
-          <MUIDataTable
-            title="All Team Admin Messages"
-            data={data}
-            columns={columns}
-            options={options}
-          />
-        </div>
+        <METable
+          classes={classes}
+          page={PAGE_PROPERTIES.ALL_TEAM_MESSAGES}
+          tableProps={{
+            title: "All Team Admin Messages",
+            data: data,
+            columns: columns,
+            options: options,
+          }}
+        />
       </div>
     );
   }

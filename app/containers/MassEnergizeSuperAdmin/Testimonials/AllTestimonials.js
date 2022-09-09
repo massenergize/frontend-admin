@@ -6,7 +6,7 @@ import brand from "dan-api/dummy/brand";
 
 import MUIDataTable from "mui-datatables";
 import EditIcon from "@material-ui/icons/Edit";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import TextField from "@material-ui/core/TextField";
 
 import messageStyles from "dan-styles/Messages.scss";
@@ -21,9 +21,15 @@ import {
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 
-import { getHumanFriendlyDate, smartString } from "../../../utils/common";
+import {
+  getHumanFriendlyDate,
+  isNotEmpty,
+  smartString,
+} from "../../../utils/common";
 import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import METable from "../ME  Tools/table /METable";
 
 class AllTestimonials extends React.Component {
   constructor(props) {
@@ -51,14 +57,20 @@ class AllTestimonials extends React.Component {
 
   fashionData = (data) => {
     return data.map((d) => [
-      getHumanFriendlyDate(d.created_at, true),
+      d.id,
+      getHumanFriendlyDate(d.created_at, false),
       smartString(d.title), // limit to first 30 chars
       { rank: d.rank, id: d.id },
       d.community && d.community.name,
-      { isLive: d.is_approved && d.is_published, item: d },
+      {
+        isLive: d.is_approved && d.is_published,
+        is_approved: d.is_approved,
+        item: d,
+      },
       smartString(d.user ? d.user.full_name : "", 20), // limit to first 20 chars
       smartString((d.action && d.action.title) || "", 30),
       d.id,
+      d.is_approved ? (d.is_published ? "Yes" : "No") : "Not Approved",
     ]);
   };
 
@@ -73,9 +85,24 @@ class AllTestimonials extends React.Component {
     }
   };
 
+  updateTestimonials = (data) => {
+    let allTestimonials = this.props.allTestimonials || [];
+    const index = allTestimonials.findIndex((a) => a.id === data.id);
+    const updateItems = allTestimonials.filter((a) => a.id !== data.id);
+    updateItems.splice(index, 0, data);
+    this.props.putTestimonialsInRedux(updateItems);
+  };
+
   getColumns = () => {
     const { classes } = this.props;
     return [
+      {
+        name: "ID",
+        key: "id",
+        options: {
+          filter: false,
+        },
+      },
       {
         name: "Date",
         key: "date",
@@ -105,14 +132,21 @@ class AllTestimonials extends React.Component {
                 required
                 name="rank"
                 variant="outlined"
-                onChange={async (event) => {
-                  const { target } = event;
+                onBlur={async (event) => {
+                  const { target, key } = event;
                   if (!target) return;
                   const { name, value } = target;
-                  await apiCall("/testimonials.rank", {
-                    testimonial_id: d && d.id,
-                    [name]: value,
-                  });
+                  if (isNotEmpty(value) && value !== String(d.rank)) {
+                    await apiCall("/testimonials.rank", {
+                      testimonial_id: d && d.id,
+                      [name]: value,
+                    }).then((res) => {
+                      if (res && res.success) {
+                 
+                        this.updateTestimonials(res && res.data);
+                      }
+                    });
+                  }
                 }}
                 label="Rank"
                 InputLabelProps={{
@@ -136,20 +170,28 @@ class AllTestimonials extends React.Component {
         key: "is_live",
         options: {
           filter: false,
+          download: false,
           customBodyRender: (d) => {
             return (
               <MEChip
-                onClick={() =>
+                onClick={() => {
+                  if (!d.item.is_approved)
+                    return this.props.history.push(
+                      `/admin/edit/${d.item.id}/testimonial`
+                    );
                   this.props.toggleLive({
                     show: true,
                     component: this.makeLiveUI({ data: d.item }),
                     onConfirm: () => this.makeLiveOrNot(d.item),
                     closeAfterConfirmation: true,
-                  })
+                  });
+                }}
+                style={{ width: !d.is_approved ? 110 : "auto" }}
+                label={
+                  d.is_approved ? (d.isLive ? "Yes" : "No") : "Not Approved"
                 }
-                label={d.isLive ? "Yes" : "No"}
-                className={`${
-                  d.isLive ? classes.yesLabel : classes.noLabel
+                className={`${d.isLive ? classes.yesLabel : classes.noLabel}  ${
+                  !d.is_approved ? "not-approved" : ""
                 } touchable-opacity`}
               />
             );
@@ -187,6 +229,16 @@ class AllTestimonials extends React.Component {
           ),
         },
       },
+      {
+        name: "Live",
+        key: "hidden_live_or_not",
+        options: {
+          display: false,
+          filter: true,
+          searchable: false,
+          download: true,
+        },
+      },
     ];
   };
 
@@ -198,9 +250,11 @@ class AllTestimonials extends React.Component {
     item.is_published = !status;
     data.splice(index, 1, item);
     putInRedux([...data]);
+    const community = item.community;
     apiCall("/testimonials.update", {
       testimonial_id: item.id,
       is_published: !status,
+      community_id: (community && community.id) || null,
     });
   }
 
@@ -222,7 +276,7 @@ class AllTestimonials extends React.Component {
     const itemsInRedux = allTestimonials;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][7];
+      const found = data[d.dataIndex][0];
       ids.push(found);
       apiCall("/testimonials.delete", { testimonial_id: found });
     });
@@ -240,6 +294,21 @@ class AllTestimonials extends React.Component {
       </Typography>
     );
   }
+  getTimeStamp = () => {
+    const today = new Date();
+    let newDate = today;
+    let options = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    };
+
+    return Intl.DateTimeFormat("en-US", options).format(newDate);
+  };
+
   render() {
     const title = brand.name + " - All Testimonials";
     const description = brand.desc;
@@ -250,7 +319,8 @@ class AllTestimonials extends React.Component {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
-      rowsPerPage: 15,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
@@ -260,6 +330,37 @@ class AllTestimonials extends React.Component {
           closeAfterConfirmation: true,
         });
         return false;
+      },
+      customSort: (data, colIndex, order) => {
+        return data.sort((a, b) => {
+          if (colIndex === 3) {
+            return (
+              (a.data[colIndex].rank < b.data[colIndex].rank ? -1 : 1) *
+              (order === "desc" ? 1 : -1)
+            );
+          } else {
+            return (
+              (a.data[colIndex] < b.data[colIndex] ? -1 : 1) *
+              (order === "desc" ? 1 : -1)
+            );
+          }
+        });
+      },
+      downloadOptions: {
+        filename: `All Testimonials (${this.getTimeStamp()}).csv`,
+        separator: ",",
+      },
+      onDownload: (buildHead, buildBody, columns, data) => {
+        let alteredData = data.map((d) => {
+          let content = [...d.data];
+          content[3] = d.data[3].rank;
+          return {
+            data: content,
+            index: d.index,
+          };
+        });
+        let csv = buildHead(columns) + buildBody(alteredData);
+        return csv;
       },
     };
 
@@ -276,7 +377,7 @@ class AllTestimonials extends React.Component {
             <Paper className={classes.root} style={{ padding: 15 }}>
               <div className={classes.root}>
                 <LinearProgress />
-                <h1>Fetching all Events. This may take a while...</h1>
+                <h1>Fetching all Testimonials. This may take a while...</h1>
                 <br />
                 <LinearProgress color="secondary" />
               </div>
@@ -296,15 +397,16 @@ class AllTestimonials extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <div className={classes.table}>
-          {/* {this.showCommunitySwitch()} */}
-          <MUIDataTable
-            title="All Testimonials"
-            data={data}
-            columns={columns}
-            options={options}
-          />
-        </div>
+        <METable
+          classes={classes}
+          page={PAGE_PROPERTIES.ALL_TESTIMONIALS}
+          tableProps={{
+            title: "All Testimonials",
+            data: data,
+            columns: columns,
+            options: options,
+          }}
+        />
       </div>
     );
   }
@@ -336,6 +438,6 @@ function mapDispatchToProps(dispatch) {
 const TestimonialsMapped = connect(
   mapStateToProps,
   mapDispatchToProps
-)(AllTestimonials);
+)(withRouter(AllTestimonials));
 
 export default withStyles(styles)(TestimonialsMapped);
