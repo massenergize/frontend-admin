@@ -23,7 +23,12 @@ import {
   loadAllEvents,
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
-import { findMatchesAndRest, getHumanFriendlyDate, makeDeleteUI, smartString } from "../../../utils/common";
+import {
+  findMatchesAndRest,
+  getHumanFriendlyDate,
+  makeDeleteUI,
+  smartString,
+} from "../../../utils/common";
 import { Chip, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
@@ -182,7 +187,10 @@ class AllEvents extends React.Component {
                     const newEvent =
                       copiedEventResponse && copiedEventResponse.data;
                     this.props.history.push(`/admin/edit/${newEvent.id}/event`);
-                    putEventsInRedux([newEvent, ...(allEvents || [])]);
+                    putEventsInRedux({
+                      items: [newEvent, ...(allEvents || [])],
+                      meta: allEvents.meta,
+                    });
                   }
                 }}
                 to="/admin/read/events"
@@ -200,7 +208,7 @@ class AllEvents extends React.Component {
           display: false,
           filter: true,
           searchable: false,
-          download:true
+          download: true,
         },
       },
       {
@@ -218,12 +226,15 @@ class AllEvents extends React.Component {
 
   makeLiveOrNot(item) {
     const putInRedux = this.props.putEventsInRedux;
-    const data = this.props.allEvents || [];
+    const data = this.props.allEvents.items || [];
     const status = item.is_published;
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
-    putInRedux([...data]);
+    putInRedux({
+      items: [...data],
+      meta: this.props.allEvents.meta,
+    });
     const community = item.community;
     apiCall("/events.update", {
       event_id: item.id,
@@ -255,21 +266,57 @@ class AllEvents extends React.Component {
       apiCall("/events.delete", { event_id: found });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putEventsInRedux(rem);
+    putEventsInRedux({
+      items: rem,
+      meta: allEvents.meta,
+    });
   }
+  callMoreData = (page) => {
+    let { auth, putEventsInRedux, allEvents, community } = this.props;
+    const isSuperAdmin = auth.is_super_admin;
+    var url = isSuperAdmin
+      ? "/events.listForSuperAdmin"
+      : "/events.listForCommunityAdmin";
+    let args = isSuperAdmin
+      ? {}
+      : { community_id: community.id || auth.admin_at[0].id };
+    apiCall(url, {
+      ...args,
+      page: page,
+    }).then((res) => {
+      if (res.success) {
+        let existing = [...allEvents.items];
+        let newList = existing.concat(res.data.items);
+        putEventsInRedux({
+          items: newList,
+          meta: res.data.meta,
+        });
+      }
+    });
+  };
 
   render() {
     const title = brand.name + " - All Events";
     const description = brand.desc;
     const { columns } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.allEvents || []);
+    const { allEvents } = this.props;
+    const data = this.fashionData(allEvents.items || []);
+
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
       rowsPerPage: 25,
+      count: allEvents && allEvents.meta && allEvents.meta.count,
       rowsPerPageOptions: [10, 25, 100],
+      onTableChange: (action, tableState) => {
+        if (action === "changePage") {
+          if (tableState.rowsPerPage * tableState.page === data.length) {
+            this.callMoreData(allEvents.meta.next);
+          }
+        }
+      },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         const [found] = findMatchesAndRest(idsToDelete, (it) => {

@@ -49,7 +49,7 @@ export const makeTagSection = ({
     children: [],
   };
 
-  (collections || []).forEach((tCol) => {
+  ((collections && collections.items) || []).forEach((tCol) => {
     const newField = {
       name: tCol.name,
       label: `${tCol.name} ${
@@ -94,15 +94,18 @@ class EditEventForm extends Component {
     var { rescheduledEvent } = state;
 
     rescheduledEvent = exceptions[id] || rescheduledEvent;
-    const event = (events || []).find((e) => e.id.toString() === id.toString());
+    const event = (events.items || []).find(
+      (e) => e.id.toString() === id.toString()
+    );
     const readOnly = checkIfReadOnly(event, auth);
     const thereIsNothingInEventsExceptionsList = rescheduledEvent === null;
-
     const readyToRenderPageFirstTime =
       events &&
-      events.length &&
+      events.items &&
+      events.items.length &&
       tags &&
-      tags.length &&
+      tags.items &&
+      tags.items.length &&
       (readOnly || rescheduledEvent || thereIsNothingInEventsExceptionsList);
 
     const jobsDoneDontRunWhatsBelowEverAgain =
@@ -110,7 +113,7 @@ class EditEventForm extends Component {
 
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
-    const coms = (communities || []).map((c) => ({
+    const coms = (communities.items || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
@@ -136,15 +139,23 @@ class EditEventForm extends Component {
     };
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     const { id } = this.props.match.params;
     var { event } = this.state;
     const { auth, events, addExceptionsToHeap, heap, exceptions } = this.props;
 
-    event =
-      event || (events || []).find((e) => e.id.toString() === id.toString());
+    const eventResponse = await apiCall("/events.info", {
+      event_id: id,
+    });
+    if (eventResponse && !eventResponse.success) {
+      return;
+    }
+    this.setState({ event: eventResponse.data });
 
-    const readOnly = checkIfReadOnly(event, auth);
+    event =event||
+      (events.items || []).find((e) => e.id.toString() === id.toString())|| eventResponse.data
+
+      const readOnly = checkIfReadOnly(event, auth);
     if (!readOnly) {
       apiCall("events.exceptions.list", { event_id: id })
         .then((json) => {
@@ -181,20 +192,20 @@ class EditEventForm extends Component {
     return (
       <div>
         {event.rsvp_enabled ? (
-        <Paper style={{ padding: 20, marginBottom: 15 }}>
-          <Typography>
-            Would you like to see a list of users who have RSVP-ed for this
-            event?
-          </Typography>
-          <Link
-            to={`/admin/edit/${event && event.id}/event-rsvps`}
-            style={{ marginTop: 6, color: "var(--app-cyan)" }}
-          >
-            See A Full List Here
-          </Link>
-        </Paper>
-        ): null}
-        
+          <Paper style={{ padding: 20, marginBottom: 15 }}>
+            <Typography>
+              Would you like to see a list of users who have RSVP-ed for this
+              event?
+            </Typography>
+            <Link
+              to={`/admin/edit/${event && event.id}/event-rsvps`}
+              style={{ marginTop: 6, color: "var(--app-cyan)" }}
+            >
+              See A Full List Here
+            </Link>
+          </Paper>
+        ) : null}
+
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
@@ -239,7 +250,10 @@ export default withStyles(styles, { withTheme: true })(EditEventMapped);
 
 const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
   const statuses = ["Draft", "Live", "Archived"];
+  console.log("====== event ======", event);
+  console.log("====== communities ======", communities);
   if (!event || !communities) return;
+
   const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Edit Event or Campaign",
@@ -513,13 +527,13 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
                 },
               }
             : {
-              name: "community",
-              label: "Primary Community (select one)",
-              fieldType: "Dropdown",
-              defaultValue: event.community && event.community.id,
-              dbName: "community_id",
-              data: [{ displayName: "--", id: "" }, ...communities],
-            },
+                name: "community",
+                label: "Primary Community (select one)",
+                fieldType: "Dropdown",
+                defaultValue: event.community && event.community.id,
+                dbName: "community_id",
+                data: [{ displayName: "--", id: "" }, ...communities],
+              },
         ],
       },
       {
