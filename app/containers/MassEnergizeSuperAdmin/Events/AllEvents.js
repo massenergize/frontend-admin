@@ -173,7 +173,7 @@ class AllEvents extends React.Component {
           filter: false,
           download: false,
           customBodyRender: (id) => (
-            <div>
+            <div style={{display:'flex'}}>
               <Link to={`/admin/edit/${id}/event`}>
                 <EditIcon size="small" variant="outlined" color="secondary" />
               </Link>
@@ -188,7 +188,7 @@ class AllEvents extends React.Component {
                       copiedEventResponse && copiedEventResponse.data;
                     this.props.history.push(`/admin/edit/${newEvent.id}/event`);
                     putEventsInRedux({
-                      items: [newEvent, ...(allEvents || [])],
+                      items: [newEvent, ...(allEvents.items || [])],
                       meta: allEvents.meta,
                     });
                   }

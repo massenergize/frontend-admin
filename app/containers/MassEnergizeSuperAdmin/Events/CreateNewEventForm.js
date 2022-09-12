@@ -48,7 +48,7 @@ class CreateNewEventForm extends Component {
   static getDerivedStateFromProps = (props) => {
     const { communities, tags, auth } = props;
 
-    const coms = (communities || []).map((c) => ({
+    const coms = (communities.items || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
@@ -59,7 +59,7 @@ class CreateNewEventForm extends Component {
       auth,
     });
 
-    const section = makeTagSection({ collections: tags, defaults: false });
+    const section = makeTagSection({ collections: tags.items, defaults: false });
 
     if (formJson) formJson.fields.splice(1, 0, section);
 
