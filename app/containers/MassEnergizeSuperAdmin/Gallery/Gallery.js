@@ -7,11 +7,13 @@ import {
   reduxFetchImages,
   reduxLoadImageInfos,
   reduxLoadSearchedImages,
+  reduxSetGalleryFilters,
 } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import { SideSheet } from "./SideSheet";
 import { styles } from "./styles";
+import GalleryFilter from "./tools/GalleryFilter";
 import LightAutoComplete from "./tools/LightAutoComplete";
 import { ProgressCircleWithLabel } from "./utils";
 
@@ -34,6 +36,9 @@ function Gallery(props) {
     putSearchResultsInRedux,
     putImageInfoInRedux,
     imageInfos,
+    tags,
+    putFiltersInRedux,
+    galleryFilters,
   } = props;
 
   const getCommunityList = () => {
@@ -201,8 +206,17 @@ function Gallery(props) {
         Manage images for your community
       </Typography>
       <Paper className={classes.container}>
-        <div className={classes.filterBox}>
-          <Typography variant="h6">Filter</Typography>
+        <div className={classes.root}>
+          <GalleryFilter
+            reset={() => putFiltersInRedux({})}
+            scopes={filters}
+            selections={galleryFilters || {}}
+            tags={tags}
+            onChange={(selections) => putFiltersInRedux(selections)}
+          >
+            <Typography variant="h6">Filter</Typography>
+          </GalleryFilter>
+
           <FormControlLabel
             control={
               <Checkbox
@@ -217,6 +231,7 @@ function Gallery(props) {
             }
             label="All communities"
           />
+          {/* </div> */}
           <LightAutoComplete
             onChange={(coms) => {
               setQueryHasChanged(true);
@@ -364,12 +379,15 @@ const mapStateToProps = (state) => ({
   communities: state.getIn(["communities"]),
   searchResults: state.getIn(["searchedImages"]),
   imageInfos: state.getIn(["imageInfos"]),
+  tags: state.getIn(["allTags"]),
+  galleryFilters: state.getIn(["galleryFilters"]),
 });
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       putSearchResultsInRedux: reduxLoadSearchedImages,
       putImageInfoInRedux: reduxLoadImageInfos,
+      putFiltersInRedux: reduxSetGalleryFilters,
     },
     dispatch
   );

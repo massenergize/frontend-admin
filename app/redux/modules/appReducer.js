@@ -33,6 +33,7 @@ import {
   LOAD_ALL_TASKS,
   LOAD_SETTINGS,
   LOAD_FEATURE_FLAGS,
+  SET_GALLERY_FILTERS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -71,6 +72,15 @@ export const reducerForFeatureFlags = (state = LOADING, action = {}) => {
 export const reducerForSettings = (state = null, action = {}) => {
   switch (action.type) {
     case LOAD_SETTINGS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
+export const reducerForGalleryFilters = (state = {}, action = {}) => {
+  switch (action.type) {
+    case SET_GALLERY_FILTERS:
       return action.payload;
     default:
       return state;

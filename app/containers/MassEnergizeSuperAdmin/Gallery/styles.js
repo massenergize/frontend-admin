@@ -11,6 +11,8 @@ export const styles = (theme) => {
       border: "solid 0px #fafafa",
       borderBottomWidth: 2,
       marginBottom: 10,
+      display: "flex",
+      flexDirection: "row",
     },
     button: {
       padding: "10px 40px",
@@ -42,6 +44,71 @@ export const styles = (theme) => {
       justifyContent: "center",
       alignItems: "center",
       width: "100%",
+    },
+  };
+};
+
+export const filterStyles = (theme) => {
+  return {
+    filterFooter: {
+      display: "flex",
+      flexDirection: "row",
+      width: "100%",
+      flex: "2",
+      position: "absolute",
+      bottom: 0,
+    },
+    content: {
+      padding: "20px 15px",
+      overflowY: "scroll",
+      minHeight: 410,
+      maxHeight: 410,
+      marginBottom: 30,
+    },
+    contentArea: {
+      opacity: 0,
+      // height: 300,
+      width: 450,
+      background: "white",
+      marginBottom: 5,
+      position: "absolute",
+      right: 0,
+      top: 40,
+      zIndex: 20,
+      borderBottomRightRadius: 6,
+      borderBottomLeftRadius: 6,
+      boxShadow:
+        "0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12) !important;",
+    },
+    ghostCurtain: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100vw",
+      height: "100vh",
+      background: "white",
+      opacity: 0,
+      zIndex: 19,
+    },
+    root: {
+      display: "flex",
+      flexDirection: "row",
+      position: "relative",
+    },
+    toggleWrapper: {
+      marginLeft: "auto",
+      padding: "6px 10px",
+      borderRadius: 4,
+      cursor: "pointer",
+      display: "inline-flex",
+      flexDirection: "row",
+      "& small": {
+        marginLeft: 5,
+      },
+      "&:hover": {
+        background: "#f6f6f6",
+        transition: ".3s ease-out",
+      },
     },
   };
 };

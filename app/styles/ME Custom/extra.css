@@ -2,10 +2,10 @@
   --app-cyan: #579ece;
 }
 
-.not-approved { 
-  width:110px; 
-  background: #bf0e0e !important; 
-  color:white !important; 
+.not-approved {
+  width: 110px;
+  background: #bf0e0e !important;
+  color: white !important;
 }
 .preview-content {
   margin-left: 30px;
@@ -44,6 +44,17 @@
   align-items: center;
 }
 
-/* .me-chip small {
-  font-size: 11px;
-} */
+.me-fade-in-down {
+  animation: me-fade-down 0.4s forwards;
+  -webkit-animation: me-fade-down 0.4s forwards;
+}
+@keyframes me-fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}

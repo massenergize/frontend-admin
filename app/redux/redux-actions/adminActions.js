@@ -33,6 +33,7 @@ import {
   LOAD_ALL_TASKS,
   LOAD_SETTINGS,
   LOAD_FEATURE_FLAGS,
+  SET_GALLERY_FILTERS,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -45,6 +46,12 @@ export const testRedux = (value) => {
 export const loadSettings = (data = {}) => {
   return {
     type: LOAD_SETTINGS,
+    payload: data,
+  };
+};
+export const reduxSetGalleryFilters = (data = {}) => {
+  return {
+    type: SET_GALLERY_FILTERS,
     payload: data,
   };
 };
