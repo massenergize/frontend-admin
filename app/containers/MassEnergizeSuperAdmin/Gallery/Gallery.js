@@ -50,14 +50,13 @@ function Gallery(props) {
   const [targetComs, setTargetComs] = useState([]);
   const [targetAllComs, setTargetAllComs] = useState(false);
   const [useAllFilters, setAllAsFilter] = useState(false);
-  const [filterOptions, setFilterOptions] = useState([]);
+  const [filterOptions, setFilterOptions] = useState([]); // where selected scope filters are stored
   const [showMoreInfo, setShowMoreInfo] = useState(false);
   const [searching, setSearching] = useState(false);
   const [loadMore, setLoadMore] = useState(false);
   const [queryHasChanged, setQueryHasChanged] = useState(false);
   const [noResults, setNoResults] = useState(false);
   const [oneImageInfo, setOneImageInfo] = useState(null);
-
   const deleteImage = (id, cb) => {
     if (!id) return;
     apiCall("/gallery.remove", { media_id: id })
@@ -128,15 +127,19 @@ function Gallery(props) {
   };
 
   const makeRequestBody = (extraParams = {}) => {
+    const filters = galleryFilters || {};
+    const scope = (filters.scope || []).filter((f) => f !== "all"); // "all" only helps us know to select all other scopes. So during API request, that's not needed anymore
     return {
       any_community: targetAllComs,
       target_communities: targetComs,
-      filters: filterOptions,
+      filters: scope,
+      tags: JSON.stringify(filters.tags || []),
       ...extraParams,
     };
   };
   const runSearch = () => {
     const form = makeRequestBody();
+    console.log("le form", form); // REMOVE THIS BEFORE PR
     fetchContent(form);
   };
 
@@ -145,6 +148,18 @@ function Gallery(props) {
     if (auth.is_super_admin) setTargetComs([]);
     else if (auth.is_community_admin) setTargetComs(getCommunityList());
     setTargetAllComs((prev) => !prev);
+  };
+
+  const handleFilterOnChange = (selections) => {
+    const _filters = selections.scope || [];
+    const wantsFromAllScopes = _filters.find((f) => f === "all");
+    var selected = [];
+    // If the user selectes "all", auto select all availabled scopes
+    if (wantsFromAllScopes) {
+      selected = filters.map((f) => f.value);
+      selected = ["all", ...selected];
+    } else selected = [..._filters];
+    putFiltersInRedux({ ...selections, scope: selected });
   };
 
   const selectAllFilters = () => {
@@ -209,10 +224,14 @@ function Gallery(props) {
         <div className={classes.root}>
           <GalleryFilter
             reset={() => putFiltersInRedux({})}
-            scopes={filters}
+            scopes={[{ name: "All", value: "all" }, ...filters]}
             selections={galleryFilters || {}}
             tags={tags}
-            onChange={(selections) => putFiltersInRedux(selections)}
+            apply={() => runSearch()}
+            onChange={(selections) => {
+              handleFilterOnChange(selections);
+              // putFiltersInRedux(selections);
+            }}
           >
             <Typography variant="h6">Filter</Typography>
           </GalleryFilter>
@@ -267,7 +286,7 @@ function Gallery(props) {
               }
               label="All"
             />
-            {filters.map((opt, ind) => {
+            {/* {filters.map((opt, ind) => {
               return (
                 <FormControlLabel
                   key={ind.toString()}
@@ -285,7 +304,7 @@ function Gallery(props) {
                   disabled={useAllFilters}
                 />
               );
-            })}
+            })} */}
             <Button
               variant="contained"
               color="secondary"

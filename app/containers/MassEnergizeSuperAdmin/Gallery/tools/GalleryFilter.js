@@ -10,6 +10,7 @@ function GalleryFilter({
   onChange,
   selections,
   reset,
+  apply,
 }) {
   const [showDrop, setShowDrop] = useState(true);
   // const [filters, setfilters] = useState(selections || {});
@@ -85,6 +86,7 @@ function GalleryFilter({
                 Reset
               </Button>
               <Button
+                onClick={() => apply && apply()}
                 variant="contained"
                 color="secondary"
                 style={{
