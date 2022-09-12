@@ -52,7 +52,7 @@ class AllCommunityAdminMessages extends React.Component {
     }
   };
 
-  fashionData = (data) => {
+  fashionData = (data=[]) => {
     return data.map((d) => [
       d.id,
       getHumanFriendlyDate(d.created_at, true),
@@ -67,8 +67,8 @@ class AllCommunityAdminMessages extends React.Component {
 
   getColumns = (classes) => [
     {
-      name: 'ID',
-      key: 'id',
+      name: "ID",
+      key: "id",
       options: {
         filter: false,
       },
@@ -145,8 +145,7 @@ class AllCommunityAdminMessages extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { messages, putMessagesInRedux } = this.props;
-    // return
-    const itemsInRedux = messages;
+    const itemsInRedux = messages && messages.items;
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
@@ -154,7 +153,10 @@ class AllCommunityAdminMessages extends React.Component {
       apiCall("/messages.delete", { message_id: found });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putMessagesInRedux(rem);
+    putMessagesInRedux({
+      items: rem,
+      meta: messages.meta,
+    });
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -167,18 +169,43 @@ class AllCommunityAdminMessages extends React.Component {
       </Typography>
     );
   }
+  callMoreData = (page) => {
+    let { putMessagesInRedux, messages } = this.props;
+    var url = "/messages.listForCommunityAdmin";
+    apiCall(url, {
+      page: page,
+    }).then((res) => {
+      if (res.success) {
+        let existing = [...messages.items];
+        let newList = existing.concat(res.data.items);
+        putMessagesInRedux({
+          items: newList,
+          meta: res.data.meta,
+        });
+      }
+    });
+  };
   render() {
     const title = brand.name + " - Community Admin Messages";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes } = this.props;
-    const data = this.fashionData(this.props.messages); // not ready for this yet: && this.props.messages.filter(item=>item.parent===null));
+    const { classes, messages } = this.props;
+    const data = this.fashionData(messages && messages.items); // not ready for this yet: && this.props.messages.filter(item=>item.parent===null));
+    const metaData = messages && messages.meta;
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
+      count: metaData && metaData.count,
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
+      onTableChange: (action, tableState) => {
+        if (action === "changePage") {
+          if (tableState.rowsPerPage * tableState.page === data.length) {
+            this.callMoreData(metaData.next);
+          }
+        }
+      },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({

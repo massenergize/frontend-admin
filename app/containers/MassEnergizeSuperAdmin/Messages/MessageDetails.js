@@ -57,7 +57,7 @@ class MessageDetails extends Component {
     const { messages, teamMessages, match } = props;
     const { id } = match.params;
     if (state.message === undefined) {
-      const msg = [...(messages || []), ...(teamMessages || [])].find(
+      const msg = [...(messages.items || []), ...(teamMessages.items || [])].find(
         (m) => m.id === id
       );
       return { message: msg || null, loading: false };

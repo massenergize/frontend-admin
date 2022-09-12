@@ -34,7 +34,10 @@ class AllTeamAdminMessages extends React.Component {
     apiCall("/messages.listTeamAdminMessages").then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
         this.props.putTeamMessagesInRedux(allMessagesResponse.data);
-        let hasItems = allMessagesResponse.data && allMessagesResponse.data.length>0;
+        let hasItems =
+          allMessagesResponse.data &&
+          allMessagesResponse.data.items &&
+          allMessagesResponse.data.items.length > 0;
         this.setState({ hasNoItems: !hasItems });
       }
     });
@@ -63,8 +66,8 @@ class AllTeamAdminMessages extends React.Component {
 
   getColumns = (classes) => [
     {
-      name: 'ID',
-      key: 'id',
+      name: "ID",
+      key: "id",
       options: {
         filter: false,
       },
@@ -149,7 +152,7 @@ class AllTeamAdminMessages extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { teamMessages, putTeamMessagesInRedux } = this.props;
-    const itemsInRedux = teamMessages;
+    const itemsInRedux = teamMessages && teamMessages.items;
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
@@ -157,7 +160,10 @@ class AllTeamAdminMessages extends React.Component {
       apiCall("/messages.delete", { message_id: found });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putTeamMessagesInRedux(rem);
+    putTeamMessagesInRedux({
+      items: rem,
+      meta: teamMessages.meta,
+    });
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -170,18 +176,44 @@ class AllTeamAdminMessages extends React.Component {
       </Typography>
     );
   }
+  callMoreData = (page) => {
+    let { putTeamMessagesInRedux, teamMessages } = this.props;
+    var url = "/messages.listTeamAdminMessages";
+    apiCall(url, {
+      page: page,
+    }).then((res) => {
+      if (res.success) {
+        let existing = [...teamMessages.items];
+        let newList = existing.concat(res.data.items);
+        putTeamMessagesInRedux({
+          items: newList,
+          meta: res.data.meta,
+        });
+      }
+    });
+  };
+
   render() {
     const title = brand.name + " - Team Admin Messages";
     const description = brand.desc;
     const { columns } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.teamMessages);
+    const data = this.fashionData(this.props.teamMessages.items);
+    const metaData = this.props.teamMessages.meta;
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
+      count: metaData && metaData.count,
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
+      onTableChange: (action, tableState) => {
+        if (action === "changePage") {
+          if (tableState.rowsPerPage * tableState.page === data.length) {
+            this.callMoreData(metaData.next);
+          }
+        }
+      },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
@@ -195,7 +227,7 @@ class AllTeamAdminMessages extends React.Component {
     };
 
     if (!data || !data.length) {
-      if(this.state.hasNoItems){
+      if (this.state.hasNoItems) {
         return (
           <Grid
             container
