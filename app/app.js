@@ -41,12 +41,12 @@ import { IS_CANARY, IS_PROD } from './config/constants';
 import * as Sentry from "@sentry/react";
 import { BrowserTracing } from "@sentry/tracing";
 
-const SENTRY_DSN = IS_PROD || IS_CANARY? process.env.REACT_APP_SENTRY_PROD_DSN: process.env.REACT_APP_SENTRY_DEV_DSN;
+// const SENTRY_DSN = IS_PROD || IS_CANARY? process.env.REACT_APP_SENTRY_PROD_DSN: process.env.REACT_APP_SENTRY_DEV_DSN;
 
-Sentry.init({
-  dsn: SENTRY_DSN,
-  integrations: [new BrowserTracing()],
-});
+// Sentry.init({
+//   dsn: SENTRY_DSN,
+//   integrations: [new BrowserTracing()],
+// });
 
 // Create redux store with history
 const initialState = {};

@@ -279,19 +279,45 @@ class AllTeams extends React.Component {
       </Typography>
     );
   }
+  callMoreData = (page) => {
+    let { putTeamsInRedux, allTeams, auth } = this.props;
+    let isSuperAdmin = auth.is_super_admin;
+    var url = isSuperAdmin ? "/teams.listForSuperAdmin" : "/teams.listForCommunityAdmin"
+    apiCall(url, {
+      page: page,
+    }).then((res) => {
+      if (res.success) {
+        let existing = [...allTeams.items];
+        let newList = existing.concat(res.data.items);
+        putTeamsInRedux({
+          items: newList,
+          meta: res.data.meta,
+        });
+      }
+    });
+  };
 
   render() {
     const title = brand.name + " - All Teams";
     const description = brand.desc;
     const { columns } = this.state;
-    const data = this.fashionData(this.props.allTeams);
-    const { classes } = this.props;
+    const { classes, allTeams } = this.props;
+    const data = this.fashionData(allTeams && allTeams.items);
+    const metaData = allTeams && allTeams.meta;
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
       rowsPerPage: 25,
+      count: metaData && metaData.count,
       rowsPerPageOptions: [10, 25, 100],
+      onTableChange: (action, tableState) => {
+        if (action === "changePage") {
+          if (tableState.rowsPerPage * tableState.page === data.length) {
+            this.callMoreData(metaData.next);
+          }
+        }
+      },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({

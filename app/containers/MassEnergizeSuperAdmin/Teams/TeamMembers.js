@@ -82,7 +82,7 @@ class TeamMembers extends React.Component {
     const { teams, match, members } = props;
     const { id } = match.params;
     if (state.team === undefined) {
-      const team = (teams || []).find((t) => t.id === id);
+      const team = (teams && teams.items || []).find((t) => t.id === id);
       return { team, allTeamMembers: (members || {})[id] };
     }
 
@@ -104,7 +104,7 @@ class TeamMembers extends React.Component {
       await this.setStateAsync({
         loading: false,
         allTeamMembers: allTeamMembersResponse.data,
-        data: this.fashionData(allTeamMembersResponse.data),
+        data: this.fashionData(allTeamMembersResponse.data.items),
       });
       addToHeap({
         ...heap,

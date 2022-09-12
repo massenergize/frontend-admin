@@ -39,7 +39,7 @@ const styles = (theme) => ({
 });
 
 const makeParentOptions = ({ teams, team }) => {
-  teams = teams || [];
+  teams = teams.items || [];
   var parentTeamOptions = "0";
   const parentTeams =
     teams.filter((_team) => _team.parent && _team.parent.id === team.id)
@@ -81,20 +81,20 @@ class EditTeam extends Component {
   static getDerivedStateFromProps(props, state) {
     var { match, communities, teams, teamsInfos } = props;
     const { id } = match.params;
-    communities = (communities || []).map((c) => ({
+    communities = (communities.items || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
     }));
     const team = teamsInfos[id.toString()];
-    const readyToRenderThePageFirstTime = team && teams && teams.length;
+    const readyToRenderThePageFirstTime = team && teams && teams.items && teams.items.length;
     const jobsDoneDontRunWhatsBelow =
       !readyToRenderThePageFirstTime || state.mounted;
 
     if (jobsDoneDontRunWhatsBelow) return null;
 
     if (team)
-      teams = teams.filter(
+      teams = teams && teams.items.filter(
         (t) => t.primary_community.id === team.primary_community.id
       );
     const parentTeamOptions = makeParentOptions({ teams, team });
