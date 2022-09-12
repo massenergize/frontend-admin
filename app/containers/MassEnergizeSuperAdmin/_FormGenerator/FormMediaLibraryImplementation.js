@@ -15,10 +15,11 @@ import { Checkbox, FormControlLabel, Typography } from "@material-ui/core";
 import { makeLimitsFromImageArray } from "../../../utils/common";
 import { ProgressCircleWithLabel } from "../Gallery/utils";
 import { getMoreInfoOnImage } from "../Gallery/Gallery";
+import { Link } from "react-router-dom";
 
 export const FormMediaLibraryImplementation = (props) => {
   const { fetchImages, auth, imagesObject, putImagesInRedux, selected } = props;
-  const [available, setAvailable] = useState(false);
+  const [available, setAvailable] = useState(auth && auth.is_super_admin);
 
   const loadMoreImages = (cb) => {
     if (!auth) return console.log("It does not look like you are signed in...");
@@ -126,24 +127,34 @@ export default connect(
 
 const UploadIntroductionComponent = ({ auth, setAvailableTo, available }) => {
   const comms = (auth.admin_at || []).map((c) => c.name).join(", ");
+  const is_community_admin =
+    auth && auth.is_community_admin && !auth.is_super_admin;
+
   return (
     <div>
-      {comms && (
+      {comms && is_community_admin && (
         <>
           <div>
             The images you upload here will be available to <b>{comms}</b>{" "}
           </div>
-          <FormControlLabel
-            label="Make the image(s) available to other communities"
-            control={
-              <Checkbox
-                checked={available}
-                onChange={() => setAvailableTo(!available)}
-              />
-            }
-          />
         </>
       )}
+      {is_community_admin && (
+        <FormControlLabel
+          label="Make the image(s) available to other communities"
+          control={
+            <Checkbox
+              checked={available}
+              onChange={() => setAvailableTo(!available)}
+            />
+          }
+        />
+      )}
+      <div>
+        <Link to="/admin/gallery/add">
+          Upload an image for specific communities instead
+        </Link>
+      </div>
     </div>
   );
 };

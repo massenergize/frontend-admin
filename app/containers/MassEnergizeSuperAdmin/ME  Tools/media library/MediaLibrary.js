@@ -4,7 +4,12 @@ import "./MediaLibrary.css";
 import MLButton from "./shared/components/button/MLButton";
 import MediaLibraryModal from "./shared/components/library modal/MediaLibraryModal";
 import ImageThumbnail from "./shared/components/thumbnail/ImageThumbnail";
-import { libraryImage, TABS } from "./shared/utils/values";
+import {
+  DEFFAULT_MAX_SIZE,
+  IMAGE_QUALITY,
+  libraryImage,
+  TABS,
+} from "./shared/utils/values";
 import { EXTENSIONS } from "./shared/utils/utils";
 
 function MediaLibrary(props) {
@@ -20,7 +25,6 @@ function MediaLibrary(props) {
     defaultTab,
     dragToOrder,
   } = props;
-
   const [show, setShow] = useState(openState);
   const [imageTray, setTrayImages] = useState(selected);
   const [state, setState] = useState({});
@@ -88,6 +92,10 @@ function MediaLibrary(props) {
 
     return [...isNotThere, ...images];
   };
+  const close = () => {
+    setShow(false);
+    setFiles([]);
+  };
 
   const swapPositions = () => {
     const prev = oldPosition.current;
@@ -105,7 +113,7 @@ function MediaLibrary(props) {
           <MediaLibraryModal
             {...props}
             images={preselectDefaultImages()}
-            close={() => setShow(false)}
+            close={close}
             getSelected={handleSelected}
             selected={imageTray}
             cropLoot={cropLoot}
@@ -343,6 +351,23 @@ MediaLibrary.propTypes = {
    */
   sideExtraComponent: PropTypes.func,
   dragToOrder: PropTypes.bool,
+
+  /**
+   * This boolean turned on will force large images to be resized by slightly reducing the image quality
+   *
+   */
+  compress: PropTypes.bool,
+
+  /**
+   * This string could be "LOW,MEDIUM or HGH" and indicates the extent that images should be compressed
+   * when compression is turned on. Default value is set to MEDIUM quality
+   */
+  compressedQuality: PropTypes.string,
+  /**
+   * Maximum size that an image should be. If a selected image exceeds this number, and the "compress" value
+   * is true, the image will be reduced to a lower quality before uploading
+   */
+  maximumImageSize: PropTypes.number,
 };
 
 MediaLibrary.Button = MLButton;
@@ -352,6 +377,7 @@ MediaLibrary.AcceptedFileTypes = {
   Images: ["image/jpg", "image/png", "image/jpeg"].join(", "),
   All: EXTENSIONS.join(", "),
 };
+MediaLibrary.CompressedQuality = IMAGE_QUALITY;
 MediaLibrary.defaultProps = {
   multiple: true,
   uploadMultiple: false,
@@ -364,6 +390,9 @@ MediaLibrary.defaultProps = {
   useAwait: false,
   awaitSeconds: 500,
   allowCropping: true,
-  dragToOrder: true,
+  dragToOrder: false,
+  compress: true,
+  compressedQuality: IMAGE_QUALITY.MEDIUM.key,
+  maximumImageSize: DEFFAULT_MAX_SIZE,
 };
 export default MediaLibrary;

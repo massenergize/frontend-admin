@@ -56,8 +56,6 @@ import {
   EditPolicy,
   UsersList,
   ImpactPage,
-  RegisterPage,
-  SigninPage,
   Impact,
   ImportContacts,
   AddCarbonEquivalency,
@@ -101,7 +99,7 @@ class Application extends React.Component {
       const currentDateTime = Date.now();
       const itsPassedADaySinceLogin = currentDateTime > expirationTime;
       if (itsPassedADaySinceLogin) this.runAdminStatusCheck();
-    }, 2000||THREE_MINUTES);
+    }, THREE_MINUTES);
   }
 
   getCommunityList() {
@@ -349,8 +347,6 @@ class Application extends React.Component {
           <Route path="/admin/edit/:id/events" component={EventsPage} />
           <Route path="/admin/edit/:id/teams" component={TeamsPage} />
           <Route path="/admin/edit/:id/vendors" component={VendorsPage} />
-          <Route path="/admin/edit/:id/signin" component={SigninPage} />
-          <Route path="/admin/edit/:id/registration" component={RegisterPage} />
           <Route
             path="/admin/edit/:id/testimonials"
             component={TestimonialsPage}

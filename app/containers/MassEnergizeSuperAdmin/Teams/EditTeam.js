@@ -188,7 +188,6 @@ const createFormJson = ({ communities, team, parentTeamOptions }) => {
             placeholder: "eg. id",
             fieldType: "TextField",
             contentType: "text",
-            isRequired: true,
             defaultValue: team.id,
             dbName: "id",
             readOnly: true,
