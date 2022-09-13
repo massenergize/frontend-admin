@@ -12,7 +12,7 @@ function GalleryFilter({
   reset,
   apply,
 }) {
-  const [showDrop, setShowDrop] = useState(true);
+  const [showDrop, setShowDrop] = useState(true); // CHANGE THIS TO FALSE BEFORE PR
   // const [filters, setfilters] = useState(selections || {});
 
   console.log("Whats in", selections);

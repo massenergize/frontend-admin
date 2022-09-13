@@ -9,9 +9,8 @@ import { Radio } from "@material-ui/core";
 import { FormControlLabel } from "@material-ui/core";
 import { TextField } from "@material-ui/core";
 import { bindActionCreators } from "redux";
-import {
-  reduxCallLibraryModalImages,
-} from "../../../redux/redux-actions/adminActions";
+import { reduxCallLibraryModalImages } from "../../../redux/redux-actions/adminActions";
+import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 const styles = (theme) => {
   const spacing = theme.spacing.unit;
   const error = {
@@ -59,12 +58,15 @@ function AddToGallery(props) {
     loadMoreModalImages,
     loadModalImages,
     modalImages,
+    tags,
   } = props;
 
   const [chosenComs, setChosenComs] = useState([]);
   const [scope, setScope] = useState(CHOICES.SPECIFIC);
   const [state, setState] = useState(defaultState);
   const [resetAutoComplete, setResetorForAutoComplete] = useState(null);
+  const [showTagAddingBox, setShowTagAddingBox] = useState(true); // SET THIS TO FALSE BEFORE PR
+  const [addedTags, setAddedTags] = useState({});
   const superAdmin = auth && auth.is_super_admin;
 
   const getCommunityList = () => {
@@ -97,6 +99,9 @@ function AddToGallery(props) {
   };
 
   const onUpload = (files, reset, closeModal) => {
+    let tags = Object.entries(addedTags).map(([_, _tags]) => _tags);
+    let spread = [];
+    for (let _tags of tags) spread = [...spread, ..._tags];
     const apiJson = {
       user_id: auth.id,
       file: files[0] || null, // TODO: allow multiple
@@ -104,6 +109,7 @@ function AddToGallery(props) {
       is_universal: scope === CHOICES.ALL,
       scope: scope,
       title: state.title,
+      tags: spread,
     };
 
     apiCall(UPLOAD_URL, apiJson)
@@ -214,6 +220,29 @@ function AddToGallery(props) {
         value={state.title || ""}
         inputProps={{ maxLength: 30 }}
       />
+
+      <Typography
+        className="touchable-opacity"
+        variant="body1"
+        style={{
+          fontWeight: "bold",
+          cursor: "pointer",
+          marginBottom: 10,
+          display: "inline-block",
+        }}
+        color="secondary"
+        onClick={() => setShowTagAddingBox(!showTagAddingBox)}
+      >
+        <i className="fa fa-plus" style={{ marginRight: 5 }} />
+        Would you like to add tags to your image?
+      </Typography>
+      {showTagAddingBox && (
+        <AddTags
+          tags={tags}
+          handleOnChange={setAddedTags}
+          selections={addedTags}
+        />
+      )}
       <MediaLibrary
         onUpload={onUpload}
         actionText="Add to Library"
@@ -243,6 +272,7 @@ const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   communities: state.getIn(["communities"]),
   modalImages: state.getIn(["modalLibraryImages"]),
+  tags: state.getIn(["allTags"]),
 });
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
@@ -258,3 +288,35 @@ const GalleryWithProps = connect(
   mapDispatchToProps
 )(AddToGallery);
 export default withStyles(styles)(GalleryWithProps);
+
+const AddTags = ({ tags, selections, handleOnChange }) => {
+  if (!tags) return <></>;
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <div>
+        {(tags || []).map((collection) => {
+          return (
+            <>
+              <div>
+                <small>{collection.name}</small>
+              </div>
+              <MEDropdown
+                data={collection.tags || []}
+                valueExtractor={(it) => it.id}
+                labelExtractor={(it) => it.name}
+                defaultValue={selections[collection.id.toString()] || []}
+                onItemSelected={(items) => {
+                  handleOnChange({
+                    ...(selections || {}),
+                    [collection.id.toString()]: items,
+                  });
+                }}
+                multiple
+              />
+            </>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
