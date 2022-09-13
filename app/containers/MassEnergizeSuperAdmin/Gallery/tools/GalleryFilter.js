@@ -38,7 +38,16 @@ function GalleryFilter({
           />
           <div className={`${classes.contentArea} me-fade-in-down`}>
             <div className={classes.content}>
-              <small>Scope</small>
+              <div className={classes.dropdownTop}>
+                <small>Scope</small>
+                <small
+                  onClick={() => handleChange("scope", [])}
+                  className={classes.resetOneFilter}
+                >
+                  Reset
+                </small>
+              </div>
+
               <MEDropdown
                 defaultValue={selections["scope"]}
                 data={scopes}
@@ -52,7 +61,22 @@ function GalleryFilter({
                 const defaults = selections["tags"] || {};
                 return (
                   <>
-                    <small>{collection.name}</small>
+                    <div className={classes.dropdownTop}>
+                      <small>{collection.name}</small>
+                      <small
+                        onClick={() => {
+                          const filters = selections["tags"];
+                          handleChange("tags", {
+                            ...(filters || {}),
+                            [collection.id.toString()]: [],
+                          });
+                        }}
+                        className={classes.resetOneFilter}
+                      >
+                        Reset
+                      </small>
+                    </div>
+
                     <MEDropdown
                       data={collection.tags || []}
                       valueExtractor={(it) => it.id}
@@ -86,7 +110,10 @@ function GalleryFilter({
                 Reset
               </Button>
               <Button
-                onClick={() => apply && apply()}
+                onClick={() => {
+                  apply && apply();
+                  setShowDrop(false);
+                }}
                 variant="contained"
                 color="secondary"
                 style={{

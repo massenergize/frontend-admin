@@ -129,11 +129,17 @@ function Gallery(props) {
   const makeRequestBody = (extraParams = {}) => {
     const filters = galleryFilters || {};
     const scope = (filters.scope || []).filter((f) => f !== "all"); // "all" only helps us know to select all other scopes. So during API request, that's not needed anymore
+    // ------------------------------------------
+    const tags = Object.entries(filters.tags || []).map(([_, _tags]) => _tags);
+    console.log("AND THE TAGS OF THE YEAR GOES TO", tags); // REmove this before PR
+    let spread = [];
+    for (let arr of tags) spread = [...spread, ...arr];
+    // ------------------------------------------
     return {
       any_community: targetAllComs,
-      target_communities: targetComs,
+      target_communities: (targetComs || []).map((c) => c.id),
       filters: scope,
-      tags: JSON.stringify(filters.tags || []),
+      tags: spread,
       ...extraParams,
     };
   };
@@ -159,6 +165,7 @@ function Gallery(props) {
       selected = filters.map((f) => f.value);
       selected = ["all", ...selected];
     } else selected = [..._filters];
+    setQueryHasChanged(true);
     putFiltersInRedux({ ...selections, scope: selected });
   };
 
@@ -184,12 +191,17 @@ function Gallery(props) {
 
   useEffect(() => {
     // run a general query to retrieve images onload, if there is no content yet
-    if (!searchResults || !searchResults.images)
+
+    if (!searchResults || !searchResults.images) {
+      var scope = filters.map((f) => f.value);
       fetchContent({
         any_community: true,
         target_communities: getCommunityList().map((com) => com.id),
-        filters: filters.map((f) => f.value),
+        filters: scope,
       });
+      scope = ["all", ...scope];
+      putFiltersInRedux({ scope });
+    }
 
     return () => fetchController.abort();
   }, []);
@@ -264,7 +276,7 @@ function Gallery(props) {
             defaultSelected={targetComs}
             allowChipRemove={!targetAllComs}
           />
-          <div
+          {/* <div
             style={{
               display: "flex",
               flexDirection: "row",
@@ -286,7 +298,7 @@ function Gallery(props) {
               }
               label="All"
             />
-            {/* {filters.map((opt, ind) => {
+            {filters.map((opt, ind) => {
               return (
                 <FormControlLabel
                   key={ind.toString()}
@@ -304,7 +316,7 @@ function Gallery(props) {
                   disabled={useAllFilters}
                 />
               );
-            })} */}
+            })}
             <Button
               variant="contained"
               color="secondary"
@@ -315,7 +327,7 @@ function Gallery(props) {
               <Icon style={{ fontSize: 15 }}>search</Icon>
               Search
             </Button>
-          </div>
+          </div> */}
         </div>
         <div>
           {/*------------------------------- IMAGES --------------------------  */}
@@ -357,6 +369,7 @@ export const LoadMoreContainer = ({
       color="secondary"
       style={{
         width: "100%",
+
         margin: 6,
         borderRadius: 4,
         marginTop: 20,

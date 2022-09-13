@@ -50,6 +50,19 @@ export const styles = (theme) => {
 
 export const filterStyles = (theme) => {
   return {
+    dropdownTop: {
+      width: "100%",
+      display: "flex",
+      flexDirection: "row",
+      marginTop: 10,
+    },
+    resetOneFilter: {
+      marginLeft: "auto",
+      color: "#c17272",
+      textDecoration: "underline",
+      cursor: "pointer",
+      marginRight: 15,
+    },
     filterFooter: {
       display: "flex",
       flexDirection: "row",
