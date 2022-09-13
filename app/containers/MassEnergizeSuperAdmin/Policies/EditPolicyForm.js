@@ -108,7 +108,6 @@ class EditPolicyForm extends Component {
               placeholder: 'eg. 1',
               fieldType: 'TextField',
               contentType: 'text',
-              isRequired: true,
               defaultValue: policy && policy.id,
               dbName: 'policy_id',
               readOnly: true
