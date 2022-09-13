@@ -283,27 +283,39 @@ module.exports = [
       },
     ],
   },
-  //{
-  //  key: "tasks",
-  //  name: "Tasks",
-  //  icon: "md-refresh",
-  //  child: [
-  //    {
-  //      key: "create-tasks",
-  //      name: "Add New task",
-  //      link: "/admin/tasks/add",
-  //    },
-  //    {
-  //      key: "all-tasks",
-  //      name: "All Tasks",
-  //      link: "/admin/read/tasks",
-  //    },
-  //  ],
-  //},
-  //{
-  //  key: "settings",
-  //  name: "Settings",
-  //  icon: "md-cog",
-  //  link: "/admin/profile/settings"
-  //},
+  {
+    key: "tasks",
+    name: "Tasks",
+    icon: "md-refresh",
+    child: [
+      {
+        key: "create-tasks",
+        name: "Add New task",
+        link: "/admin/tasks/add",
+      },
+      {
+        key: "all-tasks",
+        name: "All Tasks",
+        link: "/admin/read/tasks",
+      },
+    ],
+  },
+  {
+    key: "settings",
+    name: "Settings",
+    icon: "md-cog",
+    child: [ 
+      {
+        key:"settings-page",
+        link: "/admin/profile/settings",
+        name:"Settings"
+      },
+      {
+        key: "feature-flags",
+        link: "/admin/settings/feature-flags",
+        name:"Feature Flags"
+      },
+    ]
+   
+  },
 ];

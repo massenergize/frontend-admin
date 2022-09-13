@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import states from "dan-api/data/states";
 import { withStyles } from "@material-ui/core/styles";
-import { apiCall } from "../../../utils/messenger";
+import moment from "moment";
 import MassEnergizeForm from "../_FormGenerator";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
 import { makeTagSection } from "./EditEventForm";
@@ -76,7 +76,11 @@ class CreateNewEventForm extends Component {
     if (!formJson) return <Loading />;
     return (
       <div key={this.state.reRenderKey}>
-        <MassEnergizeForm classes={classes} formJson={formJson} />
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+          validator={validator}
+        />
       </div>
     );
   }
@@ -98,6 +102,26 @@ const CreateEventMapped = connect(mapStateToProps)(CreateNewEventForm);
 
 export default withStyles(styles, { withTheme: true })(CreateEventMapped);
 
+const validator = (cleaned) => {
+  const start = (cleaned || {})["start_date_and_time"];
+  const end = (cleaned || {})["end_date_and_time"];
+  console.log(start, end)
+  const endDateComesLater = new Date(end) > new Date(start);
+  return [
+    endDateComesLater,
+    !endDateComesLater &&
+      "Please provide an end date that comes later than your start date",
+  ];
+};
+const prefillEndDate = (formData, field) => {
+  formData = formData || {};
+  const start = formData["start_date_and_time"] || "";
+  const end = formData["end_date_and_time"] || "";
+  const endValueIsStillDefault =
+    end.toString() === field.defaultValue.toString();
+  if (endValueIsStillDefault) return moment(start).add(1, "hours");
+  return end;
+};
 const createFormJson = ({ communities, auth }) => {
   // const { communities } = this.state;
   const is_super_admin = auth && auth.is_super_admin;
@@ -151,9 +175,9 @@ const createFormJson = ({ communities, auth }) => {
             placeholder: "YYYY-MM-DD HH:MM",
             fieldType: "DateTime",
             contentType: "text",
-            isRequired: true,
-            defaultValue: "",
+            defaultValue: moment().startOf("hour"),
             dbName: "start_date_and_time",
+            minDate: moment().startOf("hour"),
             readOnly: false,
           },
           {
@@ -162,9 +186,10 @@ const createFormJson = ({ communities, auth }) => {
             placeholder: "YYYY-MM-DD HH:MM",
             fieldType: "DateTime",
             contentType: "text",
-            isRequired: true,
-            defaultValue: "",
+            valueExtractor: prefillEndDate,
+            defaultValue: moment().startOf("hour").add(1,"hours"),
             dbName: "end_date_and_time",
+            minDate: moment().startOf("hour"),
             readOnly: false,
           },
           {
@@ -283,13 +308,13 @@ const createFormJson = ({ communities, auth }) => {
                 },
               }
             : {
-              name: "community",
-              label: "Primary Community (select one)",
-              fieldType: "Dropdown",
-              defaultValue: communities[0].id,
-              dbName: "community_id",
-              data: [{ displayName: "--", id: "" }, ...communities],
-            },
+                name: "community",
+                label: "Primary Community (select one)",
+                fieldType: "Dropdown",
+                defaultValue: communities[0] && communities[0].id,
+                dbName: "community_id",
+                data: [{ displayName: "--", id: "" }, ...communities],
+              },
         ],
       },
       {

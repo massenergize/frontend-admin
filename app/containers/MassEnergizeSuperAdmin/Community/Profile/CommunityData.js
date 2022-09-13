@@ -94,7 +94,6 @@ class CommunityData extends Component {
             placeholder: 'eg. 10',
             fieldType: 'TextField',
             contentType: 'number',
-            isRequired: true,
             defaultValue: d.value,
             dbName: `value_${d.id}`,
             readOnly: true

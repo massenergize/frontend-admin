@@ -2,6 +2,12 @@ import React from "react";
 import Loading from "dan-components/Loading";
 import loadable from "../utils/loadable";
 
+export const FeatureFlags = loadable(
+  () => import("./MassEnergizeSuperAdmin/Feature Flags/FeatureFlags"),
+  {
+    fallback: <Loading />,
+  }
+);
 export const Settings = loadable(
   () => import("./MassEnergizeSuperAdmin/Settings/Settings"),
   {
@@ -87,20 +93,6 @@ export const TeamsPage = loadable(
 // Testimonials page settings
 export const TestimonialsPage = loadable(
   () => import("./MassEnergizeSuperAdmin/Pages/Testimonials"),
-  {
-    fallback: <Loading />,
-  }
-);
-// Register page settings
-export const RegisterPage = loadable(
-  () => import("./MassEnergizeSuperAdmin/Pages/Register"),
-  {
-    fallback: <Loading />,
-  }
-);
-// Signin page settings
-export const SigninPage = loadable(
-  () => import("./MassEnergizeSuperAdmin/Pages/Signin"),
   {
     fallback: <Loading />,
   }

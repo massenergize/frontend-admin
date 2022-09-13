@@ -222,7 +222,7 @@ const createFormJson = ({ communities, actions, vendors }) => {
             placeholder: "User name",
             fieldType: "TextField",
             contentType: "text",
-            isRequired: true,
+            isRequired: false,
             defaultValue: "",
             dbName: "preferred_name",
             readOnly: false,
@@ -235,9 +235,9 @@ const createFormJson = ({ communities, actions, vendors }) => {
         fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload a file for this testimonial",
-        uploadMultiple:false, 
+        uploadMultiple: false, 
         multiple: false,
-        isRequired: true,
+        isRequired: false,
       
       },
       {

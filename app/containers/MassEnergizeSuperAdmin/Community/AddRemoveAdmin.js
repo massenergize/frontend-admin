@@ -113,7 +113,6 @@ class AddRemoveAdmin extends Component {
               placeholder: 'eg. 67',
               fieldType: 'TextField',
               contentType: 'text',
-              isRequired: true,
               defaultValue: community && community.id,
               dbName: 'community_id',
               readOnly: true
