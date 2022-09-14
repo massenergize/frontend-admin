@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 import GalleryFilter from "../Gallery/tools/GalleryFilter";
 import { filters } from "../Gallery/Gallery";
 
+const DEFAULT_SCOPE = ["all", "uploads", "actions", "events", "testimonials"];
 export const FormMediaLibraryImplementation = (props) => {
   const {
     fetchImages,
@@ -26,14 +27,22 @@ export const FormMediaLibraryImplementation = (props) => {
     tags,
   } = props;
   const [available, setAvailable] = useState(auth && auth.is_super_admin);
+  const [selectedTags, setSelectedTags] = useState({ scope: DEFAULT_SCOPE });
 
   const loadMoreImages = (cb) => {
     if (!auth) return console.log("It does not look like you are signed in...");
+
+    const scopes = (selectedTags.scope || []).filter((s) => s != "all");
+    var tags = Object.values(selectedTags.tags || []);
+    var spread = [];
+    for (let t of tags) spread = [...spread, ...t];
+
     fetchImages({
       body: {
-        any_community: true,
-        filters: ["uploads", "actions", "events", "testimonials"],
-        target_communities: [],
+        any_community: auth.is_super_admin && !auth.is_community_admin,
+        filters: scopes,
+        target_communities: (auth.admin_at || []).map((c) => c.id),
+        tags: spread,
       },
       old: imagesObject,
       cb,
@@ -100,10 +109,18 @@ export const FormMediaLibraryImplementation = (props) => {
               color: "#00BCD4",
               fontWeight: "bold",
             }}
-            scopes={filters}
-            selections={{}}
+            selections={selectedTags}
+            onChange={(items) => {
+              console.log("I tihkn I am the selected items", items);
+              setSelectedTags(items);
+            }}
+            scopes={[{ name: "All", value: "all" }, ...filters]}
             tags={tags}
-            label={<small>Add filters to tune your search</small>}
+            label={
+              <small style={{ marginRight: 7 }}>
+                Add filters to tune your search
+              </small>
+            }
           />
         }
         useAwait={true}

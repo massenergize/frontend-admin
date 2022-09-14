@@ -574,7 +574,7 @@ export const universalFetchFromGallery = (props) => {
   } = props;
   old = old || {};
   community_ids = community_ids || [];
-  var requestBody = { community_ids, ...body };
+  var requestBody = { target_communities: community_ids, ...body };
   if (old.upper_limit)
     requestBody = { ...requestBody, upper_limit: old.upper_limit };
   if (old.lower_limit)

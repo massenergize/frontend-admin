@@ -5,7 +5,7 @@ import { filterStyles } from "./../styles";
 function GalleryFilter({
   classes,
   children,
-  label = "More Filters",
+  label,
   scopes,
   tags,
   onChange,
@@ -24,6 +24,15 @@ function GalleryFilter({
     const newFilters = { ...selections, [key]: value };
     if (onChange) return onChange(newFilters);
   };
+  const calculateNumberOfSelectedFilters = () => {
+    const scopeCount = (selections.scope || []).length || 0;
+    const tags = Object.values(selections.tags || {});
+    var tagCount = 0;
+    for (let t of tags) tagCount += t.length;
+
+    return scopeCount + tagCount;
+  };
+  const numberOfFilters = calculateNumberOfSelectedFilters();
   return (
     <div className={classes.root}>
       {children}
@@ -33,7 +42,26 @@ function GalleryFilter({
         onClick={() => setShowDrop(true)}
       >
         <i className="fa fa-filter" />
-        {label ? label : <small>More Filters</small>}
+        {label ? (
+          label
+        ) : (
+          <small style={{ margin: "0px 7px" }}>More Filters</small>
+        )}
+        {numberOfFilters ? (
+          <span
+            style={{
+              padding: "3px 7px",
+              fontSize: 9,
+              borderRadius: 55,
+              color: "white",
+              background: "rgb(0 188 212)",
+            }}
+          >
+            {numberOfFilters}
+          </span>
+        ) : (
+          <></>
+        )}
       </div>
       {showDrop && (
         <>
@@ -59,8 +87,8 @@ function GalleryFilter({
               <MEDropdown
                 defaultValue={(selections || {})["scope"] || []}
                 data={scopes || []}
-                valueExtractor={(it) => it.value}
-                labelExtractor={(it) => it.name}
+                valueExtractor={(it) => it && it.value}
+                labelExtractor={(it) => it && it.name}
                 multiple
                 onItemSelected={(items) => handleChange("scope", items)}
               />
@@ -87,8 +115,8 @@ function GalleryFilter({
 
                     <MEDropdown
                       data={collection.tags || []}
-                      valueExtractor={(it) => it.id}
-                      labelExtractor={(it) => it.name}
+                      valueExtractor={(it) => it && it.id}
+                      labelExtractor={(it) => it && it.name}
                       defaultValue={defaults[collection.id.toString()]}
                       onItemSelected={(items) => {
                         const filters = selections["tags"];
