@@ -123,6 +123,7 @@ function AddToGallery(props) {
         notify("Upload to library was successful!", "success");
         reset();
         closeModal();
+        setAddedTags({});
       })
       .catch((e) => console.log("UPLOADERROR: ", e));
   };

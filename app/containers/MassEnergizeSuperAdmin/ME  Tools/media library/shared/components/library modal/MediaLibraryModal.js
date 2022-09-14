@@ -40,6 +40,7 @@ function MediaLibraryModal({
   maximumImageSize,
   compress,
   compressedQuality,
+  renderBeforeImages
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -122,6 +123,7 @@ function MediaLibraryModal({
       component: (
         <Suspense fallback={<p>Loading...</p>}>
           <Library
+            renderBeforeImages={renderBeforeImages}
             sourceExtractor={sourceExtractor}
             setSelectedContent={setSelectedContent}
             content={content}

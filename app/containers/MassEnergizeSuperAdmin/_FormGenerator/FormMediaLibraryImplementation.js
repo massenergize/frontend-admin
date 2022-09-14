@@ -13,9 +13,18 @@ import { apiCall } from "../../../utils/messenger";
 import { Checkbox, FormControlLabel } from "@material-ui/core";
 import { makeLimitsFromImageArray } from "../../../utils/common";
 import { Link } from "react-router-dom";
+import GalleryFilter from "../Gallery/tools/GalleryFilter";
+import { filters } from "../Gallery/Gallery";
 
 export const FormMediaLibraryImplementation = (props) => {
-  const { fetchImages, auth, imagesObject, putImagesInRedux, selected } = props;
+  const {
+    fetchImages,
+    auth,
+    imagesObject,
+    putImagesInRedux,
+    selected,
+    tags,
+  } = props;
   const [available, setAvailable] = useState(auth && auth.is_super_admin);
 
   const loadMoreImages = (cb) => {
@@ -83,6 +92,20 @@ export const FormMediaLibraryImplementation = (props) => {
         images={(imagesObject && imagesObject.images) || []}
         actionText="Select From Library"
         sourceExtractor={(item) => item && item.url}
+        renderBeforeImages={
+          <GalleryFilter
+            dropPosition="left"
+            style={{
+              marginLeft: 10,
+              color: "#00BCD4",
+              fontWeight: "bold",
+            }}
+            scopes={filters}
+            selections={{}}
+            tags={tags}
+            label={<small>Add filters to tune your search</small>}
+          />
+        }
         useAwait={true}
         onUpload={handleUpload}
         uploadMultiple
@@ -103,6 +126,7 @@ FormMediaLibraryImplementation.propTypes = {
 const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   imagesObject: state.getIn(["galleryImages"]),
+  tags: state.getIn(["allTags"]),
 });
 
 const mapDispatchToProps = (dispatch) => {

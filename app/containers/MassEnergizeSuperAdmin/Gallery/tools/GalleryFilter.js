@@ -5,30 +5,35 @@ import { filterStyles } from "./../styles";
 function GalleryFilter({
   classes,
   children,
+  label = "More Filters",
   scopes,
   tags,
   onChange,
   selections,
   reset,
   apply,
+  style,
+  className,
+  dropPosition = "right",
 }) {
-  const [showDrop, setShowDrop] = useState(true); // CHANGE THIS TO FALSE BEFORE PR
-  // const [filters, setfilters] = useState(selections || {});
+  const [showDrop, setShowDrop] = useState(false);
 
-  console.log("Whats in", selections);
   useEffect(() => {}, [selections]);
 
   const handleChange = (key, value) => {
     const newFilters = { ...selections, [key]: value };
-    // setfilters(newFilters);
     if (onChange) return onChange(newFilters);
   };
   return (
     <div className={classes.root}>
       {children}
-      <div className={classes.toggleWrapper} onClick={() => setShowDrop(true)}>
+      <div
+        className={`${classes.toggleWrapper} ${className || ""}`}
+        style={style || {}}
+        onClick={() => setShowDrop(true)}
+      >
         <i className="fa fa-filter" />
-        <small>More Filters</small>
+        {label ? label : <small>More Filters</small>}
       </div>
       {showDrop && (
         <>
@@ -36,7 +41,10 @@ function GalleryFilter({
             className={`${classes.ghostCurtain}`}
             onClick={() => setShowDrop(false)}
           />
-          <div className={`${classes.contentArea} me-fade-in-down`}>
+          <div
+            className={`${classes.contentArea} me-fade-in-down`}
+            style={{ [dropPosition]: 0 }}
+          >
             <div className={classes.content}>
               <div className={classes.dropdownTop}>
                 <small>Scope</small>
@@ -49,8 +57,8 @@ function GalleryFilter({
               </div>
 
               <MEDropdown
-                defaultValue={selections["scope"]}
-                data={scopes}
+                defaultValue={(selections || {})["scope"] || []}
+                data={scopes || []}
                 valueExtractor={(it) => it.value}
                 labelExtractor={(it) => it.name}
                 multiple

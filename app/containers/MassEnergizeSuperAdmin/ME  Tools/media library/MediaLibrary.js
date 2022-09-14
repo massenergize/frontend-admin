@@ -362,6 +362,10 @@ MediaLibrary.propTypes = {
    * is true, the image will be reduced to a lower quality before uploading
    */
   maximumImageSize: PropTypes.number,
+  /**
+   * A component that needs to be rendered before the images in the library are to be rendered
+   */
+  renderBeforeImages: PropTypes.element
 };
 
 MediaLibrary.Button = MLButton;
@@ -388,5 +392,6 @@ MediaLibrary.defaultProps = {
   compress: true,
   compressedQuality: IMAGE_QUALITY.MEDIUM.key,
   maximumImageSize: DEFFAULT_MAX_SIZE,
+  renderBeforeImages:null
 };
 export default MediaLibrary;

@@ -11,7 +11,7 @@ export const SideSheet = (props) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const info = (data && data.info) || {};
-
+  console.log("I am the image info", data);
   const getContent = () => {
     const isLoading = data && data === "loading";
     if (isLoading)
@@ -57,6 +57,7 @@ export const SideSheet = (props) => {
               });
             }}
           />
+          <ShowTagsOnPane tags={data.tags || []} />
           {Object.keys(info).map((key, index) => {
             const imageInfo = {
               name: key,
@@ -220,3 +221,23 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(SideSheet);
+
+const ShowTagsOnPane = ({ tags }) => {
+  if (!tags || !tags.length) return <></>;
+  return (
+    <div style={{ padding: 15 }}>
+      {(tags || []).map((tag) => {
+        return (
+          <Button
+            variant="outlined"
+            color="secondary"
+            size="small"
+            style={{ fontSize: 11, padding: "0px 5px", marginRight: 5 }}
+          >
+            {tag.name}
+          </Button>
+        );
+      })}
+    </div>
+  );
+};

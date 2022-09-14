@@ -18,7 +18,7 @@ import LightAutoComplete from "./tools/LightAutoComplete";
 import { ProgressCircleWithLabel } from "./utils";
 
 const ALL_COMMUNITIES = "all-communities";
-const filters = [
+export const filters = [
   { name: "Actions", value: "actions" },
   { name: "Events", value: "events" },
   { name: "Testimonials", value: "testimonials" },
@@ -57,6 +57,7 @@ function Gallery(props) {
   const [queryHasChanged, setQueryHasChanged] = useState(false);
   const [noResults, setNoResults] = useState(false);
   const [oneImageInfo, setOneImageInfo] = useState(null);
+
   const deleteImage = (id, cb) => {
     if (!id) return;
     apiCall("/gallery.remove", { media_id: id })
@@ -131,7 +132,6 @@ function Gallery(props) {
     const scope = (filters.scope || []).filter((f) => f !== "all"); // "all" only helps us know to select all other scopes. So during API request, that's not needed anymore
     // ------------------------------------------
     const tags = Object.entries(filters.tags || []).map(([_, _tags]) => _tags);
-    console.log("AND THE TAGS OF THE YEAR GOES TO", tags); // REmove this before PR
     let spread = [];
     for (let arr of tags) spread = [...spread, ...arr];
     // ------------------------------------------
@@ -145,7 +145,6 @@ function Gallery(props) {
   };
   const runSearch = () => {
     const form = makeRequestBody();
-    console.log("le form", form); // REMOVE THIS BEFORE PR
     fetchContent(form);
   };
 
