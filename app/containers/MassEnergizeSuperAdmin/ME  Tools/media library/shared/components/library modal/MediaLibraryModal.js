@@ -41,7 +41,7 @@ function MediaLibraryModal({
   compress,
   compressedQuality,
   sideExtraComponent,
-  renderBeforeImages
+  renderBeforeImages,
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -184,7 +184,7 @@ function MediaLibraryModal({
               activeImage={activeImage}
               setShowSidePane={setShowSidePane}
               sourceExtractor={sourceExtractor}
-              sideExtraComponent = {sideExtraComponent}
+              sideExtraComponent={sideExtraComponent}
             />
           )}
           <div className="m-inner-container">
@@ -213,7 +213,9 @@ function MediaLibraryModal({
             </div>
 
             {/* ------------------------ MAIN TAB DISPLAY AREA ------------------- */}
-            <div style={{ maxHeight: 530, overflowY: "scroll" }}>
+            <div
+              style={{ maxHeight: 530, minHeight: 530, overflowY: "scroll" }}
+            >
               {TabComponent}
             </div>
           </div>

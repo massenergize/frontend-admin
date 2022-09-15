@@ -15,7 +15,6 @@ export const SideSheet = (props) => {
   var uploader = informationAboutImage.user;
   informationAboutImage = informationAboutImage.info || {};
   const { size_text, description } = informationAboutImage;
-  console.log("I am the image info", data);
   const getContent = () => {
     const isLoading = data && data === "loading";
     if (isLoading)
@@ -63,7 +62,7 @@ export const SideSheet = (props) => {
           />
           {(size_text || description || uploader) && (
             <div style={{ marginBottom: 5, padding: 15 }}>
-              <Typography variant="body2" style={{ marginBottom: 5 }}>
+              <Typography variant="body2">
                 <i>
                   Uploaded by <b>{(uploader && uploader.full_name) || "..."}</b>
                 </i>
@@ -72,7 +71,7 @@ export const SideSheet = (props) => {
                 <Typography
                   variant="h6"
                   color="primary"
-                  style={{ marginBottom: 6, fontSize: "medium" }}
+                  style={{ marginBottom: 6, marginTop: 5, fontSize: "medium" }}
                 >
                   Size: {size_text}
                 </Typography>
@@ -252,10 +251,12 @@ export default connect(
   mapDispatchToProps
 )(SideSheet);
 
-const ShowTagsOnPane = ({ tags }) => {
+export const ShowTagsOnPane = ({ tags, style }) => {
   if (!tags || !tags.length) return <></>;
   return (
-    <div style={{ padding: 15 }}>
+    <div style={{ padding: 15, ...(style || {}) }}>
+      <small style={{ color: "grey" }}>Tags</small>
+      <br />
       {(tags || []).map((tag) => {
         return (
           <Button

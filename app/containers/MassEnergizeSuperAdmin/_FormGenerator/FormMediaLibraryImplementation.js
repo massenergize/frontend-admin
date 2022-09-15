@@ -18,6 +18,7 @@ import { getMoreInfoOnImage } from "../Gallery/Gallery";
 import { Link } from "react-router-dom";
 import GalleryFilter from "../Gallery/tools/GalleryFilter";
 import { filters } from "../Gallery/Gallery";
+import { ShowTagsOnPane } from "../Gallery/SideSheet";
 
 const DEFAULT_SCOPE = ["all", "uploads", "actions", "events", "testimonials"];
 export const FormMediaLibraryImplementation = (props) => {
@@ -31,6 +32,7 @@ export const FormMediaLibraryImplementation = (props) => {
   } = props;
   const [available, setAvailable] = useState(auth && auth.is_super_admin);
   const [selectedTags, setSelectedTags] = useState({ scope: DEFAULT_SCOPE });
+  const [queryHasChanged, setQueryHasChanged] = useState(false);
 
   const loadMoreImages = (cb) => {
     if (!auth) return console.log("It does not look like you are signed in...");
@@ -47,9 +49,12 @@ export const FormMediaLibraryImplementation = (props) => {
         target_communities: (auth.admin_at || []).map((c) => c.id),
         tags: spread,
       },
-      old: imagesObject,
-      cb,
-      append: true,
+      old: queryHasChanged ? {} : imagesObject,
+      cb: () => {
+        cb && cb();
+        setQueryHasChanged(false);
+      },
+      append: !queryHasChanged, //Query Changes? Dont append new  content retrieved. If it doesnt, append all new search results
     });
   };
 
@@ -114,8 +119,8 @@ export const FormMediaLibraryImplementation = (props) => {
             }}
             selections={selectedTags}
             onChange={(items) => {
-              console.log("I tihkn I am the selected items", items);
               setSelectedTags(items);
+              setQueryHasChanged(true);
             }}
             scopes={[{ name: "All", value: "all" }, ...filters]}
             tags={tags}
@@ -124,6 +129,8 @@ export const FormMediaLibraryImplementation = (props) => {
                 Add filters to tune your search
               </small>
             }
+            reset={() => setSelectedTags({})}
+            apply={loadMoreImages}
           />
         }
         useAwait={true}
@@ -132,7 +139,17 @@ export const FormMediaLibraryImplementation = (props) => {
         accept={MediaLibrary.AcceptedFileTypes.Images}
         multiple={false}
         extras={extras}
-        sideExtraComponent={(props) => <SideExtraComponent {...props} />}
+        sideExtraComponent={(props) => {
+          return (
+            <>
+              <SideExtraComponent {...props} />{" "}
+              <ShowTagsOnPane
+                tags={props.image && props.image.tags}
+                style={{ padding: 5 }}
+              />
+            </>
+          );
+        }}
         {...props}
         loadMoreFunction={loadMoreImages}
       />
