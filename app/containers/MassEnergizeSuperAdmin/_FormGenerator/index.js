@@ -229,6 +229,24 @@ class MassEnergizeForm extends Component {
     });
   };
 
+  handleSubDomainChange = async (event) => {
+    const { target } = event;
+    if (!target) return;
+    
+    const { formData } = this.state;
+    const { name, value } = target;
+    
+    if (!value) return;
+
+    // does not leave international characters like ä
+    const newValue = value.replaceAll(' ', '_').replaceAll(/[^a-zA-Z0-9_]/g, '');
+
+    event.target.value = newValue;
+    await this.setStateAsync({
+        formData: { ...formData, [name]: newValue},
+    });
+  }
+
   /**
    * Handle checkboxes when they are clicked
    */
@@ -974,7 +992,7 @@ class MassEnergizeForm extends Component {
             <TextField
               required={field.isRequired}
               name={field.name}
-              onChange={this.handleFormDataChange}
+              onChange={field.name === "subdomain" ? this.handleSubDomainChange : this.handleFormDataChange}
               label={field.label}
               multiline={field.isMultiline}
               rows={4}
