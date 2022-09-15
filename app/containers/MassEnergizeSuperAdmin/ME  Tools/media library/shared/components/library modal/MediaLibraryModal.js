@@ -40,6 +40,7 @@ function MediaLibraryModal({
   maximumImageSize,
   compress,
   compressedQuality,
+  sideExtraComponent,
   renderBeforeImages
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
@@ -53,7 +54,7 @@ function MediaLibraryModal({
 
   excludeTabs = [
     ...(excludeTabs || []),
-    (!allowCropping && TABS.CROPPING_TAB) || "", // if allowCropping is false, exclude it from the tabs
+    allowCropping ? "" : TABS.CROPPING_TAB, // if allowCropping is false, exclude it from the tabs
   ];
   const clean = (files) => {
     // just a function that retrieves only the FileObject from the file jsons provided
@@ -183,6 +184,7 @@ function MediaLibraryModal({
               activeImage={activeImage}
               setShowSidePane={setShowSidePane}
               sourceExtractor={sourceExtractor}
+              sideExtraComponent = {sideExtraComponent}
             />
           )}
           <div className="m-inner-container">
@@ -269,7 +271,10 @@ const Footer = ({
           <button
             className="ml-footer-btn"
             style={{ "--btn-color": "white", "--btn-background": "green" }}
-            onClick={finaliseCropping}
+            onClick={(e) => {
+              e.preventDefault();
+              finaliseCropping && finaliseCropping();
+            }}
             disabled={!cropLoot}
           >
             CROP

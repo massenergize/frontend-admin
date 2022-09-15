@@ -10,6 +10,8 @@ import { FormControlLabel } from "@material-ui/core";
 import { TextField } from "@material-ui/core";
 import { bindActionCreators } from "redux";
 import { reduxCallLibraryModalImages } from "../../../redux/redux-actions/adminActions";
+import { getFileSize,
+  smartString } from "../ME  Tools/media library/shared/utils/utils";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 const styles = (theme) => {
   const spacing = theme.spacing.unit;
@@ -99,16 +101,20 @@ function AddToGallery(props) {
   };
 
   const onUpload = (files, reset, closeModal) => {
+    const file = files[0] || null;
     let tags = Object.entries(addedTags).map(([_, _tags]) => _tags);
     let spread = [];
     for (let _tags of tags) spread = [...spread, ..._tags];
     const apiJson = {
       user_id: auth.id,
-      file: files[0] || null, // TODO: allow multiple
+      file, // TODO: allow multiple
       community_ids: cleanCommunities(),
       is_universal: scope === CHOICES.ALL,
       scope: scope,
-      title: state.title,
+      title: smartString(state.title, 27),
+      size: (file && file.size) || null,
+      size_text: getFileSize(file),
+      description: state.title,
       tags: spread,
     };
 
@@ -219,7 +225,7 @@ function AddToGallery(props) {
         variant="outlined"
         autoComplete="off"
         value={state.title || ""}
-        inputProps={{ maxLength: 30 }}
+        // inputProps={{ maxLength: 30 }}
       />
 
       <Typography
