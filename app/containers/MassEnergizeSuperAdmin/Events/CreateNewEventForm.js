@@ -45,8 +45,15 @@ class CreateNewEventForm extends Component {
     };
   }
 
-  static getDerivedStateFromProps = (props) => {
+  static getDerivedStateFromProps = (props, state) => {
     const { communities, tags, auth } = props;
+
+    const readyToRenderPageFirstTime =
+      communities && communities.length && tags && tags.length && auth;
+
+    const jobsDoneDontRunWhatsBelowEverAgain =
+      !readyToRenderPageFirstTime || state.mounted;
+    if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
     const coms = (communities || []).map((c) => ({
       ...c,
@@ -66,7 +73,7 @@ class CreateNewEventForm extends Component {
     return {
       communities: coms,
       formJson,
-      reRenderKey: getRandomStringKey(),
+      mounted: true,
     };
   };
 
@@ -75,7 +82,7 @@ class CreateNewEventForm extends Component {
     const { formJson } = this.state;
     if (!formJson) return <Loading />;
     return (
-      <div key={this.state.reRenderKey}>
+      <div>
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
@@ -105,7 +112,7 @@ export default withStyles(styles, { withTheme: true })(CreateEventMapped);
 const validator = (cleaned) => {
   const start = (cleaned || {})["start_date_and_time"];
   const end = (cleaned || {})["end_date_and_time"];
-  console.log(start, end)
+  console.log(start, end);
   const endDateComesLater = new Date(end) > new Date(start);
   return [
     endDateComesLater,
@@ -187,7 +194,9 @@ const createFormJson = ({ communities, auth }) => {
             fieldType: "DateTime",
             contentType: "text",
             valueExtractor: prefillEndDate,
-            defaultValue: moment().startOf("hour").add(1,"hours"),
+            defaultValue: moment()
+              .startOf("hour")
+              .add(1, "hours"),
             dbName: "end_date_and_time",
             minDate: moment().startOf("hour"),
             readOnly: false,
