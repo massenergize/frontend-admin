@@ -233,6 +233,8 @@ function Gallery(props) {
           infos={imageInfos}
           data={oneImageInfo}
           deleteImage={deleteImage}
+          is_super_admin={auth && auth.is_super_admin}
+          is_community_admin={auth && auth.is_community_admin}
         />
       )}
       <Typography variant="h5" className={classes.title}>

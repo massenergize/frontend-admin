@@ -67,7 +67,7 @@ function AddToGallery(props) {
   const [scope, setScope] = useState(CHOICES.SPECIFIC);
   const [state, setState] = useState(defaultState);
   const [resetAutoComplete, setResetorForAutoComplete] = useState(null);
-  const [showTagAddingBox, setShowTagAddingBox] = useState(true); // SET THIS TO FALSE BEFORE PR
+  const [showTagAddingBox, setShowTagAddingBox] = useState(false);
   const [addedTags, setAddedTags] = useState({});
   const superAdmin = auth && auth.is_super_admin;
 

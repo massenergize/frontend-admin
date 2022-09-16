@@ -5,9 +5,10 @@ import { Button, CircularProgress, Paper, Typography } from "@material-ui/core";
 import MediaLibrary from "./../ME  Tools/media library/MediaLibrary";
 import "./anime.css";
 import { ProgressCircleWithLabel } from "./utils";
+import { Link, withRouter } from "react-router-dom";
 
 export const SideSheet = (props) => {
-  const { classes, hide, infos, data, deleteImage } = props;
+  const { classes, hide, infos, data, deleteImage, is_super_admin } = props;
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const info = (data && data.relations) || {};
@@ -95,7 +96,10 @@ export const SideSheet = (props) => {
 
             return (
               <React.Fragment key={index.toString()}>
-                <ImageInfoArea {...imageInfo} />
+                <ImageInfoArea
+                  {...imageInfo}
+                  is_super_admin={is_super_admin}
+                />
               </React.Fragment>
             );
           })}
@@ -175,11 +179,11 @@ const DeleteVerificationBox = ({
   );
 };
 
-const ImageInfoArea = ({ name, data = [] }) => {
+const ImageInfoArea = ({ name, data = [], is_super_admin }) => {
   const desc =
     data.length === 0
-      ? `No ${name} use this image`
-      : `${name} that use this image : (${data.length})`;
+      ? `No ${name}(s) use this image`
+      : `${name}(s) that use this image : (${data.length})`;
   return (
     <div style={{}}>
       <div>
@@ -204,19 +208,19 @@ const ImageInfoArea = ({ name, data = [] }) => {
           {data.map((item, index) => {
             return (
               <div style={{ width: "100%" }} key={index.toString()}>
-                <small style={{ color: "#00BCD4", fontWeight: "bold" }}>
-                  {index + 1}. {item.title || item.name}
-                </small>
-                {/* <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                  }}
-                >
-                  <a href="#void">
-                    <small>View in admin</small>
+                {is_super_admin ? (
+                  <a
+                    href={`/admin/edit/${item.id}/${name}`}
+                    target="_blank"
+                    style={{ color: "#00BCD4", fontWeight: "bold" }}
+                  >
+                    {index + 1}. {item.title || item.name}
                   </a>
-                </div> */}
+                ) : (
+                  <small style={{ color: "#00BCD4", fontWeight: "bold" }}>
+                    {index + 1}. {item.title || item.name}
+                  </small>
+                )}
               </div>
             );
           })}
@@ -244,12 +248,7 @@ SideSheet.propTypes = {
 
 const mapStateToProps = (state) => ({});
 
-const mapDispatchToProps = {};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SideSheet);
+export default connect(mapStateToProps)(withRouter(SideSheet));
 
 export const ShowTagsOnPane = ({ tags, style }) => {
   if (!tags || !tags.length) return <></>;
