@@ -90,8 +90,8 @@ class AllVendors extends React.Component {
 
   getColumns = (classes) => [
     {
-      name: 'ID',
-      key: 'id',
+      name: "ID",
+      key: "id",
       options: {
         filter: false,
       },
@@ -181,7 +181,7 @@ class AllVendors extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { allVendors, putVendorsInRedux } = this.props;
-    const itemsInRedux = allVendors;
+    const itemsInRedux = allVendors.items || [];
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
@@ -189,7 +189,10 @@ class AllVendors extends React.Component {
       apiCall("/vendors.delete", { vendor_id: found });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putVendorsInRedux(rem);
+    putVendorsInRedux({
+      items: rem,
+      meta: allVendors.meta,
+    });
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -202,20 +205,47 @@ class AllVendors extends React.Component {
       </Typography>
     );
   }
+  callMoreData = (page) => {
+    let { auth, putVendorsInRedux, allVendors} = this.props;
+    var url;
+    if (auth.is_super_admin) url = "/vendors.listForSuperAdmin";
+    else if (auth.is_community_admin) url = "/vendors.listForCommunityAdmin";
+    apiCall(url, {
+      page: page,
+    }).then((res) => {
+      if (res.success) {
+        let existing = [...allVendors.items];
+        let newList = existing.concat(res.data.items);
+        putVendorsInRedux({
+          items: newList,
+          meta: res.data.meta,
+        });
+      }
+    });
+  };
 
   render() {
     const title = brand.name + " - All Vendors";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes } = this.props;
-    const data = this.fashionData(this.props.allVendors || []);
+    const { classes, allVendors } = this.props;
+    const data = this.fashionData((allVendors && allVendors.items) || []);
+    const metaData = allVendors && allVendors.meta;
 
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
       rowsPerPage: 25,
+      count: metaData && metaData.count,
       rowsPerPageOptions: [10, 25, 100],
+      onTableChange: (action, tableState) => {
+        if (action === "changePage") {
+          if (tableState.rowsPerPage * tableState.page === data.length) {
+            this.callMoreData(metaData.next);
+          }
+        }
+      },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({

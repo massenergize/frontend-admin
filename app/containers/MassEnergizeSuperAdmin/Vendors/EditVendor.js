@@ -52,12 +52,12 @@ class CreateNewVendorForm extends Component {
     const vendor = vendorsInfos[id.toString()];
     const readyToRenderPageFirstTime =
       vendor &&
-      vendors &&
-      vendors.length &&
+      vendors.items &&
+      vendors.items.length &&
       communities &&
-      communities.length &&
+      communities.items && communities.items.length
       tags &&
-      tags.length;
+      tags.items && tags.items.length;
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderPageFirstTime || state.mounted;
@@ -65,11 +65,11 @@ class CreateNewVendorForm extends Component {
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
     const section = makeTagSection({
-      collections: tags,
-      event: vendor,
+      collections: tags.items,
+      event: vendor.items,
       title: "Please select tag(s) that apply to this service provider",
     });
-    const coms = communities.map((c) => ({
+    const coms = communities.items.map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
