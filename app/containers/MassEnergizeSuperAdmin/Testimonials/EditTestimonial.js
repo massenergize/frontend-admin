@@ -51,34 +51,34 @@ class EditTestimonial extends Component {
     // you need: communities, actions, vendors, tags, testimonials, testimonial
     var { testimonials, vendors, actions, tags, communities, match } = props;
     const { id } = match.params;
-    const testimonial = (testimonials || []).find(
+    const testimonial = ((testimonials && testimonials.items) || []).find(
       (t) => t.id.toString() === id.toString()
     );
     const readyToRenderThePageFirstTime =
       testimonials &&
-      testimonials.length &&
+      testimonials.items && testimonials.items.length &&
       vendors &&
-      vendors.length &&
+      vendors.items && vendors.items.length &&
       actions &&
-      actions.length &&
+      actions.items && actions.items.length&& 
       tags &&
-      tags.length;
+      tags.items && tags.items.length;
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderThePageFirstTime || state.mounted;
 
-    const coms = communities.map((c) => ({
+    const coms = ((communities && communities.items) || []).map((c) => ({
       ...c,
       id: "" + c.id,
       displayName: c.name,
     }));
 
-    const vends = vendors.map((c) => ({
+    const vends = ((vendors && vendors.items) || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
     }));
-    const acts = actions.map((c) => ({
+    const acts = ((actions && actions.items) || []).map((c) => ({
       ...c,
       id: "" + c.id,
       displayName: c.title + ` - ${c.community && c.community.name}`,

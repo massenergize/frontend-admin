@@ -47,18 +47,18 @@ class CreateNewTestimonialForm extends Component {
   static getDerivedStateFromProps(props) {
     var { vendors, actions, tags, communities } = props;
 
-    const coms = communities.map((c) => ({
+    const coms = (communities && communities.items ||[]).map((c) => ({
       ...c,
       id: "" + c.id,
       displayName: c.name,
     }));
 
-    const vends = vendors.map((c) => ({
+    const vends = (vendors && vendors.items ||[]).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
     }));
-    const acts = actions.map((c) => ({
+    const acts = (actions && actions.items ||[]).map((c) => ({
       ...c,
       id: "" + c.id,
       displayName: c.title + ` - ${c.community && c.community.name}`,

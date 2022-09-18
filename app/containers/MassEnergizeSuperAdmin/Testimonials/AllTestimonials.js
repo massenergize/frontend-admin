@@ -86,11 +86,17 @@ class AllTestimonials extends React.Component {
   };
 
   updateTestimonials = (data) => {
-    let allTestimonials = this.props.allTestimonials || [];
-    const index = allTestimonials.findIndex((a) => a.id === data.id);
-    const updateItems = allTestimonials.filter((a) => a.id !== data.id);
+    let allTestimonials = this.props.allTestimonials;
+    const index = (allTestimonials.items||[]).findIndex((a) => a.id === data.id);
+    const updateItems = (
+      (allTestimonials.items) ||
+      []
+    ).filter((a) => a.id !== data.id);
     updateItems.splice(index, 0, data);
-    this.props.putTestimonialsInRedux(updateItems);
+    this.props.putTestimonialsInRedux({
+      items: updateItems,
+      meta:allTestimonials.meta
+    });
   };
 
   getColumns = () => {
@@ -142,7 +148,6 @@ class AllTestimonials extends React.Component {
                       [name]: value,
                     }).then((res) => {
                       if (res && res.success) {
-                 
                         this.updateTestimonials(res && res.data);
                       }
                     });
@@ -243,13 +248,16 @@ class AllTestimonials extends React.Component {
   };
 
   makeLiveOrNot(item) {
-    const putInRedux = this.props.putTestimonialsInRedux;
-    const data = this.props.allTestimonials || [];
+    const {putTestimonialsInRedux, allTestimonials} = this.props
+    const data = allTestimonials.items || []
     const status = item.is_published;
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
-    putInRedux([...data]);
+    putTestimonialsInRedux({
+      items: [...data],
+      meta:allTestimonials.meta
+    });
     const community = item.community;
     apiCall("/testimonials.update", {
       testimonial_id: item.id,
@@ -273,7 +281,7 @@ class AllTestimonials extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { allTestimonials, putTestimonialsInRedux } = this.props;
-    const itemsInRedux = allTestimonials;
+    const itemsInRedux = allTestimonials.items||[];
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
@@ -281,7 +289,10 @@ class AllTestimonials extends React.Component {
       apiCall("/testimonials.delete", { testimonial_id: found });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putTestimonialsInRedux(rem);
+    putTestimonialsInRedux({
+      items: rem,
+      meta: allTestimonials.meta,
+    });
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -308,19 +319,48 @@ class AllTestimonials extends React.Component {
 
     return Intl.DateTimeFormat("en-US", options).format(newDate);
   };
+  callMoreData = (page) => {
+    let { auth, putTestimonialsInRedux } = this.props;
+    var url;
+    if (auth.is_super_admin) url = "/testimonials.listForSuperAdmin";
+    else if (auth.is_community_admin) url = "/testimonials.listForCommunityAdmin";
+    apiCall(url, {
+      page: page,
+    }).then((res) => {
+      if (res.success) {
+        let existing = [...this.props.allTestimonials.items];
+        let newList = existing.concat(res.data.items);
+        putTestimonialsInRedux({
+          items: newList,
+          meta: res.data.meta,
+        });
+      }
+    });
+  };
 
   render() {
     const title = brand.name + " - All Testimonials";
     const description = brand.desc;
     const { columns, loading } = this.state;
-    const { classes } = this.props;
-    const data = this.fashionData(this.props.allTestimonials || []);
+    const { classes, allTestimonials } = this.props;
+    const data = this.fashionData(
+      (allTestimonials && allTestimonials.items) || []
+    );
+    const metaData = allTestimonials.meta;
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
+      count: metaData && metaData.count,
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
+      onTableChange: (action, tableState) => {
+        if (action === "changePage") {
+          if (tableState.rowsPerPage * tableState.page === data.length) {
+            this.callMoreData(metaData.next);
+          }
+        }
+      },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
