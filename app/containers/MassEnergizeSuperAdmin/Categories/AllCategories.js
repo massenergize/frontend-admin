@@ -70,8 +70,8 @@ class AllTagCollections extends React.Component {
 
     const cols = [
       {
-        name: 'ID',
-        key: 'id',
+        name: "ID",
+        key: "id",
         options: {
           filter: false,
         },
@@ -142,7 +142,7 @@ class AllTagCollections extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { tags, putTagsInRedux } = this.props;
-    const itemsInRedux = tags;
+    const itemsInRedux = tags.items || [];
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
@@ -150,7 +150,10 @@ class AllTagCollections extends React.Component {
       apiCall("/tag_collections.delete", { tag_collection_id: found });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putTagsInRedux(rem);
+    putTagsInRedux({
+      items: rem,
+      meta: tags.meta,
+    });
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -163,16 +166,35 @@ class AllTagCollections extends React.Component {
       </Typography>
     );
   }
+  callMoreData = (page) => {
+    let { tags, putTagsInRedux } = this.props;
+    var url = "/tag_collections.listForCommunityAdmin";
+    apiCall(url, {
+      page: page,
+    }).then((res) => {
+      if (res.success) {
+        let existing = [...tags.items];
+        let newList = existing.concat(res.data.items);
+        putTagsInRedux({
+          items: newList,
+          meta: res.data.meta,
+        });
+      }
+    });
+  };
+
   render() {
     const title = brand.name + " - All Tag Collections";
     const description = brand.desc;
     const { columns } = this.state;
     const { classes, tags } = this.props;
-    const data = this.fashionData(tags);
+    const data = this.fashionData(tags && tags.items);
+    const metaData = tags && tags.meta;
 
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
+      count: metaData && metaData.count,
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
