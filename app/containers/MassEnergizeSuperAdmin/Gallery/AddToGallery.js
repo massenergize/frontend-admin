@@ -55,7 +55,7 @@ function AddToGallery(props) {
   const {
     auth,
     classes,
-    communities = [],
+    communities,
     loadMoreModalImages,
     loadModalImages,
     modalImages,
@@ -68,8 +68,8 @@ function AddToGallery(props) {
   const superAdmin = auth && auth.is_super_admin;
 
   const getCommunityList = () => {
-    if (auth.is_super_admin) return communities;
-    if (auth.is_community_admin) return auth.communities;
+    if (auth && auth.is_super_admin) return communities.items;
+    if (auth && auth.is_community_admin) return auth.communities;
     return [];
   };
 
@@ -187,7 +187,7 @@ function AddToGallery(props) {
           </Typography>
           <LightAutoComplete
             classes={classes}
-            data={communities}
+            data={communities.items}
             valueExtractor={(com) => com.id}
             labelExtractor={(com) => com.name}
             onChange={(communities) => setChosenComs(communities)}
