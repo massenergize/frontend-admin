@@ -120,8 +120,11 @@ class AllSubscribers extends React.Component {
       ids.push(found);
       apiCall("/subscribers.delete", { subscriber_id: found });
     });
-    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putSubscribersInRedux(rem);
+    const rem = (itemsInRedux && itemsInRedux.items || []).filter((com) => !ids.includes(com.id));
+    putSubscribersInRedux({
+      items: rem,
+      meta:itemsInRedux.meta
+    });
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -134,20 +137,47 @@ class AllSubscribers extends React.Component {
       </Typography>
     );
   }
+  callMoreData = (page) => {
+    let { auth, putSubscribersInRedux } = this.props;
+    var url;
+    if (auth.is_super_admin) url ="/subscribers.listForSuperAdmin";
+    else if (auth.is_community_admin) url ="/subscribers.listForCommunityAdmin";
+    apiCall(url, {
+      page: page,
+    }).then((res) => {
+      if (res.success) {
+        let existing = [...this.props.subscribers.items];
+        let newList = existing.concat(res.data.items);
+        putSubscribersInRedux({
+          items: newList,
+          meta: res.data.meta,
+        });
+      }
+    });
+  };
 
   render() {
     const title = brand.name + " - All Subscribers";
     const description = brand.desc;
     const { columns, dataFiltered } = this.state;
-    const { classes } = this.props;
-    const data = this.fashionData(this.props.subscribers);
+    const { classes, subscribers } = this.props;
+    const data = this.fashionData((subscribers && subscribers.items) || []);
+    let metaData = subscribers && subscribers.meta;
 
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
       print: true,
+      count: metaData && metaData.count,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
+      onTableChange: (action, tableState) => {
+        if (action === "changePage") {
+          if (tableState.rowsPerPage * tableState.page === data.length) {
+            this.callMoreData(metaData.next);
+          }
+        }
+      },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
