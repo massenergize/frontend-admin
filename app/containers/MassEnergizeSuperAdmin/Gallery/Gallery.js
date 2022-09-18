@@ -37,7 +37,7 @@ function Gallery(props) {
   } = props;
 
   const getCommunityList = () => {
-    if (auth && auth.is_super_admin) return communities || [];
+    if (auth && auth.is_super_admin) return communities.items || [];
     if (auth && auth.is_community_admin) return auth.communities || [];
     return [];
   };
@@ -137,8 +137,8 @@ function Gallery(props) {
 
   const selectAllCommunities = () => {
     // set all an admins community as target community if they are a community. Leave things empty if superadmin though
-    if (auth.is_super_admin) setTargetComs([]);
-    else if (auth.is_community_admin) setTargetComs(getCommunityList());
+    if (auth && auth.is_super_admin) setTargetComs([]);
+    else if (auth && auth.is_community_admin) setTargetComs(getCommunityList());
     setTargetAllComs((prev) => !prev);
   };
 
@@ -185,6 +185,7 @@ function Gallery(props) {
     };
     fetchContent(makeRequestBody(limits), () => setLoadMore(false));
   };
+
 
   return (
     <div>
