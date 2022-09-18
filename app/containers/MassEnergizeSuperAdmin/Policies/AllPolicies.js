@@ -107,7 +107,7 @@ class AllPolicies extends React.Component {
                   copiedPolicyResponse && copiedPolicyResponse.data;
                 if (newPolicy) {
                   // window.location.href = `/admin/edit/${newPolicy.id}/policy`;
-                  this.props.history(`/admin/edit/${newPolicy.id}/policy`);
+                  this.props.history.push(`/admin/edit/${newPolicy.id}/policy`);
                 }
               }}
               to="/admin/read/policies"
