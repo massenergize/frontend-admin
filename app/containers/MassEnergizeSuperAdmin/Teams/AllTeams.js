@@ -29,6 +29,7 @@ import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
+import { makeAPICallForMoreData } from "../../../utils/helpers";
 
 class AllTeams extends React.Component {
   constructor(props) {
@@ -283,18 +284,7 @@ class AllTeams extends React.Component {
     let { putTeamsInRedux, allTeams, auth } = this.props;
     let isSuperAdmin = auth.is_super_admin;
     var url = isSuperAdmin ? "/teams.listForSuperAdmin" : "/teams.listForCommunityAdmin"
-    apiCall(url, {
-      page: page,
-    }).then((res) => {
-      if (res.success) {
-        let existing = [...allTeams.items];
-        let newList = existing.concat(res.data.items);
-        putTeamsInRedux({
-          items: newList,
-          meta: res.data.meta,
-        });
-      }
-    });
+    makeAPICallForMoreData({ url, existing: allTeams && allTeams.items,updateRedux: putTeamsInRedux, page });
   };
 
   render() {

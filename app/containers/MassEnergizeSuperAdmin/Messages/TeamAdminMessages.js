@@ -20,6 +20,7 @@ import {
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
+import { makeAPICallForMoreData } from "../../../utils/helpers";
 class AllTeamAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -179,17 +180,11 @@ class AllTeamAdminMessages extends React.Component {
   callMoreData = (page) => {
     let { putTeamMessagesInRedux, teamMessages } = this.props;
     var url = "/messages.listTeamAdminMessages";
-    apiCall(url, {
-      page: page,
-    }).then((res) => {
-      if (res.success) {
-        let existing = [...teamMessages.items];
-        let newList = existing.concat(res.data.items);
-        putTeamMessagesInRedux({
-          items: newList,
-          meta: res.data.meta,
-        });
-      }
+    makeAPICallForMoreData({
+      url,
+      existing: teamMessages && teamMessages.items,
+      updateRedux: putUsersInRedux,
+      page,putTeamMessagesInRedux
     });
   };
 

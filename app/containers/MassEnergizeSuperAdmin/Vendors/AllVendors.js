@@ -24,6 +24,7 @@ import { smartString } from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
+import { makeAPICallForMoreData } from "../../../utils/helpers";
 
 class AllVendors extends React.Component {
   constructor(props) {
@@ -210,17 +211,11 @@ class AllVendors extends React.Component {
     var url;
     if (auth.is_super_admin) url = "/vendors.listForSuperAdmin";
     else if (auth.is_community_admin) url = "/vendors.listForCommunityAdmin";
-    apiCall(url, {
-      page: page,
-    }).then((res) => {
-      if (res.success) {
-        let existing = [...allVendors.items];
-        let newList = existing.concat(res.data.items);
-        putVendorsInRedux({
-          items: newList,
-          meta: res.data.meta,
-        });
-      }
+    makeAPICallForMoreData({
+      url,
+      existing: allVendors && allVendors.items,
+      updateRedux: putVendorsInRedux,
+      page,
     });
   };
 

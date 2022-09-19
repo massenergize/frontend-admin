@@ -3,26 +3,12 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
-import { PapperBlock } from "dan-components";
-import imgApi from "dan-api/images/photos";
-import classNames from "classnames";
 import Typography from "@material-ui/core/Typography";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Chip from "@material-ui/core/Chip";
 import Icon from "@material-ui/core/Icon";
 
 import MUIDataTable from "mui-datatables";
-import CallMadeIcon from "@material-ui/icons/CallMade";
 import EditIcon from "@material-ui/icons/Edit";
 import { Link } from "react-router-dom";
-import Avatar from "@material-ui/core/Avatar";
-import Paper from "@material-ui/core/Paper";
-import LinearProgress from "@material-ui/core/LinearProgress";
-import Grid from "@material-ui/core/Grid";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import { bindActionCreators } from "redux";
@@ -32,6 +18,7 @@ import {
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 import { connect } from "react-redux";
+import { makeAPICallForMoreData } from "../../../utils/helpers";
 class AllTagCollections extends React.Component {
   constructor(props) {
     super(props);
@@ -169,17 +156,11 @@ class AllTagCollections extends React.Component {
   callMoreData = (page) => {
     let { tags, putTagsInRedux } = this.props;
     var url = "/tag_collections.listForCommunityAdmin";
-    apiCall(url, {
-      page: page,
-    }).then((res) => {
-      if (res.success) {
-        let existing = [...tags.items];
-        let newList = existing.concat(res.data.items);
-        putTagsInRedux({
-          items: newList,
-          meta: res.data.meta,
-        });
-      }
+    makeAPICallForMoreData({
+      url,
+      existing: tags && tags.items,
+      updateRedux: putTagsInRedux,
+      page,
     });
   };
 

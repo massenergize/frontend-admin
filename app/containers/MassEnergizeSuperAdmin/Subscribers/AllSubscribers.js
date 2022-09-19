@@ -17,6 +17,7 @@ import {
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
+import { makeAPICallForMoreData } from "../../../utils/helpers";
 
 class AllSubscribers extends React.Component {
   constructor(props) {
@@ -138,22 +139,16 @@ class AllSubscribers extends React.Component {
     );
   }
   callMoreData = (page) => {
-    let { auth, putSubscribersInRedux } = this.props;
+    let { auth, putSubscribersInRedux, subscribers } = this.props;
     var url;
     if (auth.is_super_admin) url ="/subscribers.listForSuperAdmin";
     else if (auth.is_community_admin) url ="/subscribers.listForCommunityAdmin";
-    apiCall(url, {
-      page: page,
-    }).then((res) => {
-      if (res.success) {
-        let existing = [...this.props.subscribers.items];
-        let newList = existing.concat(res.data.items);
-        putSubscribersInRedux({
-          items: newList,
-          meta: res.data.meta,
-        });
-      }
-    });
+     makeAPICallForMoreData({
+       url,
+       existing: subscribers && subscribers.items,
+       updateRedux: putSubscribersInRedux,
+       page,
+     });
   };
 
   render() {

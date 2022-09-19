@@ -35,6 +35,7 @@ import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import { makeAPICallForMoreData } from "../../../utils/helpers";
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -361,21 +362,15 @@ class AllActions extends React.Component {
 
 
   callMoreData = (page) => {
-    let { auth, putActionsInRedux } = this.props;
+    let { auth, putActionsInRedux, allActions } = this.props;
     var url;
     if (auth.is_super_admin) url = "/actions.listForSuperAdmin";
     else if (auth.is_community_admin) url = "/actions.listForCommunityAdmin";
-    apiCall(url, {
-      page: page,
-    }).then((res) => {
-      if (res.success) {
-        let existing = [...this.props.allActions.items];
-        let newList = existing.concat(res.data.items);
-        putActionsInRedux({
-          items: newList,
-          meta: res.data.meta,
-        });
-      }
+    makeAPICallForMoreData({
+      url,
+      existing: allActions && allActions.items,
+      updateRedux: putActionsInRedux,
+      page,
     });
   };
 

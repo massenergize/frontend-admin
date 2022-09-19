@@ -30,6 +30,7 @@ import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
+import { makeAPICallForMoreData } from "../../../utils/helpers";
 
 class AllTestimonials extends React.Component {
   constructor(props) {
@@ -320,21 +321,15 @@ class AllTestimonials extends React.Component {
     return Intl.DateTimeFormat("en-US", options).format(newDate);
   };
   callMoreData = (page) => {
-    let { auth, putTestimonialsInRedux } = this.props;
+    let { auth, putTestimonialsInRedux,allTestimonials } = this.props;
     var url;
     if (auth.is_super_admin) url = "/testimonials.listForSuperAdmin";
     else if (auth.is_community_admin) url = "/testimonials.listForCommunityAdmin";
-    apiCall(url, {
-      page: page,
-    }).then((res) => {
-      if (res.success) {
-        let existing = [...this.props.allTestimonials.items];
-        let newList = existing.concat(res.data.items);
-        putTestimonialsInRedux({
-          items: newList,
-          meta: res.data.meta,
-        });
-      }
+    makeAPICallForMoreData({
+      url,
+      existing: allTestimonials && allTestimonials.items,
+      updateRedux: putTestimonialsInRedux,
+      page,
     });
   };
 

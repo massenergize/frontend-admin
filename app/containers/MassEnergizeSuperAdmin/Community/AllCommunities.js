@@ -26,6 +26,7 @@ import { Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import { makeAPICallForMoreData } from "../../../utils/helpers";
 
 class AllCommunities extends React.Component {
   constructor(props) {
@@ -252,22 +253,16 @@ class AllCommunities extends React.Component {
     );
   }
   callMoreData = (page) => {
-    let { auth, putCommunitiesInRedux } = this.props;
+    let { auth, putCommunitiesInRedux, communities } = this.props;
     var url;
     if (auth.is_super_admin) url = "/communities.listForSuperAdmin";
     else if (auth.is_community_admin)
       url = "/communities.listForCommunityAdmin";
-    apiCall(url, {
-      page: page,
-    }).then((res) => {
-      if (res.success) {
-        let existing = [...this.props.communities.items];
-        let newList = existing.concat(res.data.items);
-        putCommunitiesInRedux({
-          items: newList,
-          meta: res.data.meta,
-        });
-      }
+    makeAPICallForMoreData({
+      url,
+      existing: communities && communities.items,
+      updateRedux: putCommunitiesInRedux,
+      page,
     });
   };
 

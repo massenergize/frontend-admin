@@ -27,6 +27,7 @@ import { Chip } from "@material-ui/core";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
+import { makeAPICallForMoreData } from "../../../utils/helpers";
 class AllCommunityAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -172,17 +173,11 @@ class AllCommunityAdminMessages extends React.Component {
   callMoreData = (page) => {
     let { putMessagesInRedux, messages } = this.props;
     var url = "/messages.listForCommunityAdmin";
-    apiCall(url, {
-      page: page,
-    }).then((res) => {
-      if (res.success) {
-        let existing = [...messages.items];
-        let newList = existing.concat(res.data.items);
-        putMessagesInRedux({
-          items: newList,
-          meta: res.data.meta,
-        });
-      }
+    makeAPICallForMoreData({
+      url,
+      existing: messages && messages.items,
+      updateRedux: putMessagesInRedux,
+      page,
     });
   };
   render() {

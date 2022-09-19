@@ -16,6 +16,7 @@ import { getHumanFriendlyDate, smartString } from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
+import { makeAPICallForMoreData } from "../../../utils/helpers";
 
 class AllUsers extends React.Component {
   constructor(props) {
@@ -129,7 +130,7 @@ class AllUsers extends React.Component {
       <Typography>
         Are you sure you want to delete (
         {(idsToDelete && idsToDelete.length) || ""})
-        {len === 1 ? " user? " : " userrs? "}
+        {len === 1 ? " user? " : " users? "}
       </Typography>
     );
   }
@@ -138,18 +139,7 @@ class AllUsers extends React.Component {
     var url;
     if (auth.is_super_admin) url = "/users.listForSuperAdmin";
     else if (auth.is_community_admin) url = "/users.listForCommunityAdmin";
-    apiCall(url, {
-      page: page,
-    }).then((res) => {
-      if (res.success) {
-        let existing = [...allUsers.items];
-        let newList = existing.concat(res.data.items);
-        putUsersInRedux({
-          items: newList,
-          meta: res.data.meta,
-        });
-      }
-    });
+    makeAPICallForMoreData({ url, existing: allUsers && allUsers.items,updateRedux: putUsersInRedux, page });
   };
   render() {
     const title = brand.name + " - Users";
