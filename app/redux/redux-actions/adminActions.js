@@ -33,6 +33,7 @@ import {
   LOAD_ALL_TASKS,
   LOAD_SETTINGS,
   LOAD_FEATURE_FLAGS,
+  LOAD_ADMINS_FOR_MY_COMMUNITY,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -45,6 +46,12 @@ export const testRedux = (value) => {
 export const loadSettings = (data = {}) => {
   return {
     type: LOAD_SETTINGS,
+    payload: data,
+  };
+};
+export const reduxLoadAdmins = (data = LOADING) => {
+  return {
+    type: LOAD_ADMINS_FOR_MY_COMMUNITY,
     payload: data,
   };
 };
