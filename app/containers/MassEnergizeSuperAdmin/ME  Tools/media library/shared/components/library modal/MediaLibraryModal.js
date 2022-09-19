@@ -245,7 +245,7 @@ const Footer = ({
   const isCropping = currentTab === TABS.CROPPING_TAB;
   const isUploadTab = currentTab === TABS.UPLOAD_TAB;
   const tooltipMessageWhenDisabled = isUploadTab
-    ? "Click the upload button to upload first, then you can insert it"
+    ? "Click the upload button to upload first, then you can insert your image"
     : "Select an image from the list to insert";
   const len = content && content.length;
   return (
