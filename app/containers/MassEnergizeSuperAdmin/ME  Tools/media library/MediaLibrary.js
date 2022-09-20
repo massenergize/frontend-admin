@@ -175,6 +175,7 @@ function MediaLibrary(props) {
   );
 }
 
+// ----------------------------------------------------------
 const ImageTray = ({
   sourceExtractor,
   remove,
@@ -224,6 +225,7 @@ const ImageTray = ({
     </>
   );
 };
+// ----------------------------------------------------------
 
 /**
  *
@@ -362,6 +364,11 @@ MediaLibrary.propTypes = {
    * is true, the image will be reduced to a lower quality before uploading
    */
   maximumImageSize: PropTypes.number,
+
+  /**
+   * A function that should return a tooltip component. 
+   */
+  TooltipWrapper: PropTypes.string
 };
 
 MediaLibrary.Button = MLButton;
