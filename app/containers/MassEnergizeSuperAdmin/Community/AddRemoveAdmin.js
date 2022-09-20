@@ -38,13 +38,17 @@ const styles = (theme) => ({
   },
 });
 
-const fetchAdmins = async ({ id, reduxFunction }) => {
+const fetchAdmins = async ({ id, reduxFunction, admins }) => {
   const response = await apiCall("/admins.community.list", {
     community_id: id,
   });
   if (!response || !response.data) return reduxFunction({});
   // const { members, pending_members } = response.data || {};
-  reduxFunction(response.data);
+  const content = [
+    ...(response.data.members || []),
+    ...(response.data.pending_admins || []),
+  ];
+  reduxFunction({ ...(admins || {}), [id]: content });
 };
 
 class AddRemoveAdmin extends Component {
@@ -62,10 +66,13 @@ class AddRemoveAdmin extends Component {
     const { admins, putAdminsInRedux, communities } = props;
     const { id } = props.match.params;
     if (admins === LOADING)
-      return fetchAdmins({ id, reduxFunction: putAdminsInRedux });
-    if (state.mounted) return null;
+      return fetchAdmins({ id, reduxFunction: putAdminsInRedux, admins });
 
-    const community = (communities || []).find((c) => c.id === communities);
+    const loadedRequirements = communities && communities.length;
+    if (!loadedRequirements || state.mounted) return null;
+    const community = (communities || []).find(
+      (c) => c.id.toString() === id.toString()
+    );
 
     const formJson = createFormJson({ community });
     return {
@@ -76,7 +83,8 @@ class AddRemoveAdmin extends Component {
   }
 
   fashionData({ data }) {
-    return (data || []).map((d) => [
+    if (!data) return [];
+    return data.map((d) => [
       {
         id: d.email,
         image: d.profile_picture,
@@ -89,55 +97,55 @@ class AddRemoveAdmin extends Component {
       "Accepted",
     ]);
   }
-  
-  async componentDidMount() {
-    const { id } = this.props.match.params;
-    const communityAdminResponse = await apiCall("/admins.community.list", {
-      community_id: id,
-    });
-    if (communityAdminResponse && communityAdminResponse.data) {
-      const members = communityAdminResponse.data.members || [];
-      const pending = communityAdminResponse.data.pending_members || [];
-      const data = members.map((d) => [
-        {
-          id: d.email,
-          image: d.profile_picture,
-          initials: `${d.preferred_name &&
-            d.preferred_name.substring(0, 2).toUpperCase()}`,
-        },
-        d.full_name,
-        d.preferred_name,
-        d.email,
-        "Accepted",
-      ]);
-      pending.forEach((p) => {
-        data.push([
-          {
-            id: p.email,
-            image: null,
-            initials: `${p.name && p.name.substring(0, 2).toUpperCase()}`,
-          },
-          p.name,
-          p.name,
-          p.email,
-          "Pending",
-        ]);
-      });
-      await this.setStateAsync({
-        data,
-        community: communityAdminResponse.data.community,
-      });
-    }
 
-    const formJson = await this.createFormJson();
-    await this.setStateAsync({ formJson });
-  }
+  // async componentDidMount() {
+  //   const { id } = this.props.match.params;
+  //   const communityAdminResponse = await apiCall("/admins.community.list", {
+  //     community_id: id,
+  //   });
+  //   if (communityAdminResponse && communityAdminResponse.data) {
+  //     const members = communityAdminResponse.data.members || [];
+  //     const pending = communityAdminResponse.data.pending_members || [];
+  //     const data = members.map((d) => [
+  //       {
+  //         id: d.email,
+  //         image: d.profile_picture,
+  //         initials: `${d.preferred_name &&
+  //           d.preferred_name.substring(0, 2).toUpperCase()}`,
+  //       },
+  //       d.full_name,
+  //       d.preferred_name,
+  //       d.email,
+  //       "Accepted",
+  //     ]);
+  //     pending.forEach((p) => {
+  //       data.push([
+  //         {
+  //           id: p.email,
+  //           image: null,
+  //           initials: `${p.name && p.name.substring(0, 2).toUpperCase()}`,
+  //         },
+  //         p.name,
+  //         p.name,
+  //         p.email,
+  //         "Pending",
+  //       ]);
+  //     });
+  //     await this.setStateAsync({
+  //       data,
+  //       community: communityAdminResponse.data.community,
+  //     });
+  //   }
 
-  setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
-    });
-  }
+  //   const formJson = await this.createFormJson();
+  //   await this.setStateAsync({ formJson });
+  // }
+
+  // setStateAsync(state) {
+  //   return new Promise((resolve) => {
+  //     this.setState(state, resolve);
+  //   });
+  // }
 
   getColumns = () => [
     {
@@ -190,10 +198,20 @@ class AddRemoveAdmin extends Component {
     },
   ];
 
+  whenRequestIsCompleted(data, successfull, resetForm) {
+    if (!successfull || !data) return;
+    const { putAdminsInRedux, admins } = this.props;
+    const { id } = this.props.match.params;
+    const old = (admins || {})[id] || [];
+    putAdminsInRedux({ ...admins, [id]: [data.user, ...old] });
+    resetForm && resetForm();
+  }
   render() {
     const { classes, admins } = this.props;
     const { formJson, columns, community } = this.state;
-    const data = this.fashionData({ data: admins });
+    const { id } = this.props.match.params;
+    const content = (admins || {})[id] || [];
+    const data = this.fashionData({ data: content });
     if (!formJson) return <Loading />;
 
     const options = {
@@ -218,7 +236,11 @@ class AddRemoveAdmin extends Component {
 
     return (
       <div>
-        <MassEnergizeForm classes={classes} formJson={formJson} />
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+          onComplete={this.whenRequestIsCompleted.bind(this)}
+        />
         <br />
         <br />
         <div className={classes.table}>
@@ -239,7 +261,10 @@ AddRemoveAdmin.propTypes = {
 };
 
 const mapStateToProps = (state) => {
-  return { admins: state.getIn(["admins"]) };
+  return {
+    admins: state.getIn(["admins"]),
+    communities: state.getIn(["communities"]),
+  };
 };
 
 const mapDispatchToProps = (dispatch) => {
@@ -255,11 +280,10 @@ const Wrapped = connect(
   mapDispatchToProps
 )(AddRemoveAdmin);
 
-export default withStyles(styles, { withTheme: true })(AddRemoveAdmin);
+export default withStyles(styles, { withTheme: true })(Wrapped);
 
 const createFormJson = ({ community }) => {
   const { pathname } = window.location;
-  // const { community } = this.state;
   const formJson = {
     title: `Add New Administrator for ${
       community ? community.name : "this Community"
