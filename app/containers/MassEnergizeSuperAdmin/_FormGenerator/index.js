@@ -35,6 +35,7 @@ import Loading from "dan-components/Loading";
 import IconDialog from "../ME  Tools/icon dialog/IconDialog";
 import FormMediaLibraryImplementation from "./FormMediaLibraryImplementation";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
+import { isValueEmpty } from "../Community/utils";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 const styles = (theme) => ({
@@ -232,20 +233,22 @@ class MassEnergizeForm extends Component {
   handleSubDomainChange = async (event) => {
     const { target } = event;
     if (!target) return;
-    
+
     const { formData } = this.state;
     const { name, value } = target;
-    
+
     if (!value) return;
 
     // does not leave international characters like ä
-    const newValue = value.replaceAll(' ', '_').replaceAll(/[^a-zA-Z0-9_]/g, '');
+    const newValue = value
+      .replaceAll(" ", "_")
+      .replaceAll(/[^a-zA-Z0-9_]/g, "");
 
     event.target.value = newValue;
     await this.setStateAsync({
-        formData: { ...formData, [name]: newValue},
+      formData: { ...formData, [name]: newValue },
     });
-  }
+  };
 
   /**
    * Handle checkboxes when they are clicked
@@ -346,11 +349,16 @@ class MassEnergizeForm extends Component {
       } else {
         const value = formData[field.name]; //field.name is what is used to set value, b4 cleaned up onSubmit
         // if field is readOnly - ignore the isRequired if present
-        if (field.isRequired && !field.readOnly && (!value || !value.length)) {
-          culprits = {
-            ...culprits,
-            [field.name]: { name: field.name, dbName: field.dbName },
-          };
+        if (field.isRequired && !field.readOnly) {
+          if (isValueEmpty(value)) {
+            culprits = {
+              ...culprits,
+              [field.name]: {
+                name: field.name,
+                dbName: field.dbName,
+              },
+            };
+          }
         }
       }
     });
@@ -992,7 +1000,11 @@ class MassEnergizeForm extends Component {
             <TextField
               required={field.isRequired}
               name={field.name}
-              onChange={field.name === "subdomain" ? this.handleSubDomainChange : this.handleFormDataChange}
+              onChange={
+                field.name === "subdomain"
+                  ? this.handleSubDomainChange
+                  : this.handleFormDataChange
+              }
               label={field.label}
               multiline={field.isMultiline}
               rows={4}
