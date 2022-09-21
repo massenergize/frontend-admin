@@ -93,7 +93,7 @@ class CreateNewCommunityForm extends Component {
             {
               name: "subdomain",
               label:
-                "Subdomain: Please Provide a short unique name.  (only letters and numbers) ",
+                "Subdomain: Please Provide a short unique name.  (only letters and numbers are allowed, use underscores to signify spaces) ",
               placeholder: "eg. SpringfieldMA",
               fieldType: "TextField",
               contentType: "text",
