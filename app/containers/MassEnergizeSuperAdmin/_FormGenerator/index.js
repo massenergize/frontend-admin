@@ -35,6 +35,7 @@ import Loading from "dan-components/Loading";
 import IconDialog from "../ME  Tools/icon dialog/IconDialog";
 import FormMediaLibraryImplementation from "./FormMediaLibraryImplementation";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
+import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 const styles = (theme) => ({
@@ -84,6 +85,7 @@ class MassEnergizeForm extends Component {
       readOnly: false,
       // activeModal: null,
       // activeModalTitle: null,
+      refreshKey: "default-form-state", // Change this value to any different string force a re-render in the form.
     };
     this.updateForm = this.updateForm.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
@@ -459,6 +461,12 @@ class MassEnergizeForm extends Component {
   setError(error) {
     this.setState({ error: error, startCircularSpinner: false });
   }
+
+  resetForm() {
+    const refreshKey = getRandomStringKey();
+    this.setState({ formData: {}, refreshKey });
+    //More to come, on non-controlled fields (when needed)
+  }
   /**
    * This handles the form data submission
    */
@@ -518,10 +526,14 @@ class MassEnergizeForm extends Component {
         startCircularSpinner: false,
         // formData: initialFormData
       });
+
       if (onComplete)
-        onComplete(response.data, response && response.success, () =>
-          this.setStateAsync({ formData: {} })
+        onComplete(
+          response.data,
+          response && response.success,
+          this.resetForm.bind(this)
         );
+
       if (formJson.successRedirectPage) {
         this.props.history.push(formJson.successRedirectPage);
         // window.location.href = formJson.successRedirectPage;
@@ -1120,7 +1132,7 @@ class MassEnergizeForm extends Component {
     } = this.state;
     if (!formJson) return <Loading />;
     return (
-      <div>
+      <div key={this.state.refreshKey}>
         <Grid
           container
           spacing={24}

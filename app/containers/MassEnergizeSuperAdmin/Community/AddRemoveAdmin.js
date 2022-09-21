@@ -13,6 +13,7 @@ import { bindActionCreators } from "redux";
 import { reduxLoadAdmins } from "../../../redux/redux-actions/adminActions";
 import { LOADING } from "../../../utils/constants";
 import Loading from "dan-components/Loading";
+import MEChip from "../../../components/MECustom/MEChip";
 
 const styles = (theme) => ({
   root: {
@@ -39,15 +40,17 @@ const styles = (theme) => ({
 });
 
 const fetchAdmins = async ({ id, reduxFunction, admins }) => {
+  admins = admins === LOADING ? [] : admins;
   const response = await apiCall("/admins.community.list", {
     community_id: id,
   });
   if (!response || !response.data) return reduxFunction({});
-  // const { members, pending_members } = response.data || {};
-  const content = [
-    ...(response.data.members || []),
-    ...(response.data.pending_admins || []),
-  ];
+
+  var pending = (response.data.pending_admins || []).map((user) => ({
+    ...user,
+    isPending: true,
+  }));
+  const content = [...(response.data.members || []), ...pending];
   reduxFunction({ ...(admins || {}), [id]: content });
 };
 
@@ -65,7 +68,11 @@ class AddRemoveAdmin extends Component {
   static getDerivedStateFromProps(props, state) {
     const { admins, putAdminsInRedux, communities } = props;
     const { id } = props.match.params;
-    if (admins === LOADING)
+    const firstTime = admins === LOADING;
+    const notFirstTimeButNeedToFetchAdminsForDifferentCommunity =
+      (admins || {})[id] === undefined;
+
+    if (firstTime || notFirstTimeButNeedToFetchAdminsForDifferentCommunity)
       return fetchAdmins({ id, reduxFunction: putAdminsInRedux, admins });
 
     const loadedRequirements = communities && communities.length;
@@ -82,9 +89,10 @@ class AddRemoveAdmin extends Component {
     };
   }
 
-  fashionData({ data }) {
-    if (!data) return [];
-    return data.map((d) => [
+  fashionData({ data, admins }) {
+    if (!data || !admins || admins === LOADING) return [];
+
+    return (data || []).map((d) => [
       {
         id: d.email,
         image: d.profile_picture,
@@ -94,58 +102,9 @@ class AddRemoveAdmin extends Component {
       d.full_name,
       d.preferred_name,
       d.email,
-      "Accepted",
+      d.isPending || !d.accepts_terms_and_conditions,
     ]);
   }
-
-  // async componentDidMount() {
-  //   const { id } = this.props.match.params;
-  //   const communityAdminResponse = await apiCall("/admins.community.list", {
-  //     community_id: id,
-  //   });
-  //   if (communityAdminResponse && communityAdminResponse.data) {
-  //     const members = communityAdminResponse.data.members || [];
-  //     const pending = communityAdminResponse.data.pending_members || [];
-  //     const data = members.map((d) => [
-  //       {
-  //         id: d.email,
-  //         image: d.profile_picture,
-  //         initials: `${d.preferred_name &&
-  //           d.preferred_name.substring(0, 2).toUpperCase()}`,
-  //       },
-  //       d.full_name,
-  //       d.preferred_name,
-  //       d.email,
-  //       "Accepted",
-  //     ]);
-  //     pending.forEach((p) => {
-  //       data.push([
-  //         {
-  //           id: p.email,
-  //           image: null,
-  //           initials: `${p.name && p.name.substring(0, 2).toUpperCase()}`,
-  //         },
-  //         p.name,
-  //         p.name,
-  //         p.email,
-  //         "Pending",
-  //       ]);
-  //     });
-  //     await this.setStateAsync({
-  //       data,
-  //       community: communityAdminResponse.data.community,
-  //     });
-  //   }
-
-  //   const formJson = await this.createFormJson();
-  //   await this.setStateAsync({ formJson });
-  // }
-
-  // setStateAsync(state) {
-  //   return new Promise((resolve) => {
-  //     this.setState(state, resolve);
-  //   });
-  // }
 
   getColumns = () => [
     {
@@ -194,6 +153,19 @@ class AddRemoveAdmin extends Component {
       key: "status",
       options: {
         filter: false,
+        customBodyRender: (notAccepted) => {
+          const style = {
+            fontWeight: "bold",
+            color: "white",
+            background: "rgb(65 169 65)",
+          };
+          return (
+            <MEChip
+              label={notAccepted ? "Pending" : "Accepted"}
+              style={notAccepted ? { ...style, background: "#f09b00" } : style}
+            />
+          );
+        },
       },
     },
   ];
@@ -211,7 +183,7 @@ class AddRemoveAdmin extends Component {
     const { formJson, columns, community } = this.state;
     const { id } = this.props.match.params;
     const content = (admins || {})[id] || [];
-    const data = this.fashionData({ data: content });
+    const data = this.fashionData({ data: content, admins });
     if (!formJson) return <Loading />;
 
     const options = {
