@@ -220,11 +220,25 @@ class MassEnergizeForm extends Component {
   /**
    * Handles general input
    */
-  handleFormDataChange = (event) => {
+  handleFormDataChange = (event, field) => {
     const { target } = event;
     if (!target) return;
     const { name, value } = target;
     const { formData } = this.state;
+    const { onChangeMiddleware } = field || {};
+    const setValueInForm = (newContent) =>
+      this.setState({
+        formData: { ...formData, ...(newContent || {}) },
+      });
+
+    if (onChangeMiddleware)
+      return onChangeMiddleware({
+        field,
+        newValue: value,
+        formData,
+        setValueInForm,
+      });
+
     this.setState({
       formData: { ...formData, [name]: value },
     });
@@ -304,8 +318,11 @@ class MassEnergizeForm extends Component {
     }
     // If valueExtractor is passed into any field object, it means we want to step in the middle
     // and process the value before it shows.
-    if (field && field.valueExtractor)
-      return field.valueExtractor(formData, field);
+    if (field && field.valueExtractor) {
+      const passValueOnToState = (newValue) =>
+        this.setState({ formData: { ...formData, [name]: newValue } });
+      return field.valueExtractor(formData, field, passValueOnToState);
+    }
     return val;
   };
 
@@ -504,6 +521,7 @@ class MassEnergizeForm extends Component {
       );
       if (!validationPassed) return this.setError(_err);
     }
+
 
     // let's make an api call to send the data
     let response = null;
@@ -1056,9 +1074,12 @@ class MassEnergizeForm extends Component {
                   {...field}
                   value={this.getValue(field.name, field.defaultValue, field)}
                   onChange={(date) =>
-                    this.handleFormDataChange({
-                      target: { name: field.name, value: date },
-                    })
+                    this.handleFormDataChange(
+                      {
+                        target: { name: field.name, value: date },
+                      },
+                      field
+                    )
                   }
                   label="" // don't put label in the box {field.label}
                   format="MM/DD/YYYY, h:mm a"
