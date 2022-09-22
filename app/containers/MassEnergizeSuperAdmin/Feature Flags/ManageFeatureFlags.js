@@ -208,7 +208,7 @@ function ManageFeatureFlags({
         tableProps={{
           title: "All Features",
           data: dataForTable,
-          columns: columns,
+          columns: columns(),
           options: options,
         }}
       />
