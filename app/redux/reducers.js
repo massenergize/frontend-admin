@@ -52,7 +52,7 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
-    superAdminList: reducerForLoadingSuperAdmins,
+    sadmins: reducerForLoadingSuperAdmins,
     admins: reducerForLoadingAdmins,
     featureFlags: reducerForFeatureFlags,
     settings: reducerForSettings,
