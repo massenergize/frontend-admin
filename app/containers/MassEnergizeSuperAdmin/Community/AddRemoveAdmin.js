@@ -176,7 +176,7 @@ class AddRemoveAdmin extends Component {
     const { id } = this.props.match.params;
     const old = (admins || {})[id] || [];
     putAdminsInRedux({ ...admins, [id]: [data.user, ...old] });
-    resetForm && resetForm();
+    resetForm && resetForm({ formData: { community_id: id } });
   }
   render() {
     const { classes, admins } = this.props;

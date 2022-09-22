@@ -462,9 +462,9 @@ class MassEnergizeForm extends Component {
     this.setState({ error: error, startCircularSpinner: false });
   }
 
-  resetForm() {
+  resetForm(defaults = { formData: {} }) {
     const refreshKey = getRandomStringKey();
-    this.setState({ formData: {}, refreshKey });
+    this.setState({ ...defaults, refreshKey });
     //More to come, on non-controlled fields (when needed)
   }
   /**
