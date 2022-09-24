@@ -1,6 +1,6 @@
 import FileCopy from "@material-ui/icons/FileCopy";
 import EditIcon from "@material-ui/icons/Edit";
-import React from "react";
+import React, { useState } from "react";
 import MEChip from "../../../components/MECustom/MEChip";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -10,8 +10,10 @@ import { Link } from "react-router-dom";
 import { Paper, Typography } from "@material-ui/core";
 import { apiCall } from "../../../utils/messenger";
 import { LOADING } from "../../../utils/constants";
+import ThemeModal from "../../../components/Widget/ThemeModal";
+import ListingComponent from "./ListingComponent";
 const hasExpired = (date) => {
-  if (!date) return false; // features do do not expire dont have dates so...
+  if (!date) return false; // features that do not expire dont have dates so...
   const now = new Date().getTime();
   date = new Date(date).getTime();
   return date < now;
@@ -23,6 +25,9 @@ function ManageFeatureFlags({
   putFlagsInRedux,
   featureFlags,
 }) {
+  const [listingOptions, setShowListingModal] = useState({ show: true });
+  // const communityOptions = (listingOptions || {}).communityOptions || {}
+
   if (featureFlags === LOADING) return <Loading />;
   var flags = featureFlags && featureFlags.features;
   if (!flags)
@@ -54,7 +59,7 @@ function ManageFeatureFlags({
         key: "is-for-every-community",
         options: {
           filter: true,
-          customBodyRender: (isForEveryone) => {
+          customBodyRender: ({ isForEveryone }) => {
             return (
               <MEChip
                 label={isForEveryone ? "Yes" : "No"}
@@ -71,7 +76,7 @@ function ManageFeatureFlags({
         key: "is-for-every-user",
         options: {
           filter: true,
-          customBodyRender: (isForEveryone) => {
+          customBodyRender: ({ isForEveryone }) => {
             return (
               <MEChip
                 label={isForEveryone ? "Yes" : "No"}
@@ -141,8 +146,15 @@ function ManageFeatureFlags({
       return [
         feature.id,
         feature.name,
-        feature.audience === flagKeys.audience.EVERYONE.key,
-        feature.user_audience === flagKeys.audience.EVERYONE.key,
+        {
+          isForEveryone: feature.audience === flagKeys.audience.EVERYONE.key,
+          id: feature.id,
+        },
+        {
+          isForEveryone:
+            feature.user_audience === flagKeys.audience.EVERYONE.key,
+          id: feature.id,
+        },
         hasExpired(feature.expires_on) ? "Expired" : "Active",
         feature.expires_on
           ? getHumanFriendlyDate(feature.expires_on, false, false)
@@ -202,6 +214,19 @@ function ManageFeatureFlags({
 
   return (
     <div>
+      <button onClick={() => setShowListingModal({ show: true, id: 25 })}>
+        Show Modal
+      </button>
+
+      <ThemeModal
+        fullControl
+        open={listingOptions.show}
+        close={() => setShowListingModal({})}
+        contentStyle={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }}
+      >
+        <ListingComponent {...listingOptions || {}} />
+      </ThemeModal>
+
       <METable
         page={PAGE_PROPERTIES.FEATURE_FLAGS}
         classes={classes}
