@@ -1,10 +1,38 @@
 import { Button, Typography } from "@material-ui/core";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { reduxAddFlagInfo } from "../../../redux/redux-actions/adminActions";
+import { apiCall } from "../../../utils/messenger";
 
 function ListingComponent({
   id,
   title = "Communities below have the Guest Authentication active",
+  keepInfoInRedux,
+  oldInfos,
 }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [flag, setFlag] = useState(null);
+  // -------------------------------------------------------------------
+  useEffect(() => {
+    console.log("the id is here", id);
+    if (!id) {
+      setLoading(false);
+      setError("Sorry, we could not load content related to this feature flag");
+      return;
+    }
+
+    apiCall("/featureFlags.info", { id })
+      .then((response) => {
+        console.log("Here is the response", response);
+        if (!response || !response.success)
+          return console.log("FFBE_ERROR", response.error);
+      })
+      .catch((e) => console.log("FF_INFO_ERROR", e.toString()));
+  }, []);
+  // -------------------------------------------------------------------
+
   return (
     <div style={{ minWidth: 470, minHeight: 400, position: "relative" }}>
       <div>
@@ -20,12 +48,18 @@ function ListingComponent({
           {title}
         </Typography>
       </div>
+      <Error error={error} />
+
+      <LoadingSpinner show={loading} />
+
+      {/* ---------------------------------------------------------------------- */}
       <div style={{ overflowY: "scroll", maxHeight: 309, paddingBottom: 50 }}>
         {[1, 2, 3, 4, 5, 6, 7].map((i) => (
           <OneDisplayItem name={"Community - " + i} />
         ))}
       </div>
 
+      {/* ---------------------------------------------------------------------- */}
       <Button
         variant="raised"
         color="primary"
@@ -36,15 +70,33 @@ function ListingComponent({
           borderRadius: 0,
           position: "absolute",
           bottom: 0,
+          fontSize: 12,
         }}
       >
         Close
       </Button>
+      {/* ---------------------------------------------------------------------- */}
     </div>
   );
 }
 
-export default ListingComponent;
+const mapStateToProps = (state) => {
+  return { infos: state.flagInfos };
+};
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      addFlagToRedux: reduxAddFlagInfo,
+    },
+    dispatch
+  );
+};
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ListingComponent);
+
+// --------------------------------------------------------------------------------
 
 const OneDisplayItem = ({ name }) => {
   return (
@@ -62,29 +114,56 @@ const OneDisplayItem = ({ name }) => {
       <Typography variant="body2" style={{}}>
         {name || "..."}
       </Typography>
-      {/* <Button
-        variant="raised"
-        color="secondary"
-        style={{
-          marginLeft: "auto",
-          borderRadius: 55,
-          background: "#cb6565",
-          marginRight: 10,
-          marginBottom: 5,
-          minWidth: 0,
-          padding: "6px 13px",
-        }}
-      >
-        <i className="fa fa-trash" />
-      </Button> */}
 
       <small
-        style={{ color: "#cb6565", fontWeight: "bold", marginLeft: "auto" }}
+        style={{
+          color: "#cb6565",
+          fontWeight: "bold",
+          marginLeft: "auto",
+          fontSize: 11,
+        }}
         className="touchable-opacity"
       >
-        <i className="fa fa-trash" style={{ marginRight: "0px 12px" }} />{" "}
+        <i className="fa fa-trash" style={{ margin: "0px 4px" }} />{" "}
         <span>Remove</span>
       </small>
+    </div>
+  );
+};
+
+const LoadingSpinner = ({ show }) => {
+  if (!show) return <></>;
+
+  return (
+    <div
+      style={{
+        width: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <i
+        className="fa fa-spinner fa-spin"
+        style={{ fontSize: 22, padding: 10, color: "#AB47BC" }}
+      />
+    </div>
+  );
+};
+
+const Error = ({ error }) => {
+  if (!error) return <></>;
+  return (
+    <div
+      style={{
+        display: "flex",
+        width: "100%",
+        padding: 10,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Typography variant="body2">{error}</Typography>
     </div>
   );
 };

@@ -25,7 +25,10 @@ function ManageFeatureFlags({
   putFlagsInRedux,
   featureFlags,
 }) {
-  const [listingOptions, setShowListingModal] = useState({ show: true });
+  const [listingOptions, setShowListingModal] = useState({
+    show: true,
+    id: 18,
+  });
   // const communityOptions = (listingOptions || {}).communityOptions || {}
 
   if (featureFlags === LOADING) return <Loading />;
