@@ -176,6 +176,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
                       defaultValue: null,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
+                      isRequired:true
                     },
                   ],
                 },
@@ -186,7 +187,8 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
                 fieldType: "Dropdown",
                 defaultValue: communities[0].id,    // for a cadmin default to first of their communities.  Need one.
                 dbName: "community_id",
-                data: [{ displayName: "--", id: "" }, ...communities],      
+                data: [{ displayName: "--", id: "" }, ...communities],     
+                isRequired:true 
               },
         ],
       },
