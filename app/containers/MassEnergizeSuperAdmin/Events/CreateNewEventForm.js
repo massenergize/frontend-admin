@@ -45,8 +45,15 @@ class CreateNewEventForm extends Component {
     };
   }
 
-  static getDerivedStateFromProps = (props) => {
+  static getDerivedStateFromProps = (props, state) => {
     const { communities, tags, auth } = props;
+
+    const readyToRenderPageFirstTime =
+      communities && communities.length && tags && tags.length && auth;
+
+    const jobsDoneDontRunWhatsBelowEverAgain =
+      !readyToRenderPageFirstTime || state.mounted;
+    if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
     const coms = (communities || []).map((c) => ({
       ...c,
@@ -66,7 +73,7 @@ class CreateNewEventForm extends Component {
     return {
       communities: coms,
       formJson,
-      reRenderKey: getRandomStringKey(),
+      mounted: true,
     };
   };
 
@@ -75,7 +82,7 @@ class CreateNewEventForm extends Component {
     const { formJson } = this.state;
     if (!formJson) return <Loading />;
     return (
-      <div key={this.state.reRenderKey}>
+      <div>
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
@@ -105,7 +112,6 @@ export default withStyles(styles, { withTheme: true })(CreateEventMapped);
 const validator = (cleaned) => {
   const start = (cleaned || {})["start_date_and_time"];
   const end = (cleaned || {})["end_date_and_time"];
-  console.log(start, end)
   const endDateComesLater = new Date(end) > new Date(start);
   return [
     endDateComesLater,
@@ -113,17 +119,18 @@ const validator = (cleaned) => {
       "Please provide an end date that comes later than your start date",
   ];
 };
-const prefillEndDate = (formData, field) => {
+
+const whenStartDateChanges = ({
+  newValue,
+  formData,
+  setValueInForm,
+}) => {
   formData = formData || {};
-  const start = formData["start_date_and_time"] || "";
-  const end = formData["end_date_and_time"] || "";
-  const endValueIsStillDefault =
-    end.toString() === field.defaultValue.toString();
-  if (endValueIsStillDefault) return moment(start).add(1, "hours");
-  return end;
+  const newEnd = moment(newValue).add(1, "hours");
+  setValueInForm({ start_date_and_time: newValue, end_date_and_time: newEnd });
 };
+
 const createFormJson = ({ communities, auth }) => {
-  // const { communities } = this.state;
   const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Create New Event or Campaign",
@@ -170,6 +177,7 @@ const createFormJson = ({ communities, auth }) => {
             readOnly: false,
           },
           {
+            onChangeMiddleware: whenStartDateChanges,
             name: "start_date_and_time",
             label: "Start Date And Time",
             placeholder: "YYYY-MM-DD HH:MM",
@@ -186,8 +194,9 @@ const createFormJson = ({ communities, auth }) => {
             placeholder: "YYYY-MM-DD HH:MM",
             fieldType: "DateTime",
             contentType: "text",
-            valueExtractor: prefillEndDate,
-            defaultValue: moment().startOf("hour").add(1,"hours"),
+            defaultValue: moment()
+              .startOf("hour")
+              .add(1, "hours"),
             dbName: "end_date_and_time",
             minDate: moment().startOf("hour"),
             readOnly: false,

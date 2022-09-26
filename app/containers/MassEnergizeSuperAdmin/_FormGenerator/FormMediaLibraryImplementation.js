@@ -10,7 +10,7 @@ import {
   universalFetchFromGallery,
 } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
-import { Checkbox, FormControlLabel } from "@material-ui/core";
+import { Checkbox, FormControlLabel, Tooltip } from "@material-ui/core";
 import { makeLimitsFromImageArray } from "../../../utils/common";
 import { Link } from "react-router-dom";
 
@@ -89,6 +89,13 @@ export const FormMediaLibraryImplementation = (props) => {
         accept={MediaLibrary.AcceptedFileTypes.Images}
         multiple={false}
         extras={extras}
+        TooltipWrapper={({ children, title, placement }) => {
+          return (
+            <Tooltip title={title} placement={placement || "top"}>
+              {children}
+            </Tooltip>
+          );
+        }}
         {...props}
         loadMoreFunction={loadMoreImages}
       />
