@@ -194,8 +194,8 @@ class EditEventForm extends Component {
         {event.rsvp_enabled ? (
           <Paper style={{ padding: 20, marginBottom: 15 }}>
             <Typography>
-              Would you like to see a list of users who have RSVP-ed for this
-              event?
+              Would you like to see a list of users who have RSVP-ed for
+              this event?
             </Typography>
             <Link
               to={`/admin/edit/${event && event.id}/event-rsvps`}
@@ -211,6 +211,7 @@ class EditEventForm extends Component {
           formJson={formJson}
           readOnly={readOnly}
           enableCancel
+          validator={validator}
         />
       </div>
     );
@@ -247,6 +248,18 @@ EditEventForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 export default withStyles(styles, { withTheme: true })(EditEventMapped);
+
+const validator = (cleaned) => {
+  const start = (cleaned || {})["start_date_and_time"];
+  const end = (cleaned || {})["end_date_and_time"];
+  console.log(start, end);
+  const endDateComesLater = new Date(end) > new Date(start);
+  return [
+    endDateComesLater,
+    !endDateComesLater &&
+      "Please provide an end date that comes later than your start date",
+  ];
+};
 
 const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
   const statuses = ["Draft", "Live", "Archived"];
@@ -522,18 +535,20 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
                       defaultValue: event.community && event.community.id,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
+                      isRequired:true,
                     },
                   ],
                 },
               }
             : {
-                name: "community",
-                label: "Primary Community (select one)",
-                fieldType: "Dropdown",
-                defaultValue: event.community && event.community.id,
-                dbName: "community_id",
-                data: [{ displayName: "--", id: "" }, ...communities],
-              },
+              name: "community",
+              label: "Primary Community (select one)",
+              fieldType: "Dropdown",
+              defaultValue: event.community && event.community.id,
+              dbName: "community_id",
+              data: [{ displayName: "--", id: "" }, ...communities],
+              isRequired:true,
+            },
         ],
       },
       {

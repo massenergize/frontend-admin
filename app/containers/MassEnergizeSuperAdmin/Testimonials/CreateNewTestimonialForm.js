@@ -44,8 +44,20 @@ class CreateNewTestimonialForm extends Component {
     };
   }
 
-  static getDerivedStateFromProps(props) {
+  static getDerivedStateFromProps(props, state) {
     var { vendors, actions, tags, communities } = props;
+    const readyToRenderThePageFirstTime =
+      vendors &&
+      vendors.length &&
+      actions &&
+      actions.length &&
+      tags &&
+      tags.length;
+
+    const jobsDoneDontRunWhatsBelowEverAgain =
+      !readyToRenderThePageFirstTime || state.mounted;
+
+    if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
     const coms = (communities && communities.items ||[]).map((c) => ({
       ...c,
@@ -81,11 +93,9 @@ class CreateNewTestimonialForm extends Component {
       actions: acts,
       vendors: vends,
       communities: coms,
-      reRenderKey: getRandomStringKey(),
+      mounted: true,
     };
   }
-
-
 
   render() {
     const { classes } = this.props;
@@ -235,10 +245,9 @@ const createFormJson = ({ communities, actions, vendors }) => {
         fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload a file for this testimonial",
-        uploadMultiple: false, 
+        uploadMultiple: false,
         multiple: false,
         isRequired: false,
-      
       },
       {
         name: "is_approved",
