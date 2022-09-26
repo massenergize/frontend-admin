@@ -42,6 +42,7 @@ function MediaLibraryModal({
   compressedQuality,
   sideExtraComponent,
   renderBeforeImages,
+  TooltipWrapper,
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -220,6 +221,7 @@ function MediaLibraryModal({
             </div>
           </div>
           <Footer
+            TooltipWrapper={TooltipWrapper}
             images={images}
             files={files}
             content={content}
@@ -244,8 +246,13 @@ const Footer = ({
   currentTab,
   cropLoot,
   finaliseCropping,
+  TooltipWrapper,
 }) => {
   const isCropping = currentTab === TABS.CROPPING_TAB;
+  const isUploadTab = currentTab === TABS.UPLOAD_TAB;
+  const tooltipMessageWhenDisabled = isUploadTab
+    ? "Click the upload button to upload first, then you can insert your image"
+    : "Select an image from the list to insert";
   const len = content && content.length;
   return (
     <div className="ml-footer">
@@ -291,7 +298,16 @@ const Footer = ({
             }}
             disabled={!len}
           >
-            INSERT {len > 0 ? `(${len})` : ""}
+            {TooltipWrapper ? (
+              <TooltipWrapper
+                title={tooltipMessageWhenDisabled}
+                placement="top"
+              >
+                <span>INSERT {len > 0 ? `(${len})` : ""}</span>
+              </TooltipWrapper>
+            ) : (
+              `INSERT ${len > 0 ? `(${len})` : ""}`
+            )}
           </button>
         )}
       </div>
