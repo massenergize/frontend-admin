@@ -54,39 +54,62 @@ function ManageFeatureFlags({
         options: { filter: false },
       },
       {
-        name: "Is For Every Community",
+        name: "Communities",
         key: "is-for-every-community",
         options: {
           filter: true,
           customBodyRender: ({ isForEveryone, id }) => {
             return (
-              <MEChip
+              <Typography
+                variant="caption"
+                className="touchable-opacity"
+                style={{
+                  // color: "#9a5cc0",
+                  fontWeight: "bold",
+                  textDecoration: !isForEveryone ? "underline" : "none",
+                }}
                 onClick={() => {
                   if (isForEveryone) return;
-                  setShowListingModal({ id, show: true }); // Only show modal if its for only a select number of communites
+                  setShowListingModal({ id, show: true, isCommunity: true }); // Only show modal if its for only a select number of communites
                 }}
-                label={isForEveryone ? "Yes" : "No"}
-                className={`${
-                  isForEveryone ? classes.yesLabel : classes.noLabel
-                } touchable-opacity`}
-              />
+              >
+                <i
+                  className={!isForEveryone ? "fa fa-list" : "fa fa-globe"}
+                  style={{ marginRight: 5 }}
+                />
+
+                {isForEveryone ? "Everyone" : "Show List"}
+              </Typography>
             );
           },
         },
       },
       {
-        name: "Is For Every User",
+        name: "Users",
         key: "is-for-every-user",
         options: {
           filter: true,
-          customBodyRender: ({ isForEveryone }) => {
+          customBodyRender: ({ isForEveryone, id }) => {
             return (
-              <MEChip
-                label={isForEveryone ? "Yes" : "No"}
-                className={`${
-                  isForEveryone ? classes.yesLabel : classes.noLabel
-                } touchable-opacity`}
-              />
+              <Typography
+                variant="caption"
+                className="touchable-opacity"
+                style={{
+                  // color: "#9a5cc0",
+                  fontWeight: "bold",
+                  textDecoration: !isForEveryone ? "underline" : "none",
+                }}
+                onClick={() => {
+                  if (isForEveryone) return;
+                  setShowListingModal({ id, show: true, isCommunity: false });
+                }}
+              >
+                <i
+                  className={!isForEveryone ? "fa fa-user" : "fa fa-globe"}
+                  style={{ marginRight: 5 }}
+                />
+                {isForEveryone ? "Everyone" : "Show List"}
+              </Typography>
             );
           },
         },
@@ -217,10 +240,6 @@ function ManageFeatureFlags({
 
   return (
     <div>
-      {/*  REMOVE THIS BUTTON BEFORE PR */}
-      <button onClick={() => setShowListingModal({ show: true, id: 25 })}>
-        Show Modal
-      </button>
 
       <ThemeModal
         fullControl

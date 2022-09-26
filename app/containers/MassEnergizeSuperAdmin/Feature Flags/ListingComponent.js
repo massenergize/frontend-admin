@@ -7,17 +7,21 @@ import { apiCall } from "../../../utils/messenger";
 
 function ListingComponent({
   id,
-  title = "Communities below have the Guest Authentication active",
   keepInfoInRedux,
   infos,
   close,
+  isCommunity = true,
 }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [content, setContent] = useState(null); // The full version of the ff that has been loaded from the api is put here
   const [deleteContent, setDeleteContent] = useState(null); // The item that is in focus for deletion, is put here
-
-  const communities = (content || {}).communities;
+  const title = `This feature flag is associated with the following ${
+    isCommunity ? " communities " : " users "
+  } `;
+  const contentToDisplay = isCommunity
+    ? (content || {}).communities
+    : (content || {}).users;
   // -------------------------------------------------------------------
   useEffect(() => {
     const errorMessage =
@@ -34,7 +38,7 @@ function ListingComponent({
       setContent(found);
       return;
     }
-    //-------------------------------------------------
+    //-------------------------------------------------------------
 
     apiCall("/featureFlags.info", { id })
       .then((response) => {
@@ -57,14 +61,35 @@ function ListingComponent({
   const remove = () => {
     const id = deleteContent.id;
     var data = [];
-    data = (content || {}).communities;
+    if (isCommunity) data = (content || {}).communities;
+    else data = (content || {}).users;
+
     data = data.filter((it) => it.id !== id);
-    const newContent = { ...content, communities: data };
+
+    var newContent = {};
+    // Add the user/community back to the array on the particular feature flag
+    if (isCommunity) newContent = { ...content, communities: data };
+    else newContent = { ...content, users: data };
+
+    // Put the whole feature flag back to the fold
     setDeleteContent(null);
     setContent(newContent);
     const newInfos = { ...infos, [newContent.id]: newContent };
     keepInfoInRedux(newInfos);
+
     // Now send api request here
+    data = data.map((it) => it.id);
+    var body = {};
+    if (isCommunity) body = { community_ids: data };
+    else body = { user_ids: data };
+
+    setError(null);
+    apiCall("/featureFlag.update", { id: newContent.id, ...body }).catch(
+      (e) => {
+        setError(e.toString());
+        console.log("BE_ERROR:", e.toString());
+      }
+    );
   };
 
   // -------------------------------------------------------------------
@@ -97,12 +122,22 @@ function ListingComponent({
         />
       ) : (
         <div style={{ overflowY: "scroll", maxHeight: 309, paddingBottom: 50 }}>
-          {(communities || []).map((item) => (
-            <OneDisplayItem
-              name={item.name}
-              triggerRemoveConfirmation={() => setDeleteContent(item)}
-            />
-          ))}
+          {(contentToDisplay || []).map((item) => {
+            const name = isCommunity
+              ? item.name
+              : `${item.preferred_name} (${item.email})`;
+            return (
+              <OneDisplayItem
+                name={name}
+                triggerRemoveConfirmation={() =>
+                  setDeleteContent({
+                    ...item,
+                    name: item.name || item.preferred_name,
+                  })
+                }
+              />
+            );
+          })}
         </div>
       )}
 
