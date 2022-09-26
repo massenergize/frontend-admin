@@ -25,11 +25,7 @@ function ManageFeatureFlags({
   putFlagsInRedux,
   featureFlags,
 }) {
-  const [listingOptions, setShowListingModal] = useState({
-    show: true,
-    id: 18,
-  });
-  // const communityOptions = (listingOptions || {}).communityOptions || {}
+  const [listingOptions, setShowListingModal] = useState({});
 
   if (featureFlags === LOADING) return <Loading />;
   var flags = featureFlags && featureFlags.features;
@@ -62,9 +58,13 @@ function ManageFeatureFlags({
         key: "is-for-every-community",
         options: {
           filter: true,
-          customBodyRender: ({ isForEveryone }) => {
+          customBodyRender: ({ isForEveryone, id }) => {
             return (
               <MEChip
+                onClick={() => {
+                  if (isForEveryone) return;
+                  setShowListingModal({ id, show: true }); // Only show modal if its for only a select number of communites
+                }}
                 label={isForEveryone ? "Yes" : "No"}
                 className={`${
                   isForEveryone ? classes.yesLabel : classes.noLabel
@@ -217,6 +217,7 @@ function ManageFeatureFlags({
 
   return (
     <div>
+      {/*  REMOVE THIS BUTTON BEFORE PR */}
       <button onClick={() => setShowListingModal({ show: true, id: 25 })}>
         Show Modal
       </button>
@@ -227,7 +228,10 @@ function ManageFeatureFlags({
         close={() => setShowListingModal({})}
         contentStyle={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }}
       >
-        <ListingComponent {...listingOptions || {}} />
+        <ListingComponent
+          {...listingOptions || {}}
+          close={() => setShowListingModal({})}
+        />
       </ThemeModal>
 
       <METable
