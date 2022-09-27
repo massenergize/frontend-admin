@@ -159,3 +159,11 @@ export const getFilterInputsFromURL = (location) => {
   });
   return filterInputs;
 };
+
+export const ourCustomSort = ({ a, b, colIndex, order, compare }) => {
+  const directionConstant = order === "desc" ? 1 : -1;
+  a = a.data[colIndex];
+  b = b.data[colIndex];
+  if (compare) return compare({ a, b }) * directionConstant;
+  return (a < b ? -1 : 1) * directionConstant;
+};

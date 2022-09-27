@@ -45,3 +45,17 @@ export const groupSocialMediaFields = (formData, oldInfo) => {
 
 
 // All of these social media information are saved in the "more_info" field of the community table in django(stringified json)
+
+export const isValueEmpty = (value) => {
+  if (
+    value === undefined ||
+    value === null ||
+    value === "" ||
+    value === [] ||
+    value === "null" ||
+    value === "undefined" ||
+    value === {}
+  )
+    return true;
+  return false;
+};

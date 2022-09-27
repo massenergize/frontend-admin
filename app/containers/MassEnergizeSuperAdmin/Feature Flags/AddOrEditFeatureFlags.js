@@ -66,7 +66,7 @@ const preflight = (data) => {
 const uniqueIdentifier = (text) => {
   if (!text || !text.trim()) return "";
   var arr = text.split(" ");
-  return arr.join("_").toLowerCase() + "_feature";
+  return arr.join("-").toLowerCase() + "-feature-flag";
 };
 
 const parseFeatureForEditMode = (feature) => {
@@ -128,7 +128,6 @@ var createFormJson = ({
                 label: "Id of feature",
                 fieldType: fieldTypes.TextField,
                 contentType: "text",
-                isRequired: true,
                 defaultValue: id || "",
                 dbName: "id",
                 readOnly: true,
@@ -138,7 +137,7 @@ var createFormJson = ({
           {
             name: "name",
             label: "Name of the feature (60 Chars)",
-            placeholder: "Eg. 'Guest Authentication Feature '",
+            placeholder: "Eg. 'Guest Authentication'",
             fieldType: fieldTypes.TextField,
             contentType: "text",
             isRequired: true,
@@ -155,7 +154,7 @@ var createFormJson = ({
               "Eg. This feature allows guests to use all platform functionalities without...",
             fieldType: fieldTypes.TextField,
             contentType: "text",
-            isRequired: true,
+            isRequired: false,
             defaultValue: notes || "",
             dbName: "notes",
             readOnly: false,
@@ -323,17 +322,6 @@ var createFormJson = ({
               ],
             },
           },
-          // {
-          //   name: "expires_on",
-          //   label: "When should this feature expire?",
-          //   placeholder: "Eg. 'Guest Authentication Feature'",
-          //   fieldType: fieldTypes.DateTime,
-          //   contentType: "text",
-          //   isRequired: true,
-          //   defaultValue: expires_on || "",
-          //   dbName: "expires_on",
-          //   minDate: new Date(),
-          // },
         ],
       },
     ],

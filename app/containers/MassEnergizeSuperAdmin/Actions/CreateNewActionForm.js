@@ -50,8 +50,6 @@ class CreateNewActionForm extends Component {
       communities.length &&
       tags &&
       tags.length &&
-      vendors &&
-      vendors.length &&
       ccActions &&
       ccActions.length;
 
@@ -178,6 +176,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
                       defaultValue: null,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
+                      isRequired:true
                     },
                   ],
                 },
@@ -188,7 +187,8 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
                 fieldType: "Dropdown",
                 defaultValue: communities[0].id,    // for a cadmin default to first of their communities.  Need one.
                 dbName: "community_id",
-                data: [{ displayName: "--", id: "" }, ...communities],      
+                data: [{ displayName: "--", id: "" }, ...communities],     
+                isRequired:true 
               },
         ],
       },
@@ -214,7 +214,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
       {
         name: "featured_summary",
         label: "Featured Summary",
-        placeholder: "eg. This event is happening in ...",
+        placeholder: "Short sentence promoting the action",
         fieldType: "TextField",
         isMulti: true,
         isRequired: true,
@@ -224,7 +224,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
       {
         name: "about",
         label: "Write some detailed description about this action",
-        placeholder: "eg. This event is happening in ...",
+        placeholder: "Key information people should know about the action",
         fieldType: "HTMLField",
         isRequired: true,
         defaultValue: null,
@@ -233,25 +233,24 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
       {
         name: "steps_to_take",
         label: "Please outline steps to take for your users",
-        placeholder: "eg. This event is happening in ...",
+        placeholder: "Easy to follow steps to accomplish the action",
         fieldType: "HTMLField",
-        isRequired: true,
+        isRequired: false,
         defaultValue: null,
         dbName: "steps_to_take",
       },
       {
         name: "deep_dive",
-        label: "Deep dive into all the details",
-        placeholder: "eg. This action ...",
+        label: "Deep dive into all the details (optional)",
+        placeholder: "Further information some users might want to know",
         fieldType: "HTMLField",
-        isRequired: true,
+        isRequired: false,
         defaultValue: null,
         dbName: "deep_dive",
       },
       {
         name: "vendors",
         label: "Select which vendors provide services for this action",
-        placeholder: "eg. Solarize Wayland",
         fieldType: "Checkbox",
         selectMany: true,
         defaultValue: null,
@@ -261,7 +260,6 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
       {
         name: "image",
         placeholder: "Select an Image",
-        // fieldType: "File",
         fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload Files",
