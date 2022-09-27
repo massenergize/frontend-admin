@@ -117,6 +117,7 @@ class Application extends React.Component {
         return (window.location = "/login");
     } catch (e) {
       console.log("ADMIN_SESSION_STATUS_ERROR:", e.toString());
+      return (window.location = "/login");
     }
   }
 

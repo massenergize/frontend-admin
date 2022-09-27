@@ -10,7 +10,7 @@ export function makeDeleteUI({ idsToDelete, templates }) {
   const len = (idsToDelete && idsToDelete.length) || 0;
   var text = `Are you sure you want to delete (
     ${(idsToDelete && idsToDelete.length) || ""})
-    ${len === 1 ? " action? " : " actions? "}`;
+    ${len === 1 ? " event? " : " events? "}`;
 
   if (templates && templates.length)
     text = `Sorry, (${templates.length}) template${
@@ -54,6 +54,11 @@ export const getHumanFriendlyDate = (
     // make it a bit less human friendly, so it sorts properly
     format
   );
+};
+export const makeTimeAgo = (dateString) => {
+  if (!dateString) return "";
+
+  return moment(dateString).fromNow();
 };
 export const smartString = (string, charLimit = 60) => {
   if (!string) return "";

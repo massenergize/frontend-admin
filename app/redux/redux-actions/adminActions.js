@@ -33,6 +33,7 @@ import {
   LOAD_ALL_TASKS,
   LOAD_SETTINGS,
   LOAD_FEATURE_FLAGS,
+  LOAD_ADMIN_ACTIVITIES,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -107,7 +108,6 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     apiCall("/settings.list"),
     isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
   ]).then((response) => {
-
     const [
       communities,
       actions,
@@ -290,6 +290,10 @@ export const reduxLoadSummaryData = (data = []) => ({
 });
 export const reduxLoadGraphData = (data = []) => ({
   type: LOAD_GRAPH_DATA,
+  payload: data,
+});
+export const reduxLoadAdminActivities = (data = LOADING) => ({
+  type: LOAD_ADMIN_ACTIVITIES,
   payload: data,
 });
 
@@ -634,8 +638,9 @@ export const reduxCallCommunities = () => (dispatch) => {
     apiCall("/communities.listForCommunityAdmin"),
     apiCall("/summary.listForCommunityAdmin"),
     apiCall("/graphs.listForCommunityAdmin"),
+    apiCall("/what.happened"),
   ]).then((res) => {
-    const [commResponse, summaryResponse, graphResponse] = res;
+    const [commResponse, summaryResponse, graphResponse, activities] = res;
     if (commResponse.data) {
       dispatch(reduxLoadAllCommunities(commResponse.data));
     }
@@ -645,6 +650,7 @@ export const reduxCallCommunities = () => (dispatch) => {
     if (graphResponse.data) {
       dispatch(reduxLoadGraphData(graphResponse.data));
     }
+    dispatch(reduxLoadAdminActivities(activities && activities.data));
   });
 };
 
