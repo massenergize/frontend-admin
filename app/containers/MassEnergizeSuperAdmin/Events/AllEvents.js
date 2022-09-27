@@ -23,7 +23,13 @@ import {
   loadAllEvents,
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
-import { findMatchesAndRest, getHumanFriendlyDate, makeDeleteUI, smartString } from "../../../utils/common";
+import {
+  findMatchesAndRest,
+  getHumanFriendlyDate,
+  makeDeleteUI,
+  ourCustomSort,
+  smartString,
+} from "../../../utils/common";
 import { Chip, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
@@ -47,7 +53,7 @@ class AllEvents extends React.Component {
     }
   }
 
-  fashionData = (data) => {
+  fashionData(data) {
     const fashioned = data.map((d) => [
       d.id,
       getHumanFriendlyDate(d.start_date_and_time, true),
@@ -66,9 +72,9 @@ class AllEvents extends React.Component {
       d.is_global,
     ]);
     return fashioned;
-  };
+  }
 
-  getColumns = () => {
+  getColumns() {
     const { classes, putEventsInRedux, allEvents } = this.props;
     return [
       {
@@ -89,6 +95,7 @@ class AllEvents extends React.Component {
         name: "Event",
         key: "event",
         options: {
+          sort: false,
           filter: false,
           download: false,
           customBodyRender: (d) => (
@@ -200,7 +207,8 @@ class AllEvents extends React.Component {
           display: false,
           filter: true,
           searchable: false,
-          download:true
+          download: true,
+          sort: false,
         },
       },
       {
@@ -214,7 +222,7 @@ class AllEvents extends React.Component {
         },
       },
     ];
-  };
+  }
 
   makeLiveOrNot(item) {
     const putInRedux = this.props.putEventsInRedux;
@@ -245,6 +253,18 @@ class AllEvents extends React.Component {
       </div>
     );
   }
+
+  customSort(data, colIndex, order) {
+    const isComparingLive = colIndex === 7;
+    const sortForLive = ({ a, b }) => (a.isLive && !b.isLive ? -1 : 1);
+    var params = {
+      colIndex,
+      order,
+      compare: isComparingLive && sortForLive,
+    };
+    return data.sort((a, b) => ourCustomSort({ ...params, a, b }));
+  }
+  
   nowDelete({ idsToDelete, data }) {
     const { allEvents, putEventsInRedux } = this.props;
     const itemsInRedux = allEvents;
@@ -269,6 +289,7 @@ class AllEvents extends React.Component {
       responsive: "stacked",
       print: true,
       rowsPerPage: 25,
+      customSort: this.customSort,
       rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
