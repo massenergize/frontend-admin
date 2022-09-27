@@ -4,7 +4,7 @@
 import { Typography } from "@material-ui/core";
 import moment from "moment";
 import qs from "qs";
-import React from 'react';
+import React from "react";
 
 export function makeDeleteUI({ idsToDelete, templates }) {
   const len = (idsToDelete && idsToDelete.length) || 0;
@@ -153,4 +153,12 @@ export const getFilterInputsFromURL = (location) => {
     ignoreQueryPrefix: true,
   });
   return filterInputs;
+};
+
+export const ourCustomSort = ({ a, b, colIndex, order, compare }) => {
+  const directionConstant = order === "desc" ? 1 : -1;
+  a = a.data[colIndex];
+  b = b.data[colIndex];
+  if (compare) return compare({ a, b }) * directionConstant;
+  return (a < b ? -1 : 1) * directionConstant;
 };
