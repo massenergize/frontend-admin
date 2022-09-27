@@ -33,6 +33,7 @@ import {
   LOAD_ALL_TASKS,
   LOAD_SETTINGS,
   LOAD_FEATURE_FLAGS,
+  LOAD_ADMIN_ACTIVITIES,
   LOAD_ADMINS_FOR_MY_COMMUNITY,
   LOAD_SUPER_ADMIN_LIST,
 } from "../ReduxConstants";
@@ -62,6 +63,14 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+export const reducerForAdminActivities = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_ADMIN_ACTIVITIES:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForLoadingSuperAdmins = (state = LOADING, action = {}) => {
   switch (action.type) {
     case LOAD_SUPER_ADMIN_LIST:

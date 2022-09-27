@@ -24,7 +24,11 @@ import {
 } from "../../../redux/redux-actions/adminActions";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { apiCall } from "../../../utils/messenger";
-import { objArrayToString, smartString } from "../../../utils/common";
+import {
+  objArrayToString,
+  ourCustomSort,
+  smartString,
+} from "../../../utils/common";
 import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -68,7 +72,7 @@ class AllTeams extends React.Component {
     this.props.callTeamsForNormalAdmin(id);
   };
 
-  fashionData = (data) => {
+  fashionData(data) {
     if (!data) return [];
     const fashioned = data.map((d) => [
       d.id,
@@ -83,7 +87,7 @@ class AllTeams extends React.Component {
       { isLive: d.is_published, item: d },
       d.id,
       d.id,
-      d.is_published ? "Yes" : "No", // Its not duplicate, its formatted for CSV download
+      d.is_published ? "Yes" : "No", // Its not a duplicate, its formatted for CSV download
       objArrayToString(
         d.admins,
         (admin) =>
@@ -91,9 +95,9 @@ class AllTeams extends React.Component {
       ),
     ]);
     return fashioned;
-  };
+  }
 
-  getColumns = () => {
+  getColumns() {
     const { classes } = this.props;
     return [
       {
@@ -107,6 +111,7 @@ class AllTeams extends React.Component {
         name: "Team Logo",
         key: "id",
         options: {
+          sort: false,
           filter: false,
           download: false,
           customBodyRender: (d) => (
@@ -227,7 +232,7 @@ class AllTeams extends React.Component {
         },
       },
     ];
-  };
+  }
 
   makeLiveOrNot(item) {
     const putInRedux = this.props.putTeamsInRedux;
@@ -279,6 +284,16 @@ class AllTeams extends React.Component {
       </Typography>
     );
   }
+  customSort(data, colIndex, order) {
+    const isComparingLive = colIndex === 5;
+    const sortForLive = ({ a, b }) => (a.isLive && !b.isLive ? -1 : 1);
+    var params = {
+      colIndex,
+      order,
+      compare: isComparingLive && sortForLive,
+    };
+    return data.sort((a, b) => ourCustomSort({ ...params, a, b }));
+  }
 
   render() {
     const title = brand.name + " - All Teams";
@@ -292,6 +307,7 @@ class AllTeams extends React.Component {
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
+      customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({

@@ -273,6 +273,7 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
                         action.community && "" + action.community.id,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
+                      isRequired: true
                     },
                   ],
                 },
@@ -285,6 +286,7 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
                 defaultValue: action.community && "" + action.community.id,
                 dbName: "community_id",
                 data: [{ displayName: "--", id: "" }, ...communities],
+                isRequired:true
               },
         ],
       },
