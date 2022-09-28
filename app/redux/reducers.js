@@ -44,6 +44,7 @@ import app, {
   reducerForSettings,
   reducerForFeatureFlags,
   reducerForAdminActivities,
+  reducerForFlagInfo,
 } from "./modules/appReducer";
 
 /**
@@ -52,6 +53,7 @@ import app, {
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
     activities: reducerForAdminActivities,
+    flagInfos: reducerForFlagInfo,
     featureFlags: reducerForFeatureFlags,
     settings: reducerForSettings,
     testRedux: testReduxReducer,

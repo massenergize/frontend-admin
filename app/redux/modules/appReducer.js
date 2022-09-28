@@ -34,6 +34,7 @@ import {
   LOAD_SETTINGS,
   LOAD_FEATURE_FLAGS,
   LOAD_ADMIN_ACTIVITIES,
+  ADD_NEW_FEATURE_FLAG_INFO,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -64,6 +65,14 @@ export default function reducer(state = initialImmutableState, action = {}) {
 export const reducerForAdminActivities = (state = LOADING, action = {}) => {
   switch (action.type) {
     case LOAD_ADMIN_ACTIVITIES:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForFlagInfo = (state ={}, action = {}) => {
+  switch (action.type) {
+    case ADD_NEW_FEATURE_FLAG_INFO:
       return action.payload;
     default:
       return state;

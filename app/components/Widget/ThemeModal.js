@@ -17,37 +17,50 @@ function ThemeModal({
   cancelText,
   noCancel = false,
   noOk,
+  fullControl = false,
+  contentStyle = {},
 }) {
   // const [open, setopen] = useState(second)
+  const fullControlStyles = { padding: 0 };
   return (
     <Dialog open={open}>
-      <DialogContent>{children}</DialogContent>
-      <DialogActions style={{ padding: 10 }}>
-        <>
-          {!noCancel && (
-            <Button
-              color="default"
-              onClick={() => {
-                onCancel && onCancel();
-                if (close) return close();
-              }}
-            >
-              {cancelText || "  No"}
-            </Button>
-          )}
-          {!noOk && (
-            <Button
-              color="primary"
-              onClick={() => {
-                onConfirm && onConfirm();
-                if (closeAfterConfirmation) close && close();
-              }}
-            >
-              {okText || "Yes"}
-            </Button>
-          )}
-        </>
-      </DialogActions>
+      <DialogContent
+        style={
+          fullControl
+            ? { ...fullControlStyles, ...(contentStyle || {}) }
+            : contentStyle || {}
+        }
+      >
+        {children}
+      </DialogContent>
+      {!fullControl && (
+        <DialogActions style={{ padding: 10 }}>
+          <>
+            {!noCancel && (
+              <Button
+                color="default"
+                onClick={() => {
+                  onCancel && onCancel();
+                  if (close) return close();
+                }}
+              >
+                {cancelText || "  No"}
+              </Button>
+            )}
+            {!noOk && (
+              <Button
+                color="primary"
+                onClick={() => {
+                  onConfirm && onConfirm();
+                  if (closeAfterConfirmation) close && close();
+                }}
+              >
+                {okText || "Yes"}
+              </Button>
+            )}
+          </>
+        </DialogActions>
+      )}
     </Dialog>
   );
 }
