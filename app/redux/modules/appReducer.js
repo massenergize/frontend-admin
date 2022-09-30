@@ -35,6 +35,8 @@ import {
   LOAD_FEATURE_FLAGS,
   LOAD_ADMIN_ACTIVITIES,
   ADD_NEW_FEATURE_FLAG_INFO,
+  LOAD_ADMINS_FOR_MY_COMMUNITY,
+  LOAD_SUPER_ADMIN_LIST,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -73,6 +75,22 @@ export const reducerForAdminActivities = (state = LOADING, action = {}) => {
 export const reducerForFlagInfo = (state ={}, action = {}) => {
   switch (action.type) {
     case ADD_NEW_FEATURE_FLAG_INFO:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForLoadingSuperAdmins = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_SUPER_ADMIN_LIST:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForLoadingAdmins = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_ADMINS_FOR_MY_COMMUNITY:
       return action.payload;
     default:
       return state;

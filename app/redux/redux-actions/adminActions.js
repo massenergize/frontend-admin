@@ -35,6 +35,8 @@ import {
   LOAD_FEATURE_FLAGS,
   LOAD_ADMIN_ACTIVITIES,
   ADD_NEW_FEATURE_FLAG_INFO,
+  LOAD_ADMINS_FOR_MY_COMMUNITY,
+  LOAD_SUPER_ADMIN_LIST,
 } from "../ReduxConstants";
 import { apiCall } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -47,6 +49,18 @@ export const testRedux = (value) => {
 export const loadSettings = (data = {}) => {
   return {
     type: LOAD_SETTINGS,
+    payload: data,
+  };
+};
+export const reduxLoadSuperAdmins = (data = LOADING) => {
+  return {
+    type: LOAD_SUPER_ADMIN_LIST,
+    payload: data,
+  };
+};
+export const reduxLoadAdmins = (data = LOADING) => {
+  return {
+    type: LOAD_ADMINS_FOR_MY_COMMUNITY,
     payload: data,
   };
 };

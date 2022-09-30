@@ -36,6 +36,7 @@ import IconDialog from "../ME  Tools/icon dialog/IconDialog";
 import FormMediaLibraryImplementation from "./FormMediaLibraryImplementation";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { isValueEmpty } from "../Community/utils";
+import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 const styles = (theme) => ({
@@ -85,6 +86,7 @@ class MassEnergizeForm extends Component {
       readOnly: false,
       // activeModal: null,
       // activeModalTitle: null,
+      refreshKey: "default-form-state", // Change this value to any different string force a re-render in the form.
     };
     this.updateForm = this.updateForm.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
@@ -262,7 +264,7 @@ class MassEnergizeForm extends Component {
     await this.setStateAsync({
       formData: { ...formData, [name]: newValue },
     });
-  };
+  };;
 
   /**
    * Handle checkboxes when they are clicked
@@ -482,6 +484,12 @@ class MassEnergizeForm extends Component {
   setError(error) {
     this.setState({ error: error, startCircularSpinner: false });
   }
+
+  resetForm(defaults = { formData: {} }) {
+    const refreshKey = getRandomStringKey();
+    this.setState({ ...defaults, refreshKey });
+    //More to come, on uncontrolled fields (when needed)
+  }
   /**
    * This handles the form data submission
    */
@@ -542,7 +550,14 @@ class MassEnergizeForm extends Component {
         startCircularSpinner: false,
         // formData: initialFormData
       });
-      if (onComplete) onComplete(response.data, response && response.success);
+
+      if (onComplete)
+        onComplete(
+          response.data,
+          response && response.success,
+          this.resetForm.bind(this)
+        );
+
       if (formJson.successRedirectPage) {
         this.props.history.push(formJson.successRedirectPage);
         // window.location.href = formJson.successRedirectPage;
@@ -1019,9 +1034,13 @@ class MassEnergizeForm extends Component {
               required={field.isRequired}
               name={field.name}
               onChange={
+                
                 field.name === "subdomain"
+                 
                   ? this.handleSubDomainChange
+                 
                   : this.handleFormDataChange
+              
               }
               label={field.label}
               multiline={field.isMultiline}
@@ -1144,7 +1163,7 @@ class MassEnergizeForm extends Component {
     } = this.state;
     if (!formJson) return <Loading />;
     return (
-      <div>
+      <div key={this.state.refreshKey}>
         <Grid
           container
           spacing={24}
