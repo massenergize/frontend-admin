@@ -34,6 +34,7 @@ import {
   LOAD_SETTINGS,
   LOAD_FEATURE_FLAGS,
   LOAD_ADMIN_ACTIVITIES,
+  ADD_NEW_FEATURE_FLAG_INFO,
   LOAD_ADMINS_FOR_MY_COMMUNITY,
   LOAD_SUPER_ADMIN_LIST,
 } from "../ReduxConstants";
@@ -160,6 +161,11 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadFeatureFlags(featureFlags.data || {}));
   });
 };
+
+export const reduxAddFlagInfo = (data = {}) => ({
+  type: ADD_NEW_FEATURE_FLAG_INFO,
+  payload: data,
+});
 
 export const loadFeatureFlags = (data = LOADING) => ({
   type: LOAD_FEATURE_FLAGS,
