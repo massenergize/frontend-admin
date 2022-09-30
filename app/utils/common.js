@@ -1,8 +1,23 @@
 /** *
  * All utility Functions
  */
+import { Typography } from "@material-ui/core";
 import moment from "moment";
 import qs from "qs";
+import React from "react";
+
+export function makeDeleteUI({ idsToDelete, templates }) {
+  const len = (idsToDelete && idsToDelete.length) || 0;
+  var text = `Are you sure you want to delete (
+    ${(idsToDelete && idsToDelete.length) || ""})
+    ${len === 1 ? " event? " : " events? "}`;
+
+  if (templates && templates.length)
+    text = `Sorry, (${templates.length}) template${
+      templates.length === 1 ? "" : "s"
+    } selected. You can't delete templates. `;
+  return <Typography>{text}</Typography>;
+}
 
 export const objArrayToString = (data, func) => {
   var s = "";
@@ -26,13 +41,24 @@ export const makeLimitsFromImageArray = (images) => {
     images: images || [],
   };
 };
-export const getHumanFriendlyDate = (dateString, includeTime = false) => {
+export const getHumanFriendlyDate = (
+  dateString,
+  includeTime = false,
+  forSorting = true
+) => {
   if (!dateString) return null;
+  var format = "";
+  if (forSorting) format = `YYYY-MM-DD ${includeTime ? "hh:mm a" : ""}`;
+  else format = `MMMM Do, YYYY ${includeTime ? "hh:mm a" : ""}`;
   return moment(dateString).format(
     // make it a bit less human friendly, so it sorts properly
-    `YYYY-MM-DD ${includeTime ? "hh:mm a" : ""}`
-    //`MMMM Do, YYYY ${includeTime ? "hh:mm a" : ""}`
+    format
   );
+};
+export const makeTimeAgo = (dateString) => {
+  if (!dateString) return "";
+
+  return moment(dateString).fromNow();
 };
 export const smartString = (string, charLimit = 60) => {
   if (!string) return "";
@@ -54,6 +80,18 @@ export const pop = (arr = [], value, finder) => {
   arr.forEach((item) => {
     const val = finder ? finder(item) : item;
     if (val === value) found = item;
+    else rest.push(item);
+  });
+
+  return [found, rest];
+};
+
+export const findMatchesAndRest = (arr = [], finder) => {
+  if (!arr) return [];
+  const rest = [];
+  const found = [];
+  arr.forEach((item) => {
+    if (finder(item)) found.push(item);
     else rest.push(item);
   });
 
@@ -104,23 +142,6 @@ export function goHere(link, history) {
   window.location = link;
 }
 
-export function downloadFile(file) {
-  if (!file) return;
-
-  if (window.navigator.msSaveOrOpenBlob) {
-    window.navigator.msSaveBlob(file, file.name);
-  } else {
-    const elem = window.document.createElement("a");
-    const URL = window.URL.createObjectURL(file);
-    elem.href = URL;
-    elem.download = file.name;
-    document.body.appendChild(elem);
-    elem.click();
-    document.body.removeChild(elem);
-    window.URL.revokeObjectURL(URL);
-  }
-}
-
 // TODO: be aware of filter choices
 export const updateFilterChoices = () => {
   return null;
@@ -137,4 +158,12 @@ export const getFilterInputsFromURL = (location) => {
     ignoreQueryPrefix: true,
   });
   return filterInputs;
+};
+
+export const ourCustomSort = ({ a, b, colIndex, order, compare }) => {
+  const directionConstant = order === "desc" ? 1 : -1;
+  a = a.data[colIndex];
+  b = b.data[colIndex];
+  if (compare) return compare({ a, b }) * directionConstant;
+  return (a < b ? -1 : 1) * directionConstant;
 };

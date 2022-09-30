@@ -180,24 +180,27 @@ class EditEventForm extends Component {
     if (!formJson) return <Loading />;
     return (
       <div>
-        <Paper style={{ padding: 20, marginBottom: 15 }}>
-          <Typography>
-            Would you like to see a list of users who have RSVP-ed for this
-            event?
-          </Typography>
-          <Link
-            to={`/admin/edit/${event && event.id}/event-rsvps`}
-            style={{ marginTop: 6, color: "var(--app-cyan)" }}
-          >
-            See A Full List Here
-          </Link>
-        </Paper>
+        {event.rsvp_enabled ? (
+          <Paper style={{ padding: 20, marginBottom: 15 }}>
+            <Typography>
+              Would you like to see a list of users who have RSVP-ed for
+              this event?
+            </Typography>
+            <Link
+              to={`/admin/edit/${event && event.id}/event-rsvps`}
+              style={{ marginTop: 6, color: "var(--app-cyan)" }}
+            >
+              See A Full List Here
+            </Link>
+          </Paper>
+        ) : null}
 
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
           readOnly={readOnly}
           enableCancel
+          validator={validator}
         />
       </div>
     );
@@ -235,6 +238,18 @@ EditEventForm.propTypes = {
 };
 export default withStyles(styles, { withTheme: true })(EditEventMapped);
 
+const validator = (cleaned) => {
+  const start = (cleaned || {})["start_date_and_time"];
+  const end = (cleaned || {})["end_date_and_time"];
+  console.log(start, end);
+  const endDateComesLater = new Date(end) > new Date(start);
+  return [
+    endDateComesLater,
+    !endDateComesLater &&
+      "Please provide an end date that comes later than your start date",
+  ];
+};
+
 const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
   const statuses = ["Draft", "Live", "Archived"];
   if (!event || !communities) return;
@@ -255,7 +270,6 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
             placeholder: "Event ID",
             fieldType: "TextField",
             contentType: "number",
-            isRequired: true,
             defaultValue: event.id,
             dbName: "event_id",
             readOnly: true,
@@ -289,7 +303,7 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
             placeholder: "eg. 1",
             fieldType: "TextField",
             contentType: "number",
-            isRequired: true,
+            isRequired: false,
             defaultValue: event.rank,
             dbName: "rank",
             readOnly: false,
@@ -300,7 +314,6 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
             placeholder: "YYYY-MM-DD HH:MM",
             fieldType: "DateTime",
             contentType: "text",
-            isRequired: true,
             defaultValue: event.start_date_and_time,
             dbName: "start_date_and_time",
             readOnly: false,
@@ -311,7 +324,6 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
             placeholder: "YYYY-MM-DD HH:MM",
             fieldType: "DateTime",
             contentType: "text",
-            isRequired: true,
             defaultValue: event.end_date_and_time,
             dbName: "end_date_and_time",
             readOnly: false,
@@ -504,17 +516,25 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
                   fields: [
                     {
                       name: "community",
-                      label: "Primary Community",
-                      placeholder: "eg. Springfield",
+                      label: "Primary Community (select one)",
                       fieldType: "Dropdown",
                       defaultValue: event.community && event.community.id,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
+                      isRequired:true,
                     },
                   ],
                 },
               }
-            : {},
+            : {
+              name: "community",
+              label: "Primary Community (select one)",
+              fieldType: "Dropdown",
+              defaultValue: event.community && event.community.id,
+              dbName: "community_id",
+              data: [{ displayName: "--", id: "" }, ...communities],
+              isRequired:true,
+            },
         ],
       },
       {
@@ -592,7 +612,7 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
         fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload Files",
-        isRequired: true,
+        isRequired: false,
         selected: event.image ? [event.image] : [],
       },
       {

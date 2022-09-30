@@ -40,15 +40,26 @@ import app, {
   reducerForUniversalModal,
   testReduxReducer,
   allTaskFunctionsReducer,
-  allTasksReducer
+  allTasksReducer,
+  reducerForSettings,
+  reducerForFeatureFlags,
+  reducerForAdminActivities,
+  reducerForFlagInfo,
+  reducerForLoadingAdmins,
+  reducerForLoadingSuperAdmins,
 } from "./modules/appReducer";
-
 
 /**
  * Creates the main reducer with the dynamically injected ones
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    activities: reducerForAdminActivities,
+    flagInfos: reducerForFlagInfo,
+    sadmins: reducerForLoadingSuperAdmins,
+    admins: reducerForLoadingAdmins,
+    featureFlags: reducerForFeatureFlags,
+    settings: reducerForSettings,
     testRedux: testReduxReducer,
     modalOptions: reducerForUniversalModal,
     ccActions: reducerForCCAction,
@@ -86,7 +97,7 @@ export default function createReducer(injectedReducers = {}) {
     router: connectRouter(history),
     ...injectedReducers,
     taskFunctions: allTaskFunctionsReducer,
-    tasks:allTasksReducer,
+    tasks: allTasksReducer,
   });
 
   // Wrap the root reducer and return a new root reducer with router state

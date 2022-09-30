@@ -1,5 +1,6 @@
 import { Map, fromJS } from "immutable";
 import { START_UP } from "../../actions/actionConstants";
+import { LOADING } from "../../utils/constants";
 import {
   LOAD_ALL_COMMUNITIES,
   LOAD_AUTH_ADMIN,
@@ -30,6 +31,12 @@ import {
   TEST_REDUX,
   LOAD_ALL_TASK_FUNCTIONS,
   LOAD_ALL_TASKS,
+  LOAD_SETTINGS,
+  LOAD_FEATURE_FLAGS,
+  LOAD_ADMIN_ACTIVITIES,
+  ADD_NEW_FEATURE_FLAG_INFO,
+  LOAD_ADMINS_FOR_MY_COMMUNITY,
+  LOAD_SUPER_ADMIN_LIST,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -48,6 +55,7 @@ export function testReduxReducer(state = null, action = {}) {
       return state;
   }
 }
+
 export default function reducer(state = initialImmutableState, action = {}) {
   switch (action.type) {
     case START_UP:
@@ -56,6 +64,54 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+export const reducerForAdminActivities = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_ADMIN_ACTIVITIES:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForFlagInfo = (state ={}, action = {}) => {
+  switch (action.type) {
+    case ADD_NEW_FEATURE_FLAG_INFO:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForLoadingSuperAdmins = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_SUPER_ADMIN_LIST:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForLoadingAdmins = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_ADMINS_FOR_MY_COMMUNITY:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForFeatureFlags = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_FEATURE_FLAGS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForSettings = (state = null, action = {}) => {
+  switch (action.type) {
+    case LOAD_SETTINGS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 
 export const reducerForUniversalModal = (state = {}, action = {}) => {
   switch (action.type) {

@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
-import Icon from "@material-ui/core/Icon";
 import { Helmet } from "react-helmet";
 import { bindActionCreators } from "redux";
 import brand from "dan-api/dummy/brand";
@@ -12,13 +11,13 @@ import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import AppBar from "@material-ui/core/AppBar";
 import Tabs from "@material-ui/core/Tabs";
-import classNames from "classnames";
-import Grid from "@material-ui/core/Grid";
 import Tab from "@material-ui/core/Tab";
 import PeopleIcon from "@material-ui/icons/People";
 import AddBoxIcon from "@material-ui/icons/AddBox";
 import Loading from "dan-components/Loading";
 import styles from "../../../components/Widget/widget-jss";
+import Snackbar from '@material-ui/core/Snackbar';
+import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
 import {
   reduxGetAllTeams,
   reduxGetAllCommunityTeams,
@@ -26,7 +25,6 @@ import {
 } from "../../../redux/redux-actions/adminActions";
 import { apiCall, apiCallFile } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
-import { downloadFile } from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 
 function TabContainer(props) {
@@ -53,6 +51,7 @@ class TeamMembers extends React.Component {
       value: 0,
       error: null,
       loadingCSVs: [],
+      success: false,
     };
   }
 
@@ -72,7 +71,7 @@ class TeamMembers extends React.Component {
     oldLoadingCSVs = this.state.loadingCSVs;
     oldLoadingCSVs.splice(oldLoadingCSVs.indexOf(endpoint), 1);
     if (csvResponse.success) {
-      downloadFile(csvResponse.file);
+      this.setState({success: true});
     } else {
       this.setState({ error: csvResponse.error });
     }
@@ -187,7 +186,6 @@ class TeamMembers extends React.Component {
               placeholder: "eg. id",
               fieldType: "TextField",
               contentType: "text",
-              isRequired: true,
               defaultValue: team.id,
               dbName: "team_id",
               readOnly: true,
@@ -226,12 +224,27 @@ class TeamMembers extends React.Component {
     this.setState({ value });
   };
 
+  handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    this.setState({ success: false });
+  };
+
+  handleCloseStyle = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    this.setState({ error: null });
+  };
+
+
   render() {
     const title = brand.name + " - All Teams";
     const description = brand.desc;
     const { columns, data, team, formJson, value, loading } = this.state;
     const { classes } = this.props;
-    const { loadingCSVs } = this.state;
+    const { error, loadingCSVs, success } = this.state;
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
@@ -255,6 +268,39 @@ class TeamMembers extends React.Component {
       );
     return (
       <div>
+        {error && (
+          <div>
+            <Snackbar
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              open={error != null}
+              autoHideDuration={6000}
+              onClose={this.handleCloseStyle}
+            >
+              <MySnackbarContentWrapper
+                onClose={this.handleCloseStyle}
+                variant="error"
+                message={`Unable to download: ${error}`}
+              />
+            </Snackbar>
+          </div>
+        )}
+        {success && (
+          <div style={{ marginBottom: 20 }}>
+            <Snackbar
+              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+              open={success}
+              autoHideDuration={3000}
+              onClose={this.handleClose}
+            >
+              <MySnackbarContentWrapper
+                onClose={this.handleClose}
+                variant="success"
+                message={`Your request has been received. Please check your email for the file.`}
+              />
+            </Snackbar>
+          </div>
+        )}
+
         <Helmet>
           <title>{title}</title>
           <meta name="description" content={description} />
@@ -295,7 +341,7 @@ class TeamMembers extends React.Component {
             }}
             style={{ marginLeft: 20 }}
           >
-            Download Users and Actions CSV
+            Request Users and Actions CSV
           </Link>
         </Paper>
 

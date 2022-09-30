@@ -16,7 +16,7 @@ import {
   reduxCallIdToken,
   reduxLoadAuthAdmin,
 } from "../../redux/redux-actions/adminActions";
-import { LAST_VISITED } from "../../utils/constants";
+import { LAST_VISITED, TIME_UNTIL_EXPIRATION, TWENTY_FOUR_HOURS } from "../../utils/constants";
 
 window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
 
@@ -106,6 +106,10 @@ class App extends React.Component {
     apiCall("auth.login", body)
       .then((res) => {
         const { error } = res;
+        var time = Date.now();
+        time = time + TWENTY_FOUR_HOURS;
+        localStorage.setItem(TIME_UNTIL_EXPIRATION, time);
+
         if (error) {
           me.setState({ error, started: false });
           // window.location.href = '/login';

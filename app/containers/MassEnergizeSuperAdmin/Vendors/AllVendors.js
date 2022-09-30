@@ -100,6 +100,7 @@ class AllVendors extends React.Component {
       name: "Image",
       key: "image",
       options: {
+        sort:false,
         filter: false,
         download: false,
         customBodyRender: (d) => (
@@ -184,7 +185,7 @@ class AllVendors extends React.Component {
     const itemsInRedux = allVendors;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][1];
+      const found = data[d.dataIndex][0];
       ids.push(found);
       apiCall("/vendors.delete", { vendor_id: found });
     });
