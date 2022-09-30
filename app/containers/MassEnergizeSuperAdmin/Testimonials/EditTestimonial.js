@@ -180,7 +180,6 @@ const createFormJson = ({ communities, actions, vendors, testimonial }) => {
             placeholder: "0",
             fieldType: "TextField",
             contentType: "text",
-            isRequired: true,
             defaultValue: testimonial && testimonial.id,
             dbName: "testimonial_id",
             readOnly: true,
@@ -293,7 +292,7 @@ const createFormJson = ({ communities, actions, vendors, testimonial }) => {
         label: "Upload a file for this testimonial",
         uploadMultiple: false, 
         multiple: false,
-        isRequired: true,
+        isRequired: false,
        
       },
       {

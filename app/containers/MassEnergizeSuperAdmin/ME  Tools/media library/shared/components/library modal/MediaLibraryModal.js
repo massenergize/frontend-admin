@@ -36,13 +36,17 @@ function MediaLibraryModal({
   croppedSource,
   setCroppedSource,
   allowCropping,
-  fileLimit
+  fileLimit,
+  maximumImageSize,
+  compress,
+  compressedQuality,
+  TooltipWrapper,
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
   const [previews, setPreviews] = useState([]);
 
-  const [content, setSelectedContent] = useState(selected); // all the selected items in the library will always be available in an array here
+  const [content, setSelectedContent] = useState(selected); // all the selected items from library will always be available in an array here
   const [state, setState] = useState({ uploading: uploading });
   const [loadingMore, setLoadingMore] = useState(false);
   const [shouldWait, setShouldWait] = useState(useAwait);
@@ -93,6 +97,9 @@ function MediaLibraryModal({
       key: "upload",
       component: (
         <Upload
+          maximumImageSize={maximumImageSize}
+          compress={compress}
+          compressedQuality={compressedQuality}
           previews={previews}
           setPreviews={setPreviews}
           files={files}
@@ -106,7 +113,7 @@ function MediaLibraryModal({
           switchToCropping={switchToCropping}
           cropped={cropped}
           allowCropping={allowCropping}
-          fileLimit = {fileLimit}
+          fileLimit={fileLimit}
         />
       ),
     },
@@ -128,7 +135,7 @@ function MediaLibraryModal({
             shouldWait={shouldWait}
             setShouldWait={setShouldWait}
             awaitSeconds={awaitSeconds}
-            fileLimit = {fileLimit}
+            fileLimit={fileLimit}
           />
         </Suspense>
       ),
@@ -208,6 +215,7 @@ function MediaLibraryModal({
             </div>
           </div>
           <Footer
+            TooltipWrapper={TooltipWrapper}
             images={images}
             files={files}
             content={content}
@@ -232,8 +240,13 @@ const Footer = ({
   currentTab,
   cropLoot,
   finaliseCropping,
+  TooltipWrapper,
 }) => {
   const isCropping = currentTab === TABS.CROPPING_TAB;
+  const isUploadTab = currentTab === TABS.UPLOAD_TAB;
+  const tooltipMessageWhenDisabled = isUploadTab
+    ? "Click the upload button to upload first, then you can insert your image"
+    : "Select an image from the list to insert";
   const len = content && content.length;
   return (
     <div className="ml-footer">
@@ -276,7 +289,16 @@ const Footer = ({
             }}
             disabled={!len}
           >
-            INSERT {len > 0 ? `(${len})` : ""}
+            {TooltipWrapper ? (
+              <TooltipWrapper
+                title={tooltipMessageWhenDisabled}
+                placement="top"
+              >
+                <span>INSERT {len > 0 ? `(${len})` : ""}</span>
+              </TooltipWrapper>
+            ) : (
+              `INSERT ${len > 0 ? `(${len})` : ""}`
+            )}
           </button>
         )}
       </div>

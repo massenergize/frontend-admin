@@ -58,9 +58,6 @@ class CreateTaskForm extends Component {
       taskFunctions,
       toEdit: toEditTask,
     });
-    const jobsDoneDontRunWhatsBelowEverAgain =
-      !(taskFunctions && taskFunctions.length) || state.mounted;
-    if (jobsDoneDontRunWhatsBelowEverAgain) return null;
     return {
       formJson,
       taskFunctions,

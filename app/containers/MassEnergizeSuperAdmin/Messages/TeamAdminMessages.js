@@ -12,7 +12,7 @@ import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
-import { Chip, Typography } from "@material-ui/core";
+import { Chip, Typography, Grid, Paper} from "@material-ui/core";
 import {
   loadTeamMessages,
   reduxToggleUniversalModal,
@@ -26,6 +26,7 @@ class AllTeamAdminMessages extends React.Component {
     this.state = {
       loading: true,
       columns: this.getColumns(props.classes),
+      hasNoItems: false,
     };
   }
 
@@ -33,6 +34,8 @@ class AllTeamAdminMessages extends React.Component {
     apiCall("/messages.listTeamAdminMessages").then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
         this.props.putTeamMessagesInRedux(allMessagesResponse.data);
+        let hasItems = allMessagesResponse.data && allMessagesResponse.data.length>0;
+        this.setState({ hasNoItems: !hasItems });
       }
     });
   }
@@ -149,7 +152,7 @@ class AllTeamAdminMessages extends React.Component {
     const itemsInRedux = teamMessages;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][1];
+      const found = data[d.dataIndex][0];
       ids.push(found);
       apiCall("/messages.delete", { message_id: found });
     });
@@ -192,6 +195,26 @@ class AllTeamAdminMessages extends React.Component {
     };
 
     if (!data || !data.length) {
+      if(this.state.hasNoItems){
+        return (
+          <Grid
+            container
+            spacing={24}
+            alignItems="flex-start"
+            direction="row"
+            justify="center"
+          >
+            <Grid item xs={12} md={6}>
+              <Paper className={classes.root} style={{ padding: 15 }}>
+                <div className={classes.root}>
+                  <h1>No messages currently to display</h1>
+                  <br />
+                </div>
+              </Paper>
+            </Grid>
+          </Grid>
+        );
+      }
       return <LinearBuffer />;
     }
 
