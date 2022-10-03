@@ -26,6 +26,8 @@ import {
 
 import {
   findMatchesAndRest,
+  getHumanFriendlyDate,
+  getTimeStamp,
   isNotEmpty,
   makeDeleteUI,
   ourCustomSort,
@@ -263,6 +265,26 @@ class AllActions extends React.Component {
           download: false,
         },
       },
+      {
+        name: "Created At",
+        key: "hidden_created_at",
+        options: {
+          display: false,
+          filter: false,
+          searchable: false,
+          download: true,
+        },
+      },
+      {
+        name: "Last Update",
+        key: "hidden_updated_at",
+        options: {
+          display: false,
+          filter: false,
+          searchable: false,
+          download: true,
+        },
+      },
     ];
   };
   /**
@@ -287,6 +309,8 @@ class AllActions extends React.Component {
       d.id,
       d.is_published ? "Yes" : "No",
       d.is_global,
+      getHumanFriendlyDate(d.created_at, true, false),
+      getHumanFriendlyDate(d.updated_at, true, false)
     ]);
     return fashioned;
   };
@@ -334,20 +358,20 @@ class AllActions extends React.Component {
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putActionsInRedux(rem);
   }
-  getTimeStamp = () => {
-    const today = new Date();
-    let newDate = today;
-    let options = {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    };
+  // getTimeStamp = () => {
+  //   const today = new Date();
+  //   let newDate = today;
+  //   let options = {
+  //     year: "numeric",
+  //     month: "short",
+  //     day: "numeric",
+  //     hour: "2-digit",
+  //     minute: "2-digit",
+  //     second: "2-digit",
+  //   };
 
-    return Intl.DateTimeFormat("en-US", options).format(newDate);
-  };
+  //   return Intl.DateTimeFormat("en-US", options).format(newDate);
+  // };
 
   customSort(data, colIndex, order) {
     const isComparingLive = colIndex === 6;
@@ -433,23 +457,8 @@ class AllActions extends React.Component {
         });
         return false;
       },
-      // customSort: (data, colIndex, order) => {
-      //   return data.sort((a, b) => {
-      //     if (colIndex === 3) {
-      //       return (
-      //         (a.data[colIndex].rank < b.data[colIndex].rank ? -1 : 1) *
-      //         (order === "desc" ? 1 : -1)
-      //       );
-      //     } else {
-      //       return (
-      //         (a.data[colIndex] < b.data[colIndex] ? -1 : 1) *
-      //         (order === "desc" ? 1 : -1)
-      //       );
-      //     }
-      //   });
-      // },
       downloadOptions: {
-        filename: `All Actions (${this.getTimeStamp()}).csv`,
+        filename: `All Actions (${getTimeStamp()}).csv`,
         separator: ",",
       },
       onDownload: (buildHead, buildBody, columns, data) => {
