@@ -167,3 +167,18 @@ export const ourCustomSort = ({ a, b, colIndex, order, compare }) => {
   if (compare) return compare({ a, b }) * directionConstant;
   return (a < b ? -1 : 1) * directionConstant;
 };
+
+export const getTimeStamp = () => {
+  const today = new Date();
+  let newDate = today;
+  let options = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  };
+
+  return Intl.DateTimeFormat("en-US", options).format(newDate);
+};
