@@ -5,11 +5,13 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import Dashboard from "../Templates/Dashboard";
 import {
+  checkFirebaseAuthentication,
   reduxCallCommunities,
   reduxCallLibraryModalImages,
   reduxCheckUser,
   reduxFetchInitialContent,
   reduxToggleUniversalModal,
+  runAdminStatusCheck,
 } from "../../redux/redux-actions/adminActions";
 import {
   Parent,
@@ -91,6 +93,7 @@ class Application extends React.Component {
     this.props.reduxCallCommunities();
   }
   componentDidMount() {
+    this.props.checkFirebaseAuthentication()
     this.props.fetchInitialContent(this.props.auth);
     setInterval(() => {
       const expirationTime = Number(
@@ -98,27 +101,14 @@ class Application extends React.Component {
       );
       const currentDateTime = Date.now();
       const itsPassedADaySinceLogin = currentDateTime > expirationTime;
-      if (itsPassedADaySinceLogin) this.runAdminStatusCheck();
-    }, THREE_MINUTES);
+      if (itsPassedADaySinceLogin) runAdminStatusCheck();
+    },THREE_MINUTES);
   }
 
   getCommunityList() {
     const { auth } = this.props;
     const list = (auth && auth.admin_at) || [];
     return list.map((com) => com.id);
-  }
-
-  async runAdminStatusCheck() {
-    try {
-      const response = await apiCall("/auth.whoami");
-      if (response.success) return;
-
-      if (response.error === PERMISSION_DENIED)
-        return (window.location = "/login");
-    } catch (e) {
-      console.log("ADMIN_SESSION_STATUS_ERROR:", e.toString());
-      return (window.location = "/login");
-    }
   }
 
   render() {
@@ -392,6 +382,7 @@ function mapDispatchToProps(dispatch) {
       loadModalImages: reduxCallLibraryModalImages,
       fetchInitialContent: reduxFetchInitialContent,
       toggleUniversalModal: reduxToggleUniversalModal,
+      checkFirebaseAuthentication
     },
     dispatch
   );
