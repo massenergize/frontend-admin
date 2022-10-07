@@ -46,6 +46,8 @@ import app, {
   reducerForAdminActivities,
   reducerForFlagInfo,
   reducerForGalleryFilters,
+  reducerForLoadingAdmins,
+  reducerForLoadingSuperAdmins,
 } from "./modules/appReducer";
 
 /**
@@ -56,6 +58,8 @@ export default function createReducer(injectedReducers = {}) {
     activities: reducerForAdminActivities,
     flagInfos: reducerForFlagInfo,
     galleryFilters: reducerForGalleryFilters,
+    sadmins: reducerForLoadingSuperAdmins,
+    admins: reducerForLoadingAdmins,
     featureFlags: reducerForFeatureFlags,
     settings: reducerForSettings,
     testRedux: testReduxReducer,

@@ -36,14 +36,37 @@ import {
   LOAD_ADMIN_ACTIVITIES,
   ADD_NEW_FEATURE_FLAG_INFO,
   SET_GALLERY_FILTERS,
+  LOAD_ADMINS_FOR_MY_COMMUNITY,
+  LOAD_SUPER_ADMIN_LIST,
 } from "../ReduxConstants";
-import { apiCall } from "../../utils/messenger";
+import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
 import { LOADING } from "../../utils/constants";
 
 // TODO: REOMVE THIS FUNCTiON
 export const testRedux = (value) => {
   return { type: TEST_REDUX, payload: value };
+};
+
+export const runAdminStatusCheck = async () => {
+  try {
+    const response = await apiCall("/auth.whoami");
+    if (response.success) return;
+
+    if (response.error === PERMISSION_DENIED)
+      return (window.location = "/login");
+  } catch (e) {
+    console.log("ADMIN_SESSION_STATUS_ERROR:", e.toString());
+    return (window.location = "/login");
+  }
+};
+
+export const checkFirebaseAuthentication = () => {
+  return () =>
+    firebase.auth().onAuthStateChanged((user) => {
+      if (!user) return (window.location = "/login");
+      runAdminStatusCheck();
+    });
 };
 export const loadSettings = (data = {}) => {
   return {
@@ -54,6 +77,18 @@ export const loadSettings = (data = {}) => {
 export const reduxSetGalleryFilters = (data = {}) => {
   return {
     type: SET_GALLERY_FILTERS,
+    payload:data,
+  }
+}
+export const reduxLoadSuperAdmins = (data = LOADING) => {
+  return {
+    type: LOAD_SUPER_ADMIN_LIST,
+    payload: data,
+  };
+};
+export const reduxLoadAdmins = (data = LOADING) => {
+  return {
+    type: LOAD_ADMINS_FOR_MY_COMMUNITY,
     payload: data,
   };
 };

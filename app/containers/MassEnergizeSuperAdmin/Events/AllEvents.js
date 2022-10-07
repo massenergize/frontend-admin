@@ -26,6 +26,7 @@ import {
 import {
   findMatchesAndRest,
   getHumanFriendlyDate,
+  getTimeStamp,
   makeDeleteUI,
   ourCustomSort,
   smartString,
@@ -70,6 +71,8 @@ class AllEvents extends React.Component {
       d.id,
       d.is_published ? "Yes" : "No",
       d.is_global,
+      getHumanFriendlyDate(d.start_date_and_time, true, false),
+      getHumanFriendlyDate(d.end_date_and_time, true, false),
     ]);
     return fashioned;
   }
@@ -89,6 +92,7 @@ class AllEvents extends React.Component {
         key: "date",
         options: {
           filter: false,
+          download: false,
         },
       },
       {
@@ -221,6 +225,26 @@ class AllEvents extends React.Component {
           download: false,
         },
       },
+      {
+        name: "Start Date",
+        key: "hidden_start_date",
+        options: {
+          display: false,
+          filter: false,
+          searchable: false,
+          download: true,
+        },
+      },
+      {
+        name: "End Date",
+        key: "hidden_end_Date",
+        options: {
+          display: false,
+          filter: false,
+          searchable: false,
+          download: true,
+        },
+      },
     ];
   }
 
@@ -264,7 +288,7 @@ class AllEvents extends React.Component {
     };
     return data.sort((a, b) => ourCustomSort({ ...params, a, b }));
   }
-  
+
   nowDelete({ idsToDelete, data }) {
     const { allEvents, putEventsInRedux } = this.props;
     const itemsInRedux = allEvents;
@@ -291,6 +315,10 @@ class AllEvents extends React.Component {
       rowsPerPage: 25,
       customSort: this.customSort,
       rowsPerPageOptions: [10, 25, 100],
+      downloadOptions: {
+        filename: `All Events (${getTimeStamp()}).csv`,
+        separator: ",",
+      },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         const [found] = findMatchesAndRest(idsToDelete, (it) => {
