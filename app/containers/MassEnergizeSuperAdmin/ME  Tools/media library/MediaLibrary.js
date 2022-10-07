@@ -373,7 +373,7 @@ MediaLibrary.propTypes = {
   /**
    * A component that needs to be rendered before the images in the library are to be rendered
    */
-  renderBeforeImages: PropTypes.element
+  renderBeforeImages: PropTypes.element,
 
   /**
    * A function that should return a tooltip component. 
