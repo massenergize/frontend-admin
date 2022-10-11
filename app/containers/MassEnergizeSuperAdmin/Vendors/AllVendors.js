@@ -101,6 +101,7 @@ class AllVendors extends React.Component {
       name: "Image",
       key: "image",
       options: {
+        sort:false,
         filter: false,
         download: false,
         customBodyRender: (d) => (

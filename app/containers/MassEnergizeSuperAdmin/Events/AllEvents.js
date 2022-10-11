@@ -27,6 +27,9 @@ import {
   findMatchesAndRest,
   getHumanFriendlyDate,
   makeDeleteUI,
+  getTimeStamp,
+  makeDeleteUI,
+  ourCustomSort,
   smartString,
 } from "../../../utils/common";
 import { Chip, Typography } from "@material-ui/core";
@@ -52,7 +55,7 @@ class AllEvents extends React.Component {
     }
   }
 
-  fashionData = (data) => {
+  fashionData(data) {
     const fashioned = data.map((d) => [
       d.id,
       getHumanFriendlyDate(d.start_date_and_time, true),
@@ -69,11 +72,13 @@ class AllEvents extends React.Component {
       d.id,
       d.is_published ? "Yes" : "No",
       d.is_global,
+      getHumanFriendlyDate(d.start_date_and_time, true, false),
+      getHumanFriendlyDate(d.end_date_and_time, true, false),
     ]);
     return fashioned;
-  };
+  }
 
-  getColumns = () => {
+  getColumns() {
     const { classes, putEventsInRedux, allEvents } = this.props;
     return [
       {
@@ -88,12 +93,14 @@ class AllEvents extends React.Component {
         key: "date",
         options: {
           filter: false,
+          download: false,
         },
       },
       {
         name: "Event",
         key: "event",
         options: {
+          sort: false,
           filter: false,
           download: false,
           customBodyRender: (d) => (
@@ -209,6 +216,7 @@ class AllEvents extends React.Component {
           filter: true,
           searchable: false,
           download: true,
+          sort: false,
         },
       },
       {
@@ -221,8 +229,28 @@ class AllEvents extends React.Component {
           download: false,
         },
       },
+      {
+        name: "Start Date",
+        key: "hidden_start_date",
+        options: {
+          display: false,
+          filter: false,
+          searchable: false,
+          download: true,
+        },
+      },
+      {
+        name: "End Date",
+        key: "hidden_end_Date",
+        options: {
+          display: false,
+          filter: false,
+          searchable: false,
+          download: true,
+        },
+      },
     ];
-  };
+  }
 
   makeLiveOrNot(item) {
     const putInRedux = this.props.putEventsInRedux;
@@ -256,6 +284,18 @@ class AllEvents extends React.Component {
       </div>
     );
   }
+
+  customSort(data, colIndex, order) {
+    const isComparingLive = colIndex === 7;
+    const sortForLive = ({ a, b }) => (a.isLive && !b.isLive ? -1 : 1);
+    var params = {
+      colIndex,
+      order,
+      compare: isComparingLive && sortForLive,
+    };
+    return data.sort((a, b) => ourCustomSort({ ...params, a, b }));
+  }
+
   nowDelete({ idsToDelete, data }) {
     const { allEvents, putEventsInRedux } = this.props;
     const itemsInRedux = allEvents;
@@ -316,6 +356,12 @@ class AllEvents extends React.Component {
             this.callMoreData(allEvents.meta.next);
           }
         }
+      },
+      customSort: this.customSort,
+      rowsPerPageOptions: [10, 25, 100],
+      downloadOptions: {
+        filename: `All Events (${getTimeStamp()}).csv`,
+        separator: ",",
       },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;

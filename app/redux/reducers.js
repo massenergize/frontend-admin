@@ -43,6 +43,10 @@ import app, {
   allTasksReducer,
   reducerForSettings,
   reducerForFeatureFlags,
+  reducerForAdminActivities,
+  reducerForFlagInfo,
+  reducerForLoadingAdmins,
+  reducerForLoadingSuperAdmins,
 } from "./modules/appReducer";
 
 /**
@@ -50,6 +54,10 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    activities: reducerForAdminActivities,
+    flagInfos: reducerForFlagInfo,
+    sadmins: reducerForLoadingSuperAdmins,
+    admins: reducerForLoadingAdmins,
     featureFlags: reducerForFeatureFlags,
     settings: reducerForSettings,
     testRedux: testReduxReducer,

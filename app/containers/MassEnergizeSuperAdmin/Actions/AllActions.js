@@ -26,8 +26,11 @@ import {
 
 import {
   findMatchesAndRest,
+  getHumanFriendlyDate,
+  getTimeStamp,
   isNotEmpty,
   makeDeleteUI,
+  ourCustomSort,
   pop,
   smartString,
 } from "../../../utils/common";
@@ -89,7 +92,7 @@ class AllActions extends React.Component {
     await this.setStateAsync({ data: fashionData(newData) });
   };
 
-  getColumns = () => {
+  getColumns() {
     const { classes, putActionsInRedux, allActions } = this.props;
     return [
       {
@@ -103,6 +106,7 @@ class AllActions extends React.Component {
         name: "Image",
         key: "image",
         options: {
+          sort:false,
           filter: false,
           download: false,
           customBodyRender: (d) => (
@@ -271,6 +275,26 @@ class AllActions extends React.Component {
           download: false,
         },
       },
+      {
+        name: "Created At",
+        key: "hidden_created_at",
+        options: {
+          display: false,
+          filter: false,
+          searchable: false,
+          download: true,
+        },
+      },
+      {
+        name: "Last Update",
+        key: "hidden_updated_at",
+        options: {
+          display: false,
+          filter: false,
+          searchable: false,
+          download: true,
+        },
+      },
     ];
   };
   /**
@@ -279,7 +303,7 @@ class AllActions extends React.Component {
    * @param {*} data
    * @returns
    */
-  fashionData = (data) => {
+  fashionData(data) {
     const fashioned = data.map((d) => [
       d.id,
       {
@@ -295,6 +319,8 @@ class AllActions extends React.Component {
       d.id,
       d.is_published ? "Yes" : "No",
       d.is_global,
+      getHumanFriendlyDate(d.created_at, true, false),
+      getHumanFriendlyDate(d.updated_at, true, false)
     ]);
     return fashioned;
   };
@@ -345,20 +371,35 @@ class AllActions extends React.Component {
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putActionsInRedux(rem);
   }
-  getTimeStamp = () => {
-    const today = new Date();
-    let newDate = today;
-    let options = {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
+  // getTimeStamp = () => {
+  //   const today = new Date();
+  //   let newDate = today;
+  //   let options = {
+  //     year: "numeric",
+  //     month: "short",
+  //     day: "numeric",
+  //     hour: "2-digit",
+  //     minute: "2-digit",
+  //     second: "2-digit",
+  //   };
+
+  //   return Intl.DateTimeFormat("en-US", options).format(newDate);
+  // };
+
+  customSort(data, colIndex, order) {
+    const isComparingLive = colIndex === 6;
+    const isComparingRank = colIndex === 3;
+    const sortForLive = ({ a, b }) => (a.isLive && !b.isLive ? 1 : -1);
+    const sortForRank = ({ a, b }) => (a.rank < b.rank ? -1 : 1);
+    var params = {
+      colIndex,
+      order,
     };
 
-    return Intl.DateTimeFormat("en-US", options).format(newDate);
-  };
+    if (isComparingLive) params = { ...params, compare: sortForLive };
+    else if (isComparingRank) params = { ...params, compare: sortForRank };
+    return data.sort((a, b) => ourCustomSort({ ...params, a, b }));
+  }
 
 
   callMoreData = (page) => {
@@ -374,6 +415,7 @@ class AllActions extends React.Component {
     });
   };
 
+    
   render() {
     const title = brand.name + " - All Actions";
     const description = brand.desc;
@@ -426,6 +468,7 @@ class AllActions extends React.Component {
           }
         }
       },
+      customSort:this.customSort,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         const [found] = findMatchesAndRest(idsToDelete, (it) => {
@@ -450,23 +493,8 @@ class AllActions extends React.Component {
         });
         return false;
       },
-      customSort: (data, colIndex, order) => {
-        return data.sort((a, b) => {
-          if (colIndex === 3) {
-            return (
-              (a.data[colIndex].rank < b.data[colIndex].rank ? -1 : 1) *
-              (order === "desc" ? 1 : -1)
-            );
-          } else {
-            return (
-              (a.data[colIndex] < b.data[colIndex] ? -1 : 1) *
-              (order === "desc" ? 1 : -1)
-            );
-          }
-        });
-      },
       downloadOptions: {
-        filename: `All Actions (${this.getTimeStamp()}).csv`,
+        filename: `All Actions (${getTimeStamp()}).csv`,
         separator: ",",
       },
       onDownload: (buildHead, buildBody, columns, data) => {

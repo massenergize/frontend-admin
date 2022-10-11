@@ -24,6 +24,7 @@ import {
 import {
   getHumanFriendlyDate,
   isNotEmpty,
+  ourCustomSort,
   smartString,
 } from "../../../utils/common";
 import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
@@ -56,7 +57,7 @@ class AllTestimonials extends React.Component {
     }
   }
 
-  fashionData = (data) => {
+  fashionData(data) {
     return data.map((d) => [
       d.id,
       getHumanFriendlyDate(d.created_at, false),
@@ -73,7 +74,7 @@ class AllTestimonials extends React.Component {
       d.id,
       d.is_approved ? (d.is_published ? "Yes" : "No") : "Not Approved",
     ]);
-  };
+  }
 
   getStatus = (isApproved) => {
     switch (isApproved) {
@@ -100,7 +101,7 @@ class AllTestimonials extends React.Component {
     });
   };
 
-  getColumns = () => {
+  getColumns() {
     const { classes } = this.props;
     return [
       {
@@ -246,7 +247,7 @@ class AllTestimonials extends React.Component {
         },
       },
     ];
-  };
+  }
 
   makeLiveOrNot(item) {
     const {putTestimonialsInRedux, allTestimonials} = this.props
@@ -332,7 +333,21 @@ class AllTestimonials extends React.Component {
       page,
     });
   };
+  customSort(data, colIndex, order) {
+    const isComparingLive = colIndex === 5;
+    const isComparingRank = colIndex === 3;
+    const sortForLive = ({ a, b }) => (a.isLive && !b.isLive ? -1 : 1);
+    const sortForRank = ({ a, b }) => (a.rank < b.rank ? -1 : 1);
+    var params = {
+      colIndex,
+      order,
+    };
 
+    if (isComparingLive) params = { ...params, compare: sortForLive };
+    else if (isComparingRank) params = { ...params, compare: sortForRank };
+
+    return data.sort((a, b) => ourCustomSort({ ...params, a, b }));
+  }
   render() {
     const title = brand.name + " - All Testimonials";
     const description = brand.desc;
@@ -356,6 +371,7 @@ class AllTestimonials extends React.Component {
           }
         }
       },
+      customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
@@ -366,21 +382,21 @@ class AllTestimonials extends React.Component {
         });
         return false;
       },
-      customSort: (data, colIndex, order) => {
-        return data.sort((a, b) => {
-          if (colIndex === 3) {
-            return (
-              (a.data[colIndex].rank < b.data[colIndex].rank ? -1 : 1) *
-              (order === "desc" ? 1 : -1)
-            );
-          } else {
-            return (
-              (a.data[colIndex] < b.data[colIndex] ? -1 : 1) *
-              (order === "desc" ? 1 : -1)
-            );
-          }
-        });
-      },
+      // customSort: (data, colIndex, order) => {
+      //   return data.sort((a, b) => {
+      //     if (colIndex === 3) {
+      //       return (
+      //         (a.data[colIndex].rank < b.data[colIndex].rank ? -1 : 1) *
+      //         (order === "desc" ? 1 : -1)
+      //       );
+      //     } else {
+      //       return (
+      //         (a.data[colIndex] < b.data[colIndex] ? -1 : 1) *
+      //         (order === "desc" ? 1 : -1)
+      //       );
+      //     }
+      //   });
+      // },
       downloadOptions: {
         filename: `All Testimonials (${this.getTimeStamp()}).csv`,
         separator: ",",

@@ -4,13 +4,13 @@
 import { Typography } from "@material-ui/core";
 import moment from "moment";
 import qs from "qs";
-import React from 'react';
+import React from "react";
 
 export function makeDeleteUI({ idsToDelete, templates }) {
   const len = (idsToDelete && idsToDelete.length) || 0;
   var text = `Are you sure you want to delete (
     ${(idsToDelete && idsToDelete.length) || ""})
-    ${len === 1 ? " action? " : " actions? "}`;
+    ${len === 1 ? " event? " : " events? "}`;
 
   if (templates && templates.length)
     text = `Sorry, (${templates.length}) template${
@@ -54,6 +54,11 @@ export const getHumanFriendlyDate = (
     // make it a bit less human friendly, so it sorts properly
     format
   );
+};
+export const makeTimeAgo = (dateString) => {
+  if (!dateString) return "";
+
+  return moment(dateString).fromNow();
 };
 export const smartString = (string, charLimit = 60) => {
   if (!string) return "";
@@ -153,4 +158,27 @@ export const getFilterInputsFromURL = (location) => {
     ignoreQueryPrefix: true,
   });
   return filterInputs;
+};
+
+export const ourCustomSort = ({ a, b, colIndex, order, compare }) => {
+  const directionConstant = order === "desc" ? 1 : -1;
+  a = a.data[colIndex];
+  b = b.data[colIndex];
+  if (compare) return compare({ a, b }) * directionConstant;
+  return (a < b ? -1 : 1) * directionConstant;
+};
+
+export const getTimeStamp = () => {
+  const today = new Date();
+  let newDate = today;
+  let options = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  };
+
+  return Intl.DateTimeFormat("en-US", options).format(newDate);
 };

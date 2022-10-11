@@ -1,11 +1,16 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+// import PropTypes from "prop-types";
+// import { withStyles } from "@material-ui/core/styles";
 import MUIDataTable from "mui-datatables";
 import Avatar from "@material-ui/core/Avatar";
 import { apiCall } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
 
+// import { bindActionCreators } from "redux";
+// import { connect } from "react-redux";
+// import { reduxLoadSuperAdmins } from "../../../redux/redux-actions/adminActions";
+import Loading from "dan-components/Loading";
+// import { LOADING } from "../../../utils/constants";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -30,6 +35,18 @@ const styles = (theme) => ({
   },
 });
 
+const fetchSadmins = async ({ reduxFunction }) => {
+  const superAdminResponse = await apiCall("/admins.super.list");
+  if (
+    !superAdminResponse ||
+    !superAdminResponse.success ||
+    !superAdminResponse.data
+  )
+    return reduxFunction([]);
+
+  const data = superAdminResponse.data;
+  reduxFunction(data);
+};
 class AddRemoveSuperAdmin extends Component {
   constructor(props) {
     super(props);
@@ -40,69 +57,69 @@ class AddRemoveSuperAdmin extends Component {
       meta: {},
     };
   }
-
-  async componentDidMount() {
-    const superAdminResponse = await apiCall("/admins.super.list");
-    if (
-      superAdminResponse &&
-      superAdminResponse.data &&
-      superAdminResponse.data.items
-    ) {
-      const data = prepareTableData(superAdminResponse.data.items);
-      const meta = superAdminResponse.data.meta;
-      await this.setStateAsync({ data, meta });
-    }
-
-    const formJson = await this.createFormJson();
-    await this.setStateAsync({ formJson });
-  }
-
-  setStateAsync(state) {
+    setStateAsync(state) {
     return new Promise((resolve) => {
       this.setState(state, resolve);
     });
   }
 
-  createFormJson = async () => {
-    const { pathname } = window.location;
-    const formJson = {
-      title: "Add New Super Admin",
-      subTitle: "",
-      method: "/admins.super.add",
-      successRedirectPage: pathname,
-      fields: [
-        {
-          label: "About this Admin",
-          fieldType: "Section",
-          children: [
-            {
-              name: "name",
-              label: "Name",
-              placeholder: "eg. Grace Tsu",
-              fieldType: "TextField",
-              contentType: "text",
-              isRequired: true,
-              defaultValue: "",
-              dbName: "name",
-              readOnly: false,
-            },
-            {
-              name: "email",
-              label: "Email",
-              placeholder: "eg. johny.appleseed@gmail.com",
-              fieldType: "TextField",
-              contentType: "text",
-              isRequired: true,
-              defaultValue: "",
-              dbName: "email",
-              readOnly: false,
-            },
-          ],
-        },
-      ],
-    };
-    return formJson;
-  };
+
+  async componentDidMount() {
+    const superAdminResponse = await apiCall("/admins.super.list");
+    if ( superAdminResponse &&superAdminResponse.data && superAdminResponse.data.items) {
+      const data = prepareTableData(superAdminResponse.data.items);
+      const meta = superAdminResponse.data.meta;
+      await this.setStateAsync({ data, meta });
+    }
+
+    if (state.mounted) return null;
+
+
+  // createFormJson = async () => {
+  //   const { pathname } = window.location;
+  //   const formJson = {
+  //     title: "Add New Super Admin",
+  //     subTitle: "",
+  //     method: "/admins.super.add",
+  //     successRedirectPage: pathname,
+  //     fields: [
+  //       {
+  //         label: "About this Admin",
+  //         fieldType: "Section",
+  //         children: [
+  //           {
+  //             name: "name",
+  //             label: "Name",
+  //             placeholder: "eg. Grace Tsu",
+  //             fieldType: "TextField",
+  //             contentType: "text",
+  //             isRequired: true,
+  //             defaultValue: "",
+  //             dbName: "name",
+  //             readOnly: false,
+  //           },
+  //           {
+  //             name: "email",
+  //             label: "Email",
+  //             placeholder: "eg. johny.appleseed@gmail.com",
+  //             fieldType: "TextField",
+  //             contentType: "text",
+  //             isRequired: true,
+  //             defaultValue: "",
+  //             dbName: "email",
+  //             readOnly: false,
+  //           },
+  //         ],
+  //       },
+  //     ],
+  //   };
+  //   return formJson;
+  // };
+  //   return {
+  //     formJson: createFormJson(),
+  //     mounted: true,
+  //   };
+  }
 
   getColumns = () => [
     {
@@ -194,11 +211,14 @@ class AddRemoveSuperAdmin extends Component {
         });
       },
     };
-
-    if (!formJson) return <div />;
+    if (!formJson) return <Loading />;
     return (
       <div>
-        <MassEnergizeForm classes={classes} formJson={formJson} />
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+          onComplete={this.whenRequestIsCompleted.bind(this)}
+        />
         <br />
         <br />
         <div className={classes.table}>
@@ -218,18 +238,64 @@ AddRemoveSuperAdmin.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(AddRemoveSuperAdmin);
-
-function prepareTableData(items) {
-  return items.map((d) => [
+const mapStateToProps = (state) => {
+  return {
+    sadmins: state.getIn(["sadmins"]),
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
     {
-      id: d.id,
-      image: d.profile_picture,
-      initials: `${d.preferred_name &&
-        d.preferred_name.substring(0, 2).toUpperCase()}`,
+      putSadminsInRedux: reduxLoadSuperAdmins,
     },
-    d.full_name,
-    d.preferred_name,
-    d.email,
-  ]);
-}
+    dispatch
+  );
+};
+
+const Wrapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AddRemoveSuperAdmin);
+
+export default withStyles(styles, { withTheme: true })(Wrapped);
+
+const createFormJson = () => {
+  const { pathname } = window.location;
+  const formJson = {
+    title: "Add New Super Admin",
+    subTitle: "",
+    method: "/admins.super.add",
+    successRedirectPage: pathname,
+    fields: [
+      {
+        label: "About this Admin",
+        fieldType: "Section",
+        children: [
+          {
+            name: "name",
+            label: "Name",
+            placeholder: "eg. Grace Tsu",
+            fieldType: "TextField",
+            contentType: "text",
+            isRequired: true,
+            defaultValue: "",
+            dbName: "name",
+            readOnly: false,
+          },
+          {
+            name: "email",
+            label: "Email",
+            placeholder: "eg. johny.appleseed@gmail.com",
+            fieldType: "TextField",
+            contentType: "text",
+            isRequired: true,
+            defaultValue: "",
+            dbName: "email",
+            readOnly: false,
+          },
+        ],
+      },
+    ],
+  };
+  return formJson;
+};
