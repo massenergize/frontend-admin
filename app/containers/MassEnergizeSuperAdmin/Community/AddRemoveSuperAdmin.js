@@ -115,10 +115,10 @@ class AddRemoveSuperAdmin extends Component {
   //   };
   //   return formJson;
   // };
-  //   return {
-  //     formJson: createFormJson(),
-  //     mounted: true,
-  //   };
+    return {
+      formJson: createFormJson(),
+      mounted: true,
+    };
   }
 
   getColumns = () => [
