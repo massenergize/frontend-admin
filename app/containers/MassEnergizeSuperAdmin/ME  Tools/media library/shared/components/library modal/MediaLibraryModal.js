@@ -40,6 +40,8 @@ function MediaLibraryModal({
   maximumImageSize,
   compress,
   compressedQuality,
+  sideExtraComponent,
+  renderBeforeImages,
   TooltipWrapper,
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
@@ -53,7 +55,7 @@ function MediaLibraryModal({
 
   excludeTabs = [
     ...(excludeTabs || []),
-    (!allowCropping && TABS.CROPPING_TAB) || "", // if allowCropping is false, exclude it from the tabs
+    allowCropping ? "" : TABS.CROPPING_TAB, // if allowCropping is false, exclude it from the tabs
   ];
   const clean = (files) => {
     // just a function that retrieves only the FileObject from the file jsons provided
@@ -123,6 +125,7 @@ function MediaLibraryModal({
       component: (
         <Suspense fallback={<p>Loading...</p>}>
           <Library
+            renderBeforeImages={renderBeforeImages}
             sourceExtractor={sourceExtractor}
             setSelectedContent={setSelectedContent}
             content={content}
@@ -182,6 +185,7 @@ function MediaLibraryModal({
               activeImage={activeImage}
               setShowSidePane={setShowSidePane}
               sourceExtractor={sourceExtractor}
+              sideExtraComponent={sideExtraComponent}
             />
           )}
           <div className="m-inner-container">
@@ -210,7 +214,9 @@ function MediaLibraryModal({
             </div>
 
             {/* ------------------------ MAIN TAB DISPLAY AREA ------------------- */}
-            <div style={{ maxHeight: 530, overflowY: "scroll" }}>
+            <div
+              style={{ maxHeight: 530, minHeight: 530, overflowY: "scroll" }}
+            >
               {TabComponent}
             </div>
           </div>
@@ -274,7 +280,10 @@ const Footer = ({
           <button
             className="ml-footer-btn"
             style={{ "--btn-color": "white", "--btn-background": "green" }}
-            onClick={finaliseCropping}
+            onClick={(e) => {
+              e.preventDefault();
+              finaliseCropping && finaliseCropping();
+            }}
             disabled={!cropLoot}
           >
             CROP

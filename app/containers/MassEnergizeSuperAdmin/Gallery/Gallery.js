@@ -7,22 +7,52 @@ import {
   reduxFetchImages,
   reduxLoadImageInfos,
   reduxLoadSearchedImages,
+  reduxSetGalleryFilters,
 } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import { SideSheet } from "./SideSheet";
 import { styles } from "./styles";
+import GalleryFilter from "./tools/GalleryFilter";
 import LightAutoComplete from "./tools/LightAutoComplete";
 import { ProgressCircleWithLabel } from "./utils";
 
 const ALL_COMMUNITIES = "all-communities";
-const filters = [
+export const filters = [
   { name: "Actions", value: "actions" },
   { name: "Events", value: "events" },
   { name: "Testimonials", value: "testimonials" },
   { name: "My Uploads", value: "uploads" },
 ];
 
+export const getMoreInfoOnImage = ({
+  id,
+  updateStateWith,
+  updateReduxWith,
+  imageInfos,
+}) => {
+  if (!id) return console.log("The image id provided is invalid...", id);
+  const found = (imageInfos || {})[id];
+  if (found) return updateStateWith(found);
+  updateStateWith("loading");
+  apiCall("/gallery.image.info", { media_id: id })
+    .then((response) => {
+      if (response && !response.success) {
+        updateStateWith(null);
+        return console.log("IMAGE INFO REQ BE: ", response.error);
+      }
+      updateStateWith(response.data);
+      updateReduxWith({
+        oldInfos: imageInfos,
+        newInfo: response.data,
+      });
+    })
+    .catch((e) => {
+      updateStateWith(null);
+      console.log("IMAGE INFO REQ SYNTAX: ", e.toString());
+    });
+};
+// ----------------------------------------
 function Gallery(props) {
   const fetchController = new AbortController();
   const { signal } = fetchController;
@@ -34,6 +64,9 @@ function Gallery(props) {
     putSearchResultsInRedux,
     putImageInfoInRedux,
     imageInfos,
+    tags,
+    putFiltersInRedux,
+    galleryFilters,
   } = props;
 
   const getCommunityList = () => {
@@ -45,7 +78,7 @@ function Gallery(props) {
   const [targetComs, setTargetComs] = useState([]);
   const [targetAllComs, setTargetAllComs] = useState(false);
   const [useAllFilters, setAllAsFilter] = useState(false);
-  const [filterOptions, setFilterOptions] = useState([]);
+  const [filterOptions, setFilterOptions] = useState([]); // where selected scope filters are stored
   const [showMoreInfo, setShowMoreInfo] = useState(false);
   const [searching, setSearching] = useState(false);
   const [loadMore, setLoadMore] = useState(false);
@@ -71,27 +104,6 @@ function Gallery(props) {
       .catch((e) => {
         console.log("REMOVE IMAGE ERROR_SYNT", e.toString());
         if (cb) cb();
-      });
-  };
-
-  const getMoreInfoOnImage = (id) => {
-    if (!id) return console.log("The image id provided is invalid...", id);
-    setOneImageInfo("loading");
-    apiCall("/gallery.image.info", { media_id: id })
-      .then((response) => {
-        if (response && !response.success) {
-          setOneImageInfo(null);
-          return console.log("IMAGE INFO REQ BE: ", response.error);
-        }
-        setOneImageInfo(response.data);
-        putImageInfoInRedux({
-          oldInfos: imageInfos,
-          newInfo: response.data,
-        });
-      })
-      .catch((e) => {
-        setOneImageInfo(null);
-        console.log("IMAGE INFO REQ SYNTAX: ", e.toString());
       });
   };
 
@@ -123,10 +135,18 @@ function Gallery(props) {
   };
 
   const makeRequestBody = (extraParams = {}) => {
+    const filters = galleryFilters || {};
+    const scope = (filters.scope || []).filter((f) => f !== "all"); // "all" only helps us know to select all other scopes. So during API request, that's not needed anymore
+    // ------------------------------------------
+    const tags = Object.entries(filters.tags || []).map(([_, _tags]) => _tags);
+    let spread = [];
+    for (let arr of tags) spread = [...spread, ...arr];
+    // ------------------------------------------
     return {
       any_community: targetAllComs,
-      target_communities: targetComs,
-      filters: filterOptions,
+      target_communities: (targetComs || []).map((c) => c.id),
+      filters: scope,
+      tags: spread,
       ...extraParams,
     };
   };
@@ -137,9 +157,22 @@ function Gallery(props) {
 
   const selectAllCommunities = () => {
     // set all an admins community as target community if they are a community. Leave things empty if superadmin though
-    if (auth.is_super_admin) setTargetComs([]);
-    else if (auth.is_community_admin) setTargetComs(getCommunityList());
+    if (auth && auth.is_super_admin) setTargetComs([]);
+    else if (auth && auth.is_community_admin) setTargetComs(getCommunityList());
     setTargetAllComs((prev) => !prev);
+  };
+
+  const handleFilterOnChange = (selections) => {
+    const _filters = selections.scope || [];
+    const wantsFromAllScopes = _filters.find((f) => f === "all");
+    var selected = [];
+    // If the user selectes "all", auto select all availabled scopes
+    if (wantsFromAllScopes) {
+      selected = filters.map((f) => f.value);
+      selected = ["all", ...selected];
+    } else selected = [..._filters];
+    setQueryHasChanged(true);
+    putFiltersInRedux({ ...selections, scope: selected });
   };
 
   const selectAllFilters = () => {
@@ -164,12 +197,17 @@ function Gallery(props) {
 
   useEffect(() => {
     // run a general query to retrieve images onload, if there is no content yet
-    if (!searchResults || !searchResults.images)
+
+    if (!searchResults || !searchResults.images) {
+      var scope = filters.map((f) => f.value);
       fetchContent({
         any_community: true,
         target_communities: getCommunityList().map((com) => com.id),
-        filters: filters.map((f) => f.value),
+        filters: scope,
       });
+      scope = ["all", ...scope];
+      putFiltersInRedux({ scope });
+    }
 
     return () => fetchController.abort();
   }, []);
@@ -195,14 +233,29 @@ function Gallery(props) {
           infos={imageInfos}
           data={oneImageInfo}
           deleteImage={deleteImage}
+          is_super_admin={auth && auth.is_super_admin}
+          is_community_admin={auth && auth.is_community_admin}
         />
       )}
       <Typography variant="h5" className={classes.title}>
         Manage images for your community
       </Typography>
       <Paper className={classes.container}>
-        <div className={classes.filterBox}>
-          <Typography variant="h6">Filter</Typography>
+        <div className={classes.root}>
+          <GalleryFilter
+            reset={() => putFiltersInRedux({})}
+            scopes={[{ name: "All", value: "all" }, ...filters]}
+            selections={galleryFilters || {}}
+            tags={tags}
+            apply={() => runSearch()}
+            onChange={(selections) => {
+              handleFilterOnChange(selections);
+              // putFiltersInRedux(selections);
+            }}
+          >
+            <Typography variant="h6">Filter</Typography>
+          </GalleryFilter>
+
           <FormControlLabel
             control={
               <Checkbox
@@ -217,6 +270,7 @@ function Gallery(props) {
             }
             label="All communities"
           />
+          {/* </div> */}
           <LightAutoComplete
             onChange={(coms) => {
               setQueryHasChanged(true);
@@ -230,7 +284,7 @@ function Gallery(props) {
             defaultSelected={targetComs}
             allowChipRemove={!targetAllComs}
           />
-          <div
+          {/* <div
             style={{
               display: "flex",
               flexDirection: "row",
@@ -281,7 +335,7 @@ function Gallery(props) {
               <Icon style={{ fontSize: 15 }}>search</Icon>
               Search
             </Button>
-          </div>
+          </div> */}
         </div>
         <div>
           {/*------------------------------- IMAGES --------------------------  */}
@@ -291,7 +345,12 @@ function Gallery(props) {
             classes={classes}
             showMoreInfo={(id) => {
               setShowMoreInfo(true);
-              getMoreInfoOnImage(id);
+              getMoreInfoOnImage({
+                id,
+                imageInfos,
+                updateStateWith: setOneImageInfo,
+                updateReduxWith: putImageInfoInRedux,
+              });
             }}
           />
           {noResults && (
@@ -323,6 +382,7 @@ export const LoadMoreContainer = ({
       color="secondary"
       style={{
         width: "100%",
+
         margin: 6,
         borderRadius: 4,
         marginTop: 20,
@@ -364,12 +424,15 @@ const mapStateToProps = (state) => ({
   communities: state.getIn(["communities"]),
   searchResults: state.getIn(["searchedImages"]),
   imageInfos: state.getIn(["imageInfos"]),
+  tags: state.getIn(["allTags"]),
+  galleryFilters: state.getIn(["galleryFilters"]),
 });
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       putSearchResultsInRedux: reduxLoadSearchedImages,
       putImageInfoInRedux: reduxLoadImageInfos,
+      putFiltersInRedux: reduxSetGalleryFilters,
     },
     dispatch
   );
