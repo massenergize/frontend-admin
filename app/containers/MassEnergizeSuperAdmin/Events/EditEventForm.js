@@ -91,12 +91,14 @@ class EditEventForm extends Component {
   static getDerivedStateFromProps = (props, state) => {
     const { match, communities, tags, events, auth, exceptions } = props;
     const { id } = match.params;
-    var { rescheduledEvent } = state;
+    var { rescheduledEvent, event } = state;
 
     rescheduledEvent = exceptions[id] || rescheduledEvent;
-    const event = (events.items || []).find(
+    if (!event) {
+    event = (events.items || []).find(
       (e) => e.id.toString() === id.toString()
     );
+    }
     const readOnly = checkIfReadOnly(event, auth);
     const thereIsNothingInEventsExceptionsList = rescheduledEvent === null;
     const readyToRenderPageFirstTime =
@@ -150,12 +152,10 @@ class EditEventForm extends Component {
     if (eventResponse && !eventResponse.success) {
       return;
     }
-    this.setState({ event: eventResponse.data });
-
-    event =event||
-      (events.items || []).find((e) => e.id.toString() === id.toString())|| eventResponse.data
-
-      const readOnly = checkIfReadOnly(event, auth);
+    
+    event =event||(events.items || []).find((e) => e.id.toString() === id.toString())|| eventResponse.data
+    this.setState({event });
+    const readOnly = checkIfReadOnly(event, auth);
     if (!readOnly) {
       apiCall("events.exceptions.list", { event_id: id })
         .then((json) => {
@@ -263,8 +263,6 @@ const validator = (cleaned) => {
 
 const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
   const statuses = ["Draft", "Live", "Archived"];
-  console.log("====== event ======", event);
-  console.log("====== communities ======", communities);
   if (!event || !communities) return;
 
   const is_super_admin = auth && auth.is_super_admin;

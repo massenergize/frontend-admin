@@ -4,7 +4,6 @@ import { withStyles } from "@material-ui/core/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 
-import MUIDataTable from "mui-datatables";
 import FileCopy from "@material-ui/icons/FileCopy";
 import EditIcon from "@material-ui/icons/Edit";
 import { Link, withRouter } from "react-router-dom";
@@ -28,7 +27,6 @@ import {
   getHumanFriendlyDate,
   makeDeleteUI,
   getTimeStamp,
-  makeDeleteUI,
   ourCustomSort,
   smartString,
 } from "../../../utils/common";

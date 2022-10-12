@@ -128,14 +128,14 @@ class EditTestimonial extends Component {
       <>
         <Paper style={{ padding: 15 }}>
           <Typography variant="h6">Created By</Typography>
-          {testimonial.user && (
+          {testimonial && testimonial.user && (
             <Typography>
               {testimonial.user.full_name}
               ,&nbsp;
               {testimonial.user.email}
             </Typography>
           )}
-          {!testimonial.user && <p>Created By: Community Admin</p>}
+          {testimonial && !testimonial.user && <p>Created By: Community Admin</p>}
         </Paper>
         <br />
         <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
