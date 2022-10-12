@@ -44,6 +44,7 @@ function MediaLibrary(props) {
     const { source } = cropLoot;
     setCropped({ ...(cropped || {}), [source.id.toString()]: croppedSource });
     setCurrentTab(TABS.UPLOAD_TAB);
+    return false
   };
 
   const switchToCropping = (content) => {
@@ -346,6 +347,11 @@ MediaLibrary.propTypes = {
    * Determines whether or not cropping should be enabled on images. (That are freshly being uploaded)
    */
   allowCropping: PropTypes.bool,
+  /**
+   * Lets you render another component in the sidepanel of modal in case a situation needs more specific content
+   * @param props
+   */
+  sideExtraComponent: PropTypes.func,
   dragToOrder: PropTypes.bool,
 
   /**
@@ -364,6 +370,10 @@ MediaLibrary.propTypes = {
    * is true, the image will be reduced to a lower quality before uploading
    */
   maximumImageSize: PropTypes.number,
+  /**
+   * A component that needs to be rendered before the images in the library are to be rendered
+   */
+  renderBeforeImages: PropTypes.element,
 
   /**
    * A function that should return a tooltip component. 
@@ -395,5 +405,6 @@ MediaLibrary.defaultProps = {
   compress: true,
   compressedQuality: IMAGE_QUALITY.MEDIUM.key,
   maximumImageSize: DEFFAULT_MAX_SIZE,
+  renderBeforeImages:null
 };
 export default MediaLibrary;

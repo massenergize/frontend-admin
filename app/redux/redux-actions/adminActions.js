@@ -35,6 +35,7 @@ import {
   LOAD_FEATURE_FLAGS,
   LOAD_ADMIN_ACTIVITIES,
   ADD_NEW_FEATURE_FLAG_INFO,
+  SET_GALLERY_FILTERS,
   LOAD_ADMINS_FOR_MY_COMMUNITY,
   LOAD_SUPER_ADMIN_LIST,
 } from "../ReduxConstants";
@@ -73,6 +74,12 @@ export const loadSettings = (data = {}) => {
     payload: data,
   };
 };
+export const reduxSetGalleryFilters = (data = {}) => {
+  return {
+    type: SET_GALLERY_FILTERS,
+    payload:data,
+  }
+}
 export const reduxLoadSuperAdmins = (data = LOADING) => {
   return {
     type: LOAD_SUPER_ADMIN_LIST,
@@ -612,7 +619,7 @@ export const universalFetchFromGallery = (props) => {
   } = props;
   old = old || {};
   community_ids = community_ids || [];
-  var requestBody = { community_ids, ...body };
+  var requestBody = { target_communities: community_ids, ...body };
   if (old.upper_limit)
     requestBody = { ...requestBody, upper_limit: old.upper_limit };
   if (old.lower_limit)
