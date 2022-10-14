@@ -33,8 +33,13 @@ import {
   LOAD_ALL_TASKS,
   LOAD_SETTINGS,
   LOAD_FEATURE_FLAGS,
+  LOAD_ADMIN_ACTIVITIES,
+  ADD_NEW_FEATURE_FLAG_INFO,
+  SET_GALLERY_FILTERS,
+  LOAD_ADMINS_FOR_MY_COMMUNITY,
+  LOAD_SUPER_ADMIN_LIST,
 } from "../ReduxConstants";
-import { apiCall } from "../../utils/messenger";
+import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
 import { LOADING } from "../../utils/constants";
 
@@ -42,9 +47,48 @@ import { LOADING } from "../../utils/constants";
 export const testRedux = (value) => {
   return { type: TEST_REDUX, payload: value };
 };
+
+export const runAdminStatusCheck = async () => {
+  try {
+    const response = await apiCall("/auth.whoami");
+    if (response.success) return;
+
+    if (response.error === PERMISSION_DENIED)
+      return (window.location = "/login");
+  } catch (e) {
+    console.log("ADMIN_SESSION_STATUS_ERROR:", e.toString());
+    return (window.location = "/login");
+  }
+};
+
+export const checkFirebaseAuthentication = () => {
+  return () =>
+    firebase.auth().onAuthStateChanged((user) => {
+      if (!user) return (window.location = "/login");
+      runAdminStatusCheck();
+    });
+};
 export const loadSettings = (data = {}) => {
   return {
     type: LOAD_SETTINGS,
+    payload: data,
+  };
+};
+export const reduxSetGalleryFilters = (data = {}) => {
+  return {
+    type: SET_GALLERY_FILTERS,
+    payload:data,
+  }
+}
+export const reduxLoadSuperAdmins = (data = LOADING) => {
+  return {
+    type: LOAD_SUPER_ADMIN_LIST,
+    payload: data,
+  };
+};
+export const reduxLoadAdmins = (data = LOADING) => {
+  return {
+    type: LOAD_ADMINS_FOR_MY_COMMUNITY,
     payload: data,
   };
 };
@@ -107,7 +151,6 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     apiCall("/settings.list"),
     isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
   ]).then((response) => {
-
     const [
       communities,
       actions,
@@ -146,6 +189,11 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadFeatureFlags(featureFlags.data || {}));
   });
 };
+
+export const reduxAddFlagInfo = (data = {}) => ({
+  type: ADD_NEW_FEATURE_FLAG_INFO,
+  payload: data,
+});
 
 export const loadFeatureFlags = (data = LOADING) => ({
   type: LOAD_FEATURE_FLAGS,
@@ -290,6 +338,10 @@ export const reduxLoadSummaryData = (data = []) => ({
 });
 export const reduxLoadGraphData = (data = []) => ({
   type: LOAD_GRAPH_DATA,
+  payload: data,
+});
+export const reduxLoadAdminActivities = (data = LOADING) => ({
+  type: LOAD_ADMIN_ACTIVITIES,
   payload: data,
 });
 
@@ -567,7 +619,7 @@ export const universalFetchFromGallery = (props) => {
   } = props;
   old = old || {};
   community_ids = community_ids || [];
-  var requestBody = { community_ids, ...body };
+  var requestBody = { target_communities: community_ids, ...body };
   if (old.upper_limit)
     requestBody = { ...requestBody, upper_limit: old.upper_limit };
   if (old.lower_limit)
@@ -634,8 +686,9 @@ export const reduxCallCommunities = () => (dispatch) => {
     apiCall("/communities.listForCommunityAdmin"),
     apiCall("/summary.listForCommunityAdmin"),
     apiCall("/graphs.listForCommunityAdmin"),
+    apiCall("/what.happened"),
   ]).then((res) => {
-    const [commResponse, summaryResponse, graphResponse] = res;
+    const [commResponse, summaryResponse, graphResponse, activities] = res;
     if (commResponse.data) {
       dispatch(reduxLoadAllCommunities(commResponse.data));
     }
@@ -645,6 +698,7 @@ export const reduxCallCommunities = () => (dispatch) => {
     if (graphResponse.data) {
       dispatch(reduxLoadGraphData(graphResponse.data));
     }
+    dispatch(reduxLoadAdminActivities(activities && activities.data));
   });
 };
 

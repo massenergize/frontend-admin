@@ -1,6 +1,6 @@
 import { Checkbox, FormControlLabel, MenuItem } from "@material-ui/core";
 import { Chip, FormControl, FormLabel, Select } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { pop } from "../../../../utils/common";
 function MEDropdown({
   containerStyle,
@@ -20,6 +20,9 @@ function MEDropdown({
     return (item && item.name) || (item && item.toString());
   };
 
+  useEffect(() => {
+    setSelected(defaultValue || value || []);
+  }, [defaultValue, value]);
   const labelOf = (item, fromValue) => {
     if (!item) return;
     if (fromValue) {

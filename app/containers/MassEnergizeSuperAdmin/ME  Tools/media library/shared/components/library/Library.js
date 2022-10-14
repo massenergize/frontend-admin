@@ -20,6 +20,7 @@ function Library({
   setShouldWait,
   awaitSeconds,
   fileLimit,
+  renderBeforeImages,
 }) {
   const handleSelection = (image) => {
     if (!multiple) {
@@ -73,6 +74,7 @@ function Library({
   }
   return (
     <div>
+      {renderBeforeImages}
       {fileLimit && (
         <div style={{ padding: "10px 25px", fontWeight: "bold" }}>
           <small>
