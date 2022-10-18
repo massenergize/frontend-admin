@@ -48,6 +48,7 @@ import app, {
   reducerForGalleryFilters,
   reducerForLoadingAdmins,
   reducerForLoadingSuperAdmins,
+  reducerForAllOtherCommunities,
 } from "./modules/appReducer";
 
 /**
@@ -56,6 +57,7 @@ import app, {
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
     activities: reducerForAdminActivities,
+    otherCommunities: reducerForAllOtherCommunities,
     flagInfos: reducerForFlagInfo,
     galleryFilters: reducerForGalleryFilters,
     sadmins: reducerForLoadingSuperAdmins,

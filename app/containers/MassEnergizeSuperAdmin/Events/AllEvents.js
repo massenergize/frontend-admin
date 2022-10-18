@@ -31,10 +31,17 @@ import {
   ourCustomSort,
   smartString,
 } from "../../../utils/common";
-import { Chip, Typography } from "@material-ui/core";
+import {
+  Checkbox,
+  Chip,
+  FormControlLabel,
+  Typography,
+} from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
+import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 
 class AllEvents extends React.Component {
   constructor(props) {
@@ -303,6 +310,7 @@ class AllEvents extends React.Component {
   }
 
   render() {
+    console.log("Lest see all events", this.props.otherCommunities);
     const title = brand.name + " - All Events";
     const description = brand.desc;
     const { columns } = this.state;
@@ -378,7 +386,21 @@ class AllEvents extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
+        <Paper style={{ padding: 20, marginBottom: 15 }}>
+          <Typography variant="h6">
+            Show events from communities I select below
+          </Typography>
 
+          <LightAutoComplete
+            data={this.props.otherCommunities || []}
+            labelExtractor={(it) => it.name}
+            valueExtractor={(it) => it.id}
+          />
+          <FormControlLabel
+            control={<Checkbox />}
+            label="Show events from all communities, except the ones I have selected"
+          />
+        </Paper>
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_EVENTS}
@@ -403,6 +425,7 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     allEvents: state.getIn(["allEvents"]),
     community: state.getIn(["selected_community"]),
+    otherCommunities: state.getIn(["otherCommunities"]),
   };
 }
 function mapDispatchToProps(dispatch) {
