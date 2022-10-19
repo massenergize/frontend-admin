@@ -37,6 +37,7 @@ import {
   Checkbox,
   Chip,
   FormControlLabel,
+  Tabs,
   Typography,
 } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
@@ -45,11 +46,13 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { concat } from "lodash";
+import { Tab } from "@material-ui/core";
+import EventsFromOtherCommunities from "./EventsFromOtherCommunities";
 
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { columns: this.getColumns(), loading: false };
+    this.state = { columns: this.getColumns(), loading: false, currentTab: 0 };
   }
 
   componentDidMount() {
@@ -334,8 +337,13 @@ class AllEvents extends React.Component {
   render() {
     const title = brand.name + " - All Events";
     const description = brand.desc;
-    const { columns, loading } = this.state;
-    const { classes } = this.props;
+    const { columns, currentTab } = this.state;
+    const {
+      classes,
+      putOtherEventsInRedux,
+      otherCommunities,
+      otherEvents,
+    } = this.props;
     const data = this.fashionData(this.props.allEvents || []);
     const options = {
       filterType: "dropdown",
@@ -397,6 +405,31 @@ class AllEvents extends React.Component {
       );
     }
 
+    const tabs = {
+      0: (
+        <EventsFromYourCommunities
+          classes={classes}
+          page={PAGE_PROPERTIES.ALL_EVENTS}
+          tableProps={{
+            title: "All Events",
+            data: data,
+            columns: columns,
+            options: options,
+          }}
+        />
+      ),
+      1: (
+        <EventsFromOtherCommunities
+          putOtherEventsInRedux={putOtherEventsInRedux}
+          otherCommunities={otherCommunities}
+          classes={classes}
+          otherEvents={otherEvents}
+        />
+      ),
+    };
+
+    const activeComponent = tabs[currentTab];
+
     return (
       <div>
         <Helmet>
@@ -407,7 +440,7 @@ class AllEvents extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <Paper style={{ marginBottom: 15 }}>
+        {/* <Paper style={{ marginBottom: 15 }}>
           <div style={{ padding: 20 }}>
             <Typography variant="h6">
               Show events from communities I select below
@@ -420,10 +453,12 @@ class AllEvents extends React.Component {
               onChange={(items) => this.setState({ community_ids: items })}
             />
             <FormControlLabel
-              control={<Checkbox checked={this.state.exclude} />}
-              onClick={() => {
-                this.setState(({ exclude }) => ({ exclude: !exclude }));
-              }}
+              control={
+                <Checkbox
+                  checked={this.state.exclude}
+                  onChange={(e) => this.setState({ exclude: e.target.checked })}
+                />
+              }
               label="From all communities, except the ones I have selected"
             />
           </div>
@@ -450,8 +485,22 @@ class AllEvents extends React.Component {
               {loading ? "Fetching..." : "Fetch"}
             </Button>
           </div>
+        </Paper> */}
+
+        <Paper style={{ marginBottom: 10 }}>
+          <Tabs
+            onChange={(_, v) => this.setState({ currentTab: v })}
+            value={currentTab}
+            variant="fullWidth"
+            indicatorColor="primary"
+            textColor="primary"
+          >
+            <Tab label="From Your Communities" key={0} />
+            <Tab label="Other Communities" key={1} />
+          </Tabs>
         </Paper>
-        <METable
+        {activeComponent}
+        {/* <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_EVENTS}
           tableProps={{
@@ -460,7 +509,7 @@ class AllEvents extends React.Component {
             columns: columns,
             options: options,
           }}
-        />
+        /> */}
       </div>
     );
   }
@@ -498,3 +547,7 @@ const EventsMapped = connect(
   mapDispatchToProps
 )(AllEvents);
 export default withStyles(styles)(withRouter(EventsMapped));
+
+const EventsFromYourCommunities = (props) => {
+  return <METable {...props} />;
+};
