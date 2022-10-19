@@ -22,6 +22,7 @@ import {
   reduxGetAllCommunityEvents,
   loadAllEvents,
   reduxToggleUniversalModal,
+  reduxLoadAllOtherEvents,
 } from "../../../redux/redux-actions/adminActions";
 import {
   findMatchesAndRest,
@@ -32,6 +33,7 @@ import {
   smartString,
 } from "../../../utils/common";
 import {
+  Button,
   Checkbox,
   Chip,
   FormControlLabel,
@@ -42,11 +44,12 @@ import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
+import { concat } from "lodash";
 
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { columns: this.getColumns() };
+    this.state = { columns: this.getColumns(), loading: false };
   }
 
   componentDidMount() {
@@ -309,11 +312,29 @@ class AllEvents extends React.Component {
     putEventsInRedux(rem);
   }
 
+  fetchOtherEvents() {
+    const { community_ids, exclude } = this.state;
+    const { putOtherEventsInRedux } = this.props;
+    const ids = (community_ids || []).map((it) => it.id);
+    this.setState({ loading: true });
+    apiCall("/events.others.listForCommunityAdmin", {
+      community_ids: ids,
+      exclude: exclude || false,
+    })
+      .then((response) => {
+        this.setState({ loading: false });
+        if (response.success) return putOtherEventsInRedux(response.data);
+      })
+      .catch((e) => {
+        this.setState({ loading: false });
+        console.log("OTHER_EVENTS_BE_ERROR:", e.toString());
+      });
+  }
+
   render() {
-    console.log("Lest see all events", this.props.otherCommunities);
     const title = brand.name + " - All Events";
     const description = brand.desc;
-    const { columns } = this.state;
+    const { columns, loading } = this.state;
     const { classes } = this.props;
     const data = this.fashionData(this.props.allEvents || []);
     const options = {
@@ -386,20 +407,49 @@ class AllEvents extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <Paper style={{ padding: 20, marginBottom: 15 }}>
-          <Typography variant="h6">
-            Show events from communities I select below
-          </Typography>
+        <Paper style={{ marginBottom: 15 }}>
+          <div style={{ padding: 20 }}>
+            <Typography variant="h6">
+              Show events from communities I select below
+            </Typography>
 
-          <LightAutoComplete
-            data={this.props.otherCommunities || []}
-            labelExtractor={(it) => it.name}
-            valueExtractor={(it) => it.id}
-          />
-          <FormControlLabel
-            control={<Checkbox />}
-            label="Show events from all communities, except the ones I have selected"
-          />
+            <LightAutoComplete
+              data={this.props.otherCommunities || []}
+              labelExtractor={(it) => it.name}
+              valueExtractor={(it) => it.id}
+              onChange={(items) => this.setState({ community_ids: items })}
+            />
+            <FormControlLabel
+              control={<Checkbox checked={this.state.exclude} />}
+              onClick={() => {
+                this.setState(({ exclude }) => ({ exclude: !exclude }));
+              }}
+              label="From all communities, except the ones I have selected"
+            />
+          </div>
+          <div style={{ background: "#fbfbfb" }}>
+            <Button
+              onClick={() => this.fetchOtherEvents()}
+              disabled={
+                !(this.state.community_ids || []).length || this.state.loading
+              }
+              variant="contained"
+              color="secondary"
+              style={{
+                borderRadius: 0,
+                padding: 10,
+                width: 200,
+              }}
+            >
+              {loading && (
+                <i
+                  className=" fa fa-spinner fa-spin"
+                  style={{ marginRight: 5, color: "white" }}
+                />
+              )}
+              {loading ? "Fetching..." : "Fetch"}
+            </Button>
+          </div>
         </Paper>
         <METable
           classes={classes}
@@ -426,6 +476,7 @@ function mapStateToProps(state) {
     allEvents: state.getIn(["allEvents"]),
     community: state.getIn(["selected_community"]),
     otherCommunities: state.getIn(["otherCommunities"]),
+    otherEvents: state.getIn(["otherEvents"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -436,6 +487,7 @@ function mapDispatchToProps(dispatch) {
       putEventsInRedux: loadAllEvents,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
+      putOtherEventsInRedux: reduxLoadAllOtherEvents,
     },
     dispatch
   );

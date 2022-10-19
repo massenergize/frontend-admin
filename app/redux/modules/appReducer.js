@@ -39,6 +39,7 @@ import {
   LOAD_ADMINS_FOR_MY_COMMUNITY,
   LOAD_SUPER_ADMIN_LIST,
   LOAD_ALL_OTHER_COMMUNITIES,
+  LOAD_ALL_OTHER_EVENTS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -66,6 +67,14 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+export const reducerForLoadingOtherEvents = (state = [], action = {}) => {
+  switch (action.type) {
+    case LOAD_ALL_OTHER_EVENTS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForAdminActivities = (state = LOADING, action = {}) => {
   switch (action.type) {
     case LOAD_ADMIN_ACTIVITIES:

@@ -39,6 +39,7 @@ import {
   LOAD_ADMINS_FOR_MY_COMMUNITY,
   LOAD_SUPER_ADMIN_LIST,
   LOAD_ALL_OTHER_COMMUNITIES,
+  LOAD_ALL_OTHER_EVENTS,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -174,7 +175,6 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       otherCommunities,
     ] = response;
     dispatch(reduxLoadAllCommunities(communities.data));
-    console.log("I think this is the list of communitites", communities.data);
     dispatch(loadAllActions(actions.data));
     dispatch(loadAllEvents(events.data));
     dispatch(loadAllAdminMessages(messages.data));
@@ -195,6 +195,10 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
   });
 };
 
+export const reduxLoadAllOtherEvents = (data = []) => ({
+  type: LOAD_ALL_OTHER_EVENTS,
+  payload: data,
+});
 export const reduxLoadAllOtherCommunities = (data = []) => ({
   type: LOAD_ALL_OTHER_COMMUNITIES,
   payload: data,
