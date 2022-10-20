@@ -23,6 +23,7 @@ import {
   loadAllEvents,
   reduxToggleUniversalModal,
   reduxLoadAllOtherEvents,
+  reduxSaveOtherEventState,
 } from "../../../redux/redux-actions/adminActions";
 import {
   findMatchesAndRest,
@@ -52,7 +53,7 @@ import EventsFromOtherCommunities from "./EventsFromOtherCommunities";
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { columns: this.getColumns(), loading: false, currentTab: 1 };
+    this.state = { columns: this.getColumns(), loading: false, currentTab: 1 }; // BEFORE PR CHANGE CURRENT TAB TO 0
   }
 
   componentDidMount() {
@@ -343,6 +344,8 @@ class AllEvents extends React.Component {
       putOtherEventsInRedux,
       otherCommunities,
       otherEvents,
+      otherEventsState,
+      putEventsStateInRedux,
     } = this.props;
     const data = this.fashionData(this.props.allEvents || []);
     const options = {
@@ -424,6 +427,8 @@ class AllEvents extends React.Component {
           otherCommunities={otherCommunities}
           classes={classes}
           otherEvents={otherEvents}
+          state={otherEventsState}
+          putStateInRedux={putEventsStateInRedux}
         />
       ),
     };
@@ -440,53 +445,6 @@ class AllEvents extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        {/* <Paper style={{ marginBottom: 15 }}>
-          <div style={{ padding: 20 }}>
-            <Typography variant="h6">
-              Show events from communities I select below
-            </Typography>
-
-            <LightAutoComplete
-              data={this.props.otherCommunities || []}
-              labelExtractor={(it) => it.name}
-              valueExtractor={(it) => it.id}
-              onChange={(items) => this.setState({ community_ids: items })}
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={this.state.exclude}
-                  onChange={(e) => this.setState({ exclude: e.target.checked })}
-                />
-              }
-              label="From all communities, except the ones I have selected"
-            />
-          </div>
-          <div style={{ background: "#fbfbfb" }}>
-            <Button
-              onClick={() => this.fetchOtherEvents()}
-              disabled={
-                !(this.state.community_ids || []).length || this.state.loading
-              }
-              variant="contained"
-              color="secondary"
-              style={{
-                borderRadius: 0,
-                padding: 10,
-                width: 200,
-              }}
-            >
-              {loading && (
-                <i
-                  className=" fa fa-spinner fa-spin"
-                  style={{ marginRight: 5, color: "white" }}
-                />
-              )}
-              {loading ? "Fetching..." : "Fetch"}
-            </Button>
-          </div>
-        </Paper> */}
-
         <Paper style={{ marginBottom: 10 }}>
           <Tabs
             onChange={(_, v) => this.setState({ currentTab: v })}
@@ -500,16 +458,6 @@ class AllEvents extends React.Component {
           </Tabs>
         </Paper>
         {activeComponent}
-        {/* <METable
-          classes={classes}
-          page={PAGE_PROPERTIES.ALL_EVENTS}
-          tableProps={{
-            title: "All Events",
-            data: data,
-            columns: columns,
-            options: options,
-          }}
-        /> */}
       </div>
     );
   }
@@ -526,6 +474,7 @@ function mapStateToProps(state) {
     community: state.getIn(["selected_community"]),
     otherCommunities: state.getIn(["otherCommunities"]),
     otherEvents: state.getIn(["otherEvents"]),
+    otherEventsState: state.getIn(["otherEventsState"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -537,6 +486,7 @@ function mapDispatchToProps(dispatch) {
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
       putOtherEventsInRedux: reduxLoadAllOtherEvents,
+      putEventsStateInRedux: reduxSaveOtherEventState,
     },
     dispatch
   );

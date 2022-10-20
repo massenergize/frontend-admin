@@ -13,19 +13,26 @@ import { getHumanFriendlyDate, smartString } from "../../../utils/common";
 import { apiCall } from "../../../utils/messenger";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
 import METable from "../ME  Tools/table /METable";
+import CallMadeIcon from "@material-ui/icons/CallMade";
 
 function EventsFromOtherCommunities({
   putOtherEventsInRedux,
   otherCommunities,
   otherEvents,
   classes,
+  state,
+  putStateInRedux,
 }) {
-  const [exclude, setExclude] = useState(false);
-  const [communities, setCommunities] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [refreshKey, setRefreshKey] = useState("default-refresh-key");
+  const { communities, exclude } = state || {};
+
+  const setCommunities = (communities) => {
+    putStateInRedux({ ...(state || {}), communities });
+  };
+  const setExclude = (exclude) => {
+    putStateInRedux({ ...(state || {}), exclude });
+  };
 
   const fetchOtherEvents = () => {
     const ids = (communities || []).map((it) => it.id);
@@ -36,7 +43,6 @@ function EventsFromOtherCommunities({
     })
       .then((response) => {
         setLoading(false);
-        setRefreshKey(getRandomStringKey());
         if (response.success) return putOtherEventsInRedux(response.data);
       })
       .catch((e) => {
@@ -47,9 +53,11 @@ function EventsFromOtherCommunities({
 
   const fashionData = (data) => {
     if (!data) return [];
+
     const fashioned = data.map((d) => [
       d.id,
       getHumanFriendlyDate(d.start_date_and_time, true),
+      getHumanFriendlyDate(d.end_date_and_time, true),
       {
         id: d.id,
         image: d.image,
@@ -58,6 +66,7 @@ function EventsFromOtherCommunities({
       smartString(d.name), // limit to first 30 chars
       `${smartString(d.tags.map((t) => t.name).join(", "), 30)}`,
       d.is_global ? "Template" : d.community && d.community.name,
+      d.id,
     ]);
     return fashioned;
   };
@@ -132,6 +141,18 @@ function EventsFromOtherCommunities({
           filterType: "multiselect",
         },
       },
+      {
+        name: "Full View",
+        key: "full-view",
+        options: {
+          filterType: "multiselect",
+          customBodyRender: (d) => (
+            <Link to={`#`}>
+              <CallMadeIcon size="small" variant="outlined" color="secondary" />
+            </Link>
+          ),
+        },
+      },
     ];
   };
 
@@ -145,22 +166,35 @@ function EventsFromOtherCommunities({
   };
 
   const renderTable = ({ data, options }) => {
-    if (!data.length) return <h1> No data here </h1>;
+    if (loading)
+      return (
+        <Paper style={{ padding: "15px 25px" }}>
+          <i className="fa fa-spinner fa-spin" style={{ marginRight: 6 }} />
+          Looking for events...
+        </Paper>
+      );
+    if (!data.length)
+      return (
+        <Paper style={{ padding: "15px 25px" }}>
+          {" "}
+          No open events are available for your list of communities. Select
+          other ones
+        </Paper>
+      );
     return (
-      // <div key={refreshKey}>
       <METable
         classes={classes}
         page={PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS}
         tableProps={{
-          title: "From other communities",
+          title: "Events from other communities",
           options,
           data,
           columns: makeColumns(),
         }}
       />
-      // </div>
     );
   };
+
   return (
     <div>
       <Paper style={{ marginBottom: 15 }}>
@@ -170,6 +204,7 @@ function EventsFromOtherCommunities({
           </Typography>
 
           <LightAutoComplete
+            defaultSelected={communities || []}
             data={otherCommunities || []}
             labelExtractor={(it) => it.name}
             valueExtractor={(it) => it.id}
@@ -182,7 +217,7 @@ function EventsFromOtherCommunities({
                 onChange={(e) => setExclude(e.target.checked)}
               />
             }
-            label="From all communities, except the ones I have selected"
+            label="Exclude events from communities I have selected"
           />
         </div>
         <div style={{ background: "#fbfbfb" }}>
