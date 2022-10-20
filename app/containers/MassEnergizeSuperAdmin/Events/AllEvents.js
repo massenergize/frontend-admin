@@ -52,7 +52,7 @@ import EventsFromOtherCommunities from "./EventsFromOtherCommunities";
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { columns: this.getColumns(), loading: false, currentTab: 0 };
+    this.state = { columns: this.getColumns(), loading: false, currentTab: 1 };
   }
 
   componentDidMount() {

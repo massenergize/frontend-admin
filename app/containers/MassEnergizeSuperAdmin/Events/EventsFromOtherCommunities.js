@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Button,
   Checkbox,
   FormControlLabel,
@@ -12,6 +13,7 @@ import { getHumanFriendlyDate, smartString } from "../../../utils/common";
 import { apiCall } from "../../../utils/messenger";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
 import METable from "../ME  Tools/table /METable";
 
 function EventsFromOtherCommunities({
@@ -23,6 +25,7 @@ function EventsFromOtherCommunities({
   const [exclude, setExclude] = useState(false);
   const [communities, setCommunities] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [refreshKey, setRefreshKey] = useState("default-refresh-key");
 
   const fetchOtherEvents = () => {
     const ids = (communities || []).map((it) => it.id);
@@ -33,6 +36,7 @@ function EventsFromOtherCommunities({
     })
       .then((response) => {
         setLoading(false);
+        setRefreshKey(getRandomStringKey());
         if (response.success) return putOtherEventsInRedux(response.data);
       })
       .catch((e) => {
@@ -42,7 +46,6 @@ function EventsFromOtherCommunities({
   };
 
   const fashionData = (data) => {
-    console.log("Lets see comms", otherEvents);
     if (!data) return [];
     const fashioned = data.map((d) => [
       d.id,
@@ -69,7 +72,15 @@ function EventsFromOtherCommunities({
         },
       },
       {
-        name: "Date",
+        name: "Start Date",
+        key: "date",
+        options: {
+          filter: false,
+          download: false,
+        },
+      },
+      {
+        name: "End Date",
         key: "date",
         options: {
           filter: false,
@@ -121,40 +132,34 @@ function EventsFromOtherCommunities({
           filterType: "multiselect",
         },
       },
-
-      //   {
-      //     name: "Edit",
-      //     key: "edit_or_copy",
-      //     options: {
-      //       filter: false,
-      //       download: false,
-      //       customBodyRender: (id) => (
-      //         <div>
-      //           <Link
-      //             onClick={async () => {
-      //               const copiedEventResponse = await apiCall("/events.copy", {
-      //                 event_id: id,
-      //               });
-      //             }}
-      //             to="/admin/read/events"
-      //           >
-      //             <FileCopy size="small" variant="outlined" color="secondary" />
-      //           </Link>
-      //         </div>
-      //       ),
-      //     },
-      //   },
     ];
   };
 
   const data = fashionData(otherEvents || []);
-
   const options = {
     filterType: "dropdown",
     responsive: "stacked",
     print: true,
     rowsPerPage: 25,
     rowsPerPageOptions: [10, 25, 100],
+  };
+
+  const renderTable = ({ data, options }) => {
+    if (!data.length) return <h1> No data here </h1>;
+    return (
+      // <div key={refreshKey}>
+      <METable
+        classes={classes}
+        page={PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS}
+        tableProps={{
+          title: "From other communities",
+          options,
+          data,
+          columns: makeColumns(),
+        }}
+      />
+      // </div>
+    );
   };
   return (
     <div>
@@ -203,16 +208,7 @@ function EventsFromOtherCommunities({
         </div>
       </Paper>
 
-      <METable
-        classes={classes}
-        page={PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS}
-        tableProps={{
-          title: "From other communities",
-          options,
-          data,
-          colums: makeColumns(),
-        }}
-      />
+      {renderTable({ data, options })}
     </div>
   );
 }

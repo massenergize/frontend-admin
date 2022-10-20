@@ -40,6 +40,7 @@ import {
   LOAD_SUPER_ADMIN_LIST,
   LOAD_ALL_OTHER_COMMUNITIES,
   LOAD_ALL_OTHER_EVENTS,
+  SAVE_OTHER_EVENT_STATES,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -67,6 +68,14 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+export const reducerForSavingOtherEventState = (state = {}, action = {}) => {
+  switch (action.type) {
+    case SAVE_OTHER_EVENT_STATES:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForLoadingOtherEvents = (state = [], action = {}) => {
   switch (action.type) {
     case LOAD_ALL_OTHER_EVENTS:

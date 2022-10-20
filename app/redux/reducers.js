@@ -50,6 +50,7 @@ import app, {
   reducerForLoadingSuperAdmins,
   reducerForAllOtherCommunities,
   reducerForLoadingOtherEvents,
+  reducerForSavingOtherEventState,
 } from "./modules/appReducer";
 
 /**
@@ -59,6 +60,7 @@ export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
     activities: reducerForAdminActivities,
     otherCommunities: reducerForAllOtherCommunities,
+    otherEventsState: reducerForSavingOtherEventState,
     otherEvents: reducerForLoadingOtherEvents,
     flagInfos: reducerForFlagInfo,
     galleryFilters: reducerForGalleryFilters,
