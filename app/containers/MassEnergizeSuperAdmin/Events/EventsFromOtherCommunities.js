@@ -146,8 +146,8 @@ function EventsFromOtherCommunities({
         key: "full-view",
         options: {
           filterType: "multiselect",
-          customBodyRender: (d) => (
-            <Link to={`#`}>
+          customBodyRender: (id) => (
+            <Link to={`/admin/read/event/${id}/event-view`}>
               <CallMadeIcon size="small" variant="outlined" color="secondary" />
             </Link>
           ),
