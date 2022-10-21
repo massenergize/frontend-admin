@@ -2,6 +2,12 @@ import React from "react";
 import Loading from "dan-components/Loading";
 import loadable from "../utils/loadable";
 
+export const EventFullView = loadable(
+  () => import("./MassEnergizeSuperAdmin/Events/EventFullView"),
+  {
+    fallback: <Loading />,
+  }
+);
 export const FeatureFlags = loadable(
   () => import("./MassEnergizeSuperAdmin/Feature Flags/FeatureFlags"),
   {
