@@ -49,7 +49,7 @@ import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { concat } from "lodash";
 import { Tab } from "@material-ui/core";
 import EventsFromOtherCommunities from "./EventsFromOtherCommunities";
-
+import CallMadeIcon from "@material-ui/icons/CallMade";
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
@@ -213,6 +213,14 @@ class AllEvents extends React.Component {
                 to="/admin/read/events"
               >
                 <FileCopy size="small" variant="outlined" color="secondary" />
+              </Link>
+              
+              <Link to={`/admin/read/event/${id}/event-view`}>
+                <CallMadeIcon
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
             </div>
           ),

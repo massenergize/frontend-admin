@@ -6,12 +6,24 @@ import { getHumanFriendlyDate } from "../../../utils/common";
 import { apiCall } from "../../../utils/messenger";
 import Loading from "dan-components/Loading";
 import { useHistory, withRouter } from "react-router-dom";
-import { reduxAddToHeap } from "../../../redux/redux-actions/adminActions";
+import {
+  loadAllEvents,
+  reduxAddToHeap,
+} from "../../../redux/redux-actions/adminActions";
 
-function EventFullView({ events, match, storeEventInHeap, eventsInHeap }) {
+function EventFullView({
+  events,
+  match,
+  storeEventInHeap,
+  eventsInHeap,
+  auth,
+  putEventsInRedux,
+  myEvents,
+}) {
   const history = useHistory();
   const [event, setEvent] = useState(undefined);
-
+  const [hasControl, setHasControl] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
   const {
     name,
     community,
@@ -25,18 +37,27 @@ function EventFullView({ events, match, storeEventInHeap, eventsInHeap }) {
   } = event || {};
   const tagString = (tags || []).map((t) => t.name).join(", ");
   const { address, city, state, zipcode, unit } = location || {};
-
+  var id = match.params.id;
+  id = id && id.toString();
   //   ------------------------------------------------------------------------------------
   useEffect(() => {
-    var id = match.params.id;
-    id = id && id.toString();
     // Find from the list of "other events" in the table
-    const foundInRedux = (events || {}).find((ev) => ev.id.toString() === id);
-    if (foundInRedux) return setEvent(foundInRedux);
+
+    var foundInRedux = (events || []).find((ev) => ev.id.toString() === id); // search locally in the "otherCommunities" list
+    if (!foundInRedux)
+      foundInRedux = (myEvents || []).find((ev) => ev.id.toString() === id); // search locally in admin's community list
+
+    if (foundInRedux) {
+      checkIfAdminControlsEvent(foundInRedux, auth);
+      return setEvent(foundInRedux);
+    }
 
     // Otherwise, check if the item has been loaded before, and is in the heap
     const foundInHeap = (eventsInHeap || {})[id];
-    if (foundInHeap) return setEvent(foundInHeap);
+    if (foundInHeap) {
+      checkIfAdminControlsEvent(foundInHeap, auth);
+      return setEvent(foundInHeap);
+    }
 
     //  ------ Else fetch from API (Probably means the user is loading directly into this page(or refreshing)) -------
     apiCall("/events.info", { event_id: id })
@@ -49,16 +70,47 @@ function EventFullView({ events, match, storeEventInHeap, eventsInHeap }) {
         storeEventInHeap({
           eventsInHeap: { ...(eventsInHeap || {}), [id]: response.data },
         });
+        checkIfAdminControlsEvent(response.data, auth);
       })
       .catch((e) => {
         console.log("FETCH_EVENT_ERR:", e.toString());
       });
   }, []);
 
+  useEffect(() => {
+    checkIfAdminControlsEvent(event, auth);
+  }, [auth]);
+
+  const checkIfAdminControlsEvent = (event, auth) => {
+    const coms = ((auth && auth.admin_at) || []).map((c) => c.id.toString());
+    if (event) {
+      const { community } = event || {};
+      const ID = community && community.id;
+      setHasControl(coms.includes(ID && ID.toString()));
+    }
+  };
+
+  const copyEvent = () => {
+    setIsCopying(true);
+    apiCall("/events.copy", {
+      event_id: id,
+    })
+      .then((copiedEventResponse) => {
+        if (copiedEventResponse && copiedEventResponse.success) {
+          const newEvent = copiedEventResponse && copiedEventResponse.data;
+          history.push(`/admin/edit/${newEvent.id}/event`);
+          putEventsInRedux([newEvent, ...(myEvents || [])]);
+        } else console.log("ERROR_COPYING_BE:", copiedEventResponse.error);
+      })
+      .catch((e) => {
+        setIsCopying(false);
+        console.log("EVENT_COPY_ERROR:", e.toString());
+      });
+  };
   //   ----------------------------------------------------------------------------------------
   const pageIsLoading = event === undefined;
   const couldNotFindEvent = event === null;
-
+  //   ----------------------------------------------------------------------
   if (couldNotFindEvent)
     return (
       <Paper>
@@ -81,7 +133,7 @@ function EventFullView({ events, match, storeEventInHeap, eventsInHeap }) {
             onClick={() => history.push("/admin/read/events")}
           >
             <i className="fa fa-long-arrow-left" style={{ marginRight: 6 }} />{" "}
-            Back
+            All Events
           </Button>
         </div>
       </Paper>
@@ -138,7 +190,14 @@ function EventFullView({ events, match, storeEventInHeap, eventsInHeap }) {
             </div>
           )}
         </div>
-        <Footer history={history} community={community} />
+        <Footer
+          history={history}
+          community={community}
+          hasControl={hasControl}
+          id={id}
+          copyEvent={copyEvent}
+          isCopying={isCopying}
+        />
       </Paper>
 
       <Paper>
@@ -162,7 +221,13 @@ function EventFullView({ events, match, storeEventInHeap, eventsInHeap }) {
             <div dangerouslySetInnerHTML={{ __html: description }} />
           </div>
         </div>
-        <Footer history={history} community={community} />
+        <Footer
+          history={history}
+          community={community}
+          hasControl={hasControl}
+          id={id}
+          isCopying={isCopying}
+        />
       </Paper>
     </div>
   );
@@ -172,6 +237,8 @@ const mapStateToProps = (state) => {
   return {
     events: state.getIn(["otherEvents"]),
     eventsInHeap: (heap || {}).eventsInHeap,
+    myEvents: state.getIn(["allEvents"]),
+    auth: state.getIn(["auth"]),
   };
 };
 
@@ -179,6 +246,7 @@ const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       storeEventInHeap: reduxAddToHeap,
+      putEventsInRedux: loadAllEvents,
     },
     dispatch
   );
@@ -189,7 +257,18 @@ export default connect(
 )(withRouter(EventFullView));
 
 // --------------------------------------------------------------
-const Footer = ({ history, community }) => {
+const Footer = ({
+  history,
+  community,
+  hasControl,
+  id,
+  copyEvent,
+  isCopying,
+}) => {
+  const eventNotice = hasControl
+    ? ""
+    : `Only admins of ${(community && community.name) ||
+        "..."} can edit this event`;
   return (
     <div style={{ background: "#fbfbfb", display: "flex" }}>
       <Button
@@ -204,26 +283,28 @@ const Footer = ({ history, community }) => {
         }}
         onClick={() => history.push("/admin/read/events")}
       >
-        <i className="fa fa-long-arrow-left" style={{ marginRight: 6 }} /> Back
+        <i className="fa fa-long-arrow-left" style={{ marginRight: 6 }} /> All
+        Events
       </Button>
       <div style={{ marginLeft: "auto" }}>
-        <Tooltip
-          placement="top"
-          title={`Only admins of ${(community && community.name) ||
-            "..."} can edit this event`}
+        <Button
+          disabled={!hasControl}
+          variant="contained"
+          color="secondary"
+          style={{
+            borderRadius: 0,
+            padding: 10,
+            width: 200,
+            pointerEvents: "all",
+            cursor: "pointer",
+          }}
+          onClick={() => history.push(`/admin/edit/${id}/event`)}
         >
-          <Button
-            variant="contained"
-            color="secondary"
-            style={{
-              borderRadius: 0,
-              padding: 10,
-              width: 200,
-            }}
-          >
-            Edit Event
-          </Button>
-        </Tooltip>
+          <Tooltip placement="top" title={eventNotice}>
+            <span> Edit Event</span>
+          </Tooltip>
+        </Button>
+
         <Button
           variant="contained"
           color="primary"
@@ -232,7 +313,15 @@ const Footer = ({ history, community }) => {
             padding: 10,
             width: 200,
           }}
+          onClick={() => copyEvent && copyEvent()}
+          disabled={isCopying}
         >
+          {isCopying && (
+            <i
+              className=" fa fa-spinner fa-spin"
+              style={{ color: "white", marginRight: 5 }}
+            />
+          )}
           Copy Event
         </Button>
       </div>

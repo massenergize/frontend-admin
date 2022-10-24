@@ -203,6 +203,10 @@ function EventsFromOtherCommunities({
             Show events from communities I select below
           </Typography>
 
+          <small style={{ color: "grey" }}>
+            The community list below does not include communities you manage
+          </small>
+
           <LightAutoComplete
             defaultSelected={communities || []}
             data={otherCommunities || []}
