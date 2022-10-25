@@ -49,7 +49,13 @@ class CreateNewEventForm extends Component {
     const { communities, tags, auth, otherCommunities } = props;
 
     const readyToRenderPageFirstTime =
-      communities && communities.length && tags && tags.length && auth;
+      communities &&
+      communities.length &&
+      tags &&
+      tags.length &&
+      auth &&
+      otherCommunities &&
+      otherCommunities.length;
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderPageFirstTime || state.mounted;
@@ -131,6 +137,10 @@ const whenStartDateChanges = ({ newValue, formData, setValueInForm }) => {
 const createFormJson = ({ communities, auth, otherCommunities }) => {
   const is_super_admin = auth && auth.is_super_admin;
   otherCommunities = otherCommunities || [];
+  const otherCommunityList = otherCommunities.map((c) => ({
+    displayName: c.name,
+    id: c.id.toString(),
+  }));
   const formJson = {
     title: "Create New Event or Campaign",
     subTitle: "",
@@ -337,7 +347,7 @@ const createFormJson = ({ communities, auth, otherCommunities }) => {
             label: "Who should be able to see this event?",
             fieldType: "Radio",
             isRequired: false,
-            defaultValue: "false",
+            defaultValue: "OPEN",
             dbName: "publicity",
             readOnly: false,
             data: [
@@ -365,10 +375,7 @@ const createFormJson = ({ communities, auth, otherCommunities }) => {
                     selectMany: true,
                     defaultValue: [],
                     dbName: "publicity_selections",
-                    data: otherCommunities.map((c) => ({
-                      displayName: c.name,
-                      id: c.id,
-                    })),
+                    data: otherCommunityList,
                   },
                 ],
               },
@@ -383,10 +390,7 @@ const createFormJson = ({ communities, auth, otherCommunities }) => {
                     selectMany: true,
                     defaultValue: [],
                     dbName: "publicity_selections",
-                    data: otherCommunities.map((c) => ({
-                      displayName: c.name,
-                      id: c.id,
-                    })),
+                    data: otherCommunityList,
                   },
                 ],
               },
