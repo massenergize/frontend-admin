@@ -153,7 +153,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     isSuperAdmin && apiCall("/tasks.list"),
     apiCall("/settings.list"),
     isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
-    !isSuperAdmin && apiCall("communities.others.listForCommunityAdmin"),
+    apiCall("communities.others.listForCommunityAdmin"),
   ]).then((response) => {
     const [
       communities,

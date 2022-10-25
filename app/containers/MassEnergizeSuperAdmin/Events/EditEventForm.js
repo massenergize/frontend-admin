@@ -115,6 +115,9 @@ class EditEventForm extends Component {
       otherCommunities &&
       otherCommunities.length;
 
+
+      
+
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderPageFirstTime || state.mounted;
 
@@ -262,6 +265,32 @@ const validator = (cleaned) => {
   ];
 };
 
+/**
+ * If an event is open, allow event to be shared to any of the admin's communities
+ * If it's open_to, only select which of the admin's communities that have been listed as allowed to show in the dropdown
+ * If its closed_to, only select which of the admin's communities that have not been exempted to show in the dropdown
+ * @param {*} adminOf
+ * @param {*} list
+ * @param {*} publicity
+ * @returns
+ */
+const getAllowedCommunities = (adminOf, list, publicity) => {
+  if (publicity === "OPEN") return adminOf;
+  list = (list || []).map((c) => c.id);
+  // This part happens when an admin has already copied an event, and is trying to edit, (we select only communities that are allowed) to be shown in the dropdown
+  var coms;
+  if (publicity === "OPEN_TO") {
+    coms = adminOf.filter((c) => list.includes(c.id));
+    return coms;
+  }
+
+  if (publicity === "CLOSED_TO") {
+    coms = adminOf.filter((c) => !list.includes(c.id));
+    return coms;
+  }
+
+  return [];
+};
 const createFormJson = ({
   event,
   rescheduledEvent,
@@ -273,11 +302,26 @@ const createFormJson = ({
   if (!event || !communities) return;
   const is_super_admin = auth && auth.is_super_admin;
 
+  communities = getAllowedCommunities(
+    auth.admin_at,
+    event.communities_under_publicity,
+    event.publicity
+  );
+
+  communities = (communities || []).map((c) => ({
+    displayName: c.name,
+    id: c.id.toString(),
+  }));
+
+  console.log("Whats allowed", communities);
+
   const publicityCommunities = (
     (event && event.communities_under_publicity) ||
     []
   ).map((c) => c.id.toString());
-  console.log("THe public", publicityCommunities);
+
+  // Now check which of the communities are listed under publicity, and which ones match the admin's communities
+
   const otherCommunityList = otherCommunities.map((c) => ({
     displayName: c.name,
     id: c.id.toString(),

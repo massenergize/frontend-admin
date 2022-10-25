@@ -34,7 +34,10 @@ function EventFullView({
     start_date_and_time,
     location,
     tags,
+    publicity,
+    communities_under_publicity,
   } = event || {};
+
   const tagString = (tags || []).map((t) => t.name).join(", ");
   const { address, city, state, zipcode, unit } = location || {};
   var id = match.params.id;
@@ -197,6 +200,8 @@ function EventFullView({
           id={id}
           copyEvent={copyEvent}
           isCopying={isCopying}
+          publicity={publicity}
+          communities={communities_under_publicity}
         />
       </Paper>
 
@@ -227,6 +232,9 @@ function EventFullView({
           hasControl={hasControl}
           id={id}
           isCopying={isCopying}
+          auth={auth}
+          publicity={publicity}
+          communities={communities_under_publicity}
         />
       </Paper>
     </div>
@@ -264,11 +272,20 @@ const Footer = ({
   id,
   copyEvent,
   isCopying,
+  publicity,
+  communities,
 }) => {
   const eventNotice = hasControl
     ? ""
     : `Only admins of ${(community && community.name) ||
         "..."} can edit this event`;
+
+  const cannotBeShared = publicity === "CLOSE";
+  const copyNotice = cannotBeShared
+    ? "This event's publicity is closed. It cant be shared"
+    : "You can share this to your community";
+
+
   return (
     <div style={{ background: "#fbfbfb", display: "flex" }}>
       <Button
@@ -314,7 +331,7 @@ const Footer = ({
             width: 200,
           }}
           onClick={() => copyEvent && copyEvent()}
-          disabled={isCopying}
+          disabled={isCopying || (cannotBeShared && !hasControl)}
         >
           {isCopying && (
             <i
@@ -322,7 +339,9 @@ const Footer = ({
               style={{ color: "white", marginRight: 5 }}
             />
           )}
-          Copy Event
+          <Tooltip placement="top" title={copyNotice}>
+            <span> Copy Event</span>
+          </Tooltip>
         </Button>
       </div>
     </div>

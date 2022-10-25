@@ -393,7 +393,7 @@ class AllEvents extends React.Component {
       },
     };
 
-    console.log("this is the all events", this.props.allEvents)
+
     if (!data || !data.length) {
       return (
         <Grid
