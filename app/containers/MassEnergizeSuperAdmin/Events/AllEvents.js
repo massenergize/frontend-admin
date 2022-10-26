@@ -53,7 +53,7 @@ import CallMadeIcon from "@material-ui/icons/CallMade";
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { columns: this.getColumns(), loading: false, currentTab: 1 }; // BEFORE PR CHANGE CURRENT TAB TO 0
+    this.state = { columns: this.getColumns(), loading: false, currentTab: 0 };
   }
 
   componentDidMount() {
@@ -214,7 +214,6 @@ class AllEvents extends React.Component {
               >
                 <FileCopy size="small" variant="outlined" color="secondary" />
               </Link>
-              
               <Link to={`/admin/read/event/${id}/event-view`}>
                 <CallMadeIcon
                   size="small"
@@ -354,6 +353,7 @@ class AllEvents extends React.Component {
       otherEvents,
       otherEventsState,
       putEventsStateInRedux,
+      auth,
     } = this.props;
     const data = this.fashionData(this.props.allEvents || []);
     const options = {
@@ -392,7 +392,6 @@ class AllEvents extends React.Component {
         return false;
       },
     };
-
 
     if (!data || !data.length) {
       return (
@@ -455,16 +454,20 @@ class AllEvents extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <Paper style={{ marginBottom: 10 }}>
-          <Tabs
-            onChange={(_, v) => this.setState({ currentTab: v })}
-            value={currentTab}
-            variant="fullWidth"
-            indicatorColor="primary"
-            textColor="primary"
-          >
-            <Tab label="From Your Communities" key={0} />
-            <Tab label="Other Communities" key={1} />
-          </Tabs>
+          {/*  Only Show tabs when user is a cadmin. Sadmins already see everything */}
+          {!(auth && auth.is_super_admin) && (
+            <Tabs
+              onChange={(_, v) => this.setState({ currentTab: v })}
+              value={currentTab}
+              variant="fullWidth"
+              indicatorColor="primary"
+              textColor="primary"
+            >
+              <Tab label="From Your Communities" key={0} />
+
+              <Tab label="Other Communities" key={1} />
+            </Tabs>
+          )}
         </Paper>
         {activeComponent}
       </div>

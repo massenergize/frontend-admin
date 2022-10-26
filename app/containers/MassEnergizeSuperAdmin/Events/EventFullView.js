@@ -329,6 +329,8 @@ const Footer = ({
             borderRadius: 0,
             padding: 10,
             width: 200,
+            pointerEvents: "all",
+            cursor: "pointer",
           }}
           onClick={() => copyEvent && copyEvent()}
           disabled={isCopying || (cannotBeShared && !hasControl)}

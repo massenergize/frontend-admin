@@ -36,6 +36,8 @@ function EventsFromOtherCommunities({
 
   const fetchOtherEvents = () => {
     const ids = (communities || []).map((it) => it.id);
+    // return console.log("What are the coms",communities, otherCommunities);
+
     setLoading(true);
     apiCall("/events.others.listForCommunityAdmin", {
       community_ids: ids,
