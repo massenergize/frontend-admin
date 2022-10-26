@@ -10,6 +10,7 @@ import {
   loadAllEvents,
   reduxAddToHeap,
 } from "../../../redux/redux-actions/adminActions";
+import EventShareModal from "./EventShareModal";
 
 function EventFullView({
   events,
@@ -24,6 +25,8 @@ function EventFullView({
   const [event, setEvent] = useState(undefined);
   const [hasControl, setHasControl] = useState(false);
   const [isCopying, setIsCopying] = useState(false);
+
+  const [showShareModal, setshowShareModal] = useState(false);
   const {
     name,
     community,
@@ -113,7 +116,7 @@ function EventFullView({
   //   ----------------------------------------------------------------------------------------
   const pageIsLoading = event === undefined;
   const couldNotFindEvent = event === null;
-  //   ----------------------------------------------------------------------
+  //   ---------------------------------------------------------------------------------------
   if (couldNotFindEvent)
     return (
       <Paper>
@@ -146,6 +149,8 @@ function EventFullView({
   //   ----------------------------------------------------------------------------------------
   return (
     <div>
+      <EventShareModal show={showShareModal} toggleModal={setshowShareModal} />
+
       <Paper style={{ marginBottom: 10 }}>
         <div style={{ padding: "15px 25px" }}>
           <Typography variant="h5">{name || "..."}</Typography>
@@ -163,7 +168,6 @@ function EventFullView({
             <hr
               style={{
                 width: 100,
-                // border: "dotted 0px #e3e3e3",
                 border: "dotted 0px #00bcd4",
                 borderBottomWidth: 4,
               }}
@@ -202,6 +206,7 @@ function EventFullView({
           isCopying={isCopying}
           publicity={publicity}
           communities={communities_under_publicity}
+          share={() => setshowShareModal(true)}
         />
       </Paper>
 
@@ -235,6 +240,7 @@ function EventFullView({
           auth={auth}
           publicity={publicity}
           communities={communities_under_publicity}
+          share={() => setshowShareModal(true)}
         />
       </Paper>
     </div>
@@ -274,6 +280,7 @@ const Footer = ({
   isCopying,
   publicity,
   communities,
+  share
 }) => {
   const eventNotice = hasControl
     ? ""
@@ -284,7 +291,6 @@ const Footer = ({
   const copyNotice = cannotBeShared
     ? "This event's publicity is closed. It cant be shared"
     : "You can share this to your community";
-
 
   return (
     <div style={{ background: "#fbfbfb", display: "flex" }}>
@@ -302,6 +308,29 @@ const Footer = ({
       >
         <i className="fa fa-long-arrow-left" style={{ marginRight: 6 }} /> All
         Events
+      </Button>
+      <Button
+        variant="outlined"
+        color="primary"
+        style={{
+          borderRadius: 0,
+          padding: 10,
+          width: 200,
+          pointerEvents: "all",
+          cursor: "pointer",
+        }}
+        onClick={() => copyEvent && copyEvent()}
+        disabled={isCopying}
+      >
+        {isCopying && (
+          <i
+            className=" fa fa-spinner fa-spin"
+            style={{ color: "white", marginRight: 5 }}
+          />
+        )}
+        <Tooltip placement="top" title={"Copy Event"}>
+          <span> Copy Event</span>
+        </Tooltip>
       </Button>
       <div style={{ marginLeft: "auto" }}>
         <Button
@@ -332,8 +361,8 @@ const Footer = ({
             pointerEvents: "all",
             cursor: "pointer",
           }}
-          onClick={() => copyEvent && copyEvent()}
-          disabled={isCopying || (cannotBeShared && !hasControl)}
+          disabled={cannotBeShared && !hasControl}
+          onClick  = {()=> share && share()}
         >
           {isCopying && (
             <i
@@ -341,8 +370,14 @@ const Footer = ({
               style={{ color: "white", marginRight: 5 }}
             />
           )}
-          <Tooltip placement="top" title={copyNotice}>
-            <span> Copy Event</span>
+          <Tooltip placement="top" title="Share event to your community">
+            <>
+              <span> Share Event</span>
+              <i
+                className="fa fa-long-arrow-right"
+                style={{ marginLeft: 6 }}
+              />{" "}
+            </>
           </Tooltip>
         </Button>
       </div>
