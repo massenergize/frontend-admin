@@ -45,12 +45,8 @@ const fetchAdmins = async ({ id, reduxFunction, admins }) => {
     community_id: id,
   });
   if (!response || !response.data) return reduxFunction({});
-
-  var pending = (response.data.pending_admins || []).map((user) => ({
-    ...user,
-    isPending: true,
-  }));
-  const content = [...(response.data.members || []), ...pending];
+ 
+  const content = [...(response.data.members || [])];
   reduxFunction({ ...(admins || {}), [id]: content });
 };
 
