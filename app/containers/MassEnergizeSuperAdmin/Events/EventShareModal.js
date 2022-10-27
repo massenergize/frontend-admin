@@ -3,18 +3,40 @@ import { Button, FormControlLabel, Typography } from "@material-ui/core";
 
 import React, { useState } from "react";
 import ThemeModal from "../../../components/Widget/ThemeModal";
+import { fetchParamsFromURL } from "../../../utils/common";
+import { FROM } from "../../../utils/constants";
+import { apiCall } from "../../../utils/messenger";
 
 /**
  * This component lists all communities that an admin
  * viewing an event is allowed to share to
  * @returns
  */
-function EventShareModal({ show, toggleModal, event, auth, communities }) {
+
+function EventShareModal({
+  show,
+  toggleModal,
+  event,
+  auth,
+  communities,
+  events,
+  myEvents,
+  updateEventInHeap,
+  updateOtherEventListInRedux,
+  updateNormalEventListInRedux
+}) {
   const [communitiesToShareTo, setCommunities] = useState([]); // Selected communities to share to
   const [loading, setLoading] = useState(false);
 
   const isCommunityAdmin = auth && auth.is_community_admin;
   const isSuperAdmin = auth && auth.is_super_admin;
+
+  const { from } = fetchParamsFromURL(window.location, "from");
+
+  const replaceInRedux = (event, list, reduxFxn) => {
+    const rem = (list || []).filter((ev) => ev.id !== event.id);
+    reduxFxn([event, ...rem]);
+  };
 
   const getAllowedCommunities = () => {
     const { is_open, is_open_to, communities_under_publicity, is_closed_to } =
@@ -62,8 +84,42 @@ function EventShareModal({ show, toggleModal, event, auth, communities }) {
 
     return [];
   };
-
   const commsToShow = getAllowedCommunities();
+
+  /**
+   * Sends a request to the backend to update the content
+   */
+  const shareToCommunities = () => {
+    setLoading(true);
+    const share_to = communitiesToShareTo.map((c) => c.id);
+    apiCall("/events.update", { share_to })
+      .then((response) => {
+        if (!response.success)
+          return console.log("SHARING_ERROR_BE:", response.error);
+
+        setLoading(false);
+        // Now we have the event object with updated "share_to" field so
+        updateEventInHeap(response.data);
+        if (from === FROM.MAIN_EVENTS)
+          return replaceInRedux(
+            response.data,
+            myEvents,
+            updateOtherEventListInRedux
+          );
+
+        // Means the admin is viewing an event from outside all their communities
+        if (from === FROM.OTHER_EVENTS)
+          return replaceInRedux(
+            response.data,
+            myEvents,
+            updateNormalEventListInRedux
+          );
+      })
+      .catch((e) => {
+        console.log("SHARING_ERROR: ", e.toString());
+        setLoading(false);
+      });
+  };
 
   const add = (id) => {
     const communities = communitiesToShareTo;
@@ -71,7 +127,6 @@ function EventShareModal({ show, toggleModal, event, auth, communities }) {
     var rem = communities.filter((_id) => _id !== id);
     setCommunities(rem);
   };
- 
 
   const numberOf = communitiesToShareTo.length;
 
@@ -82,6 +137,8 @@ function EventShareModal({ show, toggleModal, event, auth, communities }) {
       numberOf === 1 ? "community" : "communities"
     }`;
   };
+
+  //   -------------------------------------------------------------------
   return (
     <div>
       <ThemeModal
@@ -147,22 +204,38 @@ function EventShareModal({ show, toggleModal, event, auth, communities }) {
               display: "flex",
             }}
           >
-            <Button
-              variant="contained"
-              color="primary"
-              style={{
-                borderRadius: 0,
-                marginLeft: "auto",
-                padding: "8px 25px",
-                pointerEvents: "all",
-                cursor: "pointer",
-              }}
-              disabled={!numberOf}
-            >
-              <Tooltip placement="top" title="Select communities to share to">
-                <span>{buttonText(numberOf)}</span>
-              </Tooltip>
-            </Button>
+            <div style={{ marginLeft: "auto" }}>
+              <Button
+                variant="contained"
+                color="primary"
+                style={{
+                  borderRadius: 0,
+
+                  padding: "8px 25px",
+                  background: "#d97c7c",
+                }}
+                className="touchable-opacity"
+                //   onClick={() => toggleModal && toggleModal(false)}
+              >
+                CLOSE
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                style={{
+                  borderRadius: 0,
+
+                  padding: "8px 25px",
+                  pointerEvents: "all",
+                  cursor: "pointer",
+                }}
+                disabled={!numberOf}
+              >
+                <Tooltip placement="top" title="Select communities to share to">
+                  <span>{buttonText(numberOf)}</span>
+                </Tooltip>
+              </Button>
+            </div>
           </div>
         </div>
       </ThemeModal>

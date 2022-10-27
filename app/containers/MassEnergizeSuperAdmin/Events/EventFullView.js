@@ -9,24 +9,26 @@ import { useHistory, withRouter } from "react-router-dom";
 import {
   loadAllEvents,
   reduxAddToHeap,
+  reduxLoadAllOtherEvents,
 } from "../../../redux/redux-actions/adminActions";
 import EventShareModal from "./EventShareModal";
 
-function EventFullView({
-  events,
-  match,
-  storeEventInHeap,
-  eventsInHeap,
-  auth,
-  putEventsInRedux,
-  myEvents,
-  communities,
-}) {
+function EventFullView(props) {
+  const {
+    events,
+    match,
+    storeEventInHeap,
+    eventsInHeap,
+    auth,
+    putEventsInRedux,
+    myEvents, // Events that are from the communities the current admin manages
+    communities,
+    putOtherEventsInRedux,
+  } = props;
   const history = useHistory();
   const [event, setEvent] = useState(undefined);
   const [hasControl, setHasControl] = useState(false);
   const [isCopying, setIsCopying] = useState(false);
-
   const [showShareModal, setshowShareModal] = useState(false);
   const {
     name,
@@ -46,6 +48,12 @@ function EventFullView({
   const { address, city, state, zipcode, unit } = location || {};
   var id = match.params.id;
   id = id && id.toString();
+
+  const putEventInHeap = (event) => {
+    storeEventInHeap({
+      eventsInHeap: { ...(eventsInHeap || {}), [event.id.toString()]: event },
+    });
+  };
   //   ------------------------------------------------------------------------------------
   useEffect(() => {
     // Find from the list of "other events" in the table
@@ -74,9 +82,7 @@ function EventFullView({
           return console.log("FETCH_EVENT_ERR:", response.error);
         }
         setEvent(response.data);
-        storeEventInHeap({
-          eventsInHeap: { ...(eventsInHeap || {}), [id]: response.data },
-        });
+        putEventInHeap(response.data);
         checkIfAdminControlsEvent(response.data, auth);
       })
       .catch((e) => {
@@ -147,7 +153,7 @@ function EventFullView({
     );
   if (pageIsLoading) return <Loading />;
 
-  //   ----------------------------------------------------------------------------------------
+  //   -------------------------------------- HTML MARK UP --------------------------------------------------
   return (
     <div>
       <EventShareModal
@@ -156,6 +162,11 @@ function EventFullView({
         show={showShareModal}
         toggleModal={setshowShareModal}
         event={event}
+        updateEventInHeap={putEventInHeap}
+        otherEvents={events}
+        myEvents={myEvents}
+        updateNormalEventListInRedux={putEventsInRedux}
+        updateOtherEventListInRedux={putOtherEventsInRedux}
       />
 
       <Paper style={{ marginBottom: 10 }}>
@@ -269,6 +280,7 @@ const mapDispatchToProps = (dispatch) => {
     {
       storeEventInHeap: reduxAddToHeap,
       putEventsInRedux: loadAllEvents,
+      putOtherEventsInRedux: reduxLoadAllOtherEvents,
     },
     dispatch
   );
