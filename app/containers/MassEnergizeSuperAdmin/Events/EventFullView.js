@@ -20,6 +20,7 @@ function EventFullView({
   auth,
   putEventsInRedux,
   myEvents,
+  communities,
 }) {
   const history = useHistory();
   const [event, setEvent] = useState(undefined);
@@ -149,7 +150,13 @@ function EventFullView({
   //   ----------------------------------------------------------------------------------------
   return (
     <div>
-      <EventShareModal show={showShareModal} toggleModal={setshowShareModal} />
+      <EventShareModal
+        auth={auth}
+        communities={communities}
+        show={showShareModal}
+        toggleModal={setshowShareModal}
+        event={event}
+      />
 
       <Paper style={{ marginBottom: 10 }}>
         <div style={{ padding: "15px 25px" }}>
@@ -253,6 +260,7 @@ const mapStateToProps = (state) => {
     eventsInHeap: (heap || {}).eventsInHeap,
     myEvents: state.getIn(["allEvents"]),
     auth: state.getIn(["auth"]),
+    communities: state.getIn(["communities"]),
   };
 };
 
@@ -280,7 +288,7 @@ const Footer = ({
   isCopying,
   publicity,
   communities,
-  share
+  share,
 }) => {
   const eventNotice = hasControl
     ? ""
@@ -362,7 +370,7 @@ const Footer = ({
             cursor: "pointer",
           }}
           disabled={cannotBeShared && !hasControl}
-          onClick  = {()=> share && share()}
+          onClick={() => share && share()}
         >
           {isCopying && (
             <i
