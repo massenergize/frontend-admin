@@ -2,7 +2,10 @@ import { Button, Paper, Tooltip, Typography } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { getHumanFriendlyDate } from "../../../utils/common";
+import {
+  fetchParamsFromURL,
+  getHumanFriendlyDate,
+} from "../../../utils/common";
 import { apiCall } from "../../../utils/messenger";
 import Loading from "dan-components/Loading";
 import { useHistory, withRouter } from "react-router-dom";
@@ -12,6 +15,41 @@ import {
   reduxLoadAllOtherEvents,
 } from "../../../redux/redux-actions/adminActions";
 import EventShareModal from "./EventShareModal";
+
+const open = {
+  background: "#4faa4f",
+};
+const close = {
+  background: "#d87c7b",
+};
+const PUBLICITY_PROPS = {
+  OPEN: {
+    style: open,
+    info: "This event/campaign can be shared to any community",
+    label: "Open",
+    tooltip: "Share with any community",
+  },
+  OPEN_TO: {
+    style: open,
+    info:
+      "This event/campaign can only be shared with the listed communities below",
+    label: "Open To",
+    tooltip: "Share with a few selected",
+  },
+  CLOSE: {
+    style: close,
+    info:
+      "This event/compaign is closed. It can't be shared with any community",
+    label: "Closed",
+    tooltip: "Cannot be shared",
+  },
+  CLOSED_TO: {
+    style: { ...close, background: "#e79157" },
+    info: "This event/campaign is only closed to the communities listed below",
+    label: "Closed To",
+    tooltip: "Open to all except a few listed",
+  },
+};
 
 function EventFullView(props) {
   const {
@@ -29,7 +67,12 @@ function EventFullView(props) {
   const [event, setEvent] = useState(undefined);
   const [hasControl, setHasControl] = useState(false);
   const [isCopying, setIsCopying] = useState(false);
-  const [showShareModal, setshowShareModal] = useState(false);
+  // ------------------------------------------------------------
+  const { dialog } = fetchParamsFromURL(window.location, "dialog");
+  const modalState = (dialog || "").toLowerCase() === "open";
+  // ------------------------------------------------------------
+  const [showShareModal, setshowShareModal] = useState(modalState);
+
   const {
     name,
     community,
@@ -44,6 +87,7 @@ function EventFullView(props) {
     communities_under_publicity,
   } = event || {};
 
+  const publicityProps = PUBLICITY_PROPS[publicity] || {};
   const tagString = (tags || []).map((t) => t.name).join(", ");
   const { address, city, state, zipcode, unit } = location || {};
   var id = match.params.id;
@@ -55,12 +99,13 @@ function EventFullView(props) {
     });
   };
   //   ------------------------------------------------------------------------------------
+  const finder = (ev, id) => ev.id.toString() === id;
   useEffect(() => {
     // Find from the list of "other events" in the table
 
-    var foundInRedux = (events || []).find((ev) => ev.id.toString() === id); // search locally in the "otherCommunities" list
+    var foundInRedux = (events || []).find((ev) => finder(ev, id)); // search locally in the "otherCommunities" list
     if (!foundInRedux)
-      foundInRedux = (myEvents || []).find((ev) => ev.id.toString() === id); // search locally in admin's community list
+      foundInRedux = (myEvents || []).find((ev) => finder(ev, id)); // search locally in admin's community list
 
     if (foundInRedux) {
       checkIfAdminControlsEvent(foundInRedux, auth);
@@ -94,6 +139,11 @@ function EventFullView(props) {
     checkIfAdminControlsEvent(event, auth);
   }, [auth]);
 
+  useEffect(() => {
+    const found = (eventsInHeap || {})[id];
+    if (found) setEvent(found);
+  }, [eventsInHeap]);
+  // ---------------------------------------------------------------------------------------
   const checkIfAdminControlsEvent = (event, auth) => {
     const coms = ((auth && auth.admin_at) || []).map((c) => c.id.toString());
     if (event) {
@@ -119,6 +169,18 @@ function EventFullView(props) {
         setIsCopying(false);
         console.log("EVENT_COPY_ERROR:", e.toString());
       });
+  };
+
+  const listToString = (list) => {
+    if (!list || !list.length) return "";
+
+    var str = "";
+    for (var i in list) {
+      const com = list[i];
+      if (Number(i) === 0) str += com.name;
+      else str += `, ${com.name}`;
+    }
+    return str;
   };
   //   ----------------------------------------------------------------------------------------
   const pageIsLoading = event === undefined;
@@ -154,6 +216,8 @@ function EventFullView(props) {
   if (pageIsLoading) return <Loading />;
 
   //   -------------------------------------- HTML MARK UP --------------------------------------------------
+
+  const sharedTo = listToString(event.shared_to);
   return (
     <div>
       <EventShareModal
@@ -204,8 +268,8 @@ function EventFullView(props) {
           </div>
           {location && (
             <div>
-              <Typography variant="caption" color="grey">
-                LOCATION
+              <Typography variant="caption" color="primary">
+                <b> LOCATION</b>
               </Typography>
               <Typography variant="body1">
                 {address || ""}
@@ -228,6 +292,57 @@ function EventFullView(props) {
         />
       </Paper>
 
+      <Paper style={{ marginBottom: 10 }}>
+        <div style={{ padding: "15px 25px" }}>
+          <Typography
+            variant="h5"
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 10,
+            }}
+          >
+            Event Publicity{" "}
+            <Tooltip placement="bottom" title={publicityProps.tooltip}>
+              <span
+                className="touchable-opacity"
+                style={{
+                  marginLeft: 6,
+                  background: "green",
+                  color: "white",
+                  padding: "5px 10px",
+                  fontSize: 12,
+                  borderRadius: 55,
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  ...publicityProps.style,
+                }}
+              >
+                {publicityProps.label}
+              </span>
+            </Tooltip>
+          </Typography>
+          <Typography variant="body2">{publicityProps.info}</Typography>
+          <Typography variant="body1">
+            {listToString(event.communities_under_publicity)}
+          </Typography>
+          <div style={{ marginTop: 10 }}>
+            <Typography variant="caption" color="primary">
+              <b>CURRENTLY SHARED TO</b>
+            </Typography>
+            <Typography variant="body1">
+              {sharedTo ? (
+                sharedTo
+              ) : (
+                <span style={{ color: "#d5d5d5" }}>
+                  Has not been shared with anyone yet
+                </span>
+              )}
+            </Typography>
+          </div>
+        </div>
+      </Paper>
       <Paper>
         <div style={{ padding: "15px 25px" }}>
           <div style={{ marginBottom: 10 }}>

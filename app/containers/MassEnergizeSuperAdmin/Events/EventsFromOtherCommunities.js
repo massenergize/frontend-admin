@@ -149,7 +149,7 @@ function EventsFromOtherCommunities({
         options: {
           filterType: "multiselect",
           customBodyRender: (id) => (
-            <Link to={`/admin/read/event/${id}/event-view`}>
+            <Link to={`/admin/read/event/${id}/event-view?from=others`}>
               <CallMadeIcon size="small" variant="outlined" color="secondary" />
             </Link>
           ),
