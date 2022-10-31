@@ -87,6 +87,7 @@ function EventFullView(props) {
     tags,
     publicity,
     communities_under_publicity,
+    is_published,
   } = event || {};
 
   const publicityProps = PUBLICITY_PROPS[publicity] || {};
@@ -240,7 +241,40 @@ function EventFullView(props) {
 
       <Paper style={{ marginBottom: 10 }}>
         <div style={{ padding: "15px 25px" }}>
-          <Typography variant="h5">{name || "..."}</Typography>
+          <Typography
+            variant="h5"
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            {name || "..."}{" "}
+            <Tooltip
+              placement="bottom"
+              title={
+                is_published
+                  ? "This event is live"
+                  : "This event is not live yet"
+              }
+            >
+              <span
+                className="touchable-opacity"
+                style={{
+                  marginLeft: 6,
+                  background: is_published ? "#4faa4f" : "grey",
+                  color: "white",
+                  padding: "5px 10px",
+                  fontSize: 12,
+                  borderRadius: 55,
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+              >
+                {is_published ? "Is Live" : "Not Live"}
+              </span>
+            </Tooltip>
+          </Typography>
 
           <div
             style={{
