@@ -69,6 +69,8 @@ function EventFullView(props) {
   const [isCopying, setIsCopying] = useState(false);
   // ------------------------------------------------------------
   const { dialog } = fetchParamsFromURL(window.location, "dialog");
+  const { from } = fetchParamsFromURL(window.location, "from");
+
   const modalState = (dialog || "").toLowerCase() === "open";
   // ------------------------------------------------------------
   const [showShareModal, setshowShareModal] = useState(modalState);
@@ -145,6 +147,9 @@ function EventFullView(props) {
   }, [eventsInHeap]);
   // ---------------------------------------------------------------------------------------
   const checkIfAdminControlsEvent = (event, auth) => {
+    if (auth.is_super_admin && !auth.is_community_admin)
+      return setHasControl(true); // super admin always has control
+
     const coms = ((auth && auth.admin_at) || []).map((c) => c.id.toString());
     if (event) {
       const { community } = event || {};
@@ -205,7 +210,7 @@ function EventFullView(props) {
               width: 200,
               background: "#d97c7c",
             }}
-            onClick={() => history.push("/admin/read/events")}
+            onClick={() => history.push(`/admin/read/events?from=${from}`)}
           >
             <i className="fa fa-long-arrow-left" style={{ marginRight: 6 }} />{" "}
             All Events
@@ -289,6 +294,7 @@ function EventFullView(props) {
           publicity={publicity}
           communities={communities_under_publicity}
           share={() => setshowShareModal(true)}
+          from={from}
         />
       </Paper>
 
@@ -336,7 +342,7 @@ function EventFullView(props) {
                 sharedTo
               ) : (
                 <span style={{ color: "#d5d5d5" }}>
-                  Has not been shared with anyone yet
+                  Has not been shared with any communities yet
                 </span>
               )}
             </Typography>
@@ -374,6 +380,7 @@ function EventFullView(props) {
           publicity={publicity}
           communities={communities_under_publicity}
           share={() => setshowShareModal(true)}
+          from={from}
         />
       </Paper>
     </div>
@@ -415,6 +422,7 @@ const Footer = ({
   isCopying,
   publicity,
   communities,
+  from,
   share,
 }) => {
   const eventNotice = hasControl
@@ -439,7 +447,7 @@ const Footer = ({
           width: 200,
           background: "#d97c7c",
         }}
-        onClick={() => history.push("/admin/read/events")}
+        onClick={() => history.push(`/admin/read/events?from=${from}`)}
       >
         <i className="fa fa-long-arrow-left" style={{ marginRight: 6 }} /> All
         Events

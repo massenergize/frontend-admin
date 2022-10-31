@@ -520,8 +520,6 @@ class MassEnergizeForm extends Component {
     }
 
 
-    // return console.log("Cleaned values", cleanedValues) // REMOVE BEFORE PR
-
     // if validator is provided, it means we want to make some form of unique custom validation first
     // before submiting the form
     if (validator) {

@@ -26,6 +26,7 @@ import {
   reduxSaveOtherEventState,
 } from "../../../redux/redux-actions/adminActions";
 import {
+  fetchParamsFromURL,
   findMatchesAndRest,
   getHumanFriendlyDate,
   getTimeStamp,
@@ -50,6 +51,7 @@ import { concat } from "lodash";
 import { Tab } from "@material-ui/core";
 import EventsFromOtherCommunities from "./EventsFromOtherCommunities";
 import CallMadeIcon from "@material-ui/icons/CallMade";
+import { FROM } from "../../../utils/constants";
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
@@ -57,6 +59,9 @@ class AllEvents extends React.Component {
   }
 
   componentDidMount() {
+    const { from } = fetchParamsFromURL(window.location, "from");
+    this.setState({ currentTab: from === FROM.OTHER_EVENTS ? 1 : 0 });
+    
     const user = this.props.auth ? this.props.auth : {};
     const community = this.props.community ? this.props.community : {};
     if (user.is_super_admin) {

@@ -210,6 +210,7 @@ function EventsFromOtherCommunities({
           </small>
 
           <LightAutoComplete
+            placeholder="Select Communities..."
             defaultSelected={communities || []}
             data={otherCommunities || []}
             labelExtractor={(it) => it.name}
