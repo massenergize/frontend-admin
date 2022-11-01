@@ -61,7 +61,7 @@ class AllEvents extends React.Component {
   componentDidMount() {
     const { from } = fetchParamsFromURL(window.location, "from");
     this.setState({ currentTab: from === FROM.OTHER_EVENTS ? 1 : 0 });
-    
+
     const user = this.props.auth ? this.props.auth : {};
     const community = this.props.community ? this.props.community : {};
     if (user.is_super_admin) {
@@ -459,6 +459,10 @@ class AllEvents extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <Paper style={{ marginBottom: 10 }}>
+          <Typography variant="body" style={{ padding: "10px 25px" }}>
+            Manage your events/campaigns, or lookup available events from other
+            communities that you might want to share to yours
+          </Typography>
           {/*  Only Show tabs when user is a cadmin. Sadmins already see everything */}
           {!(auth && auth.is_super_admin) && (
             <Tabs
