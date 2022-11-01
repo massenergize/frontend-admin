@@ -35,6 +35,7 @@ import {
   LOAD_FEATURE_FLAGS,
   LOAD_ADMIN_ACTIVITIES,
   ADD_NEW_FEATURE_FLAG_INFO,
+  SET_GALLERY_FILTERS,
   LOAD_ADMINS_FOR_MY_COMMUNITY,
   LOAD_SUPER_ADMIN_LIST,
 } from "../ReduxConstants";
@@ -107,6 +108,15 @@ export const reducerForFeatureFlags = (state = LOADING, action = {}) => {
 export const reducerForSettings = (state = null, action = {}) => {
   switch (action.type) {
     case LOAD_SETTINGS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
+export const reducerForGalleryFilters = (state = {}, action = {}) => {
+  switch (action.type) {
+    case SET_GALLERY_FILTERS:
       return action.payload;
     default:
       return state;

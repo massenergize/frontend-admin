@@ -45,6 +45,7 @@ import app, {
   reducerForFeatureFlags,
   reducerForAdminActivities,
   reducerForFlagInfo,
+  reducerForGalleryFilters,
   reducerForLoadingAdmins,
   reducerForLoadingSuperAdmins,
 } from "./modules/appReducer";
@@ -56,6 +57,7 @@ export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
     activities: reducerForAdminActivities,
     flagInfos: reducerForFlagInfo,
+    galleryFilters: reducerForGalleryFilters,
     sadmins: reducerForLoadingSuperAdmins,
     admins: reducerForLoadingAdmins,
     featureFlags: reducerForFeatureFlags,
