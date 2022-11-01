@@ -220,8 +220,11 @@ class AllCommunities extends React.Component {
      * TODO: We should probably let the backend accept an array of items to remove instead of looping api calls....
      */
     idsToDelete.forEach((d) => {
-      const communityId = data[d.dataIndex][6];
+      console.log(d.dataIndex)
+      console.log(data)
+      const communityId = data[d.dataIndex][0];
       ids.push(communityId);
+      console.log("communityId",communityId)
       apiCall("/communities.delete", { community_id: communityId });
     });
     const rem = (communities || []).filter((com) => !ids.includes(com.id));
