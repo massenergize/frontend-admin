@@ -38,6 +38,7 @@ import {
   SET_GALLERY_FILTERS,
   LOAD_ADMINS_FOR_MY_COMMUNITY,
   LOAD_SUPER_ADMIN_LIST,
+  KEEP_FORM_CONTENT,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -74,12 +75,19 @@ export const loadSettings = (data = {}) => {
     payload: data,
   };
 };
+export const reduxKeepFormContent = (key, newFormContent) => (dispatch, getState) => {
+  const tempForm = getState().tempForm ||{}
+  dispatch({
+    type: KEEP_FORM_CONTENT,
+    payload: {...tempForm, [key]: newFormContent},
+  });
+};
 export const reduxSetGalleryFilters = (data = {}) => {
   return {
     type: SET_GALLERY_FILTERS,
-    payload:data,
-  }
-}
+    payload: data,
+  };
+};
 export const reduxLoadSuperAdmins = (data = LOADING) => {
   return {
     type: LOAD_SUPER_ADMIN_LIST,

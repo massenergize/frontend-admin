@@ -11,3 +11,10 @@ export const PAGE_PROPERTIES = {
     ALL_USERS: { key: "ALL_USERS"},
     FEATURE_FLAGS: { key: "FEATURE_FLAGS"},
 } 
+
+
+export const PAGE_KEYS = {
+    CREATE_ACTION : { key:"CREATE_ACTION"},
+    CREATE_EVENT : { key:"CREATE_EVENT"},
+    CREATE_COMMUNITY : { key:"CREATE_COMMUNITY"},
+}

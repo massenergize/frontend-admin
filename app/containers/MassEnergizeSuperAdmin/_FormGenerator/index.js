@@ -100,6 +100,10 @@ class MassEnergizeForm extends Component {
     await this.setStateAsync({ formJson, formData, readOnly: readOnly });
   }
 
+  componentWillUnmount() {
+    const { unMount } = this.props;
+    if (unMount) unMount(this.state);
+  }
   setStateAsync(state) {
     return new Promise((resolve) => {
       this.setState(state, resolve);
@@ -264,7 +268,7 @@ class MassEnergizeForm extends Component {
     await this.setStateAsync({
       formData: { ...formData, [name]: newValue },
     });
-  };;
+  };
 
   /**
    * Handle checkboxes when they are clicked
@@ -529,7 +533,6 @@ class MassEnergizeForm extends Component {
       );
       if (!validationPassed) return this.setError(_err);
     }
-
 
     // let's make an api call to send the data
     let response = null;
@@ -1034,13 +1037,9 @@ class MassEnergizeForm extends Component {
               required={field.isRequired}
               name={field.name}
               onChange={
-                
                 field.name === "subdomain"
-                 
                   ? this.handleSubDomainChange
-                 
                   : this.handleFormDataChange
-              
               }
               label={field.label}
               multiline={field.isMultiline}

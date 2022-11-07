@@ -48,6 +48,7 @@ import app, {
   reducerForGalleryFilters,
   reducerForLoadingAdmins,
   reducerForLoadingSuperAdmins,
+  reducerForKeepingFormContent,
 } from "./modules/appReducer";
 
 /**
@@ -55,6 +56,7 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    tempForm: reducerForKeepingFormContent,
     activities: reducerForAdminActivities,
     flagInfos: reducerForFlagInfo,
     galleryFilters: reducerForGalleryFilters,

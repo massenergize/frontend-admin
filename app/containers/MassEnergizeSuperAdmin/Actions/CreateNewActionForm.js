@@ -8,6 +8,9 @@ import { connect } from "react-redux";
 import { checkIfReadOnly, makeTagSection } from "./EditActionForm";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
 import fieldTypes from "../_FormGenerator/fieldTypes";
+import { bindActionCreators } from "redux";
+import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -44,7 +47,7 @@ class CreateNewActionForm extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    const { communities, tags, vendors, ccActions, auth } = props;
+    const { communities, tags, vendors, ccActions, auth, formState } = props;
     const fullyMountedNeverRunThisAgain =
       communities &&
       communities.length &&
@@ -74,6 +77,7 @@ class CreateNewActionForm extends Component {
       vendors: vends,
       ccActions: modifiedCCActions,
       auth,
+      formState
     });
 
     const section = makeTagSection({ collections: tags, defaults: false });
@@ -89,13 +93,24 @@ class CreateNewActionForm extends Component {
     };
   }
 
+  preserveFormData(formState) {
+    const { saveFormTemporarily } = this.props;
+    const { formData } = formState || {};
+    saveFormTemporarily(PAGE_KEYS.CREATE_ACTION.key, formData);
+  }
+
   render() {
     const { classes } = this.props;
     const { formJson } = this.state;
     if (!formJson) return <Loading />;
     return (
       <div key={this.state.reRenderKey}>
-        <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+          unMount={this.preserveFormData.bind(this)}
+          enableCancel
+        />
       </div>
     );
   }
@@ -112,12 +127,26 @@ const mapStateToProps = (state) => ({
   ccActions: state.getIn(["ccActions"]),
   actions: state.getIn(["allActions"]),
   auth: state.getIn(["auth"]),
+  formState: state.getIn(["tempForm"]),
 });
 
-const NewActionMapped = connect(mapStateToProps)(CreateNewActionForm);
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      saveFormTemporarily: reduxKeepFormContent,
+    },
+    dispatch
+  );
+};
+
+const NewActionMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreateNewActionForm);
 export default withStyles(styles, { withTheme: true })(NewActionMapped);
 
-const createFormJson = ({ communities, ccActions, vendors, auth }) => {
+const createFormJson = ({ communities, ccActions, vendors, auth, formState }) => {
+  console.log("THEN YOU GO COLLECT", formState)
   const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Create a New Action",
@@ -176,7 +205,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
                       defaultValue: null,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
-                      isRequired:true
+                      isRequired: true,
                     },
                   ],
                 },
@@ -185,10 +214,10 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
                 name: "community",
                 label: "Primary Community (select one)",
                 fieldType: "Dropdown",
-                defaultValue: communities[0].id,    // for a cadmin default to first of their communities.  Need one.
+                defaultValue: communities[0].id, // for a cadmin default to first of their communities.  Need one.
                 dbName: "community_id",
-                data: [{ displayName: "--", id: "" }, ...communities],     
-                isRequired:true 
+                data: [{ displayName: "--", id: "" }, ...communities],
+                isRequired: true,
               },
         ],
       },

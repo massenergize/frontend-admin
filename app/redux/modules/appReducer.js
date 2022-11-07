@@ -38,6 +38,7 @@ import {
   SET_GALLERY_FILTERS,
   LOAD_ADMINS_FOR_MY_COMMUNITY,
   LOAD_SUPER_ADMIN_LIST,
+  KEEP_FORM_CONTENT,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -65,6 +66,14 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+export const reducerForKeepingFormContent = (state = {}, action = {}) => {
+  switch (action.type) {
+    case KEEP_FORM_CONTENT:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForAdminActivities = (state = LOADING, action = {}) => {
   switch (action.type) {
     case LOAD_ADMIN_ACTIVITIES:
@@ -73,7 +82,7 @@ export const reducerForAdminActivities = (state = LOADING, action = {}) => {
       return state;
   }
 };
-export const reducerForFlagInfo = (state ={}, action = {}) => {
+export const reducerForFlagInfo = (state = {}, action = {}) => {
   switch (action.type) {
     case ADD_NEW_FEATURE_FLAG_INFO:
       return action.payload;
