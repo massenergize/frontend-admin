@@ -11,6 +11,7 @@ import {
   reduxCheckUser,
   reduxFetchInitialContent,
   reduxToggleUniversalModal,
+  restoreFormProgress,
   runAdminStatusCheck,
 } from "../../redux/redux-actions/adminActions";
 import {
@@ -87,13 +88,15 @@ import EventRSVPs from "../MassEnergizeSuperAdmin/Events/EventRSVPs";
 import ThemeModal from "../../components/Widget/ThemeModal";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { THREE_MINUTES, TIME_UNTIL_EXPIRATION } from "../../utils/constants";
+import { ME_FORM_PROGRESS } from "../MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 
 class Application extends React.Component {
   componentWillMount() {
     this.props.reduxCallCommunities();
   }
+
   componentDidMount() {
-    this.props.checkFirebaseAuthentication()
+    this.props.checkFirebaseAuthentication();
     this.props.fetchInitialContent(this.props.auth);
     setInterval(() => {
       const expirationTime = Number(
@@ -102,7 +105,12 @@ class Application extends React.Component {
       const currentDateTime = Date.now();
       const itsPassedADaySinceLogin = currentDateTime > expirationTime;
       if (itsPassedADaySinceLogin) runAdminStatusCheck();
-    },THREE_MINUTES);
+    }, THREE_MINUTES);
+
+    // Collect form progress from local storage after page refresh
+    var progress = localStorage.getItem(ME_FORM_PROGRESS) || "{}";
+    progress = JSON.parse(progress);
+    this.props.restoreFormProgress(progress);
   }
 
   getCommunityList() {
@@ -178,6 +186,7 @@ class Application extends React.Component {
         )}
       />,
     ];
+
     const {
       component,
       show,
@@ -194,7 +203,6 @@ class Application extends React.Component {
           onCancel={() => {
             if (onCancel) onCancel();
           }}
-
           close={() => {
             toggleUniversalModal({ show: false, component: null });
             return false;
@@ -210,7 +218,11 @@ class Application extends React.Component {
 
           <Route exact path="/blank" component={BlankPage} />
           <Route exact path="/admin/profile/settings" component={Settings} />
-          <Route exact path="/admin/settings/feature-flags" component={FeatureFlags} />
+          <Route
+            exact
+            path="/admin/settings/feature-flags"
+            component={FeatureFlags}
+          />
           <Route path="/admin/read/users" component={UsersList} />
           <Route
             path="/admin/read/community-admin-messages"
@@ -382,7 +394,8 @@ function mapDispatchToProps(dispatch) {
       loadModalImages: reduxCallLibraryModalImages,
       fetchInitialContent: reduxFetchInitialContent,
       toggleUniversalModal: reduxToggleUniversalModal,
-      checkFirebaseAuthentication
+      checkFirebaseAuthentication,
+      restoreFormProgress: restoreFormProgress,
     },
     dispatch
   );

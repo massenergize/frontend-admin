@@ -43,6 +43,7 @@ import {
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
 import { LOADING } from "../../utils/constants";
+import { ME_FORM_PROGRESS } from "../../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 
 // TODO: REOMVE THIS FUNCTiON
 export const testRedux = (value) => {
@@ -75,11 +76,22 @@ export const loadSettings = (data = {}) => {
     payload: data,
   };
 };
-export const reduxKeepFormContent = (key, newFormContent) => (dispatch, getState) => {
-  const tempForm = getState().tempForm ||{}
+export const restoreFormProgress = (data = {}) => { 
+  return {
+    type: KEEP_FORM_CONTENT,
+    payload: data
+  }
+}
+export const reduxKeepFormContent = (key, newFormContent) => (
+  dispatch,
+  getState
+) => {
+  const tempForm = getState().tempForm || {};
+  const payload = { ...tempForm, [key]: newFormContent };
+  localStorage.setItem(ME_FORM_PROGRESS, JSON.stringify(payload));
   dispatch({
     type: KEEP_FORM_CONTENT,
-    payload: {...tempForm, [key]: newFormContent},
+    payload,
   });
 };
 export const reduxSetGalleryFilters = (data = {}) => {

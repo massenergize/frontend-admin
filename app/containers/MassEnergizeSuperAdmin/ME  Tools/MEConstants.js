@@ -18,3 +18,5 @@ export const PAGE_KEYS = {
     CREATE_EVENT : { key:"CREATE_EVENT"},
     CREATE_COMMUNITY : { key:"CREATE_COMMUNITY"},
 }
+
+export const ME_FORM_PROGRESS = "ME_FORM_PROGRESS"
