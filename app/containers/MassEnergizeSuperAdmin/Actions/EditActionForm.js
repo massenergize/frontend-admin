@@ -33,8 +33,13 @@ const styles = (theme) => ({
 export const getSelectedIds = (selected, dataToCrossCheck) => {
   const res = [];
   (selected || []).forEach((s) => {
-    if (dataToCrossCheck.filter((d) => d.id === s.id).length > 0) {
-      res.push("" + s.id);
+    const isString = typeof s === "string"; // The selected tags dont always come in as array of objs, sometimes they come in as array of strings (like: when tracking progress)
+    const filtered = dataToCrossCheck.filter((d) => {
+      if (isString) return d.id.toString() === s;
+      return d.id === s.id;
+    });
+    if (filtered.length > 0) {
+      res.push("" + isString ? s : s.id);
     }
   });
   return res;
@@ -51,14 +56,20 @@ export const checkIfReadOnly = (action, user) => {
   }
   return (action.is_global && !user.is_super_admin) || readOnlyWrongCommunity;
 };
-export const makeTagSection = ({ collections, action, defaults = true }) => {
+export const makeTagSection = ({
+  collections,
+  action,
+  defaults = true,
+  progress,
+}) => {
   const section = {
     label: "Please select tag(s) that apply to this action",
     fieldType: "Section",
     children: [],
   };
-
   (collections || []).forEach((tCol) => {
+    var selected = (action && action.tags) || [];
+    selected = selected.length ? selected : (progress || {})[tCol.name];
     const newField = {
       isRequired: false,
       name: tCol.name,
@@ -70,9 +81,8 @@ export const makeTagSection = ({ collections, action, defaults = true }) => {
       placeholder: "",
       fieldType: "Checkbox",
       selectMany: tCol.allow_multiple,
-      defaultValue:
-        defaults &&
-        getSelectedIds((action && action.tags) || [], tCol.tags || []),
+      defaultValue: defaults && getSelectedIds(selected || [], tCol.tags || []),
+      // defaultValue: getSelectedIds(selected || [], tCol.tags || []),
       dbName: "tags",
       data: (tCol.tags || []).map((t) => ({
         ...t,
@@ -273,7 +283,7 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
                         action.community && "" + action.community.id,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
-                      isRequired: true
+                      isRequired: true,
                     },
                   ],
                 },
@@ -286,7 +296,7 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
                 defaultValue: action.community && "" + action.community.id,
                 dbName: "community_id",
                 data: [{ displayName: "--", id: "" }, ...communities],
-                isRequired:true
+                isRequired: true,
               },
         ],
       },

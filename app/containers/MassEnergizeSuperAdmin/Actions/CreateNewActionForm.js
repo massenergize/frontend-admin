@@ -72,15 +72,21 @@ class CreateNewActionForm extends Component {
       displayName: c.description,
       id: "" + c.id,
     }));
+    
+    const progress = (formState || {})[PAGE_KEYS.CREATE_ACTION.key] || {};
+    const section = makeTagSection({
+      collections: tags,
+      defaults: true,
+      progress,
+    });
+
     const formJson = createFormJson({
       communities: coms,
       vendors: vends,
       ccActions: modifiedCCActions,
       auth,
-      formState
+      progress,
     });
-
-    const section = makeTagSection({ collections: tags, defaults: false });
 
     if (formJson) formJson.fields.splice(1, 0, section);
 
@@ -96,6 +102,7 @@ class CreateNewActionForm extends Component {
   preserveFormData(formState) {
     const { saveFormTemporarily } = this.props;
     const { formData } = formState || {};
+    console.log("WHEN STATE UNMOUNTS:", formData)
     saveFormTemporarily(PAGE_KEYS.CREATE_ACTION.key, formData);
   }
 
@@ -145,8 +152,15 @@ const NewActionMapped = connect(
 )(CreateNewActionForm);
 export default withStyles(styles, { withTheme: true })(NewActionMapped);
 
-const createFormJson = ({ communities, ccActions, vendors, auth, formState }) => {
-  console.log("THEN YOU GO COLLECT", formState)
+const createFormJson = ({
+  communities,
+  ccActions,
+  vendors,
+  auth,
+  progress,
+  collections,
+}) => {
+
   const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Create a New Action",
@@ -165,7 +179,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth, formState }) =>
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            defaultValue: progress.title || "",
             dbName: "title",
             readOnly: false,
             maxLength: 40,
@@ -178,7 +192,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth, formState }) =>
             fieldType: "TextField",
             contentType: "number",
             isRequired: true,
-            defaultValue: "",
+            defaultValue: progress.rank || "",
             dbName: "rank",
             readOnly: false,
           },
@@ -188,7 +202,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth, formState }) =>
                 label: "Is this Action a Template?",
                 fieldType: "Radio",
                 isRequired: false,
-                defaultValue: "false",
+                defaultValue: progress.is_global || "false",
                 dbName: "is_global",
                 readOnly: false,
                 data: [
@@ -202,7 +216,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth, formState }) =>
                       name: "community",
                       label: "Primary Community (select one)",
                       fieldType: "Dropdown",
-                      defaultValue: null,
+                      defaultValue: progress.community || null,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
                       isRequired: true,
@@ -214,13 +228,14 @@ const createFormJson = ({ communities, ccActions, vendors, auth, formState }) =>
                 name: "community",
                 label: "Primary Community (select one)",
                 fieldType: "Dropdown",
-                defaultValue: communities[0].id, // for a cadmin default to first of their communities.  Need one.
+                defaultValue: progress.community || communities[0].id, // for a cadmin default to first of their communities.  Need one.
                 dbName: "community_id",
                 data: [{ displayName: "--", id: "" }, ...communities],
                 isRequired: true,
               },
         ],
       },
+
       {
         label:
           "Carbon Calculator - Link your Action to one of our Carbon Calculator Actions",
@@ -231,7 +246,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth, formState }) =>
             label: "Calculator Action",
             placeholder: "eg. Wayland",
             fieldType: "Dropdown",
-            defaultValue: null,
+            defaultValue: progress.calculator_action || null,
             dbName: "calculator_action",
             data: ccActions,
             modalTitle: "Carbon Action List & Instructions",
@@ -247,7 +262,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth, formState }) =>
         fieldType: "TextField",
         isMulti: true,
         isRequired: true,
-        defaultValue: null,
+        defaultValue: progress.featured_summary || null,
         dbName: "featured_summary",
       },
       {
@@ -256,7 +271,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth, formState }) =>
         placeholder: "Key information people should know about the action",
         fieldType: "HTMLField",
         isRequired: true,
-        defaultValue: null,
+        defaultValue: progress.about || null,
         dbName: "about",
       },
       {
@@ -265,7 +280,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth, formState }) =>
         placeholder: "Easy to follow steps to accomplish the action",
         fieldType: "HTMLField",
         isRequired: false,
-        defaultValue: null,
+        defaultValue: progress.steps_to_take || null,
         dbName: "steps_to_take",
       },
       {
@@ -274,7 +289,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth, formState }) =>
         placeholder: "Further information some users might want to know",
         fieldType: "HTMLField",
         isRequired: false,
-        defaultValue: null,
+        defaultValue: progress.deep_dive || null,
         dbName: "deep_dive",
       },
       {
@@ -282,7 +297,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth, formState }) =>
         label: "Select which vendors provide services for this action",
         fieldType: "Checkbox",
         selectMany: true,
-        defaultValue: null,
+        defaultValue: progress.vendors || null,
         dbName: "vendors",
         data: vendors,
       },
@@ -293,7 +308,8 @@ const createFormJson = ({ communities, ccActions, vendors, auth, formState }) =>
         dbName: "image",
         label: "Upload Files",
         isRequired: false,
-        defaultValue: "",
+        selected: progress.image ||[],
+        defaultValue: progress.image ||[],
         filesLimit: 1,
       },
       {
@@ -301,7 +317,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth, formState }) =>
         label: "Should this action go live?",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: "false",
+        defaultValue: progress.is_published || "false",
         dbName: "is_published",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],

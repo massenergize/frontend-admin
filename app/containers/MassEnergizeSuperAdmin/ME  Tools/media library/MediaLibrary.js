@@ -26,7 +26,7 @@ function MediaLibrary(props) {
     dragToOrder,
   } = props;
   const [show, setShow] = useState(openState);
-  const [imageTray, setTrayImages] = useState(selected);
+  const [imageTray, setTrayImages] = useState([]);
   const [state, setState] = useState({});
   const [hasMounted, setHasMountedTo] = useState(undefined);
   const [cropped, setCropped] = useState({}); // all items that have been cropped are saved in this object, E.g. idOfParentImage: CroppedContent
@@ -44,7 +44,7 @@ function MediaLibrary(props) {
     const { source } = cropLoot;
     setCropped({ ...(cropped || {}), [source.id.toString()]: croppedSource });
     setCurrentTab(TABS.UPLOAD_TAB);
-    return false
+    return false;
   };
 
   const switchToCropping = (content) => {
@@ -78,6 +78,14 @@ function MediaLibrary(props) {
 
   useEffect(() => {
     setHasMountedTo(true);
+    const preSelected = (selected || []).map((img) => {
+      if (typeof img === "number") {// Sometimes, default values for the media library comes in the form of Ids, instead of objects. When that happens, use the Ids to find teh real objects
+        const found = (images || []).find((im) => im.id === img);
+        return found || {};
+      }
+      return img;
+    });
+    setTrayImages(preSelected);
   }, []);
 
   useEffect(() => {}, [cropped]);
@@ -376,9 +384,9 @@ MediaLibrary.propTypes = {
   renderBeforeImages: PropTypes.element,
 
   /**
-   * A function that should return a tooltip component. 
+   * A function that should return a tooltip component.
    */
-  TooltipWrapper: PropTypes.string
+  TooltipWrapper: PropTypes.string,
 };
 
 MediaLibrary.Button = MLButton;
@@ -405,6 +413,6 @@ MediaLibrary.defaultProps = {
   compress: true,
   compressedQuality: IMAGE_QUALITY.MEDIUM.key,
   maximumImageSize: DEFFAULT_MAX_SIZE,
-  renderBeforeImages:null
+  renderBeforeImages: null,
 };
 export default MediaLibrary;
