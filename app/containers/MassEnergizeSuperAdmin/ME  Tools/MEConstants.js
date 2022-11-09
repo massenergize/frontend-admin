@@ -16,7 +16,9 @@ export const PAGE_PROPERTIES = {
 export const PAGE_KEYS = {
     CREATE_ACTION : { key:"CREATE_ACTION"},
     CREATE_EVENT : { key:"CREATE_EVENT"},
-    CREATE_COMMUNITY : { key:"CREATE_COMMUNITY"},
+    CREATE_TEAM : { key:"CREATE_TEAM"},
+    CREATE_VENDOR : { key:"CREATE_VENDOR"},
+  
 }
 
 export const ME_FORM_PROGRESS = "ME_FORM_PROGRESS"

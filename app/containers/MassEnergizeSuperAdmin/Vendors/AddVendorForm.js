@@ -8,7 +8,9 @@ import { makeTagSection } from "../Events/EditEventForm";
 import { connect } from "react-redux";
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
-
+import { bindActionCreators } from "redux";
+import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 
 const styles = (theme) => ({
   root: {
@@ -44,12 +46,14 @@ class CreateNewVendorForm extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    const { communities, tags } = props;
+    const { communities, tags, formState } = props;
 
+    const progress = (formState || {})[PAGE_KEYS.CREATE_VENDOR.key] || {};
     const section = makeTagSection({
       collections: tags,
-      defaults: false,
+      defaults: true,
       title: "Please select tag(s) that apply to this service provider",
+      progress,
     });
     const coms = communities.map((c) => ({
       ...c,
@@ -63,7 +67,7 @@ class CreateNewVendorForm extends Component {
 
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
-    const formJson = createFormJson({ communities: coms });
+    const formJson = createFormJson({ communities: coms, progress });
     formJson.fields.splice(1, 0, section);
 
     return { formJson, communities, mounted: true };
@@ -116,13 +120,29 @@ class CreateNewVendorForm extends Component {
   //   });
   // }
 
+  preserveFormData(formState) {
+    const { saveFormTemporarily } = this.props;
+    const { formData } = formState || {};
+    const oldFormState = this.props.formState;
+    saveFormTemporarily({
+      key: PAGE_KEYS.CREATE_VENDOR.key,
+      data: formData,
+      whole: oldFormState,
+    });
+  }
+
   render() {
     const { classes } = this.props;
     const { formJson } = this.state;
     if (!formJson) return <Loading />;
     return (
       <div>
-        <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+          unMount={this.preserveFormData.bind(this)}
+          enableCancel
+        />
       </div>
     );
   }
@@ -136,12 +156,25 @@ const mapStateToProps = (state) => {
   return {
     communities: state.getIn(["communities"]),
     tags: state.getIn(["allTags"]),
+    formState: state.getIn(["tempForm"]),
   };
 };
-const Mapped = connect(mapStateToProps)(CreateNewVendorForm);
+
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      saveFormTemporarily: reduxKeepFormContent,
+    },
+    dispatch
+  );
+};
+const Mapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreateNewVendorForm);
 export default withStyles(styles, { withTheme: true })(Mapped);
 
-const createFormJson = ({ communities }) => {
+const createFormJson = ({ communities, progress }) => {
   // const { communities } = this.state;
   const formJson = {
     title: "Create New Vendor",
@@ -160,7 +193,7 @@ const createFormJson = ({ communities }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            defaultValue: progress.name || "",
             dbName: "name",
             readOnly: false,
           },
@@ -171,7 +204,7 @@ const createFormJson = ({ communities }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: false,
-            defaultValue: "",
+            defaultValue: progress.phone_number || "",
             dbName: "phone_number",
             readOnly: false,
           },
@@ -182,7 +215,7 @@ const createFormJson = ({ communities }) => {
             contentType: "text",
             isRequired: true,
             selectMany: true,
-            defaultValue: [],
+            defaultValue: progress.communities || [],
             dbName: "communities",
             readOnly: false,
             data: communities || [],
@@ -194,7 +227,7 @@ const createFormJson = ({ communities }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            defaultValue: progress.email || "",
             dbName: "email",
             readOnly: false,
           },
@@ -206,7 +239,7 @@ const createFormJson = ({ communities }) => {
             contentType: "text",
             isRequired: true,
             isMultiline: true,
-            defaultValue: "",
+            defaultValue: progress.description || "",
             dbName: "description",
             readOnly: false,
           },
@@ -216,6 +249,7 @@ const createFormJson = ({ communities }) => {
             placeholder: "eg. https://www.vendorwebsite.com",
             fieldType: "TextField",
             contentType: "text",
+            defaultValue: progress.website || "",
             isRequired: false,
             dbName: "website",
             readOnly: false,
@@ -225,7 +259,7 @@ const createFormJson = ({ communities }) => {
             label: "Do you have an address?",
             fieldType: "Radio",
             isRequired: false,
-            defaultValue: "false",
+            defaultValue: progress.have_address || "false",
             dbName: "have_address",
             readOnly: false,
             data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
@@ -239,7 +273,7 @@ const createFormJson = ({ communities }) => {
                   fieldType: "TextField",
                   contentType: "text",
                   isRequired: true,
-                  defaultValue: "",
+                  defaultValue: progress.address || "",
                   dbName: "address",
                   readOnly: false,
                 },
@@ -250,7 +284,7 @@ const createFormJson = ({ communities }) => {
                   fieldType: "TextField",
                   contentType: "text",
                   isRequired: true,
-                  defaultValue: "",
+                  defaultValue: progress.city || "",
                   dbName: "city",
                   readOnly: false,
                 },
@@ -261,7 +295,7 @@ const createFormJson = ({ communities }) => {
                   contentType: "text",
                   isRequired: false,
                   data: states,
-                  defaultValue: "Massachusetts",
+                  defaultValue: progress.state || "Massachusetts",
                   dbName: "state",
                   readOnly: false,
                 },
@@ -272,6 +306,7 @@ const createFormJson = ({ communities }) => {
                   contentType: "text",
                   isRequired: true,
                   dbName: "zipcode",
+                  defaultValue: progress.zipcode || "",
                   readOnly: false,
                 },
               ],
@@ -289,7 +324,7 @@ const createFormJson = ({ communities }) => {
             fieldType: "Radio",
             contentType: "text",
             isRequired: true,
-            defaultValue: "national",
+            defaultValue: progress.service_area || "national",
             dbName: "service_area",
             readOnly: false,
             data: [
@@ -308,7 +343,7 @@ const createFormJson = ({ communities }) => {
                   data: states,
                   selectMany: true,
                   isRequired: false,
-                  defaultValue: [],
+                  defaultValue: progress.service_area_states || [],
                   dbName: "service_area_states",
                   readOnly: false,
                 },
@@ -323,7 +358,7 @@ const createFormJson = ({ communities }) => {
             contentType: "text",
             isRequired: true,
             selectMany: true,
-            defaultValue: [],
+            defaultValue: progress.properties_serviced || [],
             dbName: "properties_serviced",
             readOnly: false,
             data: [
@@ -352,7 +387,7 @@ const createFormJson = ({ communities }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            defaultValue: progress.key_contact_full_name || "",
             dbName: "key_contact_name",
             readOnly: false,
           },
@@ -364,7 +399,7 @@ const createFormJson = ({ communities }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: false,
-            defaultValue: "",
+            defaultValue: progress.key_contact_full_name || "",
             dbName: "key_contact_email",
             readOnly: false,
           },
@@ -377,7 +412,7 @@ const createFormJson = ({ communities }) => {
         fieldType: "TextField",
         contentType: "text",
         isRequired: true,
-        defaultValue: "",
+        defaultValue: progress.onboarding_contact_email || "",
         dbName: "onboarding_contact_email",
         readOnly: false,
       },
@@ -386,16 +421,17 @@ const createFormJson = ({ communities }) => {
         placeholder: "Add a Logo",
         fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
+        defaultValue: progress.image || [],
+        selected: progress.image || [],
         label: "Upload a logo for this Vendor",
         isRequired: false,
-    
       },
       {
         name: "is_verified",
         label: "Have you verified this Vendor?",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: "false",
+        defaultValue: progress.is_verified || "false",
         dbName: "is_verified",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
@@ -405,7 +441,7 @@ const createFormJson = ({ communities }) => {
         label: "Should this vendor go live?",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: "false",
+        defaultValue: progress.is_published || "false",
         dbName: "is_published",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],

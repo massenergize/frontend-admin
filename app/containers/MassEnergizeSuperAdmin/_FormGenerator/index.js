@@ -342,7 +342,9 @@ class MassEnergizeForm extends Component {
   getDisplayName = (fieldName, id, data) => {
     const { formData } = this.state;
     if (id) {
-      const [result] = data.filter((d) => d.id.toString() === id.toString());
+      const [result] = data.filter(
+        (d) => d.id && d.id.toString() === id && id.toString()
+      );
       if (result) {
         return result.displayName;
       }
