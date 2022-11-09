@@ -9,6 +9,9 @@ import { makeTagSection } from "./EditEventForm";
 import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
 import fieldTypes from "../_FormGenerator/fieldTypes";
+import { bindActionCreators } from "redux";
+import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 
 const styles = (theme) => ({
   root: {
@@ -46,7 +49,7 @@ class CreateNewEventForm extends Component {
   }
 
   static getDerivedStateFromProps = (props, state) => {
-    const { communities, tags, auth } = props;
+    const { communities, tags, auth, formState } = props;
 
     const readyToRenderPageFirstTime =
       communities && communities.length && tags && tags.length && auth;
@@ -61,12 +64,18 @@ class CreateNewEventForm extends Component {
       id: "" + c.id,
     }));
 
+    const progress = (formState || {})[PAGE_KEYS.CREATE_EVENT.key] || {};
+    const section = makeTagSection({
+      collections: tags,
+      defaults: true,
+      progress,
+    });
+
     const formJson = createFormJson({
       communities: coms,
       auth,
+      progress
     });
-
-    const section = makeTagSection({ collections: tags, defaults: false });
 
     if (formJson) formJson.fields.splice(1, 0, section);
 
@@ -77,6 +86,16 @@ class CreateNewEventForm extends Component {
     };
   };
 
+  preserveFormData(formState) {
+    const { saveFormTemporarily } = this.props;
+    const oldFormState = this.props.formState;
+    const { formData } = formState || {};
+    saveFormTemporarily({
+      key: PAGE_KEYS.CREATE_EVENT.key,
+      data: formData,
+      whole: oldFormState,
+    });
+  }
   render() {
     const { classes } = this.props;
     const { formJson } = this.state;
@@ -87,6 +106,7 @@ class CreateNewEventForm extends Component {
           classes={classes}
           formJson={formJson}
           validator={validator}
+          unMount={this.preserveFormData.bind(this)}
         />
       </div>
     );
@@ -102,10 +122,24 @@ const mapStateToProps = (state) => {
     tags: state.getIn(["allTags"]),
     communities: state.getIn(["communities"]),
     auth: state.getIn(["auth"]),
+    formState: state.getIn(["tempForm"]),
+
   };
 };
 
-const CreateEventMapped = connect(mapStateToProps)(CreateNewEventForm);
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      saveFormTemporarily: reduxKeepFormContent,
+    },
+    dispatch
+  );
+};
+
+const CreateEventMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreateNewEventForm);
 
 export default withStyles(styles, { withTheme: true })(CreateEventMapped);
 
@@ -120,17 +154,13 @@ const validator = (cleaned) => {
   ];
 };
 
-const whenStartDateChanges = ({
-  newValue,
-  formData,
-  setValueInForm,
-}) => {
+const whenStartDateChanges = ({ newValue, formData, setValueInForm }) => {
   formData = formData || {};
   const newEnd = moment(newValue).add(1, "hours");
   setValueInForm({ start_date_and_time: newValue, end_date_and_time: newEnd });
 };
 
-const createFormJson = ({ communities, auth }) => {
+const createFormJson = ({ communities, auth , progress}) => {
   const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Create New Event or Campaign",
@@ -149,7 +179,7 @@ const createFormJson = ({ communities, auth }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            defaultValue: progress.name || "",
             dbName: "name",
             readOnly: false,
           },
@@ -160,7 +190,7 @@ const createFormJson = ({ communities, auth }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            defaultValue:progress.featured_summary ||  "",
             dbName: "featured_summary",
             readOnly: false,
           },
@@ -172,7 +202,7 @@ const createFormJson = ({ communities, auth }) => {
             fieldType: "TextField",
             contentType: "number",
             isRequired: true,
-            defaultValue: "",
+            defaultValue: progress.rank || "",
             dbName: "rank",
             readOnly: false,
           },
@@ -183,7 +213,7 @@ const createFormJson = ({ communities, auth }) => {
             placeholder: "YYYY-MM-DD HH:MM",
             fieldType: "DateTime",
             contentType: "text",
-            defaultValue: moment().startOf("hour"),
+            defaultValue: progress.start_date_and_time ||  moment().startOf("hour"),
             dbName: "start_date_and_time",
             minDate: moment().startOf("hour"),
             readOnly: false,
@@ -194,7 +224,7 @@ const createFormJson = ({ communities, auth }) => {
             placeholder: "YYYY-MM-DD HH:MM",
             fieldType: "DateTime",
             contentType: "text",
-            defaultValue: moment()
+            defaultValue: progress.end_date_and_time || moment()
               .startOf("hour")
               .add(1, "hours"),
             dbName: "end_date_and_time",
@@ -221,7 +251,7 @@ const createFormJson = ({ communities, auth }) => {
                   isRequired: true,
                   dbName: "separation_count",
                   contentType: "number",
-                  defaultValue: 1,
+                  defaultValue: progress.separation_count ||  1,
                   data: [
                     { id: 1, displayName: "1" },
                     { id: 2, displayName: "2" },
@@ -236,7 +266,7 @@ const createFormJson = ({ communities, auth }) => {
                   label: "",
                   fieldType: "Radio",
                   dbName: "recurring_type",
-                  defaultValue: null,
+                  defaultValue: progress.recurring_type || null,
                   data: [
                     { id: "week", value: "weeks" },
                     { id: "month", value: "months" },
@@ -249,7 +279,7 @@ const createFormJson = ({ communities, auth }) => {
                   fieldType: "Dropdown",
                   isRequired: true,
                   dbName: "day_of_week",
-                  defaultValue: "",
+                  defaultValue: progress.day_of_week || "",
                   data: [
                     { id: "Monday", displayName: "Monday" },
                     { id: "Tuesday", displayName: "Tuesday" },
@@ -266,7 +296,7 @@ const createFormJson = ({ communities, auth }) => {
                     'If you selected "month", choose the week of the month on which you want the event to repeat.',
                   fieldType: "Dropdown",
                   dbName: "week_of_month",
-                  defaultValue: "",
+                  defaultValue: progress.week_of_month || "",
                   data: [
                     { id: "first", displayName: "first" },
                     { id: "second", displayName: "second" },
@@ -282,7 +312,7 @@ const createFormJson = ({ communities, auth }) => {
                   fieldType: "DateTime",
                   contentType: "text",
                   isRequired: false,
-                  defaultValue: "none",
+                  defaultValue: progress.final_date ||  "none",
                   dbName: "final_date",
                   readOnly: false,
                 },
@@ -295,7 +325,7 @@ const createFormJson = ({ communities, auth }) => {
                 label: "Is this Event a Template?",
                 fieldType: "Radio",
                 isRequired: true,
-                defaultValue: "false",
+                defaultValue: progress.is_global || "false",
                 dbName: "is_global",
                 readOnly: false,
                 data: [
@@ -309,10 +339,10 @@ const createFormJson = ({ communities, auth }) => {
                       name: "community",
                       label: "Primary Community (select one)",
                       fieldType: "Dropdown",
-                      defaultValue: null,
+                      defaultValue: progress.community ||  null,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
-                      isRequired:true,
+                      isRequired: true,
                     },
                   ],
                 },
@@ -321,10 +351,10 @@ const createFormJson = ({ communities, auth }) => {
                 name: "community",
                 label: "Primary Community (select one)",
                 fieldType: "Dropdown",
-                defaultValue: communities[0] && communities[0].id,
+                defaultValue: progress.community || communities[0] && communities[0].id,
                 dbName: "community_id",
                 data: [{ displayName: "--", id: "" }, ...communities],
-                isRequired:true,
+                isRequired: true,
               },
         ],
       },
@@ -333,7 +363,7 @@ const createFormJson = ({ communities, auth }) => {
         label: "Want to add an address for this event?",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: "false",
+        defaultValue: progress.have_address || "false",
         dbName: "have_address",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
@@ -347,7 +377,7 @@ const createFormJson = ({ communities, auth }) => {
               fieldType: "TextField",
               contentType: "text",
               isRequired: true,
-              defaultValue: "",
+              defaultValue: progress.address || "",
               dbName: "address",
               readOnly: false,
             },
@@ -358,7 +388,7 @@ const createFormJson = ({ communities, auth }) => {
               fieldType: "TextField",
               contentType: "text",
               isRequired: false,
-              defaultValue: "",
+              defaultValue: progress.unit || "",
               dbName: "unit",
               readOnly: false,
             },
@@ -369,7 +399,7 @@ const createFormJson = ({ communities, auth }) => {
               fieldType: "TextField",
               contentType: "text",
               isRequired: true,
-              defaultValue: "",
+              defaultValue: progress.city || "",
               dbName: "city",
               readOnly: false,
             },
@@ -380,7 +410,7 @@ const createFormJson = ({ communities, auth }) => {
               contentType: "text",
               isRequired: false,
               data: states,
-              defaultValue: "Massachusetts",
+              defaultValue: progress.state || "Massachusetts",
               dbName: "state",
               readOnly: false,
             },
@@ -393,7 +423,7 @@ const createFormJson = ({ communities, auth }) => {
         placeholder: "eg. This event is happening in ...",
         fieldType: "HTMLField",
         isRequired: true,
-        defaultValue: null,
+        defaultValue: progress.description || null,
         dbName: "description",
       },
       {
@@ -402,6 +432,8 @@ const createFormJson = ({ communities, auth }) => {
         fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload Files",
+        selected: progress.image || [],
+        defaultValue: progress.image || [], 
         isRequired: false,
       },
       {
@@ -409,7 +441,7 @@ const createFormJson = ({ communities, auth }) => {
         label: "Enable RSVPs for this Event",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: "false",
+        defaultValue: progress.rsvp_enabled || "false",
         dbName: "rsvp_enabled",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
@@ -423,7 +455,7 @@ const createFormJson = ({ communities, auth }) => {
                 "Send an email with Zoom link or other details when user RSVPs they are coming?",
               fieldType: "Radio",
               isRequired: false,
-              defaultValue: "false",
+              defaultValue: progress.send_rsvp_email || "false",
               dbName: "rsvp_email",
               readOnly: false,
               data: [
@@ -440,7 +472,7 @@ const createFormJson = ({ communities, auth }) => {
                     placeholder: "eg. This event is happening in ...",
                     fieldType: "HTMLField",
                     isRequired: true,
-                    defaultValue: null,
+                    defaultValue: progress.rsvp_message_text || null,
                     dbName: "rsvp_message",
                   },
                 ],
@@ -454,7 +486,7 @@ const createFormJson = ({ communities, auth }) => {
         label: "Archive this Event",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: "false",
+        defaultValue: progress.archive || "false",
         dbName: "archive",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
@@ -464,7 +496,7 @@ const createFormJson = ({ communities, auth }) => {
         label: "Should this event Go Live?",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: "false",
+        defaultValue: progress.is_published || "false",
         dbName: "is_published",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],

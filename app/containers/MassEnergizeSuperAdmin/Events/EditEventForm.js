@@ -42,6 +42,7 @@ export const makeTagSection = ({
   event,
   title,
   defaults = true,
+  progress,
 }) => {
   const section = {
     label: title || "Please select tag(s) that apply to this event",
@@ -50,6 +51,8 @@ export const makeTagSection = ({
   };
 
   (collections || []).forEach((tCol) => {
+    var selected = (event && event.tags) || [];
+    selected = selected.length ? selected : (progress || {})[tCol.name];
     const newField = {
       name: tCol.name,
       label: `${tCol.name} ${
@@ -60,8 +63,7 @@ export const makeTagSection = ({
       placeholder: "",
       fieldType: "Checkbox",
       selectMany: tCol.allow_multiple,
-      defaultValue:
-        defaults && getSelectedIds((event && event.tags) || [], tCol.tags),
+      defaultValue: defaults && getSelectedIds(selected, tCol.tags || []),
       dbName: "tags",
       data: tCol.tags.map((t) => ({
         ...t,
@@ -183,8 +185,8 @@ class EditEventForm extends Component {
         {event.rsvp_enabled ? (
           <Paper style={{ padding: 20, marginBottom: 15 }}>
             <Typography>
-              Would you like to see a list of users who have RSVP-ed for
-              this event?
+              Would you like to see a list of users who have RSVP-ed for this
+              event?
             </Typography>
             <Link
               to={`/admin/edit/${event && event.id}/event-rsvps`}
@@ -241,7 +243,6 @@ export default withStyles(styles, { withTheme: true })(EditEventMapped);
 const validator = (cleaned) => {
   const start = (cleaned || {})["start_date_and_time"];
   const end = (cleaned || {})["end_date_and_time"];
-  console.log(start, end);
   const endDateComesLater = new Date(end) > new Date(start);
   return [
     endDateComesLater,
@@ -521,20 +522,20 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
                       defaultValue: event.community && event.community.id,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
-                      isRequired:true,
+                      isRequired: true,
                     },
                   ],
                 },
               }
             : {
-              name: "community",
-              label: "Primary Community (select one)",
-              fieldType: "Dropdown",
-              defaultValue: event.community && event.community.id,
-              dbName: "community_id",
-              data: [{ displayName: "--", id: "" }, ...communities],
-              isRequired:true,
-            },
+                name: "community",
+                label: "Primary Community (select one)",
+                fieldType: "Dropdown",
+                defaultValue: event.community && event.community.id,
+                dbName: "community_id",
+                data: [{ displayName: "--", id: "" }, ...communities],
+                isRequired: true,
+              },
         ],
       },
       {

@@ -72,7 +72,7 @@ class CreateNewActionForm extends Component {
       displayName: c.description,
       id: "" + c.id,
     }));
-    
+
     const progress = (formState || {})[PAGE_KEYS.CREATE_ACTION.key] || {};
     const section = makeTagSection({
       collections: tags,
@@ -102,8 +102,12 @@ class CreateNewActionForm extends Component {
   preserveFormData(formState) {
     const { saveFormTemporarily } = this.props;
     const { formData } = formState || {};
-    console.log("WHEN STATE UNMOUNTS:", formData)
-    saveFormTemporarily(PAGE_KEYS.CREATE_ACTION.key, formData);
+    const oldFormState = this.props.formState;
+    saveFormTemporarily({
+      key: PAGE_KEYS.CREATE_ACTION.key,
+      data: formData,
+      whole: oldFormState,
+    });
   }
 
   render() {
@@ -158,9 +162,7 @@ const createFormJson = ({
   vendors,
   auth,
   progress,
-  collections,
 }) => {
-
   const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Create a New Action",
@@ -308,8 +310,8 @@ const createFormJson = ({
         dbName: "image",
         label: "Upload Files",
         isRequired: false,
-        selected: progress.image ||[],
-        defaultValue: progress.image ||[],
+        selected: progress.image || [],
+        defaultValue: progress.image || [],
         filesLimit: 1,
       },
       {

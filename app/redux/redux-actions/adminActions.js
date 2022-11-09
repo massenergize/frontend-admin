@@ -76,23 +76,19 @@ export const loadSettings = (data = {}) => {
     payload: data,
   };
 };
-export const restoreFormProgress = (data = {}) => { 
+export const restoreFormProgress = (data = {}) => {
   return {
     type: KEEP_FORM_CONTENT,
-    payload: data
-  }
-}
-export const reduxKeepFormContent = (key, newFormContent) => (
-  dispatch,
-  getState
-) => {
-  const tempForm = getState().tempForm || {};
-  const payload = { ...tempForm, [key]: newFormContent };
+    payload: data,
+  };
+};
+export const reduxKeepFormContent = ({ key, data, whole }) => {
+  const payload = { ...(whole || {}), [key]: data };
   localStorage.setItem(ME_FORM_PROGRESS, JSON.stringify(payload));
-  dispatch({
+  return {
     type: KEEP_FORM_CONTENT,
     payload,
-  });
+  };
 };
 export const reduxSetGalleryFilters = (data = {}) => {
   return {
