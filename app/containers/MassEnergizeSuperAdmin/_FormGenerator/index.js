@@ -90,6 +90,7 @@ class MassEnergizeForm extends Component {
     };
     this.updateForm = this.updateForm.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
+    this.resetForm = this.resetForm.bind(this)
     //this.closePreviewModal = this.closePreviewModal.bind(this);
   }
 
@@ -512,7 +513,7 @@ class MassEnergizeForm extends Component {
     // lets set the startCircularSpinner Value so the spinner starts spinning
     await this.setStateAsync({ startCircularSpinner: true });
     // let's clean up the data
-    const { onComplete, validator } = this.props;
+    const { onComplete, validator, clearProgress } = this.props;
     let [cleanedValues, hasMediaFiles] = this.cleanItUp(
       formData,
       formJson.fields
@@ -562,6 +563,8 @@ class MassEnergizeForm extends Component {
           response && response.success,
           this.resetForm.bind(this)
         );
+
+      if (clearProgress) clearProgress(this.resetForm);
 
       if (formJson.successRedirectPage) {
         this.props.history.push(formJson.successRedirectPage);
@@ -1270,6 +1273,8 @@ class MassEnergizeForm extends Component {
                       color="secondary"
                       onClick={(e) => {
                         e.preventDefault();
+                        const { clearProgress } = this.props;
+                        if (clearProgress) clearProgress(this.resetForm);
                         if (cancel) return cancel();
                         this.props.history.goBack();
                       }}

@@ -5,6 +5,7 @@ import { Typography } from "@material-ui/core";
 import moment from "moment";
 import qs from "qs";
 import React from "react";
+import { ME_FORM_PROGRESS } from "../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 
 export function makeDeleteUI({ idsToDelete, templates }) {
   const len = (idsToDelete && idsToDelete.length) || 0;
@@ -181,4 +182,11 @@ export const getTimeStamp = () => {
   };
 
   return Intl.DateTimeFormat("en-US", options).format(newDate);
+};
+
+export const removePageProgressFromStorage = (key) => {
+  var progress = localStorage.getItem(ME_FORM_PROGRESS) || "{}";
+  progress = JSON.parse(progress);
+  progress[key] = {};
+  localStorage.setItem(ME_FORM_PROGRESS, JSON.stringify(progress));
 };

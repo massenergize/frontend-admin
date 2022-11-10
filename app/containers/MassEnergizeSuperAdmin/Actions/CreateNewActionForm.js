@@ -11,6 +11,7 @@ import fieldTypes from "../_FormGenerator/fieldTypes";
 import { bindActionCreators } from "redux";
 import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import { removePageProgressFromStorage } from "../../../utils/common";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -110,6 +111,18 @@ class CreateNewActionForm extends Component {
     });
   }
 
+  clearProgress(resetForm) {
+    resetForm();
+    const { saveFormTemporarily } = this.props;
+    const oldFormState = this.props.formState;
+    saveFormTemporarily({
+      key: PAGE_KEYS.CREATE_ACTION.key,
+      data: {},
+      whole: oldFormState,
+    });
+    removePageProgressFromStorage(PAGE_KEYS.CREATE_ACTION.key);
+  }
+
   render() {
     const { classes } = this.props;
     const { formJson } = this.state;
@@ -120,6 +133,7 @@ class CreateNewActionForm extends Component {
           classes={classes}
           formJson={formJson}
           unMount={this.preserveFormData.bind(this)}
+          clearProgress={this.clearProgress.bind(this)}
           enableCancel
         />
       </div>
