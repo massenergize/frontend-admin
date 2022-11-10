@@ -190,3 +190,31 @@ export const removePageProgressFromStorage = (key) => {
   progress[key] = {};
   localStorage.setItem(ME_FORM_PROGRESS, JSON.stringify(progress));
 };
+
+/**
+ *
+ * @param {*} location : Props Location
+ * @param {*} paramName
+ * @returns
+ */
+export const fetchParamsFromURL = (location, paramName, names) => {
+  if (!location || !location.search) return "";
+  const obj = qs.parse(location.search, { ignoreQueryPrefix: true });
+  var value = obj[paramName];
+  value = value && value.toString();
+  delete obj[paramName];
+  const params = {};
+  if (names && names.length) {
+    names.forEach((n) => {
+      params[n] = obj[n];
+      delete obj[n];
+    });
+  }
+  return (
+    {
+      params,
+      [paramName]: value,
+      rest: { object: obj, qs: qs.stringify(obj) || "" },
+    } || {}
+  );
+};

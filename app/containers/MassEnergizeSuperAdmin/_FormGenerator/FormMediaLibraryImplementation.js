@@ -11,7 +11,12 @@ import {
   universalFetchFromGallery,
 } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
-import { Checkbox, FormControlLabel, Typography, Tooltip } from "@material-ui/core";
+import {
+  Checkbox,
+  FormControlLabel,
+  Typography,
+  Tooltip,
+} from "@material-ui/core";
 import { makeLimitsFromImageArray } from "../../../utils/common";
 import { ProgressCircleWithLabel } from "../Gallery/utils";
 import { getMoreInfoOnImage } from "../Gallery/Gallery";
@@ -216,7 +221,7 @@ const UploadIntroductionComponent = ({ auth, setAvailableTo, available }) => {
         />
       )}
       <div>
-        <Link to="/admin/gallery/add">
+        <Link to={`/admin/gallery/add?tmb=${window.location.pathname}`}>
           Upload an image for specific communities instead
         </Link>
       </div>

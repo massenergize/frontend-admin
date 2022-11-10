@@ -11,6 +11,7 @@ import { bindActionCreators } from "redux";
 import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 import { removePageProgressFromStorage } from "../../../utils/common";
+import { withRouter } from "react-router-dom";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -45,7 +46,7 @@ class CreateNewTeamForm extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    var { communities, formState } = props;
+    var { communities, formState, location } = props;
     communities = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
@@ -53,7 +54,12 @@ class CreateNewTeamForm extends Component {
     }));
 
     const progress = (formState || {})[PAGE_KEYS.CREATE_TEAM.key] || {};
-    const formJson = createFormJson({ communities, progress });
+    const libOpen = location.state && location.state.libOpen;
+    const formJson = createFormJson({
+      communities,
+      progress,
+      autoOpenMediaLibrary: libOpen,
+    });
     const jobsDoneDontRunWhatsBelowEverAgain =
       !(communities && communities.length) || state.mounted;
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
@@ -129,9 +135,11 @@ const NewTeamMapped = connect(
   mapStateToProps,
   mapDispatchToProps
 )(CreateNewTeamForm);
-export default withStyles(styles, { withTheme: true })(NewTeamMapped);
+export default withStyles(styles, { withTheme: true })(
+  withRouter(NewTeamMapped)
+);
 
-const createFormJson = ({ communities, progress }) => {
+const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
   // const { communities } = this.state;
   const formJson = {
     title: "Create New Team",
@@ -234,6 +242,7 @@ const createFormJson = ({ communities, progress }) => {
         label: "Select a Logo for this team",
         defaultValue: progress.logo || [],
         selected: progress.logo || [],
+        openState: autoOpenMediaLibrary,
         isRequired: false,
       },
       {

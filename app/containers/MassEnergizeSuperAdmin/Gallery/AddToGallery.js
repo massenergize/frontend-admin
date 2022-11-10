@@ -1,4 +1,4 @@
-import { RadioGroup, Typography, withStyles } from "@material-ui/core";
+import { Link, RadioGroup, Typography, withStyles } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
@@ -10,9 +10,13 @@ import { FormControlLabel } from "@material-ui/core";
 import { TextField } from "@material-ui/core";
 import { bindActionCreators } from "redux";
 import { reduxCallLibraryModalImages } from "../../../redux/redux-actions/adminActions";
-import { getFileSize,
-  smartString } from "../ME  Tools/media library/shared/utils/utils";
+import {
+  getFileSize,
+  smartString,
+} from "../ME  Tools/media library/shared/utils/utils";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
+import { fetchParamsFromURL } from "../../../utils/common";
+import { withRouter } from "react-router-dom";
 const styles = (theme) => {
   const spacing = theme.spacing.unit;
   const error = {
@@ -61,6 +65,8 @@ function AddToGallery(props) {
     loadModalImages,
     modalImages,
     tags,
+    location,
+    history,
   } = props;
 
   const [chosenComs, setChosenComs] = useState([]);
@@ -68,12 +74,13 @@ function AddToGallery(props) {
   const [state, setState] = useState(defaultState);
   const [resetAutoComplete, setResetorForAutoComplete] = useState(null);
   const [showTagAddingBox, setShowTagAddingBox] = useState(false);
+  const [needsToReturn, setNeedsToReturn] = useState(false); // user needs to return to the page they came from
   const [addedTags, setAddedTags] = useState({});
   const superAdmin = auth && auth.is_super_admin;
 
   const getCommunityList = () => {
-    if (auth.is_super_admin) return communities;
-    if (auth.is_community_admin) return auth.communities;
+    if (auth && auth.is_super_admin) return communities;
+    if (auth && auth.is_community_admin) return auth.communities;
     return [];
   };
 
@@ -159,12 +166,16 @@ function AddToGallery(props) {
   };
 
   useEffect(() => {
+    const { tmb } = fetchParamsFromURL(location, "tmb"); // tmb: take me back
+    setNeedsToReturn(tmb);
+
     loadModalImages({
       old: modalImages,
       ...makeCommunityListParamsForFetch(),
     });
   }, []);
 
+  const isError = state.notification_type === "error";
   return (
     <Paper className={classes.container}>
       <Typography variant="h5" className={classes.header}>
@@ -259,16 +270,36 @@ function AddToGallery(props) {
         loadMoreFunction={makeLoadMoreFunction}
         excludeTabs={["library"]}
       />
-      {state.notification_type && (
+      {/* {state.notification_type && ( */}
+      {true && (
         <p
-          className={
-            state.notification_type === "error"
-              ? classes.error
-              : classes.success
-          }
+          className={isError ? classes.error : classes.success}
           onClick={() => notify()}
         >
           {state.notification_msg}
+          {/* {!isError && needsToReturn && ( */}
+          {true && (
+            <Link
+              onClick={() =>
+                history.push({
+                  pathname: needsToReturn,
+                  // search: "?libOpen=true",
+                  state:{libOpen: true}
+                })
+              }
+              style={{ textDecoration: "underline" }}
+              className={isError ? classes.error : classes.success}
+            >
+              <i>
+                {" "}
+                Return to the page you were on{" "}
+                <i
+                  style={{ marginLeft: 5 }}
+                  className="fa fa-long-arrow-right"
+                />
+              </i>
+            </Link>
+          )}
         </p>
       )}
     </Paper>
@@ -294,7 +325,7 @@ const GalleryWithProps = connect(
   mapStateToProps,
   mapDispatchToProps
 )(AddToGallery);
-export default withStyles(styles)(GalleryWithProps);
+export default withStyles(styles)(withRouter(GalleryWithProps));
 
 const AddTags = ({ tags, selections, handleOnChange }) => {
   if (!tags) return <></>;

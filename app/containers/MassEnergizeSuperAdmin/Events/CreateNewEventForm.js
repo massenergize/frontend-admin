@@ -13,6 +13,7 @@ import { bindActionCreators } from "redux";
 import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 import { removePageProgressFromStorage } from "../../../utils/common";
+import { withRouter } from "react-router-dom";
 
 const styles = (theme) => ({
   root: {
@@ -50,7 +51,7 @@ class CreateNewEventForm extends Component {
   }
 
   static getDerivedStateFromProps = (props, state) => {
-    const { communities, tags, auth, formState } = props;
+    const { communities, tags, auth, formState, location } = props;
 
     const readyToRenderPageFirstTime =
       communities && communities.length && tags && tags.length && auth;
@@ -72,10 +73,13 @@ class CreateNewEventForm extends Component {
       progress,
     });
 
+    const libOpen = location.state && location.state.libOpen;
+
     const formJson = createFormJson({
       communities: coms,
       auth,
-      progress
+      progress,
+      autoOpenMediaLibrary: libOpen,
     });
 
     if (formJson) formJson.fields.splice(1, 0, section);
@@ -98,7 +102,6 @@ class CreateNewEventForm extends Component {
     });
   }
 
-
   clearProgress(resetForm) {
     resetForm();
     const { saveFormTemporarily } = this.props;
@@ -108,7 +111,7 @@ class CreateNewEventForm extends Component {
       data: {},
       whole: oldFormState,
     });
-    
+
     removePageProgressFromStorage(PAGE_KEYS.CREATE_EVENT.key);
   }
 
@@ -124,7 +127,7 @@ class CreateNewEventForm extends Component {
           validator={validator}
           unMount={this.preserveFormData.bind(this)}
           clearProgress={this.clearProgress.bind(this)}
-          enableCancel 
+          enableCancel
         />
       </div>
     );
@@ -141,7 +144,6 @@ const mapStateToProps = (state) => {
     communities: state.getIn(["communities"]),
     auth: state.getIn(["auth"]),
     formState: state.getIn(["tempForm"]),
-
   };
 };
 
@@ -159,7 +161,9 @@ const CreateEventMapped = connect(
   mapDispatchToProps
 )(CreateNewEventForm);
 
-export default withStyles(styles, { withTheme: true })(CreateEventMapped);
+export default withStyles(styles, { withTheme: true })(
+  withRouter(CreateEventMapped)
+);
 
 const validator = (cleaned) => {
   const start = (cleaned || {})["start_date_and_time"];
@@ -178,7 +182,12 @@ const whenStartDateChanges = ({ newValue, formData, setValueInForm }) => {
   setValueInForm({ start_date_and_time: newValue, end_date_and_time: newEnd });
 };
 
-const createFormJson = ({ communities, auth , progress}) => {
+const createFormJson = ({
+  communities,
+  auth,
+  progress,
+  autoOpenMediaLibrary,
+}) => {
   const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Create New Event or Campaign",
@@ -208,7 +217,7 @@ const createFormJson = ({ communities, auth , progress}) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue:progress.featured_summary ||  "",
+            defaultValue: progress.featured_summary || "",
             dbName: "featured_summary",
             readOnly: false,
           },
@@ -231,7 +240,8 @@ const createFormJson = ({ communities, auth , progress}) => {
             placeholder: "YYYY-MM-DD HH:MM",
             fieldType: "DateTime",
             contentType: "text",
-            defaultValue: progress.start_date_and_time ||  moment().startOf("hour"),
+            defaultValue:
+              progress.start_date_and_time || moment().startOf("hour"),
             dbName: "start_date_and_time",
             minDate: moment().startOf("hour"),
             readOnly: false,
@@ -242,9 +252,11 @@ const createFormJson = ({ communities, auth , progress}) => {
             placeholder: "YYYY-MM-DD HH:MM",
             fieldType: "DateTime",
             contentType: "text",
-            defaultValue: progress.end_date_and_time || moment()
-              .startOf("hour")
-              .add(1, "hours"),
+            defaultValue:
+              progress.end_date_and_time ||
+              moment()
+                .startOf("hour")
+                .add(1, "hours"),
             dbName: "end_date_and_time",
             minDate: moment().startOf("hour"),
             readOnly: false,
@@ -269,7 +281,7 @@ const createFormJson = ({ communities, auth , progress}) => {
                   isRequired: true,
                   dbName: "separation_count",
                   contentType: "number",
-                  defaultValue: progress.separation_count ||  1,
+                  defaultValue: progress.separation_count || 1,
                   data: [
                     { id: 1, displayName: "1" },
                     { id: 2, displayName: "2" },
@@ -330,7 +342,7 @@ const createFormJson = ({ communities, auth , progress}) => {
                   fieldType: "DateTime",
                   contentType: "text",
                   isRequired: false,
-                  defaultValue: progress.final_date ||  "none",
+                  defaultValue: progress.final_date || "none",
                   dbName: "final_date",
                   readOnly: false,
                 },
@@ -357,7 +369,7 @@ const createFormJson = ({ communities, auth , progress}) => {
                       name: "community",
                       label: "Primary Community (select one)",
                       fieldType: "Dropdown",
-                      defaultValue: progress.community ||  null,
+                      defaultValue: progress.community || null,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
                       isRequired: true,
@@ -369,7 +381,8 @@ const createFormJson = ({ communities, auth , progress}) => {
                 name: "community",
                 label: "Primary Community (select one)",
                 fieldType: "Dropdown",
-                defaultValue: progress.community || communities[0] && communities[0].id,
+                defaultValue:
+                  progress.community || (communities[0] && communities[0].id),
                 dbName: "community_id",
                 data: [{ displayName: "--", id: "" }, ...communities],
                 isRequired: true,
@@ -451,7 +464,8 @@ const createFormJson = ({ communities, auth , progress}) => {
         dbName: "image",
         label: "Upload Files",
         selected: progress.image || [],
-        defaultValue: progress.image || [], 
+        defaultValue: progress.image || [],
+        openState: autoOpenMediaLibrary,
         isRequired: false,
       },
       {

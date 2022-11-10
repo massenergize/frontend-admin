@@ -12,6 +12,7 @@ import { bindActionCreators } from "redux";
 import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 import { removePageProgressFromStorage } from "../../../utils/common";
+import { withRouter } from "react-router-dom";
 
 const styles = (theme) => ({
   root: {
@@ -47,7 +48,7 @@ class CreateNewVendorForm extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    const { communities, tags, formState } = props;
+    const { communities, tags, formState, location } = props;
 
     const progress = (formState || {})[PAGE_KEYS.CREATE_VENDOR.key] || {};
     const section = makeTagSection({
@@ -68,7 +69,12 @@ class CreateNewVendorForm extends Component {
 
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
-    const formJson = createFormJson({ communities: coms, progress });
+    const libOpen = location.state && location.state.libOpen;
+    const formJson = createFormJson({
+      communities: coms,
+      progress,
+      autoOpenMediaLibrary: libOpen,
+    });
     formJson.fields.splice(1, 0, section);
 
     return { formJson, communities, mounted: true };
@@ -184,10 +190,10 @@ const mapDispatchToProps = (dispatch) => {
 const Mapped = connect(
   mapStateToProps,
   mapDispatchToProps
-)(CreateNewVendorForm);
+)(withRouter(CreateNewVendorForm));
 export default withStyles(styles, { withTheme: true })(Mapped);
 
-const createFormJson = ({ communities, progress }) => {
+const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
   // const { communities } = this.state;
   const formJson = {
     title: "Create New Vendor",
@@ -433,6 +439,7 @@ const createFormJson = ({ communities, progress }) => {
         name: "image",
         placeholder: "Add a Logo",
         fieldType: fieldTypes.MediaLibrary,
+        openState: autoOpenMediaLibrary,
         dbName: "image",
         defaultValue: progress.image || [],
         selected: progress.image || [],

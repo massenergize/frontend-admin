@@ -6,12 +6,14 @@ import MassEnergizeForm from "../_FormGenerator";
 import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
 import { checkIfReadOnly, makeTagSection } from "./EditActionForm";
-import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { bindActionCreators } from "redux";
 import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
-import { removePageProgressFromStorage } from "../../../utils/common";
+import {
+  removePageProgressFromStorage,
+} from "../../../utils/common";
+import { withRouter } from "react-router-dom";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -48,7 +50,15 @@ class CreateNewActionForm extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    const { communities, tags, vendors, ccActions, auth, formState } = props;
+    const {
+      communities,
+      tags,
+      vendors,
+      ccActions,
+      auth,
+      formState,
+      location,
+    } = props;
     const fullyMountedNeverRunThisAgain =
       communities &&
       communities.length &&
@@ -81,12 +91,15 @@ class CreateNewActionForm extends Component {
       progress,
     });
 
+    const libOpen = location.state && location.state.libOpen;
+
     const formJson = createFormJson({
       communities: coms,
       vendors: vends,
       ccActions: modifiedCCActions,
       auth,
       progress,
+      autoOpenMediaLibrary: libOpen,
     });
 
     if (formJson) formJson.fields.splice(1, 0, section);
@@ -168,7 +181,9 @@ const NewActionMapped = connect(
   mapStateToProps,
   mapDispatchToProps
 )(CreateNewActionForm);
-export default withStyles(styles, { withTheme: true })(NewActionMapped);
+export default withStyles(styles, { withTheme: true })(
+  withRouter(NewActionMapped)
+);
 
 const createFormJson = ({
   communities,
@@ -176,6 +191,7 @@ const createFormJson = ({
   vendors,
   auth,
   progress,
+  autoOpenMediaLibrary,
 }) => {
   const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
@@ -326,6 +342,7 @@ const createFormJson = ({
         isRequired: false,
         selected: progress.image || [],
         defaultValue: progress.image || [],
+        openState: autoOpenMediaLibrary,
         filesLimit: 1,
       },
       {
