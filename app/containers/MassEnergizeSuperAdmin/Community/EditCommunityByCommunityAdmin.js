@@ -9,8 +9,9 @@ import { connect } from "react-redux";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import brand from "dan-api/dummy/brand";
 import { Helmet } from "react-helmet";
-import { PapperBlock } from 'dan-components';
+import { PapperBlock } from "dan-components";
 import EditCommunityForm from "./EditCommunityForm";
+import { withRouter } from "react-router-dom";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -46,11 +47,15 @@ class EditCommunityByCommunityAdmin extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    const { communities, match } = props;
+    const { communities, match, location } = props;
     const { id } = match.params;
     if (state.community === undefined) {
       const community = (communities || []).find((c) => c.id.toString() === id);
-      const formJson = createFormJson(community);
+      const libOpen = location.state && location.state.libOpen;
+      const formJson = createFormJson({
+        community,
+        autoOpenMediaLibrary: libOpen,
+      });
       return { community, formJson };
     }
     return null;
@@ -67,7 +72,7 @@ class EditCommunityByCommunityAdmin extends Component {
     const community = communityResponse.data;
     await this.setStateAsync({ community });
 
-    const formJson = createFormJson(community);
+    const formJson = createFormJson({ community });
     await this.setStateAsync({ formJson });
   }
 
@@ -114,9 +119,9 @@ const mapStateToProps = (state) => {
 };
 
 const Wrapped = connect(mapStateToProps)(EditCommunityByCommunityAdmin);
-export default withStyles(styles, { withTheme: true })(Wrapped);
+export default withStyles(styles, { withTheme: true })(withRouter(Wrapped));
 
-const createFormJson = (community) => {
+const createFormJson = ({ community, autoOpenMediaLibrary }) => {
   if (!community) return null;
   // quick and dirty - duplicated code - needs to be consistant between pages and with the API
   // could read these options from the API or share the databaseFieldChoices json
@@ -422,6 +427,7 @@ const createFormJson = (community) => {
         name: "image",
         placeholder: "Upload a Logo",
         fieldType: fieldTypes.MediaLibrary,
+        openState: autoOpenMediaLibrary,
         dbName: "image",
         selected: community && community.logo ? [community.logo] : [],
         label: "Upload a new logo for this community",

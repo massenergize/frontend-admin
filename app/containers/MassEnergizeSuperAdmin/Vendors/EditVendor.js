@@ -10,6 +10,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { reduxAddToHeap } from "../../../redux/redux-actions/adminActions";
 import fieldTypes from "../_FormGenerator/fieldTypes";
+import { withRouter } from "react-router-dom";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -47,7 +48,7 @@ class CreateNewVendorForm extends Component {
 
   static getDerivedStateFromProps(props, state) {
     // you need: communities, vendor, vendors, tags
-    const { match, communities, vendors, tags, vendorsInfos } = props;
+    const { match, communities, vendors, tags, vendorsInfos, location } = props;
     const { id } = match.params;
     const vendor = vendorsInfos[id.toString()];
     const readyToRenderPageFirstTime =
@@ -75,7 +76,12 @@ class CreateNewVendorForm extends Component {
       id: "" + c.id,
     }));
 
-    const formJson = createFormJson({ vendor, communities: coms });
+    const libOpen = location.state && location.state.libOpen;
+    const formJson = createFormJson({
+      vendor,
+      communities: coms,
+      autoOpenMediaLibrary: libOpen,
+    });
     formJson.fields.splice(1, 0, section);
 
     return { formJson, communities, vendor, mounted: true };
@@ -140,9 +146,9 @@ const Wrapped = connect(
   mapDispatchToProps
 )(CreateNewVendorForm);
 
-export default withStyles(styles, { withTheme: true })(Wrapped);
+export default withStyles(styles, { withTheme: true })(withRouter(Wrapped));
 
-const createFormJson = ({ vendor, communities }) => {
+const createFormJson = ({ vendor, communities, autoOpenMediaLibrary }) => {
   // const { vendor, communities } = this.state;
   const formJson = {
     title: "Update Vendor",
@@ -408,6 +414,7 @@ const createFormJson = ({ vendor, communities }) => {
         name: "image",
         placeholder: "Upload a Logo",
         fieldType: fieldTypes.MediaLibrary,
+        openState: autoOpenMediaLibrary,
         dbName: "image",
         label: "Upload a logo for this Vendor",
         selected: vendor.logo ? [vendor.logo] : [],

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { Paper, Typography } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import { bindActionCreators } from "redux";
@@ -79,7 +79,7 @@ class EditTeam extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    var { match, communities, teams, teamsInfos } = props;
+    var { match, communities, teams, teamsInfos, location } = props;
     const { id } = match.params;
     communities = (communities || []).map((c) => ({
       ...c,
@@ -98,7 +98,13 @@ class EditTeam extends Component {
         (t) => t.primary_community.id === team.primary_community.id
       );
     const parentTeamOptions = makeParentOptions({ teams, team });
-    const formJson = createFormJson({ team, parentTeamOptions, communities });
+    const libOpen = location.state && location.state.libOpen;
+    const formJson = createFormJson({
+      team,
+      parentTeamOptions,
+      communities,
+      autoOpenMediaLibrary: libOpen,
+    });
     return { team, formJson, parentTeamOptions, mounted: true };
   }
   async componentDidMount() {
@@ -165,8 +171,10 @@ const EditTeamMapped = connect(
   mapDispatchToProps
 )(EditTeam);
 
-export default withStyles(styles, { withTheme: true })(EditTeamMapped);
-const createFormJson = ({ communities, team, parentTeamOptions }) => {
+export default withStyles(styles, { withTheme: true })(
+  withRouter(EditTeamMapped)
+);
+const createFormJson = ({ communities, team, parentTeamOptions,  autoOpenMediaLibrary, }) => {
   // const { communities, team, parentTeamOptions } = this.state;
   const selectedCommunities = team.communities
     ? team.communities.map((e) => "" + e.id)
@@ -265,6 +273,7 @@ const createFormJson = ({ communities, team, parentTeamOptions }) => {
         name: "logo",
         placeholder: "Select a Logo for this team",
         fieldType: fieldTypes.MediaLibrary,
+        openState: autoOpenMediaLibrary,
         selected: team.logo ? [team.logo] : [],
         dbName: "logo",
         label: "Select a Logo for this team",

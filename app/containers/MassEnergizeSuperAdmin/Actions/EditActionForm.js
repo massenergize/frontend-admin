@@ -6,6 +6,7 @@ import { apiCall } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
+import { withRouter } from "react-router-dom";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -120,6 +121,7 @@ class EditActionForm extends Component {
       vendors,
       auth,
       ccActions,
+      location
     } = props;
 
     const { id } = match.params;
@@ -153,12 +155,15 @@ class EditActionForm extends Component {
       displayName: c.description,
       id: "" + c.id,
     }));
+    const libOpen = location.state && location.state.libOpen;
     const formJson = createFormJson({
       action,
       communities: coms,
       vendors: vends,
       ccActions: modifiedCCActions,
       auth,
+      autoOpenMediaLibrary: libOpen,
+
     });
 
     const section = makeTagSection({ collections: tags, action });
@@ -208,9 +213,11 @@ EditActionForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(EditActionMapped);
+export default withStyles(styles, { withTheme: true })(
+  withRouter(EditActionMapped)
+);
 
-const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
+const createFormJson = ({ action, communities, ccActions, vendors, auth, autoOpenMediaLibrary }) => {
   if (!action || !ccActions || !vendors || !communities) return;
   const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
@@ -377,6 +384,7 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
         placeholder: "Select an Image",
         fieldType: fieldTypes.MediaLibrary,
         selected: action.image ? [action.image] : [],
+        openState: autoOpenMediaLibrary,
         dbName: "image",
         label: "Upload Files",
         isRequired: false,

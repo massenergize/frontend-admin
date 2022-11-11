@@ -270,20 +270,19 @@ function AddToGallery(props) {
         loadMoreFunction={makeLoadMoreFunction}
         excludeTabs={["library"]}
       />
-      {/* {state.notification_type && ( */}
+      {/* {state.notification_type && ( UNCOMMENT BEFORE PR*/}
       {true && (
         <p
           className={isError ? classes.error : classes.success}
           onClick={() => notify()}
         >
           {state.notification_msg}
-          {/* {!isError && needsToReturn && ( */}
+          {/* {!isError && needsToReturn && (  UNCOMMENT BEFORE PR*/} 
           {true && (
             <Link
               onClick={() =>
                 history.push({
                   pathname: needsToReturn,
-                  // search: "?libOpen=true",
                   state:{libOpen: true}
                 })
               }

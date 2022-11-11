@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import states from "dan-api/data/states";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { Paper } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import { apiCall } from "../../../utils/messenger";
@@ -91,7 +91,7 @@ class EditEventForm extends Component {
     };
   }
   static getDerivedStateFromProps = (props, state) => {
-    const { match, communities, tags, events, auth, exceptions } = props;
+    const { match, communities, tags, events, auth, exceptions, location } = props;
     const { id } = match.params;
     var { rescheduledEvent } = state;
 
@@ -117,11 +117,14 @@ class EditEventForm extends Component {
       displayName: c.name,
       id: "" + c.id,
     }));
+
+    const libOpen = location.state && location.state.libOpen;
     const formJson = createFormJson({
       event,
       communities: coms,
       rescheduledEvent,
       auth,
+      autoOpenMediaLibrary: libOpen,
     });
 
     const section = makeTagSection({ collections: tags, event });
@@ -238,7 +241,7 @@ const EditEventMapped = connect(
 EditEventForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
-export default withStyles(styles, { withTheme: true })(EditEventMapped);
+export default withStyles(styles, { withTheme: true })(withRouter(EditEventMapped));
 
 const validator = (cleaned) => {
   const start = (cleaned || {})["start_date_and_time"];
@@ -251,7 +254,7 @@ const validator = (cleaned) => {
   ];
 };
 
-const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
+const createFormJson = ({ event, rescheduledEvent, communities, auth,autoOpenMediaLibrary }) => {
   const statuses = ["Draft", "Live", "Archived"];
   if (!event || !communities) return;
   const is_super_admin = auth && auth.is_super_admin;
@@ -611,6 +614,7 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
         name: "image",
         placeholder: "Select an Image",
         fieldType: fieldTypes.MediaLibrary,
+        openState: autoOpenMediaLibrary,
         dbName: "image",
         label: "Upload Files",
         isRequired: false,
