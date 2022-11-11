@@ -71,10 +71,10 @@ export default function createReducer(injectedReducers = {}) {
     subscribers: subscribersReducer,
     teamMessages: teamMessagesReducer,
     messages: adminMessagesReducer,
-    galleryImages: galleryImagesReducer,
-    searchedImages: searchedImagesReducer,
+    galleryImages: galleryImagesReducer, // This is what the modal in the form generator uses
+    searchedImages: searchedImagesReducer, // This is what the "all images" gallery page uses
     imageInfos: imageInfosReducer,
-    modalLibraryImages: modalLibraryReducer,
+    modalLibraryImages: modalLibraryReducer, // TODO: Look into this. It might not be in use anymore
     app,
     form,
     login,

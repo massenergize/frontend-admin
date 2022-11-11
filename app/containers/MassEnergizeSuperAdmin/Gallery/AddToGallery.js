@@ -9,7 +9,11 @@ import { Radio } from "@material-ui/core";
 import { FormControlLabel } from "@material-ui/core";
 import { TextField } from "@material-ui/core";
 import { bindActionCreators } from "redux";
-import { reduxCallLibraryModalImages } from "../../../redux/redux-actions/adminActions";
+import {
+  reduxAddToGalleryImages,
+  reduxAddToSearchedImages,
+  reduxCallLibraryModalImages,
+} from "../../../redux/redux-actions/adminActions";
 import {
   getFileSize,
   smartString,
@@ -67,6 +71,10 @@ function AddToGallery(props) {
     tags,
     location,
     history,
+    addImageToGalleryList,
+    addImageToSearchedList,
+    imagesFromGallery,
+    imagesFromSearchResults,
   } = props;
 
   const [chosenComs, setChosenComs] = useState([]);
@@ -132,6 +140,14 @@ function AddToGallery(props) {
           notify(response.error.message, "error");
           return;
         }
+        addImageToGalleryList({
+          old: imagesFromGallery,
+          data: [response.data.image],
+        });
+        addImageToSearchedList({
+          old: imagesFromSearchResults,
+          data: [response.data.image],
+        });
         resetThisComponent();
         notify("Upload to library was successful!", "success");
         reset();
@@ -270,20 +286,41 @@ function AddToGallery(props) {
         loadMoreFunction={makeLoadMoreFunction}
         excludeTabs={["library"]}
       />
-      {/* {state.notification_type && ( UNCOMMENT BEFORE PR*/}
-      {true && (
+      {state.notification_type && (
         <p
           className={isError ? classes.error : classes.success}
           onClick={() => notify()}
         >
           {state.notification_msg}
-          {/* {!isError && needsToReturn && (  UNCOMMENT BEFORE PR*/} 
-          {true && (
+
+          {/* --------------------------------------- */}
+          {!isError && !needsToReturn && (
+            <Link
+              onClick={() =>
+                history.push({
+                  pathname: "/admin/gallery",
+                })
+              }
+              style={{ textDecoration: "underline" }}
+              className={isError ? classes.error : classes.success}
+            >
+              <i>
+                {" "}
+                Want to see what you just added?
+                <i
+                  style={{ marginLeft: 5 }}
+                  className="fa fa-long-arrow-right"
+                />
+              </i>
+            </Link>
+          )}
+          {/* -------------------- USER NEEDS TO RETURN TO CREATING CONTENT------------------- */}
+          {!isError && needsToReturn && (
             <Link
               onClick={() =>
                 history.push({
                   pathname: needsToReturn,
-                  state:{libOpen: true}
+                  state: { libOpen: true },
                 })
               }
               style={{ textDecoration: "underline" }}
@@ -309,6 +346,8 @@ const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   communities: state.getIn(["communities"]),
   modalImages: state.getIn(["modalLibraryImages"]),
+  imagesFromGallery: state.getIn(["galleryImages"]),
+  imagesFromSearchResults: state.getIn(["searchedImages"]),
   tags: state.getIn(["allTags"]),
 });
 const mapDispatchToProps = (dispatch) => {
@@ -316,6 +355,8 @@ const mapDispatchToProps = (dispatch) => {
     {
       loadModalImages: reduxCallLibraryModalImages,
       loadMoreModalImages: reduxCallLibraryModalImages,
+      addImageToGalleryList: reduxAddToGalleryImages,
+      addImageToSearchedList: reduxAddToSearchedImages,
     },
     dispatch
   );

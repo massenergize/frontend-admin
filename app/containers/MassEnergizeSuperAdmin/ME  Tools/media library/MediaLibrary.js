@@ -79,7 +79,8 @@ function MediaLibrary(props) {
   useEffect(() => {
     setHasMountedTo(true);
     const preSelected = (selected || []).map((img) => {
-      if (typeof img === "number") {// Sometimes, default values for the media library comes in the form of Ids, instead of objects. When that happens, use the Ids to find teh real objects
+      if (typeof img === "number") {
+        // Sometimes, default values for the media library comes in the form of Ids, instead of objects. When that happens, use the Ids to find teh real objects
         const found = (images || []).find((im) => im.id === img);
         return found || {};
       }
@@ -95,7 +96,10 @@ function MediaLibrary(props) {
     var bank = (images || []).map((img) => img.id);
     // sometimes an image that is preselected, my not be in the library's first load
     // in that case just add it to the library's list
-    var isNotThere = selected.filter((img) => !bank.includes(img.id));
+    var isNotThere = selected.filter((img) => {
+      if (typeof img === "number") return !bank.includes(img);
+      return !bank.includes(img.id);
+    });
     if (!isNotThere.length) return images;
 
     return [...isNotThere, ...images];

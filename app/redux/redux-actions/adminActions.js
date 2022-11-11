@@ -234,6 +234,23 @@ export const reduxUpdateHeap = (heap = {}) => ({
   type: UPDATE_HEAP,
   payload: heap,
 });
+
+/**
+ * Use this function if you just need to add images to the list in gallery
+ * and nothing more!
+ */
+export const reduxAddToGalleryImages = ({ old, data }) => {
+  return {
+    type: LOAD_GALLERY_IMAGES,
+    payload: { ...old, images: [...(data || []), ...(old.images || [])] },
+  };
+};
+/**
+ * When new content is loaded and all the limits need to be recorded, this
+ * is the redux function to use
+ * @param {*} param0
+ * @returns
+ */
 export const reduxLoadGalleryImages = ({
   data = {},
   old = {},
@@ -315,6 +332,16 @@ export const reduxLoadImageInfos = ({ oldInfos, newInfo }) => ({
   type: KEEP_LOADED_IMAGE_INFO,
   payload: { ...(oldInfos || {}), [newInfo.id]: newInfo },
 });
+/**
+ * Use this function if you just need to add images to the list in "all images page"
+ * and nothing more!
+ */
+export const reduxAddToSearchedImages = ({ old, data }) => {
+  return {
+    type: LOAD_SEARCHED_IMAGES,
+    payload: { ...old, images: [...(data || []), ...(old.images || [])] },
+  };
+};
 
 export const reduxLoadSearchedImages = ({ data, old, append = true }) => {
   var images;
