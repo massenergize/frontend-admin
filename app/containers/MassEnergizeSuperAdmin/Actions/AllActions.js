@@ -358,20 +358,6 @@ class AllActions extends React.Component {
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putActionsInRedux(rem);
   }
-  // getTimeStamp = () => {
-  //   const today = new Date();
-  //   let newDate = today;
-  //   let options = {
-  //     year: "numeric",
-  //     month: "short",
-  //     day: "numeric",
-  //     hour: "2-digit",
-  //     minute: "2-digit",
-  //     second: "2-digit",
-  //   };
-
-  //   return Intl.DateTimeFormat("en-US", options).format(newDate);
-  // };
 
   customSort(data, colIndex, order) {
     const isComparingLive = colIndex === 6;

@@ -279,7 +279,7 @@ function AddToGallery(props) {
       )}
       <MediaLibrary
         onUpload={onUpload}
-        actionText="Add to Library"
+        actionText="Select Image"
         defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
         images={modalImages && modalImages.images}
         sourceExtractor={(item) => item && item.url}

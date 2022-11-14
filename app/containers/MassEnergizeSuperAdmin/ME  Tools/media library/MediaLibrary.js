@@ -87,7 +87,7 @@ function MediaLibrary(props) {
       return img;
     });
     setTrayImages(preSelected);
-  }, []);
+  }, [images]);
 
   useEffect(() => {}, [cropped]);
 

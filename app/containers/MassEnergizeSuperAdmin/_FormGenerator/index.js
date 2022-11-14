@@ -90,7 +90,7 @@ class MassEnergizeForm extends Component {
     };
     this.updateForm = this.updateForm.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
-    this.resetForm = this.resetForm.bind(this)
+    this.resetForm = this.resetForm.bind(this);
     //this.closePreviewModal = this.closePreviewModal.bind(this);
   }
 
