@@ -88,7 +88,7 @@ class NormalAdminHome extends PureComponent {
   renderTable = (data, classes) => (
     <PapperBlock
       noMargin
-      title="Communities You Manage Gbemi"
+      title="Communities You Manage"
       icon="ios-share-outline"
       whiteBg
       desc=""
