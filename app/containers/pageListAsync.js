@@ -261,6 +261,12 @@ export const AllEvents = loadable(
     fallback: <Loading />,
   }
 );
+export const EventsFromOthers = loadable(
+  () => import("./MassEnergizeSuperAdmin/Events/OtherEventsWrapper"),
+  {
+    fallback: <Loading />,
+  }
+);
 export const AddEvent = loadable(
   () => import("./MassEnergizeSuperAdmin/Events/NewEventPage"),
   {

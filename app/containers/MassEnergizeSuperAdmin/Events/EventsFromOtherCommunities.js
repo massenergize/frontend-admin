@@ -6,7 +6,6 @@ import {
   Paper,
   Typography,
 } from "@material-ui/core";
-import { FileCopy } from "@material-ui/icons";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
@@ -59,7 +58,6 @@ function EventsFromOtherCommunities({
     const fashioned = data.map((d) => [
       d.id,
       getHumanFriendlyDate(d.start_date_and_time, true),
-      getHumanFriendlyDate(d.end_date_and_time, true),
       {
         id: d.id,
         image: d.image,
@@ -83,19 +81,11 @@ function EventsFromOtherCommunities({
         },
       },
       {
-        name: "Start Date",
+        name: "Date",
         key: "date",
         options: {
           filter: false,
-          download: false,
-        },
-      },
-      {
-        name: "End Date",
-        key: "date",
-        options: {
-          filter: false,
-          download: false,
+          download: true,
         },
       },
       {
@@ -132,7 +122,7 @@ function EventsFromOtherCommunities({
         key: "tags",
         options: {
           filter: true,
-          filterType: "textField",
+          filterType: "multiselect",
         },
       },
       {
@@ -147,6 +137,7 @@ function EventsFromOtherCommunities({
         name: "Full View",
         key: "full-view",
         options: {
+          filter: false,
           filterType: "multiselect",
           customBodyRender: (id) => (
             <Link to={`/admin/read/event/${id}/event-view?from=others`}>
@@ -245,7 +236,7 @@ function EventsFromOtherCommunities({
                 style={{ marginRight: 5, color: "white" }}
               />
             )}
-            {loading ? "Fetching..." : "Fetch"}
+            {loading ? "Fetching..." : "Show Events"}
           </Button>
         </div>
       </Paper>

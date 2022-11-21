@@ -339,7 +339,7 @@ const createFormJson = ({ communities, auth, otherCommunities }) => {
         ],
       },
       {
-        label: "Event Publicity",
+        label: "Who can see this event?",
         fieldType: "Section",
         children: [
           {
@@ -361,7 +361,7 @@ const createFormJson = ({ communities, auth, otherCommunities }) => {
                 value: "No one can see this, keep this in my community only ",
               },
 
-              { id: "CLOSED_TO", value: "All except these communities" },
+              // { id: "CLOSED_TO", value: "All except these communities" },
             ],
             conditionalDisplays: [
               {
@@ -379,21 +379,21 @@ const createFormJson = ({ communities, auth, otherCommunities }) => {
                   },
                 ],
               },
-              {
-                valueToCheck: "CLOSED_TO",
-                fields: [
-                  {
-                    name: "cannot-view-event",
-                    label: `Select the communities should NOT see this event`,
-                    placeholder: "",
-                    fieldType: "Checkbox",
-                    selectMany: true,
-                    defaultValue: [],
-                    dbName: "publicity_selections",
-                    data: otherCommunityList,
-                  },
-                ],
-              },
+              // {
+              //   valueToCheck: "CLOSED_TO",
+              //   fields: [
+              //     {
+              //       name: "cannot-view-event",
+              //       label: `Select the communities should NOT see this event`,
+              //       placeholder: "",
+              //       fieldType: "Checkbox",
+              //       selectMany: true,
+              //       defaultValue: [],
+              //       dbName: "publicity_selections",
+              //       data: otherCommunityList,
+              //     },
+              //   ],
+              // },
             ],
           },
         ],

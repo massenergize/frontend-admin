@@ -15,6 +15,7 @@ import {
   reduxLoadAllOtherEvents,
 } from "../../../redux/redux-actions/adminActions";
 import EventShareModal from "./EventShareModal";
+import { IS_CANARY, IS_LOCAL, IS_PROD } from "../../../config/constants";
 
 const open = {
   background: "#4faa4f",
@@ -214,7 +215,7 @@ function EventFullView(props) {
             onClick={() => history.push(`/admin/read/events?from=${from}`)}
           >
             <i className="fa fa-long-arrow-left" style={{ marginRight: 6 }} />{" "}
-            All Events
+            Back
           </Button>
         </div>
       </Paper>
@@ -224,6 +225,16 @@ function EventFullView(props) {
   //   -------------------------------------- HTML MARK UP --------------------------------------------------
 
   const sharedTo = listToString(event.shared_to);
+  var host;
+  const makeURL = (event) => {
+    if (IS_LOCAL) host = "http://localhost:3000";
+    else if (IS_CANARY) host = "https://communities-canary.massenergize.org";
+    else if (IS_PROD) host = "https://communities.massenergize.org";
+    else host = "https://community.massenergize.dev";
+
+    return `${host}/${event &&
+      (event.community || {}).subdomain}/events/${event && event.id}`;
+  };
   return (
     <div>
       <EventShareModal
@@ -343,7 +354,7 @@ function EventFullView(props) {
               marginBottom: 10,
             }}
           >
-            Event Publicity{" "}
+            Event Publicity
             <Tooltip placement="bottom" title={publicityProps.tooltip}>
               <span
                 className="touchable-opacity"
@@ -384,37 +395,15 @@ function EventFullView(props) {
         </div>
       </Paper>
       <Paper>
-        <div style={{ padding: "15px 25px" }}>
-          <div style={{ marginBottom: 10 }}>
-            <Typography variant="h6">FEATURED SUMMARY</Typography>
-            <div dangerouslySetInnerHTML={{ __html: featured_summary }} />
-          </div>
-          <div style={{ marginBottom: 10 }}>
-            <Typography variant="h6">TAGS</Typography>
-            <Typography variant="body2">{tagString}</Typography>
-          </div>
-          <div style={{ marginBottom: 10 }}>
-            <img
-              src={(image || {}).url}
-              style={{ width: "100%", maxHeight: 400, objectFit: "contain" }}
-            />
-          </div>
-          <div style={{ marginBottom: 10 }}>
-            <Typography variant="h6">DESCRIPTION</Typography>
-            <div dangerouslySetInnerHTML={{ __html: description }} />
-          </div>
-        </div>
-        <Footer
-          history={history}
-          community={community}
-          hasControl={hasControl}
-          id={id}
-          isCopying={isCopying}
-          auth={auth}
-          publicity={publicity}
-          communities={communities_under_publicity}
-          share={() => setshowShareModal(true)}
-          from={from}
+        <iframe
+          src={makeURL(event)}
+          loading="lazy"
+          style={{
+            borderStyle: "none",
+            width: "100%",
+            height: "100%",
+            minHeight: "100vh",
+          }}
         />
       </Paper>
     </div>
@@ -465,9 +454,6 @@ const Footer = ({
         "..."} can edit this event`;
 
   const cannotBeShared = publicity === "CLOSE";
-  const copyNotice = cannotBeShared
-    ? "This event's publicity is closed. It cant be shared"
-    : "You can share this to your community";
 
   return (
     <div style={{ background: "#fbfbfb", display: "flex" }}>
@@ -483,10 +469,9 @@ const Footer = ({
         }}
         onClick={() => history.push(`/admin/read/events?from=${from}`)}
       >
-        <i className="fa fa-long-arrow-left" style={{ marginRight: 6 }} /> All
-        Events
+        <i className="fa fa-long-arrow-left" style={{ marginRight: 6 }} /> Back
       </Button>
-      <Button
+      {/* <Button
         variant="outlined"
         color="primary"
         style={{
@@ -508,7 +493,7 @@ const Footer = ({
         <Tooltip placement="top" title={"Copy Event"}>
           <span> Copy Event</span>
         </Tooltip>
-      </Button>
+      </Button> */}
       <div style={{ marginLeft: "auto" }}>
         <Button
           disabled={!hasControl}

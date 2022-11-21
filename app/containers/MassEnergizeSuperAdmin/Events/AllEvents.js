@@ -35,21 +35,11 @@ import {
   smartString,
 } from "../../../utils/common";
 import {
-  Button,
-  Checkbox,
-  Chip,
-  FormControlLabel,
-  Tabs,
   Typography,
 } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
-import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
-import { concat } from "lodash";
-import { Tab } from "@material-ui/core";
-import EventsFromOtherCommunities from "./EventsFromOtherCommunities";
 import CallMadeIcon from "@material-ui/icons/CallMade";
 import { FROM } from "../../../utils/constants";
 class AllEvents extends React.Component {
@@ -154,7 +144,7 @@ class AllEvents extends React.Component {
         key: "tags",
         options: {
           filter: true,
-          filterType: "textField",
+          filterType: "multiselect",
         },
       },
       {
@@ -350,15 +340,9 @@ class AllEvents extends React.Component {
   render() {
     const title = brand.name + " - All Events";
     const description = brand.desc;
-    const { columns, currentTab } = this.state;
+    const { columns } = this.state;
     const {
       classes,
-      putOtherEventsInRedux,
-      otherCommunities,
-      otherEvents,
-      otherEventsState,
-      putEventsStateInRedux,
-      auth,
     } = this.props;
     const data = this.fashionData(this.props.allEvents || []);
     const options = {
@@ -421,32 +405,7 @@ class AllEvents extends React.Component {
       );
     }
 
-    const tabs = {
-      0: (
-        <EventsFromYourCommunities
-          classes={classes}
-          page={PAGE_PROPERTIES.ALL_EVENTS}
-          tableProps={{
-            title: "All Events",
-            data: data,
-            columns: columns,
-            options: options,
-          }}
-        />
-      ),
-      1: (
-        <EventsFromOtherCommunities
-          putOtherEventsInRedux={putOtherEventsInRedux}
-          otherCommunities={otherCommunities}
-          classes={classes}
-          otherEvents={otherEvents}
-          state={otherEventsState}
-          putStateInRedux={putEventsStateInRedux}
-        />
-      ),
-    };
-
-    const activeComponent = tabs[currentTab];
+   
 
     return (
       <div>
@@ -459,26 +418,19 @@ class AllEvents extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <Paper style={{ marginBottom: 10 }}>
-          <Typography variant="body" style={{ padding: "10px 25px" }}>
-            Manage your events/campaigns, or lookup available events from other
-            communities that you might want to share to yours
-          </Typography>
-          {/*  Only Show tabs when user is a cadmin. Sadmins already see everything */}
-          {!(auth && auth.is_super_admin) && (
-            <Tabs
-              onChange={(_, v) => this.setState({ currentTab: v })}
-              value={currentTab}
-              variant="fullWidth"
-              indicatorColor="primary"
-              textColor="primary"
-            >
-              <Tab label="From Your Communities" key={0} />
-
-              <Tab label="Other Communities" key={1} />
-            </Tabs>
-          )}
+          <METable
+            classes={classes}
+            page={PAGE_PROPERTIES.ALL_EVENTS}
+            tableProps={{
+              title: "All Events",
+              data: data,
+              columns: columns,
+              options: options,
+            }}
+          />
+        
         </Paper>
-        {activeComponent}
+      
       </div>
     );
   }
@@ -493,9 +445,6 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     allEvents: state.getIn(["allEvents"]),
     community: state.getIn(["selected_community"]),
-    otherCommunities: state.getIn(["otherCommunities"]),
-    otherEvents: state.getIn(["otherEvents"]),
-    otherEventsState: state.getIn(["otherEventsState"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -506,8 +455,6 @@ function mapDispatchToProps(dispatch) {
       putEventsInRedux: loadAllEvents,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
-      putOtherEventsInRedux: reduxLoadAllOtherEvents,
-      putEventsStateInRedux: reduxSaveOtherEventState,
     },
     dispatch
   );
@@ -519,6 +466,3 @@ const EventsMapped = connect(
 )(AllEvents);
 export default withStyles(styles)(withRouter(EventsMapped));
 
-const EventsFromYourCommunities = (props) => {
-  return <METable {...props} />;
-};

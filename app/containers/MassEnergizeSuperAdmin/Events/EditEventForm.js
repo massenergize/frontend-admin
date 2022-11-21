@@ -312,7 +312,6 @@ const createFormJson = ({
     id: c.id.toString(),
   }));
 
-
   const publicityCommunities = (
     (event && event.communities_under_publicity) ||
     []
@@ -609,7 +608,7 @@ const createFormJson = ({
         ],
       },
       {
-        label: "Event Publicity",
+        label: "Who can see this event?",
         fieldType: "Section",
         children: [
           {
@@ -631,7 +630,7 @@ const createFormJson = ({
                 value: "No one can see this, keep this in my community only ",
               },
 
-              { id: "CLOSED_TO", value: "All except these communities" },
+              // { id: "CLOSED_TO", value: "All except these communities" },
             ],
             conditionalDisplays: [
               {
@@ -649,21 +648,21 @@ const createFormJson = ({
                   },
                 ],
               },
-              {
-                valueToCheck: "CLOSED_TO",
-                fields: [
-                  {
-                    name: "cannot-view-event",
-                    label: `Select the communities should NOT see this event`,
-                    placeholder: "",
-                    fieldType: "Checkbox",
-                    selectMany: true,
-                    defaultValue: publicityCommunities,
-                    dbName: "publicity_selections",
-                    data: otherCommunityList,
-                  },
-                ],
-              },
+              // {
+              //   valueToCheck: "CLOSED_TO",
+              //   fields: [
+              //     {
+              //       name: "cannot-view-event",
+              //       label: `Select the communities should NOT see this event`,
+              //       placeholder: "",
+              //       fieldType: "Checkbox",
+              //       selectMany: true,
+              //       defaultValue: publicityCommunities,
+              //       dbName: "publicity_selections",
+              //       data: otherCommunityList,
+              //     },
+              //   ],
+              // },
             ],
           },
         ],
