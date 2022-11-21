@@ -4,6 +4,7 @@ import {
   Checkbox,
   FormControlLabel,
   Paper,
+  Tooltip,
   Typography,
 } from "@material-ui/core";
 import React, { useState } from "react";
@@ -197,7 +198,10 @@ function EventsFromOtherCommunities({
           </Typography>
 
           <small style={{ color: "grey" }}>
-            The community list below does not include communities you manage
+            The community list below does not include communities you manage.
+            When you are done selecting your communities, click the{" "}
+            <b>"search"</b>
+            button below
           </small>
 
           <LightAutoComplete
@@ -219,25 +223,30 @@ function EventsFromOtherCommunities({
           />
         </div>
         <div style={{ background: "#fbfbfb" }}>
-          <Button
-            onClick={() => fetchOtherEvents()}
-            disabled={!(communities || []).length || loading}
-            variant="contained"
-            color="secondary"
-            style={{
-              borderRadius: 0,
-              padding: 10,
-              width: 200,
-            }}
+          <Tooltip
+            placement="top"
+            title="Click this button to find events from the communities you have selected above "
           >
-            {loading && (
-              <i
-                className=" fa fa-spinner fa-spin"
-                style={{ marginRight: 5, color: "white" }}
-              />
-            )}
-            {loading ? "Fetching..." : "Show Events"}
-          </Button>
+            <Button
+              onClick={() => fetchOtherEvents()}
+              disabled={!(communities || []).length || loading}
+              variant="contained"
+              color="secondary"
+              style={{
+                borderRadius: 0,
+                padding: "10px 25px",
+                minWidth: 200,
+              }}
+            >
+              {loading && (
+                <i
+                  className=" fa fa-spinner fa-spin"
+                  style={{ marginRight: 5, color: "white" }}
+                />
+              )}
+              {loading ? "Fetching..." : "Search"}
+            </Button>
+          </Tooltip>
         </div>
       </Paper>
 
