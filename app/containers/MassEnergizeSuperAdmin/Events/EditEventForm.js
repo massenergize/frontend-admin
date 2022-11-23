@@ -89,7 +89,15 @@ class EditEventForm extends Component {
     };
   }
   static getDerivedStateFromProps = (props, state) => {
-    const { match, communities, tags, events, auth, exceptions } = props;
+    const {
+      match,
+      communities,
+      tags,
+      events,
+      auth,
+      exceptions,
+      otherCommunities,
+    } = props;
     const { id } = match.params;
     var { rescheduledEvent } = state;
 
@@ -103,7 +111,9 @@ class EditEventForm extends Component {
       events.length &&
       tags &&
       tags.length &&
-      (readOnly || rescheduledEvent || thereIsNothingInEventsExceptionsList);
+      (readOnly || rescheduledEvent || thereIsNothingInEventsExceptionsList) &&
+      otherCommunities &&
+      otherCommunities.length;
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderPageFirstTime || state.mounted;
@@ -120,6 +130,7 @@ class EditEventForm extends Component {
       communities: coms,
       rescheduledEvent,
       auth,
+      otherCommunities,
     });
 
     const section = makeTagSection({ collections: tags, event });
@@ -183,8 +194,8 @@ class EditEventForm extends Component {
         {event.rsvp_enabled ? (
           <Paper style={{ padding: 20, marginBottom: 15 }}>
             <Typography>
-              Would you like to see a list of users who have RSVP-ed for
-              this event?
+              Would you like to see a list of users who have RSVP-ed for this
+              event?
             </Typography>
             <Link
               to={`/admin/edit/${event && event.id}/event-rsvps`}
@@ -217,6 +228,7 @@ const mapStateToProps = (state) => {
     events: state.getIn(["allEvents"]),
     heap: state.getIn(["heap"]),
     exceptions: (heap && heap.exceptions) || {},
+    otherCommunities: state.getIn(["otherCommunities"]),
   };
 };
 
@@ -250,10 +262,68 @@ const validator = (cleaned) => {
   ];
 };
 
-const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
+/**
+ * If an event is open, allow event to be shared to any of the admin's communities
+ * If it's open_to, only select which of the admin's communities that have been listed as allowed to show in the dropdown
+ * If its closed_to, only select which of the admin's communities that have not been exempted to show in the dropdown
+ * @param {*} adminOf
+ * @param {*} list
+ * @param {*} publicity
+ * @returns
+ */
+const getAllowedCommunities = ({ adminOf, list, publicity }) => {
+  if (publicity === "OPEN") return adminOf;
+  list = (list || []).map((c) => c.id);
+  // This part happens when an admin has already copied an event, and is trying to edit, (we select only communities that are allowed) to be shown in the dropdown
+  var coms;
+  if (publicity === "OPEN_TO") {
+    coms = adminOf.filter((c) => list.includes(c.id));
+    return coms;
+  }
+
+  if (publicity === "CLOSED_TO") {
+    coms = adminOf.filter((c) => !list.includes(c.id));
+    return coms;
+  }
+
+  return [];
+};
+const createFormJson = ({
+  event,
+  rescheduledEvent,
+  communities,
+  auth,
+  otherCommunities,
+}) => {
   const statuses = ["Draft", "Live", "Archived"];
   if (!event || !communities) return;
   const is_super_admin = auth && auth.is_super_admin;
+
+  communities = is_super_admin
+    ? communities
+    : getAllowedCommunities({
+        adminOf: auth.admin_at,
+        list: event.communities_under_publicity,
+        publicity: event.publicity,
+      });
+
+  communities = (communities || []).map((c) => ({
+    displayName: c.name,
+    id: c.id.toString(),
+  }));
+
+  const publicityCommunities = (
+    (event && event.communities_under_publicity) ||
+    []
+  ).map((c) => c.id.toString());
+
+  // Now check which of the communities are listed under publicity, and which ones match the admin's communities
+
+  const otherCommunityList = otherCommunities.map((c) => ({
+    displayName: c.name,
+    id: c.id.toString(),
+  }));
+
   const formJson = {
     title: "Edit Event or Campaign",
     subTitle: "",
@@ -521,20 +591,80 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
                       defaultValue: event.community && event.community.id,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
-                      isRequired:true,
+                      isRequired: true,
                     },
                   ],
                 },
               }
             : {
-              name: "community",
-              label: "Primary Community (select one)",
-              fieldType: "Dropdown",
-              defaultValue: event.community && event.community.id,
-              dbName: "community_id",
-              data: [{ displayName: "--", id: "" }, ...communities],
-              isRequired:true,
-            },
+                name: "community",
+                label: "Primary Community (select one)",
+                fieldType: "Dropdown",
+                defaultValue: event.community && event.community.id,
+                dbName: "community_id",
+                data: [{ displayName: "--", id: "" }, ...communities],
+                isRequired: true,
+              },
+        ],
+      },
+      {
+        label: "Who can see this event?",
+        fieldType: "Section",
+        children: [
+          {
+            name: "publicity",
+            label: "Who should be able to see this event?",
+            fieldType: "Radio",
+            isRequired: false,
+            defaultValue: event && event.publicity,
+            dbName: "publicity",
+            readOnly: false,
+            data: [
+              { id: "OPEN", value: "All communities can see this event " },
+              {
+                id: "OPEN_TO",
+                value: "Only communities I select should see this",
+              },
+              {
+                id: "CLOSE",
+                value: "No one can see this, keep this in my community only ",
+              },
+
+              // { id: "CLOSED_TO", value: "All except these communities" },
+            ],
+            conditionalDisplays: [
+              {
+                valueToCheck: "OPEN_TO",
+                fields: [
+                  {
+                    name: "can-view-event",
+                    label: `Select the communities that can see this event`,
+                    placeholder: "",
+                    fieldType: "Checkbox",
+                    selectMany: true,
+                    defaultValue: publicityCommunities,
+                    dbName: "publicity_selections",
+                    data: otherCommunityList,
+                  },
+                ],
+              },
+              // {
+              //   valueToCheck: "CLOSED_TO",
+              //   fields: [
+              //     {
+              //       name: "cannot-view-event",
+              //       label: `Select the communities should NOT see this event`,
+              //       placeholder: "",
+              //       fieldType: "Checkbox",
+              //       selectMany: true,
+              //       defaultValue: publicityCommunities,
+              //       dbName: "publicity_selections",
+              //       data: otherCommunityList,
+              //     },
+              //   ],
+              // },
+            ],
+          },
         ],
       },
       {

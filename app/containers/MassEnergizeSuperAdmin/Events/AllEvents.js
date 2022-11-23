@@ -22,8 +22,11 @@ import {
   reduxGetAllCommunityEvents,
   loadAllEvents,
   reduxToggleUniversalModal,
+  reduxLoadAllOtherEvents,
+  reduxSaveOtherEventState,
 } from "../../../redux/redux-actions/adminActions";
 import {
+  fetchParamsFromURL,
   findMatchesAndRest,
   getHumanFriendlyDate,
   getTimeStamp,
@@ -31,18 +34,24 @@ import {
   ourCustomSort,
   smartString,
 } from "../../../utils/common";
-import { Chip, Typography } from "@material-ui/core";
+import {
+  Typography,
+} from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-
+import CallMadeIcon from "@material-ui/icons/CallMade";
+import { FROM } from "../../../utils/constants";
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { columns: this.getColumns() };
+    this.state = { columns: this.getColumns(), loading: false, currentTab: 0 };
   }
 
   componentDidMount() {
+    const { from } = fetchParamsFromURL(window.location, "from");
+    this.setState({ currentTab: from === FROM.OTHER_EVENTS ? 1 : 0 });
+
     const user = this.props.auth ? this.props.auth : {};
     const community = this.props.community ? this.props.community : {};
     if (user.is_super_admin) {
@@ -135,7 +144,7 @@ class AllEvents extends React.Component {
         key: "tags",
         options: {
           filter: true,
-          filterType: "textField",
+          filterType: "multiselect",
         },
       },
       {
@@ -199,6 +208,13 @@ class AllEvents extends React.Component {
                 to="/admin/read/events"
               >
                 <FileCopy size="small" variant="outlined" color="secondary" />
+              </Link>
+              <Link to={`/admin/read/event/${id}/event-view?from=main`}>
+                <CallMadeIcon
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
             </div>
           ),
@@ -302,11 +318,32 @@ class AllEvents extends React.Component {
     putEventsInRedux(rem);
   }
 
+  fetchOtherEvents() {
+    const { community_ids, exclude } = this.state;
+    const { putOtherEventsInRedux } = this.props;
+    const ids = (community_ids || []).map((it) => it.id);
+    this.setState({ loading: true });
+    apiCall("/events.others.listForCommunityAdmin", {
+      community_ids: ids,
+      exclude: exclude || false,
+    })
+      .then((response) => {
+        this.setState({ loading: false });
+        if (response.success) return putOtherEventsInRedux(response.data);
+      })
+      .catch((e) => {
+        this.setState({ loading: false });
+        console.log("OTHER_EVENTS_BE_ERROR:", e.toString());
+      });
+  }
+
   render() {
     const title = brand.name + " - All Events";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes } = this.props;
+    const {
+      classes,
+    } = this.props;
     const data = this.fashionData(this.props.allEvents || []);
     const options = {
       filterType: "dropdown",
@@ -368,6 +405,8 @@ class AllEvents extends React.Component {
       );
     }
 
+   
+
     return (
       <div>
         <Helmet>
@@ -378,17 +417,20 @@ class AllEvents extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-
-        <METable
-          classes={classes}
-          page={PAGE_PROPERTIES.ALL_EVENTS}
-          tableProps={{
-            title: "All Events",
-            data: data,
-            columns: columns,
-            options: options,
-          }}
-        />
+        <Paper style={{ marginBottom: 10 }}>
+          <METable
+            classes={classes}
+            page={PAGE_PROPERTIES.ALL_EVENTS}
+            tableProps={{
+              title: "All Events",
+              data: data,
+              columns: columns,
+              options: options,
+            }}
+          />
+        
+        </Paper>
+      
       </div>
     );
   }
@@ -423,3 +465,4 @@ const EventsMapped = connect(
   mapDispatchToProps
 )(AllEvents);
 export default withStyles(styles)(withRouter(EventsMapped));
+

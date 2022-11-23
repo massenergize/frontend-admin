@@ -61,8 +61,13 @@ module.exports = [
       },
       {
         key: "all-events",
-        name: "All Events & Campaigns",
+        name: "Events - My Community",
         link: "/admin/read/events",
+      },
+      {
+        key: "other-communities",
+        name: "Events - Select Communities",
+        link: "/admin/read/events/others",
       },
     ],
   },

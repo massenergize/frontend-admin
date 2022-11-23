@@ -26,7 +26,7 @@ const styles = (theme) => {
       left: 0,
       top: 100,
       width: "100%",
-      zIndex: 105,
+      zIndex: 111,
       minHeight: 50,
       boxShadow: theme.shadows[7],
       maxHeight: 330,
