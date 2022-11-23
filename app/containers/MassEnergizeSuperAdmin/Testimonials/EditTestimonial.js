@@ -58,7 +58,6 @@ class EditTestimonial extends Component {
       testimonials &&
       testimonials.length &&
       vendors &&
-      vendors.length &&
       actions &&
       actions.length &&
       tags &&

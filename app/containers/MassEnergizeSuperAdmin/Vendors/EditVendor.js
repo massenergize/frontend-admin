@@ -53,7 +53,6 @@ class CreateNewVendorForm extends Component {
     const readyToRenderPageFirstTime =
       vendor &&
       vendors &&
-      vendors.length &&
       communities &&
       communities.length &&
       tags &&
