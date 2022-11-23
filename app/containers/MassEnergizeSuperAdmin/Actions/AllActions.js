@@ -34,11 +34,18 @@ import {
   pop,
   smartString,
 } from "../../../utils/common";
-import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
+import {
+  Button,
+  Grid,
+  LinearProgress,
+  Paper,
+  Typography,
+} from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import { makeAPICallForMoreData } from "../../../utils/helpers";
+import { generateFilterParams, getAdminApiEndpoint, getFilterData, makeAPICallForMoreData } from "../../../utils/helpers";
+import actions from "redux-form/lib/actions";
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -79,8 +86,8 @@ class AllActions extends React.Component {
     const updateItems = allActions.items.filter((a) => a.id !== data.id);
     updateItems.splice(index, 0, data);
     putActionsInRedux({
-      items:updateItems,
-      meta:allActions.meta
+      items: updateItems,
+      meta: allActions.meta,
     });
   };
 
@@ -106,7 +113,7 @@ class AllActions extends React.Component {
         name: "Image",
         key: "image",
         options: {
-          sort:false,
+          sort: false,
           filter: false,
           download: false,
           customBodyRender: (d) => (
@@ -236,11 +243,8 @@ class AllActions extends React.Component {
                     const newAction =
                       copiedActionResponse && copiedActionResponse.data;
                     putActionsInRedux({
-                      items: [
-                        newAction,
-                        ...(allActions.items || []),
-                      ],
-                      meta:allActions.meta
+                      items: [newAction, ...(allActions.items || [])],
+                      meta: allActions.meta,
                     });
                     this.props.history.push(
                       `/admin/edit/${newAction.id}/action`
@@ -296,7 +300,7 @@ class AllActions extends React.Component {
         },
       },
     ];
-  };
+  }
   /**
    * NOTE: If you add or remove a field in here, make sure your changes reflect in nowDelete.
    * Deleting heavily relies on the index arrangement of the items in here. Merci!
@@ -320,10 +324,10 @@ class AllActions extends React.Component {
       d.is_published ? "Yes" : "No",
       d.is_global,
       getHumanFriendlyDate(d.created_at, true, false),
-      getHumanFriendlyDate(d.updated_at, true, false)
+      getHumanFriendlyDate(d.updated_at, true, false),
     ]);
     return fashioned;
-  };
+  }
 
   makeLiveOrNot(item) {
     const putInRedux = this.props.putActionsInRedux;
@@ -335,7 +339,7 @@ class AllActions extends React.Component {
     const community = item.community;
     putInRedux({
       items: [...data],
-      meta:this.props.allActions.meta
+      meta: this.props.allActions.meta,
     });
     apiCall("/actions.update", {
       action_id: item.id,
@@ -401,21 +405,39 @@ class AllActions extends React.Component {
     return data.sort((a, b) => ourCustomSort({ ...params, a, b }));
   }
 
-
-  callMoreData = (page) => {
+  callMoreData = (page, filterList, columns) => {
     let { auth, putActionsInRedux, allActions } = this.props;
-    var url;
-    if (auth.is_super_admin) url = "/actions.listForSuperAdmin";
-    else if (auth.is_community_admin) url = "/actions.listForCommunityAdmin";
+    let arr = generateFilterParams(filterList, columns);
+    let url = getAdminApiEndpoint(auth, "/actions")
     makeAPICallForMoreData({
       url,
       existing: allActions && allActions.items,
       updateRedux: putActionsInRedux,
-      page,
+      args: { page, params: JSON.stringify(arr) },
     });
   };
 
-    
+
+
+  handleFilterSubmit = (items) => {
+    let {auth, putActionsInRedux, allActions } = this.props;
+    const { columns } = this.state;
+    let url = getAdminApiEndpoint(auth, "/actions")
+    let arr = generateFilterParams(items, columns);
+    apiCall(url, {
+      params: JSON.stringify(arr),
+    }).then((res) => {
+      if (res && res.success) {
+        let filterData = getFilterData(
+          res.data,
+          allActions && allActions.items,
+          "id"
+        );
+        putActionsInRedux(filterData);
+      }
+    });
+  };
+
   render() {
     const title = brand.name + " - All Actions";
     const description = brand.desc;
@@ -464,16 +486,27 @@ class AllActions extends React.Component {
       onTableChange: (action, tableState) => {
         if (action === "changePage") {
           if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(metaData.next);
+            this.callMoreData(metaData.next,tableState.filterList,tableState.columns);
           }
         }
       },
-      customSort:this.customSort,
+      confirmFilters: true,
+      onSearchChange:(text)=> console.log("==== Search Text ====", text),
+      customFilterDialogFooter: (currentFilterList) => {
+        return (
+          <div style={{ display: "flex",justifyContent: "flex-end",marginTop: 10,}}>
+            <Button variant="contained" onClick={() => this.handleFilterSubmit(currentFilterList)}>
+              Apply Filters
+            </Button>
+          </div>
+        );
+      },
+      customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         const [found] = findMatchesAndRest(idsToDelete, (it) => {
           const f = data[it.dataIndex];
-          return f[9]; // this index should be changed if anyone modifies (adds/removes) an item in fashioData()
+          return f[9]; // this index should be changed if anyone modifies (adds/removes) an item in fashionData()
         });
         const noTemplatesSelectedGoAhead = !found || !found.length;
         this.props.toggleDeleteConfirmation({

@@ -30,10 +30,16 @@ import {
   ourCustomSort,
   smartString,
 } from "../../../utils/common";
-import { Chip, Typography } from "@material-ui/core";
+import { Button, Chip, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import {
+  generateFilterParams,
+  getAdminApiEndpoint,
+  getFilterData,
+  makeAPICallForMoreData,
+} from "../../../utils/helpers";
 
 class AllEvents extends React.Component {
   constructor(props) {
@@ -178,7 +184,7 @@ class AllEvents extends React.Component {
           filter: false,
           download: false,
           customBodyRender: (id) => (
-            <div style={{display:'flex'}}>
+            <div style={{ display: "flex" }}>
               <Link to={`/admin/edit/${id}/event`}>
                 <EditIcon size="small" variant="outlined" color="secondary" />
               </Link>
@@ -309,26 +315,37 @@ class AllEvents extends React.Component {
       meta: allEvents.meta,
     });
   }
-  callMoreData = (page) => {
+  callMoreData = (page, filterList, columns) => {
     let { auth, putEventsInRedux, allEvents, community } = this.props;
     const isSuperAdmin = auth.is_super_admin;
-    var url = isSuperAdmin
-      ? "/events.listForSuperAdmin"
-      : "/events.listForCommunityAdmin";
+    let url = getAdminApiEndpoint(auth, "/events");
     let args = isSuperAdmin
       ? {}
       : { community_id: community.id || auth.admin_at[0].id };
+    let arr = generateFilterParams(filterList, columns);
+
+    makeAPICallForMoreData({
+      url,
+      existing: allEvents && allEvents.items,
+      updateRedux: putEventsInRedux,
+      args: { page, params: JSON.stringify(arr), ...args },
+    });
+  };
+  handleFilterSubmit = (items) => {
+    let { auth, putEventsInRedux, allEvents } = this.props;
+    let url = getAdminApiEndpoint(auth, "/events");
+    const { columns } = this.state;
+    let arr = generateFilterParams(items, columns);
     apiCall(url, {
-      ...args,
-      page: page,
+      params: JSON.stringify(arr),
     }).then((res) => {
-      if (res.success) {
-        let existing = [...allEvents.items];
-        let newList = existing.concat(res.data.items);
-        putEventsInRedux({
-          items: newList,
-          meta: res.data.meta,
-        });
+      if (res && res.success) {
+        let filterData = getFilterData(
+          res.data,
+          allEvents && allEvents.items,
+          "id"
+        );
+        putEventsInRedux(filterData);
       }
     });
   };
@@ -340,6 +357,7 @@ class AllEvents extends React.Component {
     const { classes } = this.props;
     const { allEvents } = this.props;
     const data = this.fashionData(allEvents.items || []);
+    const metaData =this.props.allEvents && this.props.allEvents.meta;
 
     const options = {
       filterType: "dropdown",
@@ -351,9 +369,33 @@ class AllEvents extends React.Component {
       onTableChange: (action, tableState) => {
         if (action === "changePage") {
           if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(allEvents.meta.next);
+            this.callMoreData(
+              metaData.next,
+              tableState.filterList,
+              tableState.columns
+            );
           }
         }
+      },
+      confirmFilters: true,
+      onSearchChange: (text) => console.log("==== Search Text ====", text),
+      customFilterDialogFooter: (currentFilterList) => {
+        return (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginTop: 10,
+            }}
+          >
+            <Button
+              variant="contained"
+              onClick={() => this.handleFilterSubmit(currentFilterList)}
+            >
+              Apply Filters
+            </Button>
+          </div>
+        );
       },
       customSort: this.customSort,
       rowsPerPageOptions: [10, 25, 100],
