@@ -2,6 +2,12 @@ import React from "react";
 import Loading from "dan-components/Loading";
 import loadable from "../utils/loadable";
 
+export const EventFullView = loadable(
+  () => import("./MassEnergizeSuperAdmin/Events/EventFullView"),
+  {
+    fallback: <Loading />,
+  }
+);
 export const FeatureFlags = loadable(
   () => import("./MassEnergizeSuperAdmin/Feature Flags/FeatureFlags"),
   {
@@ -251,6 +257,12 @@ export const EditAction = loadable(
 
 export const AllEvents = loadable(
   () => import("./MassEnergizeSuperAdmin/Events/AllEvents"),
+  {
+    fallback: <Loading />,
+  }
+);
+export const EventsFromOthers = loadable(
+  () => import("./MassEnergizeSuperAdmin/Events/OtherEventsWrapper"),
   {
     fallback: <Loading />,
   }

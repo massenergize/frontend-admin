@@ -182,3 +182,29 @@ export const getTimeStamp = () => {
 
   return Intl.DateTimeFormat("en-US", options).format(newDate);
 };
+/**
+ *
+ * @param {*} location : Props Location
+ * @param {*} paramName
+ * @returns
+ */
+export const fetchParamsFromURL = (location, paramName, names) => {
+  if (!location || !location.search) return "";
+  const obj = qs.parse(location.search, { ignoreQueryPrefix: true });
+  const value = (obj[paramName] || "").toString();
+  delete obj[paramName];
+  const params = {};
+  if (names && names.length) {
+    names.forEach((n) => {
+      params[n] = obj[n];
+      delete obj[n];
+    });
+  }
+  return (
+    {
+      params,
+      [paramName]: value,
+      rest: { object: obj, qs: qs.stringify(obj) || "" },
+    } || {}
+  );
+};
