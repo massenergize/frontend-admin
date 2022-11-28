@@ -4,6 +4,7 @@ import { PapperBlock } from "dan-components";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 function WhatNext({ data }) {
+  const { messages, teams, testimonials, users } = data || {};
   console.log("I think I am the data my gee", data);
   return (
     <PapperBlock
@@ -20,28 +21,28 @@ function WhatNext({ data }) {
           width: "100%",
         }}
       >
-        {[1, 2, 3, 4, 5].map((_) => (
-          <div className="next-section-item">
-            <Typography variant="h6" style={{ fontSize: 16 }}>
-              MESSAGES
-            </Typography>
-            <Typography
-              className="text"
-              variant="body2"
-              style={{
-                display: "inline",
-                paddingBottom: 7,
-              }}
-            >
-              <span className="me-badge">65</span>
-              You have 65 messages that you have not answered{" "}
-              <span
-                style={{ marginLeft: 6 }}
-                className="fa fa-long-arrow-right"
-              />
-            </Typography>
-          </div>
-        ))}
+        <SectionTemplate
+          content={messages}
+          name="messages"
+          description={(count) => `You have ${count} unanswered messages`}
+        />
+        <SectionTemplate
+          content={teams}
+          name="teams"
+          description={(count) => `You have ${count} unapproved teams`}
+        />
+        <SectionTemplate
+          content={testimonials}
+          name="testimonials"
+          description={(count) => `You have ${count} unapproved testimonials`}
+        />
+        <SectionTemplate
+          content={users}
+          name="users"
+          description={(count) =>
+            `You have ${count} new registered users since your last sign in`
+          }
+        />
       </div>
     </PapperBlock>
   );
@@ -59,3 +60,39 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(WhatNext);
+
+const SectionTemplate = ({ content, name, description }) => {
+  if (!content || !content.data || !content.data.length) return <></>;
+  const { data } = content;
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        width: "100%",
+      }}
+    >
+      <div className="next-section-item">
+        <Typography
+          variant="h6"
+          style={{ fontSize: 16, textTransform: "uppercase" }}
+        >
+          {name}
+        </Typography>
+        <Typography
+          className="text"
+          variant="body2"
+          style={{
+            display: "inline",
+            paddingBottom: 7,
+          }}
+        >
+          <span className="me-badge">{data.length}</span>
+          {description(data.length)}
+          <span style={{ marginLeft: 6 }} className="fa fa-long-arrow-right" />
+        </Typography>
+      </div>
+    </div>
+  );
+};
