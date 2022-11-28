@@ -41,6 +41,7 @@ import {
   LOAD_ALL_OTHER_COMMUNITIES,
   LOAD_ALL_OTHER_EVENTS,
   SAVE_OTHER_EVENT_STATES,
+  LOAD_ADMIN_NEXT_STEPS_SUMMARY,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -153,7 +154,8 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     isSuperAdmin && apiCall("/tasks.list"),
     apiCall("/settings.list"),
     isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
-    apiCall("communities.others.listForCommunityAdmin"),
+    apiCall("/communities.others.listForCommunityAdmin"),
+    apiCall("/summary.next.steps.forAdmins"),
   ]).then((response) => {
     const [
       communities,
@@ -174,6 +176,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       settings,
       featureFlags,
       otherCommunities,
+      adminNextSteps,
     ] = response;
     dispatch(reduxLoadAllCommunities(communities.data));
     dispatch(loadAllActions(actions.data));
@@ -193,9 +196,15 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadSettings(settings.data || {}));
     dispatch(loadFeatureFlags(featureFlags.data || {}));
     dispatch(reduxLoadAllOtherCommunities(otherCommunities.data));
+    console.log("This is the adminNextSteps", adminNextSteps); // remove before PR
+    dispatch(reduxLoadNextStepsSummary(adminNextSteps.data));
   });
 };
 
+export const reduxLoadNextStepsSummary = (data = {}) => ({
+  type: LOAD_ADMIN_NEXT_STEPS_SUMMARY,
+  payload: data,
+});
 export const reduxSaveOtherEventState = (data = {}) => ({
   type: SAVE_OTHER_EVENT_STATES,
   payload: data,

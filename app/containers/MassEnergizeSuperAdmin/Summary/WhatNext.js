@@ -1,7 +1,10 @@
 import { Typography } from "@material-ui/core";
 import React from "react";
 import { PapperBlock } from "dan-components";
-function WhatNext() {
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
+function WhatNext({ data }) {
+  console.log("I think I am the data my gee", data);
   return (
     <PapperBlock
       whiteBg
@@ -44,4 +47,15 @@ function WhatNext() {
   );
 }
 
-export default WhatNext;
+const mapStateToProps = (state) => {
+  return { data: state.getIn(["nextStepsSummary"]) };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators({}, dispatch);
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WhatNext);
