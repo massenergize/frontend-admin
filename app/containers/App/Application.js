@@ -70,6 +70,8 @@ import {
   ListTasks,
   Settings,
   FeatureFlags,
+  EventFullView,
+  EventsFromOthers,
 } from "../pageListAsync";
 import EditVendor from "../MassEnergizeSuperAdmin/Vendors/EditVendor";
 import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
@@ -306,7 +308,9 @@ class Application extends React.Component {
             path="/admin/edit/:id/tag-collection"
             component={EditCategory}
           />
-          <Route path="/admin/read/events" component={AllEvents} />
+          <Route path="/admin/read/event/:id/event-view" component={EventFullView} />
+          <Route path="/admin/read/events" exact component={AllEvents} />
+          <Route path="/admin/read/events/others" exact component={EventsFromOthers} />
           <Route path="/admin/add/event" component={AddEvent} />
           <Route path="/admin/edit/:id/event" component={EditEvent} />
           <Route path="/admin/edit/:id/event-rsvps" component={EventRSVPs} />

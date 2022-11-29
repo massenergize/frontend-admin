@@ -10,6 +10,7 @@ export const PAGE_PROPERTIES = {
     ALL_VENDORS: { key: "ALL_VENDORD"},
     ALL_USERS: { key: "ALL_USERS"},
     FEATURE_FLAGS: { key: "FEATURE_FLAGS"},
+    OTHER_COMMUNITY_EVENTS: { key: "OTHER_COMMUNITY_EVENTS"},
 } 
 
 

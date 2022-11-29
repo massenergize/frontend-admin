@@ -48,6 +48,9 @@ import app, {
   reducerForGalleryFilters,
   reducerForLoadingAdmins,
   reducerForLoadingSuperAdmins,
+  reducerForAllOtherCommunities,
+  reducerForLoadingOtherEvents,
+  reducerForSavingOtherEventState,
   reducerForKeepingFormContent,
 } from "./modules/appReducer";
 
@@ -58,6 +61,9 @@ export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
     tempForm: reducerForKeepingFormContent,
     activities: reducerForAdminActivities,
+    otherCommunities: reducerForAllOtherCommunities,
+    otherEventsState: reducerForSavingOtherEventState,
+    otherEvents: reducerForLoadingOtherEvents,
     flagInfos: reducerForFlagInfo,
     galleryFilters: reducerForGalleryFilters,
     sadmins: reducerForLoadingSuperAdmins,

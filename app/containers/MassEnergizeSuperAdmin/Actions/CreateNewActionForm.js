@@ -280,7 +280,7 @@ const createFormJson = ({
             fieldType: "Dropdown",
             defaultValue: progress.calculator_action || null,
             dbName: "calculator_action",
-            data: ccActions,
+            data: [{ displayName: "--", id: "" }, ...ccActions],
             modalTitle: "Carbon Action List & Instructions",
             modalText:
               "Check out the instructions here: https://docs.google.com/document/d/1b-tCB83hKk9yWFcB15YdHBORAFOPyh63c8jt1i15WL4",

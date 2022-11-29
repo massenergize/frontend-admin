@@ -51,10 +51,16 @@ class CreateNewEventForm extends Component {
   }
 
   static getDerivedStateFromProps = (props, state) => {
-    const { communities, tags, auth, formState, location } = props;
+    const { communities, tags, auth, formState, location, otherCommunities } = props;
 
     const readyToRenderPageFirstTime =
-      communities && communities.length && tags && tags.length && auth;
+      communities &&
+      communities.length &&
+      tags &&
+      tags.length &&
+      auth &&
+      otherCommunities &&
+      otherCommunities.length;
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderPageFirstTime || state.mounted;
@@ -80,6 +86,7 @@ class CreateNewEventForm extends Component {
       auth,
       progress,
       autoOpenMediaLibrary: libOpen,
+      otherCommunities,
     });
 
     if (formJson) formJson.fields.splice(1, 0, section);
@@ -144,6 +151,7 @@ const mapStateToProps = (state) => {
     communities: state.getIn(["communities"]),
     auth: state.getIn(["auth"]),
     formState: state.getIn(["tempForm"]),
+    otherCommunities: state.getIn(["otherCommunities"]),
   };
 };
 
@@ -187,8 +195,14 @@ const createFormJson = ({
   auth,
   progress,
   autoOpenMediaLibrary,
+  otherCommunities,
 }) => {
   const is_super_admin = auth && auth.is_super_admin;
+  otherCommunities = otherCommunities || [];
+  const otherCommunityList = otherCommunities.map((c) => ({
+    displayName: c.name,
+    id: c.id.toString(),
+  }));
   const formJson = {
     title: "Create New Event or Campaign",
     subTitle: "",
@@ -261,6 +275,7 @@ const createFormJson = ({
             minDate: moment().startOf("hour"),
             readOnly: false,
           },
+
           {
             name: "is_recurring",
             label: "Make this a recurring event",
@@ -387,6 +402,66 @@ const createFormJson = ({
                 data: [{ displayName: "--", id: "" }, ...communities],
                 isRequired: true,
               },
+        ],
+      },
+      {
+        label: "Who can see this event?",
+        fieldType: "Section",
+        children: [
+          {
+            name: "publicity",
+            label: "Who should be able to see this event?",
+            fieldType: "Radio",
+            isRequired: false,
+            defaultValue: "OPEN",
+            dbName: "publicity",
+            readOnly: false,
+            data: [
+              { id: "OPEN", value: "All communities can see this event " },
+              {
+                id: "OPEN_TO",
+                value: "Only communities I select should see this",
+              },
+              {
+                id: "CLOSE",
+                value: "No one can see this, keep this in my community only ",
+              },
+
+              // { id: "CLOSED_TO", value: "All except these communities" },
+            ],
+            conditionalDisplays: [
+              {
+                valueToCheck: "OPEN_TO",
+                fields: [
+                  {
+                    name: "can-view-event",
+                    label: `Select the communities that can see this event`,
+                    placeholder: "",
+                    fieldType: "Checkbox",
+                    selectMany: true,
+                    defaultValue: [],
+                    dbName: "publicity_selections",
+                    data: otherCommunityList,
+                  },
+                ],
+              },
+              // {
+              //   valueToCheck: "CLOSED_TO",
+              //   fields: [
+              //     {
+              //       name: "cannot-view-event",
+              //       label: `Select the communities should NOT see this event`,
+              //       placeholder: "",
+              //       fieldType: "Checkbox",
+              //       selectMany: true,
+              //       defaultValue: [],
+              //       dbName: "publicity_selections",
+              //       data: otherCommunityList,
+              //     },
+              //   ],
+              // },
+            ],
+          },
         ],
       },
       {

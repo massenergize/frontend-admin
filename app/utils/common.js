@@ -183,14 +183,6 @@ export const getTimeStamp = () => {
 
   return Intl.DateTimeFormat("en-US", options).format(newDate);
 };
-
-export const removePageProgressFromStorage = (key) => {
-  var progress = localStorage.getItem(ME_FORM_PROGRESS) || "{}";
-  progress = JSON.parse(progress);
-  progress[key] = {};
-  localStorage.setItem(ME_FORM_PROGRESS, JSON.stringify(progress));
-};
-
 /**
  *
  * @param {*} location : Props Location
@@ -217,4 +209,11 @@ export const fetchParamsFromURL = (location, paramName, names) => {
       rest: { object: obj, qs: qs.stringify(obj) || "" },
     } || {}
   );
+};
+
+export const removePageProgressFromStorage = (key) => {
+  var progress = localStorage.getItem(ME_FORM_PROGRESS) || "{}";
+  progress = JSON.parse(progress);
+  progress[key] = {};
+  localStorage.setItem(ME_FORM_PROGRESS, JSON.stringify(progress));
 };

@@ -38,6 +38,9 @@ import {
   SET_GALLERY_FILTERS,
   LOAD_ADMINS_FOR_MY_COMMUNITY,
   LOAD_SUPER_ADMIN_LIST,
+  LOAD_ALL_OTHER_COMMUNITIES,
+  LOAD_ALL_OTHER_EVENTS,
+  SAVE_OTHER_EVENT_STATES,
   KEEP_FORM_CONTENT,
 } from "../ReduxConstants";
 
@@ -66,6 +69,22 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+export const reducerForSavingOtherEventState = (state = {}, action = {}) => {
+  switch (action.type) {
+    case SAVE_OTHER_EVENT_STATES:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForLoadingOtherEvents = (state = [], action = {}) => {
+  switch (action.type) {
+    case LOAD_ALL_OTHER_EVENTS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForKeepingFormContent = (state = {}, action = {}) => {
   switch (action.type) {
     case KEEP_FORM_CONTENT:
@@ -77,6 +96,14 @@ export const reducerForKeepingFormContent = (state = {}, action = {}) => {
 export const reducerForAdminActivities = (state = LOADING, action = {}) => {
   switch (action.type) {
     case LOAD_ADMIN_ACTIVITIES:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForAllOtherCommunities = (state =[], action = {}) => {
+  switch (action.type) {
+    case LOAD_ALL_OTHER_COMMUNITIES:
       return action.payload;
     default:
       return state;
