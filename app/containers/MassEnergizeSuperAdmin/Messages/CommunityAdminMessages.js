@@ -47,16 +47,20 @@ class AllCommunityAdminMessages extends React.Component {
    * Then we try to find all the messages that are already loaded in, and then load in the ones
    * that are not yet here
    */
-  rearrangeForAdmin(messages) {
+  reArrangeForAdmin(messages) {
     const { location, putMessagesInRedux } = this.props;
     const { state } = location || {};
     const ids = (state && state.ids) || [];
     const { found, notFound, itemObjects, remainder } = separate(ids, messages);
     const data = [...itemObjects, ...remainder];
-   
+
     putMessagesInRedux(data);
-    // Go and find the remaining items yeah
-    // console.log("Here it is found, notFound, messages ", found, notFound);
+
+    apiCall("/messages.listForCommunityAdmin", {
+      message_ids: notFound,
+    }).then((response) => {
+      console.log("This is the response", response);
+    });
   }
   componentDidMount() {
     const { state } = this.props.location;
@@ -64,7 +68,7 @@ class AllCommunityAdminMessages extends React.Component {
       if (allMessagesResponse && allMessagesResponse.success) {
         const data = allMessagesResponse.data;
         if (state && state.ids) {
-          this.rearrangeForAdmin(data);
+          this.reArrangeForAdmin(data);
           this.setState({ ignoreSavedFilters: true }); //When an admin enters here through the summary page, we need old filters to be turned off, so that the table will only use the new arrangement we are going to make
         } else this.props.putMessagesInRedux(data);
       }
