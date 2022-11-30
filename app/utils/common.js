@@ -6,6 +6,27 @@ import moment from "moment";
 import qs from "qs";
 import React from "react";
 
+export const separate = (ids, dataSet = []) => {
+  const found = [];
+  const notFound = [];
+  const remainder = [];
+  const itemObjects = [];
+  (dataSet || []).forEach((d) => {
+    if (d.id in ids) {
+      found.push(d.id);
+      itemObjects.push(d);
+    } else {
+      notFound.push(d.id);
+      remainder.push(d);
+    }
+  });
+  return {
+    found,
+    notFound,
+    remainder,
+    itemObjects,
+  };
+};
 export function makeDeleteUI({ idsToDelete, templates }) {
   const len = (idsToDelete && idsToDelete.length) || 0;
   var text = `Are you sure you want to delete (

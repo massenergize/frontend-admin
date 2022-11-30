@@ -19,7 +19,7 @@ function METable(props) {
   const filterObject = useRef({});
   const pageTableProperties = useRef({});
   const [tableColumns, setTableColumns] = useState([]);
-  const { classes, tableProps, page } = props;
+  const { classes, tableProps, page, ignoreSavedFilters } = props;
   // const [options, setOptions] = useState({});
 
   /**
@@ -65,6 +65,7 @@ function METable(props) {
 
   useEffect(() => {
     let { columns } = tableProps || {};
+    if (ignoreSavedFilters) return setTableColumns(columns);
     const properties = getProperties();
     pageTableProperties.current = properties;
     columns = retrieveSortOptionsAndSort(columns);

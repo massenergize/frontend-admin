@@ -16,13 +16,15 @@ import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import {
-  reduxGetAllVendors,
-  reduxGetAllCommunityVendors,
   loadAllAdminMessages,
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 import CommunitySwitch from "../Summary/CommunitySwitch";
-import { getHumanFriendlyDate, smartString } from "../../../utils/common";
+import {
+  getHumanFriendlyDate,
+  separate,
+  smartString,
+} from "../../../utils/common";
 import { Chip } from "@material-ui/core";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -37,10 +39,34 @@ class AllCommunityAdminMessages extends React.Component {
     };
   }
 
+  /**
+   * This function rearranges items in the table when they come from the summary page
+   * So that items that need attention are first on the list
+   * .......................................................
+   * From  summary page, ids of unanswered messages will be passed in here through react router
+   * Then we try to find all the messages that are already loaded in, and then load in the ones
+   * that are not yet here
+   */
+  rearrangeForAdmin(messages) {
+    const { location, putMessagesInRedux } = this.props;
+    const { state } = location || {};
+    const ids = (state && state.ids) || [];
+    const { found, notFound, itemObjects, remainder } = separate(ids, messages);
+    const data = [...itemObjects, ...remainder];
+   
+    putMessagesInRedux(data);
+    // Go and find the remaining items yeah
+    // console.log("Here it is found, notFound, messages ", found, notFound);
+  }
   componentDidMount() {
+    const { state } = this.props.location;
     apiCall("/messages.listForCommunityAdmin").then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
-        this.props.putMessagesInRedux(allMessagesResponse.data);
+        const data = allMessagesResponse.data;
+        if (state && state.ids) {
+          this.rearrangeForAdmin(data);
+          this.setState({ ignoreSavedFilters: true }); //When an admin enters here through the summary page, we need old filters to be turned off, so that the table will only use the new arrangement we are going to make
+        } else this.props.putMessagesInRedux(data);
       }
     });
   }
@@ -67,8 +93,8 @@ class AllCommunityAdminMessages extends React.Component {
 
   getColumns = (classes) => [
     {
-      name: 'ID',
-      key: 'id',
+      name: "ID",
+      key: "id",
       options: {
         filter: false,
       },
@@ -145,7 +171,6 @@ class AllCommunityAdminMessages extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { messages, putMessagesInRedux } = this.props;
-    // return
     const itemsInRedux = messages;
     const ids = [];
     idsToDelete.forEach((d) => {
@@ -213,6 +238,7 @@ class AllCommunityAdminMessages extends React.Component {
             columns: columns,
             options: options,
           }}
+          ignoreSavedFilters={this.state.ignoreSavedFilters}
         />
       </div>
     );

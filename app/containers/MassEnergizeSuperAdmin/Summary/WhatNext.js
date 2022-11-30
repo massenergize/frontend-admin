@@ -3,15 +3,17 @@ import React from "react";
 import { PapperBlock } from "dan-components";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
+import { useHistory, withRouter } from "react-router-dom";
 function WhatNext({ data }) {
-  const { messages, teams, testimonials, users } = data || {};
+  const { messages, teams, testimonials, users, team_messages } = data || {};
+  const history = useHistory();
   console.log("I think I am the data my gee", data);
   return (
     <PapperBlock
       whiteBg
       icon="ios-help"
       title="What to do next?"
-      desc="Here are items you need to take care of"
+      desc="Here are items you need to take care of "
     >
       <div
         style={{
@@ -23,7 +25,18 @@ function WhatNext({ data }) {
       >
         <SectionTemplate
           content={messages}
-          name="messages"
+          name="Messages"
+          description={(count) => `You have ${count} unanswered messages`}
+          onClick={() =>
+            history.push({
+              pathname: "/admin/read/community-admin-messages",
+              state: { ids: messages && messages.data },
+            })
+          }
+        />
+        <SectionTemplate
+          content={team_messages}
+          name="Team Messages"
           description={(count) => `You have ${count} unanswered messages`}
         />
         <SectionTemplate
@@ -59,24 +72,25 @@ const mapDispatchToProps = (dispatch) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(WhatNext);
+)(withRouter(WhatNext));
 
-const SectionTemplate = ({ content, name, description }) => {
+const SectionTemplate = ({ content, name, description, onClick }) => {
   if (!content || !content.data || !content.data.length) return <></>;
   const { data } = content;
   return (
     <div
       style={{
-        display: "flex",
+        display: "inline-flex",
         flexDirection: "row",
         flexWrap: "wrap",
-        width: "100%",
+        marginRight: "5%",
+        marginBottom: 10,
       }}
     >
       <div className="next-section-item">
         <Typography
           variant="h6"
-          style={{ fontSize: 16, textTransform: "uppercase" }}
+          style={{ fontSize: 16, textTransform: "uppercase", marginBottom: 1 }}
         >
           {name}
         </Typography>
@@ -87,6 +101,7 @@ const SectionTemplate = ({ content, name, description }) => {
             display: "inline",
             paddingBottom: 7,
           }}
+          onClick={() => onClick && onClick()}
         >
           <span className="me-badge">{data.length}</span>
           {description(data.length)}

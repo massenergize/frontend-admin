@@ -55,7 +55,7 @@
 }
 .next-section-item {
   margin-bottom: 15px;
-  flex-basis: 30%;
+  /* flex-basis: 30%; */
   margin: 10px;
   cursor: pointer;
 }
