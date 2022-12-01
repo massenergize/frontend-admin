@@ -151,7 +151,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     }),
     isSuperAdmin && apiCall("/tasks.functions.list"),
     isSuperAdmin && apiCall("/tasks.list"),
-    apiCall("/settings.list"),
+    apiCall("/preferences.list"),
     isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
     apiCall("communities.others.listForCommunityAdmin"),
   ]).then((response) => {
@@ -171,7 +171,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       galleryImages,
       tasksFunctions,
       tasks,
-      settings,
+      preferences,
       featureFlags,
       otherCommunities,
     ] = response;
@@ -190,7 +190,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
     dispatch(loadTaskFunctionsAction(tasksFunctions.data));
     dispatch(loadTasksAction(tasks.data));
-    dispatch(loadSettings(settings.data || {}));
+    dispatch(loadSettings(preferences.data || {}));
     dispatch(loadFeatureFlags(featureFlags.data || {}));
     dispatch(reduxLoadAllOtherCommunities(otherCommunities.data));
   });

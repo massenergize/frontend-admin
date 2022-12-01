@@ -1,5 +1,6 @@
 import {
   Checkbox,
+  Button,
   FormControlLabel,
   Hidden,
   Paper,
@@ -21,14 +22,15 @@ import { reduxLoadAuthAdmin } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
 
 const CHECKBOX = "checkbox";
+const RADIO = "radio";
+const BUTTON = "button";
 const LIST_OF_COMMUNITIES = "list-of-communities";
 
-function Settings({ settings, auth, communities, updateAdminObject }) {
+function Preferences({ settings, auth, communities, updateAdminObject }) {
   const [currentTab, setCurrentTab] = useState(0);
 
   const adminNudgeSettings =
     ((auth && auth.preferences) || {}).admin_portal_settings || {};
-
   if (!settings) return <Loading />;
 
   const settingsCategories = Object.entries(settings).filter(
@@ -37,7 +39,6 @@ function Settings({ settings, auth, communities, updateAdminObject }) {
   const [categoryKey, { options }] = settingsCategories[currentTab];
   const optionsArray = Object.entries(options);
   var optionInUserSettings = adminNudgeSettings[categoryKey] || {};
-
   const updateSettings = (data) => {
     var newSettings = {
       ...adminNudgeSettings,
@@ -68,13 +69,25 @@ function Settings({ settings, auth, communities, updateAdminObject }) {
       );
   };
 
+  const respondToButton = (action) => {
+    apiCall("/downloads.send_cadmin_report", {
+      id: auth.id,
+    })
+    .then((response) => {
+      if (!response.success)
+        return console.log("Error sending action to backend: ", response.error);
+    })
+    .catch((e) =>
+      console.log("Error sending action: ", e.toString())
+    );
+}
+
   return (
     <div>
       <Paper>
         {/*  TODO: The text here is just a placeholder. Text description from Kaat or Brad will be used here... */}
         <Typography variant="body1" style={{ padding: 20, margin: 20 }}>
-          Use the toggles provided to customise the application in any way that
-          bests suits you.
+          Choose the frequency and content of information you wish to receive.
         </Typography>
         <Tabs
           onChange={(_, v) => setCurrentTab(v)}
@@ -92,47 +105,71 @@ function Settings({ settings, auth, communities, updateAdminObject }) {
       <Paper style={{ marginTop: 10, padding: 40 }}>
         {/* ---------------- SETTINGS OPTION DISPLAY LEVEL --------------- */}
         {optionsArray.map(
-          ([optionKey, { live, text, type, values, expected_data_source }]) => {
+          ([optionKey, { live, text, explanation, type, values, expected_data_source }]) => {
             const availableOptionsForCurrentLevel =
               (optionInUserSettings || {})[optionKey] || {};
             if (!live) return <></>;
             const usesCheckboxes = type === CHECKBOX;
+            const usesRadioButtons = type === RADIO;
+            const usesButton = type === BUTTON;
+            if (usesButton) return (
+              <div>
+                <Button 
+                  variant="outlined"
+                  onClick={respondToButton}
+                >
+                  {text}
+                </Button>
+              </div>
+            );
+
             values = Object.entries(values);
+            console.log(explanation, usesCheckboxes, usesRadioButtons, values)
             return (
               <div key={optionKey}>
                 <Typography variant="p" style={{ fontWeight: "bold" }}>
                   {text}
-                </Typography>
-                {usesCheckboxes ? (
-                  <RenderCheckboxes
-                    values={values}
-                    expectedDataSource={expected_data_source}
-                    auth={auth}
-                    communities={communities}
-                    selectedItemsFromUserObj={availableOptionsForCurrentLevel}
-                    userSettings={adminNudgeSettings}
-                    updateSettings={(data) =>
-                      updateSettings({
-                        ...optionInUserSettings,
-                        [optionKey]: data,
-                      })
-                    }
-                  />
-                ) : (
-                  <RenderRadioButtons
-                    values={values}
-                    auth={auth}
-                    selectedItemsFromUserObj={availableOptionsForCurrentLevel}
-                    userSettings={adminNudgeSettings}
-                    optionLevelKey={optionKey}
-                    updateSettings={(data) =>
-                      updateSettings({
-                        ...optionInUserSettings,
-                        [optionKey]: data,
-                      })
-                    }
-                  />
-                )}
+                </Typography>              
+                <Typography variant="p">
+                  {explanation}
+                </Typography> 
+
+                {usesCheckboxes ? 
+                  (
+                    <RenderCheckboxes
+                      values={values}
+                      expectedDataSource={expected_data_source}
+                      auth={auth}
+                      communities={communities}
+                      selectedItemsFromUserObj={availableOptionsForCurrentLevel}
+                      userSettings={adminNudgeSettings}
+                      updateSettings={(data) =>
+                        updateSettings({
+                          ...optionInUserSettings,
+                          [optionKey]: data,
+                        })
+                      }
+                    />
+                  ): null
+                }
+
+                {usesRadioButtons ? 
+                  (
+                    <RenderRadioButtons
+                      values={values}
+                      auth={auth}
+                      selectedItemsFromUserObj={availableOptionsForCurrentLevel}
+                      userSettings={adminNudgeSettings}
+                      optionLevelKey={optionKey}
+                      updateSettings={(data) =>
+                        updateSettings({
+                          ...optionInUserSettings,
+                          [optionKey]: data,
+                        }) 
+                      }
+                    />
+                  ): null
+                }
               </div>
             );
           }
@@ -158,7 +195,7 @@ const mapDispatchToProps = (dispatch) => {
 const Mapped = connect(
   mapStateToProps,
   mapDispatchToProps
-)(Settings);
+)(Preferences);
 export default withStyles(styles)(Mapped);
 
 // -------- DISPLAY LEVEL FOR POSSIBLE CHOICES FOR EACH SETTING ---------
@@ -204,7 +241,6 @@ const RenderCheckboxes = ({
     labelExt,
     valueExt,
     selected = [];
-
   if (expectedDataSource === LIST_OF_COMMUNITIES) {
     list = auth.is_super_admin ? communities : auth.admin_at;
     list = (list || []).map((community) => {
@@ -241,7 +277,6 @@ const RenderCheckboxes = ({
       />
     );
   }
-
   return (
     <RadioGroup>
       {values.map(([valueKey, answer]) => {

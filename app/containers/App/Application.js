@@ -67,7 +67,7 @@ import {
   AddToGallery,
   AddTask,
   ListTasks,
-  Settings,
+  Preferences,
   FeatureFlags,
   EventFullView,
   EventsFromOthers,
@@ -211,7 +211,7 @@ class Application extends React.Component {
           {user.is_super_admin && superAdminSpecialRoutes}
 
           <Route exact path="/blank" component={BlankPage} />
-          <Route exact path="/admin/profile/settings" component={Settings} />
+          <Route exact path="/admin/profile/preferences" component={Preferences} />
           <Route exact path="/admin/settings/feature-flags" component={FeatureFlags} />
           <Route path="/admin/read/users" component={UsersList} />
           <Route
