@@ -4,20 +4,13 @@ import { withStyles } from "@material-ui/core/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 import Typography from "@material-ui/core/Typography";
-import Avatar from "@material-ui/core/Avatar";
 import { bindActionCreators } from "redux";
-import MUIDataTable from "mui-datatables";
-import FileCopy from "@material-ui/icons/FileCopy";
-import EditIcon from "@material-ui/icons/Edit";
 import { Link } from "react-router-dom";
 import DetailsIcon from "@material-ui/icons/Details";
-import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import {
-  reduxGetAllVendors,
-  reduxGetAllCommunityVendors,
   loadAllAdminMessages,
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
@@ -27,7 +20,8 @@ import { Chip } from "@material-ui/core";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { makeAPICallForMoreData } from "../../../utils/helpers";
+import { generateFilterParams, makeAPICallForMoreData } from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 class AllCommunityAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -53,7 +47,7 @@ class AllCommunityAdminMessages extends React.Component {
     }
   };
 
-  fashionData = (data=[]) => {
+  fashionData = (data = []) => {
     return data.map((d) => [
       d.id,
       getHumanFriendlyDate(d.created_at, true),
@@ -61,7 +55,7 @@ class AllCommunityAdminMessages extends React.Component {
       d.user_name || (d.user && d.user.full_name) || "",
       d.email || (d.user && d.user.email) || "",
       d.community && d.community.name,
-      d.have_replied,
+      d.have_replied ? "Yes" : "No",
       d.id,
     ]);
   };
@@ -170,21 +164,23 @@ class AllCommunityAdminMessages extends React.Component {
       </Typography>
     );
   }
-  callMoreData = (page) => {
+  callMoreData = (page, filterList, columns) => {
     let { putMessagesInRedux, messages } = this.props;
     var url = "/messages.listForCommunityAdmin";
+    let arr = generateFilterParams(filterList, columns);
     makeAPICallForMoreData({
       url,
       existing: messages && messages.items,
       updateRedux: putMessagesInRedux,
-      page,
+      args: { page, params: JSON.stringify(arr) },
     });
   };
+
   render() {
     const title = brand.name + " - Community Admin Messages";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, messages } = this.props;
+    const { classes, messages, putMessagesInRedux } = this.props;
     const data = this.fashionData(messages && messages.items); // not ready for this yet: && this.props.messages.filter(item=>item.parent===null));
     const metaData = messages && messages.meta;
     const options = {
@@ -197,9 +193,24 @@ class AllCommunityAdminMessages extends React.Component {
       onTableChange: (action, tableState) => {
         if (action === "changePage") {
           if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(metaData.next);
+            this.callMoreData(
+              metaData.next,
+              tableState.filterList,
+              tableState.columns
+            );
           }
         }
+      },
+      customFilterDialogFooter: (currentFilterList) => {
+        return (
+          <ApplyFilterButton 
+          url={"/messages.listForCommunityAdmin"}
+          reduxItems={messages}
+          updateReduxFunction={putMessagesInRedux}
+          columns={columns}
+          filters={currentFilterList}
+          />
+        );
       },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;

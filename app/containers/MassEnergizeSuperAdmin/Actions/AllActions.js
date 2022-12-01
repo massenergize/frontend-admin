@@ -46,6 +46,7 @@ import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import { generateFilterParams, getAdminApiEndpoint, getFilterData, makeAPICallForMoreData } from "../../../utils/helpers";
 import actions from "redux-form/lib/actions";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -417,34 +418,13 @@ class AllActions extends React.Component {
     });
   };
 
-
-
-  handleFilterSubmit = (items) => {
-    let {auth, putActionsInRedux, allActions } = this.props;
-    const { columns } = this.state;
-    let url = getAdminApiEndpoint(auth, "/actions")
-    let arr = generateFilterParams(items, columns);
-    apiCall(url, {
-      params: JSON.stringify(arr),
-    }).then((res) => {
-      if (res && res.success) {
-        let filterData = getFilterData(
-          res.data,
-          allActions && allActions.items,
-          "id"
-        );
-        putActionsInRedux(filterData);
-      }
-    });
-  };
-
   render() {
     const title = brand.name + " - All Actions";
     const description = brand.desc;
-    const { classes } = this.props;
+    const { classes, auth, allActions, putActionsInRedux} = this.props;
     const { columns, error } = this.state;
-    const data = this.fashionData(this.props.allActions.items || []);
-    const metaData = this.props.allActions.meta;
+    const data = this.fashionData(allActions && allActions.items || []);
+    const metaData = allActions && allActions.meta;
     if (!data || !data.length) {
       return (
         <Grid
@@ -494,11 +474,13 @@ class AllActions extends React.Component {
       onSearchChange:(text)=> console.log("==== Search Text ====", text),
       customFilterDialogFooter: (currentFilterList) => {
         return (
-          <div style={{ display: "flex",justifyContent: "flex-end",marginTop: 10,}}>
-            <Button variant="contained" onClick={() => this.handleFilterSubmit(currentFilterList)}>
-              Apply Filters
-            </Button>
-          </div>
+          <ApplyFilterButton
+            url={getAdminApiEndpoint(auth, "/actions")}
+            reduxItems={allActions}
+            updateReduxFunction={putActionsInRedux}
+            columns={columns}
+            filters={currentFilterList}
+          />
         );
       },
       customSort: this.customSort,

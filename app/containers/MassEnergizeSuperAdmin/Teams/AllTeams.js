@@ -33,7 +33,12 @@ import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { makeAPICallForMoreData } from "../../../utils/helpers";
+import {
+  generateFilterParams,
+  getAdminApiEndpoint,
+  makeAPICallForMoreData,
+} from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 
 class AllTeams extends React.Component {
   constructor(props) {
@@ -285,11 +290,16 @@ class AllTeams extends React.Component {
       </Typography>
     );
   }
-  callMoreData = (page) => {
+  callMoreData = (page, filterList, columns) => {
     let { putTeamsInRedux, allTeams, auth } = this.props;
-    let isSuperAdmin = auth.is_super_admin;
-    var url = isSuperAdmin ? "/teams.listForSuperAdmin" : "/teams.listForCommunityAdmin"
-    makeAPICallForMoreData({ url, existing: allTeams && allTeams.items,updateRedux: putTeamsInRedux, page });
+    let arr = generateFilterParams(filterList, columns);
+    let url = getAdminApiEndpoint(auth, "/teams");
+    makeAPICallForMoreData({
+      url,
+      existing: allTeams && allTeams.items,
+      updateRedux: putTeamsInRedux,
+      args: { page, params: JSON.stringify(arr) },
+    });
   };
   customSort(data, colIndex, order) {
     const isComparingLive = colIndex === 5;
@@ -306,7 +316,7 @@ class AllTeams extends React.Component {
     const title = brand.name + " - All Teams";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, allTeams } = this.props;
+    const { classes, allTeams, putTeamsInRedux, auth } = this.props;
     const data = this.fashionData(allTeams && allTeams.items);
     const metaData = allTeams && allTeams.meta;
     const options = {
@@ -319,9 +329,24 @@ class AllTeams extends React.Component {
       onTableChange: (action, tableState) => {
         if (action === "changePage") {
           if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(metaData.next);
+            this.callMoreData(
+              metaData.next,
+              tableState.filterList,
+              tableState.columns
+            );
           }
         }
+      },
+      customFilterDialogFooter: (currentFilterList) => {
+        return (
+          <ApplyFilterButton
+            url={getAdminApiEndpoint(auth, "/teams")}
+            reduxItems={allTeams}
+            updateReduxFunction={putTeamsInRedux}
+            columns={columns}
+            filters={currentFilterList}
+          />
+        );
       },
       customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {

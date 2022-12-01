@@ -40,6 +40,7 @@ import {
   getFilterData,
   makeAPICallForMoreData,
 } from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 
 class AllEvents extends React.Component {
   constructor(props) {
@@ -331,31 +332,12 @@ class AllEvents extends React.Component {
       args: { page, params: JSON.stringify(arr), ...args },
     });
   };
-  handleFilterSubmit = (items) => {
-    let { auth, putEventsInRedux, allEvents } = this.props;
-    let url = getAdminApiEndpoint(auth, "/events");
-    const { columns } = this.state;
-    let arr = generateFilterParams(items, columns);
-    apiCall(url, {
-      params: JSON.stringify(arr),
-    }).then((res) => {
-      if (res && res.success) {
-        let filterData = getFilterData(
-          res.data,
-          allEvents && allEvents.items,
-          "id"
-        );
-        putEventsInRedux(filterData);
-      }
-    });
-  };
-
   render() {
     const title = brand.name + " - All Events";
     const description = brand.desc;
     const { columns } = this.state;
     const { classes } = this.props;
-    const { allEvents } = this.props;
+    const { allEvents, putEventsInRedux, auth } = this.props;
     const data = this.fashionData(allEvents.items || []);
     const metaData =this.props.allEvents && this.props.allEvents.meta;
 
@@ -381,20 +363,13 @@ class AllEvents extends React.Component {
       onSearchChange: (text) => console.log("==== Search Text ====", text),
       customFilterDialogFooter: (currentFilterList) => {
         return (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              marginTop: 10,
-            }}
-          >
-            <Button
-              variant="contained"
-              onClick={() => this.handleFilterSubmit(currentFilterList)}
-            >
-              Apply Filters
-            </Button>
-          </div>
+          <ApplyFilterButton
+            url={getAdminApiEndpoint(auth, "/events")}
+            reduxItems={allEvents}
+            updateReduxFunction={putEventsInRedux}
+            columns={columns}
+            filters={currentFilterList}
+          />
         );
       },
       customSort: this.customSort,

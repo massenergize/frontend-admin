@@ -12,7 +12,7 @@ import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
-import { Chip, Typography, Grid, Paper} from "@material-ui/core";
+import { Chip, Typography, Grid, Paper } from "@material-ui/core";
 import {
   loadTeamMessages,
   reduxToggleUniversalModal,
@@ -20,7 +20,8 @@ import {
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { makeAPICallForMoreData } from "../../../utils/helpers";
+import { generateFilterParams, makeAPICallForMoreData } from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 class AllTeamAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -60,7 +61,7 @@ class AllTeamAdminMessages extends React.Component {
       d.email || (d.user && d.user.email),
       d.community && d.community.name,
       d.team && d.team.name,
-      d.have_forwarded,
+      d.have_forwarded ? "Yes" : "No",
       d.id,
     ]);
   };
@@ -177,14 +178,16 @@ class AllTeamAdminMessages extends React.Component {
       </Typography>
     );
   }
-  callMoreData = (page) => {
+  callMoreData = (page, filterList, columns) => {
     let { putTeamMessagesInRedux, teamMessages } = this.props;
     var url = "/messages.listTeamAdminMessages";
+    let arr = generateFilterParams(filterList, columns);
     makeAPICallForMoreData({
       url,
       existing: teamMessages && teamMessages.items,
       updateRedux: putUsersInRedux,
-      page,putTeamMessagesInRedux
+      putTeamMessagesInRedux,
+      args: { page, params: JSON.stringify(arr) },
     });
   };
 
@@ -192,9 +195,10 @@ class AllTeamAdminMessages extends React.Component {
     const title = brand.name + " - Team Admin Messages";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes } = this.props;
-    const data = this.fashionData(this.props.teamMessages.items);
-    const metaData = this.props.teamMessages.meta;
+    const { classes, teamMessages, putTeamMessagesInRedux } = this.props;
+    const data = this.fashionData(teamMessages && teamMessages.items ||[]);
+
+    const metaData = teamMessages &&  teamMessages.meta;
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
@@ -205,9 +209,24 @@ class AllTeamAdminMessages extends React.Component {
       onTableChange: (action, tableState) => {
         if (action === "changePage") {
           if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(metaData.next);
+            this.callMoreData(
+              metaData.next,
+              tableState.filterList,
+              tableState.columns
+            );
           }
         }
+      },
+      customFilterDialogFooter: (currentFilterList) => {
+        return (
+          <ApplyFilterButton
+            url={"/messages.listTeamAdminMessages"}
+            reduxItems={teamMessages}
+            updateReduxFunction={putTeamMessagesInRedux}
+            columns={columns}
+            filters={currentFilterList}
+          />
+        );
       },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
