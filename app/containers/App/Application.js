@@ -298,7 +298,7 @@ class Application extends React.Component {
           />
           <Route path="/admin/read/event/:id/event-view" component={EventFullView} />
           <Route path="/admin/read/events" exact component={AllEvents} />
-          <Route path="/admin/read/events/others" exact component={EventsFromOthers} />
+          <Route path="/admin/read/events/event-sharing" exact component={EventsFromOthers} />
           <Route path="/admin/add/event" component={AddEvent} />
           <Route path="/admin/edit/:id/event" component={EditEvent} />
           <Route path="/admin/edit/:id/event-rsvps" component={EventRSVPs} />

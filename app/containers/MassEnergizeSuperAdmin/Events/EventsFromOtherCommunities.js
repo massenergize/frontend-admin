@@ -139,7 +139,7 @@ function EventsFromOtherCommunities({
         key: "full-view",
         options: {
           filter: false,
-          filterType: "multiselect",
+          delete: false,
           customBodyRender: (id) => (
             <Link to={`/admin/read/event/${id}/event-view?from=others`}>
               <CallMadeIcon size="small" variant="outlined" color="secondary" />
@@ -157,6 +157,7 @@ function EventsFromOtherCommunities({
     print: true,
     rowsPerPage: 25,
     rowsPerPageOptions: [10, 25, 100],
+    selectableRows: false,
   };
 
   const renderTable = ({ data, options }) => {
@@ -200,7 +201,7 @@ function EventsFromOtherCommunities({
           <small style={{ color: "grey" }}>
             The community list below does not include communities you manage.
             When you are done selecting your communities, click the{" "}
-            <b>"search"</b>
+            <b>"apply"</b>
             button below
           </small>
 
@@ -244,7 +245,7 @@ function EventsFromOtherCommunities({
                   style={{ marginRight: 5, color: "white" }}
                 />
               )}
-              {loading ? "Fetching..." : "Search"}
+              {loading ? "Fetching..." : "Apply"}
             </Button>
           </Tooltip>
         </div>
