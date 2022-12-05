@@ -10,6 +10,7 @@ import {
   Tabs,
   withStyles,
   withTheme,
+  Tooltip,
 } from "@material-ui/core";
 import { Typography } from "@material-ui/core";
 import React, { useState } from "react";
@@ -20,6 +21,8 @@ import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import { bindActionCreators } from "redux";
 import { reduxLoadAuthAdmin } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
+import { Snackbar } from "@material-ui/core";
+import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
 
 const CHECKBOX = "checkbox";
 const RADIO = "radio";
@@ -28,6 +31,9 @@ const LIST_OF_COMMUNITIES = "list-of-communities";
 
 function Preferences({ settings, auth, communities, updateAdminObject }) {
   const [currentTab, setCurrentTab] = useState(0);
+  const [notification, setNotification] = useState({});
+  const [changed, setChanged] = useState(false); // track if user makes any changes
+  const [newPrefrences, setNewPrefrences] = useState({});
 
   const adminNudgeSettings =
     ((auth && auth.preferences) || {}).admin_portal_settings || {};
@@ -39,7 +45,8 @@ function Preferences({ settings, auth, communities, updateAdminObject }) {
   const [categoryKey, { options }] = settingsCategories[currentTab];
   const optionsArray = Object.entries(options);
   var optionInUserSettings = adminNudgeSettings[categoryKey] || {};
-  const updateSettings = (data) => {
+
+  const trackChanges = (data) => {
     var newSettings = {
       ...adminNudgeSettings,
       [categoryKey]: data,
@@ -48,39 +55,66 @@ function Preferences({ settings, auth, communities, updateAdminObject }) {
       ...(auth.preferences || {}),
       admin_portal_settings: newSettings,
     };
+
     updateAdminObject({
       ...auth,
       preferences: newSettings,
     });
-    sendUpdatesToBackend(newSettings);
+    setNewPrefrences(newSettings);
+    setChanged(true);
+  };
+  const updateSettings = () => {
+    if (!Object.values(newPrefrences).length) return;
+    sendUpdatesToBackend(newPrefrences);
   };
 
   const sendUpdatesToBackend = (newSettings) => {
+    setNotification({});
     apiCall("/users.update", {
       preferences: JSON.stringify(newSettings),
       id: auth.id,
     })
       .then((response) => {
-        if (!response.success)
+        if (!response.success) {
+          setNotification({ open: true, bad: true, message: response.error });
           return console.log("Error updating user settings: ", response.error);
+        }
+        setNotification({ open: true, message: "Saved preference changes!" });
+        setChanged(false);
       })
-      .catch((e) =>
-        console.log("Error updating admin settings: ", e.toString())
-      );
+      .catch((e) => {
+        console.log("Error updating admin settings: ", e.toString());
+        setNotification({ open: true, bad: true, message: e.toString() });
+      });
   };
 
-  const respondToButton = (action) => {
+  const sendReportToAdmin = () => {
+    setNotification({});
     apiCall("/downloads.send_cadmin_report", {
       id: auth.id,
     })
-    .then((response) => {
-      if (!response.success)
-        return console.log("Error sending action to backend: ", response.error);
-    })
-    .catch((e) =>
-      console.log("Error sending action: ", e.toString())
-    );
-}
+      .then((response) => {
+        if (!response.success) {
+          setNotification({ open: true, bad: true, message: response.error });
+          return console.log(
+            "Error sending action to backend: ",
+            response.error
+          );
+        }
+
+        setNotification({
+          open: true,
+          message: "Sample report is sent to your email!",
+        });
+      })
+      .catch((e) => {
+        setNotification({ open: true, bad: true, message: e.toString() });
+        console.log("Error sending action: ", e.toString());
+      });
+  };
+  const functions = {
+    sendReportToAdmin,
+  };
 
   return (
     <div>
@@ -102,40 +136,57 @@ function Preferences({ settings, auth, communities, updateAdminObject }) {
           ))}
         </Tabs>
       </Paper>
-      <Paper style={{ marginTop: 10, padding: 40 }}>
-        {/* ---------------- SETTINGS OPTION DISPLAY LEVEL --------------- */}
-        {optionsArray.map(
-          ([optionKey, { live, text, explanation, type, values, expected_data_source }]) => {
-            const availableOptionsForCurrentLevel =
-              (optionInUserSettings || {})[optionKey] || {};
-            if (!live) return <></>;
-            const usesCheckboxes = type === CHECKBOX;
-            const usesRadioButtons = type === RADIO;
-            const usesButton = type === BUTTON;
-            if (usesButton) return (
-              <div>
-                <Button 
-                  variant="outlined"
-                  onClick={respondToButton}
-                >
-                  {text}
-                </Button>
-              </div>
-            );
+      <Paper>
+        <div style={{ marginTop: 10, padding: 40 }}>
+          {/* ---------------- SETTINGS OPTION DISPLAY LEVEL --------------- */}
+          {optionsArray.map(
+            ([
+              optionKey,
+              {
+                live,
+                text,
+                explanation,
+                type,
+                values,
+                expected_data_source,
+                function_key,
+              },
+            ]) => {
+              const availableOptionsForCurrentLevel =
+                (optionInUserSettings || {})[optionKey] || {};
+              if (!live) return <></>;
+              const usesCheckboxes = type === CHECKBOX;
+              const usesRadioButtons = type === RADIO;
+              const usesButton = type === BUTTON;
 
-            values = Object.entries(values);
-            console.log(explanation, usesCheckboxes, usesRadioButtons, values)
-            return (
-              <div key={optionKey}>
-                <Typography variant="p" style={{ fontWeight: "bold" }}>
-                  {text}
-                </Typography>              
-                <Typography variant="p">
-                  {explanation}
-                </Typography> 
+              if (usesButton)
+                return (
+                  <>
+                    <Button
+                      style={{ marginTop: 15 }}
+                      variant="outlined"
+                      onClick={() => {
+                        const func = functions[function_key];
+                        if (!func) return;
+                        func();
+                      }}
+                      color="primary"
+                    >
+                      {text}
+                    </Button>
+                  </>
+                );
 
-                {usesCheckboxes ? 
-                  (
+              values = Object.entries(values);
+
+              return (
+                <div key={optionKey}>
+                  <Typography variant="p" style={{ fontWeight: "bold" }}>
+                    {text}
+                  </Typography>
+                  <Typography variant="p">{explanation}</Typography>
+
+                  {usesCheckboxes ? (
                     <RenderCheckboxes
                       values={values}
                       expectedDataSource={expected_data_source}
@@ -144,17 +195,15 @@ function Preferences({ settings, auth, communities, updateAdminObject }) {
                       selectedItemsFromUserObj={availableOptionsForCurrentLevel}
                       userSettings={adminNudgeSettings}
                       updateSettings={(data) =>
-                        updateSettings({
+                        trackChanges({
                           ...optionInUserSettings,
                           [optionKey]: data,
                         })
                       }
                     />
-                  ): null
-                }
+                  ) : null}
 
-                {usesRadioButtons ? 
-                  (
+                  {usesRadioButtons ? (
                     <RenderRadioButtons
                       values={values}
                       auth={auth}
@@ -162,19 +211,67 @@ function Preferences({ settings, auth, communities, updateAdminObject }) {
                       userSettings={adminNudgeSettings}
                       optionLevelKey={optionKey}
                       updateSettings={(data) =>
-                        updateSettings({
+                        trackChanges({
                           ...optionInUserSettings,
                           [optionKey]: data,
-                        }) 
+                        })
                       }
                     />
-                  ): null
-                }
-              </div>
-            );
-          }
-        )}
+                  ) : null}
+                </div>
+              );
+            }
+          )}
+
+          <div style={{ marginTop: 15 }}>
+            <Button
+              disabled={!changed}
+              variant="contained"
+              color="secondary"
+              className="touchable-opacity"
+              onClick={() => updateSettings()}
+            >
+              <Tooltip title="Click to save all the changes you have made to your preferences">
+                <span> Save Changes</span>
+              </Tooltip>
+            </Button>
+          </div>
+        </div>
+
+        {/* WILL REMOVE WHEN APPROVED AND DEPLOYED */}
+        {/* <div style={{ background: "#fbfbfb", display: "flex" }}>
+          <Button
+            variant="contained"
+            color="secondary"
+            className="touchable-opacity"
+            style={{
+              borderRadius: 0,
+              padding: 10,
+              width: 200,
+              background: "#00BCD4",
+            }}
+          >
+            SAVE CHANGES
+          </Button>
+        </div> */}
       </Paper>
+
+      <Snackbar
+        open={notification.open}
+        style={{ marginBottom: 10 }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        autoHideDuration={6000}
+        onClose={() => setNotification({})}
+      >
+        <MySnackbarContentWrapper
+          variant={notification.bad ? "error" : "success"}
+          message={
+            <small style={{ marginLeft: 15, fontSize: 15 }}>
+              {notification.message}
+            </small>
+          }
+        />
+      </Snackbar>
     </div>
   );
 }
