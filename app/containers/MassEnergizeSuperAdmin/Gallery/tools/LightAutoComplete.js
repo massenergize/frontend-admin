@@ -221,7 +221,7 @@ function LightAutoComplete(props) {
                         alignItems: "center",
                       }}
                     >
-                      Reset
+                      Clear
                     </div>
                   ) : (
                     <></>
