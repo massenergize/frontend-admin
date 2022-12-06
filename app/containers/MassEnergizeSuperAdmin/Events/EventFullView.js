@@ -17,6 +17,7 @@ import {
 import EventShareModal from "./EventShareModal";
 import { IS_CANARY, IS_LOCAL, IS_PROD } from "../../../config/constants";
 import { dateFormatString } from "../Community/utils";
+import EditEventForm from "./EditEventForm";
 
 const open = {
   background: "#4faa4f",
@@ -80,20 +81,16 @@ function EventFullView(props) {
   const {
     name,
     community,
-    description,
-    featured_summary,
-    image,
     end_date_and_time,
     start_date_and_time,
     location,
     tags,
     publicity,
     communities_under_publicity,
-    is_published,
   } = event || {};
 
-  const publicityProps = PUBLICITY_PROPS[publicity] || {};
-  const tagString = (tags || []).map((t) => t.name).join(", ");
+  // const publicityProps = PUBLICITY_PROPS[publicity] || {};
+  // const tagString = (tags || []).map((t) => t.name).join(", ");
   const { address, city, state, zipcode, unit } = location || {};
   var id = match.params.id;
   id = id && id.toString();
@@ -334,18 +331,8 @@ function EventFullView(props) {
           </div>
         </div>
       </Paper>
-      {/* <Paper>
-        <iframe
-          src={makeURL(event)}
-          loading="lazy"
-          style={{
-            borderStyle: "none",
-            width: "100%",
-            height: "100%",
-            minHeight: "100vh",
-          }}
-        />
-      </Paper> */}
+
+      <EditEventForm match={{ params: { id: event && event.id } }} />
     </div>
   );
 }
