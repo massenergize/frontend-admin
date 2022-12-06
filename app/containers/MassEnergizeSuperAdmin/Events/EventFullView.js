@@ -150,7 +150,7 @@ function EventFullView(props) {
   }, [eventsInHeap]);
   // ---------------------------------------------------------------------------------------
   const checkIfAdminControlsEvent = (event, auth) => {
-    if (auth.is_super_admin && !auth.is_community_admin)
+    if (auth && auth.is_super_admin && !auth.is_community_admin)
       return setHasControl(true); // super admin always has control
 
     const coms = ((auth && auth.admin_at) || []).map((c) => c.id.toString());
@@ -272,7 +272,6 @@ function EventFullView(props) {
             }}
           >
             <Typography variant="h6" style={{ marginRight: 15, fontSize: 17 }}>
-         
               {dateFormatString(
                 new Date(start_date_and_time),
                 new Date(end_date_and_time)

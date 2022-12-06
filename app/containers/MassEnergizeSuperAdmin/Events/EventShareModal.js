@@ -1,7 +1,7 @@
 import { Checkbox, Tab, Tabs, Tooltip } from "@material-ui/core";
 import { Button, FormControlLabel, Typography } from "@material-ui/core";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ThemeModal from "../../../components/Widget/ThemeModal";
 import { fetchParamsFromURL } from "../../../utils/common";
 import { FROM } from "../../../utils/constants";
@@ -26,9 +26,8 @@ function EventShareModal({
   updateNormalEventListInRedux,
 }) {
   const [communitiesToShareTo, setCommunities] = useState([]); // Selected communities to share to
-  const [toShareTo, setRemainingToShareTo] = useState([]); // Its just like "communitiesToshareTo", but for the unShare Tab. (Cos we want the tab to remember selections for each)
+  const [changed, setChanged] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [currentTab, setCurrentTab] = useState(0);
 
   const isCommunityAdmin = auth && auth.is_community_admin;
   const isSuperAdmin = auth && auth.is_super_admin;
@@ -39,8 +38,12 @@ function EventShareModal({
     const rem = (list || []).filter((ev) => ev.id !== event.id);
     reduxFxn([event, ...rem]);
   };
-  const inSharingMode = currentTab === 0;
-  const inUnSharingMode = currentTab === 1;
+
+  useEffect(() => {
+    var sharedTo = (event || {}).shared_to || [];
+    const idsOfCommmunitiesSharedTo = sharedTo.map((com) => com.id);
+    setCommunities(idsOfCommmunitiesSharedTo);
+  }, [event]);
 
   /**
    * Uses the publicity status and allowed communities of an event
@@ -109,28 +112,13 @@ function EventShareModal({
     return { shareTo, unShare };
   };
 
-  const { shareTo, unShare } = groupTheOptions();
-
   /**
    * Sends a request to the backend to update the content
    */
   const sendApiRequest = () => {
-    const itsUnsharing = currentTab === 1;
     setLoading(true);
-    var list;
-    if (itsUnsharing) {
-      list = (unShare || []).filter((c) => !toShareTo.includes(c.id));
-      list = list.map((c) => c.id);
-    } else {
-      list = [...communitiesToShareTo, ...(unShare || []).map((c) => c.id)];
-      // return console.log("Herre we go innit", list);
-    }
-
-    // console.log("And this is the initial unshare", unShare)
-    // return console.log("Here is the list", list);
-
     apiCall("/events.update", {
-      shared_to: list,
+      shared_to: communitiesToShareTo,
       event_id: event.id,
     })
       .then((response) => {
@@ -138,8 +126,8 @@ function EventShareModal({
         if (!response.success)
           return console.log("SHARING_ERROR_BE:", response.error);
 
-        if (itsUnsharing) setRemainingToShareTo([]);
-        else setCommunities([]);
+        setCommunities([]);
+        setChanged(false);
 
         // Now we have the event object with updated "shared_to" field so
         updateEventInHeap(response.data);
@@ -152,7 +140,6 @@ function EventShareModal({
 
         // Means the admin is viewing an event from outside all their communities
         if (from === FROM.OTHER_EVENTS) {
-          console.log("Called in here innit");
           return replaceInRedux(
             response.data,
             otherEvents,
@@ -177,40 +164,6 @@ function EventShareModal({
     var rem = communities.filter((_id) => _id !== id);
     return rem;
   };
-
-  const numberOf = communitiesToShareTo.length;
-  const numberOfUnShare = toShareTo.length;
-
-  const buttonText = (numberOf) => {
-    const itsUnsharing = currentTab === 1;
-
-    if (!numberOf) return itsUnsharing ? "Unshare" : "Share";
-
-    if (itsUnsharing)
-      return ` Stop sharing to (${numberOf ? numberOf : ""}) ${
-        numberOf === 1 ? "community" : "communities"
-      }`;
-
-    return ` Share to (${numberOf ? numberOf : ""}) ${
-      numberOf === 1 ? "community" : "communities"
-    }`;
-  };
-
-  const tabs = {
-    0: (
-      <ShareWith
-        communities={shareTo}
-        addSelected={(id) => setCommunities(add(id, communitiesToShareTo))}
-      />
-    ),
-    1: (
-      <UnShare
-        communities={unShare}
-        addSelected={(id) => setRemainingToShareTo(add(id, toShareTo))}
-      />
-    ),
-  };
-  const component = tabs[currentTab];
 
   //   -------------------------------------------------------------------
 
@@ -256,31 +209,14 @@ function EventShareModal({
               overflowY: "scroll",
             }}
           >
-            <Tabs
-              onChange={(_, v) => setCurrentTab(v)}
-              value={currentTab}
-              variant="fullWidth"
-              indicatorColor="primary"
-              textColor="primary"
-              centered
-              style={{ width: "100%", borderRadius: 0 }}
-            >
-              <Tab
-                label={
-                  !shareTo.length
-                    ? "Share With"
-                    : `Share With (${shareTo.length})`
-                }
-                key={0}
-              />
-              <Tab
-                label={
-                  !unShare.length ? "Unshare" : `Unshare (${unShare.length})`
-                }
-                key={1}
-              />
-            </Tabs>
-            {component}
+            <ShareWith
+              selected={communitiesToShareTo}
+              communities={getAllowedCommunities()}
+              addSelected={(id) => {
+                setCommunities(add(id, communitiesToShareTo));
+                setChanged(true);
+              }}
+            />
           </div>
           {/* ----------- Footer -------------- */}
           <div
@@ -307,68 +243,31 @@ function EventShareModal({
               >
                 CLOSE
               </Button>
-              {inSharingMode && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  style={{
-                    borderRadius: 0,
 
-                    padding: "8px 25px",
-                    pointerEvents: "all",
-                    cursor: "pointer",
-                  }}
-                  disabled={!numberOf || loading}
-                  onClick={() => sendApiRequest()}
-                >
-                  {loading && (
-                    <i
-                      className="fa fa-spinner fa-spin"
-                      style={{ marginRight: 5, color: "white" }}
-                    />
-                  )}
-                  <Tooltip
-                    placement="top"
-                    title={!numberOf ? "Select communities to share to" : ""}
-                  >
-                    <span>{loading ? "Sharing..." : buttonText(numberOf)}</span>
-                  </Tooltip>
-                </Button>
-              )}
-              {inUnSharingMode && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  style={{
-                    borderRadius: 0,
+              <Button
+                variant="contained"
+                color="primary"
+                style={{
+                  borderRadius: 0,
 
-                    padding: "8px 25px",
-                    pointerEvents: "all",
-                    cursor: "pointer",
-                  }}
-                  disabled={!numberOfUnShare || loading}
-                  onClick={() => sendApiRequest()}
-                >
-                  {loading && (
-                    <i
-                      className="fa fa-spinner fa-spin"
-                      style={{ marginRight: 5, color: "white" }}
-                    />
-                  )}
-                  <Tooltip
-                    placement="top"
-                    title={
-                      !numberOfUnShare
-                        ? "Select communities that you dont want to share this event with anymore"
-                        : ""
-                    }
-                  >
-                    <span>
-                      {loading ? "Sharing..." : buttonText(numberOfUnShare)}
-                    </span>
-                  </Tooltip>
-                </Button>
-              )}
+                  padding: "8px 25px",
+                  pointerEvents: "all",
+                  cursor: "pointer",
+                }}
+                disabled={!changed}
+                onClick={() => sendApiRequest()}
+              >
+                {loading && (
+                  <i
+                    className="fa fa-spinner fa-spin"
+                    style={{ marginRight: 5, color: "white" }}
+                  />
+                )}
+                <Tooltip placement="top" title="Save sharing Changes">
+                  <span>{loading ? "Saving Changes..." : "Apply"}</span>
+                </Tooltip>
+              </Button>
+              {/* )} */}
             </div>
           </div>
         </div>
@@ -379,7 +278,7 @@ function EventShareModal({
 
 export default EventShareModal;
 
-const ShareWith = ({ communities, addSelected }) => {
+const ShareWith = ({ communities, addSelected, selected }) => {
   if (!communities || !communities.length) {
     return (
       <Typography
@@ -398,7 +297,12 @@ const ShareWith = ({ communities, addSelected }) => {
       <div style={{ width: "50%" }} key={index.toString()}>
         <FormControlLabel
           key={index.toString()}
-          control={<Checkbox onChange={(e) => addSelected(comm.id)} />}
+          control={
+            <Checkbox
+              onChange={(e) => addSelected(comm.id)}
+              checked={selected.includes(comm.id)}
+            />
+          }
           label={comm.name}
         />
       </div>
