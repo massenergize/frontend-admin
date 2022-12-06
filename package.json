@@ -145,7 +145,7 @@
     "moment-timezone": "^0.5.35",
     "mui-datatables": "^2.15.0",
     "prop-types": "15.7.2",
-    "qs": "^6.10.2",
+    "qs": "^6.10.3",
     "rcolor": "^1.0.1",
     "react": "16.8.6",
     "react-anchor-link-smooth-scroll": "^1.0.12",
