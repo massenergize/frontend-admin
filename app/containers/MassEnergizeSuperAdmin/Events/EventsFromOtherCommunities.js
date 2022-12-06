@@ -212,6 +212,7 @@ function EventsFromOtherCommunities({
             labelExtractor={(it) => it.name}
             valueExtractor={(it) => it.id}
             onChange={(items) => setCommunities(items)}
+            multiple
           />
           <FormControlLabel
             control={
