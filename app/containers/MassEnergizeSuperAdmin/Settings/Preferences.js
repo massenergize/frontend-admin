@@ -90,7 +90,7 @@ function Preferences({ settings, auth, communities, updateAdminObject }) {
 
   const sendReportToAdmin = () => {
     setNotification({});
-    apiCall("/downloads.send_cadmin_report", {
+    apiCall("/downloads.cadmin_report", {
       id: auth.id,
     })
       .then((response) => {
