@@ -49,6 +49,10 @@ const styles = (theme) => {
     chips: {
       margin: "2px",
     },
+    option: {
+      textDecoration: "underline",
+      cursor: "pointer",
+    },
   };
 };
 
@@ -201,31 +205,32 @@ function LightAutoComplete(props) {
               {multiple && !thereAreNoOptionsToDisplay && (
                 <div>
                   <div
-                    className={classes.dropdownItem}
-                    onClick={() => allOrNothing({ data: optionsToDisplay })}
                     style={{
                       display: "flex",
                       flexDirection: "row",
                       alignItems: "center",
+                      padding: 16,
                     }}
                   >
-                    Select All
-                  </div>
-                  {userHasSelectedStuff ? (
-                    <div
-                      className={classes.dropdownItem}
-                      onClick={() => allOrNothing({ nothing: true })}
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                      }}
+                    <span
+                      onClick={() => allOrNothing({ data: optionsToDisplay })}
+                      className={`${classes.option} touchable-opacity`}
+                      style={{ marginRight: 15 }}
                     >
-                      Clear
-                    </div>
-                  ) : (
-                    <></>
-                  )}
+                      {" "}
+                      Select All
+                    </span>{" "}
+                    {userHasSelectedStuff ? (
+                      <span
+                        className={`${classes.option} touchable-opacity`}
+                        onClick={() => allOrNothing({ nothing: true })}
+                      >
+                        Clear
+                      </span>
+                    ) : (
+                      <></>
+                    )}
+                  </div>
                   <hr style={{ margin: 0 }} />
                 </div>
               )}

@@ -7,7 +7,7 @@ import {
   Tooltip,
   Typography,
 } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
 import { apiCall } from "../../../utils/messenger";
@@ -26,17 +26,22 @@ function EventsFromOtherCommunities({
 }) {
   const [loading, setLoading] = useState(false);
   const { communities, exclude } = state || {};
+  const [mounted, setMounted] = useState(false);
 
   const setCommunities = (communities) => {
     putStateInRedux({ ...(state || {}), communities });
   };
-  const setExclude = (exclude) => {
-    putStateInRedux({ ...(state || {}), exclude });
-  };
+  // const setExclude = (exclude) => {
+  //   putStateInRedux({ ...(state || {}), exclude });
+  // };
 
-  const fetchOtherEvents = () => {
-    const ids = (communities || []).map((it) => it.id);
-    // return console.log("What are the coms",communities, otherCommunities);
+  useEffect(() => {
+    setCommunities(otherCommunities);
+    fetchOtherEvents(otherCommunities);
+  }, []);
+
+  const fetchOtherEvents = (passedComms = []) => {
+    const ids = (passedComms || communities || []).map((it) => it.id);
 
     setLoading(true);
     apiCall("/events.others.listForCommunityAdmin", {
@@ -171,9 +176,18 @@ function EventsFromOtherCommunities({
     if (!data.length)
       return (
         <Paper style={{ padding: "15px 25px" }}>
-          {" "}
-          No open events are available for your list of communities. Select
-          other ones
+          {mounted ? (
+            <span>
+              {" "}
+              No open events are available for your list of communities. Select
+              other ones
+            </span>
+          ) : (
+            <span>
+              When you select communities and <b>"Apply"</b>, events will show
+              here..
+            </span>
+          )}
         </Paper>
       );
     return (
@@ -214,7 +228,7 @@ function EventsFromOtherCommunities({
             onChange={(items) => setCommunities(items)}
             multiple
           />
-          <FormControlLabel
+          {/* <FormControlLabel
             control={
               <Checkbox
                 checked={exclude}
@@ -222,7 +236,7 @@ function EventsFromOtherCommunities({
               />
             }
             label="Exclude events from communities I have selected"
-          />
+          /> */}
         </div>
         <div style={{ background: "#fbfbfb" }}>
           <Tooltip
@@ -230,7 +244,10 @@ function EventsFromOtherCommunities({
             title="Click this button to find events from the communities you have selected above "
           >
             <Button
-              onClick={() => fetchOtherEvents()}
+              onClick={() => {
+                fetchOtherEvents();
+                setMounted(true);
+              }}
               disabled={!(communities || []).length || loading}
               variant="contained"
               color="secondary"

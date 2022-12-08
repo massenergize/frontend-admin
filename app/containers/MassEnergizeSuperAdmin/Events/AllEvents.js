@@ -209,13 +209,13 @@ class AllEvents extends React.Component {
               >
                 <FileCopy size="small" variant="outlined" color="secondary" />
               </Link>
-              <Link to={`/admin/read/event/${id}/event-view?from=main`}>
+              {/* <Link to={`/admin/read/event/${id}/event-view?from=main`}>
                 <CallMadeIcon
                   size="small"
                   variant="outlined"
                   color="secondary"
                 />
-              </Link>
+              </Link> */}
             </div>
           ),
         },
