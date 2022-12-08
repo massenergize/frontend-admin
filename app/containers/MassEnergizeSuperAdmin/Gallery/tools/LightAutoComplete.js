@@ -142,7 +142,6 @@ function LightAutoComplete(props) {
     return height;
   };
   const onlyValues = selected.map((itm) => getValue(itm));
-  console.log("hre only values", onlyValues);
   const thereAreNoOptionsToDisplay = optionsToDisplay.length === 0;
   const userHasSelectedStuff = selected.length;
 
