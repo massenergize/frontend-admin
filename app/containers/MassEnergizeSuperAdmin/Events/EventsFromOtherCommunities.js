@@ -25,37 +25,13 @@ function EventsFromOtherCommunities({
   putStateInRedux,
 }) {
   const [loading, setLoading] = useState(false);
-  const { communities, exclude } = state || {};
-  const [mounted, setMounted] = useState(false);
+  const { communities, exclude, mounted } = state || {};
 
   const setCommunities = (communities) => {
     putStateInRedux({ ...(state || {}), communities });
   };
-  // const setExclude = (exclude) => {
-  //   putStateInRedux({ ...(state || {}), exclude });
-  // };
-
-  useEffect(() => {
-    setCommunities(otherCommunities);
-    fetchOtherEvents(otherCommunities);
-  }, []);
-
-  const fetchOtherEvents = (passedComms = []) => {
-    const ids = (passedComms || communities || []).map((it) => it.id);
-
-    setLoading(true);
-    apiCall("/events.others.listForCommunityAdmin", {
-      community_ids: ids,
-      exclude: exclude || false,
-    })
-      .then((response) => {
-        setLoading(false);
-        if (response.success) return putOtherEventsInRedux(response.data);
-      })
-      .catch((e) => {
-        setLoading(false);
-        console.log("OTHER_EVENTS_BE_ERROR:", e.toString());
-      });
+  const setMounted = (mounted) => {
+    putStateInRedux({ ...(state || {}), mounted });
   };
 
   const fashionData = (data) => {
@@ -75,6 +51,33 @@ function EventsFromOtherCommunities({
       d.id,
     ]);
     return fashioned;
+  };
+  const data = fashionData(otherEvents || []);
+
+  useEffect(() => {
+    if (!mounted) {
+      // First time the page loads, Preselect all communities
+      setCommunities(otherCommunities);
+      // fetchOtherEvents(otherCommunities);  // Uncheck if we want to automatically load in events from all the preselected communities as well
+    }
+  }, [otherCommunities]);
+
+  const fetchOtherEvents = (passedComms = []) => {
+    const ids = (passedComms || communities || []).map((it) => it.id);
+
+    setLoading(true);
+    apiCall("/events.others.listForCommunityAdmin", {
+      community_ids: ids,
+      exclude: exclude || false,
+    })
+      .then((response) => {
+        setLoading(false);
+        if (response.success) return putOtherEventsInRedux(response.data);
+      })
+      .catch((e) => {
+        setLoading(false);
+        console.log("OTHER_EVENTS_BE_ERROR:", e.toString());
+      });
   };
 
   const makeColumns = () => {
@@ -155,7 +158,6 @@ function EventsFromOtherCommunities({
     ];
   };
 
-  const data = fashionData(otherEvents || []);
   const options = {
     filterType: "dropdown",
     responsive: "stacked",
@@ -213,7 +215,6 @@ function EventsFromOtherCommunities({
           </Typography>
 
           <small style={{ color: "grey" }}>
-            The community list below does not include communities you manage.
             When you are done selecting your communities, click the{" "}
             <b>"apply"</b>
             button below
@@ -245,7 +246,7 @@ function EventsFromOtherCommunities({
           >
             <Button
               onClick={() => {
-                fetchOtherEvents();
+                fetchOtherEvents(null);
                 setMounted(true);
               }}
               disabled={!(communities || []).length || loading}

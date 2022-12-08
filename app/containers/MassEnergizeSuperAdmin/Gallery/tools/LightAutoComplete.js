@@ -128,7 +128,6 @@ function LightAutoComplete(props) {
     setOptionsToDisplay(filtered);
   };
 
-  console.log("Here is the selected", selected);
   useEffect(() => mount(), []);
 
   useEffect(() => {
