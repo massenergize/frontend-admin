@@ -66,8 +66,8 @@ module.exports = [
       },
       {
         key: "other-communities",
-        name: "Events - Select Communities",
-        link: "/admin/read/events/others",
+        name: "Share Events from Other Communities",
+        link: "/admin/read/events/event-sharing",
       },
     ],
   },
@@ -206,10 +206,16 @@ module.exports = [
       },
     ],
   },
-  //{
-  //  key: "settings",
-  //  name: "Settings",
-  //  icon: "md-cog",
-  //  link: "/admin/profile/settings"
-  //},
+  {
+    key: "settings",
+    name: "Settings",
+    icon: "md-cog",
+    child: [
+      {
+        key: "settings-page",
+        link: "/admin/profile/preferences",
+        name: "Communication preferences",
+      },
+    ],
+  },
 ];
