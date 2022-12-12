@@ -14,8 +14,8 @@ export const FeatureFlags = loadable(
     fallback: <Loading />,
   }
 );
-export const Settings = loadable(
-  () => import("./MassEnergizeSuperAdmin/Settings/Settings"),
+export const Preferences = loadable(
+  () => import("./MassEnergizeSuperAdmin/Settings/Preferences"),
   {
     fallback: <Loading />,
   }

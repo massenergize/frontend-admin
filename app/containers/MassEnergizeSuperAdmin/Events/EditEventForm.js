@@ -10,7 +10,9 @@ import MassEnergizeForm from "../_FormGenerator";
 import Typography from "@material-ui/core/Typography";
 import { checkIfReadOnly, getSelectedIds } from "../Actions/EditActionForm";
 import { bindActionCreators } from "redux";
-import { reduxUpdateHeap } from "../../../redux/redux-actions/adminActions";
+import {
+  reduxUpdateHeap,
+} from "../../../redux/redux-actions/adminActions";
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 const styles = (theme) => ({
@@ -79,6 +81,13 @@ export const makeTagSection = ({
   return section;
 };
 
+// const findEventFromBackend = ({ id, reduxFxn }) => {
+//   apiCall("events.info", { event_id: id })
+//     .then((response) => {
+//       console.log("LEts see the response", response);
+//     })
+//     .catch((e) => console.log("ERROR ", id));
+// };
 class EditEventForm extends Component {
   constructor(props) {
     super(props);
@@ -100,12 +109,17 @@ class EditEventForm extends Component {
       exceptions,
       location,
       otherCommunities,
+      eventsInHeap,
     } = props;
     const { id } = match.params;
+
     var { rescheduledEvent } = state;
 
+  
     rescheduledEvent = exceptions[id] || rescheduledEvent;
-    const event = (events || []).find((e) => e.id.toString() === id.toString());
+    var event = (events || []).find((e) => e.id.toString() === id.toString());
+    if (!event) event = (eventsInHeap || {})[id];
+
     const readOnly = checkIfReadOnly(event, auth);
     const thereIsNothingInEventsExceptionsList = rescheduledEvent === null;
 
@@ -225,7 +239,7 @@ class EditEventForm extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const heap = state.heap;
+  const heap = state.getIn(["heap"]);
   return {
     auth: state.getIn(["auth"]),
     community: state.getIn(["selected_community"]),
@@ -235,6 +249,7 @@ const mapStateToProps = (state) => {
     heap: state.getIn(["heap"]),
     exceptions: (heap && heap.exceptions) || {},
     otherCommunities: state.getIn(["otherCommunities"]),
+    eventsInHeap: (heap || {}).eventsInHeap ||{},
   };
 };
 
@@ -804,6 +819,16 @@ const createFormJson = ({
         isRequired: false,
         defaultValue: "" + event.archive,
         dbName: "archive",
+        readOnly: false,
+        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+      },
+      {
+        name: "is_approved",
+        label: "Do you approve this event?",
+        fieldType: "Radio",
+        isRequired: false,
+        defaultValue: "" + event.is_approved,
+        dbName: "is_approved",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
       },

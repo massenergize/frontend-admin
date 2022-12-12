@@ -68,7 +68,7 @@ import {
   AddToGallery,
   AddTask,
   ListTasks,
-  Settings,
+  Preferences,
   FeatureFlags,
   EventFullView,
   EventsFromOthers,
@@ -219,12 +219,8 @@ class Application extends React.Component {
           {user.is_super_admin && superAdminSpecialRoutes}
 
           <Route exact path="/blank" component={BlankPage} />
-          <Route exact path="/admin/profile/settings" component={Settings} />
-          <Route
-            exact
-            path="/admin/settings/feature-flags"
-            component={FeatureFlags}
-          />
+          <Route exact path="/admin/profile/preferences" component={Preferences} />
+          <Route exact path="/admin/settings/feature-flags" component={FeatureFlags} />
           <Route path="/admin/read/users" component={UsersList} />
           <Route
             path="/admin/read/community-admin-messages"
@@ -310,7 +306,7 @@ class Application extends React.Component {
           />
           <Route path="/admin/read/event/:id/event-view" component={EventFullView} />
           <Route path="/admin/read/events" exact component={AllEvents} />
-          <Route path="/admin/read/events/others" exact component={EventsFromOthers} />
+          <Route path="/admin/read/events/event-sharing" exact component={EventsFromOthers} />
           <Route path="/admin/add/event" component={AddEvent} />
           <Route path="/admin/edit/:id/event" component={EditEvent} />
           <Route path="/admin/edit/:id/event-rsvps" component={EventRSVPs} />

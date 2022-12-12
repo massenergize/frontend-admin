@@ -599,6 +599,16 @@ const createFormJson = ({
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
       },
       {
+        name: "is_approved",
+        label: "Do you approve this event?",
+        fieldType: "Radio",
+        isRequired: false,
+        defaultValue: "true",
+        dbName: "is_approved",
+        readOnly: false,
+        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+      },
+      {
         name: "is_published",
         label: "Should this event Go Live?",
         fieldType: "Radio",
