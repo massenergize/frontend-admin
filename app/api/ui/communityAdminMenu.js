@@ -61,8 +61,13 @@ module.exports = [
       },
       {
         key: "all-events",
-        name: "All Events & Campaigns",
+        name: "Events - My Community",
         link: "/admin/read/events",
+      },
+      {
+        key: "other-communities",
+        name: "Share Events from Other Communities",
+        link: "/admin/read/events/event-sharing",
       },
     ],
   },
@@ -201,10 +206,16 @@ module.exports = [
       },
     ],
   },
-  //{
-  //  key: "settings",
-  //  name: "Settings",
-  //  icon: "md-cog",
-  //  link: "/admin/profile/settings"
-  //},
+  {
+    key: "settings",
+    name: "Settings",
+    icon: "md-cog",
+    child: [
+      {
+        key: "settings-page",
+        link: "/admin/profile/preferences",
+        name: "Communication preferences",
+      },
+    ],
+  },
 ];
