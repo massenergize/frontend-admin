@@ -33,14 +33,13 @@ function MassEnergizeForm(props) {
     return temp;
   };
   useEffect(() => {
-    // console.log("PROGRESS FROM OUTSIDE", progress);
     const inflatedWithProgress = {
       ...formJson,
       fields: insertProgress(formJson.fields, progress),
     };
-    console.log("PROGRESS:", progress);
-    console.log("THIS IS FORMJSON: ", formJson);
-    console.log("AFTER INFLATION", inflatedWithProgress);
+    // console.log("PROGRESS:", progress);
+    // console.log("THIS IS FORMJSON: ", formJson);
+    // console.log("AFTER INFLATION", inflatedWithProgress);
     setJson(inflatedWithProgress);
   }, [formJson, progress]);
 
@@ -62,6 +61,8 @@ function MassEnergizeForm(props) {
     });
     removePageProgressFromStorage(pageKey);
   };
+
+  if (!json.fields) return <></>;
 
   return (
     <FormGenerator
