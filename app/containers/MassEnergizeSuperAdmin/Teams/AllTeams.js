@@ -37,6 +37,7 @@ import {
   generateFilterParams,
   getAdminApiEndpoint,
   makeAPICallForMoreData,
+  onTableStateChange,
 } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 
@@ -290,17 +291,6 @@ class AllTeams extends React.Component {
       </Typography>
     );
   }
-  callMoreData = (page, filterList, columns) => {
-    let { putTeamsInRedux, allTeams, auth } = this.props;
-    let arr = generateFilterParams(filterList, columns);
-    let url = getAdminApiEndpoint(auth, "/teams");
-    makeAPICallForMoreData({
-      url,
-      existing: allTeams && allTeams.items,
-      updateRedux: putTeamsInRedux,
-      args: { page, params: JSON.stringify(arr) },
-    });
-  };
   customSort(data, colIndex, order) {
     const isComparingLive = colIndex === 5;
     const sortForLive = ({ a, b }) => (a.isLive && !b.isLive ? -1 : 1);
@@ -326,18 +316,17 @@ class AllTeams extends React.Component {
       rowsPerPage: 25,
       count: metaData && metaData.count,
       rowsPerPageOptions: [10, 25, 100],
-      onTableChange: (action, tableState) => {
-        if (action === "changePage") {
-          if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(
-              metaData.next,
-              tableState.filterList,
-              tableState.columns
-            );
-          }
-        }
-      },
-      // confirmFilters: true,
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putTeamsInRedux,
+          reduxItems: allTeams,
+          auth,
+          baseApiUrl:"/teams"
+        }),
       customFilterDialogFooter: (currentFilterList) => {
         return (
           <ApplyFilterButton
