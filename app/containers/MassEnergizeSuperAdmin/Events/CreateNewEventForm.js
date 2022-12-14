@@ -49,7 +49,7 @@ class CreateNewEventForm extends Component {
     const { communities, tags, auth } = props;
 
     const readyToRenderPageFirstTime =
-      communities && communities.length && tags && tags.length && auth;
+      communities &&communities.items&& communities.items.length && tags &&tags.items && tags.items.length && auth;
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderPageFirstTime || state.mounted;

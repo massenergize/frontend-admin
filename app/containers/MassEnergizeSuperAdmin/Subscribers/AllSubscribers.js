@@ -17,7 +17,8 @@ import {
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { makeAPICallForMoreData } from "../../../utils/helpers";
+import { generateFilterParams, getAdminApiEndpoint, makeAPICallForMoreData } from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 
 class AllSubscribers extends React.Component {
   constructor(props) {
@@ -121,10 +122,12 @@ class AllSubscribers extends React.Component {
       ids.push(found);
       apiCall("/subscribers.delete", { subscriber_id: found });
     });
-    const rem = (itemsInRedux && itemsInRedux.items || []).filter((com) => !ids.includes(com.id));
+    const rem = ((itemsInRedux && itemsInRedux.items) || []).filter(
+      (com) => !ids.includes(com.id)
+    );
     putSubscribersInRedux({
       items: rem,
-      meta:itemsInRedux.meta
+      meta: itemsInRedux.meta,
     });
   }
 
@@ -138,24 +141,23 @@ class AllSubscribers extends React.Component {
       </Typography>
     );
   }
-  callMoreData = (page) => {
+  callMoreData = (page, filterList, columns) => {
     let { auth, putSubscribersInRedux, subscribers } = this.props;
-    var url;
-    if (auth.is_super_admin) url ="/subscribers.listForSuperAdmin";
-    else if (auth.is_community_admin) url ="/subscribers.listForCommunityAdmin";
-     makeAPICallForMoreData({
-       url,
-       existing: subscribers && subscribers.items,
-       updateRedux: putSubscribersInRedux,
-       page,
-     });
+    let arr = generateFilterParams(filterList, columns);
+    let url = getAdminApiEndpoint(auth, "/subscribers");
+    makeAPICallForMoreData({
+      url,
+      existing: subscribers && subscribers.items,
+      updateRedux: putSubscribersInRedux,
+      args: { page, params: JSON.stringify(arr) },
+    });
   };
 
   render() {
     const title = brand.name + " - All Subscribers";
     const description = brand.desc;
     const { columns, dataFiltered } = this.state;
-    const { classes, subscribers } = this.props;
+    const { classes, subscribers, putSubscribersInRedux, auth } = this.props;
     const data = this.fashionData((subscribers && subscribers.items) || []);
     let metaData = subscribers && subscribers.meta;
 
@@ -166,10 +168,27 @@ class AllSubscribers extends React.Component {
       count: metaData && metaData.count,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
+      onSearchChange: (text) => console.log("==== Search Text ====", text),
+      customFilterDialogFooter: (currentFilterList) => {
+        return (
+          <ApplyFilterButton
+            url={getAdminApiEndpoint(auth, "/subscribers")}
+            reduxItems={subscribers}
+            updateReduxFunction={putSubscribersInRedux}
+            columns={columns}
+            filters={currentFilterList}
+          />
+        );
+      },
       onTableChange: (action, tableState) => {
         if (action === "changePage") {
           if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(metaData.next);
+            this.callMoreData(
+              metaData.next,
+              tableState.filterList,
+              tableState.columns
+            );
           }
         }
       },

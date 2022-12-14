@@ -76,6 +76,7 @@ function METable(props) {
    * @param {*} filter 
    */
   const saveSelectedFilters = (filter) => {
+    console.log("=== filter ====", filter)
     localStorage.setItem(page.key + FILTERS, JSON.stringify(filter));
   };
 

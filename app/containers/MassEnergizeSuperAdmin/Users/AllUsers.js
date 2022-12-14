@@ -16,7 +16,8 @@ import { getHumanFriendlyDate, smartString } from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { makeAPICallForMoreData } from "../../../utils/helpers";
+import { generateFilterParams, getAdminApiEndpoint, makeAPICallForMoreData } from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 
 class AllUsers extends React.Component {
   constructor(props) {
@@ -134,18 +135,22 @@ class AllUsers extends React.Component {
       </Typography>
     );
   }
-  callMoreData = (page) => {
+  callMoreData = (page, filterList, columns) => {
     let { auth, putUsersInRedux, allUsers } = this.props;
-    var url;
-    if (auth.is_super_admin) url = "/users.listForSuperAdmin";
-    else if (auth.is_community_admin) url = "/users.listForCommunityAdmin";
-    makeAPICallForMoreData({ url, existing: allUsers && allUsers.items,updateRedux: putUsersInRedux, page });
+        let arr = generateFilterParams(filterList, columns);
+        let url = getAdminApiEndpoint(auth, "/users");
+    makeAPICallForMoreData({
+      url,
+      existing: allUsers && allUsers.items,
+      updateRedux: putUsersInRedux,
+      args: { page, params: JSON.stringify(arr) },
+    });
   };
   render() {
     const title = brand.name + " - Users";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, allUsers } = this.props;
+    const { classes, allUsers, putUsersInRedux, auth } = this.props;
     const data = this.fashionData((allUsers && allUsers.items) || []);
     const metaData = allUsers && allUsers.meta;
     const options = {
@@ -155,12 +160,25 @@ class AllUsers extends React.Component {
       count: metaData && metaData.count,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
-      onTableChange: (action, tableState) => {
+     onTableChange: (action, tableState) => {
         if (action === "changePage") {
           if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(metaData.next);
+            this.callMoreData(metaData.next,tableState.filterList,tableState.columns);
           }
         }
+      },
+      confirmFilters: true,
+      onSearchChange:(text)=> console.log("==== Search Text ====", text),
+      customFilterDialogFooter: (currentFilterList) => {
+        return (
+          <ApplyFilterButton
+            url={getAdminApiEndpoint(auth, "/users")}
+            reduxItems={allUsers}
+            updateReduxFunction={putUsersInRedux}
+            columns={columns}
+            filters={currentFilterList}
+          />
+        );
       },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;

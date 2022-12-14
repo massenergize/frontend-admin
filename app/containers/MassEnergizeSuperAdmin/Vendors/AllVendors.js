@@ -24,7 +24,12 @@ import { smartString } from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { makeAPICallForMoreData } from "../../../utils/helpers";
+import {
+  generateFilterParams,
+  getAdminApiEndpoint,
+  makeAPICallForMoreData,
+} from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 
 class AllVendors extends React.Component {
   constructor(props) {
@@ -101,7 +106,7 @@ class AllVendors extends React.Component {
       name: "Image",
       key: "image",
       options: {
-        sort:false,
+        sort: false,
         filter: false,
         download: false,
         customBodyRender: (d) => (
@@ -207,16 +212,15 @@ class AllVendors extends React.Component {
       </Typography>
     );
   }
-  callMoreData = (page) => {
-    let { auth, putVendorsInRedux, allVendors} = this.props;
-    var url;
-    if (auth.is_super_admin) url = "/vendors.listForSuperAdmin";
-    else if (auth.is_community_admin) url = "/vendors.listForCommunityAdmin";
+  callMoreData = (page, filterList, columns) => {
+    let { auth, putVendorsInRedux, allVendors } = this.props;
+    let arr = generateFilterParams(filterList, columns);
+    let url = getAdminApiEndpoint(auth, "/vendors");
     makeAPICallForMoreData({
       url,
       existing: allVendors && allVendors.items,
       updateRedux: putVendorsInRedux,
-      page,
+      args: { page, params: JSON.stringify(arr) },
     });
   };
 
@@ -224,7 +228,7 @@ class AllVendors extends React.Component {
     const title = brand.name + " - All Vendors";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, allVendors } = this.props;
+    const { classes, allVendors, putVendorsInRedux, auth } = this.props;
     const data = this.fashionData((allVendors && allVendors.items) || []);
     const metaData = allVendors && allVendors.meta;
 
@@ -238,9 +242,26 @@ class AllVendors extends React.Component {
       onTableChange: (action, tableState) => {
         if (action === "changePage") {
           if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(metaData.next);
+            this.callMoreData(
+              metaData.next,
+              tableState.filterList,
+              tableState.columns
+            );
           }
         }
+      },
+      confirmFilters: true,
+      onSearchChange: (text) => console.log("==== Search Text ====", text),
+      customFilterDialogFooter: (currentFilterList) => {
+        return (
+          <ApplyFilterButton
+            url={getAdminApiEndpoint(auth, "/vendors")}
+            reduxItems={allVendors}
+            updateReduxFunction={putVendorsInRedux}
+            columns={columns}
+            filters={currentFilterList}
+          />
+        );
       },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;

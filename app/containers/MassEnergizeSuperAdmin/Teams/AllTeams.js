@@ -337,6 +337,7 @@ class AllTeams extends React.Component {
           }
         }
       },
+      // confirmFilters: true,
       customFilterDialogFooter: (currentFilterList) => {
         return (
           <ApplyFilterButton

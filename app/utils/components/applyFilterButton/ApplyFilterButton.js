@@ -5,7 +5,8 @@ import { apiCall } from "../../messenger";
 
 export default function ApplyFilterButton({ url, reduxItems, updateReduxFunction, columns, filters }) {
   const handleFilterSubmit = () => {
-    let arr = generateFilterParams(filters, columns);
+    let newFilters = [...filters]
+    let arr = generateFilterParams(newFilters, columns);
     apiCall(url, {
       params: JSON.stringify(arr),
     }).then((res) => {

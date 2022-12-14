@@ -31,7 +31,8 @@ import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { makeAPICallForMoreData } from "../../../utils/helpers";
+import { generateFilterParams, getAdminApiEndpoint, makeAPICallForMoreData } from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 
 class AllTestimonials extends React.Component {
   constructor(props) {
@@ -89,15 +90,16 @@ class AllTestimonials extends React.Component {
 
   updateTestimonials = (data) => {
     let allTestimonials = this.props.allTestimonials;
-    const index = (allTestimonials.items||[]).findIndex((a) => a.id === data.id);
-    const updateItems = (
-      (allTestimonials.items) ||
-      []
-    ).filter((a) => a.id !== data.id);
+    const index = (allTestimonials.items || []).findIndex(
+      (a) => a.id === data.id
+    );
+    const updateItems = (allTestimonials.items || []).filter(
+      (a) => a.id !== data.id
+    );
     updateItems.splice(index, 0, data);
     this.props.putTestimonialsInRedux({
       items: updateItems,
-      meta:allTestimonials.meta
+      meta: allTestimonials.meta,
     });
   };
 
@@ -250,15 +252,15 @@ class AllTestimonials extends React.Component {
   }
 
   makeLiveOrNot(item) {
-    const {putTestimonialsInRedux, allTestimonials} = this.props
-    const data = allTestimonials.items || []
+    const { putTestimonialsInRedux, allTestimonials } = this.props;
+    const data = allTestimonials.items || [];
     const status = item.is_published;
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
     putTestimonialsInRedux({
       items: [...data],
-      meta:allTestimonials.meta
+      meta: allTestimonials.meta,
     });
     const community = item.community;
     apiCall("/testimonials.update", {
@@ -283,7 +285,7 @@ class AllTestimonials extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { allTestimonials, putTestimonialsInRedux } = this.props;
-    const itemsInRedux = allTestimonials.items||[];
+    const itemsInRedux = allTestimonials.items || [];
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
@@ -321,16 +323,15 @@ class AllTestimonials extends React.Component {
 
     return Intl.DateTimeFormat("en-US", options).format(newDate);
   };
-  callMoreData = (page) => {
-    let { auth, putTestimonialsInRedux,allTestimonials } = this.props;
-    var url;
-    if (auth.is_super_admin) url = "/testimonials.listForSuperAdmin";
-    else if (auth.is_community_admin) url = "/testimonials.listForCommunityAdmin";
+  callMoreData = (page, filterList, columns) => {
+    let { auth, putTestimonialsInRedux, allTestimonials } = this.props;
+    let url = getAdminApiEndpoint(auth, "/testimonials");
+    let arr = generateFilterParams(filterList, columns);
     makeAPICallForMoreData({
       url,
       existing: allTestimonials && allTestimonials.items,
       updateRedux: putTestimonialsInRedux,
-      page,
+      args: { page, params: JSON.stringify(arr) },
     });
   };
   customSort(data, colIndex, order) {
@@ -352,7 +353,12 @@ class AllTestimonials extends React.Component {
     const title = brand.name + " - All Testimonials";
     const description = brand.desc;
     const { columns, loading } = this.state;
-    const { classes, allTestimonials } = this.props;
+    const {
+      classes,
+      allTestimonials,
+      auth,
+      putTestimonialsInRedux,
+    } = this.props;
     const data = this.fashionData(
       (allTestimonials && allTestimonials.items) || []
     );
@@ -367,9 +373,26 @@ class AllTestimonials extends React.Component {
       onTableChange: (action, tableState) => {
         if (action === "changePage") {
           if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(metaData.next);
+            this.callMoreData(
+              metaData.next,
+              tableState.filterList,
+              tableState.columns
+            );
           }
         }
+      },
+      confirmFilters: true,
+      onSearchChange: (text) => console.log("==== Search Text ====", text),
+      customFilterDialogFooter: (currentFilterList) => {
+        return (
+          <ApplyFilterButton
+            url={getAdminApiEndpoint(auth, "/testimonials")}
+            reduxItems={allTestimonials}
+            updateReduxFunction={putTestimonialsInRedux}
+            columns={columns}
+            filters={currentFilterList}
+          />
+        );
       },
       customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {
