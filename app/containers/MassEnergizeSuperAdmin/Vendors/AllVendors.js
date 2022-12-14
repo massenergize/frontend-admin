@@ -28,6 +28,7 @@ import {
   generateFilterParams,
   getAdminApiEndpoint,
   makeAPICallForMoreData,
+  onTableStateChange,
 } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 
@@ -212,18 +213,6 @@ class AllVendors extends React.Component {
       </Typography>
     );
   }
-  callMoreData = (page, filterList, columns) => {
-    let { auth, putVendorsInRedux, allVendors } = this.props;
-    let arr = generateFilterParams(filterList, columns);
-    let url = getAdminApiEndpoint(auth, "/vendors");
-    makeAPICallForMoreData({
-      url,
-      existing: allVendors && allVendors.items,
-      updateRedux: putVendorsInRedux,
-      args: { page, params: JSON.stringify(arr) },
-    });
-  };
-
   render() {
     const title = brand.name + " - All Vendors";
     const description = brand.desc;
@@ -239,18 +228,17 @@ class AllVendors extends React.Component {
       rowsPerPage: 25,
       count: metaData && metaData.count,
       rowsPerPageOptions: [10, 25, 100],
-      onTableChange: (action, tableState) => {
-        if (action === "changePage") {
-          if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(
-              metaData.next,
-              tableState.filterList,
-              tableState.columns
-            );
-          }
-        }
-      },
-      confirmFilters: true,
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putVendorsInRedux,
+          reduxItems: allVendors,
+          apiUrl: getAdminApiEndpoint(auth, "/vendors"),
+        }),
+      // confirmFilters: true,
       onSearchChange: (text) => console.log("==== Search Text ====", text),
       customFilterDialogFooter: (currentFilterList) => {
         return (

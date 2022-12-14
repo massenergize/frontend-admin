@@ -20,7 +20,7 @@ import { Chip } from "@material-ui/core";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { generateFilterParams, makeAPICallForMoreData } from "../../../utils/helpers";
+import { generateFilterParams, makeAPICallForMoreData, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 class AllCommunityAdminMessages extends React.Component {
   constructor(props) {
@@ -164,17 +164,6 @@ class AllCommunityAdminMessages extends React.Component {
       </Typography>
     );
   }
-  callMoreData = (page, filterList, columns) => {
-    let { putMessagesInRedux, messages } = this.props;
-    var url = "/messages.listForCommunityAdmin";
-    let arr = generateFilterParams(filterList, columns);
-    makeAPICallForMoreData({
-      url,
-      existing: messages && messages.items,
-      updateRedux: putMessagesInRedux,
-      args: { page, params: JSON.stringify(arr) },
-    });
-  };
 
   render() {
     const title = brand.name + " - Community Admin Messages";
@@ -190,25 +179,24 @@ class AllCommunityAdminMessages extends React.Component {
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
-      onTableChange: (action, tableState) => {
-        if (action === "changePage") {
-          if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(
-              metaData.next,
-              tableState.filterList,
-              tableState.columns
-            );
-          }
-        }
-      },
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putMessagesInRedux,
+          reduxItems: messages,
+          apiUrl: "/messages.listForCommunityAdmin",
+        }),
       customFilterDialogFooter: (currentFilterList) => {
         return (
-          <ApplyFilterButton 
-          url={"/messages.listForCommunityAdmin"}
-          reduxItems={messages}
-          updateReduxFunction={putMessagesInRedux}
-          columns={columns}
-          filters={currentFilterList}
+          <ApplyFilterButton
+            url={"/messages.listForCommunityAdmin"}
+            reduxItems={messages}
+            updateReduxFunction={putMessagesInRedux}
+            columns={columns}
+            filters={currentFilterList}
           />
         );
       },

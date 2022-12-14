@@ -4,7 +4,6 @@ import { withStyles } from "@material-ui/core/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 
-import MUIDataTable from "mui-datatables";
 import CallMadeIcon from "@material-ui/icons/CallMade";
 import EditIcon from "@material-ui/icons/Edit";
 import { Link } from "react-router-dom";
@@ -26,7 +25,8 @@ import { Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import { makeAPICallForMoreData } from "../../../utils/helpers";
+import { getAdminApiEndpoint, onTableStateChange } from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 
 class AllCommunities extends React.Component {
   constructor(props) {
@@ -252,27 +252,14 @@ class AllCommunities extends React.Component {
       </Typography>
     );
   }
-  callMoreData = (page) => {
-    let { auth, putCommunitiesInRedux, communities } = this.props;
-    var url;
-    if (auth.is_super_admin) url = "/communities.listForSuperAdmin";
-    else if (auth.is_community_admin)
-      url = "/communities.listForCommunityAdmin";
-    makeAPICallForMoreData({
-      url,
-      existing: communities && communities.items,
-      updateRedux: putCommunitiesInRedux,
-      page,
-    });
-  };
 
   render() {
     const title = brand.name + " - All Communities";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, toggleDeleteConfirmation } = this.props;
-    const data = this.fashionData(this.props.communities.items || []);
-    const metaData = this.props.communities.meta;
+    const { classes, toggleDeleteConfirmation, communities, putCommunitiesInRedux, auth } = this.props;
+    const data = this.fashionData(communities && communities.items || []);
+    const metaData = communities && communities.meta;
     const options = {
       filterType: "dropdown",
       responsive: "stacked",
@@ -290,12 +277,28 @@ class AllCommunities extends React.Component {
         });
         return false;
       },
-      onTableChange: (action, tableState) => {
-        if (action === "changePage") {
-          if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(metaData.next);
-          }
-        }
+      confirmFilters: true,
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putCommunitiesInRedux,
+          reduxItems: communities,
+          apiUrl: getAdminApiEndpoint(auth, "/communities"),
+        }),
+      onSearchChange: (text) => console.log("==== Search Text ====", text),
+      customFilterDialogFooter: (currentFilterList) => {
+        return (
+          <ApplyFilterButton
+            url={getAdminApiEndpoint(auth, "/communities")}
+            reduxItems={communities}
+            updateReduxFunction={putCommunitiesInRedux}
+            columns={columns}
+            filters={currentFilterList}
+          />
+        );
       },
     };
 

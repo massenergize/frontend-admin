@@ -324,8 +324,7 @@ class AllTeams extends React.Component {
           metaData,
           updateReduxFunction: putTeamsInRedux,
           reduxItems: allTeams,
-          auth,
-          baseApiUrl:"/teams"
+          apiUrl: getAdminApiEndpoint(auth, "/teams"),
         }),
       customFilterDialogFooter: (currentFilterList) => {
         return (

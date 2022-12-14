@@ -44,7 +44,7 @@ import {
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import { generateFilterParams, getAdminApiEndpoint, getFilterData, makeAPICallForMoreData } from "../../../utils/helpers";
+import { generateFilterParams, getAdminApiEndpoint, getFilterData, makeAPICallForMoreData, onTableStateChange } from "../../../utils/helpers";
 import actions from "redux-form/lib/actions";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 
@@ -406,18 +406,6 @@ class AllActions extends React.Component {
     return data.sort((a, b) => ourCustomSort({ ...params, a, b }));
   }
 
-  callMoreData = (page, filterList, columns) => {
-    let { auth, putActionsInRedux, allActions } = this.props;
-    let arr = generateFilterParams(filterList, columns);
-    let url = getAdminApiEndpoint(auth, "/actions")
-    makeAPICallForMoreData({
-      url,
-      existing: allActions && allActions.items,
-      updateRedux: putActionsInRedux,
-      args: { page, params: JSON.stringify(arr) },
-    });
-  };
-
   render() {
     const title = brand.name + " - All Actions";
     const description = brand.desc;
@@ -463,15 +451,18 @@ class AllActions extends React.Component {
       rowsPerPage: 25,
       count: metaData.count,
       rowsPerPageOptions: [10, 25, 100],
-      onTableChange: (action, tableState) => {
-        if (action === "changePage") {
-          if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(metaData.next,tableState.filterList,tableState.columns);
-          }
-        }
-      },
-      confirmFilters: true,
-      onSearchChange:(text)=> console.log("==== Search Text ====", text),
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putActionsInRedux,
+          reduxItems: allActions,
+          apiUrl: getAdminApiEndpoint(auth, "/actions"),
+        }),
+      // confirmFilters: true,
+      onSearchChange: (text) => console.log("==== Search Text ====", text),
       customFilterDialogFooter: (currentFilterList) => {
         return (
           <ApplyFilterButton
@@ -499,7 +490,8 @@ class AllActions extends React.Component {
             noTemplates: noTemplatesSelectedGoAhead,
           }),
           onConfirm: () =>
-            noTemplatesSelectedGoAhead && this.nowDelete({ idsToDelete, data }),
+            noTemplatesSelectedGoAhead &&
+            this.nowDelete({ idsToDelete, data }),
           closeAfterConfirmation: true,
           cancelText: noTemplatesSelectedGoAhead
             ? "No"

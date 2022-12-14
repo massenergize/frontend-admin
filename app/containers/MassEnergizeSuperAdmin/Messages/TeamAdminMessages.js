@@ -20,7 +20,7 @@ import {
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { generateFilterParams, makeAPICallForMoreData } from "../../../utils/helpers";
+import { generateFilterParams, makeAPICallForMoreData, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 class AllTeamAdminMessages extends React.Component {
   constructor(props) {
@@ -178,19 +178,6 @@ class AllTeamAdminMessages extends React.Component {
       </Typography>
     );
   }
-  callMoreData = (page, filterList, columns) => {
-    let { putTeamMessagesInRedux, teamMessages } = this.props;
-    var url = "/messages.listTeamAdminMessages";
-    let arr = generateFilterParams(filterList, columns);
-    makeAPICallForMoreData({
-      url,
-      existing: teamMessages && teamMessages.items,
-      updateRedux: putUsersInRedux,
-      putTeamMessagesInRedux,
-      args: { page, params: JSON.stringify(arr) },
-    });
-  };
-
   render() {
     const title = brand.name + " - Team Admin Messages";
     const description = brand.desc;
@@ -206,17 +193,16 @@ class AllTeamAdminMessages extends React.Component {
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
-      onTableChange: (action, tableState) => {
-        if (action === "changePage") {
-          if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(
-              metaData.next,
-              tableState.filterList,
-              tableState.columns
-            );
-          }
-        }
-      },
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putTeamMessagesInRedux,
+          reduxItems: teamMessages,
+          apiUrl: "/messages.listTeamAdminMessages",
+        }),
       customFilterDialogFooter: (currentFilterList) => {
         return (
           <ApplyFilterButton

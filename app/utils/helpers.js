@@ -1,12 +1,12 @@
 import { apiCall } from "./messenger";
 
 export const makeAPICallForMoreData = ({
-  url,
+  apiUrl,
   existing,
   updateRedux,
   args,
 }) => {
-  apiCall(url, args).then((res) => {
+  apiCall(apiUrl, args).then((res) => {
     if (res.success) {
       let items = [...existing];
       let newList = items.concat(res.data.items);
@@ -54,13 +54,11 @@ const callMoreData = (
   columns,
   updateReduxFunction,
   reduxItems,
-  auth,
-  baseApiUrl
+  apiUrl
 ) => {
   let arr = generateFilterParams(filterList, columns);
-  let url = getAdminApiEndpoint(auth, baseApiUrl);
   makeAPICallForMoreData({
-    url,
+    apiUrl,
     existing: reduxItems && reduxItems.items,
     updateRedux: updateReduxFunction,
     args: { page, params: JSON.stringify(arr) },
@@ -74,8 +72,7 @@ export const onTableStateChange = ({
   metaData,
   updateReduxFunction,
   reduxItems,
-  auth,
-  baseApiUrl
+  apiUrl
 }) => {
   if (action === "changePage") {
     if (tableState.rowsPerPage * tableState.page === tableData.length) {
@@ -85,8 +82,7 @@ export const onTableStateChange = ({
         tableState.columns,
         updateReduxFunction,
         reduxItems,
-        auth,
-        baseApiUrl
+        apiUrl
       );
     }
   }

@@ -31,7 +31,7 @@ import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { generateFilterParams, getAdminApiEndpoint, makeAPICallForMoreData } from "../../../utils/helpers";
+import { generateFilterParams, getAdminApiEndpoint, makeAPICallForMoreData, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 
 class AllTestimonials extends React.Component {
@@ -323,17 +323,7 @@ class AllTestimonials extends React.Component {
 
     return Intl.DateTimeFormat("en-US", options).format(newDate);
   };
-  callMoreData = (page, filterList, columns) => {
-    let { auth, putTestimonialsInRedux, allTestimonials } = this.props;
-    let url = getAdminApiEndpoint(auth, "/testimonials");
-    let arr = generateFilterParams(filterList, columns);
-    makeAPICallForMoreData({
-      url,
-      existing: allTestimonials && allTestimonials.items,
-      updateRedux: putTestimonialsInRedux,
-      args: { page, params: JSON.stringify(arr) },
-    });
-  };
+
   customSort(data, colIndex, order) {
     const isComparingLive = colIndex === 5;
     const isComparingRank = colIndex === 3;
@@ -370,18 +360,17 @@ class AllTestimonials extends React.Component {
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
-      onTableChange: (action, tableState) => {
-        if (action === "changePage") {
-          if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(
-              metaData.next,
-              tableState.filterList,
-              tableState.columns
-            );
-          }
-        }
-      },
-      confirmFilters: true,
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putTestimonialsInRedux,
+          reduxItems: allTestimonials,
+          apiUrl: getAdminApiEndpoint(auth, "/testimonials"),
+        }),
+      // confirmFilters: true,
       onSearchChange: (text) => console.log("==== Search Text ====", text),
       customFilterDialogFooter: (currentFilterList) => {
         return (

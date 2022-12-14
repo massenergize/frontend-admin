@@ -73,48 +73,6 @@ class AddRemoveSuperAdmin extends Component {
     }
 
     if (state.mounted) return null;
-
-
-  // createFormJson = async () => {
-  //   const { pathname } = window.location;
-  //   const formJson = {
-  //     title: "Add New Super Admin",
-  //     subTitle: "",
-  //     method: "/admins.super.add",
-  //     successRedirectPage: pathname,
-  //     fields: [
-  //       {
-  //         label: "About this Admin",
-  //         fieldType: "Section",
-  //         children: [
-  //           {
-  //             name: "name",
-  //             label: "Name",
-  //             placeholder: "eg. Grace Tsu",
-  //             fieldType: "TextField",
-  //             contentType: "text",
-  //             isRequired: true,
-  //             defaultValue: "",
-  //             dbName: "name",
-  //             readOnly: false,
-  //           },
-  //           {
-  //             name: "email",
-  //             label: "Email",
-  //             placeholder: "eg. johny.appleseed@gmail.com",
-  //             fieldType: "TextField",
-  //             contentType: "text",
-  //             isRequired: true,
-  //             defaultValue: "",
-  //             dbName: "email",
-  //             readOnly: false,
-  //           },
-  //         ],
-  //       },
-  //     ],
-  //   };
-  //   return formJson;
-  // };
     return {
       formJson: createFormJson(),
       mounted: true,
@@ -172,14 +130,14 @@ class AddRemoveSuperAdmin extends Component {
       page: page,
     }).then((res) => {
       if (res && res.data) {
-        let existing = [...data];
-        const preparedData = prepareTableData(res.data.items);
-        let newList = existing.concat(preparedData);
-        const meta = res.data.meta;
-        this.setState({
-          data: newList,
-          meta: meta,
-        });
+        // let existing = [...data];
+        // const preparedData = prepareTableData(res.data.items);
+        // let newList = existing.concat(preparedData);
+        // const meta = res.data.meta;
+        // this.setState({
+        //   data: newList,
+        //   meta: meta,
+        // });
       }
     });
   };

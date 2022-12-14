@@ -39,6 +39,7 @@ import {
   getAdminApiEndpoint,
   getFilterData,
   makeAPICallForMoreData,
+  onTableStateChange,
 } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 
@@ -316,22 +317,7 @@ class AllEvents extends React.Component {
       meta: allEvents.meta,
     });
   }
-  callMoreData = (page, filterList, columns) => {
-    let { auth, putEventsInRedux, allEvents, community } = this.props;
-    const isSuperAdmin = auth.is_super_admin;
-    let url = getAdminApiEndpoint(auth, "/events");
-    let args = isSuperAdmin
-      ? {}
-      : { community_id: community.id || auth.admin_at[0].id };
-    let arr = generateFilterParams(filterList, columns);
-
-    makeAPICallForMoreData({
-      url,
-      existing: allEvents && allEvents.items,
-      updateRedux: putEventsInRedux,
-      args: { page, params: JSON.stringify(arr), ...args },
-    });
-  };
+  
   render() {
     const title = brand.name + " - All Events";
     const description = brand.desc;
@@ -348,18 +334,17 @@ class AllEvents extends React.Component {
       rowsPerPage: 25,
       count: allEvents && allEvents.meta && allEvents.meta.count,
       rowsPerPageOptions: [10, 25, 100],
-      onTableChange: (action, tableState) => {
-        if (action === "changePage") {
-          if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(
-              metaData.next,
-              tableState.filterList,
-              tableState.columns
-            );
-          }
-        }
-      },
-      confirmFilters: true,
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putEventsInRedux,
+          reduxItems: allEvents,
+          apiUrl: getAdminApiEndpoint(auth, "/events"),
+        }),
+      // confirmFilters: true,
       onSearchChange: (text) => console.log("==== Search Text ====", text),
       customFilterDialogFooter: (currentFilterList) => {
         return (
@@ -393,7 +378,8 @@ class AllEvents extends React.Component {
             noTemplates: noTemplatesSelectedGoAhead,
           }),
           onConfirm: () =>
-            noTemplatesSelectedGoAhead && this.nowDelete({ idsToDelete, data }),
+            noTemplatesSelectedGoAhead &&
+            this.nowDelete({ idsToDelete, data }),
           closeAfterConfirmation: true,
           cancelText: noTemplatesSelectedGoAhead
             ? "No"
