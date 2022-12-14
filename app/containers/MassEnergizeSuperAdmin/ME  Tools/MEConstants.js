@@ -19,6 +19,7 @@ export const PAGE_KEYS = {
     CREATE_EVENT : { key:"CREATE_EVENT"},
     CREATE_TEAM : { key:"CREATE_TEAM"},
     CREATE_VENDOR : { key:"CREATE_VENDOR"},
+    PLACEHOLDER_PAGE : { key:"PLACEHOLDER_KEY"},
   
 }
 

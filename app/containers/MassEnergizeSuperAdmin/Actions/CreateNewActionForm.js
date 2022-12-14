@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import { apiCall } from "../../../utils/messenger";
-import MassEnergizeForm from "../_FormGenerator";
+// import MassEnergizeForm from "../_FormGenerator";
 import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
 import { checkIfReadOnly, makeTagSection } from "./EditActionForm";
@@ -10,10 +10,9 @@ import fieldTypes from "../_FormGenerator/fieldTypes";
 import { bindActionCreators } from "redux";
 import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
-import {
-  removePageProgressFromStorage,
-} from "../../../utils/common";
+import { removePageProgressFromStorage } from "../../../utils/common";
 import { withRouter } from "react-router-dom";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -145,8 +144,9 @@ class CreateNewActionForm extends Component {
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
-          unMount={this.preserveFormData.bind(this)}
-          clearProgress={this.clearProgress.bind(this)}
+          pageKey={PAGE_KEYS.CREATE_ACTION.key}
+          // unMount={this.preserveFormData.bind(this)}
+          // clearProgress={this.clearProgress.bind(this)}
           enableCancel
         />
       </div>
@@ -211,7 +211,7 @@ const createFormJson = ({
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: progress.title || "",
+            // defaultValue: progress.title || "",
             dbName: "title",
             readOnly: false,
             maxLength: 40,
@@ -224,7 +224,7 @@ const createFormJson = ({
             fieldType: "TextField",
             contentType: "number",
             isRequired: true,
-            defaultValue: progress.rank || "",
+            // defaultValue: progress.rank || "",
             dbName: "rank",
             readOnly: false,
           },
@@ -234,7 +234,7 @@ const createFormJson = ({
                 label: "Is this Action a Template?",
                 fieldType: "Radio",
                 isRequired: false,
-                defaultValue: progress.is_global || "false",
+                // defaultValue: progress.is_global || "false",
                 dbName: "is_global",
                 readOnly: false,
                 data: [
@@ -248,7 +248,7 @@ const createFormJson = ({
                       name: "community",
                       label: "Primary Community (select one)",
                       fieldType: "Dropdown",
-                      defaultValue: progress.community || null,
+                      // defaultValue: progress.community || null,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
                       isRequired: true,
@@ -260,7 +260,8 @@ const createFormJson = ({
                 name: "community",
                 label: "Primary Community (select one)",
                 fieldType: "Dropdown",
-                defaultValue: progress.community || communities[0].id, // for a cadmin default to first of their communities.  Need one.
+                // defaultValue: progress.community || communities[0].id, // for a cadmin default to first of their communities.  Need one.
+                defaultValue: communities[0].id, // for a cadmin default to first of their communities.  Need one.
                 dbName: "community_id",
                 data: [{ displayName: "--", id: "" }, ...communities],
                 isRequired: true,
@@ -278,7 +279,7 @@ const createFormJson = ({
             label: "Calculator Action",
             placeholder: "eg. Wayland",
             fieldType: "Dropdown",
-            defaultValue: progress.calculator_action || null,
+            // defaultValue: progress.calculator_action || null,
             dbName: "calculator_action",
             data: [{ displayName: "--", id: "" }, ...ccActions],
             modalTitle: "Carbon Action List & Instructions",
@@ -294,7 +295,7 @@ const createFormJson = ({
         fieldType: "TextField",
         isMulti: true,
         isRequired: true,
-        defaultValue: progress.featured_summary || null,
+        // defaultValue: progress.featured_summary || null,
         dbName: "featured_summary",
       },
       {
@@ -303,7 +304,7 @@ const createFormJson = ({
         placeholder: "Key information people should know about the action",
         fieldType: "HTMLField",
         isRequired: true,
-        defaultValue: progress.about || null,
+        // defaultValue: progress.about || null,
         dbName: "about",
       },
       {
@@ -312,7 +313,7 @@ const createFormJson = ({
         placeholder: "Easy to follow steps to accomplish the action",
         fieldType: "HTMLField",
         isRequired: false,
-        defaultValue: progress.steps_to_take || null,
+        // defaultValue: progress.steps_to_take || null,
         dbName: "steps_to_take",
       },
       {
@@ -321,7 +322,7 @@ const createFormJson = ({
         placeholder: "Further information some users might want to know",
         fieldType: "HTMLField",
         isRequired: false,
-        defaultValue: progress.deep_dive || null,
+        // defaultValue: progress.deep_dive || null,
         dbName: "deep_dive",
       },
       {
@@ -329,7 +330,7 @@ const createFormJson = ({
         label: "Select which vendors provide services for this action",
         fieldType: "Checkbox",
         selectMany: true,
-        defaultValue: progress.vendors || null,
+        // defaultValue: progress.vendors || null,
         dbName: "vendors",
         data: vendors,
       },
@@ -340,8 +341,8 @@ const createFormJson = ({
         dbName: "image",
         label: "Upload Files",
         isRequired: false,
-        selected: progress.image || [],
-        defaultValue: progress.image || [],
+        // selected: progress.image || [],
+        // defaultValue: progress.image || [],
         openState: autoOpenMediaLibrary,
         filesLimit: 1,
       },
@@ -350,7 +351,7 @@ const createFormJson = ({
         label: "Should this action go live?",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: progress.is_published || "false",
+        // defaultValue: progress.is_published || "false",
         dbName: "is_published",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
