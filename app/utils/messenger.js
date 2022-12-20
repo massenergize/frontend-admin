@@ -59,18 +59,29 @@ export async function apiCall(
   });
 
   try {
-    const json = await response.json();
-    if (relocationPage && json && json.success) {
-      window.location.href = relocationPage;
-    } else if (!json.success) {
-      if (json.error === SESSION_EXPIRED || 
-          json.error === PERMISSION_DENIED) {
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+      const json = await response.json();
+      if (relocationPage && json && json.success) {
+        window.location.href = relocationPage;
+      } else if (!json.success) {
+        if (json.error === SESSION_EXPIRED || 
+            json.error === PERMISSION_DENIED) {
+          window.location.href = '/login';
+        } else if (json !== 'undefined') {
+          console.log(destinationUrl, json);
+        }
+      }
+      return json;  
+    }
+    else {
+      // if API returns "Forbidden" assume need to sign in
+      const responseTxt = await response.text();
+      if (responseTxt && responseTxt.indexOf("403 Forbidden") !== -1) {
         window.location.href = '/login';
-      } else if (json !== 'undefined') {
-        console.log(destinationUrl, json);
+        return console.log(destinationUrl, "Forbidden response");
       }
     }
-    return json;
   } catch (error) {
     const errorText = error.toString();
     if (errorText.search("JSON")>-1) {
