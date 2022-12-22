@@ -717,7 +717,9 @@ export const reduxCallCommunities = () => (dispatch) => {
     if (graphResponse.data) {
       dispatch(reduxLoadGraphData(graphResponse.data));
     }
-    dispatch(reduxLoadAdminActivities(activities && activities.data));
+    if (activities && activities.data) {
+      dispatch(reduxLoadAdminActivities(activities.data));
+    }
   });
 };
 
