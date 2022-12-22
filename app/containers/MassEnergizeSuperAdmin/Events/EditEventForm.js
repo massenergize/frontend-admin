@@ -205,7 +205,7 @@ class EditEventForm extends Component {
     if (!formJson) return <Loading />;
     return (
       <div>
-        {event.rsvp_enabled ? (
+        {!readOnly && event.rsvp_enabled ? (
           <Paper style={{ padding: 20, marginBottom: 15 }}>
             <Typography>
               Would you like to see a list of users who have RSVP-ed for this
