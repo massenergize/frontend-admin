@@ -33,6 +33,7 @@ function METable(props) {
    */
   const retrieveFiltersFromLastVisit = (columns) => {
     const properties = getProperties();
+    console.log("==== properties from getting filters ====", properties)
     var filterObj = localStorage.getItem(page.key + FILTERS);
     filterObj = JSON.parse(filterObj || null) || {};
     Object.keys(filterObj).forEach((indexOfColumn) => {
@@ -76,7 +77,7 @@ function METable(props) {
    * @param {*} filter 
    */
   const saveSelectedFilters = (filter) => {
-    console.log("=== filter ====", filter)
+    console.log("==== filters =====", filter)
     localStorage.setItem(page.key + FILTERS, JSON.stringify(filter));
   };
 
@@ -105,6 +106,7 @@ function METable(props) {
     const { columns } = tableProps || {};
     const columnIndex = columns.findIndex((c) => c.name === column);
     const obj = filterObject.current;
+    console.log("======= columnIndex ======", columnIndex);
     if (columnIndex === -1) return;
     var filter = obj[columnIndex] || {};
     filter = { name: column, type, list: filterList[columnIndex] };

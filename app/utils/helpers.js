@@ -19,7 +19,8 @@ export const makeAPICallForMoreData = ({
 };
 
 export const generateFilterParams = (items, columns) => {
-  return items
+  let filterItems = [...items]
+  return filterItems
     .map((item, index) => {
       return {
         name: columns[index].name,

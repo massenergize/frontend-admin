@@ -203,7 +203,7 @@ class AllTeamAdminMessages extends React.Component {
           reduxItems: teamMessages,
           apiUrl: "/messages.listTeamAdminMessages",
         }),
-      customFilterDialogFooter: (currentFilterList) => {
+        customFilterDialogFooter: (currentFilterList) => {
         return (
           <ApplyFilterButton
             url={"/messages.listTeamAdminMessages"}
@@ -214,6 +214,9 @@ class AllTeamAdminMessages extends React.Component {
           />
         );
       },
+      // customSearchRender: (searchText, handleSearch, hideSearch, options) =>{
+      //   return <input placeholder="yexy..." />
+      // },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({

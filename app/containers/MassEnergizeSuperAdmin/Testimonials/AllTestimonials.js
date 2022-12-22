@@ -370,8 +370,6 @@ class AllTestimonials extends React.Component {
           reduxItems: allTestimonials,
           apiUrl: getAdminApiEndpoint(auth, "/testimonials"),
         }),
-      // confirmFilters: true,
-      onSearchChange: (text) => console.log("==== Search Text ====", text),
       customFilterDialogFooter: (currentFilterList) => {
         return (
           <ApplyFilterButton
