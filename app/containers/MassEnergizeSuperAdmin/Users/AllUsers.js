@@ -18,6 +18,7 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import { generateFilterParams, getAdminApiEndpoint, makeAPICallForMoreData, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
 class AllUsers extends React.Component {
   constructor(props) {
@@ -158,9 +159,23 @@ class AllUsers extends React.Component {
           updateReduxFunction: putUsersInRedux,
           reduxItems: allUsers,
           apiUrl: getAdminApiEndpoint(auth, "/users"),
+          pageProp: PAGE_PROPERTIES.ALL_USERS,
         }),
-      // confirmFilters: true,
-      onSearchChange: (text) => console.log("==== Search Text ====", text),
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
+        <SearchBar
+          url={getAdminApiEndpoint(auth, "/users")}
+          reduxItems={allUsers}
+          updateReduxFunction={putUsersInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_USERS}
+        />
+      ),
       customFilterDialogFooter: (currentFilterList) => {
         return (
           <ApplyFilterButton
