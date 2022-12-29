@@ -46,10 +46,19 @@ class CreateNewEventForm extends Component {
   }
 
   static getDerivedStateFromProps = (props, state) => {
-    const { communities, tags, auth } = props;
+    const { communities, tags, auth, otherCommunities } = props;
 
     const readyToRenderPageFirstTime =
-      communities &&communities.items&& communities.items.length && tags &&tags.items && tags.items.length && auth;
+      communities &&
+      communities.items &&
+      communities.items.length &&
+      tags &&
+      tags.items &&
+      tags.items.length &&
+      auth &&
+      otherCommunities &&
+      otherCommunities.items &&
+      otherCommunities.length;;
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderPageFirstTime || state.mounted;
@@ -64,6 +73,7 @@ class CreateNewEventForm extends Component {
     const formJson = createFormJson({
       communities: coms,
       auth,
+      otherCommunities,
     });
 
     const section = makeTagSection({ collections: tags.items, defaults: false });
@@ -102,6 +112,7 @@ const mapStateToProps = (state) => {
     tags: state.getIn(["allTags"]),
     communities: state.getIn(["communities"]),
     auth: state.getIn(["auth"]),
+    otherCommunities: state.getIn(["otherCommunities"]),
   };
 };
 
@@ -120,18 +131,19 @@ const validator = (cleaned) => {
   ];
 };
 
-const whenStartDateChanges = ({
-  newValue,
-  formData,
-  setValueInForm,
-}) => {
+const whenStartDateChanges = ({ newValue, formData, setValueInForm }) => {
   formData = formData || {};
   const newEnd = moment(newValue).add(1, "hours");
   setValueInForm({ start_date_and_time: newValue, end_date_and_time: newEnd });
 };
 
-const createFormJson = ({ communities, auth }) => {
+const createFormJson = ({ communities, auth, otherCommunities }) => {
   const is_super_admin = auth && auth.is_super_admin;
+  otherCommunities = otherCommunities || [];
+  const otherCommunityList = otherCommunities.map((c) => ({
+    displayName: c.name,
+    id: c.id.toString(),
+  }));
   const formJson = {
     title: "Create New Event or Campaign",
     subTitle: "",
@@ -201,6 +213,7 @@ const createFormJson = ({ communities, auth }) => {
             minDate: moment().startOf("hour"),
             readOnly: false,
           },
+
           {
             name: "is_recurring",
             label: "Make this a recurring event",
@@ -312,7 +325,7 @@ const createFormJson = ({ communities, auth }) => {
                       defaultValue: null,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
-                      isRequired:true,
+                      isRequired: true,
                     },
                   ],
                 },
@@ -324,8 +337,68 @@ const createFormJson = ({ communities, auth }) => {
                 defaultValue: communities[0] && communities[0].id,
                 dbName: "community_id",
                 data: [{ displayName: "--", id: "" }, ...communities],
-                isRequired:true,
+                isRequired: true,
               },
+        ],
+      },
+      {
+        label: "Who can see this event?",
+        fieldType: "Section",
+        children: [
+          {
+            name: "publicity",
+            label: "Who should be able to see this event?",
+            fieldType: "Radio",
+            isRequired: false,
+            defaultValue: "OPEN",
+            dbName: "publicity",
+            readOnly: false,
+            data: [
+              { id: "OPEN", value: "All communities can see this event " },
+              {
+                id: "OPEN_TO",
+                value: "Only communities I select should see this",
+              },
+              {
+                id: "CLOSE",
+                value: "No one can see this, keep this in my community only ",
+              },
+
+              // { id: "CLOSED_TO", value: "All except these communities" },
+            ],
+            conditionalDisplays: [
+              {
+                valueToCheck: "OPEN_TO",
+                fields: [
+                  {
+                    name: "can-view-event",
+                    label: `Select the communities that can see this event`,
+                    placeholder: "",
+                    fieldType: "Checkbox",
+                    selectMany: true,
+                    defaultValue: [],
+                    dbName: "publicity_selections",
+                    data: otherCommunityList,
+                  },
+                ],
+              },
+              // {
+              //   valueToCheck: "CLOSED_TO",
+              //   fields: [
+              //     {
+              //       name: "cannot-view-event",
+              //       label: `Select the communities should NOT see this event`,
+              //       placeholder: "",
+              //       fieldType: "Checkbox",
+              //       selectMany: true,
+              //       defaultValue: [],
+              //       dbName: "publicity_selections",
+              //       data: otherCommunityList,
+              //     },
+              //   ],
+              // },
+            ],
+          },
         ],
       },
       {
@@ -456,6 +529,16 @@ const createFormJson = ({ communities, auth }) => {
         isRequired: false,
         defaultValue: "false",
         dbName: "archive",
+        readOnly: false,
+        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+      },
+      {
+        name: "is_approved",
+        label: "Do you approve this event?",
+        fieldType: "Radio",
+        isRequired: false,
+        defaultValue: "true",
+        dbName: "is_approved",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
       },

@@ -37,7 +37,8 @@ function METable(props) {
     filterObj = JSON.parse(filterObj || null) || {};
     Object.keys(filterObj).forEach((indexOfColumn) => {
       const filter = filterObj[indexOfColumn] || [];
-      columns[indexOfColumn].options.filterList = filter.list; // set the filter list of each column if available
+      const col = columns[indexOfColumn];
+      if (col) col.options.filterList = filter.list; // set the filter list of each column if available
     });
     filterObject.current = filterObj;
     return columns;

@@ -48,7 +48,6 @@ class CreateNewTestimonialForm extends Component {
     var { vendors, actions, tags, communities } = props;
     const readyToRenderThePageFirstTime =
       vendors &&
-      vendors.length &&
       actions &&
       actions.length &&
       tags &&
