@@ -22,6 +22,7 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import { generateFilterParams, makeAPICallForMoreData, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
 class AllTeamAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -202,8 +203,9 @@ class AllTeamAdminMessages extends React.Component {
           updateReduxFunction: putTeamMessagesInRedux,
           reduxItems: teamMessages,
           apiUrl: "/messages.listTeamAdminMessages",
+          pageProp: PAGE_PROPERTIES.ALL_TEAM_MESSAGES,
         }),
-        customFilterDialogFooter: (currentFilterList) => {
+      customFilterDialogFooter: (currentFilterList) => {
         return (
           <ApplyFilterButton
             url={"/messages.listTeamAdminMessages"}
@@ -214,9 +216,21 @@ class AllTeamAdminMessages extends React.Component {
           />
         );
       },
-      // customSearchRender: (searchText, handleSearch, hideSearch, options) =>{
-      //   return <input placeholder="yexy..." />
-      // },
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
+        <SearchBar
+          url={"/messages.listTeamAdminMessages"}
+          reduxItems={teamMessages}
+          updateReduxFunction={putTeamMessagesInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_TEAM_MESSAGES}
+        />
+      ),
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({

@@ -47,6 +47,7 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import { generateFilterParams, getAdminApiEndpoint, getFilterData, makeAPICallForMoreData, onTableStateChange } from "../../../utils/helpers";
 import actions from "redux-form/lib/actions";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -460,9 +461,23 @@ class AllActions extends React.Component {
           updateReduxFunction: putActionsInRedux,
           reduxItems: allActions,
           apiUrl: getAdminApiEndpoint(auth, "/actions"),
+          pageProp: PAGE_PROPERTIES.ALL_ACTIONS,
         }),
-      // confirmFilters: true,
-      onSearchChange: (text) => console.log("==== Search Text ====", text),
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
+        <SearchBar
+          url={getAdminApiEndpoint(auth, "/actions")}
+          reduxItems={allActions}
+          updateReduxFunction={putActionsInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_ACTIONS}
+        />
+      ),
       customFilterDialogFooter: (currentFilterList) => {
         return (
           <ApplyFilterButton

@@ -42,6 +42,7 @@ import {
   onTableStateChange,
 } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
 class AllEvents extends React.Component {
   constructor(props) {
@@ -343,9 +344,23 @@ class AllEvents extends React.Component {
           updateReduxFunction: putEventsInRedux,
           reduxItems: allEvents,
           apiUrl: getAdminApiEndpoint(auth, "/events"),
+          pageProp: PAGE_PROPERTIES.ALL_EVENTS,
         }),
-      // confirmFilters: true,
-      onSearchChange: (text) => console.log("==== Search Text ====", text),
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
+        <SearchBar
+          url={getAdminApiEndpoint(auth, "/events")}
+          reduxItems={allEvents}
+          updateReduxFunction={putEventsInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_EVENTS}
+        />
+      ),
       customFilterDialogFooter: (currentFilterList) => {
         return (
           <ApplyFilterButton

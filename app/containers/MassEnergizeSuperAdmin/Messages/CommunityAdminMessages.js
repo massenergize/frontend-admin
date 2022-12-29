@@ -22,6 +22,7 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import { generateFilterParams, makeAPICallForMoreData, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
 class AllCommunityAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -188,6 +189,7 @@ class AllCommunityAdminMessages extends React.Component {
           updateReduxFunction: putMessagesInRedux,
           reduxItems: messages,
           apiUrl: "/messages.listForCommunityAdmin",
+          pageProp: PAGE_PROPERTIES.ALL_ADMIN_MESSAGES,
         }),
       customFilterDialogFooter: (currentFilterList) => {
         return (
@@ -200,6 +202,21 @@ class AllCommunityAdminMessages extends React.Component {
           />
         );
       },
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
+        <SearchBar
+          url={"/messages.listForCommunityAdmin"}
+          reduxItems={messages}
+          updateReduxFunction={putMessagesInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_ADMIN_MESSAGES}
+        />
+      ),
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
