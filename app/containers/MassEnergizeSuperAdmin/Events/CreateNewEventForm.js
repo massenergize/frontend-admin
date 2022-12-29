@@ -47,9 +47,6 @@ class CreateNewEventForm extends Component {
 
   static getDerivedStateFromProps = (props, state) => {
     const { communities, tags, auth, otherCommunities } = props;
-
-    console.log("==== other comms ====",otherCommunities )
-
     const readyToRenderPageFirstTime =
       communities &&
       communities.items &&
