@@ -116,7 +116,7 @@ class EditEventForm extends Component {
     if (!event) {
     event = (events.items || []).find((e) => e.id.toString() === id.toString());
     }
-    var event = (events || []).find((e) => e.id.toString() === id.toString());
+    // var event = (events || []).find((e) => e.id.toString() === id.toString());
     if (!event) event = (eventsInHeap || {})[id];
 
     const readOnly = checkIfReadOnly(event, auth);
@@ -130,8 +130,7 @@ class EditEventForm extends Component {
       tags.items.length &&
       (readOnly || rescheduledEvent || thereIsNothingInEventsExceptionsList);
       otherCommunities &&
-      otherCommunities.items;
-      otherCommunities.items.length;
+      otherCommunities.length;
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderPageFirstTime || state.mounted;
