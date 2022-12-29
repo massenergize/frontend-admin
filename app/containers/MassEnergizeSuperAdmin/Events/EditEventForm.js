@@ -122,7 +122,6 @@ class EditEventForm extends Component {
 
     const readyToRenderPageFirstTime =
       events &&
-      events.length &&
       tags &&
       tags.length &&
       (readOnly || rescheduledEvent || thereIsNothingInEventsExceptionsList) &&
