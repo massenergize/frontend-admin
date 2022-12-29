@@ -4,7 +4,6 @@ import { withStyles } from "@material-ui/core/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 
-import MUIDataTable from "mui-datatables";
 import EditIcon from "@material-ui/icons/Edit";
 import { Link, withRouter } from "react-router-dom";
 import TextField from "@material-ui/core/TextField";
@@ -31,8 +30,12 @@ import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { generateFilterParams, getAdminApiEndpoint, makeAPICallForMoreData, onTableStateChange } from "../../../utils/helpers";
+import {
+  getAdminApiEndpoint,
+  onTableStateChange,
+} from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
 class AllTestimonials extends React.Component {
   constructor(props) {
@@ -360,15 +363,30 @@ class AllTestimonials extends React.Component {
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
+        <SearchBar
+          url={getAdminApiEndpoint(auth, "/testimonials")}
+          reduxItems={allTestimonials}
+          updateReduxFunction={putTestimonialsInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_TESTIMONIALS}
+        />
+      ),
       onTableChange: (action, tableState) =>
         onTableStateChange({
           action,
-          tableState,
           tableData: data,
           metaData,
           updateReduxFunction: putTestimonialsInRedux,
           reduxItems: allTestimonials,
           apiUrl: getAdminApiEndpoint(auth, "/testimonials"),
+          pageProp: PAGE_PROPERTIES.ALL_TESTIMONIALS,
         }),
       customFilterDialogFooter: (currentFilterList) => {
         return (
