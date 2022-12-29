@@ -27,6 +27,7 @@ import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import { getAdminApiEndpoint, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
 class AllCommunities extends React.Component {
   constructor(props) {
@@ -287,8 +288,23 @@ class AllCommunities extends React.Component {
           updateReduxFunction: putCommunitiesInRedux,
           reduxItems: communities,
           apiUrl: getAdminApiEndpoint(auth, "/communities"),
+          pageProp: PAGE_PROPERTIES.ALL_COMMUNITIES,
         }),
-      onSearchChange: (text) => console.log("==== Search Text ====", text),
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
+        <SearchBar
+          url={getAdminApiEndpoint(auth, "/communities")}
+          reduxItems={communities}
+          updateReduxFunction={putCommunitiesInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_COMMUNITIES}
+        />
+      ),
       customFilterDialogFooter: (currentFilterList) => {
         return (
           <ApplyFilterButton
