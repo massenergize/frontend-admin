@@ -3,14 +3,9 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
-import MUIDataTable from "mui-datatables";
-import FileCopy from "@material-ui/icons/FileCopy";
 import EditIcon from "@material-ui/icons/Edit";
 import { Link } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
-import Icon from "@material-ui/core/Icon";
-import Edit from "@material-ui/icons/Edit";
-import Language from "@material-ui/icons/Language";
 import PeopleIcon from "@material-ui/icons/People";
 import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";
@@ -34,12 +29,11 @@ import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import {
-  generateFilterParams,
   getAdminApiEndpoint,
-  makeAPICallForMoreData,
   onTableStateChange,
 } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
 class AllTeams extends React.Component {
   constructor(props) {
@@ -325,6 +319,7 @@ class AllTeams extends React.Component {
           updateReduxFunction: putTeamsInRedux,
           reduxItems: allTeams,
           apiUrl: getAdminApiEndpoint(auth, "/teams"),
+          pageProp: PAGE_PROPERTIES.ALL_TEAMS,
         }),
       customFilterDialogFooter: (currentFilterList) => {
         return (
@@ -337,6 +332,21 @@ class AllTeams extends React.Component {
           />
         );
       },
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
+        <SearchBar
+          url={getAdminApiEndpoint(auth, "/teams")}
+          reduxItems={allTeams}
+          updateReduxFunction={putTeamsInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_TEAMS}
+        />
+      ),
       customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;

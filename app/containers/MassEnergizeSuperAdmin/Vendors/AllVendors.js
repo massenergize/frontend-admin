@@ -31,6 +31,7 @@ import {
   onTableStateChange,
 } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
 class AllVendors extends React.Component {
   constructor(props) {
@@ -237,9 +238,23 @@ class AllVendors extends React.Component {
           updateReduxFunction: putVendorsInRedux,
           reduxItems: allVendors,
           apiUrl: getAdminApiEndpoint(auth, "/vendors"),
+          pageProp: PAGE_PROPERTIES.ALL_VENDORS,
         }),
-      // confirmFilters: true,
-      onSearchChange: (text) => console.log("==== Search Text ====", text),
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
+        <SearchBar
+          url={getAdminApiEndpoint(auth, "/vendors")}
+          reduxItems={allVendors}
+          updateReduxFunction={putVendorsInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_VENDORS}
+        />
+      ),
       customFilterDialogFooter: (currentFilterList) => {
         return (
           <ApplyFilterButton

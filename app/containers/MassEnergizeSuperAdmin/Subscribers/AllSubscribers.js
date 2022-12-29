@@ -17,8 +17,9 @@ import {
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { generateFilterParams, getAdminApiEndpoint, makeAPICallForMoreData, onTableStateChange } from "../../../utils/helpers";
+import { getAdminApiEndpoint, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
 class AllSubscribers extends React.Component {
   constructor(props) {
@@ -157,8 +158,21 @@ class AllSubscribers extends React.Component {
       count: metaData && metaData.count,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
-      // confirmFilters: true,
-      onSearchChange: (text) => console.log("==== Search Text ====", text),
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
+        <SearchBar
+          url={getAdminApiEndpoint(auth, "/subscribers")}
+          reduxItems={subscribers}
+          updateReduxFunction={putSubscribersInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_SUBSCRIBERS}
+        />
+      ),
       customFilterDialogFooter: (currentFilterList) => {
         return (
           <ApplyFilterButton
@@ -179,6 +193,7 @@ class AllSubscribers extends React.Component {
           updateReduxFunction: putSubscribersInRedux,
           reduxItems: subscribers,
           apiUrl: getAdminApiEndpoint(auth, "/subscribers"),
+          pageProp: PAGE_PROPERTIES.ALL_SUBSCRIBERS,
         }),
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
