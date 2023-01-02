@@ -383,6 +383,7 @@ class AllTestimonials extends React.Component {
           action,
           tableData: data,
           metaData,
+          tableState,
           updateReduxFunction: putTestimonialsInRedux,
           reduxItems: allTestimonials,
           apiUrl: getAdminApiEndpoint(auth, "/testimonials"),

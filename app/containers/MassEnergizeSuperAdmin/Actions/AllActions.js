@@ -6,7 +6,6 @@ import brand from "dan-api/dummy/brand";
 import { Helmet } from "react-helmet";
 import { withStyles } from "@material-ui/core/styles";
 
-import MUIDataTable from "mui-datatables";
 import FileCopy from "@material-ui/icons/FileCopy";
 import EditIcon from "@material-ui/icons/Edit";
 import { Link, withRouter } from "react-router-dom";
@@ -31,11 +30,9 @@ import {
   isNotEmpty,
   makeDeleteUI,
   ourCustomSort,
-  pop,
   smartString,
 } from "../../../utils/common";
 import {
-  Button,
   Grid,
   LinearProgress,
   Paper,
@@ -44,8 +41,7 @@ import {
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import { generateFilterParams, getAdminApiEndpoint, getFilterData, makeAPICallForMoreData, onTableStateChange } from "../../../utils/helpers";
-import actions from "redux-form/lib/actions";
+import { getAdminApiEndpoint, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
@@ -67,6 +63,7 @@ class AllActions extends React.Component {
     if (auth &&auth.is_super_admin) url = "/actions.listForSuperAdmin";
     else if (auth.is_community_admin) url = "/actions.listForCommunityAdmin";
     const allActionsResponse = await apiCall(url);
+    console.log("==== res ===", allActionsResponse);
     if (allActionsResponse && allActionsResponse.success) {
       putActionsInRedux(allActionsResponse.data);
     } else if (allActionsResponse && !allActionsResponse.success) {
