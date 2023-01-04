@@ -61,9 +61,8 @@ class AllActions extends React.Component {
     const { putActionsInRedux, auth } = this.props;
     var url;
     if (auth &&auth.is_super_admin) url = "/actions.listForSuperAdmin";
-    else if (auth.is_community_admin) url = "/actions.listForCommunityAdmin";
+    else if (auth &&auth.is_community_admin) url = "/actions.listForCommunityAdmin";
     const allActionsResponse = await apiCall(url);
-    console.log("==== res ===", allActionsResponse);
     if (allActionsResponse && allActionsResponse.success) {
       putActionsInRedux(allActionsResponse.data);
     } else if (allActionsResponse && !allActionsResponse.success) {

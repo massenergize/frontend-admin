@@ -22,10 +22,20 @@ export const getFilterParamsFromLocalStorage = (key) => {
 export const getFilterData = (data, existing = [], field = "id") => {
   let items = data.items || [];
   let all = [...existing, ...items];
-  // const unique = [...new Map(all.map((item) => [item[field], item])).values()];
-  // const unique = [...new Map(all.map((item) => [item[field], item])).values()];
-  return { items: all, meta: data.meta };
+  const unique = [...new Map(all.map((item) => [item[field], item])).values()];
+  return { items: unique, meta: data.meta };
 };
+
+
+export const prepareFilterAndSearchParamsFromLocal= (key)=>{
+  let filterParams = getFilterParamsFromLocalStorage(key);
+ let params =  JSON.stringify({
+    ...filterParams,
+    search_text: getSearchText(key) || "",
+  })
+
+  return params
+}
 
 
 export const makeAPICallForMoreData = ({
@@ -103,7 +113,9 @@ export const onTableStateChange = ({
   tableState,
 }) => {
   if (action === "changePage") {
-    if (tableState.rowsPerPage * (tableState.page) === tableState.displayData.length) {
+    if (tableState.rowsPerPage * (tableState.page) % 50 ===0) {
+      console.log('===== ToLog ========', tableState);
+    // if (tableState.rowsPerPage * (tableState.page) === tableState.displayData.length) {
       callMoreData(
         metaData.next,
         updateReduxFunction,
