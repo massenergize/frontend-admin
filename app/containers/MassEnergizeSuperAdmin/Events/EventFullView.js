@@ -15,7 +15,7 @@ import {
   reduxLoadAllOtherEvents,
 } from "../../../redux/redux-actions/adminActions";
 import EventShareModal from "./EventShareModal";
-import { IS_CANARY, IS_LOCAL, IS_PROD } from "../../../config/constants";
+import { PORTAL_HOST } from "../../../config/constants";
 import { dateFormatString } from "../Community/utils";
 import EditEventForm from "./EditEventForm";
 
@@ -223,14 +223,8 @@ function EventFullView(props) {
   //   -------------------------------------- HTML MARK UP --------------------------------------------------
 
   const sharedTo = listToString(event.shared_to);
-  var host;
   const makeURL = (event) => {
-    if (IS_LOCAL) host = "http://localhost:3000";
-    else if (IS_CANARY) host = "https://communities-canary.massenergize.org";
-    else if (IS_PROD) host = "https://communities.massenergize.org";
-    else host = "https://community.massenergize.dev";
-
-    return `${host}/${event &&
+    return `${PORTAL_HOST}/${event &&
       (event.community || {}).subdomain}/events/${event && event.id}`;
   };
   return (
