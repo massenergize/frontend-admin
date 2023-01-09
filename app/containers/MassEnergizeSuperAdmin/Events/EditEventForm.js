@@ -138,15 +138,11 @@ class EditEventForm extends Component {
     // If all local searches fail, just retrieve from backend
     if (!event) findEventFromBackend({ id, storeEventInHeap });
 
-  
     const readOnly = checkIfReadOnly(event, auth);
     const thereIsNothingInEventsExceptionsList = rescheduledEvent === null;
 
-   
-
-  
-
     const readyToRenderPageFirstTime =
+      event &&
       events &&
       tags &&
       tags.length &&
