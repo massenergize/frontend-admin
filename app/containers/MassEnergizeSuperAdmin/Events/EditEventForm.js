@@ -10,7 +10,10 @@ import MassEnergizeForm from "../_FormGenerator";
 import Typography from "@material-ui/core/Typography";
 import { checkIfReadOnly, getSelectedIds } from "../Actions/EditActionForm";
 import { bindActionCreators } from "redux";
-import { reduxUpdateHeap } from "../../../redux/redux-actions/adminActions";
+import {
+  reduxAddToHeap,
+  reduxUpdateHeap,
+} from "../../../redux/redux-actions/adminActions";
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 const styles = (theme) => ({
@@ -77,13 +80,13 @@ export const makeTagSection = ({
   return section;
 };
 
-// const findEventFromBackend = ({ id, reduxFxn }) => {
-//   apiCall("events.info", { event_id: id })
-//     .then((response) => {
-//       console.log("LEts see the response", response);
-//     })
-//     .catch((e) => console.log("ERROR ", id));
-// };
+const findEventFromBackend = ({ id, reduxFxn }) => {
+  apiCall("events.info", { event_id: id }).then((response) => {
+    if (!response.success)
+      return console.log("Sorry, could not load event with ID" + id);
+    reduxFxn && reduxFxn(response.data);
+  });
+};
 class EditEventForm extends Component {
   constructor(props) {
     super(props);
@@ -105,17 +108,35 @@ class EditEventForm extends Component {
       exceptions,
       otherCommunities,
       eventsInHeap,
-      eventsFromOtherCommunities
+      eventsFromOtherCommunities,
+      putEventInHeap,
+      heap,
     } = props;
     const { id } = match.params;
 
     var { rescheduledEvent } = state;
 
     rescheduledEvent = exceptions[id] || rescheduledEvent;
-    var event = (events || []).find((e) => e.id.toString() === id.toString());
-  
+    var event = (events || []).find((e) => e.id.toString() === id.toString()); // Search for events from my event list
+
+    // If not found, look inside heap
     if (!event) event = (eventsInHeap || {})[id];
-    if (!event) event = (eventsFromOtherCommunities || []).find((e) => e.id.toString() === id.toString());
+
+    // If not found look inside list of "other Events"
+    if (!event)
+      event = (eventsFromOtherCommunities || []).find(
+        (e) => e.id.toString() === id.toString()
+      );
+
+    const storeEventInHeap = (data) => {
+      putEventInHeap(
+        { eventsInHeap: { ...eventsInHeap, [id.toString()]: data } },
+        heap
+      );
+    };
+
+    // If all local searches fail, just retrieve from backend
+    if (!event) findEventFromBackend({ id, storeEventInHeap });
 
     const readOnly = checkIfReadOnly(event, auth);
     const thereIsNothingInEventsExceptionsList = rescheduledEvent === null;
@@ -252,6 +273,7 @@ const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       addExceptionsToHeap: reduxUpdateHeap,
+      putEventInHeap: reduxAddToHeap,
     },
     dispatch
   );
@@ -269,7 +291,6 @@ export default withStyles(styles, { withTheme: true })(EditEventMapped);
 const validator = (cleaned) => {
   const start = (cleaned || {})["start_date_and_time"];
   const end = (cleaned || {})["end_date_and_time"];
-  console.log(start, end);
   const endDateComesLater = new Date(end) > new Date(start);
   return [
     endDateComesLater,
