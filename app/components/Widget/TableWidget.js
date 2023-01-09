@@ -12,7 +12,7 @@ import Chip from '@material-ui/core/Chip';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Avatar from '@material-ui/core/Avatar';
 import Icon from '@material-ui/core/Icon';
-import ArrowDownward from '@material-ui/icons/ArrowDownward';
+import ArrowDownward from '@mui/icons-material/ArrowDownward';
 import messageStyles from 'dan-styles/Messages.scss';
 import progressStyles from 'dan-styles/Progress.scss';
 import imgApi from 'dan-api/images/photos';

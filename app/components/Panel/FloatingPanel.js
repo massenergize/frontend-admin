@@ -5,9 +5,9 @@ import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
 import classNames from 'classnames';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import ExpandIcon from '@material-ui/icons/CallMade';
-import MinimizeIcon from '@material-ui/icons/CallReceived';
+import CloseIcon from '@mui/icons-material/Close';
+import ExpandIcon from '@mui/icons-material/CallMade';
+import MinimizeIcon from '@mui/icons-material/CallReceived';
 import styles from './panel-jss';
 
 class FloatingPanel extends React.Component {

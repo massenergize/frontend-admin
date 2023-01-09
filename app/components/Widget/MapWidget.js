@@ -6,7 +6,7 @@ import CardContent from '@material-ui/core/CardContent';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from '@material-ui/core/Avatar';
-import LocationOn from '@material-ui/icons/LocationOn';
+import LocationOn from '@mui/icons-material/LocationOn';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import {

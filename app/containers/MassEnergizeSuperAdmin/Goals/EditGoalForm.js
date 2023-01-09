@@ -8,7 +8,7 @@ import SnackbarContent from '@material-ui/core/SnackbarContent';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import ErrorIcon from '@material-ui/icons/Error';
+import ErrorIcon from '@mui/icons-material/Error';
 import TextField from '@material-ui/core/TextField';
 import green from '@material-ui/core/colors/green';
 import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';

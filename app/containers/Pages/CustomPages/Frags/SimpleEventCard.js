@@ -9,10 +9,10 @@ import Grid from '@material-ui/core/Grid';
 import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button';
 import Type from 'dan-styles/Typography.scss';
-import DeleteIcon from '@material-ui/icons/Close';
+import DeleteIcon from '@mui/icons-material/Close';
 import imgApi from 'dan-api/images/photos';
 import Fab from '@material-ui/core/Fab';
-import AddIcon from '@material-ui/icons/Add';
+import AddIcon from '@mui/icons-material/Add';
 import unavailableImage from './../../../../../public/images/unavailable.jpg';
 class SimpleEventCard extends React.Component {
 

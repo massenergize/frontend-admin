@@ -1,5 +1,5 @@
-import FileCopy from "@material-ui/icons/FileCopy";
-import EditIcon from "@material-ui/icons/Edit";
+import FileCopy from "@mui/icons-material/FileCopy";
+import EditIcon from "@mui/icons-material/Edit";
 import React, { useState } from "react";
 import MEChip from "../../../components/MECustom/MEChip";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";

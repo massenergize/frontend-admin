@@ -11,8 +11,8 @@ import {
 } from 'recharts';
 import { data1 } from 'dan-api/chart/chartMiniData';
 import colorfull from 'dan-api/palette/colorfull';
-import AccountBalanceWallet from '@material-ui/icons/AccountBalanceWallet';
-import CompareArrows from '@material-ui/icons/CompareArrows';
+import AccountBalanceWallet from '@mui/icons-material/AccountBalanceWallet';
+import CompareArrows from '@mui/icons-material/CompareArrows';
 import bitcoinLogo from 'dan-images/crypto/bitcoin.png';
 import rippleLogo from 'dan-images/crypto/ripple.png';
 import moneroLogo from 'dan-images/crypto/monero.png';

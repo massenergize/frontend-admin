@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import MUIDataTable from "mui-datatables";
-import CallMadeIcon from "@material-ui/icons/CallMade";
-import EditIcon from "@material-ui/icons/Edit";
+import CallMadeIcon from "@mui/icons-material/CallMade";
+import EditIcon from "@mui/icons-material/Edit";
 import { Link } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
 import { withStyles } from "@material-ui/core/styles";

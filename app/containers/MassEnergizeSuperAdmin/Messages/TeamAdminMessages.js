@@ -6,7 +6,7 @@ import brand from "dan-api/dummy/brand";
 import { bindActionCreators } from "redux";
 import MUIDataTable from "mui-datatables";
 import { Link } from "react-router-dom";
-import DetailsIcon from "@material-ui/icons/Details";
+import DetailsIcon from "@mui/icons-material/Details";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";

@@ -13,8 +13,8 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import Collapse from '@material-ui/core/Collapse';
 import Chip from '@material-ui/core/Chip';
 import Ionicon from 'react-ionicons';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import styles from './sidebar-jss';
 import { reduxSignOut } from '../../redux/redux-actions/adminActions';
 

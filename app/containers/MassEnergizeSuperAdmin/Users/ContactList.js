@@ -10,10 +10,10 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Avatar from '@material-ui/core/Avatar';
 import BottomNavigation from '@material-ui/core/BottomNavigation';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
-import SearchIcon from '@material-ui/icons/Search';
-import PermContactCalendar from '@material-ui/icons/PermContactCalendar';
-import Add from '@material-ui/icons/Add';
-import Star from '@material-ui/icons/Star';
+import SearchIcon from '@mui/icons-material/Search';
+import PermContactCalendar from '@mui/icons-material/PermContactCalendar';
+import Add from '@mui/icons-material/Add';
+import Star from '@mui/icons-material/Star';
 import IconButton from '@material-ui/core/IconButton';
 import styles from './contact-jss';
 

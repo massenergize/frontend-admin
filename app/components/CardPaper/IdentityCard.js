@@ -8,8 +8,8 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from '@material-ui/core/Avatar';
 import Divider from '@material-ui/core/Divider';
-import LocalPhone from '@material-ui/icons/LocalPhone';
-import LocationOn from '@material-ui/icons/LocationOn';
+import LocalPhone from '@mui/icons-material/LocalPhone';
+import LocationOn from '@mui/icons-material/LocationOn';
 import styles from './cardStyle-jss';
 
 class IdentityCard extends React.Component {

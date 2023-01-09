@@ -5,8 +5,8 @@ import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 
 import MUIDataTable from "mui-datatables";
-import FileCopy from "@material-ui/icons/FileCopy";
-import EditIcon from "@material-ui/icons/Edit";
+import FileCopy from "@mui/icons-material/FileCopy";
+import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
 
@@ -38,7 +38,7 @@ import { Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import CallMadeIcon from "@material-ui/icons/CallMade";
+import CallMadeIcon from "@mui/icons-material/CallMade";
 import { FROM } from "../../../utils/constants";
 class AllEvents extends React.Component {
   constructor(props) {

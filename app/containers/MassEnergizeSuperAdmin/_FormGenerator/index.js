@@ -8,7 +8,11 @@ import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
-import { DateTimePicker, MuiPickersUtilsProvider } from "material-ui-pickers";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
+
+// import { DateTimePicker, MuiPickersUtilsProvider } from "material-ui-pickers";
 import MomentUtils from "@date-io/moment";
 import FormControl from "@material-ui/core/FormControl";
 import Checkbox from "@material-ui/core/Checkbox";
@@ -1086,13 +1090,18 @@ class MassEnergizeForm extends Component {
               {field.label}
             </Typography>
             <div className={classes.picker} style={{ width: "100%" }}>
-              <MuiPickersUtilsProvider
+              <LocalizationProvider
+                dateAdapter={AdapterDateFns}
                 utils={MomentUtils}
                 style={{ width: "100%" }}
               >
                 <DateTimePicker
                   {...field}
-                  value={this.getValue(field.name, field.defaultValue, field)}
+                  value={this.getValue(
+                    field.name,
+                    field.defaultValue,
+                    field
+                  )}
                   onChange={(date) =>
                     this.handleFormDataChange(
                       {
@@ -1104,7 +1113,7 @@ class MassEnergizeForm extends Component {
                   label="" // don't put label in the box {field.label}
                   format="MM/DD/YYYY, h:mm a"
                 />
-              </MuiPickersUtilsProvider>
+              </LocalizationProvider>
             </div>
 
             <br />

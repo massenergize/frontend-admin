@@ -7,8 +7,8 @@ import Typography from "@material-ui/core/Typography";
 import Avatar from "@material-ui/core/Avatar";
 import { bindActionCreators } from "redux";
 
-import FileCopy from "@material-ui/icons/FileCopy";
-import EditIcon from "@material-ui/icons/Edit";
+import FileCopy from "@mui/icons-material/FileCopy";
+import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
 import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";

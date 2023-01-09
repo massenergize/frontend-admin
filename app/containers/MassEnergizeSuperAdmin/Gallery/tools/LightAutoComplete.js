@@ -8,7 +8,7 @@ import {
   withStyles,
 } from "@material-ui/core";
 import { pop } from "../../../../utils/common";
-import Typography from "material-ui/styles/typography";
+import Typography from "@mui/material/Typography";
 
 const styles = (theme) => {
   const spacing = theme.spacing.unit;

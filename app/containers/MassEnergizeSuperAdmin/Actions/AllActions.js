@@ -7,8 +7,8 @@ import { Helmet } from "react-helmet";
 import { withStyles } from "@material-ui/core/styles";
 
 import MUIDataTable from "mui-datatables";
-import FileCopy from "@material-ui/icons/FileCopy";
-import EditIcon from "@material-ui/icons/Edit";
+import FileCopy from "@mui/icons-material/FileCopy";
+import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
 import TextField from "@material-ui/core/TextField";

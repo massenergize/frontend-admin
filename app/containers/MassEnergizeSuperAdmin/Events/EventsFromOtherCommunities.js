@@ -14,7 +14,7 @@ import { apiCall } from "../../../utils/messenger";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import CallMadeIcon from "@material-ui/icons/CallMade";
+import CallMadeIcon from "@mui/icons-material/CallMade";
 
 function EventsFromOtherCommunities({
   putOtherEventsInRedux,

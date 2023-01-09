@@ -5,7 +5,7 @@ import Button from '@material-ui/core/Button';
 import { withStyles, withTheme } from '@material-ui/core/styles';
 import Fade from '@material-ui/core/Fade';
 import Popper from '@material-ui/core/Popper';
-import ExpandMore from '@material-ui/icons/ExpandMore';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import classNames from 'classnames';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';

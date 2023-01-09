@@ -15,7 +15,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Input from '@material-ui/core/Input';
-import TrendingUp from '@material-ui/icons/TrendingUp';
+import TrendingUp from '@mui/icons-material/TrendingUp';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import styles from './widget-jss';
 import PapperBlock from '../PapperBlock/PapperBlock';

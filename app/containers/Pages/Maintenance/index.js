@@ -5,10 +5,10 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
-import Build from '@material-ui/icons/Build';
+import Build from '@mui/icons-material/Build';
 import Hidden from '@material-ui/core/Hidden';
-import Settings from '@material-ui/icons/SettingsApplications';
-import Warning from '@material-ui/icons/Warning';
+import Settings from '@mui/icons-material/SettingsApplications';
+import Warning from '@mui/icons-material/Warning';
 
 const styles = theme => ({
   container: {

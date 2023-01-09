@@ -5,8 +5,8 @@ import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
 
 import MUIDataTable from 'mui-datatables';
-import FileCopy from '@material-ui/icons/FileCopy';
-import EditIcon from '@material-ui/icons/Edit';
+import FileCopy from '@mui/icons-material/FileCopy';
+import EditIcon from '@mui/icons-material/Edit';
 import { Link } from 'react-router-dom';
 import Avatar from '@material-ui/core/Avatar';
 

@@ -15,9 +15,9 @@ import {
   loadTasksAction,
 } from "../../../redux/redux-actions/adminActions";
 import { bindActionCreators } from "redux";
-import EditIcon from "@material-ui/icons/Edit";
-import PauseOutlinedIcon from "@material-ui/icons/PauseOutlined";
-import PlayArrowOutlinedIcon from "@material-ui/icons/PlayArrowOutlined";
+import EditIcon from "@mui/icons-material/Edit";
+import PauseOutlinedIcon from "@mui/icons-material/PauseOutlined";
+import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
 import { Link } from "react-router-dom";
 class AllTasks extends React.Component {
   constructor(props) {

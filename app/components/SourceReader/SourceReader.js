@@ -10,11 +10,11 @@ import darkStyle from 'react-syntax-highlighter/styles/prism/xonokai';
 import Button from '@material-ui/core/Button';
 import classNames from 'classnames';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import Code from '@material-ui/icons/Code';
-import Close from '@material-ui/icons/Close';
+import Code from '@mui/icons-material/Code';
+import Close from '@mui/icons-material/Close';
 import Icon from '@material-ui/core/Icon';
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import codePreview from '../../config/codePreview';
 
 const url = '/api/docs?src=';

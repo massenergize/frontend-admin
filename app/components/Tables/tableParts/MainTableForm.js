@@ -12,7 +12,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Button from '@material-ui/core/Button';
 import classNames from 'classnames';
 import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
-import AddIcon from '@material-ui/icons/Add';
+import AddIcon from '@mui/icons-material/Add';
 import css from 'dan-styles/Table.scss';
 import RowReadOnly from './RowReadOnly';
 import styles from '../tableStyle-jss';

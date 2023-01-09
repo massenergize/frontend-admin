@@ -2,7 +2,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Button from "@material-ui/core/Button";
-import VerifiedUser from "@material-ui/icons/VerifiedUser";
+import VerifiedUser from "@mui/icons-material/VerifiedUser";
 import { withStyles } from "@material-ui/core/styles";
 import styles from "./jss/cover-jss";
 import { apiCall } from "../../../../utils/messenger";

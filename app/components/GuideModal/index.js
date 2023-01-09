@@ -6,8 +6,8 @@ import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import Slide from '@material-ui/core/Slide';
-import VideoLibraryIcon from '@material-ui/icons/VideoLibrary';
-import AssignmentIcon from '@material-ui/icons/Assignment';
+import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import styles from './guide-jss';
 
 const adminWrittenInstructionsLink = "https://docs.google.com/document/d/e/2PACX-1vT2ahP7U1gWS5ktfr7nG9CdH8cCazVo9qzOLHB5Ook2GhKD79GOWxRgvv-pOQRkIT1mogcAhzM8T5wE/pub"

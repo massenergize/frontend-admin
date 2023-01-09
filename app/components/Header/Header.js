@@ -13,7 +13,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import MenuIcon from '@material-ui/icons/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
 import UserMenu from './UserMenu';
 import styles from './header-jss';
 // import CommunitySwitch from './CommunitySwitch';

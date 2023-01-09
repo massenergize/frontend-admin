@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Chip from '@material-ui/core/Chip';
-import Check from '@material-ui/icons/Check';
+import Check from '@mui/icons-material/Check';
 import Type from 'dan-styles/Typography.scss';
 import styles from 'dan-components/Profile/profile-jss';
 

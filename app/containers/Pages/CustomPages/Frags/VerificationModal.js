@@ -9,15 +9,15 @@ import Grid from '@material-ui/core/Grid';
 import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button';
 import Type from 'dan-styles/Typography.scss';
-import DeleteIcon from '@material-ui/icons/Close';
+import DeleteIcon from '@mui/icons-material/Close';
 import SimpleEventCard from './SimpleEventCard';
-import CheckCircle from '@material-ui/icons/CheckCircle';
+import CheckCircle from '@mui/icons-material/CheckCircle';
 import { verificationContainer, verficationPaper, closeButton, summaryH3 } from './../styles';
-import ArrowForward from '@material-ui/icons/ArrowForward';
+import ArrowForward from '@mui/icons-material/ArrowForward';
 import Fab from '@material-ui/core/Fab';
-import Public from '@material-ui/icons/Public';
-import AddIcon from '@material-ui/icons/Add';
-import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp';
+import Public from '@mui/icons-material/Public';
+import AddIcon from '@mui/icons-material/Add';
+import KeyboardArrowUp from '@mui/icons-material/KeyboardArrowUp';
 
 class VerificationModal extends React.Component {
 

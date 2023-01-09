@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
-import Check from '@material-ui/icons/Check';
+import Check from '@mui/icons-material/Check';
 import { withStyles } from '@material-ui/core/styles';
 import styles from './widget-jss';
 

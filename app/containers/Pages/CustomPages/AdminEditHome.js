@@ -11,7 +11,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button';
 import Type from 'dan-styles/Typography.scss';
 import Fab from '@material-ui/core/Fab';
-import Public from '@material-ui/icons/Public';
+import Public from '@mui/icons-material/Public';
 import AboutUsVideo from './Frags/AboutUsVideo';
 import GraphChoice from './Frags/GraphChoice';
 import EventChoices from './Frags/EventChoices';

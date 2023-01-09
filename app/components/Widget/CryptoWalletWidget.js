@@ -10,7 +10,7 @@ import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
 import Tooltip from '@material-ui/core/Tooltip';
 import Input from '@material-ui/core/Input';
-import ContentCopy from '@material-ui/icons/ContentCopy';
+import ContentCopy from '@mui/icons-material/ContentCopy';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Avatar from '@material-ui/core/Avatar';
 import bitcoinLogo from 'dan-images/crypto/bitcoin.png';

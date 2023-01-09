@@ -9,12 +9,12 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
 import Avatar from '@material-ui/core/Avatar';
-import VerifiedUser from '@material-ui/icons/VerifiedUser';
+import VerifiedUser from '@mui/icons-material/VerifiedUser';
 import BottomNavigation from '@material-ui/core/BottomNavigation';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
-import SupervisorAccount from '@material-ui/icons/SupervisorAccount';
-// import Favorite from '@material-ui/icons/Favorite';
-// import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
+import SupervisorAccount from '@mui/icons-material/SupervisorAccount';
+// import Favorite from '@mui/icons-material/Favorite';
+// import PhotoLibrary from '@mui/icons-material/PhotoLibrary';
 import Divider from '@material-ui/core/Divider';
 import styles from './cardStyle-jss';
 

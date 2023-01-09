@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import Tooltip from '@material-ui/core/Tooltip';
 import Button from '@material-ui/core/Button';
 import classNames from 'classnames';
-import AddIcon from '@material-ui/icons/Add';
+import AddIcon from '@mui/icons-material/Add';
 import css from 'dan-styles/Table.scss';
 import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
 import Row from './Row';

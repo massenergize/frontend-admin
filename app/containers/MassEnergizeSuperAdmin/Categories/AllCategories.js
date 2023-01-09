@@ -16,8 +16,8 @@ import Chip from "@material-ui/core/Chip";
 import Icon from "@material-ui/core/Icon";
 
 import MUIDataTable from "mui-datatables";
-import CallMadeIcon from "@material-ui/icons/CallMade";
-import EditIcon from "@material-ui/icons/Edit";
+import CallMadeIcon from "@mui/icons-material/CallMade";
+import EditIcon from "@mui/icons-material/Edit";
 import { Link } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
 import Paper from "@material-ui/core/Paper";

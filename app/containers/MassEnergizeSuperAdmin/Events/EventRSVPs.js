@@ -11,7 +11,7 @@ import Tabs from "@material-ui/core/Tabs";
 import classNames from "classnames";
 import Grid from "@material-ui/core/Grid";
 import Tab from "@material-ui/core/Tab";
-import PeopleIcon from "@material-ui/icons/People";
+import PeopleIcon from "@mui/icons-material/People";
 import messageStyles from "dan-styles/Messages.scss";
 import SnackbarContent from "@material-ui/core/SnackbarContent";
 

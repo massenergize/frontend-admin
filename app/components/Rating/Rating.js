@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import IconButton from '@material-ui/core/IconButton';
 import orange from '@material-ui/core/colors/orange';
 import grey from '@material-ui/core/colors/grey';
-import ToggleStar from '@material-ui/icons/Star';
-import ToggleStarBorder from '@material-ui/icons/StarBorder';
+import ToggleStar from '@mui/icons-material/Star';
+import ToggleStarBorder from '@mui/icons-material/StarBorder';
 
 const styles = {
   disabled: {

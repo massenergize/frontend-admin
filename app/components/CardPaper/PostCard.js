@@ -11,10 +11,10 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import IconButton from '@material-ui/core/IconButton';
 import Avatar from '@material-ui/core/Avatar';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import ShareIcon from '@material-ui/icons/Share';
-import Comment from '@material-ui/icons/Comment';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import ShareIcon from '@mui/icons-material/Share';
+import Comment from '@mui/icons-material/Comment';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import styles from './cardStyle-jss';
 
 const optionsOpt = [

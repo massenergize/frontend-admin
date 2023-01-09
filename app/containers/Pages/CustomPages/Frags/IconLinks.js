@@ -9,7 +9,7 @@ import Grid from '@material-ui/core/Grid';
 import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button';
 import Type from 'dan-styles/Typography.scss';
-import DeleteIcon from '@material-ui/icons/Close';
+import DeleteIcon from '@mui/icons-material/Close';
 import LinkEditBox from './LinkEditBox';
 const links = [
   { name: "Events", title: "Events", desc: "" },

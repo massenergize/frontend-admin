@@ -1,7 +1,7 @@
 import React from 'react';
 import newsData from 'dan-api/dummy/newsData';
 import Typography from '@material-ui/core/Typography';
-import FlashOn from '@material-ui/icons/FlashOn';
+import FlashOn from '@mui/icons-material/FlashOn';
 import HorizontalNewsCard from '../CardPaper/HorizontalNewsCard';
 
 class NewsListWidget extends React.Component {

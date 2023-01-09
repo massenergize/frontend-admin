@@ -8,7 +8,7 @@ import { Field, reduxForm } from 'redux-form/immutable';
 import { TextField } from 'redux-form-material-ui';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
-import ArrowForward from '@material-ui/icons/ArrowForward';
+import ArrowForward from '@mui/icons-material/ArrowForward';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import brand from 'dan-api/dummy/brand';
