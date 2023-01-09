@@ -138,8 +138,13 @@ class EditEventForm extends Component {
     // If all local searches fail, just retrieve from backend
     if (!event) findEventFromBackend({ id, storeEventInHeap });
 
+  
     const readOnly = checkIfReadOnly(event, auth);
     const thereIsNothingInEventsExceptionsList = rescheduledEvent === null;
+
+   
+
+  
 
     const readyToRenderPageFirstTime =
       events &&
@@ -152,6 +157,7 @@ class EditEventForm extends Component {
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderPageFirstTime || state.mounted;
 
+    //--- When this value is true, it means we have been able to load all data needed to show the form, so no need to recreate formJson
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
     const coms = (communities || []).map((c) => ({
