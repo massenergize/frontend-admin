@@ -10,9 +10,7 @@ import MassEnergizeForm from "../_FormGenerator";
 import Typography from "@material-ui/core/Typography";
 import { checkIfReadOnly, getSelectedIds } from "../Actions/EditActionForm";
 import { bindActionCreators } from "redux";
-import {
-  reduxUpdateHeap,
-} from "../../../redux/redux-actions/adminActions";
+import { reduxUpdateHeap } from "../../../redux/redux-actions/adminActions";
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 const styles = (theme) => ({
@@ -107,15 +105,17 @@ class EditEventForm extends Component {
       exceptions,
       otherCommunities,
       eventsInHeap,
+      eventsFromOtherCommunities
     } = props;
     const { id } = match.params;
 
     var { rescheduledEvent } = state;
 
-  
     rescheduledEvent = exceptions[id] || rescheduledEvent;
     var event = (events || []).find((e) => e.id.toString() === id.toString());
+  
     if (!event) event = (eventsInHeap || {})[id];
+    if (!event) event = (eventsFromOtherCommunities || []).find((e) => e.id.toString() === id.toString());
 
     const readOnly = checkIfReadOnly(event, auth);
     const thereIsNothingInEventsExceptionsList = rescheduledEvent === null;
@@ -243,7 +243,8 @@ const mapStateToProps = (state) => {
     heap: state.getIn(["heap"]),
     exceptions: (heap && heap.exceptions) || {},
     otherCommunities: state.getIn(["otherCommunities"]),
-    eventsInHeap: (heap || {}).eventsInHeap ||{},
+    eventsInHeap: (heap || {}).eventsInHeap || {},
+    eventsFromOtherCommunities: state.getIn(["otherEvents"]),
   };
 };
 

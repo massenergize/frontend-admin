@@ -13,6 +13,7 @@ import {
   loadAllEvents,
   reduxAddToHeap,
   reduxLoadAllOtherEvents,
+  reduxUpdateHeap,
 } from "../../../redux/redux-actions/adminActions";
 import EventShareModal from "./EventShareModal";
 import { IS_CANARY, IS_LOCAL, IS_PROD } from "../../../config/constants";
@@ -65,6 +66,7 @@ function EventFullView(props) {
     myEvents, // Events that are from the communities the current admin manages
     communities,
     putOtherEventsInRedux,
+    heap,
   } = props;
   const history = useHistory();
   const [event, setEvent] = useState(undefined);
@@ -84,7 +86,7 @@ function EventFullView(props) {
     end_date_and_time,
     start_date_and_time,
     location,
-    tags,
+
     publicity,
     communities_under_publicity,
   } = event || {};
@@ -95,30 +97,35 @@ function EventFullView(props) {
   var id = match.params.id;
   id = id && id.toString();
 
+  
   const putEventInHeap = (event) => {
-    storeEventInHeap({
-      eventsInHeap: { ...(eventsInHeap || {}), [event.id.toString()]: event },
-    });
+    storeEventInHeap(
+      {
+        eventsInHeap: { ...(eventsInHeap || {}), [event.id.toString()]: event },
+      },
+      heap
+    );
   };
   //   ------------------------------------------------------------------------------------
+
   const finder = (ev, id) => ev.id.toString() === id;
   useEffect(() => {
     // Find from the list of "other events" in the table
 
-    var foundInRedux = (events || []).find((ev) => finder(ev, id)); // search locally in the "otherCommunities" list
+    var foundInRedux = (events || []).find((ev) => finder(ev, id)); // search locally in the "otherEvents" list
     if (!foundInRedux)
-      foundInRedux = (myEvents || []).find((ev) => finder(ev, id)); // search locally in admin's community list
-
-    if (foundInRedux) {
-      checkIfAdminControlsEvent(foundInRedux, auth);
-      return setEvent(foundInRedux);
-    }
+      foundInRedux = (myEvents || []).find((ev) => finder(ev, id)); // search locally in admin's events list
 
     // Otherwise, check if the item has been loaded before, and is in the heap
     const foundInHeap = (eventsInHeap || {})[id];
     if (foundInHeap) {
       checkIfAdminControlsEvent(foundInHeap, auth);
       return setEvent(foundInHeap);
+    }
+
+    if (foundInRedux) {
+      checkIfAdminControlsEvent(foundInRedux, auth);
+      return setEvent(foundInRedux);
     }
 
     //  ------ Else fetch from API (Probably means the user is loading directly into this page(or refreshing)) -------
@@ -344,6 +351,7 @@ const mapStateToProps = (state) => {
     myEvents: state.getIn(["allEvents"]),
     auth: state.getIn(["auth"]),
     communities: state.getIn(["communities"]),
+    heap
   };
 };
 
