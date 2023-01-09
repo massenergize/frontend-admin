@@ -79,7 +79,6 @@ function EventFullView(props) {
   const modalState = (dialog || "").toLowerCase() === "open";
   // ------------------------------------------------------------
   const [showShareModal, setshowShareModal] = useState(modalState);
-
   const {
     name,
     community,
@@ -97,7 +96,6 @@ function EventFullView(props) {
   var id = match.params.id;
   id = id && id.toString();
 
-  
   const putEventInHeap = (event) => {
     storeEventInHeap(
       {
@@ -116,16 +114,16 @@ function EventFullView(props) {
     if (!foundInRedux)
       foundInRedux = (myEvents || []).find((ev) => finder(ev, id)); // search locally in admin's events list
 
+    if (foundInRedux) {
+      checkIfAdminControlsEvent(foundInRedux, auth);
+      return setEvent(foundInRedux);
+    }
+
     // Otherwise, check if the item has been loaded before, and is in the heap
     const foundInHeap = (eventsInHeap || {})[id];
     if (foundInHeap) {
       checkIfAdminControlsEvent(foundInHeap, auth);
       return setEvent(foundInHeap);
-    }
-
-    if (foundInRedux) {
-      checkIfAdminControlsEvent(foundInRedux, auth);
-      return setEvent(foundInRedux);
     }
 
     //  ------ Else fetch from API (Probably means the user is loading directly into this page(or refreshing)) -------
@@ -351,7 +349,7 @@ const mapStateToProps = (state) => {
     myEvents: state.getIn(["allEvents"]),
     auth: state.getIn(["auth"]),
     communities: state.getIn(["communities"]),
-    heap
+    heap,
   };
 };
 
