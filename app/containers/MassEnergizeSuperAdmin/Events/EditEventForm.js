@@ -111,32 +111,37 @@ class EditEventForm extends Component {
       eventsFromOtherCommunities,
       putEventInHeap,
       heap,
+      passedEvent,
     } = props;
     const { id } = match.params;
 
     var { rescheduledEvent } = state;
 
     rescheduledEvent = exceptions[id] || rescheduledEvent;
-    var event = (events || []).find((e) => e.id.toString() === id.toString()); // Search for events from my event list
+    var event;
+    
+    if (!passedEvent) {
+      event = (events || []).find((e) => e.id.toString() === id.toString()); // Search for events from my event list
 
-    // If not found, look inside heap
-    if (!event) event = (eventsInHeap || {})[id];
+      // If not found, look inside heap
+      if (!event) event = (eventsInHeap || {})[id];
 
-    // If not found look inside list of "other Events"
-    if (!event)
-      event = (eventsFromOtherCommunities || []).find(
-        (e) => e.id.toString() === id.toString()
-      );
+      // If not found look inside list of "other Events"
+      if (!event)
+        event = (eventsFromOtherCommunities || []).find(
+          (e) => e.id.toString() === id.toString()
+        );
 
-    const storeEventInHeap = (data) => {
-      putEventInHeap(
-        { eventsInHeap: { ...eventsInHeap, [id.toString()]: data } },
-        heap
-      );
-    };
+      const storeEventInHeap = (data) => {
+        putEventInHeap(
+          { eventsInHeap: { ...eventsInHeap, [id.toString()]: data } },
+          heap
+        );
+      };
 
-    // If all local searches fail, just retrieve from backend
-    if (!event) findEventFromBackend({ id, storeEventInHeap });
+      // If all local searches fail, just retrieve from backend
+      if (!event) findEventFromBackend({ id, storeEventInHeap });
+    } else event = passedEvent;
 
     const readOnly = checkIfReadOnly(event, auth);
     const thereIsNothingInEventsExceptionsList = rescheduledEvent === null;
@@ -224,6 +229,8 @@ class EditEventForm extends Component {
   render() {
     const { classes } = this.props;
     const { formJson, readOnly, event } = this.state;
+
+    console.log("I am saying this is the event innit", event);
     if (!formJson) return <Loading />;
     return (
       <div>
