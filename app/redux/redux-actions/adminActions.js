@@ -226,12 +226,9 @@ export const reduxLoadCCActions = (data = []) => ({
   type: LOAD_CC_ACTIONS,
   payload: data,
 });
-export const reduxAddToHeap = (data = {}) => (dispatch, getState) => {
-  const heap = getState().heap || {};
-  dispatch({
-    type: UPDATE_HEAP,
-    payload: { ...heap, ...data },
-  });
+
+export const reduxAddToHeap = (data = {}, heap = {}) => (dispatch) => {
+  dispatch(reduxUpdateHeap({ ...heap, ...data }));
 };
 export const reduxUpdateHeap = (heap = {}) => ({
   type: UPDATE_HEAP,

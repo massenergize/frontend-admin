@@ -11,6 +11,7 @@ import Typography from "@material-ui/core/Typography";
 import { checkIfReadOnly, getSelectedIds } from "../Actions/EditActionForm";
 import { bindActionCreators } from "redux";
 import {
+  reduxAddToHeap,
   reduxUpdateHeap,
 } from "../../../redux/redux-actions/adminActions";
 import Loading from "dan-components/Loading";
@@ -79,13 +80,13 @@ export const makeTagSection = ({
   return section;
 };
 
-// const findEventFromBackend = ({ id, reduxFxn }) => {
-//   apiCall("events.info", { event_id: id })
-//     .then((response) => {
-//       console.log("LEts see the response", response);
-//     })
-//     .catch((e) => console.log("ERROR ", id));
-// };
+const findEventFromBackend = ({ id, reduxFxn }) => {
+  apiCall("events.info", { event_id: id }).then((response) => {
+    if (!response.success)
+      return console.log("Sorry, could not load event with ID" + id);
+    reduxFxn && reduxFxn(response.data);
+  });
+};
 class EditEventForm extends Component {
   constructor(props) {
     super(props);
@@ -107,20 +108,46 @@ class EditEventForm extends Component {
       exceptions,
       otherCommunities,
       eventsInHeap,
+      eventsFromOtherCommunities,
+      putEventInHeap,
+      heap,
+      passedEvent,
     } = props;
     const { id } = match.params;
 
     var { rescheduledEvent } = state;
 
-  
     rescheduledEvent = exceptions[id] || rescheduledEvent;
-    var event = (events || []).find((e) => e.id.toString() === id.toString());
-    if (!event) event = (eventsInHeap || {})[id];
+    var event;
+
+    if (!passedEvent) {
+      event = (events || []).find((e) => e.id.toString() === id.toString()); // Search for events from my event list
+
+      // If not found, look inside heap
+      if (!event) event = (eventsInHeap || {})[id];
+
+      // If not found look inside list of "other Events"
+      if (!event)
+        event = (eventsFromOtherCommunities || []).find(
+          (e) => e.id.toString() === id.toString()
+        );
+
+      const storeEventInHeap = (data) => {
+        putEventInHeap(
+          { eventsInHeap: { ...eventsInHeap, [id.toString()]: data } },
+          heap
+        );
+      };
+
+      // If all local searches fail, just retrieve from backend
+      if (!event) findEventFromBackend({ id, storeEventInHeap });
+    } else event = passedEvent;
 
     const readOnly = checkIfReadOnly(event, auth);
     const thereIsNothingInEventsExceptionsList = rescheduledEvent === null;
 
     const readyToRenderPageFirstTime =
+      event &&
       events &&
       tags &&
       tags.length &&
@@ -131,6 +158,7 @@ class EditEventForm extends Component {
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderPageFirstTime || state.mounted;
 
+    //--- When this value is true, it means we have been able to load all data needed to show the form, so no need to recreate formJson
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
     const coms = (communities || []).map((c) => ({
@@ -201,6 +229,7 @@ class EditEventForm extends Component {
   render() {
     const { classes } = this.props;
     const { formJson, readOnly, event } = this.state;
+
     if (!formJson) return <Loading />;
     return (
       <div>
@@ -242,7 +271,8 @@ const mapStateToProps = (state) => {
     heap: state.getIn(["heap"]),
     exceptions: (heap && heap.exceptions) || {},
     otherCommunities: state.getIn(["otherCommunities"]),
-    eventsInHeap: (heap || {}).eventsInHeap ||{},
+    eventsInHeap: (heap || {}).eventsInHeap || {},
+    eventsFromOtherCommunities: state.getIn(["otherEvents"]),
   };
 };
 
@@ -250,6 +280,7 @@ const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       addExceptionsToHeap: reduxUpdateHeap,
+      putEventInHeap: reduxAddToHeap,
     },
     dispatch
   );
@@ -267,7 +298,6 @@ export default withStyles(styles, { withTheme: true })(EditEventMapped);
 const validator = (cleaned) => {
   const start = (cleaned || {})["start_date_and_time"];
   const end = (cleaned || {})["end_date_and_time"];
-  console.log(start, end);
   const endDateComesLater = new Date(end) > new Date(start);
   return [
     endDateComesLater,
