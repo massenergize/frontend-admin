@@ -119,7 +119,7 @@ class EditEventForm extends Component {
 
     rescheduledEvent = exceptions[id] || rescheduledEvent;
     var event;
-    
+
     if (!passedEvent) {
       event = (events || []).find((e) => e.id.toString() === id.toString()); // Search for events from my event list
 
@@ -230,7 +230,6 @@ class EditEventForm extends Component {
     const { classes } = this.props;
     const { formJson, readOnly, event } = this.state;
 
-    console.log("I am saying this is the event innit", event);
     if (!formJson) return <Loading />;
     return (
       <div>
