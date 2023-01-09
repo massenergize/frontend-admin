@@ -40,6 +40,7 @@ import { IS_CANARY, IS_PROD } from './config/constants';
 
 import * as Sentry from "@sentry/react";
 import { BrowserTracing } from "@sentry/tracing";
+import { StyledEngineProvider } from "@mui/material/styles";
 
 const SENTRY_DSN = IS_PROD || IS_CANARY? process.env.REACT_APP_SENTRY_PROD_DSN: process.env.REACT_APP_SENTRY_DEV_DSN;
 
@@ -59,7 +60,9 @@ const render = messages => {
     <Provider store={store}>
       <LanguageProvider messages={messages}>
         <ConnectedRouter history={history}>
+          <StyledEngineProvider injectFirst>
           <App />
+          </StyledEngineProvider>
         </ConnectedRouter>
       </LanguageProvider>
     </Provider>,
