@@ -331,7 +331,7 @@ function EventFullView(props) {
         </div>
       </Paper>
 
-      <EditEventForm match={{ params: { id: event && event.id } }} passedEvent = {event} />
+      <EditEventForm passedEvent = {event} />
     </div>
   );
 }
