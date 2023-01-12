@@ -62,7 +62,9 @@ const render = messages => {
     <Provider store={store}>
       <LanguageProvider messages={messages}>
         <ConnectedRouter history={history}>
+          <StyledEngineProvider injectFirst>
           <App />
+          </StyledEngineProvider>
         </ConnectedRouter>
       </LanguageProvider>
     </Provider>

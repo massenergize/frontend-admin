@@ -7,7 +7,7 @@ import "firebase/auth";
 // import NotFound from 'containers/Pages/Standalone/NotFoundDedicated';
 import Application from "./Application";
 import LoginDedicated from "../Pages/Standalone/LoginDedicated";
-import ThemeWrapper, { AppContext } from "./ThemeWrapper";
+import { AppContext } from "./ThemeWrapper";
 import { googleProvider, facebookProvider } from "./fire-config";
 import Auth from "./Auth";
 import { apiCall } from "../../utils/messenger";
