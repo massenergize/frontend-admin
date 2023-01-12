@@ -13,6 +13,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router/immutable';
+import { createRoot } from "react-dom/client";
 import history from 'utils/history';
 import 'sanitize.css/sanitize.css';
 // Import root app
@@ -40,6 +41,7 @@ import { IS_CANARY, IS_PROD } from './config/constants';
 
 import * as Sentry from "@sentry/react";
 import { BrowserTracing } from "@sentry/tracing";
+import { StyledEngineProvider } from "@mui/material/styles";
 
 const SENTRY_DSN = IS_PROD || IS_CANARY? process.env.REACT_APP_SENTRY_PROD_DSN: process.env.REACT_APP_SENTRY_DEV_DSN;
 
@@ -53,17 +55,17 @@ const initialState = {};
 const store = configureStore(initialState, history);
 const MOUNT_NODE = document.getElementById('app');
 
+const root = createRoot(MOUNT_NODE);
 
 const render = messages => {
-  ReactDOM.render(
+  root.render(
     <Provider store={store}>
       <LanguageProvider messages={messages}>
         <ConnectedRouter history={history}>
           <App />
         </ConnectedRouter>
       </LanguageProvider>
-    </Provider>,
-    MOUNT_NODE,
+    </Provider>
   );
 };
 
