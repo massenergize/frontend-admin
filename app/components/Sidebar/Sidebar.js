@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import { connect } from 'react-redux';
 import classNames from 'classnames';
 import Hidden from '@material-ui/core/Hidden';

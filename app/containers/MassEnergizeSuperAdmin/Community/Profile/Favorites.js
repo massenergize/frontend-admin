@@ -12,7 +12,7 @@ import Quote from 'dan-components/Quote/Quote';
 import * as moment from 'moment/moment';
 const styles = theme => ({
   divider: {
-    margin: `${theme.spacing.unit * 2}px 0`,
+    margin: `${theme.spacing(1) * 2}px 0`,
     background: 'none'
   },
 });

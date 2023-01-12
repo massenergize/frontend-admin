@@ -11,7 +11,7 @@ import Ionicon from 'react-ionicons';
 const styles = theme => ({
   root: {
     width: '100%',
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing(1) * 3,
     overflowX: 'auto',
   },
   table: {

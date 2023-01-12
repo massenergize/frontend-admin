@@ -10,7 +10,7 @@ import EditIcon from '@mui/icons-material/BorderColor';
 
 const styles = theme => ({
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
 });
 

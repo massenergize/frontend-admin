@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { closeAllAction } from 'dan-actions/UiActions';
 import Button from '@material-ui/core/Button';
-import { withStyles, withTheme } from '@material-ui/core/styles';
+import { withStyles } from '@mui/styles';
 import Fade from '@material-ui/core/Fade';
 import Popper from '@material-ui/core/Popper';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -186,4 +186,4 @@ const MegaMenuMapped = connect(
   mapDispatchToProps
 )(MegaMenu);
 
-export default withTheme()(withStyles(styles)(MegaMenuMapped));
+export default (withStyles(styles)(MegaMenuMapped));

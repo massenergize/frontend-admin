@@ -20,7 +20,7 @@ const styles = theme => ({
       marginLeft: 90,
       minWidth: 400,
     },
-    marginBottom: theme.spacing.unit * 3,
+    marginBottom: theme.spacing(1) * 3,
     position: 'relative',
   },
   media: {

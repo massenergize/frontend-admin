@@ -14,7 +14,7 @@ import { getFileSize,
   smartString } from "../ME  Tools/media library/shared/utils/utils";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 const styles = (theme) => {
-  const spacing = theme.spacing.unit;
+  const spacing = theme.spacing(1);
   const error = {
     background: "rgb(255, 214, 214)",
     color: "rgb(170, 28, 28)",

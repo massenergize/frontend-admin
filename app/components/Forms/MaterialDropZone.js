@@ -13,31 +13,31 @@ import 'dan-styles/vendors/react-dropzone/react-dropzone.css';
 import CropModal from '../CropModal/CropModal';
 import isImage from './helpers/helpers.js';
 
-const styles = theme => ({
+const styles = (theme) => ({
   dropItem: {
     borderColor: theme.palette.divider,
     background: theme.palette.background.default,
     borderRadius: theme.rounded.medium,
     color: theme.palette.text.disabled,
-    textAlign: 'center'
+    textAlign: "center",
   },
   uploadIconSize: {
     width: 72,
     height: 72,
-    display: 'inline-block',
-    '& svg': {
+    display: "inline-block",
+    "& svg": {
       fill: theme.palette.secondary.main,
-    }
+    },
   },
   rightIcon: {
-    marginLeft: theme.spacing.unit,
-    '& svg': {
-      fill: theme.palette.common.white
-    }
+    marginLeft: theme.spacing(1),
+    "& svg": {
+      fill: theme.palette.common.white,
+    },
   },
   button: {
-    marginTop: 20
-  }
+    marginTop: 20,
+  },
 });
 
 class MaterialDropZone extends React.Component {

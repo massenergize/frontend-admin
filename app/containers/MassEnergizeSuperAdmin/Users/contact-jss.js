@@ -18,7 +18,7 @@ const styles = theme => ({
     position: 'relative',
     borderRadius: theme.rounded.medium,
     boxShadow: theme.shade.light,
-    marginBottom: theme.spacing.unit * 3,
+    marginBottom: theme.spacing(1) * 3,
     [theme.breakpoints.up('sm')]: {
       display: 'flex',
     },
@@ -106,7 +106,7 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit}px`,
+    padding: `${theme.spacing(1) * 2}px ${theme.spacing(1)}px`,
     position: 'relative',
   },
   content: {
@@ -153,8 +153,8 @@ const styles = theme => ({
     display: 'flex',
     background: theme.palette.common.white,
     border: `1px solid ${theme.palette.divider}`,
-    marginRight: theme.spacing.unit / 2,
-    height: theme.spacing.unit * 5,
+    marginRight: theme.spacing(1) / 2,
+    height: theme.spacing(1) * 5,
   },
   search: {
     width: 'auto',
@@ -169,7 +169,7 @@ const styles = theme => ({
   },
   input: {
     font: 'inherit',
-    padding: `${theme.spacing.unit / 2}px ${theme.spacing.unit * 2}px ${theme.spacing.unit / 2}px ${theme.spacing.unit * 6}px`,
+    padding: `${theme.spacing(1) / 2}px ${theme.spacing(1) * 2}px ${theme.spacing(1) / 2}px ${theme.spacing(1) * 6}px`,
     border: 0,
     display: 'block',
     verticalAlign: 'middle',
@@ -264,7 +264,7 @@ const styles = theme => ({
   },
   field: {
     width: '100%',
-    marginBottom: theme.spacing.unit,
+    marginBottom: theme.spacing(1),
     '& svg': {
       color: theme.palette.grey[400],
       fontSize: 18,
@@ -295,7 +295,7 @@ const styles = theme => ({
   avatarTop: {
     display: 'block',
     textAlign: 'center',
-    padding: theme.spacing.unit * 3,
+    padding: theme.spacing(1) * 3,
     '& $avatar': {
       width: 100,
       height: 100,
@@ -309,7 +309,7 @@ const styles = theme => ({
     transform: 'translate(-50%, -50%)'
   },
   navIconHide: {
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(1),
     paddingTop: 0,
     [theme.breakpoints.up('sm')]: {
       display: 'none'

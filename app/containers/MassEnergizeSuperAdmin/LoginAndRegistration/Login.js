@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@mui/styles';
 import { LoginForm } from 'dan-components';
 import styles from 'dan-components/Forms/user-jss';
 import { apiCall } from '../../../utils/messenger';

@@ -11,7 +11,7 @@ import { pop } from "../../../../utils/common";
 import Typography from "@mui/material/Typography";
 
 const styles = (theme) => {
-  const spacing = theme.spacing.unit;
+  const spacing = theme.spacing(1);
   return {
     textbox: {
       width: "100%",

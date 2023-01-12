@@ -5,7 +5,7 @@ import green from '@material-ui/core/colors/green';
 
 const styles = theme => ({
   mobileStepper: {
-    margin: `0 auto ${theme.spacing.unit * 3}px`,
+    margin: `0 auto ${theme.spacing(1) * 3}px`,
     textAlign: 'center',
     borderRadius: '0 0 12px 12px'
   },
@@ -22,14 +22,14 @@ const styles = theme => ({
     backgroundColor: green[500],
   },
   divider: {
-    margin: `${theme.spacing.unit * 1.5}px 0`,
+    margin: `${theme.spacing(1) * 1.5}px 0`,
     background: 'none'
   },
   link: {
     color: theme.palette.primary.main
   },
   listPeople: {
-    padding: `${theme.spacing.unit / 2}px ${theme.spacing.unit}px`,
+    padding: `${theme.spacing(1) / 2}px ${theme.spacing(1)}px`,
   },
   sliderWrap: {
     height: 310,
@@ -61,7 +61,7 @@ const styles = theme => ({
     height: 30,
   },
   avatarComment: {
-    marginRight: theme.spacing.unit * 3
+    marginRight: theme.spacing(1) * 3
   },
   commentAction: {
     background: theme.palette.type === 'dark' ? theme.palette.grey[700] : theme.palette.grey[100],

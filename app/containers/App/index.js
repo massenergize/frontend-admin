@@ -215,7 +215,7 @@ class App extends React.Component {
     const { auth } = this.props;
     const user = auth;
     return (
-      <ThemeWrapper>
+      <ThemeWrapper mode={"dark"} color="pink">
         <AppContext.Consumer>
           {(changeMode) => (
             <Switch>
@@ -285,7 +285,7 @@ class App extends React.Component {
             </Switch>
           )}
         </AppContext.Consumer>
-      </ThemeWrapper>
+       </ThemeWrapper>
     );
   }
 }

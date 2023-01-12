@@ -49,7 +49,7 @@ const styles = theme => ({
       position: 'relative',
       boxShadow: `0 10px 10px 10px ${theme.palette.background.paper}`,
       fontWeight: 600,
-      marginBottom: theme.spacing.unit,
+      marginBottom: theme.spacing(1),
       zIndex: 1,
       '&:after': {
         content: '""',
@@ -113,7 +113,7 @@ const styles = theme => ({
   bodyForm: {
     position: 'relative',
     background: theme.palette.background.paper,
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing(1) * 2,
     [theme.breakpoints.down('sm')]: {
       padding: '15px 10px'
     },

@@ -1,15 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import IconButton from '@material-ui/core/IconButton';
+import { withStyles } from '@mui/styles';
+import { Card, CardActions, CardContent } from "@mui/material";
+import { IconButton } from "@mui/material";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
 import Comment from '@mui/icons-material/Comment';
 import styles from './cardStyle-jss';
-
 class GeneralCard extends React.Component {
   render() {
     const {

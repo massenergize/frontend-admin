@@ -28,7 +28,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(1) * 4,
     textAlign: "center",
   },
 });

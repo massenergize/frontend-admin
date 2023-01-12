@@ -18,7 +18,7 @@ const styles = theme => ({
     position: 'absolute',
     right: 10,
     top: 10,
-    padding: theme.spacing.unit,
+    padding: theme.spacing(1),
     borderRadius: theme.rounded.big,
     fontSize: 11,
     fontWeight: theme.typography.fontWeightMedium,
