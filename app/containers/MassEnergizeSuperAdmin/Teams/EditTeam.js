@@ -109,11 +109,11 @@ class EditTeam extends Component {
   }
   async componentDidMount() {
     const { id } = this.props.match.params;
-    const { addTeamInfoToHeap, teamsInfos } = this.props;
+    const { addTeamInfoToHeap, teamsInfos,heap } = this.props;
     const teamResponse = await apiCall("/teams.info", { team_id: id });
     addTeamInfoToHeap({
       teamsInfos: { ...teamsInfos, [id.toString()]: teamResponse.data },
-    });
+    },heap);
   }
 
   setStateAsync(state) {
@@ -154,6 +154,7 @@ function mapStateToProps(state) {
     communities: state.getIn(["communities"]),
     teams: state.getIn(["allTeams"]),
     teamsInfos: heap.teamsInfos || {},
+    heap
   };
 }
 function mapDispatchToProps(dispatch) {

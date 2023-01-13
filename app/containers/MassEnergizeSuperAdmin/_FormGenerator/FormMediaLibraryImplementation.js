@@ -20,7 +20,7 @@ import {
 import { makeLimitsFromImageArray } from "../../../utils/common";
 import { ProgressCircleWithLabel } from "../Gallery/utils";
 import { getMoreInfoOnImage } from "../Gallery/Gallery";
-import { Link } from "react-router-dom";
+//import { Link } from "react-router-dom";
 import GalleryFilter from "../Gallery/tools/GalleryFilter";
 import { filters } from "../Gallery/Gallery";
 import { ShowTagsOnPane } from "../Gallery/SideSheet";
@@ -206,6 +206,7 @@ const UploadIntroductionComponent = ({ auth, setAvailableTo, available }) => {
           </div>
         </>
       )}
+      {/* we are disabling sharing images to other communities for now
       {is_community_admin && (
         <FormControlLabel
           label="Make the image(s) available to other communities"
@@ -217,11 +218,12 @@ const UploadIntroductionComponent = ({ auth, setAvailableTo, available }) => {
           }
         />
       )}
-      <div>
-        <Link to={`/admin/gallery/add?tmb=${window.location.pathname}`}>
+       <div>
+        <Link to="/admin/gallery/add">
           Upload an image for specific communities instead
         </Link>
-      </div>
+        </div> 
+        */}
     </div>
   );
 };

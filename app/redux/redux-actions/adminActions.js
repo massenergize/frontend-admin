@@ -242,12 +242,9 @@ export const reduxLoadCCActions = (data = []) => ({
   type: LOAD_CC_ACTIONS,
   payload: data,
 });
-export const reduxAddToHeap = (data = {}) => (dispatch, getState) => {
-  const heap = getState().heap || {};
-  dispatch({
-    type: UPDATE_HEAP,
-    payload: { ...heap, ...data },
-  });
+
+export const reduxAddToHeap = (data = {}, heap = {}) => (dispatch) => {
+  dispatch(reduxUpdateHeap({ ...heap, ...data }));
 };
 export const reduxUpdateHeap = (heap = {}) => ({
   type: UPDATE_HEAP,
@@ -760,7 +757,9 @@ export const reduxCallCommunities = () => (dispatch) => {
     if (graphResponse.data) {
       dispatch(reduxLoadGraphData(graphResponse.data));
     }
-    dispatch(reduxLoadAdminActivities(activities && activities.data));
+    if (activities && activities.data) {
+      dispatch(reduxLoadAdminActivities(activities.data));
+    }
   });
 };
 

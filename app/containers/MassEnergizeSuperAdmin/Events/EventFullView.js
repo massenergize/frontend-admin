@@ -13,9 +13,10 @@ import {
   loadAllEvents,
   reduxAddToHeap,
   reduxLoadAllOtherEvents,
+  reduxUpdateHeap,
 } from "../../../redux/redux-actions/adminActions";
 import EventShareModal from "./EventShareModal";
-import { IS_CANARY, IS_LOCAL, IS_PROD } from "../../../config/constants";
+import { PORTAL_HOST } from "../../../config/constants";
 import { dateFormatString } from "../Community/utils";
 import EditEventForm from "./EditEventForm";
 
@@ -65,6 +66,7 @@ function EventFullView(props) {
     myEvents, // Events that are from the communities the current admin manages
     communities,
     putOtherEventsInRedux,
+    heap,
   } = props;
   const history = useHistory();
   const [event, setEvent] = useState(undefined);
@@ -77,14 +79,13 @@ function EventFullView(props) {
   const modalState = (dialog || "").toLowerCase() === "open";
   // ------------------------------------------------------------
   const [showShareModal, setshowShareModal] = useState(modalState);
-
   const {
     name,
     community,
     end_date_and_time,
     start_date_and_time,
     location,
-    tags,
+
     publicity,
     communities_under_publicity,
   } = event || {};
@@ -96,18 +97,22 @@ function EventFullView(props) {
   id = id && id.toString();
 
   const putEventInHeap = (event) => {
-    storeEventInHeap({
-      eventsInHeap: { ...(eventsInHeap || {}), [event.id.toString()]: event },
-    });
+    storeEventInHeap(
+      {
+        eventsInHeap: { ...(eventsInHeap || {}), [event.id.toString()]: event },
+      },
+      heap
+    );
   };
   //   ------------------------------------------------------------------------------------
+
   const finder = (ev, id) => ev.id.toString() === id;
   useEffect(() => {
     // Find from the list of "other events" in the table
 
-    var foundInRedux = (events || []).find((ev) => finder(ev, id)); // search locally in the "otherCommunities" list
+    var foundInRedux = (events || []).find((ev) => finder(ev, id)); // search locally in the "otherEvents" list
     if (!foundInRedux)
-      foundInRedux = (myEvents || []).find((ev) => finder(ev, id)); // search locally in admin's community list
+      foundInRedux = (myEvents || []).find((ev) => finder(ev, id)); // search locally in admin's events list
 
     if (foundInRedux) {
       checkIfAdminControlsEvent(foundInRedux, auth);
@@ -223,14 +228,8 @@ function EventFullView(props) {
   //   -------------------------------------- HTML MARK UP --------------------------------------------------
 
   const sharedTo = listToString(event.shared_to);
-  var host;
   const makeURL = (event) => {
-    if (IS_LOCAL) host = "http://localhost:3000";
-    else if (IS_CANARY) host = "https://communities-canary.massenergize.org";
-    else if (IS_PROD) host = "https://communities.massenergize.org";
-    else host = "https://community.massenergize.dev";
-
-    return `${host}/${event &&
+    return `${PORTAL_HOST}/${event &&
       (event.community || {}).subdomain}/events/${event && event.id}`;
   };
   return (
@@ -332,7 +331,7 @@ function EventFullView(props) {
         </div>
       </Paper>
 
-      <EditEventForm match={{ params: { id: event && event.id } }} />
+      <EditEventForm match={{ params: { id: event && event.id } }} passedEvent = {event} />
     </div>
   );
 }
@@ -344,6 +343,7 @@ const mapStateToProps = (state) => {
     myEvents: state.getIn(["allEvents"]),
     auth: state.getIn(["auth"]),
     communities: state.getIn(["communities"]),
+    heap,
   };
 };
 
