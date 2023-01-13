@@ -70,7 +70,8 @@ export const makeTagSection = ({
   };
   (collections || []).forEach((tCol) => {
     var selected = (action && action.tags) || [];
-    selected = selected.length ? selected : (progress || {})[tCol.name];
+    // selected = selected.length ? selected : (progress || {})[tCol.name];
+    selected = (selected.length && selected) || [];
     const newField = {
       isRequired: false,
       name: tCol.name,
@@ -121,7 +122,7 @@ class EditActionForm extends Component {
       vendors,
       auth,
       ccActions,
-      location
+      location,
     } = props;
 
     const { id } = match.params;
@@ -163,7 +164,6 @@ class EditActionForm extends Component {
       ccActions: modifiedCCActions,
       auth,
       autoOpenMediaLibrary: libOpen,
-
     });
 
     const section = makeTagSection({ collections: tags, action });
@@ -217,7 +217,14 @@ export default withStyles(styles, { withTheme: true })(
   withRouter(EditActionMapped)
 );
 
-const createFormJson = ({ action, communities, ccActions, vendors, auth, autoOpenMediaLibrary }) => {
+const createFormJson = ({
+  action,
+  communities,
+  ccActions,
+  vendors,
+  auth,
+  autoOpenMediaLibrary,
+}) => {
   if (!action || !ccActions || !vendors || !communities) return;
   const is_super_admin = auth && auth.is_super_admin;
   const formJson = {

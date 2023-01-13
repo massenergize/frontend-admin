@@ -3,7 +3,8 @@ import PropTypes from "prop-types";
 import states from "dan-api/data/states";
 import { withStyles } from "@material-ui/core/styles";
 import moment from "moment";
-import MassEnergizeForm from "../_FormGenerator";
+// import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
 import { makeTagSection } from "./EditEventForm";
 import Loading from "dan-components/Loading";
@@ -51,7 +52,13 @@ class CreateNewEventForm extends Component {
   }
 
   static getDerivedStateFromProps = (props, state) => {
-    const { communities, tags, auth, formState, location, otherCommunities } = props;
+    const {
+      communities,
+      tags,
+      auth,
+      location,
+      otherCommunities,
+    } = props;
 
     const readyToRenderPageFirstTime =
       communities &&
@@ -72,11 +79,10 @@ class CreateNewEventForm extends Component {
       id: "" + c.id,
     }));
 
-    const progress = (formState || {})[PAGE_KEYS.CREATE_EVENT.key] || {};
+    
     const section = makeTagSection({
       collections: tags,
       defaults: true,
-      progress,
     });
 
     const libOpen = location.state && location.state.libOpen;
@@ -84,7 +90,6 @@ class CreateNewEventForm extends Component {
     const formJson = createFormJson({
       communities: coms,
       auth,
-      progress,
       autoOpenMediaLibrary: libOpen,
       otherCommunities,
     });
@@ -98,29 +103,7 @@ class CreateNewEventForm extends Component {
     };
   };
 
-  preserveFormData(formState) {
-    const { saveFormTemporarily } = this.props;
-    const oldFormState = this.props.formState;
-    const { formData } = formState || {};
-    saveFormTemporarily({
-      key: PAGE_KEYS.CREATE_EVENT.key,
-      data: formData,
-      whole: oldFormState,
-    });
-  }
-
-  clearProgress(resetForm) {
-    resetForm();
-    const { saveFormTemporarily } = this.props;
-    const oldFormState = this.props.formState;
-    saveFormTemporarily({
-      key: PAGE_KEYS.CREATE_EVENT.key,
-      data: {},
-      whole: oldFormState,
-    });
-
-    removePageProgressFromStorage(PAGE_KEYS.CREATE_EVENT.key);
-  }
+ 
 
   render() {
     const { classes } = this.props;
@@ -129,11 +112,10 @@ class CreateNewEventForm extends Component {
     return (
       <div>
         <MassEnergizeForm
+          pageKey={PAGE_KEYS.CREATE_EVENT.key}
           classes={classes}
           formJson={formJson}
           validator={validator}
-          unMount={this.preserveFormData.bind(this)}
-          clearProgress={this.clearProgress.bind(this)}
           enableCancel
         />
       </div>
@@ -220,7 +202,7 @@ const createFormJson = ({
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: progress.name || "",
+            // defaultValue: progress.name || "",
             dbName: "name",
             readOnly: false,
           },
@@ -231,7 +213,7 @@ const createFormJson = ({
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: progress.featured_summary || "",
+            // defaultValue: progress.featured_summary || "",
             dbName: "featured_summary",
             readOnly: false,
           },
@@ -243,7 +225,7 @@ const createFormJson = ({
             fieldType: "TextField",
             contentType: "number",
             isRequired: true,
-            defaultValue: progress.rank || "",
+            // defaultValue: progress.rank || "",
             dbName: "rank",
             readOnly: false,
           },
@@ -254,8 +236,7 @@ const createFormJson = ({
             placeholder: "YYYY-MM-DD HH:MM",
             fieldType: "DateTime",
             contentType: "text",
-            defaultValue:
-              progress.start_date_and_time || moment().startOf("hour"),
+            defaultValue: moment().startOf("hour"),
             dbName: "start_date_and_time",
             minDate: moment().startOf("hour"),
             readOnly: false,
@@ -266,11 +247,9 @@ const createFormJson = ({
             placeholder: "YYYY-MM-DD HH:MM",
             fieldType: "DateTime",
             contentType: "text",
-            defaultValue:
-              progress.end_date_and_time ||
-              moment()
-                .startOf("hour")
-                .add(1, "hours"),
+            defaultValue: moment()
+              .startOf("hour")
+              .add(1, "hours"),
             dbName: "end_date_and_time",
             minDate: moment().startOf("hour"),
             readOnly: false,
@@ -296,7 +275,7 @@ const createFormJson = ({
                   isRequired: true,
                   dbName: "separation_count",
                   contentType: "number",
-                  defaultValue: progress.separation_count || 1,
+                  defaultValue: 1,
                   data: [
                     { id: 1, displayName: "1" },
                     { id: 2, displayName: "2" },
@@ -311,7 +290,7 @@ const createFormJson = ({
                   label: "",
                   fieldType: "Radio",
                   dbName: "recurring_type",
-                  defaultValue: progress.recurring_type || null,
+                  // defaultValue: progress.recurring_type || null,
                   data: [
                     { id: "week", value: "weeks" },
                     { id: "month", value: "months" },
@@ -324,7 +303,7 @@ const createFormJson = ({
                   fieldType: "Dropdown",
                   isRequired: true,
                   dbName: "day_of_week",
-                  defaultValue: progress.day_of_week || "",
+                  defaultValue: "",
                   data: [
                     { id: "Monday", displayName: "Monday" },
                     { id: "Tuesday", displayName: "Tuesday" },
@@ -341,7 +320,7 @@ const createFormJson = ({
                     'If you selected "month", choose the week of the month on which you want the event to repeat.',
                   fieldType: "Dropdown",
                   dbName: "week_of_month",
-                  defaultValue: progress.week_of_month || "",
+                  defaultValue: "",
                   data: [
                     { id: "first", displayName: "first" },
                     { id: "second", displayName: "second" },
@@ -357,7 +336,7 @@ const createFormJson = ({
                   fieldType: "DateTime",
                   contentType: "text",
                   isRequired: false,
-                  defaultValue: progress.final_date || "none",
+                  defaultValue: "none",
                   dbName: "final_date",
                   readOnly: false,
                 },
@@ -370,7 +349,7 @@ const createFormJson = ({
                 label: "Is this Event a Template?",
                 fieldType: "Radio",
                 isRequired: true,
-                defaultValue: progress.is_global || "false",
+                defaultValue: "false",
                 dbName: "is_global",
                 readOnly: false,
                 data: [
@@ -384,7 +363,7 @@ const createFormJson = ({
                       name: "community",
                       label: "Primary Community (select one)",
                       fieldType: "Dropdown",
-                      defaultValue: progress.community || null,
+                      defaultValue: null,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
                       isRequired: true,
@@ -396,8 +375,7 @@ const createFormJson = ({
                 name: "community",
                 label: "Primary Community (select one)",
                 fieldType: "Dropdown",
-                defaultValue:
-                  progress.community || (communities[0] && communities[0].id),
+                defaultValue: communities[0] && communities[0].id,
                 dbName: "community_id",
                 data: [{ displayName: "--", id: "" }, ...communities],
                 isRequired: true,
@@ -469,7 +447,7 @@ const createFormJson = ({
         label: "Want to add an address for this event?",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: progress.have_address || "false",
+        defaultValue: "false",
         dbName: "have_address",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
@@ -483,7 +461,7 @@ const createFormJson = ({
               fieldType: "TextField",
               contentType: "text",
               isRequired: true,
-              defaultValue: progress.address || "",
+              defaultValue: "",
               dbName: "address",
               readOnly: false,
             },
@@ -494,7 +472,7 @@ const createFormJson = ({
               fieldType: "TextField",
               contentType: "text",
               isRequired: false,
-              defaultValue: progress.unit || "",
+              defaultValue: "",
               dbName: "unit",
               readOnly: false,
             },
@@ -505,7 +483,7 @@ const createFormJson = ({
               fieldType: "TextField",
               contentType: "text",
               isRequired: true,
-              defaultValue: progress.city || "",
+              defaultValue: "",
               dbName: "city",
               readOnly: false,
             },
@@ -516,7 +494,7 @@ const createFormJson = ({
               contentType: "text",
               isRequired: false,
               data: states,
-              defaultValue: progress.state || "Massachusetts",
+              defaultValue: "Massachusetts",
               dbName: "state",
               readOnly: false,
             },
@@ -529,7 +507,7 @@ const createFormJson = ({
         placeholder: "eg. This event is happening in ...",
         fieldType: "HTMLField",
         isRequired: true,
-        defaultValue: progress.description || null,
+        defaultValue: null,
         dbName: "description",
       },
       {
@@ -538,8 +516,8 @@ const createFormJson = ({
         fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload Files",
-        selected: progress.image || [],
-        defaultValue: progress.image || [],
+        selected: [],
+        // defaultValue: progress.image || [],
         openState: autoOpenMediaLibrary,
         isRequired: false,
       },
@@ -548,7 +526,7 @@ const createFormJson = ({
         label: "Enable RSVPs for this Event",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: progress.rsvp_enabled || "false",
+        defaultValue: "false",
         dbName: "rsvp_enabled",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
@@ -562,7 +540,7 @@ const createFormJson = ({
                 "Send an email with Zoom link or other details when user RSVPs they are coming?",
               fieldType: "Radio",
               isRequired: false,
-              defaultValue: progress.send_rsvp_email || "false",
+              defaultValue: "false",
               dbName: "rsvp_email",
               readOnly: false,
               data: [
@@ -579,7 +557,7 @@ const createFormJson = ({
                     placeholder: "eg. This event is happening in ...",
                     fieldType: "HTMLField",
                     isRequired: true,
-                    defaultValue: progress.rsvp_message_text || null,
+                    defaultValue: null,
                     dbName: "rsvp_message",
                   },
                 ],
@@ -593,7 +571,7 @@ const createFormJson = ({
         label: "Archive this Event",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: progress.archive || "false",
+        defaultValue: "false",
         dbName: "archive",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
@@ -613,7 +591,7 @@ const createFormJson = ({
         label: "Should this event Go Live?",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: progress.is_published || "false",
+        defaultValue: "false",
         dbName: "is_published",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],

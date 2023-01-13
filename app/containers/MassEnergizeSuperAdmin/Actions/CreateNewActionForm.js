@@ -83,11 +83,11 @@ class CreateNewActionForm extends Component {
       id: "" + c.id,
     }));
 
-    const progress = (formState || {})[PAGE_KEYS.CREATE_ACTION.key] || {};
+    // const progress = (formState || {})[PAGE_KEYS.CREATE_ACTION.key] || {};
     const section = makeTagSection({
       collections: tags,
       defaults: true,
-      progress,
+      // progress,
     });
 
     const libOpen = location.state && location.state.libOpen;
@@ -97,7 +97,7 @@ class CreateNewActionForm extends Component {
       vendors: vends,
       ccActions: modifiedCCActions,
       auth,
-      progress,
+      // progress,
       autoOpenMediaLibrary: libOpen,
     });
 
@@ -112,28 +112,28 @@ class CreateNewActionForm extends Component {
     };
   }
 
-  preserveFormData(formState) {
-    const { saveFormTemporarily } = this.props;
-    const { formData } = formState || {};
-    const oldFormState = this.props.formState;
-    saveFormTemporarily({
-      key: PAGE_KEYS.CREATE_ACTION.key,
-      data: formData,
-      whole: oldFormState,
-    });
-  }
+  // preserveFormData(formState) {
+  //   const { saveFormTemporarily } = this.props;
+  //   const { formData } = formState || {};
+  //   const oldFormState = this.props.formState;
+  //   saveFormTemporarily({
+  //     key: PAGE_KEYS.CREATE_ACTION.key,
+  //     data: formData,
+  //     whole: oldFormState,
+  //   });
+  // }
 
-  clearProgress(resetForm) {
-    resetForm();
-    const { saveFormTemporarily } = this.props;
-    const oldFormState = this.props.formState;
-    saveFormTemporarily({
-      key: PAGE_KEYS.CREATE_ACTION.key,
-      data: {},
-      whole: oldFormState,
-    });
-    removePageProgressFromStorage(PAGE_KEYS.CREATE_ACTION.key);
-  }
+  // clearProgress(resetForm) {
+  //   resetForm();
+  //   const { saveFormTemporarily } = this.props;
+  //   const oldFormState = this.props.formState;
+  //   saveFormTemporarily({
+  //     key: PAGE_KEYS.CREATE_ACTION.key,
+  //     data: {},
+  //     whole: oldFormState,
+  //   });
+  //   removePageProgressFromStorage(PAGE_KEYS.CREATE_ACTION.key);
+  // }
 
   render() {
     const { classes } = this.props;

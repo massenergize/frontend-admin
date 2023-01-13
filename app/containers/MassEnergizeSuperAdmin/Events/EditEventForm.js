@@ -45,7 +45,7 @@ export const makeTagSection = ({
   event,
   title,
   defaults = true,
-  progress,
+  // progress,
 }) => {
   const section = {
     label: title || "Please select tag(s) that apply to this event",
@@ -55,7 +55,8 @@ export const makeTagSection = ({
 
   (collections || []).forEach((tCol) => {
     var selected = (event && event.tags) || [];
-    selected = selected.length ? selected : (progress || {})[tCol.name];
+    // selected = selected.length ? selected : (progress || {})[tCol.name];
+    selected = selected.length && selected;
     const newField = {
       name: tCol.name,
       label: `${tCol.name} ${
@@ -299,7 +300,9 @@ const EditEventMapped = connect(
 EditEventForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
-export default withStyles(styles, { withTheme: true })(withRouter(EditEventMapped));
+export default withStyles(styles, { withTheme: true })(
+  withRouter(EditEventMapped)
+);
 
 const validator = (cleaned) => {
   const start = (cleaned || {})["start_date_and_time"];
