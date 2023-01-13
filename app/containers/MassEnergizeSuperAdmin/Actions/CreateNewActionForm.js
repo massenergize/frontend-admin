@@ -10,7 +10,6 @@ import fieldTypes from "../_FormGenerator/fieldTypes";
 import { bindActionCreators } from "redux";
 import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
-import { removePageProgressFromStorage } from "../../../utils/common";
 import { withRouter } from "react-router-dom";
 import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 const styles = (theme) => ({
@@ -55,7 +54,6 @@ class CreateNewActionForm extends Component {
       vendors,
       ccActions,
       auth,
-      formState,
       location,
     } = props;
     const fullyMountedNeverRunThisAgain =
@@ -83,11 +81,9 @@ class CreateNewActionForm extends Component {
       id: "" + c.id,
     }));
 
-    // const progress = (formState || {})[PAGE_KEYS.CREATE_ACTION.key] || {};
     const section = makeTagSection({
       collections: tags,
       defaults: true,
-      // progress,
     });
 
     const libOpen = location.state && location.state.libOpen;
@@ -97,7 +93,6 @@ class CreateNewActionForm extends Component {
       vendors: vends,
       ccActions: modifiedCCActions,
       auth,
-      // progress,
       autoOpenMediaLibrary: libOpen,
     });
 
@@ -112,28 +107,6 @@ class CreateNewActionForm extends Component {
     };
   }
 
-  // preserveFormData(formState) {
-  //   const { saveFormTemporarily } = this.props;
-  //   const { formData } = formState || {};
-  //   const oldFormState = this.props.formState;
-  //   saveFormTemporarily({
-  //     key: PAGE_KEYS.CREATE_ACTION.key,
-  //     data: formData,
-  //     whole: oldFormState,
-  //   });
-  // }
-
-  // clearProgress(resetForm) {
-  //   resetForm();
-  //   const { saveFormTemporarily } = this.props;
-  //   const oldFormState = this.props.formState;
-  //   saveFormTemporarily({
-  //     key: PAGE_KEYS.CREATE_ACTION.key,
-  //     data: {},
-  //     whole: oldFormState,
-  //   });
-  //   removePageProgressFromStorage(PAGE_KEYS.CREATE_ACTION.key);
-  // }
 
   render() {
     const { classes } = this.props;

@@ -61,7 +61,6 @@ export const makeTagSection = ({
   collections,
   action,
   defaults = true,
-  progress,
 }) => {
   const section = {
     label: "Please select tag(s) that apply to this action",
@@ -83,8 +82,10 @@ export const makeTagSection = ({
       placeholder: "",
       fieldType: "Checkbox",
       selectMany: tCol.allow_multiple,
-      defaultValue: defaults && getSelectedIds(selected || [], tCol.tags || []),
-      // defaultValue: getSelectedIds(selected || [], tCol.tags || []),
+      // defaultValue: defaults && getSelectedIds(selected || [], tCol.tags || []),
+      processedDefaultValue: (selected) =>
+        getSelectedIds(selected || [], tCol.tags || []),
+
       dbName: "tags",
       data: (tCol.tags || []).map((t) => ({
         ...t,

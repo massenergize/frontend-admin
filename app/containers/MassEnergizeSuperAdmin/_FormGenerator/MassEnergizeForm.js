@@ -39,18 +39,25 @@ function MassEnergizeForm(props) {
   const { formState, saveFormTemporarily, formJson } = props;
   const pageKey = props.pageKey || PAGE_KEYS.PLACEHOLDER_PAGE.key;
   const progress = (formState || {})[pageKey] || {};
-  console.log("RETRIEVED ", progress);
 
   const insertProgress = (children, progress) => {
     if (!children) return [];
     const temp = [];
+
     for (var child of children) {
-      const value = child.defaultValue || progress[child.name];
+      const value = progress[child.name] || child.defaultValue;
+      //--- For situations where a field needs some unique computations before setting to "defaultValue"
+      //--- All mechanics can be defined in a function and set to "processedDefaultValue"
+      const { processedDefaultValue } = child || {};
+      if (processedDefaultValue) value = processedDefaultValue(value);
       child.defaultValue = value;
+
       if (child.children) {
         const content = insertProgress(child.children, progress);
         if (content.length) child = { ...child, children: content };
-      } else if (child.child) {
+      }
+
+      if (child.child) {
         const content = insertProgress(child.child.fields, progress);
         if (content.length)
           child = {
@@ -58,8 +65,28 @@ function MassEnergizeForm(props) {
             ...{ ...child.child, fields: content },
           };
       }
+
+      if (child.conditionalDisplays) {
+        const fields = child.conditionalDisplays || [];
+        const inflated = [];
+        for (var ch of fields) {
+          const content = insertProgress(ch.fields, progress);
+          if (content.length)
+            ch = {
+              ...ch,
+              fields: content,
+            };
+          inflated.push(ch);
+        }
+        child = {
+          ...child,
+          conditionalDisplays: inflated,
+        };
+      }
+
       temp.push(child);
     }
+
     return temp;
   };
 
@@ -68,12 +95,12 @@ function MassEnergizeForm(props) {
       ...formJson,
       fields: insertProgress(formJson.fields, progress),
     };
+
     setJson(inflatedWithProgress);
   }, [formJson, progress]);
 
   const preserveFormData = (currentFormState) => {
     const { formData } = currentFormState || {};
-    console.log("CURRENT FORM STATE: ", formData);
     saveFormTemporarily({
       key: pageKey,
       data: formData,

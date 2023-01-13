@@ -45,7 +45,6 @@ export const makeTagSection = ({
   event,
   title,
   defaults = true,
-  // progress,
 }) => {
   const section = {
     label: title || "Please select tag(s) that apply to this event",
@@ -56,7 +55,6 @@ export const makeTagSection = ({
   (collections || []).forEach((tCol) => {
     var selected = (event && event.tags) || [];
     // selected = selected.length ? selected : (progress || {})[tCol.name];
-    selected = selected.length && selected;
     const newField = {
       name: tCol.name,
       label: `${tCol.name} ${
@@ -67,7 +65,9 @@ export const makeTagSection = ({
       placeholder: "",
       fieldType: "Checkbox",
       selectMany: tCol.allow_multiple,
-      defaultValue: defaults && getSelectedIds(selected, tCol.tags || []),
+      // defaultValue: defaults && getSelectedIds(selected, tCol.tags || []),
+      processedDefaultValue: (selected) =>
+        getSelectedIds(selected || [], tCol.tags || []),
       dbName: "tags",
       data: tCol.tags.map((t) => ({
         ...t,
