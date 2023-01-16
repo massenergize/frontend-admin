@@ -64,13 +64,16 @@ class AllCommunityAdminMessages extends React.Component {
   }
   componentDidMount() {
     const { state } = this.props.location;
+    
     apiCall("/messages.listForCommunityAdmin").then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
         const data = allMessagesResponse.data;
-        if (state && state.ids) {
-          this.reArrangeForAdmin(data);
-          this.setState({ ignoreSavedFilters: true }); //When an admin enters here through the summary page, we need old filters to be turned off, so that the table will only use the new arrangement we are going to make
-        } else this.props.putMessagesInRedux(data);
+        this.setState({ ignoreSavedFilters: true });
+        this.props.putMessagesInRedux(data);
+        // if (state && state.ids) {
+        //   this.reArrangeForAdmin(data);
+        //   this.setState({ ignoreSavedFilters: true }); //When an admin enters here through the summary page, we need old filters to be turned off, so that the table will only use the new arrangement we are going to make
+        // } else this.props.putMessagesInRedux(data);
       }
     });
   }
@@ -100,7 +103,8 @@ class AllCommunityAdminMessages extends React.Component {
       name: "ID",
       key: "id",
       options: {
-        filter: false,
+        filter: true,
+        filterType: "multiselect",
       },
     },
     {
@@ -200,7 +204,7 @@ class AllCommunityAdminMessages extends React.Component {
     const title = brand.name + " - Community Admin Messages";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes } = this.props;
+    const { classes, location } = this.props;
     const data = this.fashionData(this.props.messages); // not ready for this yet: && this.props.messages.filter(item=>item.parent===null));
     const options = {
       filterType: "dropdown",
@@ -242,6 +246,7 @@ class AllCommunityAdminMessages extends React.Component {
             columns: columns,
             options: options,
           }}
+          preselected={{ ID: location.state && location.state.ids }}
           ignoreSavedFilters={this.state.ignoreSavedFilters}
         />
       </div>

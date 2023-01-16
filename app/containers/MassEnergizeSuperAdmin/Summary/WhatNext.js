@@ -6,6 +6,8 @@ import { connect } from "react-redux";
 import { useHistory, withRouter } from "react-router-dom";
 function WhatNext({ data }) {
   const { messages, teams, testimonials, users, team_messages } = data || {};
+  if (!Object.keys(data).length) return <></>;
+
   const history = useHistory();
   console.log("I think I am the data my gee", data);
   return (
@@ -76,7 +78,9 @@ export default connect(
 
 const SectionTemplate = ({ content, name, description, onClick }) => {
   if (!content || !content.data || !content.data.length) return <></>;
+
   const { data } = content;
+  const single = data && data.length < 10; // Need to style single digits differently, so check
   return (
     <div
       style={{
@@ -103,7 +107,12 @@ const SectionTemplate = ({ content, name, description, onClick }) => {
           }}
           onClick={() => onClick && onClick()}
         >
-          <span className="me-badge">{data.length}</span>
+          <span
+            className="me-badge"
+            style={single ? { paddingLeft: 8, paddingRight: 8 } : {}}
+          >
+            {data.length}
+          </span>
           {description(data.length)}
           <span style={{ marginLeft: 6 }} className="fa fa-long-arrow-right" />
         </Typography>

@@ -19,7 +19,9 @@ function METable(props) {
   const filterObject = useRef({});
   const pageTableProperties = useRef({});
   const [tableColumns, setTableColumns] = useState([]);
-  const { classes, tableProps, page, ignoreSavedFilters } = props;
+  // "Preselected" contains custom filter list passed as props. items are grouped by {[column.name]: filterList)}
+  // When "Preselected" is available, it will be used instead of the saved filters
+  const { classes, tableProps, page, ignoreSavedFilters, preselected } = props;
   // const [options, setOptions] = useState({});
 
   /**
@@ -38,7 +40,10 @@ function METable(props) {
     Object.keys(filterObj).forEach((indexOfColumn) => {
       const filter = filterObj[indexOfColumn] || [];
       const col = columns[indexOfColumn];
-      if (col) col.options.filterList = filter.list; // set the filter list of each column if available
+      if (col) {
+        const selection = (preselected || {})[col.name]; 
+        col.options.filterList = selection || filter.list; // if custom passed filter selections are available, use that instead of saved filters
+      } // set the filter list of each column if available
     });
     filterObject.current = filterObj;
     return columns;
