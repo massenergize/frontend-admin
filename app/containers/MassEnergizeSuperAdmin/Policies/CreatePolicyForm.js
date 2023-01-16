@@ -1,49 +1,54 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import { apiCall } from '../../../utils/messenger';
-import MassEnergizeForm from '../_FormGenerator';
-
-const styles = theme => ({
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import { apiCall } from "../../../utils/messenger";
+// import MassEnergizeForm from '../_FormGenerator';
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
+import Loading from "dan-components/Loading";
+const styles = (theme) => ({
   root: {
     flexGrow: 1,
-    padding: 30
+    padding: 30,
   },
   field: {
-    width: '100%',
-    marginBottom: 20
+    width: "100%",
+    marginBottom: 20,
   },
   fieldBasic: {
-    width: '100%',
+    width: "100%",
     marginBottom: 20,
-    marginTop: 10
+    marginTop: 10,
   },
   inlineWrap: {
-    display: 'flex',
-    flexDirection: 'row'
+    display: "flex",
+    flexDirection: "row",
   },
   buttonInit: {
     margin: theme.spacing.unit * 4,
-    textAlign: 'center'
+    textAlign: "center",
   },
 });
-
 
 class CreateNewPolicyForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
       communities: [],
-      formJson: null
+      formJson: null,
     };
   }
 
-
   async componentDidMount() {
-    const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
+    const communitiesResponse = await apiCall(
+      "/communities.listForCommunityAdmin"
+    );
 
     if (communitiesResponse && communitiesResponse.data) {
-      const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name }));
+      const communities = communitiesResponse.data.map((c) => ({
+        ...c,
+        displayName: c.name,
+      }));
       await this.setStateAsync({ communities });
     }
 
@@ -60,83 +65,84 @@ class CreateNewPolicyForm extends Component {
   createFormJson = async () => {
     const { communities } = this.state;
     const formJson = {
-      title: 'Create New Policy',
-      subTitle: '',
-      cancelLink: '/admin/read/policies',
-      method: '/policies.create',
-      successRedirectPage: '/admin/read/policies',
+      title: "Create New Policy",
+      subTitle: "",
+      cancelLink: "/admin/read/policies",
+      method: "/policies.create",
+      successRedirectPage: "/admin/read/policies",
       fields: [
         {
-          label: 'About this Policy',
-          fieldType: 'Section',
+          label: "About this Policy",
+          fieldType: "Section",
           children: [
             {
-              name: 'name',
-              label: 'Name of Policy',
-              placeholder: 'eg. Terms and Conditions',
-              fieldType: 'TextField',
-              contentType: 'text',
+              name: "name",
+              label: "Name of Policy",
+              placeholder: "eg. Terms and Conditions",
+              fieldType: "TextField",
+              contentType: "text",
               isRequired: true,
-              defaultValue: '',
-              dbName: 'name',
-              readOnly: false
+              defaultValue: "",
+              dbName: "name",
+              readOnly: false,
             },
             {
-              name: 'is_global',
-              label: 'Is this Policy a Template?',
-              fieldType: 'Radio',
+              name: "is_global",
+              label: "Is this Policy a Template?",
+              fieldType: "Radio",
               isRequired: false,
-              defaultValue: 'true',
-              dbName: 'is_global',
+              defaultValue: "true",
+              dbName: "is_global",
               readOnly: false,
               data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
+                { id: "false", value: "No" },
+                { id: "true", value: "Yes" },
               ],
               child: {
-                valueToCheck: 'false',
+                valueToCheck: "false",
                 fields: [
                   {
-                    name: 'community',
-                    label: 'Primary Community',
-                    placeholder: 'eg. Wayland',
-                    fieldType: 'Dropdown',
+                    name: "community",
+                    label: "Primary Community",
+                    placeholder: "eg. Wayland",
+                    fieldType: "Dropdown",
                     defaultValue: null,
-                    dbName: 'community_id',
-                    data: [{displayName:"--", id:""}, ...communities],
+                    dbName: "community_id",
+                    data: [{ displayName: "--", id: "" }, ...communities],
                   },
-                ]
-              }
+                ],
+              },
             },
-          ]
+          ],
         },
         {
-          name: 'description',
-          label: 'Policy Details',
-          placeholder: 'eg. Provide details about this Policy ...',
-          fieldType: 'HTMLField',
-          contentType: 'text',
+          name: "description",
+          label: "Policy Details",
+          placeholder: "eg. Provide details about this Policy ...",
+          fieldType: "HTMLField",
+          contentType: "text",
           isRequired: true,
           isMultiline: true,
-          defaultValue: '',
-          dbName: 'description',
-          readOnly: false
+          defaultValue: "",
+          dbName: "description",
+          readOnly: false,
         },
-      ]
+      ],
     };
     return formJson;
-  }
-
+  };
 
   render() {
     const { classes } = this.props;
     const { formJson } = this.state;
-    if (!formJson) return (<div />);
+    if (!formJson) return <Loading />;
     return (
       <div>
         <MassEnergizeForm
+          pageKey={PAGE_KEYS.CREATE_POLICY.key}
           classes={classes}
           formJson={formJson}
+          enableCancel
         />
       </div>
     );
@@ -146,6 +152,5 @@ class CreateNewPolicyForm extends Component {
 CreateNewPolicyForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
-
 
 export default withStyles(styles, { withTheme: true })(CreateNewPolicyForm);

@@ -2,15 +2,15 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import { apiCall } from "../../../utils/messenger";
-import MassEnergizeForm from "../_FormGenerator";
+// import MassEnergizeForm from "../_FormGenerator";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
-import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { bindActionCreators } from "redux";
 import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
-import { PAGE_KEYS } from "../ME  Tools/MEConstants";
-import { removePageProgressFromStorage } from "../../../utils/common";
+
 import { withRouter } from "react-router-dom";
 const styles = (theme) => ({
   root: {
@@ -53,11 +53,11 @@ class CreateNewTeamForm extends Component {
       id: "" + c.id,
     }));
 
-    const progress = (formState || {})[PAGE_KEYS.CREATE_TEAM.key] || {};
+    // const progress = (formState || {})[PAGE_KEYS.CREATE_TEAM.key] || {};
     const libOpen = location.state && location.state.libOpen;
     const formJson = createFormJson({
       communities,
-      progress,
+      // progress,
       autoOpenMediaLibrary: libOpen,
     });
     const jobsDoneDontRunWhatsBelowEverAgain =
@@ -71,29 +71,6 @@ class CreateNewTeamForm extends Component {
     };
   }
 
-  preserveFormData(formState) {
-    const { saveFormTemporarily } = this.props;
-    const { formData } = formState || {};
-    const oldFormState = this.props.formState;
-    saveFormTemporarily({
-      key: PAGE_KEYS.CREATE_TEAM.key,
-      data: formData,
-      whole: oldFormState,
-    });
-  }
-
-  clearProgress(resetForm) {
-    resetForm();
-    const { saveFormTemporarily } = this.props;
-    const oldFormState = this.props.formState;
-    saveFormTemporarily({
-      key: PAGE_KEYS.CREATE_TEAM.key,
-      data: {},
-      whole: oldFormState,
-    });
-    removePageProgressFromStorage(PAGE_KEYS.CREATE_TEAM.key);
-  }
-
   render() {
     const { classes } = this.props;
     const { formJson } = this.state;
@@ -101,10 +78,9 @@ class CreateNewTeamForm extends Component {
     return (
       <div>
         <MassEnergizeForm
+          pageKey={PAGE_KEYS.CREATE_TEAM.key}
           classes={classes}
           formJson={formJson}
-          unMount={this.preserveFormData.bind(this)}
-          clearProgress={this.clearProgress.bind(this)}
           enableCancel
         />
       </div>
@@ -140,7 +116,6 @@ export default withStyles(styles, { withTheme: true })(
 );
 
 const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
-  // const { communities } = this.state;
   const formJson = {
     title: "Create New Team",
     subTitle: "",
@@ -158,7 +133,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: progress.name || "",
+            // defaultValue: progress.name || "",
             dbName: "name",
             readOnly: false,
           },
@@ -167,7 +142,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             label: "Primary Community",
             placeholder: "",
             fieldType: "Dropdown",
-            defaultValue: progress.primary_community || null,
+            defaultValue: null,
             dbName: "primary_community_id",
             data: [{ displayName: "--", id: "" }, ...communities],
           },
@@ -177,7 +152,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             placeholder: "",
             fieldType: "Checkbox",
             selectMany: true,
-            defaultValue: progress.communities || null,
+            defaultValue: null,
             dbName: "communities",
             data: communities,
           },
@@ -185,7 +160,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             name: "parent",
             label: "Parent Team (must be in the same primary community)",
             fieldType: "Dropdown",
-            defaultValue: progress.parent || null,
+            defaultValue: null,
             dbName: "parent_id",
             data: [
               {
@@ -204,7 +179,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
               "eg. Provide email of valid registered users eg. teamadmin1@gmail.com, teamadmin2@gmail.com",
             fieldType: "TextField",
             isRequired: true,
-            defaultValue: progress.admin_emails || null,
+            defaultValue:  null,
             dbName: "admin_emails",
           },
           {
@@ -215,7 +190,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             contentType: "text",
             isRequired: true,
             isMultiline: false,
-            defaultValue: progress.tagline || "",
+            // defaultValue: progress.tagline || "",
             dbName: "tagline",
             readOnly: false,
           },
@@ -227,7 +202,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             contentType: "text",
             isRequired: true,
             isMultiline: true,
-            defaultValue: progress.description || "",
+            // defaultValue: progress.description || "",
             dbName: "description",
             readOnly: false,
           },
@@ -240,8 +215,8 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
         fieldType: fieldTypes.MediaLibrary,
         dbName: "logo",
         label: "Select a Logo for this team",
-        defaultValue: progress.logo || [],
-        selected: progress.logo || [],
+        // defaultValue: progress.logo || [],
+        selected: [],
         openState: autoOpenMediaLibrary,
         isRequired: false,
       },
@@ -250,7 +225,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
         label: "Should this team go live?",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: progress.is_published || false,
+        defaultValue: false,
         dbName: "is_published",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],

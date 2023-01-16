@@ -1264,9 +1264,9 @@ class MassEnergizeForm extends Component {
                   </div>
                 )}
                 <div>
-                  {formJson && formJson.cancelLink && (
+                  {/* {formJson && formJson.cancelLink && (
                     <Link to={formJson.cancelLink}>Cancel</Link>
-                  )}
+                  )} */}
                   {"    "}
                   {enableCancel && (
                     <Button
@@ -1307,7 +1307,7 @@ MassEnergizeForm.propTypes = {
   classes: PropTypes.object.isRequired,
   formJson: PropTypes.object.isRequired,
   enableCancel: PropTypes.bool,
-  cancel: PropTypes.func,
+  // cancel: PropTypes.func,
   /**
    * Any function you want to run when the form successfully does its job
    */

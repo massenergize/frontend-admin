@@ -2,11 +2,12 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import states from "dan-api/data/states";
 import { withStyles } from "@material-ui/core/styles";
-import MassEnergizeForm from "../_FormGenerator";
+// import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import { groupSocialMediaFields, getMoreInfo } from "./utils";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { withRouter } from "react-router-dom";
-
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -69,8 +70,9 @@ class CreateNewCommunityForm extends Component {
       { id: "COUNTRY", value: "Community defined by a country" },
       //{ id: "NON_GEOGRAPHIC", value:"A non-geographic community" },
     ];
-    const location = this.props.location 
-    const libOpen = location.state && location.state.libOpen
+
+    const location = this.props.location;
+    const libOpen = location.state && location.state.libOpen;
     const formJson = {
       title: "Create New Community",
       subTitle: "",
@@ -375,7 +377,11 @@ class CreateNewCommunityForm extends Component {
     if (!formJson) return <div>Hold tight! Preparing your form ...</div>;
     return (
       <div>
-        <MassEnergizeForm classes={classes} formJson={formJson} />
+        <MassEnergizeForm
+          pageKey={PAGE_KEYS.CREATE_COMMUNITY.key}
+          classes={classes}
+          formJson={formJson}
+        />
       </div>
     );
   }

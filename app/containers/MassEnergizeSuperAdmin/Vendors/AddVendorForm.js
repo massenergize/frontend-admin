@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import states from "dan-api/data/states";
 import { withStyles } from "@material-ui/core/styles";
-import MassEnergizeForm from "../_FormGenerator";
+// import MassEnergizeForm from "../_FormGenerator";
 import { apiCall } from "../../../utils/messenger";
 import { makeTagSection } from "../Events/EditEventForm";
 import { connect } from "react-redux";
@@ -13,7 +13,7 @@ import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions"
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 import { removePageProgressFromStorage } from "../../../utils/common";
 import { withRouter } from "react-router-dom";
-
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -50,12 +50,10 @@ class CreateNewVendorForm extends Component {
   static getDerivedStateFromProps(props, state) {
     const { communities, tags, formState, location } = props;
 
-    const progress = (formState || {})[PAGE_KEYS.CREATE_VENDOR.key] || {};
     const section = makeTagSection({
       collections: tags,
       defaults: true,
       title: "Please select tag(s) that apply to this service provider",
-      progress,
     });
     const coms = communities.map((c) => ({
       ...c,
@@ -72,7 +70,6 @@ class CreateNewVendorForm extends Component {
     const libOpen = location.state && location.state.libOpen;
     const formJson = createFormJson({
       communities: coms,
-      progress,
       autoOpenMediaLibrary: libOpen,
     });
     formJson.fields.splice(1, 0, section);
@@ -80,74 +77,7 @@ class CreateNewVendorForm extends Component {
     return { formJson, communities, mounted: true };
   }
 
-  // async componentDidMount() {
-  //   const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
-  //   const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
-  //   if (communitiesResponse && communitiesResponse.data) {
-  //     const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
-  //     await this.setStateAsync({ communities });
-  //   }
-
-  //   const formJson = await this.createFormJson();
-  //   if (tagCollectionsResponse && tagCollectionsResponse.data) {
-  //     const section = {
-  //       label: 'Please select tag(s) that apply to this service provider',
-  //       fieldType: 'Section',
-  //       children: []
-  //     };
-
-  //     Object.values(tagCollectionsResponse.data).forEach(tCol => {
-  //       const newField = {
-  //         name: tCol.name,
-  //         label: `${tCol.name} ${tCol.allow_multiple ? '(You can select multiple)' : '(Only one selection allowed)'}`,
-  //         placeholder: '',
-  //         fieldType: 'Checkbox',
-  //         selectMany: tCol.allow_multiple,
-  //         defaultValue: [],
-  //         dbName: 'tags',
-  //         data: tCol.tags.map(t => ({ ...t, displayName: t.name, id: '' + t.id }))
-  //       };
-
-  //       // want this to be the 5th field
-  //       if (tCol.name === 'Category') {
-  //         section.children.push(newField);
-  //       }
-  //     });
-
-  //     // want this to be the 2nd field
-  //     formJson.fields.splice(1, 0, section);
-  //   }
-
-  //   await this.setStateAsync({ formJson });
-  // }
-
-  // setStateAsync(state) {
-  //   return new Promise((resolve) => {
-  //     this.setState(state, resolve);
-  //   });
-  // }
-
-  preserveFormData(formState) {
-    const { saveFormTemporarily } = this.props;
-    const { formData } = formState || {};
-    const oldFormState = this.props.formState;
-    saveFormTemporarily({
-      key: PAGE_KEYS.CREATE_VENDOR.key,
-      data: formData,
-      whole: oldFormState,
-    });
-  }
-  clearProgress(resetForm) {
-    resetForm();
-    const { saveFormTemporarily } = this.props;
-    const oldFormState = this.props.formState;
-    saveFormTemporarily({
-      key: PAGE_KEYS.CREATE_VENDOR.key,
-      data: {},
-      whole: oldFormState,
-    });
-    removePageProgressFromStorage(PAGE_KEYS.CREATE_VENDOR.key);
-  }
+  
 
   render() {
     const { classes } = this.props;
@@ -157,9 +87,8 @@ class CreateNewVendorForm extends Component {
       <div>
         <MassEnergizeForm
           classes={classes}
+          pageKey={PAGE_KEYS.CREATE_VENDOR.key}
           formJson={formJson}
-          unMount={this.preserveFormData.bind(this)}
-          clearProgress={this.clearProgress.bind(this)}
           enableCancel
         />
       </div>
@@ -194,7 +123,6 @@ const Mapped = connect(
 export default withStyles(styles, { withTheme: true })(Mapped);
 
 const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
-  // const { communities } = this.state;
   const formJson = {
     title: "Create New Vendor",
     subTitle: "",
@@ -212,7 +140,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: progress.name || "",
+            // defaultValue: progress.name || "",
             dbName: "name",
             readOnly: false,
           },
@@ -223,7 +151,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: false,
-            defaultValue: progress.phone_number || "",
+            // defaultValue: progress.phone_number || "",
             dbName: "phone_number",
             readOnly: false,
           },
@@ -234,7 +162,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             contentType: "text",
             isRequired: true,
             selectMany: true,
-            defaultValue: progress.communities || [],
+            // defaultValue: progress.communities || [],
             dbName: "communities",
             readOnly: false,
             data: communities || [],
@@ -246,7 +174,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: progress.email || "",
+            // defaultValue: progress.email || "",
             dbName: "email",
             readOnly: false,
           },
@@ -258,7 +186,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             contentType: "text",
             isRequired: true,
             isMultiline: true,
-            defaultValue: progress.description || "",
+            // defaultValue: progress.description || "",
             dbName: "description",
             readOnly: false,
           },
@@ -268,7 +196,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             placeholder: "eg. https://www.vendorwebsite.com",
             fieldType: "TextField",
             contentType: "text",
-            defaultValue: progress.website || "",
+            // defaultValue: progress.website || "",
             isRequired: false,
             dbName: "website",
             readOnly: false,
@@ -278,7 +206,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             label: "Do you have an address?",
             fieldType: "Radio",
             isRequired: false,
-            defaultValue: progress.have_address || "false",
+            defaultValue: "false",
             dbName: "have_address",
             readOnly: false,
             data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
@@ -292,7 +220,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
                   fieldType: "TextField",
                   contentType: "text",
                   isRequired: true,
-                  defaultValue: progress.address || "",
+                  // defaultValue: progress.address || "",
                   dbName: "address",
                   readOnly: false,
                 },
@@ -303,7 +231,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
                   fieldType: "TextField",
                   contentType: "text",
                   isRequired: true,
-                  defaultValue: progress.city || "",
+                  // defaultValue: progress.city || "",
                   dbName: "city",
                   readOnly: false,
                 },
@@ -314,7 +242,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
                   contentType: "text",
                   isRequired: false,
                   data: states,
-                  defaultValue: progress.state || "Massachusetts",
+                  defaultValue: "Massachusetts",
                   dbName: "state",
                   readOnly: false,
                 },
@@ -325,7 +253,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
                   contentType: "text",
                   isRequired: true,
                   dbName: "zipcode",
-                  defaultValue: progress.zipcode || "",
+                  // defaultValue: progress.zipcode || "",
                   readOnly: false,
                 },
               ],
@@ -343,7 +271,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             fieldType: "Radio",
             contentType: "text",
             isRequired: true,
-            defaultValue: progress.service_area || "national",
+            defaultValue:  "national",
             dbName: "service_area",
             readOnly: false,
             data: [
@@ -362,7 +290,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
                   data: states,
                   selectMany: true,
                   isRequired: false,
-                  defaultValue: progress.service_area_states || [],
+                  defaultValue:  [],
                   dbName: "service_area_states",
                   readOnly: false,
                 },
@@ -377,7 +305,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             contentType: "text",
             isRequired: true,
             selectMany: true,
-            defaultValue: progress.properties_serviced || [],
+            defaultValue: [],
             dbName: "properties_serviced",
             readOnly: false,
             data: [
@@ -406,7 +334,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: progress.key_contact_full_name || "",
+            // defaultValue: progress.key_contact_full_name || "",
             dbName: "key_contact_name",
             readOnly: false,
           },
@@ -418,7 +346,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: false,
-            defaultValue: progress.key_contact_full_name || "",
+            // defaultValue: progress.key_contact_full_name || "",
             dbName: "key_contact_email",
             readOnly: false,
           },
@@ -431,7 +359,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
         fieldType: "TextField",
         contentType: "text",
         isRequired: true,
-        defaultValue: progress.onboarding_contact_email || "",
+        // defaultValue: progress.onboarding_contact_email || "",
         dbName: "onboarding_contact_email",
         readOnly: false,
       },
@@ -441,8 +369,8 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
         fieldType: fieldTypes.MediaLibrary,
         openState: autoOpenMediaLibrary,
         dbName: "image",
-        defaultValue: progress.image || [],
-        selected: progress.image || [],
+
+        selected: [],
         label: "Upload a logo for this Vendor",
         isRequired: false,
       },
@@ -451,7 +379,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
         label: "Have you verified this Vendor?",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: progress.is_verified || "false",
+        defaultValue: "false",
         dbName: "is_verified",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
@@ -461,7 +389,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
         label: "Should this vendor go live?",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: progress.is_published || "false",
+        defaultValue:"false",
         dbName: "is_published",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
