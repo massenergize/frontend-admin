@@ -49,7 +49,7 @@ class MessageDetails extends Component {
       formJson: null,
       message: undefined,
       loading: true,
-      showMore:false
+      showMore: false,
     };
   }
 
@@ -95,6 +95,22 @@ class MessageDetails extends Component {
     });
   }
 
+
+  onComplete() {
+    const { pathname } = window.location;
+    const { location, history, match } = this.props;
+    const { id } = match.params;
+    var ids = location.state && location.state.ids;
+    if (!ids || !ids.length) return history.push(pathname);
+    // -- TODO You need to send a request to retrieve new next.steps, and update redux here 
+
+    // -- Then follow up with going back to the page
+    ids = ids.filter((_id) => _id.toString() !== id && id.toString());
+    history.push({
+      pathname: "/admin/read/community-admin-messages",
+      state: { ids },
+    });
+  }
   createFormJson = async () => {
     const { message } = this.state;
     const { pathname } = window.location;
@@ -202,9 +218,10 @@ class MessageDetails extends Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, location } = this.props;
     const { formJson, message, loading } = this.state;
     if (loading || !formJson) return <Loading />;
+
     return (
       <div>
         <div>
@@ -269,7 +286,13 @@ class MessageDetails extends Component {
         <br />
 
         {message && message.replies && message.replies.length ? (
-          <div style={{ marginBottom: "2rem", maxHeight:'75vh', overflowY:'auto'}}>
+          <div
+            style={{
+              marginBottom: "2rem",
+              maxHeight: "75vh",
+              overflowY: "auto",
+            }}
+          >
             <Paper className={classes.root} elevation={4}>
               <h2>Reply History</h2>
 
@@ -289,22 +312,15 @@ class MessageDetails extends Component {
                         marginBottom: "5px",
                       }}
                     >
-                      <Typography
-                        variant="h7"
-                        style={{ marginBottom: 3 }}
-                      >
+                      <Typography variant="h7" style={{ marginBottom: 3 }}>
                         <b>
                           {(reply && reply.user_name) ||
-                            (reply.user &&
-                              reply.user.full_name) ||
+                            (reply.user && reply.user.full_name) ||
                             "..."}
                         </b>
                       </Typography>
                       <div>
-                        <Typography
-                          variant="small"
-                          color="textSecondary"
-                        >
+                        <Typography variant="small" color="textSecondary">
                           {/* {getHumanFriendlyDate( */}
                           {reply && reply.created_at}
                           {/* )} */}
@@ -312,10 +328,7 @@ class MessageDetails extends Component {
                       </div>
                     </div>
                     <div>
-                      <Typography
-                        variant="h9"
-                        style={{ fontWeight: "bold" }}
-                      >
+                      <Typography variant="h9" style={{ fontWeight: "bold" }}>
                         {reply && reply.title}
                       </Typography>
                     </div>
@@ -324,7 +337,7 @@ class MessageDetails extends Component {
                       <Typography
                         variant="paragraph"
                         color="textPrimary"
-                        style={{ textAlign: "justify", marginTop:'15px' }}
+                        style={{ textAlign: "justify", marginTop: "15px" }}
                       >
                         {reply && reply.body}
                       </Typography>

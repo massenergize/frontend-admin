@@ -9,7 +9,7 @@ import { bindActionCreators } from "redux";
 import MUIDataTable from "mui-datatables";
 import FileCopy from "@material-ui/icons/FileCopy";
 import EditIcon from "@material-ui/icons/Edit";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import DetailsIcon from "@material-ui/icons/Details";
 import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";
@@ -63,7 +63,7 @@ class AllCommunityAdminMessages extends React.Component {
     var data = [...itemObjects, ...remainder];
     console.log("INFORMATION", result);
     data.sort(_sort);
- 
+
     putMessagesInRedux(data);
     if (!notFound.length) return; // If all items are found locally, dont go to the B.E
 
@@ -192,7 +192,15 @@ class AllCommunityAdminMessages extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/message`}>
+            {/* <Link to={`/admin/edit/${id}/message`}>
+              <DetailsIcon size="small" variant="outlined" color="secondary" />
+            </Link> */}
+            <Link
+              onClick={(e) => {
+                e.preventDefault();
+                this.replyToMessage(id);
+              }}
+            >
               <DetailsIcon size="small" variant="outlined" color="secondary" />
             </Link>
           </div>
@@ -200,6 +208,17 @@ class AllCommunityAdminMessages extends React.Component {
       },
     },
   ];
+
+  replyToMessage(id) {
+    const pathname = `/admin/edit/${id}/message`;
+    const { history, location } = this.props;
+    const ids = location.state && location.state.ids;
+    if (!ids || !ids.length) return history.push(pathname);
+    history.push({
+      pathname,
+      state: { ids }, // pass the id list on so that when a message is replied, we can remove from the list
+    });
+  }
 
   nowDelete({ idsToDelete, data }) {
     const { messages, putMessagesInRedux } = this.props;
@@ -302,4 +321,4 @@ const VendorsMapped = connect(
   mapDispatchToProps
 )(AllCommunityAdminMessages);
 
-export default withStyles(styles)(VendorsMapped);
+export default withStyles(styles)(withRouter(VendorsMapped));
