@@ -11,15 +11,15 @@ export const separate = (ids, dataSet = []) => {
   const notFound = [];
   const remainder = [];
   const itemObjects = [];
-  (dataSet || []).forEach((d) => {
-    if (d.id in ids) {
+  for (var d of dataSet || []) {
+    if (ids.includes(d.id)) {
       found.push(d.id);
       itemObjects.push(d);
     } else {
       notFound.push(d.id);
       remainder.push(d);
     }
-  });
+  }
   return {
     found,
     notFound,
