@@ -7,8 +7,10 @@ import MassEnergizeForm from "../_FormGenerator";
 import Loading from "dan-components/Loading";
 import { apiCall } from "../../../utils/messenger";
 import { connect } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { getHumanFriendlyDate } from "../../../utils/common";
+import { bindActionCreators } from "redux";
+import { fetchLatestNextSteps } from "../../../redux/redux-actions/adminActions";
 
 const styles = (theme) => ({
   root: {
@@ -95,17 +97,21 @@ class MessageDetails extends Component {
     });
   }
 
-
-  onComplete() {
+  onComplete(_, __, resetForm) {
     const { pathname } = window.location;
-    const { location, history, match } = this.props;
+    const { location, history, match, updateNextSteps } = this.props;
     const { id } = match.params;
     var ids = location.state && location.state.ids;
+    console.log("And then it did reach here meerhn");
+    resetForm && resetForm();
+    // Just means admin just answered message normally, so form should just reset, and redirect back to the same page, just like the old fxnality
     if (!ids || !ids.length) return history.push(pathname);
-    // -- TODO You need to send a request to retrieve new next.steps, and update redux here 
 
-    // -- Then follow up with going back to the page
+    updateNextSteps();
+    // -- Then follow up with going back to the msg list page, but with the id of the just-answered msg, removed
     ids = ids.filter((_id) => _id.toString() !== id && id.toString());
+    console.log("I Did run this thing", ids);
+
     history.push({
       pathname: "/admin/read/community-admin-messages",
       state: { ids },
@@ -119,7 +125,7 @@ class MessageDetails extends Component {
       title: "Reply to Message",
       subTitle: "",
       method: "/messages.replyFromCommunityAdmin",
-      successRedirectPage: pathname || "/admin/read/community-admin-messages",
+      // successRedirectPage: pathname || "/admin/read/community-admin-messages",
       fields: [
         {
           name: "ID",
@@ -349,7 +355,11 @@ class MessageDetails extends Component {
           </div>
         ) : null}
 
-        <MassEnergizeForm classes={classes} formJson={formJson} />
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+          onComplete={this.onComplete.bind(this)}
+        />
       </div>
     );
   }
@@ -365,5 +375,19 @@ const mapStateToProps = (state) => {
     teamMessages: state.getIn(["messages"]),
   };
 };
-const MessagesWrapped = connect(mapStateToProps)(MessageDetails);
-export default withStyles(styles, { withTheme: true })(MessagesWrapped);
+
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      updateNextSteps: fetchLatestNextSteps,
+    },
+    dispatch
+  );
+};
+const MessagesWrapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(MessageDetails);
+export default withStyles(styles, { withTheme: true })(
+  withRouter(MessagesWrapped)
+);

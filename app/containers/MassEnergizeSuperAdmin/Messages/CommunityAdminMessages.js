@@ -76,24 +76,32 @@ class AllCommunityAdminMessages extends React.Component {
       putMessagesInRedux(data);
     });
   }
+
+  componentWillUnmount() {
+    // Clears location state when this component is unmounting
+    window.history.replaceState({}, document.title);
+  }
   componentDidMount() {
     const { state } = this.props.location;
-    const { messages, putMessagesInRedux } = this.props;
+    const { messages, putMessagesInRedux, history } = this.props;
     const ids = state && state.ids;
-    this.setState({ ignoreSavedFilters: true }); //--- When an admin enters here through the summary page, we need old filters to be turned off, so that the table will only select the unattended items
+    // console.log("IS IT FROM ids", ids);
+    // if (messages && messages.length) {
+    //   if (ids) {
+    //     this.setState({ ignoreSavedFilters: true, saveFilters: false }); //--- When an admin enters here through the summary page, we need old filters to be turned off, so that the table will only select the unattended items
+    //     this.reArrangeForAdmin(messages);
+    //   }
+    //   return;
+    // }
 
-    if (messages && messages.length) {
-      if (ids) this.reArrangeForAdmin(messages);
-      return;
-    }
-
-    //--- Will only run if "messages" is empty. ie. This page is loading for the first time...
+    //--- Should only run if "messages" is empty. ie. This page is loading for the first time...
     apiCall("/messages.listForCommunityAdmin").then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
         const data = allMessagesResponse.data;
-
-        if (ids) this.reArrangeForAdmin(data);
-        else putMessagesInRedux(data);
+        if (ids) {
+          this.setState({ ignoreSavedFilters: true, saveFilters: false });
+          this.reArrangeForAdmin(data);
+        } else putMessagesInRedux(data);
       } else
         console.log(
           "Sorry, something happened while loading messages...",
@@ -289,8 +297,15 @@ class AllCommunityAdminMessages extends React.Component {
             columns: columns,
             options: options,
           }}
-          preselected={{ ID: location.state && location.state.ids }}
+          customFilterObject={{
+            0: {
+              name: "ID",
+              type: "multiselect",
+              list: location.state && location.state.ids,
+            },
+          }} // "0" here is the index of the "ID" column in the table
           ignoreSavedFilters={this.state.ignoreSavedFilters}
+          saveFilters={this.state.saveFilters}
         />
       </div>
     );

@@ -65,6 +65,16 @@ export const runAdminStatusCheck = async () => {
   }
 };
 
+export const fetchLatestNextSteps = (cb) => (dispatch) => {
+  apiCall("/summary.next.steps.forAdmins").then((response) => {
+    cb && cb(response); // Just in case a scenario needs to know when the request is done....
+    if (!response.success)
+      return console.log("Could not load in next steps", response);
+    console.log("I have just loaded in more next steps innit", response);
+    dispatch(reduxLoadNextStepsSummary(response.data));
+  });
+};
+
 export const checkFirebaseAuthentication = () => {
   return () =>
     firebase.auth().onAuthStateChanged((user) => {

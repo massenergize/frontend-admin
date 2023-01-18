@@ -19,9 +19,15 @@ function METable(props) {
   const filterObject = useRef({});
   const pageTableProperties = useRef({});
   const [tableColumns, setTableColumns] = useState([]);
-  // "Preselected" contains custom filter list passed as props. items are grouped by {[column.name]: filterList)}
-  // When "Preselected" is available, it will be used instead of the saved filters
-  const { classes, tableProps, page, ignoreSavedFilters, preselected } = props;
+
+  const {
+    classes,
+    tableProps,
+    page,
+    ignoreSavedFilters,
+    customFilterObject,
+    saveFilters = true,
+  } = props;
   // const [options, setOptions] = useState({});
 
   /**
@@ -34,15 +40,32 @@ function METable(props) {
    * just like MUI datatable expects.
    */
   const retrieveFiltersFromLastVisit = (columns) => {
-    const properties = getProperties();
+    // const properties = getProperties();
     var filterObj = localStorage.getItem(page.key + FILTERS);
     filterObj = JSON.parse(filterObj || null) || {};
-    Object.keys(filterObj).forEach((indexOfColumn) => {
+
+    return inflateWithFilters(columns, filterObj);
+    // Object.keys(filterObj).forEach((indexOfColumn) => {
+    //   const filter = filterObj[indexOfColumn] || [];
+    //   const col = columns[indexOfColumn];
+    //   if (col) {
+    //     const selection = (preselected || {})[col.name];
+    //     col.options.filterList = selection || filter.list; // if custom passed filter selections are available, use that instead of saved filters
+    //   } // set the filter list of each column if available
+    // });
+    // filterObject.current = filterObj;
+    // return columns;
+  };
+
+  const inflateWithFilters = (columns, filterObj) => {
+    const arr = Object.keys(filterObj);
+    if (!arr || !arr.length) return columns;
+
+    arr.forEach((indexOfColumn) => {
       const filter = filterObj[indexOfColumn] || [];
       const col = columns[indexOfColumn];
       if (col) {
-        const selection = (preselected || {})[col.name]; 
-        col.options.filterList = selection || filter.list; // if custom passed filter selections are available, use that instead of saved filters
+        col.options.filterList = filter.list; // if custom passed filter selections are available
       } // set the filter list of each column if available
     });
     filterObject.current = filterObj;
@@ -70,13 +93,18 @@ function METable(props) {
 
   useEffect(() => {
     let { columns } = tableProps || {};
-    if (ignoreSavedFilters) return setTableColumns(columns);
+    var modified;
+    if (ignoreSavedFilters) {
+      console.log("Hope you are running from here");
+      modified = inflateWithFilters(columns, customFilterObject || {});
+      return setTableColumns(modified);
+    }
     const properties = getProperties();
     pageTableProperties.current = properties;
     columns = retrieveSortOptionsAndSort(columns);
-    const modified = retrieveFiltersFromLastVisit(columns);
+    modified = retrieveFiltersFromLastVisit(columns);
     setTableColumns(modified);
-  }, []);
+  }, [ignoreSavedFilters, customFilterObject]);
 
   /**
   
@@ -116,7 +144,7 @@ function METable(props) {
     filter = { name: column, type, list: filterList[columnIndex] };
     const newObj = { ...(obj || {}), [columnIndex]: filter };
     filterObject.current = newObj;
-    saveSelectedFilters(newObj);
+    if (saveFilters) saveSelectedFilters(newObj);
   };
 
   const getProperties = () => {
