@@ -44,7 +44,6 @@ class AllTeamAdminMessages extends React.Component {
     const { putTeamMessagesInRedux } = this.props;
     const ids = state && state.ids;
     const comingFromDashboard = ids && ids.length;
-    console.log("HEre is the list", ids)
 
     apiCall("/messages.listTeamAdminMessages").then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {

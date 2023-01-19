@@ -517,8 +517,9 @@ export const reduxGetAllGoals = () => (dispatch) => {
   return { type: "DO_NOTHING", payload: null };
 };
 
-export const reduxGetAllTeams = () => (dispatch) => {
+export const reduxGetAllTeams = (cb) => (dispatch) => {
   apiCall("/teams.listForCommunityAdmin").then((response) => {
+    cb && cb(response.data, !response.success)
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllTeams(response.data));

@@ -6,7 +6,7 @@ import brand from "dan-api/dummy/brand";
 import MUIDataTable from "mui-datatables";
 import FileCopy from "@material-ui/icons/FileCopy";
 import EditIcon from "@material-ui/icons/Edit";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
 import Icon from "@material-ui/core/Icon";
 import Edit from "@material-ui/icons/Edit";
@@ -27,6 +27,7 @@ import { apiCall } from "../../../utils/messenger";
 import {
   objArrayToString,
   ourCustomSort,
+  reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
 import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
@@ -40,14 +41,43 @@ class AllTeams extends React.Component {
     this.state = { data: [], loading: true, columns: this.getColumns() };
   }
 
+  componentWillUnmount() {
+    window.history.replaceState({}, document.title);
+  }
+
   componentDidMount() {
-    const user = this.props.auth ? this.props.auth : {};
-    if (user.is_super_admin) {
-      this.props.callTeamsForSuperAdmin();
-    }
-    if (user.is_community_admin) {
-      this.props.callTeamsForNormalAdmin();
-    }
+    const {
+      putTeamsInRedux,
+      auth,
+      callTeamsForNormalAdmin,
+      callTeamsForSuperAdmin,
+      fetchTeams,
+      location,
+      allTeams,
+    } = this.props;
+
+    const { state } = location;
+    // const user = auth ? auth : {};
+    // if (user.is_super_admin) callTeamsForSuperAdmin();
+    // if (user.is_community_admin) callTeamsForNormalAdmin();
+    const ids = state && state.ids;
+    const comingFromDashboard = ids && ids.length;
+    if (!comingFromDashboard) return fetchTeams();
+    this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
+    var content = {
+      fieldKey: "team_ids",
+      apiURL: "/teams.listForCommunityAdmin",
+      props: this.props,
+      dataSource: [],
+      reduxFxn: putTeamsInRedux,
+    };
+    if (allTeams && allTeams.length)
+      return reArrangeForAdmin({ ...content, dataSource: allTeams });
+
+    fetchTeams((data, failed) => {
+      if (failed) return console.log("Could not fetch team list from B.E...");
+      reArrangeForAdmin({ ...content, dataSource: data });
+    });
   }
 
   getStatus = (isApproved) => {
@@ -362,6 +392,15 @@ class AllTeams extends React.Component {
             columns: columns,
             options: options,
           }}
+          customFilterObject={{
+            0: {
+              name: "ID",
+              type: "multiselect",
+              list: this.state.ids,
+            },
+          }}
+          ignoreSavedFilters={this.state.ignoreSavedFilters}
+          saveFilters={this.state.saveFilters}
         />
       </div>
     );
@@ -381,7 +420,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
-      callTeamsForSuperAdmin: reduxGetAllTeams,
+      fetchTeams: reduxGetAllTeams, // B.E already knows whether user is cadmin, or sadmin
+      // callTeamsForSuperAdmin: reduxGetAllTeams,
       callTeamsForNormalAdmin: reduxGetAllCommunityTeams,
       putTeamsInRedux: loadAllTeams,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
@@ -395,4 +435,4 @@ const TeamsMapped = connect(
   mapDispatchToProps
 )(AllTeams);
 
-export default withStyles(styles)(TeamsMapped);
+export default withStyles(styles)(withRouter(TeamsMapped));
