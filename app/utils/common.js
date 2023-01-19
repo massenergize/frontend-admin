@@ -5,26 +5,25 @@ import { Typography } from "@material-ui/core";
 import moment from "moment";
 import qs from "qs";
 import React from "react";
+import { apiCall } from "./messenger";
 
 export const separate = (ids, dataSet = []) => {
   const found = [];
-  const notFound = [];
+  var notFound = [];
   const remainder = [];
   const itemObjects = [];
   for (var d of dataSet || []) {
     if (ids.includes(d.id)) {
       found.push(d.id);
       itemObjects.push(d);
-    } else {
-      notFound.push(d.id);
-      remainder.push(d);
-    }
+    } else remainder.push(d);
   }
+  notFound = found.filter((id) => !ids.includes(id));
   return {
-    found,
-    notFound,
-    remainder,
-    itemObjects,
+    found, // Found locally
+    notFound, // Not found locally
+    remainder, // Just the general remaining items from the datasource
+    itemObjects, // Full objects of items that were found
   };
 };
 export function makeDeleteUI({ idsToDelete, templates }) {
@@ -257,15 +256,15 @@ export const reArrangeForAdmin = ({
   var data = [...itemObjects, ...remainder];
   console.log("INFORMATION", result);
   data.sort(_sort);
-
   reduxFxn(data);
   if (!notFound.length) return; // If all items are found locally, dont go to the B.E
 
   apiCall(apiURL, {
     [fieldKey]: notFound,
   }).then((response) => {
+    console.log("RESPONSE AFTER THE TEAM INNIT", response);
     if (response.success) data = [...response.data, ...data];
-    //-- Messages that were not found, have now been loaded from the B.E!
+    //-- Items that were not found, have now been loaded from the B.E!
     data.sort(_sort);
     reduxFxn(data);
   });

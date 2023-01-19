@@ -30,6 +30,17 @@ import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 
+export const replyToMessage = ({ pathname, props, transfer }) => {
+  // const pathname = `/admin/edit/${id}/message`;
+  const { history, location } = props;
+  const ids = location.state && location.state.ids;
+  if (!ids || !ids.length) return history.push(pathname);
+  history.push({
+    pathname,
+    state: { ids, ...(transfer || {}) }, // pass the id list on so that when a message is replied, we can remove from the list
+  });
+};
+
 class AllCommunityAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -206,7 +217,10 @@ class AllCommunityAdminMessages extends React.Component {
             <Link
               onClick={(e) => {
                 e.preventDefault();
-                this.replyToMessage(id);
+                replyToMessage({
+                  pathname: `/admin/edit/${id}/message`,
+                  props: this.props,
+                });
               }}
             >
               <DetailsIcon size="small" variant="outlined" color="secondary" />
@@ -216,17 +230,6 @@ class AllCommunityAdminMessages extends React.Component {
       },
     },
   ];
-
-  replyToMessage(id) {
-    const pathname = `/admin/edit/${id}/message`;
-    const { history, location } = this.props;
-    const ids = location.state && location.state.ids;
-    if (!ids || !ids.length) return history.push(pathname);
-    history.push({
-      pathname,
-      state: { ids }, // pass the id list on so that when a message is replied, we can remove from the list
-    });
-  }
 
   nowDelete({ idsToDelete, data }) {
     const { messages, putMessagesInRedux } = this.props;

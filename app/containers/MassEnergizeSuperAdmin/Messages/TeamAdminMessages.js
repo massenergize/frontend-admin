@@ -24,6 +24,7 @@ import {
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
+import { replyToMessage } from "./CommunityAdminMessages";
 class AllTeamAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -37,13 +38,14 @@ class AllTeamAdminMessages extends React.Component {
   componentWillUnmount() {
     window.history.replaceState({}, document.title);
   }
+
   componentDidMount() {
     const { state } = this.props.location;
     const { putTeamMessagesInRedux } = this.props;
     const ids = state && state.ids;
     const comingFromDashboard = ids && ids.length;
+    console.log("HEre is the list", ids)
 
-    console.log("HEre is the location details", state);
     apiCall("/messages.listTeamAdminMessages").then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
         let hasItems =
@@ -54,7 +56,7 @@ class AllTeamAdminMessages extends React.Component {
 
         if (!comingFromDashboard)
           return putTeamMessagesInRedux(allMessagesResponse.data);
-          
+
         this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
         reArrangeForAdmin({
           apiURL: "/messages.listTeamAdminMessages",
@@ -165,7 +167,17 @@ class AllTeamAdminMessages extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/message`}>
+            <Link
+              // to={`/admin/edit/${id}/message`}
+              onClick={(e) => {
+                e.preventDefault();
+                replyToMessage({
+                  pathname: `/admin/edit/${id}/message`,
+                  transfer: { fromTeam: true },
+                  props: this.props,
+                });
+              }}
+            >
               <DetailsIcon size="small" variant="outlined" color="secondary" />
             </Link>
           </div>
