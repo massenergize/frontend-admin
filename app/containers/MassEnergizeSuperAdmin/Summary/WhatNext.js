@@ -40,6 +40,12 @@ function WhatNext({ data }) {
           content={team_messages}
           name="Team Messages"
           description={(count) => `You have ${count} unanswered messages`}
+          onClick={() =>
+            history.push({
+              pathname: "/admin/read/team-admin-messages",
+              state: { ids: team_messages && team_messages.data },
+            })
+          }
         />
         <SectionTemplate
           content={teams}

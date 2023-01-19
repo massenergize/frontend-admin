@@ -229,3 +229,44 @@ export const fetchParamsFromURL = (location, paramName, names) => {
     } || {}
   );
 };
+
+/**
+   * 
+   * This function takes a list of ids of items(msgs, actions, testimonials etc.) that need attending to and matches it against the data source, 
+   * to find out which of the items are available locally, and which ones need to be fetched.
+   * If all items are available locally, nothing happens. 
+   * If not, it fetches all the items not found and appends it to the main data source. 
+   * 
+   * This fxn helps arrange data properly so that when admins click from their dashboard to see 
+   * "15" unanswered messages, all and only the unanswered messages will show up in the table, to make things easier.
+   
+   */
+export const reArrangeForAdmin = ({
+  dataSource,
+  props,
+  apiURL,
+  fieldKey,
+  reduxFxn,
+}) => {
+  const _sort = (a, b) => (b.id < a.id ? -1 : 1);
+  const { location } = props;
+  const { state } = location || {};
+  const ids = (state && state.ids) || [];
+  const result = separate(ids, dataSource);
+  const { notFound, itemObjects, remainder } = result;
+  var data = [...itemObjects, ...remainder];
+  console.log("INFORMATION", result);
+  data.sort(_sort);
+
+  reduxFxn(data);
+  if (!notFound.length) return; // If all items are found locally, dont go to the B.E
+
+  apiCall(apiURL, {
+    [fieldKey]: notFound,
+  }).then((response) => {
+    if (response.success) data = [...response.data, ...data];
+    //-- Messages that were not found, have now been loaded from the B.E!
+    data.sort(_sort);
+    reduxFxn(data);
+  });
+};

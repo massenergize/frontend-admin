@@ -95,7 +95,6 @@ function METable(props) {
     let { columns } = tableProps || {};
     var modified;
     if (ignoreSavedFilters) {
-      console.log("Hope you are running from here");
       modified = inflateWithFilters(columns, customFilterObject || {});
       return setTableColumns(modified);
     }

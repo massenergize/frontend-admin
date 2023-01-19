@@ -102,16 +102,13 @@ class MessageDetails extends Component {
     const { location, history, match, updateNextSteps } = this.props;
     const { id } = match.params;
     var ids = location.state && location.state.ids;
-    console.log("And then it did reach here meerhn");
     resetForm && resetForm();
-    // Just means admin just answered message normally, so form should just reset, and redirect back to the same page, just like the old fxnality
-    if (!ids || !ids.length) return history.push(pathname);
-
     updateNextSteps();
+     // Just means admin just answered message normally, so form should just reset, and redirect back to the same page, just like the old fxnality
+     if (!ids || !ids.length) return history.push(pathname);
+     
     // -- Then follow up with going back to the msg list page, but with the id of the just-answered msg, removed
     ids = ids.filter((_id) => _id.toString() !== id && id.toString());
-    console.log("I Did run this thing", ids);
-
     history.push({
       pathname: "/admin/read/community-admin-messages",
       state: { ids },
