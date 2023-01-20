@@ -62,6 +62,12 @@ function WhatNext({ data }) {
           content={testimonials}
           name="testimonials"
           description={(count) => `You have ${count} unapproved testimonials`}
+          onClick={() =>
+            history.push({
+              pathname: "/admin/read/testimonials",
+              state: { ids: testimonials && testimonials.data },
+            })
+          }
         />
         <SectionTemplate
           content={users}

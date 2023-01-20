@@ -28,7 +28,6 @@ function METable(props) {
     customFilterObject,
     saveFilters = true,
   } = props;
-  // const [options, setOptions] = useState({});
 
   /**
    * This function is called when the component is first rendered.
@@ -40,21 +39,9 @@ function METable(props) {
    * just like MUI datatable expects.
    */
   const retrieveFiltersFromLastVisit = (columns) => {
-    // const properties = getProperties();
     var filterObj = localStorage.getItem(page.key + FILTERS);
     filterObj = JSON.parse(filterObj || null) || {};
-
     return inflateWithFilters(columns, filterObj);
-    // Object.keys(filterObj).forEach((indexOfColumn) => {
-    //   const filter = filterObj[indexOfColumn] || [];
-    //   const col = columns[indexOfColumn];
-    //   if (col) {
-    //     const selection = (preselected || {})[col.name];
-    //     col.options.filterList = selection || filter.list; // if custom passed filter selections are available, use that instead of saved filters
-    //   } // set the filter list of each column if available
-    // });
-    // filterObject.current = filterObj;
-    // return columns;
   };
 
   const inflateWithFilters = (columns, filterObj) => {

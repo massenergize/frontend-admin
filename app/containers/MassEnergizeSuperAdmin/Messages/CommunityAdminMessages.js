@@ -146,7 +146,7 @@ class AllCommunityAdminMessages extends React.Component {
       name: "ID",
       key: "id",
       options: {
-        filter: true,
+        filter: false,
         filterType: "multiselect",
       },
     },
@@ -302,8 +302,6 @@ class AllCommunityAdminMessages extends React.Component {
           }}
           customFilterObject={{
             0: {
-              name: "ID",
-              type: "multiselect",
               list: location.state && location.state.ids,
             },
           }} // "0" here is the index of the "ID" column in the table

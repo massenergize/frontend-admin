@@ -437,8 +437,9 @@ export const reduxGetAllCommunityVendors = (community_id) => (dispatch) => {
   return { type: "DO_NOTHING", payload: null };
 };
 
-export const reduxGetAllCommunityTestimonials = () => (dispatch) => {
+export const reduxGetAllCommunityTestimonials = (cb) => (dispatch) => {
   apiCall("/testimonials.listForCommunityAdmin").then((response) => {
+    cb && cb(response.data, !response.success);
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllTestimonials(response.data));
@@ -519,7 +520,7 @@ export const reduxGetAllGoals = () => (dispatch) => {
 
 export const reduxGetAllTeams = (cb) => (dispatch) => {
   apiCall("/teams.listForCommunityAdmin").then((response) => {
-    cb && cb(response.data, !response.success)
+    cb && cb(response.data, !response.success);
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllTeams(response.data));

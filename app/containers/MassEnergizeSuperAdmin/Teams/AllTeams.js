@@ -46,24 +46,14 @@ class AllTeams extends React.Component {
   }
 
   componentDidMount() {
-    const {
-      putTeamsInRedux,
-      auth,
-      callTeamsForNormalAdmin,
-      callTeamsForSuperAdmin,
-      fetchTeams,
-      location,
-      allTeams,
-    } = this.props;
-
+    const { putTeamsInRedux, fetchTeams, location } = this.props;
     const { state } = location;
-    // const user = auth ? auth : {};
-    // if (user.is_super_admin) callTeamsForSuperAdmin();
-    // if (user.is_community_admin) callTeamsForNormalAdmin();
     const ids = state && state.ids;
     const comingFromDashboard = ids && ids.length;
+
     if (!comingFromDashboard) return fetchTeams();
     this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
+
     var content = {
       fieldKey: "team_ids",
       apiURL: "/teams.listForCommunityAdmin",
@@ -71,9 +61,6 @@ class AllTeams extends React.Component {
       dataSource: [],
       reduxFxn: putTeamsInRedux,
     };
-    if (allTeams && allTeams.length)
-      return reArrangeForAdmin({ ...content, dataSource: allTeams });
-
     fetchTeams((data, failed) => {
       if (failed) return console.log("Could not fetch team list from B.E...");
       reArrangeForAdmin({ ...content, dataSource: data });
@@ -133,8 +120,10 @@ class AllTeams extends React.Component {
       {
         name: "ID",
         key: "id",
+
         options: {
           filter: false,
+          filterType: "multiselect",
         },
       },
       {
@@ -394,8 +383,6 @@ class AllTeams extends React.Component {
           }}
           customFilterObject={{
             0: {
-              name: "ID",
-              type: "multiselect",
               list: this.state.ids,
             },
           }}
