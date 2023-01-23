@@ -206,7 +206,6 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadSettings(settings.data || {}));
     dispatch(loadFeatureFlags(featureFlags.data || {}));
     dispatch(reduxLoadAllOtherCommunities(otherCommunities.data));
-    console.log("This is the adminNextSteps", adminNextSteps); // remove before PR
     dispatch(reduxLoadNextStepsSummary(adminNextSteps.data));
   });
 };
@@ -312,6 +311,14 @@ export const loadAllEvents = (data = null) => ({
   type: GET_ALL_EVENTS,
   payload: data,
 });
+export const fetchUsersFromBackend = (cb) => (dispatch) => {
+  apiCall("/users.listForCommunityAdmin").then((allUsersResponse) => {
+    cb && cb(allUsersResponse.data, !allUsersResponse.success)
+    if (allUsersResponse && allUsersResponse.success) {
+      dispatch(loadAllUsers(allUsersResponse.data));
+    }
+  });
+};
 export const loadAllUsers = (data) => ({ type: GET_ALL_USERS, payload: data });
 export const loadAllSubscribers = (data) => ({
   type: GET_ALL_SUBSCRIBERS,

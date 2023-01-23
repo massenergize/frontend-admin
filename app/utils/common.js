@@ -7,18 +7,20 @@ import qs from "qs";
 import React from "react";
 import { apiCall } from "./messenger";
 
-export const separate = (ids, dataSet = []) => {
+export const separate = (ids, dataSet = [], options = {}) => {
+  const { valueExtractor } = options || {};
   const found = [];
   var notFound = [];
   const remainder = [];
   const itemObjects = [];
   for (var d of dataSet || []) {
-    if (ids.includes(d.id)) {
-      found.push(d.id);
+    const value = valueExtractor ? valueExtractor(d) : d.id
+    if (ids.includes(value)) {
+      found.push(value);
       itemObjects.push(d);
     } else remainder.push(d);
   }
-  notFound = found.filter((id) => !ids.includes(id));
+  notFound = ids.filter((id) => !found.includes(id));
   return {
     found, // Found locally
     notFound, // Not found locally
@@ -246,15 +248,15 @@ export const reArrangeForAdmin = ({
   apiURL,
   fieldKey,
   reduxFxn,
+  separationOptions,
 }) => {
   const _sort = (a, b) => (b.id < a.id ? -1 : 1);
   const { location } = props;
   const { state } = location || {};
   const ids = (state && state.ids) || [];
-  const result = separate(ids, dataSource);
+  const result = separate(ids, dataSource, separationOptions);
   const { notFound, itemObjects, remainder } = result;
   var data = [...itemObjects, ...remainder];
-  console.log("INFORMATION", result);
   data.sort(_sort);
   reduxFxn(data);
   if (!notFound.length) return; // If all items are found locally, dont go to the B.E
@@ -262,7 +264,6 @@ export const reArrangeForAdmin = ({
   apiCall(apiURL, {
     [fieldKey]: notFound,
   }).then((response) => {
-    console.log("RESPONSE AFTER THE TEAM INNIT", response);
     if (response.success) data = [...response.data, ...data];
     //-- Items that were not found, have now been loaded from the B.E!
     data.sort(_sort);

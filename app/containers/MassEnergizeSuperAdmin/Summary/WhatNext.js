@@ -75,6 +75,12 @@ function WhatNext({ data }) {
           description={(count) =>
             `You have ${count} new registered users since your last sign in`
           }
+          onClick={() =>
+            history.push({
+              pathname: "/admin/read/users",
+              state: { ids: users && users.data },
+            })
+          }
         />
       </div>
     </PapperBlock>

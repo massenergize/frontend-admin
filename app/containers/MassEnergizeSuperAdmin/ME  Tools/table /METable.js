@@ -134,6 +134,7 @@ function METable(props) {
   };
 
   const getProperties = () => {
+    if(ignoreSavedFilters) return {}
     const val = localStorage.getItem(page.key + TABLE_PROPERTIES);
     return JSON.parse(val || null) || {};
   };
