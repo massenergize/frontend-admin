@@ -246,7 +246,15 @@ class AllTestimonials extends React.Component {
           download: false,
           customBodyRender: (id) => (
             <div>
-              <Link to={`/admin/edit/${id}/testimonial`}>
+              <Link to={`/admin/edit/${id}/testimonial`} 
+               onClick={(e) => {
+                e.preventDefault();
+                this.props.history.push({
+                  pathname: `/admin/edit/${id}/testimonial`,
+                  state: { ids: this.state.ids },
+                });
+              }}
+              >
                 <EditIcon size="small" variant="outlined" color="secondary" />
               </Link>
             </div>
