@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Typography from '@material-ui/core/Typography';
 import Type from 'dan-styles/Typography.scss';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import Avatar from '@material-ui/core/Avatar';

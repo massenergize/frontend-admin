@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import Paper from "@material-ui/core/Paper";
 import { Helmet } from "react-helmet";
 import { bindActionCreators } from "redux";

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import Typography from '@material-ui/core/Typography';
 import Type from 'dan-styles/Typography.scss';
 import Card from '@material-ui/core/Card';

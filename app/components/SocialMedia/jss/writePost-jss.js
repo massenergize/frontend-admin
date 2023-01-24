@@ -1,87 +1,90 @@
-import { fade } from '@material-ui/core/styles/colorManipulator';
-const styles = theme => ({
+import { alpha, darken } from "@mui/material";
+const styles = (theme) => ({
   statusWrap: {
-    position: 'relative',
+    position: "relative",
     marginBottom: theme.spacing(1) * 3,
-    '& > div': {
-      overflow: 'hidden'
+    "& > div": {
+      overflow: "hidden",
     },
-    '& textarea': {
-      border: 'none',
-      padding: '20px 20px 20px 50px',
-      outline: 'none',
-      width: '100%',
-      resize: 'none',
-      overflow: 'hidden',
-      background: 'none',
+    "& textarea": {
+      border: "none",
+      padding: "20px 20px 20px 50px",
+      outline: "none",
+      width: "100%",
+      resize: "none",
+      overflow: "hidden",
+      background: "none",
       color: theme.palette.text.primary,
       height: 50,
-      transition: theme.transitions.create(['height'], {
+      transition: theme.transitions.create(["height"], {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
       }),
-      '&:focus': {
+      "&:focus": {
         height: 100,
-        overflow: 'auto',
-      }
-    }
+        overflow: "auto",
+      },
+    },
   },
   inputMessage: {
-    backgroundColor: theme.palette.type === 'dark' ? fade(theme.palette.background.paper, 0.85) : fade(theme.palette.background.paper, 0.95)
+    backgroundColor:
+      theme.palette.type === "dark"
+        ? alpha(theme.palette.background.paper, 0.85)
+        : alpha(theme.palette.background.paper, 0.95),
   },
   avatarMini: {
     width: 30,
     height: 30,
-    position: 'absolute',
+    position: "absolute",
     top: 10,
-    left: 10
+    left: 10,
   },
   control: {
-    padding: '10px 20px 0',
-    display: 'flex'
+    padding: "10px 20px 0",
+    display: "flex",
   },
   privacy: {
     flex: 1,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    textAlign: 'right',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    textAlign: "right",
   },
   button: {
-    margin: theme.spacing(1) / 2
+    margin: theme.spacing(1) / 2,
   },
   sendBtn: {
-    position: 'relative',
-    top: 5
+    position: "relative",
+    top: 5,
   },
   formControl: {
     width: 150,
     margin: `0 ${theme.spacing(1)}px`,
-    [theme.breakpoints.up('sm')]: {
-      margin: '0 20px',
+    [theme.breakpoints.up("sm")]: {
+      margin: "0 20px",
       paddingLeft: 10,
     },
-    textAlign: 'left',
-    '&:before, &:after': {
-      borderBottom: 'none'
-    }
+    textAlign: "left",
+    "&:before, &:after": {
+      borderBottom: "none",
+    },
   },
   selectEmpty: {
-    border: 'none',
-    background: theme.palette.action.hover
+    border: "none",
+    background: theme.palette.action.hover,
   },
   hiddenDropzone: {
-    display: 'none'
+    display: "none",
   },
   preview: {
-    position: 'relative',
-    '& figure': {
-      textAlign: 'center'
-    }
+    position: "relative",
+    "& figure": {
+      textAlign: "center",
+    },
   },
   removeBtn: {
-    opacity: 1
-  }
+    opacity: 1,
+  },
 });
 
 export default styles;

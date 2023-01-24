@@ -3,7 +3,7 @@ import { PropTypes } from 'prop-types';
 import classNames from 'classnames';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import { GuideModal } from 'dan-components';
 import { toggleAction, openAction, playTransitionAction } from 'dan-actions/UiActions';
 import LeftSidebarLayout from './layouts/LeftSidebarLayout';
@@ -68,8 +68,8 @@ class Dashboard extends React.Component {
       <div
         className={
           classNames(
-            classes.appFrameInner,
-            layout === 'top-navigation' || layout === 'mega-menu' ? classes.topNav : classes.sideNav,
+            classes && classes.appFrameInner,
+            layout === 'top-navigation' || layout === 'mega-menu' ?classes && classes.topNav :classes && classes.sideNav,
             mode === 'dark' ? 'dark-mode' : 'light-mode'
           )
         }
@@ -165,7 +165,7 @@ class Dashboard extends React.Component {
 }
 
 Dashboard.propTypes = {
-  classes: PropTypes.object.isRequired,
+  // classes: PropTypes.object.isRequired,
   children: PropTypes.node.isRequired,
   history: PropTypes.object.isRequired,
   initialOpen: PropTypes.func.isRequired,
@@ -204,4 +204,4 @@ const DashboardMaped = connect(
   mapDispatchToProps
 )(Dashboard);
 
-export default (withStyles(styles)(DashboardMaped));
+export default withStyles(styles)(DashboardMaped);

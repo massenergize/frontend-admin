@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import TableIcon from '@mui/icons-material/Apps';
 import styles from 'dan-components/Tables/tableStyle-jss';
 

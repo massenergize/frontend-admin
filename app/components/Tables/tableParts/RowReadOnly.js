@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import TableCell from '@material-ui/core/TableCell';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import IconButton from '@material-ui/core/IconButton';
 import classNames from 'classnames';
 import css from 'dan-styles/Table.scss';

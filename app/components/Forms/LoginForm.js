@@ -1,10 +1,8 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
 import classNames from 'classnames';
-import { Field, reduxForm } from 'redux-form/immutable';
-import { TextField } from 'redux-form-material-ui';
+import { Field, reduxForm, } from 'redux-form';
 import Button from '@material-ui/core/Button';
 import { connect } from 'react-redux';
 import { NavLink } from 'react-router-dom';
@@ -22,10 +20,10 @@ import brand from 'dan-api/dummy/brand';
 import logo from 'dan-images/logo.png';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { ContentDivider } from '../Divider';
-import styles from './user-jss';
 import { IS_PROD, BUILD_VERSION, IS_CANARY } from '../../config/constants';
-
-
+import { TextField } from '@mui/material';
+import {withStyles} from "@mui/styles"
+import styles from "./user-jss";
 // validation functions
 const required = value => (value == null ? 'Required' : undefined);
 const email = value => (
@@ -74,17 +72,28 @@ class LoginForm extends React.Component {
     return (
       <Fragment>
         <Hidden mdUp>
-          <NavLink to="/" className={classNames(classes.brand, classes.outer)}>
-            <img src={logo} alt={brand.name} />
-            {brand.name}
+          <NavLink
+            to="/"
+            className={classNames(
+              classes && classes.brand,
+              classes && classes.outer
+            )}
+          >
+            <img src={logo} alt={brand && brand.name} />
+            {brand && brand.name}
           </NavLink>
         </Hidden>
-        <Paper className={classNames(classes.paperWrap, deco && classes.petal)}>
+        <Paper
+          className={classNames(
+            classes && classes.paperWrap,
+            deco && classes && classes.petal
+          )}
+        >
           <Hidden smDown>
-            <div className={classes.topBar}>
-              <NavLink to="/" className={classes.brand}>
-                <img src={logo} alt={brand.name} />
-                {brand.name}
+            <div className={classes && classes.topBar}>
+              <NavLink to="/" className={classes && classes.brand}>
+                <img src={logo} alt={brand && brand.name} />
+                {brand && brand.name}
               </NavLink>
               {/* <Button size="small" className={classes.buttonLink} component={NavLink} to="/register">
                 <Icon className={classes.icon}>arrow_forward</Icon>
@@ -93,28 +102,57 @@ class LoginForm extends React.Component {
             </div>
           </Hidden>
           {IS_PROD && (
-            <Typography variant="h4" className={classes.title} gutterBottom>
+            <Typography
+              variant="h4"
+              className={classes && classes.title}
+              gutterBottom
+            >
               Administrators - Sign In
             </Typography>
           )}
           {IS_CANARY && (
-            <Typography variant="h4" className={classes.title} gutterBottom>
+            <Typography
+              variant="h4"
+              className={classes && classes.title}
+              gutterBottom
+            >
               Canary: Administrators - Sign In
             </Typography>
           )}
           {!IS_PROD && !IS_CANARY && (
-            <Typography variant="h4" className={classes.title} gutterBottom>
+            <Typography
+              variant="h4"
+              className={classes &&  classes.title}
+              gutterBottom
+            >
               DEV: Administrators - Sign In
             </Typography>
           )}
 
-          <Typography variant="caption" className={classes.subtitle} gutterBottom align="center">
-            This site is meant to be exclusively used by Administrators only.
+          <Typography
+            variant="caption"
+            className={classes && classes.subtitle}
+            gutterBottom
+            align="center"
+          >
+            This site is meant to be exclusively used by Administrators
+            only.
           </Typography>
-          <section className={classes.socmedLogin}>
-            <div className={classes.btnArea}>
-              <Button variant="outlined" size="small" onClick={() => this.props.loginWithGoogleFxn()} className={classes.redBtn} type="button">
-                <People className={classNames(classes.leftIcon, classes.iconSmall)} />
+          <section className={classes && classes.socmedLogin}>
+            <div className={classes && classes.btnArea}>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => this.props.loginWithGoogleFxn()}
+                className={classes && classes.redBtn}
+                type="button"
+              >
+                <People
+                  className={classNames(
+                    classes && classes.leftIcon,
+                    classes && classes.iconSmall
+                  )}
+                />
                 Google
               </Button>
               {/* <Button variant="outlined" onClick={() => this.props.loginWithFacebookFxn()}size="small" className={classes.blueBtn} type="button">
@@ -127,18 +165,22 @@ class LoginForm extends React.Component {
               </Button> */}
             </div>
             <ContentDivider content="Or sign in with email" />
-
           </section>
-          <section className={classes.formWrap}>
+          <section className={classes && classes.formWrap}>
             <form onSubmit={(e) => e.preventDefault()}>
               <div>
-                <FormControl className={classes.formControl}>
+                <FormControl className={classes && classes.formControl}>
                   {err && (
-                    <Typography style={{ color: 'red' }} variant="caption" className={classes.subtitle} gutterBottom align="center">
+                    <Typography
+                      style={{ color: "red" }}
+                      variant="caption"
+                      className={classes && classes.subtitle}
+                      gutterBottom
+                      align="center"
+                    >
                       {err}
                     </Typography>
-                  )
-                  }
+                  )}
                   <Field
                     ref="email"
                     name="email"
@@ -147,17 +189,17 @@ class LoginForm extends React.Component {
                     label="Your Email"
                     required
                     validate={[required, email]}
-                    className={classes.field}
+                    className={classes && classes.field}
                   />
                 </FormControl>
               </div>
               <div>
-                <FormControl className={classes.formControl}>
+                <FormControl className={classes && classes.formControl}>
                   <Field
                     ref="pass"
                     name="password"
                     component={TextField}
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     label="Your Password"
                     InputProps={{
                       endAdornment: (
@@ -167,38 +209,66 @@ class LoginForm extends React.Component {
                             onClick={this.handleClickShowPassword}
                             onMouseDown={this.handleMouseDownPassword}
                           >
-                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                            {showPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
                           </IconButton>
                         </InputAdornment>
-                      )
+                      ),
                     }}
                     required
                     validate={required}
-                    className={classes.field}
+                    className={classes && classes.field}
                   />
                 </FormControl>
               </div>
-              <div className={classes.optArea}>
-                {/* <FormControlLabel className={classes.label} control={<Field name="checkbox" component={Checkbox} />} label="Remember" /> */}
-                {/* <Button size="small" component={NavLink} to="/reset-password" className={classes.buttonLink}>Forgot Password</Button> */}
+              <div className={classes && classes.optArea}>
+                {/* <FormControlLabel className={classes && classes.label} control={<Field name="checkbox" component={Checkbox} />} label="Remember" /> */}
+                {/* <Button size="small" component={NavLink} to="/reset-password" className={classes && classes.buttonLink}>Forgot Password</Button> */}
               </div>
               {this.showProgressBar()}
-              <div className={classes.btnArea}>
-
-                <Button variant="contained" onClick={() => normalLoginFxn(this.refs.email.value, this.refs.pass.value)} color="primary" size="large" type="submit">
+              <div className={classes && classes.btnArea}>
+                <Button
+                  variant="contained"
+                  onClick={() =>
+                    normalLoginFxn(
+                      this.refs.email.value,
+                      this.refs.pass.value
+                    )
+                  }
+                  color="primary"
+                  size="large"
+                  type="submit"
+                >
                   Sign in
-                  <ArrowForward className={classNames(classes.rightIcon, classes.iconSmall)} disabled={submitting || pristine} />
+                  <ArrowForward
+                    className={classNames(
+                      classes && classes.rightIcon,
+                      classes && classes.iconSmall
+                    )}
+                    disabled={submitting || pristine}
+                  />
                 </Button>
                 {/* <button onClick = {(e)=>{e.preventDefault();this.props.signOutFxn()}}>signout</button> */}
               </div>
             </form>
             {IS_PROD && (
-              <Typography variant="body1" className={classes.title} gutterBottom>
+              <Typography
+                variant="body1"
+                className={classes && classes.title}
+                gutterBottom
+              >
                 Production Build {BUILD_VERSION}
               </Typography>
             )}
             {!IS_PROD && (
-              <Typography variant="body1" className={classes.title} gutterBottom>
+              <Typography
+                variant="body1"
+                className={classes && classes.title}
+                gutterBottom
+              >
                 Development Build {BUILD_VERSION}
               </Typography>
             )}
@@ -210,7 +280,7 @@ class LoginForm extends React.Component {
 }
 
 LoginForm.propTypes = {
-  classes: PropTypes.object.isRequired,
+  // classes: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   pristine: PropTypes.bool.isRequired,
   submitting: PropTypes.bool.isRequired,

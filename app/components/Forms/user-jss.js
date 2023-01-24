@@ -1,4 +1,4 @@
-import { alpha } from "@mui/styles";
+import { alpha } from "@mui/material/styles";
 import cyan from '@mui/material/colors/cyan';
 import indigo from '@mui/material/colors/indigo';
 import red from '@mui/material/colors/red';

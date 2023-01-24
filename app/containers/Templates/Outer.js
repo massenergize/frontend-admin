@@ -2,7 +2,7 @@ import React from 'react';
 import { PropTypes } from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import styles from './appStyles-jss';
 
 class Outer extends React.Component {

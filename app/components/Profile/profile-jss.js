@@ -1,14 +1,14 @@
-import { fade } from '@material-ui/core/styles/colorManipulator';
 import deepOrange from '@material-ui/core/colors/deepOrange';
 import deepPurple from '@material-ui/core/colors/deepPurple';
 import pink from '@material-ui/core/colors/pink';
 import green from '@material-ui/core/colors/green';
-const styles = theme => ({
+import { alpha, darken } from '@mui/material';
+const styles = (theme) => ({
   profileList: {
     padding: 0,
-    '& li': {
-      paddingLeft: 0
-    }
+    "& li": {
+      paddingLeft: 0,
+    },
   },
   avatar: {
     margin: 10,
@@ -27,27 +27,27 @@ const styles = theme => ({
   },
   divider: {
     margin: `${theme.spacing(1) * 1.5}px 0`,
-    background: 'none',
+    background: "none",
   },
   albumRoot: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    overflow: 'hidden',
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "space-around",
+    overflow: "hidden",
     backgroundColor: theme.palette.background.paper,
-    '& > *': {
-      width: '100%'
-    }
+    "& > *": {
+      width: "100%",
+    },
   },
   gridList: {
     width: 500,
-    height: 'auto',
+    height: "auto",
   },
   icon: {
-    color: 'rgba(255, 255, 255, 0.54)',
+    color: "rgba(255, 255, 255, 0.54)",
   },
   img: {
-    maxWidth: 'none'
+    maxWidth: "none",
   },
   root: theme.mixins.gutters({
     paddingTop: 16,
@@ -60,123 +60,124 @@ const styles = theme => ({
   styledPaper: {
     backgroundColor: theme.palette.secondary.main,
     padding: 20,
-    '& $title, & $subtitle': {
-      color: theme.palette.common.white
-    }
+    "& $title, & $subtitle": {
+      color: theme.palette.common.white,
+    },
   },
   progress: {
     marginTop: 20,
     background: theme.palette.secondary.dark,
-    '& div': {
+    "& div": {
       background: theme.palette.primary.light,
-    }
+    },
   },
   chip: {
     marginTop: 20,
     background: theme.palette.common.white,
     color: theme.palette.secondary.main,
-    '& div': {
+    "& div": {
       background: green[500],
-      color: theme.palette.common.white
-    }
+      color: theme.palette.common.white,
+    },
   },
   colList: {
-    '& li': {
-      padding: '10px 0'
+    "& li": {
+      padding: "10px 0",
     },
-    '& $avatar': {
-      margin: 0
-    }
+    "& $avatar": {
+      margin: 0,
+    },
   },
   title: {},
   subtitle: {},
   rootAlbum: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    overflow: 'hidden',
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "space-around",
+    overflow: "hidden",
   },
   image: {
-    position: 'relative',
-    height: 'auto',
+    position: "relative",
+    height: "auto",
     boxShadow: theme.shadows[6],
-    borderRadius: theme.rounded.medium,
-    overflow: 'hidden',
+    borderRadius:`10px`,
+    overflow: "hidden",
     marginBottom: 30,
-    width: '100% !important', // Overrides inline-style
-    '&:hover, &$focusVisible': {
+    width: "100% !important", // Overrides inline-style
+    "&:hover, &$focusVisible": {
       zIndex: 1,
-      '& $imageBackdrop': {
+      "& $imageBackdrop": {
         opacity: 0.6,
       },
-      '& $imageMarked': {
+      "& $imageMarked": {
         opacity: 0,
       },
-      '& $imageTitle': {
-        border: '4px solid currentColor',
+      "& $imageTitle": {
+        border: "4px solid currentColor",
       },
     },
   },
   imageButton: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
     top: 0,
     bottom: 0,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     color: theme.palette.common.white,
   },
   imageBackdrop: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
     top: 0,
     bottom: 0,
     backgroundColor: theme.palette.common.black,
     opacity: 0.4,
-    transition: theme.transitions.create('opacity'),
+    transition: theme.transitions.create("opacity"),
   },
   imageTitle: {
-    position: 'relative',
-    padding: `${theme.spacing(1) * 2}px ${theme.spacing(1) * 4}px ${theme.spacing(1) + 6}px`,
+    position: "relative",
+    padding: `${theme.spacing(1) * 2}px ${theme.spacing(1) *
+      4}px ${theme.spacing(1) + 6}px`,
   },
   imageMarked: {
     height: 3,
     width: 18,
     backgroundColor: theme.palette.common.white,
-    position: 'absolute',
+    position: "absolute",
     bottom: -2,
-    left: 'calc(50% - 9px)',
-    transition: theme.transitions.create('opacity'),
+    left: "calc(50% - 9px)",
+    transition: theme.transitions.create("opacity"),
   },
   focusVisible: {},
   gridListAlbum: {
-    height: 'auto',
-    background: theme.palette.common.black
+    height: "auto",
+    background: theme.palette.common.black,
   },
   subheader: {
-    width: '100%',
+    width: "100%",
   },
   subscribeForm: {
     marginTop: theme.spacing(1) * -6,
-    display: 'flex',
-    '& > div': {
-      flex: 1
+    display: "flex",
+    "& > div": {
+      flex: 1,
     },
-    '& button': {
+    "& button": {
       marginTop: theme.spacing(1) * 4.5,
-      marginLeft: theme.spacing(1)
-    }
+      marginLeft: theme.spacing(1),
+    },
   },
   whiteInputRoot: {
-    '& label, input': {
+    "& label, input": {
       color: `${theme.palette.common.white} !important`,
     },
-    '& > div': {
-      borderColor: fade(theme.palette.common.white, 0.6),
-    }
+    "& > div": {
+      borderColor: alpha(theme.palette.common.white, 0.6),
+    },
   },
 });
 

@@ -1,8 +1,14 @@
-import { fade, darken } from '@material-ui/core/styles';
+import { alpha, darken } from '@mui/material/styles';
 import { gradientBgLight, gradientBgDark } from 'containers/Templates/appStyles-jss';
 const drawerWidth = 240;
 
-const styles = (theme) => ({
+const styles = (theme) =>{
+  console.log("======= THEME =======")
+  console.log(theme)
+
+  console.log("=========== THEME END=====================")
+
+return {
   appBar: {
     background: "rgba(0,0,0,0)",
     zIndex: theme.zIndex.drawer + 1,
@@ -66,7 +72,7 @@ const styles = (theme) => ({
       padding: `${theme.spacing(1) / 2}px 0`,
     },
     [theme.breakpoints.up("lg")]: {
-      background: fade(theme.palette.background.paper, 0.8),
+      background: alpha(theme.palette.background.paper, 0.8),
     },
     color: theme.palette.text.primary,
   },
@@ -112,7 +118,7 @@ const styles = (theme) => ({
         theme.palette.type === "dark"
           ? theme.palette.primary.main
           : theme.palette.primary.light,
-      boxShadow: theme.glow.medium,
+      boxShadow: `0px 0px 0px 8px ${alpha(theme.palette.success.main, 0.16)}`,
     },
     "& $headerAction": {
       marginLeft: theme.spacing(1),
@@ -149,16 +155,16 @@ const styles = (theme) => ({
     borderRadius: 22,
     display: "inline-block",
     "&:hover": {
-      background: fade(theme.palette.common.white, 0.25),
+      background: alpha(theme.palette.common.white, 0.25),
     },
     "&$light": {
-      background: fade(theme.palette.common.white, 0.2),
+      background: alpha(theme.palette.common.white, 0.2),
     },
     "&$dark": {
       background:
         theme.palette.type === "dark"
           ? theme.palette.grey[700]
-          : fade(theme.palette.common.white, 0.8),
+          : alpha(theme.palette.common.white, 0.8),
       boxShadow: theme.shade.light,
       "& input": {
         color: theme.palette.grey[700],
@@ -372,7 +378,7 @@ const styles = (theme) => ({
       borderLeft: `5px solid ${theme.palette.primary.main}`,
       backgroundColor:
         theme.palette.type === "dark"
-          ? fade(theme.palette.secondary.main, 0.24)
+          ? alpha(theme.palette.secondary.main, 0.24)
           : theme.palette.secondary.light,
       "& span": {
         color: theme.palette.primary.main,
@@ -380,7 +386,7 @@ const styles = (theme) => ({
       "&:hover": {
         backgroundColor:
           theme.palette.type === "dark"
-            ? fade(theme.palette.secondary.main, 0.24)
+            ? alpha(theme.palette.secondary.main, 0.24)
             : theme.palette.secondary.light,
       },
     },
@@ -395,7 +401,7 @@ const styles = (theme) => ({
     display: "inline-block",
     width: "auto",
     margin: theme.spacing(1),
-    borderRadius: theme.rounded.big,
+    borderRadius: theme.rounded.big, // theme.rounded.big,
     padding: `${theme.spacing(1) / 4}px ${theme.spacing(1)}px`,
     "& span": {
       fontSize: 14,
@@ -407,7 +413,7 @@ const styles = (theme) => ({
       border: `1px solid ${theme.palette.primary.main}`,
       backgroundColor:
         theme.palette.type === "dark"
-          ? fade(theme.palette.secondary.main, 0.24)
+          ? alpha(theme.palette.secondary.main, 0.24)
           : theme.palette.secondary.light,
       "& span": {
         color: theme.palette.primary.main,
@@ -415,7 +421,7 @@ const styles = (theme) => ({
       "&:hover": {
         backgroundColor:
           theme.palette.type === "dark"
-            ? fade(theme.palette.secondary.main, 0.24)
+            ? alpha(theme.palette.secondary.main, 0.24)
             : theme.palette.secondary.light,
       },
     },
@@ -450,7 +456,7 @@ const styles = (theme) => ({
     "& $button": {
       margin: `0 ${theme.spacing(1)}px / 2`,
       "& svg": {
-        fill: fade(theme.palette.common.white, 0.87),
+        fill: alpha(theme.palette.common.white, 0.87),
         width: 28,
         height: 28,
       },
@@ -464,7 +470,7 @@ const styles = (theme) => ({
     "&$invert": {
       "& $button": {
         "& svg": {
-          fill: fade(theme.palette.text.primary, 0.5),
+          fill: alpha(theme.palette.text.primary, 0.5),
         },
       },
     },
@@ -495,6 +501,7 @@ const styles = (theme) => ({
     alignItems: "center",
   },
   howdy: { margin: 0 },
-});
+};
+}
 
 export default styles;

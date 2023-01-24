@@ -1,8 +1,8 @@
-import { fade } from '@material-ui/core/styles/colorManipulator';
-import lightGreen from '@material-ui/core/colors/lightGreen';
-import red from '@material-ui/core/colors/red';
-import amber from '@material-ui/core/colors/amber';
-import grey from '@material-ui/core/colors/grey';
+import { alpha, darken } from "@mui/material/styles";
+import lightGreen from "@material-ui/core/colors/lightGreen";
+import red from "@material-ui/core/colors/red";
+import amber from "@material-ui/core/colors/amber";
+import grey from "@material-ui/core/colors/grey";
 
 const drawerWidth = 240;
 const styles = (theme) => ({
@@ -36,7 +36,7 @@ const styles = (theme) => ({
       height: theme.spacing(5),
       top: 0,
       left: 0,
-      background: fade(theme.palette.primary.main, 0.5),
+      background: alpha(theme.palette.primary.main, 0.5),
     },
   },
   drawerPaperClose: {
@@ -93,8 +93,8 @@ const styles = (theme) => ({
     position: "fixed",
     backgroundColor:
       theme.palette.type === "dark"
-        ? fade(theme.palette.background.paper, 0.75)
-        : fade(theme.palette.background.paper, 0.95),
+        ? alpha(theme.palette.background.paper, 0.75)
+        : alpha(theme.palette.background.paper, 0.95),
     boxShadow: theme.shade.light,
   },
   drawerInnerMobile: {
@@ -102,8 +102,8 @@ const styles = (theme) => ({
     height: "100%",
     backgroundColor:
       theme.palette.type === "dark"
-        ? fade(theme.palette.background.paper, 0.75)
-        : fade(theme.palette.background.paper, 0.95),
+        ? alpha(theme.palette.background.paper, 0.75)
+        : alpha(theme.palette.background.paper, 0.95),
   },
   drawerHeader: {
     padding: "0",
@@ -169,7 +169,7 @@ const styles = (theme) => ({
   active: {
     backgroundColor:
       theme.palette.type === "dark"
-        ? fade(theme.palette.primary.main, 0.24)
+        ? alpha(theme.palette.primary.main, 0.24)
         : theme.palette.primary.light,
     "& $primary": {
       color:
@@ -183,7 +183,7 @@ const styles = (theme) => ({
     "&:hover, &:focus": {
       backgroundColor:
         theme.palette.type === "dark"
-          ? fade(theme.palette.primary.main, 0.24)
+          ? alpha(theme.palette.primary.main, 0.24)
           : theme.palette.primary.light,
     },
   },
@@ -207,7 +207,7 @@ const styles = (theme) => ({
     borderRadius: `0 ${theme.spacing(3)}px ${theme.spacing(3)}px 0`,
     paddingLeft: theme.spacing(3),
     "&$iconed": {
-      paddingLeft: theme.spacing(3) ,
+      paddingLeft: theme.spacing(3),
     },
     '& svg[class^="MuiSvgIcon"]': {
       left: -10,
@@ -352,8 +352,7 @@ const styles = (theme) => ({
     "&$rounded": {
       paddingRight: theme.spacing(1) * 1.5,
       "& a": {
-        borderRadius: `0 ${theme.spacing(1) * 3}px ${theme.spacing(1) *
-          3}px 0`,
+        borderRadius: `0 ${theme.spacing(1) * 3}px ${theme.spacing(1) * 3}px 0`,
       },
       "& $opened": {
         "&:before": {

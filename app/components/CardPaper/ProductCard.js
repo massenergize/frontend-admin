@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Typography from '@material-ui/core/Typography';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames';

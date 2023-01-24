@@ -7,7 +7,7 @@ import IconButton from '@material-ui/core/IconButton';
 import VerifiedUser from '@mui/icons-material/VerifiedUser';
 import Info from '@mui/icons-material/Info';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import { PORTAL_HOST } from '../../config/constants';
 
 import styles from './jss/cover-jss';

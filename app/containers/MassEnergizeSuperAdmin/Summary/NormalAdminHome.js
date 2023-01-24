@@ -3,7 +3,7 @@ import classNames from "classnames";
 import Chip from "@material-ui/core/Chip";
 import brand from "dan-api/dummy/brand";
 import { Helmet } from "react-helmet";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import Grid from "@material-ui/core/Grid";
 import Divider from "@material-ui/core/Divider";
 import { Link } from "react-router-dom";

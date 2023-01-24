@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import MUIDataTable from "mui-datatables";
 import Avatar from "@material-ui/core/Avatar";
 import { apiCall } from "../../../utils/messenger";

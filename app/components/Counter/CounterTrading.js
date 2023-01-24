@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import CountUp from 'react-countup';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import Typography from '@material-ui/core/Typography';
 import TrendingUp from '@mui/icons-material/TrendingUp';
 import TrendingDown from '@mui/icons-material/TrendingDown';

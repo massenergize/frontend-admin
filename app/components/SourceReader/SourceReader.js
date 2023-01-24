@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import Axios from 'axios';
 import { connect } from 'react-redux';
 import SyntaxHighlighter, { registerLanguage } from 'react-syntax-highlighter/prism-light';

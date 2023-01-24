@@ -10,7 +10,7 @@ import Hidden from "@material-ui/core/Hidden";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import PhotoLibrary from "@mui/icons-material/PhotoLibrary";
 import InsertChart from "@mui/icons-material/InsertChart";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import bgCover from "dan-images/petal_bg.svg";

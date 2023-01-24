@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import Button from '@material-ui/core/Button';
 import Avatar from '@material-ui/core/Avatar';
 import Type from 'dan-styles/Typography.scss';

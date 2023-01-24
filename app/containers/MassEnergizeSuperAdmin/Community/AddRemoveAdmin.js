@@ -5,7 +5,7 @@ import CallMadeIcon from "@mui/icons-material/CallMade";
 import EditIcon from "@mui/icons-material/Edit";
 import { Link } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
 import { connect } from "react-redux";

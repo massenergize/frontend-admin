@@ -1,9 +1,10 @@
-import pink from '@material-ui/core/colors/pink';
-import lightGreen from '@material-ui/core/colors/lightGreen';
-import dark from '@material-ui/core/colors/blueGrey';
-import { alpha, darken } from "@material-ui/core/styles";
+import pink from '@mui/material/colors/pink';
+import lightGreen from '@mui/material/colors/lightGreen';
+import dark from "@mui/material/colors/blueGrey";
+darken
 import roundedThumbLight from 'dan-images/decoration/roundedThumbLight.png';
 import roundedThumbDark from 'dan-images/decoration/roundedThumbDark.png';
+import { darken, alpha } from '@mui/material';
 
 const styles = (theme) => ({
   divider: {

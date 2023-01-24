@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 
 import brand from "dan-api/dummy/brand";
 import { Helmet } from "react-helmet";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 
 import MUIDataTable from "mui-datatables";
 import FileCopy from "@mui/icons-material/FileCopy";

@@ -2,7 +2,7 @@ import React from 'react';
 import Dropzone from 'react-dropzone';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import Button from '@material-ui/core/Button';
 import FileIcon from '@mui/icons-material/Description';
 import ActionDelete from '@mui/icons-material/Delete';

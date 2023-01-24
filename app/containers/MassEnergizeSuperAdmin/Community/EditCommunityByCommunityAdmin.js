@@ -1,7 +1,7 @@
 // TODO: eliminate nearly identical code
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import states from "dan-api/data/states";
 import { apiCall } from "../../../utils/messenger";
 import { getMoreInfo, groupSocialMediaFields } from "./utils";

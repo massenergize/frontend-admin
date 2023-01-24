@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import Grid from '@material-ui/core/Grid';
 import classNames from 'classnames';
 import Dvr from '@mui/icons-material/Dvr';

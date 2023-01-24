@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
 import classNames from 'classnames';
 import Tooltip from '@material-ui/core/Tooltip';

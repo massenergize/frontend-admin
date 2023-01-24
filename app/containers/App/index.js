@@ -7,7 +7,7 @@ import "firebase/auth";
 // import NotFound from 'containers/Pages/Standalone/NotFoundDedicated';
 import Application from "./Application";
 import LoginDedicated from "../Pages/Standalone/LoginDedicated";
-import { AppContext } from "./ThemeWrapper";
+import ThemeWrapper, { AppContext } from "./ThemeWrapper";
 import { googleProvider, facebookProvider } from "./fire-config";
 import Auth from "./Auth";
 import { apiCall } from "../../utils/messenger";
@@ -215,7 +215,7 @@ class App extends React.Component {
     const { auth } = this.props;
     const user = auth;
     return (
-      <ThemeWrapper mode={"dark"} color="pink">
+      <ThemeWrapper>
         <AppContext.Consumer>
           {(changeMode) => (
             <Switch>
@@ -285,7 +285,7 @@ class App extends React.Component {
             </Switch>
           )}
         </AppContext.Consumer>
-       </ThemeWrapper>
+      </ThemeWrapper>
     );
   }
 }

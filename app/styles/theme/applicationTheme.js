@@ -1,22 +1,13 @@
-import themePalette from 'dan-api/palette/themePaletteMode';
-const applicationTheme = (color, mode) => {
-  return {
+import { themePalette } from "./themeColors";
+
+const applicationTheme = (color, mode) => ({
   palette: {
     type: mode,
-    primary: "tomato",
-    secondary: "blue",
+    primary: themePalette(color, mode).palette.primary,
+    secondary: themePalette(color, mode).palette.secondary,
     action: {
       hover: mode === "dark" ? "rgba(80,80,80, 0.9)" : "rgba(80,80,80, 0.05)",
       hoverOpacity: 0.05,
-    },
-  },
-  breakpoints: {
-    values: {
-      xs: 0,
-      sm: 600,
-      md: 900,
-      lg: 1200,
-      xl: 1536,
     },
   },
   typography: {
@@ -34,9 +25,9 @@ const applicationTheme = (color, mode) => {
     light: "0 10px 15px -5px rgba(62, 57, 107, .07)",
   },
   glow: {
-    light: `0 2px 20px -5px pink`,
-    medium: `0 2px 40px -5px pink`,
-    dark: `0 2px 40px 0px pink`,
+    light: `0 2px 20px -5px ${themePalette(color, mode).palette.primary.main}`,
+    medium: `0 2px 40px -5px ${themePalette(color, mode).palette.primary.main}`,
+    dark: `0 2px 40px 0px ${themePalette(color, mode).palette.primary.main}`,
   },
   rounded: {
     small: "8px",
@@ -152,7 +143,9 @@ const applicationTheme = (color, mode) => {
           height: "calc(100% + 1px)",
           borderRadius: 6,
           bottom: -1,
-          boxShadow: `0 0 1px pink`,
+          boxShadow: `0 0 1px ${
+            themePalette(color, mode).palette.primary.main
+          }`,
         },
         "&:before": {
           display: "none",
@@ -295,18 +288,20 @@ const applicationTheme = (color, mode) => {
     MuiPickersClock: {
       clock: {
         backgroundColor: "none",
-        border: `1px solid pink`,
+        border: `1px solid ${themePalette(color, mode).palette.primary.main}`,
       },
     },
     MuiPickersClockPointer: {
       thumb: {
-        boxShadow: `0 1px 10px 0px pink`,
+        boxShadow: `0 1px 10px 0px ${
+          themePalette(color, mode).palette.primary.main
+        }`,
       },
     },
     MuiPickerDTTabs: {
       tabs: {
         backgroundColor: "transparent",
-        color: 'pink',
+        color: themePalette(color, mode).palette.primary.main,
       },
     },
     MuiSlider: {
@@ -337,15 +332,15 @@ const applicationTheme = (color, mode) => {
           position: "absolute",
           width: 60,
           height: 4,
-          background: "pink",
+          background: themePalette(color, mode).palette.primary.main,
           bottom: 0,
           left: 26,
         },
         "& h2": {
           color:
             mode === "dark"
-              ? "blue"
-              : "pink",
+              ? themePalette(color, mode).palette.primary.light
+              : themePalette(color, mode).palette.primary.dark,
         },
       },
     },
@@ -363,8 +358,8 @@ const applicationTheme = (color, mode) => {
       colorPrimary: {
         backgroundColor:
           mode === "dark"
-            ? "blue"
-            : "pink",
+            ? themePalette(color, mode).palette.primary.dark
+            : themePalette(color, mode).palette.primary.main,
       },
     },
     MuiTabs: {
@@ -380,7 +375,7 @@ const applicationTheme = (color, mode) => {
       root: {
         borderRadius: 20,
         boxShadow: "none !important",
-        border: `1px solid pink`,
+        border: `1px solid ${themePalette(color, mode).palette.secondary.main}`,
       },
     },
     MuiToggleButton: {
@@ -393,14 +388,15 @@ const applicationTheme = (color, mode) => {
         boxShadow: "none",
         backgroundColor:
           mode === "dark"
-            ? "pink"
-            : "blue",
+            ? themePalette(color, mode).palette.secondary.dark
+            : themePalette(color, mode).palette.secondary.light,
       },
       deleteIcon: {
         color: mode === "dark" ? "#FFF" : "#000",
       },
     },
   },
-}}
+});
 
 export default applicationTheme;
+

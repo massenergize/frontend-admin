@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import Drawer from '@material-ui/core/Drawer';
 import classNames from 'classnames';
 import List from '@material-ui/core/List';

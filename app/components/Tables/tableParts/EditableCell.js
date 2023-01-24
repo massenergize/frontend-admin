@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import PropTypes from 'prop-types';
 import TableCell from '@material-ui/core/TableCell';
 import TextField from '@material-ui/core/TextField';

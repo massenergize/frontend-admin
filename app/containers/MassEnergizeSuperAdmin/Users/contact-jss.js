@@ -4,190 +4,205 @@ import purple from '@material-ui/core/colors/deepPurple';
 import teal from '@material-ui/core/colors/teal';
 import brown from '@material-ui/core/colors/brown';
 import red from '@material-ui/core/colors/red';
-import { lighten, darken, fade } from '@material-ui/core/styles/colorManipulator';
-
+import { alpha, lighten, darken } from "@mui/material/styles";
 const drawerWidth = 300;
 const drawerHeight = 680;
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     flexGrow: 1,
     height: drawerHeight,
     zIndex: 1,
-    overflow: 'hidden',
-    position: 'relative',
+    overflow: "hidden",
+    position: "relative",
     borderRadius: theme.rounded.medium,
     boxShadow: theme.shade.light,
     marginBottom: theme.spacing(1) * 3,
-    [theme.breakpoints.up('sm')]: {
-      display: 'flex',
+    [theme.breakpoints.up("sm")]: {
+      display: "flex",
     },
   },
   addBtn: {
-    position: 'fixed',
+    position: "fixed",
     bottom: 30,
     right: 30,
-    zIndex: 100
+    zIndex: 100,
   },
   fixHeight: {},
   appBar: {
-    height: 'auto',
-    background: theme.palette.type === 'dark' ? theme.palette.grey[800] : theme.palette.background.paper,
-    [theme.breakpoints.up('md')]: {
-      background: theme.palette.type === 'dark' ? fade(theme.palette.grey[800], 0.75) : fade(theme.palette.background.paper, 0.95),
+    height: "auto",
+    background:
+      theme.palette.type === "dark"
+        ? theme.palette.grey[800]
+        : theme.palette.background.paper,
+    [theme.breakpoints.up("md")]: {
+      background:
+        theme.palette.type === "dark"
+          ? alpha(theme.palette.grey[800], 0.75)
+          : alpha(theme.palette.background.paper, 0.95),
     },
-    justifyContent: 'center',
-    '& $avatar': {
+    justifyContent: "center",
+    "& $avatar": {
       boxShadow: theme.glow.light,
       width: 80,
       height: 80,
       marginRight: 30,
     },
-    '& h2': {
+    "& h2": {
       flex: 1,
       color: theme.palette.text.primary,
-      '& span': {
-        color: theme.palette.text.secondary
-      }
+      "& span": {
+        color: theme.palette.text.secondary,
+      },
     },
   },
   online: {
-    background: '#CDDC39'
+    background: "#CDDC39",
   },
   bussy: {
-    background: '#EF5350'
+    background: "#EF5350",
   },
   idle: {
-    background: '#FFC107'
+    background: "#FFC107",
   },
   offline: {
-    background: '#9E9E9E'
+    background: "#9E9E9E",
   },
   status: {
-    padding: '2px 6px',
-    '& span': {
-      borderRadius: '50%',
-      display: 'inline-block',
+    padding: "2px 6px",
+    "& span": {
+      borderRadius: "50%",
+      display: "inline-block",
       marginRight: 2,
       width: 10,
       height: 10,
-      border: `1px solid ${theme.palette.common.white}`
-    }
+      border: `1px solid ${theme.palette.common.white}`,
+    },
   },
   appBarShift: {
     marginLeft: 0,
-    width: '100%',
-    transition: theme.transitions.create(['width', 'margin'], {
+    width: "100%",
+    transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    [theme.breakpoints.down('md')]: {
-      zIndex: 1300
-    }
+    [theme.breakpoints.down("md")]: {
+      zIndex: 1300,
+    },
   },
   total: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 11,
     color: theme.palette.text.disabled,
-    textTransform: 'uppercase'
+    textTransform: "uppercase",
   },
   drawerPaper: {
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.up("sm")]: {
       width: drawerWidth,
     },
-    position: 'relative',
+    position: "relative",
     paddingBottom: 65,
     height: drawerHeight,
-    background: theme.palette.type === 'dark' ? darken(theme.palette.primary.light, 0.6) : lighten(theme.palette.primary.light, 0.5),
-    border: 'none',
+    background:
+      theme.palette.type === "dark"
+        ? darken(theme.palette.primary.light, 0.6)
+        : lighten(theme.palette.primary.light, 0.5),
+    border: "none",
   },
   clippedRight: {},
   toolbar: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     padding: `${theme.spacing(1) * 2}px ${theme.spacing(1)}px`,
-    position: 'relative',
+    position: "relative",
   },
   content: {
     flexGrow: 1,
-    backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[800] : theme.palette.background.paper,
-    transition: 'left 0.4s ease-out, opacity 0.4s ease-out',
-    [theme.breakpoints.up('lg')]: {
-      backgroundColor: theme.palette.type === 'dark' ? fade(theme.palette.grey[800], 0.75) : fade(theme.palette.background.paper, 0.95),
+    backgroundColor:
+      theme.palette.type === "dark"
+        ? theme.palette.grey[800]
+        : theme.palette.background.paper,
+    transition: "left 0.4s ease-out, opacity 0.4s ease-out",
+    [theme.breakpoints.up("lg")]: {
+      backgroundColor:
+        theme.palette.type === "dark"
+          ? alpha(theme.palette.grey[800], 0.75)
+          : alpha(theme.palette.background.paper, 0.95),
     },
-    [theme.breakpoints.down('xs')]: {
-      left: '100%',
+    [theme.breakpoints.down("xs")]: {
+      left: "100%",
       top: 0,
       opacity: 0,
-      position: 'absolute',
+      position: "absolute",
       zIndex: 1200,
-      width: '100%',
-      overflow: 'auto',
-      height: '100%'
-    }
+      width: "100%",
+      overflow: "auto",
+      height: "100%",
+    },
   },
   detailPopup: {
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       left: 0,
       opacity: 1,
-      zIndex: 2001
-    }
+      zIndex: 2001,
+    },
   },
   title: {
-    display: 'flex',
+    display: "flex",
     flex: 1,
-    '& svg': {
-      marginRight: 5
-    }
+    "& svg": {
+      marginRight: 5,
+    },
   },
   flex: {
-    display: 'flex',
-    alignItems: 'center'
+    display: "flex",
+    alignItems: "center",
   },
   searchWrapper: {
     flex: 1,
     fontFamily: theme.typography.fontFamily,
-    position: 'relative',
+    position: "relative",
     borderRadius: theme.rounded.big,
-    display: 'flex',
+    display: "flex",
     background: theme.palette.common.white,
     border: `1px solid ${theme.palette.divider}`,
     marginRight: theme.spacing(1) / 2,
     height: theme.spacing(1) * 5,
   },
   search: {
-    width: 'auto',
-    height: '100%',
+    width: "auto",
+    height: "100%",
     top: 0,
     left: 20,
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    position: "absolute",
+    pointerEvents: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   input: {
-    font: 'inherit',
-    padding: `${theme.spacing(1) / 2}px ${theme.spacing(1) * 2}px ${theme.spacing(1) / 2}px ${theme.spacing(1) * 6}px`,
+    font: "inherit",
+    padding: `${theme.spacing(1) / 2}px ${theme.spacing(1) *
+      2}px ${theme.spacing(1) / 2}px ${theme.spacing(1) * 6}px`,
     border: 0,
-    display: 'block',
-    verticalAlign: 'middle',
-    whiteSpace: 'normal',
-    background: 'none',
+    display: "block",
+    verticalAlign: "middle",
+    whiteSpace: "normal",
+    background: "none",
     margin: 0, // Reset for Safari
-    color: 'inherit',
-    width: '100%',
-    '&:focus': {
+    color: "inherit",
+    width: "100%",
+    "&:focus": {
       outline: 0,
     },
   },
   bottomFilter: {
-    position: 'absolute',
-    width: '100%',
-    background: 'none',
-    border: 'none',
-    [theme.breakpoints.up('sm')]: {
+    position: "absolute",
+    width: "100%",
+    background: "none",
+    border: "none",
+    [theme.breakpoints.up("sm")]: {
       width: drawerWidth,
     },
     zIndex: 2000,
@@ -196,124 +211,130 @@ const styles = theme => ({
   },
   avatar: {},
   userName: {
-    textAlign: 'left',
+    textAlign: "left",
   },
   cover: {
-    padding: '20px 8px',
-    position: 'relative',
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    '& $avatar': {
+    padding: "20px 8px",
+    position: "relative",
+    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    "& $avatar": {
       boxShadow: theme.glow.light,
       width: 80,
       height: 80,
       marginRight: 30,
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down("sm")]: {
         width: 50,
         height: 50,
-        marginRight: 20
-      }
+        marginRight: 20,
+      },
     },
   },
   opt: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
   },
   favorite: {
-    color: amber[500]
+    color: amber[500],
   },
   redIcon: {
     background: red[50],
-    '& svg': {
-      color: red[500]
-    }
+    "& svg": {
+      color: red[500],
+    },
   },
   brownIcon: {
     background: brown[50],
-    '& svg': {
-      color: brown[500]
-    }
+    "& svg": {
+      color: brown[500],
+    },
   },
   tealIcon: {
     background: teal[50],
-    '& svg': {
-      color: teal[500]
-    }
+    "& svg": {
+      color: teal[500],
+    },
   },
   blueIcon: {
     background: blue[50],
-    '& svg': {
-      color: blue[500]
-    }
+    "& svg": {
+      color: blue[500],
+    },
   },
   amberIcon: {
     background: amber[50],
-    '& svg': {
-      color: amber[500]
-    }
+    "& svg": {
+      color: amber[500],
+    },
   },
   purpleIcon: {
     background: purple[50],
-    '& svg': {
-      color: purple[500]
-    }
+    "& svg": {
+      color: purple[500],
+    },
   },
   field: {
-    width: '100%',
+    width: "100%",
     marginBottom: theme.spacing(1),
-    '& svg': {
+    "& svg": {
       color: theme.palette.grey[400],
       fontSize: 18,
-    }
+    },
   },
   uploadAvatar: {
-    width: '100%',
-    height: '100%',
-    background: theme.palette.type === 'dark' ? theme.palette.grey[700] : theme.palette.grey[100],
+    width: "100%",
+    height: "100%",
+    background:
+      theme.palette.type === "dark"
+        ? theme.palette.grey[700]
+        : theme.palette.grey[100],
   },
   selected: {
-    background: theme.palette.type === 'dark' ? darken(theme.palette.primary.light, 0.5) : darken(theme.palette.primary.light, 0.05),
+    background:
+      theme.palette.type === "dark"
+        ? darken(theme.palette.primary.light, 0.5)
+        : darken(theme.palette.primary.light, 0.05),
     borderLeft: `4px solid ${theme.palette.secondary.main}`,
     paddingLeft: 20,
-    '& h3': {
-      color: theme.palette.primary.dark
-    }
+    "& h3": {
+      color: theme.palette.primary.dark,
+    },
   },
   hiddenDropzone: {
-    display: 'none'
+    display: "none",
   },
   avatarWrap: {
     width: 100,
     height: 100,
-    margin: '10px auto 30px',
-    position: 'relative'
+    margin: "10px auto 30px",
+    position: "relative",
   },
   avatarTop: {
-    display: 'block',
-    textAlign: 'center',
+    display: "block",
+    textAlign: "center",
     padding: theme.spacing(1) * 3,
-    '& $avatar': {
+    "& $avatar": {
       width: 100,
       height: 100,
-      margin: '0 auto'
-    }
+      margin: "0 auto",
+    },
   },
   buttonUpload: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)'
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
   },
   navIconHide: {
     marginRight: theme.spacing(1),
     paddingTop: 0,
-    [theme.breakpoints.up('sm')]: {
-      display: 'none'
-    }
+    [theme.breakpoints.up("sm")]: {
+      display: "none",
+    },
   },
 });
 

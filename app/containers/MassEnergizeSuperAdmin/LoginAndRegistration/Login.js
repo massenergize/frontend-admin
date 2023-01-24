@@ -1,13 +1,12 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
-import brand from 'dan-api/dummy/brand';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withStyles } from '@mui/styles';
+import { withStyles } from "@mui/styles";
 import { LoginForm } from 'dan-components';
-import styles from 'dan-components/Forms/user-jss';
 import { apiCall } from '../../../utils/messenger';
-
+import styles from "dan-components/Forms/user-jss";
+import brand from "dan-api/dummy/brand";
+import PropTypes from "prop-types";
 class Login extends React.Component {
   submitForm = async (values) => {
     await apiCall('/auth.login', values.entries(), '/admin');
@@ -15,7 +14,7 @@ class Login extends React.Component {
 
 
   render() {
-    const title = brand.name + ' - Login';
+    const title = brand.name + " - Login";
     const description = brand.desc;
     const {
       classes, started, signOutFxn, loginWithFacebookFxn, loginWithGoogleFxn, normalLoginFxn, error

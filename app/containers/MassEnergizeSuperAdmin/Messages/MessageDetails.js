@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import MassEnergizeForm from "../_FormGenerator";
 import Loading from "dan-components/Loading";
 import { apiCall } from "../../../utils/messenger";

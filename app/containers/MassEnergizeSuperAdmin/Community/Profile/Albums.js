@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Grid from '@material-ui/core/Grid';
 import { NavLink } from 'react-router-dom';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import ButtonBase from '@material-ui/core/ButtonBase';

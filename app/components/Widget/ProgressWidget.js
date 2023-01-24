@@ -8,7 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
 import Check from '@mui/icons-material/Check';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import styles from './widget-jss';
 
 function ProgressWidget(props) {

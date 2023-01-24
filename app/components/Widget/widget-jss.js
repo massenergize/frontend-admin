@@ -1,9 +1,5 @@
 import colorfull from "dan-api/palette/colorfull";
-import {
-  darken,
-  fade,
-  lighten,
-} from "@material-ui/core/styles/colorManipulator";
+import { alpha, darken, lighten } from "@mui/material";
 import {
   gradientBgLight,
   gradientBgDark,
@@ -11,6 +7,7 @@ import {
 import green from "@material-ui/core/colors/green";
 import red from "@material-ui/core/colors/red";
 import images from "dan-api/images/photos";
+
 const tableLabel = {
   fontWeight: "bold",
   background: "rgb(65 169 65)",
@@ -19,8 +16,8 @@ const tableLabel = {
   height: 21,
 };
 const styles = (theme) => ({
-  tableShadowReset: { 
-    boxShadow:"0px 0px !important",
+  tableShadowReset: {
+    boxShadow: "0px 0px !important",
   },
   yesLabel: {
     ...tableLabel,
@@ -481,8 +478,8 @@ const styles = (theme) => ({
       border: `10px solid ${theme.palette.secondary.main}`,
       boxShadow:
         theme.palette.type === "dark"
-          ? `0 0 0 10px ${fade(theme.palette.secondary.main, 0.6)}`
-          : `0 0 0 10px ${fade(theme.palette.secondary.light, 0.6)}`,
+          ? `0 0 0 10px ${alpha(theme.palette.secondary.main, 0.6)}`
+          : `0 0 0 10px ${alpha(theme.palette.secondary.light, 0.6)}`,
       borderRadius: "50%",
       "& > div": {
         background: theme.palette.secondary.main,
@@ -504,8 +501,8 @@ const styles = (theme) => ({
     textAlign: "center",
     justifyContent: "center",
     "& li": {
-      margin: `${theme.spacing(1) * 3}px ${theme.spacing(1)}px ${theme
-        .spacing.unit * 2}px`,
+      margin: `${theme.spacing(1) * 3}px ${theme.spacing(1)}px ${theme.spacing
+        .unit * 2}px`,
     },
   },
   buttonReadMore: {
@@ -562,7 +559,7 @@ const styles = (theme) => ({
         ? gradientBgDark(theme)
         : gradientBgLight(theme),
     "& button": {
-      background: fade(theme.palette.background.paper, 0.3),
+      background: alpha(theme.palette.background.paper, 0.3),
       color: theme.palette.common.white,
       borderRadius: theme.rounded.medium,
     },
@@ -571,7 +568,7 @@ const styles = (theme) => ({
     "& tbody tr:nth-child(even)": {
       background:
         theme.palette.type === "dark"
-          ? fade(theme.palette.grey[900], 0.5)
+          ? alpha(theme.palette.grey[900], 0.5)
           : theme.palette.grey[50],
     },
   },

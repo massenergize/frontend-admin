@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Paper from '@material-ui/core/Paper';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import Calendar from 'react-calendar';
 import Clock from 'react-clock';
 import 'dan-styles/vendors/react-clock/react-clock.css';

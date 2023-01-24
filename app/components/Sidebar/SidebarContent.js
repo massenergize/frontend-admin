@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@mui/styles';
 import { bindActionCreators } from 'redux';
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
@@ -73,30 +73,53 @@ class SidebarContent extends React.Component {
       }
     };
     return (
-      <div className={classNames(classes.drawerInner, !drawerPaper ? classes.drawerPaperClose : '')}>
-        <div className={classes.drawerHeader}>
-          <NavLink to="/admin" className={classNames(classes.brand, classes.brandBar, turnDarker && classes.darker)}>
+      <div
+        className={classNames(
+          classes && classes.drawerInner,
+          !drawerPaper ? classes && classes.drawerPaperClose : ""
+        )}
+      >
+        <div className={classes && classes.drawerHeader}>
+          <NavLink
+            to="/admin"
+            className={classNames(
+              classes && classes.brand,
+              classes && classes.brandBar,
+              turnDarker && classes && classes.darker
+            )}
+          >
             <img src={logo} alt={brand.name} />
             {brand.name}
           </NavLink>
-          {isLogin && user && Object.keys(user).length>0 && (
+          {isLogin && user && Object.keys(user).length > 0 && (
             <div
               className={classNames(classes.profile, classes.user)}
-              style={{ opacity: 1 - (transform / 100), marginTop: transform * -0.3 }}
+              style={{
+                opacity: 1 - transform / 100,
+                marginTop: transform * -0.3,
+              }}
             >
-              {user.profile_picture
-                && <Avatar alt={user.preferred_name} src={user.profile_picture.url} style={{ margin: 10 }} />
-              }
-              {!user.profile_picture
-                && <Avatar style={{ margin: 10 }}>{user.preferred_name.substring(0, 2)}</Avatar>
-              }
+              {user.profile_picture && (
+                <Avatar
+                  alt={user.preferred_name}
+                  src={user.profile_picture.url}
+                  style={{ margin: 10 }}
+                />
+              )}
+              {!user.profile_picture && (
+                <Avatar style={{ margin: 10 }}>
+                  {user.preferred_name.substring(0, 2)}
+                </Avatar>
+              )}
               <div>
-                <h4>{user.preferred_name ? user.preferred_name : '...'}</h4>
-                <small>{user.is_super_admin ? 'Super Admin' : 'Community Admin ' }</small>
-                <p style={{fontSize: '7px'}}>
-                  {IS_PROD ? 'Production ' : 'Development '}
+                <h4>{user.preferred_name ? user.preferred_name : "..."}</h4>
+                <small>
+                  {user.is_super_admin ? "Super Admin" : "Community Admin "}
+                </small>
+                <p style={{ fontSize: "7px" }}>
+                  {IS_PROD ? "Production " : "Development "}
                   Build version
-                  {' ' + BUILD_VERSION}
+                  {" " + BUILD_VERSION}
                 </p>
               </div>
             </div>
@@ -104,15 +127,17 @@ class SidebarContent extends React.Component {
         </div>
         <div
           id="sidebar"
-          className={
-            classNames(
-              classes.menuContainer,
-              leftSidebar && classes.rounded,
-              isLogin && classes.withProfile
-            )
-          }
+          className={classNames(
+            classes.menuContainer,
+            leftSidebar && classes.rounded,
+            isLogin && classes.withProfile
+          )}
         >
-          <MainMenu loadTransition={loadTransition} dataMenu={dataMenu} toggleDrawerOpen={toggleDrawerOpen} />
+          <MainMenu
+            loadTransition={loadTransition}
+            dataMenu={dataMenu}
+            toggleDrawerOpen={toggleDrawerOpen}
+          />
         </div>
       </div>
     );

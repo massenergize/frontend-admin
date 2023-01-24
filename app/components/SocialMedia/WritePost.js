@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Dropzone from 'react-dropzone';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import IconButton from '@material-ui/core/IconButton';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import Send from '@mui/icons-material/Send';

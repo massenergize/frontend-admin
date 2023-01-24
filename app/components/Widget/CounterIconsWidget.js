@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import Grid from '@material-ui/core/Grid';
 import OndemandVideo from '@mui/icons-material/OndemandVideo';
 import SupervisorAccount from '@mui/icons-material/SupervisorAccount';

@@ -3,7 +3,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import Button from "@material-ui/core/Button";
 import VerifiedUser from "@mui/icons-material/VerifiedUser";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import styles from "./jss/cover-jss";
 import { apiCall } from "../../../../utils/messenger";
 import { PORTAL_HOST } from "../../../../config/constants";
