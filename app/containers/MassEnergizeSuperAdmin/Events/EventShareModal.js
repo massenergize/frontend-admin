@@ -15,6 +15,7 @@ import { apiCall } from "../../../utils/messenger";
 
 function EventShareModal({
   show,
+  close,
   toggleModal,
   event,
   auth,
@@ -126,6 +127,7 @@ function EventShareModal({
         if (!response.success)
           return console.log("SHARING_ERROR_BE:", response.error);
 
+        close && close()
         setCommunities([]);
         setChanged(false);
 
