@@ -222,7 +222,15 @@ class AllTeams extends React.Component {
           filter: false,
           download: false,
           customBodyRender: (id) => (
-            <Link to={`/admin/edit/${id}/team`}>
+            <Link
+              onClick={(e) => {
+                e.preventDefault();
+                this.props.history.push({
+                  pathname: `/admin/edit/${id}/team`,
+                  state: { ids: this.state.ids },
+                });
+              }}
+            >
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
           ),

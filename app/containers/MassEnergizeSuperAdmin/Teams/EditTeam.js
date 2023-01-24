@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { Paper, Typography } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import { bindActionCreators } from "redux";
@@ -8,6 +8,7 @@ import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
 import {
+  fetchLatestNextSteps,
   reduxAddToHeap,
   reduxGetAllCommunityTeams,
   reduxUpdateHeap,
@@ -110,6 +111,25 @@ class EditTeam extends Component {
     });
   }
 
+  onComplete(_, __, resetForm) {
+    const pathname = "/admin/read/teams";
+    const { location, history, match, updateNextSteps } = this.props;
+    const { id } = match.params;
+    var ids = location.state && location.state.ids;
+
+    resetForm && resetForm();
+    updateNextSteps();
+    // Just means admin just answered message normally, so form should just reset, and redirect back to the same page, just like the old fxnality
+    if (!ids || !ids.length) return history.push(pathname);
+
+    // -- Then follow up with going back to the msg list page, but with the id of the just-answered msg, removed
+    ids = ids.filter((_id) => _id.toString() !== id && id.toString());
+    history.push({
+      pathname,
+      state: { ids },
+    });
+  }
+
   setStateAsync(state) {
     return new Promise((resolve) => {
       this.setState(state, resolve);
@@ -132,7 +152,12 @@ class EditTeam extends Component {
         </Paper>
 
         <br />
-        <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+          enableCancel
+          onComplete={this.onComplete.bind(this)}
+        />
       </div>
     );
   }
@@ -156,6 +181,7 @@ function mapDispatchToProps(dispatch) {
       callTeamsForNormalAdmin: reduxGetAllCommunityTeams,
       addTeamsToHeap: reduxUpdateHeap,
       addTeamInfoToHeap: reduxAddToHeap,
+      updateNextSteps: fetchLatestNextSteps,
     },
     dispatch
   );
@@ -163,7 +189,7 @@ function mapDispatchToProps(dispatch) {
 const EditTeamMapped = connect(
   mapStateToProps,
   mapDispatchToProps
-)(EditTeam);
+)(withRouter(EditTeam));
 
 export default withStyles(styles, { withTheme: true })(EditTeamMapped);
 const createFormJson = ({ communities, team, parentTeamOptions }) => {
