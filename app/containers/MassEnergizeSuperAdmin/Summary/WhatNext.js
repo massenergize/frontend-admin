@@ -9,7 +9,6 @@ function WhatNext({ data }) {
   if (!Object.keys(data).length) return <></>;
 
   const history = useHistory();
-  // console.log("I think I am the data my gee", data);
   return (
     <PapperBlock
       whiteBg
