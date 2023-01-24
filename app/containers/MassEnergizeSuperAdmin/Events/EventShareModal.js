@@ -118,7 +118,7 @@ function EventShareModal({
   const sendApiRequest = () => {
     setLoading(true);
     apiCall("/events.update", {
-      shared_to: communitiesToShareTo,
+      shared_to: communitiesToShareTo.length ? communitiesToShareTo : ["reset"],
       event_id: event.id,
     })
       .then((response) => {
