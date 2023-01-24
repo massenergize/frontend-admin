@@ -238,6 +238,7 @@ function EventFullView(props) {
         auth={auth}
         communities={communities}
         show={showShareModal}
+        close = {()=> setshowShareModal(false)}
         toggleModal={setshowShareModal}
         event={event}
         updateEventInHeap={putEventInHeap}
