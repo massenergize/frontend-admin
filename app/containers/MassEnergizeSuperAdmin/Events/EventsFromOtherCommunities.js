@@ -7,7 +7,7 @@ import {
   Tooltip,
   Typography,
 } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
 import { apiCall } from "../../../utils/messenger";
@@ -25,32 +25,13 @@ function EventsFromOtherCommunities({
   putStateInRedux,
 }) {
   const [loading, setLoading] = useState(false);
-  const { communities, exclude } = state || {};
+  const { communities, exclude, mounted } = state || {};
 
   const setCommunities = (communities) => {
     putStateInRedux({ ...(state || {}), communities });
   };
-  const setExclude = (exclude) => {
-    putStateInRedux({ ...(state || {}), exclude });
-  };
-
-  const fetchOtherEvents = () => {
-    const ids = (communities || []).map((it) => it.id);
-    // return console.log("What are the coms",communities, otherCommunities);
-
-    setLoading(true);
-    apiCall("/events.others.listForCommunityAdmin", {
-      community_ids: ids,
-      exclude: exclude || false,
-    })
-      .then((response) => {
-        setLoading(false);
-        if (response.success) return putOtherEventsInRedux(response.data);
-      })
-      .catch((e) => {
-        setLoading(false);
-        console.log("OTHER_EVENTS_BE_ERROR:", e.toString());
-      });
+  const setMounted = (mounted) => {
+    putStateInRedux({ ...(state || {}), mounted });
   };
 
   const fashionData = (data) => {
@@ -70,6 +51,33 @@ function EventsFromOtherCommunities({
       d.id,
     ]);
     return fashioned;
+  };
+  const data = fashionData(otherEvents || []);
+
+  useEffect(() => {
+    if (!mounted) {
+      // First time the page loads, Preselect all communities
+      setCommunities(otherCommunities);
+      // fetchOtherEvents(otherCommunities);  // Uncheck if we want to automatically load in events from all the preselected communities as well
+    }
+  }, [otherCommunities]);
+
+  const fetchOtherEvents = (passedComms = []) => {
+    const ids = (passedComms || communities || []).map((it) => it.id);
+
+    setLoading(true);
+    apiCall("/events.others.listForCommunityAdmin", {
+      community_ids: ids,
+      exclude: exclude || false,
+    })
+      .then((response) => {
+        setLoading(false);
+        if (response.success) return putOtherEventsInRedux(response.data);
+      })
+      .catch((e) => {
+        setLoading(false);
+        console.log("OTHER_EVENTS_BE_ERROR:", e.toString());
+      });
   };
 
   const makeColumns = () => {
@@ -139,7 +147,7 @@ function EventsFromOtherCommunities({
         key: "full-view",
         options: {
           filter: false,
-          filterType: "multiselect",
+          delete: false,
           customBodyRender: (id) => (
             <Link to={`/admin/read/event/${id}/event-view?from=others`}>
               <CallMadeIcon size="small" variant="outlined" color="secondary" />
@@ -150,13 +158,13 @@ function EventsFromOtherCommunities({
     ];
   };
 
-  const data = fashionData(otherEvents || []);
   const options = {
     filterType: "dropdown",
     responsive: "stacked",
     print: true,
     rowsPerPage: 25,
     rowsPerPageOptions: [10, 25, 100],
+    selectableRows: false,
   };
 
   const renderTable = ({ data, options }) => {
@@ -170,9 +178,18 @@ function EventsFromOtherCommunities({
     if (!data.length)
       return (
         <Paper style={{ padding: "15px 25px" }}>
-          {" "}
-          No open events are available for your list of communities. Select
-          other ones
+          {mounted ? (
+            <span>
+              {" "}
+              No open events are available for your list of communities. Select
+              other ones
+            </span>
+          ) : (
+            <span>
+              When you select communities and <b>"Apply"</b>, events will show
+              here..
+            </span>
+          )}
         </Paper>
       );
     return (
@@ -198,9 +215,8 @@ function EventsFromOtherCommunities({
           </Typography>
 
           <small style={{ color: "grey" }}>
-            The community list below does not include communities you manage.
             When you are done selecting your communities, click the{" "}
-            <b>"search"</b>
+            <b>"apply"</b>
             button below
           </small>
 
@@ -211,8 +227,9 @@ function EventsFromOtherCommunities({
             labelExtractor={(it) => it.name}
             valueExtractor={(it) => it.id}
             onChange={(items) => setCommunities(items)}
+            multiple
           />
-          <FormControlLabel
+          {/* <FormControlLabel
             control={
               <Checkbox
                 checked={exclude}
@@ -220,7 +237,7 @@ function EventsFromOtherCommunities({
               />
             }
             label="Exclude events from communities I have selected"
-          />
+          /> */}
         </div>
         <div style={{ background: "#fbfbfb" }}>
           <Tooltip
@@ -228,7 +245,10 @@ function EventsFromOtherCommunities({
             title="Click this button to find events from the communities you have selected above "
           >
             <Button
-              onClick={() => fetchOtherEvents()}
+              onClick={() => {
+                fetchOtherEvents(null);
+                setMounted(true);
+              }}
               disabled={!(communities || []).length || loading}
               variant="contained"
               color="secondary"
@@ -244,7 +264,7 @@ function EventsFromOtherCommunities({
                   style={{ marginRight: 5, color: "white" }}
                 />
               )}
-              {loading ? "Fetching..." : "Search"}
+              {loading ? "Fetching..." : "Apply"}
             </Button>
           </Tooltip>
         </div>

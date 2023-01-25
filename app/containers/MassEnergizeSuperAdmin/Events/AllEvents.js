@@ -34,9 +34,7 @@ import {
   ourCustomSort,
   smartString,
 } from "../../../utils/common";
-import {
-  Typography,
-} from "@material-ui/core";
+import { Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -87,7 +85,8 @@ class AllEvents extends React.Component {
   }
 
   getColumns() {
-    const { classes, putEventsInRedux, allEvents } = this.props;
+    const { classes, putEventsInRedux, allEvents, auth } = this.props;
+
     return [
       {
         name: "ID",
@@ -209,13 +208,15 @@ class AllEvents extends React.Component {
               >
                 <FileCopy size="small" variant="outlined" color="secondary" />
               </Link>
-              <Link to={`/admin/read/event/${id}/event-view?from=main`}>
-                <CallMadeIcon
-                  size="small"
-                  variant="outlined"
-                  color="secondary"
-                />
-              </Link>
+              {auth && auth.is_super_admin && (
+                <Link to={`/admin/read/event/${id}/event-view?from=main`}>
+                  <CallMadeIcon
+                    size="small"
+                    variant="outlined"
+                    color="secondary"
+                  />
+                </Link>
+              )}
             </div>
           ),
         },
@@ -341,9 +342,7 @@ class AllEvents extends React.Component {
     const title = brand.name + " - All Events";
     const description = brand.desc;
     const { columns } = this.state;
-    const {
-      classes,
-    } = this.props;
+    const { classes } = this.props;
     const data = this.fashionData(this.props.allEvents || []);
     const options = {
       filterType: "dropdown",
@@ -405,8 +404,6 @@ class AllEvents extends React.Component {
       );
     }
 
-   
-
     return (
       <div>
         <Helmet>
@@ -428,9 +425,7 @@ class AllEvents extends React.Component {
               options: options,
             }}
           />
-        
         </Paper>
-      
       </div>
     );
   }
@@ -465,4 +460,3 @@ const EventsMapped = connect(
   mapDispatchToProps
 )(AllEvents);
 export default withStyles(styles)(withRouter(EventsMapped));
-

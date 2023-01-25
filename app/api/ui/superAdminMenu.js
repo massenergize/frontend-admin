@@ -307,15 +307,15 @@ module.exports = [
     child: [ 
       {
         key:"settings-page",
-        link: "/admin/profile/settings",
-        name:"Settings"
+        link: "/admin/profile/preferences",
+        name:"Communication preferences"
       },
       {
         key: "feature-flags",
         link: "/admin/settings/feature-flags",
         name:"Feature Flags"
       },
-    ]
-   
+    
+    ]  
   },
 ];

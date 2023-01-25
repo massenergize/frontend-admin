@@ -10,7 +10,10 @@ import MassEnergizeForm from "../_FormGenerator";
 import Typography from "@material-ui/core/Typography";
 import { checkIfReadOnly, getSelectedIds } from "../Actions/EditActionForm";
 import { bindActionCreators } from "redux";
-import { reduxUpdateHeap } from "../../../redux/redux-actions/adminActions";
+import {
+  reduxAddToHeap,
+  reduxUpdateHeap,
+} from "../../../redux/redux-actions/adminActions";
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 const styles = (theme) => ({
@@ -77,6 +80,13 @@ export const makeTagSection = ({
   return section;
 };
 
+const findEventFromBackend = ({ id, reduxFxn }) => {
+  apiCall("events.info", { event_id: id }).then((response) => {
+    if (!response.success)
+      return console.log("Sorry, could not load event with ID" + id);
+    reduxFxn && reduxFxn(response.data);
+  });
+};
 class EditEventForm extends Component {
   constructor(props) {
     super(props);
@@ -88,6 +98,17 @@ class EditEventForm extends Component {
       readOnly: false,
     };
   }
+
+  /**
+   * All this needs to happen inside getDerivedState because
+   * We need a lifecycle that runs whenever our props change.
+   * The data we load from the API will always come in late.
+   * That is why this is the best place.
+   *
+   * Summary Of Whats Happening Here:
+   * 1. Find event object (Look inside, already loaded event lists, or check event heap, if none of them have it already, just fetch from API)
+   * 2. Use the object to prefill the formJson and use it to create a form.
+   */
   static getDerivedStateFromProps = (props, state) => {
     const {
       match,
@@ -97,27 +118,74 @@ class EditEventForm extends Component {
       auth,
       exceptions,
       otherCommunities,
+      eventsInHeap,
+      eventsFromOtherCommunities,
+      putEventInHeap,
+      heap,
+      passedEvent, // In cases where this component is being used as a child component, the event object will be passed here directly
     } = props;
-    const { id } = match.params;
+
+    const { id } = (match && match.params) || {};
+
     var { rescheduledEvent } = state;
 
     rescheduledEvent = exceptions[id] || rescheduledEvent;
-    const event = (events || []).find((e) => e.id.toString() === id.toString());
+    var event;
+
+    // ----------------------------------------------------------------------
+    if (!passedEvent) {
+      //--- Search for events from my event list
+      event = (events || []).find((e) => e.id.toString() === id.toString());
+
+      //--- If not found, look inside heap
+      if (!event) event = (eventsInHeap || {})[id];
+
+      //--- If not found look inside list of "other Events"
+      if (!event)
+        event = (eventsFromOtherCommunities || []).find(
+          (e) => e.id.toString() === id.toString()
+        );
+
+      const storeEventInHeap = (data) => {
+        putEventInHeap(
+          { eventsInHeap: { ...eventsInHeap, [id.toString()]: data } },
+          heap
+        );
+      };
+
+      //--- If all local searches fail, just retrieve from backend
+      if (!event) findEventFromBackend({ id, storeEventInHeap });
+    } else event = passedEvent;
+    // ----------------------------------------------------------------------
+
     const readOnly = checkIfReadOnly(event, auth);
     const thereIsNothingInEventsExceptionsList = rescheduledEvent === null;
 
+    /** The whole point of this is to make sure all of the following have loaded in,
+     *   before we start creating the form. If all of these values load in,  *"readyToRenderPageFirstTime" will be a positive value
+     */
     const readyToRenderPageFirstTime =
+      event &&
       events &&
-      events.length &&
       tags &&
       tags.length &&
       (readOnly || rescheduledEvent || thereIsNothingInEventsExceptionsList) &&
       otherCommunities &&
       otherCommunities.length;
 
+    /**
+     * Now, when all the values needed to create the form are loaded in, we now need to create the form
+     * "jobsDoneDontRunWhatsBelowEverAgain" is setup to always be the inverse value of "readyToRender...". Meaning when "readyToRender..." is true, "jobsDone..." will be false.
+     "state.mounted" is initally always false (will get to that soon). Since the If statement below resolves to false, code below will run. The formJson will be created nicely as well as the other things...
+     * Then after, to ensure that the creation never happens again, there has  to
+     * be a third party that indicates that all the loading processes are done, form is created and that everything is finished here. That is where "state.mounted" comes in.
+     * "state.mounted" is set to true the first time the formJson is created.
+     * This way, even if "getDerivedStateFromProps" is triggered from a props change somewhere down the line, the whole process will terminate here...
+     */
     const jobsDoneDontRunWhatsBelowEverAgain =
-      !readyToRenderPageFirstTime || state.mounted;
+      !readyToRenderPageFirstTime || state.mounted; // state.mounted will only be true when the code below has run at least once!
 
+    //--- When this value is true, it means we have been able to load all data needed to show the form, so no need to recreate formJson
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
     const coms = (communities || []).map((c) => ({
@@ -148,7 +216,8 @@ class EditEventForm extends Component {
   };
 
   componentDidMount() {
-    const { id } = this.props.match.params;
+    const { match, passedEvent } = this.props;
+    const { id } = (match && match.params) || passedEvent || {};
     var { event } = this.state;
     const { auth, events, addExceptionsToHeap, heap, exceptions } = this.props;
 
@@ -187,11 +256,20 @@ class EditEventForm extends Component {
 
   render() {
     const { classes } = this.props;
-    const { formJson, readOnly, event } = this.state;
+    const { formJson, readOnly, event, mounted } = this.state;
+
+    if (!event && mounted)
+      return (
+        <p>
+          Sorry, we could not load the event you are looking for. If you are
+          sure your event exists, please report this!
+        </p>
+      );
+
     if (!formJson) return <Loading />;
     return (
       <div>
-        {event.rsvp_enabled ? (
+        {!readOnly && event.rsvp_enabled ? (
           <Paper style={{ padding: 20, marginBottom: 15 }}>
             <Typography>
               Would you like to see a list of users who have RSVP-ed for this
@@ -219,7 +297,7 @@ class EditEventForm extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const heap = state.heap;
+  const heap = state.getIn(["heap"]);
   return {
     auth: state.getIn(["auth"]),
     community: state.getIn(["selected_community"]),
@@ -229,6 +307,8 @@ const mapStateToProps = (state) => {
     heap: state.getIn(["heap"]),
     exceptions: (heap && heap.exceptions) || {},
     otherCommunities: state.getIn(["otherCommunities"]),
+    eventsInHeap: (heap || {}).eventsInHeap || {},
+    eventsFromOtherCommunities: state.getIn(["otherEvents"]),
   };
 };
 
@@ -236,6 +316,7 @@ const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       addExceptionsToHeap: reduxUpdateHeap,
+      putEventInHeap: reduxAddToHeap,
     },
     dispatch
   );
@@ -253,7 +334,6 @@ export default withStyles(styles, { withTheme: true })(EditEventMapped);
 const validator = (cleaned) => {
   const start = (cleaned || {})["start_date_and_time"];
   const end = (cleaned || {})["end_date_and_time"];
-  console.log(start, end);
   const endDateComesLater = new Date(end) > new Date(start);
   return [
     endDateComesLater,
@@ -797,6 +877,16 @@ const createFormJson = ({
         isRequired: false,
         defaultValue: "" + event.archive,
         dbName: "archive",
+        readOnly: false,
+        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+      },
+      {
+        name: "is_approved",
+        label: "Do you approve this event?",
+        fieldType: "Radio",
+        isRequired: false,
+        defaultValue: "" + event.is_approved,
+        dbName: "is_approved",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
       },
