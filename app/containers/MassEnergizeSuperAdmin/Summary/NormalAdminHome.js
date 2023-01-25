@@ -30,6 +30,7 @@ import ActionsChartWidget from "./graph/ActionsChartWidget";
 import { PORTAL_HOST } from "../../../config/constants";
 import { Paper } from "@material-ui/core";
 import ReportingActivities from "./ReportingActivities";
+import WhatNext from "./WhatNext";
 
 class NormalAdminHome extends PureComponent {
   constructor(props) {
@@ -88,7 +89,7 @@ class NormalAdminHome extends PureComponent {
   renderTable = (data, classes) => (
     <PapperBlock
       noMargin
-      title="Communities You Manage Gbemi"
+      title="Communities You Manage"
       icon="ios-share-outline"
       whiteBg
       desc=""
@@ -192,13 +193,15 @@ class NormalAdminHome extends PureComponent {
             😊
           </span>
         </h1>
-        {/* {this.showCommunitySwitch()} */}
+
         <Grid container className={classes.root}>
           <SummaryChart data={summary_data} />
         </Grid>
+        <br />
+        <WhatNext />
         <Divider className={classes.divider} />
         {graph_data && <ActionsChartWidget data={graph_data || {}} />}
-      
+
         <br />
         <Grid md={12} style={{ display: "flex" }}>
           {auth && !auth.is_super_admin && (

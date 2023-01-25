@@ -44,6 +44,28 @@
   align-items: center;
 }
 
+.me-badge {
+  padding: 5px 6px;
+  border-radius: 55px;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  background: green;
+  margin-right: 7px;
+}
+.next-section-item {
+  margin-bottom: 15px;
+  /* flex-basis: 30%; */
+  margin: 10px;
+  cursor: pointer;
+}
+
+.next-section-item .text:hover {
+  border: dotted 0px #cfcfcf;
+  border-bottom-width: 2px;
+  opacity: 0.7;
+  transition: 0.1s ease-out;
+}
 .me-fade-in-down {
   animation: me-fade-down 0.4s forwards;
   -webkit-animation: me-fade-down 0.4s forwards;

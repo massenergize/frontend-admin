@@ -22,6 +22,7 @@ import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarConte
 import { apiCallFile } from "../../../utils/messenger";
 import ReportingActivities from "./ReportingActivities";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import WhatNext from "./WhatNext";
 
 // import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
 class SummaryDashboard extends PureComponent {
@@ -142,6 +143,8 @@ class SummaryDashboard extends PureComponent {
         <Grid container className={classes.root}>
           <SummaryChart data={summary_data} />
         </Grid>
+        <br/> 
+        <WhatNext />
         <Divider className={classes.divider} />
 
         {graph_data && <ActionsChartWidget data={graph_data || {}} />}
