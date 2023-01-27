@@ -1,11 +1,20 @@
-import { Typography } from "@material-ui/core";
+import { Tooltip, Typography } from "@material-ui/core";
 import React from "react";
 import { PapperBlock } from "dan-components";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { useHistory, withRouter } from "react-router-dom";
 function WhatNext({ data }) {
-  const { messages, teams, testimonials, users, team_messages } = data || {};
+  const {
+    messages,
+    teams,
+    testimonials,
+    users,
+    team_messages,
+    sign_ins,
+    todo_interactions,
+    done_interactions,
+  } = data || {};
   if (!Object.keys(data).length) return <></>;
 
   const history = useHistory();
@@ -81,6 +90,54 @@ function WhatNext({ data }) {
             })
           }
         />
+        <SectionTemplate
+          content={sign_ins}
+          name="Sign Ins"
+          description={(count) =>
+            `${count} ${
+              count === 1 ? "sign-in" : "sign-ins"
+            } in your communities`
+          }
+          subtitle={(_) =>
+            `The number of sign-in activities in  any of the communities you manage, on the community portal`
+          }
+        />
+        <SectionTemplate
+          content={done_interactions}
+          name="Actions Taken"
+          description={(count) =>
+            `${count} ${
+              count === 1 ? "action" : "actions"
+            } taken since your last visit`
+          }
+          subtitle={(_) =>
+            `These are actions in any of the communities you manage that users have taken. Click to see which actions are involved`
+          }
+          onClick={() =>
+            history.push({
+              pathname: "/admin/read/actions",
+              state: { ids: done_interactions && done_interactions.data },
+            })
+          }
+        />
+        <SectionTemplate
+          content={todo_interactions}
+          name="ACTIONS TO BE TAKEN (TODO)"
+          description={(count) =>
+            `${count} ${
+              count === 1 ? "action" : "actions"
+            } in todo list since your last visit`
+          }
+          subtitle={(_) =>
+            `These are actions in any of the communities you manage, that are in user todo lists. Click to see which actions are involved`
+          }
+          onClick={() =>
+            history.push({
+              pathname: "/admin/read/actions",
+              state: { ids: todo_interactions && todo_interactions.data },
+            })
+          }
+        />
       </div>
     </PapperBlock>
   );
@@ -99,11 +156,12 @@ export default connect(
   mapDispatchToProps
 )(withRouter(WhatNext));
 
-const SectionTemplate = ({ content, name, description, onClick }) => {
+const SectionTemplate = ({ content, name, description, onClick, subtitle }) => {
   if (!content || !content.data || !content.data.length) return <></>;
 
   const { data } = content;
   const single = data && data.length < 10; // Need to style single digits differently, so check
+  const nonClickStyling = onClick ? {} : { borderWidth: 0, cursor: "auto" };
   return (
     <div
       style={{
@@ -121,24 +179,36 @@ const SectionTemplate = ({ content, name, description, onClick }) => {
         >
           {name}
         </Typography>
-        <Typography
-          className="text"
-          variant="body2"
-          style={{
-            display: "inline",
-            paddingBottom: 7,
-          }}
-          onClick={() => onClick && onClick()}
+
+        <Tooltip
+          title={(subtitle && subtitle(data.length)) || ""}
+          placement="top"
         >
-          <span
-            className="me-badge"
-            style={single ? { paddingLeft: 8, paddingRight: 8 } : {}}
+          <Typography
+            className="text"
+            variant="body2"
+            style={{
+              display: "inline",
+              paddingBottom: 7,
+              ...nonClickStyling,
+            }}
+            onClick={() => onClick && onClick()}
           >
-            {data.length}
-          </span>
-          {description(data.length)}
-          <span style={{ marginLeft: 6 }} className="fa fa-long-arrow-right" />
-        </Typography>
+            <span
+              className="me-badge"
+              style={single ? { paddingLeft: 8, paddingRight: 8 } : {}}
+            >
+              {data.length}
+            </span>
+            {description(data.length)}
+            {onClick && (
+              <span
+                style={{ marginLeft: 6 }}
+                className="fa fa-long-arrow-right"
+              />
+            )}
+          </Typography>
+        </Tooltip>
       </div>
     </div>
   );
