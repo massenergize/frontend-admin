@@ -194,7 +194,7 @@ const styles = (theme) => ({
     whiteSpace: "pre-wrap",
   },
   icon: {
-    marginRight: theme.spacing(1) / 2,
+    marginRight: theme.spacing(0.5),
     fill:
       theme.palette.type === "dark"
         ? theme.palette.primary.light
@@ -205,9 +205,7 @@ const styles = (theme) => ({
     padding: `${theme.spacing(1)}px 0`,
     margin: `${theme.spacing(1)}px 0`,
     borderRadius: `0 ${theme.spacing(3)}px ${theme.spacing(3)}px 0`,
-    paddingLeft: theme.spacing(3),
     "&$iconed": {
-      paddingLeft: theme.spacing(3),
     },
     '& svg[class^="MuiSvgIcon"]': {
       left: -10,
@@ -215,8 +213,7 @@ const styles = (theme) => ({
     },
   },
   headCapital: {
-    padding: `${theme.spacing(1)}px 0 ${theme.spacing(1)}px ${theme.spacing
-      .unit * 9}px`,
+    padding: `${theme.spacing(1)}px 0 ${theme.spacing(1)}px ${theme.spacing(9)}px`,
     left: theme.spacing(-2),
     position: "relative",
     textTransform: "uppercase",
@@ -352,7 +349,7 @@ const styles = (theme) => ({
     "&$rounded": {
       paddingRight: theme.spacing(1.5),
       "& a": {
-        borderRadius: `0 ${theme.spacing(3)}px ${theme.spacing(3)}px 0`,
+        borderRadius: `0 ${theme.spacing(3)} ${theme.spacing(3)} 0`,
       },
       "& $opened": {
         "&:before": {

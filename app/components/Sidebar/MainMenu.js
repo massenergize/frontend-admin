@@ -43,11 +43,11 @@ class MainMenu extends React.Component {
       open,
       dataMenu
     } = this.props;
-    const getMenus = menuArray => menuArray.map((item, index) => {
+    const getMenus = (menuArray, isChild=false) => menuArray.map((item, index) => {
       if (item.child) {
         return (
           <div key={index.toString()}>
-            <ListItem
+            <ListItem 
             button
               className={
                 classNames(
@@ -63,7 +63,7 @@ class MainMenu extends React.Component {
                   <Ionicon icon={item.icon} />
                 </ListItemIcon>
               )}
-              <ListItemText classes={{ primary: classes.primary }} variant="inset" primary={item.name} />
+              <ListItemText classes={{ primary: classes.primary }} primary={item.name} />
               {open.indexOf(item.key) > -1 ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
             <Collapse
@@ -96,7 +96,7 @@ class MainMenu extends React.Component {
         );
       }
       return (
-        <ListItemButton
+        <ListItem
           key={index.toString()}
           button
           exact
@@ -111,11 +111,19 @@ class MainMenu extends React.Component {
               <Ionicon icon={item.icon} />
             </ListItemIcon>
           )}
-          <ListItemText classes={{ primary: classes.primary }} inset primary={item.name}  />
+          <ListItemText
+            classes={{ primary: classes.primary }}
+            primary={item.name}
+            inset={isChild ? true:false}
+          />
           {item.badge && (
-            <Chip color="primary" label={item.badge} className={classes.badge} />
+            <Chip
+              color="primary"
+              label={item.badge}
+              className={classes.badge}
+            />
           )}
-        </ListItemButton>
+        </ListItem>
       );
     });
     return (
