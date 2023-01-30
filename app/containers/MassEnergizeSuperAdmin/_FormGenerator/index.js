@@ -11,7 +11,7 @@ import Grid from "@mui/material/Grid";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
-
+import OutlinedInput from "@mui/material/OutlinedInput";
 // import { DateTimePicker, MuiPickersUtilsProvider } from "material-ui-pickers";
 import MomentUtils from "@date-io/moment";
 import FormControl from "@mui/material/FormControl";
@@ -268,7 +268,7 @@ class MassEnergizeForm extends Component {
     await this.setStateAsync({
       formData: { ...formData, [name]: newValue },
     });
-  };;
+  };
 
   /**
    * Handle checkboxes when they are clicked
@@ -523,7 +523,6 @@ class MassEnergizeForm extends Component {
       );
     }
 
-
     // if validator is provided, it means we want to make some form of unique custom validation first
     // before submiting the form
     if (validator) {
@@ -534,7 +533,6 @@ class MassEnergizeForm extends Component {
       );
       if (!validationPassed) return this.setError(_err);
     }
-
 
     // let's make an api call to send the data
     let response = null;
@@ -732,10 +730,15 @@ class MassEnergizeForm extends Component {
           <div key={field.name}>
             <FormControl className={classes.field}>
               {this.renderGeneralContent(field)}
-              <InputLabel htmlFor={field.name}>{field.label}</InputLabel>
-
+              <InputLabel
+                htmlFor={field.label}
+                className={classes.selectFieldLabel}
+              >
+                {field.label}
+              </InputLabel>
               <Select
                 native
+                label={field.label}
                 name={field.name}
                 onChange={async (newValue) => {
                   await this.updateForm(field.name, newValue.target.value);
@@ -1039,13 +1042,9 @@ class MassEnergizeForm extends Component {
               required={field.isRequired}
               name={field.name}
               onChange={
-                
                 field.name === "subdomain"
-                 
                   ? this.handleSubDomainChange
-                 
                   : this.handleFormDataChange
-              
               }
               label={field.label}
               multiline={field.isMultiline}
@@ -1060,6 +1059,7 @@ class MassEnergizeForm extends Component {
               defaultValue={field.defaultValue}
               inputProps={{ maxLength: field.maxLength }}
               // maxLength={field.maxLength}
+              variant="outlined"
             />
           </div>
         );
@@ -1097,11 +1097,7 @@ class MassEnergizeForm extends Component {
               >
                 <DateTimePicker
                   {...field}
-                  value={this.getValue(
-                    field.name,
-                    field.defaultValue,
-                    field
-                  )}
+                  value={this.getValue(field.name, field.defaultValue, field)}
                   onChange={(date) =>
                     this.handleFormDataChange(
                       {
@@ -1157,7 +1153,8 @@ class MassEnergizeForm extends Component {
   renderFields = (fields) =>
     fields.map((field, key) => (
       <div key={`${field.name}-${key.toString()}`}>
-        {this.renderModalText(field)}
+        <div style={{marginBottom:15}}>{this.renderModalText(field)}</div>
+
         {this.renderField(field)}
       </div>
     ));

@@ -95,7 +95,7 @@ class ActionsChartWidget extends PureComponent {
 
     if (!communities && !dataToGraph) {
       return (
-        <PapperBlock whiteBg noMargin title="Community Engagement" icon="ios-stats-outline" desc="">
+        <PapperBlock whiteBg noMargin title="Community Engagement" icon="ios-stats-outline" desc="" >
           <Grid container spacing={16}>
             <LinearBuffer />
           </Grid>
@@ -103,36 +103,58 @@ class ActionsChartWidget extends PureComponent {
       );
     }
     return (
-      <PapperBlock whiteBg noMargin title="Community Engagement" icon="ios-stats-outline" desc="">
+      <PapperBlock
+        whiteBg
+        noMargin
+        title="Community Engagement"
+        icon="ios-stats-outline"
+        desc=""
+      >
         <Grid container spacing={16}>
           <Grid item md={8} xs={12}>
             <ul className={classes.bigResume}>
-              {communities && communities.map((c, i) => (
-                <li key={c}>
-                  <Avatar className={classNames(classes.avatar, avatarColor[i % avatarColor.length])}>
-                    <FlareIcon />
-                  </Avatar>
-                  <Typography variant="h6">
-                    <span className={avatarColor[i % texts.length]}>{' '}</span>
-                    <Typography>{c}</Typography>
-                  </Typography>
-                </li>
-              ))}
+              {communities &&
+                communities.map((c, i) => (
+                  <li key={c}>
+                    <Avatar
+                      className={classNames(
+                        classes.avatar,
+                        avatarColor[i % avatarColor.length]
+                      )}
+                    >
+                      <FlareIcon />
+                    </Avatar>
+                    <Typography variant="h6">
+                      <span className={avatarColor[i % texts.length]}>
+                        {" "}
+                      </span>
+                      <Typography>{c}</Typography>
+                    </Typography>
+                  </li>
+                ))}
             </ul>
             <div className={classes.chartWrap}>
               <div className={classes.chartFluid}>
                 <ResponsiveContainer>
-                  <BarChart
-                    data={dataToGraph}
-                  >
+                  <BarChart data={dataToGraph}>
                     <XAxis dataKey="name" tickLine={false} />
-                    <YAxis axisLine={false} tickSize={3} tickLine={false} tick={{ stroke: 'none' }} />
+                    <YAxis
+                      axisLine={false}
+                      tickSize={3}
+                      tickLine={false}
+                      tick={{ stroke: "none" }}
+                    />
                     <CartesianGrid vertical={false} strokeDasharray="3 3" />
                     <CartesianAxis />
                     <Tooltip />
-                    {communities && communities.map((c, i) => (
-                      <Bar key={c} dataKey={c} fill={colors[i % colors.length]} />
-                    ))}
+                    {communities &&
+                      communities.map((c, i) => (
+                        <Bar
+                          key={c}
+                          dataKey={c}
+                          fill={colors[i % colors.length]}
+                        />
+                      ))}
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -157,11 +179,18 @@ class ActionsChartWidget extends PureComponent {
                   paddingAngle={5}
                   label
                 >
-                  {
-                    householdsEngagedData.map((entry, index) => <Cell key={index.toString()} fill={colorsPie[index % colorsPie.length]} />)
-                  }
+                  {householdsEngagedData.map((entry, index) => (
+                    <Cell
+                      key={index.toString()}
+                      fill={colorsPie[index % colorsPie.length]}
+                    />
+                  ))}
                 </Pie>
-                <Legend iconType="circle" verticalALign="bottom" iconSize={10} />
+                <Legend
+                  iconType="circle"
+                  verticalALign="bottom"
+                  iconSize={10}
+                />
               </PieChart>
             </Grid>
           </Grid>

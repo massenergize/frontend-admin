@@ -26,8 +26,8 @@ class IconInfographic extends React.Component {
   render() {
     const { classes, data } = this.props;
     return (
-      <div className={classes.rootCounterFull} style={{ width: "100%" }}>
-        <Grid container spacing={8}>
+      <div className={classes.rootCounterFull} style={{ width: "100%", marginBottom:20 }}>
+        <Grid container spacing={1}>
           {data &&
             data.map((d, i) => (
               <Grid

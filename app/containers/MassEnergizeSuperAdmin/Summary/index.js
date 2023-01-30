@@ -152,7 +152,7 @@ class SummaryDashboard extends PureComponent {
                 !loadingCSVs.includes("users") && this.getCSV("users");
               }}
               className={`${classes.pageCard}`}
-              elevation={1}
+              elevation={2}
             >
               <Typography
                 variant="h5"
@@ -175,7 +175,7 @@ class SummaryDashboard extends PureComponent {
                 !loadingCSVs.includes("actions") && this.getCSV("actions");
               }}
               className={`${classes.pageCard}`}
-              elevation={1}
+              elevation={2}
             >
               <Typography
                 variant="h5"
@@ -199,7 +199,7 @@ class SummaryDashboard extends PureComponent {
                   this.getCSV("communities");
               }}
               className={`${classes.pageCard}`}
-              elevation={1}
+              elevation={2}
             >
               <Typography
                 variant="h5"

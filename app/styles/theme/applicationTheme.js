@@ -171,31 +171,31 @@ const applicationTheme = (color, mode) => ({
         },
       },
     },
-    MuiInputLabel: {
-      styleOverrides: {
-        formControl: {
-          top: 12,
-          left: 10,
-          transform: "translate(0, 22px) scale(1)",
-        },
-        shrink: {
-          zIndex: 1,
-          transform: "translate(0, 13px) scale(0.7)",
-        },
-        filled: {
-          transform: "translate(2px, 6px) scale(1)",
-          "&$shrink": {
-            transform: "translate(0px, -6px) scale(0.75)",
-          },
-        },
-        outlined: {
-          transform: "translate(2px, 6px) scale(1)",
-          "&$shrink": {
-            transform: "translate(4px, -16px) scale(0.75)",
-          },
-        },
-      },
-    },
+    // MuiInputLabel: {
+    //   styleOverrides: {
+    //     formControl: {
+    //       // top: 12,
+    //       left: 10,
+    //       transform: "translate(0, 22px) scale(1)",
+    //     },
+    //     shrink: {
+    //       zIndex: 1,
+    //       transform: "translate(0, 13px) scale(0.7)",
+    //     },
+    //     filled: {
+    //       transform: "translate(2px, 6px) scale(1)",
+    //       "&$shrink": {
+    //         transform: "translate(0px, -6px) scale(0.75)",
+    //       },
+    //     },
+    //     outlined: {
+    //       transform: "translate(2px, 6px) scale(1)",
+    //       "&$shrink": {
+    //         transform: "translate(4px, -16px) scale(0.75)",
+    //       },
+    //     },
+    //   },
+    // },
     MuiFormLabel: {
       styleOverrides: {
         root: {
@@ -210,31 +210,31 @@ const applicationTheme = (color, mode) => ({
         },
       },
     },
-    MuiSelect: {
-      styleOverrides: {
-        root: {
-          borderRadius: 6,
-        },
-        icon: {
-          top: "calc(50% - 10px)",
-        },
-      },
-    },
-    MuiFormControl: {
-      styleOverrides: {
-        root: {
-          "& label + div": {
-            alignItems: "flex-end",
-            "& input, select, > div > div": {
-              padding: "24px 8px 4px",
-            },
-            '&[role="radiogroup"]': {
-              alignItems: "flex-start",
-            },
-          },
-        },
-      },
-    },
+    // MuiSelect: {
+    //   styleOverrides: {
+    //     root: {
+    //       borderRadius: 6,
+    //     },
+    //     icon: {
+    //       top: "calc(50% - 10px)",
+    //     },
+    //   },
+    // },
+    // MuiFormControl: {
+    //   styleOverrides: {
+    //     root: {
+    //       "& label + div": {
+    //         alignItems: "flex-end",
+    //         "& input, select, > div > div": {
+    //           padding: "24px 8px 4px",
+    //         },
+    //         '&[role="radiogroup"]': {
+    //           alignItems: "flex-start",
+    //         },
+    //       },
+    //     },
+    //   },
+    // },
     MuiInputAdornment: {
       styleOverrides: {
         root: {
