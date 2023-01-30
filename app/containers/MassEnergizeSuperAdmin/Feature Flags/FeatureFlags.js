@@ -1,4 +1,5 @@
-import { Paper, Tab, Tabs, Typography, withStyles } from "@mui/material";
+import { Paper, Tab, Tabs, Typography } from "@mui/material";
+import { withStyles } from "@mui/styles";
 import React, { useState } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";

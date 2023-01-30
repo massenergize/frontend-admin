@@ -8,8 +8,6 @@ import {
   RadioGroup,
   Tab,
   Tabs,
-  withStyles,
-  withTheme,
   Tooltip,
 } from "@mui/material";
 import { Typography } from "@mui/material";
@@ -23,6 +21,7 @@ import { reduxLoadAuthAdmin } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
 import { Snackbar } from "@mui/material";
 import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
+import { withStyles } from "@mui/styles";
 
 const CHECKBOX = "checkbox";
 const RADIO = "radio";
