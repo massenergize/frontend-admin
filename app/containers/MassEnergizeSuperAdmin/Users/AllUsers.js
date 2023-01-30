@@ -9,13 +9,20 @@ import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import {
+  fetchUsersFromBackend,
   loadAllUsers,
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
-import { getHumanFriendlyDate, smartString } from "../../../utils/common";
+import {
+  getHumanFriendlyDate,
+  reArrangeForAdmin,
+  smartString,
+} from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
+import { withRouter } from "react-router-dom";
+import { AdbOutlined } from "@material-ui/icons";
 
 class AllUsers extends React.Component {
   constructor(props) {
@@ -27,18 +34,33 @@ class AllUsers extends React.Component {
     };
   }
 
+  componentWillUnmount() {
+    window.history.replaceState({}, document.title);
+  }
+
   componentDidMount() {
-    const { auth } = this.props;
-    var url;
-    if (!auth) return;
-    
-    if (auth.is_super_admin) url = "/users.listForSuperAdmin";
-    else if (auth.is_community_admin) url = "/users.listForCommunityAdmin";
-    apiCall(url).then((allUsersResponse) => {
-      if (allUsersResponse && allUsersResponse.success) {
-        this.props.putUsersInRedux(allUsersResponse.data);
-      }
+    const { auth, putUsersInRedux, location, fetchUsers } = this.props;
+    const { state } = location;
+    const ids = state && state.ids;
+    const comingFromDashboard = ids && ids.length;
+
+    if (!comingFromDashboard) return fetchUsers();
+
+    this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
+
+    var content = {
+      fieldKey: "user_emails",
+      apiURL: "/users.listForCommunityAdmin",
+      props: this.props,
+      dataSource: [],
+      valueExtractor: (user) => user.email,
+      reduxFxn: putUsersInRedux,
+    };
+    fetchUsers((data, failed) => {
+      if (failed) return console.log("Could not fetch user list from B.E...");
+      reArrangeForAdmin({ ...content, dataSource: data });
     });
+
   }
 
   fashionData = (data) => {
@@ -87,7 +109,7 @@ class AllUsers extends React.Component {
       key: "email",
       options: {
         filter: false,
-        filterType: "textField",
+        filterType: "multiselect",
       },
     },
     {
@@ -176,6 +198,13 @@ class AllUsers extends React.Component {
             columns: columns,
             options: options,
           }}
+          customFilterObject={{
+            3: {
+              list: this.state.ids,
+            },
+          }}
+          ignoreSavedFilters={this.state.ignoreSavedFilters}
+          saveFilters={this.state.saveFilters}
         />
       </div>
     );
@@ -195,6 +224,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
+      fetchUsers: fetchUsersFromBackend,
       putUsersInRedux: loadAllUsers,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
     },
@@ -206,4 +236,4 @@ const VendorsMapped = connect(
   mapDispatchToProps
 )(AllUsers);
 
-export default withStyles(styles)(VendorsMapped);
+export default withStyles(styles)(withRouter(VendorsMapped));

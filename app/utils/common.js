@@ -5,7 +5,29 @@ import { Typography } from "@material-ui/core";
 import moment from "moment";
 import qs from "qs";
 import React from "react";
+import { apiCall } from "./messenger";
 
+export const separate = (ids, dataSet = [], options = {}) => {
+  const { valueExtractor } = options || {};
+  const found = [];
+  var notFound = [];
+  const remainder = [];
+  const itemObjects = [];
+  for (var d of dataSet || []) {
+    const value = valueExtractor ? valueExtractor(d) : d.id
+    if (ids.includes(value)) {
+      found.push(value);
+      itemObjects.push(d);
+    } else remainder.push(d);
+  }
+  notFound = ids.filter((id) => !found.includes(id));
+  return {
+    found, // Found locally
+    notFound, // Not found locally
+    remainder, // Just the general remaining items from the datasource
+    itemObjects, // Full objects of items that were found
+  };
+};
 export function makeDeleteUI({ idsToDelete, templates }) {
   const len = (idsToDelete && idsToDelete.length) || 0;
   var text = `Are you sure you want to delete (
@@ -207,4 +229,44 @@ export const fetchParamsFromURL = (location, paramName, names) => {
       rest: { object: obj, qs: qs.stringify(obj) || "" },
     } || {}
   );
+};
+
+/**
+   * 
+   * This function takes a list of ids of items(msgs, actions, testimonials etc.) that need attending to and matches it against the data source, 
+   * to find out which of the items are available locally, and which ones need to be fetched.
+   * If all items are available locally, nothing happens. 
+   * If not, it fetches all the items not found and appends it to the main data source. 
+   * 
+   * This fxn helps arrange data properly so that when admins click from their dashboard to see 
+   * "15" unanswered messages, all and only the unanswered messages will show up in the table, to make things easier.
+   
+   */
+export const reArrangeForAdmin = ({
+  dataSource,
+  props,
+  apiURL,
+  fieldKey,
+  reduxFxn,
+  separationOptions,
+}) => {
+  const _sort = (a, b) => (b.id < a.id ? -1 : 1);
+  const { location } = props;
+  const { state } = location || {};
+  const ids = (state && state.ids) || [];
+  const result = separate(ids, dataSource, separationOptions);
+  const { notFound, itemObjects, remainder } = result;
+  var data = [...itemObjects, ...remainder];
+  data.sort(_sort);
+  reduxFxn(data);
+  if (!notFound.length) return; // If all items are found locally, dont go to the B.E
+
+  apiCall(apiURL, {
+    [fieldKey]: notFound,
+  }).then((response) => {
+    if (response.success) data = [...response.data, ...data];
+    //-- Items that were not found, have now been loaded from the B.E!
+    data.sort(_sort);
+    reduxFxn(data);
+  });
 };

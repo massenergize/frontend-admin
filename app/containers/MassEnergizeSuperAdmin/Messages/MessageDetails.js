@@ -7,8 +7,10 @@ import MassEnergizeForm from "../_FormGenerator";
 import Loading from "dan-components/Loading";
 import { apiCall } from "../../../utils/messenger";
 import { connect } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { getHumanFriendlyDate } from "../../../utils/common";
+import { bindActionCreators } from "redux";
+import { fetchLatestNextSteps } from "../../../redux/redux-actions/adminActions";
 
 const styles = (theme) => ({
   root: {
@@ -49,7 +51,7 @@ class MessageDetails extends Component {
       formJson: null,
       message: undefined,
       loading: true,
-      showMore:false
+      showMore: false,
     };
   }
 
@@ -95,6 +97,26 @@ class MessageDetails extends Component {
     });
   }
 
+  onComplete(_, __, resetForm) {
+    const { pathname } = window.location;
+    const { location, history, match, updateNextSteps } = this.props;
+    const { id } = match.params;
+    var ids = location.state && location.state.ids;
+    var fromTeamMessagesPage = location.state && location.state.fromTeam;
+    resetForm && resetForm();
+    updateNextSteps();
+    // Just means admin just answered message normally, so form should just reset, and redirect back to the same page, just like the old fxnality
+    if (!ids || !ids.length) return history.push(pathname);
+
+    // -- Then follow up with going back to the msg list page, but with the id of the just-answered msg, removed
+    ids = ids.filter((_id) => _id.toString() !== id && id.toString());
+    history.push({
+      pathname: fromTeamMessagesPage
+        ? "/admin/read/team-admin-messages"
+        : "/admin/read/community-admin-messages",
+      state: { ids },
+    });
+  }
   createFormJson = async () => {
     const { message } = this.state;
     const { pathname } = window.location;
@@ -103,7 +125,7 @@ class MessageDetails extends Component {
       title: "Reply to Message",
       subTitle: "",
       method: "/messages.replyFromCommunityAdmin",
-      successRedirectPage: pathname || "/admin/read/community-admin-messages",
+      // successRedirectPage: pathname || "/admin/read/community-admin-messages",
       fields: [
         {
           name: "ID",
@@ -202,9 +224,10 @@ class MessageDetails extends Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, location } = this.props;
     const { formJson, message, loading } = this.state;
     if (loading || !formJson) return <Loading />;
+
     return (
       <div>
         <div>
@@ -269,7 +292,13 @@ class MessageDetails extends Component {
         <br />
 
         {message && message.replies && message.replies.length ? (
-          <div style={{ marginBottom: "2rem", maxHeight:'75vh', overflowY:'auto'}}>
+          <div
+            style={{
+              marginBottom: "2rem",
+              maxHeight: "75vh",
+              overflowY: "auto",
+            }}
+          >
             <Paper className={classes.root} elevation={4}>
               <h2>Reply History</h2>
 
@@ -289,22 +318,15 @@ class MessageDetails extends Component {
                         marginBottom: "5px",
                       }}
                     >
-                      <Typography
-                        variant="h7"
-                        style={{ marginBottom: 3 }}
-                      >
+                      <Typography variant="h7" style={{ marginBottom: 3 }}>
                         <b>
                           {(reply && reply.user_name) ||
-                            (reply.user &&
-                              reply.user.full_name) ||
+                            (reply.user && reply.user.full_name) ||
                             "..."}
                         </b>
                       </Typography>
                       <div>
-                        <Typography
-                          variant="small"
-                          color="textSecondary"
-                        >
+                        <Typography variant="small" color="textSecondary">
                           {/* {getHumanFriendlyDate( */}
                           {reply && reply.created_at}
                           {/* )} */}
@@ -312,10 +334,7 @@ class MessageDetails extends Component {
                       </div>
                     </div>
                     <div>
-                      <Typography
-                        variant="h9"
-                        style={{ fontWeight: "bold" }}
-                      >
+                      <Typography variant="h9" style={{ fontWeight: "bold" }}>
                         {reply && reply.title}
                       </Typography>
                     </div>
@@ -324,7 +343,7 @@ class MessageDetails extends Component {
                       <Typography
                         variant="paragraph"
                         color="textPrimary"
-                        style={{ textAlign: "justify", marginTop:'15px' }}
+                        style={{ textAlign: "justify", marginTop: "15px" }}
                       >
                         {reply && reply.body}
                       </Typography>
@@ -336,7 +355,11 @@ class MessageDetails extends Component {
           </div>
         ) : null}
 
-        <MassEnergizeForm classes={classes} formJson={formJson} />
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+          onComplete={this.onComplete.bind(this)}
+        />
       </div>
     );
   }
@@ -352,5 +375,19 @@ const mapStateToProps = (state) => {
     teamMessages: state.getIn(["messages"]),
   };
 };
-const MessagesWrapped = connect(mapStateToProps)(MessageDetails);
-export default withStyles(styles, { withTheme: true })(MessagesWrapped);
+
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      updateNextSteps: fetchLatestNextSteps,
+    },
+    dispatch
+  );
+};
+const MessagesWrapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(MessageDetails);
+export default withStyles(styles, { withTheme: true })(
+  withRouter(MessagesWrapped)
+);
