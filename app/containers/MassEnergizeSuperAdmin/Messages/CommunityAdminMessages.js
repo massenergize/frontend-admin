@@ -9,7 +9,7 @@ import { bindActionCreators } from "redux";
 import MUIDataTable from "mui-datatables";
 import FileCopy from "@mui/icons-material/FileCopy";
 import EditIcon from "@mui/icons-material/Edit";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import DetailsIcon from "@mui/icons-material/Details";
 import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";

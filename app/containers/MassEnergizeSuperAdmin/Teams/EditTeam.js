@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { Paper, Typography } from "@mui/material";
 import { withStyles } from "@mui/styles";
 import { bindActionCreators } from "redux";

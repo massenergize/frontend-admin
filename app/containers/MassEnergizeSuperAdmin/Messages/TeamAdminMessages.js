@@ -5,7 +5,7 @@ import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 import { bindActionCreators } from "redux";
 import MUIDataTable from "mui-datatables";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import DetailsIcon from "@mui/icons-material/Details";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
