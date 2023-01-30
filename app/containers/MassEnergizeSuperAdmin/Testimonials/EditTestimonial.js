@@ -10,6 +10,8 @@ import { getSelectedIds } from "../Actions/EditActionForm";
 import { makeTagSection } from "../Events/EditEventForm";
 import { Paper, Typography } from "@mui/material";
 import fieldTypes from "../_FormGenerator/fieldTypes";
+import { withRouter } from "react-router-dom";
+import { fetchLatestNextSteps } from "../../../redux/redux-actions/adminActions";
 
 const styles = (theme) => ({
   root: {
@@ -108,7 +110,25 @@ class EditTestimonial extends Component {
     };
   }
 
- 
+  onComplete(_, __, resetForm) {
+    const pathname = "/admin/read/testimonials";
+    const { location, history, match, updateNextSteps } = this.props;
+    const { id } = match.params;
+    var ids = location.state && location.state.ids;
+
+    resetForm && resetForm();
+    updateNextSteps();
+    // Just means admin just answered message normally, so form should just reset, and redirect back to the same page, just like the old fxnality
+    if (!ids || !ids.length) return history.push(pathname);
+
+    // -- Then follow up with going back to the msg list page, but with the id of the just-answered msg, removed
+    ids = ids.filter((_id) => _id.toString() !== id && id.toString());
+    history.push({
+      pathname,
+      state: { ids },
+    });
+  }
+
   getSelectedIds = (selected, dataToCrossCheck) => {
     const res = [];
     selected.forEach((s) => {
@@ -137,7 +157,12 @@ class EditTestimonial extends Component {
           {!testimonial.user && <p>Created By: Community Admin</p>}
         </Paper>
         <br />
-        <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+          onComplete={this.onComplete.bind(this)}
+          enableCancel
+        />
       </>
     );
   }
@@ -157,8 +182,19 @@ const mapStateToProps = (state) => {
   };
 };
 
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      updateNextSteps: fetchLatestNextSteps,
+    },
+    dispatch
+  );
+};
 
-const Wrapped = connect(mapStateToProps)(EditTestimonial);
+const Wrapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(EditTestimonial));
 
 export default withStyles(styles, { withTheme: true })(Wrapped);
 
@@ -287,12 +323,11 @@ const createFormJson = ({ communities, actions, vendors, testimonial }) => {
         placeholder: "Select an Image",
         fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
-        selected: testimonial && testimonial.file ? [testimonial.file] :[],
+        selected: testimonial && testimonial.file ? [testimonial.file] : [],
         label: "Upload a file for this testimonial",
-        uploadMultiple: false, 
+        uploadMultiple: false,
         multiple: false,
         isRequired: false,
-       
       },
       {
         name: "is_approved",
