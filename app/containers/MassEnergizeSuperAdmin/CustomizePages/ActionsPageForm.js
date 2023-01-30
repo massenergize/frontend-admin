@@ -15,12 +15,8 @@ import Typography from '@mui/material/Typography';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Button from '@mui/material/Button';
-import {
-  Checkbox,
-  Select,
-  TextField,
-  Switch
-} from 'redux-form-material-ui';
+
+import { TextField, Switch, Select, Checkbox} from "@mui/material";
 import { initAction, clearAction } from '../../../actions/ReduxFormActions';
 
 const renderRadioGroup = ({ input, ...rest }) => (

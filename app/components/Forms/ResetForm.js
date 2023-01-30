@@ -5,7 +5,6 @@ import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Field, reduxForm } from 'redux-form/immutable';
-import { TextField } from 'redux-form-material-ui';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import ArrowForward from '@mui/icons-material/ArrowForward';
@@ -14,6 +13,7 @@ import Typography from '@mui/material/Typography';
 import brand from 'dan-api/dummy/brand';
 import logo from 'dan-images/logo.png';
 import styles from './user-jss';
+import { TextField } from '@mui/material';
 
 // validation functions
 const required = value => (value == null ? 'Required' : undefined);

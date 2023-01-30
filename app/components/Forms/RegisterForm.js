@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import { Field, reduxForm } from 'redux-form/immutable';
-import { Checkbox, TextField } from 'redux-form-material-ui';
+import { TextField, Checkbox } from "@mui/material";
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';

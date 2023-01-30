@@ -8,11 +8,10 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
+import dayjs from "dayjs"; // don't remove this
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import OutlinedInput from "@mui/material/OutlinedInput";
-// import { DateTimePicker, MuiPickersUtilsProvider } from "material-ui-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import MomentUtils from "@date-io/moment";
 import FormControl from "@mui/material/FormControl";
 import Checkbox from "@mui/material/Checkbox";
@@ -1091,13 +1090,18 @@ class MassEnergizeForm extends Component {
             </Typography>
             <div className={classes.picker} style={{ width: "100%" }}>
               <LocalizationProvider
-                dateAdapter={AdapterDateFns}
+                dateAdapter={AdapterDayjs}
                 utils={MomentUtils}
                 style={{ width: "100%" }}
               >
                 <DateTimePicker
                   {...field}
-                  value={this.getValue(field.name, field.defaultValue, field)}
+                  renderInput={(props) => <TextField {...props} />}
+                  value={this.getValue(
+                    field.name,
+                    field.defaultValue,
+                    field
+                  )}
                   onChange={(date) =>
                     this.handleFormDataChange(
                       {
