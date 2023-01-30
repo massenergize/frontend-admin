@@ -3,10 +3,10 @@ import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
 import PropTypes from 'prop-types';
 import { withStyles } from "@mui/styles";
-import Typography from '@material-ui/core/Typography';
-import Avatar from '@material-ui/core/Avatar';
+import Typography from '@mui/material/Typography';
+import Avatar from '@mui/material/Avatar';
 import Build from '@mui/icons-material/Build';
-import Hidden from '@material-ui/core/Hidden';
+import Hidden from '@mui/material/Hidden';
 import Settings from '@mui/icons-material/SettingsApplications';
 import Warning from '@mui/icons-material/Warning';
 

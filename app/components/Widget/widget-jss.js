@@ -4,8 +4,8 @@ import {
   gradientBgLight,
   gradientBgDark,
 } from "containers/Templates/appStyles-jss";
-import green from "@material-ui/core/colors/green";
-import red from "@material-ui/core/colors/red";
+import green from "@mui/material/colors/green";
+import red from "@mui/material/colors/red";
 import images from "dan-api/images/photos";
 
 const tableLabel = {
@@ -42,14 +42,14 @@ const styles = (theme) => ({
     },
   },
   divider: {
-    margin: `${theme.spacing(1) * 3}px 0`,
+    margin: `${theme.spacing(3)}px 0`,
   },
   dividerBig: {
-    margin: `${theme.spacing(1) * 2}px 0`,
+    margin: `${theme.spacing(3)}px 0`,
   },
   centerItem: {},
   smallTitle: {
-    padding: `0 ${theme.spacing(1) * 2}px`,
+    padding: `0 ${theme.spacing(2) }px`,
     color:
       theme.palette.type === "dark"
         ? theme.palette.primary.light
@@ -59,7 +59,7 @@ const styles = (theme) => ({
     marginRight: theme.spacing(1),
   },
   secondaryWrap: {
-    padding: `1px ${theme.spacing(1) * 2}px`,
+    padding: `1px ${theme.spacing(2)}px`,
     borderRadius: 4,
     justifyContent: "space-around",
     "& > $centerItem": {
@@ -79,7 +79,7 @@ const styles = (theme) => ({
     },
   },
   bigResume: {
-    marginBottom: theme.spacing(1) * 5,
+    marginBottom: theme.spacing(5),
     justifyContent: "space-between",
     display: "flex",
     [theme.breakpoints.down("xs")]: {
@@ -87,13 +87,13 @@ const styles = (theme) => ({
       display: "block",
     },
     "& li": {
-      paddingRight: theme.spacing(1) * 3,
+      paddingRight: theme.spacing(3),
       display: "flex",
       alignItems: "center",
       justifyContent: "flex-start",
       [theme.breakpoints.down("xs")]: {
         paddingRight: 0,
-        paddingBottom: theme.spacing(1) * 2,
+        paddingBottom: theme.spacing(2),
         width: "50%",
         float: "left",
       },
@@ -225,7 +225,7 @@ const styles = (theme) => ({
   },
   root: {
     width: "100%",
-    marginTop: theme.spacing(1) * 3,
+    marginTop: theme.spacing(3),
     overflowX: "auto",
   },
   chip: {
@@ -254,10 +254,10 @@ const styles = (theme) => ({
     color: theme.palette.primary.main,
   },
   productPhoto: {
-    borderRadius: theme.spacing(1) / 2,
+    borderRadius: theme.spacing(1/2),
     marginRight: theme.spacing(1),
-    width: theme.spacing(1) * 10,
-    height: theme.spacing(1) * 10,
+    width: theme.spacing(10),
+    height: theme.spacing(10),
   },
   done: {},
   listItem: {
@@ -373,20 +373,20 @@ const styles = (theme) => ({
     flexDirection: "column",
     fontWeight: 500,
     fontSize: 20,
-    marginBottom: theme.spacing(1) * 10,
+    marginBottom: theme.spacing(10),
   },
   carouselDesc: {
     color: theme.palette.common.white,
   },
   chartWrap: {
     overflow: "auto",
-    marginTop: theme.spacing(1) * 2,
+    marginTop: theme.spacing(2),
   },
   chartFluid: {
     width: "100%",
     minWidth: 400,
     height: 300,
-    marginLeft: theme.spacing(1) * -3,
+    marginLeft: theme.spacing(-3),
   },
   tabNotif: {
     "& > span": {
@@ -472,7 +472,7 @@ const styles = (theme) => ({
         ? theme.palette.secondary.dark
         : theme.palette.secondary.main,
     [theme.breakpoints.down("sm")]: {
-      paddingTop: theme.spacing(1) * 3,
+      paddingTop: theme.spacing(3),
     },
     "& > time": {
       border: `10px solid ${theme.palette.secondary.main}`,
@@ -492,7 +492,7 @@ const styles = (theme) => ({
   },
   today: {
     fontSize: 18,
-    margin: theme.spacing(1) * 3,
+    margin: theme.spacing(3),
     fontWeight: theme.typography.fontWeightRegular,
     color: theme.palette.primary.light,
   },
@@ -501,7 +501,7 @@ const styles = (theme) => ({
     textAlign: "center",
     justifyContent: "center",
     "& li": {
-      margin: `${theme.spacing(1) * 3}px ${theme.spacing(1)}px ${theme.spacing
+      margin: `${theme.spacing(3)}px ${theme.spacing(1)}px ${theme.spacing
         .unit * 2}px`,
     },
   },
@@ -525,7 +525,7 @@ const styles = (theme) => ({
     boxShadow: "none",
   },
   mobileStepper: {
-    margin: `0 auto ${theme.spacing(1) * 4}px`,
+    margin: `0 auto ${theme.spacing(4)}px`,
     textAlign: "center",
     borderRadius: "0 0 12px 12px",
     [theme.breakpoints.down("sm")]: {
@@ -553,7 +553,7 @@ const styles = (theme) => ({
   rootCalculator: {
     width: "100%",
     height: 420,
-    padding: theme.spacing(1) * 2,
+    padding: theme.spacing(2),
     backgroundImage:
       theme.palette.type === "dark"
         ? gradientBgDark(theme)
@@ -615,13 +615,13 @@ const styles = (theme) => ({
   },
   formControl: {
     width: "100%",
-    marginBottom: theme.spacing(1) * 3,
-    marginTop: theme.spacing(1) * -2,
+    marginBottom: theme.spacing(3),
+    marginTop: theme.spacing(-2),
   },
   formControlTrade: {
     width: "100%",
-    marginTop: theme.spacing(1) * -2,
-    marginBottom: theme.spacing(1) * 2,
+    marginTop: theme.spacing(-2),
+    marginBottom: theme.spacing(2),
   },
   tradeUp: {
     color: green[500],
@@ -650,15 +650,15 @@ const styles = (theme) => ({
     },
     "& button": {
       [theme.breakpoints.down("xs")]: {
-        marginTop: theme.spacing(1) * 2,
+        marginTop: theme.spacing(2),
       },
     },
   },
   walletLabel: {
-    marginBottom: theme.spacing(1) * 3,
+    marginBottom: theme.spacing(3),
   },
   tabContainer: {
-    margin: `0 ${theme.spacing(1) * -3}px`,
+    margin: `0 ${theme.spacing(-3)}px`,
   },
   rootTable: {
     width: "100%",

@@ -401,7 +401,7 @@ const styles = (theme) => ({
   optArea: {
     display: "flex",
     justifyContent: "space-between",
-    padding: `0 ${theme.spacing(1) / 2}px`,
+    padding: `0 ${theme.spacing(1 / 2)}px`,
   },
 });
 

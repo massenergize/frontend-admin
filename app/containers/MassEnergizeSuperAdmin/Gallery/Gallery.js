@@ -1,5 +1,6 @@
-import { Button, Checkbox, FormControlLabel, Icon } from "@material-ui/core";
-import { Paper, Typography, withStyles } from "@material-ui/core";
+import { Button, Checkbox, FormControlLabel, Icon } from "@mui/material";
+import { Paper, Typography } from "@mui/material";
+import { withStyles } from "@mui/styles";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";

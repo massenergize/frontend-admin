@@ -1,7 +1,7 @@
 const styles = theme => ({
   root: {
     flexGrow: 1,
-    margin: `${theme.spacing(1) * 2}px 0`,
+    margin: `${theme.spacing(2)}px 0`,
     borderRadius: 40,
     overflow: 'hidden',
     boxShadow: theme.shadows[5]
@@ -16,7 +16,7 @@ const styles = theme => ({
   wrapper: {
     fontFamily: theme.typography.fontFamily,
     position: 'relative',
-    marginRight: theme.spacing(1) * 2,
+    marginRight: theme.spacing(2),
     marginLeft: theme.spacing(1),
     borderRadius: 2,
     display: 'block',
@@ -41,7 +41,7 @@ const styles = theme => ({
   },
   input: {
     font: 'inherit',
-    padding: `${theme.spacing(1)}px ${theme.spacing(1)}px ${theme.spacing(1)}px ${theme.spacing(1) * 4}px`,
+    padding: `${theme.spacing(1)}px ${theme.spacing(1)}px ${theme.spacing(1)}px ${theme.spacing(4)}px`,
     border: 0,
     display: 'block',
     verticalAlign: 'middle',
@@ -56,7 +56,7 @@ const styles = theme => ({
   },
   toggleContainer: {
     height: 56,
-    padding: `${theme.spacing(1)}px ${theme.spacing(1) * 2}px`,
+    padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -64,7 +64,7 @@ const styles = theme => ({
   },
   inputHeader: {
     font: 'inherit',
-    padding: `${theme.spacing(1)}px ${theme.spacing(1)}px ${theme.spacing(1)}px ${theme.spacing(1) * 9}px`,
+    padding: `${theme.spacing(1)}px ${theme.spacing(1)}px ${theme.spacing(1)}px ${theme.spacing(9)}px`,
     border: 0,
     display: 'block',
     verticalAlign: 'middle',

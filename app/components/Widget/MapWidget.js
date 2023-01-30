@@ -1,14 +1,14 @@
 import React from 'react';
 import { compose } from 'recompose';
 import PropTypes from 'prop-types';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Avatar from '@material-ui/core/Avatar';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Avatar from '@mui/material/Avatar';
 import LocationOn from '@mui/icons-material/LocationOn';
 import { withStyles } from "@mui/styles";
-import Paper from '@material-ui/core/Paper';
+import Paper from '@mui/material/Paper';
 import {
   withScriptjs,
   withGoogleMap,

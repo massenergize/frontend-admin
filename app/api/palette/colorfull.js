@@ -1,10 +1,10 @@
-import pink from '@material-ui/core/colors/pink';
-import purple from '@material-ui/core/colors/purple';
-import orange from '@material-ui/core/colors/orange';
-import teal from '@material-ui/core/colors/teal';
-import lightGreen from '@material-ui/core/colors/lightGreen';
-import lightBlue from '@material-ui/core/colors/lightBlue';
-import indigo from '@material-ui/core/colors/indigo';
+import pink from '@mui/material/colors/pink';
+import purple from '@mui/material/colors/purple';
+import orange from '@mui/material/colors/orange';
+import teal from '@mui/material/colors/teal';
+import lightGreen from '@mui/material/colors/lightGreen';
+import lightBlue from '@mui/material/colors/lightBlue';
+import indigo from '@mui/material/colors/indigo';
 const colorfull = [
   pink[400],
   purple[500],

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
 import MUIDataTable from "mui-datatables";
-import Avatar from "@material-ui/core/Avatar";
+import Avatar from "@mui/material/Avatar";
 import { apiCall } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
 import { bindActionCreators } from "redux";
@@ -29,7 +29,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing(1) * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });

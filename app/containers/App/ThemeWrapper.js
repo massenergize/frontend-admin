@@ -13,9 +13,8 @@ import {
   changeModeAction,
 } from 'dan-actions/UiActions';
 import applicationTheme from '../../styles/theme/applicationTheme';
-import { purple } from "@mui/material/colors";
-const mode = 'light';
-const color = purple;
+
+
 const styles = {
   root: {
     width: '100%',
@@ -32,15 +31,14 @@ class ThemeWrapper extends React.Component {
     super(props);
     this.state = {
       pageLoaded: true,
-      theme: createTheme((applicationTheme(color, mode))),
+      theme: createTheme((applicationTheme(props.color, props.mode))),
     };
   }
 
-  componentWillMount = () => {
-    this.onProgressShow();
-  };
 
   componentDidMount = () => {
+
+    this.onProgressShow();
     this.playProgress();
   };
 
@@ -70,7 +68,7 @@ class ThemeWrapper extends React.Component {
   };
 
   render() {
-    const { classes, children } = this.props;
+    const { classes, children , mode} = this.props;
     const { pageLoaded, theme } = this.state;
     return (
       <ThemeProvider theme={theme}>
@@ -81,7 +79,7 @@ class ThemeWrapper extends React.Component {
             color="rgba(255,255,255,.9)"
             showSpinner={false}
           />
-          <AppContext.Provider value={this.handleChangeMode}>
+          <AppContext.Provider value={()=>this.handleChangeMode(mode)}>
             {children}
           </AppContext.Provider>
         </div>

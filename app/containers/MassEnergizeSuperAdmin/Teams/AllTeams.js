@@ -7,8 +7,8 @@ import MUIDataTable from "mui-datatables";
 import FileCopy from "@mui/icons-material/FileCopy";
 import EditIcon from "@mui/icons-material/Edit";
 import { Link } from "react-router-dom";
-import Avatar from "@material-ui/core/Avatar";
-import Icon from "@material-ui/core/Icon";
+import Avatar from "@mui/material/Avatar";
+import Icon from "@mui/material/Icon";
 import Edit from "@mui/icons-material/Edit";
 import Language from "@mui/icons-material/Language";
 import PeopleIcon from "@mui/icons-material/People";
@@ -29,7 +29,7 @@ import {
   ourCustomSort,
   smartString,
 } from "../../../utils/common";
-import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
+import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";

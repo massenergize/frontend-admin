@@ -1,10 +1,10 @@
 import React from "react";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import Icon from "@material-ui/core/Icon";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import Icon from "@mui/material/Icon";
 import styles from "./profile-jss";
 import { withRouter } from "react-router-dom";
 

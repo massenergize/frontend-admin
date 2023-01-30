@@ -18,7 +18,7 @@ import {
   loadAllPolicies,
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
-import { Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 class AllPolicies extends React.Component {
   constructor(props) {
     super(props);

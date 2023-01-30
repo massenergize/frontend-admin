@@ -12,7 +12,7 @@ import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
-import { Chip, Typography, Grid, Paper} from "@material-ui/core";
+import { Chip, Typography, Grid, Paper} from "@mui/material";
 import {
   loadTeamMessages,
   reduxToggleUniversalModal,

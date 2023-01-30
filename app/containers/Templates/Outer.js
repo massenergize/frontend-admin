@@ -42,4 +42,4 @@ const OuterMaped = connect(
   mapStateToProps,
 )(Outer);
 
-export default (withStyles(styles)(OuterMaped));
+export default withStyles(styles)(OuterMaped);

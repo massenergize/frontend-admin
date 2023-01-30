@@ -2,14 +2,14 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import CountUp from 'react-countup';
 import { withStyles } from "@mui/styles";
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import TrendingUp from '@mui/icons-material/TrendingUp';
 import TrendingDown from '@mui/icons-material/TrendingDown';
 import TrendingFlat from '@mui/icons-material/TrendingFlat';
-import Avatar from '@material-ui/core/Avatar';
-import green from '@material-ui/core/colors/green';
-import red from '@material-ui/core/colors/red';
-import Paper from '@material-ui/core/Paper';
+import Avatar from '@mui/material/Avatar';
+import green from '@mui/material/colors/green';
+import red from '@mui/material/colors/red';
+import Paper from '@mui/material/Paper';
 
 const styles = (theme) => ({
   root: {
@@ -52,7 +52,7 @@ const styles = (theme) => ({
   extend: {
     color: theme.palette.common.white,
     fontSize: 12,
-    padding: theme.spacing(1) / 2,
+    padding: theme.spacing(1/2),
     position: "relative",
     zIndex: 1,
     marginBottom: 4,
@@ -87,7 +87,7 @@ const styles = (theme) => ({
   avatar: {
     width: 40,
     height: 40,
-    marginRight: theme.spacing(1) / 2,
+    marginRight: theme.spacing(1/2),
   },
   decoration: {
     borderRadius: "50%",

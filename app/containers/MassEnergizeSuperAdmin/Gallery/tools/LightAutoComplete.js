@@ -5,10 +5,11 @@ import {
   Chip,
   Paper,
   TextField,
-  withStyles,
-} from "@material-ui/core";
+} from "@mui/material";
 import { pop } from "../../../../utils/common";
 import Typography from "@mui/material/Typography";
+import { withStyles } from "@mui/styles";
+
 
 const styles = (theme) => {
   const spacing = theme.spacing(1);

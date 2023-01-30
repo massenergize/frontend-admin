@@ -7,7 +7,7 @@ import brand from "dan-api/dummy/brand";
 import MUIDataTable from "mui-datatables";
 import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
-import TextField from "@material-ui/core/TextField";
+import TextField from "@mui/material/TextField";
 
 import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";
@@ -27,7 +27,7 @@ import {
   ourCustomSort,
   smartString,
 } from "../../../utils/common";
-import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
+import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";

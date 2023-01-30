@@ -9,7 +9,7 @@ import { connect } from "react-redux";
 import styles from "../../../components/Widget/widget-jss";
 import { apiCall } from "../../../utils/messenger";
 import { smartString } from "../../../utils/common";
-import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
+import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import {
   reduxToggleUniversalModal,
   loadTasksAction,

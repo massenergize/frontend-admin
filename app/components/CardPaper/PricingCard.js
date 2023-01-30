@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from "@mui/styles";
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import classNames from 'classnames';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import Button from '@material-ui/core/Button';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
+import Button from '@mui/material/Button';
 import styles from './cardStyle-jss';
 
 class PricingCard extends React.Component {

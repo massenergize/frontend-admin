@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 import brand from "dan-api/dummy/brand";
 import { Helmet } from "react-helmet";
 import { withStyles } from "@mui/styles";
-import Grid from "@material-ui/core/Grid";
-import Divider from "@material-ui/core/Divider";
+import Grid from "@mui/material/Grid";
+import Divider from "@mui/material/Divider";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from "./dashboard-jss";
@@ -14,14 +14,14 @@ import {
   reduxLoadSelectedCommunity,
   reduxCheckUser,
 } from "../../../redux/redux-actions/adminActions";
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import Icon from "@material-ui/core/Icon";
-import Snackbar from "@material-ui/core/Snackbar";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import Icon from "@mui/material/Icon";
+import Snackbar from "@mui/material/Snackbar";
 import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
 import { apiCallFile } from "../../../utils/messenger";
 import ReportingActivities from "./ReportingActivities";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import CircularProgress from "@mui/material/CircularProgress";
 
 // import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
 class SummaryDashboard extends PureComponent {

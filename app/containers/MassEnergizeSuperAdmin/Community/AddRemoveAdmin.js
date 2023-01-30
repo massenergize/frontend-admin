@@ -4,7 +4,7 @@ import MUIDataTable from "mui-datatables";
 import CallMadeIcon from "@mui/icons-material/CallMade";
 import EditIcon from "@mui/icons-material/Edit";
 import { Link } from "react-router-dom";
-import Avatar from "@material-ui/core/Avatar";
+import Avatar from "@mui/material/Avatar";
 import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
@@ -34,7 +34,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing(1) * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });

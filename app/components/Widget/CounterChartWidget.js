@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from "@mui/styles";
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 import {connect} from 'react-redux'; 
 import {bindActionCreators} from 'redux';
 import {

@@ -1,34 +1,34 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
-import InputLabel from "@material-ui/core/InputLabel";
-import Input from "@material-ui/core/Input";
-import Select from "@material-ui/core/Select";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import Paper from "@material-ui/core/Paper";
-import Grid from "@material-ui/core/Grid";
+import InputLabel from "@mui/material/InputLabel";
+import Input from "@mui/material/Input";
+import Select from "@mui/material/Select";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import Paper from "@mui/material/Paper";
+import Grid from "@mui/material/Grid";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 
 // import { DateTimePicker, MuiPickersUtilsProvider } from "material-ui-pickers";
 import MomentUtils from "@date-io/moment";
-import FormControl from "@material-ui/core/FormControl";
-import Checkbox from "@material-ui/core/Checkbox";
-import FormLabel from "@material-ui/core/FormLabel";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
-import Chip from "@material-ui/core/Chip";
+import FormControl from "@mui/material/FormControl";
+import Checkbox from "@mui/material/Checkbox";
+import FormLabel from "@mui/material/FormLabel";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
 import { Link, withRouter } from "react-router-dom";
 import { MaterialDropZone } from "dan-components";
-import Snackbar from "@material-ui/core/Snackbar";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import Snackbar from "@mui/material/Snackbar";
+import CircularProgress from "@mui/material/CircularProgress";
 import { Editor as TinyEditor } from "@tinymce/tinymce-react";
-import { MenuItem } from "@material-ui/core";
-import TextField from "@material-ui/core/TextField";
-// import Icon from '@material-ui/core/Icon';
+import { MenuItem } from "@mui/material";
+import TextField from "@mui/material/TextField";
+// import Icon from '@mui/material/Icon';
 import moment from "moment";
 import { apiCall } from "../../../utils/messenger";
 import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
@@ -62,7 +62,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing(1) * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });

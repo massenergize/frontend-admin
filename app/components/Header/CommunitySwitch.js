@@ -1,9 +1,9 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import TextField from "@material-ui/core/TextField";
+import TextField from "@mui/material/TextField";
 import { withStyles } from "@mui/styles";
 import { connect } from "react-redux";
-import MenuItem from "@material-ui/core/MenuItem";
+import MenuItem from "@mui/material/MenuItem";
 import { bindActionCreators } from "redux";
 import { reduxLoadSelectedCommunity } from "../../redux/redux-actions/adminActions";
 import styles from "./header-jss";

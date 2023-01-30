@@ -1,6 +1,6 @@
 import React from 'react';
 import newsData from 'dan-api/dummy/newsData';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import FlashOn from '@mui/icons-material/FlashOn';
 import HorizontalNewsCard from '../CardPaper/HorizontalNewsCard';
 

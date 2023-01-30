@@ -17,6 +17,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import styles from './sidebar-jss';
 import { reduxSignOut } from '../../redux/redux-actions/adminActions';
 import { withStyles } from '@mui/styles';
+import { ListItemButton } from "@mui/material";
 
 class MainMenu extends React.Component {
   handleClick() {
@@ -47,7 +48,7 @@ class MainMenu extends React.Component {
         return (
           <div key={index.toString()}>
             <ListItem
-              button
+            button
               className={
                 classNames(
                   classes.head,
@@ -95,7 +96,7 @@ class MainMenu extends React.Component {
         );
       }
       return (
-        <ListItem
+        <ListItemButton
           key={index.toString()}
           button
           exact
@@ -114,7 +115,7 @@ class MainMenu extends React.Component {
           {item.badge && (
             <Chip color="primary" label={item.badge} className={classes.badge} />
           )}
-        </ListItem>
+        </ListItemButton>
       );
     });
     return (

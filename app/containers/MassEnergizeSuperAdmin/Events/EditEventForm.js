@@ -3,11 +3,11 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import states from "dan-api/data/states";
 import { Link } from "react-router-dom";
-import { Paper } from "@material-ui/core";
+import { Paper } from "@mui/material";
 import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import { checkIfReadOnly, getSelectedIds } from "../Actions/EditActionForm";
 import { bindActionCreators } from "redux";
 import {
@@ -35,7 +35,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing(1) * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });

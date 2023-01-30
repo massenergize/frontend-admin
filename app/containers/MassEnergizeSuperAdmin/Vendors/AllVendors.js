@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
-import Typography from "@material-ui/core/Typography";
-import Avatar from "@material-ui/core/Avatar";
+import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
 import { bindActionCreators } from "redux";
 
 import FileCopy from "@mui/icons-material/FileCopy";

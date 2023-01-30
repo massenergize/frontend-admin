@@ -1,22 +1,22 @@
 import React from 'react';
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from "@mui/styles";
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
 import moment from 'moment';
-import Avatar from '@material-ui/core/Avatar';
-import LinearProgress from '@material-ui/core/LinearProgress';
+import Avatar from '@mui/material/Avatar';
+import LinearProgress from '@mui/material/LinearProgress';
 import LocalPhone from '@mui/icons-material/LocalPhone';
-import Icon from '@material-ui/core/Icon';
+import Icon from '@mui/material/Icon';
 import DateRange from '@mui/icons-material/DateRange';
 import LocationOn from '@mui/icons-material/LocationOn';
-import Divider from '@material-ui/core/Divider';
-import Chip from '@material-ui/core/Chip';
+import Divider from '@mui/material/Divider';
+import Chip from '@mui/material/Chip';
 import Email from '@mui/icons-material/Email';
 import { Link, Redirect, withRouter } from 'react-router-dom';
 import Check from '@mui/icons-material/Check';
@@ -25,10 +25,10 @@ import Type from 'dan-styles/Typography.scss';
 import PapperBlock from 'dan-components/PapperBlock/PapperBlock';
 import styles from './profile-jss';
 import { getAddress, goHere } from '../../../../utils/common';
-import Snackbar from '@material-ui/core/Snackbar';
+import Snackbar from '@mui/material/Snackbar';
 import MySnackbarContentWrapper from '../../../../components/SnackBar/SnackbarContentWrapper';
 import { apiCallFile } from '../../../../utils/messenger';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CircularProgress from '@mui/material/CircularProgress';
 
 class About extends React.Component {
   constructor(props) {

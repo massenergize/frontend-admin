@@ -1,4 +1,4 @@
-import { Paper, Tab, Tabs, Typography, withStyles } from "@material-ui/core";
+import { Paper, Tab, Tabs, Typography, withStyles } from "@mui/material";
 import React, { useState } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";

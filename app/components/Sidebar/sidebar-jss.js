@@ -1,8 +1,8 @@
-import { alpha, darken } from "@mui/material/styles";
-import lightGreen from "@material-ui/core/colors/lightGreen";
-import red from "@material-ui/core/colors/red";
-import amber from "@material-ui/core/colors/amber";
-import grey from "@material-ui/core/colors/grey";
+import { alpha } from "@mui/material/styles";
+import lightGreen from "@mui/material/colors/lightGreen";
+import red from "@mui/material/colors/red";
+import amber from "@mui/material/colors/amber";
+import grey from "@mui/material/colors/grey";
 
 const drawerWidth = 240;
 const styles = (theme) => ({
@@ -33,7 +33,7 @@ const styles = (theme) => ({
       content: '""',
       position: "absolute",
       width: 5,
-      height: theme.spacing(5),
+      height: theme.spacing(10),
       top: 0,
       left: 0,
       background: alpha(theme.palette.primary.main, 0.5),
@@ -71,7 +71,7 @@ const styles = (theme) => ({
     "& $profile": {
       flexDirection: "row",
       top: theme.spacing(6),
-      padding: theme.spacing(1) / 2,
+      padding: theme.spacing(1/2),
       textAlign: "left",
       "& button": {
         width: "auto",
@@ -220,7 +220,7 @@ const styles = (theme) => ({
     left: theme.spacing(-2),
     position: "relative",
     textTransform: "uppercase",
-    borderRadius: `0 ${theme.spacing(3) * 3}px ${theme.spacing(1) * 3}px 0`,
+    borderRadius: `0 ${theme.spacing(3)}px ${theme.spacing(3)}px 0`,
     margin: `${theme.spacing(1)}px`,
     "& span": {
       fontSize: 14,
@@ -229,14 +229,14 @@ const styles = (theme) => ({
   copyright: {
     color: theme.palette.text.secondary,
     background: theme.palette.background.paper,
-    padding: theme.spacing(1) * 2,
+    padding: theme.spacing(2),
     position: "fixed",
     [theme.breakpoints.up("lg")]: {
       background: "none",
       position: "absolute",
     },
     bottom: 0,
-    left: theme.spacing(1) * 3,
+    left: theme.spacing(3),
     lineHeight: "24px",
   },
   brand: {
@@ -257,7 +257,7 @@ const styles = (theme) => ({
     },
   },
   brandBig: {
-    paddingTop: theme.spacing(1) * 4,
+    paddingTop: theme.spacing(3),
     position: "relative",
     textAlign: "center",
     "& img": {
@@ -265,7 +265,7 @@ const styles = (theme) => ({
     },
     "& h3": {
       fontSize: 18,
-      marginTop: theme.spacing(1) * 2,
+      marginTop: theme.spacing(2),
       fontWeight: 500,
       color: theme.palette.text.primary,
     },
@@ -280,7 +280,7 @@ const styles = (theme) => ({
     textAlign: "center",
     alignItems: "center",
     position: "absolute",
-    margin: `${theme.spacing(1) * 2}px 0`,
+    margin: `${theme.spacing(2)}px 0`,
     zIndex: 0,
     "& h4": {
       fontSize: 18,
@@ -313,7 +313,7 @@ const styles = (theme) => ({
     height: theme.spacing(1),
     display: "inline-block",
     borderRadius: "50%",
-    marginRight: theme.spacing(1) / 2,
+    marginRight: theme.spacing(1/2),
   },
   online: {
     backgroundColor: lightGreen[500],
@@ -336,23 +336,23 @@ const styles = (theme) => ({
     width: drawerWidth,
     position: "relative",
     display: "block",
-    padding: `${theme.spacing(1) * 5}px 0`,
+    padding: `${theme.spacing(5)}px 0`,
     "&$withProfile": {
-      paddingTop: theme.spacing(1) * 18,
+      paddingTop: theme.spacing(18),
     },
     "&$landingNav": {
       [theme.breakpoints.up("lg")]: {
-        paddingTop: theme.spacing(1) * 5,
+        paddingTop: theme.spacing(5),
       },
       [theme.breakpoints.down("lg")]: {
         height: "calc(100% - 164px)",
-        paddingTop: theme.spacing(1) * 5,
+        paddingTop: theme.spacing(5),
       },
     },
     "&$rounded": {
-      paddingRight: theme.spacing(1) * 1.5,
+      paddingRight: theme.spacing(1.5),
       "& a": {
-        borderRadius: `0 ${theme.spacing(1) * 3}px ${theme.spacing(1) * 3}px 0`,
+        borderRadius: `0 ${theme.spacing(3)}px ${theme.spacing(3)}px 0`,
       },
       "& $opened": {
         "&:before": {

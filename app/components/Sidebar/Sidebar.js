@@ -65,6 +65,8 @@ class Sidebar extends React.Component {
       leftSidebar,
       auth,
     } = this.props;
+    const drawerWidth = 240;
+
     const { status, anchorEl, turnDarker } = this.state;
     const dataMenu = auth && auth.is_super_admin ? superAdminMenu : communityAdminMenu;
     return (
@@ -98,9 +100,9 @@ class Sidebar extends React.Component {
             onClose={toggleDrawerOpen}
             classes={{
               paper: classNames(
-                classes && classes.drawer,
-                classes && classes.drawerPaper,
-                !open ? classes &&  classes.drawerPaperClose : ""
+                classes.drawer,
+                classes.drawerPaper,
+                !open ? classes.drawerPaperClose : ""
               ),
             }}
             open={open}

@@ -8,7 +8,7 @@ import MUIDataTable from 'mui-datatables';
 import FileCopy from '@mui/icons-material/FileCopy';
 import EditIcon from '@mui/icons-material/Edit';
 import { Link } from 'react-router-dom';
-import Avatar from '@material-ui/core/Avatar';
+import Avatar from '@mui/material/Avatar';
 
 import messageStyles from 'dan-styles/Messages.scss';
 import { connect } from 'react-redux';

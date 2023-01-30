@@ -4,10 +4,10 @@ import classNames from 'classnames';
 import { withStyles } from "@mui/styles";
 import { TimePicker, MuiPickersUtilsProvider } from 'material-ui-pickers';
 import MomentUtils from '@date-io/moment';
-import TableCell from '@material-ui/core/TableCell';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import Icon from '@material-ui/core/Icon';
-import IconButton from '@material-ui/core/IconButton';
+import TableCell from '@mui/material/TableCell';
+import InputAdornment from '@mui/material/InputAdornment';
+import Icon from '@mui/material/Icon';
+import IconButton from '@mui/material/IconButton';
 import css from 'dan-styles/Table.scss';
 
 const styles = {};

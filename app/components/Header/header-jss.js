@@ -1,3 +1,4 @@
+import { purple } from '@mui/material/colors';
 import { alpha, darken } from '@mui/material/styles';
 import { gradientBgLight, gradientBgDark } from 'containers/Templates/appStyles-jss';
 const drawerWidth = 240;
@@ -9,6 +10,9 @@ const styles = (theme) =>{
   console.log("=========== THEME END=====================")
 
 return {
+  root:{
+     backgroundColor:purple
+  },
   appBar: {
     background: "rgba(0,0,0,0)",
     zIndex: theme.zIndex.drawer + 1,
@@ -69,7 +73,7 @@ return {
     background: theme.palette.background.paper,
     boxShadow: theme.shadows[3],
     [theme.breakpoints.down("md")]: {
-      padding: `${theme.spacing(1) / 2}px 0`,
+      padding: `${theme.spacing(1/2)}px 0`,
     },
     [theme.breakpoints.up("lg")]: {
       background: alpha(theme.palette.background.paper, 0.8),
@@ -315,11 +319,11 @@ return {
   },
   headMenu: {
     fontSize: 12,
-    padding: `${theme.spacing(1) / 2}px ${theme.spacing(1)}px ${theme.spacing(
-      1
-    ) / 2}px ${theme.spacing(1) * 2}px`,
+    padding: `${theme.spacing(1/2) }px ${theme.spacing(1)}px ${theme.spacing(
+      1/2
+    )}px ${theme.spacing(2)}px`,
     minHeight: "auto",
-    margin: `0 ${theme.spacing(1) / 2}px`,
+    margin: `0 ${theme.spacing(1/2)}px`,
   },
   opened: {
     color: theme.palette.primary.main,
@@ -329,7 +333,7 @@ return {
     },
   },
   rightIcon: {
-    marginLeft: theme.spacing(1) / 2,
+    marginLeft: theme.spacing(1/2),
     opacity: 0.3,
   },
   selected: {
@@ -402,7 +406,7 @@ return {
     width: "auto",
     margin: theme.spacing(1),
     borderRadius: theme.rounded.big, // theme.rounded.big,
-    padding: `${theme.spacing(1) / 4}px ${theme.spacing(1)}px`,
+    padding: `${theme.spacing(1/4) }px ${theme.spacing(1)}px`,
     "& span": {
       fontSize: 14,
     },
@@ -451,10 +455,10 @@ return {
   leftMargin: {},
   headerAction: {
     display: "inline-block",
-    margin: `0 ${theme.spacing(1) * 3}px`,
+    margin: `0 ${theme.spacing(3)}px`,
     transition: "opacity 0.5s ease",
     "& $button": {
-      margin: `0 ${theme.spacing(1)}px / 2`,
+      margin: `0 ${theme.spacing(1/2)}px`,
       "& svg": {
         fill: alpha(theme.palette.common.white, 0.87),
         width: 28,
@@ -479,7 +483,7 @@ return {
   headerTitle: {
     display: "inline-block",
     transition: "all 0.3s ease",
-    fontSize: theme.spacing(1) * 3,
+    fontSize: theme.spacing(3),
     marginLeft: "20px",
     textTransform: "capitalize",
     fontWeight: 700,

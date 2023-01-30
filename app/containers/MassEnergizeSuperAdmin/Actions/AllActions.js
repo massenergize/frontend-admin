@@ -10,8 +10,8 @@ import MUIDataTable from "mui-datatables";
 import FileCopy from "@mui/icons-material/FileCopy";
 import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
-import Avatar from "@material-ui/core/Avatar";
-import TextField from "@material-ui/core/TextField";
+import Avatar from "@mui/material/Avatar";
+import TextField from "@mui/material/TextField";
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -34,7 +34,7 @@ import {
   pop,
   smartString,
 } from "../../../utils/common";
-import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
+import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";

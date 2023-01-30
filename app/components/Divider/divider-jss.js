@@ -57,7 +57,7 @@ const styles = (theme) => ({
         ? `1px solid ${theme.palette.grey[700]}`
         : `1px solid ${theme.palette.grey[300]}`,
     color: theme.palette.text.secondary,
-    margin: `${theme.spacing(1)}px ${theme.spacing(1) / 2}px ${theme.spacing
+    margin: `${theme.spacing(1)}px ${theme.spacing(1/2) }px ${theme.spacing
       .unit * 2}px`,
     textAlign: "center",
     "&:after": {

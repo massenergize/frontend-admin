@@ -2,15 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from "@mui/styles";
 import classNames from 'classnames';
-import Typography from '@material-ui/core/Typography';
-import Hidden from '@material-ui/core/Hidden';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Fab from '@material-ui/core/Fab';
+import Typography from '@mui/material/Typography';
+import Hidden from '@mui/material/Hidden';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Fab from '@mui/material/Fab';
 import Ionicon from 'react-ionicons';
-import Tooltip from '@material-ui/core/Tooltip';
-import IconButton from '@material-ui/core/IconButton';
-import Button from '@material-ui/core/Button';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -153,16 +153,16 @@ class Header extends React.Component {
 
     return (
       <AppBar
-        className={
-          classNames(
-            classes.appBar,
-            classes.floatingBar,
-            margin && classes.appBarShift,
-            setMargin(position),
-            turnDarker && classes.darker,
-            gradient ? classes.gradientBg : classes.solidBg
-          )
-        }
+      color='primary'
+        className={classNames(
+          classes.appBar,
+          classes.root,
+          classes.floatingBar,
+          margin && classes.appBarShift,
+          setMargin(position),
+          turnDarker && classes.darker,
+          gradient ? classes.gradientBg : classes.solidBg
+        )}
       >
         <Toolbar disableGutters={!open}>
           <Fab
@@ -170,41 +170,53 @@ class Header extends React.Component {
             className={classes.menuButton}
             aria-label="Menu"
             onClick={toggleDrawerOpen}
+            style={{ borderRadius: "50%" }}
           >
             <MenuIcon />
           </Fab>
           <Hidden smDown>
             <div className={classes.headerProperties}>
               {isTitle && showTitle && (
-                <Typography component="h2" className={classNames(classes.headerTitle, classes.show)}>
+                <Typography
+                  component="h2"
+                  className={classNames(classes.headerTitle, classes.show)}
+                >
                   {title}
                 </Typography>
-              )
-              }
+              )}
               <div className={classNames(classes.headerAction)}>
                 {fullScreen ? (
                   <Tooltip title="Exit Full Screen" placement="bottom">
-                    <IconButton className={classes.button} onClick={this.closeFullScreen}>
+                    <IconButton
+                      className={classes.button}
+                      onClick={this.closeFullScreen}
+                    >
                       <Ionicon icon="ios-qr-scanner" />
                     </IconButton>
                   </Tooltip>
                 ) : (
-                    <Tooltip title="Full Screen" placement="bottom">
-                      <IconButton className={classes.button} onClick={this.openFullScreen}>
-                        <Ionicon icon="ios-qr-scanner" />
-                      </IconButton>
-                    </Tooltip>
-                  )}
+                  <Tooltip title="Full Screen" placement="bottom">
+                    <IconButton
+                      className={classes.button}
+                      onClick={this.openFullScreen}
+                    >
+                      <Ionicon icon="ios-qr-scanner" />
+                    </IconButton>
+                  </Tooltip>
+                )}
                 <Tooltip title="Turn Dark/Light" placement="bottom">
-                  <IconButton className={classes.button} onClick={() => this.turnMode(mode)}>
+                  <IconButton
+                    className={classes.button}
+                    onClick={() => this.turnMode(mode)}
+                  >
                     <Ionicon icon="ios-bulb-outline" />
                   </IconButton>
                 </Tooltip>
                 <Button className={classes.button} onClick={openGuide}>
-                  <Ionicon icon="ios-help-circle-outline" /> &nbsp; Need Help?
+                  <Ionicon icon="ios-help-circle-outline" /> &nbsp; Need
+                  Help?
                 </Button>
               </div>
-
             </div>
           </Hidden>
           {/* <CommunitySwitch actionToPerform={this.handleCommunityChange} /> */}
@@ -217,8 +229,11 @@ class Header extends React.Component {
               <SearchUi history={history} /> */}
             <h3 className={classes.howdy}>
               Howdy,
-              {auth && ' ' + auth.preferred_name}
-              {auth && (auth.is_super_admin ? ' (Super Admin) ' : ' (Community Admin) ')}
+              {auth && " " + auth.preferred_name}
+              {auth &&
+                (auth.is_super_admin
+                  ? " (Super Admin) "
+                  : " (Community Admin) ")}
               <span role="img" aria-label="smiley">
                 😊
               </span>

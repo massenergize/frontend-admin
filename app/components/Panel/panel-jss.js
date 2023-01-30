@@ -116,7 +116,7 @@ const styles = (theme) => ({
   bodyForm: {
     position: "relative",
     background: theme.palette.background.paper,
-    padding: theme.spacing(1) * 2,
+    padding: theme.spacing(2),
     [theme.breakpoints.down("sm")]: {
       padding: "15px 10px",
     },

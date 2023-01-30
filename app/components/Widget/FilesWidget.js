@@ -1,21 +1,22 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from "@mui/styles";
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import Chip from '@material-ui/core/Chip';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-import GridListTileBar from '@material-ui/core/GridListTileBar';
-import Button from '@material-ui/core/Button';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip';
+import CircularProgress from '@mui/material/CircularProgress';
+// import GridList from '@mui/material/GridList';
+// import GridListTile from '@mui/material/GridListTile';
+// import GridListTileBar from '@mui/material/GridListTileBar';
+import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
 import InfoIcon from '@mui/icons-material/Info';
 import imgData from 'dan-api/images/imgData';
 import styles from './widget-jss';
 import PapperBlock from '../PapperBlock/PapperBlock';
 
+import { ImageListItem, ImageList, ImageListItemBar } from "@mui/material";
 class FilesWidget extends PureComponent {
   render() {
     const {
@@ -52,34 +53,40 @@ class FilesWidget extends PureComponent {
         <Grid item md={4} sm={12} xs={12}>
           <PapperBlock title="Your Photos" icon="ios-images-outline" whiteBg desc="">
             <div className={classes.albumRoot}>
-              <GridList cellHeight={120} className={classes.gridList}>
+              <ImageList cellHeight={120} className={classes.gridList}>
                 {
                   imgData.map((tile, index) => {
                     if (index >= 4) {
                       return false;
                     }
                     return (
-                      <GridListTile key={index.toString()}>
-                        <img src={tile.img} className={classes.img} alt={tile.title} />
-                        <GridListTileBar
+                      <ImageListItem key={index.toString()}>
+                        <img
+                          src={tile.img}
+                          className={classes.img}
+                          alt={tile.title}
+                        />
+                        <ImageListItemBar
                           title={tile.title}
-                          subtitle={(
+                          subtitle={
                             <span>
                               by:&nbsp;
                               {tile.author}
                             </span>
-                          )}
-                          actionIcon={(
-                            <IconButton className={classes.icon}>
+                          }
+                          actionIcon={
+                            <IconButton
+                              className={classes.icon}
+                            >
                               <InfoIcon />
                             </IconButton>
-                          )}
+                          }
                         />
-                      </GridListTile>
+                      </ImageListItem>
                     );
                   })
                 }
-              </GridList>
+              </ImageList>
             </div>
             <Divider className={classes.divider} />
             <Grid container justify="center">
@@ -92,14 +99,14 @@ class FilesWidget extends PureComponent {
         <Grid item md={4} sm={12} xs={12}>
           <PapperBlock title="Favorites" icon="ios-heart-outline" whiteBg desc="">
             <div className={classes.albumRoot}>
-              <GridList cellHeight={120} className={classes.gridList}>
+              <ImageList cellHeight={120} className={classes.gridList}>
                 {
                   imgData.map((tile, index) => {
                     if (index >= 4 && index < 8) {
                       return (
-                        <GridListTile key={index.toString()}>
+                        <ImageListItem key={index.toString()}>
                           <img src={tile.img} className={classes.img} alt={tile.title} />
-                          <GridListTileBar
+                          <ImageListItemBar
                             title={tile.title}
                             subtitle={(
                               <span>
@@ -113,13 +120,13 @@ class FilesWidget extends PureComponent {
                               </IconButton>
                             )}
                           />
-                        </GridListTile>
+                        </ImageListItem>
                       );
                     }
                     return false;
                   })
                 }
-              </GridList>
+              </ImageList>
             </div>
             <Divider className={classes.divider} />
             <Grid container justify="center">

@@ -1,11 +1,11 @@
-import deepOrange from '@material-ui/core/colors/deepOrange';
-import deepPurple from '@material-ui/core/colors/deepPurple';
-import pink from '@material-ui/core/colors/pink';
-import green from '@material-ui/core/colors/green';
+import deepOrange from '@mui/material/colors/deepOrange';
+import deepPurple from '@mui/material/colors/deepPurple';
+import pink from '@mui/material/colors/pink';
+import green from '@mui/material/colors/green';
 
 const styles = theme => ({
   mobileStepper: {
-    margin: `0 auto ${theme.spacing(1) * 3}px`,
+    margin: `0 auto ${theme.spacing(3)}px`,
     textAlign: 'center',
     borderRadius: '0 0 12px 12px'
   },
@@ -22,14 +22,14 @@ const styles = theme => ({
     backgroundColor: green[500],
   },
   divider: {
-    margin: `${theme.spacing(1) * 1.5}px 0`,
+    margin: `${theme.spacing(1.5)}px 0`,
     background: 'none'
   },
   link: {
     color: theme.palette.primary.main
   },
   listPeople: {
-    padding: `${theme.spacing(1) / 2}px ${theme.spacing(1)}px`,
+    padding: `${theme.spacing(1/2)}px ${theme.spacing(1)}px`,
   },
   sliderWrap: {
     height: 310,
@@ -61,7 +61,7 @@ const styles = theme => ({
     height: 30,
   },
   avatarComment: {
-    marginRight: theme.spacing(1) * 3
+    marginRight: theme.spacing(3)
   },
   commentAction: {
     background: theme.palette.type === 'dark' ? theme.palette.grey[700] : theme.palette.grey[100],

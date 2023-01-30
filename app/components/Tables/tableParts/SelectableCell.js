@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from "@mui/styles";
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import TableCell from '@material-ui/core/TableCell';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import TableCell from '@mui/material/TableCell';
 import css from 'dan-styles/Table.scss';
 
 const styles = {};

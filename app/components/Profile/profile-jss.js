@@ -1,7 +1,7 @@
-import deepOrange from '@material-ui/core/colors/deepOrange';
-import deepPurple from '@material-ui/core/colors/deepPurple';
-import pink from '@material-ui/core/colors/pink';
-import green from '@material-ui/core/colors/green';
+import deepOrange from '@mui/material/colors/deepOrange';
+import deepPurple from '@mui/material/colors/deepPurple';
+import pink from '@mui/material/colors/pink';
+import green from '@mui/material/colors/green';
 import { alpha, darken } from '@mui/material';
 const styles = (theme) => ({
   profileList: {
@@ -26,7 +26,7 @@ const styles = (theme) => ({
     backgroundColor: green[500],
   },
   divider: {
-    margin: `${theme.spacing(1) * 1.5}px 0`,
+    margin: `${theme.spacing(1.5)}px 0`,
     background: "none",
   },
   albumRoot: {
@@ -52,10 +52,10 @@ const styles = (theme) => ({
   root: theme.mixins.gutters({
     paddingTop: 16,
     paddingBottom: 16,
-    marginTop: theme.spacing(1) * 3,
+    marginTop: theme.spacing(3),
   }),
   progressRoot: {
-    marginBottom: theme.spacing(1) * 3,
+    marginBottom: theme.spacing(3) ,
   },
   styledPaper: {
     backgroundColor: theme.palette.secondary.main,
@@ -140,8 +140,7 @@ const styles = (theme) => ({
   },
   imageTitle: {
     position: "relative",
-    padding: `${theme.spacing(1) * 2}px ${theme.spacing(1) *
-      4}px ${theme.spacing(1) + 6}px`,
+    padding: `${theme.spacing(2)}px ${theme.spacing(4)}px ${theme.spacing(1) + 6}px`,
   },
   imageMarked: {
     height: 3,
@@ -161,13 +160,13 @@ const styles = (theme) => ({
     width: "100%",
   },
   subscribeForm: {
-    marginTop: theme.spacing(1) * -6,
+    marginTop: theme.spacing(-6),
     display: "flex",
     "& > div": {
       flex: 1,
     },
     "& button": {
-      marginTop: theme.spacing(1) * 4.5,
+      marginTop: theme.spacing(4.5),
       marginLeft: theme.spacing(1),
     },
   },

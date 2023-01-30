@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from "@mui/styles";
-import Grid from '@material-ui/core/Grid';
-import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
+import Grid from '@mui/material/Grid';
+import withWidth, { isWidthDown } from '@mui/material/withWidth';
 import {
   LineChart,
   Line,

@@ -177,7 +177,7 @@ const styles = (theme) => ({
     width: "100%",
   },
   price: {
-    padding: `${theme.spacing(1)}px ${theme.spacing(1) * 2}px ${theme.spacing
+    padding: `${theme.spacing(1)}px ${theme.spacing(2)}px ${theme.spacing
       .unit * 3}px`,
   },
   verified: {
@@ -345,10 +345,10 @@ const styles = (theme) => ({
     overflow: "hidden",
   },
   mainFeaturedPostContent: {
-    padding: `${theme.spacing(1) * 2}px`,
+    padding: `${theme.spacing(2)}px`,
     minHeight: 200,
     [theme.breakpoints.up("md")]: {
-      padding: `${theme.spacing(1) * 6}px`,
+      padding: `${theme.spacing(6)}px`,
       paddingRight: 0,
     },
     [theme.breakpoints.down("sm")]: {

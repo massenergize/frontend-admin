@@ -1,13 +1,13 @@
-import { RadioGroup, Typography, withStyles } from "@material-ui/core";
-import Paper from "@material-ui/core/Paper";
+import { RadioGroup, Typography, withStyles } from "@mui/material";
+import Paper from "@mui/material/Paper";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import LightAutoComplete from "./tools/LightAutoComplete";
-import { Radio } from "@material-ui/core";
-import { FormControlLabel } from "@material-ui/core";
-import { TextField } from "@material-ui/core";
+import { Radio } from "@mui/material";
+import { FormControlLabel } from "@mui/material";
+import { TextField } from "@mui/material";
 import { bindActionCreators } from "redux";
 import { reduxCallLibraryModalImages } from "../../../redux/redux-actions/adminActions";
 import { getFileSize,

@@ -1,9 +1,9 @@
-import amber from '@material-ui/core/colors/amber';
-import blue from '@material-ui/core/colors/blue';
-import purple from '@material-ui/core/colors/deepPurple';
-import teal from '@material-ui/core/colors/teal';
-import brown from '@material-ui/core/colors/brown';
-import red from '@material-ui/core/colors/red';
+import amber from '@mui/material/colors/amber';
+import blue from '@mui/material/colors/blue';
+import purple from '@mui/material/colors/deepPurple';
+import teal from '@mui/material/colors/teal';
+import brown from '@mui/material/colors/brown';
+import red from '@mui/material/colors/red';
 import { alpha, lighten, darken } from "@mui/material/styles";
 const drawerWidth = 300;
 const drawerHeight = 680;
@@ -17,7 +17,7 @@ const styles = (theme) => ({
     position: "relative",
     borderRadius: theme.rounded.medium,
     boxShadow: theme.shade.light,
-    marginBottom: theme.spacing(1) * 3,
+    marginBottom: theme.spacing(3),
     [theme.breakpoints.up("sm")]: {
       display: "flex",
     },
@@ -114,7 +114,7 @@ const styles = (theme) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: `${theme.spacing(1) * 2}px ${theme.spacing(1)}px`,
+    padding: `${theme.spacing(2)}px ${theme.spacing(1)}px`,
     position: "relative",
   },
   content: {
@@ -167,8 +167,8 @@ const styles = (theme) => ({
     display: "flex",
     background: theme.palette.common.white,
     border: `1px solid ${theme.palette.divider}`,
-    marginRight: theme.spacing(1) / 2,
-    height: theme.spacing(1) * 5,
+    marginRight: theme.spacing(1/2),
+    height: theme.spacing(5),
   },
   search: {
     width: "auto",
@@ -183,8 +183,7 @@ const styles = (theme) => ({
   },
   input: {
     font: "inherit",
-    padding: `${theme.spacing(1) / 2}px ${theme.spacing(1) *
-      2}px ${theme.spacing(1) / 2}px ${theme.spacing(1) * 6}px`,
+    padding: `${theme.spacing(1/2)}px ${theme.spacing(2)}px ${theme.spacing(1/2)}px ${theme.spacing(6)}px`,
     border: 0,
     display: "block",
     verticalAlign: "middle",
@@ -316,7 +315,7 @@ const styles = (theme) => ({
   avatarTop: {
     display: "block",
     textAlign: "center",
-    padding: theme.spacing(1) * 3,
+    padding: theme.spacing(3),
     "& $avatar": {
       width: 100,
       height: 100,

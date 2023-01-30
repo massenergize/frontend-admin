@@ -64,12 +64,13 @@ class Dashboard extends React.Component {
     const titleException = ['/app', '/app/crm-dashboard', '/app/crypto-dashboard'];
     const parts = history.location.pathname.split('/');
     const place = parts[parts.length - 1].replace('-', ' ');
+
     return (
       <div
         className={
           classNames(
-            classes && classes.appFrameInner,
-            layout === 'top-navigation' || layout === 'mega-menu' ?classes && classes.topNav :classes && classes.sideNav,
+            classes.appFrameInner,
+            layout === 'top-navigation' || layout === 'mega-menu' ?classes.topNav :classes.sideNav,
             mode === 'dark' ? 'dark-mode' : 'light-mode'
           )
         }
@@ -204,4 +205,4 @@ const DashboardMaped = connect(
   mapDispatchToProps
 )(Dashboard);
 
-export default withStyles(styles)(DashboardMaped);
+export default withStyles(styles) (DashboardMaped);

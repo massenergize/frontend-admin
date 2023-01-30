@@ -1,17 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@mui/styles';
-import { bindActionCreators } from 'redux';
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
-import Button from '@material-ui/core/Button';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import Avatar from '@material-ui/core/Avatar';
+import Avatar from '@mui/material/Avatar';
 import brand from 'dan-api/dummy/brand';
-import dummy from 'dan-api/dummy/dummyContents';
 import logo from 'dan-images/logo.png';
-import { connect } from 'react-redux';
 import MainMenu from './MainMenu';
 import styles from './sidebar-jss';
 import { IS_PROD, BUILD_VERSION } from '../../config/constants';
@@ -58,7 +52,6 @@ class SidebarContent extends React.Component {
     const user = this.props.auth;
     const { transform } = this.state;
     const profile = user && user.profile_picture ? user.profile_picture.url : null;
-
 
     const setStatus = st => {
       switch (st) {

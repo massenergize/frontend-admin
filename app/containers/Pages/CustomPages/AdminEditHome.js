@@ -2,15 +2,15 @@
 // Home page
 import React from 'react';
 import { PropTypes } from 'prop-types';
-import TextField from '@material-ui/core/TextField';
+import TextField from '@mui/material/TextField';
 import { withStyles } from "@mui/styles";
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
-import MenuItem from '@material-ui/core/MenuItem';
-import Button from '@material-ui/core/Button';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import MenuItem from '@mui/material/MenuItem';
+import Button from '@mui/material/Button';
 import Type from 'dan-styles/Typography.scss';
-import Fab from '@material-ui/core/Fab';
+import Fab from '@mui/material/Fab';
 import Public from '@mui/icons-material/Public';
 import AboutUsVideo from './Frags/AboutUsVideo';
 import GraphChoice from './Frags/GraphChoice';

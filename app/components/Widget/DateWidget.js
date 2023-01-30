@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Paper from '@material-ui/core/Paper';
+import Paper from '@mui/material/Paper';
 import { withStyles } from "@mui/styles";
 import Calendar from 'react-calendar';
 import Clock from 'react-clock';

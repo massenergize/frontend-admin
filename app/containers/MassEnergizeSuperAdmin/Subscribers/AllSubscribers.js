@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import { bindActionCreators } from "redux";
 import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";

@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from "@mui/styles";
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 import { Route, Link } from 'react-router-dom';
 
 const styles = (theme) => ({
@@ -21,7 +21,7 @@ const styles = (theme) => ({
     justifyContent: "center",
     flexDirection: "column",
     position: "relative",
-    margin: `${theme.spacing(1) * 3}px auto`,
+    margin: `${theme.spacing(3)}px auto`,
     "& h5": {
       [theme.breakpoints.down("sm")]: {
         fontSize: "1.2rem",
@@ -33,7 +33,7 @@ const styles = (theme) => ({
     textShadow: `10px 6px 50px ${theme.palette.primary.main}`,
     [theme.breakpoints.down("sm")]: {
       fontSize: "4rem",
-      marginBottom: theme.spacing(1) * 2,
+      marginBottom: theme.spacing(2),
     },
   },
   deco: {

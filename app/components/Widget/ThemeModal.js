@@ -3,7 +3,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-} from "@material-ui/core";
+} from "@mui/material";
 import React, { useState } from "react";
 
 function ThemeModal({

@@ -11,8 +11,8 @@ import {
   withStyles,
   withTheme,
   Tooltip,
-} from "@material-ui/core";
-import { Typography } from "@material-ui/core";
+} from "@mui/material";
+import { Typography } from "@mui/material";
 import React, { useState } from "react";
 import styles from "dan-components/SocialMedia/jss/cover-jss";
 import { connect } from "react-redux";
@@ -21,7 +21,7 @@ import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import { bindActionCreators } from "redux";
 import { reduxLoadAuthAdmin } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
-import { Snackbar } from "@material-ui/core";
+import { Snackbar } from "@mui/material";
 import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
 
 const CHECKBOX = "checkbox";

@@ -1,8 +1,8 @@
-import { fade } from '@material-ui/core/styles/colorManipulator';
+import { fade } from '@mui/material/styles/colorManipulator';
 const styles = theme => ({
   statusWrap: {
     position: 'relative',
-    marginBottom: theme.spacing(1) * 3,
+    marginBottom: theme.spacing(3),
     '& > div': {
       overflow: 'hidden'
     },
@@ -48,7 +48,7 @@ const styles = theme => ({
     textAlign: 'right',
   },
   button: {
-    margin: theme.spacing(1) / 2
+    margin: theme.spacing(1/2)
   },
   sendBtn: {
     position: 'relative',

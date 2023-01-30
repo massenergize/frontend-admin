@@ -7,7 +7,7 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import Loading from "dan-components/Loading";
 import { Link } from "react-router-dom";
-import { Paper, Typography } from "@material-ui/core";
+import { Paper, Typography } from "@mui/material";
 import { apiCall } from "../../../utils/messenger";
 import { LOADING } from "../../../utils/constants";
 import ThemeModal from "../../../components/Widget/ThemeModal";
