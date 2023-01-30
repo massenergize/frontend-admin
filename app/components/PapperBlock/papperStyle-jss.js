@@ -2,8 +2,7 @@ import { alpha } from "@mui/material/styles";
 
 const styles = (theme) => ({
   root: {
-    paddingTop: theme.spacing(3),
-    paddingBottom: theme.spacing(3),
+    padding: theme.spacing(3),
     marginBottom: theme.spacing(3),
     boxShadow:theme.shadows[3],
     color: theme.palette.text.primary,
