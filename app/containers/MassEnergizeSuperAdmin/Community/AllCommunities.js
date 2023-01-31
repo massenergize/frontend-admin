@@ -46,7 +46,7 @@ class AllCommunities extends React.Component {
       url = "/communities.listForCommunityAdmin";
     apiCall(url).then((allCommunitiesResponse) => {
       if (allCommunitiesResponse && allCommunitiesResponse.success) {
-        this.props.putCommunitiesInRedux(allCommunitiesResponse.data);
+        this.props.putCommunitiesInRedux(allCommunitiesResponse.data, allCommunitiesResponse.meta);
       }
     });
   }
@@ -195,10 +195,7 @@ class AllCommunities extends React.Component {
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
-    putInRedux({
-      items: [...data],
-      meta: this.props.communities.meta,
-    });
+    putInRedux( [...data],this.props.communities.meta);
     apiCall("/communities.update", {
       community_id: item.id,
       is_published: !status,
@@ -230,10 +227,7 @@ class AllCommunities extends React.Component {
       apiCall("/communities.delete", { community_id: communityId });
     });
     const rem = (communities || []).filter((com) => !ids.includes(com.id));
-    putCommunitiesInRedux({
-      items: rem,
-      meta: communities.meta,
-    });
+    putCommunitiesInRedux(rem,communities.meta);
   }
 
   makeDeleteUI({ idsToDelete }) {
