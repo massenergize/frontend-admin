@@ -198,10 +198,7 @@ class AllVendors extends React.Component {
       apiCall("/vendors.delete", { vendor_id: found });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putVendorsInRedux({
-      items: rem,
-      meta: allVendors.meta,
-    });
+    putVendorsInRedux( rem,allVendors.meta);
   }
 
   makeDeleteUI({ idsToDelete }) {
