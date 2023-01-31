@@ -19,7 +19,7 @@ import {
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { onTableStateChange } from "../../../utils/helpers";
+import { getLimit, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 class AllTeamAdminMessages extends React.Component {
@@ -33,7 +33,7 @@ class AllTeamAdminMessages extends React.Component {
   }
 
   componentDidMount() {
-    apiCall("/messages.listTeamAdminMessages").then((allMessagesResponse) => {
+    apiCall("/messages.listTeamAdminMessages", {limit:getLimit(PAGE_PROPERTIES.ALL_TEAM_MESSAGES.key)}).then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
         this.props.putTeamMessagesInRedux(allMessagesResponse.data, allMessagesResponse.meta);
         let hasItems =

@@ -16,7 +16,7 @@ import { getHumanFriendlyDate, smartString } from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { generateFilterParams, getAdminApiEndpoint, makeAPICallForMoreData, onTableStateChange } from "../../../utils/helpers";
+import { generateFilterParams, getAdminApiEndpoint, getLimit, makeAPICallForMoreData, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
@@ -37,11 +37,16 @@ class AllUsers extends React.Component {
 
     if (auth.is_super_admin) url = "/users.listForSuperAdmin";
     else if (auth.is_community_admin) url = "/users.listForCommunityAdmin";
-    apiCall(url).then((allUsersResponse) => {
-      if (allUsersResponse && allUsersResponse.success) {
-        this.props.putUsersInRedux(allUsersResponse.data, allUsersResponse.meta);
+    apiCall(url, { limit: getLimit(PAGE_PROPERTIES.ALL_USERS.key) }).then(
+      (allUsersResponse) => {
+        if (allUsersResponse && allUsersResponse.success) {
+          this.props.putUsersInRedux(
+            allUsersResponse.data,
+            allUsersResponse.meta
+          );
+        }
       }
-    });
+    );
   }
 
   fashionData = (data) => {

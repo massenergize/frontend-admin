@@ -25,7 +25,7 @@ import { Typography } from "@material-ui/core";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import { getAdminApiEndpoint, onTableStateChange } from "../../../utils/helpers";
+import { getAdminApiEndpoint, getLimit, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
@@ -44,7 +44,7 @@ class AllCommunities extends React.Component {
     if (auth && auth.is_super_admin) url = "/communities.listForSuperAdmin";
     else if (auth && auth.is_community_admin)
       url = "/communities.listForCommunityAdmin";
-    apiCall(url).then((allCommunitiesResponse) => {
+    apiCall(url, {limit:getLimit(PAGE_PROPERTIES.ALL_COMMUNITIES.key)}).then((allCommunitiesResponse) => {
       if (allCommunitiesResponse && allCommunitiesResponse.success) {
         this.props.putCommunitiesInRedux(allCommunitiesResponse.data, allCommunitiesResponse.meta);
       }

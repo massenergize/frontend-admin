@@ -18,7 +18,12 @@ import {
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 import { connect } from "react-redux";
-import { makeAPICallForMoreData } from "../../../utils/helpers";
+import { getAdminApiEndpoint, getLimit, onTableStateChange } from "../../../utils/helpers";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import { Paper } from "@material-ui/core";
+import METable from "../ME  Tools/table /METable";
 class AllTagCollections extends React.Component {
   constructor(props) {
     super(props);
@@ -26,10 +31,10 @@ class AllTagCollections extends React.Component {
   }
 
   componentDidMount() {
-    apiCall("/tag_collections.listForCommunityAdmin").then(
+    apiCall("/tag_collections.listForCommunityAdmin", {limit:getLimit(PAGE_PROPERTIES.ALL_TAG_COLLECTS.key)}).then(
       (tagCollectionsResponse) => {
         if (tagCollectionsResponse && tagCollectionsResponse.success) {
-          this.props.putTagsInRedux(tagCollectionsResponse.data);
+          this.props.putTagsInRedux(tagCollectionsResponse.data, tagCollectionsResponse.meta);
         }
       }
     );
@@ -118,6 +123,7 @@ class AllTagCollections extends React.Component {
   };
 
   fashionData(data) {
+    console.log("=== data ===", data)
     return (data || []).map((d) => [
       d.id,
       `${d.name}...`.substring(0, 30), // limit to first 30 chars
@@ -137,10 +143,7 @@ class AllTagCollections extends React.Component {
       apiCall("/tag_collections.delete", { tag_collection_id: found });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putTagsInRedux({
-      items: rem,
-      meta: tags.meta,
-    });
+    putTagsInRedux(rem,tags.meta);
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -153,22 +156,12 @@ class AllTagCollections extends React.Component {
       </Typography>
     );
   }
-  callMoreData = (page) => {
-    let { tags, putTagsInRedux } = this.props;
-    var url = "/tag_collections.listForCommunityAdmin";
-    makeAPICallForMoreData({
-      url,
-      existing: tags && tags.items,
-      updateRedux: putTagsInRedux,
-      page,
-    });
-  };
 
   render() {
     const title = brand.name + " - All Tag Collections";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, tags } = this.props;
+    const { classes, tags, putTagsInRedux } = this.props;
     const data = this.fashionData(tags && tags.items);
     const metaData = tags && tags.meta;
 
@@ -197,6 +190,44 @@ class AllTagCollections extends React.Component {
         //   });
         // });
       },
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putTagsInRedux,
+          reduxItems: tags,
+          apiUrl: "/tag_collections.listForCommunityAdmin",
+          pageProp: PAGE_PROPERTIES.ALL_TAG_COLLECTS,
+        }),
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
+        <SearchBar
+          url="/tag_collections.listForCommunityAdmin"
+          reduxItems={tags}
+          updateReduxFunction={putTagsInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_TAG_COLLECTS}
+        />
+      ),
+      // Not needed for now.
+      // customFilterDialogFooter: (currentFilterList) => {
+      //   return (
+      //     <ApplyFilterButton
+      //       url="/tag_collections.listForCommunityAdmin"
+      //       reduxItems={tags}
+      //       updateReduxFunction={putTagsInRedux}
+      //       columns={columns}
+      //       filters={currentFilterList}
+      //     />
+      //   );
+      // },
     };
     if (!data || !data.length) {
       return <Loading />;
@@ -211,14 +242,19 @@ class AllTagCollections extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <div className={classes.table}>
-          <MUIDataTable
-            title="All Tag Collections"
-            data={data}
-            columns={columns}
-            options={options}
+
+        <Paper style={{ marginBottom: 10 }}>
+          <METable
+            classes={classes}
+            page={PAGE_PROPERTIES.ALL_TAG_COLLECTS}
+            tableProps={{
+              title: "All Tag Collections",
+              data: data,
+              columns: columns,
+              options: options,
+            }}
           />
-        </div>
+        </Paper>
       </div>
     );
   }

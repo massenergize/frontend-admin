@@ -41,7 +41,7 @@ import {
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import { getAdminApiEndpoint, onTableStateChange } from "../../../utils/helpers";
+import { getAdminApiEndpoint, getLimit, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
@@ -61,8 +61,10 @@ class AllActions extends React.Component {
     const { putActionsInRedux, auth } = this.props;
     var url;
     if (auth &&auth.is_super_admin) url = "/actions.listForSuperAdmin";
-    else if (auth &&auth.is_community_admin) url = "/actions.listForCommunityAdmin";
-    const allActionsResponse = await apiCall(url);
+    else if (auth && auth.is_community_admin) url = "/actions.listForCommunityAdmin";
+    const allActionsResponse = await apiCall(url, {
+      limit: getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key),
+    });
     if (allActionsResponse && allActionsResponse.success) {
       putActionsInRedux(allActionsResponse.data, allActionsResponse.meta);
     } else if (allActionsResponse && !allActionsResponse.success) {
@@ -300,7 +302,6 @@ class AllActions extends React.Component {
    * @returns
    */
   fashionData(data) {
-    console.log("===== FasionData =====", data)
     const fashioned = data.map((d) => [
       d.id,
       {

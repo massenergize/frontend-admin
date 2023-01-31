@@ -36,11 +36,17 @@ class AllSubscribers extends React.Component {
     const user = this.props.auth ? this.props.auth : {};
     let allSubscribersResponse = null;
     if (user.is_super_admin) {
-      allSubscribersResponse = await apiCall("/subscribers.listForSuperAdmin");
+      allSubscribersResponse = await apiCall(
+        "/subscribers.listForSuperAdmin",
+        { limit: getLimit(PAGE_PROPERTIES.ALL_SUBSCRIBERS.key) }
+      );
     } else if (user.is_community_admin) {
       allSubscribersResponse = await apiCall(
         "/subscribers.listForCommunityAdmin",
-        { community_id: null }
+        {
+          community_id: null,
+          limit: getLimit(PAGE_PROPERTIES.ALL_SUBSCRIBERS.key),
+        }
       );
     }
 
@@ -69,8 +75,15 @@ class AllSubscribers extends React.Component {
     await this.setStateAsync({ dataFiltered: filteredData });
   };
 
-  fashionData = (data) =>
-    data.map((d) => [d.id, d.name, d.email, d.community && d.community.name]);
+  fashionData = (data) =>{
+    console.log("==== data ====", data)
+    return data.map((d) => [
+      d.id,
+      d.name,
+      d.email,
+      d.community && d.community.name,
+    ]);
+  }
 
   getStatus = (isApproved) => {
     switch (isApproved) {

@@ -45,7 +45,7 @@ import {
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
 import { LOADING } from "../../utils/constants";
-import { prepareFilterAndSearchParamsFromLocal } from "../../utils/helpers";
+import { getLimit, prepareFilterAndSearchParamsFromLocal } from "../../utils/helpers";
 import { PAGE_PROPERTIES } from "../../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 
 // TODO: REOMVE THIS FUNCTiON
@@ -105,74 +105,114 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     apiCall(
       isSuperAdmin
         ? "/communities.listForSuperAdmin"
-        : "/communities.listForCommunityAdmin", 
-        {
-          params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_COMMUNITIES.key)
-        }
+        : "/communities.listForCommunityAdmin",
+      {
+        params: prepareFilterAndSearchParamsFromLocal(
+          PAGE_PROPERTIES.ALL_COMMUNITIES.key
+        ),
+        limit: getLimit(PAGE_PROPERTIES.ALL_COMMUNITIES.key),
+      }
     ),
     apiCall(
       isSuperAdmin
         ? "/actions.listForSuperAdmin"
         : "/actions.listForCommunityAdmin",
-        {
-          params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_ACTIONS.key)
-        }
+      {
+        params: prepareFilterAndSearchParamsFromLocal(
+          PAGE_PROPERTIES.ALL_ACTIONS.key
+        ),
+        limit: getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key),
+      }
     ),
     apiCall(
       isSuperAdmin
         ? "/events.listForSuperAdmin"
         : "/events.listForCommunityAdmin",
-        {
-          params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_EVENTS.key)
-        }
+      {
+        params: prepareFilterAndSearchParamsFromLocal(
+          PAGE_PROPERTIES.ALL_EVENTS.key
+        ),
+        limit: getLimit(PAGE_PROPERTIES.ALL_EVENTS.key),
+      }
     ),
-    apiCall("/messages.listForCommunityAdmin",  {
-      params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key)
+    apiCall("/messages.listForCommunityAdmin", {
+      params: prepareFilterAndSearchParamsFromLocal(
+        PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key
+      ),
+      limit: getLimit(PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key),
     }),
-    apiCall("/messages.listTeamAdminMessages",
-    {
-      params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_TEAM_MESSAGES.key)
+    apiCall("/messages.listTeamAdminMessages", {
+      params: prepareFilterAndSearchParamsFromLocal(
+        PAGE_PROPERTIES.ALL_TEAM_MESSAGES.key
+      ),
+      limit: getLimit(PAGE_PROPERTIES.ALL_TEAM_MESSAGES.key),
     }),
     apiCall(
-      isSuperAdmin ? "/teams.listForSuperAdmin" : "/teams.listForCommunityAdmin",  {
-        params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_TEAMS.key)
+      isSuperAdmin
+        ? "/teams.listForSuperAdmin"
+        : "/teams.listForCommunityAdmin",
+      {
+        params: prepareFilterAndSearchParamsFromLocal(
+          PAGE_PROPERTIES.ALL_TEAMS.key
+        ),
+        limit: getLimit(PAGE_PROPERTIES.ALL_TEAMS.key),
       }
     ),
     apiCall(
       isSuperAdmin
         ? "/subscribers.listForSuperAdmin"
         : "/subscribers.listForCommunityAdmin",
-        {
-          params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_SUBSCRIBERS.key)
-        }
+      {
+        params: prepareFilterAndSearchParamsFromLocal(
+          PAGE_PROPERTIES.ALL_SUBSCRIBERS.key
+        ),
+        limit: getLimit(PAGE_PROPERTIES.ALL_SUBSCRIBERS.key),
+      }
     ),
     apiCall(
       isSuperAdmin
         ? "/testimonials.listForSuperAdmin"
         : "/testimonials.listForCommunityAdmin",
-        {
-          params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_TESTIMONIALS.key)
-        }
+      {
+        params: prepareFilterAndSearchParamsFromLocal(
+          PAGE_PROPERTIES.ALL_TESTIMONIALS.key
+        ),
+        limit: getLimit(PAGE_PROPERTIES.ALL_TESTIMONIALS.key),
+      }
     ),
     apiCall(
-      isSuperAdmin ? "/users.listForSuperAdmin" : "/users.listForCommunityAdmin",
+      isSuperAdmin
+        ? "/users.listForSuperAdmin"
+        : "/users.listForCommunityAdmin",
       {
-        params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_USERS.key)
+        params: prepareFilterAndSearchParamsFromLocal(
+          PAGE_PROPERTIES.ALL_USERS.key
+        ),
+        limit: getLimit(PAGE_PROPERTIES.ALL_USERS.key),
       }
     ),
     apiCall(
       isSuperAdmin
         ? "/vendors.listForSuperAdmin"
         : "/vendors.listForCommunityAdmin",
-        {
-          params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_VENDORS.key)
-        }
+      {
+        params: prepareFilterAndSearchParamsFromLocal(
+          PAGE_PROPERTIES.ALL_VENDORS.key
+        ),
+        limit: getLimit(PAGE_PROPERTIES.ALL_VENDORS.key),
+      }
     ),
     apiCall("/cc/info/actions"),
     apiCall(
       isSuperAdmin
         ? "/tag_collections.listForSuperAdmin"
-        : "/tag_collections.listForCommunityAdmin"
+        : "/tag_collections.listForCommunityAdmin",
+      {
+        params: prepareFilterAndSearchParamsFromLocal(
+          PAGE_PROPERTIES.ALL_TAG_COLLECTS.key
+        ),
+        limit: getLimit(PAGE_PROPERTIES.ALL_TAG_COLLECTS.key),
+      }
     ),
     apiCall("/gallery.search", {
       any_community: true,
@@ -216,7 +256,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadAllUsers(users.data, users.meta));
     dispatch(loadAllVendors(vendors.data, vendors.meta));
     dispatch(reduxLoadCCActions(ccActions.data.actions));
-    dispatch(loadAllTags(tagCollections.data));
+    dispatch(loadAllTags(tagCollections.data, tagCollections.meta));
     dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
     dispatch(loadTaskFunctionsAction(tasksFunctions.data));
     dispatch(loadTasksAction(tasks.data));
@@ -328,9 +368,9 @@ export const loadAllSubscribers = (data,meta) => ({
   type: GET_ALL_SUBSCRIBERS,
   payload: {items: data, meta: meta},
 });
-export const loadAllTags = (data) => ({
+export const loadAllTags = (data, meta) => ({
   type: GET_ALL_TAG_COLLECTIONS,
-  payload: data,
+  payload: {items: data, meta: meta},
 });
 export const loadAllActions = (data, meta) => ({
   type: GET_ALL_ACTIONS,
@@ -438,20 +478,23 @@ export const reduxGetAllCommunityPolicies = (community_id) => (dispatch) => {
 };
 
 export const reduxGetAllCommunityVendors = (community_id) => (dispatch) => {
-  apiCall("/vendors.listForCommunityAdmin", { community_id }).then(
-    (response) => {
-      if (response && response.success) {
-        redirectIfExpired(response);
-        dispatch(loadAllVendors(response.data, response.meta));
-      }
-      return { type: "DO_NOTHING", payload: null };
+  apiCall("/vendors.listForCommunityAdmin", {
+    community_id,
+    limit: getLimit(PAGE_PROPERTIES.ALL_VENDORS.key),
+  }).then((response) => {
+    if (response && response.success) {
+      redirectIfExpired(response);
+      dispatch(loadAllVendors(response.data, response.meta));
     }
-  );
+    return { type: "DO_NOTHING", payload: null };
+  });
   return { type: "DO_NOTHING", payload: null };
 };
 
 export const reduxGetAllCommunityTestimonials = () => (dispatch) => {
-  apiCall("/testimonials.listForCommunityAdmin").then((response) => {
+  apiCall("/testimonials.listForCommunityAdmin", {
+    limit: getLimit(PAGE_PROPERTIES.ALL_TESTIMONIALS.key),
+  }).then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllTestimonials(response.data, response.meta));
@@ -473,7 +516,7 @@ export const reduxGetAllCommunityGoals = (community_id) => (dispatch) => {
 };
 
 export const reduxGetAllCommunityTeams = (community_id) => (dispatch) => {
-  apiCall("/teams.listForCommunityAdmin", { community_id }).then((response) => {
+  apiCall("/teams.listForCommunityAdmin", { community_id, limit: getLimit(PAGE_PROPERTIES.ALL_TEAMS.key) }).then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllTeams(response.data, response.meta));
@@ -495,7 +538,7 @@ export const reduxGetAllCommunityUsers = (community_id) => (dispatch) => {
 };
 
 export const reduxGetAllCommunityEvents = (community_id, cb) => (dispatch) => {
-  apiCall("/events.listForCommunityAdmin", { community_id }).then(
+  apiCall("/events.listForCommunityAdmin", { community_id, limit:getLimit(PAGE_PROPERTIES.ALL_EVENTS.key) }).then(
     (response) => {
       if (response && response.success) {
         redirectIfExpired(response);
@@ -509,7 +552,9 @@ export const reduxGetAllCommunityEvents = (community_id, cb) => (dispatch) => {
 };
 
 export const reduxGetAllVendors = () => (dispatch) => {
-  apiCall("/vendors.listForSuperAdmin").then((response) => {
+  apiCall("/vendors.listForSuperAdmin", {
+    limit: getLimit(PAGE_PROPERTIES.ALL_VENDORS.key),
+  }).then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllVendors(response.data, response.meta));
@@ -531,7 +576,9 @@ export const reduxGetAllGoals = () => (dispatch) => {
 };
 
 export const reduxGetAllTeams = () => (dispatch) => {
-  apiCall("/teams.listForCommunityAdmin").then((response) => {
+  apiCall("/teams.listForCommunityAdmin", {
+    limit: getLimit(PAGE_PROPERTIES.ALL_TEAMS.key),
+  }).then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllTeams(response.data, response.meta));
@@ -553,7 +600,7 @@ export const reduxGetAllPolicies = () => (dispatch) => {
 };
 
 export const reduxGetAllEvents = () => (dispatch) => {
-  apiCall("/events.listForCommunityAdmin").then((response) => {
+  apiCall("/events.listForCommunityAdmin", {limit:getLimit(PAGE_PROPERTIES.ALL_EVENTS.key)}).then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllEvents(response.data, response.meta));
@@ -575,7 +622,9 @@ export const reduxGetAllUsers = () => (dispatch) => {
 };
 
 export const reduxGetAllTestimonials = () => (dispatch) => {
-  apiCall("/testimonials.listForSuperAdmin").then((response) => {
+  apiCall("/testimonials.listForSuperAdmin", {
+    limit: getLimit(PAGE_PROPERTIES.ALL_TESTIMONIALS.key),
+  }).then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllTestimonials(response.data, response.meta));
@@ -602,7 +651,7 @@ export const reduxGetAllTags = () => (dispatch) => {
   getTagCollectionsData().then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
-      dispatch(loadAllTags(response.data));
+      dispatch(loadAllTags(response.data, response.meta));
     }
     return { type: "DO_NOTHING", payload: null };
   });

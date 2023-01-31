@@ -7,6 +7,11 @@ export const getSearchText = (key) => {
   tableProp = JSON.parse(tableProp || null) || {};
   return tableProp && tableProp.search;
 };
+export const getLimit = (key) => {
+  var tableProp = localStorage.getItem(key + TABLE_PROPERTIES);
+  tableProp = JSON.parse(tableProp || null) || {};
+  return tableProp && tableProp.rowsPerPage || 100;
+};
 export const getFilterParamsFromLocalStorage = (key) => {
   var tableProp = localStorage.getItem(key + FILTERS);
   tableProp = JSON.parse(tableProp || null) || {};
@@ -93,6 +98,7 @@ const callMoreData = (
     updateRedux: updateReduxFunction,
     args: {
       page,
+      limit:getLimit(pageProp.key),
       params: JSON.stringify({
         ...filterParams,
         search_text: getSearchText(pageProp.key) || "",
@@ -111,7 +117,7 @@ export const onTableStateChange = ({
   tableState,
 }) => {
   if (action === "changePage") {
-    if (tableState.rowsPerPage * (tableState.page) % 50 ===0) {
+    // if (tableState.rowsPerPage * (tableState.page) % 50 ===0) {
       console.log('===== ToLog ========', tableState);
     // if (tableState.rowsPerPage * (tableState.page) === tableState.displayData.length) {
       callMoreData(
@@ -122,5 +128,5 @@ export const onTableStateChange = ({
         pageProp
       );
     }
-  }
+  // }
 };
