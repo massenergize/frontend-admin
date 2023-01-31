@@ -100,10 +100,7 @@ class AllTestimonials extends React.Component {
       (a) => a.id !== data.id
     );
     updateItems.splice(index, 0, data);
-    this.props.putTestimonialsInRedux({
-      items: updateItems,
-      meta: allTestimonials.meta,
-    });
+    this.props.putTestimonialsInRedux(updateItems,allTestimonials.meta);
   };
 
   getColumns() {
@@ -261,10 +258,7 @@ class AllTestimonials extends React.Component {
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
-    putTestimonialsInRedux({
-      items: [...data],
-      meta: allTestimonials.meta,
-    });
+    putTestimonialsInRedux( [...data],allTestimonials.meta);
     const community = item.community;
     apiCall("/testimonials.update", {
       testimonial_id: item.id,
@@ -296,10 +290,7 @@ class AllTestimonials extends React.Component {
       apiCall("/testimonials.delete", { testimonial_id: found });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putTestimonialsInRedux({
-      items: rem,
-      meta: allTestimonials.meta,
-    });
+    putTestimonialsInRedux(rem,allTestimonials.meta);
   }
 
   makeDeleteUI({ idsToDelete }) {
