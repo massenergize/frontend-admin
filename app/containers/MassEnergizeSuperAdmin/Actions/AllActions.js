@@ -63,9 +63,8 @@ class AllActions extends React.Component {
     if (auth &&auth.is_super_admin) url = "/actions.listForSuperAdmin";
     else if (auth.is_community_admin) url = "/actions.listForCommunityAdmin";
     const allActionsResponse = await apiCall(url);
-    console.log("==== res ===", allActionsResponse);
     if (allActionsResponse && allActionsResponse.success) {
-      putActionsInRedux(allActionsResponse.data);
+      putActionsInRedux(allActionsResponse.data, allActionsResponse.meta);
     } else if (allActionsResponse && !allActionsResponse.success) {
       await this.setStateAsync({
         error: allActionsResponse.error,
@@ -84,10 +83,7 @@ class AllActions extends React.Component {
     const index = allActions.items.findIndex((a) => a.id === data.id);
     const updateItems = allActions.items.filter((a) => a.id !== data.id);
     updateItems.splice(index, 0, data);
-    putActionsInRedux({
-      items: updateItems,
-      meta: allActions.meta,
-    });
+    putActionsInRedux(updateItems,allActions.meta);
   };
 
   changeActions = async (id) => {
@@ -241,10 +237,7 @@ class AllActions extends React.Component {
                   if (copiedActionResponse && copiedActionResponse.success) {
                     const newAction =
                       copiedActionResponse && copiedActionResponse.data;
-                    putActionsInRedux({
-                      items: [newAction, ...(allActions.items || [])],
-                      meta: allActions.meta,
-                    });
+                    putActionsInRedux([newAction, ...(allActions.items || [])],allActions.meta);
                     this.props.history.push(
                       `/admin/edit/${newAction.id}/action`
                     );
@@ -307,6 +300,7 @@ class AllActions extends React.Component {
    * @returns
    */
   fashionData(data) {
+    console.log("===== FasionData =====", data)
     const fashioned = data.map((d) => [
       d.id,
       {
@@ -336,10 +330,7 @@ class AllActions extends React.Component {
     item.is_published = !status;
     data.splice(index, 1, item);
     const community = item.community;
-    putInRedux({
-      items: [...data],
-      meta: this.props.allActions.meta,
-    });
+    putInRedux([...data],this.props.allActions.meta);
     apiCall("/actions.update", {
       action_id: item.id,
       is_published: !status,
@@ -372,7 +363,7 @@ class AllActions extends React.Component {
       );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putActionsInRedux(rem);
+    putActionsInRedux(rem, allActions.meta);
   }
   // getTimeStamp = () => {
   //   const today = new Date();

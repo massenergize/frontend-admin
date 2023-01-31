@@ -20,7 +20,7 @@ export const getFilterParamsFromLocalStorage = (key) => {
 };
 
 export const getFilterData = (data, existing = [], field = "id") => {
-  let items = data.items || [];
+  let items = data.data || [];
   let all = [...existing, ...items];
   // const unique = [...new Map(all.map((item) => [item[field], item])).values()];
   // const unique = [...new Map(all.map((item) => [item[field], item])).values()];
@@ -36,12 +36,10 @@ export const makeAPICallForMoreData = ({
 }) => {
   apiCall(apiUrl, args).then((res) => {
     if (res.success) {
+      console.log("==== res =====", res)
       let items = [...existing];
-      let newList = items.concat(res.data.items);
-      updateRedux({
-        items: newList,
-        meta: res.data.meta,
-      });
+      let newList = items.concat(res.data);
+      updateRedux(newList,res.meta,);
     }
   });
 };

@@ -24,7 +24,7 @@ export default function SearchBar({url, reduxItems, updateReduxFunction, handleS
       }).then((res) => {
         if (res && res.success) {
           let filterData = getFilterData(
-            res.data,
+            res,
             reduxItems && reduxItems.items,
             "id"
           );

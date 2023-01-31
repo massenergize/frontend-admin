@@ -12,7 +12,7 @@ export default function ApplyFilterButton({ url, reduxItems, updateReduxFunction
     }).then((res) => {
       if (res && res.success) {
         let filterData = getFilterData(
-          res.data,
+          res,
           reduxItems && reduxItems.items,
           "id"
         );
