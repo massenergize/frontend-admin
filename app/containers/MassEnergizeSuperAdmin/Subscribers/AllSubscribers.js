@@ -45,7 +45,7 @@ class AllSubscribers extends React.Component {
     }
 
     if (allSubscribersResponse && allSubscribersResponse.data) {
-      this.props.putSubscribersInRedux(allSubscribersResponse.data);
+      this.props.putSubscribersInRedux(allSubscribersResponse.data, allSubscribersResponse.meta);
     }
   }
 
@@ -126,10 +126,7 @@ class AllSubscribers extends React.Component {
     const rem = ((itemsInRedux && itemsInRedux.items) || []).filter(
       (com) => !ids.includes(com.id)
     );
-    putSubscribersInRedux({
-      items: rem,
-      meta: itemsInRedux.meta,
-    });
+    putSubscribersInRedux(rem, itemsInRedux.meta);
   }
 
   makeDeleteUI({ idsToDelete }) {
