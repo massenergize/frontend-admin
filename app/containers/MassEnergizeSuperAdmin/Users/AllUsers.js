@@ -39,7 +39,7 @@ class AllUsers extends React.Component {
     else if (auth.is_community_admin) url = "/users.listForCommunityAdmin";
     apiCall(url).then((allUsersResponse) => {
       if (allUsersResponse && allUsersResponse.success) {
-        this.props.putUsersInRedux(allUsersResponse.data);
+        this.props.putUsersInRedux(allUsersResponse.data, allUsersResponse.meta);
       }
     });
   }
@@ -120,10 +120,7 @@ class AllUsers extends React.Component {
       apiCall("/users.delete", { id: found });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putUsersInRedux({
-      items: rem,
-      meta: allUsers.meta,
-    });
+    putUsersInRedux(rem, allUsers.meta);
   }
 
   makeDeleteUI({ idsToDelete }) {

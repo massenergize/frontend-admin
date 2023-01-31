@@ -205,10 +205,7 @@ class AllEvents extends React.Component {
                     const newEvent =
                       copiedEventResponse && copiedEventResponse.data;
                     this.props.history.push(`/admin/edit/${newEvent.id}/event`);
-                    putEventsInRedux({
-                      items: [newEvent, ...(allEvents.items || [])],
-                      meta: allEvents.meta,
-                    });
+                    putEventsInRedux([newEvent, ...(allEvents.items || [])],allEvents.meta);
                   }
                 }}
                 to="/admin/read/events"
@@ -279,10 +276,7 @@ class AllEvents extends React.Component {
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
-    putInRedux({
-      items: [...data],
-      meta: this.props.allEvents.meta,
-    });
+    putInRedux( [...data],this.props.allEvents.meta);
     const community = item.community;
     apiCall("/events.update", {
       event_id: item.id,
@@ -326,10 +320,7 @@ class AllEvents extends React.Component {
       apiCall("/events.delete", { event_id: found });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putEventsInRedux({
-      items: rem,
-      meta: allEvents.meta,
-    });
+    putEventsInRedux( rem,allEvents.meta);
   }
   
 
