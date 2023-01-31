@@ -4,7 +4,6 @@ import { withStyles } from "@material-ui/core/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 import { bindActionCreators } from "redux";
-import MUIDataTable from "mui-datatables";
 import { Link } from "react-router-dom";
 import DetailsIcon from "@material-ui/icons/Details";
 import { connect } from "react-redux";
@@ -20,7 +19,7 @@ import {
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { generateFilterParams, makeAPICallForMoreData, onTableStateChange } from "../../../utils/helpers";
+import { onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 class AllTeamAdminMessages extends React.Component {
@@ -36,7 +35,7 @@ class AllTeamAdminMessages extends React.Component {
   componentDidMount() {
     apiCall("/messages.listTeamAdminMessages").then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
-        this.props.putTeamMessagesInRedux(allMessagesResponse.data);
+        this.props.putTeamMessagesInRedux(allMessagesResponse.data, allMessagesResponse.meta);
         let hasItems =
           allMessagesResponse.data &&
           allMessagesResponse.data.items &&
@@ -163,10 +162,7 @@ class AllTeamAdminMessages extends React.Component {
       apiCall("/messages.delete", { message_id: found });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putTeamMessagesInRedux({
-      items: rem,
-      meta: teamMessages.meta,
-    });
+    putTeamMessagesInRedux(rem,teamMessages.meta);
   }
 
   makeDeleteUI({ idsToDelete }) {

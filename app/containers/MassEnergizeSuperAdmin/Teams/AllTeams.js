@@ -264,7 +264,7 @@ class AllTeams extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { allTeams, putTeamsInRedux } = this.props;
-    const itemsInRedux = allTeams;
+    const itemsInRedux = allTeams && allTeams.items;
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][1];
@@ -272,7 +272,7 @@ class AllTeams extends React.Component {
       apiCall("/teams.delete", { team_id: found && found.id });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putTeamsInRedux(rem);
+    putTeamsInRedux(rem, allTeams.meta);
   }
 
   makeDeleteUI({ idsToDelete }) {

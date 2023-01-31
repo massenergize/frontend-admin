@@ -28,7 +28,7 @@ export default function SearchBar({url, reduxItems, updateReduxFunction, handleS
             reduxItems && reduxItems.items,
             "id"
           );
-          updateReduxFunction(filterData);
+          updateReduxFunction(filterData.items, filterData.meta);
         }
       });
     };

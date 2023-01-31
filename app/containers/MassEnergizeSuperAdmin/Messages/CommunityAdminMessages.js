@@ -36,7 +36,7 @@ class AllCommunityAdminMessages extends React.Component {
   componentDidMount() {
     apiCall("/messages.listForCommunityAdmin").then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
-        this.props.putMessagesInRedux(allMessagesResponse.data);
+        this.props.putMessagesInRedux(allMessagesResponse.data, allMessagesResponse.meta);
       }
     });
   }
@@ -149,10 +149,7 @@ class AllCommunityAdminMessages extends React.Component {
       apiCall("/messages.delete", { message_id: found });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putMessagesInRedux({
-      items: rem,
-      meta: messages.meta,
-    });
+    putMessagesInRedux(rem,messages.meta);
   }
 
   makeDeleteUI({ idsToDelete }) {

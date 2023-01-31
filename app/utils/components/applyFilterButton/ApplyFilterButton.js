@@ -16,7 +16,7 @@ export default function ApplyFilterButton({ url, reduxItems, updateReduxFunction
           reduxItems && reduxItems.items,
           "id"
         );
-        updateReduxFunction(filterData);
+        updateReduxFunction(filterData.items, filterData.meta);
       }
     });
   };
