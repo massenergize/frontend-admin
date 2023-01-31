@@ -45,6 +45,8 @@ import {
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
 import { LOADING } from "../../utils/constants";
+import { prepareFilterAndSearchParamsFromLocal } from "../../utils/helpers";
+import { PAGE_PROPERTIES } from "../../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 
 // TODO: REOMVE THIS FUNCTiON
 export const testRedux = (value) => {
@@ -103,40 +105,68 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     apiCall(
       isSuperAdmin
         ? "/communities.listForSuperAdmin"
-        : "/communities.listForCommunityAdmin"
+        : "/communities.listForCommunityAdmin", 
+        {
+          params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_COMMUNITIES.key)
+        }
     ),
     apiCall(
       isSuperAdmin
         ? "/actions.listForSuperAdmin"
-        : "/actions.listForCommunityAdmin"
+        : "/actions.listForCommunityAdmin",
+        {
+          params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_ACTIONS.key)
+        }
     ),
     apiCall(
       isSuperAdmin
         ? "/events.listForSuperAdmin"
-        : "/events.listForCommunityAdmin"
+        : "/events.listForCommunityAdmin",
+        {
+          params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_EVENTS.key)
+        }
     ),
-    apiCall("/messages.listForCommunityAdmin"),
-    apiCall("/messages.listTeamAdminMessages"),
+    apiCall("/messages.listForCommunityAdmin",  {
+      params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key)
+    }),
+    apiCall("/messages.listTeamAdminMessages",
+    {
+      params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_TEAM_MESSAGES.key)
+    }),
     apiCall(
-      isSuperAdmin ? "/teams.listForSuperAdmin" : "/teams.listForCommunityAdmin"
+      isSuperAdmin ? "/teams.listForSuperAdmin" : "/teams.listForCommunityAdmin",  {
+        params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_TEAMS.key)
+      }
     ),
     apiCall(
       isSuperAdmin
         ? "/subscribers.listForSuperAdmin"
-        : "/subscribers.listForCommunityAdmin"
+        : "/subscribers.listForCommunityAdmin",
+        {
+          params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_SUBSCRIBERS.key)
+        }
     ),
     apiCall(
       isSuperAdmin
         ? "/testimonials.listForSuperAdmin"
-        : "/testimonials.listForCommunityAdmin"
+        : "/testimonials.listForCommunityAdmin",
+        {
+          params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_TESTIMONIALS.key)
+        }
     ),
     apiCall(
-      isSuperAdmin ? "/users.listForSuperAdmin" : "/users.listForCommunityAdmin"
+      isSuperAdmin ? "/users.listForSuperAdmin" : "/users.listForCommunityAdmin",
+      {
+        params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_USERS.key)
+      }
     ),
     apiCall(
       isSuperAdmin
         ? "/vendors.listForSuperAdmin"
-        : "/vendors.listForCommunityAdmin"
+        : "/vendors.listForCommunityAdmin",
+        {
+          params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_VENDORS.key)
+        }
     ),
     apiCall("/cc/info/actions"),
     apiCall(
