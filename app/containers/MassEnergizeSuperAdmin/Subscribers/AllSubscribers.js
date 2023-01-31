@@ -76,7 +76,6 @@ class AllSubscribers extends React.Component {
   };
 
   fashionData = (data) =>{
-    console.log("==== data ====", data)
     return data.map((d) => [
       d.id,
       d.name,

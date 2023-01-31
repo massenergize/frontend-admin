@@ -123,7 +123,6 @@ class AllTagCollections extends React.Component {
   };
 
   fashionData(data) {
-    console.log("=== data ===", data)
     return (data || []).map((d) => [
       d.id,
       `${d.name}...`.substring(0, 30), // limit to first 30 chars

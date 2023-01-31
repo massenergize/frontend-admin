@@ -51,7 +51,6 @@ export const makeAPICallForMoreData = ({
 }) => {
   apiCall(apiUrl, args).then((res) => {
     if (res.success) {
-      console.log("==== res =====", res)
       let items = [...existing];
       let newList = items.concat(res.data);
       updateRedux(newList,res.meta,);
@@ -118,7 +117,6 @@ export const onTableStateChange = ({
 }) => {
   if (action === "changePage") {
     // if (tableState.rowsPerPage * (tableState.page) % 50 ===0) {
-      console.log('===== ToLog ========', tableState);
     // if (tableState.rowsPerPage * (tableState.page) === tableState.displayData.length) {
       callMoreData(
         metaData.next,
