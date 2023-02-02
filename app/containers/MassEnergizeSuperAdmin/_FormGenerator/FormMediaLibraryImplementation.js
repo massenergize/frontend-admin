@@ -165,7 +165,7 @@ export const FormMediaLibraryImplementation = (props) => {
 };
 
 FormMediaLibraryImplementation.propTypes = {
-  props: PropTypes,
+  props: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({

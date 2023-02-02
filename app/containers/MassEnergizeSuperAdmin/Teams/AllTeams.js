@@ -330,7 +330,7 @@ class AllTeams extends React.Component {
     const { classes } = this.props;
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],

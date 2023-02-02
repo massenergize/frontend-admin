@@ -254,7 +254,7 @@ class AllCommunities extends React.Component {
     const data = this.fashionData(this.props.communities || []);
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],

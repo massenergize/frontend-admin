@@ -221,7 +221,7 @@ function ManageFeatureFlags({
   };
   const options = {
     filterType: "dropdown",
-    responsive: "stacked",
+    responsive: "standard",
     download: false,
     print: false,
     rowsPerPage: 25,

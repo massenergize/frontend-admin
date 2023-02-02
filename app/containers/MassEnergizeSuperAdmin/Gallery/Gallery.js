@@ -405,7 +405,7 @@ const ImageCollectionTray = ({
   if (searching)
     return <ProgressCircleWithLabel label="We are fetching your data..." />;
   return (
-    <div classesName={classes.thumbnailContainer}>
+    <div className={classes.thumbnailContainer}>
       {(images || []).map((image, index) => {
         return (
           <div key={index} style={{ display: "inline-block" }}>

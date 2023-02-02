@@ -4,7 +4,6 @@ import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 import { bindActionCreators } from "redux";
-import MUIDataTable from "mui-datatables";
 import { Link, withRouter } from "react-router-dom";
 import DetailsIcon from "@mui/icons-material/Details";
 import { connect } from "react-redux";
@@ -216,7 +215,7 @@ class AllTeamAdminMessages extends React.Component {
     const data = this.fashionData(this.props.teamMessages);
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],

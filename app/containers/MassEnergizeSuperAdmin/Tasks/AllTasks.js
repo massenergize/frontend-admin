@@ -255,7 +255,7 @@ class AllTasks extends React.Component {
     const { classes } = this.props;
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 30,
 

@@ -91,10 +91,8 @@ import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { THREE_MINUTES, TIME_UNTIL_EXPIRATION } from "../../utils/constants";
 
 class Application extends React.Component {
-  componentWillMount() {
-    this.props.reduxCallCommunities();
-  }
   componentDidMount() {
+    this.props.reduxCallCommunities();
     this.props.checkFirebaseAuthentication()
     this.props.fetchInitialContent(this.props.auth);
     setInterval(() => {

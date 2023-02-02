@@ -22,14 +22,10 @@ class CounterChartWidget extends PureComponent {
     this.state = { summary: [] };
   }
 
-  componentWillMount = () => {
-    
-    this.props.callUsers();
-    this.props.callTags();
-    this.props.callCommunities();
-    
-  }
   componentDidMount() {
+        this.props.callUsers();
+        this.props.callTags();
+        this.props.callCommunities();
     this.fashionData();
   }
   

@@ -12,9 +12,9 @@ class DateWidget extends Component {
     date: new Date(),
   }
 
-  componentWillMount() {
-    this.setTime();
-  }
+  // componentWillMount() {
+  //   this.setTime();
+  // }
 
   componentDidMount() {
     setInterval(
