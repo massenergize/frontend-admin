@@ -4,11 +4,6 @@ import { gradientBgLight, gradientBgDark } from 'containers/Templates/appStyles-
 const drawerWidth = 240;
 
 const styles = (theme) =>{
-  console.log("======= THEME =======")
-  console.log(theme)
-
-  console.log("=========== THEME END=====================")
-
 return {
   root:{
      backgroundColor:purple

@@ -10,7 +10,7 @@ import classNames from 'classnames';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { NavLink } from 'react-router-dom';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
+import { ClickAwayListener } from "@mui/material";
 import Paper from '@mui/material/Paper';
 import Ionicon from 'react-ionicons';
 import Grid from '@mui/material/Grid';
@@ -96,30 +96,48 @@ class MegaMenu extends React.Component {
               transition
               disablePortal
             >
-              {({ TransitionProps, placement }) => (
-                <Fade
-                  {...TransitionProps}
-                  id="menu-list-grow"
-                  style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
-                >
-                  <Paper className={classes.dropDownMenu}>
-                    <ClickAwayListener onClickAway={this.handleClose}>
-                      <Grid container>
-                        <Grid item md={3} container justify="center">
-                          <span className={classes.bigIcon}>
-                            <Ionicon icon={item.icon} />
-                          </span>
+              {({ TransitionProps, placement }) => {
+                return (
+                  <Fade
+                    {...TransitionProps}
+                    id="menu-list-grow"
+                    style={{
+                      transformOrigin:
+                        placement === "bottom"
+                          ? "center top"
+                          : "center bottom",
+                    }}
+                  >
+                    <Paper className={classes.dropDownMenu}>
+                      <ClickAwayListener
+                        onClickAway={this.handleClose}
+                      >
+                        <Grid container>
+                          <Grid
+                            item
+                            md={3}
+                            container
+                            justify="center"
+                          >
+                            <span className={classes.bigIcon}>
+                              <Ionicon icon={item.icon} />
+                            </span>
+                          </Grid>
+                          <Grid item md={9}>
+                            <List
+                              role="menu"
+                              component="nav"
+                              className={classes.megaMenu}
+                            >
+                              {getMenus(item.key, item.child)}
+                            </List>
+                          </Grid>
                         </Grid>
-                        <Grid item md={9}>
-                          <List role="menu" component="nav" className={classes.megaMenu}>
-                            { getMenus(item.key, item.child) }
-                          </List>
-                        </Grid>
-                      </Grid>
-                    </ClickAwayListener>
-                  </Paper>
-                </Fade>
-              )}
+                      </ClickAwayListener>
+                    </Paper>
+                  </Fade>
+                );
+              }}
             </Popper>
           </div>
         );

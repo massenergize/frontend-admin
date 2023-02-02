@@ -6,7 +6,7 @@ import brand from "dan-api/dummy/brand";
 import MUIDataTable from "mui-datatables";
 import FileCopy from "@mui/icons-material/FileCopy";
 import EditIcon from "@mui/icons-material/Edit";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import Icon from "@mui/material/Icon";
 import Edit from "@mui/icons-material/Edit";

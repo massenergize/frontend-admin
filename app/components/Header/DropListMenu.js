@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { closeAllAction } from 'dan-actions/UiActions';
 import Button from '@mui/material/Button';
 import { withStyles } from '@mui/styles';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
+import { ClickAwayListener } from '@mui/material';
 import Grow from '@mui/material/Grow';
 import Popper from '@mui/material/Popper';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -94,21 +94,34 @@ class MainMenu extends React.Component {
               transition
               disablePortal
             >
-              {({ TransitionProps, placement }) => (
-                <Grow
-                  {...TransitionProps}
-                  id="menu-list-grow"
-                  style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
-                >
-                  <Paper className={classes.dropDownMenu}>
-                    <ClickAwayListener onClickAway={this.handleClose}>
-                      <List role="menu" component="nav" className={classes.paperMenu}>
-                        { getMenus(item.key, item.child) }
-                      </List>
-                    </ClickAwayListener>
-                  </Paper>
-                </Grow>
-              )}
+              {({ TransitionProps, placement }) => {
+                return (
+                  <Grow
+                    {...TransitionProps}
+                    id="menu-list-grow"
+                    style={{
+                      transformOrigin:
+                        placement === "bottom"
+                          ? "center top"
+                          : "center bottom",
+                    }}
+                  >
+                    <Paper className={classes.dropDownMenu}>
+                      <ClickAwayListener
+                        onClickAway={this.handleClose}
+                      >
+                        <List
+                          role="menu"
+                          component="nav"
+                          className={classes.paperMenu}
+                        >
+                          {getMenus(item.key, item.child)}
+                        </List>
+                      </ClickAwayListener>
+                    </Paper>
+                  </Grow>
+                );
+              }}
             </Popper>
           </div>
         );

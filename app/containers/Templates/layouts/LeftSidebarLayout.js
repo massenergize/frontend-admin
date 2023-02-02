@@ -32,6 +32,7 @@ class LeftSidebarLayout extends React.Component {
       titleException,
       handleOpenGuide
     } = this.props;
+
     return (
       <Fragment>
         <Header

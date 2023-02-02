@@ -25,7 +25,7 @@ import { MaterialDropZone } from "dan-components";
 import Snackbar from "@mui/material/Snackbar";
 import CircularProgress from "@mui/material/CircularProgress";
 import { Editor as TinyEditor } from "@tinymce/tinymce-react";
-import { MenuItem } from "@mui/material";
+import { MenuItem, Alert } from "@mui/material";
 import TextField from "@mui/material/TextField";
 // import Icon from '@mui/material/Icon';
 import moment from "moment";
@@ -1212,12 +1212,15 @@ class MassEnergizeForm extends Component {
               {error && (
                 <div>
                   <Snackbar
-                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "right",
+                    }}
                     open={error != null}
                     autoHideDuration={6000}
                     onClose={this.handleCloseStyle}
                   >
-                    <MySnackbarContentWrapper
+                    {/* <MySnackbarContentWrapper
                       onClose={this.handleCloseStyle}
                       variant="error"
                       message={
@@ -1225,7 +1228,17 @@ class MassEnergizeForm extends Component {
                           {error}
                         </small>
                       }
-                    />
+                    /> */}
+
+                    <Alert
+                      onClose={this.handleCloseStyle}
+                      severity={"error"}
+                      sx={{ width: "100%" }}
+                    >
+                      <small style={{ marginLeft: 15, fontSize: 15 }}>
+                        {error}
+                      </small>
+                    </Alert>
                   </Snackbar>
                   <p style={{ color: "red" }}>{error}</p>
                 </div>
@@ -1243,15 +1256,15 @@ class MassEnergizeForm extends Component {
                     autoHideDuration={6000}
                     onClose={this.handleCloseStyle}
                   >
-                    <MySnackbarContentWrapper
+                    <Alert
                       onClose={this.handleCloseStyle}
-                      variant="success"
-                      message={
-                        <small style={{ marginLeft: 15, fontSize: 14 }}>
-                          {successMsg}
-                        </small>
-                      }
-                    />
+                      severity={"success"}
+                      sx={{ width: "100%" }}
+                    >
+                      <small style={{ marginLeft: 15, fontSize: 15 }}>
+                        {successMsg}
+                      </small>
+                    </Alert>
                   </Snackbar>
                   <p style={{ color: "green" }}>{successMsg}</p>
                 </div>

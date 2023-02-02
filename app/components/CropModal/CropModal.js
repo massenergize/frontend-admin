@@ -36,9 +36,12 @@ class CropModal extends React.Component {
     this.cancelCrop = this.cancelCrop.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  static getDerivedStateFromProps(props, state) {
     const { imageFile } = nextProps;
-    this.setState({ imageData: imageFile.preview, isOpen: true });
+    return {
+      imageData: imageFile.preview,
+      isOpen: true,
+    };
   }
 
   onCropChange = (crop) => {

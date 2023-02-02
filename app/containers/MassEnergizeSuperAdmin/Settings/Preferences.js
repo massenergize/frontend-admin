@@ -19,7 +19,7 @@ import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import { bindActionCreators } from "redux";
 import { reduxLoadAuthAdmin } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
-import { Snackbar } from "@mui/material";
+import { Snackbar, Alert } from "@mui/material";
 import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
 import { withStyles } from "@mui/styles";
 
@@ -100,7 +100,6 @@ function Preferences({ settings, auth, communities, updateAdminObject }) {
             response.error
           );
         }
-
         setNotification({
           open: true,
           message: "Sample report is sent to your email!",
@@ -191,7 +190,9 @@ function Preferences({ settings, auth, communities, updateAdminObject }) {
                       expectedDataSource={expected_data_source}
                       auth={auth}
                       communities={communities}
-                      selectedItemsFromUserObj={availableOptionsForCurrentLevel}
+                      selectedItemsFromUserObj={
+                        availableOptionsForCurrentLevel
+                      }
                       userSettings={adminNudgeSettings}
                       updateSettings={(data) =>
                         trackChanges({
@@ -206,7 +207,9 @@ function Preferences({ settings, auth, communities, updateAdminObject }) {
                     <RenderRadioButtons
                       values={values}
                       auth={auth}
-                      selectedItemsFromUserObj={availableOptionsForCurrentLevel}
+                      selectedItemsFromUserObj={
+                        availableOptionsForCurrentLevel
+                      }
                       userSettings={adminNudgeSettings}
                       optionLevelKey={optionKey}
                       updateSettings={(data) =>
@@ -258,18 +261,19 @@ function Preferences({ settings, auth, communities, updateAdminObject }) {
       <Snackbar
         open={notification.open}
         style={{ marginBottom: 10 }}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         autoHideDuration={6000}
         onClose={() => setNotification({})}
       >
-        <MySnackbarContentWrapper
-          variant={notification.bad ? "error" : "success"}
-          message={
-            <small style={{ marginLeft: 15, fontSize: 15 }}>
-              {notification.message}
-            </small>
-          }
-        />
+        <Alert
+          onClose={() => setNotification({})}
+          severity={notification.bad ? "error" : "success"}
+          sx={{ width: "100%" }}
+        >
+          <small style={{ marginLeft: 15, fontSize: 15 }}>
+            {notification.message}
+          </small>
+        </Alert>
       </Snackbar>
     </div>
   );
