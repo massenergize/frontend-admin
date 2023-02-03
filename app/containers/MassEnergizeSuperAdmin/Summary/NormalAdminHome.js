@@ -31,6 +31,7 @@ import { PORTAL_HOST } from "../../../config/constants";
 import { Paper } from "@material-ui/core";
 import ReportingActivities from "./ReportingActivities";
 import WhatNext from "./WhatNext";
+import CommunityEngagement from "./CommunityEngagement";
 
 class NormalAdminHome extends PureComponent {
   constructor(props) {
@@ -200,21 +201,28 @@ class NormalAdminHome extends PureComponent {
         <br />
         <WhatNext />
         <Divider className={classes.divider} />
-        {graph_data && <ActionsChartWidget data={graph_data || {}} />}
+        {/* {graph_data && <ActionsChartWidget data={graph_data || {}} />} */}
 
         <br />
-        <Grid md={12} style={{ display: "flex" }}>
-          {auth && !auth.is_super_admin && (
-            <Grid
-              item
-              className={classes.root}
-              md={8}
-              xs={12}
-              style={{ margin: 10 }}
-            >
-              {this.renderTable(auth.admin_at || [], classes)}
-            </Grid>
-          )}
+        <Grid md={12} style={{ display: "flex", marginBottom: 10 }}>
+          <Grid
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              marginRight: 10,
+            }}
+            item
+            className={classes.root}
+            md={8}
+            xs={12}
+          >
+            <CommunityEngagement />
+            {auth && !auth.is_super_admin && (
+              <Grid item className={classes.root} style={{ marginTop: 20 }}>
+                {this.renderTable(auth.admin_at || [], classes)}
+              </Grid>
+            )}
+          </Grid>
           <Grid md={4}>
             <ReportingActivities
               style={{ maxHeight: 300, overflowY: "scroll" }}
