@@ -10,7 +10,8 @@ import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import dayjs from "dayjs"; // don't remove this
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+// import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import MomentUtils from "@date-io/moment";
 import FormControl from "@mui/material/FormControl";
@@ -404,9 +405,7 @@ class MassEnergizeForm extends Component {
             cleanedValues[field.dbName] = fieldValueInForm;
             break;
           case FieldTypes.DateTime:
-            cleanedValues[field.dbName] = (
-              moment.utc(fieldValueInForm) || moment.now()
-            ).format();
+            cleanedValues[field.dbName] = (moment.utc(fieldValueInForm)|| moment.now()).format();
             break;
           case FieldTypes.Checkbox:
             // If two or more items have the same dbName, the get combined into an array
@@ -1090,7 +1089,7 @@ class MassEnergizeForm extends Component {
             </Typography>
             <div className={classes.picker} style={{ width: "100%" }}>
               <LocalizationProvider
-                dateAdapter={AdapterDayjs}
+                dateAdapter={AdapterMoment}
                 utils={MomentUtils}
                 style={{ width: "100%" }}
               >
@@ -1102,16 +1101,21 @@ class MassEnergizeForm extends Component {
                     field.defaultValue,
                     field
                   )}
-                  onChange={(date) =>
+                  onChange={(date) => {
                     this.handleFormDataChange(
                       {
-                        target: { name: field.name, value: date },
+                        target: {
+                          name: field.name,
+                          value: date,
+                        },
                       },
                       field
-                    )
-                  }
+                    );
+                  }}
                   label="" // don't put label in the box {field.label}
-                  format="MM/DD/YYYY, h:mm a"
+                  // mask="MM/DD/YYYY, h:mm a"
+                  inputFormat="MM/DD/YYYY HH:mm:ss"
+                  mask={"__/__/____ __:__:__"}
                 />
               </LocalizationProvider>
             </div>
