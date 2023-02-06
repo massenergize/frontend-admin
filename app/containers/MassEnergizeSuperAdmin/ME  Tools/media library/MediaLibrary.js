@@ -44,7 +44,7 @@ function MediaLibrary(props) {
     const { source } = cropLoot;
     setCropped({ ...(cropped || {}), [source.id.toString()]: croppedSource });
     setCurrentTab(TABS.UPLOAD_TAB);
-    return false
+    return false;
   };
 
   const switchToCropping = (content) => {
@@ -109,7 +109,14 @@ function MediaLibrary(props) {
   return (
     <React.Fragment>
       {show && (
-        <div style={{ position: "fixed", top: 0, left: 0, zIndex: 5 }}>
+        <div
+          style={{
+            position: "fixed",
+            zIndex: "1500",
+            top: 0,
+            left: 0,
+          }}
+        >
           <MediaLibraryModal
             {...props}
             images={preselectDefaultImages()}
@@ -162,15 +169,22 @@ function MediaLibrary(props) {
           />
         )}
 
-        <MediaLibrary.Button
+        <div
           onClick={(e) => {
             e.preventDefault();
             setShow(true);
           }}
-          style={{ borderRadius: 5, marginTop: 20, padding: "15px 40px" }}
+          className={`ml-footer-btn `}
+          style={{
+            "--btn-color": "white",
+            "--btn-background": "green",
+            borderRadius: 5,
+            marginTop: 20,
+            padding: "15px 40px",
+          }}
         >
           {actionText}
-        </MediaLibrary.Button>
+        </div>
       </div>
     </React.Fragment>
   );
@@ -376,9 +390,9 @@ MediaLibrary.propTypes = {
   renderBeforeImages: PropTypes.element,
 
   /**
-   * A function that should return a tooltip component. 
+   * A function that should return a tooltip component.
    */
-  TooltipWrapper: PropTypes.string
+  TooltipWrapper: PropTypes.string,
 };
 
 MediaLibrary.Button = MLButton;
@@ -405,6 +419,6 @@ MediaLibrary.defaultProps = {
   compress: true,
   compressedQuality: IMAGE_QUALITY.MEDIUM.key,
   maximumImageSize: DEFFAULT_MAX_SIZE,
-  renderBeforeImages:null
+  renderBeforeImages: null,
 };
 export default MediaLibrary;
