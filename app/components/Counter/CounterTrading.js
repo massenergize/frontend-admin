@@ -1,39 +1,39 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import CountUp from 'react-countup';
-import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import TrendingUp from '@material-ui/icons/TrendingUp';
-import TrendingDown from '@material-ui/icons/TrendingDown';
-import TrendingFlat from '@material-ui/icons/TrendingFlat';
-import Avatar from '@material-ui/core/Avatar';
-import green from '@material-ui/core/colors/green';
-import red from '@material-ui/core/colors/red';
-import Paper from '@material-ui/core/Paper';
+import { withStyles } from "@mui/styles";
+import Typography from '@mui/material/Typography';
+import TrendingUp from '@mui/icons-material/TrendingUp';
+import TrendingDown from '@mui/icons-material/TrendingDown';
+import TrendingFlat from '@mui/icons-material/TrendingFlat';
+import Avatar from '@mui/material/Avatar';
+import green from '@mui/material/colors/green';
+import red from '@mui/material/colors/red';
+import Paper from '@mui/material/Paper';
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     flexGrow: 1,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     height: 196,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: 6,
-    display: 'flex',
-    flexDirection: 'column',
+    display: "flex",
+    flexDirection: "column",
     background: theme.palette.background.papaer,
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.up("sm")]: {
       marginBottom: -1,
     },
-    [theme.breakpoints.down('xs')]: {
-      flexDirection: 'column',
+    [theme.breakpoints.down("xs")]: {
+      flexDirection: "column",
     },
-    '& > *': {
-      padding: '0 5px'
-    }
+    "& > *": {
+      padding: "0 5px",
+    },
   },
   header: {
-    display: 'flex',
-    alignItems: 'center',
+    display: "flex",
+    alignItems: "center",
     padding: 10,
   },
   title: {
@@ -41,62 +41,62 @@ const styles = theme => ({
     fontSize: 16,
     fontWeight: 400,
     flex: 1,
-    '& span': {
-      fontWeight: 'bold',
+    "& span": {
+      fontWeight: "bold",
       fontSize: 12,
-      '& svg': {
-        width: 16
-      }
-    }
+      "& svg": {
+        width: 16,
+      },
+    },
   },
   extend: {
     color: theme.palette.common.white,
     fontSize: 12,
-    padding: theme.spacing.unit / 2,
-    position: 'relative',
+    padding: theme.spacing(1/2),
+    position: "relative",
     zIndex: 1,
-    marginBottom: 4
+    marginBottom: 4,
   },
   counter: {
     color: theme.palette.text.secondary,
     fontSize: 36,
-    fontWeight: 500
+    fontWeight: 500,
   },
   content: {
-    textAlign: 'right',
-    position: 'relative'
+    textAlign: "right",
+    position: "relative",
   },
   up: {
     color: green[500],
-    '& svg': {
+    "& svg": {
       fill: green[500],
-    }
+    },
   },
   down: {
     color: red[500],
-    '& svg': {
+    "& svg": {
       fill: red[500],
-    }
+    },
   },
   flat: {
     color: theme.palette.divider,
-    '& svg': {
+    "& svg": {
       fill: theme.palette.divider,
-    }
+    },
   },
   avatar: {
     width: 40,
     height: 40,
-    marginRight: theme.spacing.unit / 2,
+    marginRight: theme.spacing(1/2),
   },
   decoration: {
-    borderRadius: '50%',
-    width: '200%',
-    position: 'absolute',
+    borderRadius: "50%",
+    width: "200%",
+    position: "absolute",
     height: 260,
-    left: '-50%',
-    top: -20
-  }
+    left: "-50%",
+    top: -20,
+  },
 });
 
 class CounterTrading extends PureComponent {

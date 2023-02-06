@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Link, withRouter } from "react-router-dom";
-import { Paper, Typography } from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
+import { Paper, Typography } from "@mui/material";
+import { withStyles } from "@mui/styles";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
@@ -34,7 +34,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });

@@ -1,5 +1,5 @@
-import { Checkbox, Tab, Tabs, Tooltip } from "@material-ui/core";
-import { Button, FormControlLabel, Typography } from "@material-ui/core";
+import { Checkbox, Tab, Tabs, Tooltip } from "@mui/material";
+import { Button, FormControlLabel, Typography } from "@mui/material";
 
 import React, { useEffect, useState } from "react";
 import ThemeModal from "../../../components/Widget/ThemeModal";

@@ -1,13 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 
 import MUIDataTable from "mui-datatables";
-import EditIcon from "@material-ui/icons/Edit";
+import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
-import TextField from "@material-ui/core/TextField";
+import TextField from "@mui/material/TextField";
 
 import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";
@@ -19,6 +19,7 @@ import {
   reduxGetAllCommunityTestimonials,
   reduxGetAllTestimonials,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 
 import {
@@ -28,7 +29,7 @@ import {
   reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
-import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
+import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
@@ -310,7 +311,23 @@ class AllTestimonials extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/testimonials.delete", { testimonial_id: found });
+      apiCall("/testimonials.delete", { testimonial_id: found }).then(
+        (response) => {
+          if (response.success) {
+            this.props.toggleToast({
+              open: true,
+              message: "Community successfully deleted",
+              variant: "success",
+            });
+          } else {
+            this.props.toggleToast({
+              open: true,
+              message: "An error occurred while deleting the community",
+              variant: "error",
+            });
+          }
+        }
+      );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putTestimonialsInRedux(rem);
@@ -364,7 +381,7 @@ class AllTestimonials extends React.Component {
 
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
@@ -470,6 +487,7 @@ function mapDispatchToProps(dispatch) {
       putTestimonialsInRedux: loadAllTestimonials,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

@@ -1,7 +1,7 @@
 /** *
  * All utility Functions
  */
-import { Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 import moment from "moment";
 import qs from "qs";
 import React from "react";

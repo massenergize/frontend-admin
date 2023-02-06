@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
 import Loading from "dan-components/Loading";
@@ -8,7 +8,7 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { getSelectedIds } from "../Actions/EditActionForm";
 import { makeTagSection } from "../Events/EditEventForm";
-import { Paper, Typography } from "@material-ui/core";
+import { Paper, Typography } from "@mui/material";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { withRouter } from "react-router-dom";
 import { fetchLatestNextSteps } from "../../../redux/redux-actions/adminActions";
@@ -32,7 +32,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4) ,
     textAlign: "center",
   },
 });

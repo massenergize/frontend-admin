@@ -2,7 +2,7 @@ import { connect } from "react-redux";
 import React from "react";
 import { bindActionCreators } from "redux";
 import { PapperBlock } from "dan-components";
-import { Paper, Typography } from "@material-ui/core";
+import { Paper, Typography } from "@mui/material";
 import { LOADING } from "../../../utils/constants";
 import Loading from "dan-components/Loading";
 import { makeTimeAgo } from "../../../utils/common";

@@ -1,5 +1,5 @@
-import FileCopy from "@material-ui/icons/FileCopy";
-import EditIcon from "@material-ui/icons/Edit";
+import FileCopy from "@mui/icons-material/FileCopy";
+import EditIcon from "@mui/icons-material/Edit";
 import React, { useState } from "react";
 import MEChip from "../../../components/MECustom/MEChip";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
@@ -7,7 +7,7 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import Loading from "dan-components/Loading";
 import { Link } from "react-router-dom";
-import { Paper, Typography } from "@material-ui/core";
+import { Paper, Typography } from "@mui/material";
 import { apiCall } from "../../../utils/messenger";
 import { LOADING } from "../../../utils/constants";
 import ThemeModal from "../../../components/Widget/ThemeModal";
@@ -24,6 +24,7 @@ function ManageFeatureFlags({
   toggleDeleteConfirmation,
   putFlagsInRedux,
   featureFlags,
+  toggleToast
 }) {
   const [listingOptions, setShowListingModal] = useState({});
 
@@ -197,9 +198,23 @@ function ManageFeatureFlags({
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/featureFlag.delete", { id: found }).catch((e) =>
-        console.log("FEATURE_DELETE_ERROR:", e)
-      );
+      apiCall("/featureFlag.delete", { id: found })
+        .then((response) => {
+          if (response.success) {
+            toggleToast({
+              open: true,
+              message: "Feature Flag successfully deleted",
+              variant: "success",
+            });
+          } else {
+            toggleToast({
+              open: true,
+              message: "An error occurred while deleting the feature flag",
+              variant: "error",
+            });
+          }
+        })
+        .catch((e) => console.log("FEATURE_DELETE_ERROR:", e));
     });
     var rem = (itemsInRedux || []).filter(
       ([_, com]) => !ids.includes(Number(com.id))
@@ -221,7 +236,7 @@ function ManageFeatureFlags({
   };
   const options = {
     filterType: "dropdown",
-    responsive: "stacked",
+    responsive: "standard",
     download: false,
     print: false,
     rowsPerPage: 25,

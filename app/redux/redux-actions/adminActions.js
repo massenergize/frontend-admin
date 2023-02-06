@@ -42,6 +42,7 @@ import {
   LOAD_ALL_OTHER_EVENTS,
   SAVE_OTHER_EVENT_STATES,
   LOAD_ADMIN_NEXT_STEPS_SUMMARY,
+  TOGGLE_UNIVERSAL_TOAST,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -238,6 +239,10 @@ export const loadFeatureFlags = (data = LOADING) => ({
 });
 export const reduxToggleUniversalModal = (data = {}) => ({
   type: TOGGLE_UNIVERSAL_MODAL,
+  payload: data,
+});
+export const reduxToggleUniversalToast = (data = {}) => ({
+  type: TOGGLE_UNIVERSAL_TOAST,
   payload: data,
 });
 export const reduxLoadCCActions = (data = []) => ({

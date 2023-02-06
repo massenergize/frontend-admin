@@ -1,16 +1,16 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
-import Typography from "@material-ui/core/Typography";
-import Avatar from "@material-ui/core/Avatar";
+import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
 import { bindActionCreators } from "redux";
 import MUIDataTable from "mui-datatables";
-import FileCopy from "@material-ui/icons/FileCopy";
-import EditIcon from "@material-ui/icons/Edit";
+import FileCopy from "@mui/icons-material/FileCopy";
+import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
-import DetailsIcon from "@material-ui/icons/Details";
+import DetailsIcon from "@mui/icons-material/Details";
 import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
@@ -18,14 +18,15 @@ import styles from "../../../components/Widget/widget-jss";
 import {
   loadAllAdminMessages,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import {
   getHumanFriendlyDate,
-  separate,
   smartString,
+  separate,
 } from "../../../utils/common";
-import { Chip } from "@material-ui/core";
+import { Chip } from "@mui/material";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
@@ -238,7 +239,23 @@ class AllCommunityAdminMessages extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/messages.delete", { message_id: found });
+      apiCall("/messages.delete", { message_id: found }).then(
+        (response) => {
+          if (response.success) {
+            this.props.toggleToast({
+              open: true,
+              message: "Message(s) successfully deleted",
+              variant: "success",
+            });
+          } else {
+            this.props.toggleToast({
+              open: true,
+              message: "An error occurred while deleting the message(s)",
+              variant: "error",
+            });
+          }
+        }
+      );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putMessagesInRedux(rem);
@@ -262,7 +279,7 @@ class AllCommunityAdminMessages extends React.Component {
     const data = this.fashionData(this.props.messages); // not ready for this yet: && this.props.messages.filter(item=>item.parent===null));
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
@@ -328,6 +345,7 @@ function mapDispatchToProps(dispatch) {
     {
       putMessagesInRedux: loadAllAdminMessages,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

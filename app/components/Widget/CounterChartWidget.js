@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
+import { withStyles } from "@mui/styles";
+import Grid from '@mui/material/Grid';
 import {connect} from 'react-redux'; 
 import {bindActionCreators} from 'redux';
 import {
@@ -22,14 +22,10 @@ class CounterChartWidget extends PureComponent {
     this.state = { summary: [] };
   }
 
-  componentWillMount = () => {
-    
-    this.props.callUsers();
-    this.props.callTags();
-    this.props.callCommunities();
-    
-  }
   componentDidMount() {
+        this.props.callUsers();
+        this.props.callTags();
+        this.props.callCommunities();
     this.fashionData();
   }
   

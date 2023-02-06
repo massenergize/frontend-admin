@@ -11,7 +11,7 @@ import {
   universalFetchFromGallery,
 } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
-import { Checkbox, FormControlLabel, Typography, Tooltip } from "@material-ui/core";
+import { Checkbox, FormControlLabel, Typography, Tooltip } from "@mui/material";
 import { makeLimitsFromImageArray } from "../../../utils/common";
 import { ProgressCircleWithLabel } from "../Gallery/utils";
 import { getMoreInfoOnImage } from "../Gallery/Gallery";
@@ -165,7 +165,7 @@ export const FormMediaLibraryImplementation = (props) => {
 };
 
 FormMediaLibraryImplementation.propTypes = {
-  props: PropTypes,
+  props: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
