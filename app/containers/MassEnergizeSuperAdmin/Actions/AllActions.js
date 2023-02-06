@@ -22,6 +22,7 @@ import {
   reduxGetAllCommunityActions,
   loadAllActions,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 
 import {
@@ -351,7 +352,22 @@ class AllActions extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/actions.delete", { action_id: found }).catch((e) =>
+      apiCall("/actions.delete", { action_id: found }).then(res=>{
+        if (res.success) {
+          this.props.toggleToast({
+            open: true,
+            message: "Action(s) successfully deleted",
+            variant: "success",
+          });
+        } else {
+          this.props.toggleToast({
+            open: true,
+            message:
+              "An error occurred while deleting the action(s), please try again",
+            variant: "error",
+          });
+        }
+      }).catch((e) =>
         console.log("ACTION_DELETE_ERRO:", e)
       );
     });
@@ -517,6 +533,7 @@ const mapDispatchToProps = (dispatch) =>
       putActionsInRedux: loadAllActions,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

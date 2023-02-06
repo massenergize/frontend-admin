@@ -24,6 +24,7 @@ import {
   reduxToggleUniversalModal,
   reduxLoadAllOtherEvents,
   reduxSaveOtherEventState,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import {
   fetchParamsFromURL,
@@ -313,7 +314,21 @@ class AllEvents extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/events.delete", { event_id: found });
+      apiCall("/events.delete", { event_id: found }).then((response) => {
+        if (response.success) {
+          this.props.toggleToast({
+            open: true,
+            message: "Event(s) successfully deleted",
+            variant: "success",
+          });
+        } else {
+          this.props.toggleToast({
+            open: true,
+            message: "An error occurred while deleting the event(s)",
+            variant: "error",
+          });
+        }
+      });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putEventsInRedux(rem);
@@ -450,6 +465,7 @@ function mapDispatchToProps(dispatch) {
       putEventsInRedux: loadAllEvents,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

@@ -19,6 +19,7 @@ import {
   reduxGetAllCommunityTestimonials,
   reduxGetAllTestimonials,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 
 import {
@@ -310,7 +311,23 @@ class AllTestimonials extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/testimonials.delete", { testimonial_id: found });
+      apiCall("/testimonials.delete", { testimonial_id: found }).then(
+        (response) => {
+          if (response.success) {
+            this.props.toggleToast({
+              open: true,
+              message: "Community successfully deleted",
+              variant: "success",
+            });
+          } else {
+            this.props.toggleToast({
+              open: true,
+              message: "An error occurred while deleting the community",
+              variant: "error",
+            });
+          }
+        }
+      );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putTestimonialsInRedux(rem);
@@ -470,6 +487,7 @@ function mapDispatchToProps(dispatch) {
       putTestimonialsInRedux: loadAllTestimonials,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

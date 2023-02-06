@@ -13,6 +13,7 @@ import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import {
   reduxToggleUniversalModal,
   loadTasksAction,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import { bindActionCreators } from "redux";
 import EditIcon from "@mui/icons-material/Edit";
@@ -230,7 +231,21 @@ class AllTasks extends React.Component {
     idsToDelete.forEach((d) => {
       const found = tasks[d.dataIndex].id;
       ids.push(found);
-      apiCall("/tasks.delete", { id: found });
+      apiCall("/tasks.delete", { id: found }).then((response) => {
+        if (response.success) {
+          this.props.toggleToast({
+            open: true,
+            message: "Task successfully deleted",
+            variant: "success",
+          });
+        } else {
+          this.props.toggleToast({
+            open: true,
+            message: "An error occurred while deleting the task",
+            variant: "error",
+          });
+        }
+      });
     });
     const rem = (tasks || []).filter((com) => !ids.includes(com.id));
     putTasksInRedux(rem);
@@ -352,6 +367,7 @@ function mapDispatchToProps(dispatch) {
     {
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       putTasksInRedux: loadTasksAction,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

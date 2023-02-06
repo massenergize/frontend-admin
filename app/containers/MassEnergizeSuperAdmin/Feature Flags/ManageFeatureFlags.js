@@ -24,6 +24,7 @@ function ManageFeatureFlags({
   toggleDeleteConfirmation,
   putFlagsInRedux,
   featureFlags,
+  toggleToast
 }) {
   const [listingOptions, setShowListingModal] = useState({});
 
@@ -197,9 +198,23 @@ function ManageFeatureFlags({
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/featureFlag.delete", { id: found }).catch((e) =>
-        console.log("FEATURE_DELETE_ERROR:", e)
-      );
+      apiCall("/featureFlag.delete", { id: found })
+        .then((response) => {
+          if (response.success) {
+            toggleToast({
+              open: true,
+              message: "Feature Flag successfully deleted",
+              variant: "success",
+            });
+          } else {
+            toggleToast({
+              open: true,
+              message: "An error occurred while deleting the feature flag",
+              variant: "error",
+            });
+          }
+        })
+        .catch((e) => console.log("FEATURE_DELETE_ERROR:", e));
     });
     var rem = (itemsInRedux || []).filter(
       ([_, com]) => !ids.includes(Number(com.id))

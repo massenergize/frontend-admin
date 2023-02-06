@@ -30,6 +30,7 @@ import Loading from "dan-components/Loading";
 import {
   loadAllTags,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import { connect } from "react-redux";
 class AllTagCollections extends React.Component {
@@ -147,7 +148,23 @@ class AllTagCollections extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/tag_collections.delete", { tag_collection_id: found });
+      apiCall("/tag_collections.delete", {
+        tag_collection_id: found,
+      }).then((response) => {
+        if (response.success) {
+          this.props.toggleToast({
+            open: true,
+            message: `Tag(s) successfully deleted`,
+            variant: "success",
+          });
+        } else {
+          this.props.toggleToast({
+            open: true,
+            message: "An error occurred while deleting the tag(s)",
+            variant: "error",
+          });
+        }
+      });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putTagsInRedux(rem);
@@ -234,6 +251,7 @@ const mapDispatchToProps = (dispatch) => {
     {
       putTagsInRedux: loadAllTags,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

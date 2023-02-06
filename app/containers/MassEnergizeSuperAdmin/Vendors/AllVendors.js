@@ -19,6 +19,7 @@ import {
   reduxGetAllCommunityVendors,
   reduxToggleUniversalModal,
   loadAllVendors,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import { smartString } from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
@@ -187,7 +188,23 @@ class AllVendors extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/vendors.delete", { vendor_id: found });
+      apiCall("/vendors.delete", { vendor_id: found }).then(
+        (response) => {
+          if (response.success) {
+            this.props.toggleToast({
+              open: true,
+              message: "Vendor(s) successfully deleted",
+              variant: "success",
+            });
+          } else {
+            this.props.toggleToast({
+              open: true,
+              message: "An error occurred while deleting the vendor(s)",
+              variant: "error",
+            });
+          }
+        }
+      );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putVendorsInRedux(rem);
@@ -275,6 +292,7 @@ function mapDispatchToProps(dispatch) {
       callVendorsForNormalAdmin: reduxGetAllCommunityVendors,
       putVendorsInRedux: loadAllVendors,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

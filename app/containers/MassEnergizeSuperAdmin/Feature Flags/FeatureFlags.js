@@ -7,6 +7,7 @@ import styles from "../../../components/Widget/widget-jss";
 import {
   loadFeatureFlags,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import AddOrEditFeatureFlags from "./AddOrEditFeatureFlags";
 import ManageFeatureFlags from "./ManageFeatureFlags";
@@ -18,6 +19,7 @@ function FeatureFlags({
   users,
   putFlagsInRedux,
   toggleDeleteConfirmation,
+  toggleToast
 }) {
   const [currentTab, setCurrentTab] = useState(0);
   const [featureToEdit, setFeatureToEdit] = useState(null);
@@ -36,6 +38,7 @@ function FeatureFlags({
           }}
           toggleDeleteConfirmation={toggleDeleteConfirmation}
           putFlagsInRedux={putFlagsInRedux}
+          toggleToast={toggleToast}
         />
       ),
     },
@@ -102,6 +105,7 @@ const mapDispatchToProps = (dispatch) => {
     {
       putFlagsInRedux: loadFeatureFlags,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

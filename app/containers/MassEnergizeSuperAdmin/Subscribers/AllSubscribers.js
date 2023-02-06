@@ -13,6 +13,7 @@ import CommunitySwitch from "../Summary/CommunitySwitch";
 import {
   loadAllSubscribers,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -118,7 +119,23 @@ class AllSubscribers extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/subscribers.delete", { subscriber_id: found });
+      apiCall("/subscribers.delete", { subscriber_id: found }).then(
+        (response) => {
+          if (response.success) {
+            this.props.toggleToast({
+              open: true,
+              message: "Subscriber(s) successfully deleted",
+              variant: "success",
+            });
+          } else {
+            this.props.toggleToast({
+              open: true,
+              message: "An error occurred while deleting the subscriber(s)",
+              variant: "error",
+            });
+          }
+        }
+      );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putSubscribersInRedux(rem);
@@ -204,6 +221,7 @@ function mapDispatchToProps(dispatch) {
     {
       putSubscribersInRedux: loadAllSubscribers,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

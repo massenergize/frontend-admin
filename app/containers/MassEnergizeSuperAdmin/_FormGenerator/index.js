@@ -1224,16 +1224,6 @@ class MassEnergizeForm extends Component {
                     autoHideDuration={6000}
                     onClose={this.handleCloseStyle}
                   >
-                    {/* <MySnackbarContentWrapper
-                      onClose={this.handleCloseStyle}
-                      variant="error"
-                      message={
-                        <small style={{ marginLeft: 15, fontSize: 15 }}>
-                          {error}
-                        </small>
-                      }
-                    /> */}
-
                     <Alert
                       onClose={this.handleCloseStyle}
                       severity={"error"}

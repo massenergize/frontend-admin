@@ -12,6 +12,7 @@ import {
   fetchUsersFromBackend,
   loadAllUsers,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import {
   getHumanFriendlyDate,
@@ -135,7 +136,21 @@ class AllUsers extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][6];
       ids.push(found);
-      apiCall("/users.delete", { id: found });
+      apiCall("/users.delete", { id: found }).then((response) => {
+        if (response.success) {
+          this.props.toggleToast({
+            open: true,
+            message: "User(s) successfully deleted",
+            variant: "success",
+          });
+        } else {
+          this.props.toggleToast({
+            open: true,
+            message: "An error occurred while deleting the user(s)",
+            variant: "error",
+          });
+        }
+      });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putUsersInRedux(rem);
@@ -226,6 +241,7 @@ function mapDispatchToProps(dispatch) {
       fetchUsers: fetchUsersFromBackend,
       putUsersInRedux: loadAllUsers,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

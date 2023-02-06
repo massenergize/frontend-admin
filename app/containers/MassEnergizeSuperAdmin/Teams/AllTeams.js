@@ -21,6 +21,7 @@ import {
   reduxGetAllCommunityTeams,
   loadAllTeams,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { apiCall } from "../../../utils/messenger";
@@ -295,7 +296,23 @@ class AllTeams extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][1];
       ids.push(found && found.id);
-      apiCall("/teams.delete", { team_id: found && found.id });
+      apiCall("/teams.delete", { team_id: found && found.id }).then(
+        (response) => {
+          if (response.success) {
+            this.props.toggleToast({
+              open: true,
+              message: "Team(s) successfully deleted",
+              variant: "success",
+            });
+          } else {
+            this.props.toggleToast({
+              open: true,
+              message: "An error occurred while deleting the Team(s)",
+              variant: "error",
+            });
+          }
+        }
+      );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putTeamsInRedux(rem);
@@ -421,6 +438,7 @@ function mapDispatchToProps(dispatch) {
       putTeamsInRedux: loadAllTeams,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );
