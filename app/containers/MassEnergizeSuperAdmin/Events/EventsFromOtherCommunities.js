@@ -6,7 +6,7 @@ import {
   Paper,
   Tooltip,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
@@ -14,7 +14,7 @@ import { apiCall } from "../../../utils/messenger";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import CallMadeIcon from "@material-ui/icons/CallMade";
+import CallMadeIcon from "@mui/icons-material/CallMade";
 
 function EventsFromOtherCommunities({
   putOtherEventsInRedux,
@@ -160,7 +160,7 @@ function EventsFromOtherCommunities({
 
   const options = {
     filterType: "dropdown",
-    responsive: "stacked",
+    responsive: "standard",
     print: true,
     rowsPerPage: 25,
     rowsPerPageOptions: [10, 25, 100],

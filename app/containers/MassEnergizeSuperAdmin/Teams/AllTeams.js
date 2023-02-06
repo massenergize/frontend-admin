@@ -1,17 +1,17 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 import MUIDataTable from "mui-datatables";
-import FileCopy from "@material-ui/icons/FileCopy";
-import EditIcon from "@material-ui/icons/Edit";
+import FileCopy from "@mui/icons-material/FileCopy";
+import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
-import Avatar from "@material-ui/core/Avatar";
-import Icon from "@material-ui/core/Icon";
-import Edit from "@material-ui/icons/Edit";
-import Language from "@material-ui/icons/Language";
-import PeopleIcon from "@material-ui/icons/People";
+import Avatar from "@mui/material/Avatar";
+import Icon from "@mui/material/Icon";
+import Edit from "@mui/icons-material/Edit";
+import Language from "@mui/icons-material/Language";
+import PeopleIcon from "@mui/icons-material/People";
 import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";
 import styles from "../../../components/Widget/widget-jss";
@@ -21,6 +21,7 @@ import {
   reduxGetAllCommunityTeams,
   loadAllTeams,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { apiCall } from "../../../utils/messenger";
@@ -30,7 +31,7 @@ import {
   reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
-import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
+import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
@@ -295,7 +296,23 @@ class AllTeams extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][1];
       ids.push(found && found.id);
-      apiCall("/teams.delete", { team_id: found && found.id });
+      apiCall("/teams.delete", { team_id: found && found.id }).then(
+        (response) => {
+          if (response.success) {
+            this.props.toggleToast({
+              open: true,
+              message: "Team(s) successfully deleted",
+              variant: "success",
+            });
+          } else {
+            this.props.toggleToast({
+              open: true,
+              message: "An error occurred while deleting the Team(s)",
+              variant: "error",
+            });
+          }
+        }
+      );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putTeamsInRedux(rem);
@@ -330,7 +347,7 @@ class AllTeams extends React.Component {
     const { classes } = this.props;
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
@@ -421,6 +438,7 @@ function mapDispatchToProps(dispatch) {
       putTeamsInRedux: loadAllTeams,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

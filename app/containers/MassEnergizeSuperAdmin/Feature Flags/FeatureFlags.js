@@ -1,4 +1,5 @@
-import { Paper, Tab, Tabs, Typography, withStyles } from "@material-ui/core";
+import { Paper, Tab, Tabs, Typography } from "@mui/material";
+import { withStyles } from "@mui/styles";
 import React, { useState } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -6,6 +7,7 @@ import styles from "../../../components/Widget/widget-jss";
 import {
   loadFeatureFlags,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import AddOrEditFeatureFlags from "./AddOrEditFeatureFlags";
 import ManageFeatureFlags from "./ManageFeatureFlags";
@@ -17,6 +19,7 @@ function FeatureFlags({
   users,
   putFlagsInRedux,
   toggleDeleteConfirmation,
+  toggleToast
 }) {
   const [currentTab, setCurrentTab] = useState(0);
   const [featureToEdit, setFeatureToEdit] = useState(null);
@@ -35,6 +38,7 @@ function FeatureFlags({
           }}
           toggleDeleteConfirmation={toggleDeleteConfirmation}
           putFlagsInRedux={putFlagsInRedux}
+          toggleToast={toggleToast}
         />
       ),
     },
@@ -101,6 +105,7 @@ const mapDispatchToProps = (dispatch) => {
     {
       putFlagsInRedux: loadFeatureFlags,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

@@ -1,19 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Field, reduxForm } from 'redux-form/immutable';
-import { TextField } from 'redux-form-material-ui';
-import Button from '@material-ui/core/Button';
-import FormControl from '@material-ui/core/FormControl';
-import ArrowForward from '@material-ui/icons/ArrowForward';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import ArrowForward from '@mui/icons-material/ArrowForward';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 import brand from 'dan-api/dummy/brand';
 import logo from 'dan-images/logo.png';
 import styles from './user-jss';
+import { TextField } from '@mui/material';
 
 // validation functions
 const required = value => (value == null ? 'Required' : undefined);

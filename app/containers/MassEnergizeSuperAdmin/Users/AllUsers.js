@@ -1,9 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
@@ -12,6 +12,7 @@ import {
   fetchUsersFromBackend,
   loadAllUsers,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import {
   getHumanFriendlyDate,
@@ -22,7 +23,6 @@ import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import { withRouter } from "react-router-dom";
-import { AdbOutlined } from "@material-ui/icons";
 
 class AllUsers extends React.Component {
   constructor(props) {
@@ -136,7 +136,21 @@ class AllUsers extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][6];
       ids.push(found);
-      apiCall("/users.delete", { id: found });
+      apiCall("/users.delete", { id: found }).then((response) => {
+        if (response.success) {
+          this.props.toggleToast({
+            open: true,
+            message: "User(s) successfully deleted",
+            variant: "success",
+          });
+        } else {
+          this.props.toggleToast({
+            open: true,
+            message: "An error occurred while deleting the user(s)",
+            variant: "error",
+          });
+        }
+      });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putUsersInRedux(rem);
@@ -160,7 +174,7 @@ class AllUsers extends React.Component {
     const data = this.fashionData(this.props.allUsers || []);
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
@@ -227,6 +241,7 @@ function mapDispatchToProps(dispatch) {
       fetchUsers: fetchUsersFromBackend,
       putUsersInRedux: loadAllUsers,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

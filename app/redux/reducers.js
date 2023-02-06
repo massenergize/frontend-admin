@@ -52,6 +52,7 @@ import app, {
   reducerForLoadingOtherEvents,
   reducerForSavingOtherEventState,
   reducerForNextStepsSummary,
+  reducerForUniversalToast,
 } from "./modules/appReducer";
 
 /**
@@ -72,6 +73,7 @@ export default function createReducer(injectedReducers = {}) {
     settings: reducerForSettings,
     testRedux: testReduxReducer,
     modalOptions: reducerForUniversalModal,
+    toastOptions:reducerForUniversalToast,
     ccActions: reducerForCCAction,
     heap: reducerForHeap, // an object that is used to temporarily hold all kinds of random data.
     subscribers: subscribersReducer,

@@ -184,6 +184,7 @@ function METable(props) {
     rowsPerPage: rowsPerPage || tableProps.options.rowsPerPage,
     onColumnSortChange: whenAdminSortsAColumn,
   };
+
   return (
     <div className={(classes && classes.table) || ""}>
       <MUIDataTable {...tableProps} options={options} columns={tableColumns} />
