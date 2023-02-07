@@ -75,7 +75,6 @@ class CommunityProfile extends React.Component {
     if (!community) {
       return <div>Loading Data ...</div>;
     }
-
     return (
       <div>
         <Helmet>

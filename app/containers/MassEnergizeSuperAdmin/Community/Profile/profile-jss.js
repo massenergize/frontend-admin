@@ -1,5 +1,4 @@
-// import { fade } from "@mui/material/styles/colorManipulator";
-import { fade } from "@mui/material/styles";
+import { alpha } from "@mui/material/styles";
 import deepOrange from "@mui/material/colors/deepOrange";
 import deepPurple from "@mui/material/colors/deepPurple";
 import pink from "@mui/material/colors/pink";
@@ -70,11 +69,11 @@ const styles = (theme) => ({
   img: {
     maxWidth: "none",
   },
-  root: theme.mixins.gutters({
+  root: {
     paddingTop: 16,
     paddingBottom: 16,
     marginTop: theme.spacing(3),
-  }),
+  },
   progressRoot: {
     marginBottom: theme.spacing(3),
   },
@@ -197,7 +196,7 @@ const styles = (theme) => ({
       color: `${theme.palette.common.white} !important`,
     },
     "& > div": {
-      borderColor: fade(theme.palette.common.white, 0.6),
+      borderColor: alpha(theme.palette.common.white, 0.6),
     },
   },
 });

@@ -1,5 +1,4 @@
-// import { fade, darken } from "@mui/material/styles/colorManipulator";
-import { fade,darken } from "@mui/material/styles";
+import { alpha,darken } from "@mui/material/styles";
 import CustomJss from "../../../../../utils/jss/Custom-jss";
 const common = {
   textDecoration: "none !important",
@@ -68,11 +67,11 @@ const styles = (theme) => ({
       marginTop: -48,
     },
     borderRadius: `0 0 ${theme.rounded.medium} ${theme.rounded.medium}`,
-    background: fade(theme.palette.background.paper, 0.8),
+    background: alpha(theme.palette.background.paper, 0.8),
     position: "relative",
   },
   content: {
-    //background: fade(theme.palette.secondary.main, 0.3),
+    //background: alpha(theme.palette.secondary.main, 0.3),
     height: "100%",
     width: "100%",
     padding: `70px ${theme.spacing(3)}px 30px`,
