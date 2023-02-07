@@ -3,26 +3,12 @@ import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
-import { PapperBlock } from "dan-components";
-import imgApi from "dan-api/images/photos";
-import classNames from "classnames";
 import Typography from "@mui/material/Typography";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Chip from "@mui/material/Chip";
 import Icon from "@mui/material/Icon";
 
-import MUIDataTable from "mui-datatables";
-import CallMadeIcon from "@mui/icons-material/CallMade";
 import EditIcon from "@mui/icons-material/Edit";
 import { Link } from "react-router-dom";
-import Avatar from "@mui/material/Avatar";
 import Paper from "@mui/material/Paper";
-import LinearProgress from "@mui/material/LinearProgress";
-import Grid from "@mui/material/Grid";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import { bindActionCreators } from "redux";
@@ -33,11 +19,9 @@ import {
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import { connect } from "react-redux";
-import { getAdminApiEndpoint, getLimit, onTableStateChange } from "../../../utils/helpers";
+import { getLimit, onTableStateChange } from "../../../utils/helpers";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
-import { Paper } from "@material-ui/core";
 import METable from "../ME  Tools/table /METable";
 class AllTagCollections extends React.Component {
   constructor(props) {

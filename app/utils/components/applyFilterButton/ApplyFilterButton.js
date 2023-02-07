@@ -1,4 +1,4 @@
-import { Button } from "@material-ui/core";
+import { Button } from "@mui/material/Button";
 import React from "react";
 import { generateFilterParams, getFilterData } from "../../helpers";
 import { apiCall } from "../../messenger";
