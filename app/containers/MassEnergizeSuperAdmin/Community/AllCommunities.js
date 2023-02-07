@@ -1,17 +1,18 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 
-import CallMadeIcon from "@material-ui/icons/CallMade";
-import EditIcon from "@material-ui/icons/Edit";
+import MUIDataTable from "mui-datatables";
+import CallMadeIcon from "@mui/icons-material/CallMade";
+import EditIcon from "@mui/icons-material/Edit";
 import { Link } from "react-router-dom";
-import Avatar from "@material-ui/core/Avatar";
+import Avatar from "@mui/material/Avatar";
 
-import Paper from "@material-ui/core/Paper";
-import LinearProgress from "@material-ui/core/LinearProgress";
-import Grid from "@material-ui/core/Grid";
+import Paper from "@mui/material/Paper";
+import LinearProgress from "@mui/material/LinearProgress";
+import Grid from "@mui/material/Grid";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import { connect } from "react-redux";
@@ -19,9 +20,10 @@ import { bindActionCreators } from "redux";
 import {
   reduxLoadAllCommunities,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import { smartString } from "../../../utils/common";
-import { Typography } from "@material-ui/core";
+import { Alert, Snackbar, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -35,6 +37,7 @@ class AllCommunities extends React.Component {
     this.state = {
       columns: this.getColumns(props.classes),
       loading: true,
+      toastData:{}
     };
   }
 
@@ -224,7 +227,22 @@ class AllCommunities extends React.Component {
     idsToDelete.forEach((d) => {
       const communityId = data[d.dataIndex][0];
       ids.push(communityId);
-      apiCall("/communities.delete", { community_id: communityId });
+      apiCall("/communities.delete", { community_id: communityId }).then(response => {
+        if(response.success){
+          this.props.toggleToast({
+            open: true,
+            message:"Community successfully deleted",
+            variant:"success",
+          })
+        }
+        else{
+           this.props.toggleToast({
+             open: true,
+             message: "An error occurred while deleting the community",
+             variant: "error",
+           });
+        }
+      })
     });
     const rem = (communities || []).filter((com) => !ids.includes(com.id));
     putCommunitiesInRedux(rem,communities.meta);
@@ -257,7 +275,7 @@ class AllCommunities extends React.Component {
     const metaData = communities && communities.meta;
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       count: metaData && metaData.count,
@@ -335,7 +353,7 @@ class AllCommunities extends React.Component {
       );
     }
 
-    const { idsToDelete } = this.state;
+    const { idsToDelete, toastData } = this.state;
     return (
       <div>
         <Helmet>
@@ -356,14 +374,6 @@ class AllCommunities extends React.Component {
             options: options,
           }}
         />
-        {/* <div className={classes.table}>
-          <MUIDataTable
-            title="All Communities"
-            data={data}
-            columns={columns}
-            options={options}
-          />
-        </div> */}
       </div>
     );
   }
@@ -384,6 +394,7 @@ const mapDispatchToProps = (dispatch) => {
     {
       putCommunitiesInRedux: reduxLoadAllCommunities,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast,
       toggleLive: reduxToggleUniversalModal,
     },
     dispatch

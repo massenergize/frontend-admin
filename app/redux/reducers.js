@@ -51,6 +51,8 @@ import app, {
   reducerForAllOtherCommunities,
   reducerForLoadingOtherEvents,
   reducerForSavingOtherEventState,
+  reducerForNextStepsSummary,
+  reducerForUniversalToast,
 } from "./modules/appReducer";
 
 /**
@@ -58,6 +60,7 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    nextStepsSummary: reducerForNextStepsSummary,
     activities: reducerForAdminActivities,
     otherCommunities: reducerForAllOtherCommunities,
     otherEventsState: reducerForSavingOtherEventState,
@@ -70,6 +73,7 @@ export default function createReducer(injectedReducers = {}) {
     settings: reducerForSettings,
     testRedux: testReduxReducer,
     modalOptions: reducerForUniversalModal,
+    toastOptions:reducerForUniversalToast,
     ccActions: reducerForCCAction,
     heap: reducerForHeap, // an object that is used to temporarily hold all kinds of random data.
     subscribers: subscribersReducer,

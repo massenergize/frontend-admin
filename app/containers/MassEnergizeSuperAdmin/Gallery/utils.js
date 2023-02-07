@@ -2,7 +2,7 @@
 
 
 import React from "react";
-import { CircularProgress, Typography } from "@material-ui/core";
+import { CircularProgress, Typography } from "@mui/material";
 
   export const ProgressCircleWithLabel = ({ label }) => {
     return (

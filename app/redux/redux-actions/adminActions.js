@@ -41,6 +41,8 @@ import {
   LOAD_ALL_OTHER_COMMUNITIES,
   LOAD_ALL_OTHER_EVENTS,
   SAVE_OTHER_EVENT_STATES,
+  LOAD_ADMIN_NEXT_STEPS_SUMMARY,
+  TOGGLE_UNIVERSAL_TOAST,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -64,6 +66,16 @@ export const runAdminStatusCheck = async () => {
     console.log("ADMIN_SESSION_STATUS_ERROR:", e.toString());
     return (window.location = "/login");
   }
+};
+
+export const fetchLatestNextSteps = (cb) => (dispatch) => {
+  apiCall("/summary.next.steps.forAdmins").then((response) => {
+    cb && cb(response); // Just in case a scenario needs to know when the request is done....
+    if (!response.success)
+      return console.log("Could not load in next steps", response);
+    console.log("I have just loaded in more next steps innit", response);
+    dispatch(reduxLoadNextStepsSummary(response.data));
+  });
 };
 
 export const checkFirebaseAuthentication = () => {
@@ -223,7 +235,8 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     isSuperAdmin && apiCall("/tasks.list"),
     apiCall("/preferences.list"),
     isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
-    apiCall("communities.others.listForCommunityAdmin"),
+    apiCall("/communities.others.listForCommunityAdmin"),
+    apiCall("/summary.next.steps.forAdmins"),
   ]).then((response) => {
     const [
       communities,
@@ -244,6 +257,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       preferences,
       featureFlags,
       otherCommunities,
+      adminNextSteps,
     ] = response;
     dispatch(reduxLoadAllCommunities(communities.data, communities.meta));
     dispatch(loadAllActions(actions.data, actions.meta));
@@ -263,9 +277,14 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadSettings(preferences.data || {}));
     dispatch(loadFeatureFlags(featureFlags.data || {}));
     dispatch(reduxLoadAllOtherCommunities(otherCommunities.data));
+    dispatch(reduxLoadNextStepsSummary(adminNextSteps.data));
   });
 };
 
+export const reduxLoadNextStepsSummary = (data = {}) => ({
+  type: LOAD_ADMIN_NEXT_STEPS_SUMMARY,
+  payload: data,
+});
 export const reduxSaveOtherEventState = (data = {}) => ({
   type: SAVE_OTHER_EVENT_STATES,
   payload: data,
@@ -292,16 +311,17 @@ export const reduxToggleUniversalModal = (data = {}) => ({
   type: TOGGLE_UNIVERSAL_MODAL,
   payload: data,
 });
+export const reduxToggleUniversalToast = (data = {}) => ({
+  type: TOGGLE_UNIVERSAL_TOAST,
+  payload: data,
+});
 export const reduxLoadCCActions = (data = []) => ({
   type: LOAD_CC_ACTIONS,
   payload: data,
 });
-export const reduxAddToHeap = (data = {}) => (dispatch, getState) => {
-  const heap = getState().heap || {};
-  dispatch({
-    type: UPDATE_HEAP,
-    payload: { ...heap, ...data },
-  });
+
+export const reduxAddToHeap = (data = {}, heap = {}) => (dispatch) => {
+  dispatch(reduxUpdateHeap({ ...heap, ...data }));
 };
 export const reduxUpdateHeap = (heap = {}) => ({
   type: UPDATE_HEAP,
@@ -363,6 +383,14 @@ export const loadAllEvents = (data = null, meta) => ({
   type: GET_ALL_EVENTS,
   payload: {items: data, meta: meta},
 });
+export const fetchUsersFromBackend = (cb) => (dispatch) => {
+  apiCall("/users.listForCommunityAdmin", {limit:getLimit(PAGE_PROPERTIES.ALL_USERS.key)}).then((allUsersResponse) => {
+    cb && cb(allUsersResponse.data, !allUsersResponse.success)
+    if (allUsersResponse && allUsersResponse.success) {
+      dispatch(loadAllUsers(allUsersResponse.data, allUsersResponse.meta));
+    }
+  });
+};
 export const loadAllUsers = (data, meta) => ({ type: GET_ALL_USERS, payload: {items: data, meta: meta} });
 export const loadAllSubscribers = (data,meta) => ({
   type: GET_ALL_SUBSCRIBERS,

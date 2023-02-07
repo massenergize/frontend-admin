@@ -1,8 +1,9 @@
-import { fade } from "@material-ui/core/styles/colorManipulator";
-import deepOrange from "@material-ui/core/colors/deepOrange";
-import deepPurple from "@material-ui/core/colors/deepPurple";
-import pink from "@material-ui/core/colors/pink";
-import green from "@material-ui/core/colors/green";
+// import { fade } from "@mui/material/styles/colorManipulator";
+import { fade } from "@mui/material/styles";
+import deepOrange from "@mui/material/colors/deepOrange";
+import deepPurple from "@mui/material/colors/deepPurple";
+import pink from "@mui/material/colors/pink";
+import green from "@mui/material/colors/green";
 import customJss from "./../../../../utils/jss/Custom-jss";
 const raise = customJss;
 const pagesCustom = {
@@ -46,7 +47,7 @@ const styles = (theme) => ({
     backgroundColor: green[500],
   },
   divider: {
-    margin: `${theme.spacing.unit * 1.5}px 0`,
+    margin: `${theme.spacing(1.5)}px 0`,
     background: "none",
   },
   albumRoot: {
@@ -72,10 +73,10 @@ const styles = (theme) => ({
   root: theme.mixins.gutters({
     paddingTop: 16,
     paddingBottom: 16,
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing(3),
   }),
   progressRoot: {
-    marginBottom: theme.spacing.unit * 3,
+    marginBottom: theme.spacing(3),
   },
   styledPaper: {
     backgroundColor: theme.palette.secondary.main,
@@ -160,7 +161,7 @@ const styles = (theme) => ({
   },
   imageTitle: {
     position: "relative",
-    padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit * 4}px ${theme
+    padding: `${theme.spacing(2)}px ${theme.spacing(4)}px ${theme
       .spacing.unit + 6}px`,
   },
   imageMarked: {
@@ -181,14 +182,14 @@ const styles = (theme) => ({
     width: "100%",
   },
   subscribeForm: {
-    marginTop: theme.spacing.unit * -6,
+    marginTop: theme.spacing(-6),
     display: "flex",
     "& > div": {
       flex: 1,
     },
     "& button": {
-      marginTop: theme.spacing.unit * 4.5,
-      marginLeft: theme.spacing.unit,
+      marginTop: theme.spacing(4.5),
+      marginLeft: theme.spacing(1),
     },
   },
   whiteInputRoot: {

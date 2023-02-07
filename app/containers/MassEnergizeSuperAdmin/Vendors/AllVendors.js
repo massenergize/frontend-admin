@@ -1,14 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
-import Typography from "@material-ui/core/Typography";
-import Avatar from "@material-ui/core/Avatar";
+import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
 import { bindActionCreators } from "redux";
 
-import FileCopy from "@material-ui/icons/FileCopy";
-import EditIcon from "@material-ui/icons/Edit";
+import FileCopy from "@mui/icons-material/FileCopy";
+import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
 import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";
@@ -19,6 +19,7 @@ import {
   reduxGetAllCommunityVendors,
   reduxToggleUniversalModal,
   loadAllVendors,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import { smartString } from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
@@ -195,7 +196,23 @@ class AllVendors extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/vendors.delete", { vendor_id: found });
+      apiCall("/vendors.delete", { vendor_id: found }).then(
+        (response) => {
+          if (response.success) {
+            this.props.toggleToast({
+              open: true,
+              message: "Vendor(s) successfully deleted",
+              variant: "success",
+            });
+          } else {
+            this.props.toggleToast({
+              open: true,
+              message: "An error occurred while deleting the vendor(s)",
+              variant: "error",
+            });
+          }
+        }
+      );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putVendorsInRedux( rem,allVendors.meta);
@@ -221,7 +238,7 @@ class AllVendors extends React.Component {
 
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       count: metaData && metaData.count,
@@ -321,6 +338,7 @@ function mapDispatchToProps(dispatch) {
       callVendorsForNormalAdmin: reduxGetAllCommunityVendors,
       putVendorsInRedux: loadAllVendors,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

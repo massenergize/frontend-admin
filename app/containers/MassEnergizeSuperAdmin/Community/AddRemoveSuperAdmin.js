@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import MUIDataTable from "mui-datatables";
-import Avatar from "@material-ui/core/Avatar";
+import Avatar from "@mui/material/Avatar";
 import { apiCall } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
 
@@ -30,7 +30,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -147,7 +147,7 @@ class AddRemoveSuperAdmin extends Component {
     const { formJson, data, columns, meta } = this.state;
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       count: meta.count,

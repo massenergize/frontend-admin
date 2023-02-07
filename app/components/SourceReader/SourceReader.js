@@ -1,20 +1,20 @@
 import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import Axios from 'axios';
 import { connect } from 'react-redux';
 import SyntaxHighlighter, { registerLanguage } from 'react-syntax-highlighter/prism-light';
 import jsx from 'react-syntax-highlighter/languages/prism/jsx';
 import lightStyle from 'react-syntax-highlighter/styles/prism/prism';
 import darkStyle from 'react-syntax-highlighter/styles/prism/xonokai';
-import Button from '@material-ui/core/Button';
+import Button from '@mui/material/Button';
 import classNames from 'classnames';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import Code from '@material-ui/icons/Code';
-import Close from '@material-ui/icons/Close';
-import Icon from '@material-ui/core/Icon';
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+import LinearProgress from '@mui/material/LinearProgress';
+import Code from '@mui/icons-material/Code';
+import Close from '@mui/icons-material/Close';
+import Icon from '@mui/material/Icon';
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import codePreview from '../../config/codePreview';
 
 const url = '/api/docs?src=';
@@ -27,7 +27,7 @@ const styles = theme => ({
     fontSize: 20,
   },
   leftIcon: {
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(1),
   },
   source: {
     overflow: 'hidden',

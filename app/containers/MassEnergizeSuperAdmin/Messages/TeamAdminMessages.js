@@ -1,20 +1,25 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 import { bindActionCreators } from "redux";
-import { Link } from "react-router-dom";
-import DetailsIcon from "@material-ui/icons/Details";
+import { Link, withRouter } from "react-router-dom";
+import DetailsIcon from "@mui/icons-material/Details";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import CommunitySwitch from "../Summary/CommunitySwitch";
-import { getHumanFriendlyDate, smartString } from "../../../utils/common";
-import { Chip, Typography, Grid, Paper } from "@material-ui/core";
+import {
+  getHumanFriendlyDate,
+  reArrangeForAdmin,
+  smartString,
+} from "../../../utils/common";
+import { Chip, Typography, Grid, Paper} from "@mui/material";
 import {
   loadTeamMessages,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -22,6 +27,7 @@ import METable from "../ME  Tools/table /METable";
 import { getLimit, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import { replyToMessage } from "./CommunityAdminMessages";
 class AllTeamAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -32,15 +38,35 @@ class AllTeamAdminMessages extends React.Component {
     };
   }
 
+  componentWillUnmount() {
+    window.history.replaceState({}, document.title);
+  }
+
   componentDidMount() {
-    apiCall("/messages.listTeamAdminMessages", {limit:getLimit(PAGE_PROPERTIES.ALL_TEAM_MESSAGES.key)}).then((allMessagesResponse) => {
+    const { state } = this.props.location;
+    const { putTeamMessagesInRedux } = this.props;
+    const ids = state && state.ids;
+    const comingFromDashboard = ids && ids.length;
+
+    apiCall("/messages.listTeamAdminMessages",{limit:getLimit(PAGE_PROPERTIES.ALL_TEAM_MESSAGES.key)}).then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
-        this.props.putTeamMessagesInRedux(allMessagesResponse.data, allMessagesResponse.meta);
-        let hasItems =
+       let hasItems =
           allMessagesResponse.data &&
           allMessagesResponse.data.items &&
           allMessagesResponse.data.items.length > 0;
         this.setState({ hasNoItems: !hasItems });
+
+        if (!comingFromDashboard)
+          return putTeamMessagesInRedux(allMessagesResponse.data, allMessagesResponse.meta);
+
+        this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
+        reArrangeForAdmin({
+          apiURL: "/messages.listTeamAdminMessages",
+          fieldKey: "message_ids",
+          props: this.props,
+          dataSource: allMessagesResponse.data,
+          reduxFxn: putTeamMessagesInRedux,
+        });
       }
     });
   }
@@ -143,7 +169,17 @@ class AllTeamAdminMessages extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/message`}>
+            <Link
+              // to={`/admin/edit/${id}/message`}
+              onClick={(e) => {
+                e.preventDefault();
+                replyToMessage({
+                  pathname: `/admin/edit/${id}/message`,
+                  transfer: { fromTeam: true },
+                  props: this.props,
+                });
+              }}
+            >
               <DetailsIcon size="small" variant="outlined" color="secondary" />
             </Link>
           </div>
@@ -159,7 +195,23 @@ class AllTeamAdminMessages extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/messages.delete", { message_id: found });
+      apiCall("/messages.delete", { message_id: found }).then(
+        (response) => {
+          if (response.success) {
+            this.props.toggleToast({
+              open: true,
+              message: "Team Message(s) successfully deleted",
+              variant: "success",
+            });
+          } else {
+            this.props.toggleToast({
+              open: true,
+              message: "An error occurred while deleting the team message(s)",
+              variant: "error",
+            });
+          }
+        }
+      );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putTeamMessagesInRedux(rem,teamMessages.meta);
@@ -282,6 +334,15 @@ class AllTeamAdminMessages extends React.Component {
             columns: columns,
             options: options,
           }}
+          customFilterObject={{
+            0: {
+              name: "ID",
+              type: "multiselect",
+              list: this.state.ids,
+            },
+          }}
+          ignoreSavedFilters={this.state.ignoreSavedFilters}
+          saveFilters={this.state.saveFilters}
         />
       </div>
     );
@@ -303,6 +364,7 @@ function mapDispatchToProps(dispatch) {
     {
       putTeamMessagesInRedux: loadTeamMessages,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );
@@ -312,4 +374,4 @@ const VendorsMapped = connect(
   mapDispatchToProps
 )(AllTeamAdminMessages);
 
-export default withStyles(styles)(VendorsMapped);
+export default withStyles(styles)(withRouter(VendorsMapped));

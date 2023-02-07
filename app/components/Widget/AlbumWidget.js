@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-import GridListTileBar from '@material-ui/core/GridListTileBar';
-import IconButton from '@material-ui/core/IconButton';
-import InfoIcon from '@material-ui/icons/Info';
+import { withStyles } from "@mui/styles";
+// import GridList from '@mui/material/GridList';
+// import GridListTile from '@mui/material/GridListTile';
+// import GridListTileBar from '@mui/material/GridListTileBar';
+import IconButton from '@mui/material/IconButton';
+import InfoIcon from '@mui/icons-material/Info';
 import imgData from 'dan-api/images/imgData';
 import PapperBlock from '../PapperBlock/PapperBlock';
 import styles from './widget-jss';
+import { ImageListItem, ImageList, ImageListItemBar } from "@mui/material";
 
 class AlbumWidget extends React.Component {
   render() {
@@ -16,34 +17,38 @@ class AlbumWidget extends React.Component {
     return (
       <PapperBlock noMargin title="My Albums (4)" whiteBg desc="">
         <div className={classes.albumRoot}>
-          <GridList cellHeight={180} className={classes.gridList}>
+          <ImageList cellHeight={180} className={classes.gridList}>
             {
               imgData.map((tile, index) => {
                 if (index >= 4) {
                   return false;
                 }
                 return (
-                  <GridListTile key={index.toString()}>
-                    <img src={tile.img} className={classes.img} alt={tile.title} />
-                    <GridListTileBar
+                  <ImageListItem key={index.toString()}>
+                    <img
+                      src={tile.img}
+                      className={classes.img}
+                      alt={tile.title}
+                    />
+                    <ImageListItemBar
                       title={tile.title}
-                      subtitle={(
+                      subtitle={
                         <span>
                           by:&nbsp;
                           {tile.author}
                         </span>
-                      )}
-                      actionIcon={(
+                      }
+                      actionIcon={
                         <IconButton className={classes.icon}>
                           <InfoIcon />
                         </IconButton>
-                      )}
+                      }
                     />
-                  </GridListTile>
+                  </ImageListItem>
                 );
               })
             }
-          </GridList>
+          </ImageList>
         </div>
       </PapperBlock>
     );

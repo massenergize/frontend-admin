@@ -1,14 +1,28 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
-import Typography from "@material-ui/core/Typography";
-import Icon from "@material-ui/core/Icon";
+import { PapperBlock } from "dan-components";
+import imgApi from "dan-api/images/photos";
+import classNames from "classnames";
+import Typography from "@mui/material/Typography";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Chip from "@mui/material/Chip";
+import Icon from "@mui/material/Icon";
 
 import MUIDataTable from "mui-datatables";
-import EditIcon from "@material-ui/icons/Edit";
+import CallMadeIcon from "@mui/icons-material/CallMade";
+import EditIcon from "@mui/icons-material/Edit";
 import { Link } from "react-router-dom";
+import Avatar from "@mui/material/Avatar";
+import Paper from "@mui/material/Paper";
+import LinearProgress from "@mui/material/LinearProgress";
+import Grid from "@mui/material/Grid";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import { bindActionCreators } from "redux";
@@ -16,6 +30,7 @@ import Loading from "dan-components/Loading";
 import {
   loadAllTags,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import { connect } from "react-redux";
 import { getAdminApiEndpoint, getLimit, onTableStateChange } from "../../../utils/helpers";
@@ -139,7 +154,23 @@ class AllTagCollections extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/tag_collections.delete", { tag_collection_id: found });
+      apiCall("/tag_collections.delete", {
+        tag_collection_id: found,
+      }).then((response) => {
+        if (response.success) {
+          this.props.toggleToast({
+            open: true,
+            message: `Tag(s) successfully deleted`,
+            variant: "success",
+          });
+        } else {
+          this.props.toggleToast({
+            open: true,
+            message: "An error occurred while deleting the tag(s)",
+            variant: "error",
+          });
+        }
+      });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putTagsInRedux(rem,tags.meta);
@@ -272,6 +303,7 @@ const mapDispatchToProps = (dispatch) => {
     {
       putTagsInRedux: loadAllTags,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

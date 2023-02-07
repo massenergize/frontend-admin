@@ -1,9 +1,9 @@
 import React from 'react';
 import classNames from 'classnames';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import PropTypes from 'prop-types';
-import TableCell from '@material-ui/core/TableCell';
-import TextField from '@material-ui/core/TextField';
+import TableCell from '@mui/material/TableCell';
+import TextField from '@mui/material/TextField';
 import css from 'dan-styles/Table.scss';
 
 const styles = {};

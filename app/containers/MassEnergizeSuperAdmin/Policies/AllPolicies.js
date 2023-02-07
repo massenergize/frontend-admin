@@ -1,11 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Helmet } from "react-helmet";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import brand from "dan-api/dummy/brand";
 import MUIDataTable from "mui-datatables";
-import FileCopy from "@material-ui/icons/FileCopy";
-import EditIcon from "@material-ui/icons/Edit";
+import FileCopy from "@mui/icons-material/FileCopy";
+import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
@@ -18,7 +18,7 @@ import {
   loadAllPolicies,
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
-import { Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 class AllPolicies extends React.Component {
   constructor(props) {
     super(props);
@@ -152,7 +152,7 @@ class AllPolicies extends React.Component {
 
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],

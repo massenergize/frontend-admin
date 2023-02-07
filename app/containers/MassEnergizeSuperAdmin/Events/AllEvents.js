@@ -1,17 +1,18 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 
-import FileCopy from "@material-ui/icons/FileCopy";
-import EditIcon from "@material-ui/icons/Edit";
+import MUIDataTable from "mui-datatables";
+import FileCopy from "@mui/icons-material/FileCopy";
+import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
-import Avatar from "@material-ui/core/Avatar";
+import Avatar from "@mui/material/Avatar";
 
-import Paper from "@material-ui/core/Paper";
-import LinearProgress from "@material-ui/core/LinearProgress";
-import Grid from "@material-ui/core/Grid";
+import Paper from "@mui/material/Paper";
+import LinearProgress from "@mui/material/LinearProgress";
+import Grid from "@mui/material/Grid";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { apiCall } from "../../../utils/messenger";
@@ -21,6 +22,9 @@ import {
   reduxGetAllCommunityEvents,
   loadAllEvents,
   reduxToggleUniversalModal,
+  reduxLoadAllOtherEvents,
+  reduxSaveOtherEventState,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import {
   fetchParamsFromURL,
@@ -31,7 +35,7 @@ import {
   ourCustomSort,
   smartString,
 } from "../../../utils/common";
-import { Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -41,8 +45,7 @@ import {
 } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
-
-import CallMadeIcon from "@material-ui/icons/CallMade";
+import CallMadeIcon from "@mui/icons-material/CallMade";
 import { FROM } from "../../../utils/constants";
 class AllEvents extends React.Component {
   constructor(props) {
@@ -317,7 +320,21 @@ class AllEvents extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/events.delete", { event_id: found });
+      apiCall("/events.delete", { event_id: found }).then((response) => {
+        if (response.success) {
+          this.props.toggleToast({
+            open: true,
+            message: "Event(s) successfully deleted",
+            variant: "success",
+          });
+        } else {
+          this.props.toggleToast({
+            open: true,
+            message: "An error occurred while deleting the event(s)",
+            variant: "error",
+          });
+        }
+      });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putEventsInRedux( rem,allEvents.meta);
@@ -354,7 +371,7 @@ class AllEvents extends React.Component {
 
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       count: allEvents && allEvents.meta && allEvents.meta.count,
@@ -498,6 +515,7 @@ function mapDispatchToProps(dispatch) {
       putEventsInRedux: loadAllEvents,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

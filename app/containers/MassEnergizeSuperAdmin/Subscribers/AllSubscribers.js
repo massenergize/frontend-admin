@@ -1,9 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import { bindActionCreators } from "redux";
 import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";
@@ -13,6 +13,7 @@ import CommunitySwitch from "../Summary/CommunitySwitch";
 import {
   loadAllSubscribers,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -133,7 +134,23 @@ class AllSubscribers extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/subscribers.delete", { subscriber_id: found });
+      apiCall("/subscribers.delete", { subscriber_id: found }).then(
+        (response) => {
+          if (response.success) {
+            this.props.toggleToast({
+              open: true,
+              message: "Subscriber(s) successfully deleted",
+              variant: "success",
+            });
+          } else {
+            this.props.toggleToast({
+              open: true,
+              message: "An error occurred while deleting the subscriber(s)",
+              variant: "error",
+            });
+          }
+        }
+      );
     });
     const rem = ((itemsInRedux && itemsInRedux.items) || []).filter(
       (com) => !ids.includes(com.id)
@@ -162,7 +179,7 @@ class AllSubscribers extends React.Component {
 
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       count: metaData && metaData.count,
       rowsPerPage: 25,
@@ -260,6 +277,7 @@ function mapDispatchToProps(dispatch) {
     {
       putSubscribersInRedux: loadAllSubscribers,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

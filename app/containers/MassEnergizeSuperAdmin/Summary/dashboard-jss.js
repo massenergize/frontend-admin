@@ -22,10 +22,10 @@ const styles = theme => ({
     flexGrow: 1,
   },
   rootGeneral: {
-    padding: theme.spacing.unit * 3
+    padding: theme.spacing(3)
   },
   divider: {
-    margin: `${theme.spacing.unit * 1.5}px 0`,
+    margin: `${theme.spacing(1.5)}px 0`,
     background: 'none'
   },
   sliderWrap: {

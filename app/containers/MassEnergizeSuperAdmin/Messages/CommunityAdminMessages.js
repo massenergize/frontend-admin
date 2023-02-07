@@ -1,28 +1,50 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
 import { bindActionCreators } from "redux";
-import { Link } from "react-router-dom";
-import DetailsIcon from "@material-ui/icons/Details";
+import MUIDataTable from "mui-datatables";
+import FileCopy from "@mui/icons-material/FileCopy";
+import EditIcon from "@mui/icons-material/Edit";
+import { Link, withRouter } from "react-router-dom";
+import DetailsIcon from "@mui/icons-material/Details";
+import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import {
   loadAllAdminMessages,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import CommunitySwitch from "../Summary/CommunitySwitch";
-import { getHumanFriendlyDate, smartString } from "../../../utils/common";
-import { Chip } from "@material-ui/core";
+import {
+  getHumanFriendlyDate,
+  smartString,
+  separate,
+} from "../../../utils/common";
+import { Chip } from "@mui/material";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import { generateFilterParams, getLimit, makeAPICallForMoreData, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
+
+export const replyToMessage = ({ pathname, props, transfer }) => {
+  // const pathname = `/admin/edit/${id}/message`;
+  const { history, location } = props;
+  const ids = location.state && location.state.ids;
+  if (!ids || !ids.length) return history.push(pathname);
+  history.push({
+    pathname,
+    state: { ids, ...(transfer || {}) }, // pass the id list on so that when a message is replied, we can remove from the list
+  });
+};
+
 class AllCommunityAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -33,16 +55,76 @@ class AllCommunityAdminMessages extends React.Component {
     };
   }
 
+  /**
+   * Here, we take the ids of all the messages that have not been attended to yet (If a user visits the mesages page by clicking on the "... unanswered message" on dashboard, the list of ids of unanswered messages will be passed into this page via location state ).
+   * Then with the list of IDs we have, we run through list of messages that's loaded in from the Backend,
+   * then note down all the messages that have not been attended to, and are not in the batch of messages 
+   * that were loaded from the backend.  
+   * With that list, we go back to the backend to retrieve the specific items. 
+   * 
+   * The whole point of this process is to make sure that  if a user clicks through the "15 unanswered messages" on the dashboard
+   * The table is able to identify and only show the "15" messages 
+   * 
+   * NB: This has nothing to do with how the table actually does the filtering
+   
+   */
+  reArrangeForAdmin(messages, meta) {
+    const _sort = (a, b) => (b.id < a.id ? -1 : 1);
+    const { location, putMessagesInRedux } = this.props;
+    const { state } = location || {};
+    const ids = (state && state.ids) || [];
+    const result = separate(ids, messages);
+    const { notFound, itemObjects, remainder } = result;
+    var data = [...itemObjects, ...remainder];
+    console.log("INFORMATION", result);
+    data.sort(_sort);
+
+    putMessagesInRedux(data, meta);
+    if (!notFound.length) return; // If all items are found locally, dont go to the B.E
+
+    apiCall("/messages.listForCommunityAdmin", {
+      message_ids: notFound,
+    }).then((response) => {
+      if (response.success) data = [...response.data, ...data];
+      //-- Messages that were not found, have now been loaded from the B.E!
+      data.sort(_sort);
+      putMessagesInRedux(data);
+    });
+  }
+
+  componentWillUnmount() {
+    // Clears location state when this component is unmounting
+    window.history.replaceState({}, document.title);
+  }
   componentDidMount() {
+    const { state } = this.props.location;
+    const { messages, putMessagesInRedux, history } = this.props;
+    const ids = state && state.ids;
+    // console.log("IS IT FROM ids", ids);
+    // if (messages && messages.length) {
+    //   if (ids) {
+    //     this.setState({ ignoreSavedFilters: true, saveFilters: false }); //--- When an admin enters here through the summary page, we need old filters to be turned off, so that the table will only select the unattended items
+    //     this.reArrangeForAdmin(messages);
+    //   }
+    //   return;
+    // }
+
+    //--- Should only run if "messages" is empty. ie. This page is loading for the first time...
     apiCall("/messages.listForCommunityAdmin", {
       limit: getLimit(PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key),
     }).then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
-        this.props.putMessagesInRedux(
-          allMessagesResponse.data,
-          allMessagesResponse.meta
+        const data = allMessagesResponse.data;
+        const meta = allMessagesResponse.meta;
+        if (ids) {
+          this.setState({ ignoreSavedFilters: true, saveFilters: false });
+          this.reArrangeForAdmin(data, meta);
+        } else putMessagesInRedux(data, meta);
+      } else
+        console.log(
+          "Sorry, something happened while loading messages...",
+          allMessagesResponse
         );
-      }
     });
   }
 
@@ -72,6 +154,7 @@ class AllCommunityAdminMessages extends React.Component {
       key: "id",
       options: {
         filter: false,
+        filterType: "multiselect",
       },
     },
     {
@@ -135,7 +218,18 @@ class AllCommunityAdminMessages extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/message`}>
+            {/* <Link to={`/admin/edit/${id}/message`}>
+              <DetailsIcon size="small" variant="outlined" color="secondary" />
+            </Link> */}
+            <Link
+              onClick={(e) => {
+                e.preventDefault();
+                replyToMessage({
+                  pathname: `/admin/edit/${id}/message`,
+                  props: this.props,
+                });
+              }}
+            >
               <DetailsIcon size="small" variant="outlined" color="secondary" />
             </Link>
           </div>
@@ -151,7 +245,23 @@ class AllCommunityAdminMessages extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/messages.delete", { message_id: found });
+      apiCall("/messages.delete", { message_id: found }).then(
+        (response) => {
+          if (response.success) {
+            this.props.toggleToast({
+              open: true,
+              message: "Message(s) successfully deleted",
+              variant: "success",
+            });
+          } else {
+            this.props.toggleToast({
+              open: true,
+              message: "An error occurred while deleting the message(s)",
+              variant: "error",
+            });
+          }
+        }
+      );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putMessagesInRedux(rem,messages.meta);
@@ -253,6 +363,13 @@ class AllCommunityAdminMessages extends React.Component {
             columns: columns,
             options: options,
           }}
+          customFilterObject={{
+            0: {
+              list: location.state && location.state.ids,
+            },
+          }} // "0" here is the index of the "ID" column in the table
+          ignoreSavedFilters={this.state.ignoreSavedFilters}
+          saveFilters={this.state.saveFilters}
         />
       </div>
     );
@@ -274,6 +391,7 @@ function mapDispatchToProps(dispatch) {
     {
       putMessagesInRedux: loadAllAdminMessages,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );
@@ -283,4 +401,4 @@ const VendorsMapped = connect(
   mapDispatchToProps
 )(AllCommunityAdminMessages);
 
-export default withStyles(styles)(VendorsMapped);
+export default withStyles(styles)(withRouter(VendorsMapped));

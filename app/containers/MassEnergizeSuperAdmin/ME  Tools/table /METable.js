@@ -19,8 +19,15 @@ function METable(props) {
   const filterObject = useRef({});
   const pageTableProperties = useRef({});
   const [tableColumns, setTableColumns] = useState([]);
-  const { classes, tableProps, page } = props;
-  // const [options, setOptions] = useState({});
+
+  const {
+    classes,
+    tableProps,
+    page,
+    ignoreSavedFilters,
+    customFilterObject,
+    saveFilters = true,
+  } = props;
 
   /**
    * This function is called when the component is first rendered.
@@ -32,13 +39,21 @@ function METable(props) {
    * just like MUI datatable expects.
    */
   const retrieveFiltersFromLastVisit = (columns) => {
-    const properties = getProperties();
     var filterObj = localStorage.getItem(page.key + FILTERS);
     filterObj = JSON.parse(filterObj || null) || {};
-    Object.keys(filterObj).forEach((indexOfColumn) => {
+    return inflateWithFilters(columns, filterObj);
+  };
+
+  const inflateWithFilters = (columns, filterObj) => {
+    const arr = Object.keys(filterObj);
+    if (!arr || !arr.length) return columns;
+
+    arr.forEach((indexOfColumn) => {
       const filter = filterObj[indexOfColumn] || [];
       const col = columns[indexOfColumn];
-      if (col) col.options.filterList = filter.list; // set the filter list of each column if available
+      if (col) {
+        col.options.filterList = filter.list; // if custom passed filter selections are available
+      } // set the filter list of each column if available
     });
     filterObject.current = filterObj;
     return columns;
@@ -65,12 +80,17 @@ function METable(props) {
 
   useEffect(() => {
     let { columns } = tableProps || {};
+    var modified;
+    if (ignoreSavedFilters) {
+      modified = inflateWithFilters(columns, customFilterObject || {});
+      return setTableColumns(modified);
+    }
     const properties = getProperties();
     pageTableProperties.current = properties;
     columns = retrieveSortOptionsAndSort(columns);
-    const modified = retrieveFiltersFromLastVisit(columns);
+    modified = retrieveFiltersFromLastVisit(columns);
     setTableColumns(modified);
-  }, [tableProps]);
+  }, [ignoreSavedFilters, customFilterObject]);
 
   /**
   
@@ -110,10 +130,11 @@ function METable(props) {
     filter = { name: column, type, list: filterList[columnIndex] };
     const newObj = { ...(obj || {}), [columnIndex]: filter };
     filterObject.current = newObj;
-    saveSelectedFilters(newObj);
+    if (saveFilters) saveSelectedFilters(newObj);
   };
 
   const getProperties = () => {
+    if(ignoreSavedFilters) return {}
     const val = localStorage.getItem(page.key + TABLE_PROPERTIES);
     return JSON.parse(val || null) || {};
   };
@@ -163,6 +184,7 @@ function METable(props) {
     rowsPerPage: rowsPerPage || tableProps.options.rowsPerPage,
     onColumnSortChange: whenAdminSortsAColumn,
   };
+
   return (
     <div className={(classes && classes.table) || ""}>
       <MUIDataTable {...tableProps} options={options} columns={tableColumns} />

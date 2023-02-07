@@ -1,5 +1,5 @@
-import { Checkbox, Tab, Tabs, Tooltip } from "@material-ui/core";
-import { Button, FormControlLabel, Typography } from "@material-ui/core";
+import { Checkbox, Tab, Tabs, Tooltip } from "@mui/material";
+import { Button, FormControlLabel, Typography } from "@mui/material";
 
 import React, { useEffect, useState } from "react";
 import ThemeModal from "../../../components/Widget/ThemeModal";
@@ -15,6 +15,7 @@ import { apiCall } from "../../../utils/messenger";
 
 function EventShareModal({
   show,
+  close,
   toggleModal,
   event,
   auth,
@@ -118,7 +119,7 @@ function EventShareModal({
   const sendApiRequest = () => {
     setLoading(true);
     apiCall("/events.update", {
-      shared_to: communitiesToShareTo,
+      shared_to: communitiesToShareTo.length ? communitiesToShareTo : ["reset"],
       event_id: event.id,
     })
       .then((response) => {
@@ -126,6 +127,7 @@ function EventShareModal({
         if (!response.success)
           return console.log("SHARING_ERROR_BE:", response.error);
 
+        close && close()
         setCommunities([]);
         setChanged(false);
 

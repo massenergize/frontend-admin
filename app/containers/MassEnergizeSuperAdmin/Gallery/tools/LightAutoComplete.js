@@ -5,13 +5,14 @@ import {
   Chip,
   Paper,
   TextField,
-  withStyles,
-} from "@material-ui/core";
+} from "@mui/material";
 import { pop } from "../../../../utils/common";
-import Typography from "material-ui/styles/typography";
+import Typography from "@mui/material/Typography";
+import { withStyles } from "@mui/styles";
+
 
 const styles = (theme) => {
-  const spacing = theme.spacing.unit;
+  const spacing = theme.spacing(1);
   return {
     textbox: {
       width: "100%",
@@ -53,6 +54,11 @@ const styles = (theme) => {
       textDecoration: "underline",
       cursor: "pointer",
     },
+    container: {},
+    error: {},
+    header: {},
+    dropdownArea: {},
+    success:{}
   };
 };
 
