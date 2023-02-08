@@ -253,7 +253,7 @@ class AllTeamAdminMessages extends React.Component {
           apiUrl: "/messages.listTeamAdminMessages",
           pageProp: PAGE_PROPERTIES.ALL_TEAM_MESSAGES,
         }),
-      customFilterDialogFooter: (currentFilterList) => {
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
         return (
           <ApplyFilterButton
             url={"/messages.listTeamAdminMessages"}
@@ -261,6 +261,7 @@ class AllTeamAdminMessages extends React.Component {
             updateReduxFunction={putTeamMessagesInRedux}
             columns={columns}
             filters={currentFilterList}
+            applyFilters={applyFilters}
           />
         );
       },

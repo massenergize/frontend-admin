@@ -69,7 +69,7 @@ export default function SearchBar({url, reduxItems, updateReduxFunction, handleS
       </div>
 
       <div style={{ marginLeft: 10 }}>
-        <Button variant="raised" onClick={() => handleBackendSearch()}>
+        <Button variant="contained" onClick={() => handleBackendSearch()}>
           Search
         </Button>
       </div>

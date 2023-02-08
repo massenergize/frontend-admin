@@ -811,7 +811,7 @@ export const reduxCallLibraryModalImages = (props) => {
 
 export const reduxCallCommunities = () => (dispatch) => {
   Promise.all([
-    apiCall("/communities.listForCommunityAdmin"),
+    apiCall("/communities.listForCommunityAdmin", {limit: 100}),
     apiCall("/summary.listForCommunityAdmin"),
     apiCall("/graphs.listForCommunityAdmin"),
     apiCall("/what.happened"),

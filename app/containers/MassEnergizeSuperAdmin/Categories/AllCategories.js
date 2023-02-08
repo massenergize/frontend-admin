@@ -231,7 +231,7 @@ class AllTagCollections extends React.Component {
         />
       ),
       // Not needed for now.
-      // customFilterDialogFooter: (currentFilterList) => {
+      //  customFilterDialogFooter: (currentFilterList, applyFilters) => {
       //   return (
       //     <ApplyFilterButton
       //       url="/tag_collections.listForCommunityAdmin"
@@ -239,6 +239,7 @@ class AllTagCollections extends React.Component {
       //       updateReduxFunction={putTagsInRedux}
       //       columns={columns}
       //       filters={currentFilterList}
+      //       applyFilters={applyFilters}
       //     />
       //   );
       // },

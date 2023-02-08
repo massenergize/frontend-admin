@@ -303,7 +303,7 @@ class AllCommunityAdminMessages extends React.Component {
           apiUrl: "/messages.listForCommunityAdmin",
           pageProp: PAGE_PROPERTIES.ALL_ADMIN_MESSAGES,
         }),
-      customFilterDialogFooter: (currentFilterList) => {
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
         return (
           <ApplyFilterButton
             url={"/messages.listForCommunityAdmin"}
@@ -311,6 +311,7 @@ class AllCommunityAdminMessages extends React.Component {
             updateReduxFunction={putMessagesInRedux}
             columns={columns}
             filters={currentFilterList}
+            applyFilters={applyFilters}
           />
         );
       },

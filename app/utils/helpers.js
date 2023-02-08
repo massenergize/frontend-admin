@@ -10,7 +10,7 @@ export const getSearchText = (key) => {
 export const getLimit = (key) => {
   var tableProp = localStorage.getItem(key + TABLE_PROPERTIES);
   tableProp = JSON.parse(tableProp || null) || {};
-  return tableProp && tableProp.rowsPerPage || 100;
+  return (tableProp && tableProp.rowsPerPage) || 100;
 };
 export const getFilterParamsFromLocalStorage = (key) => {
   var tableProp = localStorage.getItem(key + FILTERS);
@@ -31,17 +31,15 @@ export const getFilterData = (data, existing = [], field = "id") => {
   return { items: unique, meta: data.meta };
 };
 
-
-export const prepareFilterAndSearchParamsFromLocal= (key)=>{
+export const prepareFilterAndSearchParamsFromLocal = (key) => {
   let filterParams = getFilterParamsFromLocalStorage(key);
- let params =  JSON.stringify({
+  let params = JSON.stringify({
     ...filterParams,
     search_text: getSearchText(key) || "",
-  })
+  });
 
-  return params
-}
-
+  return params;
+};
 
 export const makeAPICallForMoreData = ({
   apiUrl,
@@ -53,7 +51,7 @@ export const makeAPICallForMoreData = ({
     if (res.success) {
       let items = [...existing];
       let newList = items.concat(res.data);
-      updateRedux(newList,res.meta,);
+      updateRedux(newList, res.meta);
     }
   });
 };
@@ -73,7 +71,6 @@ export const generateFilterParams = (items, columns) => {
       {}
     );
 };
-
 
 export const getAdminApiEndpoint = (auth, base) => {
   let url = base;
@@ -97,7 +94,7 @@ const callMoreData = (
     updateRedux: updateReduxFunction,
     args: {
       page,
-      limit:getLimit(pageProp.key),
+      limit: getLimit(pageProp.key),
       params: JSON.stringify({
         ...filterParams,
         search_text: getSearchText(pageProp.key) || "",
@@ -118,13 +115,40 @@ export const onTableStateChange = ({
   if (action === "changePage") {
     // if (tableState.rowsPerPage * (tableState.page) % 50 ===0) {
     // if (tableState.rowsPerPage * (tableState.page) === tableState.displayData.length) {
-      callMoreData(
-        metaData.next,
-        updateReduxFunction,
-        reduxItems,
-        apiUrl,
-        pageProp
-      );
-    }
+    callMoreData(
+      metaData.next,
+      updateReduxFunction,
+      reduxItems,
+      apiUrl,
+      pageProp
+    );
+  }
   // }
+};
+
+export const handleChipFilterChange = ({
+  column,
+  applyFilters,
+  url,
+  reduxItems,
+  updateReduxFunction,
+  columns,
+}) => {
+  let filterList = applyFilters()
+  console.log("=== filterList ===", filterList)
+
+    let arr = generateFilterParams(filterList, columns);
+    apiCall(url, {
+      params: JSON.stringify(arr),
+      limit: 100,
+    }).then((res) => {
+      if (res && res.success) {
+        let filterData = getFilterData(
+          res,
+          reduxItems && reduxItems.items,
+          "id"
+        );
+        updateReduxFunction(filterData.items, filterData.meta);
+      }
+    });
 };

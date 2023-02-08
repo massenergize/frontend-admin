@@ -317,7 +317,7 @@ class AllCommunities extends React.Component {
           pageProp={PAGE_PROPERTIES.ALL_COMMUNITIES}
         />
       ),
-      customFilterDialogFooter: (currentFilterList) => {
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
         return (
           <ApplyFilterButton
             url={getAdminApiEndpoint(auth, "/communities")}
@@ -325,6 +325,7 @@ class AllCommunities extends React.Component {
             updateReduxFunction={putCommunitiesInRedux}
             columns={columns}
             filters={currentFilterList}
+            applyFilters={applyFilters}
           />
         );
       },

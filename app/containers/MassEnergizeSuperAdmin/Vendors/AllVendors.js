@@ -269,7 +269,7 @@ class AllVendors extends React.Component {
           pageProp={PAGE_PROPERTIES.ALL_VENDORS}
         />
       ),
-      customFilterDialogFooter: (currentFilterList) => {
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
         return (
           <ApplyFilterButton
             url={getAdminApiEndpoint(auth, "/vendors")}
@@ -277,6 +277,7 @@ class AllVendors extends React.Component {
             updateReduxFunction={putVendorsInRedux}
             columns={columns}
             filters={currentFilterList}
+            applyFilters={applyFilters}
           />
         );
       },

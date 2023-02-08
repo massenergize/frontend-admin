@@ -225,7 +225,7 @@ class AllUsers extends React.Component {
           pageProp={PAGE_PROPERTIES.ALL_USERS}
         />
       ),
-      customFilterDialogFooter: (currentFilterList) => {
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
         return (
           <ApplyFilterButton
             url={getAdminApiEndpoint(auth, "/users")}
@@ -233,6 +233,7 @@ class AllUsers extends React.Component {
             updateReduxFunction={putUsersInRedux}
             columns={columns}
             filters={currentFilterList}
+            applyFilters={applyFilters}
           />
         );
       },

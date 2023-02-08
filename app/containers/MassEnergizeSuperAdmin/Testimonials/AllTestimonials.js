@@ -4,7 +4,6 @@ import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 
-import MUIDataTable from "mui-datatables";
 import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
 import TextField from "@mui/material/TextField";
@@ -17,7 +16,6 @@ import styles from "../../../components/Widget/widget-jss";
 import {
   loadAllTestimonials,
   reduxGetAllCommunityTestimonials,
-  reduxGetAllTestimonials,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
@@ -430,7 +428,7 @@ class AllTestimonials extends React.Component {
           apiUrl: getAdminApiEndpoint(auth, "/testimonials"),
           pageProp: PAGE_PROPERTIES.ALL_TESTIMONIALS,
         }),
-      customFilterDialogFooter: (currentFilterList) => {
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
         return (
           <ApplyFilterButton
             url={getAdminApiEndpoint(auth, "/testimonials")}
@@ -438,9 +436,26 @@ class AllTestimonials extends React.Component {
             updateReduxFunction={putTestimonialsInRedux}
             columns={columns}
             filters={currentFilterList}
+            applyFilters={applyFilters}
           />
         );
       },
+      // onFilterChange: (column, filterList, type) => {
+      //   console.log("=== type ===", type);
+      //   if (type === "chip") {
+      //     var newFilters = () => filterList;
+      //     // handleChipFilterChange({
+      //     //   column,
+      //     //   columns,
+      //     //   filterList,
+      //     //   applyFilters: newFilters,
+      //     //   url: getAdminApiEndpoint(auth, "/testimonials"),
+      //     //   updateReduxFunction: putTestimonialsInRedux,
+      //     //   reduxItems: allTestimonials,
+      //     //   pageProp: PAGE_PROPERTIES.ALL_TESTIMONIALS,
+      //     // });
+      //   }
+      // },
       customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;

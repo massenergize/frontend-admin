@@ -402,7 +402,7 @@ class AllEvents extends React.Component {
           pageProp={PAGE_PROPERTIES.ALL_EVENTS}
         />
       ),
-      customFilterDialogFooter: (currentFilterList) => {
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
         return (
           <ApplyFilterButton
             url={getAdminApiEndpoint(auth, "/events")}
@@ -410,6 +410,7 @@ class AllEvents extends React.Component {
             updateReduxFunction={putEventsInRedux}
             columns={columns}
             filters={currentFilterList}
+            applyFilters={applyFilters}
           />
         );
       },

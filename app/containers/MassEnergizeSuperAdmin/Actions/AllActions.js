@@ -38,7 +38,7 @@ import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import { getAdminApiEndpoint, getLimit, onTableStateChange } from "../../../utils/helpers";
+import { getAdminApiEndpoint, getLimit, handleChipFilterChange, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
@@ -453,6 +453,7 @@ class AllActions extends React.Component {
       rowsPerPage: 25,
       count: metaData.count,
       rowsPerPageOptions: [10, 25, 100],
+
       onTableChange: (action, tableState) =>
         onTableStateChange({
           action,
@@ -479,7 +480,7 @@ class AllActions extends React.Component {
           pageProp={PAGE_PROPERTIES.ALL_ACTIONS}
         />
       ),
-      customFilterDialogFooter: (currentFilterList) => {
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
         return (
           <ApplyFilterButton
             url={getAdminApiEndpoint(auth, "/actions")}
@@ -487,9 +488,28 @@ class AllActions extends React.Component {
             updateReduxFunction={putActionsInRedux}
             columns={columns}
             filters={currentFilterList}
+            applyFilters={applyFilters}
           />
         );
       },
+      onChangeRowsPerPage: (numberOfRows) => {
+        console.log("=== number of rows per page ===", numberOfRows);
+      },
+      // onFilterChange: (column, filterList, type) => {
+      //   if (type === "chip") {
+      //     var newFilters = () => filterList;
+      //     handleChipFilterChange({
+      //       column,
+      //       columns,
+      //       filterList,
+      //       applyFilters: newFilters,
+      //       url: getAdminApiEndpoint(auth, "/actions"),
+      //       updateReduxFunction: putActionsInRedux,
+      //       reduxItems: allActions,
+      //       pageProp: PAGE_PROPERTIES.ALL_ACTIONS,
+      //     });
+      //   }
+      // },
       customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;

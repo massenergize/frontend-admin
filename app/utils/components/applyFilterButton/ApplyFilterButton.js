@@ -1,14 +1,17 @@
-import { Button } from "@mui/material/Button";
+import { Button } from "@mui/material";
 import React from "react";
 import { generateFilterParams, getFilterData } from "../../helpers";
 import { apiCall } from "../../messenger";
 
-export default function ApplyFilterButton({ url, reduxItems, updateReduxFunction, columns, filters }) {
+export default function ApplyFilterButton({ url, reduxItems, updateReduxFunction, columns, filters, applyFilters}) {
   const handleFilterSubmit = () => {
+    const filterList = applyFilters()
+    console.log("== filterList ==", filterList)
     let newFilters = [...filters]
     let arr = generateFilterParams(newFilters, columns);
     apiCall(url, {
       params: JSON.stringify(arr),
+      limit:100
     }).then((res) => {
       if (res && res.success) {
         let filterData = getFilterData(

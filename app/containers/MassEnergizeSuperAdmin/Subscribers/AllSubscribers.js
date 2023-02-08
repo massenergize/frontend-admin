@@ -18,7 +18,7 @@ import {
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { getAdminApiEndpoint, onTableStateChange } from "../../../utils/helpers";
+import { getAdminApiEndpoint, getLimit, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
@@ -199,7 +199,7 @@ class AllSubscribers extends React.Component {
           pageProp={PAGE_PROPERTIES.ALL_SUBSCRIBERS}
         />
       ),
-      customFilterDialogFooter: (currentFilterList) => {
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
         return (
           <ApplyFilterButton
             url={getAdminApiEndpoint(auth, "/subscribers")}
@@ -207,6 +207,7 @@ class AllSubscribers extends React.Component {
             updateReduxFunction={putSubscribersInRedux}
             columns={columns}
             filters={currentFilterList}
+            applyFilters={applyFilters}
           />
         );
       },

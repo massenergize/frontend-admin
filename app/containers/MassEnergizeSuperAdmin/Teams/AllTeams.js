@@ -370,7 +370,7 @@ class AllTeams extends React.Component {
           apiUrl: getAdminApiEndpoint(auth, "/teams"),
           pageProp: PAGE_PROPERTIES.ALL_TEAMS,
         }),
-      customFilterDialogFooter: (currentFilterList) => {
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
         return (
           <ApplyFilterButton
             url={getAdminApiEndpoint(auth, "/teams")}
@@ -378,6 +378,7 @@ class AllTeams extends React.Component {
             updateReduxFunction={putTeamsInRedux}
             columns={columns}
             filters={currentFilterList}
+            applyFilters={applyFilters}
           />
         );
       },
