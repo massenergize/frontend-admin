@@ -52,6 +52,7 @@ import app, {
   reducerForLoadingOtherEvents,
   reducerForSavingOtherEventState,
   reducerForNextStepsSummary,
+  reducerForEngagementOptions,
 } from "./modules/appReducer";
 
 /**
@@ -59,6 +60,7 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    engagementOptions: reducerForEngagementOptions,
     nextStepsSummary: reducerForNextStepsSummary,
     activities: reducerForAdminActivities,
     otherCommunities: reducerForAllOtherCommunities,

@@ -1,3 +1,4 @@
+import { IS_CANARY, IS_LOCAL, IS_PROD } from "../../../config/constants";
 
 export const getMoreInfo = (community) => {
   // const { community } = this.state;
@@ -43,7 +44,6 @@ export const groupSocialMediaFields = (formData, oldInfo) => {
   return { ...formData, more_info };
 };
 
-
 // All of these social media information are saved in the "more_info" field of the community table in django(stringified json)
 
 export const isValueEmpty = (value) => {
@@ -58,4 +58,13 @@ export const isValueEmpty = (value) => {
   )
     return true;
   return false;
+};
+
+export const getHost = () => {
+  var host;
+  if (IS_LOCAL) host = "http://localhost:3000";
+  else if (IS_CANARY) host = "https://communities-canary.massenergize.org";
+  else if (IS_PROD) host = "https://communities.massenergize.org";
+  else host = "https://community.massenergize.dev";
+  return host;
 };

@@ -60,6 +60,7 @@ function LightAutoComplete(props) {
     onMount,
     disabled,
     allowChipRemove,
+    containerStyle,
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
@@ -144,7 +145,7 @@ function LightAutoComplete(props) {
         style={{ top: -500, height: 500 }}
         classes={classes}
       />
-      <div style={{}}>
+      <div style={containerStyle || {}}>
         <TextField
           disabled={disabled}
           onClick={() => {

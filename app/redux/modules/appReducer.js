@@ -42,6 +42,7 @@ import {
   LOAD_ALL_OTHER_EVENTS,
   SAVE_OTHER_EVENT_STATES,
   LOAD_ADMIN_NEXT_STEPS_SUMMARY,
+  SET_ENGAGMENT_OPTIONS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -69,6 +70,14 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+export const reducerForEngagementOptions = (state = {}, action = {}) => {
+  switch (action.type) {
+    case SET_ENGAGMENT_OPTIONS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForNextStepsSummary = (state = {}, action = {}) => {
   switch (action.type) {
     case LOAD_ADMIN_NEXT_STEPS_SUMMARY:
@@ -101,7 +110,7 @@ export const reducerForAdminActivities = (state = LOADING, action = {}) => {
       return state;
   }
 };
-export const reducerForAllOtherCommunities = (state =[], action = {}) => {
+export const reducerForAllOtherCommunities = (state = [], action = {}) => {
   switch (action.type) {
     case LOAD_ALL_OTHER_COMMUNITIES:
       return action.payload;
@@ -109,7 +118,7 @@ export const reducerForAllOtherCommunities = (state =[], action = {}) => {
       return state;
   }
 };
-export const reducerForFlagInfo = (state ={}, action = {}) => {
+export const reducerForFlagInfo = (state = {}, action = {}) => {
   switch (action.type) {
     case ADD_NEW_FEATURE_FLAG_INFO:
       return action.payload;

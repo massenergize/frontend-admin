@@ -1,11 +1,33 @@
 import React, { useState } from "react";
 import { PapperBlock } from "dan-components";
 import EngagementCard from "./EngagementCard";
-import { Typography } from "@material-ui/core";
+import { Typography, Button } from "@material-ui/core";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
-function CommunityEngagement() {
-  useState;
-  const [specific, setSpecific] = useState(false);
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
+import { getHost } from "../Community/utils";
+import { setEngagementOptions } from "../../../redux/redux-actions/adminActions";
+import { apiCall } from "../../../utils/messenger";
+function CommunityEngagement({ communities, auth, options, setOptions }) {
+  const [specific, setSpecific] = useState(true);
+  const isSuperAdmin = auth && auth.is_super_admin;
+
+  const openImpactPage = (items) => {
+    const [subdomain] = items || [];
+    if (!subdomain) return;
+    const url = `${getHost()}/${subdomain}`;
+    window.open(url, "_blank");
+  };
+
+  const fetchFromBackendAfterFilters = () => {
+    const body = {
+      time_range: options.range,
+      communities: options.communities,
+    };
+    apiCall("/summary.get.engagements", body).then((response) => {
+      console.log("I think I am the response", response);
+    });
+  };
   return (
     <div>
       <PapperBlock
@@ -21,7 +43,6 @@ function CommunityEngagement() {
           {!specific && (
             <span
               onClick={() => setSpecific(true)}
-              
               className="touchable-opacity"
               style={{
                 paddingBottom: 4,
@@ -35,7 +56,16 @@ function CommunityEngagement() {
             </span>
           )}
         </Typography>
-        {specific && <AddFilters hide={() => setSpecific(false)} />}
+        {specific && (
+          <AddFilters
+            hide={() => setSpecific(false)}
+            communities={communities}
+            isSuperAdmin={isSuperAdmin}
+            options={options}
+            setOptions={setOptions}
+            apply={fetchFromBackendAfterFilters}
+          />
+        )}
         <div
           style={{ display: "flex", flexDirection: "row", margin: "10px 0px" }}
         >
@@ -64,13 +94,13 @@ function CommunityEngagement() {
           <Typography variant="h6" color="primary">
             <b>IMPACT</b>
           </Typography>
-          {/* <Typography variant="body">
-            See impact in any of your communities from the dropdown below
-          </Typography> */}
 
           <MEDropdown
             placeholder="See impact in any of your communities from the dropdown below"
-            data={["First", "Second", "Third"]}
+            data={communities}
+            labelExtractor={(c) => c.name}
+            valueExtractor={(c) => c.subdomain}
+            onItemSelected={openImpactPage}
           />
         </div>
       </PapperBlock>
@@ -78,22 +108,133 @@ function CommunityEngagement() {
   );
 }
 
-export default CommunityEngagement;
+const mapStateToProps = (state) => {
+  return {
+    communities: state.getIn(["communities"]),
+    auth: state.getIn(["auth"]),
+    options: state.getIn(["engagementOptions"]),
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      setOptions: setEngagementOptions,
+    },
+    dispatch
+  );
+};
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CommunityEngagement);
 
-export const AddFilters = ({ hide }) => {
+// ------------------------------------------------------------------------------------
+const TIME_RANGE = [
+  { name: "Last Visit", key: "last-visit" },
+  { name: "Last Week", key: "last-week" },
+  { name: "Last Month", key: "last-month" },
+  { name: "Custom Date & Time", key: "custom" },
+];
+// ------------------------------------------------------------------------------------
+
+export const AddFilters = ({
+  hide,
+  communities,
+  isSuperAdmin,
+  options,
+  setOptions,
+  apply,
+}) => {
+  options = options || {};
+  const extraStyles = isSuperAdmin ? {} : { width: "auto", flex: "1" };
+  const rangeValue = options.range || [];
+  const comValue = options.communities || [];
+
+  const handleCommunitySelection = (selection) => {
+    const last = selection[selection.length - 1];
+    const wantsAll = last === "all";
+    if (wantsAll) return setOptions({ ...options, communities: ["all"] });
+    selection = selection.filter((f) => f !== "all");
+    setOptions({ ...options, communities: selection });
+  };
+
   return (
-    <div>
-      <MEDropdown
-        placeholder="Time Range"
-        data={["First", "Second", "Third"]}
-      />
-      <MEDropdown
-        placeholder="Select any of the communities you manage"
-        data={["First", "Second", "Third"]}
-      />
-      <div style={{ display: "flex", flexDirection: "row", marginTop: 8 }}>
-        <Typography
+    <div
+      style={{ border: "dashed 2px #f3f3f3", marginTop: 13, marginBottom: 10 }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: isSuperAdmin ? "column" : "row",
+          flex: "2",
+          justifyContent: "center",
+          padding: 14,
+        }}
+      >
+        <MEDropdown
+          multiple={false}
+          data={TIME_RANGE}
+          placeholder="Time Range"
+          valueExtractor={(t) => t.key}
+          labelExtractor={(t) => t.name}
+          containerStyle={{ ...extraStyles, marginRight: 14 }}
+          defaultValue={rangeValue}
+          onItemSelected={(selection) =>
+            setOptions({ ...options, range: selection })
+          }
+        />
+        <MEDropdown
+          multiple={true}
+          containerStyle={extraStyles}
+          placeholder="Select any of the communities you manage"
+          data={[{ name: "All", id: "all" }, ...(communities || [])]}
+          valueExtractor={(c) => c.id}
+          labelExtractor={(c) => c.name}
+          defaultValue={comValue}
+          onItemSelected={handleCommunitySelection}
+        />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          marginTop: 8,
+          background: "#fafafa",
+        }}
+      >
+        <Button
+          variant="contained"
+          color="secondary"
+          className="touchable-opacity"
+          style={{
+            borderRadius: 0,
+            padding: 10,
+            color: "white",
+            width: 113,
+            background: "green",
+          }}
+          onClick={apply && apply()}
+        >
+          APPLY
+        </Button>
+        <Button
+          variant="contained"
+          color="secondary"
+          className="touchable-opacity"
+          style={{
+            borderRadius: 0,
+            padding: 10,
+            color: "white",
+            width: 113,
+            background: "#d24646",
+            // marginLeft: "auto",
+          }}
           onClick={() => hide && hide()}
+        >
+          HIDE
+        </Button>
+        {/* <Typography
+         
           className="touchable-opacity"
           style={{
             marginLeft: "auto",
@@ -104,7 +245,7 @@ export const AddFilters = ({ hide }) => {
           }}
         >
           Hide
-        </Typography>
+        </Typography> */}
       </div>
     </div>
   );

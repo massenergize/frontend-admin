@@ -2,17 +2,19 @@ import { Checkbox, FormControlLabel, MenuItem } from "@material-ui/core";
 import { Chip, FormControl, FormLabel, Select } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { pop } from "../../../../utils/common";
-function MEDropdown({
-  containerStyle,
-  labelExtractor,
-  valueExtractor,
-  onItemSelected,
-  multiple,
-  data,
-  placeholder,
-  defaultValue,
-  value,
-}) {
+import LightAutoComplete from "../../Gallery/tools/LightAutoComplete";
+function MEDropdown(props) {
+  const {
+    containerStyle,
+    labelExtractor,
+    valueExtractor,
+    onItemSelected,
+    multiple,
+    data,
+    placeholder,
+    defaultValue,
+    value,
+  } = props;
   const [selected, setSelected] = useState(defaultValue || value || []);
   const valueOf = (item) => {
     if (!item) return;
@@ -23,6 +25,12 @@ function MEDropdown({
   useEffect(() => {
     setSelected(defaultValue || value || []);
   }, [defaultValue, value]);
+
+  // -------------------------------------------------------------------
+  // Always switch dropdown to auto complete dropdown if there are a lot of items. A lot = (>20 items)
+  if (data && data.length > 20) return <LightAutoComplete {...props} />;
+  // -------------------------------------------------------------------
+
   const labelOf = (item, fromValue) => {
     if (!item) return;
     if (fromValue) {
@@ -36,8 +44,8 @@ function MEDropdown({
     var items;
     if (!multiple) {
       items = [valueOf(item)];
-      setSelected(items);
-      if (onItemSelected) return onItemSelected(items);
+      if (onItemSelected) onItemSelected(items);
+      return setSelected(items);
     }
 
     const [found, rest] = pop(selected, valueOf(item));

@@ -42,6 +42,7 @@ import {
   LOAD_ALL_OTHER_EVENTS,
   SAVE_OTHER_EVENT_STATES,
   LOAD_ADMIN_NEXT_STEPS_SUMMARY,
+  SET_ENGAGMENT_OPTIONS,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -52,6 +53,9 @@ export const testRedux = (value) => {
   return { type: TEST_REDUX, payload: value };
 };
 
+export const setEngagementOptions = (data) => {
+  return { type: SET_ENGAGMENT_OPTIONS, payload: data };
+};
 export const runAdminStatusCheck = async () => {
   try {
     const response = await apiCall("/auth.whoami");
