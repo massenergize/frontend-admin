@@ -17,7 +17,7 @@ deploy-prod:
 .PHONY: deploy-prod
 
 deploy-canary:
-	python deployment/prepare_to_deploy.py canary 0 1
+	python deployment/ploy.py canary 0 1
 	npm run build && aws2 s3 sync build/ s3://admin-canary.massenergize.org
 .PHONY: deploy-prod
 
