@@ -237,7 +237,7 @@ class AllTeamAdminMessages extends React.Component {
     const metaData = teamMessages &&  teamMessages.meta;
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+        responsive: "standard",
       count: metaData && metaData.count,
       print: true,
       rowsPerPage: 25,

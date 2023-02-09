@@ -181,7 +181,7 @@ class AllTagCollections extends React.Component {
 
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+        responsive: "standard",
       count: metaData && metaData.count,
       print: true,
       rowsPerPage: 25,

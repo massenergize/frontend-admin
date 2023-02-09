@@ -397,7 +397,7 @@ class AllTestimonials extends React.Component {
     const metaData = allTestimonials.meta;
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+        responsive: "standard",
       count: metaData && metaData.count,
       print: true,
       rowsPerPage: 25,

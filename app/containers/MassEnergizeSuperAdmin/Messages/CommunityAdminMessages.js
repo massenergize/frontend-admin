@@ -88,7 +88,7 @@ class AllCommunityAdminMessages extends React.Component {
       if (response.success) data = [...response.data, ...data];
       //-- Messages that were not found, have now been loaded from the B.E!
       data.sort(_sort);
-      putMessagesInRedux(data);
+      putMessagesInRedux(data, meta);
     });
   }
 
@@ -287,7 +287,7 @@ class AllCommunityAdminMessages extends React.Component {
     const metaData = messages && messages.meta;
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+        responsive: "standard",
       count: metaData && metaData.count,
       print: true,
       rowsPerPage: 25,
