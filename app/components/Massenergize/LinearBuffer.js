@@ -1,7 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import LinearProgress from '@material-ui/core/LinearProgress';
+import React from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import LinearProgress from "@material-ui/core/LinearProgress";
 
 const styles = {
   root: {
@@ -32,7 +32,10 @@ class LinearBuffer extends React.Component {
     } else {
       const diff = Math.random() * 10;
       const diff2 = Math.random() * 10;
-      this.setState({ completed: completed + diff, buffer: completed + diff + diff2 });
+      this.setState({
+        completed: completed + diff,
+        buffer: completed + diff + diff2,
+      });
     }
   };
 
@@ -41,24 +44,29 @@ class LinearBuffer extends React.Component {
     const { completed, buffer } = this.state;
     return (
       <div className={classes.root}>
-        {message
-          && (<p>message</p>)
-        }
-        {!message
-          && (
-            <div>
-              <p>
-                Hold tight, I am fetching data from the database.  Almost done ...
-                <span role="img" aria-label="smiley">
-                  😊
-                </span>
-              </p>
-            </div>
-          )
-        }
-        <LinearProgress variant="buffer" value={completed} valueBuffer={buffer} />
+        {message && <p>{message}</p>}
+        {!message && (
+          <div>
+            <p>
+              Hold tight, I am fetching data from the database. Almost done ...
+              <span role="img" aria-label="smiley">
+                😊
+              </span>
+            </p>
+          </div>
+        )}
+        <LinearProgress
+          variant="buffer"
+          value={completed}
+          valueBuffer={buffer}
+        />
         <br />
-        <LinearProgress color="secondary" variant="buffer" value={completed} valueBuffer={buffer} />
+        <LinearProgress
+          color="secondary"
+          variant="buffer"
+          value={completed}
+          valueBuffer={buffer}
+        />
       </div>
     );
   }

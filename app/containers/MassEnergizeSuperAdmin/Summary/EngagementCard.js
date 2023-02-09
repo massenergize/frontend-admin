@@ -42,7 +42,7 @@ function EngagementCard({
           alignItems: "center",
         }}
       >
-        <>{value || "..."}</>
+        <>{value || "0"}</>
         {icon && (
           <i
             className={`fa ${icon}`}

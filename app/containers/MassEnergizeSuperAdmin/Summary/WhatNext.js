@@ -5,6 +5,8 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { useHistory, withRouter } from "react-router-dom";
 import Loading from "dan-components/Loading";
+import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+
 function WhatNext({ data }) {
   const {
     messages,
@@ -16,7 +18,14 @@ function WhatNext({ data }) {
     // todo_interactions,
     // done_interactions,
   } = data || {};
-  if (!Object.keys(data).length) return <Loading />;
+
+  console.log("Her eis the data", data);
+  if (!Object.keys(data).length)
+    return (
+      <div style={{ padding: 20, background: "white", borderRadius: 10 }}>
+        <LinearBuffer message="We are looking for items you need to handle..." />
+      </div>
+    );
 
   const history = useHistory();
   return (

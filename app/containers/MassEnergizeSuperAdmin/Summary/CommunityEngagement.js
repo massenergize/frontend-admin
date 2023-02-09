@@ -32,6 +32,8 @@ function CommunityEngagement({
   const hasOnlyOneCommunity = communities.length === 1;
   const first = (communities || [])[0];
 
+  console.log("here are the egag",engagements)
+
   // ----------------------------------------------------------------------
   const loadEngagements = () => {
     apiCall("/summary.get.engagements", { time_range: "last-month" }).then(
