@@ -1,7 +1,7 @@
 import { Button, Input } from "@mui/material";
 import { Cancel } from '@mui/icons-material';
 import React, {useState} from 'react'
-import { getFilterData } from '../../helpers';
+import { getFilterData, getLimit } from '../../helpers';
 import { apiCall } from '../../messenger';
 
 export default function SearchBar({url, reduxItems, updateReduxFunction, handleSearch, hideSearch,pageProp}) {
@@ -17,6 +17,7 @@ export default function SearchBar({url, reduxItems, updateReduxFunction, handleS
   
     const handleBackendSearch = () => {
       apiCall(url, {
+        limit: getLimit(pageProp.key),
         params: JSON.stringify({
           search_text: text,
         }),
