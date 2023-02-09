@@ -14,11 +14,10 @@ import {
   reduxLoadSelectedCommunity,
   reduxCheckUser,
 } from "../../../redux/redux-actions/adminActions";
-import Paper from "@mui/material/Paper";
+import { Paper, Alert } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import Icon from "@mui/material/Icon";
 import Snackbar from "@mui/material/Snackbar";
-import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
 import { apiCallFile } from "../../../utils/messenger";
 import ReportingActivities from "./ReportingActivities";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -106,11 +105,15 @@ class SummaryDashboard extends PureComponent {
               autoHideDuration={6000}
               onClose={this.handleCloseStyle}
             >
-              <MySnackbarContentWrapper
+              <Alert
                 onClose={this.handleCloseStyle}
-                variant="error"
-                message={`Unable to download: ${error}`}
-              />
+                severity={"error"}
+                sx={{ width: "100%" }}
+              >
+                <small style={{ marginLeft: 15, fontSize: 15 }}>
+                  {`Unable to download: ${error}`}
+                </small>
+              </Alert>
             </Snackbar>
           </div>
         )}
@@ -122,11 +125,16 @@ class SummaryDashboard extends PureComponent {
               autoHideDuration={3000}
               onClose={this.handleClose}
             >
-              <MySnackbarContentWrapper
+              <Alert
                 onClose={this.handleClose}
-                variant="success"
-                message={`Your request has been received. Please check your email for the file.`}
-              />
+                severity={"success"}
+                sx={{ width: "100%" }}
+              >
+                <small style={{ marginLeft: 15, fontSize: 15 }}>
+                  Your request has been received. Please check your email for
+                  the file.
+                </small>
+              </Alert>
             </Snackbar>
           </div>
         )}
@@ -143,7 +151,7 @@ class SummaryDashboard extends PureComponent {
         <Grid container className={classes.root}>
           <SummaryChart data={summary_data} />
         </Grid>
-        <br/> 
+        <br />
         <WhatNext />
         <Divider className={classes.divider} />
 
