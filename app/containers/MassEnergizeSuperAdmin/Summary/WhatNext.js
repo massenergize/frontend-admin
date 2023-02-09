@@ -4,6 +4,7 @@ import { PapperBlock } from "dan-components";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { useHistory, withRouter } from "react-router-dom";
+import Loading from "dan-components/Loading";
 function WhatNext({ data }) {
   const {
     messages,
@@ -11,11 +12,11 @@ function WhatNext({ data }) {
     testimonials,
     users,
     team_messages,
-    sign_ins,
-    todo_interactions,
-    done_interactions,
+    // sign_ins,
+    // todo_interactions,
+    // done_interactions,
   } = data || {};
-  if (!Object.keys(data).length) return <></>;
+  if (!Object.keys(data).length) return <Loading />;
 
   const history = useHistory();
   return (
@@ -90,7 +91,7 @@ function WhatNext({ data }) {
             })
           }
         />
-        <SectionTemplate
+        {/* <SectionTemplate
           content={sign_ins}
           name="Sign Ins"
           description={(count) =>
@@ -101,8 +102,8 @@ function WhatNext({ data }) {
           subtitle={(_) =>
             `The number of sign-in activities in  any of the communities you manage, on the community portal`
           }
-        />
-        <SectionTemplate
+        /> */}
+        {/* <SectionTemplate
           content={done_interactions}
           name="Actions Taken"
           description={(count) =>
@@ -137,7 +138,7 @@ function WhatNext({ data }) {
               state: { ids: todo_interactions && todo_interactions.data },
             })
           }
-        />
+        /> */}
       </div>
     </PapperBlock>
   );

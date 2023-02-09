@@ -225,7 +225,7 @@ class NormalAdminHome extends PureComponent {
           </Grid>
           <Grid md={4}>
             <ReportingActivities
-              style={{ maxHeight: 300, overflowY: "scroll" }}
+              style={{ maxHeight: 615, overflowY: "scroll" }}
             />
           </Grid>
         </Grid>

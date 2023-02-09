@@ -43,6 +43,7 @@ import {
   SAVE_OTHER_EVENT_STATES,
   LOAD_ADMIN_NEXT_STEPS_SUMMARY,
   SET_ENGAGMENT_OPTIONS,
+  LOAD_USER_ENGAGEMENTS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -70,6 +71,14 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+export const reducerForUserEngagements = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_USER_ENGAGEMENTS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForEngagementOptions = (state = {}, action = {}) => {
   switch (action.type) {
     case SET_ENGAGMENT_OPTIONS:

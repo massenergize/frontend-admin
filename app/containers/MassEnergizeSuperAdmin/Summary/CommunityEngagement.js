@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PapperBlock } from "dan-components";
 import EngagementCard from "./EngagementCard";
 import { Typography, Button } from "@material-ui/core";
@@ -6,15 +6,48 @@ import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { getHost } from "../Community/utils";
-import { setEngagementOptions } from "../../../redux/redux-actions/adminActions";
+import Loading from "dan-components/Loading";
+import {
+  loadUserEngagements,
+  setEngagementOptions,
+} from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
 import { DateTimePicker, MuiPickersUtilsProvider } from "material-ui-pickers";
 import MomentUtils from "@date-io/moment";
 import moment from "moment";
-function CommunityEngagement({ communities, auth, options, setOptions }) {
+import { LOADING } from "../../../utils/constants";
+import { useHistory, withRouter } from "react-router-dom";
+function CommunityEngagement({
+  communities,
+  auth,
+  options,
+  setOptions,
+  engagements,
+  putEngagementsInRedux,
+}) {
+  const history = useHistory();
   const [specific, setSpecific] = useState(true);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const isSuperAdmin = auth && auth.is_super_admin;
+  const hasOnlyOneCommunity = communities.length === 1;
+  const first = (communities || [])[0];
+
+  // ----------------------------------------------------------------------
+  const loadEngagements = () => {
+    apiCall("/summary.get.engagements", { time_range: "last-month" }).then(
+      (response) => {
+        console.log("Loading for the first time", response);
+        if (!response.success) return response.error;
+        putEngagementsInRedux(response.data);
+      }
+    );
+  };
+  useEffect(() => {
+    loadEngagements();
+  }, []);
+  // ----------------------------------------------------------------------
+  if (engagements === LOADING) return <Loading />;
+  // ----------------------------------------------------------------------
 
   const openImpactPage = (items) => {
     const [subdomain] = items || [];
@@ -28,23 +61,29 @@ function CommunityEngagement({ communities, auth, options, setOptions }) {
     const isCustom = range === "custom";
     const dates = isCustom
       ? {
-          start_time: moment.utc(options.startDate).format(),
+          start_time: moment.utc(options.startDate).format(), //"YYYY-MM-DD HH:MM"
           end_time: moment.utc(options.endDate).format(),
         }
       : {};
     const body = {
-      time_range: options.range,
+      time_range: range,
       communities: options.communities,
       ...dates,
     };
     console.log("This is where the body is", body);
     setLoading(true);
-    return;
+
     apiCall("/summary.get.engagements", body).then((response) => {
       console.log("I think I am the response", response);
+      if (!response.success) return response.error;
       setLoading(false);
+      putEngagementsInRedux(response.data);
     });
   };
+  const doneInteractions = engagements.done_interactions;
+  const todoInteractions = engagements.todo_interactions;
+  const signIns = engagements.sign_ins;
+
   return (
     <div>
       <PapperBlock
@@ -92,6 +131,13 @@ function CommunityEngagement({ communities, auth, options, setOptions }) {
             title="USER SIGN-INS"
             subtitle="See involved users"
             icon="fa-user"
+            value={signIns.count}
+            onClick={() =>
+              history.push({
+                pathname: "/admin/read/users",
+                state: { ids: signIns && signIns.data },
+              })
+            }
           />
           <EngagementCard
             theme="#EAFFEB"
@@ -99,6 +145,13 @@ function CommunityEngagement({ communities, auth, options, setOptions }) {
             title="ACTIONS COMPLETED"
             subtitle="See involved actions"
             icon="fa-check-circle"
+            value={doneInteractions.count}
+            onClick={() => {
+              history.push({
+                pathname: "/admin/read/actions",
+                state: { ids: doneInteractions && doneInteractions.data },
+              });
+            }}
           />
           <EngagementCard
             color="#9BA1D8"
@@ -106,20 +159,43 @@ function CommunityEngagement({ communities, auth, options, setOptions }) {
             title="ACTIONS IN TODO"
             subtitle="See involved actions"
             icon="fa-tasks"
+            value={todoInteractions.count}
+            onClick={() => {
+              history.push({
+                pathname: "/admin/read/actions",
+                state: { ids: todoInteractions && todoInteractions.data },
+              });
+            }}
           />
         </div>
         <div>
           <Typography variant="h6" color="primary">
             <b>IMPACT</b>
           </Typography>
-
-          <MEDropdown
-            placeholder="See impact in any of your communities from the dropdown below"
-            data={communities}
-            labelExtractor={(c) => c.name}
-            valueExtractor={(c) => c.subdomain}
-            onItemSelected={openImpactPage}
-          />
+          {hasOnlyOneCommunity && first ? (
+            <Typography
+              className="touchable-opacity"
+              variant="body"
+              style={{
+                color: "#AB47BC",
+                border: "dotted 0px #AB47BC",
+                borderBottomWidth: 2,
+                paddingBottom: 4,
+                display: "inline-block",
+              }}
+              onClick={() => openImpactPage([first.subdomain])}
+            >
+              See impact graph in <b>{first.name}</b>
+            </Typography>
+          ) : (
+            <MEDropdown
+              placeholder="See impact in any of your communities from the dropdown below"
+              data={communities}
+              labelExtractor={(c) => c.name}
+              valueExtractor={(c) => c.subdomain}
+              onItemSelected={openImpactPage}
+            />
+          )}
         </div>
       </PapperBlock>
     </div>
@@ -131,12 +207,14 @@ const mapStateToProps = (state) => {
     communities: state.getIn(["communities"]),
     auth: state.getIn(["auth"]),
     options: state.getIn(["engagementOptions"]),
+    engagements: state.getIn(["userEngagements"]),
   };
 };
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       setOptions: setEngagementOptions,
+      putEngagementsInRedux: loadUserEngagements,
     },
     dispatch
   );
@@ -144,7 +222,7 @@ const mapDispatchToProps = (dispatch) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(CommunityEngagement);
+)(withRouter(CommunityEngagement));
 
 // ------------------------------------------------------------------------------------
 const TIME_RANGE = [
@@ -180,7 +258,6 @@ export const AddFilters = ({
   };
 
   const isCustomRange = ((options && options.range) || [])[0] === "custom";
-  console.log("these are th eoptions", options);
 
   // const handleRangeSelection = (selection) => {
   //   const item = selection[0];
@@ -248,15 +325,17 @@ export const AddFilters = ({
             <DateTimePicker
               style={{ marginRight: 10 }}
               label="Start Date"
-              format="MM/DD/YYYY"
-              value={(options && options.startDate) || ""}
+              // format="MM/DD/YYYY"
+              format="MM-DD-YYYY HH:mm"
+              value={(options && options.startDate) || moment.now()}
               onChange={(date) => handleDateSelection(date, "startDate")}
             />
             <DateTimePicker
               onChange={(date) => handleDateSelection(date, "endDate")}
-              value={(options && options.endDate) || ""}
+              value={(options && options.endDate) || moment.now()}
               label="End Date"
-              format="MM/DD/YYYY"
+              // format="MM/DD/YYYY"
+              format="MM-DD-YYYY HH:mm"
             />
           </MuiPickersUtilsProvider>
         </div>

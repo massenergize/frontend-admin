@@ -1,7 +1,15 @@
 import { Typography } from "@material-ui/core";
 import React from "react";
 
-function EngagementCard({ color, theme, icon, title, subtitle }) {
+function EngagementCard({
+  color,
+  theme,
+  icon,
+  title,
+  subtitle,
+  value,
+  onClick,
+}) {
   return (
     <div
       style={{
@@ -34,14 +42,18 @@ function EngagementCard({ color, theme, icon, title, subtitle }) {
           alignItems: "center",
         }}
       >
-        <>3459</>
+        <>{value || "..."}</>
         {icon && (
-          <i className={`fa ${icon}`} style={{ marginLeft: "auto", color, opacity:"0.2" }} />
+          <i
+            className={`fa ${icon}`}
+            style={{ marginLeft: "auto", color, opacity: "0.2" }}
+          />
         )}
       </Typography>
       <Typography
         className="touchable-opacity"
         variant="caption"
+        onClick={() => onClick && onClick()}
         style={{
           cursor: "pointer",
           marginTop: 5,
