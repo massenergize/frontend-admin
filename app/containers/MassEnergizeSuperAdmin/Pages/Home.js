@@ -58,8 +58,9 @@ class HomePageEditForm extends Component {
     if (eventsResponse && eventsResponse.data) {
       const events = eventsResponse.data.map((c) => ({
         ...c,
-        displayName: c.name,
+        displayName: c.name + " -- " + c.start_date_and_time.split("T", 1),
         id: "" + c.id,
+        date: "" + c.start_date_and_time
       }));
       await this.setStateAsync({ events });
     } else {
@@ -82,7 +83,7 @@ class HomePageEditForm extends Component {
     const { community, featured_events } = homePageData;
     let { images, featured_links } = homePageData;
 
-    if (!images) {
+    if (!images) {s
       images = [];
     }
 
@@ -100,8 +101,9 @@ class HomePageEditForm extends Component {
       .filter((f) => !f.is_published)
       .map((c) => ({
         ...c,
-        displayName: "(Archived) " + c.name,
+        displayName: "(Archived) " + c.name +  " -- " + c.start_date_and_time.split("T", 1),
         id: "" + c.id,
+        date: c.start_date_and_time
       }));
     const eventsToDisplay = [...archivedEvents, ...events];
 
@@ -284,7 +286,7 @@ class HomePageEditForm extends Component {
                     selectMany: true,
                     defaultValue: selectedEvents,
                     dbName: "featured_events",
-                    data: eventsToDisplay,
+                    data: eventsToDisplay.sort((a, b) => (b.date < a.date ? -1 : 1)),
                   },
                 ],
               },
