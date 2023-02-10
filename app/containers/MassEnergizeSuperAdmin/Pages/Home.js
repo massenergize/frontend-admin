@@ -5,6 +5,7 @@ import MassEnergizeForm from "../_FormGenerator";
 import { apiCall } from "../../../utils/messenger";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 
+
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -54,11 +55,12 @@ class HomePageEditForm extends Component {
       return;
     }
 
+    var currentdate = new Date().toISOString().split('T')[0]; 
     const eventsResponse = await apiCall("/events.list", { community_id: id });
     if (eventsResponse && eventsResponse.data) {
-      const events = eventsResponse.data.map((c) => ({
+      const events = eventsResponse.data.filter((f) => f.end_date_and_time > currentdate).map((c) => ({  // 
         ...c,
-        displayName: c.name + "  " + c.start_date_and_time.split("T", 1),
+        displayName: c.start_date_and_time.split("T", 1) + "  " + c.name ,
         id: "" + c.id,
         date: "" + c.start_date_and_time
       }));
