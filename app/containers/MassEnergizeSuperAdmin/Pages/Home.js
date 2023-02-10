@@ -58,8 +58,9 @@ class HomePageEditForm extends Component {
     if (eventsResponse && eventsResponse.data) {
       const events = eventsResponse.data.map((c) => ({
         ...c,
-        displayName: c.name,
+        displayName: c.name + "  " + c.start_date_and_time.split("T", 1),
         id: "" + c.id,
+        date: "" + c.start_date_and_time
       }));
       await this.setStateAsync({ events });
     } else {
@@ -96,14 +97,16 @@ class HomePageEditForm extends Component {
       homePageData && featured_events
         ? featured_events.map((e) => "" + e.id)
         : [];
-    const archivedEvents = featured_events
+    /*
+        const archivedEvents = featured_events
       .filter((f) => !f.is_published)
       .map((c) => ({
         ...c,
         displayName: "(Archived) " + c.name,
         id: "" + c.id,
       }));
-    const eventsToDisplay = [...archivedEvents, ...events];
+      */
+    const eventsToDisplay = [ ...events]; //...archivedEvents,
 
     const formJson = {
       title: `Edit ${
@@ -284,7 +287,7 @@ class HomePageEditForm extends Component {
                     selectMany: true,
                     defaultValue: selectedEvents,
                     dbName: "featured_events",
-                    data: eventsToDisplay,
+                    data: eventsToDisplay.sort((a, b) => (b.date < a.date ? 1 : -1)),
                   },
                 ],
               },
