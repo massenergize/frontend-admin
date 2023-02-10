@@ -6,6 +6,7 @@ import MassEnergizeForm from '../_FormGenerator';
 import { apiCall } from '../../../utils/messenger';
 import { getMoreInfo, groupSocialMediaFields } from './utils';
 import fieldTypes from '../_FormGenerator/fieldTypes';
+import { withRouter } from 'react-router-dom';
 // @NB: Looks like this file isnt being used anymore
 const styles = (theme) => ({
   root: {

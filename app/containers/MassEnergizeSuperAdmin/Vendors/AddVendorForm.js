@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import states from "dan-api/data/states";
 import { withStyles } from "@mui/styles";
-import MassEnergizeForm from "../_FormGenerator";
 import { apiCall } from "../../../utils/messenger";
 import { makeTagSection } from "../Events/EditEventForm";
 import { connect } from "react-redux";

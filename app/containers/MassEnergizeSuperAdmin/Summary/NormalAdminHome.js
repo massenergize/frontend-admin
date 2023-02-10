@@ -203,19 +203,19 @@ class NormalAdminHome extends PureComponent {
         {graph_data && <ActionsChartWidget data={graph_data || {}} />}
 
         <br />
-        <Grid md={12} style={{ display: "flex" }}>
+        <Grid container md={12} columnGap={1}>
           {auth && !auth.is_super_admin && (
             <Grid
               item
               className={classes.root}
-              md={8}
+              md={7}
               xs={12}
-              style={{ margin: 10 }}
+              // style={{ margin: 10 }}
             >
               {this.renderTable(auth.admin_at || [], classes)}
             </Grid>
           )}
-          <Grid md={4}>
+          <Grid xs={12} md={4}>
             <ReportingActivities
               style={{ maxHeight: 300, overflowY: "scroll" }}
             />

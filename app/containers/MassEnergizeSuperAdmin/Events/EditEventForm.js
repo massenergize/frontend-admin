@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import states from "dan-api/data/states";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { Paper } from "@mui/material";
 import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
