@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import states from 'dan-api/data/states';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import MassEnergizeForm from '../_FormGenerator';
 import { apiCall } from '../../../utils/messenger';
 import { getMoreInfo, groupSocialMediaFields } from './utils';
@@ -26,7 +26,7 @@ const styles = (theme) => ({
     flexDirection: 'row',
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: 'center',
   },
 });

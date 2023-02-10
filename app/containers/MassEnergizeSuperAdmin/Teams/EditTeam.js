@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Link, withRouter } from "react-router-dom";
-import { Paper, Typography } from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
+import { Paper, Typography } from "@mui/material";
+import { withStyles } from "@mui/styles";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
@@ -34,7 +34,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -104,11 +104,11 @@ class EditTeam extends Component {
   }
   async componentDidMount() {
     const { id } = this.props.match.params;
-    const { addTeamInfoToHeap, teamsInfos } = this.props;
+    const { addTeamInfoToHeap, teamsInfos,heap } = this.props;
     const teamResponse = await apiCall("/teams.info", { team_id: id });
     addTeamInfoToHeap({
       teamsInfos: { ...teamsInfos, [id.toString()]: teamResponse.data },
-    });
+    },heap);
   }
 
   onComplete(_, __, resetForm) {
@@ -173,6 +173,7 @@ function mapStateToProps(state) {
     communities: state.getIn(["communities"]),
     teams: state.getIn(["allTeams"]),
     teamsInfos: heap.teamsInfos || {},
+    heap
   };
 }
 function mapDispatchToProps(dispatch) {

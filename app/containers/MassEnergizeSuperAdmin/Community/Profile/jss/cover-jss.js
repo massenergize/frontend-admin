@@ -1,4 +1,4 @@
-import { fade, darken } from "@material-ui/core/styles/colorManipulator";
+import { alpha,darken } from "@mui/material/styles";
 import CustomJss from "../../../../../utils/jss/Custom-jss";
 const common = {
   textDecoration: "none !important",
@@ -67,19 +67,19 @@ const styles = (theme) => ({
       marginTop: -48,
     },
     borderRadius: `0 0 ${theme.rounded.medium} ${theme.rounded.medium}`,
-    background: fade(theme.palette.background.paper, 0.8),
+    background: alpha(theme.palette.background.paper, 0.8),
     position: "relative",
   },
   content: {
-    //background: fade(theme.palette.secondary.main, 0.3),
+    //background: alpha(theme.palette.secondary.main, 0.3),
     height: "100%",
     width: "100%",
-    padding: `70px ${theme.spacing.unit * 3}px 30px`,
+    padding: `70px ${theme.spacing(3)}px 30px`,
   },
   name: {},
   subheading: {},
   avatar: {
-    margin: `0 auto ${theme.spacing.unit * 2}px`,
+    margin: `0 auto ${theme.spacing(2)}px`,
     width: 120,
     height: 120,
     boxShadow: theme.glow.medium,
@@ -93,11 +93,11 @@ const styles = (theme) => ({
     },
   },
   verified: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
     position: "relative",
   },
   button: {
-    marginTop: theme.spacing.unit,
+    marginTop: theme.spacing(1),
   },
 });
 

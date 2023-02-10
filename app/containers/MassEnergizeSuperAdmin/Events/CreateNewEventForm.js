@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import states from "dan-api/data/states";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import moment from "moment";
 import MassEnergizeForm from "../_FormGenerator";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
@@ -29,7 +29,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -526,6 +526,16 @@ const createFormJson = ({ communities, auth, otherCommunities }) => {
         isRequired: false,
         defaultValue: "false",
         dbName: "archive",
+        readOnly: false,
+        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+      },
+      {
+        name: "is_approved",
+        label: "Do you approve this event?",
+        fieldType: "Radio",
+        isRequired: false,
+        defaultValue: "true",
+        dbName: "is_approved",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
       },

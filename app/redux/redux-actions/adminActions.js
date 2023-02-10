@@ -44,6 +44,7 @@ import {
   LOAD_ADMIN_NEXT_STEPS_SUMMARY,
   SET_ENGAGMENT_OPTIONS,
   LOAD_USER_ENGAGEMENTS,
+  TOGGLE_UNIVERSAL_TOAST,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -170,7 +171,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     }),
     isSuperAdmin && apiCall("/tasks.functions.list"),
     isSuperAdmin && apiCall("/tasks.list"),
-    apiCall("/settings.list"),
+    apiCall("/preferences.list"),
     isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
     apiCall("/communities.others.listForCommunityAdmin"),
     apiCall("/summary.next.steps.forAdmins"),
@@ -191,7 +192,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       galleryImages,
       tasksFunctions,
       tasks,
-      settings,
+      preferences,
       featureFlags,
       otherCommunities,
       adminNextSteps,
@@ -211,7 +212,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
     dispatch(loadTaskFunctionsAction(tasksFunctions.data));
     dispatch(loadTasksAction(tasks.data));
-    dispatch(loadSettings(settings.data || {}));
+    dispatch(loadSettings(preferences.data || {}));
     dispatch(loadFeatureFlags(featureFlags.data || {}));
     dispatch(reduxLoadAllOtherCommunities(otherCommunities.data));
     dispatch(reduxLoadNextStepsSummary(adminNextSteps.data));
@@ -248,16 +249,17 @@ export const reduxToggleUniversalModal = (data = {}) => ({
   type: TOGGLE_UNIVERSAL_MODAL,
   payload: data,
 });
+export const reduxToggleUniversalToast = (data = {}) => ({
+  type: TOGGLE_UNIVERSAL_TOAST,
+  payload: data,
+});
 export const reduxLoadCCActions = (data = []) => ({
   type: LOAD_CC_ACTIONS,
   payload: data,
 });
-export const reduxAddToHeap = (data = {}) => (dispatch, getState) => {
-  const heap = getState().heap || {};
-  dispatch({
-    type: UPDATE_HEAP,
-    payload: { ...heap, ...data },
-  });
+
+export const reduxAddToHeap = (data = {}, heap = {}) => (dispatch) => {
+  dispatch(reduxUpdateHeap({ ...heap, ...data }));
 };
 export const reduxUpdateHeap = (heap = {}) => ({
   type: UPDATE_HEAP,
@@ -754,7 +756,9 @@ export const reduxCallCommunities = () => (dispatch) => {
     if (graphResponse.data) {
       dispatch(reduxLoadGraphData(graphResponse.data));
     }
-    dispatch(reduxLoadAdminActivities(activities && activities.data));
+    if (activities && activities.data) {
+      dispatch(reduxLoadAdminActivities(activities.data));
+    }
   });
 };
 

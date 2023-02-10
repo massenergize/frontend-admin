@@ -44,6 +44,7 @@ import {
   LOAD_ADMIN_NEXT_STEPS_SUMMARY,
   SET_ENGAGMENT_OPTIONS,
   LOAD_USER_ENGAGEMENTS,
+  TOGGLE_UNIVERSAL_TOAST,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -180,6 +181,15 @@ export const reducerForGalleryFilters = (state = {}, action = {}) => {
 export const reducerForUniversalModal = (state = {}, action = {}) => {
   switch (action.type) {
     case TOGGLE_UNIVERSAL_MODAL:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+export const reducerForUniversalToast = (state = {}, action = {}) => {
+  switch (action.type) {
+    case TOGGLE_UNIVERSAL_TOAST:
       return action.payload;
 
     default:

@@ -1,22 +1,22 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
+import { withStyles } from "@mui/styles";
+import Paper from "@mui/material/Paper";
 import { Helmet } from "react-helmet";
 import { bindActionCreators } from "redux";
 import brand from "dan-api/dummy/brand";
 import MUIDataTable from "mui-datatables";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
-import AppBar from "@material-ui/core/AppBar";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import PeopleIcon from "@material-ui/icons/People";
-import AddBoxIcon from "@material-ui/icons/AddBox";
+import AppBar from "@mui/material/AppBar";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import PeopleIcon from "@mui/icons-material/People";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 import Loading from "dan-components/Loading";
 import styles from "../../../components/Widget/widget-jss";
-import Snackbar from '@material-ui/core/Snackbar';
+import Snackbar from '@mui/material/Snackbar';
 import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
 import {
   reduxGetAllTeams,
@@ -247,7 +247,7 @@ class TeamMembers extends React.Component {
     const { error, loadingCSVs, success } = this.state;
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],

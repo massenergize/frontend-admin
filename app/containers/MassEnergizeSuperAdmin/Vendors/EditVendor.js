@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import states from "dan-api/data/states";
 import MassEnergizeForm from "../_FormGenerator";
 import { apiCall } from "../../../utils/messenger";
@@ -29,7 +29,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -81,13 +81,19 @@ class CreateNewVendorForm extends Component {
   }
 
   async componentDidMount() {
-    const { addVendorToHeap, vendorsInfos, match } = this.props;
+    const { addVendorToHeap, vendorsInfos, match, heap } = this.props;
     const { id } = match.params;
     const vendorResponse = await apiCall("/vendors.info", { vendor_id: id });
     if (vendorResponse && vendorResponse.success) {
-      addVendorToHeap({
-        vendorsInfos: { ...vendorsInfos, [id.toString()]: vendorResponse.data },
-      });
+      addVendorToHeap(
+        {
+          vendorsInfos: {
+            ...vendorsInfos,
+            [id.toString()]: vendorResponse.data,
+          },
+        },
+        heap
+      );
     }
   }
   getSelectedIds = (selected, dataToCrossCheck) => {
@@ -123,6 +129,7 @@ const mapStateToProps = (state) => {
     tags: state.getIn(["allTags"]),
     communities: state.getIn(["communities"]),
     vendorsInfos: heap.vendorsInfos || {},
+    heap,
   };
 };
 const mapDispatchToProps = (dispatch) => {

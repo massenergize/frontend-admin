@@ -1,4 +1,4 @@
-import { Button, Paper, Tooltip, Typography } from "@material-ui/core";
+import { Button, Paper, Tooltip, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -13,10 +13,14 @@ import {
   loadAllEvents,
   reduxAddToHeap,
   reduxLoadAllOtherEvents,
+  reduxUpdateHeap,
 } from "../../../redux/redux-actions/adminActions";
 import EventShareModal from "./EventShareModal";
-import { IS_CANARY, IS_LOCAL, IS_PROD } from "../../../config/constants";
+
 import { getHost } from "../Community/utils";
+import { PORTAL_HOST } from "../../../config/constants";
+import { dateFormatString } from "../Community/utils";
+import EditEventForm from "./EditEventForm";
 
 const open = {
   background: "#4faa4f",
@@ -64,6 +68,7 @@ function EventFullView(props) {
     myEvents, // Events that are from the communities the current admin manages
     communities,
     putOtherEventsInRedux,
+    heap,
   } = props;
   const history = useHistory();
   const [event, setEvent] = useState(undefined);
@@ -76,41 +81,40 @@ function EventFullView(props) {
   const modalState = (dialog || "").toLowerCase() === "open";
   // ------------------------------------------------------------
   const [showShareModal, setshowShareModal] = useState(modalState);
-
   const {
     name,
     community,
-    description,
-    featured_summary,
-    image,
     end_date_and_time,
     start_date_and_time,
     location,
-    tags,
+
     publicity,
     communities_under_publicity,
-    is_published,
   } = event || {};
 
-  const publicityProps = PUBLICITY_PROPS[publicity] || {};
-  const tagString = (tags || []).map((t) => t.name).join(", ");
+  // const publicityProps = PUBLICITY_PROPS[publicity] || {};
+  // const tagString = (tags || []).map((t) => t.name).join(", ");
   const { address, city, state, zipcode, unit } = location || {};
   var id = match.params.id;
   id = id && id.toString();
 
   const putEventInHeap = (event) => {
-    storeEventInHeap({
-      eventsInHeap: { ...(eventsInHeap || {}), [event.id.toString()]: event },
-    });
+    storeEventInHeap(
+      {
+        eventsInHeap: { ...(eventsInHeap || {}), [event.id.toString()]: event },
+      },
+      heap
+    );
   };
   //   ------------------------------------------------------------------------------------
+
   const finder = (ev, id) => ev.id.toString() === id;
   useEffect(() => {
     // Find from the list of "other events" in the table
 
-    var foundInRedux = (events || []).find((ev) => finder(ev, id)); // search locally in the "otherCommunities" list
+    var foundInRedux = (events || []).find((ev) => finder(ev, id)); // search locally in the "otherEvents" list
     if (!foundInRedux)
-      foundInRedux = (myEvents || []).find((ev) => finder(ev, id)); // search locally in admin's community list
+      foundInRedux = (myEvents || []).find((ev) => finder(ev, id)); // search locally in admin's events list
 
     if (foundInRedux) {
       checkIfAdminControlsEvent(foundInRedux, auth);
@@ -150,7 +154,7 @@ function EventFullView(props) {
   }, [eventsInHeap]);
   // ---------------------------------------------------------------------------------------
   const checkIfAdminControlsEvent = (event, auth) => {
-    if (auth.is_super_admin && !auth.is_community_admin)
+    if (auth && auth.is_super_admin && !auth.is_community_admin)
       return setHasControl(true); // super admin always has control
 
     const coms = ((auth && auth.admin_at) || []).map((c) => c.id.toString());
@@ -213,7 +217,7 @@ function EventFullView(props) {
               width: 200,
               background: "#d97c7c",
             }}
-            onClick={() => history.push(`/admin/read/events?from=${from}`)}
+            onClick={() => history.goBack()}
           >
             <i className="fa fa-long-arrow-left" style={{ marginRight: 6 }} />{" "}
             Back
@@ -237,6 +241,7 @@ function EventFullView(props) {
         auth={auth}
         communities={communities}
         show={showShareModal}
+        close = {()=> setshowShareModal(false)}
         toggleModal={setshowShareModal}
         event={event}
         updateEventInHeap={putEventInHeap}
@@ -257,30 +262,6 @@ function EventFullView(props) {
             }}
           >
             {name || "..."}{" "}
-            <Tooltip
-              placement="bottom"
-              title={
-                is_published
-                  ? "This event is live"
-                  : "This event is not live yet"
-              }
-            >
-              <span
-                className="touchable-opacity"
-                style={{
-                  marginLeft: 6,
-                  background: is_published ? "#4faa4f" : "grey",
-                  color: "white",
-                  padding: "5px 10px",
-                  fontSize: 12,
-                  borderRadius: 55,
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                }}
-              >
-                {is_published ? "Is Live" : "Not Live"}
-              </span>
-            </Tooltip>
           </Typography>
 
           <div
@@ -291,18 +272,10 @@ function EventFullView(props) {
             }}
           >
             <Typography variant="h6" style={{ marginRight: 15, fontSize: 17 }}>
-              {getHumanFriendlyDate(start_date_and_time, true, false)}
-            </Typography>
-            <hr
-              style={{
-                width: 100,
-                border: "dotted 0px #00bcd4",
-                borderBottomWidth: 4,
-              }}
-            />
-
-            <Typography variant="h6" style={{ marginLeft: 15, fontSize: 17 }}>
-              {getHumanFriendlyDate(end_date_and_time, true, false)}
+              {dateFormatString(
+                new Date(start_date_and_time),
+                new Date(end_date_and_time)
+              )}
             </Typography>
             <Typography
               variant="h6"
@@ -326,6 +299,7 @@ function EventFullView(props) {
           )}
         </div>
         <Footer
+          viewOnPortal={() => window.open(makeURL(event), "_blank")}
           history={history}
           community={community}
           hasControl={hasControl}
@@ -341,41 +315,11 @@ function EventFullView(props) {
 
       <Paper style={{ marginBottom: 10 }}>
         <div style={{ padding: "15px 25px" }}>
-          <Typography
-            variant="h5"
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: 10,
-            }}
-          >
-            Event Publicity
-            <Tooltip placement="bottom" title={publicityProps.tooltip}>
-              <span
-                className="touchable-opacity"
-                style={{
-                  marginLeft: 6,
-                  background: "green",
-                  color: "white",
-                  padding: "5px 10px",
-                  fontSize: 12,
-                  borderRadius: 55,
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                  ...publicityProps.style,
-                }}
-              >
-                {publicityProps.label}
-              </span>
-            </Tooltip>
-          </Typography>
-          <Typography variant="body2">{publicityProps.info}</Typography>
           <Typography variant="body1">
             {listToString(event.communities_under_publicity)}
           </Typography>
           <div style={{ marginTop: 10 }}>
-            <Typography variant="caption" color="primary">
+            <Typography variant="H6" color="primary">
               <b>CURRENTLY SHARED TO</b>
             </Typography>
             <Typography variant="body1">
@@ -390,18 +334,8 @@ function EventFullView(props) {
           </div>
         </div>
       </Paper>
-      <Paper>
-        <iframe
-          src={makeURL(event)}
-          loading="lazy"
-          style={{
-            borderStyle: "none",
-            width: "100%",
-            height: "100%",
-            minHeight: "100vh",
-          }}
-        />
-      </Paper>
+
+      <EditEventForm passedEvent = {event} />
     </div>
   );
 }
@@ -413,6 +347,7 @@ const mapStateToProps = (state) => {
     myEvents: state.getIn(["allEvents"]),
     auth: state.getIn(["auth"]),
     communities: state.getIn(["communities"]),
+    heap,
   };
 };
 
@@ -443,6 +378,7 @@ const Footer = ({
   communities,
   from,
   share,
+  viewOnPortal,
 }) => {
   const eventNotice = hasControl
     ? ""
@@ -467,9 +403,9 @@ const Footer = ({
       >
         <i className="fa fa-long-arrow-left" style={{ marginRight: 6 }} /> Back
       </Button>
-      {/* <Button
-        variant="outlined"
-        color="primary"
+      <Button
+        variant="contained"
+        color="secondary"
         style={{
           borderRadius: 0,
           padding: 10,
@@ -477,19 +413,17 @@ const Footer = ({
           pointerEvents: "all",
           cursor: "pointer",
         }}
-        onClick={() => copyEvent && copyEvent()}
-        disabled={isCopying}
+        onClick={() => {
+          viewOnPortal && viewOnPortal();
+        }}
       >
-        {isCopying && (
-          <i
-            className=" fa fa-spinner fa-spin"
-            style={{ color: "white", marginRight: 5 }}
-          />
-        )}
-        <Tooltip placement="top" title={"Copy Event"}>
-          <span> Copy Event</span>
+        <Tooltip
+          placement="top"
+          title={"See what event looks like on the community portal"}
+        >
+          <span> View Event on Portal </span>
         </Tooltip>
-      </Button> */}
+      </Button>
       <div style={{ marginLeft: "auto" }}>
         <Button
           disabled={!hasControl}

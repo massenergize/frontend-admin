@@ -1,36 +1,38 @@
 import React from 'react';
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { withStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import LocalPhone from '@material-ui/icons/LocalPhone';
-import DateRange from '@material-ui/icons/DateRange';
-import LocationOn from '@material-ui/icons/LocationOn';
-import Divider from '@material-ui/core/Divider';
-import Chip from '@material-ui/core/Chip';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-import GridListTileBar from '@material-ui/core/GridListTileBar';
-import IconButton from '@material-ui/core/IconButton';
-import InfoIcon from '@material-ui/icons/Info';
-import Check from '@material-ui/icons/Check';
-import AcUnit from '@material-ui/icons/AcUnit';
-import Adb from '@material-ui/icons/Adb';
-import AllInclusive from '@material-ui/icons/AllInclusive';
-import AssistantPhoto from '@material-ui/icons/AssistantPhoto';
+import { withStyles } from "@mui/styles";
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import LinearProgress from '@mui/material/LinearProgress';
+import LocalPhone from '@mui/icons-material/LocalPhone';
+import DateRange from '@mui/icons-material/DateRange';
+import LocationOn from '@mui/icons-material/LocationOn';
+import Divider from '@mui/material/Divider';
+import Chip from '@mui/material/Chip';
+// import GridList from '@mui/material/GridList';
+// import GridListTile from '@mui/material/GridListTile';
+// import GridListTileBar from '@mui/material/GridListTileBar';
+import IconButton from '@mui/material/IconButton';
+import InfoIcon from '@mui/icons-material/Info';
+import Check from '@mui/icons-material/Check';
+import AcUnit from '@mui/icons-material/AcUnit';
+import Adb from '@mui/icons-material/Adb';
+import AllInclusive from '@mui/icons-material/AllInclusive';
+import AssistantPhoto from '@mui/icons-material/AssistantPhoto';
 import imgData from 'dan-api/images/imgData';
 import Type from 'dan-styles/Typography.scss';
 import Timeline from '../SocialMedia/Timeline';
 import PapperBlock from '../PapperBlock/PapperBlock';
 import styles from './profile-jss';
+
+import { ImageListItem, ImageList, ImageListItemBar } from "@mui/material";
 
 class About extends React.Component {
   render() {
@@ -101,34 +103,40 @@ class About extends React.Component {
           {/* My Albums */}
           <PapperBlock title="My Albums (6)" icon="ios-images-outline" whiteBg desc="">
             <div className={classes.albumRoot}>
-              <GridList cellHeight={180} className={classes.gridList}>
+              <ImageList cellHeight={180} className={classes.gridList}>
                 {
                   imgData.map((tile, index) => {
                     if (index >= 4) {
                       return false;
                     }
                     return (
-                      <GridListTile key={index.toString()}>
-                        <img src={tile.img} className={classes.img} alt={tile.title} />
-                        <GridListTileBar
+                      <ImageListItem key={index.toString()}>
+                        <img
+                          src={tile.img}
+                          className={classes.img}
+                          alt={tile.title}
+                        />
+                        <ImageListItemBar
                           title={tile.title}
-                          subtitle={(
+                          subtitle={
                             <span>
                               by:&nbsp;
                               {tile.author}
                             </span>
-                          )}
-                          actionIcon={(
-                            <IconButton className={classes.icon}>
+                          }
+                          actionIcon={
+                            <IconButton
+                              className={classes.icon}
+                            >
                               <InfoIcon />
                             </IconButton>
-                          )}
+                          }
                         />
-                      </GridListTile>
+                      </ImageListItem>
                     );
                   })
                 }
-              </GridList>
+              </ImageList>
             </div>
             <Divider className={classes.divider} />
             <Grid container justify="center">

@@ -2,9 +2,9 @@ import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import brand from "dan-api/dummy/brand";
 import { Helmet } from "react-helmet";
-import { withStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
-import Divider from "@material-ui/core/Divider";
+import { withStyles } from "@mui/styles";
+import Grid from "@mui/material/Grid";
+import Divider from "@mui/material/Divider";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from "./dashboard-jss";
@@ -14,14 +14,13 @@ import {
   reduxLoadSelectedCommunity,
   reduxCheckUser,
 } from "../../../redux/redux-actions/adminActions";
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import Icon from "@material-ui/core/Icon";
-import Snackbar from "@material-ui/core/Snackbar";
-import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
+import { Paper, Alert } from "@mui/material";
+import Typography from "@mui/material/Typography";
+import Icon from "@mui/material/Icon";
+import Snackbar from "@mui/material/Snackbar";
 import { apiCallFile } from "../../../utils/messenger";
 import ReportingActivities from "./ReportingActivities";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import CircularProgress from "@mui/material/CircularProgress";
 import WhatNext from "./WhatNext";
 import CommunityEngagement from "./CommunityEngagement";
 import { PapperBlock } from "dan-components";
@@ -108,11 +107,15 @@ class SummaryDashboard extends PureComponent {
               autoHideDuration={6000}
               onClose={this.handleCloseStyle}
             >
-              <MySnackbarContentWrapper
+              <Alert
                 onClose={this.handleCloseStyle}
-                variant="error"
-                message={`Unable to download: ${error}`}
-              />
+                severity={"error"}
+                sx={{ width: "100%" }}
+              >
+                <small style={{ marginLeft: 15, fontSize: 15 }}>
+                  {`Unable to download: ${error}`}
+                </small>
+              </Alert>
             </Snackbar>
           </div>
         )}
@@ -124,11 +127,16 @@ class SummaryDashboard extends PureComponent {
               autoHideDuration={3000}
               onClose={this.handleClose}
             >
-              <MySnackbarContentWrapper
+              <Alert
                 onClose={this.handleClose}
-                variant="success"
-                message={`Your request has been received. Please check your email for the file.`}
-              />
+                severity={"success"}
+                sx={{ width: "100%" }}
+              >
+                <small style={{ marginLeft: 15, fontSize: 15 }}>
+                  Your request has been received. Please check your email for
+                  the file.
+                </small>
+              </Alert>
             </Snackbar>
           </div>
         )}

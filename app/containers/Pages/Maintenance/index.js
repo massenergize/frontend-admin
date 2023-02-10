@@ -2,13 +2,13 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import Avatar from '@material-ui/core/Avatar';
-import Build from '@material-ui/icons/Build';
-import Hidden from '@material-ui/core/Hidden';
-import Settings from '@material-ui/icons/SettingsApplications';
-import Warning from '@material-ui/icons/Warning';
+import { withStyles } from "@mui/styles";
+import Typography from '@mui/material/Typography';
+import Avatar from '@mui/material/Avatar';
+import Build from '@mui/icons-material/Build';
+import Hidden from '@mui/material/Hidden';
+import Settings from '@mui/icons-material/SettingsApplications';
+import Warning from '@mui/icons-material/Warning';
 
 const styles = theme => ({
   container: {

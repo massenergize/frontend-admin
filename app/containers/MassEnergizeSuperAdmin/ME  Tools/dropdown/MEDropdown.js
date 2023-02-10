@@ -1,5 +1,5 @@
-import { Checkbox, FormControlLabel, MenuItem } from "@material-ui/core";
-import { Chip, FormControl, FormLabel, Select } from "@material-ui/core";
+import { Checkbox, FormControlLabel, MenuItem } from "@mui/material";
+import { Chip, FormControl, FormLabel, Select } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { pop } from "../../../../utils/common";
 import LightAutoComplete from "../../Gallery/tools/LightAutoComplete";
