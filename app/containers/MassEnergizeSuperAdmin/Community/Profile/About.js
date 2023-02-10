@@ -415,6 +415,7 @@ class About extends React.Component {
               </Typography>
             </Paper>
           </Grid>
+          {/* Removing all-metrics download button for all users
           <Grid item xs={4}>
             <Paper onClick={() => { !loadingCSVs.includes('metrics') && this.getCSV('metrics'); }} className={`${classes.pageCard}`} elevation={1}>
               <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem'}} component="h3">
@@ -425,6 +426,7 @@ class About extends React.Component {
               </Typography>
             </Paper>
           </Grid>
+          */}
         </Grid>
         
       </>
