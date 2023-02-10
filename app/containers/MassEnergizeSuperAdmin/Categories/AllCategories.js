@@ -1,28 +1,28 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 import { PapperBlock } from "dan-components";
 import imgApi from "dan-api/images/photos";
 import classNames from "classnames";
-import Typography from "@material-ui/core/Typography";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Chip from "@material-ui/core/Chip";
-import Icon from "@material-ui/core/Icon";
+import Typography from "@mui/material/Typography";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Chip from "@mui/material/Chip";
+import Icon from "@mui/material/Icon";
 
 import MUIDataTable from "mui-datatables";
-import CallMadeIcon from "@material-ui/icons/CallMade";
-import EditIcon from "@material-ui/icons/Edit";
+import CallMadeIcon from "@mui/icons-material/CallMade";
+import EditIcon from "@mui/icons-material/Edit";
 import { Link } from "react-router-dom";
-import Avatar from "@material-ui/core/Avatar";
-import Paper from "@material-ui/core/Paper";
-import LinearProgress from "@material-ui/core/LinearProgress";
-import Grid from "@material-ui/core/Grid";
+import Avatar from "@mui/material/Avatar";
+import Paper from "@mui/material/Paper";
+import LinearProgress from "@mui/material/LinearProgress";
+import Grid from "@mui/material/Grid";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import { bindActionCreators } from "redux";
@@ -30,6 +30,7 @@ import Loading from "dan-components/Loading";
 import {
   loadAllTags,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import { connect } from "react-redux";
 class AllTagCollections extends React.Component {
@@ -147,7 +148,23 @@ class AllTagCollections extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/tag_collections.delete", { tag_collection_id: found });
+      apiCall("/tag_collections.delete", {
+        tag_collection_id: found,
+      }).then((response) => {
+        if (response.success) {
+          this.props.toggleToast({
+            open: true,
+            message: `Tag(s) successfully deleted`,
+            variant: "success",
+          });
+        } else {
+          this.props.toggleToast({
+            open: true,
+            message: "An error occurred while deleting the tag(s)",
+            variant: "error",
+          });
+        }
+      });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putTagsInRedux(rem);
@@ -172,7 +189,7 @@ class AllTagCollections extends React.Component {
 
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
@@ -234,6 +251,7 @@ const mapDispatchToProps = (dispatch) => {
     {
       putTagsInRedux: loadAllTags,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

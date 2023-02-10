@@ -1,16 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import TableCell from '@material-ui/core/TableCell';
-import { withStyles } from '@material-ui/core/styles';
-import IconButton from '@material-ui/core/IconButton';
+import TableCell from '@mui/material/TableCell';
+import { withStyles } from "@mui/styles";
+import IconButton from '@mui/material/IconButton';
 import classNames from 'classnames';
 import css from 'dan-styles/Table.scss';
-import DeleteIcon from '@material-ui/icons/Delete';
-import EditIcon from '@material-ui/icons/BorderColor';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/BorderColor';
 
 const styles = theme => ({
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
 });
 

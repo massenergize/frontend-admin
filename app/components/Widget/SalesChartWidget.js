@@ -1,20 +1,20 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
+import { withStyles } from "@mui/styles";
+import Grid from '@mui/material/Grid';
 import classNames from 'classnames';
-import CardGiftcard from '@material-ui/icons/CardGiftcard';
-import LocalLibrary from '@material-ui/icons/LocalLibrary';
-import Computer from '@material-ui/icons/Computer';
-import Toys from '@material-ui/icons/Toys';
-import Avatar from '@material-ui/core/Avatar';
-import Divider from '@material-ui/core/Divider';
-import Style from '@material-ui/icons/Style';
-import Typography from '@material-ui/core/Typography';
-import purple from '@material-ui/core/colors/purple';
-import blue from '@material-ui/core/colors/blue';
-import cyan from '@material-ui/core/colors/cyan';
-import pink from '@material-ui/core/colors/pink';
+import CardGiftcard from '@mui/icons-material/CardGiftcard';
+import LocalLibrary from '@mui/icons-material/LocalLibrary';
+import Computer from '@mui/icons-material/Computer';
+import Toys from '@mui/icons-material/Toys';
+import Avatar from '@mui/material/Avatar';
+import Divider from '@mui/material/Divider';
+import Style from '@mui/icons-material/Style';
+import Typography from '@mui/material/Typography';
+import purple from '@mui/material/colors/purple';
+import blue from '@mui/material/colors/blue';
+import cyan from '@mui/material/colors/cyan';
+import pink from '@mui/material/colors/pink';
 import colorfull from 'dan-api/palette/colorfull';
 import {
   BarChart,

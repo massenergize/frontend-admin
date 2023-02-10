@@ -1,4 +1,4 @@
-import { Button, Paper, Tooltip, Typography } from "@material-ui/core";
+import { Button, Paper, Tooltip, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -238,6 +238,7 @@ function EventFullView(props) {
         auth={auth}
         communities={communities}
         show={showShareModal}
+        close = {()=> setshowShareModal(false)}
         toggleModal={setshowShareModal}
         event={event}
         updateEventInHeap={putEventInHeap}
@@ -331,7 +332,7 @@ function EventFullView(props) {
         </div>
       </Paper>
 
-      <EditEventForm match={{ params: { id: event && event.id } }} passedEvent = {event} />
+      <EditEventForm passedEvent = {event} />
     </div>
   );
 }

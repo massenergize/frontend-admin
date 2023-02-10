@@ -1,13 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 
 import MUIDataTable from "mui-datatables";
-import EditIcon from "@material-ui/icons/Edit";
+import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
-import TextField from "@material-ui/core/TextField";
+import TextField from "@mui/material/TextField";
 
 import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";
@@ -19,15 +19,17 @@ import {
   reduxGetAllCommunityTestimonials,
   reduxGetAllTestimonials,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 
 import {
   getHumanFriendlyDate,
   isNotEmpty,
   ourCustomSort,
+  reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
-import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
+import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
@@ -41,19 +43,41 @@ class AllTestimonials extends React.Component {
     };
   }
 
+  componentWillUnmount() {
+    window.history.replaceState({}, document.title);
+  }
+
   componentDidMount() {
-    const user = this.props.auth ? this.props.auth : {};
-    if (user.is_super_admin) {
-      this.props.callTestimonialsForSuperAdmin();
-    }
-    if (user.is_community_admin) {
-      const com = this.props.community
-        ? this.props.community
-        : user.admin_at[0];
-      if (com) {
-        this.props.callTestimonialsForNormalAdmin(com.id);
-      }
-    }
+    const {
+      fetchTestimonials,
+      location,
+      putTestimonialsInRedux,
+      allTestimonials,
+    } = this.props;
+    const { state } = location;
+    const ids = state && state.ids;
+    const comingFromDashboard = ids && ids.length;
+    if (!comingFromDashboard) return fetchTestimonials();
+    var content = {
+      fieldKey: "testimonial_ids",
+      apiURL: "/testimonials.listForCommunityAdmin",
+      props: this.props,
+      dataSource: [],
+      reduxFxn: putTestimonialsInRedux,
+    };
+
+    this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
+
+    fetchTestimonials((data, failed) => {
+      if (failed)
+        return console.log(
+          "Sorry, could not load in more testimonials from B.E!"
+        );
+      reArrangeForAdmin({
+        ...content,
+        dataSource: data,
+      });
+    });
   }
 
   fashionData(data) {
@@ -102,6 +126,7 @@ class AllTestimonials extends React.Component {
         key: "id",
         options: {
           filter: false,
+          filterType: "multiselect",
         },
       },
       {
@@ -222,7 +247,15 @@ class AllTestimonials extends React.Component {
           download: false,
           customBodyRender: (id) => (
             <div>
-              <Link to={`/admin/edit/${id}/testimonial`}>
+              <Link to={`/admin/edit/${id}/testimonial`} 
+               onClick={(e) => {
+                e.preventDefault();
+                this.props.history.push({
+                  pathname: `/admin/edit/${id}/testimonial`,
+                  state: { ids: this.state.ids },
+                });
+              }}
+              >
                 <EditIcon size="small" variant="outlined" color="secondary" />
               </Link>
             </div>
@@ -278,7 +311,23 @@ class AllTestimonials extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/testimonials.delete", { testimonial_id: found });
+      apiCall("/testimonials.delete", { testimonial_id: found }).then(
+        (response) => {
+          if (response.success) {
+            this.props.toggleToast({
+              open: true,
+              message: "Community successfully deleted",
+              variant: "success",
+            });
+          } else {
+            this.props.toggleToast({
+              open: true,
+              message: "An error occurred while deleting the community",
+              variant: "error",
+            });
+          }
+        }
+      );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putTestimonialsInRedux(rem);
@@ -332,7 +381,7 @@ class AllTestimonials extends React.Component {
 
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
@@ -347,21 +396,6 @@ class AllTestimonials extends React.Component {
         });
         return false;
       },
-      // customSort: (data, colIndex, order) => {
-      //   return data.sort((a, b) => {
-      //     if (colIndex === 3) {
-      //       return (
-      //         (a.data[colIndex].rank < b.data[colIndex].rank ? -1 : 1) *
-      //         (order === "desc" ? 1 : -1)
-      //       );
-      //     } else {
-      //       return (
-      //         (a.data[colIndex] < b.data[colIndex] ? -1 : 1) *
-      //         (order === "desc" ? 1 : -1)
-      //       );
-      //     }
-      //   });
-      // },
       downloadOptions: {
         filename: `All Testimonials (${this.getTimeStamp()}).csv`,
         separator: ",",
@@ -422,6 +456,13 @@ class AllTestimonials extends React.Component {
             columns: columns,
             options: options,
           }}
+          customFilterObject={{
+            0: {
+              list: this.state.ids,
+            },
+          }}
+          ignoreSavedFilters={this.state.ignoreSavedFilters}
+          saveFilters={this.state.saveFilters}
         />
       </div>
     );
@@ -442,11 +483,11 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
-      callTestimonialsForSuperAdmin: reduxGetAllTestimonials,
-      callTestimonialsForNormalAdmin: reduxGetAllCommunityTestimonials,
+      fetchTestimonials: reduxGetAllCommunityTestimonials,
       putTestimonialsInRedux: loadAllTestimonials,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

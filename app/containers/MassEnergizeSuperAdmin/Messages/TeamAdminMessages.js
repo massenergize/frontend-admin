@@ -1,25 +1,30 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 import { bindActionCreators } from "redux";
-import MUIDataTable from "mui-datatables";
-import { Link } from "react-router-dom";
-import DetailsIcon from "@material-ui/icons/Details";
+import { Link, withRouter } from "react-router-dom";
+import DetailsIcon from "@mui/icons-material/Details";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import CommunitySwitch from "../Summary/CommunitySwitch";
-import { getHumanFriendlyDate, smartString } from "../../../utils/common";
-import { Chip, Typography, Grid, Paper} from "@material-ui/core";
+import {
+  getHumanFriendlyDate,
+  reArrangeForAdmin,
+  smartString,
+} from "../../../utils/common";
+import { Chip, Typography, Grid, Paper} from "@mui/material";
 import {
   loadTeamMessages,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
+import { replyToMessage } from "./CommunityAdminMessages";
 class AllTeamAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -30,12 +35,35 @@ class AllTeamAdminMessages extends React.Component {
     };
   }
 
+  componentWillUnmount() {
+    window.history.replaceState({}, document.title);
+  }
+
   componentDidMount() {
+    const { state } = this.props.location;
+    const { putTeamMessagesInRedux } = this.props;
+    const ids = state && state.ids;
+    const comingFromDashboard = ids && ids.length;
+
     apiCall("/messages.listTeamAdminMessages").then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
-        this.props.putTeamMessagesInRedux(allMessagesResponse.data);
-        let hasItems = allMessagesResponse.data && allMessagesResponse.data.length>0;
-        this.setState({ hasNoItems: !hasItems });
+        let hasItems =
+          allMessagesResponse.data && allMessagesResponse.data.length > 0;
+        this.setState({
+          hasNoItems: !hasItems,
+        });
+
+        if (!comingFromDashboard)
+          return putTeamMessagesInRedux(allMessagesResponse.data);
+
+        this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
+        reArrangeForAdmin({
+          apiURL: "/messages.listTeamAdminMessages",
+          fieldKey: "message_ids",
+          props: this.props,
+          dataSource: allMessagesResponse.data,
+          reduxFxn: putTeamMessagesInRedux,
+        });
       }
     });
   }
@@ -63,8 +91,8 @@ class AllTeamAdminMessages extends React.Component {
 
   getColumns = (classes) => [
     {
-      name: 'ID',
-      key: 'id',
+      name: "ID",
+      key: "id",
       options: {
         filter: false,
       },
@@ -138,7 +166,17 @@ class AllTeamAdminMessages extends React.Component {
         download: false,
         customBodyRender: (id) => (
           <div>
-            <Link to={`/admin/edit/${id}/message`}>
+            <Link
+              // to={`/admin/edit/${id}/message`}
+              onClick={(e) => {
+                e.preventDefault();
+                replyToMessage({
+                  pathname: `/admin/edit/${id}/message`,
+                  transfer: { fromTeam: true },
+                  props: this.props,
+                });
+              }}
+            >
               <DetailsIcon size="small" variant="outlined" color="secondary" />
             </Link>
           </div>
@@ -154,7 +192,23 @@ class AllTeamAdminMessages extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/messages.delete", { message_id: found });
+      apiCall("/messages.delete", { message_id: found }).then(
+        (response) => {
+          if (response.success) {
+            this.props.toggleToast({
+              open: true,
+              message: "Team Message(s) successfully deleted",
+              variant: "success",
+            });
+          } else {
+            this.props.toggleToast({
+              open: true,
+              message: "An error occurred while deleting the team message(s)",
+              variant: "error",
+            });
+          }
+        }
+      );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putTeamMessagesInRedux(rem);
@@ -178,7 +232,7 @@ class AllTeamAdminMessages extends React.Component {
     const data = this.fashionData(this.props.teamMessages);
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
@@ -195,7 +249,7 @@ class AllTeamAdminMessages extends React.Component {
     };
 
     if (!data || !data.length) {
-      if(this.state.hasNoItems){
+      if (this.state.hasNoItems) {
         return (
           <Grid
             container
@@ -237,6 +291,15 @@ class AllTeamAdminMessages extends React.Component {
             columns: columns,
             options: options,
           }}
+          customFilterObject={{
+            0: {
+              name: "ID",
+              type: "multiselect",
+              list: this.state.ids,
+            },
+          }}
+          ignoreSavedFilters={this.state.ignoreSavedFilters}
+          saveFilters={this.state.saveFilters}
         />
       </div>
     );
@@ -258,6 +321,7 @@ function mapDispatchToProps(dispatch) {
     {
       putTeamMessagesInRedux: loadTeamMessages,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );
@@ -267,4 +331,4 @@ const VendorsMapped = connect(
   mapDispatchToProps
 )(AllTeamAdminMessages);
 
-export default withStyles(styles)(VendorsMapped);
+export default withStyles(styles)(withRouter(VendorsMapped));

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import 'dan-styles/vendors/react-weather/GenericWeather.css';
 import classNames from 'classnames';
 import styles from './widget-jss';

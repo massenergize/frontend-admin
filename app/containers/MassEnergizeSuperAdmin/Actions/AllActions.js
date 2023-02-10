@@ -4,14 +4,14 @@ import PropTypes from "prop-types";
 
 import brand from "dan-api/dummy/brand";
 import { Helmet } from "react-helmet";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 
 import MUIDataTable from "mui-datatables";
-import FileCopy from "@material-ui/icons/FileCopy";
-import EditIcon from "@material-ui/icons/Edit";
+import FileCopy from "@mui/icons-material/FileCopy";
+import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
-import Avatar from "@material-ui/core/Avatar";
-import TextField from "@material-ui/core/TextField";
+import Avatar from "@mui/material/Avatar";
+import TextField from "@mui/material/TextField";
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -22,6 +22,7 @@ import {
   reduxGetAllCommunityActions,
   loadAllActions,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 
 import {
@@ -34,7 +35,7 @@ import {
   pop,
   smartString,
 } from "../../../utils/common";
-import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
+import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -351,7 +352,22 @@ class AllActions extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/actions.delete", { action_id: found }).catch((e) =>
+      apiCall("/actions.delete", { action_id: found }).then(res=>{
+        if (res.success) {
+          this.props.toggleToast({
+            open: true,
+            message: "Action(s) successfully deleted",
+            variant: "success",
+          });
+        } else {
+          this.props.toggleToast({
+            open: true,
+            message:
+              "An error occurred while deleting the action(s), please try again",
+            variant: "error",
+          });
+        }
+      }).catch((e) =>
         console.log("ACTION_DELETE_ERRO:", e)
       );
     });
@@ -413,7 +429,7 @@ class AllActions extends React.Component {
 
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
@@ -503,6 +519,7 @@ const mapDispatchToProps = (dispatch) =>
       putActionsInRedux: loadAllActions,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );

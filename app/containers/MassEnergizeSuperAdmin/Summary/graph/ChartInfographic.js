@@ -1,12 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
+import { withStyles } from "@mui/styles";
+import Grid from "@mui/material/Grid";
 import { Link } from "react-router-dom";
-import OndemandVideo from "@material-ui/icons/OndemandVideo";
-import SupervisorAccount from "@material-ui/icons/SupervisorAccount";
-import CollectionsBookmark from "@material-ui/icons/CollectionsBookmark";
-import TrendingUp from "@material-ui/icons/TrendingUp";
+import OndemandVideo from "@mui/icons-material/OndemandVideo";
+import SupervisorAccount from "@mui/icons-material/SupervisorAccount";
+import CollectionsBookmark from "@mui/icons-material/CollectionsBookmark";
+import TrendingUp from "@mui/icons-material/TrendingUp";
 import colorfull from "dan-api/palette/colorfull";
 import { CounterWidget } from "dan-components";
 import styles from "dan-components/Widget/widget-jss";
@@ -26,8 +26,8 @@ class IconInfographic extends React.Component {
   render() {
     const { classes, data } = this.props;
     return (
-      <div className={classes.rootCounterFull} style={{ width: "100%" }}>
-        <Grid container spacing={8}>
+      <div className={classes.rootCounterFull} style={{ width: "100%", marginBottom:20 }}>
+        <Grid container spacing={1}>
           {data &&
             data.map((d, i) => (
               <Grid

@@ -1,12 +1,11 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import states from "dan-api/data/states";
-import { withStyles } from "@material-ui/core/styles";
-import MassEnergizeForm from "../_FormGenerator";
-import { apiCall } from "../../../utils/messenger";
-import { getMoreInfo, groupSocialMediaFields } from "./utils";
-import fieldTypes from "../_FormGenerator/fieldTypes";
-import { withRouter } from "react-router-dom";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import states from 'dan-api/data/states';
+import { withStyles } from "@mui/styles";
+import MassEnergizeForm from '../_FormGenerator';
+import { apiCall } from '../../../utils/messenger';
+import { getMoreInfo, groupSocialMediaFields } from './utils';
+import fieldTypes from '../_FormGenerator/fieldTypes';
 // @NB: Looks like this file isnt being used anymore
 const styles = (theme) => ({
   root: {
@@ -27,8 +26,8 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
-    textAlign: "center",
+    margin: theme.spacing(4),
+    textAlign: 'center',
   },
 });
 

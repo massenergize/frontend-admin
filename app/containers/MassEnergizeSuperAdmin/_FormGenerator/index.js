@@ -1,33 +1,36 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import InputLabel from "@material-ui/core/InputLabel";
-import Input from "@material-ui/core/Input";
-import Select from "@material-ui/core/Select";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import Paper from "@material-ui/core/Paper";
-import Grid from "@material-ui/core/Grid";
-import { DateTimePicker, MuiPickersUtilsProvider } from "material-ui-pickers";
+import { withStyles } from "@mui/styles";
+import InputLabel from "@mui/material/InputLabel";
+import Input from "@mui/material/Input";
+import Select from "@mui/material/Select";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import Paper from "@mui/material/Paper";
+import Grid from "@mui/material/Grid";
+import dayjs from "dayjs"; // don't remove this
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+// import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import MomentUtils from "@date-io/moment";
-import FormControl from "@material-ui/core/FormControl";
-import Checkbox from "@material-ui/core/Checkbox";
-import FormLabel from "@material-ui/core/FormLabel";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
-import Chip from "@material-ui/core/Chip";
+import FormControl from "@mui/material/FormControl";
+import Checkbox from "@mui/material/Checkbox";
+import FormLabel from "@mui/material/FormLabel";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
 import { Link, withRouter } from "react-router-dom";
 import { MaterialDropZone } from "dan-components";
-import Snackbar from "@material-ui/core/Snackbar";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import Snackbar from "@mui/material/Snackbar";
+import CircularProgress from "@mui/material/CircularProgress";
 import { Editor as TinyEditor } from "@tinymce/tinymce-react";
-import { MenuItem } from "@material-ui/core";
-import TextField from "@material-ui/core/TextField";
-// import Icon from '@material-ui/core/Icon';
+import { MenuItem, Alert } from "@mui/material";
+import TextField from "@mui/material/TextField";
+// import Icon from '@mui/material/Icon';
 import moment from "moment";
 import { apiCall } from "../../../utils/messenger";
-import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
 import FieldTypes from "./fieldTypes";
 import Modal from "./Modal";
 // import PreviewModal from './PreviewModal';
@@ -58,7 +61,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -408,9 +411,7 @@ class MassEnergizeForm extends Component {
             cleanedValues[field.dbName] = fieldValueInForm;
             break;
           case FieldTypes.DateTime:
-            cleanedValues[field.dbName] = (
-              moment.utc(fieldValueInForm) || moment.now()
-            ).format();
+            cleanedValues[field.dbName] = (moment.utc(fieldValueInForm)|| moment.now()).format();
             break;
           case FieldTypes.Checkbox:
             // If two or more items have the same dbName, the get combined into an array
@@ -525,7 +526,6 @@ class MassEnergizeForm extends Component {
         this.setError.bind(this)
       );
     }
-
 
     // if validator is provided, it means we want to make some form of unique custom validation first
     // before submiting the form
@@ -736,10 +736,15 @@ class MassEnergizeForm extends Component {
           <div key={field.name}>
             <FormControl className={classes.field}>
               {this.renderGeneralContent(field)}
-              <InputLabel htmlFor={field.name}>{field.label}</InputLabel>
-
+              <InputLabel
+                htmlFor={field.label}
+                className={classes.selectFieldLabel}
+              >
+                {field.label}
+              </InputLabel>
               <Select
                 native
+                label={field.label}
                 name={field.name}
                 onChange={async (newValue) => {
                   await this.updateForm(field.name, newValue.target.value);
@@ -1060,6 +1065,7 @@ class MassEnergizeForm extends Component {
               defaultValue={field.defaultValue}
               inputProps={{ maxLength: field.maxLength }}
               // maxLength={field.maxLength}
+              variant="outlined"
             />
           </div>
         );
@@ -1090,25 +1096,36 @@ class MassEnergizeForm extends Component {
               {field.label}
             </Typography>
             <div className={classes.picker} style={{ width: "100%" }}>
-              <MuiPickersUtilsProvider
+              <LocalizationProvider
+                dateAdapter={AdapterMoment}
                 utils={MomentUtils}
                 style={{ width: "100%" }}
               >
                 <DateTimePicker
                   {...field}
-                  value={this.getValue(field.name, field.defaultValue, field)}
-                  onChange={(date) =>
+                  renderInput={(props) => <TextField {...props} />}
+                  value={this.getValue(
+                    field.name,
+                    field.defaultValue,
+                    field
+                  )}
+                  onChange={(date) => {
                     this.handleFormDataChange(
                       {
-                        target: { name: field.name, value: date },
+                        target: {
+                          name: field.name,
+                          value: date,
+                        },
                       },
                       field
-                    )
-                  }
+                    );
+                  }}
                   label="" // don't put label in the box {field.label}
-                  format="MM/DD/YYYY, h:mm a"
+                  // mask="MM/DD/YYYY, h:mm a"
+                  inputFormat="MM/DD/YYYY HH:mm:ss"
+                  mask={"__/__/____ __:__:__"}
                 />
-              </MuiPickersUtilsProvider>
+              </LocalizationProvider>
             </div>
 
             <br />
@@ -1152,7 +1169,8 @@ class MassEnergizeForm extends Component {
   renderFields = (fields) =>
     fields.map((field, key) => (
       <div key={`${field.name}-${key.toString()}`}>
-        {this.renderModalText(field)}
+        <div style={{marginBottom:15}}>{this.renderModalText(field)}</div>
+
         {this.renderField(field)}
       </div>
     ));
@@ -1206,20 +1224,23 @@ class MassEnergizeForm extends Component {
               {error && (
                 <div>
                   <Snackbar
-                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "right",
+                    }}
                     open={error != null}
                     autoHideDuration={6000}
                     onClose={this.handleCloseStyle}
                   >
-                    <MySnackbarContentWrapper
+                    <Alert
                       onClose={this.handleCloseStyle}
-                      variant="error"
-                      message={
-                        <small style={{ marginLeft: 15, fontSize: 15 }}>
-                          {error}
-                        </small>
-                      }
-                    />
+                      severity={"error"}
+                      sx={{ width: "100%" }}
+                    >
+                      <small style={{ marginLeft: 15, fontSize: 15 }}>
+                        {error}
+                      </small>
+                    </Alert>
                   </Snackbar>
                   <p style={{ color: "red" }}>{error}</p>
                 </div>
@@ -1237,15 +1258,15 @@ class MassEnergizeForm extends Component {
                     autoHideDuration={6000}
                     onClose={this.handleCloseStyle}
                   >
-                    <MySnackbarContentWrapper
+                    <Alert
                       onClose={this.handleCloseStyle}
-                      variant="success"
-                      message={
-                        <small style={{ marginLeft: 15, fontSize: 14 }}>
-                          {successMsg}
-                        </small>
-                      }
-                    />
+                      severity={"success"}
+                      sx={{ width: "100%" }}
+                    >
+                      <small style={{ marginLeft: 15, fontSize: 15 }}>
+                        {successMsg}
+                      </small>
+                    </Alert>
                   </Snackbar>
                   <p style={{ color: "green" }}>{successMsg}</p>
                 </div>

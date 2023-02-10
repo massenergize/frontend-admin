@@ -1,13 +1,14 @@
-import { Link, RadioGroup, Typography, withStyles } from "@material-ui/core";
-import Paper from "@material-ui/core/Paper";
+import { RadioGroup, Typography } from "@mui/material";
+
+import Paper from "@mui/material/Paper";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import LightAutoComplete from "./tools/LightAutoComplete";
-import { Radio } from "@material-ui/core";
-import { FormControlLabel } from "@material-ui/core";
-import { TextField } from "@material-ui/core";
+import { Radio } from "@mui/material";
+import { FormControlLabel } from "@mui/material";
+import { TextField } from "@mui/material";
 import { bindActionCreators } from "redux";
 import {
   reduxAddToGalleryImages,
@@ -19,10 +20,11 @@ import {
   smartString,
 } from "../ME  Tools/media library/shared/utils/utils";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
+import {withStyles} from '@mui/styles'
+import PapperBlock from "../../../components/PapperBlock/PapperBlock";
 import { fetchParamsFromURL } from "../../../utils/common";
-import { withRouter } from "react-router-dom";
-const styles = (theme) => {
-  const spacing = theme.spacing.unit;
+import { makeStyles, } from "@mui/styles";
+
   const error = {
     background: "rgb(255, 214, 214)",
     color: "rgb(170, 28, 28)",
@@ -32,25 +34,34 @@ const styles = (theme) => {
     borderRadius: 5,
     cursor: "pointer",
   };
-  return {
-    container: {
-      padding: spacing * 3,
-      borderRadius: 5,
-    },
-    header: {
-      marginBottom: spacing * 2,
-    },
-    dropdownArea: {
-      marginBottom: spacing * 1,
-    },
-    error: error,
-    success: {
-      ...error,
-      background: "rgb(174, 223, 174)",
-      color: "rgb(12, 131, 30)",
-    },
-  };
-};
+
+const useStyles = makeStyles((theme) => ({
+  container: {
+    padding: theme.spacing(3),
+    borderRadius: 5,
+  },
+  error: {
+    background: "rgb(255, 214, 214)",
+    color: "rgb(170, 28, 28)",
+    width: "100%",
+    marginTop: 6,
+    padding: "16px 25px",
+    borderRadius: 5,
+    cursor: "pointer",
+  },
+  header: {
+    marginBottom: theme.spacing(2),
+  },
+  dropdownArea: {
+    marginBottom: theme.spacing(1),
+  },
+  success: {
+    ...error,
+    background: "rgb(174, 223, 174)",
+    color: "rgb(12, 131, 30)",
+  },
+}));
+
 
 const UPLOAD_URL = "/gallery.add";
 const CHOICES = { MINE: "MINE", ALL: "ALL", SPECIFIC: "SPECIFIC" };
@@ -63,7 +74,6 @@ const defaultState = {
 function AddToGallery(props) {
   const {
     auth,
-    classes,
     communities = [],
     loadMoreModalImages,
     loadModalImages,
@@ -76,6 +86,8 @@ function AddToGallery(props) {
     imagesFromGallery,
     imagesFromSearchResults,
   } = props;
+
+   const classes = useStyles();
 
   const [chosenComs, setChosenComs] = useState([]);
   const [scope, setScope] = useState(CHOICES.SPECIFIC);
@@ -193,7 +205,7 @@ function AddToGallery(props) {
 
   const isError = state.notification_type === "error";
   return (
-    <Paper className={classes.container}>
+    <PapperBlock>
       <Typography variant="h5" className={classes.header}>
         Add an image to your community's library{" "}
       </Typography>
@@ -338,7 +350,7 @@ function AddToGallery(props) {
           )}
         </p>
       )}
-    </Paper>
+    </PapperBlock>
   );
 }
 
