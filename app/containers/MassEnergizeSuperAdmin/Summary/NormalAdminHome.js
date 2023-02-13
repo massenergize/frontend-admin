@@ -32,6 +32,7 @@ import { Paper } from "@mui/material";
 import ReportingActivities from "./ReportingActivities";
 import WhatNext from "./WhatNext";
 import CommunityEngagement from "./CommunityEngagement";
+import Feature from "../../../components/FeatureFlags/Feature";
 
 class NormalAdminHome extends PureComponent {
   constructor(props) {
@@ -194,13 +195,14 @@ class NormalAdminHome extends PureComponent {
             😊
           </span>
         </h1>
+        <Feature />
 
         <Grid container className={classes.root}>
           <SummaryChart data={summary_data} />
         </Grid>
         <br />
         <WhatNext />
-        
+
         {/* {graph_data && <ActionsChartWidget data={graph_data || {}} />} */}
 
         <br />
@@ -219,7 +221,14 @@ class NormalAdminHome extends PureComponent {
             md={7}
             xs={12}
           >
-            <CommunityEngagement />
+            <Feature
+              fallback={
+                graph_data && <ActionsChartWidget data={graph_data || {}} />
+              }
+            >
+              <CommunityEngagement />
+            </Feature>
+
             {auth && !auth.is_super_admin && (
               <Grid item className={classes.root} style={{ marginTop: 20 }}>
                 {this.renderTable(auth.admin_at || [], classes)}
@@ -241,7 +250,7 @@ NormalAdminHome.propTypes = {};
 
 const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
-  // communities: state.getIn(['communities']),
+  adminCommunities: state.getIn(["communities"]),
   selected_community: state.getIn(["selected_community"]),
   summary_data: state.getIn(["summary_data"]),
   graph_data: state.getIn(["graph_data"]) || {},
