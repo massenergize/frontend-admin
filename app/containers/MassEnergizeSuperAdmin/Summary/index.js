@@ -155,10 +155,9 @@ class SummaryDashboard extends PureComponent {
         </Grid>
         <br />
         <WhatNext />
-        <Divider className={classes.divider} />
 
         {/* {graph_data && <ActionsChartWidget data={graph_data || {}} />} */}
-        <Grid container style={{ marginBottom: 15 }}>
+        <Grid container columnGap={2} style={{ marginBottom: 15 }}>
           <Grid item xs={7} style={{ marginRight: 10 }}>
             <CommunityEngagement />
           </Grid>

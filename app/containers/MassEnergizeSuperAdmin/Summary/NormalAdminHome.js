@@ -200,20 +200,23 @@ class NormalAdminHome extends PureComponent {
         </Grid>
         <br />
         <WhatNext />
-        <Divider className={classes.divider} />
+        
         {/* {graph_data && <ActionsChartWidget data={graph_data || {}} />} */}
 
         <br />
-        <Grid md={12} style={{ display: "flex", marginBottom: 10 }}>
+        <Grid
+          container
+          columnGap={2}
+          // style={{ display: "flex", marginBottom: 10 }}
+        >
           <Grid
             style={{
               display: "flex",
               flexDirection: "column",
-              marginRight: 10,
             }}
             item
             className={classes.root}
-            md={8}
+            md={7}
             xs={12}
           >
             <CommunityEngagement />

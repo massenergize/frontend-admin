@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import { Toolbar, Typography, Tooltip } from "@mui/material";
 import React from "react";
 import { PapperBlock } from "dan-components";
 import { bindActionCreators } from "redux";
@@ -189,7 +189,7 @@ const SectionTemplate = ({ content, name, description, onClick, subtitle }) => {
         >
           {name}
         </Typography>
-
+        
         <Tooltip
           title={(subtitle && subtitle(data.length)) || ""}
           placement="top"
