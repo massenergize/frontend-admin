@@ -118,8 +118,6 @@ class CreateNewActionForm extends Component {
           classes={classes}
           formJson={formJson}
           pageKey={PAGE_KEYS.CREATE_ACTION.key}
-          // unMount={this.preserveFormData.bind(this)}
-          // clearProgress={this.clearProgress.bind(this)}
           enableCancel
         />
       </div>
