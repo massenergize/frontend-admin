@@ -108,10 +108,11 @@ class Application extends React.Component {
       if (itsPassedADaySinceLogin) runAdminStatusCheck();
     }, THREE_MINUTES);
 
+    // ---- UNCOMMENT THIS WHEN WE WANT TO CONTINUE WITH PERSISTING FORM PROGRESS TO LOCAL STORAGE
     // Collect form progress from local storage after page refresh
-    var progress = localStorage.getItem(ME_FORM_PROGRESS) || "{}";
-    progress = JSON.parse(progress);
-    this.props.restoreFormProgress(progress);
+    // var progress = localStorage.getItem(ME_FORM_PROGRESS) || "{}";
+    // progress = JSON.parse(progress);
+    // this.props.restoreFormProgress(progress);
   }
 
   getCommunityList() {

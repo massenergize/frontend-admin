@@ -99,7 +99,7 @@ export const restoreFormProgress = (data = {}) => {
 };
 export const reduxKeepFormContent = ({ key, data, whole }) => {
   const payload = { ...(whole || {}), [key]: data };
-  localStorage.setItem(ME_FORM_PROGRESS, JSON.stringify(payload));
+  // localStorage.setItem(ME_FORM_PROGRESS, JSON.stringify(payload)); // -- UNCOMMENT WHEN WE WANT TO CONTINUE WITH PERSISTING PROGRESS
   return {
     type: KEEP_FORM_CONTENT,
     payload,
