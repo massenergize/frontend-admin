@@ -37,6 +37,7 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import {
   getAdminApiEndpoint,
+  handleFilterChange,
   onTableStateChange,
 } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
@@ -359,6 +360,7 @@ class AllTeams extends React.Component {
       rowsPerPage: 25,
       count: metaData && metaData.count,
       rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
       onTableChange: (action, tableState) =>
         onTableStateChange({
           action,
@@ -407,6 +409,22 @@ class AllTeams extends React.Component {
           closeAfterConfirmation: true,
         });
       },
+      onFilterChange: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_TEAMS,
+          updateReduxFunction: putTeamsInRedux,
+          reduxItems: allTeams,
+          url: getAdminApiEndpoint(auth, "/teams"),
+        }),
     };
 
     if (!data || !data.length) {

@@ -27,6 +27,7 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import {
   getAdminApiEndpoint,
+  handleFilterChange,
   onTableStateChange,
 } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
@@ -241,6 +242,7 @@ class AllVendors extends React.Component {
       rowsPerPage: 25,
       count: metaData && metaData.count,
       rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
       onTableChange: (action, tableState) =>
         onTableStateChange({
           action,
@@ -279,6 +281,22 @@ class AllVendors extends React.Component {
           />
         );
       },
+      onFilterChange: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_VENDORS,
+          updateReduxFunction: putVendorsInRedux,
+          reduxItems: allVendors,
+          url: getAdminApiEndpoint(auth, "/vendors"),
+        }),
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({

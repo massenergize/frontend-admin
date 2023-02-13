@@ -41,6 +41,7 @@ import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import {
   getAdminApiEndpoint,
+  handleFilterChange,
   onTableStateChange,
 } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
@@ -376,6 +377,7 @@ class AllEvents extends React.Component {
       rowsPerPage: 25,
       count: allEvents && allEvents.meta && allEvents.meta.count,
       rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
       onTableChange: (action, tableState) =>
         onTableStateChange({
           action,
@@ -414,6 +416,22 @@ class AllEvents extends React.Component {
           />
         );
       },
+      onFilterChange: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_EVENTS,
+          updateReduxFunction: putEventsInRedux,
+          reduxItems: allEvents,
+          url: getAdminApiEndpoint(auth, "/events"),
+        }),
       customSort: this.customSort,
       rowsPerPageOptions: [10, 25, 100],
       downloadOptions: {

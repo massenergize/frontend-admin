@@ -123,16 +123,17 @@ function METable(props) {
    */
 
   const onFilterChange = (
-    changedColumn,
+    column,
     filterList,
     type,
     changedColumnIndex,
     displayData
   ) => {
     const { columns, options } = tableProps || {};
+//  this changes have been made to allow us apply custom filtering to the table.
     if(options.onFilterChange){
       let { obj, newColumns } = options.onFilterChange(
-        changedColumn,
+        column,
         filterList,
         type,
         changedColumnIndex,
@@ -145,11 +146,11 @@ function METable(props) {
       return 
     }
     
-    const columnIndex = columns.findIndex((c) => c.name === changedColumn);
+    const columnIndex = columns.findIndex((c) => c.name === column);
     const obj = filterObject.current;
     if (columnIndex === -1) return;
     var filter = obj[columnIndex] || {};
-    filter = { name: changedColumn, type, list: filterList[columnIndex] };
+    filter = { name: column, type, list: filterList[columnIndex] };
     const newObj = { ...(obj || {}), [columnIndex]: filter };
     filterObject.current = newObj;
     if (saveFilters) saveSelectedFilters(newObj);

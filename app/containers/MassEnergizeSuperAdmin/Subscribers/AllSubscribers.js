@@ -18,7 +18,7 @@ import {
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { getAdminApiEndpoint, getLimit, onTableStateChange } from "../../../utils/helpers";
+import { getAdminApiEndpoint, getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
@@ -184,6 +184,7 @@ class AllSubscribers extends React.Component {
       count: metaData && metaData.count,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
       customSearchRender: (
         searchText,
         handleSearch,
@@ -231,6 +232,22 @@ class AllSubscribers extends React.Component {
           closeAfterConfirmation: true,
         });
       },
+      onFilterChange: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_SUBSCRIBERS,
+          updateReduxFunction: putSubscribersInRedux,
+          reduxItems: subscribers,
+          url: getAdminApiEndpoint(auth, "/subscribers"),
+        }),
     };
     if (!data || !data.length) {
       return <LinearBuffer />;

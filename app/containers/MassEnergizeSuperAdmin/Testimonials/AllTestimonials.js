@@ -33,6 +33,7 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import {
   getAdminApiEndpoint,
+  handleFilterChange,
   onTableStateChange,
 } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
@@ -397,11 +398,12 @@ class AllTestimonials extends React.Component {
     const metaData = allTestimonials.meta;
     const options = {
       filterType: "dropdown",
-        responsive: "standard",
+      responsive: "standard",
       count: metaData && metaData.count,
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
       customSearchRender: (
         searchText,
         handleSearch,
@@ -440,6 +442,22 @@ class AllTestimonials extends React.Component {
           />
         );
       },
+      onFilterChange: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_TESTIMONIALS,
+          updateReduxFunction: putTestimonialsInRedux,
+          reduxItems: allTestimonials,
+          url: getAdminApiEndpoint(auth, "/testimonials"),
+        }),
       customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;

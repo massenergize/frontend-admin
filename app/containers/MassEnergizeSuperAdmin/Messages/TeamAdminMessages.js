@@ -24,7 +24,7 @@ import {
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { getLimit, onTableStateChange } from "../../../utils/helpers";
+import { getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import { replyToMessage } from "./CommunityAdminMessages";
@@ -237,11 +237,12 @@ class AllTeamAdminMessages extends React.Component {
     const metaData = teamMessages &&  teamMessages.meta;
     const options = {
       filterType: "dropdown",
-        responsive: "standard",
+      responsive: "standard",
       count: metaData && metaData.count,
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
       onTableChange: (action, tableState) =>
         onTableStateChange({
           action,
@@ -290,6 +291,22 @@ class AllTeamAdminMessages extends React.Component {
         });
         return false;
       },
+      onFilterChange: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_TEAM_MESSAGES,
+          updateReduxFunction: putTeamMessagesInRedux,
+          reduxItems: teamMessages,
+          url: "/messages.listTeamAdminMessages",
+        }),
     };
 
     if (!data || !data.length) {

@@ -27,7 +27,7 @@ import { Alert, Snackbar, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import { getAdminApiEndpoint, getLimit, onTableStateChange } from "../../../utils/helpers";
+import { getAdminApiEndpoint, getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
@@ -329,6 +329,22 @@ class AllCommunities extends React.Component {
           />
         );
       },
+      onFilterChange: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_COMMUNITIES,
+          updateReduxFunction: putCommunitiesInRedux,
+          reduxItems: communities,
+          url: getAdminApiEndpoint(auth, "/communities"),
+        }),
     };
 
     if (!data || !data.length) {

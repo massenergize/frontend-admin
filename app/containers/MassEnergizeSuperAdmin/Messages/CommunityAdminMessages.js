@@ -25,7 +25,7 @@ import { Chip } from "@mui/material";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { getLimit, onTableStateChange } from "../../../utils/helpers";
+import { getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
@@ -282,11 +282,12 @@ class AllCommunityAdminMessages extends React.Component {
     const metaData = messages && messages.meta;
     const options = {
       filterType: "dropdown",
-        responsive: "standard",
+      responsive: "standard",
       count: metaData && metaData.count,
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
       onTableChange: (action, tableState) =>
         onTableStateChange({
           action,
@@ -335,6 +336,22 @@ class AllCommunityAdminMessages extends React.Component {
         });
         return false;
       },
+      onFilterChange: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_ADMIN_MESSAGES,
+          updateReduxFunction: putMessagesInRedux,
+          reduxItems: messages,
+          url: "/messages.listForCommunityAdmin",
+        }),
     };
     if (!data || !data.length) {
       return <LinearBuffer />;

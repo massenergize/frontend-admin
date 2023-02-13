@@ -22,7 +22,7 @@ import {
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { getAdminApiEndpoint, onTableStateChange } from "../../../utils/helpers";
+import { getAdminApiEndpoint, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import { withRouter } from "react-router-dom";
@@ -199,6 +199,7 @@ class AllUsers extends React.Component {
       count: metaData && metaData.count,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
       onTableChange: (action, tableState) =>
         onTableStateChange({
           action,
@@ -247,6 +248,22 @@ class AllUsers extends React.Component {
         });
         return false;
       },
+      onFilterChange: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_USERS,
+          updateReduxFunction: putUsersInRedux,
+          reduxItems: allUsers,
+          url: getAdminApiEndpoint(auth, "/users"),
+        }),
     };
 
     if (!data || !data.length) {
