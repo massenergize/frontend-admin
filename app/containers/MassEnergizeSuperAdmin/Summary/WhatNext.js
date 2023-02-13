@@ -22,7 +22,14 @@ function WhatNext({ data }) {
   console.log("Her eis the data", data);
   if (!Object.keys(data).length)
     return (
-      <div style={{ padding: 20, background: "white", borderRadius: 10 }}>
+      <div
+        style={{
+          padding: 20,
+          background: "white",
+          borderRadius: 10,
+          marginBottom: 10,
+        }}
+      >
         <LinearBuffer message="We are looking for items you need to handle..." />
       </div>
     );
@@ -189,7 +196,7 @@ const SectionTemplate = ({ content, name, description, onClick, subtitle }) => {
         >
           {name}
         </Typography>
-        
+
         <Tooltip
           title={(subtitle && subtitle(data.length)) || ""}
           placement="top"

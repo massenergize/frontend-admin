@@ -32,7 +32,7 @@ function CommunityEngagement({
   const hasOnlyOneCommunity = communities.length === 1;
   const first = (communities || [])[0];
 
-  console.log("here are the egag",engagements)
+  console.log("here are the egag", engagements);
 
   // ----------------------------------------------------------------------
   const loadEngagements = () => {
@@ -196,6 +196,7 @@ function CommunityEngagement({
               labelExtractor={(c) => c.name}
               valueExtractor={(c) => c.subdomain}
               onItemSelected={openImpactPage}
+            
             />
           )}
         </div>
@@ -261,13 +262,6 @@ export const AddFilters = ({
 
   const isCustomRange = ((options && options.range) || [])[0] === "custom";
 
-  // const handleRangeSelection = (selection) => {
-  //   const item = selection[0];
-  //   if (item === "custom") return setCustomRange(true);
-  //   setOptions({ ...options, range: selection });
-  //   setCustomRange(false);
-  // };
-
   const handleDateSelection = (date, name) => {
     setOptions({ ...options, [name]: date });
   };
@@ -313,6 +307,7 @@ export const AddFilters = ({
           labelExtractor={(c) => c.name}
           defaultValue={comValue}
           onItemSelected={handleCommunitySelection}
+          showSelectAll={false}
         />
       </div>
       {isCustomRange && (
