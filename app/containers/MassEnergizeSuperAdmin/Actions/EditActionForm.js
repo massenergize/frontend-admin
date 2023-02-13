@@ -57,11 +57,7 @@ export const checkIfReadOnly = (action, user) => {
   }
   return (action.is_global && !user.is_super_admin) || readOnlyWrongCommunity;
 };
-export const makeTagSection = ({
-  collections,
-  action,
-  defaults = true,
-}) => {
+export const makeTagSection = ({ collections, action, defaults = true }) => {
   const section = {
     label: "Please select tag(s) that apply to this action",
     fieldType: "Section",
@@ -69,7 +65,14 @@ export const makeTagSection = ({
   };
   (collections || []).forEach((tCol) => {
     var selected = (action && action.tags) || [];
-    // selected = selected.length ? selected : (progress || {})[tCol.name];
+    let putDefaultsIfUpdating = {};
+    if (defaults) {
+      let data = selected.map((c) => c.id.toString());
+      putDefaultsIfUpdating = {
+        defaultValue: defaults && getSelectedIds(data || [], tCol.tags || []),
+      };
+    }
+
     selected = (selected.length && selected) || [];
     const newField = {
       isRequired: false,
@@ -82,7 +85,7 @@ export const makeTagSection = ({
       placeholder: "",
       fieldType: "Checkbox",
       selectMany: tCol.allow_multiple,
-      // defaultValue: defaults && getSelectedIds(selected || [], tCol.tags || []),
+      ...putDefaultsIfUpdating,
       processedDefaultValue: (selected) =>
         getSelectedIds(selected || [], tCol.tags || []),
 

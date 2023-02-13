@@ -82,7 +82,7 @@ class CreateNewEventForm extends Component {
     
     const section = makeTagSection({
       collections: tags,
-      defaults: true,
+      defaults: false,
     });
 
     const libOpen = location.state && location.state.libOpen;

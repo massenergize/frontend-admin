@@ -54,7 +54,14 @@ export const makeTagSection = ({
 
   (collections || []).forEach((tCol) => {
     var selected = (event && event.tags) || [];
-    // selected = selected.length ? selected : (progress || {})[tCol.name];
+    let putDefaultsIfUpdating = {};
+    if (defaults) {
+      let data = selected.map((c) => c.id.toString());
+      putDefaultsIfUpdating = {
+        defaultValue: defaults && getSelectedIds(data || [], tCol.tags || []),
+      };
+    }
+ 
     const newField = {
       name: tCol.name,
       label: `${tCol.name} ${
@@ -65,7 +72,7 @@ export const makeTagSection = ({
       placeholder: "",
       fieldType: "Checkbox",
       selectMany: tCol.allow_multiple,
-      // defaultValue: defaults && getSelectedIds(selected, tCol.tags || []),
+      ...putDefaultsIfUpdating,
       processedDefaultValue: (selected) =>
         getSelectedIds(selected || [], tCol.tags || []),
       dbName: "tags",

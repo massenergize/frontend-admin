@@ -45,7 +45,7 @@ function MassEnergizeForm(props) {
     const temp = [];
 
     for (var child of children) {
-      const value = progress[child.name] || child.defaultValue;
+      let value = progress[child.name] || child.defaultValue;
       //--- For situations where a field needs some unique computations before setting to "defaultValue"
       //--- All mechanics can be defined in a function and set to "processedDefaultValue"
       const { processedDefaultValue } = child || {};
