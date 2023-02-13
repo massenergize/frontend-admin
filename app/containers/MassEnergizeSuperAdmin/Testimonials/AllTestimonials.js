@@ -440,22 +440,6 @@ class AllTestimonials extends React.Component {
           />
         );
       },
-      // onFilterChange: (column, filterList, type) => {
-      //   console.log("=== type ===", type);
-      //   if (type === "chip") {
-      //     var newFilters = () => filterList;
-      //     // handleChipFilterChange({
-      //     //   column,
-      //     //   columns,
-      //     //   filterList,
-      //     //   applyFilters: newFilters,
-      //     //   url: getAdminApiEndpoint(auth, "/testimonials"),
-      //     //   updateReduxFunction: putTestimonialsInRedux,
-      //     //   reduxItems: allTestimonials,
-      //     //   pageProp: PAGE_PROPERTIES.ALL_TESTIMONIALS,
-      //     // });
-      //   }
-      // },
       customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;

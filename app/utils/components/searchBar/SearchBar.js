@@ -15,11 +15,11 @@ export default function SearchBar({url, reduxItems, updateReduxFunction, handleS
   };
   const [text, setText] = useState(getSearchText());
   
-    const handleBackendSearch = () => {
+    const handleBackendSearch = (reset=false) => {
       apiCall(url, {
         limit: getLimit(pageProp.key),
         params: JSON.stringify({
-          search_text: text,
+          search_text: reset? "": text,
         }),
       }).then((res) => {
         if (res && res.success) {
@@ -52,7 +52,6 @@ export default function SearchBar({url, reduxItems, updateReduxFunction, handleS
           placeholder='Enter text to search '
           onInput={(e) => {
             setText(e.target.value);
-            handleSearch(e.target.value);
           }}
           value={text}
         />
@@ -65,7 +64,10 @@ export default function SearchBar({url, reduxItems, updateReduxFunction, handleS
             cursor: "pointer",
           }}
         >
-          <Cancel onClick={() => hideSearch()} color="grey"/>
+          <Cancel onClick={() =>{
+            hideSearch();
+            handleBackendSearch(true)
+          }} color="grey"/>
         </div>
       </div>
 

@@ -18,7 +18,12 @@ export const getFilterParamsFromLocalStorage = (key) => {
   let filters = {};
   Object.values(tableProp).forEach((value) => {
     if (value.list.length) {
-      filters[value.name.toLowerCase()] = value.list;
+      filters[
+        value &&
+          value.name &&
+          value.name.toLowerCase &&
+          value.name.toLowerCase()
+      ] = value.list;
     }
   });
   return filters;
@@ -49,9 +54,8 @@ export const makeAPICallForMoreData = ({
 }) => {
   apiCall(apiUrl, args).then((res) => {
     if (res.success) {
-      let items = [...existing];
-      let newList = items.concat(res.data);
-      updateRedux(newList, res.meta);
+      let { items, meta } = getFilterData(res, existing, "id");
+      updateRedux(items, meta);
     }
   });
 };
@@ -85,7 +89,8 @@ const callMoreData = (
   updateReduxFunction,
   reduxItems,
   apiUrl,
-  pageProp
+  pageProp,
+  sortBy
 ) => {
   let filterParams = getFilterParamsFromLocalStorage(pageProp.key);
   makeAPICallForMoreData({
@@ -98,6 +103,7 @@ const callMoreData = (
       params: JSON.stringify({
         ...filterParams,
         search_text: getSearchText(pageProp.key) || "",
+        sort_params: sortBy,
       }),
     },
   });
@@ -112,35 +118,73 @@ export const onTableStateChange = ({
   apiUrl,
   tableState,
 }) => {
-  if (action === "changePage") {
-    // if (tableState.rowsPerPage * (tableState.page) % 50 ===0) {
-    // if (tableState.rowsPerPage * (tableState.page) === tableState.displayData.length) {
-    callMoreData(
-      metaData.next,
-      updateReduxFunction,
-      reduxItems,
-      apiUrl,
-      pageProp
-    );
+  switch (action) {
+    case "changePage":
+      if (
+        tableState.rowsPerPage * tableState.page ===
+        tableState.displayData.length
+      ) {
+        callMoreData(
+          metaData.next,
+          updateReduxFunction,
+          reduxItems,
+          apiUrl,
+          pageProp,
+          tableState && tableState.sort
+        );
+      }
+      break;
+    case "sort":
+      callMoreData(
+        1,
+        updateReduxFunction,
+        reduxItems,
+        apiUrl,
+        pageProp,
+        tableState && tableState.sortOrder
+      );
+      break;
+    default:
   }
-  // }
 };
 
-export const handleChipFilterChange = ({
-  column,
-  applyFilters,
+
+const convertToLocalFormat = (filterList, columns) => {
+  let obj = {};
+  let newColumns = [];
+
+  columns.forEach((column, index) => {
+    let newColumn = {
+      ...column,
+      options: { ...column.options, filterList: filterList[index] },
+    };
+    newColumns.push(newColumn);
+
+    let filter = {
+      name: column.name,
+      type: column.options.filterType || "",
+      list: filterList[index],
+    };
+    obj = { ...(obj || {}), [index]: filter };
+  });
+
+  return { obj, newColumns };
+};
+
+export const handleFilterChange = ({
+  filterList,
+  type,
+  columns,
+  page,
   url,
   reduxItems,
   updateReduxFunction,
-  columns,
 }) => {
-  let filterList = applyFilters()
-  console.log("=== filterList ===", filterList)
-
+  if (type === "chip") {
     let arr = generateFilterParams(filterList, columns);
     apiCall(url, {
       params: JSON.stringify(arr),
-      limit: 100,
+      limit: getLimit(page.key),
     }).then((res) => {
       if (res && res.success) {
         let filterData = getFilterData(
@@ -151,4 +195,6 @@ export const handleChipFilterChange = ({
         updateReduxFunction(filterData.items, filterData.meta);
       }
     });
+  }
+  return convertToLocalFormat(filterList, columns);
 };

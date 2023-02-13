@@ -6,19 +6,13 @@ import { apiCall } from "../../messenger";
 export default function ApplyFilterButton({ url, reduxItems, updateReduxFunction, columns, filters, applyFilters}) {
   const handleFilterSubmit = () => {
     const filterList = applyFilters()
-    console.log("== filterList ==", filterList)
-    let newFilters = [...filters]
-    let arr = generateFilterParams(newFilters, columns);
+    let arr = generateFilterParams(filterList, columns);
     apiCall(url, {
       params: JSON.stringify(arr),
       limit:100
     }).then((res) => {
       if (res && res.success) {
-        let filterData = getFilterData(
-          res,
-          reduxItems && reduxItems.items,
-          "id"
-        );
+        let filterData = getFilterData(res,reduxItems && reduxItems.items,"id");
         updateReduxFunction(filterData.items, filterData.meta);
       }
     });

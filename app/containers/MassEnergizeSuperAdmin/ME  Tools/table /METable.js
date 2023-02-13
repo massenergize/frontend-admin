@@ -121,13 +121,35 @@ function METable(props) {
    * @param {*} type
    * @returns
    */
-  const onFilterChange = (column, filterList, type) => {
-    const { columns } = tableProps || {};
-    const columnIndex = columns.findIndex((c) => c.name === column);
+
+  const onFilterChange = (
+    changedColumn,
+    filterList,
+    type,
+    changedColumnIndex,
+    displayData
+  ) => {
+    const { columns, options } = tableProps || {};
+    if(options.onFilterChange){
+      let { obj, newColumns } = options.onFilterChange(
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      );
+
+      filterObject.current = obj
+      saveSelectedFilters(newObj);
+      setTableColumns(newColumns);
+      return 
+    }
+    
+    const columnIndex = columns.findIndex((c) => c.name === changedColumn);
     const obj = filterObject.current;
     if (columnIndex === -1) return;
     var filter = obj[columnIndex] || {};
-    filter = { name: column, type, list: filterList[columnIndex] };
+    filter = { name: changedColumn, type, list: filterList[columnIndex] };
     const newObj = { ...(obj || {}), [columnIndex]: filter };
     filterObject.current = newObj;
     if (saveFilters) saveSelectedFilters(newObj);
