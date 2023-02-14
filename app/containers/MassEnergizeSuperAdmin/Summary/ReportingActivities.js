@@ -79,7 +79,7 @@ const OneActivity = ({
   const extra = super_admin_mode ? { fontSize: 15 } : {};
   const byASadmin = !super_admin_mode && by_super_admin; // To mark activities that show what superadmins have been doing to your community
   return (
-    <Typography variant="caption" style={{ marginBottom: 5, ...extra }}>
+    <Typography variant="caption" style={{ marginBottom: 5, display:"block", ...extra }}>
       {byASadmin && (
         <i
           className="fas fa-shield"

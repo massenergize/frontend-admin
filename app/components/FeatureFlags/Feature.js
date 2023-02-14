@@ -13,16 +13,14 @@ function Feature({ name, fallback, children, auth, communities }) {
     let flags = [];
     const track = [];
     for (let f of together) {
-      if (!track.includes(f.id)) {
+      if (!track.includes(f?.id)) {
         flags.push(f);
-        track.push(f.id);
+        track.push(f?.id);
       }
     }
     let flag = (flags || []).find((f) => f?.key === name);
     setFlag(flag);
   }, []);
-
-  console.log("Logging", flag);
 
   if (flag) return children;
   if (fallback) return fallback;
