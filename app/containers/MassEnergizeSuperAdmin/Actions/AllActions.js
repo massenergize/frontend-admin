@@ -119,7 +119,9 @@ class AllActions extends React.Component {
                   style={{ margin: 10 }}
                 />
               )}
-              {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
+              {!d.image && (
+                <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
+              )}
             </div>
           ),
         },
@@ -221,22 +223,36 @@ class AllActions extends React.Component {
         options: {
           filter: false,
           download: false,
+          sort: false,
           customBodyRender: (id) => (
             <div>
               <Link to={`/admin/edit/${id}/action`}>
-                <EditIcon size="small" variant="outlined" color="secondary" />
+                <EditIcon
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
               &nbsp;&nbsp;
               <Link
                 onClick={async () => {
-                  const copiedActionResponse = await apiCall("/actions.copy", {
-                    action_id: id,
-                  });
+                  const copiedActionResponse = await apiCall(
+                    "/actions.copy",
+                    {
+                      action_id: id,
+                    }
+                  );
 
-                  if (copiedActionResponse && copiedActionResponse.success) {
+                  if (
+                    copiedActionResponse &&
+                    copiedActionResponse.success
+                  ) {
                     const newAction =
                       copiedActionResponse && copiedActionResponse.data;
-                    putActionsInRedux([newAction, ...(allActions.items || [])],allActions.meta);
+                    putActionsInRedux(
+                      [newAction, ...(allActions.items || [])],
+                      allActions.meta
+                    );
                     this.props.history.push(
                       `/admin/edit/${newAction.id}/action`
                     );
@@ -244,7 +260,11 @@ class AllActions extends React.Component {
                 }}
                 to="/admin/read/actions"
               >
-                <FileCopy size="small" variant="outlined" color="secondary" />
+                <FileCopy
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
             </div>
           ),

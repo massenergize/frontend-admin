@@ -48,16 +48,21 @@ class AllTeamAdminMessages extends React.Component {
     const ids = state && state.ids;
     const comingFromDashboard = ids && ids.length;
 
-    apiCall("/messages.listTeamAdminMessages",{limit:getLimit(PAGE_PROPERTIES.ALL_TEAM_MESSAGES.key)}).then((allMessagesResponse) => {
+    apiCall("/messages.listTeamAdminMessages", {
+      limit: getLimit(PAGE_PROPERTIES.ALL_TEAM_MESSAGES.key),
+    }).then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
-       let hasItems =
+        let hasItems =
           allMessagesResponse.data &&
           allMessagesResponse.data.items &&
           allMessagesResponse.data.items.length > 0;
         this.setState({ hasNoItems: !hasItems });
 
         if (!comingFromDashboard)
-          return putTeamMessagesInRedux(allMessagesResponse.data, allMessagesResponse.meta);
+          return putTeamMessagesInRedux(
+            allMessagesResponse.data,
+            allMessagesResponse.meta
+          );
 
         this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
         reArrangeForAdmin({
@@ -167,6 +172,7 @@ class AllTeamAdminMessages extends React.Component {
       options: {
         filter: false,
         download: false,
+        sort: false,
         customBodyRender: (id) => (
           <div>
             <Link
@@ -195,26 +201,24 @@ class AllTeamAdminMessages extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/messages.delete", { message_id: found }).then(
-        (response) => {
-          if (response.success) {
-            this.props.toggleToast({
-              open: true,
-              message: "Team Message(s) successfully deleted",
-              variant: "success",
-            });
-          } else {
-            this.props.toggleToast({
-              open: true,
-              message: "An error occurred while deleting the team message(s)",
-              variant: "error",
-            });
-          }
+      apiCall("/messages.delete", { message_id: found }).then((response) => {
+        if (response.success) {
+          this.props.toggleToast({
+            open: true,
+            message: "Team Message(s) successfully deleted",
+            variant: "success",
+          });
+        } else {
+          this.props.toggleToast({
+            open: true,
+            message: "An error occurred while deleting the team message(s)",
+            variant: "error",
+          });
         }
-      );
+      });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putTeamMessagesInRedux(rem,teamMessages.meta);
+    putTeamMessagesInRedux(rem, teamMessages.meta);
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -232,9 +236,9 @@ class AllTeamAdminMessages extends React.Component {
     const description = brand.desc;
     const { columns } = this.state;
     const { classes, teamMessages, putTeamMessagesInRedux } = this.props;
-    const data = this.fashionData(teamMessages && teamMessages.items ||[]);
+    const data = this.fashionData((teamMessages && teamMessages.items) || []);
 
-    const metaData = teamMessages &&  teamMessages.meta;
+    const metaData = teamMessages && teamMessages.meta;
     const options = {
       filterType: "dropdown",
       responsive: "standard",
@@ -266,12 +270,7 @@ class AllTeamAdminMessages extends React.Component {
           />
         );
       },
-      customSearchRender: (
-        searchText,
-        handleSearch,
-        hideSearch,
-        options
-      ) => (
+      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
         <SearchBar
           url={"/messages.listTeamAdminMessages"}
           reduxItems={teamMessages}

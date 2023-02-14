@@ -224,7 +224,9 @@ class AllTestimonials extends React.Component {
                 label={
                   d.is_approved ? (d.isLive ? "Yes" : "No") : "Not Approved"
                 }
-                className={`${d.isLive ? classes.yesLabel : classes.noLabel}  ${
+                className={`${
+                  d.isLive ? classes.yesLabel : classes.noLabel
+                }  ${
                   !d.is_approved ? "not-approved" : ""
                 } touchable-opacity`}
               />
@@ -254,18 +256,24 @@ class AllTestimonials extends React.Component {
         options: {
           filter: false,
           download: false,
+          sort: false,
           customBodyRender: (id) => (
             <div>
-              <Link to={`/admin/edit/${id}/testimonial`} 
-               onClick={(e) => {
-                e.preventDefault();
-                this.props.history.push({
-                  pathname: `/admin/edit/${id}/testimonial`,
-                  state: { ids: this.state.ids },
-                });
-              }}
+              <Link
+                to={`/admin/edit/${id}/testimonial`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.props.history.push({
+                    pathname: `/admin/edit/${id}/testimonial`,
+                    state: { ids: this.state.ids },
+                  });
+                }}
               >
-                <EditIcon size="small" variant="outlined" color="secondary" />
+                <EditIcon
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
             </div>
           ),

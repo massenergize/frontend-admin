@@ -161,6 +161,7 @@ class AllVendors extends React.Component {
       options: {
         filter: false,
         download: false,
+        sort: false,
         customBodyRender: (id) => (
           <div>
             <Link to={`/admin/edit/${id}/vendor`}>
@@ -195,26 +196,24 @@ class AllVendors extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/vendors.delete", { vendor_id: found }).then(
-        (response) => {
-          if (response.success) {
-            this.props.toggleToast({
-              open: true,
-              message: "Vendor(s) successfully deleted",
-              variant: "success",
-            });
-          } else {
-            this.props.toggleToast({
-              open: true,
-              message: "An error occurred while deleting the vendor(s)",
-              variant: "error",
-            });
-          }
+      apiCall("/vendors.delete", { vendor_id: found }).then((response) => {
+        if (response.success) {
+          this.props.toggleToast({
+            open: true,
+            message: "Vendor(s) successfully deleted",
+            variant: "success",
+          });
+        } else {
+          this.props.toggleToast({
+            open: true,
+            message: "An error occurred while deleting the vendor(s)",
+            variant: "error",
+          });
         }
-      );
+      });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putVendorsInRedux( rem,allVendors.meta);
+    putVendorsInRedux(rem, allVendors.meta);
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -254,12 +253,7 @@ class AllVendors extends React.Component {
           apiUrl: getAdminApiEndpoint(auth, "/vendors"),
           pageProp: PAGE_PROPERTIES.ALL_VENDORS,
         }),
-      customSearchRender: (
-        searchText,
-        handleSearch,
-        hideSearch,
-        options
-      ) => (
+      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
         <SearchBar
           url={getAdminApiEndpoint(auth, "/vendors")}
           reduxItems={allVendors}

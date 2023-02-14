@@ -127,7 +127,9 @@ class AllEvents extends React.Component {
                   style={{ margin: 10 }}
                 />
               )}
-              {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
+              {!d.image && (
+                <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
+              )}
             </div>
           ),
         },
@@ -194,27 +196,44 @@ class AllEvents extends React.Component {
         options: {
           filter: false,
           download: false,
+          sort: false,
           customBodyRender: (id) => (
             <div style={{ display: "flex" }}>
               <Link to={`/admin/edit/${id}/event`}>
-                <EditIcon size="small" variant="outlined" color="secondary" />
+                <EditIcon
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
               &nbsp;&nbsp;
               <Link
                 onClick={async () => {
-                  const copiedEventResponse = await apiCall("/events.copy", {
-                    event_id: id,
-                  });
+                  const copiedEventResponse = await apiCall(
+                    "/events.copy",
+                    {
+                      event_id: id,
+                    }
+                  );
                   if (copiedEventResponse && copiedEventResponse.success) {
                     const newEvent =
                       copiedEventResponse && copiedEventResponse.data;
-                    this.props.history.push(`/admin/edit/${newEvent.id}/event`);
-                    putEventsInRedux([newEvent, ...(allEvents.items || [])],allEvents.meta);
+                    this.props.history.push(
+                      `/admin/edit/${newEvent.id}/event`
+                    );
+                    putEventsInRedux(
+                      [newEvent, ...(allEvents.items || [])],
+                      allEvents.meta
+                    );
                   }
                 }}
                 to="/admin/read/events"
               >
-                <FileCopy size="small" variant="outlined" color="secondary" />
+                <FileCopy
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
               {auth && auth.is_super_admin && (
                 <Link to={`/admin/read/event/${id}/event-view?from=main`}>

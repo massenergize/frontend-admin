@@ -25,7 +25,7 @@ import { Chip } from "@mui/material";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
+import { getLimit, handleFilterChange, isTrue, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
@@ -198,8 +198,8 @@ class AllCommunityAdminMessages extends React.Component {
         customBodyRender: (d) => {
           return (
             <Chip
-              label={d ? "Yes" : "No"}
-              className={d ? classes.yesLabel : classes.noLabel}
+              label={isTrue(d) ? "Yes" : "No"}
+              className={isTrue(d) ? classes.yesLabel : classes.noLabel}
             />
           );
         },
@@ -211,6 +211,7 @@ class AllCommunityAdminMessages extends React.Component {
       options: {
         filter: false,
         download: false,
+        sort:false,
         customBodyRender: (id) => (
           <div>
             {/* <Link to={`/admin/edit/${id}/message`}>

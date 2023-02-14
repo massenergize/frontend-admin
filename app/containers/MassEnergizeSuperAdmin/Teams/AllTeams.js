@@ -218,7 +218,11 @@ class AllTeams extends React.Component {
           download: false,
           customBodyRender: (id) => (
             <Link to={`/admin/edit/${id}/team-members`}>
-              <PeopleIcon size="small" variant="outlined" color="secondary" />
+              <PeopleIcon
+                size="small"
+                variant="outlined"
+                color="secondary"
+              />
             </Link>
           ),
         },
@@ -229,6 +233,7 @@ class AllTeams extends React.Component {
         options: {
           filter: false,
           download: false,
+          sort: false,
           customBodyRender: (id) => (
             <Link
               onClick={(e) => {

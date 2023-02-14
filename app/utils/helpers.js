@@ -198,3 +198,9 @@ export const handleFilterChange = ({
   }
   return convertToLocalFormat(filterList, columns);
 };
+
+
+
+export const isTrue = (value)=>{
+  if([true, "True", "Yes", "yes"].includes(value)) return true
+}
