@@ -108,7 +108,12 @@ class HomePageEditForm extends Component {
         id: "" + c.id,
       }));
       */
+
     const eventsToDisplay = [ ...events]; //...archivedEvents,
+
+    function sort_by_date(events_data) {
+      return events_data.sort((a, b) => (b.date < a.date ? 1 : -1))
+    }
 
     const formJson = {
       title: `Edit ${
@@ -289,7 +294,7 @@ class HomePageEditForm extends Component {
                     selectMany: true,
                     defaultValue: selectedEvents,
                     dbName: "featured_events",
-                    data: eventsToDisplay.sort((a, b) => (b.date < a.date ? 1 : -1)),
+                    data: sort_by_date(eventsToDisplay),
                   },
                 ],
               },
