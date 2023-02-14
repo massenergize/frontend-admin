@@ -95,7 +95,8 @@ function CommunityEngagement({
         desc=""
       >
         <Typography variant="body">
-          Here is a summary of user engagements in all of your communities.
+          Here is a summary of user engagements in all of your communities
+          within the last month.
           <br />
           {!specific && (
             <span
@@ -249,6 +250,7 @@ export const AddFilters = ({
   const extraStyles = isSuperAdmin ? {} : { width: "auto", flex: "1" };
   const rangeValue = options.range || [];
   const comValue = options.communities || [];
+  console.log("Lets see options", options)
 
   const handleCommunitySelection = (selection) => {
     const last = selection[selection.length - 1];

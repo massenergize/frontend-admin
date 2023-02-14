@@ -80,7 +80,10 @@ export const reducerForUserEngagements = (state = LOADING, action = {}) => {
       return state;
   }
 };
-export const reducerForEngagementOptions = (state = {}, action = {}) => {
+export const reducerForEngagementOptions = (
+  state = { range: ["last-month"], communities: ["all"] },
+  action = {}
+) => {
   switch (action.type) {
     case SET_ENGAGMENT_OPTIONS:
       return action.payload;
