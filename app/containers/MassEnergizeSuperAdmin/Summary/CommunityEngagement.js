@@ -53,7 +53,7 @@ function CommunityEngagement({
   const openImpactPage = (items) => {
     const [subdomain] = items || [];
     if (!subdomain) return;
-    const url = `${getHost()}/${subdomain}`;
+    const url = `${getHost()}/${subdomain}/impact`;
     window.open(url, "_blank");
   };
 
