@@ -8,25 +8,18 @@ import Loading from "dan-components/Loading";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 
 function WhatNext({ data }) {
-  const {
-    messages,
-    teams,
-    testimonials,
-    users,
-    team_messages,
-    // sign_ins,
-    // todo_interactions,
-    // done_interactions,
-  } = data || {};
+  const { messages, teams, testimonials, users, team_messages } = data || {};
 
   if (!Object.keys(data).length)
     return (
       <div
         style={{
+          boxShadow:
+            "0px 1px 8px 0px rgb(80 80 80 / 20%), 0px 3px 4px 0px rgb(80 80 80 / 14%), 0px 3px 3px -2px rgb(80 80 80 / 12%)",
           padding: 20,
           background: "white",
           borderRadius: 10,
-          marginBottom: 10,
+          marginBottom: 20,
         }}
       >
         <LinearBuffer message="We are looking for items you need to handle..." />
@@ -106,54 +99,6 @@ function WhatNext({ data }) {
             })
           }
         />
-        {/* <SectionTemplate
-          content={sign_ins}
-          name="Sign Ins"
-          description={(count) =>
-            `${count} ${
-              count === 1 ? "sign-in" : "sign-ins"
-            } in your communities`
-          }
-          subtitle={(_) =>
-            `The number of sign-in activities in  any of the communities you manage, on the community portal`
-          }
-        /> */}
-        {/* <SectionTemplate
-          content={done_interactions}
-          name="Actions Taken"
-          description={(count) =>
-            `${count} ${
-              count === 1 ? "action" : "actions"
-            } taken since your last visit`
-          }
-          subtitle={(_) =>
-            `These are actions in any of the communities you manage that users have taken. Click to see which actions are involved`
-          }
-          onClick={() =>
-            history.push({
-              pathname: "/admin/read/actions",
-              state: { ids: done_interactions && done_interactions.data },
-            })
-          }
-        />
-        <SectionTemplate
-          content={todo_interactions}
-          name="ACTIONS TO BE TAKEN (TODO)"
-          description={(count) =>
-            `${count} ${
-              count === 1 ? "action" : "actions"
-            } in todo list since your last visit`
-          }
-          subtitle={(_) =>
-            `These are actions in any of the communities you manage, that are in user todo lists. Click to see which actions are involved`
-          }
-          onClick={() =>
-            history.push({
-              pathname: "/admin/read/actions",
-              state: { ids: todo_interactions && todo_interactions.data },
-            })
-          }
-        /> */}
       </div>
     </PapperBlock>
   );

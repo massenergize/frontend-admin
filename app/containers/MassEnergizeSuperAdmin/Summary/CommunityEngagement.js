@@ -12,8 +12,6 @@ import {
   setEngagementOptions,
 } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
-// import { DateTimePicker, MuiPickersUtilsProvider } from "@mui/x-date-pickers";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import MomentUtils from "@date-io/moment";
@@ -30,7 +28,7 @@ function CommunityEngagement({
   putEngagementsInRedux,
 }) {
   const history = useHistory();
-  const [specific, setSpecific] = useState(true);
+  const [specific, setSpecific] = useState(false);
   const [loading, setLoading] = useState(false);
   const isSuperAdmin = auth && auth.is_super_admin;
   const hasOnlyOneCommunity = communities.length === 1;
@@ -191,7 +189,7 @@ function CommunityEngagement({
             </Typography>
           ) : (
             <MEDropdown
-              placeholder="See impact in any of your communities from the dropdown below"
+              placeholder="See impact in any of your communities from the dropdown below. (Click to select community)"
               data={communities}
               labelExtractor={(c) => c.name}
               valueExtractor={(c) => c.subdomain}
@@ -244,13 +242,11 @@ export const AddFilters = ({
   apply,
   loading,
 }) => {
-  // const [customRange, setCustomRange] = useState(true); // change to false before PR(BPR)
-
   options = options || {};
   const extraStyles = isSuperAdmin ? {} : { width: "auto", flex: "1" };
   const rangeValue = options.range || [];
   const comValue = options.communities || [];
-  console.log("Lets see options", options)
+  console.log("Lets see options", options);
 
   const handleCommunitySelection = (selection) => {
     const last = selection[selection.length - 1];
