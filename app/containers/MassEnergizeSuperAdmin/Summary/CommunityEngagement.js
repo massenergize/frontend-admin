@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { PapperBlock } from "dan-components";
 import EngagementCard from "./EngagementCard";
-import { Typography, Button } from "@mui/material";
+import { Typography, Button, TextField } from "@mui/material";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
@@ -12,11 +12,15 @@ import {
   setEngagementOptions,
 } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
-import { DateTimePicker, MuiPickersUtilsProvider } from "@mui/x-date-pickers";
+// import { DateTimePicker, MuiPickersUtilsProvider } from "@mui/x-date-pickers";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import MomentUtils from "@date-io/moment";
 import moment from "moment";
 import { LOADING } from "../../../utils/constants";
 import { useHistory, withRouter } from "react-router-dom";
+import { DatePicker } from "@mui/x-date-pickers";
 function CommunityEngagement({
   communities,
   auth,
@@ -32,13 +36,10 @@ function CommunityEngagement({
   const hasOnlyOneCommunity = communities.length === 1;
   const first = (communities || [])[0];
 
-  console.log("here are the egag", engagements);
-
   // ----------------------------------------------------------------------
   const loadEngagements = () => {
     apiCall("/summary.get.engagements", { time_range: "last-month" }).then(
       (response) => {
-        console.log("Loading for the first time", response);
         if (!response.success) return response.error;
         putEngagementsInRedux(response.data);
       }
@@ -72,11 +73,9 @@ function CommunityEngagement({
       communities: options.communities,
       ...dates,
     };
-    console.log("This is where the body is", body);
     setLoading(true);
 
     apiCall("/summary.get.engagements", body).then((response) => {
-      console.log("I think I am the response", response);
       if (!response.success) return response.error;
       setLoading(false);
       putEngagementsInRedux(response.data);
@@ -196,7 +195,6 @@ function CommunityEngagement({
               labelExtractor={(c) => c.name}
               valueExtractor={(c) => c.subdomain}
               onItemSelected={openImpactPage}
-            
             />
           )}
         </div>
@@ -315,26 +313,39 @@ export const AddFilters = ({
           <Typography variant="body">
             Select your start, and end date below
           </Typography>
-          <MuiPickersUtilsProvider
-            utils={MomentUtils}
-            style={{ width: "100%" }}
-          >
-            <DateTimePicker
-              style={{ marginRight: 10 }}
-              label="Start Date"
-              // format="MM/DD/YYYY"
-              format="MM-DD-YYYY HH:mm"
-              value={(options && options.startDate) || moment.now()}
-              onChange={(date) => handleDateSelection(date, "startDate")}
-            />
-            <DateTimePicker
-              onChange={(date) => handleDateSelection(date, "endDate")}
-              value={(options && options.endDate) || moment.now()}
-              label="End Date"
-              // format="MM/DD/YYYY"
-              format="MM-DD-YYYY HH:mm"
-            />
-          </MuiPickersUtilsProvider>
+          <div style={{ marginTop: 16 }}>
+            <LocalizationProvider
+              dateAdapter={AdapterMoment}
+              utils={MomentUtils}
+            >
+              <div
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <DatePicker
+                  renderInput={(props) => (
+                    <TextField style={{ marginRight: 10 }} {...props} />
+                  )}
+                  label="Start Date"
+                  value={(options && options.startDate) || moment.now()}
+                  onChange={(date) => handleDateSelection(date, "startDate")}
+                />
+                <Typography style={{ marginRight: 10 }}>To</Typography>
+                <DatePicker
+                  onChange={(date) => handleDateSelection(date, "endDate")}
+                  renderInput={(props) => <TextField {...props} />}
+                  value={(options && options.endDate) || moment.now()}
+                  label="End Date"
+
+                  // format="MM/DD/YYYY"
+                />
+              </div>
+            </LocalizationProvider>
+          </div>
         </div>
       )}
       <div

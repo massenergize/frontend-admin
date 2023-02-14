@@ -19,7 +19,6 @@ function WhatNext({ data }) {
     // done_interactions,
   } = data || {};
 
-  console.log("Her eis the data", data);
   if (!Object.keys(data).length)
     return (
       <div
