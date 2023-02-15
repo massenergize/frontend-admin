@@ -276,7 +276,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadTasksAction(tasks.data));
     dispatch(loadSettings(preferences.data || {}));
     dispatch(loadFeatureFlags(featureFlags.data || {}));
-    dispatch(reduxLoadAllOtherCommunities(otherCommunities.data));
+    dispatch(reduxLoadAllOtherCommunities(otherCommunities.data, otherCommunities.meta));
     dispatch(reduxLoadNextStepsSummary(adminNextSteps.data));
   });
 };
@@ -289,13 +289,13 @@ export const reduxSaveOtherEventState = (data = {}) => ({
   type: SAVE_OTHER_EVENT_STATES,
   payload: data,
 });
-export const reduxLoadAllOtherEvents = (data = []) => ({
+export const reduxLoadAllOtherEvents = (data = [], meta={}) => ({
   type: LOAD_ALL_OTHER_EVENTS,
-  payload: data,
+  payload: {items:data, meta:meta},
 });
-export const reduxLoadAllOtherCommunities = (data = []) => ({
+export const reduxLoadAllOtherCommunities = (data = [], meta={}) => ({
   type: LOAD_ALL_OTHER_COMMUNITIES,
-  payload: data,
+  payload: {items:data, meta},
 });
 
 export const reduxAddFlagInfo = (data = {}) => ({

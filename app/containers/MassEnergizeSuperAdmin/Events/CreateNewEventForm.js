@@ -56,7 +56,7 @@ class CreateNewEventForm extends Component {
       tags.items.length &&
       auth &&
       otherCommunities &&
-      otherCommunities.length;
+      otherCommunities.items && otherCommunities.items.length;
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderPageFirstTime || state.mounted;
@@ -71,7 +71,7 @@ class CreateNewEventForm extends Component {
     const formJson = createFormJson({
       communities: coms,
       auth,
-      otherCommunities,
+      otherCommunities: otherCommunities.items || [],
     });
 
     const section = makeTagSection({ collections: tags.items, defaults: false });

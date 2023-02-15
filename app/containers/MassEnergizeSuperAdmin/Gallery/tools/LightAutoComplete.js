@@ -146,7 +146,7 @@ function LightAutoComplete(props) {
       : 0;
     return height;
   };
-  const onlyValues = selected.map((itm) => getValue(itm));
+  const onlyValues = (selected||[]).map((itm) => getValue(itm));
   const thereAreNoOptionsToDisplay = optionsToDisplay.length === 0;
   const userHasSelectedStuff = selected.length;
 

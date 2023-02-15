@@ -1,9 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import MUIDataTable from "mui-datatables";
-import CallMadeIcon from "@mui/icons-material/CallMade";
-import EditIcon from "@mui/icons-material/Edit";
-import { Link } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";

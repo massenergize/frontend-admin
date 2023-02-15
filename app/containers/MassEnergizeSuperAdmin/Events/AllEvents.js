@@ -4,7 +4,6 @@ import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 
-import MUIDataTable from "mui-datatables";
 import FileCopy from "@mui/icons-material/FileCopy";
 import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
@@ -22,8 +21,6 @@ import {
   reduxGetAllCommunityEvents,
   loadAllEvents,
   reduxToggleUniversalModal,
-  reduxLoadAllOtherEvents,
-  reduxSaveOtherEventState,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import {
@@ -369,6 +366,9 @@ class AllEvents extends React.Component {
     apiCall("/events.others.listForCommunityAdmin", {
       community_ids: ids,
       exclude: exclude || false,
+      limit:50,
+      params:json.stringify({}),
+      page:1,
     })
       .then((response) => {
         this.setState({ loading: false });

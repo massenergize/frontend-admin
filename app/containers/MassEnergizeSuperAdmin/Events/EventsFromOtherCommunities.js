@@ -1,8 +1,6 @@
 import {
   Avatar,
   Button,
-  Checkbox,
-  FormControlLabel,
   Paper,
   Tooltip,
   Typography,
@@ -26,6 +24,7 @@ function EventsFromOtherCommunities({
 }) {
   const [loading, setLoading] = useState(false);
   const { communities, exclude, mounted } = state || {};
+
 
   const setCommunities = (communities) => {
     putStateInRedux({ ...(state || {}), communities });
@@ -52,12 +51,12 @@ function EventsFromOtherCommunities({
     ]);
     return fashioned;
   };
-  const data = fashionData(otherEvents || []);
+  const data = fashionData(otherEvents && otherEvents.items || []);
 
   useEffect(() => {
     if (!mounted) {
       // First time the page loads, Preselect all communities
-      setCommunities(otherCommunities);
+      setCommunities(otherCommunities.items || []);
       // fetchOtherEvents(otherCommunities);  // Uncheck if we want to automatically load in events from all the preselected communities as well
     }
   }, [otherCommunities]);
@@ -72,7 +71,7 @@ function EventsFromOtherCommunities({
     })
       .then((response) => {
         setLoading(false);
-        if (response.success) return putOtherEventsInRedux(response.data);
+        if (response.success) return putOtherEventsInRedux(response.data, response.meta);
       })
       .catch((e) => {
         setLoading(false);
@@ -223,7 +222,7 @@ function EventsFromOtherCommunities({
           <LightAutoComplete
             placeholder="Select Communities..."
             defaultSelected={communities || []}
-            data={otherCommunities || []}
+            data={otherCommunities.items || []}
             labelExtractor={(it) => it.name}
             valueExtractor={(it) => it.id}
             onChange={(items) => setCommunities(items)}

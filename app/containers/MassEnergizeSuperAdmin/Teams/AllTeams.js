@@ -275,13 +275,13 @@ class AllTeams extends React.Component {
   }
 
   makeLiveOrNot(item) {
-    const putInRedux = this.props.putTeamsInRedux;
-    const data = this.props.allTeams || [];
+    let {putTeamsInRedux, allTeams} = this.props;
+    const data = allTeams && allTeams.items  || [];
     const status = item.is_published;
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
-    putInRedux([...data]);
+    putTeamsInRedux([...data], allTeams.meta);
     apiCall("/teams.update", {
       id: item.id,
       is_published: !status,

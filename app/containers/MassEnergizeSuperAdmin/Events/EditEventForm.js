@@ -124,7 +124,7 @@ class EditEventForm extends Component {
       heap,
       passedEvent, // In cases where this component is being used as a child component, the event object will be passed here directly
     } = props;
-    const { id } = match.params;
+    const id = match &&  match.params && match.params.id;
     var { rescheduledEvent, event } = state;
 
     rescheduledEvent = exceptions[id] || rescheduledEvent;
@@ -133,7 +133,7 @@ class EditEventForm extends Component {
     // ----------------------------------------------------------------------
     if (!passedEvent) {
       //--- Search for events from my event list
-      event = (events || []).find((e) => e.id.toString() === id.toString());
+      event = (events.items || []).find((e) => e.id.toString() === id.toString());
 
       //--- If not found, look inside heap
       if (!event) event = (eventsInHeap || {})[id];
@@ -171,8 +171,8 @@ class EditEventForm extends Component {
       tags.items &&
       tags.items.length &&
       (readOnly || rescheduledEvent || thereIsNothingInEventsExceptionsList);
-      otherCommunities &&
-      otherCommunities.length;
+      otherCommunities && otherCommunities.items && otherCommunities.items.length
+      
 
     /**
      * Now, when all the values needed to create the form are loaded in, we now need to create the form
@@ -199,7 +199,7 @@ class EditEventForm extends Component {
       communities: coms,
       rescheduledEvent,
       auth,
-      otherCommunities,
+      otherCommunities: otherCommunities.items || [],
     });
 
     const section = makeTagSection({ collections: tags, event });
