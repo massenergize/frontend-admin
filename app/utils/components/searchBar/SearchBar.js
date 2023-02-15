@@ -23,12 +23,8 @@ export default function SearchBar({url, reduxItems, updateReduxFunction, handleS
         }),
       }).then((res) => {
         if (res && res.success) {
-          let filterData = getFilterData(
-            res,
-            reduxItems && reduxItems.items,
-            "id"
-          );
-          updateReduxFunction(filterData.items, filterData.meta);
+          updateReduxFunction(res.data, res.meta);
+          handleSearch(reset ? "" : text);
         }
       });
     };

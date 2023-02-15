@@ -5,7 +5,6 @@ import MUIDataTable from "mui-datatables";
 import Avatar from "@mui/material/Avatar";
 import { apiCall } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
-
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { reduxLoadSuperAdmins } from "../../../redux/redux-actions/adminActions";
@@ -54,25 +53,17 @@ class AddRemoveSuperAdmin extends Component {
       formJson: null,
       data: [],
       columns: this.getColumns(),
-      meta: {},
     };
   }
-    setStateAsync(state) {
-    return new Promise((resolve) => {
-      this.setState(state, resolve);
-    });
-  }
 
+  static getDerivedStateFromProps(props, state) {
+    const { sadmins, putSadminsInRedux } = props;
 
-  async componentDidMount() {
-    const superAdminResponse = await apiCall("/admins.super.list");
-    if ( superAdminResponse &&superAdminResponse.data && superAdminResponse.data.items) {
-      const data = prepareTableData(superAdminResponse.data.items);
-      const meta = superAdminResponse.data.meta;
-      await this.setStateAsync({ data, meta });
-    }
+    if (sadmins === LOADING)
+      return fetchSadmins({ reduxFunction: putSadminsInRedux });
 
     if (state.mounted) return null;
+
     return {
       formJson: createFormJson(),
       mounted: true,
@@ -123,42 +114,39 @@ class AddRemoveSuperAdmin extends Component {
     },
   ];
 
-  callMoreData = (page) => {
-    let { data } = this.state;
-    var url = "/admins.super.list";
-    apiCall(url, {
-      page: page,
-    }).then((res) => {
-      if (res && res.data) {
-        // let existing = [...data];
-        // const preparedData = prepareTableData(res.data.items);
-        // let newList = existing.concat(preparedData);
-        // const meta = res.data.meta;
-        // this.setState({
-        //   data: newList,
-        //   meta: meta,
-        // });
-      }
-    });
+  fashionData = ({ data }) => {
+    if (!data || data === LOADING) return [];
+    return data.map((d) => [
+      {
+        id: d.id,
+        image: d.profile_picture,
+        initials: `${d.preferred_name &&
+          d.preferred_name.substring(0, 2).toUpperCase()}`,
+      },
+      d.full_name,
+      d.preferred_name,
+      d.email, // limit to first 20 chars
+    ]);
   };
 
+  whenRequestIsCompleted(data, successfull, resetForm) {
+    if (!successfull || !data) return;
+    const { putSadminsInRedux, sadmins } = this.props;
+    putSadminsInRedux([data, ...sadmins]);
+    resetForm && resetForm();
+  }
+
   render() {
-    const { classes } = this.props;
-    const { formJson, data, columns, meta } = this.state;
+    const { classes, sadmins } = this.props;
+    const { formJson, columns } = this.state;
+    const data = this.fashionData({ data: sadmins });
+
     const options = {
       filterType: "dropdown",
       responsive: "standard",
       print: true,
       rowsPerPage: 25,
-      count: meta.count,
       rowsPerPageOptions: [10, 25, 100],
-      onTableChange: (action, tableState) => {
-        if (action === "changePage") {
-          if (tableState.rowsPerPage * tableState.page === data.length) {
-            this.callMoreData(meta.next);
-          }
-        }
-      },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         const { pathname } = window.location;

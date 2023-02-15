@@ -495,7 +495,7 @@ class AllTestimonials extends React.Component {
       },
     };
 
-    if (!data || !data.length) {
+    if (!data || data === null) {
       return (
         <Grid
           container
@@ -504,7 +504,7 @@ class AllTestimonials extends React.Component {
           direction="row"
           justify="center"
         >
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={8}>
             <Paper className={classes.root} style={{ padding: 15 }}>
               <div className={classes.root}>
                 <LinearProgress />

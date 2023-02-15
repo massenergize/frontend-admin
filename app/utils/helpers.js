@@ -54,7 +54,7 @@ export const makeAPICallForMoreData = ({
 }) => {
   apiCall(apiUrl, args).then((res) => {
     if (res.success) {
-      let { items, meta } = getFilterData(res, existing, "id");
+      let { items, meta } = getFilterData(res, existing);
       updateRedux(items, meta);
     }
   });

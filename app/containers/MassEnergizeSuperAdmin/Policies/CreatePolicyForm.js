@@ -42,8 +42,8 @@ class CreateNewPolicyForm extends Component {
   async componentDidMount() {
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
 
-    if (communitiesResponse && communitiesResponse.data && communitiesResponse.data.items) {
-      const communities = communitiesResponse.data.items.map(c => ({ ...c, displayName: c.name }));
+    if (communitiesResponse && communitiesResponse.data) {
+      const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name }));
       await this.setStateAsync({ communities });
     }
 
