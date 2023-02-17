@@ -19,6 +19,18 @@ import moment from "moment";
 import { LOADING } from "../../../utils/constants";
 import { useHistory, withRouter } from "react-router-dom";
 import { DatePicker } from "@mui/x-date-pickers";
+import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+
+// ------------------------------------------------------------------------------------
+const TIME_RANGE = [
+  { name: "Last Visit", key: "last-visit" },
+  { name: "Last Week", key: "last-week" },
+  { name: "Last Month", key: "last-month" },
+  { name: "Custom Date", key: "custom" },
+];
+// ------------------------------------------------------------------------------------
+
 function CommunityEngagement({
   communities,
   auth,
@@ -57,7 +69,7 @@ function CommunityEngagement({
     window.open(url, "_blank");
   };
 
-  const fetchFromBackendAfterFilters = () => {
+  const fetchFromBackendAfterFilters = ({ options }) => {
     const range = (options.range || [])[0];
     const isCustom = range === "custom";
     const dates = isCustom
@@ -82,36 +94,91 @@ function CommunityEngagement({
   const doneInteractions = engagements.done_interactions;
   const todoInteractions = engagements.todo_interactions;
   const signIns = engagements.sign_ins;
+  const rangeValue = options.range || [];
 
   return (
     <div>
-      <PapperBlock
+      {/* <PapperBlock
         noMargin
         title="Community Engagement"
         icon="ios-share-outline"
         whiteBg
         desc=""
+      > */}
+      <MEPaperBlock
+        customHeader={
+          <>
+            <div style={{ marginBottom: 20 }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginBottom: 8,
+                }}
+              >
+                <Typography
+                  variant="h3"
+                  style={{
+                    fontSize: 24,
+                    color: "#8E24AA",
+                    fontWeight: "bold",
+                    marginRight: 20,
+                  }}
+                >
+                  Community Engagement
+                </Typography>
+                {!specific && (
+                  <MEDropdown
+                    multiple={false}
+                    data={TIME_RANGE}
+                    valueExtractor={(t) => t.key}
+                    labelExtractor={(t) => t.name}
+                    containerStyle={{ width: "35%", marginTop: 0 }}
+                    defaultValue={rangeValue}
+                    onItemSelected={(selection) => {
+                      const item = selection && selection[0];
+                      const op = { ...options, range: selection };
+                      if (item == "custom") {
+                        setOptions(op);
+                        return setSpecific(true);
+                      }
+                      fetchFromBackendAfterFilters({ options: op });
+                    }}
+                  />
+                )}
+              </div>
+              {loading && (
+                <>
+                  <LinearBuffer message="In a bit..." />
+                  <br />
+                </>
+              )}
+              <Typography variant="body" style={{ fontSize: "1rem" }}>
+                {" "}
+                Here is a summary of user engagements in all of your communities
+                within the last month.
+                {!specific && (
+                  <span
+                    onClick={() => setSpecific(true)}
+                    className="touchable-opacity"
+                    style={{
+                      paddingBottom: 4,
+                      border: "dotted 0px",
+                      borderBottomWidth: 2,
+                      fontWeight: "bold",
+                      color: "rgb(156, 39, 176)",
+                      marginLeft: 6,
+                    }}
+                  >
+                    Click for more specific results
+                  </span>
+                )}
+              </Typography>
+            </div>
+          </>
+        }
       >
-        <Typography variant="body">
-          Here is a summary of user engagements in all of your communities
-          within the last month.
-          <br />
-          {!specific && (
-            <span
-              onClick={() => setSpecific(true)}
-              className="touchable-opacity"
-              style={{
-                paddingBottom: 4,
-                border: "dotted 0px",
-                borderBottomWidth: 2,
-                fontWeight: "bold",
-                color: "rgb(156, 39, 176)",
-              }}
-            >
-              Click for more specific results
-            </span>
-          )}
-        </Typography>
         {specific && (
           <AddFilters
             hide={() => setSpecific(false)}
@@ -119,7 +186,7 @@ function CommunityEngagement({
             isSuperAdmin={isSuperAdmin}
             options={options}
             setOptions={setOptions}
-            apply={fetchFromBackendAfterFilters}
+            apply={() => fetchFromBackendAfterFilters({ options })}
             loading={loading}
           />
         )}
@@ -197,7 +264,8 @@ function CommunityEngagement({
             />
           )}
         </div>
-      </PapperBlock>
+      </MEPaperBlock>
+      {/* </PapperBlock> */}
     </div>
   );
 }
@@ -224,15 +292,7 @@ export default connect(
   mapDispatchToProps
 )(withRouter(CommunityEngagement));
 
-// ------------------------------------------------------------------------------------
-const TIME_RANGE = [
-  { name: "Last Visit", key: "last-visit" },
-  { name: "Last Week", key: "last-week" },
-  { name: "Last Month", key: "last-month" },
-  { name: "Custom Date & Time", key: "custom" },
-];
-// ------------------------------------------------------------------------------------
-
+// ------------------------------------------------------------------
 export const AddFilters = ({
   hide,
   communities,
@@ -246,7 +306,6 @@ export const AddFilters = ({
   const extraStyles = isSuperAdmin ? {} : { width: "auto", flex: "1" };
   const rangeValue = options.range || [];
   const comValue = options.communities || [];
-  console.log("Lets see options", options);
 
   const handleCommunitySelection = (selection) => {
     const last = selection[selection.length - 1];

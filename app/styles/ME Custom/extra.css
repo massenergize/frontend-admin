@@ -80,3 +80,7 @@
     transform: translateY(0px);
   }
 }
+
+.me-drop-override > .MuiSelect-outlined {
+  padding: 8px !important;
+}

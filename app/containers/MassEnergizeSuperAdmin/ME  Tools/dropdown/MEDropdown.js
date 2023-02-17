@@ -65,6 +65,7 @@ function MEDropdown(props) {
     >
       {placeholder && <FormLabel component="legend">{placeholder}</FormLabel>}
       <Select
+        className="me-drop-override"
         multiple={multiple}
         displayEmpty
         renderValue={(itemsToDisplay) => (
