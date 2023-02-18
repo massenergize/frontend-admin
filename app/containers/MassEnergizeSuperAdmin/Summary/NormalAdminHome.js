@@ -203,14 +203,14 @@ class NormalAdminHome extends PureComponent {
         {graph_data && <ActionsChartWidget data={graph_data || {}} />}
 
         <br />
-        <Grid md={12} style={{ display: "flex" }}>
+        <Grid md={12} className={classes.acti}>
           {auth && !auth.is_super_admin && (
             <Grid
               item
               className={classes.root}
               md={8}
               xs={12}
-              style={{ margin: 10 }}
+              style={{ marginBottom: 20 }}
             >
               {this.renderTable(auth.admin_at || [], classes)}
             </Grid>
