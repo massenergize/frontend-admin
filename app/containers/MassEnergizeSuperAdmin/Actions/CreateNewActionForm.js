@@ -148,7 +148,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
             placeholder: "eg. 1",
             fieldType: "TextField",
             contentType: "number",
-            isRequired: true,
+            isRequired: false,
             defaultValue: "",
             dbName: "rank",
             readOnly: false,
