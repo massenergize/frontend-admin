@@ -132,6 +132,8 @@ export const onTableStateChange = ({
   meta
 }) => {
 
+  console.log("== table state ===", tableState);
+
   switch (action) {
     case "changePage":
       if (
