@@ -256,9 +256,7 @@ function LightAutoComplete(props) {
                         )}
                       />
                     )}
-                    <span style={{ padding: 10 }}>
                       {getLabel(op)}
-                    </span>
                   </div>
                 );
               })}
