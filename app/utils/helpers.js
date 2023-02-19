@@ -10,7 +10,7 @@ export const getSearchText = (key) => {
 export const getLimit = (key) => {
   var tableProp = localStorage.getItem(key + TABLE_PROPERTIES);
   tableProp = JSON.parse(tableProp || null) || {};
-  return (tableProp && tableProp.rowsPerPage) || 100;
+  return (tableProp && tableProp.rowsPerPage) ||50;
 };
 export const getFilterParamsFromLocalStorage = (key) => {
   var tableProp = localStorage.getItem(key + FILTERS);
@@ -33,7 +33,7 @@ export const getFilterData = (data, existing = [], field = "id") => {
   let items = data.data || [];
   let all = [...existing, ...items];
   const unique = [...new Map(all.map((item) => [item[field], item])).values()];
-  return { items: unique, meta: data.meta };
+  return unique;
 };
 
 export const prepareFilterAndSearchParamsFromLocal = (key) => {
@@ -51,11 +51,15 @@ export const makeAPICallForMoreData = ({
   existing,
   updateRedux,
   args,
+  name,
+  updateMetaData,
+  meta
 }) => {
   apiCall(apiUrl, args).then((res) => {
     if (res.success) {
-      let { items, meta } = getFilterData(res, existing);
-      updateRedux(items, meta);
+      let data = getFilterData(res, existing);
+      updateRedux(data);
+      updateMetaData({ ...meta, [name]: res.cursor });
     }
   });
 };
@@ -90,12 +94,15 @@ const callMoreData = (
   reduxItems,
   apiUrl,
   pageProp,
-  sortBy
+  sortBy,
+  name,
+  updateMetaData,
+  meta
 ) => {
   let filterParams = getFilterParamsFromLocalStorage(pageProp.key);
   makeAPICallForMoreData({
     apiUrl,
-    existing: reduxItems && reduxItems.items,
+    existing: reduxItems,
     updateRedux: updateReduxFunction,
     args: {
       page,
@@ -106,6 +113,9 @@ const callMoreData = (
         sort_params: sortBy,
       }),
     },
+    name,
+    updateMetaData,
+    meta
   });
 };
 
@@ -117,7 +127,11 @@ export const onTableStateChange = ({
   reduxItems,
   apiUrl,
   tableState,
+  name,
+  updateMetaData,
+  meta
 }) => {
+
   switch (action) {
     case "changePage":
       if (
@@ -130,7 +144,10 @@ export const onTableStateChange = ({
           reduxItems,
           apiUrl,
           pageProp,
-          tableState && tableState.sort
+          tableState && tableState.sort,
+          name,
+          updateMetaData,
+          meta
         );
       }
       break;
@@ -141,7 +158,10 @@ export const onTableStateChange = ({
         reduxItems,
         apiUrl,
         pageProp,
-        tableState && tableState.sortOrder
+        tableState && tableState.sortOrder,
+        name,
+        updateMetaData,
+        meta
       );
       break;
     default:
@@ -179,7 +199,13 @@ export const handleFilterChange = ({
   url,
   reduxItems,
   updateReduxFunction,
+  meta,
+  name,
+  updateMetaData
 }) => {
+
+  console.log("=== filter has changed ===");
+  console.log("=== filter has changed type ===", type);
   if (type === "chip") {
     let arr = generateFilterParams(filterList, columns);
     apiCall(url, {
@@ -189,10 +215,11 @@ export const handleFilterChange = ({
       if (res && res.success) {
         let filterData = getFilterData(
           res,
-          reduxItems && reduxItems.items,
+          reduxItems,
           "id"
         );
-        updateReduxFunction(filterData.items, filterData.meta);
+        updateReduxFunction(filterData);
+        updateMetaData({ ...meta, [name]: res.cursor });
       }
     });
   }

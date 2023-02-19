@@ -58,7 +58,7 @@ export const makeTagSection = ({ collections, action, defaults = true }) => {
     children: [],
   };
 
-  (collections.items || []).forEach((tCol) => {
+  (collections || []).forEach((tCol) => {
     const newField = {
       isRequired: false,
       name: tCol.name,
@@ -126,31 +126,29 @@ class EditActionForm extends Component {
     const { id } = match.params;
     const readyToRunPageFirstTime =
       actions &&
-      actions.items &&
-      actions.items.length &&
+      actions.length &&
       ccActions &&
       ccActions.length &&
       tags &&
-      tags.items &&
-      tags.items.length;
+      tags.length;
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRunPageFirstTime || state.mounted;
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
     let action = state.action;
     if (!action) {
-      action = ((actions && actions.items) || []).find(
+      action = ((actions) || []).find(
         (a) => a.id.toString() === id.toString()
       );
     }
 
     const readOnly = checkIfReadOnly(action, auth);
-    const coms = (communities.items || []).map((c) => ({
+    const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
     }));
-    const vends = (vendors.items || []).map((c) => ({
+    const vends = (vendors || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,

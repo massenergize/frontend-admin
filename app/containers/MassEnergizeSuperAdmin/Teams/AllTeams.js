@@ -22,6 +22,7 @@ import {
   loadAllTeams,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
+  reduxLoadMetaDataAction,
 } from "../../../redux/redux-actions/adminActions";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { apiCall } from "../../../utils/messenger";
@@ -37,6 +38,7 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import {
   getAdminApiEndpoint,
+  getLimit,
   handleFilterChange,
   onTableStateChange,
 } from "../../../utils/helpers";
@@ -276,12 +278,12 @@ class AllTeams extends React.Component {
 
   makeLiveOrNot(item) {
     let {putTeamsInRedux, allTeams} = this.props;
-    const data = allTeams && allTeams.items  || [];
+    const data = allTeams || [];
     const status = item.is_published;
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
-    putTeamsInRedux([...data], allTeams.meta);
+    putTeamsInRedux([...data]);
     apiCall("/teams.update", {
       id: item.id,
       is_published: !status,
@@ -303,7 +305,7 @@ class AllTeams extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { allTeams, putTeamsInRedux } = this.props;
-    const itemsInRedux = allTeams && allTeams.items;
+    const itemsInRedux = allTeams;
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][1];
@@ -327,7 +329,7 @@ class AllTeams extends React.Component {
       );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putTeamsInRedux(rem, allTeams.meta);
+    putTeamsInRedux(rem);
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -355,9 +357,9 @@ class AllTeams extends React.Component {
     const title = brand.name + " - All Teams";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, allTeams, putTeamsInRedux, auth } = this.props;
-    const data = this.fashionData(allTeams && allTeams.items);
-    const metaData = allTeams && allTeams.meta;
+    const { classes, allTeams, putTeamsInRedux, auth, meta, putMetaDataToRedux } = this.props;
+    const data = this.fashionData(allTeams);
+    const metaData = meta && meta.teams;
     const options = {
       filterType: "dropdown",
       responsive: "standard",
@@ -376,6 +378,9 @@ class AllTeams extends React.Component {
           reduxItems: allTeams,
           apiUrl: getAdminApiEndpoint(auth, "/teams"),
           pageProp: PAGE_PROPERTIES.ALL_TEAMS,
+          updateMetaData: putMetaDataToRedux,
+          name: "teams",
+          meta: meta,
         }),
       customFilterDialogFooter: (currentFilterList, applyFilters) => {
         return (
@@ -384,8 +389,11 @@ class AllTeams extends React.Component {
             reduxItems={allTeams}
             updateReduxFunction={putTeamsInRedux}
             columns={columns}
-            filters={currentFilterList}
+            limit={getLimit(PAGE_PROPERTIES.ALL_TEAMS.key)}
             applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="teams"
+            meta={meta}
           />
         );
       },
@@ -402,6 +410,9 @@ class AllTeams extends React.Component {
           handleSearch={handleSearch}
           hideSearch={hideSearch}
           pageProp={PAGE_PROPERTIES.ALL_TEAMS}
+          updateMetaData={putMetaDataToRedux}
+          name="teams"
+          meta={meta}
         />
       ),
       customSort: this.customSort,
@@ -414,7 +425,7 @@ class AllTeams extends React.Component {
           closeAfterConfirmation: true,
         });
       },
-      onFilterChange: (
+      whenFilterChanges: (
         changedColumn,
         filterList,
         type,
@@ -429,6 +440,9 @@ class AllTeams extends React.Component {
           updateReduxFunction: putTeamsInRedux,
           reduxItems: allTeams,
           url: getAdminApiEndpoint(auth, "/teams"),
+          updateMetaData: putMetaDataToRedux,
+          name: "teams",
+          meta: meta,
         }),
     };
 
@@ -496,6 +510,7 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     allTeams: state.getIn(["allTeams"]),
     community: state.getIn(["selected_community"]),
+    meta: state.getIn(["paginationMetaData"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -507,7 +522,8 @@ function mapDispatchToProps(dispatch) {
       putTeamsInRedux: loadAllTeams,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

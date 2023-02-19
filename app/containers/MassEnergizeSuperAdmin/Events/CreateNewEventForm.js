@@ -49,20 +49,18 @@ class CreateNewEventForm extends Component {
     const { communities, tags, auth, otherCommunities } = props;
     const readyToRenderPageFirstTime =
       communities &&
-      communities.items &&
-      communities.items.length &&
+      communities.length &&
       tags &&
-      tags.items &&
-      tags.items.length &&
+      tags.length &&
       auth &&
       otherCommunities &&
-      otherCommunities.items && otherCommunities.items.length;
+      otherCommunities.length;
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderPageFirstTime || state.mounted;
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
-    const coms = (communities.items || []).map((c) => ({
+    const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
@@ -71,10 +69,10 @@ class CreateNewEventForm extends Component {
     const formJson = createFormJson({
       communities: coms,
       auth,
-      otherCommunities: otherCommunities.items || [],
+      otherCommunities: otherCommunities || [],
     });
 
-    const section = makeTagSection({ collections: tags.items, defaults: false });
+    const section = makeTagSection({ collections: tags, defaults: false });
 
     if (formJson) formJson.fields.splice(1, 0, section);
 

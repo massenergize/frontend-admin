@@ -43,6 +43,7 @@ import {
   SAVE_OTHER_EVENT_STATES,
   LOAD_ADMIN_NEXT_STEPS_SUMMARY,
   TOGGLE_UNIVERSAL_TOAST,
+  LOAD_ALL_META_DATA,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -408,6 +409,14 @@ export const allTaskFunctionsReducer = (state = [], action = {}) => {
 export const allTasksReducer = (state = [], action = {}) => {
   switch (action.type) {
     case LOAD_ALL_TASKS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const allMetaDataReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case LOAD_ALL_META_DATA:
       return action.payload;
     default:
       return state;

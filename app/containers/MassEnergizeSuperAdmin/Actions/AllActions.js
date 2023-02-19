@@ -6,7 +6,6 @@ import brand from "dan-api/dummy/brand";
 import { Helmet } from "react-helmet";
 import { withStyles } from "@mui/styles";
 
-import MUIDataTable from "mui-datatables";
 import FileCopy from "@mui/icons-material/FileCopy";
 import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
@@ -23,6 +22,7 @@ import {
   loadAllActions,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
+  reduxLoadMetaDataAction
 } from "../../../redux/redux-actions/adminActions";
 
 import {
@@ -38,7 +38,7 @@ import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import { getAdminApiEndpoint, getLimit, handleChipFilterChange, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
+import { getAdminApiEndpoint, getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
@@ -55,7 +55,7 @@ class AllActions extends React.Component {
   }
 
   async componentDidMount() {
-    const { putActionsInRedux, auth } = this.props;
+    const { putActionsInRedux, auth, meta, putMetaDataToRedux } = this.props;
     var url;
     if (auth &&auth.is_super_admin) url = "/actions.listForSuperAdmin";
     else if (auth && auth.is_community_admin) url = "/actions.listForCommunityAdmin";
@@ -63,7 +63,8 @@ class AllActions extends React.Component {
       limit: getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key),
     });
     if (allActionsResponse && allActionsResponse.success) {
-      putActionsInRedux(allActionsResponse.data, allActionsResponse.meta);
+      putActionsInRedux(allActionsResponse.data);
+      putMetaDataToRedux({ ...meta, actions: allActionsResponse.cursor });
     } else if (allActionsResponse && !allActionsResponse.success) {
       await this.setStateAsync({
         error: allActionsResponse.error,
@@ -79,15 +80,15 @@ class AllActions extends React.Component {
 
   updateRedux = (data) => {
     const { putActionsInRedux, allActions } = this.props;
-    const index = allActions.items.findIndex((a) => a.id === data.id);
-    const updateItems = allActions.items.filter((a) => a.id !== data.id);
+    const index = allActions.findIndex((a) => a.id === data.id);
+    const updateItems = allActions.filter((a) => a.id !== data.id);
     updateItems.splice(index, 0, data);
-    putActionsInRedux(updateItems,allActions.meta);
+    putActionsInRedux(updateItems)
   };
 
   changeActions = async (id) => {
     const { allActions } = this.state;
-    const newData = allActions.items.filter(
+    const newData = allActions.filter(
       (a) => (a.community && a.community.id === id) || a.is_global
     );
     await this.setStateAsync({ data: fashionData(newData) });
@@ -249,10 +250,7 @@ class AllActions extends React.Component {
                   ) {
                     const newAction =
                       copiedActionResponse && copiedActionResponse.data;
-                    putActionsInRedux(
-                      [newAction, ...(allActions.items || [])],
-                      allActions.meta
-                    );
+                    putActionsInRedux([newAction, ...(allActions || [])],);
                     this.props.history.push(
                       `/admin/edit/${newAction.id}/action`
                     );
@@ -342,13 +340,13 @@ class AllActions extends React.Component {
 
   makeLiveOrNot(item) {
     const putInRedux = this.props.putActionsInRedux;
-    const data = this.props.allActions.items || [];
+    const data = this.props.allActions || [];
     const status = item.is_published;
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
     const community = item.community;
-    putInRedux([...data],this.props.allActions.meta);
+    putInRedux([...data]);
     apiCall("/actions.update", {
       action_id: item.id,
       is_published: !status,
@@ -371,7 +369,7 @@ class AllActions extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { allActions, putActionsInRedux } = this.props;
-    const itemsInRedux = allActions.items;
+    const itemsInRedux = allActions;
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
@@ -396,7 +394,7 @@ class AllActions extends React.Component {
       );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putActionsInRedux(rem, allActions.meta);
+    putActionsInRedux(rem);
   }
   // getTimeStamp = () => {
   //   const today = new Date();
@@ -431,10 +429,11 @@ class AllActions extends React.Component {
   render() {
     const title = brand.name + " - All Actions";
     const description = brand.desc;
-    const { classes, auth, allActions, putActionsInRedux} = this.props;
+    const { classes, auth, allActions, putActionsInRedux, putMetaDataToRedux, meta} = this.props;
     const { columns, error } = this.state;
-    const data = this.fashionData(allActions && allActions.items || []);
-    const metaData = allActions && allActions.meta;
+    const data = this.fashionData(allActions || []);
+    const metaData = meta && meta.actions;
+
     if (!data || !data.length) {
       return (
         <Grid
@@ -471,7 +470,7 @@ class AllActions extends React.Component {
       responsive: "standard",
       print: true,
       rowsPerPage: 25,
-      count: metaData.count,
+      count: metaData && metaData.count,
       rowsPerPageOptions: [10, 25, 100],
       confirmFilters: true,
       onTableChange: (action, tableState) =>
@@ -484,6 +483,9 @@ class AllActions extends React.Component {
           reduxItems: allActions,
           apiUrl: getAdminApiEndpoint(auth, "/actions"),
           pageProp: PAGE_PROPERTIES.ALL_ACTIONS,
+          updateMetaData: putMetaDataToRedux,
+          name: "actions",
+          meta: meta,
         }),
       customSearchRender: (
         searchText,
@@ -498,6 +500,9 @@ class AllActions extends React.Component {
           handleSearch={handleSearch}
           hideSearch={hideSearch}
           pageProp={PAGE_PROPERTIES.ALL_ACTIONS}
+          updateMetaData={putMetaDataToRedux}
+          name="actions"
+          meta={meta}
         />
       ),
       customFilterDialogFooter: (currentFilterList, applyFilters) => {
@@ -507,13 +512,16 @@ class AllActions extends React.Component {
             reduxItems={allActions}
             updateReduxFunction={putActionsInRedux}
             columns={columns}
-            filters={currentFilterList}
+            limit={getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key)}
             applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="actions"
+            meta={meta}
           />
         );
       },
 
-      onFilterChange: (
+      whenFilterChanges: (
         changedColumn,
         filterList,
         type,
@@ -528,6 +536,9 @@ class AllActions extends React.Component {
           updateReduxFunction: putActionsInRedux,
           reduxItems: allActions,
           url: getAdminApiEndpoint(auth, "/actions"),
+          updateMetaData: putMetaDataToRedux,
+          name: "actions",
+          meta: meta,
         }),
       customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {
@@ -606,6 +617,7 @@ const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   allActions: state.getIn(["allActions"]),
   community: state.getIn(["selected_community"]),
+  meta: state.getIn(["paginationMetaData"]),
 });
 const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
@@ -615,7 +627,8 @@ const mapDispatchToProps = (dispatch) =>
       putActionsInRedux: loadAllActions,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast:reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

@@ -97,6 +97,8 @@ function METable(props) {
    * @param {*} filter 
    */
   const saveSelectedFilters = (filter) => {
+    console.log("=== filter save filters===", filter);
+    console.log("== KEY save filters==", page.key);
     localStorage.setItem(page.key + FILTERS, JSON.stringify(filter));
   };
 
@@ -122,17 +124,13 @@ function METable(props) {
    * @returns
    */
 
-  const onFilterChange = (
-    column,
-    filterList,
-    type,
-    changedColumnIndex,
-    displayData
-  ) => {
+  const onFilterChange = (column,filterList,type,changedColumnIndex,displayData) => {
     const { columns, options } = tableProps || {};
+    console.log("=== in filter change===", options)
 //  this changes have been made to allow us apply custom filtering to the table.
-    if(options.onFilterChange){
-      let { obj, newColumns } = options.onFilterChange(
+    if(options.whenFilterChanges){
+      console.log("=== In custom function===")
+      let { obj, newColumns } = options.whenFilterChanges(
         column,
         filterList,
         type,
@@ -141,8 +139,8 @@ function METable(props) {
       );
 
       filterObject.current = obj
-      saveSelectedFilters(newObj);
       setTableColumns(newColumns);
+      saveSelectedFilters(obj);
       return 
     }
     
@@ -202,7 +200,7 @@ function METable(props) {
     ...(tableProps.options || {}),
     onSearchChange,
     searchText: search || "",
-    searchOpen: search,
+    searchOpen: search ? true : false,
     onChangeRowsPerPage: whenRowsPerPageChanges,
     rowsPerPage: rowsPerPage || tableProps.options.rowsPerPage,
     onColumnSortChange: whenAdminSortsAColumn,

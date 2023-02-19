@@ -11,6 +11,7 @@ import styles from "../../../components/Widget/widget-jss";
 import {
   fetchUsersFromBackend,
   loadAllUsers,
+  reduxLoadMetaDataAction,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
@@ -22,7 +23,7 @@ import {
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { getAdminApiEndpoint, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
+import { getAdminApiEndpoint, getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import { withRouter } from "react-router-dom";
@@ -42,22 +43,7 @@ class AllUsers extends React.Component {
   }
 
   componentDidMount() {
-    // const { auth } = this.props;
-    // var url;
-    // if (!auth) return;
 
-    // if (auth.is_super_admin) url = "/users.listForSuperAdmin";
-    // else if (auth.is_community_admin) url = "/users.listForCommunityAdmin";
-    // apiCall(url, { limit: getLimit(PAGE_PROPERTIES.ALL_USERS.key) }).then(
-    //   (allUsersResponse) => {
-    //     if (allUsersResponse && allUsersResponse.success) {
-    //       this.props.putUsersInRedux(
-    //         allUsersResponse.data,
-    //         allUsersResponse.meta
-    //       );
-    //     }
-    //   }
-    // );
     const { auth, putUsersInRedux, location, fetchUsers } = this.props;
     const { state } = location;
     const ids = state && state.ids;
@@ -74,6 +60,9 @@ class AllUsers extends React.Component {
       dataSource: [],
       valueExtractor: (user) => user.email,
       reduxFxn: putUsersInRedux,
+      args:{
+        limit:getLimit(PAGE_PROPERTIES.ALL_USERS.key)
+      }
     };
     fetchUsers((data, failed) => {
       if (failed) return console.log("Could not fetch user list from B.E...");
@@ -150,7 +139,7 @@ class AllUsers extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { allUsers, putUsersInRedux } = this.props;
-    const itemsInRedux = allUsers.items || [];
+    const itemsInRedux = allUsers || [];
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][6];
@@ -172,7 +161,7 @@ class AllUsers extends React.Component {
       });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putUsersInRedux(rem, allUsers.meta);
+    putUsersInRedux(rem);
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -189,9 +178,10 @@ class AllUsers extends React.Component {
     const title = brand.name + " - Users";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, allUsers, putUsersInRedux, auth } = this.props;
-    const data = this.fashionData((allUsers && allUsers.items) || []);
-    const metaData = allUsers && allUsers.meta;
+    const { classes, allUsers, putUsersInRedux, auth, meta, putMetaDataToRedux } = this.props;
+    const data = this.fashionData(allUsers || []);
+    const metaData = meta && meta.users
+
     const options = {
       filterType: "dropdown",
       responsive: "standard",
@@ -210,6 +200,9 @@ class AllUsers extends React.Component {
           reduxItems: allUsers,
           apiUrl: getAdminApiEndpoint(auth, "/users"),
           pageProp: PAGE_PROPERTIES.ALL_USERS,
+          updateMetaData: putMetaDataToRedux,
+          name: "users",
+          meta: meta,
         }),
       customSearchRender: (
         searchText,
@@ -224,6 +217,9 @@ class AllUsers extends React.Component {
           handleSearch={handleSearch}
           hideSearch={hideSearch}
           pageProp={PAGE_PROPERTIES.ALL_USERS}
+          updateMetaData={putMetaDataToRedux}
+          name="users"
+          meta={meta}
         />
       ),
       customFilterDialogFooter: (currentFilterList, applyFilters) => {
@@ -233,8 +229,11 @@ class AllUsers extends React.Component {
             reduxItems={allUsers}
             updateReduxFunction={putUsersInRedux}
             columns={columns}
-            filters={currentFilterList}
+            limit={getLimit(PAGE_PROPERTIES.ALL_USERS.key)}
             applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="users"
+            meta={meta}
           />
         );
       },
@@ -248,7 +247,7 @@ class AllUsers extends React.Component {
         });
         return false;
       },
-      onFilterChange: (
+      whenFilterChanges: (
         changedColumn,
         filterList,
         type,
@@ -263,6 +262,9 @@ class AllUsers extends React.Component {
           updateReduxFunction: putUsersInRedux,
           reduxItems: allUsers,
           url: getAdminApiEndpoint(auth, "/users"),
+          updateMetaData: putMetaDataToRedux,
+          name: "users",
+          meta: meta,
         }),
     };
 
@@ -309,6 +311,7 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     community: state.getIn(["selected_community"]),
     allUsers: state.getIn(["allUsers"]),
+    meta: state.getIn(["paginationMetaData"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -317,7 +320,8 @@ function mapDispatchToProps(dispatch) {
       fetchUsers: fetchUsersFromBackend,
       putUsersInRedux: loadAllUsers,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

@@ -46,19 +46,19 @@ class CreateNewActionForm extends Component {
   static getDerivedStateFromProps(props, state) {
     const { communities, tags, vendors, ccActions, auth } = props;
     const fullyMountedNeverRunThisAgain =
-      communities && communities.items && communities.items.length;
+      communities && communities.length;
       tags &&
-      tags.items && tags.items.length &&
+      tags.length &&
       ccActions &&
       ccActions.length;
 
     if (!fullyMountedNeverRunThisAgain && !state.mounted) return null;
-    const coms = (communities.items || []).map((c) => ({
+    const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
     }));
-    const vends = (vendors.items || []).map((c) => ({
+    const vends = (vendors || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,

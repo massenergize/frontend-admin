@@ -20,6 +20,7 @@ import {
   reduxToggleUniversalModal,
   loadAllVendors,
   reduxToggleUniversalToast,
+  reduxLoadMetaDataAction,
 } from "../../../redux/redux-actions/adminActions";
 import { smartString } from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
@@ -27,6 +28,7 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import {
   getAdminApiEndpoint,
+  getLimit,
   handleFilterChange,
   onTableStateChange,
 } from "../../../utils/helpers";
@@ -145,7 +147,7 @@ class AllVendors extends React.Component {
       key: "communities",
       options: {
         filter: true,
-        filterType: "textField",
+        filterType: "dropdown",
       },
     },
     {
@@ -191,7 +193,7 @@ class AllVendors extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { allVendors, putVendorsInRedux } = this.props;
-    const itemsInRedux = allVendors.items || [];
+    const itemsInRedux = allVendors || [];
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
@@ -213,7 +215,7 @@ class AllVendors extends React.Component {
       });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putVendorsInRedux(rem, allVendors.meta);
+    putVendorsInRedux(rem);
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -230,9 +232,9 @@ class AllVendors extends React.Component {
     const title = brand.name + " - All Vendors";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, allVendors, putVendorsInRedux, auth } = this.props;
-    const data = this.fashionData((allVendors && allVendors.items) || []);
-    const metaData = allVendors && allVendors.meta;
+    const { classes, allVendors, putVendorsInRedux, auth, meta, putMetaDataToRedux } = this.props;
+    const data = this.fashionData((allVendors) || []);
+    const metaData = meta && meta.vendors;
 
     const options = {
       filterType: "dropdown",
@@ -252,8 +254,16 @@ class AllVendors extends React.Component {
           reduxItems: allVendors,
           apiUrl: getAdminApiEndpoint(auth, "/vendors"),
           pageProp: PAGE_PROPERTIES.ALL_VENDORS,
+          updateMetaData: putMetaDataToRedux,
+          name: "vendors",
+          meta: meta,
         }),
-      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
         <SearchBar
           url={getAdminApiEndpoint(auth, "/vendors")}
           reduxItems={allVendors}
@@ -261,6 +271,9 @@ class AllVendors extends React.Component {
           handleSearch={handleSearch}
           hideSearch={hideSearch}
           pageProp={PAGE_PROPERTIES.ALL_VENDORS}
+          updateMetaData={putMetaDataToRedux}
+          name="vendors"
+          meta={meta}
         />
       ),
       customFilterDialogFooter: (currentFilterList, applyFilters) => {
@@ -270,12 +283,15 @@ class AllVendors extends React.Component {
             reduxItems={allVendors}
             updateReduxFunction={putVendorsInRedux}
             columns={columns}
-            filters={currentFilterList}
+            limit={getLimit(PAGE_PROPERTIES.ALL_VENDORS.key)}
             applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="vendors"
+            meta={meta}
           />
         );
       },
-      onFilterChange: (
+      whenFilterChanges: (
         changedColumn,
         filterList,
         type,
@@ -290,6 +306,9 @@ class AllVendors extends React.Component {
           updateReduxFunction: putVendorsInRedux,
           reduxItems: allVendors,
           url: getAdminApiEndpoint(auth, "/vendors"),
+          updateMetaData: putMetaDataToRedux,
+          name: "vendors",
+          meta: meta,
         }),
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
@@ -303,7 +322,7 @@ class AllVendors extends React.Component {
       },
     };
 
-    if (!data || !data.length) {
+    if (!data || data == undefined) {
       return <LinearBuffer />;
     }
 
@@ -340,6 +359,7 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     allVendors: state.getIn(["allVendors"]),
     community: state.getIn(["selected_community"]),
+    meta: state.getIn(["paginationMetaData"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -349,7 +369,8 @@ function mapDispatchToProps(dispatch) {
       callVendorsForNormalAdmin: reduxGetAllCommunityVendors,
       putVendorsInRedux: loadAllVendors,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

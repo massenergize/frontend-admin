@@ -53,34 +53,39 @@ class EditTestimonial extends Component {
     // you need: communities, actions, vendors, tags, testimonials, testimonial
     var { testimonials, vendors, actions, tags, communities, match } = props;
     const { id } = match.params;
-    const testimonial = ((testimonials && testimonials.items) || []).find(
-      (t) => t.id.toString() === id.toString()
-    );
+    let testimonial = ((testimonials) || []).find((t) => t.id.toString() === id.toString());
+    if (!testimonial){
+      apiCall("/testimonials.info", {id: id }).then(response=>{
+        if (response.success){
+          testimonial = response.data
+        }
+      })
+    }
     const readyToRenderThePageFirstTime =
       testimonials &&
-      testimonials.items && testimonials.items.length &&
+      testimonials.length &&
       vendors &&
-      vendors.items && vendors.items.length &&
+      vendors.length &&
       actions &&
-      actions.items && actions.items.length&& 
+      actions.length&& 
       tags &&
-      tags.items && tags.items.length;
+      tags.length;
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderThePageFirstTime || state.mounted;
 
-    const coms = ((communities && communities.items) || []).map((c) => ({
+    const coms = ((communities) || []).map((c) => ({
       ...c,
       id: "" + c.id,
       displayName: c.name,
     }));
 
-    const vends = ((vendors && vendors.items) || []).map((c) => ({
+    const vends = ((vendors) || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
     }));
-    const acts = ((actions && actions.items) || []).map((c) => ({
+    const acts = ((actions) || []).map((c) => ({
       ...c,
       id: "" + c.id,
       displayName: c.title + ` - ${c.community && c.community.name}`,

@@ -52,7 +52,7 @@ export const makeTagSection = ({
     children: [],
   };
 
-  ((collections && collections.items) || []).forEach((tCol) => {
+  ((collections) || []).forEach((tCol) => {
     const newField = {
       name: tCol.name,
       label: `${tCol.name} ${
@@ -133,7 +133,7 @@ class EditEventForm extends Component {
     // ----------------------------------------------------------------------
     if (!passedEvent) {
       //--- Search for events from my event list
-      event = (events.items || []).find((e) => e.id.toString() === id.toString());
+      event = (events || []).find((e) => e.id.toString() === id.toString());
 
       //--- If not found, look inside heap
       if (!event) event = (eventsInHeap || {})[id];
@@ -164,14 +164,11 @@ class EditEventForm extends Component {
      */
     const readyToRenderPageFirstTime =
       event &&
-      events &&
-      events.items &&
-      events.items.length &&
+      events.length &&
       tags &&
-      tags.items &&
-      tags.items.length &&
+      tags.length &&
       (readOnly || rescheduledEvent || thereIsNothingInEventsExceptionsList);
-      otherCommunities && otherCommunities.items && otherCommunities.items.length
+      otherCommunities && otherCommunities.length
       
 
     /**
@@ -189,7 +186,7 @@ class EditEventForm extends Component {
     //--- When this value is true, it means we have been able to load all data needed to show the form, so no need to recreate formJson
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
-    const coms = (communities.items || []).map((c) => ({
+    const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
@@ -199,7 +196,7 @@ class EditEventForm extends Component {
       communities: coms,
       rescheduledEvent,
       auth,
-      otherCommunities: otherCommunities.items || [],
+      otherCommunities: otherCommunities || [],
     });
 
     const section = makeTagSection({ collections: tags, event });
@@ -229,7 +226,7 @@ class EditEventForm extends Component {
       return;
     }
     
-    event =event||(events.items || []).find((e) => e.id.toString() === id.toString())|| eventResponse.data
+    event =event||(event || []).find((e) => e.id.toString() === id.toString())|| eventResponse.data
     this.setState({event });
     const readOnly = checkIfReadOnly(event, auth);
     if (!readOnly) {

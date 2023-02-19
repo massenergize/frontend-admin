@@ -13,6 +13,9 @@ import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import CallMadeIcon from "@mui/icons-material/CallMade";
+import { getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 
 function EventsFromOtherCommunities({
   putOtherEventsInRedux,
@@ -21,6 +24,8 @@ function EventsFromOtherCommunities({
   classes,
   state,
   putStateInRedux,
+  meta,
+  putMetaDataToRedux,
 }) {
   const [loading, setLoading] = useState(false);
   const { communities, exclude, mounted } = state || {};
@@ -51,12 +56,13 @@ function EventsFromOtherCommunities({
     ]);
     return fashioned;
   };
-  const data = fashionData(otherEvents && otherEvents.items || []);
+
+  const data = fashionData(otherEvents || []);
 
   useEffect(() => {
     if (!mounted) {
       // First time the page loads, Preselect all communities
-      setCommunities(otherCommunities.items || []);
+      setCommunities(otherCommunities || []);
       // fetchOtherEvents(otherCommunities);  // Uncheck if we want to automatically load in events from all the preselected communities as well
     }
   }, [otherCommunities]);
@@ -68,10 +74,14 @@ function EventsFromOtherCommunities({
     apiCall("/events.others.listForCommunityAdmin", {
       community_ids: ids,
       exclude: exclude || false,
+      limit:getLimit(PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS.key)
     })
       .then((response) => {
         setLoading(false);
-        if (response.success) return putOtherEventsInRedux(response.data, response.meta);
+        if (response.success){
+          putOtherEventsInRedux(response.data);
+          putMetaDataToRedux({...meta, otherEvents: response.cursor });
+        }
       })
       .catch((e) => {
         setLoading(false);
@@ -156,7 +166,8 @@ function EventsFromOtherCommunities({
       },
     ];
   };
-
+const metaData =meta && meta.otherEvents
+const columns = makeColumns();
   const options = {
     filterType: "dropdown",
     responsive: "standard",
@@ -164,6 +175,70 @@ function EventsFromOtherCommunities({
     rowsPerPage: 25,
     rowsPerPageOptions: [10, 25, 100],
     selectableRows: false,
+    count: metaData && metaData.count,
+    confirmFilters: true,
+    onTableChange: (action, tableState) =>
+      onTableStateChange({
+        action,
+        tableState,
+        tableData: data,
+        metaData,
+        updateReduxFunction: putOtherEventsInRedux,
+        reduxItems: otherEvents,
+        apiUrl: "/events.others.listForCommunityAdmin",
+        pageProp: PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS,
+        updateMetaData: putMetaDataToRedux,
+        name:"otherEvents",
+        meta: meta,
+      }),
+    customSearchRender: (searchText, handleSearch, hideSearch, options) => (
+      <SearchBar
+        url={"/events.others.listForCommunityAdmin"}
+        reduxItems={otherEvents}
+        updateReduxFunction={putOtherEventsInRedux}
+        handleSearch={handleSearch}
+        hideSearch={hideSearch}
+        pageProp={PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS}
+        updateMetaData={putMetaDataToRedux}
+        name="otherEvents"
+        meta={meta}
+      />
+    ),
+    customFilterDialogFooter: (currentFilterList, applyFilters) => {
+      return (
+        <ApplyFilterButton
+          url={"/events.others.listForCommunityAdmin"}
+          reduxItems={otherEvents}
+          updateReduxFunction={putOtherEventsInRedux}
+          columns={columns}
+          filters={currentFilterList}
+          applyFilters={applyFilters}
+          updateMetaData={putMetaDataToRedux}
+          name="otherEvents"
+          meta={meta}
+        />
+      );
+    },
+
+    whenFilterChanges: (
+      changedColumn,
+      filterList,
+      type,
+      changedColumnIndex,
+      displayData
+    ) =>
+      handleFilterChange({
+        filterList,
+        type,
+        columns,
+        page: PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS,
+        updateReduxFunction: putOtherEventsInRedux,
+        reduxItems: otherEvents,
+        url:"/events.others.listForCommunityAdmin",
+        updateMetaData: putMetaDataToRedux,
+        name: "otherEvents",
+        meta: meta,
+      }),
   };
 
   const renderTable = ({ data, options }) => {
@@ -222,7 +297,7 @@ function EventsFromOtherCommunities({
           <LightAutoComplete
             placeholder="Select Communities..."
             defaultSelected={communities || []}
-            data={otherCommunities.items || []}
+            data={otherCommunities || []}
             labelExtractor={(it) => it.name}
             valueExtractor={(it) => it.id}
             onChange={(items) => setCommunities(items)}

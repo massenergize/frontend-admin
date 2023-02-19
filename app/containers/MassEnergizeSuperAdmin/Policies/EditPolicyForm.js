@@ -72,8 +72,8 @@ class EditPolicyForm extends Component {
     if (policyResponse && policyResponse.success) {
       await this.setStateAsync({ policy: policyResponse.data });
     }
-    if (communitiesResponse && communitiesResponse.data && communitiesResponse.data.items) {
-      const communities = communitiesResponse.data.items.map(c => ({ ...c, id: '' + c.id, displayName: c.name }));
+    if (communitiesResponse && communitiesResponse.data ) {
+      const communities = communitiesResponse.data.map(c => ({ ...c, id: '' + c.id, displayName: c.name }));
       await this.setStateAsync({ communities });
     }
 

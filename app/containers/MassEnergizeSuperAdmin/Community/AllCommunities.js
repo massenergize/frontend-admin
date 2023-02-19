@@ -4,7 +4,6 @@ import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 
-import MUIDataTable from "mui-datatables";
 import CallMadeIcon from "@mui/icons-material/CallMade";
 import EditIcon from "@mui/icons-material/Edit";
 import { Link } from "react-router-dom";
@@ -19,11 +18,12 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import {
   reduxLoadAllCommunities,
+  reduxLoadMetaDataAction,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import { smartString } from "../../../utils/common";
-import { Alert, Snackbar, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -42,14 +42,15 @@ class AllCommunities extends React.Component {
   }
 
   componentDidMount() {
-    const { auth } = this.props;
+    const { auth, putMetaDataToRedux, meta} = this.props;
     var url;
     if (auth && auth.is_super_admin) url = "/communities.listForSuperAdmin";
     else if (auth && auth.is_community_admin)
       url = "/communities.listForCommunityAdmin";
     apiCall(url, {limit:getLimit(PAGE_PROPERTIES.ALL_COMMUNITIES.key)}).then((allCommunitiesResponse) => {
       if (allCommunitiesResponse && allCommunitiesResponse.success) {
-        this.props.putCommunitiesInRedux(allCommunitiesResponse.data, allCommunitiesResponse.meta);
+        this.props.putCommunitiesInRedux(allCommunitiesResponse.data,);
+        putMetaDataToRedux({...meta, communities: allCommunitiesResponse.cursor});
       }
     });
   }
@@ -193,12 +194,12 @@ class AllCommunities extends React.Component {
 
   makeLiveOrNot(item) {
     const putInRedux = this.props.putCommunitiesInRedux;
-    const data = this.props.communities.items || [];
+    const data = this.props.communities || [];
     const status = item.is_published;
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
-    putInRedux( [...data],this.props.communities.meta);
+    putInRedux( [...data]);
     apiCall("/communities.update", {
       community_id: item.id,
       is_published: !status,
@@ -245,7 +246,7 @@ class AllCommunities extends React.Component {
       })
     });
     const rem = (communities || []).filter((com) => !ids.includes(com.id));
-    putCommunitiesInRedux(rem,communities.meta);
+    putCommunitiesInRedux(rem);
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -270,9 +271,11 @@ class AllCommunities extends React.Component {
     const title = brand.name + " - All Communities";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, toggleDeleteConfirmation, communities, putCommunitiesInRedux, auth } = this.props;
-    const data = this.fashionData(communities && communities.items || []);
-    const metaData = communities && communities.meta;
+    const { classes, toggleDeleteConfirmation, communities, putCommunitiesInRedux, auth, meta, putMetaDataToRedux } = this.props;
+    const data = this.fashionData(communities || []);
+    const metaData = meta && meta.communities;
+
+    console.log("=== metaData ===", meta);
     const options = {
       filterType: "dropdown",
       responsive: "standard",
@@ -301,6 +304,9 @@ class AllCommunities extends React.Component {
           reduxItems: communities,
           apiUrl: getAdminApiEndpoint(auth, "/communities"),
           pageProp: PAGE_PROPERTIES.ALL_COMMUNITIES,
+          updateMetaData: putMetaDataToRedux,
+          name: "communities",
+          meta: meta,
         }),
       customSearchRender: (
         searchText,
@@ -315,6 +321,9 @@ class AllCommunities extends React.Component {
           handleSearch={handleSearch}
           hideSearch={hideSearch}
           pageProp={PAGE_PROPERTIES.ALL_COMMUNITIES}
+          updateMetaData={putMetaDataToRedux}
+          name="communities"
+          meta={meta}
         />
       ),
       customFilterDialogFooter: (currentFilterList, applyFilters) => {
@@ -324,12 +333,15 @@ class AllCommunities extends React.Component {
             reduxItems={communities}
             updateReduxFunction={putCommunitiesInRedux}
             columns={columns}
-            filters={currentFilterList}
+            limit={getLimit(PAGE_PROPERTIES.ALL_COMMUNITIES.key)}
             applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="communities"
+            meta={meta}
           />
         );
       },
-      onFilterChange: (
+      whenFilterChanges: (
         changedColumn,
         filterList,
         type,
@@ -344,10 +356,13 @@ class AllCommunities extends React.Component {
           updateReduxFunction: putCommunitiesInRedux,
           reduxItems: communities,
           url: getAdminApiEndpoint(auth, "/communities"),
+          updateMetaData: putMetaDataToRedux,
+          name: "communities",
+          meta: meta,
         }),
     };
 
-    if (!data || !data.length) {
+    if (!data || data === null) {
       return (
         <Grid
           container
@@ -403,6 +418,7 @@ const mapStateToProps = (state) => {
   return {
     communities: state.getIn(["communities"]),
     auth: state.getIn(["auth"]),
+    meta: state.getIn(["paginationMetaData"]),
   };
 };
 
@@ -411,8 +427,9 @@ const mapDispatchToProps = (dispatch) => {
     {
       putCommunitiesInRedux: reduxLoadAllCommunities,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast,
+      toggleToast: reduxToggleUniversalToast,
       toggleLive: reduxToggleUniversalModal,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

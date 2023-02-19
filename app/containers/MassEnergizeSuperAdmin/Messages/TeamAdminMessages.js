@@ -18,6 +18,7 @@ import {
 import { Chip, Typography, Grid, Paper} from "@mui/material";
 import {
   loadTeamMessages,
+  reduxLoadMetaDataAction,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
@@ -44,7 +45,7 @@ class AllTeamAdminMessages extends React.Component {
 
   componentDidMount() {
     const { state } = this.props.location;
-    const { putTeamMessagesInRedux } = this.props;
+    const { putTeamMessagesInRedux, meta, putMetaDataToRedux } = this.props;
     const ids = state && state.ids;
     const comingFromDashboard = ids && ids.length;
 
@@ -54,15 +55,14 @@ class AllTeamAdminMessages extends React.Component {
       if (allMessagesResponse && allMessagesResponse.success) {
         let hasItems =
           allMessagesResponse.data &&
-          allMessagesResponse.data.items &&
-          allMessagesResponse.data.items.length > 0;
+          allMessagesResponse.data.length > 0;
         this.setState({ hasNoItems: !hasItems });
 
-        if (!comingFromDashboard)
-          return putTeamMessagesInRedux(
-            allMessagesResponse.data,
-            allMessagesResponse.meta
-          );
+        if (!comingFromDashboard){
+          putTeamMessagesInRedux(allMessagesResponse.data);
+          putMetaDataToRedux({...meta, teamMessages: allMessagesResponse.cursor});
+          return
+        }
 
         this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
         reArrangeForAdmin({
@@ -196,7 +196,7 @@ class AllTeamAdminMessages extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { teamMessages, putTeamMessagesInRedux } = this.props;
-    const itemsInRedux = teamMessages && teamMessages.items;
+    const itemsInRedux = teamMessages && teamMessages;
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
@@ -218,7 +218,7 @@ class AllTeamAdminMessages extends React.Component {
       });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putTeamMessagesInRedux(rem, teamMessages.meta);
+    putTeamMessagesInRedux(rem);
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -235,10 +235,10 @@ class AllTeamAdminMessages extends React.Component {
     const title = brand.name + " - Team Admin Messages";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, teamMessages, putTeamMessagesInRedux } = this.props;
-    const data = this.fashionData((teamMessages && teamMessages.items) || []);
-
-    const metaData = teamMessages && teamMessages.meta;
+    const { classes, teamMessages, putTeamMessagesInRedux, meta, putMetaDataToRedux } = this.props;
+    const data = this.fashionData((teamMessages && teamMessages) || []);
+    
+    const metaData = meta && meta.teamMessages;
     const options = {
       filterType: "dropdown",
       responsive: "standard",
@@ -257,6 +257,9 @@ class AllTeamAdminMessages extends React.Component {
           reduxItems: teamMessages,
           apiUrl: "/messages.listTeamAdminMessages",
           pageProp: PAGE_PROPERTIES.ALL_TEAM_MESSAGES,
+          updateMetaData: putMetaDataToRedux,
+          name: "teamMessages",
+          meta: meta,
         }),
       customFilterDialogFooter: (currentFilterList, applyFilters) => {
         return (
@@ -265,12 +268,20 @@ class AllTeamAdminMessages extends React.Component {
             reduxItems={teamMessages}
             updateReduxFunction={putTeamMessagesInRedux}
             columns={columns}
-            filters={currentFilterList}
+            limit={getLimit(PAGE_PROPERTIES.ALL_TEAM_MESSAGES.key)}
             applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="teamMessages"
+            meta={meta}
           />
         );
       },
-      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
         <SearchBar
           url={"/messages.listTeamAdminMessages"}
           reduxItems={teamMessages}
@@ -278,6 +289,9 @@ class AllTeamAdminMessages extends React.Component {
           handleSearch={handleSearch}
           hideSearch={hideSearch}
           pageProp={PAGE_PROPERTIES.ALL_TEAM_MESSAGES}
+          updateMetaData={putMetaDataToRedux}
+          name="teamMessages"
+          meta={meta}
         />
       ),
       onRowsDelete: (rowsDeleted) => {
@@ -290,7 +304,7 @@ class AllTeamAdminMessages extends React.Component {
         });
         return false;
       },
-      onFilterChange: (
+      whenFilterChanges: (
         changedColumn,
         filterList,
         type,
@@ -305,6 +319,9 @@ class AllTeamAdminMessages extends React.Component {
           updateReduxFunction: putTeamMessagesInRedux,
           reduxItems: teamMessages,
           url: "/messages.listTeamAdminMessages",
+          updateMetaData: putMetaDataToRedux,
+          name: "teamMessages",
+          meta: meta,
         }),
     };
 
@@ -374,6 +391,7 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     community: state.getIn(["selected_community"]),
     teamMessages: state.getIn(["teamMessages"]),
+    meta: state.getIn(["paginationMetaData"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -381,7 +399,8 @@ function mapDispatchToProps(dispatch) {
     {
       putTeamMessagesInRedux: loadTeamMessages,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

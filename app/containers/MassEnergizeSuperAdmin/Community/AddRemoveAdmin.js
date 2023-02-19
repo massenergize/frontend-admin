@@ -68,10 +68,10 @@ class AddRemoveAdmin extends Component {
     if (firstTime || notFirstTimeButNeedToFetchAdminsForDifferentCommunity)
       return fetchAdmins({ id, reduxFunction: putAdminsInRedux, admins });
 
-    const loadedRequirements = communities &&communities.items && communities.items.length;
+    const loadedRequirements = communities.length;
     if (!loadedRequirements || state.mounted) return null;
     const community = (
-      (communities && communities.items && communities.items) ||
+      (communities) ||
       []
     ).find((c) => c.id.toString() === id.toString());
 

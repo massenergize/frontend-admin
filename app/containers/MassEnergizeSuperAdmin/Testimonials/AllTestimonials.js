@@ -16,6 +16,7 @@ import styles from "../../../components/Widget/widget-jss";
 import {
   loadAllTestimonials,
   reduxGetAllCommunityTestimonials,
+  reduxLoadMetaDataAction,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
@@ -33,6 +34,7 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import {
   getAdminApiEndpoint,
+  getLimit,
   handleFilterChange,
   onTableStateChange,
 } from "../../../utils/helpers";
@@ -57,7 +59,6 @@ class AllTestimonials extends React.Component {
       fetchTestimonials,
       location,
       putTestimonialsInRedux,
-      allTestimonials,
     } = this.props;
     const { state } = location;
     const ids = state && state.ids;
@@ -69,6 +70,9 @@ class AllTestimonials extends React.Component {
       props: this.props,
       dataSource: [],
       reduxFxn: putTestimonialsInRedux,
+      args:{
+        limit:getLimit(PAGE_PROPERTIES.ALL_TESTIMONIALS)
+      }
     };
 
     this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
@@ -117,14 +121,14 @@ class AllTestimonials extends React.Component {
 
   updateTestimonials = (data) => {
     let allTestimonials = this.props.allTestimonials;
-    const index = (allTestimonials.items || []).findIndex(
+    const index = (allTestimonials || []).findIndex(
       (a) => a.id === data.id
     );
-    const updateItems = (allTestimonials.items || []).filter(
+    const updateItems = (allTestimonials || []).filter(
       (a) => a.id !== data.id
     );
     updateItems.splice(index, 0, data);
-    this.props.putTestimonialsInRedux(updateItems,allTestimonials.meta);
+    this.props.putTestimonialsInRedux(updateItems);
   };
 
   getColumns() {
@@ -294,12 +298,12 @@ class AllTestimonials extends React.Component {
 
   makeLiveOrNot(item) {
     const { putTestimonialsInRedux, allTestimonials } = this.props;
-    const data = allTestimonials.items || [];
+    const data = allTestimonials || [];
     const status = item.is_published;
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
-    putTestimonialsInRedux( [...data],allTestimonials.meta);
+    putTestimonialsInRedux( [...data],);
     const community = item.community;
     apiCall("/testimonials.update", {
       testimonial_id: item.id,
@@ -323,7 +327,7 @@ class AllTestimonials extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { allTestimonials, putTestimonialsInRedux } = this.props;
-    const itemsInRedux = allTestimonials.items || [];
+    const itemsInRedux = allTestimonials || [];
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
@@ -347,7 +351,7 @@ class AllTestimonials extends React.Component {
       );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putTestimonialsInRedux(rem,allTestimonials.meta);
+    putTestimonialsInRedux(rem);
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -399,11 +403,12 @@ class AllTestimonials extends React.Component {
       allTestimonials,
       auth,
       putTestimonialsInRedux,
+      meta, 
+      putMetaDataToRedux
     } = this.props;
-    const data = this.fashionData(
-      (allTestimonials && allTestimonials.items) || []
-    );
-    const metaData = allTestimonials.meta;
+    
+    const data = this.fashionData( (allTestimonials) || [] );
+    const metaData = meta && meta.testimonials;
     const options = {
       filterType: "dropdown",
       responsive: "standard",
@@ -425,6 +430,9 @@ class AllTestimonials extends React.Component {
           handleSearch={handleSearch}
           hideSearch={hideSearch}
           pageProp={PAGE_PROPERTIES.ALL_TESTIMONIALS}
+          updateMetaData={putMetaDataToRedux}
+          name="testimonials"
+          meta={meta}
         />
       ),
       onTableChange: (action, tableState) =>
@@ -437,6 +445,9 @@ class AllTestimonials extends React.Component {
           reduxItems: allTestimonials,
           apiUrl: getAdminApiEndpoint(auth, "/testimonials"),
           pageProp: PAGE_PROPERTIES.ALL_TESTIMONIALS,
+          updateMetaData: putMetaDataToRedux,
+          name: "testimonials",
+          meta: meta,
         }),
       customFilterDialogFooter: (currentFilterList, applyFilters) => {
         return (
@@ -445,12 +456,15 @@ class AllTestimonials extends React.Component {
             reduxItems={allTestimonials}
             updateReduxFunction={putTestimonialsInRedux}
             columns={columns}
-            filters={currentFilterList}
+            limit={getLimit(PAGE_PROPERTIES.ALL_TESTIMONIALS.key)}
             applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="testimonials"
+            meta={meta}
           />
         );
       },
-      onFilterChange: (
+      whenFilterChanges: (
         changedColumn,
         filterList,
         type,
@@ -465,6 +479,9 @@ class AllTestimonials extends React.Component {
           updateReduxFunction: putTestimonialsInRedux,
           reduxItems: allTestimonials,
           url: getAdminApiEndpoint(auth, "/testimonials"),
+          updateMetaData: putMetaDataToRedux,
+          name: "testimonials",
+          meta: meta,
         }),
       customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {
@@ -559,6 +576,7 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     allTestimonials: state.getIn(["allTestimonials"]),
     community: state.getIn(["selected_community"]),
+    meta: state.getIn(["paginationMetaData"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -568,7 +586,8 @@ function mapDispatchToProps(dispatch) {
       putTestimonialsInRedux: loadAllTestimonials,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

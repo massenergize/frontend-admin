@@ -12,6 +12,7 @@ import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import {
   loadAllAdminMessages,
+  reduxLoadMetaDataAction,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
@@ -74,7 +75,7 @@ class AllCommunityAdminMessages extends React.Component {
     console.log("INFORMATION", result);
     data.sort(_sort);
 
-    putMessagesInRedux(data, meta);
+    putMessagesInRedux(data);
     if (!notFound.length) return; // If all items are found locally, dont go to the B.E
 
     apiCall("/messages.listForCommunityAdmin", {
@@ -83,7 +84,7 @@ class AllCommunityAdminMessages extends React.Component {
       if (response.success) data = [...response.data, ...data];
       //-- Messages that were not found, have now been loaded from the B.E!
       data.sort(_sort);
-      putMessagesInRedux(data, meta);
+      putMessagesInRedux(data);
     });
   }
 
@@ -93,7 +94,7 @@ class AllCommunityAdminMessages extends React.Component {
   }
   componentDidMount() {
     const { state } = this.props.location;
-    const { messages, putMessagesInRedux, history } = this.props;
+    const { messages, putMessagesInRedux, history, meta, putMetaDataToRedux } = this.props;
     const ids = state && state.ids;
     // console.log("IS IT FROM ids", ids);
     // if (messages && messages.length) {
@@ -110,11 +111,14 @@ class AllCommunityAdminMessages extends React.Component {
     }).then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
         const data = allMessagesResponse.data;
-        const meta = allMessagesResponse.meta;
         if (ids) {
           this.setState({ ignoreSavedFilters: true, saveFilters: false });
           this.reArrangeForAdmin(data, meta);
-        } else putMessagesInRedux(data, meta);
+        } else {
+          putMessagesInRedux(data);
+          putMetaDataToRedux({...meta, adminMessages:allMessagesResponse.cursor})
+
+        }
       } else
         console.log(
           "Sorry, something happened while loading messages...",
@@ -236,7 +240,7 @@ class AllCommunityAdminMessages extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { messages, putMessagesInRedux } = this.props;
-    const itemsInRedux = messages && messages.items;
+    const itemsInRedux = messages;
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
@@ -260,7 +264,7 @@ class AllCommunityAdminMessages extends React.Component {
       );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putMessagesInRedux(rem,messages.meta);
+    putMessagesInRedux(rem);
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -278,9 +282,9 @@ class AllCommunityAdminMessages extends React.Component {
     const title = brand.name + " - Community Admin Messages";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, messages, putMessagesInRedux } = this.props;
-    const data = this.fashionData(messages && messages.items); // not ready for this yet: && this.props.messages.filter(item=>item.parent===null));
-    const metaData = messages && messages.meta;
+    const { classes, messages, putMessagesInRedux, meta, putMetaDataToRedux } = this.props;
+    const data = this.fashionData(messages); // not ready for this yet: && this.props.messages.filter(item=>item.parent===null));
+    const metaData = meta && meta.adminMessages;
     const options = {
       filterType: "dropdown",
       responsive: "standard",
@@ -299,6 +303,9 @@ class AllCommunityAdminMessages extends React.Component {
           reduxItems: messages,
           apiUrl: "/messages.listForCommunityAdmin",
           pageProp: PAGE_PROPERTIES.ALL_ADMIN_MESSAGES,
+          updateMetaData: putMetaDataToRedux,
+          name: "adminMessages",
+          meta: meta,
         }),
       customFilterDialogFooter: (currentFilterList, applyFilters) => {
         return (
@@ -307,8 +314,11 @@ class AllCommunityAdminMessages extends React.Component {
             reduxItems={messages}
             updateReduxFunction={putMessagesInRedux}
             columns={columns}
-            filters={currentFilterList}
+            limit={getLimit(PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key)}
             applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="adminMessages"
+            meta={meta}
           />
         );
       },
@@ -325,6 +335,9 @@ class AllCommunityAdminMessages extends React.Component {
           handleSearch={handleSearch}
           hideSearch={hideSearch}
           pageProp={PAGE_PROPERTIES.ALL_ADMIN_MESSAGES}
+          updateMetaData={putMetaDataToRedux}
+          name="adminMessages"
+          meta={meta}
         />
       ),
       onRowsDelete: (rowsDeleted) => {
@@ -337,7 +350,7 @@ class AllCommunityAdminMessages extends React.Component {
         });
         return false;
       },
-      onFilterChange: (
+      whenFilterChanges: (
         changedColumn,
         filterList,
         type,
@@ -352,6 +365,9 @@ class AllCommunityAdminMessages extends React.Component {
           updateReduxFunction: putMessagesInRedux,
           reduxItems: messages,
           url: "/messages.listForCommunityAdmin",
+          updateMetaData: putMetaDataToRedux,
+          name: "adminMessages",
+          meta: meta,
         }),
     };
     if (!data || !data.length) {
@@ -398,6 +414,7 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     community: state.getIn(["selected_community"]),
     messages: state.getIn(["messages"]),
+    meta: state.getIn(["paginationMetaData"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -405,7 +422,8 @@ function mapDispatchToProps(dispatch) {
     {
       putMessagesInRedux: loadAllAdminMessages,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

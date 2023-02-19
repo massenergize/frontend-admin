@@ -12,6 +12,7 @@ import styles from "../../../components/Widget/widget-jss";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import {
   loadAllSubscribers,
+  reduxLoadMetaDataAction,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
@@ -52,7 +53,8 @@ class AllSubscribers extends React.Component {
     }
 
     if (allSubscribersResponse && allSubscribersResponse.data) {
-      this.props.putSubscribersInRedux(allSubscribersResponse.data, allSubscribersResponse.meta);
+      this.props.putSubscribersInRedux(allSubscribersResponse.data);
+      this.props.putMetaDataToRedux({...this.props,meta, subscriber:allSubscribersResponse.cursor})
     }
   }
 
@@ -152,10 +154,10 @@ class AllSubscribers extends React.Component {
         }
       );
     });
-    const rem = ((itemsInRedux && itemsInRedux.items) || []).filter(
+    const rem = ((itemsInRedux) || []).filter(
       (com) => !ids.includes(com.id)
     );
-    putSubscribersInRedux(rem, itemsInRedux.meta);
+    putSubscribersInRedux(rem);
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -173,9 +175,9 @@ class AllSubscribers extends React.Component {
     const title = brand.name + " - All Subscribers";
     const description = brand.desc;
     const { columns, dataFiltered } = this.state;
-    const { classes, subscribers, putSubscribersInRedux, auth } = this.props;
-    const data = this.fashionData((subscribers && subscribers.items) || []);
-    let metaData = subscribers && subscribers.meta;
+    const { classes, subscribers, putSubscribersInRedux, auth, meta, putMetaDataToRedux } = this.props;
+    const data = this.fashionData((subscribers) || []);
+    let metaData = meta && meta.subscribers;
 
     const options = {
       filterType: "dropdown",
@@ -198,6 +200,9 @@ class AllSubscribers extends React.Component {
           handleSearch={handleSearch}
           hideSearch={hideSearch}
           pageProp={PAGE_PROPERTIES.ALL_SUBSCRIBERS}
+          updateMetaData={putMetaDataToRedux}
+          name="subscribers"
+          meta={meta}
         />
       ),
       customFilterDialogFooter: (currentFilterList, applyFilters) => {
@@ -207,8 +212,11 @@ class AllSubscribers extends React.Component {
             reduxItems={subscribers}
             updateReduxFunction={putSubscribersInRedux}
             columns={columns}
-            filters={currentFilterList}
+            limit={getLimit(PAGE_PROPERTIES.ALL_SUBSCRIBERS.key)}
             applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="subscribers"
+            meta={meta}
           />
         );
       },
@@ -222,6 +230,9 @@ class AllSubscribers extends React.Component {
           reduxItems: subscribers,
           apiUrl: getAdminApiEndpoint(auth, "/subscribers"),
           pageProp: PAGE_PROPERTIES.ALL_SUBSCRIBERS,
+          updateMetaData: putMetaDataToRedux,
+          name: "subscribers",
+          meta: meta,
         }),
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
@@ -232,7 +243,7 @@ class AllSubscribers extends React.Component {
           closeAfterConfirmation: true,
         });
       },
-      onFilterChange: (
+      whenFilterChanges: (
         changedColumn,
         filterList,
         type,
@@ -247,6 +258,9 @@ class AllSubscribers extends React.Component {
           updateReduxFunction: putSubscribersInRedux,
           reduxItems: subscribers,
           url: getAdminApiEndpoint(auth, "/subscribers"),
+          updateMetaData: putMetaDataToRedux,
+          name: "subscribers",
+          meta: meta,
         }),
     };
     if (!data || !data.length) {
@@ -268,7 +282,7 @@ class AllSubscribers extends React.Component {
           classes={classes}
           page={PAGE_PROPERTIES.ALL_SUBSCRIBERS}
           tableProps={{
-            title: "All Team Admin Messages Pro",
+            title: "All Subscribers",
             data: data,
             columns: columns,
             options: options,
@@ -288,6 +302,7 @@ function mapStateToProps(state) {
     allVendors: state.getIn(["allVendors"]),
     community: state.getIn(["selected_community"]),
     subscribers: state.getIn(["subscribers"]),
+    meta: state.getIn(["paginationMetaData"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -295,7 +310,8 @@ function mapDispatchToProps(dispatch) {
     {
       putSubscribersInRedux: loadAllSubscribers,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

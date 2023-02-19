@@ -71,7 +71,7 @@ function Gallery(props) {
   } = props;
 
   const getCommunityList = () => {
-    if (auth && auth.is_super_admin) return communities.items || [];
+    if (auth && auth.is_super_admin) return communities || [];
     if (auth && auth.is_community_admin) return auth.communities || [];
     return [];
   };

@@ -4,7 +4,7 @@ import React, {useState} from 'react'
 import { getFilterData, getLimit } from '../../helpers';
 import { apiCall } from '../../messenger';
 
-export default function SearchBar({url, reduxItems, updateReduxFunction, handleSearch, hideSearch,pageProp}) {
+export default function SearchBar({url, reduxItems, updateReduxFunction, handleSearch, hideSearch,pageProp, name, updateMetaData, meta, args}) {
   
   const TABLE_PROPERTIES = "_TABLE_PROPERTIES";
   
@@ -21,9 +21,12 @@ export default function SearchBar({url, reduxItems, updateReduxFunction, handleS
         params: JSON.stringify({
           search_text: reset? "": text,
         }),
+        ...(args || {})
       }).then((res) => {
         if (res && res.success) {
-          updateReduxFunction(res.data, res.meta);
+          console.log("=== data from Search ===", res.data);
+          updateReduxFunction(res.data);
+          updateMetaData({ ...meta, [name]: res.cursor });
           handleSearch(reset ? "" : text);
         }
       });
@@ -45,7 +48,8 @@ export default function SearchBar({url, reduxItems, updateReduxFunction, handleS
       >
         <Input
           fullWidth
-          placeholder='Enter text to search '
+          autoFocus={true}
+          placeholder="Enter text to search "
           onInput={(e) => {
             setText(e.target.value);
           }}
@@ -60,10 +64,13 @@ export default function SearchBar({url, reduxItems, updateReduxFunction, handleS
             cursor: "pointer",
           }}
         >
-          <Cancel onClick={() =>{
-            hideSearch();
-            handleBackendSearch(true)
-          }} color="grey"/>
+          <Cancel
+            onClick={() => {
+              hideSearch();
+              handleBackendSearch(true);
+            }}
+            color="grey"
+          />
         </div>
       </div>
 

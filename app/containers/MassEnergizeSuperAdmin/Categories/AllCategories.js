@@ -15,6 +15,7 @@ import { bindActionCreators } from "redux";
 import Loading from "dan-components/Loading";
 import {
   loadAllTags,
+  reduxLoadMetaDataAction,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
@@ -30,10 +31,12 @@ class AllTagCollections extends React.Component {
   }
 
   componentDidMount() {
+    let {putMetaDataToRedux, meta, putTagsInRedux} = this.props;
     apiCall("/tag_collections.listForCommunityAdmin", {limit:getLimit(PAGE_PROPERTIES.ALL_TAG_COLLECTS.key)}).then(
       (tagCollectionsResponse) => {
         if (tagCollectionsResponse && tagCollectionsResponse.success) {
-          this.props.putTagsInRedux(tagCollectionsResponse.data, tagCollectionsResponse.meta);
+          putTagsInRedux(tagCollectionsResponse.data);
+          putMetaDataToRedux({ ...meta, tagCollections:tagCollectionsResponse.cursor});
         }
       }
     );
@@ -138,7 +141,7 @@ class AllTagCollections extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { tags, putTagsInRedux } = this.props;
-    const itemsInRedux = tags.items || [];
+    const itemsInRedux = tags || [];
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
@@ -162,7 +165,7 @@ class AllTagCollections extends React.Component {
       });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putTagsInRedux(rem,tags.meta);
+    putTagsInRedux(rem);
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -180,13 +183,13 @@ class AllTagCollections extends React.Component {
     const title = brand.name + " - All Tag Collections";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, tags, putTagsInRedux } = this.props;
-    const data = this.fashionData(tags && tags.items);
-    const metaData = tags && tags.meta;
+    const { classes, tags, putTagsInRedux, meta, putMetaDataToRedux } = this.props;
+    const data = this.fashionData(tags);
+    const metaData = meta && meta.tagCollections;
 
     const options = {
       filterType: "dropdown",
-        responsive: "standard",
+      responsive: "standard",
       count: metaData && metaData.count,
       print: true,
       rowsPerPage: 25,
@@ -200,14 +203,6 @@ class AllTagCollections extends React.Component {
           closeAfterConfirmation: true,
         });
         return false;
-
-        // const idsToDelete = rowsDeleted.data;
-        // idsToDelete.forEach((d) => {
-        //   const tagCollectionId = data[d.dataIndex][0];
-        //   apiCall("/tag_collections.delete", {
-        //     tag_collection_id: tagCollectionId,
-        //   });
-        // });
       },
       onTableChange: (action, tableState) =>
         onTableStateChange({
@@ -219,6 +214,9 @@ class AllTagCollections extends React.Component {
           reduxItems: tags,
           apiUrl: "/tag_collections.listForCommunityAdmin",
           pageProp: PAGE_PROPERTIES.ALL_TAG_COLLECTS,
+          updateMetaData: putMetaDataToRedux,
+          name: "tagCollections",
+          meta: meta,
         }),
       customSearchRender: (
         searchText,
@@ -233,6 +231,9 @@ class AllTagCollections extends React.Component {
           handleSearch={handleSearch}
           hideSearch={hideSearch}
           pageProp={PAGE_PROPERTIES.ALL_TAG_COLLECTS}
+          updateMetaData={putMetaDataToRedux}
+          name="tagCollections"
+          meta={meta}
         />
       ),
       // Not needed for now.
@@ -249,7 +250,7 @@ class AllTagCollections extends React.Component {
       //   );
       // },
     };
-    if (!data || !data.length) {
+    if (!data || data===null) {
       return <Loading />;
     }
     return (
@@ -285,7 +286,11 @@ AllTagCollections.propTypes = {
 };
 
 const mapStateToProps = (state) => {
-  return { tags: state.getIn(["allTags"]) };
+  return {
+    tags: state.getIn(["allTags"]),
+    meta: state.getIn(["paginationMetaData"]),
+  };
+  
 };
 
 const mapDispatchToProps = (dispatch) => {
@@ -293,7 +298,8 @@ const mapDispatchToProps = (dispatch) => {
     {
       putTagsInRedux: loadAllTags,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

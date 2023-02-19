@@ -3,17 +3,18 @@ import React from "react";
 import { generateFilterParams, getFilterData } from "../../helpers";
 import { apiCall } from "../../messenger";
 
-export default function ApplyFilterButton({ url, reduxItems, updateReduxFunction, columns, filters, applyFilters}) {
+export default function ApplyFilterButton({ url, reduxItems, updateReduxFunction, columns, limit, applyFilters, name, meta, updateMetaData}) {
   const handleFilterSubmit = () => {
     const filterList = applyFilters()
     let arr = generateFilterParams(filterList, columns);
     apiCall(url, {
       params: JSON.stringify(arr),
-      limit:100
+      limit:limit
     }).then((res) => {
       if (res && res.success) {
-        let filterData = getFilterData(res,reduxItems && reduxItems.items,"id");
-        updateReduxFunction(filterData.items, filterData.meta);
+        let filterData = getFilterData(res,reduxItems);
+        updateReduxFunction(res.data);
+        updateMetaData({ ...meta, [name]: res.cursor });
       }
     });
   };

@@ -42,7 +42,7 @@ class CreateNewTeamForm extends Component {
 
   static getDerivedStateFromProps(props, state) {
     var { communities } = props;
-    communities = (communities.items || []).map((c) => ({
+    communities = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,

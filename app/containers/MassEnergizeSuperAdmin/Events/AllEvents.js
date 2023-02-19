@@ -22,6 +22,7 @@ import {
   loadAllEvents,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
+  reduxLoadMetaDataAction,
 } from "../../../redux/redux-actions/adminActions";
 import {
   fetchParamsFromURL,
@@ -38,6 +39,7 @@ import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import {
   getAdminApiEndpoint,
+  getLimit,
   handleFilterChange,
   onTableStateChange,
 } from "../../../utils/helpers";
@@ -218,10 +220,7 @@ class AllEvents extends React.Component {
                     this.props.history.push(
                       `/admin/edit/${newEvent.id}/event`
                     );
-                    putEventsInRedux(
-                      [newEvent, ...(allEvents.items || [])],
-                      allEvents.meta
-                    );
+                    putEventsInRedux([newEvent, ...(allEvents || [])]);
                   }
                 }}
                 to="/admin/read/events"
@@ -291,12 +290,12 @@ class AllEvents extends React.Component {
 
   makeLiveOrNot(item) {
     const putInRedux = this.props.putEventsInRedux;
-    const data = this.props.allEvents.items || [];
+    const data = this.props.allEvents || [];
     const status = item.is_published;
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
-    putInRedux( [...data],this.props.allEvents.meta);
+    putInRedux( [...data]);
     const community = item.community;
     apiCall("/events.update", {
       event_id: item.id,
@@ -354,7 +353,7 @@ class AllEvents extends React.Component {
       });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putEventsInRedux( rem,allEvents.meta);
+    putEventsInRedux( rem);
   }
   
 
@@ -366,7 +365,7 @@ class AllEvents extends React.Component {
     apiCall("/events.others.listForCommunityAdmin", {
       community_ids: ids,
       exclude: exclude || false,
-      limit:50,
+      limit:getLimit(PAGE_PROPERTIES.ALL_EVENTS.key),
       params:json.stringify({}),
       page:1,
     })
@@ -385,16 +384,16 @@ class AllEvents extends React.Component {
     const description = brand.desc;
     const { columns } = this.state;
     const { classes } = this.props;
-    const { allEvents, putEventsInRedux, auth } = this.props;
-    const data = this.fashionData(allEvents.items || []);
-    const metaData =this.props.allEvents && this.props.allEvents.meta;
-
+    const { allEvents, putEventsInRedux, auth, meta, putMetaDataToRedux } = this.props;
+    const data = this.fashionData(allEvents || []);
+    const metaData = meta && meta.events;
+    
     const options = {
       filterType: "dropdown",
       responsive: "standard",
       print: true,
       rowsPerPage: 25,
-      count: allEvents && allEvents.meta && allEvents.meta.count,
+      count: metaData && metaData.count,
       rowsPerPageOptions: [10, 25, 100],
       confirmFilters: true,
       onTableChange: (action, tableState) =>
@@ -407,6 +406,9 @@ class AllEvents extends React.Component {
           reduxItems: allEvents,
           apiUrl: getAdminApiEndpoint(auth, "/events"),
           pageProp: PAGE_PROPERTIES.ALL_EVENTS,
+          updateMetaData: putMetaDataToRedux,
+          name: "events",
+          meta: meta,
         }),
       customSearchRender: (
         searchText,
@@ -421,6 +423,9 @@ class AllEvents extends React.Component {
           handleSearch={handleSearch}
           hideSearch={hideSearch}
           pageProp={PAGE_PROPERTIES.ALL_EVENTS}
+          updateMetaData={putMetaDataToRedux}
+          name="events"
+          meta={meta}
         />
       ),
       customFilterDialogFooter: (currentFilterList, applyFilters) => {
@@ -432,10 +437,13 @@ class AllEvents extends React.Component {
             columns={columns}
             filters={currentFilterList}
             applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="events"
+            meta={meta}
           />
         );
       },
-      onFilterChange: (
+      whenFilterChanges: (
         changedColumn,
         filterList,
         type,
@@ -450,6 +458,9 @@ class AllEvents extends React.Component {
           updateReduxFunction: putEventsInRedux,
           reduxItems: allEvents,
           url: getAdminApiEndpoint(auth, "/events"),
+          updateMetaData: putMetaDataToRedux,
+          name: "events",
+          meta: meta,
         }),
       customSort: this.customSort,
       rowsPerPageOptions: [10, 25, 100],
@@ -543,6 +554,7 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     allEvents: state.getIn(["allEvents"]),
     community: state.getIn(["selected_community"]),
+    meta: state.getIn(["paginationMetaData"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -553,7 +565,8 @@ function mapDispatchToProps(dispatch) {
       putEventsInRedux: loadAllEvents,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );
