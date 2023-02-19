@@ -78,7 +78,6 @@ class AllEvents extends React.Component {
         initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`,
       },
       smartString(d.name), // limit to first 30 chars
-      d.rank,
       `${smartString(d.tags.map((t) => t.name).join(", "), 30)}`,
       d.is_global ? "Template" : d.community && d.community.name,
       { isLive: d.is_published, item: d },
@@ -136,13 +135,6 @@ class AllEvents extends React.Component {
       {
         name: "Name",
         key: "name",
-        options: {
-          filter: false,
-        },
-      },
-      {
-        name: "Rank",
-        key: "rank",
         options: {
           filter: false,
         },
@@ -319,7 +311,7 @@ class AllEvents extends React.Component {
   }
 
   customSort(data, colIndex, order) {
-    const isComparingLive = colIndex === 7;
+    const isComparingLive = colIndex === 6;
     const sortForLive = ({ a, b }) => (a.isLive && !b.isLive ? -1 : 1);
     var params = {
       colIndex,
@@ -472,7 +464,7 @@ class AllEvents extends React.Component {
         const idsToDelete = rowsDeleted.data;
         const [found] = findMatchesAndRest(idsToDelete, (it) => {
           const f = data[it.dataIndex];
-          return f[10]; // this index should be changed if anyone modifies (adds/removes) an item in fashioData()
+          return f[9]; // this index should be changed if anyone modifies (adds/removes) an item in fashioData()
         });
         const noTemplatesSelectedGoAhead = !found || !found.length;
         this.props.toggleDeleteConfirmation({

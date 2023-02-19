@@ -42,6 +42,8 @@ import {
   LOAD_ALL_OTHER_EVENTS,
   SAVE_OTHER_EVENT_STATES,
   LOAD_ADMIN_NEXT_STEPS_SUMMARY,
+  SET_ENGAGMENT_OPTIONS,
+  LOAD_USER_ENGAGEMENTS,
   TOGGLE_UNIVERSAL_TOAST,
   LOAD_ALL_META_DATA,
 } from "../ReduxConstants";
@@ -71,6 +73,25 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+export const reducerForUserEngagements = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_USER_ENGAGEMENTS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForEngagementOptions = (
+  state = { range: ["last-month"], communities: ["all"] },
+  action = {}
+) => {
+  switch (action.type) {
+    case SET_ENGAGMENT_OPTIONS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForNextStepsSummary = (state = {}, action = {}) => {
   switch (action.type) {
     case LOAD_ADMIN_NEXT_STEPS_SUMMARY:
@@ -103,7 +124,7 @@ export const reducerForAdminActivities = (state = LOADING, action = {}) => {
       return state;
   }
 };
-export const reducerForAllOtherCommunities = (state =[], action = {}) => {
+export const reducerForAllOtherCommunities = (state = [], action = {}) => {
   switch (action.type) {
     case LOAD_ALL_OTHER_COMMUNITIES:
       return action.payload;
@@ -111,7 +132,7 @@ export const reducerForAllOtherCommunities = (state =[], action = {}) => {
       return state;
   }
 };
-export const reducerForFlagInfo = (state ={}, action = {}) => {
+export const reducerForFlagInfo = (state = {}, action = {}) => {
   switch (action.type) {
     case ADD_NEW_FEATURE_FLAG_INFO:
       return action.payload;

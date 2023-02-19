@@ -166,7 +166,7 @@ const createFormJson = ({ communities, actions, vendors }) => {
             placeholder: "eg. 0",
             fieldType: "TextField",
             contentType: "number",
-            isRequired: true,
+            isRequired: false,
             defaultValue: "",
             dbName: "rank",
             readOnly: false,
