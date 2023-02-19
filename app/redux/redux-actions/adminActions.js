@@ -42,6 +42,8 @@ import {
   LOAD_ALL_OTHER_EVENTS,
   SAVE_OTHER_EVENT_STATES,
   LOAD_ADMIN_NEXT_STEPS_SUMMARY,
+  SET_ENGAGMENT_OPTIONS,
+  LOAD_USER_ENGAGEMENTS,
   TOGGLE_UNIVERSAL_TOAST,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
@@ -53,6 +55,12 @@ export const testRedux = (value) => {
   return { type: TEST_REDUX, payload: value };
 };
 
+export const loadUserEngagements = (data) => {
+  return { type: LOAD_USER_ENGAGEMENTS, payload: data };
+};
+export const setEngagementOptions = (data) => {
+  return { type: SET_ENGAGMENT_OPTIONS, payload: data };
+};
 export const runAdminStatusCheck = async () => {
   try {
     const response = await apiCall("/auth.whoami");
@@ -315,7 +323,7 @@ export const loadAllEvents = (data = null) => ({
 });
 export const fetchUsersFromBackend = (cb) => (dispatch) => {
   apiCall("/users.listForCommunityAdmin").then((allUsersResponse) => {
-    cb && cb(allUsersResponse.data, !allUsersResponse.success)
+    cb && cb(allUsersResponse.data, !allUsersResponse.success);
     if (allUsersResponse && allUsersResponse.success) {
       dispatch(loadAllUsers(allUsersResponse.data));
     }
@@ -583,9 +591,10 @@ export const reduxGetAllTestimonials = () => (dispatch) => {
   return { type: "DO_NOTHING", payload: null };
 };
 
-export const reduxGetAllCommunityActions = (community_id) => (dispatch) => {
+export const reduxGetAllCommunityActions = (community_id, cb) => (dispatch) => {
   apiCall("/actions.listForCommunityAdmin", { community_id }).then(
     (response) => {
+      cb && cb(response.data, !response.success, response.error);
       if (response && response.success) {
         redirectIfExpired(response);
         dispatch(loadAllActions(response.data));
@@ -607,7 +616,7 @@ export const reduxGetAllTags = () => (dispatch) => {
   return { type: "DO_NOTHING", payload: null };
 };
 
-export const reduxGetAllActions = () => (dispatch) => {
+export const reduxGetAllActions = (cb) => (dispatch) => {
   console.log("reduxGetAllActions calls actions.listForCommunityAdmin");
   apiCall("/actions.listForCommunityAdmin").then((response) => {
     if (response && response.success) {

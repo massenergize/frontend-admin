@@ -33,6 +33,7 @@ import {
   makeDeleteUI,
   ourCustomSort,
   pop,
+  reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
 import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
@@ -53,18 +54,37 @@ class AllActions extends React.Component {
   }
 
   async componentDidMount() {
-    const { putActionsInRedux, auth } = this.props;
-    var url;
-    if (auth.is_super_admin) url = "/actions.listForSuperAdmin";
-    else if (auth.is_community_admin) url = "/actions.listForCommunityAdmin";
-    const allActionsResponse = await apiCall(url);
-    if (allActionsResponse && allActionsResponse.success) {
-      putActionsInRedux(allActionsResponse.data);
-    } else if (allActionsResponse && !allActionsResponse.success) {
-      await this.setStateAsync({
-        error: allActionsResponse.error,
-      });
-    }
+    const { putActionsInRedux, fetchActions, location } = this.props;
+
+    const { state } = location;
+    const ids = state && state.ids;
+    const comingFromDashboard = ids && ids.length;
+
+    if (!comingFromDashboard) return fetchActions();
+    this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
+
+    var content = {
+      fieldKey: "action_ids",
+      apiURL: "/actions.listForCommunityAdmin",
+      props: this.props,
+      dataSource: [],
+      reduxFxn: putActionsInRedux,
+    };
+    fetchActions(null, (data, failed, error) => {
+      if (failed) return this.setState({ error });
+      reArrangeForAdmin({ ...content, dataSource: data });
+    });
+    // var url;
+    // if (auth.is_super_admin) url = "/actions.listForSuperAdmin";
+    // else if (auth.is_community_admin) url = "/actions.listForCommunityAdmin";
+    // const allActionsResponse = await apiCall(url);
+    // if (allActionsResponse && allActionsResponse.success) {
+    //   putActionsInRedux(allActionsResponse.data);
+    // } else if (allActionsResponse && !allActionsResponse.success) {
+    //   await this.setStateAsync({
+    //     error: allActionsResponse.error,
+    //   });
+    // }
   }
 
   setStateAsync(state) {
@@ -97,13 +117,14 @@ class AllActions extends React.Component {
         key: "id",
         options: {
           filter: false,
+          filterType: "multiselect",
         },
       },
       {
         name: "Image",
         key: "image",
         options: {
-          sort:false,
+          sort: false,
           filter: false,
           download: false,
           customBodyRender: (d) => (
@@ -287,7 +308,7 @@ class AllActions extends React.Component {
         },
       },
     ];
-  };
+  }
   /**
    * NOTE: If you add or remove a field in here, make sure your changes reflect in nowDelete.
    * Deleting heavily relies on the index arrangement of the items in here. Merci!
@@ -311,10 +332,10 @@ class AllActions extends React.Component {
       d.is_published ? "Yes" : "No",
       d.is_global,
       getHumanFriendlyDate(d.created_at, true, false),
-      getHumanFriendlyDate(d.updated_at, true, false)
+      getHumanFriendlyDate(d.updated_at, true, false),
     ]);
     return fashioned;
-  };
+  }
 
   makeLiveOrNot(item) {
     const putInRedux = this.props.putActionsInRedux;
@@ -447,7 +468,7 @@ class AllActions extends React.Component {
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
-      customSort:this.customSort,
+      customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         const [found] = findMatchesAndRest(idsToDelete, (it) => {
@@ -463,8 +484,7 @@ class AllActions extends React.Component {
             noTemplates: noTemplatesSelectedGoAhead,
           }),
           onConfirm: () =>
-            noTemplatesSelectedGoAhead &&
-            this.nowDelete({ idsToDelete, data }),
+            noTemplatesSelectedGoAhead && this.nowDelete({ idsToDelete, data }),
           closeAfterConfirmation: true,
           cancelText: noTemplatesSelectedGoAhead
             ? "No"
@@ -510,6 +530,13 @@ class AllActions extends React.Component {
             columns: columns,
             options: options,
           }}
+          customFilterObject={{
+            0: {
+              list: this.state.ids,
+            },
+          }}
+          ignoreSavedFilters={this.state.ignoreSavedFilters}
+          saveFilters={this.state.saveFilters}
         />
       </div>
     );
@@ -528,8 +555,9 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
     {
-      callAllActions: reduxGetAllActions,
-      callCommunityActions: reduxGetAllCommunityActions,
+      fetchActions: reduxGetAllCommunityActions,
+      // callAllActions: reduxGetAllActions,
+      // callCommunityActions: reduxGetAllCommunityActions,
       putActionsInRedux: loadAllActions,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,

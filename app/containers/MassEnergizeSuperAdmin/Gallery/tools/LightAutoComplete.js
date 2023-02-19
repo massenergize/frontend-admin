@@ -1,18 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
-import {
-  Checkbox,
-  Chip,
-  Paper,
-  TextField,
-} from "@mui/material";
+import { Checkbox, Chip, Paper, TextField } from "@mui/material";
 import { pop } from "../../../../utils/common";
 import Typography from "@mui/material/Typography";
 import { withStyles } from "@mui/styles";
 
-
 const styles = (theme) => {
-  const spacing = theme.spacing(1);
   return {
     textbox: {
       width: "100%",
@@ -40,7 +33,7 @@ const styles = (theme) => {
       overflowY: "scroll",
     },
     dropdownItem: {
-      padding: spacing * 2,
+      padding: 16,
       width: "100%",
       cursor: "pointer",
       "&:hover": {
@@ -49,6 +42,7 @@ const styles = (theme) => {
     },
     chips: {
       margin: "2px",
+      opacity: "1",
     },
     option: {
       textDecoration: "underline",
@@ -58,7 +52,7 @@ const styles = (theme) => {
     error: {},
     header: {},
     dropdownArea: {},
-    success:{}
+    success: {},
   };
 };
 
@@ -76,7 +70,9 @@ function LightAutoComplete(props) {
     onMount,
     disabled,
     allowChipRemove,
+    containerStyle,
     multiple,
+    showSelectAll = true,
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
@@ -163,7 +159,6 @@ function LightAutoComplete(props) {
                 label={getLabel(option)}
                 {...deleteOptions}
                 className={classes.chips}
-                disabled
               />
             );
           })}
@@ -175,7 +170,7 @@ function LightAutoComplete(props) {
         style={{ top: -500, height: 500 }}
         classes={classes}
       />
-      <div style={{}}>
+      <div style={containerStyle || {}}>
         <TextField
           disabled={disabled}
           onClick={() => {
@@ -206,7 +201,7 @@ function LightAutoComplete(props) {
                 </p>
               )}
 
-              {multiple && !thereAreNoOptionsToDisplay && (
+              {multiple && !thereAreNoOptionsToDisplay && showSelectAll && (
                 <div>
                   <div
                     style={{
@@ -223,7 +218,8 @@ function LightAutoComplete(props) {
                     >
                       {" "}
                       Select All
-                    </span>{" "}
+                    </span>
+
                     {userHasSelectedStuff ? (
                       <span
                         className={`${classes.option} touchable-opacity`}
