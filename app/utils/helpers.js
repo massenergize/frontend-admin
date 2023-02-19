@@ -204,8 +204,6 @@ export const handleFilterChange = ({
   updateMetaData
 }) => {
 
-  console.log("=== filter has changed ===");
-  console.log("=== filter has changed type ===", type);
   if (type === "chip") {
     let arr = generateFilterParams(filterList, columns);
     apiCall(url, {

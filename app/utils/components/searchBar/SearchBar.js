@@ -24,7 +24,6 @@ export default function SearchBar({url, reduxItems, updateReduxFunction, handleS
         ...(args || {})
       }).then((res) => {
         if (res && res.success) {
-          console.log("=== data from Search ===", res.data);
           updateReduxFunction(res.data);
           updateMetaData({ ...meta, [name]: res.cursor });
           handleSearch(reset ? "" : text);

@@ -256,8 +256,6 @@ class TeamMembers extends React.Component {
     const metaData = meta && meta.teamMembers
     const { id } = this.props.match.params;
 
-    console.log("=== metq ===", meta)
-
     const options = {
       filterType: "dropdown",
       responsive: "standard",
