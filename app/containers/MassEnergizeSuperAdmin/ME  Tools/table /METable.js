@@ -97,8 +97,6 @@ function METable(props) {
    * @param {*} filter 
    */
   const saveSelectedFilters = (filter) => {
-    console.log("=== filter save filters===", filter);
-    console.log("== KEY save filters==", page.key);
     localStorage.setItem(page.key + FILTERS, JSON.stringify(filter));
   };
 
@@ -126,10 +124,8 @@ function METable(props) {
 
   const onFilterChange = (column,filterList,type,changedColumnIndex,displayData) => {
     const { columns, options } = tableProps || {};
-    console.log("=== in filter change===", options)
 //  this changes have been made to allow us apply custom filtering to the table.
     if(options.whenFilterChanges){
-      console.log("=== In custom function===")
       let { obj, newColumns } = options.whenFilterChanges(
         column,
         filterList,

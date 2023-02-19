@@ -25,7 +25,7 @@ import {
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
+import { getLimit, handleFilterChange, isTrue, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import { replyToMessage } from "./CommunityAdminMessages";
@@ -84,6 +84,7 @@ class AllTeamAdminMessages extends React.Component {
   };
 
   fashionData = (data) => {
+    console.log(data);
     return data.map((d) => [
       d.id,
       getHumanFriendlyDate(d.created_at, true),
@@ -159,8 +160,8 @@ class AllTeamAdminMessages extends React.Component {
         customBodyRender: (d) => {
           return (
             <Chip
-              label={d ? "Yes" : "No"}
-              className={d ? classes.yesLabel : classes.noLabel}
+              label={isTrue(d) ? "Yes" : "No"}
+              className={isTrue(d)? classes.yesLabel : classes.noLabel}
             />
           );
         },

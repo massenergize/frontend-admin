@@ -434,7 +434,7 @@ class AllActions extends React.Component {
     const data = this.fashionData(allActions || []);
     const metaData = meta && meta.actions;
 
-    if (!data || !data.length) {
+    if (!data || data == null) {
       return (
         <Grid
           container
