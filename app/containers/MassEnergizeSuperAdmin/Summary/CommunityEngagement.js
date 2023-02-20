@@ -24,9 +24,10 @@ import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 
 // ------------------------------------------------------------------------------------
 const TIME_RANGE = [
-  { name: "Last Visit", key: "last-visit" },
+  // { name: "Last Visit", key: "last-visit" },
   { name: "Last Week", key: "last-week" },
   { name: "Last Month", key: "last-month" },
+  { name: "Last Year", key: "last-year" },
   { name: "Custom Date", key: "custom" },
 ];
 // ------------------------------------------------------------------------------------
@@ -44,19 +45,22 @@ function CommunityEngagement({
   const [loading, setLoading] = useState(false);
   const isSuperAdmin = auth && auth.is_super_admin;
   const hasOnlyOneCommunity = communities.length === 1;
-  const first = (communities || [])[0];
+  const first = (communities || [])[0] || {};
 
   // ----------------------------------------------------------------------
-  const loadEngagements = () => {
-    apiCall("/summary.get.engagements", { time_range: "last-month" }).then(
-      (response) => {
-        if (!response.success) return response.error;
-        putEngagementsInRedux(response.data);
-      }
-    );
+  const loadEngagements = ({ body }) => {
+    apiCall("/summary.get.engagements", body).then((response) => {
+      if (!response.success) return response.error;
+      putEngagementsInRedux(response.data);
+    });
   };
   useEffect(() => {
-    loadEngagements();
+    loadEngagements({
+      body: {
+        time_range: "last-month",
+        communities: first?.id && !isSuperAdmin ? [first.id] : [], // cadmin, only engagements for 1 community should load the first time page starts
+      },
+    });
   }, []);
   // ----------------------------------------------------------------------
   if (engagements === LOADING) return <Loading />;
@@ -98,13 +102,6 @@ function CommunityEngagement({
 
   return (
     <div>
-      {/* <PapperBlock
-        noMargin
-        title="Community Engagement"
-        icon="ios-share-outline"
-        whiteBg
-        desc=""
-      > */}
       <MEPaperBlock
         customHeader={
           <>
@@ -130,15 +127,21 @@ function CommunityEngagement({
                 </Typography>
                 {!specific && (
                   <MEDropdown
+                    generics={{
+                      sx: {
+                        boxShadow: "none",
+                        ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                      },
+                    }}
                     multiple={false}
                     data={TIME_RANGE}
                     valueExtractor={(t) => t.key}
                     labelExtractor={(t) => t.name}
-                    containerStyle={{ width: "35%", marginTop: 0 }}
+                    containerStyle={{ width: "21%", marginTop: 0 }}
                     defaultValue={rangeValue}
                     onItemSelected={(selection) => {
                       const item = selection && selection[0];
-                      const op = { ...options, range: selection };
+                      const op = { ...options, range: selection }; // It uses previous selection of communities
                       if (item == "custom") {
                         setOptions(op);
                         return setSpecific(true);
@@ -148,7 +151,7 @@ function CommunityEngagement({
                   />
                 )}
               </div>
-              {loading && (
+              {loading && !specific && (
                 <>
                   <LinearBuffer message="In a bit..." />
                   <br />
@@ -156,8 +159,7 @@ function CommunityEngagement({
               )}
               <Typography variant="body" style={{ fontSize: "1rem" }}>
                 {" "}
-                Here is a summary of user engagements in all of your communities
-                within the last month.
+                Here is a summary of user engagements in your communities.
                 {!specific && (
                   <span
                     onClick={() => setSpecific(true)}
@@ -188,6 +190,7 @@ function CommunityEngagement({
             setOptions={setOptions}
             apply={() => fetchFromBackendAfterFilters({ options })}
             loading={loading}
+            firstCommunity={first}
           />
         )}
         <div
@@ -301,11 +304,14 @@ export const AddFilters = ({
   setOptions,
   apply,
   loading,
+  firstCommunity,
 }) => {
+  communities = (communities || []).sort((a, b) => (a.name > b.name ? 1 : -1));
   options = options || {};
   const extraStyles = isSuperAdmin ? {} : { width: "auto", flex: "1" };
   const rangeValue = options.range || [];
-  const comValue = options.communities || [];
+  const comValue =
+    options.communities || (!isSuperAdmin ? [firstCommunity?.id] : ["all"]); // If cadmin, their first community should be default, but "all" should be default for sadmin (when page first loads)
 
   const handleCommunitySelection = (selection) => {
     const last = selection[selection.length - 1];

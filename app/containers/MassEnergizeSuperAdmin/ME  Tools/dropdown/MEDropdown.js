@@ -14,6 +14,7 @@ function MEDropdown(props) {
     placeholder,
     defaultValue,
     value,
+    generics,
   } = props;
   const [selected, setSelected] = useState(defaultValue || value || []);
   const valueOf = (item) => {
@@ -28,7 +29,18 @@ function MEDropdown(props) {
 
   // -------------------------------------------------------------------
   // Always switch dropdown to auto complete dropdown if there are a lot of items. A lot = (>20 items)
-  if (data && data.length > 20) return <LightAutoComplete {...props} />;
+  if (data && data.length > 20) {
+    return (
+      <LightAutoComplete
+        onChange={(items) => {
+          items = (items || []).map((a) => valueExtractor(a));
+          console.log("Here are the items", items);
+          onItemSelected(items);
+        }}
+        {...props}
+      />
+    );
+  }
   // -------------------------------------------------------------------
 
   const labelOf = (item, fromValue) => {
@@ -65,6 +77,7 @@ function MEDropdown(props) {
     >
       {placeholder && <FormLabel component="legend">{placeholder}</FormLabel>}
       <Select
+        {...generics || {}}
         className="me-drop-override"
         multiple={multiple}
         displayEmpty

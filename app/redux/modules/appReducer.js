@@ -81,7 +81,7 @@ export const reducerForUserEngagements = (state = LOADING, action = {}) => {
   }
 };
 export const reducerForEngagementOptions = (
-  state = { range: ["last-month"], communities: ["all"] },
+  state = { range: ["last-month"] },
   action = {}
 ) => {
   switch (action.type) {
