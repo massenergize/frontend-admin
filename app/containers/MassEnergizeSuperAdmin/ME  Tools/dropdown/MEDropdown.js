@@ -1,4 +1,9 @@
-import { Checkbox, FormControlLabel, MenuItem } from "@mui/material";
+import {
+  Checkbox,
+  FormControlLabel,
+  MenuItem,
+  Typography,
+} from "@mui/material";
 import { Chip, FormControl, FormLabel, Select } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { pop } from "../../../../utils/common";
@@ -107,13 +112,19 @@ function MEDropdown(props) {
                 onClick={() => handleOnChange(d)}
                 key={i}
                 control={
-                  <Checkbox
-                    checked={itemIsSelected(valueOf(d))}
-                    value={valueOf(d)}
-                    name={labelOf(d)}
-                  />
+                  multiple ? (
+                    <Checkbox
+                      checked={itemIsSelected(valueOf(d))}
+                      value={valueOf(d)}
+                      name={labelOf(d)}
+                    />
+                  ) : (
+                    <Typography style={{ padding: "7px 15px" }}>
+                      {labelOf(d)}
+                    </Typography>
+                  )
                 }
-                label={labelOf(d)}
+                label={multiple ? labelOf(d) : ""}
               />
             </MenuItem>
           );
