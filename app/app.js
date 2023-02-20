@@ -48,10 +48,10 @@ const SENTRY_DSN =
     ? process.env.REACT_APP_SENTRY_PROD_DSN
     : process.env.REACT_APP_SENTRY_DEV_DSN;
 
-// Sentry.init({
-//   dsn: SENTRY_DSN,
-//   integrations: [new BrowserTracing()],
-// });
+Sentry.init({
+  dsn: SENTRY_DSN,
+  integrations: [new BrowserTracing()],
+});
 
 // Create redux store with history
 const initialState = {};
