@@ -4,7 +4,7 @@ import React, {useState} from 'react'
 import { getFilterData, getLimit } from '../../helpers';
 import { apiCall } from '../../messenger';
 
-export default function SearchBar({url, reduxItems, updateReduxFunction, handleSearch, hideSearch,pageProp, name, updateMetaData, meta, args}) {
+export default function SearchBar({url, reduxItems, updateReduxFunction, handleSearch, hideSearch,pageProp, name, updateMetaData, meta,otherArgs}) {
   
   const TABLE_PROPERTIES = "_TABLE_PROPERTIES";
   
@@ -19,9 +19,9 @@ export default function SearchBar({url, reduxItems, updateReduxFunction, handleS
       apiCall(url, {
         limit: getLimit(pageProp.key),
         params: JSON.stringify({
-          search_text: reset? "": text,
+          search_text: reset ? "" : text,
         }),
-        ...(args || {})
+        ...(otherArgs || {}),
       }).then((res) => {
         if (res && res.success) {
           updateReduxFunction(res.data);

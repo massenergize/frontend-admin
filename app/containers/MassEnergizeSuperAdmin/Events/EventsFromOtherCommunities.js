@@ -168,6 +168,7 @@ function EventsFromOtherCommunities({
   };
 const metaData =meta && meta.otherEvents
 const columns = makeColumns();
+const ids = (communities || []).map((it) => it.id);
   const options = {
     filterType: "dropdown",
     responsive: "standard",
@@ -188,8 +189,11 @@ const columns = makeColumns();
         apiUrl: "/events.others.listForCommunityAdmin",
         pageProp: PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS,
         updateMetaData: putMetaDataToRedux,
-        name:"otherEvents",
+        name: "otherEvents",
         meta: meta,
+        otherArgs: {
+          community_ids: ids,
+        },
       }),
     customSearchRender: (searchText, handleSearch, hideSearch, options) => (
       <SearchBar
@@ -202,6 +206,9 @@ const columns = makeColumns();
         updateMetaData={putMetaDataToRedux}
         name="otherEvents"
         meta={meta}
+        otherArgs={{
+          community_ids: ids,
+        }}
       />
     ),
     customFilterDialogFooter: (currentFilterList, applyFilters) => {
@@ -211,11 +218,14 @@ const columns = makeColumns();
           reduxItems={otherEvents}
           updateReduxFunction={putOtherEventsInRedux}
           columns={columns}
-          filters={currentFilterList}
+          limit={getLimit(PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS.key)}
           applyFilters={applyFilters}
           updateMetaData={putMetaDataToRedux}
           name="otherEvents"
           meta={meta}
+          otherArgs={{
+            community_ids: ids,
+          }}
         />
       );
     },
@@ -234,10 +244,13 @@ const columns = makeColumns();
         page: PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS,
         updateReduxFunction: putOtherEventsInRedux,
         reduxItems: otherEvents,
-        url:"/events.others.listForCommunityAdmin",
+        url: "/events.others.listForCommunityAdmin",
         updateMetaData: putMetaDataToRedux,
         name: "otherEvents",
         meta: meta,
+        otherArgs: {
+          community_ids: ids,
+        },
       }),
   };
 

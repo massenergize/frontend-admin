@@ -106,6 +106,7 @@ class TeamMembers extends React.Component {
       team_id: id,
       limit:getLimit(PAGE_PROPERTIES.ALL_TEAM_MEMBERS.key)
     });
+
     if (allTeamMembersResponse && allTeamMembersResponse.success) {
       await this.setStateAsync({
         loading: false,
@@ -262,8 +263,8 @@ class TeamMembers extends React.Component {
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
-      count: metaData && metaData.count,
-      confirmFilters: true,
+      // count: metaData && metaData.count,
+      // confirmFilters: true,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach((d) => {
@@ -271,25 +272,25 @@ class TeamMembers extends React.Component {
           apiCall("/teams.removeMember", { team_id: team.id, email });
         });
       },
-      customSearchRender: (
-        searchText,
-        handleSearch,
-        hideSearch,
-        options
-      ) => (
-        <SearchBar
-          url={"/teams.members"}
-          reduxItems={members[id]}
-          updateReduxFunction={(data) => console.log("=== data ===", data)}
-          handleSearch={handleSearch}
-          hideSearch={hideSearch}
-          pageProp={PAGE_PROPERTIES.ALL_TEAM_MEMBERS}
-          updateMetaData={putMetaDataToRedux}
-          name="teamMembers"
-          meta={meta}
-          args={{ team_id:id}}
-        />
-      ),
+      // customSearchRender: (
+      //   searchText,
+      //   handleSearch,
+      //   hideSearch,
+      //   options
+      // ) => (
+      //   <SearchBar
+      //     url={"/teams.members"}
+      //     reduxItems={members[id]}
+      //     updateReduxFunction={(data) => console.log("=== data ===", data)}
+      //     handleSearch={handleSearch}
+      //     hideSearch={hideSearch}
+      //     pageProp={PAGE_PROPERTIES.ALL_TEAM_MEMBERS}
+      //     updateMetaData={putMetaDataToRedux}
+      //     name="teamMembers"
+      //     meta={meta}
+      //     otherArgs={{ team_id:id}}
+      //   />
+      // ),
     };
 
     const nowLoadingMembers = loading && (!data || !data.length);
