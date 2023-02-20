@@ -237,6 +237,20 @@ function CommunityEngagement({
               });
             }}
           />
+          <EngagementCard
+            color="rgb(216 155 155)"
+            theme="rgb(255 234 234)"
+            title="TESTIMONIALS"
+            subtitle="See involved testimonials"
+            icon="fa-tasks"
+            value={todoInteractions.count}
+            onClick={() => {
+              history.push({
+                pathname: "/admin/read/actions",
+                state: { ids: todoInteractions && todoInteractions.data },
+              });
+            }}
+          />
         </div>
         <div>
           <Typography variant="h6" color="primary">

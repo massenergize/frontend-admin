@@ -260,15 +260,16 @@ class NormalAdminHome extends PureComponent {
         >
           <>
             <WhatNext />
-            <Grid container columnGap={2}>
+            <Grid container style={{ paddingRight: 20 }}>
               <Grid
                 style={{
                   display: "flex",
                   flexDirection: "column",
+                  paddingRight: 20,
                 }}
                 item
                 className={classes.root}
-                md={7}
+                md={9}
                 xs={12}
               >
                 <CommunityEngagement />
@@ -278,7 +279,7 @@ class NormalAdminHome extends PureComponent {
                   </Grid>
                 )}
               </Grid>
-              <Grid md={4}>
+              <Grid md={3}>
                 <ReportingActivities
                   style={{ maxHeight: 615, overflowY: "scroll" }}
                 />
