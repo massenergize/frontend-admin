@@ -427,7 +427,7 @@ class AllEvents extends React.Component {
             reduxItems={allEvents}
             updateReduxFunction={putEventsInRedux}
             columns={columns}
-            filters={currentFilterList}
+            limit={getLimit(PAGE_PROPERTIES.ALL_EVENTS.key)}
             applyFilters={applyFilters}
             updateMetaData={putMetaDataToRedux}
             name="events"
