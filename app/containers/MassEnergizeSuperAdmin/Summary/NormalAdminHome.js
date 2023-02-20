@@ -34,6 +34,7 @@ import WhatNext from "./WhatNext";
 import CommunityEngagement from "./CommunityEngagement";
 import Feature from "../../../components/FeatureFlags/Feature";
 import { FLAGS } from "../../../components/FeatureFlags/flags";
+import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 
 class NormalAdminHome extends PureComponent {
   constructor(props) {
@@ -92,12 +93,12 @@ class NormalAdminHome extends PureComponent {
   renderTable = (data, classes) => {
     const { history } = this.props;
     return (
-      <PapperBlock
+      <MEPaperBlock
         noMargin
         title="Communities You Manage"
         icon="ios-share-outline"
         whiteBg
-        desc=""
+        subtitle="A list of all the communities you manage"
       >
         <div className={classes.root}>
           <Table
@@ -190,7 +191,7 @@ class NormalAdminHome extends PureComponent {
             </TableBody>
           </Table>
         </div>
-      </PapperBlock>
+      </MEPaperBlock>
     );
   };
 

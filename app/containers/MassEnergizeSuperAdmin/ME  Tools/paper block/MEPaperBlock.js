@@ -11,13 +11,12 @@ function MEPaperBlock({ children, customHeader, title, subtitle }) {
           minHeight: 200,
           padding: 30,
           background: "white",
-
-          //   boxShadow:
-          //     "0px 1px 8px 0px rgb(80 80 80 / 20%), 0px 3px 4px 0px rgb(80 80 80 / 14%), 0px 3px 3px -2px rgb(80 80 80 / 12%)",
+          borderRadius: 10,
+          marginBottom: 20,
         }}
       >
         {!customHeader ? (
-          <div style={{ marginBottom: 200 }}>
+          <div style={{ marginBottom: 20 }}>
             {title && (
               <Typography
                 variant="h3"

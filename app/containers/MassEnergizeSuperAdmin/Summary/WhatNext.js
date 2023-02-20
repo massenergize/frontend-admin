@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import { useHistory, withRouter } from "react-router-dom";
 import Loading from "dan-components/Loading";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 
 function WhatNext({ data }) {
   const { messages, teams, testimonials, users, team_messages } = data || {};
@@ -28,11 +29,9 @@ function WhatNext({ data }) {
 
   const history = useHistory();
   return (
-    <PapperBlock
-      whiteBg
-      icon="ios-help"
+    <MEPaperBlock
       title="What to do next?"
-      desc="Here are items you need to take care of "
+      subtitle="Here are items you need to take care of "
     >
       <div
         style={{
@@ -100,7 +99,7 @@ function WhatNext({ data }) {
           }
         />
       </div>
-    </PapperBlock>
+    </MEPaperBlock>
   );
 }
 
