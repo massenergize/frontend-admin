@@ -46,7 +46,7 @@ function CommunityEngagement({
   const isSuperAdmin = auth && auth.is_super_admin;
   const hasOnlyOneCommunity = communities.length === 1;
   const first = (communities || [])[0] || {};
-
+  
   // ----------------------------------------------------------------------
   const loadEngagements = ({ body }) => {
     apiCall("/summary.get.engagements", body).then((response) => {
@@ -98,6 +98,7 @@ function CommunityEngagement({
   const doneInteractions = engagements.done_interactions;
   const todoInteractions = engagements.todo_interactions;
   const signIns = engagements.sign_ins;
+  const testimonials = engagements.testimonials;
   const rangeValue = options.range || [];
 
   return (
@@ -205,7 +206,7 @@ function CommunityEngagement({
             onClick={() =>
               history.push({
                 pathname: "/admin/read/users",
-                state: { ids: signIns && signIns.data },
+                state: { ids: signIns?.data },
               })
             }
           />
@@ -219,7 +220,7 @@ function CommunityEngagement({
             onClick={() => {
               history.push({
                 pathname: "/admin/read/actions",
-                state: { ids: doneInteractions && doneInteractions.data },
+                state: { ids: doneInteractions?.data },
               });
             }}
           />
@@ -233,7 +234,7 @@ function CommunityEngagement({
             onClick={() => {
               history.push({
                 pathname: "/admin/read/actions",
-                state: { ids: todoInteractions && todoInteractions.data },
+                state: { ids: todoInteractions?.data },
               });
             }}
           />
@@ -243,11 +244,11 @@ function CommunityEngagement({
             title="TESTIMONIALS"
             subtitle="See involved testimonials"
             icon="fa-tasks"
-            value={todoInteractions.count}
+            value={testimonials.count}
             onClick={() => {
               history.push({
                 pathname: "/admin/read/actions",
-                state: { ids: todoInteractions && todoInteractions.data },
+                state: { ids: testimonials?.data },
               });
             }}
           />
