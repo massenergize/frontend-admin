@@ -14,7 +14,7 @@ function ContinueWhereYouLeft() {
   const startExitTimer = () => {
     setTimeout(() => {
       setSavedURL(null);
-        history.push("/");
+      history.push("/");
     }, WAIT_TIME);
   };
   useEffect(() => {
@@ -48,7 +48,7 @@ function ContinueWhereYouLeft() {
       }}
     >
       <Typography
-        onClick={() => history.push(url)}
+        onClick={() => (window.location.href = url)}
         style={{ border: "dotted 0px black", borderBottomWidth: 2 }}
       >
         <b>
