@@ -30,7 +30,7 @@
 .ml-preview-image {
   height: 190px;
   width: 230px;
-  object-fit: cover;
+  object-fit: contain;
   margin: 10px;
   border-radius: 5px;
   box-shadow: var(--elevate-float);
