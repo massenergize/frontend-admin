@@ -10,44 +10,53 @@ import { apiCall } from "../../../utils/messenger";
 import { bindActionCreators } from "redux";
 import { reduxLoadActionEngagements } from "../../../redux/redux-actions/adminActions";
 
+const NO_DATA = "NO_DATA";
 function ActionEngagements({ engagements, putItemsInRedux }) {
   const location = useLocation();
   const ids = location.state?.ids || [];
+  const type = location.state?.type || ""; // whether TODO or DONE
+  const filters = location.state?.options || {};
+  console.log("ids", ids, type);
+
   useEffect(() => {
-    apiCall("/communities.actions.completed", { actions: ids }).then(
-      (response) => {
-        console.log("Here is the response", response);
-        if (!response.success) console.log(response.error);
-        putItemsInRedux(response.data);
-      }
-    );
+    const body = {
+      actions: ids,
+      time_range: filters?.range || null,
+      communities: filters?.communities || [],
+      end_date: filters?.endDate || null,
+      start_date: filters?.startDate || null,
+    };
+    apiCall("/communities.actions.completed", body).then((response) => {
+      console.log("Here is the response", response);
+      if (!response.success) console.log(response.error);
+      putItemsInRedux({ ...engagements, [type]: response.data || NO_DATA });
+    });
   }, []);
-  if (!ids.length || !engagements)
+
+  if (engagements === LOADING) return <Loading />;
+  var data = engagements[type];
+  if (!data) return <Loading />;
+
+  if (!ids.length || data === NO_DATA)
     return (
       <div style={{ padding: 20, background: "white", borderRadius: 10 }}>
-        <Typography>Sorry, we could not load the action engagements</Typography>
+        <Typography>We could not find any action engagement data...</Typography>
       </div>
     );
-  if (engagements === LOADING) return <Loading />;
-  const fashionData = (data) => {
-    return (data || []).map((d) => [
+
+  const fashionData = (_data) => {
+    return (_data || []).map((d) => [
       d.id,
+      d.name,
       d.category,
       d.done_count,
       d.todo_count,
       d.carbon_total,
     ]);
   };
+
   const makeColumns = () => {
     return [
-      {
-        name: "name",
-        key: "name",
-        options: {
-          filter: false,
-          filterType: "multiselect",
-        },
-      },
       {
         name: "ID",
         key: "id",
@@ -57,7 +66,16 @@ function ActionEngagements({ engagements, putItemsInRedux }) {
         },
       },
       {
-        name: "category",
+        name: "Name",
+        key: "name",
+        options: {
+          filter: false,
+          filterType: "multiselect",
+        },
+      },
+
+      {
+        name: "Category",
         key: "category",
         options: {
           filter: false,
@@ -94,12 +112,12 @@ function ActionEngagements({ engagements, putItemsInRedux }) {
     rowsPerPage: 25,
     rowsPerPageOptions: [10, 25, 100],
   };
-
-  const data = fashionData(actionCountObjs);
+  data = fashionData(data);
+  //   ----------------------------------------------------
   return (
     <div>
       <METable
-        classes={classes}
+        // classes={classes}
         page={PAGE_PROPERTIES.ACTION_ENGAGEMENTS}
         tableProps={{
           title: "Action Engagements",

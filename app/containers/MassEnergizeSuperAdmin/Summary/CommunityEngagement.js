@@ -46,7 +46,7 @@ function CommunityEngagement({
   const isSuperAdmin = auth && auth.is_super_admin;
   const hasOnlyOneCommunity = communities.length === 1;
   const first = (communities || [])[0] || {};
-  
+
   // ----------------------------------------------------------------------
   const loadEngagements = ({ body }) => {
     apiCall("/summary.get.engagements", body).then((response) => {
@@ -220,7 +220,7 @@ function CommunityEngagement({
             onClick={() => {
               history.push({
                 pathname: "/admin/read/action-engagements",
-                state: { ids: doneInteractions?.data },
+                state: { ids: doneInteractions?.data, type: "DONE", options },
               });
             }}
           />
@@ -234,7 +234,7 @@ function CommunityEngagement({
             onClick={() => {
               history.push({
                 pathname: "/admin/read/action-engagements",
-                state: { ids: todoInteractions?.data },
+                state: { ids: todoInteractions?.data, type: "TODO", options },
               });
             }}
           />
