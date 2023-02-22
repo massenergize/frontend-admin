@@ -34,6 +34,7 @@ import WhatNext from "./WhatNext";
 import CommunityEngagement from "./CommunityEngagement";
 import Feature from "../../../components/FeatureFlags/Feature";
 import { FLAGS } from "../../../components/FeatureFlags/flags";
+import ContinueWhereYouLeft from "./ContinueWhereYouLeft";
 
 class NormalAdminHome extends PureComponent {
   constructor(props) {
@@ -225,6 +226,8 @@ class NormalAdminHome extends PureComponent {
           <SummaryChart data={summary_data} />
         </Grid>
         <br />
+
+        <ContinueWhereYouLeft />
 
         <Feature
           name={FLAGS.NEW_USER_ENGAGEMENT_VIEW}
