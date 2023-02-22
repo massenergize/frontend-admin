@@ -55,6 +55,7 @@ import app, {
   reducerForEngagementOptions,
   reducerForUserEngagements,
   reducerForUniversalToast,
+  reducerForActionEngagements,
 } from "./modules/appReducer";
 
 /**
@@ -62,6 +63,7 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    actionEngagements: reducerForActionEngagements,
     userEngagements: reducerForUserEngagements,
     engagementOptions: reducerForEngagementOptions,
     nextStepsSummary: reducerForNextStepsSummary,

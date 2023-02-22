@@ -219,7 +219,7 @@ function CommunityEngagement({
             value={doneInteractions.count}
             onClick={() => {
               history.push({
-                pathname: "/admin/read/actions",
+                pathname: "/admin/read/action-engagements",
                 state: { ids: doneInteractions?.data },
               });
             }}
@@ -233,7 +233,7 @@ function CommunityEngagement({
             value={todoInteractions.count}
             onClick={() => {
               history.push({
-                pathname: "/admin/read/actions",
+                pathname: "/admin/read/action-engagements",
                 state: { ids: todoInteractions?.data },
               });
             }}
