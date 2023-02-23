@@ -23,7 +23,7 @@ import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 
 // ------------------------------------------------------------------------------------
-const TIME_RANGE = [
+export const TIME_RANGE = [
   // { name: "Last Visit", key: "last-visit" },
   { name: "Last Week", key: "last-week" },
   { name: "Last Month", key: "last-month" },
@@ -55,6 +55,7 @@ function CommunityEngagement({
     });
   };
   useEffect(() => {
+    if (options.mounted) return;
     loadEngagements({
       body: {
         time_range: "last-month",
@@ -73,6 +74,18 @@ function CommunityEngagement({
     window.open(url, "_blank");
   };
 
+  const transferOptions = (options) => {
+    const { startDate, endDate } = options || {};
+    if (!startDate && !endDate) return options;
+    return {
+      // moment date objects needs to be changed to string before it can be transfered via router state
+      ...options,
+      startDate: moment.utc(options.startDate).format(),
+      endDate: moment.utc(options.endDate).format(),
+      startDateString: moment.utc(options.startDate).format("YYYY/MM/DD"),
+      endDateString: moment.utc(options.endDate).format("YYYY/MM/DD"),
+    };
+  };
   const fetchFromBackendAfterFilters = ({ options }) => {
     const range = (options.range || [])[0];
     const isCustom = range === "custom";
@@ -142,11 +155,14 @@ function CommunityEngagement({
                     defaultValue={rangeValue}
                     onItemSelected={(selection) => {
                       const item = selection && selection[0];
-                      const op = { ...options, range: selection }; // It uses previous selection of communities
-                      if (item == "custom") {
-                        setOptions(op);
-                        return setSpecific(true);
-                      }
+                      const op = {
+                        ...options,
+                        range: selection,
+                        mounted: true,
+                      }; // It uses previous selection of communities
+                      setOptions(op);
+                      if (item == "custom") return setSpecific(true);
+
                       fetchFromBackendAfterFilters({ options: op });
                     }}
                   />
@@ -220,7 +236,11 @@ function CommunityEngagement({
             onClick={() => {
               history.push({
                 pathname: "/admin/read/action-engagements",
-                state: { ids: doneInteractions?.data, type: "DONE", options },
+                state: {
+                  ids: doneInteractions?.data,
+                  type: "DONE",
+                  options: transferOptions(options),
+                },
               });
             }}
           />
@@ -234,7 +254,11 @@ function CommunityEngagement({
             onClick={() => {
               history.push({
                 pathname: "/admin/read/action-engagements",
-                state: { ids: todoInteractions?.data, type: "TODO", options },
+                state: {
+                  ids: todoInteractions?.data,
+                  type: "TODO",
+                  options: transferOptions(options),
+                },
               });
             }}
           />
@@ -319,21 +343,19 @@ export const AddFilters = ({
   setOptions,
   apply,
   loading,
-  firstCommunity,
 }) => {
   communities = (communities || []).sort((a, b) => (a.name > b.name ? 1 : -1));
   options = options || {};
   const extraStyles = isSuperAdmin ? {} : { width: "auto", flex: "1" };
   const rangeValue = options.range || [];
-  const comValue =
-    options.communities || (!isSuperAdmin ? [firstCommunity?.id] : ["all"]); // If cadmin, their first community should be default, but "all" should be default for sadmin (when page first loads)
+  const comValue = options.communities;
 
   const handleCommunitySelection = (selection) => {
     const last = selection[selection.length - 1];
     const wantsAll = last === "all";
     if (wantsAll) return setOptions({ ...options, communities: ["all"] });
     selection = selection.filter((f) => f !== "all");
-    setOptions({ ...options, communities: selection });
+    setOptions({ ...options, communities: selection, mounted: true });
   };
 
   const isCustomRange = ((options && options.range) || [])[0] === "custom";
@@ -370,7 +392,7 @@ export const AddFilters = ({
           containerStyle={{ ...extraStyles, marginRight: 14 }}
           defaultValue={rangeValue}
           onItemSelected={(selection) =>
-            setOptions({ ...options, range: selection })
+            setOptions({ ...options, range: selection, mounted: true })
           }
         />
 
@@ -409,14 +431,14 @@ export const AddFilters = ({
                     <TextField style={{ marginRight: 10 }} {...props} />
                   )}
                   label="Start Date"
-                  value={(options && options.startDate) || moment.now()}
+                  value={(options && options.startDate) || ""}
                   onChange={(date) => handleDateSelection(date, "startDate")}
                 />
                 <Typography style={{ marginRight: 10 }}>To</Typography>
                 <DatePicker
                   onChange={(date) => handleDateSelection(date, "endDate")}
                   renderInput={(props) => <TextField {...props} />}
-                  value={(options && options.endDate) || moment.now()}
+                  value={(options && options.endDate) || ""}
                   label="End Date"
 
                   // format="MM/DD/YYYY"
