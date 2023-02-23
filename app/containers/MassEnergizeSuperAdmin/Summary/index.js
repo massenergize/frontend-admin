@@ -157,7 +157,7 @@ class SummaryDashboard extends PureComponent {
           <SummaryChart data={summary_data} />
         </Grid>
         <br />
-
+        <ContinueWhereYouLeft />
         <Feature
           name={FLAGS.NEW_USER_ENGAGEMENT_VIEW}
           fallback={

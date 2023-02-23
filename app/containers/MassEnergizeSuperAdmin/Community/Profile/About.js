@@ -621,6 +621,7 @@ class About extends React.Component {
               </Typography>
             </Paper>
           </Grid>
+          {/* Removing all-metrics download button for all users
           <Grid item xs={4}>
             <Paper
               onClick={() => {
@@ -648,6 +649,7 @@ class About extends React.Component {
               </Typography>
             </Paper>
           </Grid>
+          */}
         </Grid>
       </>
     );

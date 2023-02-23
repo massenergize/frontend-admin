@@ -35,6 +35,7 @@ import CommunityEngagement from "./CommunityEngagement";
 import Feature from "../../../components/FeatureFlags/Feature";
 import { FLAGS } from "../../../components/FeatureFlags/flags";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import ContinueWhereYouLeft from "./ContinueWhereYouLeft";
 
 class NormalAdminHome extends PureComponent {
   constructor(props) {
@@ -226,6 +227,8 @@ class NormalAdminHome extends PureComponent {
           <SummaryChart data={summary_data} />
         </Grid>
         <br />
+
+        <ContinueWhereYouLeft />
 
         <Feature
           name={FLAGS.NEW_USER_ENGAGEMENT_VIEW}
