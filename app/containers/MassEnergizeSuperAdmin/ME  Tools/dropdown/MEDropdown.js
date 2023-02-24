@@ -1,4 +1,9 @@
-import { Checkbox, FormControlLabel, MenuItem } from "@mui/material";
+import {
+  Checkbox,
+  FormControlLabel,
+  MenuItem,
+  Typography,
+} from "@mui/material";
 import { Chip, FormControl, FormLabel, Select } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { pop } from "../../../../utils/common";
@@ -14,6 +19,7 @@ function MEDropdown(props) {
     placeholder,
     defaultValue,
     value,
+    generics,
   } = props;
   const [selected, setSelected] = useState(defaultValue || value || []);
   const valueOf = (item) => {
@@ -28,7 +34,18 @@ function MEDropdown(props) {
 
   // -------------------------------------------------------------------
   // Always switch dropdown to auto complete dropdown if there are a lot of items. A lot = (>20 items)
-  if (data && data.length > 20) return <LightAutoComplete {...props} />;
+  if (data && data.length > 20) {
+    return (
+      <LightAutoComplete
+        onChange={(items) => {
+          items = (items || []).map((a) => valueExtractor(a));
+          console.log("Here are the items", items);
+          onItemSelected(items);
+        }}
+        {...props}
+      />
+    );
+  }
   // -------------------------------------------------------------------
 
   const labelOf = (item, fromValue) => {
@@ -65,6 +82,8 @@ function MEDropdown(props) {
     >
       {placeholder && <FormLabel component="legend">{placeholder}</FormLabel>}
       <Select
+        {...generics || {}}
+        className="me-drop-override"
         multiple={multiple}
         displayEmpty
         renderValue={(itemsToDisplay) => (
@@ -93,13 +112,19 @@ function MEDropdown(props) {
                 onClick={() => handleOnChange(d)}
                 key={i}
                 control={
-                  <Checkbox
-                    checked={itemIsSelected(valueOf(d))}
-                    value={valueOf(d)}
-                    name={labelOf(d)}
-                  />
+                  multiple ? (
+                    <Checkbox
+                      checked={itemIsSelected(valueOf(d))}
+                      value={valueOf(d)}
+                      name={labelOf(d)}
+                    />
+                  ) : (
+                    <Typography style={{ padding: "7px 15px" }}>
+                      {labelOf(d)}
+                    </Typography>
+                  )
                 }
-                label={labelOf(d)}
+                label={multiple ? labelOf(d) : ""}
               />
             </MenuItem>
           );

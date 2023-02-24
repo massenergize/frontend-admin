@@ -19,6 +19,19 @@ import moment from "moment";
 import { LOADING } from "../../../utils/constants";
 import { useHistory, withRouter } from "react-router-dom";
 import { DatePicker } from "@mui/x-date-pickers";
+import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+
+// ------------------------------------------------------------------------------------
+export const TIME_RANGE = [
+  // { name: "Last Visit", key: "last-visit" },
+  { name: "Last Week", key: "last-week" },
+  { name: "Last Month", key: "last-month" },
+  { name: "Last Year", key: "last-year" },
+  { name: "Custom Date", key: "custom" },
+];
+// ------------------------------------------------------------------------------------
+
 function CommunityEngagement({
   communities,
   auth,
@@ -32,19 +45,23 @@ function CommunityEngagement({
   const [loading, setLoading] = useState(false);
   const isSuperAdmin = auth && auth.is_super_admin;
   const hasOnlyOneCommunity = communities.length === 1;
-  const first = (communities || [])[0];
+  const first = (communities || [])[0] || {};
 
   // ----------------------------------------------------------------------
-  const loadEngagements = () => {
-    apiCall("/summary.get.engagements", { time_range: "last-month" }).then(
-      (response) => {
-        if (!response.success) return response.error;
-        putEngagementsInRedux(response.data);
-      }
-    );
+  const loadEngagements = ({ body }) => {
+    apiCall("/summary.get.engagements", body).then((response) => {
+      if (!response.success) return response.error;
+      putEngagementsInRedux(response.data);
+    });
   };
   useEffect(() => {
-    loadEngagements();
+    if (options.mounted) return;
+    loadEngagements({
+      body: {
+        time_range: "last-month",
+        communities: first?.id && !isSuperAdmin ? [first.id] : [], // cadmin, only engagements for 1 community should load the first time page starts
+      },
+    });
   }, []);
   // ----------------------------------------------------------------------
   if (engagements === LOADING) return <Loading />;
@@ -57,7 +74,19 @@ function CommunityEngagement({
     window.open(url, "_blank");
   };
 
-  const fetchFromBackendAfterFilters = () => {
+  const transferOptions = (options) => {
+    const { startDate, endDate } = options || {};
+    if (!startDate && !endDate) return options;
+    return {
+      // moment date objects needs to be changed to string before it can be transfered via router state
+      ...options,
+      startDate: moment.utc(options.startDate).format(),
+      endDate: moment.utc(options.endDate).format(),
+      startDateString: moment.utc(options.startDate).format("YYYY/MM/DD"),
+      endDateString: moment.utc(options.endDate).format("YYYY/MM/DD"),
+    };
+  };
+  const fetchFromBackendAfterFilters = ({ options }) => {
     const range = (options.range || [])[0];
     const isCustom = range === "custom";
     const dates = isCustom
@@ -82,36 +111,93 @@ function CommunityEngagement({
   const doneInteractions = engagements.done_interactions;
   const todoInteractions = engagements.todo_interactions;
   const signIns = engagements.sign_ins;
+  const testimonials = engagements.testimonials;
+  const rangeValue = options.range || [];
 
   return (
     <div>
-      <PapperBlock
-        noMargin
-        title="Community Engagement"
-        icon="ios-share-outline"
-        whiteBg
-        desc=""
+      <MEPaperBlock
+        customHeader={
+          <>
+            <div style={{ marginBottom: 20 }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginBottom: 8,
+                }}
+              >
+                <Typography
+                  variant="h3"
+                  style={{
+                    fontSize: 24,
+                    color: "#8E24AA",
+                    fontWeight: "bold",
+                    marginRight: 20,
+                  }}
+                >
+                  Community Engagement
+                </Typography>
+                {!specific && (
+                  <MEDropdown
+                    generics={{
+                      sx: {
+                        boxShadow: "none",
+                        ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                      },
+                    }}
+                    multiple={false}
+                    data={TIME_RANGE}
+                    valueExtractor={(t) => t.key}
+                    labelExtractor={(t) => t.name}
+                    containerStyle={{ width: "21%", marginTop: 0 }}
+                    defaultValue={rangeValue}
+                    onItemSelected={(selection) => {
+                      const item = selection && selection[0];
+                      const op = {
+                        ...options,
+                        range: selection,
+                        mounted: true,
+                      }; // It uses previous selection of communities
+                      setOptions(op);
+                      if (item == "custom") return setSpecific(true);
+
+                      fetchFromBackendAfterFilters({ options: op });
+                    }}
+                  />
+                )}
+              </div>
+              {loading && !specific && (
+                <>
+                  <LinearBuffer message="In a bit..." />
+                  <br />
+                </>
+              )}
+              <Typography variant="body" style={{ fontSize: "1rem" }}>
+                {" "}
+                Here is a summary of user engagements in your communities.
+                {!specific && (
+                  <span
+                    onClick={() => setSpecific(true)}
+                    className="touchable-opacity"
+                    style={{
+                      paddingBottom: 4,
+                      border: "dotted 0px",
+                      borderBottomWidth: 2,
+                      fontWeight: "bold",
+                      color: "rgb(156, 39, 176)",
+                      marginLeft: 6,
+                    }}
+                  >
+                    Click for more specific results
+                  </span>
+                )}
+              </Typography>
+            </div>
+          </>
+        }
       >
-        <Typography variant="body">
-          Here is a summary of user engagements in all of your communities
-          within the last month.
-          <br />
-          {!specific && (
-            <span
-              onClick={() => setSpecific(true)}
-              className="touchable-opacity"
-              style={{
-                paddingBottom: 4,
-                border: "dotted 0px",
-                borderBottomWidth: 2,
-                fontWeight: "bold",
-                color: "rgb(156, 39, 176)",
-              }}
-            >
-              Click for more specific results
-            </span>
-          )}
-        </Typography>
         {specific && (
           <AddFilters
             hide={() => setSpecific(false)}
@@ -119,8 +205,9 @@ function CommunityEngagement({
             isSuperAdmin={isSuperAdmin}
             options={options}
             setOptions={setOptions}
-            apply={fetchFromBackendAfterFilters}
+            apply={() => fetchFromBackendAfterFilters({ options })}
             loading={loading}
+            firstCommunity={first}
           />
         )}
         <div
@@ -135,7 +222,7 @@ function CommunityEngagement({
             onClick={() =>
               history.push({
                 pathname: "/admin/read/users",
-                state: { ids: signIns && signIns.data },
+                state: { ids: signIns?.data },
               })
             }
           />
@@ -148,8 +235,12 @@ function CommunityEngagement({
             value={doneInteractions.count}
             onClick={() => {
               history.push({
-                pathname: "/admin/read/actions",
-                state: { ids: doneInteractions && doneInteractions.data },
+                pathname: "/admin/read/action-engagements",
+                state: {
+                  ids: doneInteractions?.data,
+                  type: "DONE",
+                  options: transferOptions(options),
+                },
               });
             }}
           />
@@ -162,8 +253,26 @@ function CommunityEngagement({
             value={todoInteractions.count}
             onClick={() => {
               history.push({
+                pathname: "/admin/read/action-engagements",
+                state: {
+                  ids: todoInteractions?.data,
+                  type: "TODO",
+                  options: transferOptions(options),
+                },
+              });
+            }}
+          />
+          <EngagementCard
+            color="rgb(216 155 155)"
+            theme="rgb(255 234 234)"
+            title="TESTIMONIALS"
+            subtitle="See involved testimonials"
+            icon="fa-tasks"
+            value={testimonials.count}
+            onClick={() => {
+              history.push({
                 pathname: "/admin/read/actions",
-                state: { ids: todoInteractions && todoInteractions.data },
+                state: { ids: testimonials?.data },
               });
             }}
           />
@@ -197,7 +306,8 @@ function CommunityEngagement({
             />
           )}
         </div>
-      </PapperBlock>
+      </MEPaperBlock>
+      {/* </PapperBlock> */}
     </div>
   );
 }
@@ -224,15 +334,7 @@ export default connect(
   mapDispatchToProps
 )(withRouter(CommunityEngagement));
 
-// ------------------------------------------------------------------------------------
-const TIME_RANGE = [
-  { name: "Last Visit", key: "last-visit" },
-  { name: "Last Week", key: "last-week" },
-  { name: "Last Month", key: "last-month" },
-  { name: "Custom Date & Time", key: "custom" },
-];
-// ------------------------------------------------------------------------------------
-
+// ------------------------------------------------------------------
 export const AddFilters = ({
   hide,
   communities,
@@ -242,18 +344,18 @@ export const AddFilters = ({
   apply,
   loading,
 }) => {
+  communities = (communities || []).sort((a, b) => (a.name > b.name ? 1 : -1));
   options = options || {};
   const extraStyles = isSuperAdmin ? {} : { width: "auto", flex: "1" };
   const rangeValue = options.range || [];
-  const comValue = options.communities || [];
-  console.log("Lets see options", options);
+  const comValue = options.communities;
 
   const handleCommunitySelection = (selection) => {
     const last = selection[selection.length - 1];
     const wantsAll = last === "all";
     if (wantsAll) return setOptions({ ...options, communities: ["all"] });
     selection = selection.filter((f) => f !== "all");
-    setOptions({ ...options, communities: selection });
+    setOptions({ ...options, communities: selection, mounted: true });
   };
 
   const isCustomRange = ((options && options.range) || [])[0] === "custom";
@@ -290,7 +392,7 @@ export const AddFilters = ({
           containerStyle={{ ...extraStyles, marginRight: 14 }}
           defaultValue={rangeValue}
           onItemSelected={(selection) =>
-            setOptions({ ...options, range: selection })
+            setOptions({ ...options, range: selection, mounted: true })
           }
         />
 
@@ -329,14 +431,14 @@ export const AddFilters = ({
                     <TextField style={{ marginRight: 10 }} {...props} />
                   )}
                   label="Start Date"
-                  value={(options && options.startDate) || moment.now()}
+                  value={(options && options.startDate) || ""}
                   onChange={(date) => handleDateSelection(date, "startDate")}
                 />
                 <Typography style={{ marginRight: 10 }}>To</Typography>
                 <DatePicker
                   onChange={(date) => handleDateSelection(date, "endDate")}
                   renderInput={(props) => <TextField {...props} />}
-                  value={(options && options.endDate) || moment.now()}
+                  value={(options && options.endDate) || ""}
                   label="End Date"
 
                   // format="MM/DD/YYYY"

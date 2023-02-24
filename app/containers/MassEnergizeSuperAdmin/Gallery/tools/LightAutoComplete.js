@@ -13,7 +13,7 @@ const styles = (theme) => {
     ghostCurtain: {
       position: "absolute",
       top: 100,
-      left: 0,
+      left: "-100px",
       width: "100vw",
       height: "100vh",
       background: "white",
@@ -147,7 +147,7 @@ function LightAutoComplete(props) {
   const userHasSelectedStuff = selected.length;
 
   return (
-    <div style={{ position: "relative", width: "100%" }}>
+    <div style={{ position: "relative", width: "100%", marginTop: 19 }}>
       {selected && selected.length > 0 && (
         <div ref={chipWrapperRef}>
           {selected.map((option, index) => {

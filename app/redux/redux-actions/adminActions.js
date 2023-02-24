@@ -46,6 +46,7 @@ import {
   LOAD_USER_ENGAGEMENTS,
   TOGGLE_UNIVERSAL_TOAST,
   LOAD_ALL_META_DATA,
+  ACTION_ENGAGMENTS,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -60,6 +61,9 @@ export const testRedux = (value) => {
   return { type: TEST_REDUX, payload: value };
 };
 
+export const reduxLoadActionEngagements = (data) => {
+  return { type: ACTION_ENGAGMENTS, payload: data };
+};
 export const loadUserEngagements = (data) => {
   return { type: LOAD_USER_ENGAGEMENTS, payload: data };
 };

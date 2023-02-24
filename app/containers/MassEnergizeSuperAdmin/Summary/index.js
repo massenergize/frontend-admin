@@ -26,6 +26,8 @@ import CommunityEngagement from "./CommunityEngagement";
 import { PapperBlock } from "dan-components";
 import Feature from "../../../components/FeatureFlags/Feature";
 import { FLAGS } from "../../../components/FeatureFlags/flags";
+import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import ContinueWhereYouLeft from "./ContinueWhereYouLeft";
 
 // import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
 class SummaryDashboard extends PureComponent {
@@ -232,7 +234,10 @@ export default withStyles(styles)(summaryMapped);
 
 const CSVDownloads = ({ loadingCSVs, classes }) => {
   return (
-    <PapperBlock whiteBg title="CSV Downloads">
+    <MEPaperBlock
+      subtitle="Download your data as CSV here"
+      title="CSV Downloads"
+    >
       <Grid container className={classes.colList}>
         <Grid item xs={12}>
           <Paper
@@ -305,6 +310,6 @@ const CSVDownloads = ({ loadingCSVs, classes }) => {
           </Paper>
         </Grid>
       </Grid>
-    </PapperBlock>
+    </MEPaperBlock>
   );
 };
