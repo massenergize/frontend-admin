@@ -316,7 +316,7 @@ class AllTestimonials extends React.Component {
           if (response.success) {
             this.props.toggleToast({
               open: true,
-              message: "Community successfully deleted",
+              message: "Testimonial successfully deleted",
               variant: "success",
             });
           } else {
