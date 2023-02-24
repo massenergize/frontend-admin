@@ -53,33 +53,39 @@ class EditTestimonial extends Component {
     // you need: communities, actions, vendors, tags, testimonials, testimonial
     var { testimonials, vendors, actions, tags, communities, match } = props;
     const { id } = match.params;
-    const testimonial = (testimonials || []).find(
-      (t) => t.id.toString() === id.toString()
-    );
+    let testimonial = ((testimonials) || []).find((t) => t.id.toString() === id.toString());
+    if (!testimonial){
+      apiCall("/testimonials.info", {id: id }).then(response=>{
+        if (response.success){
+          testimonial = response.data
+        }
+      })
+    }
     const readyToRenderThePageFirstTime =
       testimonials &&
       testimonials.length &&
       vendors &&
+      vendors.length &&
       actions &&
-      actions.length &&
+      actions.length&& 
       tags &&
       tags.length;
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderThePageFirstTime || state.mounted;
 
-    const coms = communities.map((c) => ({
+    const coms = ((communities) || []).map((c) => ({
       ...c,
       id: "" + c.id,
       displayName: c.name,
     }));
 
-    const vends = vendors.map((c) => ({
+    const vends = ((vendors) || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
     }));
-    const acts = actions.map((c) => ({
+    const acts = ((actions) || []).map((c) => ({
       ...c,
       id: "" + c.id,
       displayName: c.title + ` - ${c.community && c.community.name}`,
@@ -147,14 +153,14 @@ class EditTestimonial extends Component {
       <>
         <Paper style={{ padding: 15 }}>
           <Typography variant="h6">Created By</Typography>
-          {testimonial.user && (
+          {testimonial && testimonial.user && (
             <Typography>
               {testimonial.user.full_name}
               ,&nbsp;
               {testimonial.user.email}
             </Typography>
           )}
-          {!testimonial.user && <p>Created By: Community Admin</p>}
+          {testimonial && !testimonial.user && <p>Created By: Community Admin</p>}
         </Paper>
         <br />
         <MassEnergizeForm
@@ -261,7 +267,7 @@ const createFormJson = ({ communities, actions, vendors, testimonial }) => {
             placeholder: "eg. 0",
             fieldType: "TextField",
             contentType: "number",
-            isRequired: true,
+            isRequired: false,
             defaultValue: testimonial && testimonial.rank,
             dbName: "rank",
             readOnly: false,

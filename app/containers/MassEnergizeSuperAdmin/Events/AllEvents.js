@@ -4,7 +4,6 @@ import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 
-import MUIDataTable from "mui-datatables";
 import FileCopy from "@mui/icons-material/FileCopy";
 import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
@@ -22,16 +21,15 @@ import {
   reduxGetAllCommunityEvents,
   loadAllEvents,
   reduxToggleUniversalModal,
-  reduxLoadAllOtherEvents,
-  reduxSaveOtherEventState,
   reduxToggleUniversalToast,
+  reduxLoadMetaDataAction,
 } from "../../../redux/redux-actions/adminActions";
 import {
   fetchParamsFromURL,
   findMatchesAndRest,
   getHumanFriendlyDate,
-  getTimeStamp,
   makeDeleteUI,
+  getTimeStamp,
   ourCustomSort,
   smartString,
 } from "../../../utils/common";
@@ -39,6 +37,14 @@ import { Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import {
+  getAdminApiEndpoint,
+  getLimit,
+  handleFilterChange,
+  onTableStateChange,
+} from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import CallMadeIcon from "@mui/icons-material/CallMade";
 import { FROM } from "../../../utils/constants";
 class AllEvents extends React.Component {
@@ -72,7 +78,6 @@ class AllEvents extends React.Component {
         initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`,
       },
       smartString(d.name), // limit to first 30 chars
-      d.rank,
       `${smartString(d.tags.map((t) => t.name).join(", "), 30)}`,
       d.is_global ? "Template" : d.community && d.community.name,
       { isLive: d.is_published, item: d },
@@ -120,7 +125,9 @@ class AllEvents extends React.Component {
                   style={{ margin: 10 }}
                 />
               )}
-              {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
+              {!d.image && (
+                <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
+              )}
             </div>
           ),
         },
@@ -128,13 +135,6 @@ class AllEvents extends React.Component {
       {
         name: "Name",
         key: "name",
-        options: {
-          filter: false,
-        },
-      },
-      {
-        name: "Rank",
-        key: "rank",
         options: {
           filter: false,
         },
@@ -187,27 +187,41 @@ class AllEvents extends React.Component {
         options: {
           filter: false,
           download: false,
+          sort: false,
           customBodyRender: (id) => (
-            <div>
+            <div style={{ display: "flex" }}>
               <Link to={`/admin/edit/${id}/event`}>
-                <EditIcon size="small" variant="outlined" color="secondary" />
+                <EditIcon
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
               &nbsp;&nbsp;
               <Link
                 onClick={async () => {
-                  const copiedEventResponse = await apiCall("/events.copy", {
-                    event_id: id,
-                  });
+                  const copiedEventResponse = await apiCall(
+                    "/events.copy",
+                    {
+                      event_id: id,
+                    }
+                  );
                   if (copiedEventResponse && copiedEventResponse.success) {
                     const newEvent =
                       copiedEventResponse && copiedEventResponse.data;
-                    this.props.history.push(`/admin/edit/${newEvent.id}/event`);
+                    this.props.history.push(
+                      `/admin/edit/${newEvent.id}/event`
+                    );
                     putEventsInRedux([newEvent, ...(allEvents || [])]);
                   }
                 }}
                 to="/admin/read/events"
               >
-                <FileCopy size="small" variant="outlined" color="secondary" />
+                <FileCopy
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
               {auth && auth.is_super_admin && (
                 <Link to={`/admin/read/event/${id}/event-view?from=main`}>
@@ -273,7 +287,7 @@ class AllEvents extends React.Component {
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
-    putInRedux([...data]);
+    putInRedux( [...data]);
     const community = item.community;
     apiCall("/events.update", {
       event_id: item.id,
@@ -297,7 +311,7 @@ class AllEvents extends React.Component {
   }
 
   customSort(data, colIndex, order) {
-    const isComparingLive = colIndex === 7;
+    const isComparingLive = colIndex === 6;
     const sortForLive = ({ a, b }) => (a.isLive && !b.isLive ? -1 : 1);
     var params = {
       colIndex,
@@ -331,8 +345,9 @@ class AllEvents extends React.Component {
       });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putEventsInRedux(rem);
+    putEventsInRedux( rem);
   }
+  
 
   fetchOtherEvents() {
     const { community_ids, exclude } = this.state;
@@ -342,6 +357,9 @@ class AllEvents extends React.Component {
     apiCall("/events.others.listForCommunityAdmin", {
       community_ids: ids,
       exclude: exclude || false,
+      limit:getLimit(PAGE_PROPERTIES.ALL_EVENTS.key),
+      params:json.stringify({}),
+      page:1,
     })
       .then((response) => {
         this.setState({ loading: false });
@@ -358,12 +376,84 @@ class AllEvents extends React.Component {
     const description = brand.desc;
     const { columns } = this.state;
     const { classes } = this.props;
-    const data = this.fashionData(this.props.allEvents || []);
+    const { allEvents, putEventsInRedux, auth, meta, putMetaDataToRedux } = this.props;
+    const data = this.fashionData(allEvents || []);
+    const metaData = meta && meta.events;
+    
     const options = {
       filterType: "dropdown",
       responsive: "standard",
       print: true,
       rowsPerPage: 25,
+      count: metaData && metaData.count,
+      rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putEventsInRedux,
+          reduxItems: allEvents,
+          apiUrl: getAdminApiEndpoint(auth, "/events"),
+          pageProp: PAGE_PROPERTIES.ALL_EVENTS,
+          updateMetaData: putMetaDataToRedux,
+          name: "events",
+          meta: meta,
+        }),
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
+        <SearchBar
+          url={getAdminApiEndpoint(auth, "/events")}
+          reduxItems={allEvents}
+          updateReduxFunction={putEventsInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_EVENTS}
+          updateMetaData={putMetaDataToRedux}
+          name="events"
+          meta={meta}
+        />
+      ),
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
+        return (
+          <ApplyFilterButton
+            url={getAdminApiEndpoint(auth, "/events")}
+            reduxItems={allEvents}
+            updateReduxFunction={putEventsInRedux}
+            columns={columns}
+            limit={getLimit(PAGE_PROPERTIES.ALL_EVENTS.key)}
+            applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="events"
+            meta={meta}
+          />
+        );
+      },
+      whenFilterChanges: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_EVENTS,
+          updateReduxFunction: putEventsInRedux,
+          reduxItems: allEvents,
+          url: getAdminApiEndpoint(auth, "/events"),
+          updateMetaData: putMetaDataToRedux,
+          name: "events",
+          meta: meta,
+        }),
       customSort: this.customSort,
       rowsPerPageOptions: [10, 25, 100],
       downloadOptions: {
@@ -374,7 +464,7 @@ class AllEvents extends React.Component {
         const idsToDelete = rowsDeleted.data;
         const [found] = findMatchesAndRest(idsToDelete, (it) => {
           const f = data[it.dataIndex];
-          return f[10]; // this index should be changed if anyone modifies (adds/removes) an item in fashioData()
+          return f[9]; // this index should be changed if anyone modifies (adds/removes) an item in fashioData()
         });
         const noTemplatesSelectedGoAhead = !found || !found.length;
         this.props.toggleDeleteConfirmation({
@@ -385,7 +475,8 @@ class AllEvents extends React.Component {
             noTemplates: noTemplatesSelectedGoAhead,
           }),
           onConfirm: () =>
-            noTemplatesSelectedGoAhead && this.nowDelete({ idsToDelete, data }),
+            noTemplatesSelectedGoAhead &&
+            this.nowDelete({ idsToDelete, data }),
           closeAfterConfirmation: true,
           cancelText: noTemplatesSelectedGoAhead
             ? "No"
@@ -455,6 +546,7 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     allEvents: state.getIn(["allEvents"]),
     community: state.getIn(["selected_community"]),
+    meta: state.getIn(["paginationMetaData"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -465,7 +557,8 @@ function mapDispatchToProps(dispatch) {
       putEventsInRedux: loadAllEvents,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

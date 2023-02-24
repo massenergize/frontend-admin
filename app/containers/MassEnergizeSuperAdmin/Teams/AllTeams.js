@@ -22,6 +22,7 @@ import {
   loadAllTeams,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
+  reduxLoadMetaDataAction,
 } from "../../../redux/redux-actions/adminActions";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { apiCall } from "../../../utils/messenger";
@@ -35,6 +36,14 @@ import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
+import {
+  getAdminApiEndpoint,
+  getLimit,
+  handleFilterChange,
+  onTableStateChange,
+} from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
 class AllTeams extends React.Component {
   constructor(props) {
@@ -211,7 +220,11 @@ class AllTeams extends React.Component {
           download: false,
           customBodyRender: (id) => (
             <Link to={`/admin/edit/${id}/team-members`}>
-              <PeopleIcon size="small" variant="outlined" color="secondary" />
+              <PeopleIcon
+                size="small"
+                variant="outlined"
+                color="secondary"
+              />
             </Link>
           ),
         },
@@ -222,6 +235,7 @@ class AllTeams extends React.Component {
         options: {
           filter: false,
           download: false,
+          sort: false,
           customBodyRender: (id) => (
             <Link
               onClick={(e) => {
@@ -263,13 +277,13 @@ class AllTeams extends React.Component {
   }
 
   makeLiveOrNot(item) {
-    const putInRedux = this.props.putTeamsInRedux;
-    const data = this.props.allTeams || [];
+    let {putTeamsInRedux, allTeams} = this.props;
+    const data = allTeams || [];
     const status = item.is_published;
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
-    putInRedux([...data]);
+    putTeamsInRedux([...data]);
     apiCall("/teams.update", {
       id: item.id,
       is_published: !status,
@@ -343,14 +357,64 @@ class AllTeams extends React.Component {
     const title = brand.name + " - All Teams";
     const description = brand.desc;
     const { columns } = this.state;
-    const data = this.fashionData(this.props.allTeams);
-    const { classes } = this.props;
+    const { classes, allTeams, putTeamsInRedux, auth, meta, putMetaDataToRedux } = this.props;
+    const data = this.fashionData(allTeams);
+    const metaData = meta && meta.teams;
     const options = {
       filterType: "dropdown",
       responsive: "standard",
       print: true,
       rowsPerPage: 25,
+      count: metaData && metaData.count,
       rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putTeamsInRedux,
+          reduxItems: allTeams,
+          apiUrl: getAdminApiEndpoint(auth, "/teams"),
+          pageProp: PAGE_PROPERTIES.ALL_TEAMS,
+          updateMetaData: putMetaDataToRedux,
+          name: "teams",
+          meta: meta,
+        }),
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
+        return (
+          <ApplyFilterButton
+            url={getAdminApiEndpoint(auth, "/teams")}
+            reduxItems={allTeams}
+            updateReduxFunction={putTeamsInRedux}
+            columns={columns}
+            limit={getLimit(PAGE_PROPERTIES.ALL_TEAMS.key)}
+            applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="teams"
+            meta={meta}
+          />
+        );
+      },
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
+        <SearchBar
+          url={getAdminApiEndpoint(auth, "/teams")}
+          reduxItems={allTeams}
+          updateReduxFunction={putTeamsInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_TEAMS}
+          updateMetaData={putMetaDataToRedux}
+          name="teams"
+          meta={meta}
+        />
+      ),
       customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
@@ -361,6 +425,25 @@ class AllTeams extends React.Component {
           closeAfterConfirmation: true,
         });
       },
+      whenFilterChanges: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_TEAMS,
+          updateReduxFunction: putTeamsInRedux,
+          reduxItems: allTeams,
+          url: getAdminApiEndpoint(auth, "/teams"),
+          updateMetaData: putMetaDataToRedux,
+          name: "teams",
+          meta: meta,
+        }),
     };
 
     if (!data || !data.length) {
@@ -427,6 +510,7 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     allTeams: state.getIn(["allTeams"]),
     community: state.getIn(["selected_community"]),
+    meta: state.getIn(["paginationMetaData"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -438,7 +522,8 @@ function mapDispatchToProps(dispatch) {
       putTeamsInRedux: loadAllTeams,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

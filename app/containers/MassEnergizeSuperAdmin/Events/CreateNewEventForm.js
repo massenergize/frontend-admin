@@ -47,7 +47,6 @@ class CreateNewEventForm extends Component {
 
   static getDerivedStateFromProps = (props, state) => {
     const { communities, tags, auth, otherCommunities } = props;
-
     const readyToRenderPageFirstTime =
       communities &&
       communities.length &&
@@ -70,7 +69,7 @@ class CreateNewEventForm extends Component {
     const formJson = createFormJson({
       communities: coms,
       auth,
-      otherCommunities,
+      otherCommunities: otherCommunities || [],
     });
 
     const section = makeTagSection({ collections: tags, defaults: false });
@@ -171,18 +170,6 @@ const createFormJson = ({ communities, auth, otherCommunities }) => {
             isRequired: true,
             defaultValue: "",
             dbName: "featured_summary",
-            readOnly: false,
-          },
-          {
-            name: "rank",
-            label:
-              "Rank (Which order should this event appear in?  Lower numbers come first)",
-            placeholder: "eg. 1",
-            fieldType: "TextField",
-            contentType: "number",
-            isRequired: true,
-            defaultValue: "",
-            dbName: "rank",
             readOnly: false,
           },
           {
@@ -360,8 +347,6 @@ const createFormJson = ({ communities, auth, otherCommunities }) => {
                 id: "CLOSE",
                 value: "No one can see this, keep this in my community only ",
               },
-
-              // { id: "CLOSED_TO", value: "All except these communities" },
             ],
             conditionalDisplays: [
               {
@@ -379,21 +364,6 @@ const createFormJson = ({ communities, auth, otherCommunities }) => {
                   },
                 ],
               },
-              // {
-              //   valueToCheck: "CLOSED_TO",
-              //   fields: [
-              //     {
-              //       name: "cannot-view-event",
-              //       label: `Select the communities should NOT see this event`,
-              //       placeholder: "",
-              //       fieldType: "Checkbox",
-              //       selectMany: true,
-              //       defaultValue: [],
-              //       dbName: "publicity_selections",
-              //       data: otherCommunityList,
-              //     },
-              //   ],
-              // },
             ],
           },
         ],

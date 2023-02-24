@@ -52,7 +52,7 @@ export const makeTagSection = ({
     children: [],
   };
 
-  (collections || []).forEach((tCol) => {
+  ((collections) || []).forEach((tCol) => {
     const newField = {
       name: tCol.name,
       label: `${tCol.name} ${
@@ -124,10 +124,8 @@ class EditEventForm extends Component {
       heap,
       passedEvent, // In cases where this component is being used as a child component, the event object will be passed here directly
     } = props;
-
-    const { id } = (match && match.params) || {};
-
-    var { rescheduledEvent } = state;
+    const id = match &&  match.params && match.params.id;
+    var { rescheduledEvent, event } = state;
 
     rescheduledEvent = exceptions[id] || rescheduledEvent;
     var event;
@@ -166,12 +164,12 @@ class EditEventForm extends Component {
      */
     const readyToRenderPageFirstTime =
       event &&
-      events &&
+      events.length &&
       tags &&
       tags.length &&
-      (readOnly || rescheduledEvent || thereIsNothingInEventsExceptionsList) &&
-      otherCommunities &&
-      otherCommunities.length;
+      (readOnly || rescheduledEvent || thereIsNothingInEventsExceptionsList);
+      otherCommunities && otherCommunities.length
+      
 
     /**
      * Now, when all the values needed to create the form are loaded in, we now need to create the form
@@ -198,7 +196,7 @@ class EditEventForm extends Component {
       communities: coms,
       rescheduledEvent,
       auth,
-      otherCommunities,
+      otherCommunities: otherCommunities || [],
     });
 
     const section = makeTagSection({ collections: tags, event });
@@ -215,15 +213,21 @@ class EditEventForm extends Component {
     };
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     const { match, passedEvent } = this.props;
     const { id } = (match && match.params) || passedEvent || {};
     var { event } = this.state;
     const { auth, events, addExceptionsToHeap, heap, exceptions } = this.props;
 
-    event =
-      event || (events || []).find((e) => e.id.toString() === id.toString());
-
+    const eventResponse = await apiCall("/events.info", {
+      event_id: id,
+    });
+    if (eventResponse && !eventResponse.success) {
+      return;
+    }
+    
+    event =event||(event || []).find((e) => e.id.toString() === id.toString())|| eventResponse.data
+    this.setState({event });
     const readOnly = checkIfReadOnly(event, auth);
     if (!readOnly) {
       apiCall("events.exceptions.list", { event_id: id })
@@ -377,6 +381,7 @@ const createFormJson = ({
 }) => {
   const statuses = ["Draft", "Live", "Archived"];
   if (!event || !communities) return;
+
   const is_super_admin = auth && auth.is_super_admin;
 
   communities = is_super_admin
@@ -444,18 +449,6 @@ const createFormJson = ({
             isRequired: true,
             defaultValue: event.featured_summary,
             dbName: "featured_summary",
-            readOnly: false,
-          },
-          {
-            name: "rank",
-            label:
-              "Rank (Which order should this event appear in?  Lower numbers come first)",
-            placeholder: "eg. 1",
-            fieldType: "TextField",
-            contentType: "number",
-            isRequired: false,
-            defaultValue: event.rank,
-            dbName: "rank",
             readOnly: false,
           },
           {

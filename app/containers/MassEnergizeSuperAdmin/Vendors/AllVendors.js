@@ -20,11 +20,20 @@ import {
   reduxToggleUniversalModal,
   loadAllVendors,
   reduxToggleUniversalToast,
+  reduxLoadMetaDataAction,
 } from "../../../redux/redux-actions/adminActions";
 import { smartString } from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
+import {
+  getAdminApiEndpoint,
+  getLimit,
+  handleFilterChange,
+  onTableStateChange,
+} from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
 class AllVendors extends React.Component {
   constructor(props) {
@@ -91,8 +100,8 @@ class AllVendors extends React.Component {
 
   getColumns = (classes) => [
     {
-      name: 'ID',
-      key: 'id',
+      name: "ID",
+      key: "id",
       options: {
         filter: false,
       },
@@ -101,7 +110,7 @@ class AllVendors extends React.Component {
       name: "Image",
       key: "image",
       options: {
-        sort:false,
+        sort: false,
         filter: false,
         download: false,
         customBodyRender: (d) => (
@@ -138,7 +147,7 @@ class AllVendors extends React.Component {
       key: "communities",
       options: {
         filter: true,
-        filterType: "textField",
+        filterType: "dropdown",
       },
     },
     {
@@ -154,6 +163,7 @@ class AllVendors extends React.Component {
       options: {
         filter: false,
         download: false,
+        sort: false,
         customBodyRender: (id) => (
           <div>
             <Link to={`/admin/edit/${id}/vendor`}>
@@ -183,28 +193,26 @@ class AllVendors extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { allVendors, putVendorsInRedux } = this.props;
-    const itemsInRedux = allVendors;
+    const itemsInRedux = allVendors || [];
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/vendors.delete", { vendor_id: found }).then(
-        (response) => {
-          if (response.success) {
-            this.props.toggleToast({
-              open: true,
-              message: "Vendor(s) successfully deleted",
-              variant: "success",
-            });
-          } else {
-            this.props.toggleToast({
-              open: true,
-              message: "An error occurred while deleting the vendor(s)",
-              variant: "error",
-            });
-          }
+      apiCall("/vendors.delete", { vendor_id: found }).then((response) => {
+        if (response.success) {
+          this.props.toggleToast({
+            open: true,
+            message: "Vendor(s) successfully deleted",
+            variant: "success",
+          });
+        } else {
+          this.props.toggleToast({
+            open: true,
+            message: "An error occurred while deleting the vendor(s)",
+            variant: "error",
+          });
         }
-      );
+      });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putVendorsInRedux(rem);
@@ -220,20 +228,88 @@ class AllVendors extends React.Component {
       </Typography>
     );
   }
-
   render() {
     const title = brand.name + " - All Vendors";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes } = this.props;
-    const data = this.fashionData(this.props.allVendors || []);
+    const { classes, allVendors, putVendorsInRedux, auth, meta, putMetaDataToRedux } = this.props;
+    const data = this.fashionData((allVendors) || []);
+    const metaData = meta && meta.vendors;
 
     const options = {
       filterType: "dropdown",
       responsive: "standard",
       print: true,
       rowsPerPage: 25,
+      count: metaData && metaData.count,
       rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putVendorsInRedux,
+          reduxItems: allVendors,
+          apiUrl: getAdminApiEndpoint(auth, "/vendors"),
+          pageProp: PAGE_PROPERTIES.ALL_VENDORS,
+          updateMetaData: putMetaDataToRedux,
+          name: "vendors",
+          meta: meta,
+        }),
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
+        <SearchBar
+          url={getAdminApiEndpoint(auth, "/vendors")}
+          reduxItems={allVendors}
+          updateReduxFunction={putVendorsInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_VENDORS}
+          updateMetaData={putMetaDataToRedux}
+          name="vendors"
+          meta={meta}
+        />
+      ),
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
+        return (
+          <ApplyFilterButton
+            url={getAdminApiEndpoint(auth, "/vendors")}
+            reduxItems={allVendors}
+            updateReduxFunction={putVendorsInRedux}
+            columns={columns}
+            limit={getLimit(PAGE_PROPERTIES.ALL_VENDORS.key)}
+            applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="vendors"
+            meta={meta}
+          />
+        );
+      },
+      whenFilterChanges: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_VENDORS,
+          updateReduxFunction: putVendorsInRedux,
+          reduxItems: allVendors,
+          url: getAdminApiEndpoint(auth, "/vendors"),
+          updateMetaData: putMetaDataToRedux,
+          name: "vendors",
+          meta: meta,
+        }),
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
@@ -246,7 +322,7 @@ class AllVendors extends React.Component {
       },
     };
 
-    if (!data || !data.length) {
+    if (!data || data == undefined) {
       return <LinearBuffer />;
     }
 
@@ -283,6 +359,7 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     allVendors: state.getIn(["allVendors"]),
     community: state.getIn(["selected_community"]),
+    meta: state.getIn(["paginationMetaData"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -292,7 +369,8 @@ function mapDispatchToProps(dispatch) {
       callVendorsForNormalAdmin: reduxGetAllCommunityVendors,
       putVendorsInRedux: loadAllVendors,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

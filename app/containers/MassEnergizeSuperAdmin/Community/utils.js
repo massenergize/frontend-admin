@@ -1,4 +1,5 @@
-import moment from "moment";
+import moment from "moment/moment";
+import { IS_CANARY, IS_LOCAL, IS_PROD } from "../../../config/constants";
 
 export const getMoreInfo = (community) => {
   // const { community } = this.state;
@@ -60,6 +61,14 @@ export const isValueEmpty = (value) => {
   return false;
 };
 
+export const getHost = () => {
+  var host;
+  if (IS_LOCAL) host = "http://localhost:3000";
+  else if (IS_CANARY) host = "https://communities-canary.massenergize.org";
+  else if (IS_PROD) host = "https://communities.massenergize.org";
+  else host = "https://community.massenergize.dev";
+  return host;
+};
 function sameYear(date1, date2) {
   return date1.getFullYear() === date2.getFullYear();
 }

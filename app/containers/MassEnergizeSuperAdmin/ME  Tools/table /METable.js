@@ -121,8 +121,25 @@ function METable(props) {
    * @param {*} type
    * @returns
    */
-  const onFilterChange = (column, filterList, type) => {
-    const { columns } = tableProps || {};
+
+  const onFilterChange = (column,filterList,type,changedColumnIndex,displayData) => {
+    const { columns, options } = tableProps || {};
+//  this changes have been made to allow us apply custom filtering to the table.
+    if(options.whenFilterChanges){
+      let { obj, newColumns } = options.whenFilterChanges(
+        column,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      );
+
+      filterObject.current = obj
+      setTableColumns(newColumns);
+      saveSelectedFilters(obj);
+      return 
+    }
+    
     const columnIndex = columns.findIndex((c) => c.name === column);
     const obj = filterObject.current;
     if (columnIndex === -1) return;
@@ -179,7 +196,7 @@ function METable(props) {
     ...(tableProps.options || {}),
     onSearchChange,
     searchText: search || "",
-    searchOpen: search,
+    searchOpen: search ? true : false,
     onChangeRowsPerPage: whenRowsPerPageChanges,
     rowsPerPage: rowsPerPage || tableProps.options.rowsPerPage,
     onColumnSortChange: whenAdminSortsAColumn,

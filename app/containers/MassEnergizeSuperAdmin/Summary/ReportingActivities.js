@@ -6,6 +6,7 @@ import { Paper, Typography } from "@mui/material";
 import { LOADING } from "../../../utils/constants";
 import Loading from "dan-components/Loading";
 import { makeTimeAgo } from "../../../utils/common";
+import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 function ReportingActivities({
   activities,
   style,
@@ -32,10 +33,9 @@ function ReportingActivities({
 
   const footages = activities.footages || [];
   return (
-    <PapperBlock
+    <MEPaperBlock
       title="Activities"
-      whiteBg
-      desc="Want to know what's been happening?"
+      subtitle="Want to know what's been happening?"
     >
       <div style={{ ...(style || {}) }}>
         {footages.map((act, index) => {
@@ -51,7 +51,7 @@ function ReportingActivities({
           );
         })}
       </div>
-    </PapperBlock>
+    </MEPaperBlock>
   );
 }
 
@@ -79,7 +79,10 @@ const OneActivity = ({
   const extra = super_admin_mode ? { fontSize: 15 } : {};
   const byASadmin = !super_admin_mode && by_super_admin; // To mark activities that show what superadmins have been doing to your community
   return (
-    <Typography variant="caption" style={{ marginBottom: 5, ...extra }}>
+    <Typography
+      variant="caption"
+      style={{ marginBottom: 5, display: "block", ...extra }}
+    >
       {byASadmin && (
         <i
           className="fas fa-shield"

@@ -95,7 +95,7 @@ class EditTeam extends Component {
     if (jobsDoneDontRunWhatsBelow) return null;
 
     if (team)
-      teams = teams.filter(
+      teams = teams && teams.filter(
         (t) => t.primary_community.id === team.primary_community.id
       );
     const parentTeamOptions = makeParentOptions({ teams, team });

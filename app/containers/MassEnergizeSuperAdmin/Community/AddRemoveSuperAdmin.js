@@ -35,14 +35,15 @@ const styles = (theme) => ({
 });
 
 const fetchSadmins = async ({ reduxFunction }) => {
-  const superAdminResponse = await apiCall("/admins.super.list");
+  const superAdminResponse = await apiCall("/admins.super.list", {
+    limit: 50,
+  });
   if (
     !superAdminResponse ||
     !superAdminResponse.success ||
     !superAdminResponse.data
   )
     return reduxFunction([]);
-
   const data = superAdminResponse.data;
   reduxFunction(data);
 };
@@ -54,6 +55,11 @@ class AddRemoveSuperAdmin extends Component {
       data: [],
       columns: this.getColumns(),
     };
+  }
+
+  componentDidMount(){
+    const { sadmins, putSadminsInRedux } = this.props;
+    fetchSadmins({ reduxFunction: putSadminsInRedux });
   }
 
   static getDerivedStateFromProps(props, state) {

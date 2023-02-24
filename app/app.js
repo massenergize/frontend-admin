@@ -50,7 +50,12 @@ const SENTRY_DSN =
 
 Sentry.init({
   dsn: SENTRY_DSN,
-  integrations: [new BrowserTracing()],
+  replaysSessionSampleRate: 1.0,
+  replaysOnErrorSampleRate: 1.0,
+  integrations: [
+    new Sentry.Replay({ stickySession: true }),
+    new BrowserTracing(),
+  ],
 });
 
 // Create redux store with history
