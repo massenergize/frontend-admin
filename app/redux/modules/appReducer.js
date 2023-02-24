@@ -45,6 +45,7 @@ import {
   SET_ENGAGMENT_OPTIONS,
   LOAD_USER_ENGAGEMENTS,
   TOGGLE_UNIVERSAL_TOAST,
+  LOAD_ALL_META_DATA,
   ACTION_ENGAGMENTS,
 } from "../ReduxConstants";
 
@@ -438,6 +439,14 @@ export const allTaskFunctionsReducer = (state = [], action = {}) => {
 export const allTasksReducer = (state = [], action = {}) => {
   switch (action.type) {
     case LOAD_ALL_TASKS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const allMetaDataReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case LOAD_ALL_META_DATA:
       return action.payload;
     default:
       return state;

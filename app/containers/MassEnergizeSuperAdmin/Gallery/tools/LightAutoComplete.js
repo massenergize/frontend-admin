@@ -142,7 +142,7 @@ function LightAutoComplete(props) {
       : 0;
     return height;
   };
-  const onlyValues = selected.map((itm) => getValue(itm));
+  const onlyValues = (selected||[]).map((itm) => getValue(itm));
   const thereAreNoOptionsToDisplay = optionsToDisplay.length === 0;
   const userHasSelectedStuff = selected.length;
 
@@ -193,7 +193,8 @@ function LightAutoComplete(props) {
             />
             <Paper
               className={classes.dropdown}
-              style={{ top: 70 + increasedRatio() }}
+              style={{ top: 70 + increasedRatio(),}}
+
             >
               {thereAreNoOptionsToDisplay && (
                 <p style={{ padding: 10, color: "lightgray" }}>
@@ -250,10 +251,12 @@ function LightAutoComplete(props) {
                     {multiple && (
                       <Checkbox
                         style={{ padding: 0, marginRight: 6 }}
-                        checked={onlyValues.includes(getValue(op))}
+                        checked={onlyValues.includes(
+                          getValue(op)
+                        )}
                       />
                     )}
-                    {getLabel(op)}
+                      {getLabel(op)}
                   </div>
                 );
               })}

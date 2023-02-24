@@ -1,3 +1,4 @@
+import moment from "moment/moment";
 import { IS_CANARY, IS_LOCAL, IS_PROD } from "../../../config/constants";
 
 export const getMoreInfo = (community) => {

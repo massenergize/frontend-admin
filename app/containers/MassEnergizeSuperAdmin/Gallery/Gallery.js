@@ -225,6 +225,7 @@ function Gallery(props) {
     fetchContent(makeRequestBody(limits), () => setLoadMore(false));
   };
 
+
   return (
     <div>
       {showMoreInfo && (

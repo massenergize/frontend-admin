@@ -47,7 +47,6 @@ class CreateNewEventForm extends Component {
 
   static getDerivedStateFromProps = (props, state) => {
     const { communities, tags, auth, otherCommunities } = props;
-
     const readyToRenderPageFirstTime =
       communities &&
       communities.length &&
@@ -70,7 +69,7 @@ class CreateNewEventForm extends Component {
     const formJson = createFormJson({
       communities: coms,
       auth,
-      otherCommunities,
+      otherCommunities: otherCommunities || [],
     });
 
     const section = makeTagSection({ collections: tags, defaults: false });

@@ -55,6 +55,7 @@ import app, {
   reducerForEngagementOptions,
   reducerForUserEngagements,
   reducerForUniversalToast,
+  allMetaDataReducer,
   reducerForActionEngagements,
 } from "./modules/appReducer";
 
@@ -116,6 +117,7 @@ export default function createReducer(injectedReducers = {}) {
     ...injectedReducers,
     taskFunctions: allTaskFunctionsReducer,
     tasks: allTasksReducer,
+    paginationMetaData:allMetaDataReducer, // stores pagination data for all tables
   });
 
   // Wrap the root reducer and return a new root reducer with router state

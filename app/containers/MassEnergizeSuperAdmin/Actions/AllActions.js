@@ -6,7 +6,6 @@ import brand from "dan-api/dummy/brand";
 import { Helmet } from "react-helmet";
 import { withStyles } from "@mui/styles";
 
-import MUIDataTable from "mui-datatables";
 import FileCopy from "@mui/icons-material/FileCopy";
 import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
@@ -23,6 +22,7 @@ import {
   loadAllActions,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
+  reduxLoadMetaDataAction
 } from "../../../redux/redux-actions/adminActions";
 
 import {
@@ -40,6 +40,9 @@ import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import { getAdminApiEndpoint, getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -54,6 +57,21 @@ class AllActions extends React.Component {
   }
 
   async componentDidMount() {
+    // const { putActionsInRedux, auth, meta, putMetaDataToRedux } = this.props;
+    // var url;
+    // if (auth &&auth.is_super_admin) url = "/actions.listForSuperAdmin";
+    // else if (auth && auth.is_community_admin) url = "/actions.listForCommunityAdmin";
+    // const allActionsResponse = await apiCall(url, {
+    //   limit: getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key),
+    // });
+    // if (allActionsResponse && allActionsResponse.success) {
+    //   putActionsInRedux(allActionsResponse.data);
+    //   putMetaDataToRedux({ ...meta, actions: allActionsResponse.cursor });
+    // } else if (allActionsResponse && !allActionsResponse.success) {
+    //   await this.setStateAsync({
+    //     error: allActionsResponse.error,
+    //   });
+    // }
     const { putActionsInRedux, fetchActions, location } = this.props;
 
     const { state } = location;
@@ -69,6 +87,9 @@ class AllActions extends React.Component {
       props: this.props,
       dataSource: [],
       reduxFxn: putActionsInRedux,
+      args:{
+       limit: getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key), 
+      }
     };
     fetchActions(null, (data, failed, error) => {
       if (failed) return this.setState({ error });
@@ -98,7 +119,7 @@ class AllActions extends React.Component {
     const index = allActions.findIndex((a) => a.id === data.id);
     const updateItems = allActions.filter((a) => a.id !== data.id);
     updateItems.splice(index, 0, data);
-    putActionsInRedux(updateItems);
+    putActionsInRedux(updateItems)
   };
 
   changeActions = async (id) => {
@@ -136,7 +157,9 @@ class AllActions extends React.Component {
                   style={{ margin: 10 }}
                 />
               )}
-              {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
+              {!d.image && (
+                <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
+              )}
             </div>
           ),
         },
@@ -238,22 +261,33 @@ class AllActions extends React.Component {
         options: {
           filter: false,
           download: false,
+          sort: false,
           customBodyRender: (id) => (
             <div>
               <Link to={`/admin/edit/${id}/action`}>
-                <EditIcon size="small" variant="outlined" color="secondary" />
+                <EditIcon
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
               &nbsp;&nbsp;
               <Link
                 onClick={async () => {
-                  const copiedActionResponse = await apiCall("/actions.copy", {
-                    action_id: id,
-                  });
+                  const copiedActionResponse = await apiCall(
+                    "/actions.copy",
+                    {
+                      action_id: id,
+                    }
+                  );
 
-                  if (copiedActionResponse && copiedActionResponse.success) {
+                  if (
+                    copiedActionResponse &&
+                    copiedActionResponse.success
+                  ) {
                     const newAction =
                       copiedActionResponse && copiedActionResponse.data;
-                    putActionsInRedux([newAction, ...(allActions || [])]);
+                    putActionsInRedux([newAction, ...(allActions || [])],);
                     this.props.history.push(
                       `/admin/edit/${newAction.id}/action`
                     );
@@ -261,7 +295,11 @@ class AllActions extends React.Component {
                 }}
                 to="/admin/read/actions"
               >
-                <FileCopy size="small" variant="outlined" color="secondary" />
+                <FileCopy
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
             </div>
           ),
@@ -422,16 +460,18 @@ class AllActions extends React.Component {
 
     if (isComparingLive) params = { ...params, compare: sortForLive };
     else if (isComparingRank) params = { ...params, compare: sortForRank };
-
     return data.sort((a, b) => ourCustomSort({ ...params, a, b }));
   }
+
   render() {
     const title = brand.name + " - All Actions";
     const description = brand.desc;
-    const { classes } = this.props;
+    const { classes, auth, allActions, putActionsInRedux, putMetaDataToRedux, meta} = this.props;
     const { columns, error } = this.state;
-    const data = this.fashionData(this.props.allActions || []);
-    if (!data || !data.length) {
+    const data = this.fashionData(allActions || []);
+    const metaData = meta && meta.actions;
+
+    if (!data || data == null) {
       return (
         <Grid
           container
@@ -467,13 +507,82 @@ class AllActions extends React.Component {
       responsive: "standard",
       print: true,
       rowsPerPage: 25,
+      count: metaData && metaData.count,
       rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putActionsInRedux,
+          reduxItems: allActions,
+          apiUrl: getAdminApiEndpoint(auth, "/actions"),
+          pageProp: PAGE_PROPERTIES.ALL_ACTIONS,
+          updateMetaData: putMetaDataToRedux,
+          name: "actions",
+          meta: meta,
+        }),
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
+        <SearchBar
+          url={getAdminApiEndpoint(auth, "/actions")}
+          reduxItems={allActions}
+          updateReduxFunction={putActionsInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_ACTIONS}
+          updateMetaData={putMetaDataToRedux}
+          name="actions"
+          meta={meta}
+        />
+      ),
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
+        return (
+          <ApplyFilterButton
+            url={getAdminApiEndpoint(auth, "/actions")}
+            reduxItems={allActions}
+            updateReduxFunction={putActionsInRedux}
+            columns={columns}
+            limit={getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key)}
+            applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="actions"
+            meta={meta}
+          />
+        );
+      },
+
+      whenFilterChanges: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_ACTIONS,
+          updateReduxFunction: putActionsInRedux,
+          reduxItems: allActions,
+          url: getAdminApiEndpoint(auth, "/actions"),
+          updateMetaData: putMetaDataToRedux,
+          name: "actions",
+          meta: meta,
+        }),
       customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         const [found] = findMatchesAndRest(idsToDelete, (it) => {
           const f = data[it.dataIndex];
-          return f[9]; // this index should be changed if anyone modifies (adds/removes) an item in fashioData()
+          return f[9]; // this index should be changed if anyone modifies (adds/removes) an item in fashionData()
         });
         const noTemplatesSelectedGoAhead = !found || !found.length;
         this.props.toggleDeleteConfirmation({
@@ -551,6 +660,7 @@ const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   allActions: state.getIn(["allActions"]),
   community: state.getIn(["selected_community"]),
+  meta: state.getIn(["paginationMetaData"]),
 });
 const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
@@ -561,7 +671,8 @@ const mapDispatchToProps = (dispatch) =>
       putActionsInRedux: loadAllActions,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast:reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );
