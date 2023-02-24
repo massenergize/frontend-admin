@@ -45,6 +45,7 @@ import {
   SET_ENGAGMENT_OPTIONS,
   LOAD_USER_ENGAGEMENTS,
   TOGGLE_UNIVERSAL_TOAST,
+  ACTION_ENGAGMENTS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -72,6 +73,14 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+export const reducerForActionEngagements = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case ACTION_ENGAGMENTS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForUserEngagements = (state = LOADING, action = {}) => {
   switch (action.type) {
     case LOAD_USER_ENGAGEMENTS:
@@ -81,7 +90,7 @@ export const reducerForUserEngagements = (state = LOADING, action = {}) => {
   }
 };
 export const reducerForEngagementOptions = (
-  state = { range: ["last-month"], communities: ["all"] },
+  state = { range: ["last-month"] },
   action = {}
 ) => {
   switch (action.type) {

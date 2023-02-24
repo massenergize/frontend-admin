@@ -34,6 +34,7 @@ import WhatNext from "./WhatNext";
 import CommunityEngagement from "./CommunityEngagement";
 import Feature from "../../../components/FeatureFlags/Feature";
 import { FLAGS } from "../../../components/FeatureFlags/flags";
+import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import ContinueWhereYouLeft from "./ContinueWhereYouLeft";
 
 class NormalAdminHome extends PureComponent {
@@ -93,12 +94,12 @@ class NormalAdminHome extends PureComponent {
   renderTable = (data, classes) => {
     const { history } = this.props;
     return (
-      <PapperBlock
+      <MEPaperBlock
         noMargin
         title="Communities You Manage"
         icon="ios-share-outline"
         whiteBg
-        desc=""
+        subtitle="A list of all the communities you manage"
       >
         <div className={classes.root}>
           <Table
@@ -191,7 +192,7 @@ class NormalAdminHome extends PureComponent {
             </TableBody>
           </Table>
         </div>
-      </PapperBlock>
+      </MEPaperBlock>
     );
   };
 
@@ -262,15 +263,16 @@ class NormalAdminHome extends PureComponent {
         >
           <>
             <WhatNext />
-            <Grid container columnGap={2}>
+            <Grid container style={{ paddingRight: 20 }}>
               <Grid
                 style={{
                   display: "flex",
                   flexDirection: "column",
+                  paddingRight: 20,
                 }}
                 item
                 className={classes.root}
-                md={7}
+                md={9}
                 xs={12}
               >
                 <CommunityEngagement />
@@ -280,7 +282,7 @@ class NormalAdminHome extends PureComponent {
                   </Grid>
                 )}
               </Grid>
-              <Grid md={4}>
+              <Grid md={3}>
                 <ReportingActivities
                   style={{ maxHeight: 615, overflowY: "scroll" }}
                 />

@@ -56,6 +56,12 @@ export const SuperAllActions = loadable(
     fallback: <Loading />,
   }
 );
+export const ActionEngagementList = loadable(
+  () => import("./MassEnergizeSuperAdmin/Pages/ActionEngagements"),
+  {
+    fallback: <Loading />,
+  }
+);
 
 export const SuperDonate = loadable(
   () => import("./MassEnergizeSuperAdmin/Pages/Donate"),
