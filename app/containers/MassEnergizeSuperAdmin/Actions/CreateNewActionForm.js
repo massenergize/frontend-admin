@@ -46,7 +46,7 @@ class CreateNewActionForm extends Component {
   static getDerivedStateFromProps(props, state) {
     const { communities, tags, vendors, ccActions, auth } = props;
     const fullyMountedNeverRunThisAgain =
-      communities && communities.length;
+      communities && communities.length &&
       tags &&
       tags.length &&
       ccActions &&

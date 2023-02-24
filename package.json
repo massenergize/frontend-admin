@@ -98,7 +98,7 @@
     "@mui/lab": "^5.0.0-alpha.118",
     "@mui/material": "^5.11.7",
     "@mui/styles": "^5.11.7",
-    "@mui/x-date-pickers": "^5.0.13",
+    "@mui/x-date-pickers": "^5.0.20",
     "@sentry/react": "^7.38.0",
     "@sentry/tracing": "^7.38.0",
     "@tinymce/tinymce-react": "^3.14.0",

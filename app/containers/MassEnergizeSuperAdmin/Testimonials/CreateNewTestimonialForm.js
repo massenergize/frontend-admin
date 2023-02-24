@@ -63,7 +63,7 @@ class CreateNewTestimonialForm extends Component {
       displayName: c.name,
     }));
 
-    const vends = (vendors && vendors ||[]).map((c) => ({
+    const vends = (vendors && vendors.length ||[]).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,

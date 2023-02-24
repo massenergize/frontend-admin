@@ -34,7 +34,7 @@ class CommunitySwitch extends PureComponent {
   getDropdownCommunities() {
     var { auth, communities } = this.props;
 
-    communities = communities && communities|| [];
+    communities = communities && communities.length || [];
     var firstCom = communities[0] || {};
     if (!auth) return [];
     if (auth.is_super_admin) return [communities, communities[0] || firstCom];
