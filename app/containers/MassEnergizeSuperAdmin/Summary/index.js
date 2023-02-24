@@ -27,6 +27,7 @@ import { PapperBlock } from "dan-components";
 import Feature from "../../../components/FeatureFlags/Feature";
 import { FLAGS } from "../../../components/FeatureFlags/flags";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import ContinueWhereYouLeft from "./ContinueWhereYouLeft";
 
 // import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
 class SummaryDashboard extends PureComponent {
