@@ -22,7 +22,7 @@ import {
   loadAllActions,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
-  reduxLoadMetaDataAction
+  reduxLoadMetaDataAction,
 } from "../../../redux/redux-actions/adminActions";
 
 import {
@@ -41,9 +41,15 @@ import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import { getAdminApiEndpoint, getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
+import {
+  getAdminApiEndpoint,
+  getLimit,
+  handleFilterChange,
+  onTableStateChange,
+} from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import Loader from "../../../utils/components/Loader";
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -88,9 +94,9 @@ class AllActions extends React.Component {
       props: this.props,
       dataSource: [],
       reduxFxn: putActionsInRedux,
-      args:{
-       limit: getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key), 
-      }
+      args: {
+        limit: getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key),
+      },
     };
     fetchActions(null, (data, failed, error) => {
       if (failed) return this.setState({ error });
@@ -120,7 +126,7 @@ class AllActions extends React.Component {
     const index = allActions.findIndex((a) => a.id === data.id);
     const updateItems = allActions.filter((a) => a.id !== data.id);
     updateItems.splice(index, 0, data);
-    putActionsInRedux(updateItems)
+    putActionsInRedux(updateItems);
   };
 
   changeActions = async (id) => {
@@ -158,9 +164,7 @@ class AllActions extends React.Component {
                   style={{ margin: 10 }}
                 />
               )}
-              {!d.image && (
-                <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
-              )}
+              {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
             </div>
           ),
         },
@@ -266,29 +270,19 @@ class AllActions extends React.Component {
           customBodyRender: (id) => (
             <div>
               <Link to={`/admin/edit/${id}/action`}>
-                <EditIcon
-                  size="small"
-                  variant="outlined"
-                  color="secondary"
-                />
+                <EditIcon size="small" variant="outlined" color="secondary" />
               </Link>
               &nbsp;&nbsp;
               <Link
                 onClick={async () => {
-                  const copiedActionResponse = await apiCall(
-                    "/actions.copy",
-                    {
-                      action_id: id,
-                    }
-                  );
+                  const copiedActionResponse = await apiCall("/actions.copy", {
+                    action_id: id,
+                  });
 
-                  if (
-                    copiedActionResponse &&
-                    copiedActionResponse.success
-                  ) {
+                  if (copiedActionResponse && copiedActionResponse.success) {
                     const newAction =
                       copiedActionResponse && copiedActionResponse.data;
-                    putActionsInRedux([newAction, ...(allActions || [])],);
+                    putActionsInRedux([newAction, ...(allActions || [])]);
                     this.props.history.push(
                       `/admin/edit/${newAction.id}/action`
                     );
@@ -296,11 +290,7 @@ class AllActions extends React.Component {
                 }}
                 to="/admin/read/actions"
               >
-                <FileCopy
-                  size="small"
-                  variant="outlined"
-                  color="secondary"
-                />
+                <FileCopy size="small" variant="outlined" color="secondary" />
               </Link>
             </div>
           ),
@@ -412,24 +402,24 @@ class AllActions extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/actions.delete", { action_id: found }).then(res=>{
-        if (res.success) {
-          this.props.toggleToast({
-            open: true,
-            message: "Action(s) successfully deleted",
-            variant: "success",
-          });
-        } else {
-          this.props.toggleToast({
-            open: true,
-            message:
-              "An error occurred while deleting the action(s), please try again",
-            variant: "error",
-          });
-        }
-      }).catch((e) =>
-        console.log("ACTION_DELETE_ERRO:", e)
-      );
+      apiCall("/actions.delete", { action_id: found })
+        .then((res) => {
+          if (res.success) {
+            this.props.toggleToast({
+              open: true,
+              message: "Action(s) successfully deleted",
+              variant: "success",
+            });
+          } else {
+            this.props.toggleToast({
+              open: true,
+              message:
+                "An error occurred while deleting the action(s), please try again",
+              variant: "error",
+            });
+          }
+        })
+        .catch((e) => console.log("ACTION_DELETE_ERRO:", e));
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putActionsInRedux(rem);
@@ -453,31 +443,21 @@ class AllActions extends React.Component {
   render() {
     const title = brand.name + " - All Actions";
     const description = brand.desc;
-    const { classes, auth, allActions, putActionsInRedux, putMetaDataToRedux, meta} = this.props;
+    const {
+      classes,
+      auth,
+      allActions,
+      putActionsInRedux,
+      putMetaDataToRedux,
+      meta,
+    } = this.props;
     const { columns, error } = this.state;
     const data = this.fashionData(allActions || []);
     const metaData = meta && meta.actions;
 
     if (isEmpty(metaData)) {
       return (
-        <Grid
-          container
-          spacing={24}
-          alignItems="flex-start"
-          direction="row"
-          justify="center"
-        >
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root} style={{ padding: 15 }}>
-              <div className={classes.root}>
-                <LinearProgress />
-                <h1>Fetching all Actions. This may take a while...</h1>
-                <br />
-                <LinearProgress color="secondary" />
-              </div>
-            </Paper>
-          </Grid>
-        </Grid>
+        <Loader />
       );
     }
 
@@ -511,12 +491,7 @@ class AllActions extends React.Component {
           name: "actions",
           meta: meta,
         }),
-      customSearchRender: (
-        searchText,
-        handleSearch,
-        hideSearch,
-        options
-      ) => (
+      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
         <SearchBar
           url={getAdminApiEndpoint(auth, "/actions")}
           reduxItems={allActions}
@@ -658,7 +633,7 @@ const mapDispatchToProps = (dispatch) =>
       putActionsInRedux: loadAllActions,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast,
+      toggleToast: reduxToggleUniversalToast,
       putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch

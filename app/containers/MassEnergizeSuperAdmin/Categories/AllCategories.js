@@ -25,6 +25,7 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import METable from "../ME  Tools/table /METable";
 import { isEmpty } from "../../../utils/common";
+import Loader from "../../../utils/components/Loader";
 class AllTagCollections extends React.Component {
   constructor(props) {
     super(props);
@@ -251,9 +252,9 @@ class AllTagCollections extends React.Component {
       //   );
       // },
     };
-    if (isEmpty(metaData)) {
-      return <Loading />;
-    }
+   if (isEmpty(metaData)) {
+     return <Loader />;
+   }
     return (
       <div>
         <Helmet>
