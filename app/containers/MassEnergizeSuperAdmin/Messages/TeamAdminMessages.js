@@ -16,7 +16,7 @@ import {
   reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
-import { Chip, Typography, Grid, Paper} from "@mui/material";
+import { Chip, Typography, Grid, Paper } from "@mui/material";
 import {
   loadTeamMessages,
   reduxLoadMetaDataAction,
@@ -26,10 +26,16 @@ import {
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { getLimit, handleFilterChange, isTrue, onTableStateChange } from "../../../utils/helpers";
+import {
+  getLimit,
+  handleFilterChange,
+  isTrue,
+  onTableStateChange,
+} from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import { replyToMessage } from "./CommunityAdminMessages";
+import Loader from "../../../utils/components/Loader";
 class AllTeamAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -55,14 +61,16 @@ class AllTeamAdminMessages extends React.Component {
     }).then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
         let hasItems =
-          allMessagesResponse.data &&
-          allMessagesResponse.data.length > 0;
+          allMessagesResponse.data && allMessagesResponse.data.length > 0;
         this.setState({ hasNoItems: !hasItems });
 
-        if (!comingFromDashboard){
+        if (!comingFromDashboard) {
           putTeamMessagesInRedux(allMessagesResponse.data);
-          putMetaDataToRedux({...meta, teamMessages: allMessagesResponse.cursor});
-          return
+          putMetaDataToRedux({
+            ...meta,
+            teamMessages: allMessagesResponse.cursor,
+          });
+          return;
         }
 
         this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
@@ -162,7 +170,7 @@ class AllTeamAdminMessages extends React.Component {
           return (
             <Chip
               label={isTrue(d) ? "Yes" : "No"}
-              className={isTrue(d)? classes.yesLabel : classes.noLabel}
+              className={isTrue(d) ? classes.yesLabel : classes.noLabel}
             />
           );
         },
@@ -237,9 +245,15 @@ class AllTeamAdminMessages extends React.Component {
     const title = brand.name + " - Team Admin Messages";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, teamMessages, putTeamMessagesInRedux, meta, putMetaDataToRedux } = this.props;
+    const {
+      classes,
+      teamMessages,
+      putTeamMessagesInRedux,
+      meta,
+      putMetaDataToRedux,
+    } = this.props;
     const data = this.fashionData((teamMessages && teamMessages) || []);
-    
+
     const metaData = meta && meta.teamMessages;
     const options = {
       filterType: "dropdown",
@@ -278,12 +292,7 @@ class AllTeamAdminMessages extends React.Component {
           />
         );
       },
-      customSearchRender: (
-        searchText,
-        handleSearch,
-        hideSearch,
-        options
-      ) => (
+      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
         <SearchBar
           url={"/messages.listTeamAdminMessages"}
           reduxItems={teamMessages}
@@ -327,29 +336,9 @@ class AllTeamAdminMessages extends React.Component {
         }),
     };
 
-     if (isEmpty(metaData)) {
-       if (this.state.hasNoItems) {
-         return (
-           <Grid
-             container
-             spacing={24}
-             alignItems="flex-start"
-             direction="row"
-             justify="center"
-           >
-             <Grid item xs={12} md={6}>
-               <Paper className={classes.root} style={{ padding: 15 }}>
-                 <div className={classes.root}>
-                   <h1>No messages currently to display</h1>
-                   <br />
-                 </div>
-               </Paper>
-             </Grid>
-           </Grid>
-         );
-       }
-       return <LinearBuffer />;
-     }
+    if (isEmpty(metaData)) {
+      return <Loader />;
+    }
 
     return (
       <div>

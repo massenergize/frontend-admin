@@ -34,6 +34,7 @@ import {
 } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import Loader from "../../../utils/components/Loader";
 
 class AllVendors extends React.Component {
   constructor(props) {
@@ -322,9 +323,9 @@ class AllVendors extends React.Component {
       },
     };
 
-     if (isEmpty(metaData)) {
-       return <LinearBuffer />;
-     }
+       if (isEmpty(metaData)) {
+         return <Loader />;
+       }
 
     return (
       <div>

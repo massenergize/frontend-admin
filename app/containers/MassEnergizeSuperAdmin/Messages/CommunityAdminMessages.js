@@ -30,6 +30,7 @@ import METable from "../ME  Tools/table /METable";
 import { getLimit, handleFilterChange, isTrue, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import Loader from "../../../utils/components/Loader";
 
 export const replyToMessage = ({ pathname, props, transfer }) => {
   // const pathname = `/admin/edit/${id}/message`;
@@ -371,9 +372,9 @@ class AllCommunityAdminMessages extends React.Component {
           meta: meta,
         }),
     };
-     if (isEmpty(metaData)) {
-       return <LinearBuffer />;
-     }
+   if (isEmpty(metaData)) {
+     return <Loader />;
+   }
 
     return (
       <div>

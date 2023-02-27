@@ -30,6 +30,7 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import { getAdminApiEndpoint, getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import Loader from "../../../utils/components/Loader";
 
 class AllCommunities extends React.Component {
   constructor(props) {
@@ -357,29 +358,9 @@ class AllCommunities extends React.Component {
           meta: meta,
         }),
     };
-
-    if (isEmpty(metaData)) {
-      return (
-        <Grid
-          container
-          spacing={24}
-          alignItems="flex-start"
-          direction="row"
-          justify="center"
-        >
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root}>
-              <div className={classes.root}>
-                <LinearProgress />
-                <h1>Fetching all Communities. This may take a while...</h1>
-                <br />
-                <LinearProgress color="secondary" />
-              </div>
-            </Paper>
-          </Grid>
-        </Grid>
-      );
-    }
+   if (isEmpty(metaData)) {
+     return <Loader />;
+   }
 
     const { idsToDelete, toastData } = this.state;
     return (
