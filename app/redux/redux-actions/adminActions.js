@@ -41,6 +41,7 @@ import {
   LOAD_ALL_OTHER_COMMUNITIES,
   LOAD_ALL_OTHER_EVENTS,
   SAVE_OTHER_EVENT_STATES,
+  KEEP_FORM_CONTENT,
   LOAD_ADMIN_NEXT_STEPS_SUMMARY,
   SET_ENGAGMENT_OPTIONS,
   LOAD_USER_ENGAGEMENTS,
@@ -104,6 +105,20 @@ export const loadSettings = (data = {}) => {
   return {
     type: LOAD_SETTINGS,
     payload: data,
+  };
+};
+export const restoreFormProgress = (data = {}) => {
+  return {
+    type: KEEP_FORM_CONTENT,
+    payload: data,
+  };
+};
+export const reduxKeepFormContent = ({ key, data, whole }) => {
+  const payload = { ...(whole || {}), [key]: data };
+  // localStorage.setItem(ME_FORM_PROGRESS, JSON.stringify(payload)); // -- UNCOMMENT WHEN WE WANT TO CONTINUE WITH PERSISTING PROGRESS
+  return {
+    type: KEEP_FORM_CONTENT,
+    payload,
   };
 };
 export const reduxSetGalleryFilters = (data = {}) => {
@@ -357,6 +372,23 @@ export const reduxUpdateHeap = (heap = {}) => ({
   type: UPDATE_HEAP,
   payload: heap,
 });
+
+/**
+ * Use this function if you just need to add images to the list in gallery
+ * and nothing more!
+ */
+export const reduxAddToGalleryImages = ({ old, data }) => {
+  return {
+    type: LOAD_GALLERY_IMAGES,
+    payload: { ...old, images: [...(data || []), ...(old.images || [])] },
+  };
+};
+/**
+ * When new content is loaded and all the limits need to be recorded, this
+ * is the redux function to use
+ * @param {*} param0
+ * @returns
+ */
 export const reduxLoadGalleryImages = ({
   data = {},
   old = {},
@@ -446,6 +478,16 @@ export const reduxLoadImageInfos = ({ oldInfos, newInfo }) => ({
   type: KEEP_LOADED_IMAGE_INFO,
   payload: { ...(oldInfos || {}), [newInfo.id]: newInfo },
 });
+/**
+ * Use this function if you just need to add images to the list in "all images page"
+ * and nothing more!
+ */
+export const reduxAddToSearchedImages = ({ old, data }) => {
+  return {
+    type: LOAD_SEARCHED_IMAGES,
+    payload: { ...old, images: [...(data || []), ...(old.images || [])] },
+  };
+};
 
 export const reduxLoadMetaDataAction = (meta) => ({
   type: LOAD_ALL_META_DATA,

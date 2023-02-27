@@ -2,11 +2,12 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import states from "dan-api/data/states";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { Paper } from "@mui/material";
 import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
-import MassEnergizeForm from "../_FormGenerator";
+// import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import Typography from "@mui/material/Typography";
 import { checkIfReadOnly, getSelectedIds } from "../Actions/EditActionForm";
 import { bindActionCreators } from "redux";
@@ -16,6 +17,7 @@ import {
 } from "../../../redux/redux-actions/adminActions";
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -52,7 +54,16 @@ export const makeTagSection = ({
     children: [],
   };
 
-  ((collections) || []).forEach((tCol) => {
+  (collections || []).forEach((tCol) => {
+    var selected = (event && event.tags) || [];
+    let putDefaultsIfUpdating = {};
+    if (defaults) {
+      let data = selected.map((c) => c.id.toString());
+      putDefaultsIfUpdating = {
+        defaultValue: defaults && getSelectedIds(data || [], tCol.tags || []),
+      };
+    }
+
     const newField = {
       name: tCol.name,
       label: `${tCol.name} ${
@@ -63,8 +74,9 @@ export const makeTagSection = ({
       placeholder: "",
       fieldType: "Checkbox",
       selectMany: tCol.allow_multiple,
-      defaultValue:
-        defaults && getSelectedIds((event && event.tags) || [], tCol.tags),
+      ...putDefaultsIfUpdating,
+      processedDefaultValue: (selected) =>
+        getSelectedIds(selected || [], tCol.tags || []),
       dbName: "tags",
       data: tCol.tags.map((t) => ({
         ...t,
@@ -117,6 +129,7 @@ class EditEventForm extends Component {
       events,
       auth,
       exceptions,
+      location,
       otherCommunities,
       eventsInHeap,
       eventsFromOtherCommunities,
@@ -124,7 +137,7 @@ class EditEventForm extends Component {
       heap,
       passedEvent, // In cases where this component is being used as a child component, the event object will be passed here directly
     } = props;
-    const id = match &&  match.params && match.params.id;
+    const id = match && match.params && match.params.id;
     var { rescheduledEvent, event } = state;
 
     rescheduledEvent = exceptions[id] || rescheduledEvent;
@@ -168,8 +181,7 @@ class EditEventForm extends Component {
       tags &&
       tags.length &&
       (readOnly || rescheduledEvent || thereIsNothingInEventsExceptionsList);
-      otherCommunities && otherCommunities.length
-      
+    otherCommunities && otherCommunities.length;
 
     /**
      * Now, when all the values needed to create the form are loaded in, we now need to create the form
@@ -191,11 +203,14 @@ class EditEventForm extends Component {
       displayName: c.name,
       id: "" + c.id,
     }));
+
+    const libOpen = location.state && location.state.libOpen;
     const formJson = createFormJson({
       event,
       communities: coms,
       rescheduledEvent,
       auth,
+      autoOpenMediaLibrary: libOpen,
       otherCommunities: otherCommunities || [],
     });
 
@@ -225,9 +240,12 @@ class EditEventForm extends Component {
     if (eventResponse && !eventResponse.success) {
       return;
     }
-    
-    event =event||(event || []).find((e) => e.id.toString() === id.toString())|| eventResponse.data
-    this.setState({event });
+
+    event =
+      event ||
+      (event || []).find((e) => e.id.toString() === id.toString()) ||
+      eventResponse.data;
+    this.setState({ event });
     const readOnly = checkIfReadOnly(event, auth);
     if (!readOnly) {
       apiCall("events.exceptions.list", { event_id: id })
@@ -259,8 +277,9 @@ class EditEventForm extends Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, match, passedEvent } = this.props;
     const { formJson, readOnly, event, mounted } = this.state;
+    const { id } = (match && match.params) || passedEvent || {};
 
     if (!event && mounted)
       return (
@@ -289,6 +308,7 @@ class EditEventForm extends Component {
         ) : null}
 
         <MassEnergizeForm
+          pageKey={`${PAGE_KEYS.EDIT_EVENT.key}-${id}`}
           classes={classes}
           formJson={formJson}
           readOnly={readOnly}
@@ -333,7 +353,9 @@ const EditEventMapped = connect(
 EditEventForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
-export default withStyles(styles, { withTheme: true })(EditEventMapped);
+export default withStyles(styles, { withTheme: true })(
+  withRouter(EditEventMapped)
+);
 
 const validator = (cleaned) => {
   const start = (cleaned || {})["start_date_and_time"];
@@ -377,6 +399,7 @@ const createFormJson = ({
   rescheduledEvent,
   communities,
   auth,
+  autoOpenMediaLibrary,
   otherCommunities,
 }) => {
   const statuses = ["Draft", "Live", "Archived"];
@@ -813,6 +836,7 @@ const createFormJson = ({
         name: "image",
         placeholder: "Select an Image",
         fieldType: fieldTypes.MediaLibrary,
+        openState: autoOpenMediaLibrary,
         dbName: "image",
         label: "Upload Files",
         isRequired: false,

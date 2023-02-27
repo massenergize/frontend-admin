@@ -41,6 +41,7 @@ import {
   LOAD_ALL_OTHER_COMMUNITIES,
   LOAD_ALL_OTHER_EVENTS,
   SAVE_OTHER_EVENT_STATES,
+  KEEP_FORM_CONTENT,
   LOAD_ADMIN_NEXT_STEPS_SUMMARY,
   SET_ENGAGMENT_OPTIONS,
   LOAD_USER_ENGAGEMENTS,
@@ -120,6 +121,14 @@ export const reducerForSavingOtherEventState = (state = {}, action = {}) => {
 export const reducerForLoadingOtherEvents = (state = [], action = {}) => {
   switch (action.type) {
     case LOAD_ALL_OTHER_EVENTS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForKeepingFormContent = (state = {}, action = {}) => {
+  switch (action.type) {
+    case KEEP_FORM_CONTENT:
       return action.payload;
     default:
       return state;

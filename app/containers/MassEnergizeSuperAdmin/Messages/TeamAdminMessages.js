@@ -12,6 +12,7 @@ import styles from "../../../components/Widget/widget-jss";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import {
   getHumanFriendlyDate,
+  isEmpty,
   reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
@@ -326,29 +327,29 @@ class AllTeamAdminMessages extends React.Component {
         }),
     };
 
-    if (!data || !data.length) {
-      if (this.state.hasNoItems) {
-        return (
-          <Grid
-            container
-            spacing={24}
-            alignItems="flex-start"
-            direction="row"
-            justify="center"
-          >
-            <Grid item xs={12} md={6}>
-              <Paper className={classes.root} style={{ padding: 15 }}>
-                <div className={classes.root}>
-                  <h1>No messages currently to display</h1>
-                  <br />
-                </div>
-              </Paper>
-            </Grid>
-          </Grid>
-        );
-      }
-      return <LinearBuffer />;
-    }
+     if (isEmpty(metaData)) {
+       if (this.state.hasNoItems) {
+         return (
+           <Grid
+             container
+             spacing={24}
+             alignItems="flex-start"
+             direction="row"
+             justify="center"
+           >
+             <Grid item xs={12} md={6}>
+               <Paper className={classes.root} style={{ padding: 15 }}>
+                 <div className={classes.root}>
+                   <h1>No messages currently to display</h1>
+                   <br />
+                 </div>
+               </Paper>
+             </Grid>
+           </Grid>
+         );
+       }
+       return <LinearBuffer />;
+     }
 
     return (
       <div>

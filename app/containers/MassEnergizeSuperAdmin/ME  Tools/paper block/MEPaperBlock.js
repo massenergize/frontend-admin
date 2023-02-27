@@ -1,7 +1,13 @@
 import { Typography } from "@mui/material";
 import React from "react";
 
-function MEPaperBlock({ children, customHeader, title, subtitle }) {
+function MEPaperBlock({
+  children,
+  customHeader,
+  title,
+  subtitle,
+  containerStyle,
+}) {
   return (
     <div>
       <div
@@ -13,6 +19,7 @@ function MEPaperBlock({ children, customHeader, title, subtitle }) {
           background: "white",
           borderRadius: 10,
           marginBottom: 20,
+          ...(containerStyle || {}),
         }}
       >
         {!customHeader ? (
@@ -30,10 +37,12 @@ function MEPaperBlock({ children, customHeader, title, subtitle }) {
                 {title}
               </Typography>
             )}
-            {subtitle && (
+            {subtitle?.length ? (
               <Typography variant="body" style={{ fontSize: "1rem" }}>
                 {subtitle}
               </Typography>
+            ) : (
+              <>{subtitle}</>
             )}
           </div>
         ) : (

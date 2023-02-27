@@ -23,6 +23,7 @@ import {
 
 import {
   getHumanFriendlyDate,
+  isEmpty,
   isNotEmpty,
   ourCustomSort,
   reArrangeForAdmin,
@@ -512,7 +513,7 @@ class AllTestimonials extends React.Component {
       },
     };
 
-    if (!data || data === null) {
+    if (isEmpty(metaData)) {
       return (
         <Grid
           container

@@ -5,6 +5,7 @@ import { Typography } from "@mui/material";
 import moment from "moment";
 import qs from "qs";
 import React from "react";
+import { ME_FORM_PROGRESS } from "../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 import { apiCall } from "./messenger";
 
 export const separate = (ids, dataSet = [], options = {}) => {
@@ -213,7 +214,8 @@ export const getTimeStamp = () => {
 export const fetchParamsFromURL = (location, paramName, names) => {
   if (!location || !location.search) return "";
   const obj = qs.parse(location.search, { ignoreQueryPrefix: true });
-  const value = (obj[paramName] || "").toString();
+  var value = obj[paramName];
+  value = value && value.toString();
   delete obj[paramName];
   const params = {};
   if (names && names.length) {
@@ -231,6 +233,12 @@ export const fetchParamsFromURL = (location, paramName, names) => {
   );
 };
 
+export const removePageProgressFromStorage = (key) => {
+  var progress = localStorage.getItem(ME_FORM_PROGRESS) || "{}";
+  progress = JSON.parse(progress);
+  progress[key] = {};
+  localStorage.setItem(ME_FORM_PROGRESS, JSON.stringify(progress));
+}
 /**
    * 
    * This function takes a list of ids of items(msgs, actions, testimonials etc.) that need attending to and matches it against the data source, 

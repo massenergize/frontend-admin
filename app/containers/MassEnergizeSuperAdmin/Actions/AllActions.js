@@ -29,6 +29,7 @@ import {
   findMatchesAndRest,
   getHumanFriendlyDate,
   getTimeStamp,
+  isEmpty,
   isNotEmpty,
   makeDeleteUI,
   ourCustomSort,
@@ -433,20 +434,6 @@ class AllActions extends React.Component {
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putActionsInRedux(rem);
   }
-  // getTimeStamp = () => {
-  //   const today = new Date();
-  //   let newDate = today;
-  //   let options = {
-  //     year: "numeric",
-  //     month: "short",
-  //     day: "numeric",
-  //     hour: "2-digit",
-  //     minute: "2-digit",
-  //     second: "2-digit",
-  //   };
-
-  //   return Intl.DateTimeFormat("en-US", options).format(newDate);
-  // };
 
   customSort(data, colIndex, order) {
     const isComparingLive = colIndex === 6;
@@ -471,7 +458,7 @@ class AllActions extends React.Component {
     const data = this.fashionData(allActions || []);
     const metaData = meta && meta.actions;
 
-    if (!data || data == null) {
+    if (isEmpty(metaData)) {
       return (
         <Grid
           container

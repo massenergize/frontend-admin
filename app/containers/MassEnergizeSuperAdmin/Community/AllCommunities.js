@@ -22,7 +22,7 @@ import {
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
-import { smartString } from "../../../utils/common";
+import { isEmpty, smartString } from "../../../utils/common";
 import { Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
@@ -43,10 +43,7 @@ class AllCommunities extends React.Component {
 
   componentDidMount() {
     const { auth, putMetaDataToRedux, meta} = this.props;
-    var url;
-    if (auth && auth.is_super_admin) url = "/communities.listForSuperAdmin";
-    else if (auth && auth.is_community_admin)
-      url = "/communities.listForCommunityAdmin";
+    var url = getAdminApiEndpoint(auth, "/communities");
     apiCall(url, {limit:getLimit(PAGE_PROPERTIES.ALL_COMMUNITIES.key)}).then((allCommunitiesResponse) => {
       if (allCommunitiesResponse && allCommunitiesResponse.success) {
         this.props.putCommunitiesInRedux(allCommunitiesResponse.data,);
@@ -274,8 +271,7 @@ class AllCommunities extends React.Component {
     const { classes, toggleDeleteConfirmation, communities, putCommunitiesInRedux, auth, meta, putMetaDataToRedux } = this.props;
     const data = this.fashionData(communities || []);
     const metaData = meta && meta.communities;
-
-    console.log("=== metaData ===", meta);
+    
     const options = {
       filterType: "dropdown",
       responsive: "standard",
@@ -362,7 +358,7 @@ class AllCommunities extends React.Component {
         }),
     };
 
-    if (!data || data === null) {
+    if (isEmpty(metaData)) {
       return (
         <Grid
           container
