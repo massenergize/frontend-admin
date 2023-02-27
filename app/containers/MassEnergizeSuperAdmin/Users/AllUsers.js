@@ -17,6 +17,7 @@ import {
 } from "../../../redux/redux-actions/adminActions";
 import {
   getHumanFriendlyDate,
+  isEmpty,
   reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
@@ -268,9 +269,9 @@ class AllUsers extends React.Component {
         }),
     };
 
-    if (!data || !data.length) {
-      return <LinearBuffer />;
-    }
+     if (isEmpty(metaData)) {
+       return <LinearBuffer />;
+     }
     return (
       <div>
         <Helmet>

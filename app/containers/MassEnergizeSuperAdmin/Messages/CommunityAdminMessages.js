@@ -21,6 +21,7 @@ import {
   getHumanFriendlyDate,
   smartString,
   separate,
+  isEmpty,
 } from "../../../utils/common";
 import { Chip } from "@mui/material";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
@@ -370,9 +371,9 @@ class AllCommunityAdminMessages extends React.Component {
           meta: meta,
         }),
     };
-    if (!data || !data.length) {
-      return <LinearBuffer />;
-    }
+     if (isEmpty(metaData)) {
+       return <LinearBuffer />;
+     }
 
     return (
       <div>

@@ -22,7 +22,7 @@ import {
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
-import { smartString } from "../../../utils/common";
+import { isEmpty, smartString } from "../../../utils/common";
 import { Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
@@ -358,7 +358,7 @@ class AllCommunities extends React.Component {
         }),
     };
 
-    if (!data || data === null) {
+    if (isEmpty(metaData)) {
       return (
         <Grid
           container

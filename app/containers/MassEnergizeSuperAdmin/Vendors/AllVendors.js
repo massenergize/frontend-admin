@@ -22,7 +22,7 @@ import {
   reduxToggleUniversalToast,
   reduxLoadMetaDataAction,
 } from "../../../redux/redux-actions/adminActions";
-import { smartString } from "../../../utils/common";
+import { isEmpty, smartString } from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
@@ -322,9 +322,9 @@ class AllVendors extends React.Component {
       },
     };
 
-    if (!data || data == undefined) {
-      return <LinearBuffer />;
-    }
+     if (isEmpty(metaData)) {
+       return <LinearBuffer />;
+     }
 
     return (
       <div>

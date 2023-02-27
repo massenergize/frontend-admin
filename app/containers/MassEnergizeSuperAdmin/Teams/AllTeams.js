@@ -27,6 +27,7 @@ import {
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { apiCall } from "../../../utils/messenger";
 import {
+  isEmpty,
   objArrayToString,
   ourCustomSort,
   reArrangeForAdmin,
@@ -446,28 +447,28 @@ class AllTeams extends React.Component {
         }),
     };
 
-    if (!data || !data.length) {
-      return (
-        <Grid
-          container
-          spacing={24}
-          alignItems="flex-start"
-          direction="row"
-          justify="center"
-        >
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root} style={{ padding: 15 }}>
-              <div className={classes.root}>
-                <LinearProgress />
-                <h1>Fetching all Teams. This may take a while...</h1>
-                <br />
-                <LinearProgress color="secondary" />
-              </div>
-            </Paper>
-          </Grid>
-        </Grid>
-      );
-    }
+   if (isEmpty(metaData)) {
+     return (
+       <Grid
+         container
+         spacing={24}
+         alignItems="flex-start"
+         direction="row"
+         justify="center"
+       >
+         <Grid item xs={12} md={6}>
+           <Paper className={classes.root} style={{ padding: 15 }}>
+             <div className={classes.root}>
+               <LinearProgress />
+               <h1>Fetching all Teams. This may take a while...</h1>
+               <br />
+               <LinearProgress color="secondary" />
+             </div>
+           </Paper>
+         </Grid>
+       </Grid>
+     );
+   }
 
     return (
       <div>

@@ -22,6 +22,7 @@ import METable from "../ME  Tools/table /METable";
 import { getAdminApiEndpoint, getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import { isEmpty } from "../../../utils/common";
 
 class AllSubscribers extends React.Component {
   constructor(props) {
@@ -263,9 +264,9 @@ class AllSubscribers extends React.Component {
           meta: meta,
         }),
     };
-    if (!data || !data.length) {
-      return <LinearBuffer />;
-    }
+     if (isEmpty(metaData)) {
+       return <LinearBuffer />;
+     }
 
     return (
       <div>
