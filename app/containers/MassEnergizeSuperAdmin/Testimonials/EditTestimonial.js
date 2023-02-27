@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
-import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import Loading from "dan-components/Loading";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
@@ -12,6 +12,7 @@ import { Paper, Typography } from "@mui/material";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { withRouter } from "react-router-dom";
 import { fetchLatestNextSteps } from "../../../redux/redux-actions/adminActions";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 
 const styles = (theme) => ({
   root: {
@@ -146,8 +147,9 @@ class EditTestimonial extends Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, match } = this.props;
     const { formJson, testimonial } = this.state;
+    const { id } = match.params;
     if (!formJson) return <Loading />;
     return (
       <>
@@ -167,6 +169,7 @@ class EditTestimonial extends Component {
           classes={classes}
           formJson={formJson}
           onComplete={this.onComplete.bind(this)}
+          pageKey={`${PAGE_KEYS.EDIT_TESTIMONIALS.key}-${id}`}
           enableCancel
         />
       </>

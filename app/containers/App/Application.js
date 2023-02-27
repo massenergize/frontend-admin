@@ -11,6 +11,7 @@ import {
   reduxCheckUser,
   reduxFetchInitialContent,
   reduxToggleUniversalModal,
+  restoreFormProgress,
   reduxToggleUniversalToast,
   runAdminStatusCheck,
 } from "../../redux/redux-actions/adminActions";
@@ -92,6 +93,7 @@ import ThemeModal from "../../components/Widget/ThemeModal";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { THREE_MINUTES, TIME_UNTIL_EXPIRATION } from "../../utils/constants";
 import ThemeToast from "../../components/Widget/ThemeToast";
+import { ME_FORM_PROGRESS } from "../MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 
 class Application extends React.Component {
   componentDidMount() {
@@ -105,7 +107,13 @@ class Application extends React.Component {
       const currentDateTime = Date.now();
       const itsPassedADaySinceLogin = currentDateTime > expirationTime;
       if (itsPassedADaySinceLogin) runAdminStatusCheck();
-    },THREE_MINUTES);
+    }, THREE_MINUTES);
+
+    // ---- UNCOMMENT THIS WHEN WE WANT TO CONTINUE WITH PERSISTING FORM PROGRESS TO LOCAL STORAGE
+    // Collect form progress from local storage after page refresh
+    // var progress = localStorage.getItem(ME_FORM_PROGRESS) || "{}";
+    // progress = JSON.parse(progress);
+    // this.props.restoreFormProgress(progress);
   }
 
   getCommunityList() {
@@ -183,6 +191,7 @@ class Application extends React.Component {
         )}
       />,
     ];
+
     const {
       component,
       show,
@@ -449,6 +458,7 @@ function mapDispatchToProps(dispatch) {
       fetchInitialContent: reduxFetchInitialContent,
       toggleUniversalModal: reduxToggleUniversalModal,
       checkFirebaseAuthentication,
+      restoreFormProgress: restoreFormProgress,
       toggleUniversalToast:reduxToggleUniversalToast
     },
     dispatch
