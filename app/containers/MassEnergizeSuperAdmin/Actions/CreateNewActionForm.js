@@ -57,8 +57,7 @@ class CreateNewActionForm extends Component {
       location,
     } = props;
     const fullyMountedNeverRunThisAgain =
-      communities &&
-      communities.length &&
+      communities && communities.length &&
       tags &&
       tags.length &&
       ccActions &&
@@ -194,8 +193,8 @@ const createFormJson = ({
             placeholder: "eg. 1",
             fieldType: "TextField",
             contentType: "number",
-            isRequired: true,
-            // defaultValue: progress.rank || "",
+            isRequired: false,
+            defaultValue: "",
             dbName: "rank",
             readOnly: false,
           },

@@ -5,7 +5,7 @@ import { withRouter } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import EventsFromOtherCommunities from "./EventsFromOtherCommunities";
 import styles from "../../../components/Widget/widget-jss";
-import { reduxLoadAllOtherEvents, reduxSaveOtherEventState } from "../../../redux/redux-actions/adminActions";
+import { reduxLoadAllOtherEvents, reduxLoadMetaDataAction, reduxSaveOtherEventState } from "../../../redux/redux-actions/adminActions";
 
 function OtherEvents({
   putOtherEventsInRedux,
@@ -14,6 +14,8 @@ function OtherEvents({
   otherEvents,
   otherEventsState,
   putEventsStateInRedux,
+  meta,
+  putMetaDataToRedux
 }) {
   return (
     <div>
@@ -24,6 +26,8 @@ function OtherEvents({
         otherEvents={otherEvents}
         state={otherEventsState}
         putStateInRedux={putEventsStateInRedux}
+        meta={meta}
+        putMetaDataToRedux={putMetaDataToRedux}
       />
     </div>
   );
@@ -37,6 +41,7 @@ function mapStateToProps(state) {
     otherCommunities: state.getIn(["otherCommunities"]),
     otherEvents: state.getIn(["otherEvents"]),
     otherEventsState: state.getIn(["otherEventsState"]),
+    meta: state.getIn(["paginationMetaData"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -49,6 +54,7 @@ function mapDispatchToProps(dispatch) {
       // toggleLive: reduxToggleUniversalModal,
       putOtherEventsInRedux: reduxLoadAllOtherEvents,
       putEventsStateInRedux: reduxSaveOtherEventState,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

@@ -257,6 +257,7 @@ export const reArrangeForAdmin = ({
   fieldKey,
   reduxFxn,
   separationOptions,
+  args
 }) => {
   const _sort = (a, b) => (b.id < a.id ? -1 : 1);
   const { location } = props;
@@ -271,6 +272,7 @@ export const reArrangeForAdmin = ({
 
   apiCall(apiURL, {
     [fieldKey]: notFound,
+    ...(args || {}),
   }).then((response) => {
     if (response.success) data = [...response.data, ...data];
     //-- Items that were not found, have now been loaded from the B.E!

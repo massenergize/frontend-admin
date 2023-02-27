@@ -53,7 +53,11 @@ import app, {
   reducerForSavingOtherEventState,
   reducerForKeepingFormContent,
   reducerForNextStepsSummary,
+  reducerForEngagementOptions,
+  reducerForUserEngagements,
   reducerForUniversalToast,
+  allMetaDataReducer,
+  reducerForActionEngagements,
 } from "./modules/appReducer";
 
 /**
@@ -62,6 +66,9 @@ import app, {
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
     tempForm: reducerForKeepingFormContent,
+    actionEngagements: reducerForActionEngagements,
+    userEngagements: reducerForUserEngagements,
+    engagementOptions: reducerForEngagementOptions,
     nextStepsSummary: reducerForNextStepsSummary,
     activities: reducerForAdminActivities,
     otherCommunities: reducerForAllOtherCommunities,
@@ -112,6 +119,7 @@ export default function createReducer(injectedReducers = {}) {
     ...injectedReducers,
     taskFunctions: allTaskFunctionsReducer,
     tasks: allTasksReducer,
+    paginationMetaData:allMetaDataReducer, // stores pagination data for all tables
   });
 
   // Wrap the root reducer and return a new root reducer with router state

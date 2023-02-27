@@ -43,7 +43,11 @@ import {
   SAVE_OTHER_EVENT_STATES,
   KEEP_FORM_CONTENT,
   LOAD_ADMIN_NEXT_STEPS_SUMMARY,
+  SET_ENGAGMENT_OPTIONS,
+  LOAD_USER_ENGAGEMENTS,
   TOGGLE_UNIVERSAL_TOAST,
+  LOAD_ALL_META_DATA,
+  ACTION_ENGAGMENTS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -71,6 +75,33 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+export const reducerForActionEngagements = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case ACTION_ENGAGMENTS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForUserEngagements = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_USER_ENGAGEMENTS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForEngagementOptions = (
+  state = { range: ["last-month"] },
+  action = {}
+) => {
+  switch (action.type) {
+    case SET_ENGAGMENT_OPTIONS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForNextStepsSummary = (state = {}, action = {}) => {
   switch (action.type) {
     case LOAD_ADMIN_NEXT_STEPS_SUMMARY:
@@ -111,7 +142,7 @@ export const reducerForAdminActivities = (state = LOADING, action = {}) => {
       return state;
   }
 };
-export const reducerForAllOtherCommunities = (state =[], action = {}) => {
+export const reducerForAllOtherCommunities = (state = [], action = {}) => {
   switch (action.type) {
     case LOAD_ALL_OTHER_COMMUNITIES:
       return action.payload;
@@ -417,6 +448,14 @@ export const allTaskFunctionsReducer = (state = [], action = {}) => {
 export const allTasksReducer = (state = [], action = {}) => {
   switch (action.type) {
     case LOAD_ALL_TASKS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const allMetaDataReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case LOAD_ALL_META_DATA:
       return action.payload;
     default:
       return state;

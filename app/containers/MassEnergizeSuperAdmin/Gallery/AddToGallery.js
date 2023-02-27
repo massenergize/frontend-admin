@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
     ...error,
     background: "rgb(174, 223, 174)",
     color: "rgb(12, 131, 30)",
-  },
+  }
 }));
 
 

@@ -73,6 +73,7 @@ import {
   FeatureFlags,
   EventFullView,
   EventsFromOthers,
+  ActionEngagementList,
 } from "../pageListAsync";
 import EditVendor from "../MassEnergizeSuperAdmin/Vendors/EditVendor";
 import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
@@ -415,6 +416,10 @@ class Application extends React.Component {
           <Route path="/admin/read/about-us" component={SuperAboutUs} />
           <Route path="/admin/add/donate" component={SuperDonate} />
           <Route path="/admin/read/contact-us" component={SuperContactUs} />
+          <Route
+            path="/admin/read/action-engagements"
+            component={ActionEngagementList}
+          />
           <Route
             path="/admin/read/all-actions"
             component={SuperAllActions}

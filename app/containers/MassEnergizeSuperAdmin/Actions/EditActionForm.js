@@ -117,6 +117,17 @@ class EditActionForm extends Component {
     };
   }
 
+  async componentDidMount() {
+    const { id } = this.props.match.params;
+    const actionResponse = await apiCall("/actions.info", {
+      id: id,
+    });
+    if (actionResponse && !actionResponse.success) {
+      return;
+    }
+    await this.setStateAsync({ action: actionResponse.data });
+  }
+
   static getDerivedStateFromProps(props, state) {
     const {
       match,
@@ -137,13 +148,17 @@ class EditActionForm extends Component {
       ccActions.length &&
       tags &&
       tags.length;
+
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRunPageFirstTime || state.mounted;
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
+    let action = state.action;
+    if (!action) {
+      action = ((actions) || []).find(
+        (a) => a.id.toString() === id.toString()
+      );
+    }
 
-    const action = (actions || []).find(
-      (a) => a.id.toString() === id.toString()
-    );
     const readOnly = checkIfReadOnly(action, auth);
     const coms = (communities || []).map((c) => ({
       ...c,
@@ -161,6 +176,7 @@ class EditActionForm extends Component {
       id: "" + c.id,
     }));
     const libOpen = location.state && location.state.libOpen;
+
     const formJson = createFormJson({
       action,
       communities: coms,
@@ -182,6 +198,11 @@ class EditActionForm extends Component {
       formJson,
       readOnly,
     };
+  }
+  setStateAsync(state) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve);
+    });
   }
 
   render() {
@@ -271,7 +292,7 @@ const createFormJson = ({
             placeholder: "eg. 1",
             fieldType: "TextField",
             contentType: "number",
-            isRequired: true,
+            isRequired: false,
             defaultValue: action.rank,
             dbName: "rank",
             readOnly: false,

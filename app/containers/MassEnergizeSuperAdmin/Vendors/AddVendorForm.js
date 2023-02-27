@@ -53,14 +53,14 @@ class CreateNewVendorForm extends Component {
       defaults: true,
       title: "Please select tag(s) that apply to this service provider",
     });
-    const coms = communities.map((c) => ({
+    const coms = (communities ||[]).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
     }));
 
     const jobsDoneDontRunWhatsBelowEverAgain =
-      !(communities && communities.length && tags && tags.length) ||
+      !(communities && communities.length && tags.length) ||
       state.mounted;
 
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;

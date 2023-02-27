@@ -53,9 +53,9 @@ class CreateNewVendorForm extends Component {
     const vendor = vendorsInfos[id.toString()];
     const readyToRenderPageFirstTime =
       vendor &&
-      vendors &&
+      vendors.length &&
       communities &&
-      communities.length &&
+      communities.length
       tags &&
       tags.length;
 
