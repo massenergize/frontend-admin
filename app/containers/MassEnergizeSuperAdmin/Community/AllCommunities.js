@@ -43,10 +43,7 @@ class AllCommunities extends React.Component {
 
   componentDidMount() {
     const { auth, putMetaDataToRedux, meta} = this.props;
-    var url;
-    if (auth && auth.is_super_admin) url = "/communities.listForSuperAdmin";
-    else if (auth && auth.is_community_admin)
-      url = "/communities.listForCommunityAdmin";
+    var url = getAdminApiEndpoint(auth, "/communities");
     apiCall(url, {limit:getLimit(PAGE_PROPERTIES.ALL_COMMUNITIES.key)}).then((allCommunitiesResponse) => {
       if (allCommunitiesResponse && allCommunitiesResponse.success) {
         this.props.putCommunitiesInRedux(allCommunitiesResponse.data,);
