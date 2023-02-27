@@ -48,6 +48,7 @@ import ApplyFilterButton from "../../../utils/components/applyFilterButton/Apply
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import CallMadeIcon from "@mui/icons-material/CallMade";
 import { FROM } from "../../../utils/constants";
+import Loader from "../../../utils/components/Loader";
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
@@ -488,28 +489,9 @@ class AllEvents extends React.Component {
       },
     };
 
-   if (isEmpty(metaData)) {
-     return (
-       <Grid
-         container
-         spacing={24}
-         alignItems="flex-start"
-         direction="row"
-         justify="center"
-       >
-         <Grid item xs={12} md={6}>
-           <Paper className={classes.root} style={{ padding: 15 }}>
-             <div className={classes.root}>
-               <LinearProgress />
-               <h1>Fetching all Events. This may take a while...</h1>
-               <br />
-               <LinearProgress color="secondary" />
-             </div>
-           </Paper>
-         </Grid>
-       </Grid>
-     );
-   }
+     if (isEmpty(metaData)) {
+       return <Loader />;
+     }
 
     return (
       <div>

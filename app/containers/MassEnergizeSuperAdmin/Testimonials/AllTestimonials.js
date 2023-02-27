@@ -41,6 +41,7 @@ import {
 } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import Loader from "../../../utils/components/Loader";
 
 class AllTestimonials extends React.Component {
   constructor(props) {
@@ -513,28 +514,9 @@ class AllTestimonials extends React.Component {
       },
     };
 
-    if (isEmpty(metaData)) {
-      return (
-        <Grid
-          container
-          spacing={24}
-          alignItems="flex-start"
-          direction="row"
-          justify="center"
-        >
-          <Grid item xs={12} md={8}>
-            <Paper className={classes.root} style={{ padding: 15 }}>
-              <div className={classes.root}>
-                <LinearProgress />
-                <h1>Fetching all Testimonials. This may take a while...</h1>
-                <br />
-                <LinearProgress color="secondary" />
-              </div>
-            </Paper>
-          </Grid>
-        </Grid>
-      );
-    }
+   if (isEmpty(metaData)) {
+     return <Loader />;
+   }
 
     return (
       <div>

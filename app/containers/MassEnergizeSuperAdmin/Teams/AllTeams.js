@@ -45,6 +45,7 @@ import {
 } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import Loader from "../../../utils/components/Loader";
 
 class AllTeams extends React.Component {
   constructor(props) {
@@ -447,28 +448,9 @@ class AllTeams extends React.Component {
         }),
     };
 
-   if (isEmpty(metaData)) {
-     return (
-       <Grid
-         container
-         spacing={24}
-         alignItems="flex-start"
-         direction="row"
-         justify="center"
-       >
-         <Grid item xs={12} md={6}>
-           <Paper className={classes.root} style={{ padding: 15 }}>
-             <div className={classes.root}>
-               <LinearProgress />
-               <h1>Fetching all Teams. This may take a while...</h1>
-               <br />
-               <LinearProgress color="secondary" />
-             </div>
-           </Paper>
-         </Grid>
-       </Grid>
-     );
-   }
+      if (isEmpty(metaData)) {
+        return <Loader />;
+      }
 
     return (
       <div>

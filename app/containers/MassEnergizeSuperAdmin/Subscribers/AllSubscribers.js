@@ -23,6 +23,7 @@ import { getAdminApiEndpoint, getLimit, handleFilterChange, onTableStateChange }
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import { isEmpty } from "../../../utils/common";
+import Loader from "../../../utils/components/Loader";
 
 class AllSubscribers extends React.Component {
   constructor(props) {
@@ -264,9 +265,9 @@ class AllSubscribers extends React.Component {
           meta: meta,
         }),
     };
-     if (isEmpty(metaData)) {
-       return <LinearBuffer />;
-     }
+        if (isEmpty(metaData)) {
+          return <Loader />;
+        }
 
     return (
       <div>
