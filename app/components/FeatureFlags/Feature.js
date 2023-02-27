@@ -20,7 +20,7 @@ function Feature({ name, fallback, children, auth, communities }) {
     }
     let flag = (flags || []).find((f) => f?.key === name);
     setFlag(flag);
-  }, []);
+  }, [communities]);
 
   if (flag) return children;
   if (fallback) return fallback;

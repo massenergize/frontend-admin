@@ -3,13 +3,26 @@ import React from "react";
 import { PapperBlock } from "dan-components";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { useHistory, withRouter } from "react-router-dom";
+import { Link, useHistory, withRouter } from "react-router-dom";
 import Loading from "dan-components/Loading";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 
 function WhatNext({ data }) {
   const { messages, teams, testimonials, users, team_messages } = data || {};
+
+  const totalCount = (data) => {
+    if (!data) return 0;
+    const { messages, teams, testimonials, users, team_messages } = data;
+    let total = 0;
+    total += messages?.count || 0;
+    total += teams?.count || 0;
+    total += testimonials?.count || 0;
+    total += users?.count || 0;
+    total += team_messages?.count || 0;
+    return total;
+  };
+  const userHasNothingTodo = !totalCount(data);
 
   if (!Object.keys(data).length)
     return (
@@ -28,10 +41,22 @@ function WhatNext({ data }) {
     );
 
   const history = useHistory();
+  const subtitle = userHasNothingTodo ? (
+    <Typography>
+      <span>🎊</span> Awesome! You have cleared all pending items. You currently
+      have nothing to take care of.
+      <br /> <Link to="/admin/add/event"> Create new events, </Link>
+      <Link to="/admin/add/action"> add new actions,</Link> or{" "}
+      <Link to="/admin/add/vendor"> vendors</Link> to build your community!
+    </Typography>
+  ) : (
+    "Here are items you need to take care of"
+  );
   return (
     <MEPaperBlock
       title="What to do next?"
-      subtitle="Here are items you need to take care of "
+      subtitle={subtitle}
+      containerStyle={userHasNothingTodo ? { minHeight: 130, height: 130 } : {}}
     >
       <div
         style={{
