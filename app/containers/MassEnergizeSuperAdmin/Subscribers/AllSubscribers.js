@@ -16,7 +16,6 @@ import {
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
-import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import { getAdminApiEndpoint, getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
@@ -37,7 +36,8 @@ class AllSubscribers extends React.Component {
   }
 
   async componentDidMount() {
-    const user = this.props.auth ? this.props.auth : {};
+    let {auth, meta, putMetaDataToRedux, putSubscribersInRedux} = this.props;
+    const user = auth ? auth : {};
     let allSubscribersResponse = null;
     if (user.is_super_admin) {
       allSubscribersResponse = await apiCall(
@@ -54,9 +54,9 @@ class AllSubscribers extends React.Component {
       );
     }
 
-    if (allSubscribersResponse && allSubscribersResponse.data) {
-      this.props.putSubscribersInRedux(allSubscribersResponse.data);
-      this.props.putMetaDataToRedux({...this.props,meta, subscriber:allSubscribersResponse.cursor})
+    if (allSubscribersResponse?.data) {
+      putSubscribersInRedux(allSubscribersResponse.data);
+      putMetaDataToRedux({...meta, subscribers:allSubscribersResponse.cursor})
     }
   }
 
