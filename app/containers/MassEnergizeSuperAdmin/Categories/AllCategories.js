@@ -24,6 +24,7 @@ import { getLimit, onTableStateChange } from "../../../utils/helpers";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import METable from "../ME  Tools/table /METable";
+import { isEmpty } from "../../../utils/common";
 class AllTagCollections extends React.Component {
   constructor(props) {
     super(props);
@@ -250,7 +251,7 @@ class AllTagCollections extends React.Component {
       //   );
       // },
     };
-    if (!data || data===null) {
+    if (isEmpty(metaData)) {
       return <Loading />;
     }
     return (

@@ -29,6 +29,7 @@ import {
   findMatchesAndRest,
   getHumanFriendlyDate,
   getTimeStamp,
+  isEmpty,
   isNotEmpty,
   makeDeleteUI,
   ourCustomSort,
@@ -471,7 +472,7 @@ class AllActions extends React.Component {
     const data = this.fashionData(allActions || []);
     const metaData = meta && meta.actions;
 
-    if (!data || data == null) {
+    if (isEmpty(metaData)) {
       return (
         <Grid
           container

@@ -82,7 +82,7 @@ export const generateFilterParams = (items, columns) => {
 
 export const getAdminApiEndpoint = (auth, base) => {
   let url = base;
-  const isSuperAdmin = auth.is_super_admin;
+  const isSuperAdmin = auth && auth.is_super_admin;
   return isSuperAdmin
     ? `${url}.listForSuperAdmin`
     : `${url}.listForCommunityAdmin`;
