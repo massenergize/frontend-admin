@@ -271,8 +271,7 @@ class AllCommunities extends React.Component {
     const { classes, toggleDeleteConfirmation, communities, putCommunitiesInRedux, auth, meta, putMetaDataToRedux } = this.props;
     const data = this.fashionData(communities || []);
     const metaData = meta && meta.communities;
-
-    console.log("=== metaData ===", meta);
+    
     const options = {
       filterType: "dropdown",
       responsive: "standard",
