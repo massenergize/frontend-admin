@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
 import states from "dan-api/data/states";
-import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import { apiCall } from "../../../utils/messenger";
 import Loading from "dan-components/Loading";
 import { makeTagSection } from "../Events/EditEventForm";
@@ -11,6 +11,7 @@ import { bindActionCreators } from "redux";
 import { reduxAddToHeap } from "../../../redux/redux-actions/adminActions";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { withRouter } from "react-router-dom";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -52,12 +53,8 @@ class CreateNewVendorForm extends Component {
     const { id } = match.params;
     const vendor = vendorsInfos[id.toString()];
     const readyToRenderPageFirstTime =
-      vendor &&
-      vendors.length &&
-      communities &&
-      communities.length
-      tags &&
-      tags.length;
+      vendor && vendors.length && communities && communities.length;
+    tags && tags.length;
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderPageFirstTime || state.mounted;
@@ -113,12 +110,18 @@ class CreateNewVendorForm extends Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, match } = this.props;
     const { formJson } = this.state;
+    const { id } = match.params;
+
     if (!formJson) return <Loading />;
     return (
       <div>
-        <MassEnergizeForm classes={classes} formJson={formJson} />
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+          pageKey={`${PAGE_KEYS.EDIT_VENDOR.key}-${id}`}
+        />
       </div>
     );
   }

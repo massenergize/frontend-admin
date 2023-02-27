@@ -1,12 +1,13 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import states from 'dan-api/data/states';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import states from "dan-api/data/states";
 import { withStyles } from "@mui/styles";
-import MassEnergizeForm from '../_FormGenerator';
-import { apiCall } from '../../../utils/messenger';
-import { getMoreInfo, groupSocialMediaFields } from './utils';
-import fieldTypes from '../_FormGenerator/fieldTypes';
-import { withRouter } from 'react-router-dom';
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
+import { apiCall } from "../../../utils/messenger";
+import { getMoreInfo, groupSocialMediaFields } from "./utils";
+import fieldTypes from "../_FormGenerator/fieldTypes";
+import { withRouter } from "react-router-dom";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 // @NB: Looks like this file isnt being used anymore
 const styles = (theme) => ({
   root: {
@@ -28,7 +29,7 @@ const styles = (theme) => ({
   },
   buttonInit: {
     margin: theme.spacing(4),
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
 
@@ -73,7 +74,7 @@ class EditCommunityForm extends Component {
     // quick and dirty - duplicated code - needs to be consistant between pages and with the API
     // could read these options from the API or share the databaseFieldChoices json
     const superAdmin = this.props.superAdmin ? this.props.superAdmin : false;
-    const location = this.props.location
+    const location = this.props.location;
     const geographyTypes = superAdmin
       ? [
           {
@@ -429,10 +430,16 @@ class EditCommunityForm extends Component {
   render() {
     const { classes } = this.props;
     const { formJson } = this.state;
+    const { id } = this.props.match.params;
     if (!formJson) return <div>Hold tight! Preparing your form ...</div>;
+
     return (
       <div>
-        <MassEnergizeForm classes={classes} formJson={formJson} />
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+          pageKey={`${PAGE_KEYS.EDIT_COMMUNITY.key}-${id}`}
+        />
       </div>
     );
   }

@@ -3,10 +3,11 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
-import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { withRouter } from "react-router-dom";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -154,9 +155,7 @@ class EditActionForm extends Component {
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
     let action = state.action;
     if (!action) {
-      action = ((actions) || []).find(
-        (a) => a.id.toString() === id.toString()
-      );
+      action = (actions || []).find((a) => a.id.toString() === id.toString());
     }
 
     const readOnly = checkIfReadOnly(action, auth);
@@ -208,6 +207,7 @@ class EditActionForm extends Component {
   render() {
     const { classes } = this.props;
     const { formJson, readOnly, action } = this.state;
+    const { id } = this.props.match.params;
     if (!action || !formJson) return <Loading />;
     return (
       <div>
@@ -215,6 +215,7 @@ class EditActionForm extends Component {
           classes={classes}
           formJson={formJson}
           readOnly={readOnly}
+          pageKey={`${PAGE_KEYS.EDIT_ACTION.key}-${id}`}
           enableCancel
         />
       </div>

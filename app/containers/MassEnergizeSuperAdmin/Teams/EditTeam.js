@@ -6,7 +6,7 @@ import { withStyles } from "@mui/styles";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
-import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import {
   fetchLatestNextSteps,
   reduxAddToHeap,
@@ -15,6 +15,7 @@ import {
 } from "../../../redux/redux-actions/adminActions";
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -145,6 +146,7 @@ class EditTeam extends Component {
   render() {
     const { classes } = this.props;
     const { formJson, team } = this.state;
+    const { id } = this.props.match.params;
     if (!formJson) return <Loading />;
     return (
       <div>
@@ -158,9 +160,11 @@ class EditTeam extends Component {
         </Paper>
 
         <br />
+        
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
+          pageKey={`${PAGE_KEYS.EDIT_TEAM.key}-${id}`}
           enableCancel
           onComplete={this.onComplete.bind(this)}
         />

@@ -27,6 +27,12 @@ export const PAGE_KEYS = {
     CREATE_POLICY : { key:"CREATE_POLICY"},
     CREATE_CARBON_EQ : { key:"CREATE_CARBON_EQ"},
     CREATE_NEW_TAG : { key:"CREATE_NEW_TAG"}, 
+    EDIT_ACTION : { key:"EDIT_ACTION"}, 
+    EDIT_EVENT : { key:"EDIT_EVENT"}, 
+    EDIT_TEAM : { key:"EDIT_TEAM"}, 
+    EDIT_VENDOR : { key:"EDIT_VENDOR"}, 
+    EDIT_TESTIMONIALS : { key:"EDIT_TESTIMONIAL"}, 
+    EDIT_COMMUNITY : { key:"EDIT_COMMUNITY"}, 
 }
 
 export const ME_FORM_PROGRESS = "ME_FORM_PROGRESS"
