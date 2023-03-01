@@ -37,7 +37,7 @@ class CropModal extends React.Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    const { imageFile } = nextProps;
+    const { imageFile } = props;
     return {
       imageData: imageFile.preview,
       isOpen: true,
