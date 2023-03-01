@@ -400,7 +400,7 @@ class EditCommunityForm extends Component {
           uploadMultiple: false,
           multiple: false,
         },
-        superAdmin && {
+        {
           name: "is_approved",
           label:
             "Do you approve this community? (Check yes after background check)",

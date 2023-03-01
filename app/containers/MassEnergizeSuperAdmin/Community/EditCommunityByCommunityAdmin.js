@@ -85,8 +85,7 @@ class EditCommunityByCommunityAdmin extends Component {
   render() {
     const description = brand.desc;
     const auth = this.props.auth;
-    const superAdmin =
-      auth & (auth !== undefined) ? auth.is_super_admin : false;
+    const superAdmin =auth?.is_super_admin
     const formTitle = "Edit Community Infomation";
     const title = brand.name + " - " + formTitle;
 
@@ -115,6 +114,7 @@ EditCommunityByCommunityAdmin.propTypes = {
 const mapStateToProps = (state) => {
   return {
     communities: state.getIn(["communities"]),
+    auth: state.getIn(["auth"]),
   };
 };
 
