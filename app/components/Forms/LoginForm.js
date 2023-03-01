@@ -2,7 +2,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Field, reduxForm, } from 'redux-form';
 import { Button } from "@mui/material";
 import { connect } from 'react-redux';
 import { NavLink } from 'react-router-dom';
@@ -25,16 +24,14 @@ import { TextField } from '@mui/material';
 import {withStyles} from "@mui/styles"
 import styles from "./user-jss";
 // validation functions
-const required = value => (value == null ? 'Required' : undefined);
-const email = value => (
-  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)
-    ? 'Invalid email'
-    : undefined
-);
+const validateEmail = value => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)
 
 class LoginForm extends React.Component {
   state = {
-    showPassword: false
+    showPassword: false,
+    email:"",
+    password:"",
+    emailError: "",
   }
 
   handleClickShowPassword = () => {
@@ -49,7 +46,7 @@ class LoginForm extends React.Component {
   showProgressBar = () => {
     if (this.props.started) {
       return (
-        <div>
+        <div style={{marginBottom:10}}>
           <p style={{ color: 'darkgray' }}>We are checking...</p>
           <LinearProgress />
         </div>
@@ -57,15 +54,21 @@ class LoginForm extends React.Component {
     }
   }
 
+  onFormSubmit = (e) => {
+    e.preventDefault();
+    const { email, password } = this.state;
+    const isEmailValid = validateEmail(email);
+    if (isEmailValid) return this.props.normalLoginFxn(email, password);
+    this.setState({ emailError: "Invalid email" });
+  }
+
   render() {
     const {
       classes,
-      handleSubmit,
       pristine,
       submitting,
       deco,
       err,
-      normalLoginFxn,
     } = this.props;
     const { showPassword } = this.state;
 
@@ -74,20 +77,14 @@ class LoginForm extends React.Component {
         <Hidden mdUp>
           <NavLink
             to="/"
-            className={classNames(
-              classes.brand,
-              classes.outer
-            )}
+            className={classNames(classes.brand, classes.outer)}
           >
             <img src={logo} alt={brand && brand.name} />
             {brand && brand.name}
           </NavLink>
         </Hidden>
         <Paper
-          className={classNames(
-            classes.paperWrap,
-            deco && classes.petal
-          )}
+          className={classNames(classes.paperWrap, deco && classes.petal)}
         >
           <Hidden smDown>
             <div className={classes.topBar}>
@@ -102,29 +99,17 @@ class LoginForm extends React.Component {
             </div>
           </Hidden>
           {IS_PROD && (
-            <Typography
-              variant="h4"
-              className={classes.title}
-              gutterBottom
-            >
+            <Typography variant="h4" className={classes.title} gutterBottom>
               Administrators - Sign In
             </Typography>
           )}
           {IS_CANARY && (
-            <Typography
-              variant="h4"
-              className={classes.title}
-              gutterBottom
-            >
+            <Typography variant="h4" className={classes.title} gutterBottom>
               Canary: Administrators - Sign In
             </Typography>
           )}
           {!IS_PROD && !IS_CANARY && (
-            <Typography
-              variant="h4"
-              className={ classes.title}
-              gutterBottom
-            >
+            <Typography variant="h4" className={classes.title} gutterBottom>
               DEV: Administrators - Sign In
             </Typography>
           )}
@@ -181,26 +166,32 @@ class LoginForm extends React.Component {
                       {err}
                     </Typography>
                   )}
-                  <Field
-                    ref="email"
-                    name="email"
-                    component={TextField}
-                    placeholder="Your Email"
+                  <TextField
+                    error
+                    required={true}
+                    name={"email"}
+                    onChange={(e) =>
+                      this.setState({ email: e.target.value })
+                    }
                     label="Your Email"
-                    required
-                    validate={[required, email]}
-                    className={classes.field}
+                    placeholder="Your Email"
+                    variant="outlined"
+                    helperText={this.state.emailError}
                   />
                 </FormControl>
               </div>
               <div>
                 <FormControl className={classes.formControl}>
-                  <Field
-                    ref="pass"
+                  <TextField
+                    required={true}
                     name="password"
-                    component={TextField}
-                    type={showPassword ? "text" : "password"}
+                    onChange={(e) =>
+                      this.setState({ password: e.target.value })
+                    }
                     label="Your Password"
+                    placeholder="Your Password"
+                    type={showPassword ? "text" : "password"}
+                    variant="outlined"
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
@@ -218,9 +209,6 @@ class LoginForm extends React.Component {
                         </InputAdornment>
                       ),
                     }}
-                    required
-                    validate={required}
-                    className={classes.field}
                   />
                 </FormControl>
               </div>
@@ -232,12 +220,7 @@ class LoginForm extends React.Component {
               <div className={classes.btnArea}>
                 <Button
                   variant="contained"
-                  onClick={() =>
-                    normalLoginFxn(
-                      this.refs.email.value,
-                      this.refs.pass.value
-                    )
-                  }
+                  onClick={this.onFormSubmit}
                   color="primary"
                   size="large"
                   type="submit"
@@ -287,19 +270,17 @@ LoginForm.propTypes = {
   deco: PropTypes.bool.isRequired,
 };
 
-const LoginFormReduxed = reduxForm({
-  form: 'immutableExample',
-  enableReinitialize: true,
-})(LoginForm);
+// const LoginFormReduxed = reduxForm({
+//   form: 'immutableExample',
+//   enableReinitialize: true,
+// })(LoginForm);
 
 const reducerLogin = 'login';
 const reducerUi = 'ui';
-const FormInit = connect(
-  state => ({
-    force: state,
-    initialValues: state.getIn([reducerLogin, 'usersLogin']),
-    deco: state.getIn([reducerUi, 'decoration'])
-  }),
-)(LoginFormReduxed);
+const FormInit = connect((state) => ({
+  force: state,
+  initialValues: state.getIn([reducerLogin, "usersLogin"]),
+  deco: state.getIn([reducerUi, "decoration"]),
+}))(LoginForm);
 
 export default withStyles(styles)(FormInit);
