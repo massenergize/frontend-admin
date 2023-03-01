@@ -1,12 +1,13 @@
 import { connect } from "react-redux";
 import React from "react";
 import { bindActionCreators } from "redux";
-import { PapperBlock } from "dan-components";
+// import { PapperBlock } from "dan-components";
 import { Paper, Typography } from "@mui/material";
 import { LOADING } from "../../../utils/constants";
 import Loading from "dan-components/Loading";
 import { makeTimeAgo } from "../../../utils/common";
-import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import PapperBlock from "../../../components/PapperBlock/PapperBlock";
+// import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 function ReportingActivities({
   activities,
   style,
@@ -33,7 +34,7 @@ function ReportingActivities({
 
   const footages = activities.footages || [];
   return (
-    <MEPaperBlock
+    <PapperBlock
       title="Activities"
       subtitle="Want to know what's been happening?"
     >
@@ -51,7 +52,7 @@ function ReportingActivities({
           );
         })}
       </div>
-    </MEPaperBlock>
+    </PapperBlock>
   );
 }
 
