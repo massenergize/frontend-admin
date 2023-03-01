@@ -50,21 +50,25 @@ function EngagementCard({
           />
         )}
       </Typography>
-      <Typography
-        className="touchable-opacity"
-        variant="caption"
-        onClick={() => onClick && onClick()}
-        style={{
-          cursor: "pointer",
-          marginTop: 5,
-          fontWeight: "bold",
-          color,
-          border: "dotted 0px",
-          borderBottomWidth: 2,
-        }}
-      >
-        {subtitle}
-      </Typography>
+      {subtitle ? (
+        <Typography
+          className="touchable-opacity"
+          variant="caption"
+          onClick={() => onClick && onClick()}
+          style={{
+            cursor: "pointer",
+            marginTop: 5,
+            fontWeight: "bold",
+            color,
+            border: "dotted 0px",
+            borderBottomWidth: 2,
+          }}
+        >
+          {subtitle}
+        </Typography>
+      ) : (
+        <></>
+      )}
     </div>
   );
 }

@@ -47,9 +47,10 @@ class ThemeWrapper extends React.Component {
   }
 
   handleChangeMode = (mode) => {
+    const newMode =  (mode ==="light" ? "dark" : "light") 
     const { color, changeMode } = this.props;
-    this.setState({ theme: createTheme(applicationTheme(color, mode)) });
-    changeMode(mode);
+    this.setState({ theme: createTheme(applicationTheme(color, newMode)) });
+    changeMode(newMode);
   };
 
   onProgressShow = () => {
