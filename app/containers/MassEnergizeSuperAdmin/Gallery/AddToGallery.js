@@ -24,6 +24,7 @@ import {withStyles} from '@mui/styles'
 import PapperBlock from "../../../components/PapperBlock/PapperBlock";
 import { fetchParamsFromURL } from "../../../utils/common";
 import { makeStyles, } from "@mui/styles";
+import { styles } from "./styles";
 
   const error = {
     background: "rgb(255, 214, 214)",
@@ -87,7 +88,7 @@ function AddToGallery(props) {
     imagesFromSearchResults,
   } = props;
 
-   const classes = useStyles();
+  const classes = useStyles();
 
   const [chosenComs, setChosenComs] = useState([]);
   const [scope, setScope] = useState(CHOICES.SPECIFIC);
