@@ -24,6 +24,7 @@ import {withStyles} from '@mui/styles'
 import PapperBlock from "../../../components/PapperBlock/PapperBlock";
 import { fetchParamsFromURL } from "../../../utils/common";
 import { makeStyles, } from "@mui/styles";
+import { withRouter } from "react-router-dom";
 import { styles } from "./styles";
 
   const error = {
