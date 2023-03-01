@@ -137,7 +137,7 @@ function CommunityEngagement({
                     marginRight: 20,
                   }}
                 >
-                  Community Engagement
+                  Community Engagement {first?.name || ""}
                 </Typography>
                 {!specific && (
                   <MEDropdown
@@ -216,7 +216,7 @@ function CommunityEngagement({
           <EngagementCard
             color="#A38E6E"
             title="USER SIGN-INS"
-            subtitle="See involved users"
+            subtitle={signIns.count && "See involved users"}
             icon="fa-user"
             value={signIns.count}
             onClick={() =>
@@ -230,7 +230,7 @@ function CommunityEngagement({
             theme="#EAFFEB"
             color="#82A36E"
             title="ACTIONS COMPLETED"
-            subtitle="See involved actions"
+            subtitle={doneInteractions.count && "See involved actions"}
             icon="fa-check-circle"
             value={doneInteractions.count}
             onClick={() => {
@@ -248,7 +248,7 @@ function CommunityEngagement({
             color="#9BA1D8"
             theme="#EAEEFF"
             title="ACTIONS IN TODO"
-            subtitle="See involved actions"
+            subtitle={todoInteractions.count && "See involved actions"}
             icon="fa-tasks"
             value={todoInteractions.count}
             onClick={() => {
@@ -266,21 +266,21 @@ function CommunityEngagement({
             color="rgb(216 155 155)"
             theme="rgb(255 234 234)"
             title="TESTIMONIALS"
-            subtitle="See involved testimonials"
+            subtitle={testimonials.count && "See involved testimonials"}
             icon="fa-tasks"
             value={testimonials.count}
             onClick={() => {
               history.push({
-                pathname: "/admin/read/actions",
+                pathname: "/admin/read/testimonials",
                 state: { ids: testimonials?.data },
               });
             }}
           />
         </div>
         <div>
-          <Typography variant="h6" color="primary">
+          {/* <Typography variant="h6" color="primary">
             <b>IMPACT</b>
-          </Typography>
+          </Typography> */}
           {hasOnlyOneCommunity && first ? (
             <Typography
               className="touchable-opacity"
@@ -294,7 +294,7 @@ function CommunityEngagement({
               }}
               onClick={() => openImpactPage([first.subdomain])}
             >
-              See impact graph in <b>{first.name}</b>
+              View the impact page for <b>{first.name}</b>
             </Typography>
           ) : (
             <MEDropdown
@@ -353,7 +353,8 @@ export const AddFilters = ({
   const handleCommunitySelection = (selection) => {
     const last = selection[selection.length - 1];
     const wantsAll = last === "all";
-    if (wantsAll) return setOptions({ ...options, communities: ["all"] });
+    if (wantsAll)
+      return setOptions({ ...options, communities: ["all"], mounted: true });
     selection = selection.filter((f) => f !== "all");
     setOptions({ ...options, communities: selection, mounted: true });
   };
@@ -361,7 +362,7 @@ export const AddFilters = ({
   const isCustomRange = ((options && options.range) || [])[0] === "custom";
 
   const handleDateSelection = (date, name) => {
-    setOptions({ ...options, [name]: date });
+    setOptions({ ...options, [name]: date, mounted: true });
   };
   const disableButton =
     !options ||
@@ -467,7 +468,10 @@ export const AddFilters = ({
             width: 113,
             background: "green",
           }}
-          onClick={() => apply && apply()}
+          onClick={() => {
+            apply && apply();
+            hide & hide();
+          }}
           disabled={disableButton}
         >
           {loading && (
