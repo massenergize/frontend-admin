@@ -15,7 +15,7 @@ export const separate = (ids, dataSet = [], options = {}) => {
   const remainder = [];
   const itemObjects = [];
   for (var d of dataSet || []) {
-    const value = valueExtractor ? valueExtractor(d) : d.id
+    const value = valueExtractor ? valueExtractor(d) : d.id;
     if (ids.includes(value)) {
       found.push(value);
       itemObjects.push(d);
@@ -238,7 +238,7 @@ export const removePageProgressFromStorage = (key) => {
   progress = JSON.parse(progress);
   progress[key] = {};
   localStorage.setItem(ME_FORM_PROGRESS, JSON.stringify(progress));
-}
+};
 /**
    * 
    * This function takes a list of ids of items(msgs, actions, testimonials etc.) that need attending to and matches it against the data source, 
@@ -257,7 +257,8 @@ export const reArrangeForAdmin = ({
   fieldKey,
   reduxFxn,
   separationOptions,
-  args
+  args,
+  cb,
 }) => {
   const _sort = (a, b) => (b.id < a.id ? -1 : 1);
   const { location } = props;
@@ -268,14 +269,14 @@ export const reArrangeForAdmin = ({
   var data = [...itemObjects, ...remainder];
   data.sort(_sort);
   reduxFxn(data);
-  if (!notFound.length) return; // If all items are found locally, dont go to the B.E
-
+  if (!notFound.length) return cb && cb(); // If all items are found locally, dont go to the B.E
   apiCall(apiURL, {
     [fieldKey]: notFound,
     ...(args || {}),
   }).then((response) => {
     if (response.success) data = [...response.data, ...data];
     //-- Items that were not found, have now been loaded from the B.E!
+    cb && cb(response.data);
     data.sort(_sort);
     reduxFxn(data);
   });

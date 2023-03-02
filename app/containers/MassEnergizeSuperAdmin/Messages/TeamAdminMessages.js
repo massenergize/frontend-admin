@@ -72,7 +72,6 @@ class AllTeamAdminMessages extends React.Component {
           });
           return;
         }
-
         this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
         reArrangeForAdmin({
           apiURL: "/messages.listTeamAdminMessages",
@@ -93,7 +92,6 @@ class AllTeamAdminMessages extends React.Component {
   };
 
   fashionData = (data) => {
-    console.log(data);
     return data.map((d) => [
       d.id,
       getHumanFriendlyDate(d.created_at, true),
