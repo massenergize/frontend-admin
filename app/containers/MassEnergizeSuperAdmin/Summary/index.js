@@ -193,7 +193,7 @@ class SummaryDashboard extends PureComponent {
                 style={{ fontWeight: "600", fontSize: "1rem" }}
                 component="h3"
               >
-                Request All Actions CSV{" "}
+                Request All Communities and Actions CSV{" "}
                 <Icon style={{ paddingTop: 3, color: "green" }}>
                   arrow_downward
                 </Icon>
