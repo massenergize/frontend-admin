@@ -24,7 +24,12 @@ import {
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { getAdminApiEndpoint, getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
+import {
+  getAdminApiEndpoint,
+  getLimit,
+  handleFilterChange,
+  onTableStateChange,
+} from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import { withRouter } from "react-router-dom";
@@ -45,7 +50,6 @@ class AllUsers extends React.Component {
   }
 
   componentDidMount() {
-
     const { auth, putUsersInRedux, location, fetchUsers } = this.props;
     const { state } = location;
     const ids = state && state.ids;
@@ -53,7 +57,12 @@ class AllUsers extends React.Component {
 
     if (!comingFromDashboard) return fetchUsers();
 
-    this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
+    this.setState({
+      ignoreSavedFilters: true,
+      saveFilters: false,
+      ids,
+      updating: true,
+    });
 
     var content = {
       fieldKey: "user_emails",
@@ -62,15 +71,15 @@ class AllUsers extends React.Component {
       dataSource: [],
       valueExtractor: (user) => user.email,
       reduxFxn: putUsersInRedux,
-      args:{
-        limit:getLimit(PAGE_PROPERTIES.ALL_USERS.key)
-      }
+      args: {
+        limit: getLimit(PAGE_PROPERTIES.ALL_USERS.key),
+      },
+      cb: () => this.setState({ updating: false }),
     };
     fetchUsers((data, failed) => {
       if (failed) return console.log("Could not fetch user list from B.E...");
       reArrangeForAdmin({ ...content, dataSource: data });
     });
-
   }
 
   fashionData = (data) => {
@@ -180,9 +189,16 @@ class AllUsers extends React.Component {
     const title = brand.name + " - Users";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, allUsers, putUsersInRedux, auth, meta, putMetaDataToRedux } = this.props;
+    const {
+      classes,
+      allUsers,
+      putUsersInRedux,
+      auth,
+      meta,
+      putMetaDataToRedux,
+    } = this.props;
     const data = this.fashionData(allUsers || []);
-    const metaData = meta && meta.users
+    const metaData = meta && meta.users;
 
     const options = {
       filterType: "dropdown",
@@ -192,6 +208,7 @@ class AllUsers extends React.Component {
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
       confirmFilters: true,
+      // When there is time, we need to think of a way to implement this in MEDatatable itself, so we dont have to repeat this
       onTableChange: (action, tableState) =>
         onTableStateChange({
           action,
@@ -206,12 +223,7 @@ class AllUsers extends React.Component {
           name: "users",
           meta: meta,
         }),
-      customSearchRender: (
-        searchText,
-        handleSearch,
-        hideSearch,
-        options
-      ) => (
+      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
         <SearchBar
           url={getAdminApiEndpoint(auth, "/users")}
           reduxItems={allUsers}
@@ -270,9 +282,9 @@ class AllUsers extends React.Component {
         }),
     };
 
-      if (isEmpty(metaData)) {
-        return <Loader />;
-      }
+    if (isEmpty(metaData)) {
+      return <Loader />;
+    }
     return (
       <div>
         <Helmet>
@@ -283,6 +295,11 @@ class AllUsers extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
+
+        {this.state.updating && (
+          <LinearBuffer asCard message="Checking for updates..." lines={1} />
+        )}
+
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_USERS}

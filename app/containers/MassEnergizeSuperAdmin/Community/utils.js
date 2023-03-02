@@ -127,3 +127,9 @@ export function dateFormatString(startDate, endDate) {
 
   return dateString;
 }
+
+
+export const  arrInRange = (start, end) => {
+  if(start === end) return [start];
+  return [start, ...arrInRange(start + 1, end)];
+}
