@@ -27,7 +27,12 @@ import { Chip } from "@mui/material";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import { getLimit, handleFilterChange, isTrue, onTableStateChange } from "../../../utils/helpers";
+import {
+  getLimit,
+  handleFilterChange,
+  isTrue,
+  onTableStateChange,
+} from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
@@ -74,7 +79,6 @@ class AllCommunityAdminMessages extends React.Component {
     const result = separate(ids, messages);
     const { notFound, itemObjects, remainder } = result;
     var data = [...itemObjects, ...remainder];
-    console.log("INFORMATION", result);
     data.sort(_sort);
 
     putMessagesInRedux(data);
@@ -96,30 +100,22 @@ class AllCommunityAdminMessages extends React.Component {
   }
   componentDidMount() {
     const { state } = this.props.location;
-    const { messages, putMessagesInRedux, history, meta, putMetaDataToRedux } = this.props;
+    const { putMessagesInRedux, meta, putMetaDataToRedux } = this.props;
     const ids = state && state.ids;
-    // console.log("IS IT FROM ids", ids);
-    // if (messages && messages.length) {
-    //   if (ids) {
-    //     this.setState({ ignoreSavedFilters: true, saveFilters: false }); //--- When an admin enters here through the summary page, we need old filters to be turned off, so that the table will only select the unattended items
-    //     this.reArrangeForAdmin(messages);
-    //   }
-    //   return;
-    // }
-
-    //--- Should only run if "messages" is empty. ie. This page is loading for the first time...
     apiCall("/messages.listForCommunityAdmin", {
       limit: getLimit(PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key),
     }).then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
         const data = allMessagesResponse.data;
         if (ids) {
-          this.setState({ ignoreSavedFilters: true, saveFilters: false });
+          this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
           this.reArrangeForAdmin(data, meta);
         } else {
           putMessagesInRedux(data);
-          putMetaDataToRedux({...meta, adminMessages:allMessagesResponse.cursor})
-
+          putMetaDataToRedux({
+            ...meta,
+            adminMessages: allMessagesResponse.cursor,
+          });
         }
       } else
         console.log(
@@ -217,7 +213,7 @@ class AllCommunityAdminMessages extends React.Component {
       options: {
         filter: false,
         download: false,
-        sort:false,
+        sort: false,
         customBodyRender: (id) => (
           <div>
             {/* <Link to={`/admin/edit/${id}/message`}>
@@ -247,23 +243,21 @@ class AllCommunityAdminMessages extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/messages.delete", { message_id: found }).then(
-        (response) => {
-          if (response.success) {
-            this.props.toggleToast({
-              open: true,
-              message: "Message(s) successfully deleted",
-              variant: "success",
-            });
-          } else {
-            this.props.toggleToast({
-              open: true,
-              message: "An error occurred while deleting the message(s)",
-              variant: "error",
-            });
-          }
+      apiCall("/messages.delete", { message_id: found }).then((response) => {
+        if (response.success) {
+          this.props.toggleToast({
+            open: true,
+            message: "Message(s) successfully deleted",
+            variant: "success",
+          });
+        } else {
+          this.props.toggleToast({
+            open: true,
+            message: "An error occurred while deleting the message(s)",
+            variant: "error",
+          });
         }
-      );
+      });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putMessagesInRedux(rem);
@@ -284,7 +278,13 @@ class AllCommunityAdminMessages extends React.Component {
     const title = brand.name + " - Community Admin Messages";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, messages, putMessagesInRedux, meta, putMetaDataToRedux } = this.props;
+    const {
+      classes,
+      messages,
+      putMessagesInRedux,
+      meta,
+      putMetaDataToRedux,
+    } = this.props;
     const data = this.fashionData(messages); // not ready for this yet: && this.props.messages.filter(item=>item.parent===null));
     const metaData = meta && meta.adminMessages;
     const options = {
@@ -324,12 +324,7 @@ class AllCommunityAdminMessages extends React.Component {
           />
         );
       },
-      customSearchRender: (
-        searchText,
-        handleSearch,
-        hideSearch,
-        options
-      ) => (
+      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
         <SearchBar
           url={"/messages.listForCommunityAdmin"}
           reduxItems={messages}
@@ -372,9 +367,9 @@ class AllCommunityAdminMessages extends React.Component {
           meta: meta,
         }),
     };
-   if (isEmpty(metaData)) {
-     return <Loader />;
-   }
+    if (isEmpty(metaData)) {
+      return <Loader />;
+    }
 
     return (
       <div>
@@ -397,7 +392,7 @@ class AllCommunityAdminMessages extends React.Component {
           }}
           customFilterObject={{
             0: {
-              list: location.state && location.state.ids,
+              list: this.state.ids,
             },
           }} // "0" here is the index of the "ID" column in the table
           ignoreSavedFilters={this.state.ignoreSavedFilters}

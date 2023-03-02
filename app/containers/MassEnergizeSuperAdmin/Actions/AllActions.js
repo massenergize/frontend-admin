@@ -64,21 +64,6 @@ class AllActions extends React.Component {
   }
 
   async componentDidMount() {
-    // const { putActionsInRedux, auth, meta, putMetaDataToRedux } = this.props;
-    // var url;
-    // if (auth &&auth.is_super_admin) url = "/actions.listForSuperAdmin";
-    // else if (auth && auth.is_community_admin) url = "/actions.listForCommunityAdmin";
-    // const allActionsResponse = await apiCall(url, {
-    //   limit: getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key),
-    // });
-    // if (allActionsResponse && allActionsResponse.success) {
-    //   putActionsInRedux(allActionsResponse.data);
-    //   putMetaDataToRedux({ ...meta, actions: allActionsResponse.cursor });
-    // } else if (allActionsResponse && !allActionsResponse.success) {
-    //   await this.setStateAsync({
-    //     error: allActionsResponse.error,
-    //   });
-    // }
     const { putActionsInRedux, fetchActions, location } = this.props;
 
     const { state } = location;
@@ -102,17 +87,7 @@ class AllActions extends React.Component {
       if (failed) return this.setState({ error });
       reArrangeForAdmin({ ...content, dataSource: data });
     });
-    // var url;
-    // if (auth.is_super_admin) url = "/actions.listForSuperAdmin";
-    // else if (auth.is_community_admin) url = "/actions.listForCommunityAdmin";
-    // const allActionsResponse = await apiCall(url);
-    // if (allActionsResponse && allActionsResponse.success) {
-    //   putActionsInRedux(allActionsResponse.data);
-    // } else if (allActionsResponse && !allActionsResponse.success) {
-    //   await this.setStateAsync({
-    //     error: allActionsResponse.error,
-    //   });
-    // }
+  
   }
 
   setStateAsync(state) {
