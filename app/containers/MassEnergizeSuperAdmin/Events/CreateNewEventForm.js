@@ -502,7 +502,6 @@ const createFormJson = ({
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
         child: {
-          dbName: "rsvp_communication",
           valueToCheck: "true",
           fields: [
             {
