@@ -53,9 +53,9 @@ function WhatNext({ data }) {
     "Here are items you need to take care of"
   );
   return (
-    <MEPaperBlock
+    <PapperBlock
       title="What to do next?"
-      subtitle={subtitle}
+      desc={subtitle}
       containerStyle={userHasNothingTodo ? { minHeight: 130, height: 130 } : {}}
     >
       <div
@@ -124,7 +124,7 @@ function WhatNext({ data }) {
           }
         />
       </div>
-    </MEPaperBlock>
+    </PapperBlock>
   );
 }
 

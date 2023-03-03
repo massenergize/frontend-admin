@@ -94,14 +94,14 @@ class NormalAdminHome extends PureComponent {
   };
 
   renderTable = (data, classes) => {
-    const { history } = this.props;
+    const { history, mode } = this.props;
     return (
-      <MEPaperBlock
+      <PapperBlock
         noMargin
         title="Communities You Manage"
         icon="ios-share-outline"
         whiteBg
-        subtitle="A list of all the communities you manage"
+        desc="A list of all the communities you manage"
       >
         <div className={classes.root}>
           <Table
@@ -142,7 +142,7 @@ class NormalAdminHome extends PureComponent {
                           borderBottomWidth: 2,
                           marginLeft: 15,
                           textDecoration: "none",
-                          color: "black",
+                          color: mode=="light"&& "black",
                         }}
                         className="touchable-opacity"
                         onClick={(e) => {
@@ -194,7 +194,7 @@ class NormalAdminHome extends PureComponent {
             </TableBody>
           </Table>
         </div>
-      </MEPaperBlock>
+      </PapperBlock>
     );
   };
 
@@ -202,7 +202,6 @@ class NormalAdminHome extends PureComponent {
     const title = brand.name + " - Summary Dashboard";
     const description = brand.desc;
     const { auth, summary_data, graph_data, classes } = this.props;
-
     const firstComm = (auth.admin_at || [])[0];
     const firstCommId = firstComm && firstComm.id;
     if (!firstCommId) {
@@ -305,6 +304,7 @@ const mapStateToProps = (state) => ({
   selected_community: state.getIn(["selected_community"]),
   summary_data: state.getIn(["summary_data"]),
   graph_data: state.getIn(["graph_data"]) || {},
+  mode: state.getIn(["ui", "type"]),
 });
 
 const mapDispatchToProps = (dispatch) =>

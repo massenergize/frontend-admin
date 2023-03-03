@@ -116,8 +116,8 @@ function CommunityEngagement({
 
   return (
     <div>
-      <MEPaperBlock
-        customHeader={
+      <PapperBlock
+        desc={
           <>
             <div style={{ marginBottom: 20 }}>
               <div
@@ -306,7 +306,7 @@ function CommunityEngagement({
             />
           )}
         </div>
-      </MEPaperBlock>
+      </PapperBlock>
       {/* </PapperBlock> */}
     </div>
   );
