@@ -441,8 +441,6 @@ export const AddFilters = ({
                   renderInput={(props) => <TextField {...props} />}
                   value={(options && options.endDate) || ""}
                   label="End Date"
-
-                  // format="MM/DD/YYYY"
                 />
               </div>
             </LocalizationProvider>

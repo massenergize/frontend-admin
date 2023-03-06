@@ -12,6 +12,7 @@ import {
   fetchUsersFromBackend,
   loadAllUsers,
   reduxLoadMetaDataAction,
+  reduxLoadTableFilters,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
@@ -23,7 +24,7 @@ import {
 } from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import METable from "../ME  Tools/table /METable";
+import METable, { FILTERS } from "../ME  Tools/table /METable";
 import {
   getAdminApiEndpoint,
   getLimit,
@@ -50,18 +51,26 @@ class AllUsers extends React.Component {
   }
 
   componentDidMount() {
-    const { auth, putUsersInRedux, location, fetchUsers } = this.props;
+    const {
+      auth,
+      putUsersInRedux,
+      location,
+      fetchUsers,
+      updateTableFilters,
+      tableFilters,
+    } = this.props;
     const { state } = location;
     const ids = state && state.ids;
     const comingFromDashboard = ids && ids.length;
 
     if (!comingFromDashboard) return fetchUsers();
 
-    this.setState({
-      ignoreSavedFilters: true,
-      saveFilters: false,
-      ids,
-      updating: true,
+    this.setState({ updating: true, saveFilters: false });
+    const key = PAGE_PROPERTIES.ALL_USERS.key + FILTERS;
+
+    updateTableFilters({
+      ...(tableFilters || {}),
+      [key]: { 3: { list: ids } },
     });
 
     var content = {
@@ -309,12 +318,6 @@ class AllUsers extends React.Component {
             columns: columns,
             options: options,
           }}
-          customFilterObject={{
-            3: {
-              list: this.state.ids,
-            },
-          }}
-          ignoreSavedFilters={this.state.ignoreSavedFilters}
           saveFilters={this.state.saveFilters}
         />
       </div>
@@ -331,6 +334,7 @@ function mapStateToProps(state) {
     community: state.getIn(["selected_community"]),
     allUsers: state.getIn(["allUsers"]),
     meta: state.getIn(["paginationMetaData"]),
+    tableFilters: state.getIn(["tableFilters"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -341,6 +345,7 @@ function mapDispatchToProps(dispatch) {
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleToast: reduxToggleUniversalToast,
       putMetaDataToRedux: reduxLoadMetaDataAction,
+      updateTableFilters: reduxLoadTableFilters,
     },
     dispatch
   );

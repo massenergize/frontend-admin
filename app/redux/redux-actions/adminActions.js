@@ -48,6 +48,7 @@ import {
   TOGGLE_UNIVERSAL_TOAST,
   LOAD_ALL_META_DATA,
   ACTION_ENGAGMENTS,
+  LOAD_TABLE_FILTERS,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -62,6 +63,9 @@ export const testRedux = (value) => {
   return { type: TEST_REDUX, payload: value };
 };
 
+export const reduxLoadTableFilters = (data) => {
+  return { type: LOAD_TABLE_FILTERS, payload: data };
+};
 export const reduxLoadActionEngagements = (data) => {
   return { type: ACTION_ENGAGMENTS, payload: data };
 };
