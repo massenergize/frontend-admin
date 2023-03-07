@@ -29,7 +29,6 @@ function METable(props) {
     tableProps,
     page,
     ignoreSavedFilters,
-    customFilterObject,
     saveFilters = true,
     filtersFromRedux,
     sendFilterUpdatesToRedux,

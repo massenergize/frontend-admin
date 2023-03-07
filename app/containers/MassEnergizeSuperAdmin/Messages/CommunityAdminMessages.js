@@ -109,20 +109,24 @@ class AllCommunityAdminMessages extends React.Component {
       tableFilters,
     } = this.props;
     const ids = state && state.ids;
+    const comingFromDashboard = ids?.length;
+    if (comingFromDashboard) {
+      this.setState({ saveFilters: false });
+      const key = PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key + FILTERS;
+      updateTableFilters({
+        ...(tableFilters || {}),
+        [key]: { 0: { list: ids } },
+      });
+    }
+    
     apiCall("/messages.listForCommunityAdmin", {
       limit: getLimit(PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key),
     }).then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
         const data = allMessagesResponse.data;
-        if (ids) {
-          this.setState({ updating: true, saveFilters: false });
-          const key = PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key + FILTERS;
-          updateTableFilters({
-            ...(tableFilters || {}),
-            [key]: { 3: { list: ids } },
-          });
 
-          // this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
+        if (comingFromDashboard) {
+          this.setState({ updating: true });
           this.reArrangeForAdmin(data, meta);
         } else {
           putMessagesInRedux(data);
