@@ -23,6 +23,7 @@ import {
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
   reduxLoadMetaDataAction,
+  reduxLoadTableFilters,
 } from "../../../redux/redux-actions/adminActions";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { apiCall } from "../../../utils/messenger";
@@ -36,7 +37,7 @@ import {
 import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import METable from "../ME  Tools/table /METable";
+import METable, { FILTERS } from "../ME  Tools/table /METable";
 import {
   getAdminApiEndpoint,
   getLimit,
@@ -58,13 +59,26 @@ class AllTeams extends React.Component {
   }
 
   componentDidMount() {
-    const { putTeamsInRedux, fetchTeams, location } = this.props;
+    const {
+      putTeamsInRedux,
+      fetchTeams,
+      location,
+      updateTableFilters,
+      tableFilters,
+    } = this.props;
     const { state } = location;
     const ids = state && state.ids;
     const comingFromDashboard = ids && ids.length;
 
     if (!comingFromDashboard) return fetchTeams();
-    this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
+    this.setState({ saveFilters: false });
+
+    const key = PAGE_PROPERTIES.ALL_TEAMS.key + FILTERS;
+
+    updateTableFilters({
+      ...(tableFilters || {}),
+      [key]: { 0: { list: ids } },
+    });
 
     var content = {
       fieldKey: "team_ids",
@@ -222,11 +236,7 @@ class AllTeams extends React.Component {
           download: false,
           customBodyRender: (id) => (
             <Link to={`/admin/edit/${id}/team-members`}>
-              <PeopleIcon
-                size="small"
-                variant="outlined"
-                color="secondary"
-              />
+              <PeopleIcon size="small" variant="outlined" color="secondary" />
             </Link>
           ),
         },
@@ -279,7 +289,7 @@ class AllTeams extends React.Component {
   }
 
   makeLiveOrNot(item) {
-    let {putTeamsInRedux, allTeams} = this.props;
+    let { putTeamsInRedux, allTeams } = this.props;
     const data = allTeams || [];
     const status = item.is_published;
     const index = data.findIndex((a) => a.id === item.id);
@@ -359,7 +369,14 @@ class AllTeams extends React.Component {
     const title = brand.name + " - All Teams";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, allTeams, putTeamsInRedux, auth, meta, putMetaDataToRedux } = this.props;
+    const {
+      classes,
+      allTeams,
+      putTeamsInRedux,
+      auth,
+      meta,
+      putMetaDataToRedux,
+    } = this.props;
     const data = this.fashionData(allTeams);
     const metaData = meta && meta.teams;
     const options = {
@@ -399,12 +416,7 @@ class AllTeams extends React.Component {
           />
         );
       },
-      customSearchRender: (
-        searchText,
-        handleSearch,
-        hideSearch,
-        options
-      ) => (
+      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
         <SearchBar
           url={getAdminApiEndpoint(auth, "/teams")}
           reduxItems={allTeams}
@@ -448,9 +460,9 @@ class AllTeams extends React.Component {
         }),
     };
 
-      if (isEmpty(metaData)) {
-        return <Loader />;
-      }
+    if (isEmpty(metaData)) {
+      return <Loader />;
+    }
 
     return (
       <div>
@@ -472,12 +484,6 @@ class AllTeams extends React.Component {
             columns: columns,
             options: options,
           }}
-          customFilterObject={{
-            0: {
-              list: this.state.ids,
-            },
-          }}
-          ignoreSavedFilters={this.state.ignoreSavedFilters}
           saveFilters={this.state.saveFilters}
         />
       </div>
@@ -494,6 +500,7 @@ function mapStateToProps(state) {
     allTeams: state.getIn(["allTeams"]),
     community: state.getIn(["selected_community"]),
     meta: state.getIn(["paginationMetaData"]),
+    tableFilters: state.getIn(["tableFilters"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -507,6 +514,7 @@ function mapDispatchToProps(dispatch) {
       toggleLive: reduxToggleUniversalModal,
       toggleToast: reduxToggleUniversalToast,
       putMetaDataToRedux: reduxLoadMetaDataAction,
+      updateTableFilters: reduxLoadTableFilters,
     },
     dispatch
   );

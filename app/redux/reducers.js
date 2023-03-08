@@ -58,6 +58,7 @@ import app, {
   reducerForUniversalToast,
   allMetaDataReducer,
   reducerForActionEngagements,
+  reducerForTableFilters,
 } from "./modules/appReducer";
 
 /**
@@ -65,6 +66,7 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    tableFilters: reducerForTableFilters,
     tempForm: reducerForKeepingFormContent,
     actionEngagements: reducerForActionEngagements,
     userEngagements: reducerForUserEngagements,

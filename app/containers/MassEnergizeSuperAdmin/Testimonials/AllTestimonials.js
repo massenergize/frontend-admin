@@ -17,6 +17,7 @@ import {
   loadAllTestimonials,
   reduxGetAllCommunityTestimonials,
   reduxLoadMetaDataAction,
+  reduxLoadTableFilters,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
@@ -32,7 +33,7 @@ import {
 import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import METable from "../ME  Tools/table /METable";
+import METable, { FILTERS } from "../ME  Tools/table /METable";
 import {
   getAdminApiEndpoint,
   getLimit,
@@ -61,6 +62,8 @@ class AllTestimonials extends React.Component {
       fetchTestimonials,
       location,
       putTestimonialsInRedux,
+      updateTableFilters,
+      tableFilters,
     } = this.props;
     const { state } = location;
     const ids = state && state.ids;
@@ -72,12 +75,18 @@ class AllTestimonials extends React.Component {
       props: this.props,
       dataSource: [],
       reduxFxn: putTestimonialsInRedux,
-      args:{
-        limit:getLimit(PAGE_PROPERTIES.ALL_TESTIMONIALS)
-      }
+      args: {
+        limit: getLimit(PAGE_PROPERTIES.ALL_TESTIMONIALS),
+      },
     };
 
-    this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
+    this.setState({ saveFilters: false });
+    const key = PAGE_PROPERTIES.ALL_TESTIMONIALS.key + FILTERS;
+
+    updateTableFilters({
+      ...(tableFilters || {}),
+      [key]: { 0: { list: ids } },
+    });
 
     fetchTestimonials((data, failed) => {
       if (failed)
@@ -123,12 +132,8 @@ class AllTestimonials extends React.Component {
 
   updateTestimonials = (data) => {
     let allTestimonials = this.props.allTestimonials;
-    const index = (allTestimonials || []).findIndex(
-      (a) => a.id === data.id
-    );
-    const updateItems = (allTestimonials || []).filter(
-      (a) => a.id !== data.id
-    );
+    const index = (allTestimonials || []).findIndex((a) => a.id === data.id);
+    const updateItems = (allTestimonials || []).filter((a) => a.id !== data.id);
     updateItems.splice(index, 0, data);
     this.props.putTestimonialsInRedux(updateItems);
   };
@@ -230,9 +235,7 @@ class AllTestimonials extends React.Component {
                 label={
                   d.is_approved ? (d.isLive ? "Yes" : "No") : "Not Approved"
                 }
-                className={`${
-                  d.isLive ? classes.yesLabel : classes.noLabel
-                }  ${
+                className={`${d.isLive ? classes.yesLabel : classes.noLabel}  ${
                   !d.is_approved ? "not-approved" : ""
                 } touchable-opacity`}
               />
@@ -275,11 +278,7 @@ class AllTestimonials extends React.Component {
                   });
                 }}
               >
-                <EditIcon
-                  size="small"
-                  variant="outlined"
-                  color="secondary"
-                />
+                <EditIcon size="small" variant="outlined" color="secondary" />
               </Link>
             </div>
           ),
@@ -305,7 +304,7 @@ class AllTestimonials extends React.Component {
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
-    putTestimonialsInRedux( [...data],);
+    putTestimonialsInRedux([...data]);
     const community = item.community;
     apiCall("/testimonials.update", {
       testimonial_id: item.id,
@@ -405,11 +404,11 @@ class AllTestimonials extends React.Component {
       allTestimonials,
       auth,
       putTestimonialsInRedux,
-      meta, 
-      putMetaDataToRedux
+      meta,
+      putMetaDataToRedux,
     } = this.props;
-    
-    const data = this.fashionData( (allTestimonials) || [] );
+
+    const data = this.fashionData(allTestimonials || []);
     const metaData = meta && meta.testimonials;
     const options = {
       filterType: "dropdown",
@@ -419,12 +418,7 @@ class AllTestimonials extends React.Component {
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
       confirmFilters: true,
-      customSearchRender: (
-        searchText,
-        handleSearch,
-        hideSearch,
-        options
-      ) => (
+      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
         <SearchBar
           url={getAdminApiEndpoint(auth, "/testimonials")}
           reduxItems={allTestimonials}
@@ -514,9 +508,9 @@ class AllTestimonials extends React.Component {
       },
     };
 
-   if (isEmpty(metaData)) {
-     return <Loader />;
-   }
+    if (isEmpty(metaData)) {
+      return <Loader />;
+    }
 
     return (
       <div>
@@ -537,12 +531,6 @@ class AllTestimonials extends React.Component {
             columns: columns,
             options: options,
           }}
-          customFilterObject={{
-            0: {
-              list: this.state.ids,
-            },
-          }}
-          ignoreSavedFilters={this.state.ignoreSavedFilters}
           saveFilters={this.state.saveFilters}
         />
       </div>
@@ -560,6 +548,7 @@ function mapStateToProps(state) {
     allTestimonials: state.getIn(["allTestimonials"]),
     community: state.getIn(["selected_community"]),
     meta: state.getIn(["paginationMetaData"]),
+    tableFilters: state.getIn(["tableFilters"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -571,6 +560,7 @@ function mapDispatchToProps(dispatch) {
       toggleLive: reduxToggleUniversalModal,
       toggleToast: reduxToggleUniversalToast,
       putMetaDataToRedux: reduxLoadMetaDataAction,
+      updateTableFilters: reduxLoadTableFilters,
     },
     dispatch
   );
