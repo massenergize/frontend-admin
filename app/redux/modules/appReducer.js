@@ -48,6 +48,7 @@ import {
   TOGGLE_UNIVERSAL_TOAST,
   LOAD_ALL_META_DATA,
   ACTION_ENGAGMENTS,
+  LOAD_TABLE_FILTERS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -75,6 +76,14 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+export const reducerForTableFilters = (state = {}, action = {}) => {
+  switch (action.type) {
+    case LOAD_TABLE_FILTERS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForActionEngagements = (state = LOADING, action = {}) => {
   switch (action.type) {
     case ACTION_ENGAGMENTS:

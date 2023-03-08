@@ -23,6 +23,7 @@ import {
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
   reduxLoadMetaDataAction,
+  reduxLoadTableFilters,
 } from "../../../redux/redux-actions/adminActions";
 
 import {
@@ -39,7 +40,7 @@ import {
 } from "../../../utils/common";
 import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
-import METable from "../ME  Tools/table /METable";
+import METable, { FILTERS } from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import {
   getAdminApiEndpoint,
@@ -64,14 +65,25 @@ class AllActions extends React.Component {
   }
 
   async componentDidMount() {
-    const { putActionsInRedux, fetchActions, location } = this.props;
+    const {
+      putActionsInRedux,
+      fetchActions,
+      location,
+      tableFilters,
+      updateTableFilters,
+    } = this.props;
 
     const { state } = location;
     const ids = state && state.ids;
     const comingFromDashboard = ids && ids.length;
-
     if (!comingFromDashboard) return fetchActions();
-    this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
+
+    this.setState({ saveFilters: false });
+    const key = PAGE_PROPERTIES.ALL_ACTIONS.key + FILTERS;
+    updateTableFilters({
+      ...(tableFilters || {}),
+      [key]: { 0: { list: ids } },
+    });
 
     var content = {
       fieldKey: "action_ids",
@@ -87,7 +99,6 @@ class AllActions extends React.Component {
       if (failed) return this.setState({ error });
       reArrangeForAdmin({ ...content, dataSource: data });
     });
-  
   }
 
   setStateAsync(state) {
@@ -431,9 +442,7 @@ class AllActions extends React.Component {
     const metaData = meta && meta.actions;
 
     if (isEmpty(metaData)) {
-      return (
-        <Loader />
-      );
+      return <Loader />;
     }
 
     if (error) {
@@ -576,12 +585,6 @@ class AllActions extends React.Component {
             columns: columns,
             options: options,
           }}
-          customFilterObject={{
-            0: {
-              list: this.state.ids,
-            },
-          }}
-          ignoreSavedFilters={this.state.ignoreSavedFilters}
           saveFilters={this.state.saveFilters}
         />
       </div>
@@ -598,6 +601,7 @@ const mapStateToProps = (state) => ({
   allActions: state.getIn(["allActions"]),
   community: state.getIn(["selected_community"]),
   meta: state.getIn(["paginationMetaData"]),
+  tableFilters: state.getIn(["tableFilters"]),
 });
 const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
@@ -610,6 +614,7 @@ const mapDispatchToProps = (dispatch) =>
       toggleLive: reduxToggleUniversalModal,
       toggleToast: reduxToggleUniversalToast,
       putMetaDataToRedux: reduxLoadMetaDataAction,
+      updateTableFilters: reduxLoadTableFilters,
     },
     dispatch
   );

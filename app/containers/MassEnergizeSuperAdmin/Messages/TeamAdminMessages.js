@@ -20,12 +20,13 @@ import { Chip, Typography, Grid, Paper } from "@mui/material";
 import {
   loadTeamMessages,
   reduxLoadMetaDataAction,
+  reduxLoadTableFilters,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import METable from "../ME  Tools/table /METable";
+import METable, { FILTERS } from "../ME  Tools/table /METable";
 import {
   getLimit,
   handleFilterChange,
@@ -52,9 +53,24 @@ class AllTeamAdminMessages extends React.Component {
 
   componentDidMount() {
     const { state } = this.props.location;
-    const { putTeamMessagesInRedux, meta, putMetaDataToRedux } = this.props;
+    const {
+      putTeamMessagesInRedux,
+      meta,
+      putMetaDataToRedux,
+      tableFilters,
+      updateTableFilters,
+    } = this.props;
     const ids = state && state.ids;
     const comingFromDashboard = ids && ids.length;
+
+    const key = PAGE_PROPERTIES.ALL_TEAM_MESSAGES.key + FILTERS;
+    if (comingFromDashboard) {
+      this.setState({ saveFilters: false });
+      updateTableFilters({
+        ...(tableFilters || {}),
+        [key]: { 0: { list: ids } },
+      });
+    }
 
     apiCall("/messages.listTeamAdminMessages", {
       limit: getLimit(PAGE_PROPERTIES.ALL_TEAM_MESSAGES.key),
@@ -72,7 +88,7 @@ class AllTeamAdminMessages extends React.Component {
           });
           return;
         }
-        this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
+
         reArrangeForAdmin({
           apiURL: "/messages.listTeamAdminMessages",
           fieldKey: "message_ids",
@@ -357,14 +373,6 @@ class AllTeamAdminMessages extends React.Component {
             columns: columns,
             options: options,
           }}
-          customFilterObject={{
-            0: {
-              name: "ID",
-              type: "multiselect",
-              list: this.state.ids,
-            },
-          }}
-          ignoreSavedFilters={this.state.ignoreSavedFilters}
           saveFilters={this.state.saveFilters}
         />
       </div>
@@ -381,6 +389,7 @@ function mapStateToProps(state) {
     community: state.getIn(["selected_community"]),
     teamMessages: state.getIn(["teamMessages"]),
     meta: state.getIn(["paginationMetaData"]),
+    tableFilters: state.getIn(["tableFilters"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -390,6 +399,7 @@ function mapDispatchToProps(dispatch) {
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleToast: reduxToggleUniversalToast,
       putMetaDataToRedux: reduxLoadMetaDataAction,
+      updateTableFilters: reduxLoadTableFilters,
     },
     dispatch
   );

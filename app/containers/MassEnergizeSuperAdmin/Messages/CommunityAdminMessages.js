@@ -13,6 +13,7 @@ import styles from "../../../components/Widget/widget-jss";
 import {
   loadAllAdminMessages,
   reduxLoadMetaDataAction,
+  reduxLoadTableFilters,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
@@ -26,7 +27,7 @@ import {
 import { Chip } from "@mui/material";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import METable from "../ME  Tools/table /METable";
+import METable, { FILTERS } from "../ME  Tools/table /METable";
 import {
   getLimit,
   handleFilterChange,
@@ -100,15 +101,32 @@ class AllCommunityAdminMessages extends React.Component {
   }
   componentDidMount() {
     const { state } = this.props.location;
-    const { putMessagesInRedux, meta, putMetaDataToRedux } = this.props;
+    const {
+      putMessagesInRedux,
+      meta,
+      putMetaDataToRedux,
+      updateTableFilters,
+      tableFilters,
+    } = this.props;
     const ids = state && state.ids;
+    const comingFromDashboard = ids?.length;
+    if (comingFromDashboard) {
+      this.setState({ saveFilters: false });
+      const key = PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key + FILTERS;
+      updateTableFilters({
+        ...(tableFilters || {}),
+        [key]: { 0: { list: ids } },
+      });
+    }
+    
     apiCall("/messages.listForCommunityAdmin", {
       limit: getLimit(PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key),
     }).then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
         const data = allMessagesResponse.data;
-        if (ids) {
-          this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
+
+        if (comingFromDashboard) {
+          this.setState({ updating: true });
           this.reArrangeForAdmin(data, meta);
         } else {
           putMessagesInRedux(data);
@@ -412,6 +430,7 @@ function mapStateToProps(state) {
     community: state.getIn(["selected_community"]),
     messages: state.getIn(["messages"]),
     meta: state.getIn(["paginationMetaData"]),
+    tableFilters: state.getIn(["tableFilters"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -421,6 +440,7 @@ function mapDispatchToProps(dispatch) {
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleToast: reduxToggleUniversalToast,
       putMetaDataToRedux: reduxLoadMetaDataAction,
+      updateTableFilters: reduxLoadTableFilters,
     },
     dispatch
   );
