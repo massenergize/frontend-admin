@@ -75,6 +75,9 @@ import {
   EventFullView,
   EventsFromOthers,
   ActionEngagementList,
+  PolicyFullViewPage,
+  TermsOfServicePage,
+  PrivacyPolicyPage,
 } from "../pageListAsync";
 import EditVendor from "../MassEnergizeSuperAdmin/Vendors/EditVendor";
 import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
@@ -242,6 +245,10 @@ class Application extends React.Component {
 
           <Route exact path="/blank" component={BlankPage} />
           <Route
+            path="/admin/view/policy/:policy_key"
+            component={TermsOfServicePage}
+          />
+          <Route
             exact
             path="/admin/profile/preferences"
             component={Preferences}
@@ -354,6 +361,7 @@ class Application extends React.Component {
           <Route path="/admin/read/subscribers" component={AllSubscribers} />
           <Route path="/admin/read/policies" component={AllPolicies} />
           <Route path="/admin/add/policy" component={AddPolicy} />
+
           <Route path="/admin/edit/:id/policy" component={EditPolicy} />
           <Route path="/admin/read/goals" component={AllGoals} />
           <Route path="/admin/add/goal" component={AddGoal} />

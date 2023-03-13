@@ -1,11 +1,12 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
-import { apiCall } from '../../../utils/messenger';
+import { apiCall } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import Loading from "dan-components/Loading";
-import { PAGE_KEYS } from '../ME  Tools/MEConstants';
-const styles = theme => ({
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import { connect } from "react-redux";
+const styles = (theme) => ({
   root: {
     flexGrow: 1,
     padding: 30,
@@ -25,7 +26,7 @@ const styles = theme => ({
   },
   buttonInit: {
     margin: theme.spacing(4),
-    textAlign: 'center'
+    textAlign: "center",
   },
 });
 
@@ -39,20 +40,28 @@ class CreateNewPolicyForm extends Component {
   }
 
   async componentDidMount() {
-    const communitiesResponse = await apiCall(
-      "/communities.listForCommunityAdmin"
-    );
+    const { communities } = this.props;
+    console.log("I am the COMS", communities);
+    (communities || []).sort((a, b) => (a.name > b.name ? 1 : -1));
+    // const communitiesResponse = await apiCall(
+    //   "/communities.listForCommunityAdmin"
+    // );
 
-    if (communitiesResponse && communitiesResponse.data) {
-      const communities = communitiesResponse.data.map((c) => ({
-        ...c,
-        displayName: c.name,
-      }));
-      await this.setStateAsync({ communities });
-    }
+    // if (communitiesResponse && communitiesResponse.data) {
+    //   const communities = communitiesResponse.data.map((c) => ({
+    //     ...c,
+    //     displayName: c.name,
+    //   }));
+    //   await this.setStateAsync({ communities });
+    // }
 
-    const formJson = await this.createFormJson();
-    await this.setStateAsync({ formJson });
+    const formJson = this.createFormJson({
+      communities: (communities || []).map((com) => ({
+        displayName: com?.name,
+        id: com?.id,
+      })),
+    });
+    this.setState({ formJson });
   }
 
   setStateAsync(state) {
@@ -60,9 +69,15 @@ class CreateNewPolicyForm extends Component {
       this.setState(state, resolve);
     });
   }
+  autoGenerateKey({ newValue, _, setValueInForm }) {
+    let policyNameArr = newValue?.toLowerCase()?.split(" ");
+    let key = policyNameArr.join("-");
+    console.log("Here is the joined", key);
+    setValueInForm({ key });
+  }
 
-  createFormJson = async () => {
-    const { communities } = this.state;
+  createFormJson = ({ communities }) => {
+    // const { communities } = this.state;
     const formJson = {
       title: "Create New Policy",
       subTitle: "",
@@ -83,6 +98,18 @@ class CreateNewPolicyForm extends Component {
               isRequired: true,
               defaultValue: "",
               dbName: "name",
+              readOnly: false,
+              onChangeMiddleware: this.autoGenerateKey,
+            },
+            {
+              name: "key",
+              label: "Key (auto generated, but can be edited)",
+              placeholder: "Unique Key",
+              fieldType: "TextField",
+              contentType: "text",
+              isRequired: true,
+              defaultValue: "",
+              dbName: "key",
               readOnly: false,
             },
             {
@@ -135,7 +162,7 @@ class CreateNewPolicyForm extends Component {
     const { classes } = this.props;
     const { formJson } = this.state;
     if (!formJson) return <Loading />;
-    
+
     return (
       <div>
         <MassEnergizeForm
@@ -153,4 +180,8 @@ CreateNewPolicyForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(CreateNewPolicyForm);
+const mapStateToProps = (state) => ({
+  communities: state.getIn(["communities"]),
+});
+const Mapped = connect(mapStateToProps)(CreateNewPolicyForm);
+export default withStyles(styles, { withTheme: true })(Mapped);

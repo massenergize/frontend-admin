@@ -30,22 +30,8 @@ class AllPolicies extends React.Component {
     if (user.is_super_admin) {
       this.props.callPoliciesForSuperAdmin();
     }
-    if (user.is_community_admin) {
-      const com = user.admin_at[0];
-      this.props.callPoliciesForNormalAdmin((com && com.id) || null);
-    }
+
   }
-
-  showCommunitySwitch = () => {
-    const user = this.props.auth ? this.props.auth : {};
-    if (user.is_community_admin) {
-      return <CommunitySwitch actionToPerform={this.handleCommunityChange} />;
-    }
-  };
-
-  handleCommunityChange = (id) => {
-    this.props.callPoliciesForNormalAdmin(id);
-  };
 
   fashionData = (data) => {
     const fashioned = data.map((d) => [
@@ -167,12 +153,6 @@ class AllPolicies extends React.Component {
           closeAfterConfirmation: true,
         });
         return false;
-
-        // const idsToDelete = rowsDeleted.data;
-        // idsToDelete.forEach(d => {
-        //   const policyId = data[d.dataIndex][0];
-        //   apiCall('/policies.delete', { policy_id: policyId });
-        // });
       },
     };
 
@@ -187,7 +167,6 @@ class AllPolicies extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <div className={classes.table}>
-          {this.showCommunitySwitch()}
           <MUIDataTable
             title="All Policies"
             data={data}
@@ -214,7 +193,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
       callPoliciesForSuperAdmin: reduxGetAllPolicies,
-      callPoliciesForNormalAdmin: reduxGetAllCommunityPolicies,
+      // callPoliciesForNormalAdmin: reduxGetAllCommunityPolicies,
       putPoliciesInRedux: loadAllPolicies,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
     },

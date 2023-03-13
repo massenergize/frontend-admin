@@ -53,10 +53,11 @@ import {
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
 import { LOADING } from "../../utils/constants";
-import { getLimit, prepareFilterAndSearchParamsFromLocal } from "../../utils/helpers";
+import {
+  getLimit,
+  prepareFilterAndSearchParamsFromLocal,
+} from "../../utils/helpers";
 import { PAGE_PROPERTIES } from "../../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
-
-
 
 // TODO: REOMVE THIS FUNCTiON
 export const testRedux = (value) => {
@@ -148,6 +149,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
   if (!auth) return;
   const isSuperAdmin = auth && auth.is_super_admin;
   Promise.all([
+    apiCall("/policies.listForCommunityAdmin"),
     apiCall(
       isSuperAdmin
         ? "/communities.listForSuperAdmin"
@@ -269,10 +271,11 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     isSuperAdmin && apiCall("/tasks.list"),
     apiCall("/preferences.list"),
     isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
-    apiCall("/communities.others.listForCommunityAdmin", {limit:50}),
+    apiCall("/communities.others.listForCommunityAdmin", { limit: 50 }),
     apiCall("/summary.next.steps.forAdmins"),
   ]).then((response) => {
     const [
+      policies,
       communities,
       actions,
       events,
@@ -293,11 +296,12 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       otherCommunities,
       adminNextSteps,
     ] = response;
+    dispatch(loadAllPolicies(policies.data))
     dispatch(reduxLoadAllCommunities(communities.data));
     dispatch(loadAllActions(actions.data));
     dispatch(loadAllEvents(events.data));
     dispatch(loadAllAdminMessages(messages.data));
-    dispatch(loadTeamMessages(teamMessages.data))
+    dispatch(loadTeamMessages(teamMessages.data));
     dispatch(loadAllTeams(teams.data));
     dispatch(loadAllSubscribers(subscribers.data));
     dispatch(loadAllTestimonials(testimonials.data));
@@ -325,6 +329,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       tagCollections: tagCollections.cursor,
       otherCommunities: otherCommunities.cursor,
       testimonials: testimonials.cursor,
+      policies: policies.cursor
     };
     dispatch(reduxLoadMetaDataAction(cursor));
   });
@@ -423,7 +428,7 @@ export const loadTeamMessages = (data = null) => ({
 });
 export const loadAllAdminMessages = (data = null) => ({
   type: GET_ADMIN_MESSAGES,
-  payload:data,
+  payload: data,
 });
 export const loadAllPolicies = (data = null) => ({
   type: GET_ALL_POLICIES,
@@ -443,28 +448,30 @@ export const loadAllGoals = (data = null) => ({
 });
 export const loadAllTeams = (data = null) => ({
   type: GET_ALL_TEAMS,
-  payload: data
+  payload: data,
 });
 export const loadAllEvents = (data = null) => ({
   type: GET_ALL_EVENTS,
   payload: data,
 });
 export const fetchUsersFromBackend = (cb) => (dispatch) => {
-  apiCall("/users.listForCommunityAdmin", {limit:getLimit(PAGE_PROPERTIES.ALL_USERS.key)}).then((allUsersResponse) => {
-    cb && cb(allUsersResponse.data, !allUsersResponse.success)
+  apiCall("/users.listForCommunityAdmin", {
+    limit: getLimit(PAGE_PROPERTIES.ALL_USERS.key),
+  }).then((allUsersResponse) => {
+    cb && cb(allUsersResponse.data, !allUsersResponse.success);
     if (allUsersResponse && allUsersResponse.success) {
       dispatch(loadAllUsers(allUsersResponse.data));
     }
   });
 };
-export const loadAllUsers = (data) => ({ type: GET_ALL_USERS, payload:data });
+export const loadAllUsers = (data) => ({ type: GET_ALL_USERS, payload: data });
 export const loadAllSubscribers = (data) => ({
   type: GET_ALL_SUBSCRIBERS,
   payload: data,
 });
 export const loadAllTags = (data) => ({
   type: GET_ALL_TAG_COLLECTIONS,
-  payload:data,
+  payload: data,
 });
 export const loadAllActions = (data) => ({
   type: GET_ALL_ACTIONS,
@@ -623,7 +630,10 @@ export const reduxGetAllCommunityGoals = (community_id) => (dispatch) => {
 };
 
 export const reduxGetAllCommunityTeams = (community_id) => (dispatch) => {
-  apiCall("/teams.listForCommunityAdmin", { community_id, limit: getLimit(PAGE_PROPERTIES.ALL_TEAMS.key) }).then((response) => {
+  apiCall("/teams.listForCommunityAdmin", {
+    community_id,
+    limit: getLimit(PAGE_PROPERTIES.ALL_TEAMS.key),
+  }).then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllTeams(response.data));
@@ -645,16 +655,17 @@ export const reduxGetAllCommunityUsers = (community_id) => (dispatch) => {
 };
 
 export const reduxGetAllCommunityEvents = (community_id, cb) => (dispatch) => {
-  apiCall("/events.listForCommunityAdmin", { community_id, limit:getLimit(PAGE_PROPERTIES.ALL_EVENTS.key) }).then(
-    (response) => {
-      if (response && response.success) {
-        redirectIfExpired(response);
-        dispatch(loadAllEvents(response.data));
-      }
-      cb && cb();
-      return { type: "DO_NOTHING", payload: null };
+  apiCall("/events.listForCommunityAdmin", {
+    community_id,
+    limit: getLimit(PAGE_PROPERTIES.ALL_EVENTS.key),
+  }).then((response) => {
+    if (response && response.success) {
+      redirectIfExpired(response);
+      dispatch(loadAllEvents(response.data));
     }
-  );
+    cb && cb();
+    return { type: "DO_NOTHING", payload: null };
+  });
   return { type: "DO_NOTHING", payload: null };
 };
 
@@ -707,7 +718,9 @@ export const reduxGetAllPolicies = () => (dispatch) => {
 };
 
 export const reduxGetAllEvents = () => (dispatch) => {
-  apiCall("/events.listForCommunityAdmin", {limit:getLimit(PAGE_PROPERTIES.ALL_EVENTS.key)}).then((response) => {
+  apiCall("/events.listForCommunityAdmin", {
+    limit: getLimit(PAGE_PROPERTIES.ALL_EVENTS.key),
+  }).then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllEvents(response.data));
@@ -893,7 +906,7 @@ export const reduxCallLibraryModalImages = (props) => {
 
 export const reduxCallCommunities = () => (dispatch) => {
   Promise.all([
-    apiCall("/communities.listForCommunityAdmin", {limit: 100}),
+    apiCall("/communities.listForCommunityAdmin", { limit: 100 }),
     apiCall("/summary.listForCommunityAdmin"),
     apiCall("/graphs.listForCommunityAdmin"),
     apiCall("/what.happened"),

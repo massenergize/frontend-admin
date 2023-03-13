@@ -92,7 +92,7 @@ class EditPolicyForm extends Component {
     const { pathname } = window.location;
 
     const formJson = {
-      title: 'Create New Policy',
+      title: 'Edit Policy',
       subTitle: '',
       method: '/policies.update',
       cancelLink: '/admin/read/policies',

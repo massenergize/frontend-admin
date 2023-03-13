@@ -238,7 +238,7 @@ class MassEnergizeForm extends Component {
     const { onChangeMiddleware } = field || {};
     const setValueInForm = (newContent) =>
       this.setState({
-        formData: { ...formData, ...(newContent || {}) },
+        formData: { ...formData, [name]: value, ...(newContent || {}) },
       });
 
     if (onChangeMiddleware)
@@ -248,7 +248,6 @@ class MassEnergizeForm extends Component {
         formData,
         setValueInForm,
       });
-
     this.setState({
       formData: { ...formData, [name]: value },
     });
@@ -411,7 +410,9 @@ class MassEnergizeForm extends Component {
             cleanedValues[field.dbName] = fieldValueInForm;
             break;
           case FieldTypes.DateTime:
-            cleanedValues[field.dbName] = (moment.utc(fieldValueInForm)|| moment.now()).format();
+            cleanedValues[field.dbName] = (
+              moment.utc(fieldValueInForm) || moment.now()
+            ).format();
             break;
           case FieldTypes.Checkbox:
             // If two or more items have the same dbName, the get combined into an array
@@ -1047,10 +1048,10 @@ class MassEnergizeForm extends Component {
             <TextField
               required={field.isRequired}
               name={field.name}
-              onChange={
+              onChange={(e) =>
                 field.name === "subdomain"
-                  ? this.handleSubDomainChange
-                  : this.handleFormDataChange
+                  ? this.handleSubDomainChange(e)
+                  : this.handleFormDataChange(e, field)
               }
               label={field.label}
               multiline={field.isMultiline}
@@ -1062,7 +1063,8 @@ class MassEnergizeForm extends Component {
                 shrink: true,
               }}
               disabled={field.readOnly || this.state.readOnly}
-              defaultValue={field.defaultValue}
+              value={this.getValue(field.name, field.defaultValue, field)}
+              // defaultValue={field.defaultValue}
               inputProps={{ maxLength: field.maxLength }}
               // maxLength={field.maxLength}
               variant="outlined"
@@ -1104,11 +1106,7 @@ class MassEnergizeForm extends Component {
                 <DateTimePicker
                   {...field}
                   renderInput={(props) => <TextField {...props} />}
-                  value={this.getValue(
-                    field.name,
-                    field.defaultValue,
-                    field
-                  )}
+                  value={this.getValue(field.name, field.defaultValue, field)}
                   onChange={(date) => {
                     this.handleFormDataChange(
                       {
@@ -1169,7 +1167,7 @@ class MassEnergizeForm extends Component {
   renderFields = (fields) =>
     fields.map((field, key) => (
       <div key={`${field.name}-${key.toString()}`}>
-        <div style={{marginBottom:15}}>{this.renderModalText(field)}</div>
+        <div style={{ marginBottom: 15 }}>{this.renderModalText(field)}</div>
 
         {this.renderField(field)}
       </div>
