@@ -320,6 +320,7 @@ class MassEnergizeForm extends Component {
   getValue = (name, defaultValue = null, field = null) => {
     let { formData } = this.state;
     let val = formData[name];
+    if (field?.fieldType === FieldTypes.TextField && !val) return ""; // Now needed because I've had to make TextFields controlled inputs.[Makes sure that when field is cleared out, defalut value is not retrieved again]
     if (!val) {
       formData = { ...formData, [name]: defaultValue };
       // this.setState({ formData });

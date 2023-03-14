@@ -245,7 +245,7 @@ class Application extends React.Component {
 
           <Route exact path="/blank" component={BlankPage} />
           <Route
-            path="/admin/view/policy/:policy_key"
+            path="/admin/view/policy/:policyKey"
             component={TermsOfServicePage}
           />
           <Route

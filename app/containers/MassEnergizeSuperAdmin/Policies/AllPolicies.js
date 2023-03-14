@@ -19,6 +19,7 @@ import {
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 import { Typography } from "@mui/material";
+import { ArrowRight, ArrowRightAlt } from "@mui/icons-material";
 class AllPolicies extends React.Component {
   constructor(props) {
     super(props);
@@ -30,7 +31,6 @@ class AllPolicies extends React.Component {
     if (user.is_super_admin) {
       this.props.callPoliciesForSuperAdmin();
     }
-
   }
 
   fashionData = (data) => {
@@ -38,8 +38,9 @@ class AllPolicies extends React.Component {
       d.id,
       d.name,
       d.is_global ? "Template" : d.community && d.community.name,
-      "" + d.is_published ? "Yes": "No",
+      "" + d.is_published ? "Yes" : "No",
       d.id,
+      d.key,
     ]);
     return fashioned;
   };
@@ -103,6 +104,24 @@ class AllPolicies extends React.Component {
           </div>
         ),
       },
+    }, 
+    {
+      name: "Full View",
+      key: "view",
+      options: {
+        filter: false,
+        customBodyRender: (key) => (
+          <div>
+            <Link to={`/admin/view/policy/${key}?ct=true`}>
+              <ArrowRightAlt
+                size="small"
+                variant="outlined"
+                color="secondary"
+              />
+            </Link>
+          </div>
+        ),
+      },
     },
   ];
 
@@ -135,7 +154,6 @@ class AllPolicies extends React.Component {
     const { columns } = this.state;
     const { classes } = this.props;
     const data = this.fashionData(this.props.allPolicies);
-
     const options = {
       filterType: "dropdown",
       responsive: "standard",

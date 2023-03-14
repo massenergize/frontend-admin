@@ -30,6 +30,12 @@ const styles = (theme) => ({
   },
 });
 
+export const makeKeyFromName = ({ newValue, _, setValueInForm }) => {
+  let policyNameArr = newValue?.toLowerCase()?.split(" ");
+  let key = policyNameArr.join("-");
+  setValueInForm({ key });
+};
+
 class CreateNewPolicyForm extends Component {
   constructor(props) {
     super(props);
@@ -69,12 +75,6 @@ class CreateNewPolicyForm extends Component {
       this.setState(state, resolve);
     });
   }
-  autoGenerateKey({ newValue, _, setValueInForm }) {
-    let policyNameArr = newValue?.toLowerCase()?.split(" ");
-    let key = policyNameArr.join("-");
-    console.log("Here is the joined", key);
-    setValueInForm({ key });
-  }
 
   createFormJson = ({ communities }) => {
     // const { communities } = this.state;
@@ -99,7 +99,7 @@ class CreateNewPolicyForm extends Component {
               defaultValue: "",
               dbName: "name",
               readOnly: false,
-              onChangeMiddleware: this.autoGenerateKey,
+              onChangeMiddleware: makeKeyFromName,
             },
             {
               name: "key",
