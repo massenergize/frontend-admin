@@ -202,6 +202,7 @@ class NormalAdminHome extends PureComponent {
     const title = brand.name + " - Summary Dashboard";
     const description = brand.desc;
     const { auth, summary_data, graph_data, classes } = this.props;
+    console.log("This is the auth my gee", auth)
     const firstComm = (auth.admin_at || [])[0];
     const firstCommId = firstComm && firstComm.id;
     if (!firstCommId) {

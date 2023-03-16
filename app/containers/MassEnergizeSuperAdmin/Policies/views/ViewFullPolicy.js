@@ -12,8 +12,8 @@ function ViewFullPolicy() {
   const [policy, setPolicy] = useState(LOADING);
   const policies = useSelector((store) => store.getIn(["allPolicies"]));
   const { policyKey } = useParams();
-  const isMOU = MOU == policyKey;
-
+  const isMOU = MOU === policyKey;
+  console.log("WE SEE INNIT", policy)
   useEffect(() => {
     const found = (policies || []).find((item) => item.key === policyKey);
     if (found) setPolicy(found);
@@ -30,6 +30,7 @@ function ViewFullPolicy() {
       </MEPaperBlock>
     );
 
+  
   return (
     <div>
       <Typography
@@ -55,19 +56,44 @@ const BFooter = ({ isMOU }) => {
         display: "flex column",
         justifyContent: "center",
         minHeight: "auto",
-        padding: "15px 30px",
+        padding: "0px",
       }}
     >
-      <Typography variant="h6" style={{ marginBottom: 10 }}>
-        Please proceed to "Accept" the terms, or choose "No" to deactivate your
-        role as an admin
-      </Typography>
-      <div>
-        <Button variant="contained" color="success">
+      <div style={{ padding: "15px 30px" }}>
+        <Typography variant="h6" style={{ marginBottom: 10 }}>
+          Please proceed to <b>"Accept"</b> the terms, or choose <b>"No"</b> to
+          deactivate your role as an admin
+        </Typography>
+        <Typography variant="body" style={{ marginBottom: 10 }}>
+          A copy of the signed agreement will be sent to you and the{" "}
+          massenergize team via email when you accept.
+        </Typography>
+      </div>
+      <div style={{ background: "#fbfbfb" }}>
+        <Button
+          className="touchable-opacity"
+          style={{
+            borderRadius: 0,
+            padding: 10,
+            width: 180,
+          }}
+          variant="contained"
+          color="success"
+        >
           Yes, I accept
         </Button>
-        <Button variant="contained" color="error" style={{ marginLeft: 10 }}>
-          No
+        <Button
+          className="touchable-opacity"
+          style={{
+            borderRadius: 0,
+            padding: 10,
+            width: 180,
+            // background: "#d97c7c",
+          }}
+          variant="contained"
+          color="error"
+        >
+          No, I Don't Accept
         </Button>
       </div>
     </MEPaperBlock>

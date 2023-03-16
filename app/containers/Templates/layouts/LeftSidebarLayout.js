@@ -1,17 +1,13 @@
-import React, { Fragment } from 'react';
-import { PropTypes } from 'prop-types';
-import classNames from 'classnames';
-import Typography from '@mui/material/Typography';
+import React, { Fragment } from "react";
+import { PropTypes } from "prop-types";
+import classNames from "classnames";
+import Typography from "@mui/material/Typography";
 import { withStyles } from "@mui/styles";
-import {
-  Header,
-  Sidebar,
-  BreadCrumb,
-} from 'dan-components';
-import dataMenu from 'dan-api/ui/menu';
-import Decoration from '../Decoration';
-import styles from '../appStyles-jss';
-import { Fade } from '@mui/material';
+import { Header, Sidebar, BreadCrumb } from "dan-components";
+import dataMenu from "dan-api/ui/menu";
+import Decoration from "../Decoration";
+import styles from "../appStyles-jss";
+import { Fade } from "@mui/material";
 
 class LeftSidebarLayout extends React.Component {
   render() {
@@ -30,29 +26,34 @@ class LeftSidebarLayout extends React.Component {
       changeMode,
       place,
       titleException,
-      handleOpenGuide
+      handleOpenGuide,
+      lock,
     } = this.props;
 
     return (
       <Fragment>
-        <Header
-          toggleDrawerOpen={toggleDrawer}
-          margin={sidebarOpen}
-          gradient={gradient}
-          position="left-sidebar"
-          changeMode={changeMode}
-          mode={mode}
-          title={place}
-          history={history}
-          openGuide={handleOpenGuide}
-        />
-        <Sidebar
-          open={sidebarOpen}
-          toggleDrawerOpen={toggleDrawer}
-          loadTransition={loadTransition}
-          dataMenu={dataMenu}
-          leftSidebar
-        />
+        {!lock && (
+          <>
+            <Header
+              toggleDrawerOpen={toggleDrawer}
+              margin={sidebarOpen}
+              gradient={gradient}
+              position="left-sidebar"
+              changeMode={changeMode}
+              mode={mode}
+              title={place}
+              history={history}
+              openGuide={handleOpenGuide}
+            />
+            <Sidebar
+              open={sidebarOpen}
+              toggleDrawerOpen={toggleDrawer}
+              loadTransition={loadTransition}
+              dataMenu={dataMenu}
+              leftSidebar
+            />
+          </>
+        )}
         <main
           className={classNames(
             classes.content,
@@ -126,7 +127,7 @@ LeftSidebarLayout.propTypes = {
   bgPosition: PropTypes.string.isRequired,
   place: PropTypes.string.isRequired,
   titleException: PropTypes.array.isRequired,
-  handleOpenGuide: PropTypes.func.isRequired
+  handleOpenGuide: PropTypes.func.isRequired,
 };
 
-export default (withStyles(styles)(LeftSidebarLayout));
+export default withStyles(styles)(LeftSidebarLayout);

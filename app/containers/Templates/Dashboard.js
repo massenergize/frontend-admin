@@ -69,6 +69,7 @@ class Dashboard extends React.Component {
       bgPosition,
       layout,
       changeMode,
+      lock,
     } = this.props;
     const { openGuide } = this.state;
     const titleException = [
@@ -90,7 +91,7 @@ class Dashboard extends React.Component {
         )}
       >
         <GuideModal openGuide={openGuide} closeGuide={this.handleCloseGuide} />
-        {/* Left Sidebar Layout */
+        {
         layout === "left-sidebar" && (
           <LeftSidebarLayout
             history={history}
@@ -106,11 +107,12 @@ class Dashboard extends React.Component {
             place={place}
             titleException={titleException}
             handleOpenGuide={this.handleOpenGuide}
+            lock = {lock}
           >
             {children}
           </LeftSidebarLayout>
         )}
-        {/* Right Sidebar Layout */
+        {/* {
         layout === "right-sidebar" && (
           <RightSidebarLayout
             history={history}
@@ -129,8 +131,9 @@ class Dashboard extends React.Component {
           >
             {children}
           </RightSidebarLayout>
-        )}
-        {/* Top Bar with Dropdown Menu */
+        )} */}
+         {/* Top Bar with Dropdown Menu  */}
+        {/* {
         layout === "top-navigation" && (
           <DropMenuLayout
             history={history}
@@ -149,8 +152,9 @@ class Dashboard extends React.Component {
           >
             {children}
           </DropMenuLayout>
-        )}
-        {/* Top Bar with Mega Menu */
+        )} */}
+        {/* Top Bar with Mega Menu */}
+        {/* {
         layout === "mega-menu" && (
           <MegaMenuLayout
             history={history}
@@ -169,7 +173,7 @@ class Dashboard extends React.Component {
           >
             {children}
           </MegaMenuLayout>
-        )}
+        )} */}
       </div>
     );
   }
