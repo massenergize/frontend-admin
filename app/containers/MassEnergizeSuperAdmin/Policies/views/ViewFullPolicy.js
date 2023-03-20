@@ -9,10 +9,13 @@ import { useParams } from "react-router-dom";
 import RichTextToPDF from "../../ME  Tools/to pdf/RichTextToPDF";
 import { apiCall } from "../../../../utils/messenger";
 import { bindActionCreators } from "redux";
-import { reduxLoadAuthAdmin } from "../../../../redux/redux-actions/adminActions";
+import {
+  reduxLoadAuthAdmin,
+  reduxToggleUniversalModal,
+} from "../../../../redux/redux-actions/adminActions";
 
 const MOU = "mou";
-function ViewFullPolicy() {
+function ViewFullPolicy({ confirmDecline }) {
   const [policy, setPolicy] = useState(LOADING);
   const [loading, setLoading] = useState(null);
 
@@ -20,11 +23,31 @@ function ViewFullPolicy() {
   const { policyKey } = useParams();
   const isMOU = MOU === policyKey;
 
+  const toggleConfirmationDialog = (show, options = {}) => {
+    confirmDecline({
+      show,
+      component: (
+        <ConfirmationModal
+          {...options || {}}
+          accept={() => null}
+          defer={() => null}
+          decline={() => null}
+          close={() => confirmDecline({ show: false })}
+        />
+      ),
+      fullControl: true,
+      contentStyle: { minWidth: 450 },
+    });
+  };
+
   useEffect(() => {
     const found = (policies || []).find((item) => item.key === policyKey);
     if (found) setPolicy(found);
   }, [policies]);
 
+  const signUserOut = () => { 
+
+  }
   const respond = ({ accept, type }) => {
     setLoading(type);
     apiCall("/users.mou.accept", { accept, policy_key: policyKey }).then(
@@ -55,7 +78,11 @@ function ViewFullPolicy() {
         {policy?.name || "..."}
       </Typography>
 
-      <BFooter isMOU={isMOU} loading={loading} respond={respond} />
+      <BFooter
+        isMOU={isMOU}
+        loading={loading}
+        respond={toggleConfirmationDialog}
+      />
       {/* --------------------------------------------------- */}
       <MEPaperBlock
         containerStyle={{ padding: 0, height: "auto", minHeight: "auto" }}
@@ -119,6 +146,7 @@ const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       setAuthUser: reduxLoadAuthAdmin,
+      confirmDecline: reduxToggleUniversalModal,
     },
     dispatch
   );
@@ -133,8 +161,120 @@ export default connect(
   /* --------------------------------------------------- */
 }
 
+const ConfirmationModal = ({
+  type = "accept",
+  close,
+  defer,
+  decline,
+  accept,
+}) => {
+  const states = {
+    accept: {
+      title: "You are almost there!",
+      subtext: "This is what it means to accept:",
+      content: (
+        <>
+          <ol style={{ listStyleType: "decimal" }}>
+            <li>
+              You will receive a confirmation email of your signed document
+            </li>
+            <li>You will continue with all your admin rights</li>
+            <li>You will only be reminded to sign again in a year's time</li>
+          </ol>
+        </>
+      ),
+      okText: "Yes, Proceed",
+      action: accept,
+    },
+    defer: {
+      title: "Are you sure you want to defer?",
+      subtext: "What it means to defer: ",
+      content: (
+        <Typography variant="body">
+          You will be signed out, and will be brought back to this page the next
+          time you sign in again.
+        </Typography>
+      ),
+      okText: "Yes, Defer",
+      action: defer,
+    },
+    decline: {
+      title: "Are you sure you want to decline?",
+      subtext: "What it means to decline:",
+      okText: "Yes, Decline",
+      content: (
+        <>
+          <ol style={{ listStyleType: "decimal" }}>
+            <li>You will be signed out</li>
+            <li>You will no longer be an admin (all rights revoked)</li>
+          </ol>
+        </>
+      ),
+      action: decline,
+    },
+  };
+
+  const { title, subtext, content, okText, action } = states[type] || {};
+  return (
+    <div>
+      <div style={{ padding: "10px 25px" }}>
+        {title && (
+          <Typography variant="h6" style={{ fontWeight: "bold", fontSize: 16 }}>
+            {title}
+          </Typography>
+        )}
+        {subtext && (
+          <Typography variant="body2" style={{ fontWeight: "bold" }}>
+            {subtext}
+          </Typography>
+        )}
+        {content && <div style={{ padding: "10px 20px" }}>{content}</div>}
+      </div>
+      <div style={{ background: "#fbfbfb", display: "flex" }}>
+        <div style={{ marginLeft: "auto" }}>
+          <Button
+            className="touchable-opacity"
+            style={{
+              borderRadius: 0,
+              padding: 10,
+              width: 130,
+              fontSize: 13,
+              fontWeight: "bold",
+            }}
+            variant="contained"
+            color="error"
+            onClick={() => close && close()}
+          >
+            Cancel
+          </Button>
+          <Button
+            className="touchable-opacity"
+            style={{
+              borderRadius: 0,
+              padding: 10,
+              width: 130,
+              fontSize: 13,
+              fontWeight: "bold",
+            }}
+            variant="contained"
+            color="success"
+            onClick={() => action && action()}
+          >
+            {okText || "Yes, Proceed"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
 const BFooter = ({ isMOU, loading, respond }) => {
   if (!isMOU) return <></>;
+  const btnStyles = {
+    borderRadius: 0,
+    padding: 10,
+    width: 180,
+    fontWeight: "bold",
+  };
   return (
     <MEPaperBlock
       containerStyle={{
@@ -157,13 +297,11 @@ const BFooter = ({ isMOU, loading, respond }) => {
       <div style={{ background: "#fbfbfb" }}>
         <Button
           className="touchable-opacity"
-          style={{
-            borderRadius: 0,
-            padding: 10,
-            width: 180,
-          }}
+          style={{ ...btnStyles }}
           variant="contained"
           color="success"
+          disabled={loading}
+          onClick={() => respond("accept", { type: "accept" })}
         >
           {loading === "yes" && (
             <i
@@ -173,16 +311,24 @@ const BFooter = ({ isMOU, loading, respond }) => {
           )}
           Yes, I accept
         </Button>
+
         <Button
           className="touchable-opacity"
-          style={{
-            borderRadius: 0,
-            padding: 10,
-            width: 180,
-            // background: "#d97c7c",
-          }}
+          style={{ ...btnStyles }}
+          variant="contained"
+          color="secondary"
+          disabled={loading}
+          onClick={() => respond("defer", { type: "defer" })}
+        >
+          Defer
+        </Button>
+        <Button
+          className="touchable-opacity"
+          style={{ ...btnStyles }}
           variant="contained"
           color="error"
+          disabled={loading}
+          onClick={() => respond("decline", { type: "decline" })}
         >
           {loading === "no" && (
             <i

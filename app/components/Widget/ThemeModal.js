@@ -29,9 +29,11 @@ function ThemeModal({
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">
-          {"Confirmation Dialog"}
-        </DialogTitle>
+        {!fullControl && (
+          <DialogTitle id="alert-dialog-title">
+            {"Confirmation Dialog"}
+          </DialogTitle>
+        )}
         <DialogContent
           style={
             fullControl
