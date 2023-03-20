@@ -296,7 +296,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       otherCommunities,
       adminNextSteps,
     ] = response;
-    dispatch(loadAllPolicies(policies.data))
+    dispatch(loadAllPolicies(policies.data));
     dispatch(reduxLoadAllCommunities(communities.data));
     dispatch(loadAllActions(actions.data));
     dispatch(loadAllEvents(events.data));
@@ -329,7 +329,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       tagCollections: tagCollections.cursor,
       otherCommunities: otherCommunities.cursor,
       testimonials: testimonials.cursor,
-      policies: policies.cursor
+      policies: policies.cursor,
     };
     dispatch(reduxLoadMetaDataAction(cursor));
   });
@@ -560,7 +560,7 @@ export const reduxFetchImages = (community_ids = [], callback) => {
     .catch((e) => console.log("GALLERY_FETCH_ERROR:", e.toString()));
 };
 
-export const reduxSignOut = () => (dispatch) => {
+export const reduxSignOut = (cb) => (dispatch) => {
   if (firebase) {
     firebase
       .auth()
@@ -573,6 +573,7 @@ export const reduxSignOut = () => (dispatch) => {
       });
 
     apiCall("/auth.logout").then(() => {
+      cb && cb();
       console.log("Signed Out");
     });
   }

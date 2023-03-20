@@ -5,17 +5,22 @@ import { LOADING } from "../../../../utils/constants";
 import MEPaperBlock from "../../ME  Tools/paper block/MEPaperBlock";
 import LinearBuffer from "../../../../components/Massenergize/LinearBuffer";
 import { Button, Typography } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import RichTextToPDF from "../../ME  Tools/to pdf/RichTextToPDF";
 import { apiCall } from "../../../../utils/messenger";
 import { bindActionCreators } from "redux";
 import {
   reduxLoadAuthAdmin,
+  reduxSignOut,
   reduxToggleUniversalModal,
 } from "../../../../redux/redux-actions/adminActions";
 
 const MOU = "mou";
-function ViewFullPolicy({ confirmDecline }) {
+const ACCEPT = "accept";
+const DECLINE = "decline";
+const DEFER = "defer";
+function ViewFullPolicy({ confirmDecline, signOut }) {
+  const history = useHistory();
   const [policy, setPolicy] = useState(LOADING);
   const [loading, setLoading] = useState(null);
 
@@ -29,13 +34,14 @@ function ViewFullPolicy({ confirmDecline }) {
       component: (
         <ConfirmationModal
           {...options || {}}
-          accept={() => null}
-          defer={() => null}
-          decline={() => null}
+          accept={respond}
+          defer={signUserOut}
+          decline={respond}
           close={() => confirmDecline({ show: false })}
         />
       ),
       fullControl: true,
+      closeAfterConfirmation: true,
       contentStyle: { minWidth: 450 },
     });
   };
@@ -45,15 +51,22 @@ function ViewFullPolicy({ confirmDecline }) {
     if (found) setPolicy(found);
   }, [policies]);
 
-  const signUserOut = () => { 
-
-  }
+  const signUserOut = () => {
+    signOut(() => history.push("/login"));
+  };
   const respond = ({ accept, type }) => {
     setLoading(type);
     apiCall("/users.mou.accept", { accept, policy_key: policyKey }).then(
       (response) => {
+        setLoading(null);
         if (!response.success)
           return console.log("ERROR RESPONDING:", response.error);
+        if (accept) {
+          // Set the authenticated user that will be returned from this in redux
+          // Then redirect back to dashboard
+        }
+        // If the user declined and the response was successfull, signed them out here
+        // And go back to login page
       }
     );
   };
@@ -81,7 +94,7 @@ function ViewFullPolicy({ confirmDecline }) {
       <BFooter
         isMOU={isMOU}
         loading={loading}
-        respond={toggleConfirmationDialog}
+        confirm={toggleConfirmationDialog}
       />
       {/* --------------------------------------------------- */}
       <MEPaperBlock
@@ -147,6 +160,7 @@ const mapDispatchToProps = (dispatch) => {
     {
       setAuthUser: reduxLoadAuthAdmin,
       confirmDecline: reduxToggleUniversalModal,
+      signOut: reduxSignOut,
     },
     dispatch
   );
@@ -169,7 +183,7 @@ const ConfirmationModal = ({
   accept,
 }) => {
   const states = {
-    accept: {
+    [ACCEPT]: {
       title: "You are almost there!",
       subtext: "This is what it means to accept:",
       content: (
@@ -184,9 +198,9 @@ const ConfirmationModal = ({
         </>
       ),
       okText: "Yes, Proceed",
-      action: accept,
+      action: () => accept && accept({ accept: true, type: ACCEPT }),
     },
-    defer: {
+    [DEFER]: {
       title: "Are you sure you want to defer?",
       subtext: "What it means to defer: ",
       content: (
@@ -198,7 +212,7 @@ const ConfirmationModal = ({
       okText: "Yes, Defer",
       action: defer,
     },
-    decline: {
+    [DECLINE]: {
       title: "Are you sure you want to decline?",
       subtext: "What it means to decline:",
       okText: "Yes, Decline",
@@ -210,7 +224,7 @@ const ConfirmationModal = ({
           </ol>
         </>
       ),
-      action: decline,
+      action: () => accept && accept({ accept: false, type: DECLINE }),
     },
   };
 
@@ -267,7 +281,7 @@ const ConfirmationModal = ({
     </div>
   );
 };
-const BFooter = ({ isMOU, loading, respond }) => {
+const BFooter = ({ isMOU, loading, confirm }) => {
   if (!isMOU) return <></>;
   const btnStyles = {
     borderRadius: 0,
@@ -301,9 +315,9 @@ const BFooter = ({ isMOU, loading, respond }) => {
           variant="contained"
           color="success"
           disabled={loading}
-          onClick={() => respond("accept", { type: "accept" })}
+          onClick={() => confirm("accept", { type: "accept" })}
         >
-          {loading === "yes" && (
+          {loading === ACCEPT && (
             <i
               style={{ color: "white", marginRight: 6 }}
               className="fa fa-spinner fa-spin"
@@ -318,7 +332,7 @@ const BFooter = ({ isMOU, loading, respond }) => {
           variant="contained"
           color="secondary"
           disabled={loading}
-          onClick={() => respond("defer", { type: "defer" })}
+          onClick={() => confirm("defer", { type: "defer" })}
         >
           Defer
         </Button>
@@ -328,9 +342,9 @@ const BFooter = ({ isMOU, loading, respond }) => {
           variant="contained"
           color="error"
           disabled={loading}
-          onClick={() => respond("decline", { type: "decline" })}
+          onClick={() => confirm("decline", { type: "decline" })}
         >
-          {loading === "no" && (
+          {loading === DECLINE && (
             <i
               style={{ color: "white", marginRight: 6 }}
               className="fa fa-spinner fa-spin"
