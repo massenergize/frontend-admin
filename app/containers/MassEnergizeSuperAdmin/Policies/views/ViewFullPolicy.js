@@ -19,7 +19,7 @@ const MOU = "mou";
 const ACCEPT = "accept";
 const DECLINE = "decline";
 const DEFER = "defer";
-function ViewFullPolicy({ confirmDecline, signOut }) {
+function ViewFullPolicy({ showModal, signOut, auth, putAdminInRedux }) {
   const history = useHistory();
   const [policy, setPolicy] = useState(LOADING);
   const [loading, setLoading] = useState(null);
@@ -29,7 +29,7 @@ function ViewFullPolicy({ confirmDecline, signOut }) {
   const isMOU = MOU === policyKey;
 
   const toggleConfirmationDialog = (show, options = {}) => {
-    confirmDecline({
+    showModal({
       show,
       component: (
         <ConfirmationModal
@@ -37,7 +37,8 @@ function ViewFullPolicy({ confirmDecline, signOut }) {
           accept={respond}
           defer={signUserOut}
           decline={respond}
-          close={() => confirmDecline({ show: false })}
+          close={() => showModal({ show: false })}
+          auth={auth}
         />
       ),
       fullControl: true,
@@ -56,17 +57,17 @@ function ViewFullPolicy({ confirmDecline, signOut }) {
   };
   const respond = ({ accept, type }) => {
     setLoading(type);
+    if (loading) return;
     apiCall("/users.mou.accept", { accept, policy_key: policyKey }).then(
       (response) => {
         setLoading(null);
         if (!response.success)
           return console.log("ERROR RESPONDING:", response.error);
-        if (accept) {
-          // Set the authenticated user that will be returned from this in redux
-          // Then redirect back to dashboard
-        }
-        // If the user declined and the response was successfull, signed them out here
-        // And go back to login page
+        if (!accept) signUserOut();
+
+        console.log("REPONSE AFTER ACCEPTING", response);
+        // putAdminInRedux(response.data); 
+        window.location.href = "/"
       }
     );
   };
@@ -101,7 +102,10 @@ function ViewFullPolicy({ confirmDecline, signOut }) {
         containerStyle={{ padding: 0, height: "auto", minHeight: "auto" }}
       >
         <div style={{ padding: "25px 65px" }}>
-          <Typography variant="h6">Please do one of the following</Typography>
+          <Typography variant="h6">
+            Hi <b>{auth?.full_name || "..."}</b>, please do one of the
+            following:{" "}
+          </Typography>
           <ol style={{ listStyleType: "decimal", marginTop: 6 }}>
             <li>
               Review, <b>accept</b> and continue as admin
@@ -149,17 +153,23 @@ function ViewFullPolicy({ confirmDecline, signOut }) {
       </MEPaperBlock>
       {/* --------------------------------------------------- */}
       <MEPaperBlock>
-        <div dangerouslySetInnerHTML={{ __html: policy?.description }} />
+        <div
+          dangerouslySetInnerHTML={{
+            __html: policy?.description,
+          }}
+        />
       </MEPaperBlock>
     </div>
   );
 }
-
+const mapStateToProps = (state) => {
+  return { auth: state.getIn(["auth"]) };
+};
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
-      setAuthUser: reduxLoadAuthAdmin,
-      confirmDecline: reduxToggleUniversalModal,
+      putAdminInRedux: reduxLoadAuthAdmin,
+      showModal: reduxToggleUniversalModal,
       signOut: reduxSignOut,
     },
     dispatch
@@ -167,7 +177,7 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(ViewFullPolicy);
 
@@ -181,6 +191,7 @@ const ConfirmationModal = ({
   defer,
   decline,
   accept,
+  auth,
 }) => {
   const states = {
     [ACCEPT]: {
@@ -194,11 +205,18 @@ const ConfirmationModal = ({
             </li>
             <li>You will continue with all your admin rights</li>
             <li>You will only be reminded to sign again in a year's time</li>
+            <li>
+              Your full name <b>"{auth?.full_name}"</b> will be used to sign the
+              document
+            </li>
           </ol>
         </>
       ),
       okText: "Yes, Proceed",
-      action: () => accept && accept({ accept: true, type: ACCEPT }),
+      action: () => {
+        accept && accept({ accept: true, type: ACCEPT });
+        close && close();
+      },
     },
     [DEFER]: {
       title: "Are you sure you want to defer?",
@@ -210,7 +228,10 @@ const ConfirmationModal = ({
         </Typography>
       ),
       okText: "Yes, Defer",
-      action: defer,
+      action: () => {
+        defer && defer();
+        close && close();
+      },
     },
     [DECLINE]: {
       title: "Are you sure you want to decline?",
@@ -224,14 +245,17 @@ const ConfirmationModal = ({
           </ol>
         </>
       ),
-      action: () => accept && accept({ accept: false, type: DECLINE }),
+      action: () => {
+        accept && accept({ accept: false, type: DECLINE });
+        close && close();
+      },
     },
   };
 
   const { title, subtext, content, okText, action } = states[type] || {};
   return (
     <div>
-      <div style={{ padding: "10px 25px" }}>
+      <div style={{ padding: "10px 25px", color: "black" }}>
         {title && (
           <Typography variant="h6" style={{ fontWeight: "bold", fontSize: 16 }}>
             {title}
@@ -242,7 +266,9 @@ const ConfirmationModal = ({
             {subtext}
           </Typography>
         )}
-        {content && <div style={{ padding: "10px 20px" }}>{content}</div>}
+        {content && (
+          <div style={{ padding: "10px 20px", color: "black" }}>{content}</div>
+        )}
       </div>
       <div style={{ background: "#fbfbfb", display: "flex" }}>
         <div style={{ marginLeft: "auto" }}>
@@ -314,7 +340,7 @@ const BFooter = ({ isMOU, loading, confirm }) => {
           style={{ ...btnStyles }}
           variant="contained"
           color="success"
-          disabled={loading}
+          disabled={loading && loading !== ACCEPT}
           onClick={() => confirm("accept", { type: "accept" })}
         >
           {loading === ACCEPT && (
@@ -331,17 +357,17 @@ const BFooter = ({ isMOU, loading, confirm }) => {
           style={{ ...btnStyles }}
           variant="contained"
           color="secondary"
-          disabled={loading}
+          disabled={loading && loading !== DEFER}
           onClick={() => confirm("defer", { type: "defer" })}
         >
           Defer
         </Button>
         <Button
           className="touchable-opacity"
-          style={{ ...btnStyles }}
+          style={{ ...btnStyles, minWidth: 240 }}
           variant="contained"
           color="error"
-          disabled={loading}
+          disabled={loading && loading !== DECLINE}
           onClick={() => confirm("decline", { type: "decline" })}
         >
           {loading === DECLINE && (
@@ -350,7 +376,7 @@ const BFooter = ({ isMOU, loading, confirm }) => {
               className="fa fa-spinner fa-spin"
             />
           )}
-          No, I Don't Accept
+          No, I Don't Accept (DELETE)
         </Button>
       </div>
     </MEPaperBlock>
