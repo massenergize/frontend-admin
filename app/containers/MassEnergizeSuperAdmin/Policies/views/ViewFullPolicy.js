@@ -66,8 +66,8 @@ function ViewFullPolicy({ showModal, signOut, auth, putAdminInRedux }) {
         if (!accept) signUserOut();
 
         console.log("REPONSE AFTER ACCEPTING", response);
-        // putAdminInRedux(response.data); 
-        window.location.href = "/"
+        // putAdminInRedux(response.data);
+        window.location.href = "/";
       }
     );
   };
@@ -92,11 +92,6 @@ function ViewFullPolicy({ showModal, signOut, auth, putAdminInRedux }) {
         {policy?.name || "..."}
       </Typography>
 
-      <BFooter
-        isMOU={isMOU}
-        loading={loading}
-        confirm={toggleConfirmationDialog}
-      />
       {/* --------------------------------------------------- */}
       <MEPaperBlock
         containerStyle={{ padding: 0, height: "auto", minHeight: "auto" }}
@@ -159,6 +154,11 @@ function ViewFullPolicy({ showModal, signOut, auth, putAdminInRedux }) {
           }}
         />
       </MEPaperBlock>
+      <BFooter
+        isMOU={isMOU}
+        loading={loading}
+        confirm={toggleConfirmationDialog}
+      />
     </div>
   );
 }
