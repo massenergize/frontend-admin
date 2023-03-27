@@ -52,6 +52,7 @@ import CallMadeIcon from "@mui/icons-material/CallMade";
 import { FROM } from "../../../utils/constants";
 import Loader from "../../../utils/components/Loader";
 import StarRateIcon from "@mui/icons-material/StarRate";
+import HomeIcon from "@mui/icons-material/Home";
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
@@ -152,15 +153,16 @@ class AllEvents extends React.Component {
               <div>
                 {<span>{d?.name}</span>}
                 {d?.is_on_home_page && (
-                  <StarsIcon
-                    size="small"
-                    variant="outlined"
-                    color="secondary"
-                    sx={{
-                      fontSize: 19,
-                      // marginBottom: 1,
-                    }}
-                  />
+                  <Tooltip title="Event is live on community homepage">
+                    <StarsIcon
+                      size="small"
+                      variant="outlined"
+                      color="secondary"
+                      sx={{
+                        fontSize: 19,
+                      }}
+                    />
+                  </Tooltip>
                 )}
               </div>
             );
@@ -260,8 +262,7 @@ class AllEvents extends React.Component {
                   />
                 </Link>
               )}
-              {/* {auth && auth.cadmin && ( */}
-              <Tooltip title="Add/Remove event to community homepage">
+              <Tooltip title="Add/Remove event to/from community homepage">
                 <Link
                   onClick={() => {
                     console.log("clicked");
@@ -273,14 +274,23 @@ class AllEvents extends React.Component {
                     });
                   }}
                 >
-                  <StarRateIcon
+                  <HomeIcon
                     size="small"
                     variant="outlined"
-                    color="secondary"
+                    sx={{
+                      color: "rgb(65 172 65)",
+                    }}
                   />
+                  {/* <StarRateIcon
+                    size="small"
+                    variant="outlined"
+                    // color="secondary"
+                    sx={{
+                      color: "rgb(65 172 65)",
+                    }}
+                  /> */}
                 </Link>
               </Tooltip>
-              {/* )} */}
             </div>
           ),
         },
