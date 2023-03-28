@@ -233,6 +233,8 @@ function MediaLibraryModal({
             </div>
           </div>
           <Footer
+            uploading={state.uploading}
+            upload={handleUpload}
             TooltipWrapper={TooltipWrapper}
             images={images}
             files={files}
@@ -250,22 +252,81 @@ function MediaLibraryModal({
   );
 }
 
-const Footer = ({
+const ContextButton = ({
   content,
-  cancel,
-  insert,
-  images,
   currentTab,
+  files,
+  insert,
   cropLoot,
   finaliseCropping,
   TooltipWrapper,
+  uploading,
 }) => {
+  const withWrapper = (text, tooltipMessage) => {
+    if (!TooltipWrapper) return <span>{text}</span>;
+    return (
+      <TooltipWrapper title={tooltipMessage || ""} placement="top">
+        <span>{text}</span>
+      </TooltipWrapper>
+    );
+  };
+  const len = content && content.length;
+  const availableButtons = {
+    [TABS.LIBRARY_TAB]: (
+      <button
+        className="ml-footer-btn"
+        style={{ "--btn-color": "white", "--btn-background": "green" }}
+        onClick={(e) => {
+          e.preventDefault();
+          insert();
+        }}
+        disabled={!len}
+      >
+        {withWrapper(
+          `INSERT ${len > 0 ? `(${len})` : ""}`,
+          "Select an iamge from the list to insert"
+        )}
+      </button>
+    ),
+    [TABS.CROPPING_TAB]: (
+      <button
+        className="ml-footer-btn"
+        style={{ "--btn-color": "white", "--btn-background": "green" }}
+        onClick={(e) => {
+          e.preventDefault();
+          finaliseCropping && finaliseCropping();
+        }}
+        disabled={!cropLoot}
+      >
+        CROP
+      </button>
+    ),
+    [TABS.UPLOAD_TAB]: (
+      <button
+        className="ml-footer-btn"
+        style={{ "--btn-color": "white", "--btn-background": "green" }}
+        onClick={(e) => {
+          e.preventDefault();
+          // finaliseCropping && finaliseCropping();
+        }}
+        disabled={uploading || !files.length}
+      >
+        {withWrapper(
+          "UPLOAD & INSERT",
+          "Your selected image will be uploaded and preselected"
+        )}
+      </button>
+    ),
+  };
+
+  return availableButtons[currentTab] || <></>;
+};
+
+const Footer = (props) => {
+  const { cancel, images, currentTab } = props;
   const isCropping = currentTab === TABS.CROPPING_TAB;
   const isUploadTab = currentTab === TABS.UPLOAD_TAB;
-  const tooltipMessageWhenDisabled = isUploadTab
-    ? "Click the upload button to upload first, then you can insert your image"
-    : "Select an image from the list to insert";
-  const len = content && content.length;
+
   return (
     <div className="ml-footer">
       <h3
@@ -287,8 +348,9 @@ const Footer = ({
         <MLButton backColor="maroon" btnColor="white" onClick={cancel}>
           CANCEL
         </MLButton>
+        <ContextButton {...props} />
 
-        {isCropping ? (
+        {/* {isCropping ? (
           <button
             className="ml-footer-btn"
             style={{ "--btn-color": "white", "--btn-background": "green" }}
@@ -321,7 +383,7 @@ const Footer = ({
               `INSERT ${len > 0 ? `(${len})` : ""}`
             )}
           </button>
-        )}
+        )} */}
       </div>
     </div>
   );
