@@ -83,16 +83,13 @@ class AllEvents extends React.Component {
         image: d.image,
         initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`,
       },
-      {
-        name: smartString(d.name),
-        is_on_home_page: d.is_on_home_page,
-      },
+      smartString(d.name),
       `${
         smartString(d.tags.map((t) => t.name).join(", "), 30) // limit to first 30 chars
       }`,
       d.is_global ? "Template" : d.community && d.community.name,
       { isLive: d.is_published, item: d },
-      d.id,
+      { id: d.id,  is_on_home_page: d.is_on_home_page},
       d.is_published ? "Yes" : "No",
       d.is_global,
       getHumanFriendlyDate(d.start_date_and_time, true, false),
@@ -148,25 +145,6 @@ class AllEvents extends React.Component {
         key: "name",
         options: {
           filter: false,
-          customBodyRender: (d) => {
-            return (
-              <div>
-                {<span>{d?.name}</span>}
-                {d?.is_on_home_page && (
-                  <Tooltip title="Event is live on community homepage">
-                    <StarsIcon
-                      size="small"
-                      variant="outlined"
-                      color="secondary"
-                      sx={{
-                        fontSize: 19,
-                      }}
-                    />
-                  </Tooltip>
-                )}
-              </div>
-            );
-          },
         },
       },
       {
@@ -218,7 +196,7 @@ class AllEvents extends React.Component {
           filter: false,
           download: false,
           sort: false,
-          customBodyRender: (id) => (
+          customBodyRender: ({ id, is_on_home_page }) => (
             <div style={{ display: "flex" }}>
               <Link to={`/admin/edit/${id}/event`}>
                 <EditIcon
@@ -262,7 +240,10 @@ class AllEvents extends React.Component {
                   />
                 </Link>
               )}
-              <Tooltip title="Add/Remove event to/from community homepage">
+              <Tooltip
+                title={`${is_on_home_page ? "Remove" : "Add"} event ${
+                  is_on_home_page ? "from" : "to" } community's homepage`}
+              >
                 <Link
                   onClick={() => {
                     console.log("clicked");
@@ -274,21 +255,21 @@ class AllEvents extends React.Component {
                     });
                   }}
                 >
-                  <HomeIcon
-                    size="small"
-                    variant="outlined"
-                    sx={{
-                      color: "rgb(65 172 65)",
-                    }}
-                  />
-                  {/* <StarRateIcon
-                    size="small"
-                    variant="outlined"
-                    // color="secondary"
-                    sx={{
-                      color: "rgb(65 172 65)",
-                    }}
-                  /> */}
+                  {is_on_home_page ? (
+                    <HomeIcon
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        color: "rgb(65 172 65)",
+                      }}
+                    />
+                  ) : (
+                    <HomeIcon
+                      size="small"
+                      variant="outlined"
+                      color={"secondary"}
+                    />
+                  )}
                 </Link>
               </Tooltip>
             </div>
