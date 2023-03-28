@@ -102,6 +102,7 @@ export const FormMediaLibraryImplementation = (props) => {
   return (
     <div>
       <MediaLibrary
+        defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
         images={(imagesObject && imagesObject.images) || []}
         actionText="Select From Library"
         sourceExtractor={(item) => item && item.url}
@@ -152,6 +153,11 @@ export const FormMediaLibraryImplementation = (props) => {
               {children}
             </Tooltip>
           );
+        }}
+        tabModifiers={{
+          [MediaLibrary.Tabs.LIBRARY_TAB]: {
+            name: "Choose From Media Library",
+          },
         }}
         {...props}
         selected={defaultValue}

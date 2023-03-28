@@ -43,6 +43,7 @@ function MediaLibraryModal({
   sideExtraComponent,
   renderBeforeImages,
   TooltipWrapper,
+  tabModifiers,
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -93,10 +94,15 @@ function MediaLibraryModal({
     loadMoreFunction(() => setLoadingMore(false), close);
   };
 
+  const customName = (key, _default) => {
+    const modifier = (tabModifiers || {})[key];
+    return modifier?.name || _default || "...";
+  };
+
   var Tabs = [
     {
-      headerName: "Upload",
-      key: "upload",
+      headerName: customName(TABS.UPLOAD_TAB, "Upload"),
+      key: TABS.UPLOAD_TAB,
       component: (
         <Upload
           maximumImageSize={maximumImageSize}
@@ -120,8 +126,8 @@ function MediaLibraryModal({
       ),
     },
     {
-      headerName: "Library",
-      key: "library",
+      headerName: customName(TABS.LIBRARY_TAB, "Library"),
+      key: TABS.LIBRARY_TAB,
       component: (
         <Suspense fallback={<p>Loading...</p>}>
           <Library
@@ -144,8 +150,8 @@ function MediaLibraryModal({
       ),
     },
     {
-      headerName: "Crop",
-      key: "crop",
+      headerName: customName(TABS.CROPPING_TAB, "crop"),
+      key: TABS.CROPPING_TAB,
       component: (
         <Cropping
           setCurrentTab={setCurrentTab}
