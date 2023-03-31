@@ -69,14 +69,25 @@ function MediaLibraryModal({
       return file;
     });
   };
-  const handleUpload = () => {
+  const returnRightAfterUpload = (images) => {
+    handleInsert(images, reset);
+  };
+  const handleUpload = ({ quickReturn = false }) => {
     if (!onUpload) return;
     setState((prev) => ({ ...prev, uploading: true }));
-    onUpload(clean(files), reset, close, setCurrentTab);
+
+    onUpload(
+      clean(files),
+      reset,
+      close,
+      setCurrentTab,
+      quickReturn && returnRightAfterUpload
+    );
   };
 
-  const handleInsert = () => {
-    getSelected(content, reset);
+  const handleInsert = (_content) => {
+   
+    getSelected(_content, reset);
     close();
   };
 
@@ -241,7 +252,7 @@ function MediaLibraryModal({
             content={content}
             multiple={multiple}
             cancel={close}
-            insert={handleInsert}
+            insert={() => handleInsert(content)}
             currentTab={currentTab}
             cropLoot={cropLoot}
             finaliseCropping={finaliseCropping}
@@ -261,8 +272,9 @@ const ContextButton = ({
   finaliseCropping,
   TooltipWrapper,
   uploading,
+  upload,
 }) => {
-  const withWrapper = (text, tooltipMessage) => {
+  const withWrapper = (text, tooltipMessage) => {;
     if (!TooltipWrapper) return <span>{text}</span>;
     return (
       <TooltipWrapper title={tooltipMessage || ""} placement="top">
@@ -284,7 +296,7 @@ const ContextButton = ({
       >
         {withWrapper(
           `INSERT ${len > 0 ? `(${len})` : ""}`,
-          "Select an iamge from the list to insert"
+          "Select an image from the list to insert"
         )}
       </button>
     ),
@@ -307,13 +319,13 @@ const ContextButton = ({
         style={{ "--btn-color": "white", "--btn-background": "green" }}
         onClick={(e) => {
           e.preventDefault();
-          // finaliseCropping && finaliseCropping();
+          upload({ quickReturn: true });
         }}
         disabled={uploading || !files.length}
       >
         {withWrapper(
           "UPLOAD & INSERT",
-          "Your selected image will be uploaded and preselected"
+          "Your chosen image will be uploaded and inserted right away"
         )}
       </button>
     ),

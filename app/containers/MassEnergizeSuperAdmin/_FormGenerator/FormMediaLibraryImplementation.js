@@ -54,7 +54,7 @@ export const FormMediaLibraryImplementation = (props) => {
     });
   };
 
-  const handleUpload = (files, reset, _, changeTabTo) => {
+  const handleUpload = (files, reset, _, changeTabTo, immediately) => {
     const isUniversal = available ? { is_universal: true } : {};
     const apiJson = {
       user_id: auth.id,
@@ -81,6 +81,7 @@ export const FormMediaLibraryImplementation = (props) => {
           append: true,
           prepend: true,
         });
+        if (immediately) return immediately(images, response);
         reset();
         changeTabTo(MediaLibrary.Tabs.LIBRARY_TAB);
       })

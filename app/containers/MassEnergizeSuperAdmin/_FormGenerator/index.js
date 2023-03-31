@@ -411,7 +411,9 @@ class MassEnergizeForm extends Component {
             cleanedValues[field.dbName] = fieldValueInForm;
             break;
           case FieldTypes.DateTime:
-            cleanedValues[field.dbName] = (moment.utc(fieldValueInForm)|| moment.now()).format();
+            cleanedValues[field.dbName] = (
+              moment.utc(fieldValueInForm) || moment.now()
+            ).format();
             break;
           case FieldTypes.Checkbox:
             // If two or more items have the same dbName, the get combined into an array
@@ -827,6 +829,7 @@ class MassEnergizeForm extends Component {
             <br />
             <FormMediaLibraryImplementation
               {...field}
+              selected={this.getValue(field.name, field.defaultValue, field)}
               actionText={field.placeholder}
               onInsert={(files) => {
                 const formData = this.state.formData || {};
@@ -1104,11 +1107,7 @@ class MassEnergizeForm extends Component {
                 <DateTimePicker
                   {...field}
                   renderInput={(props) => <TextField {...props} />}
-                  value={this.getValue(
-                    field.name,
-                    field.defaultValue,
-                    field
-                  )}
+                  value={this.getValue(field.name, field.defaultValue, field)}
                   onChange={(date) => {
                     this.handleFormDataChange(
                       {
@@ -1169,7 +1168,7 @@ class MassEnergizeForm extends Component {
   renderFields = (fields) =>
     fields.map((field, key) => (
       <div key={`${field.name}-${key.toString()}`}>
-        <div style={{marginBottom:15}}>{this.renderModalText(field)}</div>
+        <div style={{ marginBottom: 15 }}>{this.renderModalText(field)}</div>
 
         {this.renderField(field)}
       </div>
