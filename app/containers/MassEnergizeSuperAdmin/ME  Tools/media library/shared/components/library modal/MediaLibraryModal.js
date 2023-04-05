@@ -361,41 +361,6 @@ const Footer = (props) => {
           CANCEL
         </MLButton>
         <ContextButton {...props} />
-
-        {/* {isCropping ? (
-          <button
-            className="ml-footer-btn"
-            style={{ "--btn-color": "white", "--btn-background": "green" }}
-            onClick={(e) => {
-              e.preventDefault();
-              finaliseCropping && finaliseCropping();
-            }}
-            disabled={!cropLoot}
-          >
-            CROP
-          </button>
-        ) : (
-          <button
-            className="ml-footer-btn"
-            style={{ "--btn-color": "white", "--btn-background": "green" }}
-            onClick={(e) => {
-              e.preventDefault();
-              insert();
-            }}
-            disabled={!len}
-          >
-            {TooltipWrapper ? (
-              <TooltipWrapper
-                title={tooltipMessageWhenDisabled}
-                placement="top"
-              >
-                <span>INSERT {len > 0 ? `(${len})` : ""}</span>
-              </TooltipWrapper>
-            ) : (
-              `INSERT ${len > 0 ? `(${len})` : ""}`
-            )}
-          </button>
-        )} */}
       </div>
     </div>
   );
