@@ -33,8 +33,14 @@ import {
 } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
-import { withRouter } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import Loader from "../../../utils/components/Loader";
+import {
+  ArrowRight,
+  ArrowRightTwoTone,
+  KeyboardArrowRight,
+} from "@mui/icons-material";
+import RenderVisitLogs from "./RenderVisitLogs";
 
 class AllUsers extends React.Component {
   constructor(props) {
@@ -155,6 +161,26 @@ class AllUsers extends React.Component {
         filter: true,
       },
     },
+    {
+      name: "Last Visited",
+      key: "last-visited",
+      options: {
+        filter: false,
+        download: false,
+        customBodyRender: (id) => {
+          return (
+            <Link
+              onClick={(e) => {
+                e.preventDefault();
+                this.showVisitRecords(id);
+              }}
+            >
+              <span>View Records</span>
+            </Link>
+          );
+        },
+      },
+    },
   ];
 
   nowDelete({ idsToDelete, data }) {
@@ -193,6 +219,21 @@ class AllUsers extends React.Component {
         {len === 1 ? " user? " : " users? "}
       </Typography>
     );
+  }
+
+  showVisitRecords(id) {
+    const { toggleModal } = this.props;
+    toggleModal({
+      show: true,
+      component: <RenderVisitLogs id={id} />,
+      // onConfirm: () => this.nowDelete({ idsToDelete, data }),
+      closeAfterConfirmation: true,
+      // contentStyle: { width: 400, height: 200 },
+      fullControl: true,
+      noTitle: true,
+      // onCancel: () => toggleModal({ show: false, component: null }),
+      // title: ""
+    });
   }
   render() {
     const title = brand.name + " - Users";
@@ -337,12 +378,14 @@ function mapStateToProps(state) {
     tableFilters: state.getIn(["tableFilters"]),
   };
 }
+
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
       fetchUsers: fetchUsersFromBackend,
       putUsersInRedux: loadAllUsers,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleModal: reduxToggleUniversalModal,
       toggleToast: reduxToggleUniversalToast,
       putMetaDataToRedux: reduxLoadMetaDataAction,
       updateTableFilters: reduxLoadTableFilters,

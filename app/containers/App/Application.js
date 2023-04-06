@@ -202,22 +202,13 @@ class Application extends React.Component {
       />,
     ];
 
-    const {
-      component,
-      show,
-      onConfirm,
-      onCancel,
-      closeAfterConfirmation,
-    } = modalOptions;
+    const { component, show, onConfirm, closeAfterConfirmation } = modalOptions;
     return (
       <Dashboard history={history} changeMode={changeMode}>
         <ThemeModal
           {...modalOptions || {}}
           open={show}
           onConfirm={onConfirm}
-          onCancel={() => {
-            if (onCancel) onCancel();
-          }}
           close={() => {
             toggleUniversalModal({ show: false, component: null });
             return false;
