@@ -49,6 +49,7 @@ import {
   LOAD_ALL_META_DATA,
   ACTION_ENGAGMENTS,
   LOAD_TABLE_FILTERS,
+  LOAD_VISIT_LOGS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -79,6 +80,14 @@ export default function reducer(state = initialImmutableState, action = {}) {
 export const reducerForTableFilters = (state = {}, action = {}) => {
   switch (action.type) {
     case LOAD_TABLE_FILTERS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForVisitLogs = (state = null, action = {}) => {
+  switch (action.type) {
+    case LOAD_VISIT_LOGS:
       return action.payload;
     default:
       return state;
