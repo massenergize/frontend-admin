@@ -45,7 +45,13 @@ function CommunityEngagement({
   const [loading, setLoading] = useState(false);
   const isSuperAdmin = auth && auth.is_super_admin;
   const hasOnlyOneCommunity = communities.length === 1;
-  const first = (communities || [])[0] || {};
+
+  const selectedCommunity = () => {
+    const id = (options?.communities || [])[0];
+    if (!id) return (communities || [])[0] || {};
+    return (communities || []).find((c) => c.id === id) || {};
+  };
+  const first = selectedCommunity();
 
   // ----------------------------------------------------------------------
   const loadEngagements = ({ body }) => {
@@ -114,12 +120,18 @@ function CommunityEngagement({
   const testimonials = engagements.testimonials;
   const rangeValue = options.range || [];
 
+  const muiOverride = {
+    sx: {
+      boxShadow: "none",
+      ".MuiOutlinedInput-notchedOutline": { border: 0 },
+    },
+  };
   return (
     <div>
-      <PapperBlock
-        desc={
+      <MEPaperBlock
+        customHeader={
           <>
-            <div style={{ marginBottom: 20 }}>
+            <div style={{ marginBottom: 15 }}>
               <div
                 style={{
                   display: "flex",
@@ -137,36 +149,50 @@ function CommunityEngagement({
                     marginRight: 20,
                   }}
                 >
-                  Community Engagement {first?.name || ""}
+                  Community Engagement
                 </Typography>
-                {!specific && (
-                  <MEDropdown
-                    generics={{
-                      sx: {
-                        boxShadow: "none",
-                        ".MuiOutlinedInput-notchedOutline": { border: 0 },
-                      },
-                    }}
-                    multiple={false}
-                    data={TIME_RANGE}
-                    valueExtractor={(t) => t.key}
-                    labelExtractor={(t) => t.name}
-                    containerStyle={{ width: "21%", marginTop: 0 }}
-                    defaultValue={rangeValue}
-                    onItemSelected={(selection) => {
-                      const item = selection && selection[0];
-                      const op = {
-                        ...options,
-                        range: selection,
-                        mounted: true,
-                      }; // It uses previous selection of communities
-                      setOptions(op);
-                      if (item == "custom") return setSpecific(true);
 
-                      fetchFromBackendAfterFilters({ options: op });
-                    }}
-                  />
-                )}
+                <MEDropdown
+                  generics={muiOverride}
+                  multiple={false}
+                  data={communities}
+                  valueExtractor={(c) => c.id}
+                  labelExtractor={(c) => c.name}
+                  containerStyle={{ width: "18%", marginTop: 0 }}
+                  defaultValue={[first.id]}
+                  onItemSelected={(selection) => {
+                    const item = selection && selection[0];
+                    const op = {
+                      ...options,
+                      communities: selection,
+                      mounted: true,
+                    }; // It uses previous selection of communities
+                    setOptions(op);
+                    fetchFromBackendAfterFilters({ options: op });
+                  }}
+                />
+
+                <MEDropdown
+                  generics={muiOverride}
+                  multiple={false}
+                  data={TIME_RANGE}
+                  valueExtractor={(t) => t.key}
+                  labelExtractor={(t) => t.name}
+                  containerStyle={{ width: "15%", marginTop: 0 }}
+                  defaultValue={rangeValue}
+                  onItemSelected={(selection) => {
+                    const item = selection && selection[0];
+                    const op = {
+                      ...options,
+                      range: selection,
+                      mounted: true,
+                    }; // It uses previous selection of communities
+                    setOptions(op);
+                    if (item == "custom") return setSpecific(true);
+
+                    fetchFromBackendAfterFilters({ options: op });
+                  }}
+                />
               </div>
               {loading && !specific && (
                 <>
@@ -175,24 +201,7 @@ function CommunityEngagement({
                 </>
               )}
               <Typography variant="body" style={{ fontSize: "1rem" }}>
-                {" "}
                 Here is a summary of user engagements in your communities.
-                {!specific && (
-                  <span
-                    onClick={() => setSpecific(true)}
-                    className="touchable-opacity"
-                    style={{
-                      paddingBottom: 4,
-                      border: "dotted 0px",
-                      borderBottomWidth: 2,
-                      fontWeight: "bold",
-                      color: "rgb(156, 39, 176)",
-                      marginLeft: 6,
-                    }}
-                  >
-                    Click for more specific results
-                  </span>
-                )}
               </Typography>
             </div>
           </>
@@ -210,9 +219,7 @@ function CommunityEngagement({
             firstCommunity={first}
           />
         )}
-        <div
-          style={{ display: "flex", flexDirection: "row", margin: "10px 0px" }}
-        >
+        <div style={{ display: "flex", flexDirection: "row", margin: "0px" }}>
           <EngagementCard
             color="#A38E6E"
             title="USER SIGN-INS"
@@ -306,7 +313,7 @@ function CommunityEngagement({
             />
           )}
         </div>
-      </PapperBlock>
+      </MEPaperBlock>
       {/* </PapperBlock> */}
     </div>
   );
@@ -375,7 +382,8 @@ export const AddFilters = ({
     <div
       style={{ border: "dashed 2px #f3f3f3", marginTop: 13, marginBottom: 10 }}
     >
-      <div
+      {/* ---- DONT REMOVE YET----- */}
+      {/* <div
         style={{
           display: "flex",
           flexDirection: isSuperAdmin ? "column" : "row",
@@ -408,7 +416,7 @@ export const AddFilters = ({
           onItemSelected={handleCommunitySelection}
           showSelectAll={false}
         />
-      </div>
+      </div> */}
       {isCustomRange && (
         <div style={{ padding: 14 }}>
           <Typography variant="body">
