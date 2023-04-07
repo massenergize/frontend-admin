@@ -568,8 +568,7 @@ class MassEnergizeForm extends Component {
       if (clearProgress) clearProgress(this.resetForm);
 
       if (formJson.successRedirectPage) {
-        this.props.history.push(formJson.successRedirectPage);
-        // window.location.href = formJson.successRedirectPage;
+        window.location.href = formJson.successRedirectPage;
       }
     } else if (response && !response.success) {
       // we got an error from the backend so let's set it so the snackbar can pick it up
