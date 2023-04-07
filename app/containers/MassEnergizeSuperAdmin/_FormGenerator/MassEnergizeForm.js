@@ -97,7 +97,7 @@ function MassEnergizeForm(props) {
     };
 
     setJson(inflatedWithProgress);
-  }, [formJson, progress]);
+  }, [formJson]);
 
   const preserveFormData = (currentFormState) => {
     const { formData } = currentFormState || {};
