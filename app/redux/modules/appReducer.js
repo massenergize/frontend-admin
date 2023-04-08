@@ -49,6 +49,7 @@ import {
   LOAD_ALL_META_DATA,
   ACTION_ENGAGMENTS,
   LOAD_TABLE_FILTERS,
+  SET_UNIVERSAL_VARIABLE,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -470,7 +471,17 @@ export const allMetaDataReducer = (state = {}, action = {}) => {
       return state;
   }
 };
+export const setUniversalVariableReducer = (state = null, action = {}) => {
+  switch (action.type) {
+    case SET_UNIVERSAL_VARIABLE:
+      return action.payload;
+    default:
+      return state;
+  }
+}
 
 export const allReducers = {
   communities: communitiesReducer,
 };
+
+

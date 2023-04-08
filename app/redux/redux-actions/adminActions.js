@@ -49,6 +49,7 @@ import {
   LOAD_ALL_META_DATA,
   ACTION_ENGAGMENTS,
   LOAD_TABLE_FILTERS,
+  SET_UNIVERSAL_VARIABLE,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -958,3 +959,11 @@ export const loadTasksAction = (data = []) => {
     payload: data,
   };
 };
+
+
+export const setUniversalVariableAction = (data) => {
+  return {
+    type: SET_UNIVERSAL_VARIABLE,
+    payload: data,
+  };
+}

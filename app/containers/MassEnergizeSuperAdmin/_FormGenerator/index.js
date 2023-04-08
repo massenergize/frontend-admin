@@ -747,6 +747,7 @@ class MassEnergizeForm extends Component {
                 label={field.label}
                 name={field.name}
                 onChange={async (newValue) => {
+                field?.getValue && field?.getValue(newValue.target.value);
                   await this.updateForm(field.name, newValue.target.value);
                 }}
                 inputProps={{

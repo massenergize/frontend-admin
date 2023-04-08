@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
@@ -9,7 +9,10 @@ import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { bindActionCreators } from "redux";
-import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
+import {
+  reduxKeepFormContent,
+  setUniversalVariableAction,
+} from "../../../redux/redux-actions/adminActions";
 
 import { withRouter } from "react-router-dom";
 const styles = (theme) => ({
@@ -36,39 +39,76 @@ const styles = (theme) => ({
   },
 });
 
+
 class CreateNewTeamForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
       communities: [],
       formJson: null,
+      parents: [],
+      comID: null,
     };
   }
 
-  static getDerivedStateFromProps(props, state) {
-    var { communities, formState, location } = props;
+
+  getParentTeams = async (community_id) => {
+    if (!community_id) return [];
+    let res = await apiCall("/teams.list", {
+      community_id
+    });
+    if (res?.success) {
+      return res?.data?.map((p) => ({
+        displayName: p.name,
+        id: p.id,
+      }));
+    }
+  };
+
+  // update parents and formJson
+  async componentDidUpdate() {
+    var { communities, location} = this.props;
+    let {comID} = this.state;
+    let parents = []
     communities = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
     }));
 
+    const takeComID = (id)=>{
+      if(!id) return;
+        this.setState({
+          comID:id,
+        })
+     }
+
     // const progress = (formState || {})[PAGE_KEYS.CREATE_TEAM.key] || {};
     const libOpen = location.state && location.state.libOpen;
-    const formJson = createFormJson({
+
+    if (comID) {
+      parents = await this.getParentTeams(comID);
+    }
+
+    let formJson = createFormJson({
       communities,
-      // progress,
       autoOpenMediaLibrary: libOpen,
+      setComId: takeComID,
+      parents: parents,
     });
-    const jobsDoneDontRunWhatsBelowEverAgain =
-      !(communities && communities.length) || state.mounted;
+    
+  
+
+    const jobsDoneDontRunWhatsBelowEverAgain = !(communities && communities.length) || (this.state.mounted);
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
-    return {
+    console.log("=== here=======")
+    this.setState({
       communities,
       formJson,
       mounted: true,
-    };
+    })
+
   }
 
   render() {
@@ -96,12 +136,14 @@ const mapStateToProps = (state) => {
   return {
     communities: state.getIn(["communities"]),
     formState: state.getIn(["tempForm"]),
+    universalVariable: state.getIn(["universalVariable"]),
   };
 };
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       saveFormTemporarily: reduxKeepFormContent,
+      setUniversalVariable: setUniversalVariableAction,
     },
     dispatch
   );
@@ -115,7 +157,12 @@ export default withStyles(styles, { withTheme: true })(
   withRouter(NewTeamMapped)
 );
 
-const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
+const createFormJson = ({
+  communities,
+  autoOpenMediaLibrary,
+  setComId,
+  parents
+}) => {
   const formJson = {
     title: "Create New Team",
     subTitle: "",
@@ -145,6 +192,9 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             defaultValue: null,
             dbName: "primary_community_id",
             data: [{ displayName: "--", id: "" }, ...communities],
+            getValue: (value) => {
+              setComId(value);
+            },
           },
           {
             name: "communities",
@@ -162,14 +212,8 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             fieldType: "Dropdown",
             defaultValue: null,
             dbName: "parent_id",
-            data: [
-              {
-                id: null,
-                displayName:
-                  "Please choose a community and save the team.  Then edit it to set a parent team",
-              },
-            ],
-            readOnly: true,
+            data: parents,
+            // readOnly: true,
           },
           {
             name: "admin_emails",
@@ -179,7 +223,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
               "eg. Provide email of valid registered users eg. teamadmin1@gmail.com, teamadmin2@gmail.com",
             fieldType: "TextField",
             isRequired: true,
-            defaultValue:  null,
+            defaultValue: null,
             dbName: "admin_emails",
           },
           {
