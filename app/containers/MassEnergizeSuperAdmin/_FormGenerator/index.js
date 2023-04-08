@@ -1189,7 +1189,6 @@ class MassEnergizeForm extends Component {
       <div key={this.state.refreshKey}>
         <Grid
           container
-          spacing={24}
           alignItems="flex-start"
           direction="row"
           justify="center"
