@@ -40,7 +40,7 @@ class SummaryDashboard extends PureComponent {
     };
   }
 
-  async getCSV(endpoint) {
+  getCSV = async (endpoint) => {
     let oldLoadingCSVs = this.state.loadingCSVs;
     this.setState({ loadingCSVs: oldLoadingCSVs.concat(endpoint) });
     const csvResponse = await apiCallFile("/downloads." + endpoint);
@@ -54,7 +54,7 @@ class SummaryDashboard extends PureComponent {
     }
     this.setState({ loadingCSVs: oldLoadingCSVs });
     this.forceUpdate();
-  }
+  };
 
   handleCloseStyle = (event, reason) => {
     if (reason === "clickaway") {
@@ -172,7 +172,11 @@ class SummaryDashboard extends PureComponent {
                   />
                 </Grid>
                 <Grid md={3}>
-                  <CSVDownloads loadingCSVs={loadingCSVs} classes={classes} />
+                  <CSVDownloads
+                    loadingCSVs={loadingCSVs}
+                    classes={classes}
+                    getCSV={this.getCSV}
+                  />
                 </Grid>
               </Grid>
             </>
@@ -184,7 +188,11 @@ class SummaryDashboard extends PureComponent {
               <CommunityEngagement />
             </Grid>
             <Grid item xs={4}>
-              <CSVDownloads loadingCSVs={loadingCSVs} classes={classes} />
+              <CSVDownloads
+                loadingCSVs={loadingCSVs}
+                classes={classes}
+                getCSV={this.getCSV}
+              />
               <Grid>
                 <ReportingActivities
                   super_admin_mode
@@ -232,7 +240,7 @@ const summaryMapped = connect(
 
 export default withStyles(styles)(summaryMapped);
 
-const CSVDownloads = ({ loadingCSVs, classes }) => {
+const CSVDownloads = ({ loadingCSVs, classes, getCSV}) => {
   return (
     <MEPaperBlock
       subtitle="Download your data as CSV here"
@@ -242,7 +250,7 @@ const CSVDownloads = ({ loadingCSVs, classes }) => {
         <Grid item xs={12}>
           <Paper
             onClick={() => {
-              !loadingCSVs.includes("users") && this.getCSV("users");
+              !loadingCSVs.includes("users") && getCSV("users");
             }}
             className={`${classes.pageCard}`}
             elevation={1}
@@ -265,7 +273,7 @@ const CSVDownloads = ({ loadingCSVs, classes }) => {
         <Grid item xs={12}>
           <Paper
             onClick={() => {
-              !loadingCSVs.includes("actions") && this.getCSV("actions");
+              !loadingCSVs.includes("actions") && getCSV("actions");
             }}
             className={`${classes.pageCard}`}
             elevation={1}
@@ -289,7 +297,7 @@ const CSVDownloads = ({ loadingCSVs, classes }) => {
           <Paper
             onClick={() => {
               !loadingCSVs.includes("communities") &&
-                this.getCSV("communities");
+                getCSV("communities");
             }}
             className={`${classes.pageCard}`}
             elevation={1}
