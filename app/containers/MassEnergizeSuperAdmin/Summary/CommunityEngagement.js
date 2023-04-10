@@ -43,7 +43,7 @@ function CommunityEngagement({
   const history = useHistory();
   const [specific, setSpecific] = useState(false);
   const [loading, setLoading] = useState(false);
-  const isSuperAdmin = auth && auth.is_super_admin;
+  const isSuperAdmin = auth && auth.is_super_admin && !auth.is_community_admin;
   const hasOnlyOneCommunity = communities.length === 1;
 
   const selectedCommunity = () => {
@@ -149,29 +149,44 @@ function CommunityEngagement({
                     marginRight: 20,
                   }}
                 >
-                  Community Engagement
+                  Community Engagement Summary for{" "}
+                  {hasOnlyOneCommunity ? <span>{first?.name}</span> : <></>}
                 </Typography>
 
-                <MEDropdown
-                  generics={muiOverride}
-                  multiple={false}
-                  data={communities}
-                  valueExtractor={(c) => c.id}
-                  labelExtractor={(c) => c.name}
-                  containerStyle={{ width: "18%", marginTop: 0 }}
-                  defaultValue={[first.id]}
-                  onItemSelected={(selection) => {
-                    const item = selection && selection[0];
-                    const op = {
-                      ...options,
-                      communities: selection,
-                      mounted: true,
-                    }; // It uses previous selection of communities
-                    setOptions(op);
-                    fetchFromBackendAfterFilters({ options: op });
-                  }}
-                />
+                {!hasOnlyOneCommunity && (
+                  <MEDropdown
+                    generics={muiOverride}
+                    multiple={false}
+                    data={communities}
+                    valueExtractor={(c) => c.id}
+                    labelExtractor={(c) => c.name}
+                    containerStyle={{ width: "18%", marginTop: 0 }}
+                    defaultValue={[first.id]}
+                    onItemSelected={(selection) => {
+                      const item = selection && selection[0];
+                      const op = {
+                        ...options,
+                        communities: selection,
+                        mounted: true,
+                      }; // It uses previous selection of communities
+                      setOptions(op);
+                      fetchFromBackendAfterFilters({ options: op });
+                    }}
+                  />
+                )}
 
+                <Typography
+                  variant="caption"
+                  style={{
+                    marginLeft: 5,
+                    marginRight: 5,
+                    fontSize: 14,
+                    // color: "#8E24AA",
+                    // fontWeight: "bold",
+                  }}
+                >
+                  Time Range
+                </Typography>
                 <MEDropdown
                   generics={muiOverride}
                   multiple={false}
@@ -293,6 +308,7 @@ function CommunityEngagement({
               className="touchable-opacity"
               variant="body"
               style={{
+                marginTop: 15,
                 color: "#AB47BC",
                 border: "dotted 0px #AB47BC",
                 borderBottomWidth: 2,
