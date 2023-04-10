@@ -407,7 +407,6 @@ const createFormJson = ({
   const statuses = ["Draft", "Live", "Archived"];
   if (!event || !communities) return;
 
-  console.log("communities 1", communities)
   const is_super_admin = auth && auth.is_super_admin;
 
   //communities = is_super_admin
@@ -417,13 +416,11 @@ const createFormJson = ({
   //      list: event.communities_under_publicity,
   //      publicity: event.publicity,
   //    });
-  //console.log("communities 2", communities)
 
   communities = (communities || []).map((c) => ({
     displayName: c.name,
     id: c.id.toString(),
   }));
-  console.log("communities 3", communities)
 
   const publicityCommunities = (
     (event && event.communities_under_publicity) ||
