@@ -377,23 +377,25 @@ const validator = (cleaned) => {
  * @param {*} publicity
  * @returns
  */
-const getAllowedCommunities = ({ adminOf, list, publicity }) => {
-  if (publicity === "OPEN") return adminOf;
-  list = (list || []).map((c) => c.id);
-  // This part happens when an admin has already copied an event, and is trying to edit, (we select only communities that are allowed) to be shown in the dropdown
-  var coms;
-  if (publicity === "OPEN_TO") {
-    coms = adminOf.filter((c) => list.includes(c.id));
-    return coms;
-  }
 
-  if (publicity === "CLOSED_TO") {
-    coms = adminOf.filter((c) => !list.includes(c.id));
-    return coms;
-  }
+//const getAllowedCommunities = ({ adminOf, list, publicity }) => {
+//  if (publicity === "OPEN") return adminOf;
+//  list = (list || []).map((c) => c.id);
+//  // This part happens when an admin has already copied an event, and is trying to edit, (we select only communities that are allowed) to be shown in the dropdown
+//  var coms;
+//  if (publicity === "OPEN_TO") {
+//    coms = adminOf.filter((c) => list.includes(c.id));
+//    return coms;
+//  }
+//
+//  if (publicity === "CLOSED_TO") {
+//    coms = adminOf.filter((c) => !list.includes(c.id));
+//    return coms;
+//  }
+//
+//  return [];
+//};
 
-  return [];
-};
 const createFormJson = ({
   event,
   rescheduledEvent,
@@ -405,20 +407,23 @@ const createFormJson = ({
   const statuses = ["Draft", "Live", "Archived"];
   if (!event || !communities) return;
 
+  console.log("communities 1", communities)
   const is_super_admin = auth && auth.is_super_admin;
 
-  communities = is_super_admin
-    ? communities
-    : getAllowedCommunities({
-        adminOf: auth.admin_at,
-        list: event.communities_under_publicity,
-        publicity: event.publicity,
-      });
+  //communities = is_super_admin
+  //  ? communities
+  //  : getAllowedCommunities({
+  //      adminOf: auth.admin_at,
+  //      list: event.communities_under_publicity,
+  //      publicity: event.publicity,
+  //    });
+  //console.log("communities 2", communities)
 
   communities = (communities || []).map((c) => ({
     displayName: c.name,
     id: c.id.toString(),
   }));
+  console.log("communities 3", communities)
 
   const publicityCommunities = (
     (event && event.communities_under_publicity) ||
