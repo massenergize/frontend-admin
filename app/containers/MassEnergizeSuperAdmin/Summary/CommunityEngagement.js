@@ -5,7 +5,8 @@ import { Typography, Button, TextField } from "@mui/material";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { getHost } from "../Community/utils";
+import { PORTAL_HOST } from "../../../config/constants";
+//import { getHost } from "../Community/utils";
 import Loading from "dan-components/Loading";
 import {
   loadUserEngagements,
@@ -76,7 +77,7 @@ function CommunityEngagement({
   const openImpactPage = (items) => {
     const [subdomain] = items || [];
     if (!subdomain) return;
-    const url = `${getHost()}/${subdomain}/impact`;
+    const url = `${PORTAL_HOST}/${subdomain}/impact`;
     window.open(url, "_blank");
   };
 
@@ -303,6 +304,7 @@ function CommunityEngagement({
           {/* <Typography variant="h6" color="primary">
             <b>IMPACT</b>
           </Typography> */}
+          {/*
           {hasOnlyOneCommunity && first ? (
             <Typography
               className="touchable-opacity"
@@ -328,6 +330,7 @@ function CommunityEngagement({
               onItemSelected={openImpactPage}
             />
           )}
+          */}
         </div>
       </MEPaperBlock>
       {/* </PapperBlock> */}
