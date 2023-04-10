@@ -185,7 +185,7 @@ function CommunityEngagement({
                     // fontWeight: "bold",
                   }}
                 >
-                  Time Range
+                  Time Interval
                 </Typography>
                 <MEDropdown
                   generics={muiOverride}
