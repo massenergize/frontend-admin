@@ -7,6 +7,7 @@ export const getMoreInfo = (community) => {
     community && community.more_info ? JSON.parse(community.more_info) : {};
   return more_info;
 };
+
 export const dbNames = {
   fb: "facebook_link",
   tw: "twitter_link",
@@ -30,12 +31,12 @@ export const groupSocialMediaFields = (formData, oldInfo) => {
     [dbNames.tw]: formData[dbNames.tw],
     wants_socials: formData.wants_socials,
   };
-  const dbArr = [dbNames.fb, dbNames.tw, dbNames.insta];
+  // const dbArr = [dbNames.fb, dbNames.tw, dbNames.insta];
   //keep old social media fields if they exist and have not been changed
-  dbArr.forEach((name) => {
-    let newVal = more_info[name];
-    if (!newVal) more_info[name] = oldInfo[name];
-  });
+  // dbArr.forEach((name) => {
+  //   let newVal = more_info[name];
+  //   if (!newVal) more_info[name] = oldInfo[name];
+  // });
   more_info = { ...oldInfo, ...more_info }; //still have to do this to retain other fields that are not related to social media
   more_info = JSON.stringify(more_info);
   delete formData[dbNames.fb];
