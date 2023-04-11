@@ -1,20 +1,25 @@
 import { Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { reduxLoadVisitLogs } from "../../../redux/redux-actions/adminActions";
+import { getHumanFriendlyDate } from "../../../utils/common";
 import { LOADING } from "../../../utils/constants";
 import { apiCall } from "../../../utils/messenger";
 
-function RenderVisitLogs({ putLogsInRedux, logs, id }) {
+function RenderVisitLogs({ putLogsInRedux, logs, id, users }) {
   logs = logs || {};
-  console.log("L>Ets see what the ID has to say", id);
   const [loading, setLoading] = useState(true);
   const [content, setContent] = useState([]);
+  const userInQuestion = useMemo(() => users?.find((user) => user?.id === id), [
+    users,
+    id,
+  ]);
 
   const fetchLogs = (id) => {
+  
     apiCall("users.get.visits", { id }).then((response) => {
       setLoading(false);
       if (!response.success)
@@ -28,37 +33,57 @@ function RenderVisitLogs({ putLogsInRedux, logs, id }) {
   useEffect(() => {
     // If admin has clicked the modal for a user before, their data would already have been loaded so no need to fetch again, just retrieve from redux
     const cachedVersion = logs[id];
-    if (cachedVersion) return setContent(cachedVersion);
+    if (cachedVersion) {
+      setLoading(false);
+      return setContent(cachedVersion);
+    }
     fetchLogs(id);
   }, []);
 
   const Container = ({ children }) => {
-    return <div style={{ width: 400, height: 300 }}>{children}</div>;
+    return (
+      <div style={{ width: 400, height: 300 }}>
+        <Typography
+          variant="h6"
+          style={{
+            color: "black",
+            border: "solid 0px rgb(236 236 236)",
+            borderBottomWidth: 2,
+            paddingBottom: 7,
+          }}
+        >
+          {userInQuestion?.full_name || "..."}
+        </Typography>
+        <br />
+        {children}
+      </div>
+    );
   };
-  // if (loading)
-  //   return (
-  //     <Container>
-  //       {" "}
-  //       <LinearBuffer message="Looking for records..." />
-  //     </Container>
-  //   );
+  if (loading)
+    return (
+      <Container>
+        {" "}
+        <LinearBuffer message="Looking for records..." />
+      </Container>
+    );
+  if (content.length === 0)
+    return (
+      <Container>
+        <Typography
+          variant="body"
+          style={{ marginBottom: 5, color: "#444040" }}
+        >
+          Sorry, it appears this user has not had any login activity since March
+          2023...
+          {/* I am using March because its around that time that we started recording user portal signins with Footages  */}
+        </Typography>
+      </Container>
+    );
 
   return (
     <Container>
-      <Typography
-        variant="h6"
-        style={{
-          color: "black",
-          border: "solid 0px rgb(236 236 236)",
-          borderBottomWidth: 2,
-          paddingBottom: 7,
-        }}
-      >
-        Akwesi Frimpong{" "}
-      </Typography>
-      <br />
       <div style={{ display: "flex", flexDirection: "column" }}>
-        {[1, 2, 3, 4, 5, 6].map((item) => {
+        {content.map((log) => {
           return (
             <Typography
               variant="body"
@@ -68,7 +93,7 @@ function RenderVisitLogs({ putLogsInRedux, logs, id }) {
                 className="fa fa-clock"
                 style={{ marginRight: 6, color: "#e8e8e8" }}
               />{" "}
-              <span> 22nd March 1998 9:15 AM</span>
+              <span> {getHumanFriendlyDate(log?.created_at, true, false)}</span>
             </Typography>
           );
         })}
@@ -78,7 +103,10 @@ function RenderVisitLogs({ putLogsInRedux, logs, id }) {
 }
 
 const mapStateToProps = (state) => {
-  return { logs: state.userVisitLogs };
+  return {
+    logs: state.getIn(["userVisitLogs"]),
+    users: state.getIn(["allUsers"]),
+  };
 };
 
 const mapDispatchToProps = (dispatch) => {
