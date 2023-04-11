@@ -226,13 +226,12 @@ class AllUsers extends React.Component {
     toggleModal({
       show: true,
       component: <RenderVisitLogs id={id} />,
-      // onConfirm: () => this.nowDelete({ idsToDelete, data }),
+      onConfirm: () => toggleModal({ show: false, component: null }),
       closeAfterConfirmation: true,
-      // contentStyle: { width: 400, height: 200 },
-      fullControl: true,
+      // title: "Visit Records",
       noTitle: true,
-      // onCancel: () => toggleModal({ show: false, component: null }),
-      // title: ""
+      noCancel: true,
+      okText: "Close",
     });
   }
   render() {
