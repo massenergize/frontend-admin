@@ -33,10 +33,11 @@ class CommunitySwitch extends PureComponent {
 
   getDropdownCommunities() {
     var { auth, communities } = this.props;
-    communities = communities || [];
+
+    communities = communities?.length? communities : [];
     var firstCom = communities[0] || {};
     if (!auth) return [];
-    if (auth.is_super_admin) return [communities, communities[0] || firstCom];
+    if (auth?.is_super_admin) return [communities, communities[0] || firstCom];
     communities = (auth && auth.admin_at) || [];
     var firstCom = communities[0] || {};
     if (auth.is_community_admin) return [communities, firstCom];
@@ -49,6 +50,7 @@ class CommunitySwitch extends PureComponent {
     const communityName = selected_community
       ? selected_community.name
       : (first && first.name) || "-------";
+
     return (
       <div>
         <Paper style={{ padding: 20, marginBottom: 10 }}>
@@ -74,7 +76,7 @@ class CommunitySwitch extends PureComponent {
             margin="normal"
             variant="outlined"
           >
-            {communities.map((option) => (
+            {communities?.map((option) => (
               <MenuItem key={option.id.toString()} value={option.name}>
                 {option.name}
               </MenuItem>

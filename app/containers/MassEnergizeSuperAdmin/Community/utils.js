@@ -1,4 +1,5 @@
-import moment from "moment";
+import moment from "moment/moment";
+import { IS_CANARY, IS_LOCAL, IS_PROD } from "../../../config/constants";
 
 export const getMoreInfo = (community) => {
   // const { community } = this.state;
@@ -6,6 +7,7 @@ export const getMoreInfo = (community) => {
     community && community.more_info ? JSON.parse(community.more_info) : {};
   return more_info;
 };
+
 export const dbNames = {
   fb: "facebook_link",
   tw: "twitter_link",
@@ -29,12 +31,12 @@ export const groupSocialMediaFields = (formData, oldInfo) => {
     [dbNames.tw]: formData[dbNames.tw],
     wants_socials: formData.wants_socials,
   };
-  const dbArr = [dbNames.fb, dbNames.tw, dbNames.insta];
+  // const dbArr = [dbNames.fb, dbNames.tw, dbNames.insta];
   //keep old social media fields if they exist and have not been changed
-  dbArr.forEach((name) => {
-    let newVal = more_info[name];
-    if (!newVal) more_info[name] = oldInfo[name];
-  });
+  // dbArr.forEach((name) => {
+  //   let newVal = more_info[name];
+  //   if (!newVal) more_info[name] = oldInfo[name];
+  // });
   more_info = { ...oldInfo, ...more_info }; //still have to do this to retain other fields that are not related to social media
   more_info = JSON.stringify(more_info);
   delete formData[dbNames.fb];
@@ -60,6 +62,15 @@ export const isValueEmpty = (value) => {
   return false;
 };
 
+//duplicate code - use PORTAL_HOST
+//export const getHost = () => {
+//  var host;
+//  if (IS_LOCAL) host = "http://localhost:3000";
+//  else if (IS_CANARY) host = "https://community-canary.massenergize.org";
+//  else if (IS_PROD) host = "https://community.massenergize.org";
+//  else host = "https://community.massenergize.dev";
+//  return host;
+//};
 function sameYear(date1, date2) {
   return date1.getFullYear() === date2.getFullYear();
 }
@@ -117,4 +128,10 @@ export function dateFormatString(startDate, endDate) {
   }
 
   return dateString;
+}
+
+
+export const  arrInRange = (start, end) => {
+  if(start === end) return [start];
+  return [start, ...arrInRange(start + 1, end)];
 }

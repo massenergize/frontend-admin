@@ -7,6 +7,7 @@ import { withStyles } from "@mui/styles";
 import styles from "./jss/cover-jss";
 import { apiCall } from "../../../../utils/messenger";
 import { PORTAL_HOST } from "../../../../config/constants";
+import { Paper } from "@mui/material";
 
 class Cover extends React.Component {
   goLive = async () => {
@@ -24,7 +25,7 @@ class Cover extends React.Component {
     const { classes } = this.props;
     if (is_published) {
       return (
-        <div style={{ flex: "1" }}>
+        <div>
           <Button
             onClick={() => {
               this.goLive();
@@ -74,7 +75,7 @@ class Cover extends React.Component {
     };
 
     return (
-      <div className={classes.cover} style={coverStyle}>
+      <Paper className={classes.cover} style={coverStyle}>
         <div className={classes.content}>
           <div style={{ display: "flex", flex: "2", alignItems: "center" }}>
             <h2 style={contentStyle}>
@@ -127,7 +128,7 @@ class Cover extends React.Component {
             </div>
           </div>
         </div>
-      </div>
+      </Paper>
     );
   }
 }

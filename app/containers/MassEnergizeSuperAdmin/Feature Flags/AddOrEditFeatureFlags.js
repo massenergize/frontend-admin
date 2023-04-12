@@ -34,7 +34,7 @@ function AddOrEditFeatureFlags({
   };
 
   const formJson = createFormJson({
-    communities,
+    communities:communities,
     flagKeys,
     users,
     putFlagsInRedux,

@@ -22,18 +22,14 @@ import { ShowTagsOnPane } from "../Gallery/SideSheet";
 
 const DEFAULT_SCOPE = ["all", "uploads", "actions", "events", "testimonials"];
 export const FormMediaLibraryImplementation = (props) => {
-  const {
-    fetchImages,
-    auth,
-    imagesObject,
-    putImagesInRedux,
-    selected,
-    tags,
-  } = props;
+  const { fetchImages, auth, imagesObject, putImagesInRedux, tags } = props;
   const [available, setAvailable] = useState(auth && auth.is_super_admin);
   const [selectedTags, setSelectedTags] = useState({ scope: DEFAULT_SCOPE });
   const [queryHasChanged, setQueryHasChanged] = useState(false);
 
+  const defaultValue =
+    (props.selected && props.selected.length && props.selected) ||
+    (props.defaultValue && props.defaultValue.length && props.defaultValue);
   const loadMoreImages = (cb) => {
     if (!auth) return console.log("It does not look like you are signed in...");
 
@@ -158,6 +154,7 @@ export const FormMediaLibraryImplementation = (props) => {
           );
         }}
         {...props}
+        selected={defaultValue}
         loadMoreFunction={loadMoreImages}
       />
     </div>

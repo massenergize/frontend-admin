@@ -5,7 +5,6 @@ import {Paper, Alert} from "@mui/material";
 import { Helmet } from "react-helmet";
 import { bindActionCreators } from "redux";
 import brand from "dan-api/dummy/brand";
-import MUIDataTable from "mui-datatables";
 import Typography from "@mui/material/Typography";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
@@ -21,10 +20,15 @@ import {
   reduxGetAllTeams,
   reduxGetAllCommunityTeams,
   reduxUpdateHeap,
+  reduxLoadMetaDataAction,
 } from "../../../redux/redux-actions/adminActions";
 import { apiCall, apiCallFile } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import METable from "../ME  Tools/table /METable";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import { getLimit } from "../../../utils/helpers";
 
 function TabContainer(props) {
   const { children } = props;
@@ -51,6 +55,7 @@ class TeamMembers extends React.Component {
       error: null,
       loadingCSVs: [],
       success: false,
+      meta:{}
     };
   }
 
@@ -89,7 +94,7 @@ class TeamMembers extends React.Component {
   }
   async componentDidMount() {
     const { id } = this.props.match.params;
-    const { heap, addToHeap } = this.props;
+    const { heap, addToHeap, meta, putMetaDataToRedux} = this.props;
     const teamResponse = await apiCall("/teams.info", { team_id: id });
     if (teamResponse && teamResponse.data) {
       const team = teamResponse.data;
@@ -98,13 +103,17 @@ class TeamMembers extends React.Component {
 
     const allTeamMembersResponse = await apiCall("/teams.members", {
       team_id: id,
+      limit:getLimit(PAGE_PROPERTIES.ALL_TEAM_MEMBERS.key)
     });
+
     if (allTeamMembersResponse && allTeamMembersResponse.success) {
       await this.setStateAsync({
         loading: false,
         allTeamMembers: allTeamMembersResponse.data,
         data: this.fashionData(allTeamMembersResponse.data),
       });
+      putMetaDataToRedux({...meta, teamMembers: allTeamMembersResponse.cursor})
+
       addToHeap({
         ...heap,
         teamMembers: { [id]: allTeamMembersResponse.data },
@@ -242,14 +251,19 @@ class TeamMembers extends React.Component {
     const title = brand.name + " - All Teams";
     const description = brand.desc;
     const { columns, data, team, formJson, value, loading } = this.state;
-    const { classes } = this.props;
+    const { classes, meta, putMetaDataToRedux, members} = this.props;
     const { error, loadingCSVs, success } = this.state;
+    const metaData = meta && meta.teamMembers
+    const { id } = this.props.match.params;
+
     const options = {
       filterType: "dropdown",
       responsive: "standard",
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
+      // count: metaData && metaData.count,
+      // confirmFilters: true,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach((d) => {
@@ -257,7 +271,27 @@ class TeamMembers extends React.Component {
           apiCall("/teams.removeMember", { team_id: team.id, email });
         });
       },
+      // customSearchRender: (
+      //   searchText,
+      //   handleSearch,
+      //   hideSearch,
+      //   options
+      // ) => (
+      //   <SearchBar
+      //     url={"/teams.members"}
+      //     reduxItems={members[id]}
+      //     updateReduxFunction={(data) => console.log("=== data ===", data)}
+      //     handleSearch={handleSearch}
+      //     hideSearch={hideSearch}
+      //     pageProp={PAGE_PROPERTIES.ALL_TEAM_MEMBERS}
+      //     updateMetaData={putMetaDataToRedux}
+      //     name="teamMembers"
+      //     meta={meta}
+      //     otherArgs={{ team_id:id}}
+      //   />
+      // ),
     };
+
     const nowLoadingMembers = loading && (!data || !data.length);
     if (loading && !team)
       return (
@@ -270,7 +304,7 @@ class TeamMembers extends React.Component {
         {error && (
           <div>
             <Snackbar
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
               open={error != null}
               autoHideDuration={6000}
               onClose={this.handleCloseStyle}
@@ -324,9 +358,10 @@ class TeamMembers extends React.Component {
           </Typography>
 
           <Typography variant="p" style={{ marginBottom: 5 }}>
-            <b>NOTE:</b> This page <b style={{ color: "#c74545" }}>does not</b>{" "}
-            list members of sub-teams. On the community portal, parent team
-            pages <b style={{ color: "#c74545" }}>do</b> list members of
+            <b>NOTE:</b> This page{" "}
+            <b style={{ color: "#c74545" }}>does not</b> list members of
+            sub-teams. On the community portal, parent team pages{" "}
+            <b style={{ color: "#c74545" }}>do</b> list members of
             sub-teams.
           </Typography>
 
@@ -339,7 +374,9 @@ class TeamMembers extends React.Component {
           >
             Go back
           </Link>
-          <Link onClick={() => this.props.history.push("/admin/read/teams")}>
+          <Link
+            onClick={() => this.props.history.push("/admin/read/teams")}
+          >
             Go to all teams
           </Link>
           <Link
@@ -365,7 +402,10 @@ class TeamMembers extends React.Component {
               textColor="primary"
             >
               <Tab label="Team Members & Admins" icon={<PeopleIcon />} />
-              <Tab label="Change Team Member Status" icon={<AddBoxIcon />} />
+              <Tab
+                label="Change Team Member Status"
+                icon={<AddBoxIcon />}
+              />
             </Tabs>
           </AppBar>
           {value === 0 &&
@@ -374,12 +414,15 @@ class TeamMembers extends React.Component {
             ) : (
               <TabContainer>
                 <div className={classes.table}>
-                  <MUIDataTable
-                    className={classes.tableShadowReset}
-                    title="Team Members"
-                    data={data}
-                    columns={columns}
-                    options={options}
+                  <METable
+                    classes={classes}
+                    page={PAGE_PROPERTIES.ALL_TEAM_MEMBERS}
+                    tableProps={{
+                      title: "Team Members",
+                      data: data,
+                      columns: columns,
+                      options: options,
+                    }}
                   />
                 </div>
               </TabContainer>
@@ -408,6 +451,7 @@ function mapStateToProps(state) {
     community: state.getIn(["selected_community"]),
     members: (heap && heap.teamMembers) || {},
     heap,
+    meta: state.getIn(["paginationMetaData"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -416,6 +460,7 @@ function mapDispatchToProps(dispatch) {
       callTeamsForSuperAdmin: reduxGetAllTeams,
       callTeamsForNormalAdmin: reduxGetAllCommunityTeams,
       addToHeap: reduxUpdateHeap,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

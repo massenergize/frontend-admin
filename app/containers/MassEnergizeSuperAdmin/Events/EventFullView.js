@@ -16,6 +16,7 @@ import {
   reduxUpdateHeap,
 } from "../../../redux/redux-actions/adminActions";
 import EventShareModal from "./EventShareModal";
+
 import { PORTAL_HOST } from "../../../config/constants";
 import { dateFormatString } from "../Community/utils";
 import EditEventForm from "./EditEventForm";
@@ -228,6 +229,7 @@ function EventFullView(props) {
   //   -------------------------------------- HTML MARK UP --------------------------------------------------
 
   const sharedTo = listToString(event.shared_to);
+
   const makeURL = (event) => {
     return `${PORTAL_HOST}/${event &&
       (event.community || {}).subdomain}/events/${event && event.id}`;

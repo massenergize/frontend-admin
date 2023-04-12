@@ -4,19 +4,16 @@ import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 import Typography from "@mui/material/Typography";
-import Avatar from "@mui/material/Avatar";
 import { bindActionCreators } from "redux";
-import MUIDataTable from "mui-datatables";
-import FileCopy from "@mui/icons-material/FileCopy";
-import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
 import DetailsIcon from "@mui/icons-material/Details";
-import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import {
   loadAllAdminMessages,
+  reduxLoadMetaDataAction,
+  reduxLoadTableFilters,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
@@ -25,11 +22,21 @@ import {
   getHumanFriendlyDate,
   smartString,
   separate,
+  isEmpty,
 } from "../../../utils/common";
 import { Chip } from "@mui/material";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import METable from "../ME  Tools/table /METable";
+import METable, { FILTERS } from "../ME  Tools/table /METable";
+import {
+  getLimit,
+  handleFilterChange,
+  isTrue,
+  onTableStateChange,
+} from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import Loader from "../../../utils/components/Loader";
 
 export const replyToMessage = ({ pathname, props, transfer }) => {
   // const pathname = `/admin/edit/${id}/message`;
@@ -65,7 +72,7 @@ class AllCommunityAdminMessages extends React.Component {
    * NB: This has nothing to do with how the table actually does the filtering
    
    */
-  reArrangeForAdmin(messages) {
+  reArrangeForAdmin(messages, meta) {
     const _sort = (a, b) => (b.id < a.id ? -1 : 1);
     const { location, putMessagesInRedux } = this.props;
     const { state } = location || {};
@@ -73,7 +80,6 @@ class AllCommunityAdminMessages extends React.Component {
     const result = separate(ids, messages);
     const { notFound, itemObjects, remainder } = result;
     var data = [...itemObjects, ...remainder];
-    console.log("INFORMATION", result);
     data.sort(_sort);
 
     putMessagesInRedux(data);
@@ -95,25 +101,40 @@ class AllCommunityAdminMessages extends React.Component {
   }
   componentDidMount() {
     const { state } = this.props.location;
-    const { messages, putMessagesInRedux, history } = this.props;
+    const {
+      putMessagesInRedux,
+      meta,
+      putMetaDataToRedux,
+      updateTableFilters,
+      tableFilters,
+    } = this.props;
     const ids = state && state.ids;
-    // console.log("IS IT FROM ids", ids);
-    // if (messages && messages.length) {
-    //   if (ids) {
-    //     this.setState({ ignoreSavedFilters: true, saveFilters: false }); //--- When an admin enters here through the summary page, we need old filters to be turned off, so that the table will only select the unattended items
-    //     this.reArrangeForAdmin(messages);
-    //   }
-    //   return;
-    // }
-
-    //--- Should only run if "messages" is empty. ie. This page is loading for the first time...
-    apiCall("/messages.listForCommunityAdmin").then((allMessagesResponse) => {
+    const comingFromDashboard = ids?.length;
+    if (comingFromDashboard) {
+      this.setState({ saveFilters: false });
+      const key = PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key + FILTERS;
+      updateTableFilters({
+        ...(tableFilters || {}),
+        [key]: { 0: { list: ids } },
+      });
+    }
+    
+    apiCall("/messages.listForCommunityAdmin", {
+      limit: getLimit(PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key),
+    }).then((allMessagesResponse) => {
       if (allMessagesResponse && allMessagesResponse.success) {
         const data = allMessagesResponse.data;
-        if (ids) {
-          this.setState({ ignoreSavedFilters: true, saveFilters: false });
-          this.reArrangeForAdmin(data);
-        } else putMessagesInRedux(data);
+
+        if (comingFromDashboard) {
+          this.setState({ updating: true });
+          this.reArrangeForAdmin(data, meta);
+        } else {
+          putMessagesInRedux(data);
+          putMetaDataToRedux({
+            ...meta,
+            adminMessages: allMessagesResponse.cursor,
+          });
+        }
       } else
         console.log(
           "Sorry, something happened while loading messages...",
@@ -129,7 +150,7 @@ class AllCommunityAdminMessages extends React.Component {
     }
   };
 
-  fashionData = (data) => {
+  fashionData = (data = []) => {
     return data.map((d) => [
       d.id,
       getHumanFriendlyDate(d.created_at, true),
@@ -137,7 +158,7 @@ class AllCommunityAdminMessages extends React.Component {
       d.user_name || (d.user && d.user.full_name) || "",
       d.email || (d.user && d.user.email) || "",
       d.community && d.community.name,
-      d.have_replied,
+      d.have_replied ? "Yes" : "No",
       d.id,
     ]);
   };
@@ -197,8 +218,8 @@ class AllCommunityAdminMessages extends React.Component {
         customBodyRender: (d) => {
           return (
             <Chip
-              label={d ? "Yes" : "No"}
-              className={d ? classes.yesLabel : classes.noLabel}
+              label={isTrue(d) ? "Yes" : "No"}
+              className={isTrue(d) ? classes.yesLabel : classes.noLabel}
             />
           );
         },
@@ -210,6 +231,7 @@ class AllCommunityAdminMessages extends React.Component {
       options: {
         filter: false,
         download: false,
+        sort: false,
         customBodyRender: (id) => (
           <div>
             {/* <Link to={`/admin/edit/${id}/message`}>
@@ -239,23 +261,21 @@ class AllCommunityAdminMessages extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/messages.delete", { message_id: found }).then(
-        (response) => {
-          if (response.success) {
-            this.props.toggleToast({
-              open: true,
-              message: "Message(s) successfully deleted",
-              variant: "success",
-            });
-          } else {
-            this.props.toggleToast({
-              open: true,
-              message: "An error occurred while deleting the message(s)",
-              variant: "error",
-            });
-          }
+      apiCall("/messages.delete", { message_id: found }).then((response) => {
+        if (response.success) {
+          this.props.toggleToast({
+            open: true,
+            message: "Message(s) successfully deleted",
+            variant: "success",
+          });
+        } else {
+          this.props.toggleToast({
+            open: true,
+            message: "An error occurred while deleting the message(s)",
+            variant: "error",
+          });
         }
-      );
+      });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putMessagesInRedux(rem);
@@ -271,18 +291,70 @@ class AllCommunityAdminMessages extends React.Component {
       </Typography>
     );
   }
+
   render() {
     const title = brand.name + " - Community Admin Messages";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, location } = this.props;
-    const data = this.fashionData(this.props.messages); // not ready for this yet: && this.props.messages.filter(item=>item.parent===null));
+    const {
+      classes,
+      messages,
+      putMessagesInRedux,
+      meta,
+      putMetaDataToRedux,
+    } = this.props;
+    const data = this.fashionData(messages); // not ready for this yet: && this.props.messages.filter(item=>item.parent===null));
+    const metaData = meta && meta.adminMessages;
     const options = {
       filterType: "dropdown",
       responsive: "standard",
+      count: metaData && metaData.count,
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putMessagesInRedux,
+          reduxItems: messages,
+          apiUrl: "/messages.listForCommunityAdmin",
+          pageProp: PAGE_PROPERTIES.ALL_ADMIN_MESSAGES,
+          updateMetaData: putMetaDataToRedux,
+          name: "adminMessages",
+          meta: meta,
+        }),
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
+        return (
+          <ApplyFilterButton
+            url={"/messages.listForCommunityAdmin"}
+            reduxItems={messages}
+            updateReduxFunction={putMessagesInRedux}
+            columns={columns}
+            limit={getLimit(PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key)}
+            applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="adminMessages"
+            meta={meta}
+          />
+        );
+      },
+      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
+        <SearchBar
+          url={"/messages.listForCommunityAdmin"}
+          reduxItems={messages}
+          updateReduxFunction={putMessagesInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_ADMIN_MESSAGES}
+          updateMetaData={putMetaDataToRedux}
+          name="adminMessages"
+          meta={meta}
+        />
+      ),
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
@@ -293,9 +365,28 @@ class AllCommunityAdminMessages extends React.Component {
         });
         return false;
       },
+      whenFilterChanges: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_ADMIN_MESSAGES,
+          updateReduxFunction: putMessagesInRedux,
+          reduxItems: messages,
+          url: "/messages.listForCommunityAdmin",
+          updateMetaData: putMetaDataToRedux,
+          name: "adminMessages",
+          meta: meta,
+        }),
     };
-    if (!data || !data.length) {
-      return <LinearBuffer />;
+    if (isEmpty(metaData)) {
+      return <Loader />;
     }
 
     return (
@@ -319,7 +410,7 @@ class AllCommunityAdminMessages extends React.Component {
           }}
           customFilterObject={{
             0: {
-              list: location.state && location.state.ids,
+              list: this.state.ids,
             },
           }} // "0" here is the index of the "ID" column in the table
           ignoreSavedFilters={this.state.ignoreSavedFilters}
@@ -338,6 +429,8 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     community: state.getIn(["selected_community"]),
     messages: state.getIn(["messages"]),
+    meta: state.getIn(["paginationMetaData"]),
+    tableFilters: state.getIn(["tableFilters"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -345,7 +438,9 @@ function mapDispatchToProps(dispatch) {
     {
       putMessagesInRedux: loadAllAdminMessages,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
+      updateTableFilters: reduxLoadTableFilters,
     },
     dispatch
   );

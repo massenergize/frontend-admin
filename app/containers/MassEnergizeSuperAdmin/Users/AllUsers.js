@@ -11,18 +11,30 @@ import styles from "../../../components/Widget/widget-jss";
 import {
   fetchUsersFromBackend,
   loadAllUsers,
+  reduxLoadMetaDataAction,
+  reduxLoadTableFilters,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import {
   getHumanFriendlyDate,
+  isEmpty,
   reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import METable from "../ME  Tools/table /METable";
+import METable, { FILTERS } from "../ME  Tools/table /METable";
+import {
+  getAdminApiEndpoint,
+  getLimit,
+  handleFilterChange,
+  onTableStateChange,
+} from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import { withRouter } from "react-router-dom";
+import Loader from "../../../utils/components/Loader";
 
 class AllUsers extends React.Component {
   constructor(props) {
@@ -39,14 +51,27 @@ class AllUsers extends React.Component {
   }
 
   componentDidMount() {
-    const { auth, putUsersInRedux, location, fetchUsers } = this.props;
+    const {
+      auth,
+      putUsersInRedux,
+      location,
+      fetchUsers,
+      updateTableFilters,
+      tableFilters,
+    } = this.props;
     const { state } = location;
     const ids = state && state.ids;
     const comingFromDashboard = ids && ids.length;
 
     if (!comingFromDashboard) return fetchUsers();
 
-    this.setState({ ignoreSavedFilters: true, saveFilters: false, ids });
+    this.setState({ updating: true, saveFilters: false });
+    const key = PAGE_PROPERTIES.ALL_USERS.key + FILTERS;
+
+    updateTableFilters({
+      ...(tableFilters || {}),
+      [key]: { 3: { list: ids } },
+    });
 
     var content = {
       fieldKey: "user_emails",
@@ -55,12 +80,15 @@ class AllUsers extends React.Component {
       dataSource: [],
       valueExtractor: (user) => user.email,
       reduxFxn: putUsersInRedux,
+      args: {
+        limit: getLimit(PAGE_PROPERTIES.ALL_USERS.key),
+      },
+      cb: () => this.setState({ updating: false }),
     };
     fetchUsers((data, failed) => {
       if (failed) return console.log("Could not fetch user list from B.E...");
       reArrangeForAdmin({ ...content, dataSource: data });
     });
-
   }
 
   fashionData = (data) => {
@@ -131,7 +159,7 @@ class AllUsers extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { allUsers, putUsersInRedux } = this.props;
-    const itemsInRedux = allUsers;
+    const itemsInRedux = allUsers || [];
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][6];
@@ -162,7 +190,7 @@ class AllUsers extends React.Component {
       <Typography>
         Are you sure you want to delete (
         {(idsToDelete && idsToDelete.length) || ""})
-        {len === 1 ? " user? " : " userrs? "}
+        {len === 1 ? " user? " : " users? "}
       </Typography>
     );
   }
@@ -170,14 +198,68 @@ class AllUsers extends React.Component {
     const title = brand.name + " - Users";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes } = this.props;
-    const data = this.fashionData(this.props.allUsers || []);
+    const {
+      classes,
+      allUsers,
+      putUsersInRedux,
+      auth,
+      meta,
+      putMetaDataToRedux,
+    } = this.props;
+    const data = this.fashionData(allUsers || []);
+    const metaData = meta && meta.users;
+
     const options = {
       filterType: "dropdown",
       responsive: "standard",
       print: true,
+      count: metaData && metaData.count,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
+      // When there is time, we need to think of a way to implement this in MEDatatable itself, so we dont have to repeat this
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putUsersInRedux,
+          reduxItems: allUsers,
+          apiUrl: getAdminApiEndpoint(auth, "/users"),
+          pageProp: PAGE_PROPERTIES.ALL_USERS,
+          updateMetaData: putMetaDataToRedux,
+          name: "users",
+          meta: meta,
+        }),
+      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
+        <SearchBar
+          url={getAdminApiEndpoint(auth, "/users")}
+          reduxItems={allUsers}
+          updateReduxFunction={putUsersInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_USERS}
+          updateMetaData={putMetaDataToRedux}
+          name="users"
+          meta={meta}
+        />
+      ),
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
+        return (
+          <ApplyFilterButton
+            url={getAdminApiEndpoint(auth, "/users")}
+            reduxItems={allUsers}
+            updateReduxFunction={putUsersInRedux}
+            columns={columns}
+            limit={getLimit(PAGE_PROPERTIES.ALL_USERS.key)}
+            applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="users"
+            meta={meta}
+          />
+        );
+      },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
@@ -188,10 +270,29 @@ class AllUsers extends React.Component {
         });
         return false;
       },
+      whenFilterChanges: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_USERS,
+          updateReduxFunction: putUsersInRedux,
+          reduxItems: allUsers,
+          url: getAdminApiEndpoint(auth, "/users"),
+          updateMetaData: putMetaDataToRedux,
+          name: "users",
+          meta: meta,
+        }),
     };
 
-    if (!data || !data.length) {
-      return <LinearBuffer />;
+    if (isEmpty(metaData)) {
+      return <Loader />;
     }
     return (
       <div>
@@ -203,6 +304,11 @@ class AllUsers extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
+
+        {this.state.updating && (
+          <LinearBuffer asCard message="Checking for updates..." lines={1} />
+        )}
+
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_USERS}
@@ -212,12 +318,6 @@ class AllUsers extends React.Component {
             columns: columns,
             options: options,
           }}
-          customFilterObject={{
-            3: {
-              list: this.state.ids,
-            },
-          }}
-          ignoreSavedFilters={this.state.ignoreSavedFilters}
           saveFilters={this.state.saveFilters}
         />
       </div>
@@ -233,6 +333,8 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     community: state.getIn(["selected_community"]),
     allUsers: state.getIn(["allUsers"]),
+    meta: state.getIn(["paginationMetaData"]),
+    tableFilters: state.getIn(["tableFilters"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -241,7 +343,9 @@ function mapDispatchToProps(dispatch) {
       fetchUsers: fetchUsersFromBackend,
       putUsersInRedux: loadAllUsers,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
+      updateTableFilters: reduxLoadTableFilters,
     },
     dispatch
   );

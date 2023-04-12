@@ -10,14 +10,22 @@ import { Radio } from "@mui/material";
 import { FormControlLabel } from "@mui/material";
 import { TextField } from "@mui/material";
 import { bindActionCreators } from "redux";
-import { reduxCallLibraryModalImages } from "../../../redux/redux-actions/adminActions";
-import { getFileSize,
-  smartString } from "../ME  Tools/media library/shared/utils/utils";
+import {
+  reduxAddToGalleryImages,
+  reduxAddToSearchedImages,
+  reduxCallLibraryModalImages,
+} from "../../../redux/redux-actions/adminActions";
+import {
+  getFileSize,
+  smartString,
+} from "../ME  Tools/media library/shared/utils/utils";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import {withStyles} from '@mui/styles'
 import PapperBlock from "../../../components/PapperBlock/PapperBlock";
-
+import { fetchParamsFromURL } from "../../../utils/common";
 import { makeStyles, } from "@mui/styles";
+import { withRouter } from "react-router-dom";
+import { styles } from "./styles";
 
   const error = {
     background: "rgb(255, 214, 214)",
@@ -53,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
     ...error,
     background: "rgb(174, 223, 174)",
     color: "rgb(12, 131, 30)",
-  },
+  }
 }));
 
 
@@ -73,15 +81,22 @@ function AddToGallery(props) {
     loadModalImages,
     modalImages,
     tags,
+    location,
+    history,
+    addImageToGalleryList,
+    addImageToSearchedList,
+    imagesFromGallery,
+    imagesFromSearchResults,
   } = props;
 
-   const classes = useStyles();
+  const classes = useStyles();
 
   const [chosenComs, setChosenComs] = useState([]);
   const [scope, setScope] = useState(CHOICES.SPECIFIC);
   const [state, setState] = useState(defaultState);
   const [resetAutoComplete, setResetorForAutoComplete] = useState(null);
   const [showTagAddingBox, setShowTagAddingBox] = useState(false);
+  const [needsToReturn, setNeedsToReturn] = useState(false); // user needs to return to the page they came from
   const [addedTags, setAddedTags] = useState({});
   const superAdmin = auth && auth.is_super_admin;
 
@@ -139,6 +154,14 @@ function AddToGallery(props) {
           notify(response.error.message, "error");
           return;
         }
+        addImageToGalleryList({
+          old: imagesFromGallery,
+          data: [response.data.image],
+        });
+        addImageToSearchedList({
+          old: imagesFromSearchResults,
+          data: [response.data.image],
+        });
         resetThisComponent();
         notify("Upload to library was successful!", "success");
         reset();
@@ -173,12 +196,16 @@ function AddToGallery(props) {
   };
 
   useEffect(() => {
+    const { tmb } = fetchParamsFromURL(location, "tmb"); // tmb: take me back
+    setNeedsToReturn(tmb);
+
     loadModalImages({
       old: modalImages,
       ...makeCommunityListParamsForFetch(),
     });
   }, []);
 
+  const isError = state.notification_type === "error";
   return (
     <PapperBlock>
       <Typography variant="h5" className={classes.header}>
@@ -266,7 +293,7 @@ function AddToGallery(props) {
       )}
       <MediaLibrary
         onUpload={onUpload}
-        actionText="Add to Library"
+        actionText="Select Image"
         defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
         images={modalImages && modalImages.images}
         sourceExtractor={(item) => item && item.url}
@@ -275,14 +302,54 @@ function AddToGallery(props) {
       />
       {state.notification_type && (
         <p
-          className={
-            state.notification_type === "error"
-              ? classes.error
-              : classes.success
-          }
+          className={isError ? classes.error : classes.success}
           onClick={() => notify()}
         >
           {state.notification_msg}
+
+          {/* --------------------------------------- */}
+          {!isError && !needsToReturn && (
+            <Link
+              onClick={() =>
+                history.push({
+                  pathname: "/admin/gallery",
+                })
+              }
+              style={{ textDecoration: "underline" }}
+              className={isError ? classes.error : classes.success}
+            >
+              <i>
+                {" "}
+                Want to see what you just added?
+                <i
+                  style={{ marginLeft: 5 }}
+                  className="fa fa-long-arrow-right"
+                />
+              </i>
+            </Link>
+          )}
+          {/* -------------------- USER NEEDS TO RETURN TO CREATING CONTENT------------------- */}
+          {!isError && needsToReturn && (
+            <Link
+              onClick={() =>
+                history.push({
+                  pathname: needsToReturn,
+                  state: { libOpen: true },
+                })
+              }
+              style={{ textDecoration: "underline" }}
+              className={isError ? classes.error : classes.success}
+            >
+              <i>
+                {" "}
+                Return to the page you were on{" "}
+                <i
+                  style={{ marginLeft: 5 }}
+                  className="fa fa-long-arrow-right"
+                />
+              </i>
+            </Link>
+          )}
         </p>
       )}
     </PapperBlock>
@@ -293,6 +360,8 @@ const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   communities: state.getIn(["communities"]),
   modalImages: state.getIn(["modalLibraryImages"]),
+  imagesFromGallery: state.getIn(["galleryImages"]),
+  imagesFromSearchResults: state.getIn(["searchedImages"]),
   tags: state.getIn(["allTags"]),
 });
 const mapDispatchToProps = (dispatch) => {
@@ -300,6 +369,8 @@ const mapDispatchToProps = (dispatch) => {
     {
       loadModalImages: reduxCallLibraryModalImages,
       loadMoreModalImages: reduxCallLibraryModalImages,
+      addImageToGalleryList: reduxAddToGalleryImages,
+      addImageToSearchedList: reduxAddToSearchedImages,
     },
     dispatch
   );
@@ -308,7 +379,7 @@ const GalleryWithProps = connect(
   mapStateToProps,
   mapDispatchToProps
 )(AddToGallery);
-export default (GalleryWithProps);
+export default withStyles(styles)(withRouter(GalleryWithProps));
 
 const AddTags = ({ tags, selections, handleOnChange }) => {
   if (!tags) return <></>;

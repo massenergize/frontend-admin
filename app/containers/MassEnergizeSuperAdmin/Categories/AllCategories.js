@@ -3,36 +3,29 @@ import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
-import { PapperBlock } from "dan-components";
-import imgApi from "dan-api/images/photos";
-import classNames from "classnames";
 import Typography from "@mui/material/Typography";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Chip from "@mui/material/Chip";
 import Icon from "@mui/material/Icon";
 
-import MUIDataTable from "mui-datatables";
-import CallMadeIcon from "@mui/icons-material/CallMade";
 import EditIcon from "@mui/icons-material/Edit";
 import { Link } from "react-router-dom";
-import Avatar from "@mui/material/Avatar";
 import Paper from "@mui/material/Paper";
-import LinearProgress from "@mui/material/LinearProgress";
-import Grid from "@mui/material/Grid";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import { bindActionCreators } from "redux";
 import Loading from "dan-components/Loading";
 import {
   loadAllTags,
+  reduxLoadMetaDataAction,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import { connect } from "react-redux";
+import { getLimit, onTableStateChange } from "../../../utils/helpers";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import METable from "../ME  Tools/table /METable";
+import { isEmpty } from "../../../utils/common";
+import Loader from "../../../utils/components/Loader";
 class AllTagCollections extends React.Component {
   constructor(props) {
     super(props);
@@ -40,10 +33,12 @@ class AllTagCollections extends React.Component {
   }
 
   componentDidMount() {
-    apiCall("/tag_collections.listForCommunityAdmin").then(
+    let {putMetaDataToRedux, meta, putTagsInRedux} = this.props;
+    apiCall("/tag_collections.listForCommunityAdmin", {limit:getLimit(PAGE_PROPERTIES.ALL_TAG_COLLECTS.key)}).then(
       (tagCollectionsResponse) => {
         if (tagCollectionsResponse && tagCollectionsResponse.success) {
-          this.props.putTagsInRedux(tagCollectionsResponse.data);
+          putTagsInRedux(tagCollectionsResponse.data);
+          putMetaDataToRedux({ ...meta, tagCollections:tagCollectionsResponse.cursor});
         }
       }
     );
@@ -71,8 +66,8 @@ class AllTagCollections extends React.Component {
 
     const cols = [
       {
-        name: 'ID',
-        key: 'id',
+        name: "ID",
+        key: "id",
         options: {
           filter: false,
         },
@@ -116,10 +111,15 @@ class AllTagCollections extends React.Component {
         options: {
           filter: false,
           download: false,
+          sort: false,
           customBodyRender: (id) => (
             <div>
               <Link to={`/admin/edit/${id}/tag-collection`}>
-                <EditIcon size="small" variant="outlined" color="secondary" />
+                <EditIcon
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
               &nbsp;&nbsp;
             </div>
@@ -143,7 +143,7 @@ class AllTagCollections extends React.Component {
 
   nowDelete({ idsToDelete, data }) {
     const { tags, putTagsInRedux } = this.props;
-    const itemsInRedux = tags;
+    const itemsInRedux = tags || [];
     const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
@@ -180,16 +180,19 @@ class AllTagCollections extends React.Component {
       </Typography>
     );
   }
+
   render() {
     const title = brand.name + " - All Tag Collections";
     const description = brand.desc;
     const { columns } = this.state;
-    const { classes, tags } = this.props;
+    const { classes, tags, putTagsInRedux, meta, putMetaDataToRedux } = this.props;
     const data = this.fashionData(tags);
+    const metaData = meta && meta.tagCollections;
 
     const options = {
       filterType: "dropdown",
       responsive: "standard",
+      count: metaData && metaData.count,
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
@@ -202,19 +205,56 @@ class AllTagCollections extends React.Component {
           closeAfterConfirmation: true,
         });
         return false;
-
-        // const idsToDelete = rowsDeleted.data;
-        // idsToDelete.forEach((d) => {
-        //   const tagCollectionId = data[d.dataIndex][0];
-        //   apiCall("/tag_collections.delete", {
-        //     tag_collection_id: tagCollectionId,
-        //   });
-        // });
       },
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putTagsInRedux,
+          reduxItems: tags,
+          apiUrl: "/tag_collections.listForCommunityAdmin",
+          pageProp: PAGE_PROPERTIES.ALL_TAG_COLLECTS,
+          updateMetaData: putMetaDataToRedux,
+          name: "tagCollections",
+          meta: meta,
+        }),
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
+        <SearchBar
+          url="/tag_collections.listForCommunityAdmin"
+          reduxItems={tags}
+          updateReduxFunction={putTagsInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_TAG_COLLECTS}
+          updateMetaData={putMetaDataToRedux}
+          name="tagCollections"
+          meta={meta}
+        />
+      ),
+      // Not needed for now.
+      //  customFilterDialogFooter: (currentFilterList, applyFilters) => {
+      //   return (
+      //     <ApplyFilterButton
+      //       url="/tag_collections.listForCommunityAdmin"
+      //       reduxItems={tags}
+      //       updateReduxFunction={putTagsInRedux}
+      //       columns={columns}
+      //       filters={currentFilterList}
+      //       applyFilters={applyFilters}
+      //     />
+      //   );
+      // },
     };
-    if (!data || !data.length) {
-      return <Loading />;
-    }
+   if (isEmpty(metaData)) {
+     return <Loader />;
+   }
     return (
       <div>
         <Helmet>
@@ -225,14 +265,19 @@ class AllTagCollections extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <div className={classes.table}>
-          <MUIDataTable
-            title="All Tag Collections"
-            data={data}
-            columns={columns}
-            options={options}
+
+        <Paper style={{ marginBottom: 10 }}>
+          <METable
+            classes={classes}
+            page={PAGE_PROPERTIES.ALL_TAG_COLLECTS}
+            tableProps={{
+              title: "All Tag Collections",
+              data: data,
+              columns: columns,
+              options: options,
+            }}
           />
-        </div>
+        </Paper>
       </div>
     );
   }
@@ -243,7 +288,11 @@ AllTagCollections.propTypes = {
 };
 
 const mapStateToProps = (state) => {
-  return { tags: state.getIn(["allTags"]) };
+  return {
+    tags: state.getIn(["allTags"]),
+    meta: state.getIn(["paginationMetaData"]),
+  };
+  
 };
 
 const mapDispatchToProps = (dispatch) => {
@@ -251,7 +300,8 @@ const mapDispatchToProps = (dispatch) => {
     {
       putTagsInRedux: loadAllTags,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

@@ -4,7 +4,7 @@ import themePalette from "dan-api/palette/themePaletteMode";
 const applicationTheme = (color, mode) => ({
   spacing: 10,
   palette: {
-    type: mode,
+    mode: mode,
     primary: themePalette(color, mode).palette.primary,
     secondary: themePalette(color, mode).palette.secondary,
     action: {

@@ -3,12 +3,18 @@ import PropTypes from "prop-types";
 import states from "dan-api/data/states";
 import { withStyles } from "@mui/styles";
 import moment from "moment";
-import MassEnergizeForm from "../_FormGenerator";
+// import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
 import { makeTagSection } from "./EditEventForm";
 import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
 import fieldTypes from "../_FormGenerator/fieldTypes";
+import { bindActionCreators } from "redux";
+import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import { removePageProgressFromStorage } from "../../../utils/common";
+import { withRouter } from "react-router-dom";
 
 const styles = (theme) => ({
   root: {
@@ -46,7 +52,13 @@ class CreateNewEventForm extends Component {
   }
 
   static getDerivedStateFromProps = (props, state) => {
-    const { communities, tags, auth, otherCommunities } = props;
+    const {
+      communities,
+      tags,
+      auth,
+      location,
+      otherCommunities,
+    } = props;
 
     const readyToRenderPageFirstTime =
       communities &&
@@ -67,13 +79,20 @@ class CreateNewEventForm extends Component {
       id: "" + c.id,
     }));
 
+    
+    const section = makeTagSection({
+      collections: tags,
+      defaults: false,
+    });
+
+    const libOpen = location.state && location.state.libOpen;
+
     const formJson = createFormJson({
       communities: coms,
       auth,
-      otherCommunities,
+      autoOpenMediaLibrary: libOpen,
+      otherCommunities: otherCommunities || [],
     });
-
-    const section = makeTagSection({ collections: tags, defaults: false });
 
     if (formJson) formJson.fields.splice(1, 0, section);
 
@@ -84,6 +103,8 @@ class CreateNewEventForm extends Component {
     };
   };
 
+ 
+
   render() {
     const { classes } = this.props;
     const { formJson } = this.state;
@@ -91,9 +112,11 @@ class CreateNewEventForm extends Component {
     return (
       <div>
         <MassEnergizeForm
+          pageKey={PAGE_KEYS.CREATE_EVENT.key}
           classes={classes}
           formJson={formJson}
           validator={validator}
+          enableCancel
         />
       </div>
     );
@@ -109,13 +132,28 @@ const mapStateToProps = (state) => {
     tags: state.getIn(["allTags"]),
     communities: state.getIn(["communities"]),
     auth: state.getIn(["auth"]),
+    formState: state.getIn(["tempForm"]),
     otherCommunities: state.getIn(["otherCommunities"]),
   };
 };
 
-const CreateEventMapped = connect(mapStateToProps)(CreateNewEventForm);
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      saveFormTemporarily: reduxKeepFormContent,
+    },
+    dispatch
+  );
+};
 
-export default withStyles(styles, { withTheme: true })(CreateEventMapped);
+const CreateEventMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreateNewEventForm);
+
+export default withStyles(styles, { withTheme: true })(
+  withRouter(CreateEventMapped)
+);
 
 const validator = (cleaned) => {
   const start = (cleaned || {})["start_date_and_time"];
@@ -134,7 +172,13 @@ const whenStartDateChanges = ({ newValue, formData, setValueInForm }) => {
   setValueInForm({ start_date_and_time: newValue, end_date_and_time: newEnd });
 };
 
-const createFormJson = ({ communities, auth, otherCommunities }) => {
+const createFormJson = ({
+  communities,
+  auth,
+  progress,
+  autoOpenMediaLibrary,
+  otherCommunities,
+}) => {
   const is_super_admin = auth && auth.is_super_admin;
   otherCommunities = otherCommunities || [];
   const otherCommunityList = otherCommunities.map((c) => ({
@@ -158,7 +202,7 @@ const createFormJson = ({ communities, auth, otherCommunities }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            // defaultValue: progress.name || "",
             dbName: "name",
             readOnly: false,
           },
@@ -169,20 +213,8 @@ const createFormJson = ({ communities, auth, otherCommunities }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            // defaultValue: progress.featured_summary || "",
             dbName: "featured_summary",
-            readOnly: false,
-          },
-          {
-            name: "rank",
-            label:
-              "Rank (Which order should this event appear in?  Lower numbers come first)",
-            placeholder: "eg. 1",
-            fieldType: "TextField",
-            contentType: "number",
-            isRequired: true,
-            defaultValue: "",
-            dbName: "rank",
             readOnly: false,
           },
           {
@@ -246,7 +278,7 @@ const createFormJson = ({ communities, auth, otherCommunities }) => {
                   label: "",
                   fieldType: "Radio",
                   dbName: "recurring_type",
-                  defaultValue: null,
+                  // defaultValue: progress.recurring_type || null,
                   data: [
                     { id: "week", value: "weeks" },
                     { id: "month", value: "months" },
@@ -360,8 +392,6 @@ const createFormJson = ({ communities, auth, otherCommunities }) => {
                 id: "CLOSE",
                 value: "No one can see this, keep this in my community only ",
               },
-
-              // { id: "CLOSED_TO", value: "All except these communities" },
             ],
             conditionalDisplays: [
               {
@@ -379,21 +409,6 @@ const createFormJson = ({ communities, auth, otherCommunities }) => {
                   },
                 ],
               },
-              // {
-              //   valueToCheck: "CLOSED_TO",
-              //   fields: [
-              //     {
-              //       name: "cannot-view-event",
-              //       label: `Select the communities should NOT see this event`,
-              //       placeholder: "",
-              //       fieldType: "Checkbox",
-              //       selectMany: true,
-              //       defaultValue: [],
-              //       dbName: "publicity_selections",
-              //       data: otherCommunityList,
-              //     },
-              //   ],
-              // },
             ],
           },
         ],
@@ -472,6 +487,9 @@ const createFormJson = ({ communities, auth, otherCommunities }) => {
         fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload Files",
+        selected: [],
+        // defaultValue: progress.image || [],
+        openState: autoOpenMediaLibrary,
         isRequired: false,
       },
       {
@@ -484,7 +502,6 @@ const createFormJson = ({ communities, auth, otherCommunities }) => {
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
         child: {
-          dbName: "rsvp_communication",
           valueToCheck: "true",
           fields: [
             {

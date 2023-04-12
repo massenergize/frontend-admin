@@ -6,7 +6,7 @@ import { withStyles } from "@mui/styles";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
-import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import {
   fetchLatestNextSteps,
   reduxAddToHeap,
@@ -15,6 +15,7 @@ import {
 } from "../../../redux/redux-actions/adminActions";
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -80,7 +81,7 @@ class EditTeam extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    var { match, communities, teams, teamsInfos } = props;
+    var { match, communities, teams, teamsInfos, location } = props;
     const { id } = match.params;
     communities = (communities || []).map((c) => ({
       ...c,
@@ -95,11 +96,17 @@ class EditTeam extends Component {
     if (jobsDoneDontRunWhatsBelow) return null;
 
     if (team)
-      teams = teams.filter(
+      teams = teams && teams.filter(
         (t) => t.primary_community.id === team.primary_community.id
       );
     const parentTeamOptions = makeParentOptions({ teams, team });
-    const formJson = createFormJson({ team, parentTeamOptions, communities });
+    const libOpen = location.state && location.state.libOpen;
+    const formJson = createFormJson({
+      team,
+      parentTeamOptions,
+      communities,
+      autoOpenMediaLibrary: libOpen,
+    });
     return { team, formJson, parentTeamOptions, mounted: true };
   }
   async componentDidMount() {
@@ -139,6 +146,7 @@ class EditTeam extends Component {
   render() {
     const { classes } = this.props;
     const { formJson, team } = this.state;
+    const { id } = this.props.match.params;
     if (!formJson) return <Loading />;
     return (
       <div>
@@ -152,9 +160,11 @@ class EditTeam extends Component {
         </Paper>
 
         <br />
+        
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
+          pageKey={`${PAGE_KEYS.EDIT_TEAM.key}-${id}`}
           enableCancel
           onComplete={this.onComplete.bind(this)}
         />
@@ -192,8 +202,10 @@ const EditTeamMapped = connect(
   mapDispatchToProps
 )(withRouter(EditTeam));
 
-export default withStyles(styles, { withTheme: true })(EditTeamMapped);
-const createFormJson = ({ communities, team, parentTeamOptions }) => {
+export default withStyles(styles, { withTheme: true })(
+  withRouter(EditTeamMapped)
+);
+const createFormJson = ({ communities, team, parentTeamOptions,  autoOpenMediaLibrary, }) => {
   // const { communities, team, parentTeamOptions } = this.state;
   const selectedCommunities = team.communities
     ? team.communities.map((e) => "" + e.id)
@@ -292,6 +304,7 @@ const createFormJson = ({ communities, team, parentTeamOptions }) => {
         name: "logo",
         placeholder: "Select a Logo for this team",
         fieldType: fieldTypes.MediaLibrary,
+        openState: autoOpenMediaLibrary,
         selected: team.logo ? [team.logo] : [],
         dbName: "logo",
         label: "Select a Logo for this team",

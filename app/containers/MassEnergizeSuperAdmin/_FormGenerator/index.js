@@ -93,6 +93,7 @@ class MassEnergizeForm extends Component {
     };
     this.updateForm = this.updateForm.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
+    this.resetForm = this.resetForm.bind(this);
     //this.closePreviewModal = this.closePreviewModal.bind(this);
   }
 
@@ -103,6 +104,10 @@ class MassEnergizeForm extends Component {
     await this.setStateAsync({ formJson, formData, readOnly: readOnly });
   }
 
+  componentWillUnmount() {
+    const { unMount } = this.props;
+    if (unMount) unMount(this.state);
+  }
   setStateAsync(state) {
     return new Promise((resolve) => {
       this.setState(state, resolve);
@@ -341,7 +346,9 @@ class MassEnergizeForm extends Component {
   getDisplayName = (fieldName, id, data) => {
     const { formData } = this.state;
     if (id) {
-      const [result] = data.filter((d) => d.id.toString() === id.toString());
+      const [result] = data.filter(
+        (d) => d.id && d.id.toString() === id && id.toString()
+      );
       if (result) {
         return result.displayName;
       }
@@ -507,7 +514,7 @@ class MassEnergizeForm extends Component {
     // lets set the startCircularSpinner Value so the spinner starts spinning
     await this.setStateAsync({ startCircularSpinner: true });
     // let's clean up the data
-    const { onComplete, validator } = this.props;
+    const { onComplete, validator, clearProgress } = this.props;
     let [cleanedValues, hasMediaFiles] = this.cleanItUp(
       formData,
       formJson.fields
@@ -558,9 +565,10 @@ class MassEnergizeForm extends Component {
           this.resetForm.bind(this)
         );
 
+      if (clearProgress) clearProgress(this.resetForm);
+
       if (formJson.successRedirectPage) {
-        this.props.history.push(formJson.successRedirectPage);
-        // window.location.href = formJson.successRedirectPage;
+        window.location.href = formJson.successRedirectPage;
       }
     } else if (response && !response.success) {
       // we got an error from the backend so let's set it so the snackbar can pick it up
@@ -1029,7 +1037,7 @@ class MassEnergizeForm extends Component {
               this.getValue(field.name) === field.child.valueToCheck &&
               this.renderFields(field.child.fields)}
             {this.renderConditionalDisplays(field)}
-          </div>
+          </div> 
         );
       case FieldTypes.TextField:
         return (
@@ -1053,7 +1061,8 @@ class MassEnergizeForm extends Component {
                 shrink: true,
               }}
               disabled={field.readOnly || this.state.readOnly}
-              defaultValue={field.defaultValue}
+              // defaultValue={field.defaultValue}
+              value={this.getValue(field.name)}
               inputProps={{ maxLength: field.maxLength }}
               // maxLength={field.maxLength}
               variant="outlined"
@@ -1180,7 +1189,6 @@ class MassEnergizeForm extends Component {
       <div key={this.state.refreshKey}>
         <Grid
           container
-          spacing={24}
           alignItems="flex-start"
           direction="row"
           justify="center"
@@ -1276,9 +1284,9 @@ class MassEnergizeForm extends Component {
                   </div>
                 )}
                 <div>
-                  {formJson && formJson.cancelLink && (
+                  {/* {formJson && formJson.cancelLink && (
                     <Link to={formJson.cancelLink}>Cancel</Link>
-                  )}
+                  )} */}
                   {"    "}
                   {enableCancel && (
                     <Button
@@ -1286,6 +1294,8 @@ class MassEnergizeForm extends Component {
                       color="secondary"
                       onClick={(e) => {
                         e.preventDefault();
+                        const { clearProgress } = this.props;
+                        if (clearProgress) clearProgress(this.resetForm);
                         if (cancel) return cancel();
                         this.props.history.goBack();
                       }}
@@ -1317,7 +1327,7 @@ MassEnergizeForm.propTypes = {
   classes: PropTypes.object.isRequired,
   formJson: PropTypes.object.isRequired,
   enableCancel: PropTypes.bool,
-  cancel: PropTypes.func,
+  // cancel: PropTypes.func,
   /**
    * Any function you want to run when the form successfully does its job
    */

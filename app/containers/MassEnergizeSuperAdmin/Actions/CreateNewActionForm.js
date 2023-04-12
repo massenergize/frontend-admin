@@ -2,12 +2,16 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
-import MassEnergizeForm from "../_FormGenerator";
+// import MassEnergizeForm from "../_FormGenerator";
 import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
 import { checkIfReadOnly, makeTagSection } from "./EditActionForm";
-import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
 import fieldTypes from "../_FormGenerator/fieldTypes";
+import { bindActionCreators } from "redux";
+import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import { withRouter } from "react-router-dom";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -44,10 +48,16 @@ class CreateNewActionForm extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    const { communities, tags, vendors, ccActions, auth } = props;
+    const {
+      communities,
+      tags,
+      vendors,
+      ccActions,
+      auth,
+      location,
+    } = props;
     const fullyMountedNeverRunThisAgain =
-      communities &&
-      communities.length &&
+      communities && communities.length &&
       tags &&
       tags.length &&
       ccActions &&
@@ -69,14 +79,21 @@ class CreateNewActionForm extends Component {
       displayName: c.description,
       id: "" + c.id,
     }));
+
+    const section = makeTagSection({
+      collections: tags,
+      defaults: false
+    });
+
+    const libOpen = location.state && location.state.libOpen;
+
     const formJson = createFormJson({
       communities: coms,
       vendors: vends,
       ccActions: modifiedCCActions,
       auth,
+      autoOpenMediaLibrary: libOpen,
     });
-
-    const section = makeTagSection({ collections: tags, defaults: false });
 
     if (formJson) formJson.fields.splice(1, 0, section);
 
@@ -89,13 +106,19 @@ class CreateNewActionForm extends Component {
     };
   }
 
+
   render() {
     const { classes } = this.props;
     const { formJson } = this.state;
     if (!formJson) return <Loading />;
     return (
       <div key={this.state.reRenderKey}>
-        <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+          pageKey={PAGE_KEYS.CREATE_ACTION.key}
+          enableCancel
+        />
       </div>
     );
   }
@@ -112,12 +135,34 @@ const mapStateToProps = (state) => ({
   ccActions: state.getIn(["ccActions"]),
   actions: state.getIn(["allActions"]),
   auth: state.getIn(["auth"]),
+  formState: state.getIn(["tempForm"]),
 });
 
-const NewActionMapped = connect(mapStateToProps)(CreateNewActionForm);
-export default withStyles(styles, { withTheme: true })(NewActionMapped);
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      saveFormTemporarily: reduxKeepFormContent,
+    },
+    dispatch
+  );
+};
 
-const createFormJson = ({ communities, ccActions, vendors, auth }) => {
+const NewActionMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreateNewActionForm);
+export default withStyles(styles, { withTheme: true })(
+  withRouter(NewActionMapped)
+);
+
+const createFormJson = ({
+  communities,
+  ccActions,
+  vendors,
+  auth,
+  progress,
+  autoOpenMediaLibrary,
+}) => {
   const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Create a New Action",
@@ -136,7 +181,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            // defaultValue: progress.title || "",
             dbName: "title",
             readOnly: false,
             maxLength: 40,
@@ -148,7 +193,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
             placeholder: "eg. 1",
             fieldType: "TextField",
             contentType: "number",
-            isRequired: true,
+            isRequired: false,
             defaultValue: "",
             dbName: "rank",
             readOnly: false,
@@ -159,7 +204,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
                 label: "Is this Action a Template?",
                 fieldType: "Radio",
                 isRequired: false,
-                defaultValue: "false",
+                // defaultValue: progress.is_global || "false",
                 dbName: "is_global",
                 readOnly: false,
                 data: [
@@ -173,10 +218,10 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
                       name: "community",
                       label: "Primary Community (select one)",
                       fieldType: "Dropdown",
-                      defaultValue: null,
+                      // defaultValue: progress.community || null,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
-                      isRequired:true
+                      isRequired: true,
                     },
                   ],
                 },
@@ -185,13 +230,15 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
                 name: "community",
                 label: "Primary Community (select one)",
                 fieldType: "Dropdown",
-                defaultValue: communities[0].id,    // for a cadmin default to first of their communities.  Need one.
+                // defaultValue: progress.community || communities[0].id, // for a cadmin default to first of their communities.  Need one.
+                defaultValue: communities[0].id, // for a cadmin default to first of their communities.  Need one.
                 dbName: "community_id",
-                data: [{ displayName: "--", id: "" }, ...communities],     
-                isRequired:true 
+                data: [{ displayName: "--", id: "" }, ...communities],
+                isRequired: true,
               },
         ],
       },
+
       {
         label:
           "Carbon Calculator - Link your Action to one of our Carbon Calculator Actions",
@@ -202,7 +249,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
             label: "Calculator Action",
             placeholder: "eg. Wayland",
             fieldType: "Dropdown",
-            defaultValue: null,
+            // defaultValue: progress.calculator_action || null,
             dbName: "calculator_action",
             data: [{ displayName: "--", id: "" }, ...ccActions],
             modalTitle: "Carbon Action List & Instructions",
@@ -218,7 +265,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
         fieldType: "TextField",
         isMulti: true,
         isRequired: true,
-        defaultValue: null,
+        // defaultValue: progress.featured_summary || null,
         dbName: "featured_summary",
       },
       {
@@ -227,7 +274,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
         placeholder: "Key information people should know about the action",
         fieldType: "HTMLField",
         isRequired: true,
-        defaultValue: null,
+        // defaultValue: progress.about || null,
         dbName: "about",
       },
       {
@@ -236,7 +283,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
         placeholder: "Easy to follow steps to accomplish the action",
         fieldType: "HTMLField",
         isRequired: false,
-        defaultValue: null,
+        // defaultValue: progress.steps_to_take || null,
         dbName: "steps_to_take",
       },
       {
@@ -245,7 +292,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
         placeholder: "Further information some users might want to know",
         fieldType: "HTMLField",
         isRequired: false,
-        defaultValue: null,
+        // defaultValue: progress.deep_dive || null,
         dbName: "deep_dive",
       },
       {
@@ -253,7 +300,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
         label: "Select which vendors provide services for this action",
         fieldType: "Checkbox",
         selectMany: true,
-        defaultValue: null,
+        // defaultValue: progress.vendors || null,
         dbName: "vendors",
         data: vendors,
       },
@@ -264,7 +311,9 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
         dbName: "image",
         label: "Upload Files",
         isRequired: false,
-        defaultValue: "",
+        // selected: progress.image || [],
+        // defaultValue: progress.image || [],
+        openState: autoOpenMediaLibrary,
         filesLimit: 1,
       },
       {
@@ -272,7 +321,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth }) => {
         label: "Should this action go live?",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: "false",
+        // defaultValue: progress.is_published || "false",
         dbName: "is_published",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],

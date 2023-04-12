@@ -3,9 +3,11 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
-import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
+import { withRouter } from "react-router-dom";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -33,8 +35,13 @@ const styles = (theme) => ({
 export const getSelectedIds = (selected, dataToCrossCheck) => {
   const res = [];
   (selected || []).forEach((s) => {
-    if (dataToCrossCheck.filter((d) => d.id === s.id).length > 0) {
-      res.push("" + s.id);
+    const isString = typeof s === "string"; // The selected tags dont always come in as array of objs, sometimes they come in as array of strings (like: when tracking progress)
+    const filtered = dataToCrossCheck.filter((d) => {
+      if (isString) return d.id.toString() === s;
+      return d.id === s.id;
+    });
+    if (filtered.length > 0) {
+      res.push("" + isString ? s : s.id);
     }
   });
   return res;
@@ -57,8 +64,17 @@ export const makeTagSection = ({ collections, action, defaults = true }) => {
     fieldType: "Section",
     children: [],
   };
-
   (collections || []).forEach((tCol) => {
+    var selected = (action && action.tags) || [];
+    let putDefaultsIfUpdating = {};
+    if (defaults) {
+      let data = selected.map((c) => c.id.toString());
+      putDefaultsIfUpdating = {
+        defaultValue: defaults && getSelectedIds(data || [], tCol.tags || []),
+      };
+    }
+
+    selected = (selected.length && selected) || [];
     const newField = {
       isRequired: false,
       name: tCol.name,
@@ -70,9 +86,10 @@ export const makeTagSection = ({ collections, action, defaults = true }) => {
       placeholder: "",
       fieldType: "Checkbox",
       selectMany: tCol.allow_multiple,
-      defaultValue:
-        defaults &&
-        getSelectedIds((action && action.tags) || [], tCol.tags || []),
+      ...putDefaultsIfUpdating,
+      processedDefaultValue: (selected) =>
+        getSelectedIds(selected || [], tCol.tags || []),
+
       dbName: "tags",
       data: (tCol.tags || []).map((t) => ({
         ...t,
@@ -101,6 +118,17 @@ class EditActionForm extends Component {
     };
   }
 
+  async componentDidMount() {
+    const { id } = this.props.match.params;
+    const actionResponse = await apiCall("/actions.info", {
+      id: id,
+    });
+    if (actionResponse && !actionResponse.success) {
+      return;
+    }
+    await this.setStateAsync({ action: actionResponse.data });
+  }
+
   static getDerivedStateFromProps(props, state) {
     const {
       match,
@@ -110,6 +138,7 @@ class EditActionForm extends Component {
       vendors,
       auth,
       ccActions,
+      location,
     } = props;
 
     const { id } = match.params;
@@ -120,13 +149,15 @@ class EditActionForm extends Component {
       ccActions.length &&
       tags &&
       tags.length;
+
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRunPageFirstTime || state.mounted;
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
+    let action = state.action;
+    if (!action) {
+      action = (actions || []).find((a) => a.id.toString() === id.toString());
+    }
 
-    const action = (actions || []).find(
-      (a) => a.id.toString() === id.toString()
-    );
     const readOnly = checkIfReadOnly(action, auth);
     const coms = (communities || []).map((c) => ({
       ...c,
@@ -143,12 +174,15 @@ class EditActionForm extends Component {
       displayName: c.description,
       id: "" + c.id,
     }));
+    const libOpen = location.state && location.state.libOpen;
+
     const formJson = createFormJson({
       action,
       communities: coms,
       vendors: vends,
       ccActions: modifiedCCActions,
       auth,
+      autoOpenMediaLibrary: libOpen,
     });
 
     const section = makeTagSection({ collections: tags, action });
@@ -164,10 +198,16 @@ class EditActionForm extends Component {
       readOnly,
     };
   }
+  setStateAsync(state) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve);
+    });
+  }
 
   render() {
     const { classes } = this.props;
     const { formJson, readOnly, action } = this.state;
+    const { id } = this.props.match.params;
     if (!action || !formJson) return <Loading />;
     return (
       <div>
@@ -175,6 +215,7 @@ class EditActionForm extends Component {
           classes={classes}
           formJson={formJson}
           readOnly={readOnly}
+          pageKey={`${PAGE_KEYS.EDIT_ACTION.key}-${id}`}
           enableCancel
         />
       </div>
@@ -198,9 +239,18 @@ EditActionForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(EditActionMapped);
+export default withStyles(styles, { withTheme: true })(
+  withRouter(EditActionMapped)
+);
 
-const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
+const createFormJson = ({
+  action,
+  communities,
+  ccActions,
+  vendors,
+  auth,
+  autoOpenMediaLibrary,
+}) => {
   if (!action || !ccActions || !vendors || !communities) return;
   const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
@@ -243,7 +293,7 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
             placeholder: "eg. 1",
             fieldType: "TextField",
             contentType: "number",
-            isRequired: true,
+            isRequired: false,
             defaultValue: action.rank,
             dbName: "rank",
             readOnly: false,
@@ -273,7 +323,7 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
                         action.community && "" + action.community.id,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
-                      isRequired: true
+                      isRequired: true,
                     },
                   ],
                 },
@@ -286,7 +336,7 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
                 defaultValue: action.community && "" + action.community.id,
                 dbName: "community_id",
                 data: [{ displayName: "--", id: "" }, ...communities],
-                isRequired:true
+                isRequired: true,
               },
         ],
       },
@@ -367,6 +417,7 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth }) => {
         placeholder: "Select an Image",
         fieldType: fieldTypes.MediaLibrary,
         selected: action.image ? [action.image] : [],
+        openState: autoOpenMediaLibrary,
         dbName: "image",
         label: "Upload Files",
         isRequired: false,
