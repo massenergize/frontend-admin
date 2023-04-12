@@ -1,12 +1,13 @@
 /* eslint-disable camelcase */
 import React from "react";
 import PropTypes from "prop-types";
-import Button from "@material-ui/core/Button";
-import VerifiedUser from "@material-ui/icons/VerifiedUser";
-import { withStyles } from "@material-ui/core/styles";
+import Button from "@mui/material/Button";
+import VerifiedUser from "@mui/icons-material/VerifiedUser";
+import { withStyles } from "@mui/styles";
 import styles from "./jss/cover-jss";
 import { apiCall } from "../../../../utils/messenger";
 import { PORTAL_HOST } from "../../../../config/constants";
+import { Paper } from "@mui/material";
 
 class Cover extends React.Component {
   goLive = async () => {
@@ -74,7 +75,7 @@ class Cover extends React.Component {
     };
 
     return (
-      <div className={classes.cover} style={coverStyle}>
+      <Paper className={classes.cover} style={coverStyle}>
         <div className={classes.content}>
           <div style={{ display: "flex", flex: "2", alignItems: "center" }}>
             <h2 style={contentStyle}>
@@ -127,7 +128,7 @@ class Cover extends React.Component {
             </div>
           </div>
         </div>
-      </div>
+      </Paper>
     );
   }
 }

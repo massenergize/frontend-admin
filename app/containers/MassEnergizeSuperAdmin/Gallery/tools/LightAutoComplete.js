@@ -1,17 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
-import {
-  Checkbox,
-  Chip,
-  Paper,
-  TextField,
-  withStyles,
-} from "@material-ui/core";
+import { Checkbox, Chip, Paper, TextField } from "@mui/material";
 import { pop } from "../../../../utils/common";
-import Typography from "material-ui/styles/typography";
+import Typography from "@mui/material/Typography";
+import { withStyles } from "@mui/styles";
 
 const styles = (theme) => {
-  const spacing = theme.spacing.unit;
   return {
     textbox: {
       width: "100%",
@@ -19,7 +13,7 @@ const styles = (theme) => {
     ghostCurtain: {
       position: "absolute",
       top: 100,
-      left: 0,
+      left: "-100px",
       width: "100vw",
       height: "100vh",
       background: "white",
@@ -39,7 +33,7 @@ const styles = (theme) => {
       overflowY: "scroll",
     },
     dropdownItem: {
-      padding: spacing * 2,
+      padding: 16,
       width: "100%",
       cursor: "pointer",
       "&:hover": {
@@ -48,11 +42,17 @@ const styles = (theme) => {
     },
     chips: {
       margin: "2px",
+      opacity: "1",
     },
     option: {
       textDecoration: "underline",
       cursor: "pointer",
     },
+    container: {},
+    error: {},
+    header: {},
+    dropdownArea: {},
+    success: {},
   };
 };
 
@@ -70,7 +70,9 @@ function LightAutoComplete(props) {
     onMount,
     disabled,
     allowChipRemove,
+    containerStyle,
     multiple,
+    showSelectAll = true,
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
@@ -140,12 +142,12 @@ function LightAutoComplete(props) {
       : 0;
     return height;
   };
-  const onlyValues = selected.map((itm) => getValue(itm));
+  const onlyValues = (selected||[]).map((itm) => getValue(itm));
   const thereAreNoOptionsToDisplay = optionsToDisplay.length === 0;
   const userHasSelectedStuff = selected.length;
 
   return (
-    <div style={{ position: "relative", width: "100%" }}>
+    <div style={{ position: "relative", width: "100%", marginTop: 19 }}>
       {selected && selected.length > 0 && (
         <div ref={chipWrapperRef}>
           {selected.map((option, index) => {
@@ -157,7 +159,6 @@ function LightAutoComplete(props) {
                 label={getLabel(option)}
                 {...deleteOptions}
                 className={classes.chips}
-                disabled
               />
             );
           })}
@@ -169,7 +170,7 @@ function LightAutoComplete(props) {
         style={{ top: -500, height: 500 }}
         classes={classes}
       />
-      <div style={{}}>
+      <div style={containerStyle || {}}>
         <TextField
           disabled={disabled}
           onClick={() => {
@@ -192,7 +193,8 @@ function LightAutoComplete(props) {
             />
             <Paper
               className={classes.dropdown}
-              style={{ top: 70 + increasedRatio() }}
+              style={{ top: 70 + increasedRatio(),}}
+
             >
               {thereAreNoOptionsToDisplay && (
                 <p style={{ padding: 10, color: "lightgray" }}>
@@ -200,7 +202,7 @@ function LightAutoComplete(props) {
                 </p>
               )}
 
-              {multiple && !thereAreNoOptionsToDisplay && (
+              {multiple && !thereAreNoOptionsToDisplay && showSelectAll && (
                 <div>
                   <div
                     style={{
@@ -217,7 +219,8 @@ function LightAutoComplete(props) {
                     >
                       {" "}
                       Select All
-                    </span>{" "}
+                    </span>
+
                     {userHasSelectedStuff ? (
                       <span
                         className={`${classes.option} touchable-opacity`}
@@ -248,10 +251,12 @@ function LightAutoComplete(props) {
                     {multiple && (
                       <Checkbox
                         style={{ padding: 0, marginRight: 6 }}
-                        checked={onlyValues.includes(getValue(op))}
+                        checked={onlyValues.includes(
+                          getValue(op)
+                        )}
                       />
                     )}
-                    {getLabel(op)}
+                      {getLabel(op)}
                   </div>
                 );
               })}

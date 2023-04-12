@@ -1,19 +1,21 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
-import { Paper, Typography } from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
+import { Link, withRouter } from "react-router-dom";
+import { Paper, Typography } from "@mui/material";
+import { withStyles } from "@mui/styles";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
-import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import {
+  fetchLatestNextSteps,
   reduxAddToHeap,
   reduxGetAllCommunityTeams,
   reduxUpdateHeap,
 } from "../../../redux/redux-actions/adminActions";
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -33,7 +35,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -79,7 +81,7 @@ class EditTeam extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    var { match, communities, teams, teamsInfos } = props;
+    var { match, communities, teams, teamsInfos, location } = props;
     const { id } = match.params;
     communities = (communities || []).map((c) => ({
       ...c,
@@ -94,11 +96,17 @@ class EditTeam extends Component {
     if (jobsDoneDontRunWhatsBelow) return null;
 
     if (team)
-      teams = teams.filter(
+      teams = teams && teams.filter(
         (t) => t.primary_community.id === team.primary_community.id
       );
     const parentTeamOptions = makeParentOptions({ teams, team });
-    const formJson = createFormJson({ team, parentTeamOptions, communities });
+    const libOpen = location.state && location.state.libOpen;
+    const formJson = createFormJson({
+      team,
+      parentTeamOptions,
+      communities,
+      autoOpenMediaLibrary: libOpen,
+    });
     return { team, formJson, parentTeamOptions, mounted: true };
   }
   async componentDidMount() {
@@ -110,6 +118,25 @@ class EditTeam extends Component {
     },heap);
   }
 
+  onComplete(_, __, resetForm) {
+    const pathname = "/admin/read/teams";
+    const { location, history, match, updateNextSteps } = this.props;
+    const { id } = match.params;
+    var ids = location.state && location.state.ids;
+
+    resetForm && resetForm();
+    updateNextSteps();
+    // Just means admin just answered message normally, so form should just reset, and redirect back to the same page, just like the old fxnality
+    if (!ids || !ids.length) return history.push(pathname);
+
+    // -- Then follow up with going back to the msg list page, but with the id of the just-answered msg, removed
+    ids = ids.filter((_id) => _id.toString() !== id && id.toString());
+    history.push({
+      pathname,
+      state: { ids },
+    });
+  }
+
   setStateAsync(state) {
     return new Promise((resolve) => {
       this.setState(state, resolve);
@@ -119,6 +146,7 @@ class EditTeam extends Component {
   render() {
     const { classes } = this.props;
     const { formJson, team } = this.state;
+    const { id } = this.props.match.params;
     if (!formJson) return <Loading />;
     return (
       <div>
@@ -132,7 +160,14 @@ class EditTeam extends Component {
         </Paper>
 
         <br />
-        <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
+        
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+          pageKey={`${PAGE_KEYS.EDIT_TEAM.key}-${id}`}
+          enableCancel
+          onComplete={this.onComplete.bind(this)}
+        />
       </div>
     );
   }
@@ -157,6 +192,7 @@ function mapDispatchToProps(dispatch) {
       callTeamsForNormalAdmin: reduxGetAllCommunityTeams,
       addTeamsToHeap: reduxUpdateHeap,
       addTeamInfoToHeap: reduxAddToHeap,
+      updateNextSteps: fetchLatestNextSteps,
     },
     dispatch
   );
@@ -164,10 +200,12 @@ function mapDispatchToProps(dispatch) {
 const EditTeamMapped = connect(
   mapStateToProps,
   mapDispatchToProps
-)(EditTeam);
+)(withRouter(EditTeam));
 
-export default withStyles(styles, { withTheme: true })(EditTeamMapped);
-const createFormJson = ({ communities, team, parentTeamOptions }) => {
+export default withStyles(styles, { withTheme: true })(
+  withRouter(EditTeamMapped)
+);
+const createFormJson = ({ communities, team, parentTeamOptions,  autoOpenMediaLibrary, }) => {
   // const { communities, team, parentTeamOptions } = this.state;
   const selectedCommunities = team.communities
     ? team.communities.map((e) => "" + e.id)
@@ -266,6 +304,7 @@ const createFormJson = ({ communities, team, parentTeamOptions }) => {
         name: "logo",
         placeholder: "Select a Logo for this team",
         fieldType: fieldTypes.MediaLibrary,
+        openState: autoOpenMediaLibrary,
         selected: team.logo ? [team.logo] : [],
         dbName: "logo",
         label: "Select a Logo for this team",

@@ -1,12 +1,10 @@
 import {
   Avatar,
   Button,
-  Checkbox,
-  FormControlLabel,
   Paper,
   Tooltip,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
@@ -14,7 +12,10 @@ import { apiCall } from "../../../utils/messenger";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
-import CallMadeIcon from "@material-ui/icons/CallMade";
+import CallMadeIcon from "@mui/icons-material/CallMade";
+import { getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 
 function EventsFromOtherCommunities({
   putOtherEventsInRedux,
@@ -23,9 +24,12 @@ function EventsFromOtherCommunities({
   classes,
   state,
   putStateInRedux,
+  meta,
+  putMetaDataToRedux,
 }) {
   const [loading, setLoading] = useState(false);
   const { communities, exclude, mounted } = state || {};
+
 
   const setCommunities = (communities) => {
     putStateInRedux({ ...(state || {}), communities });
@@ -52,12 +56,13 @@ function EventsFromOtherCommunities({
     ]);
     return fashioned;
   };
+
   const data = fashionData(otherEvents || []);
 
   useEffect(() => {
     if (!mounted) {
       // First time the page loads, Preselect all communities
-      setCommunities(otherCommunities);
+      setCommunities(otherCommunities || []);
       // fetchOtherEvents(otherCommunities);  // Uncheck if we want to automatically load in events from all the preselected communities as well
     }
   }, [otherCommunities]);
@@ -69,10 +74,14 @@ function EventsFromOtherCommunities({
     apiCall("/events.others.listForCommunityAdmin", {
       community_ids: ids,
       exclude: exclude || false,
+      limit:getLimit(PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS.key)
     })
       .then((response) => {
         setLoading(false);
-        if (response.success) return putOtherEventsInRedux(response.data);
+        if (response.success){
+          putOtherEventsInRedux(response.data);
+          putMetaDataToRedux({...meta, otherEvents: response.cursor });
+        }
       })
       .catch((e) => {
         setLoading(false);
@@ -157,14 +166,92 @@ function EventsFromOtherCommunities({
       },
     ];
   };
-
+const metaData =meta && meta.otherEvents
+const columns = makeColumns();
+const ids = (communities || []).map((it) => it.id);
   const options = {
     filterType: "dropdown",
-    responsive: "stacked",
+    responsive: "standard",
     print: true,
     rowsPerPage: 25,
     rowsPerPageOptions: [10, 25, 100],
     selectableRows: false,
+    count: metaData && metaData.count,
+    confirmFilters: true,
+    onTableChange: (action, tableState) =>
+      onTableStateChange({
+        action,
+        tableState,
+        tableData: data,
+        metaData,
+        updateReduxFunction: putOtherEventsInRedux,
+        reduxItems: otherEvents,
+        apiUrl: "/events.others.listForCommunityAdmin",
+        pageProp: PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS,
+        updateMetaData: putMetaDataToRedux,
+        name: "otherEvents",
+        meta: meta,
+        otherArgs: {
+          community_ids: ids,
+        },
+      }),
+    customSearchRender: (searchText, handleSearch, hideSearch, options) => (
+      <SearchBar
+        url={"/events.others.listForCommunityAdmin"}
+        reduxItems={otherEvents}
+        updateReduxFunction={putOtherEventsInRedux}
+        handleSearch={handleSearch}
+        hideSearch={hideSearch}
+        pageProp={PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS}
+        updateMetaData={putMetaDataToRedux}
+        name="otherEvents"
+        meta={meta}
+        otherArgs={{
+          community_ids: ids,
+        }}
+      />
+    ),
+    customFilterDialogFooter: (currentFilterList, applyFilters) => {
+      return (
+        <ApplyFilterButton
+          url={"/events.others.listForCommunityAdmin"}
+          reduxItems={otherEvents}
+          updateReduxFunction={putOtherEventsInRedux}
+          columns={columns}
+          limit={getLimit(PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS.key)}
+          applyFilters={applyFilters}
+          updateMetaData={putMetaDataToRedux}
+          name="otherEvents"
+          meta={meta}
+          otherArgs={{
+            community_ids: ids,
+          }}
+        />
+      );
+    },
+
+    whenFilterChanges: (
+      changedColumn,
+      filterList,
+      type,
+      changedColumnIndex,
+      displayData
+    ) =>
+      handleFilterChange({
+        filterList,
+        type,
+        columns,
+        page: PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS,
+        updateReduxFunction: putOtherEventsInRedux,
+        reduxItems: otherEvents,
+        url: "/events.others.listForCommunityAdmin",
+        updateMetaData: putMetaDataToRedux,
+        name: "otherEvents",
+        meta: meta,
+        otherArgs: {
+          community_ids: ids,
+        },
+      }),
   };
 
   const renderTable = ({ data, options }) => {

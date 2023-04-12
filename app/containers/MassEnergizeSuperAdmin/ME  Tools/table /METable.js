@@ -1,7 +1,11 @@
 import MUIDataTable from "mui-datatables";
 import React, { useEffect, useRef, useState } from "react";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { reduxLoadTableFilters } from "../../../../redux/redux-actions/adminActions";
 
-const FILTERS = "_FILTERS";
+export const FILTER_OBJ_KEY = "MAIN_FILTER_OBJECT";
+export const FILTERS = "_FILTERS";
 const TABLE_PROPERTIES = "_TABLE_PROPERTIES";
 const DIRECTIONS = { descending: "desc", ascending: "asc" };
 /**
@@ -19,8 +23,18 @@ function METable(props) {
   const filterObject = useRef({});
   const pageTableProperties = useRef({});
   const [tableColumns, setTableColumns] = useState([]);
-  const { classes, tableProps, page } = props;
-  // const [options, setOptions] = useState({});
+
+  const {
+    classes,
+    tableProps,
+    page,
+    ignoreSavedFilters,
+    saveFilters = true,
+    filtersFromRedux,
+    sendFilterUpdatesToRedux,
+  } = props;
+
+  const CURRENT_TABLE_KEY = page.key + FILTERS;
 
   /**
    * This function is called when the component is first rendered.
@@ -32,13 +46,20 @@ function METable(props) {
    * just like MUI datatable expects.
    */
   const retrieveFiltersFromLastVisit = (columns) => {
-    const properties = getProperties();
-    var filterObj = localStorage.getItem(page.key + FILTERS);
-    filterObj = JSON.parse(filterObj || null) || {};
-    Object.keys(filterObj).forEach((indexOfColumn) => {
+    let filterObj = (filtersFromRedux || {})[CURRENT_TABLE_KEY] || {};
+    return inflateWithFilters(columns, filterObj);
+  };
+
+  const inflateWithFilters = (columns, filterObj) => {
+    const arr = Object.keys(filterObj);
+    if (!arr || !arr.length) return columns;
+
+    arr.forEach((indexOfColumn) => {
       const filter = filterObj[indexOfColumn] || [];
       const col = columns[indexOfColumn];
-      if (col) col.options.filterList = filter.list; // set the filter list of each column if available
+      if (col) {
+        col.options.filterList = filter.list; // if custom passed filter selections are available
+      } // set the filter list of each column if available
     });
     filterObject.current = filterObj;
     return columns;
@@ -65,19 +86,31 @@ function METable(props) {
 
   useEffect(() => {
     let { columns } = tableProps || {};
+    var modified;
     const properties = getProperties();
     pageTableProperties.current = properties;
     columns = retrieveSortOptionsAndSort(columns);
-    const modified = retrieveFiltersFromLastVisit(columns);
+    modified = retrieveFiltersFromLastVisit(columns);
     setTableColumns(modified);
-  }, []);
+  }, [filtersFromRedux]);
 
   /**
   
    * @param {*} filter 
    */
   const saveSelectedFilters = (filter) => {
-    localStorage.setItem(page.key + FILTERS, JSON.stringify(filter));
+    // From 03.06.23  -> Redux is the sole source of truth for table filters
+    // From 03.06.23 Onwards, filter items per page are all now saved in one object and set to redux instead of each table filter having it's own space in local storage/redux
+    const obj = filtersFromRedux || {};
+    localStorage.setItem(
+      FILTER_OBJ_KEY,
+      JSON.stringify({ ...obj, [CURRENT_TABLE_KEY]: filter }) // This will get loaded into redux onLoad inside <Application />
+    );
+  };
+
+  const putFiltersInRedux = (filter) => {
+    const obj = filtersFromRedux || {};
+    sendFilterUpdatesToRedux({ ...obj, [CURRENT_TABLE_KEY]: filter });
   };
 
   /**
@@ -101,8 +134,32 @@ function METable(props) {
    * @param {*} type
    * @returns
    */
-  const onFilterChange = (column, filterList, type) => {
-    const { columns } = tableProps || {};
+
+  const onFilterChange = (
+    column,
+    filterList,
+    type,
+    changedColumnIndex,
+    displayData
+  ) => {
+    const { columns, options } = tableProps || {};
+    //  this changes have been made to allow us apply custom filtering to the table.
+    if (options.whenFilterChanges) {
+      let { obj, newColumns } = options.whenFilterChanges(
+        column,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      );
+
+      filterObject.current = obj;
+      setTableColumns(newColumns);
+      putFiltersInRedux(obj);
+      if (saveFilters) saveSelectedFilters(obj);
+      return;
+    }
+
     const columnIndex = columns.findIndex((c) => c.name === column);
     const obj = filterObject.current;
     if (columnIndex === -1) return;
@@ -110,10 +167,11 @@ function METable(props) {
     filter = { name: column, type, list: filterList[columnIndex] };
     const newObj = { ...(obj || {}), [columnIndex]: filter };
     filterObject.current = newObj;
-    saveSelectedFilters(newObj);
+    if (saveFilters) saveSelectedFilters(newObj);
   };
 
   const getProperties = () => {
+    if (ignoreSavedFilters) return {};
     const val = localStorage.getItem(page.key + TABLE_PROPERTIES);
     return JSON.parse(val || null) || {};
   };
@@ -158,15 +216,30 @@ function METable(props) {
     ...(tableProps.options || {}),
     onSearchChange,
     searchText: search || "",
-    searchOpen: search,
+    searchOpen: search ? true : false,
     onChangeRowsPerPage: whenRowsPerPageChanges,
     rowsPerPage: rowsPerPage || tableProps.options.rowsPerPage,
     onColumnSortChange: whenAdminSortsAColumn,
   };
+
   return (
     <div className={(classes && classes.table) || ""}>
       <MUIDataTable {...tableProps} options={options} columns={tableColumns} />
     </div>
   );
 }
-export default METable;
+const mapStateToProps = (state) => {
+  return { filtersFromRedux: state.getIn(["tableFilters"]) };
+};
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      sendFilterUpdatesToRedux: reduxLoadTableFilters,
+    },
+    dispatch
+  );
+};
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(METable);

@@ -3,7 +3,7 @@ import MassEnergizeForm from "../_FormGenerator";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import Loading from "dan-components/Loading";
 import { LOADING } from "../../../utils/constants";
-import { Paper } from "@material-ui/core";
+import { Paper } from "@mui/material";
 
 function AddOrEditFeatureFlags({
   communities,
@@ -34,7 +34,7 @@ function AddOrEditFeatureFlags({
   };
 
   const formJson = createFormJson({
-    communities,
+    communities:communities,
     flagKeys,
     users,
     putFlagsInRedux,

@@ -1,4 +1,4 @@
-import pink from '@material-ui/core/colors/pink';
+import pink from '@mui/material/colors/pink';
 const styles = theme => ({
   card: {
     display: 'flex',
@@ -20,7 +20,7 @@ const styles = theme => ({
       marginLeft: 90,
       minWidth: 400,
     },
-    marginBottom: theme.spacing.unit * 3,
+    marginBottom: theme.spacing(3),
     position: 'relative',
   },
   media: {

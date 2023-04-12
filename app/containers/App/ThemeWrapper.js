@@ -4,14 +4,16 @@ import { connect } from 'react-redux';
 import Loading from 'react-loading-bar';
 import { bindActionCreators } from 'redux';
 import {
-  withTheme, withStyles,
-  createMuiTheme, MuiThemeProvider
-} from '@material-ui/core/styles';
+  ThemeProvider, CssBaseline, createTheme
+} from '@mui/material';
+
+import { withTheme, withStyles } from "@mui/styles";
 import 'dan-styles/vendors/react-loading-bar/index.css';
 import {
   changeModeAction,
 } from 'dan-actions/UiActions';
 import applicationTheme from '../../styles/theme/applicationTheme';
+
 
 const styles = {
   root: {
@@ -29,59 +31,60 @@ class ThemeWrapper extends React.Component {
     super(props);
     this.state = {
       pageLoaded: true,
-      theme: createMuiTheme(applicationTheme(props.color, props.mode)),
+      theme: createTheme((applicationTheme(props.color, props.mode))),
     };
   }
 
-  componentWillMount = () => {
-    this.onProgressShow();
-  }
 
   componentDidMount = () => {
+
+    this.onProgressShow();
     this.playProgress();
-  }
+  };
 
   componentWillUnmount() {
     this.onProgressShow();
   }
 
-  handleChangeMode = mode => {
+  handleChangeMode = (mode) => {
+    const newMode =  (mode ==="light" ? "dark" : "light") 
     const { color, changeMode } = this.props;
-    this.setState({ theme: createMuiTheme(applicationTheme(color, mode)) });
-    changeMode(mode);
+    this.setState({ theme: createTheme(applicationTheme(color, newMode)) });
+    changeMode(newMode);
   };
 
   onProgressShow = () => {
     this.setState({ pageLoaded: true });
-  }
+  };
 
   onProgressHide = () => {
     this.setState({ pageLoaded: false });
-  }
+  };
 
   playProgress = () => {
     this.onProgressShow();
     setTimeout(() => {
       this.onProgressHide();
     }, 500);
-  }
+  };
 
   render() {
-    const { classes, children } = this.props;
+    const { classes, children , mode} = this.props;
     const { pageLoaded, theme } = this.state;
     return (
-      <MuiThemeProvider theme={theme}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
         <div className={classes.root}>
           <Loading
             show={pageLoaded}
             color="rgba(255,255,255,.9)"
             showSpinner={false}
           />
-          <AppContext.Provider value={this.handleChangeMode}>
+          <AppContext.Provider value={()=>this.handleChangeMode(mode)}>
             {children}
           </AppContext.Provider>
         </div>
-      </MuiThemeProvider>
+      </ThemeProvider>
     );
   }
 }
@@ -110,4 +113,4 @@ const ThemeWrapperMapped = connect(
   dispatchToProps
 )(ThemeWrapper);
 
-export default withTheme()(withStyles(styles)(ThemeWrapperMapped));
+export default withTheme((withStyles(styles)(ThemeWrapperMapped)));
