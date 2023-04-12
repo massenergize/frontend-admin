@@ -1,10 +1,10 @@
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-} from "@material-ui/core";
-import React, { useState } from "react";
+import { Button } from "@mui/material";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import React from "react";
 
 function ThemeModal({
   children,
@@ -13,32 +13,64 @@ function ThemeModal({
   open,
   closeAfterConfirmation,
   close,
+  okText,
+  cancelText,
+  noCancel = false,
+  noOk,
+  fullControl = false,
+  contentStyle = {},
 }) {
-  // const [open, setopen] = useState(second)
+  const fullControlStyles = { padding: 0 };
   return (
-    <Dialog open={open}>
-      <DialogContent>{children}</DialogContent>
-      <DialogActions>
-        <Button
-          color="default"
-          onClick={() => {
-            onCancel && onCancel();
-            if (close) close();
-          }}
+    <>
+      <Dialog
+        open={open}
+        onClose={onCancel}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Confirmation Dialog"}
+        </DialogTitle>
+        <DialogContent
+          style={
+            fullControl
+              ? { ...fullControlStyles, ...(contentStyle || {}) }
+              : contentStyle || {}
+          }
         >
-          No
-        </Button>
-        <Button
-          color="primary"
-          onClick={() => {
-            onConfirm && onConfirm();
-            if (closeAfterConfirmation) close && close();
-          }}
-        >
-          Yes
-        </Button>
-      </DialogActions>
-    </Dialog>
+          <DialogContentText id="alert-dialog-description">
+            {children}
+          </DialogContentText>
+        </DialogContent>
+        {!fullControl && (
+          <DialogActions>
+            {!noCancel && (
+              <Button
+                // color="default"
+                onClick={() => {
+                  onCancel && onCancel();
+                  if (close) return close();
+                }}
+              >
+                {cancelText || "  No"}
+              </Button>
+            )}
+            {!noOk && (
+              <Button
+                // color="primary"
+                onClick={() => {
+                  onConfirm && onConfirm();
+                  if (closeAfterConfirmation) close && close();
+                }}
+              >
+                {okText || "Yes"}
+              </Button>
+            )}
+          </DialogActions>
+        )}
+      </Dialog>
+    </>
   );
 }
 

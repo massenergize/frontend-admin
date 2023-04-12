@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import states from 'dan-api/data/states';
-import MassEnergizeForm from '../_FormGenerator';
-import { apiCall } from '../../../utils/messenger';
+import MassEnergizeForm from '../containers/MassEnergizeSuperAdmin/_FormGenerator';
+import { apiCall } from '../utils/messenger';
 
 const styles = theme => ({
   root: {
@@ -24,7 +24,7 @@ const styles = theme => ({
     flexDirection: 'row'
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: 'center'
   },
 });
@@ -106,7 +106,6 @@ class CreateNewVendorForm extends Component {
               placeholder: 'eg. 100',
               fieldType: 'TextField',
               contentType: 'text',
-              isRequired: true,
               defaultValue: vendor.id,
               dbName: 'id',
               readOnly: true
@@ -324,7 +323,7 @@ class CreateNewVendorForm extends Component {
           isRequired: true,
           defaultValue: vendor && vendor.onboarding_contact && vendor.onboarding_contact.email,
           dbName: 'onboarding_contact_email',
-          readOnly: true
+          readOnly: false
         },
         {
           name: 'image',

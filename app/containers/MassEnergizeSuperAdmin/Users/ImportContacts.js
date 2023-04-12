@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import Tooltip from '@material-ui/core/Tooltip';
-import Fab from '@material-ui/core/Fab';
-import Add from '@material-ui/icons/Add';
+import { withStyles } from "@mui/styles";
+import Tooltip from '@mui/material/Tooltip';
+import Fab from '@mui/material/Fab';
+import Add from '@mui/icons-material/Add';
 import FloatingPanel from 'dan-components/Panel/FloatingPanel';
 import AddContactForm from './AddContactForm';
 import styles from './contact-jss';
@@ -80,7 +80,6 @@ class ImportContacts extends React.Component {
                         name="csv"
                         type="file"
                         //ref={(input) => { this.filesInput = input }}
-                        name="file"
                         icon='file text outline'
                         iconPosition='left'
                         label='Upload CSV'

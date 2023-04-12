@@ -4,14 +4,13 @@ import PropTypes from "prop-types";
 
 import brand from "dan-api/dummy/brand";
 import { Helmet } from "react-helmet";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 
-import MUIDataTable from "mui-datatables";
-import FileCopy from "@material-ui/icons/FileCopy";
-import EditIcon from "@material-ui/icons/Edit";
+import FileCopy from "@mui/icons-material/FileCopy";
+import EditIcon from "@mui/icons-material/Edit";
 import { Link, withRouter } from "react-router-dom";
-import Avatar from "@material-ui/core/Avatar";
-import TextField from "@material-ui/core/TextField";
+import Avatar from "@mui/material/Avatar";
+import TextField from "@mui/material/TextField";
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -22,11 +21,36 @@ import {
   reduxGetAllCommunityActions,
   loadAllActions,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
+  reduxLoadMetaDataAction,
+  reduxLoadTableFilters,
 } from "../../../redux/redux-actions/adminActions";
 
-import { isNotEmpty, smartString } from "../../../utils/common";
-import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
+import {
+  findMatchesAndRest,
+  getHumanFriendlyDate,
+  getTimeStamp,
+  isEmpty,
+  isNotEmpty,
+  makeDeleteUI,
+  ourCustomSort,
+  pop,
+  reArrangeForAdmin,
+  smartString,
+} from "../../../utils/common";
+import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
+import METable, { FILTERS } from "../ME  Tools/table /METable";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import {
+  getAdminApiEndpoint,
+  getLimit,
+  handleFilterChange,
+  onTableStateChange,
+} from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import Loader from "../../../utils/components/Loader";
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -41,18 +65,40 @@ class AllActions extends React.Component {
   }
 
   async componentDidMount() {
-    const { putActionsInRedux, auth } = this.props;
-    var url;
-    if (auth.is_super_admin) url = "/actions.listForSuperAdmin";
-    else if (auth.is_community_admin) url = "/actions.listForCommunityAdmin";
-    const allActionsResponse = await apiCall(url);
-    if (allActionsResponse && allActionsResponse.success) {
-      putActionsInRedux(allActionsResponse.data);
-    } else if (allActionsResponse && !allActionsResponse.success) {
-      await this.setStateAsync({
-        error: allActionsResponse.error,
-      });
-    }
+    const {
+      putActionsInRedux,
+      fetchActions,
+      location,
+      tableFilters,
+      updateTableFilters,
+    } = this.props;
+
+    const { state } = location;
+    const ids = state && state.ids;
+    const comingFromDashboard = ids && ids.length;
+    if (!comingFromDashboard) return fetchActions();
+
+    this.setState({ saveFilters: false });
+    const key = PAGE_PROPERTIES.ALL_ACTIONS.key + FILTERS;
+    updateTableFilters({
+      ...(tableFilters || {}),
+      [key]: { 0: { list: ids } },
+    });
+
+    var content = {
+      fieldKey: "action_ids",
+      apiURL: "/actions.listForCommunityAdmin",
+      props: this.props,
+      dataSource: [],
+      reduxFxn: putActionsInRedux,
+      args: {
+        limit: getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key),
+      },
+    };
+    fetchActions(null, (data, failed, error) => {
+      if (failed) return this.setState({ error });
+      reArrangeForAdmin({ ...content, dataSource: data });
+    });
   }
 
   setStateAsync(state) {
@@ -60,6 +106,14 @@ class AllActions extends React.Component {
       this.setState(state, resolve);
     });
   }
+
+  updateRedux = (data) => {
+    const { putActionsInRedux, allActions } = this.props;
+    const index = allActions.findIndex((a) => a.id === data.id);
+    const updateItems = allActions.filter((a) => a.id !== data.id);
+    updateItems.splice(index, 0, data);
+    putActionsInRedux(updateItems);
+  };
 
   changeActions = async (id) => {
     const { allActions } = this.state;
@@ -69,13 +123,22 @@ class AllActions extends React.Component {
     await this.setStateAsync({ data: fashionData(newData) });
   };
 
-  getColumns = () => {
-    const { classes } = this.props;
+  getColumns() {
+    const { classes, putActionsInRedux, allActions } = this.props;
     return [
+      {
+        name: "ID",
+        key: "id",
+        options: {
+          filter: false,
+          filterType: "multiselect",
+        },
+      },
       {
         name: "Image",
         key: "image",
         options: {
+          sort: false,
           filter: false,
           download: false,
           customBodyRender: (d) => (
@@ -114,7 +177,7 @@ class AllActions extends React.Component {
                   required
                   name="rank"
                   variant="outlined"
-                  onChange={async (event) => {
+                  onBlur={async (event) => {
                     const { target } = event;
                     if (!target) return;
                     const { name, value } = target;
@@ -122,6 +185,10 @@ class AllActions extends React.Component {
                       await apiCall("/actions.rank", {
                         action_id: d && d.id,
                         [name]: value,
+                      }).then((res) => {
+                        if (res && res.success) {
+                          this.updateRedux(res && res.data);
+                        }
                       });
                     }
                   }}
@@ -158,6 +225,7 @@ class AllActions extends React.Component {
         key: "is_live",
         options: {
           filter: false,
+          download: false,
           customBodyRender: (d) => {
             return (
               <MEChip
@@ -184,6 +252,7 @@ class AllActions extends React.Component {
         options: {
           filter: false,
           download: false,
+          sort: false,
           customBodyRender: (id) => (
             <div>
               <Link to={`/admin/edit/${id}/action`}>
@@ -195,9 +264,11 @@ class AllActions extends React.Component {
                   const copiedActionResponse = await apiCall("/actions.copy", {
                     action_id: id,
                   });
+
                   if (copiedActionResponse && copiedActionResponse.success) {
                     const newAction =
                       copiedActionResponse && copiedActionResponse.data;
+                    putActionsInRedux([newAction, ...(allActions || [])]);
                     this.props.history.push(
                       `/admin/edit/${newAction.id}/action`
                     );
@@ -211,11 +282,57 @@ class AllActions extends React.Component {
           ),
         },
       },
+      {
+        name: "Live",
+        key: "hidden_live_or_not",
+        options: {
+          display: false,
+          filter: true,
+          searchable: false,
+          download: true,
+        },
+      },
+      {
+        name: "Live",
+        key: "is_a_template",
+        options: {
+          display: false,
+          filter: false,
+          searchable: false,
+          download: false,
+        },
+      },
+      {
+        name: "Created At",
+        key: "hidden_created_at",
+        options: {
+          display: false,
+          filter: false,
+          searchable: false,
+          download: true,
+        },
+      },
+      {
+        name: "Last Update",
+        key: "hidden_updated_at",
+        options: {
+          display: false,
+          filter: false,
+          searchable: false,
+          download: true,
+        },
+      },
     ];
-  };
-  fashionData = (data) => {
+  }
+  /**
+   * NOTE: If you add or remove a field in here, make sure your changes reflect in nowDelete.
+   * Deleting heavily relies on the index arrangement of the items in here. Merci!
+   * @param {*} data
+   * @returns
+   */
+  fashionData(data) {
     const fashioned = data.map((d) => [
-      // d.id,
+      d.id,
       {
         id: d.id,
         image: d.image,
@@ -227,9 +344,13 @@ class AllActions extends React.Component {
       d.is_global ? "Template" : d.community && d.community.name,
       { isLive: d.is_published, item: d },
       d.id,
+      d.is_published ? "Yes" : "No",
+      d.is_global,
+      getHumanFriendlyDate(d.created_at, true, false),
+      getHumanFriendlyDate(d.updated_at, true, false),
     ]);
     return fashioned;
-  };
+  }
 
   makeLiveOrNot(item) {
     const putInRedux = this.props.putActionsInRedux;
@@ -238,10 +359,12 @@ class AllActions extends React.Component {
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
+    const community = item.community;
     putInRedux([...data]);
     apiCall("/actions.update", {
       action_id: item.id,
       is_published: !status,
+      community_id: (community && community.id) || null,
     });
   }
 
@@ -263,52 +386,63 @@ class AllActions extends React.Component {
     const itemsInRedux = allActions;
     const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][6];
+      const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/actions.delete", { action_id: found });
+      apiCall("/actions.delete", { action_id: found })
+        .then((res) => {
+          if (res.success) {
+            this.props.toggleToast({
+              open: true,
+              message: "Action(s) successfully deleted",
+              variant: "success",
+            });
+          } else {
+            this.props.toggleToast({
+              open: true,
+              message:
+                "An error occurred while deleting the action(s), please try again",
+              variant: "error",
+            });
+          }
+        })
+        .catch((e) => console.log("ACTION_DELETE_ERRO:", e));
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putActionsInRedux(rem);
   }
 
-  makeDeleteUI({ idsToDelete }) {
-    const len = (idsToDelete && idsToDelete.length) || 0;
-    return (
-      <Typography>
-        Are you sure you want to delete (
-        {(idsToDelete && idsToDelete.length) || ""})
-        {len === 1 ? " action? " : " actions? "}
-      </Typography>
-    );
+  customSort(data, colIndex, order) {
+    const isComparingLive = colIndex === 6;
+    const isComparingRank = colIndex === 3;
+    const sortForLive = ({ a, b }) => (a.isLive && !b.isLive ? 1 : -1);
+    const sortForRank = ({ a, b }) => (a.rank < b.rank ? -1 : 1);
+    var params = {
+      colIndex,
+      order,
+    };
+
+    if (isComparingLive) params = { ...params, compare: sortForLive };
+    else if (isComparingRank) params = { ...params, compare: sortForRank };
+    return data.sort((a, b) => ourCustomSort({ ...params, a, b }));
   }
 
   render() {
     const title = brand.name + " - All Actions";
     const description = brand.desc;
-    const { classes } = this.props;
+    const {
+      classes,
+      auth,
+      allActions,
+      putActionsInRedux,
+      putMetaDataToRedux,
+      meta,
+    } = this.props;
     const { columns, error } = this.state;
-    const data = this.fashionData(this.props.allActions || []);
-    if (!data || !data.length) {
-      return (
-        <Grid
-          container
-          spacing={24}
-          alignItems="flex-start"
-          direction="row"
-          justify="center"
-        >
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root} style={{ padding: 15 }}>
-              <div className={classes.root}>
-                <LinearProgress />
-                <h1>Fetching all Actions. This may take a while...</h1>
-                <br />
-                <LinearProgress color="secondary" />
-              </div>
-            </Paper>
-          </Grid>
-        </Grid>
-      );
+    const data = this.fashionData(allActions || []);
+    const metaData = meta && meta.actions;
+
+    if (isEmpty(metaData)) {
+      return <Loader />;
     }
 
     if (error) {
@@ -321,25 +455,117 @@ class AllActions extends React.Component {
 
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
-      rowsPerPage: 15,
+      rowsPerPage: 25,
+      count: metaData && metaData.count,
+      rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putActionsInRedux,
+          reduxItems: allActions,
+          apiUrl: getAdminApiEndpoint(auth, "/actions"),
+          pageProp: PAGE_PROPERTIES.ALL_ACTIONS,
+          updateMetaData: putMetaDataToRedux,
+          name: "actions",
+          meta: meta,
+        }),
+      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
+        <SearchBar
+          url={getAdminApiEndpoint(auth, "/actions")}
+          reduxItems={allActions}
+          updateReduxFunction={putActionsInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_ACTIONS}
+          updateMetaData={putMetaDataToRedux}
+          name="actions"
+          meta={meta}
+        />
+      ),
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
+        return (
+          <ApplyFilterButton
+            url={getAdminApiEndpoint(auth, "/actions")}
+            reduxItems={allActions}
+            updateReduxFunction={putActionsInRedux}
+            columns={columns}
+            limit={getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key)}
+            applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="actions"
+            meta={meta}
+          />
+        );
+      },
+
+      whenFilterChanges: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_ACTIONS,
+          updateReduxFunction: putActionsInRedux,
+          reduxItems: allActions,
+          url: getAdminApiEndpoint(auth, "/actions"),
+          updateMetaData: putMetaDataToRedux,
+          name: "actions",
+          meta: meta,
+        }),
+      customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
+        const [found] = findMatchesAndRest(idsToDelete, (it) => {
+          const f = data[it.dataIndex];
+          return f[9]; // this index should be changed if anyone modifies (adds/removes) an item in fashionData()
+        });
+        const noTemplatesSelectedGoAhead = !found || !found.length;
         this.props.toggleDeleteConfirmation({
           show: true,
-          component: this.makeDeleteUI({ idsToDelete }),
-          onConfirm: () => this.nowDelete({ idsToDelete, data }),
+          component: makeDeleteUI({
+            idsToDelete,
+            templates: found,
+            noTemplates: noTemplatesSelectedGoAhead,
+          }),
+          onConfirm: () =>
+            noTemplatesSelectedGoAhead && this.nowDelete({ idsToDelete, data }),
           closeAfterConfirmation: true,
+          cancelText: noTemplatesSelectedGoAhead
+            ? "No"
+            : "Go Back and Remove Templates",
+          noOk: !noTemplatesSelectedGoAhead,
         });
         return false;
-        // const idsToDelete = rowsDeleted.data;
-        // idsToDelete.forEach(async (d) => {
-        //   const actionId = data[d.dataIndex][0];
-        //   await apiCall("/actions.delete", { action_id: actionId });
-        // });
+      },
+      downloadOptions: {
+        filename: `All Actions (${getTimeStamp()}).csv`,
+        separator: ",",
+      },
+      onDownload: (buildHead, buildBody, columns, data) => {
+        let alteredData = data.map((d) => {
+          let content = [...d.data];
+          content[3] = d.data[3].rank;
+          return {
+            data: content,
+            index: d.index,
+          };
+        });
+        let csv = buildHead(columns) + buildBody(alteredData);
+        return csv;
       },
     };
+
     return (
       <div>
         <Helmet>
@@ -350,15 +576,17 @@ class AllActions extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
-        <div className={classes.table}>
-          {/* {this.showCommunitySwitch()} */}
-          <MUIDataTable
-            title="All Actions"
-            data={data}
-            columns={columns}
-            options={options}
-          />
-        </div>
+        <METable
+          classes={classes}
+          page={PAGE_PROPERTIES.ALL_ACTIONS}
+          tableProps={{
+            title: "All Actions",
+            data: data,
+            columns: columns,
+            options: options,
+          }}
+          saveFilters={this.state.saveFilters}
+        />
       </div>
     );
   }
@@ -372,15 +600,21 @@ const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   allActions: state.getIn(["allActions"]),
   community: state.getIn(["selected_community"]),
+  meta: state.getIn(["paginationMetaData"]),
+  tableFilters: state.getIn(["tableFilters"]),
 });
 const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
     {
-      callAllActions: reduxGetAllActions,
-      callCommunityActions: reduxGetAllCommunityActions,
+      fetchActions: reduxGetAllCommunityActions,
+      // callAllActions: reduxGetAllActions,
+      // callCommunityActions: reduxGetAllCommunityActions,
       putActionsInRedux: loadAllActions,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
+      updateTableFilters: reduxLoadTableFilters,
     },
     dispatch
   );

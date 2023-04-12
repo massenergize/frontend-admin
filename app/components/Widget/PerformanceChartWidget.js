@@ -1,17 +1,17 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
+import { withStyles } from "@mui/styles";
+import Grid from '@mui/material/Grid';
 import classNames from 'classnames';
-import Dvr from '@material-ui/icons/Dvr';
-import CheckCircle from '@material-ui/icons/CheckCircle';
-import Healing from '@material-ui/icons/Healing';
-import FilterCenterFocus from '@material-ui/icons/FilterCenterFocus';
-import Avatar from '@material-ui/core/Avatar';
-import Divider from '@material-ui/core/Divider';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import LocalActivity from '@material-ui/icons/LocalActivity';
-import Typography from '@material-ui/core/Typography';
+import Dvr from '@mui/icons-material/Dvr';
+import CheckCircle from '@mui/icons-material/CheckCircle';
+import Healing from '@mui/icons-material/Healing';
+import FilterCenterFocus from '@mui/icons-material/FilterCenterFocus';
+import Avatar from '@mui/material/Avatar';
+import Divider from '@mui/material/Divider';
+import LinearProgress from '@mui/material/LinearProgress';
+import LocalActivity from '@mui/icons-material/LocalActivity';
+import Typography from '@mui/material/Typography';
 import 'dan-styles/vendors/rechart/styles.css';
 import {
   ComposedChart,

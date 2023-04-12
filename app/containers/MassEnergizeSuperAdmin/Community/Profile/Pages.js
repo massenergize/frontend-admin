@@ -1,10 +1,10 @@
 import React from "react";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import Icon from "@material-ui/core/Icon";
+import { withStyles } from "@mui/styles";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import Icon from "@mui/material/Icon";
 import styles from "./profile-jss";
 import { withRouter } from "react-router-dom";
 
@@ -58,7 +58,7 @@ class Pages extends React.Component {
       { name: "All Testimonials Page", key: "homepage", link: testimonials },
       { name: "All Services Page", key: "homepage", link: vendors },
       //{ name: "Registration Page", key: "homepage", link: registration },
-      { name: "Sign In Page", key: "homepage", link: signin },
+      // { name: "Sign In Page", key: "homepage", link: signin },
     ];
 
     return (

@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import { apiCall } from "../../../utils/messenger";
+import { withStyles } from "@mui/styles";
 import MassEnergizeForm from "../_FormGenerator";
 import Loading from "dan-components/Loading";
 import { makeTagSection } from "../Events/EditEventForm";
 import { connect } from "react-redux";
-import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
+import fieldTypes from "../_FormGenerator/fieldTypes";
+
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -26,7 +26,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -43,21 +43,32 @@ class CreateNewTestimonialForm extends Component {
     };
   }
 
-  static getDerivedStateFromProps(props) {
+  static getDerivedStateFromProps(props, state) {
     var { vendors, actions, tags, communities } = props;
+    const readyToRenderThePageFirstTime =
+      vendors &&
+      actions &&
+      actions.length &&
+      tags &&
+      tags.length;
 
-    const coms = communities.map((c) => ({
+    const jobsDoneDontRunWhatsBelowEverAgain =
+      !readyToRenderThePageFirstTime || state.mounted;
+
+    if (jobsDoneDontRunWhatsBelowEverAgain) return null;
+
+    const coms = (communities ||[]).map((c) => ({
       ...c,
       id: "" + c.id,
       displayName: c.name,
     }));
 
-    const vends = vendors.map((c) => ({
+    const vends = (vendors ||[]).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
     }));
-    const acts = actions.map((c) => ({
+    const acts = (actions ||[]).map((c) => ({
       ...c,
       id: "" + c.id,
       displayName: c.title + ` - ${c.community && c.community.name}`,
@@ -80,11 +91,9 @@ class CreateNewTestimonialForm extends Component {
       actions: acts,
       vendors: vends,
       communities: coms,
-      reRenderKey: getRandomStringKey(),
+      mounted: true,
     };
   }
-
-
 
   render() {
     const { classes } = this.props;
@@ -157,7 +166,7 @@ const createFormJson = ({ communities, actions, vendors }) => {
             placeholder: "eg. 0",
             fieldType: "TextField",
             contentType: "number",
-            isRequired: true,
+            isRequired: false,
             defaultValue: "",
             dbName: "rank",
             readOnly: false,
@@ -221,7 +230,7 @@ const createFormJson = ({ communities, actions, vendors }) => {
             placeholder: "User name",
             fieldType: "TextField",
             contentType: "text",
-            isRequired: true,
+            isRequired: false,
             defaultValue: "",
             dbName: "preferred_name",
             readOnly: false,
@@ -231,13 +240,12 @@ const createFormJson = ({ communities, actions, vendors }) => {
       {
         name: "image",
         placeholder: "Select an Image",
-        fieldType: "File",
+        fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload a file for this testimonial",
-        selectMany: false,
-        isRequired: true,
-        defaultValue: "",
-        filesLimit: 1,
+        uploadMultiple: false,
+        multiple: false,
+        isRequired: false,
       },
       {
         name: "is_approved",

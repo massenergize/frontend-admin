@@ -7,6 +7,7 @@ export default function SidePane({
   activeImage,
   setShowSidePane,
   sourceExtractor,
+  sideExtraComponent,
 }) {
   const url =
     (sourceExtractor && sourceExtractor(activeImage)) ||
@@ -26,40 +27,44 @@ export default function SidePane({
           imageSource={url}
           key={getRandomStringKey()}
         />
-
-        <h6 style={{ margin: 0, fontSize: 18 }}>URL</h6>
-        <textarea
-          style={{
-            padding: 10,
-            width: "100%",
-            border: "solid 0px cornflowerblue",
-            borderBottomWidth: 2,
-            borderRadius: 3,
-            fontSize: "medium",
-            marginTop: 5,
-            background: "#fafeff",
-            resize: "none",
-            marginBottom: 0,
-          }}
-          rows="4"
-          value={url}
-        />
-        <a
-          href={url}
-          target="_blank"
-          className="touchable-opacity"
-          style={{
-            fontSize: 13,
-            color: "cornflowerblue",
-            padding: "10px 15px",
-            background: "rgb(241 248 255)",
-            textDecoration: "none",
-            display: "block",
-            width: "100%",
-          }}
+        <div
+          style={{ overflowY: "scroll", maxHeight: "36vh", paddingBottom: 30 }}
         >
-          See Full Image Here
-        </a>
+          {sideExtraComponent && sideExtraComponent({ image: activeImage })}
+          <h6 style={{ margin: 0, fontSize: 14 }}>URL</h6>
+          <textarea
+            style={{
+              padding: 10,
+              width: "100%",
+              border: "solid 0px cornflowerblue",
+              borderBottomWidth: 2,
+              borderRadius: 3,
+              fontSize: "small",
+              marginTop: 5,
+              background: "#fafeff",
+              resize: "none",
+              marginBottom: 0,
+            }}
+            rows="4"
+            value={url}
+          />
+          <a
+            href={url}
+            target="_blank"
+            className="touchable-opacity"
+            style={{
+              fontSize: 13,
+              color: "cornflowerblue",
+              padding: "10px 15px",
+              background: "rgb(241 248 255)",
+              textDecoration: "none",
+              display: "block",
+              width: "100%",
+            }}
+          >
+            See Full Image Here
+          </a>
+        </div>
 
         <MLButton
           onClick={() => setShowSidePane(false)}

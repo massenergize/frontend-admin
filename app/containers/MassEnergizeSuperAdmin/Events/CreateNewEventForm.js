@@ -1,13 +1,20 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import states from "dan-api/data/states";
-import { withStyles } from "@material-ui/core/styles";
-import { apiCall } from "../../../utils/messenger";
-import MassEnergizeForm from "../_FormGenerator";
+import { withStyles } from "@mui/styles";
+import moment from "moment";
+// import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
 import { makeTagSection } from "./EditEventForm";
 import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
+import fieldTypes from "../_FormGenerator/fieldTypes";
+import { bindActionCreators } from "redux";
+import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import { removePageProgressFromStorage } from "../../../utils/common";
+import { withRouter } from "react-router-dom";
 
 const styles = (theme) => ({
   root: {
@@ -28,7 +35,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -44,8 +51,27 @@ class CreateNewEventForm extends Component {
     };
   }
 
-  static getDerivedStateFromProps = (props) => {
-    const { communities, tags } = props;
+  static getDerivedStateFromProps = (props, state) => {
+    const {
+      communities,
+      tags,
+      auth,
+      location,
+      otherCommunities,
+    } = props;
+
+    const readyToRenderPageFirstTime =
+      communities &&
+      communities.length &&
+      tags &&
+      tags.length &&
+      auth &&
+      otherCommunities &&
+      otherCommunities.length;
+
+    const jobsDoneDontRunWhatsBelowEverAgain =
+      !readyToRenderPageFirstTime || state.mounted;
+    if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
     const coms = (communities || []).map((c) => ({
       ...c,
@@ -53,29 +79,45 @@ class CreateNewEventForm extends Component {
       id: "" + c.id,
     }));
 
-    const formJson = createFormJson({
-      communities: coms,
+    
+    const section = makeTagSection({
+      collections: tags,
+      defaults: false,
     });
 
-    const section = makeTagSection({ collections: tags, defaults: false });
+    const libOpen = location.state && location.state.libOpen;
+
+    const formJson = createFormJson({
+      communities: coms,
+      auth,
+      autoOpenMediaLibrary: libOpen,
+      otherCommunities: otherCommunities || [],
+    });
 
     if (formJson) formJson.fields.splice(1, 0, section);
 
     return {
       communities: coms,
       formJson,
-      reRenderKey: getRandomStringKey(),
+      mounted: true,
     };
   };
 
+ 
 
   render() {
     const { classes } = this.props;
     const { formJson } = this.state;
     if (!formJson) return <Loading />;
     return (
-      <div key = {this.state.reRenderKey}>
-        <MassEnergizeForm classes={classes} formJson={formJson} />
+      <div>
+        <MassEnergizeForm
+          pageKey={PAGE_KEYS.CREATE_EVENT.key}
+          classes={classes}
+          formJson={formJson}
+          validator={validator}
+          enableCancel
+        />
       </div>
     );
   }
@@ -89,15 +131,60 @@ const mapStateToProps = (state) => {
   return {
     tags: state.getIn(["allTags"]),
     communities: state.getIn(["communities"]),
+    auth: state.getIn(["auth"]),
+    formState: state.getIn(["tempForm"]),
+    otherCommunities: state.getIn(["otherCommunities"]),
   };
 };
 
-const CreateEventMapped = connect(mapStateToProps)(CreateNewEventForm);
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      saveFormTemporarily: reduxKeepFormContent,
+    },
+    dispatch
+  );
+};
 
-export default withStyles(styles, { withTheme: true })(CreateEventMapped);
+const CreateEventMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreateNewEventForm);
 
-const createFormJson = ({ communities }) => {
-  // const { communities } = this.state;
+export default withStyles(styles, { withTheme: true })(
+  withRouter(CreateEventMapped)
+);
+
+const validator = (cleaned) => {
+  const start = (cleaned || {})["start_date_and_time"];
+  const end = (cleaned || {})["end_date_and_time"];
+  const endDateComesLater = new Date(end) > new Date(start);
+  return [
+    endDateComesLater,
+    !endDateComesLater &&
+      "Please provide an end date that comes later than your start date",
+  ];
+};
+
+const whenStartDateChanges = ({ newValue, formData, setValueInForm }) => {
+  formData = formData || {};
+  const newEnd = moment(newValue).add(1, "hours");
+  setValueInForm({ start_date_and_time: newValue, end_date_and_time: newEnd });
+};
+
+const createFormJson = ({
+  communities,
+  auth,
+  progress,
+  autoOpenMediaLibrary,
+  otherCommunities,
+}) => {
+  const is_super_admin = auth && auth.is_super_admin;
+  otherCommunities = otherCommunities || [];
+  const otherCommunityList = otherCommunities.map((c) => ({
+    displayName: c.name,
+    id: c.id.toString(),
+  }));
   const formJson = {
     title: "Create New Event or Campaign",
     subTitle: "",
@@ -115,7 +202,7 @@ const createFormJson = ({ communities }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            // defaultValue: progress.name || "",
             dbName: "name",
             readOnly: false,
           },
@@ -126,31 +213,20 @@ const createFormJson = ({ communities }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            // defaultValue: progress.featured_summary || "",
             dbName: "featured_summary",
             readOnly: false,
           },
           {
-            name: "rank",
-            label:
-              "Rank (Which order should this event appear in?  Lower numbers come first)",
-            placeholder: "eg. 1",
-            fieldType: "TextField",
-            contentType: "number",
-            isRequired: true,
-            defaultValue: "",
-            dbName: "rank",
-            readOnly: false,
-          },
-          {
+            onChangeMiddleware: whenStartDateChanges,
             name: "start_date_and_time",
             label: "Start Date And Time",
             placeholder: "YYYY-MM-DD HH:MM",
             fieldType: "DateTime",
             contentType: "text",
-            isRequired: true,
-            defaultValue: "",
+            defaultValue: moment().startOf("hour"),
             dbName: "start_date_and_time",
+            minDate: moment().startOf("hour"),
             readOnly: false,
           },
           {
@@ -159,11 +235,14 @@ const createFormJson = ({ communities }) => {
             placeholder: "YYYY-MM-DD HH:MM",
             fieldType: "DateTime",
             contentType: "text",
-            isRequired: true,
-            defaultValue: "",
+            defaultValue: moment()
+              .startOf("hour")
+              .add(1, "hours"),
             dbName: "end_date_and_time",
+            minDate: moment().startOf("hour"),
             readOnly: false,
           },
+
           {
             name: "is_recurring",
             label: "Make this a recurring event",
@@ -199,7 +278,7 @@ const createFormJson = ({ communities }) => {
                   label: "",
                   fieldType: "Radio",
                   dbName: "recurring_type",
-                  defaultValue: null,
+                  // defaultValue: progress.recurring_type || null,
                   data: [
                     { id: "week", value: "weeks" },
                     { id: "month", value: "months" },
@@ -252,29 +331,85 @@ const createFormJson = ({ communities }) => {
               ],
             },
           },
-          {
-            name: "is_global",
-            label: "Is this Event a Template?",
-            fieldType: "Radio",
-            isRequired: true,
-            defaultValue: "false",
-            dbName: "is_global",
-            readOnly: false,
-            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-            child: {
-              valueToCheck: "false",
-              fields: [
-                {
-                  name: "community",
-                  label: "Primary Community",
-                  placeholder: "eg. Wayland",
-                  fieldType: "Dropdown",
-                  defaultValue: null,
-                  dbName: "community_id",
-                  data: [{ displayName: "--", id: "" }, ...communities],
+          is_super_admin
+            ? {
+                name: "is_global",
+                label: "Is this Event a Template?",
+                fieldType: "Radio",
+                isRequired: true,
+                defaultValue: "false",
+                dbName: "is_global",
+                readOnly: false,
+                data: [
+                  { id: "false", value: "No" },
+                  { id: "true", value: "Yes" },
+                ],
+                child: {
+                  valueToCheck: "false",
+                  fields: [
+                    {
+                      name: "community",
+                      label: "Primary Community (select one)",
+                      fieldType: "Dropdown",
+                      defaultValue: null,
+                      dbName: "community_id",
+                      data: [{ displayName: "--", id: "" }, ...communities],
+                      isRequired: true,
+                    },
+                  ],
                 },
-              ],
-            },
+              }
+            : {
+                name: "community",
+                label: "Primary Community (select one)",
+                fieldType: "Dropdown",
+                defaultValue: communities[0] && communities[0].id,
+                dbName: "community_id",
+                data: [{ displayName: "--", id: "" }, ...communities],
+                isRequired: true,
+              },
+        ],
+      },
+      {
+        label: "Who can see this event?",
+        fieldType: "Section",
+        children: [
+          {
+            name: "publicity",
+            label: "Who should be able to see this event?",
+            fieldType: "Radio",
+            isRequired: false,
+            defaultValue: "OPEN",
+            dbName: "publicity",
+            readOnly: false,
+            data: [
+              { id: "OPEN", value: "All communities can see this event " },
+              {
+                id: "OPEN_TO",
+                value: "Only communities I select should see this",
+              },
+              {
+                id: "CLOSE",
+                value: "No one can see this, keep this in my community only ",
+              },
+            ],
+            conditionalDisplays: [
+              {
+                valueToCheck: "OPEN_TO",
+                fields: [
+                  {
+                    name: "can-view-event",
+                    label: `Select the communities that can see this event`,
+                    placeholder: "",
+                    fieldType: "Checkbox",
+                    selectMany: true,
+                    defaultValue: [],
+                    dbName: "publicity_selections",
+                    data: otherCommunityList,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -349,13 +484,13 @@ const createFormJson = ({ communities }) => {
       {
         name: "image",
         placeholder: "Select an Image",
-        fieldType: "File",
+        fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload Files",
-        selectMany: false,
+        selected: [],
+        // defaultValue: progress.image || [],
+        openState: autoOpenMediaLibrary,
         isRequired: false,
-        defaultValue: "",
-        filesLimit: 1,
       },
       {
         name: "rsvp_enabled",
@@ -365,12 +500,8 @@ const createFormJson = ({ communities }) => {
         defaultValue: "false",
         dbName: "rsvp_enabled",
         readOnly: false,
-        data: [
-          { id: 'false', value: 'No' },
-          { id: 'true', value: 'Yes' }
-        ],
+        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
         child: {
-          dbName: "rsvp_communication",
           valueToCheck: "true",
           fields: [
             {
@@ -379,7 +510,7 @@ const createFormJson = ({ communities }) => {
                 "Send an email with Zoom link or other details when user RSVPs they are coming?",
               fieldType: "Radio",
               isRequired: false,
-              defaultValue: 'false',
+              defaultValue: "false",
               dbName: "rsvp_email",
               readOnly: false,
               data: [
@@ -391,18 +522,18 @@ const createFormJson = ({ communities }) => {
                 valueToCheck: "true",
                 fields: [
                   {
-                    name: 'rsvp_message_text',
-                    label: 'Message to send to RSVP',
-                    placeholder: 'eg. This event is happening in ...',
-                    fieldType: 'HTMLField',
+                    name: "rsvp_message_text",
+                    label: "Message to send to RSVP",
+                    placeholder: "eg. This event is happening in ...",
+                    fieldType: "HTMLField",
                     isRequired: true,
                     defaultValue: null,
-                    dbName: 'rsvp_message',
+                    dbName: "rsvp_message",
                   },
-                ]
+                ],
               },
             },
-          ]
+          ],
         },
       },
       {
@@ -412,6 +543,16 @@ const createFormJson = ({ communities }) => {
         isRequired: false,
         defaultValue: "false",
         dbName: "archive",
+        readOnly: false,
+        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+      },
+      {
+        name: "is_approved",
+        label: "Do you approve this event?",
+        fieldType: "Radio",
+        isRequired: false,
+        defaultValue: "true",
+        dbName: "is_approved",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
       },
