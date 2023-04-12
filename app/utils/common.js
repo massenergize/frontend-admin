@@ -1,16 +1,39 @@
 /** *
  * All utility Functions
  */
-import { Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 import moment from "moment";
 import qs from "qs";
-import React from 'react';
+import React from "react";
+import { ME_FORM_PROGRESS } from "../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
+import { apiCall } from "./messenger";
 
+export const separate = (ids, dataSet = [], options = {}) => {
+  const { valueExtractor } = options || {};
+  const found = [];
+  var notFound = [];
+  const remainder = [];
+  const itemObjects = [];
+  for (var d of dataSet || []) {
+    const value = valueExtractor ? valueExtractor(d) : d.id;
+    if (ids.includes(value)) {
+      found.push(value);
+      itemObjects.push(d);
+    } else remainder.push(d);
+  }
+  notFound = ids.filter((id) => !found.includes(id));
+  return {
+    found, // Found locally
+    notFound, // Not found locally
+    remainder, // Just the general remaining items from the datasource
+    itemObjects, // Full objects of items that were found
+  };
+};
 export function makeDeleteUI({ idsToDelete, templates }) {
   const len = (idsToDelete && idsToDelete.length) || 0;
   var text = `Are you sure you want to delete (
     ${(idsToDelete && idsToDelete.length) || ""})
-    ${len === 1 ? " action? " : " actions? "}`;
+    ${len === 1 ? " event? " : " events? "}`;
 
   if (templates && templates.length)
     text = `Sorry, (${templates.length}) template${
@@ -54,6 +77,11 @@ export const getHumanFriendlyDate = (
     // make it a bit less human friendly, so it sorts properly
     format
   );
+};
+export const makeTimeAgo = (dateString) => {
+  if (!dateString) return "";
+
+  return moment(dateString).fromNow();
 };
 export const smartString = (string, charLimit = 60) => {
   if (!string) return "";
@@ -153,4 +181,103 @@ export const getFilterInputsFromURL = (location) => {
     ignoreQueryPrefix: true,
   });
   return filterInputs;
+};
+
+export const ourCustomSort = ({ a, b, colIndex, order, compare }) => {
+  const directionConstant = order === "desc" ? 1 : -1;
+  a = a.data[colIndex];
+  b = b.data[colIndex];
+  if (compare) return compare({ a, b }) * directionConstant;
+  return (a < b ? -1 : 1) * directionConstant;
+};
+
+export const getTimeStamp = () => {
+  const today = new Date();
+  let newDate = today;
+  let options = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  };
+
+  return Intl.DateTimeFormat("en-US", options).format(newDate);
+};
+/**
+ *
+ * @param {*} location : Props Location
+ * @param {*} paramName
+ * @returns
+ */
+export const fetchParamsFromURL = (location, paramName, names) => {
+  if (!location || !location.search) return "";
+  const obj = qs.parse(location.search, { ignoreQueryPrefix: true });
+  var value = obj[paramName];
+  value = value && value.toString();
+  delete obj[paramName];
+  const params = {};
+  if (names && names.length) {
+    names.forEach((n) => {
+      params[n] = obj[n];
+      delete obj[n];
+    });
+  }
+  return (
+    {
+      params,
+      [paramName]: value,
+      rest: { object: obj, qs: qs.stringify(obj) || "" },
+    } || {}
+  );
+};
+
+export const removePageProgressFromStorage = (key) => {
+  var progress = localStorage.getItem(ME_FORM_PROGRESS) || "{}";
+  progress = JSON.parse(progress);
+  progress[key] = {};
+  localStorage.setItem(ME_FORM_PROGRESS, JSON.stringify(progress));
+};
+/**
+   * 
+   * This function takes a list of ids of items(msgs, actions, testimonials etc.) that need attending to and matches it against the data source, 
+   * to find out which of the items are available locally, and which ones need to be fetched.
+   * If all items are available locally, nothing happens. 
+   * If not, it fetches all the items not found and appends it to the main data source. 
+   * 
+   * This fxn helps arrange data properly so that when admins click from their dashboard to see 
+   * "15" unanswered messages, all and only the unanswered messages will show up in the table, to make things easier.
+   
+   */
+export const reArrangeForAdmin = ({
+  dataSource,
+  props,
+  apiURL,
+  fieldKey,
+  reduxFxn,
+  separationOptions,
+  args,
+  cb,
+}) => {
+  const _sort = (a, b) => (b.id < a.id ? -1 : 1);
+  const { location } = props;
+  const { state } = location || {};
+  const ids = (state && state.ids) || [];
+  const result = separate(ids, dataSource, separationOptions);
+  const { notFound, itemObjects, remainder } = result;
+  var data = [...itemObjects, ...remainder];
+  data.sort(_sort);
+  reduxFxn(data);
+  if (!notFound.length) return cb && cb(); // If all items are found locally, dont go to the B.E
+  apiCall(apiURL, {
+    [fieldKey]: notFound,
+    ...(args || {}),
+  }).then((response) => {
+    if (response.success) data = [...response.data, ...data];
+    //-- Items that were not found, have now been loaded from the B.E!
+    cb && cb(response.data);
+    data.sort(_sort);
+    reduxFxn(data);
+  });
 };

@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import MassEnergizeForm from "../_FormGenerator";
 import { apiCall } from "../../../utils/messenger";
 import fieldTypes from "../_FormGenerator/fieldTypes";
+
 
 const styles = (theme) => ({
   root: {
@@ -24,7 +25,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -54,12 +55,14 @@ class HomePageEditForm extends Component {
       return;
     }
 
+    var currentdate = new Date().toISOString().split('T')[0]; 
     const eventsResponse = await apiCall("/events.list", { community_id: id });
     if (eventsResponse && eventsResponse.data) {
-      const events = eventsResponse.data.map((c) => ({
+      const events = eventsResponse.data.filter((f) => f.end_date_and_time > currentdate).map((c) => ({  // 
         ...c,
-        displayName: c.name,
+        displayName: c.start_date_and_time.split("T", 1) + "  " + c.name ,
         id: "" + c.id,
+        date: "" + c.start_date_and_time
       }));
       await this.setStateAsync({ events });
     } else {
@@ -96,14 +99,21 @@ class HomePageEditForm extends Component {
       homePageData && featured_events
         ? featured_events.map((e) => "" + e.id)
         : [];
-    const archivedEvents = featured_events
+    /*
+        const archivedEvents = featured_events
       .filter((f) => !f.is_published)
       .map((c) => ({
         ...c,
         displayName: "(Archived) " + c.name,
         id: "" + c.id,
       }));
-    const eventsToDisplay = [...archivedEvents, ...events];
+      */
+
+    const eventsToDisplay = [ ...events]; //...archivedEvents,
+
+    function sort_by_date(events_data) {
+      return events_data.sort((a, b) => (b.date < a.date ? 1 : -1))
+    }
 
     const formJson = {
       title: `Edit ${
@@ -284,7 +294,7 @@ class HomePageEditForm extends Component {
                     selectMany: true,
                     defaultValue: selectedEvents,
                     dbName: "featured_events",
-                    data: eventsToDisplay,
+                    data: sort_by_date(eventsToDisplay),
                   },
                 ],
               },

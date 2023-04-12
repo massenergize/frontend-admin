@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
+import { withStyles } from "@mui/styles";
+import Typography from '@mui/material/Typography';
 import classNames from 'classnames';
-import blueGrey from '@material-ui/core/colors/blueGrey';
+import blueGrey from '@mui/material/colors/blueGrey';
 
 const styles = ({
   quoteWrap: {
