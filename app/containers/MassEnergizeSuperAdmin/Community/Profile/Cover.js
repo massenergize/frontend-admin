@@ -25,7 +25,7 @@ class Cover extends React.Component {
     const { classes } = this.props;
     if (is_published) {
       return (
-        <div style={{ flex: "1" }}>
+        <div>
           <Button
             onClick={() => {
               this.goLive();
