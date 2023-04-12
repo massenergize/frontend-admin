@@ -1,4 +1,4 @@
-import { darken } from '@material-ui/core/styles/colorManipulator';
+import { darken } from '@mui/material/styles';
 import bg from 'dan-images/petal_bg.svg';
 
 export const gradientBgLight = (theme) => `linear-gradient(-45deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.main} 33%, ${theme.palette.secondary.main} 100%);`;
@@ -43,18 +43,19 @@ const styles = theme => ({
   },
   topNav: {
     flexDirection: 'column',
+    marginBottom:40,
   },
   sideNav: {
     flexDirection: 'row',
   },
   content: {
     width: '100%',
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing(2),
     minHeight: '100%',
     overflow: 'hidden',
     [theme.breakpoints.down('md')]: {
-      paddingLeft: theme.spacing.unit,
-      paddingRight: theme.spacing.unit,
+      paddingLeft: theme.spacing(1),
+      paddingRight: theme.spacing(1),
     },
   },
   petal: {
@@ -136,11 +137,11 @@ const styles = theme => ({
       willChange: 'inherit !important' // hack for floating form issue when expaded
     },
     '&$sidebarLayout': {
-      paddingTop: theme.spacing.unit * 8,
+      paddingTop: theme.spacing(8),
     },
     '&$topbarLayout': {
       width: '100%',
-      marginTop: theme.spacing.unit * 3,
+      marginTop: theme.spacing(3),
     },
   },
   preloader: {
@@ -193,8 +194,8 @@ const styles = theme => ({
   },
   light: {},
   pageTitle: {
-    padding: theme.spacing.unit,
-    paddingBottom: theme.spacing.unit * 3,
+    padding: theme.spacing(1),
+    paddingBottom: theme.spacing(3),
     [theme.breakpoints.up('lg')]: {
       display: 'flex',
       justifyContent: 'space-between',
@@ -204,7 +205,7 @@ const styles = theme => ({
       fontWeight: 700,
       textTransform: 'capitalize',
       [theme.breakpoints.down('md')]: {
-        marginBottom: theme.spacing.unit * 3
+        marginBottom: theme.spacing(3)
       }
     },
   },

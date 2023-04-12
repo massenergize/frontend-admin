@@ -1,9 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import { bindActionCreators } from "redux";
 import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";
@@ -12,11 +12,17 @@ import styles from "../../../components/Widget/widget-jss";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import {
   loadAllSubscribers,
+  reduxLoadMetaDataAction,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
-import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
+import { getAdminApiEndpoint, getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import { isEmpty } from "../../../utils/common";
+import Loader from "../../../utils/components/Loader";
 
 class AllSubscribers extends React.Component {
   constructor(props) {
@@ -30,19 +36,27 @@ class AllSubscribers extends React.Component {
   }
 
   async componentDidMount() {
-    const user = this.props.auth ? this.props.auth : {};
+    let {auth, meta, putMetaDataToRedux, putSubscribersInRedux} = this.props;
+    const user = auth ? auth : {};
     let allSubscribersResponse = null;
     if (user.is_super_admin) {
-      allSubscribersResponse = await apiCall("/subscribers.listForSuperAdmin");
+      allSubscribersResponse = await apiCall(
+        "/subscribers.listForSuperAdmin",
+        { limit: getLimit(PAGE_PROPERTIES.ALL_SUBSCRIBERS.key) }
+      );
     } else if (user.is_community_admin) {
       allSubscribersResponse = await apiCall(
         "/subscribers.listForCommunityAdmin",
-        { community_id: null }
+        {
+          community_id: null,
+          limit: getLimit(PAGE_PROPERTIES.ALL_SUBSCRIBERS.key),
+        }
       );
     }
 
-    if (allSubscribersResponse && allSubscribersResponse.data) {
-      this.props.putSubscribersInRedux(allSubscribersResponse.data);
+    if (allSubscribersResponse?.data) {
+      putSubscribersInRedux(allSubscribersResponse.data);
+      putMetaDataToRedux({...meta, subscribers:allSubscribersResponse.cursor})
     }
   }
 
@@ -66,8 +80,14 @@ class AllSubscribers extends React.Component {
     await this.setStateAsync({ dataFiltered: filteredData });
   };
 
-  fashionData = (data) =>
-    data.map((d) => [d.id, d.name, d.email, d.community && d.community.name]);
+  fashionData = (data) =>{
+    return data.map((d) => [
+      d.id,
+      d.name,
+      d.email,
+      d.community && d.community.name,
+    ]);
+  }
 
   getStatus = (isApproved) => {
     switch (isApproved) {
@@ -118,9 +138,27 @@ class AllSubscribers extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/subscribers.delete", { subscriber_id: found });
+      apiCall("/subscribers.delete", { subscriber_id: found }).then(
+        (response) => {
+          if (response.success) {
+            this.props.toggleToast({
+              open: true,
+              message: "Subscriber(s) successfully deleted",
+              variant: "success",
+            });
+          } else {
+            this.props.toggleToast({
+              open: true,
+              message: "An error occurred while deleting the subscriber(s)",
+              variant: "error",
+            });
+          }
+        }
+      );
     });
-    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
+    const rem = ((itemsInRedux) || []).filter(
+      (com) => !ids.includes(com.id)
+    );
     putSubscribersInRedux(rem);
   }
 
@@ -139,15 +177,65 @@ class AllSubscribers extends React.Component {
     const title = brand.name + " - All Subscribers";
     const description = brand.desc;
     const { columns, dataFiltered } = this.state;
-    const { classes } = this.props;
-    const data = this.fashionData(this.props.subscribers);
+    const { classes, subscribers, putSubscribersInRedux, auth, meta, putMetaDataToRedux } = this.props;
+    const data = this.fashionData((subscribers) || []);
+    let metaData = meta && meta.subscribers;
 
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
+      count: metaData && metaData.count,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
+      customSearchRender: (
+        searchText,
+        handleSearch,
+        hideSearch,
+        options
+      ) => (
+        <SearchBar
+          url={getAdminApiEndpoint(auth, "/subscribers")}
+          reduxItems={subscribers}
+          updateReduxFunction={putSubscribersInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_SUBSCRIBERS}
+          updateMetaData={putMetaDataToRedux}
+          name="subscribers"
+          meta={meta}
+        />
+      ),
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
+        return (
+          <ApplyFilterButton
+            url={getAdminApiEndpoint(auth, "/subscribers")}
+            reduxItems={subscribers}
+            updateReduxFunction={putSubscribersInRedux}
+            columns={columns}
+            limit={getLimit(PAGE_PROPERTIES.ALL_SUBSCRIBERS.key)}
+            applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="subscribers"
+            meta={meta}
+          />
+        );
+      },
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putSubscribersInRedux,
+          reduxItems: subscribers,
+          apiUrl: getAdminApiEndpoint(auth, "/subscribers"),
+          pageProp: PAGE_PROPERTIES.ALL_SUBSCRIBERS,
+          updateMetaData: putMetaDataToRedux,
+          name: "subscribers",
+          meta: meta,
+        }),
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({
@@ -157,10 +245,29 @@ class AllSubscribers extends React.Component {
           closeAfterConfirmation: true,
         });
       },
+      whenFilterChanges: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_SUBSCRIBERS,
+          updateReduxFunction: putSubscribersInRedux,
+          reduxItems: subscribers,
+          url: getAdminApiEndpoint(auth, "/subscribers"),
+          updateMetaData: putMetaDataToRedux,
+          name: "subscribers",
+          meta: meta,
+        }),
     };
-    if (!data || !data.length) {
-      return <LinearBuffer />;
-    }
+        if (isEmpty(metaData)) {
+          return <Loader />;
+        }
 
     return (
       <div>
@@ -177,7 +284,7 @@ class AllSubscribers extends React.Component {
           classes={classes}
           page={PAGE_PROPERTIES.ALL_SUBSCRIBERS}
           tableProps={{
-            title: "All Team Admin Messages Pro",
+            title: "All Subscribers",
             data: data,
             columns: columns,
             options: options,
@@ -197,6 +304,7 @@ function mapStateToProps(state) {
     allVendors: state.getIn(["allVendors"]),
     community: state.getIn(["selected_community"]),
     subscribers: state.getIn(["subscribers"]),
+    meta: state.getIn(["paginationMetaData"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -204,6 +312,8 @@ function mapDispatchToProps(dispatch) {
     {
       putSubscribersInRedux: loadAllSubscribers,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

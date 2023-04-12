@@ -1,21 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { closeAllAction } from 'dan-actions/UiActions';
-import Button from '@material-ui/core/Button';
-import { withStyles, withTheme } from '@material-ui/core/styles';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import Grow from '@material-ui/core/Grow';
-import Popper from '@material-ui/core/Popper';
-import ExpandMore from '@material-ui/icons/ExpandMore';
+import Button from '@mui/material/Button';
+import { withStyles } from '@mui/styles';
+import { ClickAwayListener } from '@mui/material';
+import Grow from '@mui/material/Grow';
+import Popper from '@mui/material/Popper';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import classNames from 'classnames';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { NavLink } from 'react-router-dom';
-import Paper from '@material-ui/core/Paper';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListSubheader from '@material-ui/core/ListSubheader';
+import Paper from '@mui/material/Paper';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListSubheader from '@mui/material/ListSubheader';
 import styles from './header-jss';
 
 class MainMenu extends React.Component {
@@ -94,21 +94,34 @@ class MainMenu extends React.Component {
               transition
               disablePortal
             >
-              {({ TransitionProps, placement }) => (
-                <Grow
-                  {...TransitionProps}
-                  id="menu-list-grow"
-                  style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
-                >
-                  <Paper className={classes.dropDownMenu}>
-                    <ClickAwayListener onClickAway={this.handleClose}>
-                      <List role="menu" component="nav" className={classes.paperMenu}>
-                        { getMenus(item.key, item.child) }
-                      </List>
-                    </ClickAwayListener>
-                  </Paper>
-                </Grow>
-              )}
+              {({ TransitionProps, placement }) => {
+                return (
+                  <Grow
+                    {...TransitionProps}
+                    id="menu-list-grow"
+                    style={{
+                      transformOrigin:
+                        placement === "bottom"
+                          ? "center top"
+                          : "center bottom",
+                    }}
+                  >
+                    <Paper className={classes.dropDownMenu}>
+                      <ClickAwayListener
+                        onClickAway={this.handleClose}
+                      >
+                        <List
+                          role="menu"
+                          component="nav"
+                          className={classes.paperMenu}
+                        >
+                          {getMenus(item.key, item.child)}
+                        </List>
+                      </ClickAwayListener>
+                    </Paper>
+                  </Grow>
+                );
+              }}
             </Popper>
           </div>
         );
@@ -169,4 +182,4 @@ const MainMenuMapped = connect(
   mapDispatchToProps
 )(MainMenu);
 
-export default withTheme()(withStyles(styles)(MainMenuMapped));
+export default withStyles(styles)(MainMenuMapped);

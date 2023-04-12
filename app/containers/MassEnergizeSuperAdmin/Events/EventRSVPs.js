@@ -1,23 +1,23 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 import MUIDataTable from "mui-datatables";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import { Link } from "react-router-dom";
-import AppBar from "@material-ui/core/AppBar";
-import Tabs from "@material-ui/core/Tabs";
+import AppBar from "@mui/material/AppBar";
+import Tabs from "@mui/material/Tabs";
 import classNames from "classnames";
-import Grid from "@material-ui/core/Grid";
-import Tab from "@material-ui/core/Tab";
-import PeopleIcon from "@material-ui/icons/People";
+import Grid from "@mui/material/Grid";
+import Tab from "@mui/material/Tab";
+import PeopleIcon from "@mui/icons-material/People";
 import messageStyles from "dan-styles/Messages.scss";
-import SnackbarContent from "@material-ui/core/SnackbarContent";
+import SnackbarContent from "@mui/material/SnackbarContent";
 
 import styles from "../../../components/Widget/widget-jss";
 import { apiCall } from "../../../utils/messenger";
-import { Paper } from "@material-ui/core";
+import { Paper } from "@mui/material";
 
 function TabContainer(props) {
   const { children } = props;
@@ -130,7 +130,7 @@ class EventRSVPs extends React.Component {
     const { classes } = this.props;
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
