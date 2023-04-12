@@ -5,11 +5,16 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import Dashboard from "../Templates/Dashboard";
 import {
+  checkFirebaseAuthentication,
   reduxCallCommunities,
   reduxCallLibraryModalImages,
   reduxCheckUser,
   reduxFetchInitialContent,
   reduxToggleUniversalModal,
+  restoreFormProgress,
+  reduxToggleUniversalToast,
+  runAdminStatusCheck,
+  reduxLoadTableFilters,
 } from "../../redux/redux-actions/adminActions";
 import {
   Parent,
@@ -65,8 +70,11 @@ import {
   AddToGallery,
   AddTask,
   ListTasks,
-  Settings,
+  Preferences,
   FeatureFlags,
+  EventFullView,
+  EventsFromOthers,
+  ActionEngagementList,
 } from "../pageListAsync";
 import EditVendor from "../MassEnergizeSuperAdmin/Vendors/EditVendor";
 import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
@@ -85,12 +93,14 @@ import EventRSVPs from "../MassEnergizeSuperAdmin/Events/EventRSVPs";
 import ThemeModal from "../../components/Widget/ThemeModal";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { THREE_MINUTES, TIME_UNTIL_EXPIRATION } from "../../utils/constants";
+import ThemeToast from "../../components/Widget/ThemeToast";
+import { ME_FORM_PROGRESS } from "../MassEnergizeSuperAdmin/ME  Tools/MEConstants";
+import { FILTER_OBJ_KEY } from "../MassEnergizeSuperAdmin/ME  Tools/table /METable";
 
 class Application extends React.Component {
-  componentWillMount() {
-    this.props.reduxCallCommunities();
-  }
   componentDidMount() {
+    this.props.reduxCallCommunities();
+    this.props.checkFirebaseAuthentication();
     this.props.fetchInitialContent(this.props.auth);
     setInterval(() => {
       const expirationTime = Number(
@@ -98,26 +108,28 @@ class Application extends React.Component {
       );
       const currentDateTime = Date.now();
       const itsPassedADaySinceLogin = currentDateTime > expirationTime;
-      if (itsPassedADaySinceLogin) this.runAdminStatusCheck();
+      if (itsPassedADaySinceLogin) runAdminStatusCheck();
     }, THREE_MINUTES);
+
+    // ---- UNCOMMENT THIS WHEN WE WANT TO CONTINUE WITH PERSISTING FORM PROGRESS TO LOCAL STORAGE
+    // Collect form progress from local storage after page refresh
+    // var progress = localStorage.getItem(ME_FORM_PROGRESS) || "{}";
+    // progress = JSON.parse(progress);
+    // this.props.restoreFormProgress(progress);
+
+    // ---- PICK UP SAVED FILTERS FROM LOCAL STORAGE ON FIRST LOAD ------
+    this.findSavedFiltersAndInflate();
+  }
+  findSavedFiltersAndInflate() {
+    const { putFiltersInRedux } = this.props;
+    const filters = localStorage.getItem(FILTER_OBJ_KEY);
+    putFiltersInRedux(JSON.parse(filters));
   }
 
   getCommunityList() {
     const { auth } = this.props;
     const list = (auth && auth.admin_at) || [];
     return list.map((com) => com.id);
-  }
-
-  async runAdminStatusCheck() {
-    try {
-      const response = await apiCall("/auth.whoami");
-      if (response.success) return;
-
-      if (response.error === PERMISSION_DENIED)
-        return (window.location = "/login");
-    } catch (e) {
-      console.log("ADMIN_SESSION_STATUS_ERROR:", e.toString());
-    }
   }
 
   render() {
@@ -127,6 +139,8 @@ class Application extends React.Component {
       history,
       modalOptions,
       toggleUniversalModal,
+      toastOptions,
+      toggleUniversalToast,
     } = this.props;
     const user = auth || {};
 
@@ -187,6 +201,7 @@ class Application extends React.Component {
         )}
       />,
     ];
+
     const {
       component,
       show,
@@ -203,7 +218,6 @@ class Application extends React.Component {
           onCancel={() => {
             if (onCancel) onCancel();
           }}
-
           close={() => {
             toggleUniversalModal({ show: false, component: null });
             return false;
@@ -212,14 +226,31 @@ class Application extends React.Component {
         >
           {component}
         </ThemeModal>
+        <ThemeToast
+          {...toastOptions || {}}
+          open={toastOptions?.open}
+          onClose={() => {
+            toggleUniversalToast({ open: false, component: null });
+            return false;
+          }}
+          message={toastOptions?.message}
+        />
 
         <Switch>
           {user.is_community_admin && communityAdminSpecialRoutes}
           {user.is_super_admin && superAdminSpecialRoutes}
 
           <Route exact path="/blank" component={BlankPage} />
-          <Route exact path="/admin/profile/settings" component={Settings} />
-          <Route exact path="/admin/settings/feature-flags" component={FeatureFlags} />
+          <Route
+            exact
+            path="/admin/profile/preferences"
+            component={Preferences}
+          />
+          <Route
+            exact
+            path="/admin/settings/feature-flags"
+            component={FeatureFlags}
+          />
           <Route path="/admin/read/users" component={UsersList} />
           <Route
             path="/admin/read/community-admin-messages"
@@ -303,7 +334,16 @@ class Application extends React.Component {
             path="/admin/edit/:id/tag-collection"
             component={EditCategory}
           />
-          <Route path="/admin/read/events" component={AllEvents} />
+          <Route
+            path="/admin/read/event/:id/event-view"
+            component={EventFullView}
+          />
+          <Route path="/admin/read/events" exact component={AllEvents} />
+          <Route
+            path="/admin/read/events/event-sharing"
+            exact
+            component={EventsFromOthers}
+          />
           <Route path="/admin/add/event" component={AddEvent} />
           <Route path="/admin/edit/:id/event" component={EditEvent} />
           <Route path="/admin/edit/:id/event-rsvps" component={EventRSVPs} />
@@ -358,6 +398,10 @@ class Application extends React.Component {
           <Route path="/admin/read/about-us" component={SuperAboutUs} />
           <Route path="/admin/add/donate" component={SuperDonate} />
           <Route path="/admin/read/contact-us" component={SuperContactUs} />
+          <Route
+            path="/admin/read/action-engagements"
+            component={ActionEngagementList}
+          />
           <Route path="/admin/read/all-actions" component={SuperAllActions} />
           <Route exact path="/admin/gallery/" component={GalleryPage} />
           <Route exact path="/admin/gallery/add" component={AddToGallery} />
@@ -381,6 +425,7 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     modalLibraryImages: state.getIn(["modalLibraryImages"]),
     modalOptions: state.getIn(["modalOptions"]),
+    toastOptions: state.getIn(["toastOptions"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -391,6 +436,10 @@ function mapDispatchToProps(dispatch) {
       loadModalImages: reduxCallLibraryModalImages,
       fetchInitialContent: reduxFetchInitialContent,
       toggleUniversalModal: reduxToggleUniversalModal,
+      checkFirebaseAuthentication,
+      restoreFormProgress: restoreFormProgress,
+      toggleUniversalToast: reduxToggleUniversalToast,
+      putFiltersInRedux: reduxLoadTableFilters,
     },
     dispatch
   );

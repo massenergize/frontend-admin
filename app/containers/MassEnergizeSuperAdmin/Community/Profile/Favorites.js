@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
-import Divider from '@material-ui/core/Divider';
+import { withStyles } from "@mui/styles";
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import Divider from '@mui/material/Divider';
 import imgApi from 'dan-api/images/photos';
 import avatarApi from 'dan-api/images/avatars';
 import GeneralCard from 'dan-components/CardPaper/GeneralCard';
@@ -12,7 +12,7 @@ import Quote from 'dan-components/Quote/Quote';
 import * as moment from 'moment/moment';
 const styles = theme => ({
   divider: {
-    margin: `${theme.spacing.unit * 2}px 0`,
+    margin: `${theme.spacing(2)}px 0`,
     background: 'none'
   },
 });

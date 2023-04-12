@@ -1,20 +1,20 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
+import { withStyles } from "@mui/styles";
+import Drawer from '@mui/material/Drawer';
 import classNames from 'classnames';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Tooltip from '@material-ui/core/Tooltip';
-import Avatar from '@material-ui/core/Avatar';
-import BottomNavigation from '@material-ui/core/BottomNavigation';
-import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
-import SearchIcon from '@material-ui/icons/Search';
-import PermContactCalendar from '@material-ui/icons/PermContactCalendar';
-import Add from '@material-ui/icons/Add';
-import Star from '@material-ui/icons/Star';
-import IconButton from '@material-ui/core/IconButton';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Tooltip from '@mui/material/Tooltip';
+import Avatar from '@mui/material/Avatar';
+import BottomNavigation from '@mui/material/BottomNavigation';
+import BottomNavigationAction from '@mui/material/BottomNavigationAction';
+import SearchIcon from '@mui/icons-material/Search';
+import PermContactCalendar from '@mui/icons-material/PermContactCalendar';
+import Add from '@mui/icons-material/Add';
+import Star from '@mui/icons-material/Star';
+import IconButton from '@mui/material/IconButton';
 import styles from './contact-jss';
 
 class ContactList extends React.Component {

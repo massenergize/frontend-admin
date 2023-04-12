@@ -2,17 +2,22 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import states from "dan-api/data/states";
-import { Link } from "react-router-dom";
-import { Paper } from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
+import { Link, withRouter } from "react-router-dom";
+import { Paper } from "@mui/material";
+import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
-import MassEnergizeForm from "../_FormGenerator";
-import Typography from "@material-ui/core/Typography";
+// import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
+import Typography from "@mui/material/Typography";
 import { checkIfReadOnly, getSelectedIds } from "../Actions/EditActionForm";
 import { bindActionCreators } from "redux";
-import { reduxUpdateHeap } from "../../../redux/redux-actions/adminActions";
+import {
+  reduxAddToHeap,
+  reduxUpdateHeap,
+} from "../../../redux/redux-actions/adminActions";
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -32,7 +37,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -50,6 +55,15 @@ export const makeTagSection = ({
   };
 
   (collections || []).forEach((tCol) => {
+    var selected = (event && event.tags) || [];
+    let putDefaultsIfUpdating = {};
+    if (defaults) {
+      let data = selected.map((c) => c.id.toString());
+      putDefaultsIfUpdating = {
+        defaultValue: defaults && getSelectedIds(data || [], tCol.tags || []),
+      };
+    }
+
     const newField = {
       name: tCol.name,
       label: `${tCol.name} ${
@@ -60,8 +74,9 @@ export const makeTagSection = ({
       placeholder: "",
       fieldType: "Checkbox",
       selectMany: tCol.allow_multiple,
-      defaultValue:
-        defaults && getSelectedIds((event && event.tags) || [], tCol.tags),
+      ...putDefaultsIfUpdating,
+      processedDefaultValue: (selected) =>
+        getSelectedIds(selected || [], tCol.tags || []),
       dbName: "tags",
       data: tCol.tags.map((t) => ({
         ...t,
@@ -77,6 +92,13 @@ export const makeTagSection = ({
   return section;
 };
 
+const findEventFromBackend = ({ id, reduxFxn }) => {
+  apiCall("events.info", { event_id: id }).then((response) => {
+    if (!response.success)
+      return console.log("Sorry, could not load event with ID" + id);
+    reduxFxn && reduxFxn(response.data);
+  });
+};
 class EditEventForm extends Component {
   constructor(props) {
     super(props);
@@ -88,26 +110,92 @@ class EditEventForm extends Component {
       readOnly: false,
     };
   }
+
+  /**
+   * All this needs to happen inside getDerivedState because
+   * We need a lifecycle that runs whenever our props change.
+   * The data we load from the API will always come in late.
+   * That is why this is the best place.
+   *
+   * Summary Of Whats Happening Here:
+   * 1. Find event object (Look inside, already loaded event lists, or check event heap, if none of them have it already, just fetch from API)
+   * 2. Use the object to prefill the formJson and use it to create a form.
+   */
   static getDerivedStateFromProps = (props, state) => {
-    const { match, communities, tags, events, auth, exceptions } = props;
-    const { id } = match.params;
-    var { rescheduledEvent } = state;
+    const {
+      match,
+      communities,
+      tags,
+      events,
+      auth,
+      exceptions,
+      location,
+      otherCommunities,
+      eventsInHeap,
+      eventsFromOtherCommunities,
+      putEventInHeap,
+      heap,
+      passedEvent, // In cases where this component is being used as a child component, the event object will be passed here directly
+    } = props;
+    const id = match && match.params && match.params.id;
+    var { rescheduledEvent, event } = state;
 
     rescheduledEvent = exceptions[id] || rescheduledEvent;
-    const event = (events || []).find((e) => e.id.toString() === id.toString());
+    var event;
+
+    // ----------------------------------------------------------------------
+    if (!passedEvent) {
+      //--- Search for events from my event list
+      event = (events || []).find((e) => e.id.toString() === id.toString());
+
+      //--- If not found, look inside heap
+      if (!event) event = (eventsInHeap || {})[id];
+
+      //--- If not found look inside list of "other Events"
+      if (!event)
+        event = (eventsFromOtherCommunities || []).find(
+          (e) => e.id.toString() === id.toString()
+        );
+
+      const storeEventInHeap = (data) => {
+        putEventInHeap(
+          { eventsInHeap: { ...eventsInHeap, [id.toString()]: data } },
+          heap
+        );
+      };
+
+      //--- If all local searches fail, just retrieve from backend
+      if (!event) findEventFromBackend({ id, storeEventInHeap });
+    } else event = passedEvent;
+    // ----------------------------------------------------------------------
+
     const readOnly = checkIfReadOnly(event, auth);
     const thereIsNothingInEventsExceptionsList = rescheduledEvent === null;
 
+    /** The whole point of this is to make sure all of the following have loaded in,
+     *   before we start creating the form. If all of these values load in,  *"readyToRenderPageFirstTime" will be a positive value
+     */
     const readyToRenderPageFirstTime =
-      events &&
+      event &&
       events.length &&
       tags &&
       tags.length &&
       (readOnly || rescheduledEvent || thereIsNothingInEventsExceptionsList);
+    otherCommunities && otherCommunities.length;
 
+    /**
+     * Now, when all the values needed to create the form are loaded in, we now need to create the form
+     * "jobsDoneDontRunWhatsBelowEverAgain" is setup to always be the inverse value of "readyToRender...". Meaning when "readyToRender..." is true, "jobsDone..." will be false.
+     "state.mounted" is initally always false (will get to that soon). Since the If statement below resolves to false, code below will run. The formJson will be created nicely as well as the other things...
+     * Then after, to ensure that the creation never happens again, there has  to
+     * be a third party that indicates that all the loading processes are done, form is created and that everything is finished here. That is where "state.mounted" comes in.
+     * "state.mounted" is set to true the first time the formJson is created.
+     * This way, even if "getDerivedStateFromProps" is triggered from a props change somewhere down the line, the whole process will terminate here...
+     */
     const jobsDoneDontRunWhatsBelowEverAgain =
-      !readyToRenderPageFirstTime || state.mounted;
+      !readyToRenderPageFirstTime || state.mounted; // state.mounted will only be true when the code below has run at least once!
 
+    //--- When this value is true, it means we have been able to load all data needed to show the form, so no need to recreate formJson
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
     const coms = (communities || []).map((c) => ({
@@ -115,11 +203,15 @@ class EditEventForm extends Component {
       displayName: c.name,
       id: "" + c.id,
     }));
+
+    const libOpen = location.state && location.state.libOpen;
     const formJson = createFormJson({
       event,
       communities: coms,
       rescheduledEvent,
       auth,
+      autoOpenMediaLibrary: libOpen,
+      otherCommunities: otherCommunities || [],
     });
 
     const section = makeTagSection({ collections: tags, event });
@@ -136,14 +228,24 @@ class EditEventForm extends Component {
     };
   };
 
-  componentDidMount() {
-    const { id } = this.props.match.params;
+  async componentDidMount() {
+    const { match, passedEvent } = this.props;
+    const { id } = (match && match.params) || passedEvent || {};
     var { event } = this.state;
     const { auth, events, addExceptionsToHeap, heap, exceptions } = this.props;
 
-    event =
-      event || (events || []).find((e) => e.id.toString() === id.toString());
+    const eventResponse = await apiCall("/events.info", {
+      event_id: id,
+    });
+    if (eventResponse && !eventResponse.success) {
+      return;
+    }
 
+    event =
+      event ||
+      (event || []).find((e) => e.id.toString() === id.toString()) ||
+      eventResponse.data;
+    this.setState({ event });
     const readOnly = checkIfReadOnly(event, auth);
     if (!readOnly) {
       apiCall("events.exceptions.list", { event_id: id })
@@ -175,16 +277,26 @@ class EditEventForm extends Component {
   }
 
   render() {
-    const { classes } = this.props;
-    const { formJson, readOnly, event } = this.state;
+    const { classes, match, passedEvent } = this.props;
+    const { formJson, readOnly, event, mounted } = this.state;
+    const { id } = (match && match.params) || passedEvent || {};
+
+    if (!event && mounted)
+      return (
+        <p>
+          Sorry, we could not load the event you are looking for. If you are
+          sure your event exists, please report this!
+        </p>
+      );
+
     if (!formJson) return <Loading />;
     return (
       <div>
-        {event.rsvp_enabled ? (
+        {!readOnly && event.rsvp_enabled ? (
           <Paper style={{ padding: 20, marginBottom: 15 }}>
             <Typography>
-              Would you like to see a list of users who have RSVP-ed for
-              this event?
+              Would you like to see a list of users who have RSVP-ed for this
+              event?
             </Typography>
             <Link
               to={`/admin/edit/${event && event.id}/event-rsvps`}
@@ -196,6 +308,7 @@ class EditEventForm extends Component {
         ) : null}
 
         <MassEnergizeForm
+          pageKey={`${PAGE_KEYS.EDIT_EVENT.key}-${id}`}
           classes={classes}
           formJson={formJson}
           readOnly={readOnly}
@@ -208,7 +321,7 @@ class EditEventForm extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const heap = state.heap;
+  const heap = state.getIn(["heap"]);
   return {
     auth: state.getIn(["auth"]),
     community: state.getIn(["selected_community"]),
@@ -217,6 +330,9 @@ const mapStateToProps = (state) => {
     events: state.getIn(["allEvents"]),
     heap: state.getIn(["heap"]),
     exceptions: (heap && heap.exceptions) || {},
+    otherCommunities: state.getIn(["otherCommunities"]),
+    eventsInHeap: (heap || {}).eventsInHeap || {},
+    eventsFromOtherCommunities: state.getIn(["otherEvents"]),
   };
 };
 
@@ -224,6 +340,7 @@ const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       addExceptionsToHeap: reduxUpdateHeap,
+      putEventInHeap: reduxAddToHeap,
     },
     dispatch
   );
@@ -236,12 +353,13 @@ const EditEventMapped = connect(
 EditEventForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
-export default withStyles(styles, { withTheme: true })(EditEventMapped);
+export default withStyles(styles, { withTheme: true })(
+  withRouter(EditEventMapped)
+);
 
 const validator = (cleaned) => {
   const start = (cleaned || {})["start_date_and_time"];
   const end = (cleaned || {})["end_date_and_time"];
-  console.log(start, end);
   const endDateComesLater = new Date(end) > new Date(start);
   return [
     endDateComesLater,
@@ -250,10 +368,72 @@ const validator = (cleaned) => {
   ];
 };
 
-const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
+/**
+ * If an event is open, allow event to be shared to any of the admin's communities
+ * If it's open_to, only select which of the admin's communities that have been listed as allowed to show in the dropdown
+ * If its closed_to, only select which of the admin's communities that have not been exempted to show in the dropdown
+ * @param {*} adminOf
+ * @param {*} list
+ * @param {*} publicity
+ * @returns
+ */
+
+//const getAllowedCommunities = ({ adminOf, list, publicity }) => {
+//  if (publicity === "OPEN") return adminOf;
+//  list = (list || []).map((c) => c.id);
+//  // This part happens when an admin has already copied an event, and is trying to edit, (we select only communities that are allowed) to be shown in the dropdown
+//  var coms;
+//  if (publicity === "OPEN_TO") {
+//    coms = adminOf.filter((c) => list.includes(c.id));
+//    return coms;
+//  }
+//
+//  if (publicity === "CLOSED_TO") {
+//    coms = adminOf.filter((c) => !list.includes(c.id));
+//    return coms;
+//  }
+//
+//  return [];
+//};
+
+const createFormJson = ({
+  event,
+  rescheduledEvent,
+  communities,
+  auth,
+  autoOpenMediaLibrary,
+  otherCommunities,
+}) => {
   const statuses = ["Draft", "Live", "Archived"];
   if (!event || !communities) return;
+
   const is_super_admin = auth && auth.is_super_admin;
+
+  //communities = is_super_admin
+  //  ? communities
+  //  : getAllowedCommunities({
+  //      adminOf: auth.admin_at,
+  //      list: event.communities_under_publicity,
+  //      publicity: event.publicity,
+  //    });
+
+  communities = (communities || []).map((c) => ({
+    displayName: c.name,
+    id: c.id.toString(),
+  }));
+
+  const publicityCommunities = (
+    (event && event.communities_under_publicity) ||
+    []
+  ).map((c) => c.id.toString());
+
+  // Now check which of the communities are listed under publicity, and which ones match the admin's communities
+
+  const otherCommunityList = otherCommunities.map((c) => ({
+    displayName: c.name,
+    id: c.id.toString(),
+  }));
+
   const formJson = {
     title: "Edit Event or Campaign",
     subTitle: "",
@@ -294,18 +474,6 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
             isRequired: true,
             defaultValue: event.featured_summary,
             dbName: "featured_summary",
-            readOnly: false,
-          },
-          {
-            name: "rank",
-            label:
-              "Rank (Which order should this event appear in?  Lower numbers come first)",
-            placeholder: "eg. 1",
-            fieldType: "TextField",
-            contentType: "number",
-            isRequired: false,
-            defaultValue: event.rank,
-            dbName: "rank",
             readOnly: false,
           },
           {
@@ -521,18 +689,80 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
                       defaultValue: event.community && event.community.id,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
+                      isRequired: true,
                     },
                   ],
                 },
               }
             : {
-              name: "community",
-              label: "Primary Community (select one)",
-              fieldType: "Dropdown",
-              defaultValue: event.community && event.community.id,
-              dbName: "community_id",
-              data: [{ displayName: "--", id: "" }, ...communities],
-            },
+                name: "community",
+                label: "Primary Community (select one)",
+                fieldType: "Dropdown",
+                defaultValue: event.community && event.community.id,
+                dbName: "community_id",
+                data: [{ displayName: "--", id: "" }, ...communities],
+                isRequired: true,
+              },
+        ],
+      },
+      {
+        label: "Who can see this event?",
+        fieldType: "Section",
+        children: [
+          {
+            name: "publicity",
+            label: "Who should be able to see this event?",
+            fieldType: "Radio",
+            isRequired: false,
+            defaultValue: event && event.publicity,
+            dbName: "publicity",
+            readOnly: false,
+            data: [
+              { id: "OPEN", value: "All communities can see this event " },
+              {
+                id: "OPEN_TO",
+                value: "Only communities I select should see this",
+              },
+              {
+                id: "CLOSE",
+                value: "No one can see this, keep this in my community only ",
+              },
+
+              // { id: "CLOSED_TO", value: "All except these communities" },
+            ],
+            conditionalDisplays: [
+              {
+                valueToCheck: "OPEN_TO",
+                fields: [
+                  {
+                    name: "can-view-event",
+                    label: `Select the communities that can see this event`,
+                    placeholder: "",
+                    fieldType: "Checkbox",
+                    selectMany: true,
+                    defaultValue: publicityCommunities,
+                    dbName: "publicity_selections",
+                    data: otherCommunityList,
+                  },
+                ],
+              },
+              // {
+              //   valueToCheck: "CLOSED_TO",
+              //   fields: [
+              //     {
+              //       name: "cannot-view-event",
+              //       label: `Select the communities should NOT see this event`,
+              //       placeholder: "",
+              //       fieldType: "Checkbox",
+              //       selectMany: true,
+              //       defaultValue: publicityCommunities,
+              //       dbName: "publicity_selections",
+              //       data: otherCommunityList,
+              //     },
+              //   ],
+              // },
+            ],
+          },
         ],
       },
       {
@@ -608,6 +838,7 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
         name: "image",
         placeholder: "Select an Image",
         fieldType: fieldTypes.MediaLibrary,
+        openState: autoOpenMediaLibrary,
         dbName: "image",
         label: "Upload Files",
         isRequired: false,
@@ -623,7 +854,6 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
         child: {
-          dbName: "rsvp_communication",
           valueToCheck: "true",
           fields: [
             {
@@ -665,6 +895,16 @@ const createFormJson = ({ event, rescheduledEvent, communities, auth }) => {
         isRequired: false,
         defaultValue: "" + event.archive,
         dbName: "archive",
+        readOnly: false,
+        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+      },
+      {
+        name: "is_approved",
+        label: "Do you approve this event?",
+        fieldType: "Radio",
+        isRequired: false,
+        defaultValue: "" + event.is_approved,
+        dbName: "is_approved",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
       },

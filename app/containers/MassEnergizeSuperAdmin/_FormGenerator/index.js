@@ -1,33 +1,36 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import InputLabel from "@material-ui/core/InputLabel";
-import Input from "@material-ui/core/Input";
-import Select from "@material-ui/core/Select";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import Paper from "@material-ui/core/Paper";
-import Grid from "@material-ui/core/Grid";
-import { DateTimePicker, MuiPickersUtilsProvider } from "material-ui-pickers";
+import { withStyles } from "@mui/styles";
+import InputLabel from "@mui/material/InputLabel";
+import Input from "@mui/material/Input";
+import Select from "@mui/material/Select";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import Paper from "@mui/material/Paper";
+import Grid from "@mui/material/Grid";
+import dayjs from "dayjs"; // don't remove this
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+// import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import MomentUtils from "@date-io/moment";
-import FormControl from "@material-ui/core/FormControl";
-import Checkbox from "@material-ui/core/Checkbox";
-import FormLabel from "@material-ui/core/FormLabel";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
-import Chip from "@material-ui/core/Chip";
+import FormControl from "@mui/material/FormControl";
+import Checkbox from "@mui/material/Checkbox";
+import FormLabel from "@mui/material/FormLabel";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
 import { Link, withRouter } from "react-router-dom";
 import { MaterialDropZone } from "dan-components";
-import Snackbar from "@material-ui/core/Snackbar";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import Snackbar from "@mui/material/Snackbar";
+import CircularProgress from "@mui/material/CircularProgress";
 import { Editor as TinyEditor } from "@tinymce/tinymce-react";
-import { MenuItem } from "@material-ui/core";
-import TextField from "@material-ui/core/TextField";
-// import Icon from '@material-ui/core/Icon';
+import { MenuItem, Alert } from "@mui/material";
+import TextField from "@mui/material/TextField";
+// import Icon from '@mui/material/Icon';
 import moment from "moment";
 import { apiCall } from "../../../utils/messenger";
-import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
 import FieldTypes from "./fieldTypes";
 import Modal from "./Modal";
 // import PreviewModal from './PreviewModal';
@@ -36,6 +39,7 @@ import IconDialog from "../ME  Tools/icon dialog/IconDialog";
 import FormMediaLibraryImplementation from "./FormMediaLibraryImplementation";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { isValueEmpty } from "../Community/utils";
+import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 const styles = (theme) => ({
@@ -57,7 +61,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -85,9 +89,11 @@ class MassEnergizeForm extends Component {
       readOnly: false,
       // activeModal: null,
       // activeModalTitle: null,
+      refreshKey: "default-form-state", // Change this value to any different string force a re-render in the form.
     };
     this.updateForm = this.updateForm.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
+    this.resetForm = this.resetForm.bind(this);
     //this.closePreviewModal = this.closePreviewModal.bind(this);
   }
 
@@ -98,6 +104,10 @@ class MassEnergizeForm extends Component {
     await this.setStateAsync({ formJson, formData, readOnly: readOnly });
   }
 
+  componentWillUnmount() {
+    const { unMount } = this.props;
+    if (unMount) unMount(this.state);
+  }
   setStateAsync(state) {
     return new Promise((resolve) => {
       this.setState(state, resolve);
@@ -336,7 +346,9 @@ class MassEnergizeForm extends Component {
   getDisplayName = (fieldName, id, data) => {
     const { formData } = this.state;
     if (id) {
-      const [result] = data.filter((d) => d.id.toString() === id.toString());
+      const [result] = data.filter(
+        (d) => d.id && d.id.toString() === id && id.toString()
+      );
       if (result) {
         return result.displayName;
       }
@@ -399,9 +411,7 @@ class MassEnergizeForm extends Component {
             cleanedValues[field.dbName] = fieldValueInForm;
             break;
           case FieldTypes.DateTime:
-            cleanedValues[field.dbName] = (
-              moment.utc(fieldValueInForm) || moment.now()
-            ).format();
+            cleanedValues[field.dbName] = (moment.utc(fieldValueInForm)|| moment.now()).format();
             break;
           case FieldTypes.Checkbox:
             // If two or more items have the same dbName, the get combined into an array
@@ -482,6 +492,12 @@ class MassEnergizeForm extends Component {
   setError(error) {
     this.setState({ error: error, startCircularSpinner: false });
   }
+
+  resetForm(defaults = { formData: {} }) {
+    const refreshKey = getRandomStringKey();
+    this.setState({ ...defaults, refreshKey });
+    //More to come, on uncontrolled fields (when needed)
+  }
   /**
    * This handles the form data submission
    */
@@ -498,7 +514,7 @@ class MassEnergizeForm extends Component {
     // lets set the startCircularSpinner Value so the spinner starts spinning
     await this.setStateAsync({ startCircularSpinner: true });
     // let's clean up the data
-    const { onComplete, validator } = this.props;
+    const { onComplete, validator, clearProgress } = this.props;
     let [cleanedValues, hasMediaFiles] = this.cleanItUp(
       formData,
       formJson.fields
@@ -522,7 +538,6 @@ class MassEnergizeForm extends Component {
       if (!validationPassed) return this.setError(_err);
     }
 
-
     // let's make an api call to send the data
     let response = null;
     if (hasMediaFiles) {
@@ -542,10 +557,18 @@ class MassEnergizeForm extends Component {
         startCircularSpinner: false,
         // formData: initialFormData
       });
-      if (onComplete) onComplete(response.data, response && response.success);
+
+      if (onComplete)
+        onComplete(
+          response.data,
+          response && response.success,
+          this.resetForm.bind(this)
+        );
+
+      if (clearProgress) clearProgress(this.resetForm);
+
       if (formJson.successRedirectPage) {
-        this.props.history.push(formJson.successRedirectPage);
-        // window.location.href = formJson.successRedirectPage;
+        window.location.href = formJson.successRedirectPage;
       }
     } else if (response && !response.success) {
       // we got an error from the backend so let's set it so the snackbar can pick it up
@@ -712,10 +735,15 @@ class MassEnergizeForm extends Component {
           <div key={field.name}>
             <FormControl className={classes.field}>
               {this.renderGeneralContent(field)}
-              <InputLabel htmlFor={field.name}>{field.label}</InputLabel>
-
+              <InputLabel
+                htmlFor={field.label}
+                className={classes.selectFieldLabel}
+              >
+                {field.label}
+              </InputLabel>
               <Select
                 native
+                label={field.label}
                 name={field.name}
                 onChange={async (newValue) => {
                   await this.updateForm(field.name, newValue.target.value);
@@ -1009,7 +1037,7 @@ class MassEnergizeForm extends Component {
               this.getValue(field.name) === field.child.valueToCheck &&
               this.renderFields(field.child.fields)}
             {this.renderConditionalDisplays(field)}
-          </div>
+          </div> 
         );
       case FieldTypes.TextField:
         return (
@@ -1033,9 +1061,11 @@ class MassEnergizeForm extends Component {
                 shrink: true,
               }}
               disabled={field.readOnly || this.state.readOnly}
-              defaultValue={field.defaultValue}
+              // defaultValue={field.defaultValue}
+              value={this.getValue(field.name)}
               inputProps={{ maxLength: field.maxLength }}
               // maxLength={field.maxLength}
+              variant="outlined"
             />
           </div>
         );
@@ -1066,25 +1096,36 @@ class MassEnergizeForm extends Component {
               {field.label}
             </Typography>
             <div className={classes.picker} style={{ width: "100%" }}>
-              <MuiPickersUtilsProvider
+              <LocalizationProvider
+                dateAdapter={AdapterMoment}
                 utils={MomentUtils}
                 style={{ width: "100%" }}
               >
                 <DateTimePicker
                   {...field}
-                  value={this.getValue(field.name, field.defaultValue, field)}
-                  onChange={(date) =>
+                  renderInput={(props) => <TextField {...props} />}
+                  value={this.getValue(
+                    field.name,
+                    field.defaultValue,
+                    field
+                  )}
+                  onChange={(date) => {
                     this.handleFormDataChange(
                       {
-                        target: { name: field.name, value: date },
+                        target: {
+                          name: field.name,
+                          value: date,
+                        },
                       },
                       field
-                    )
-                  }
+                    );
+                  }}
                   label="" // don't put label in the box {field.label}
-                  format="MM/DD/YYYY, h:mm a"
+                  // mask="MM/DD/YYYY, h:mm a"
+                  inputFormat="MM/DD/YYYY HH:mm:ss"
+                  mask={"__/__/____ __:__:__"}
                 />
-              </MuiPickersUtilsProvider>
+              </LocalizationProvider>
             </div>
 
             <br />
@@ -1128,7 +1169,8 @@ class MassEnergizeForm extends Component {
   renderFields = (fields) =>
     fields.map((field, key) => (
       <div key={`${field.name}-${key.toString()}`}>
-        {this.renderModalText(field)}
+        <div style={{marginBottom:15}}>{this.renderModalText(field)}</div>
+
         {this.renderField(field)}
       </div>
     ));
@@ -1144,10 +1186,9 @@ class MassEnergizeForm extends Component {
     } = this.state;
     if (!formJson) return <Loading />;
     return (
-      <div>
+      <div key={this.state.refreshKey}>
         <Grid
           container
-          spacing={24}
           alignItems="flex-start"
           direction="row"
           justify="center"
@@ -1182,20 +1223,23 @@ class MassEnergizeForm extends Component {
               {error && (
                 <div>
                   <Snackbar
-                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "right",
+                    }}
                     open={error != null}
                     autoHideDuration={6000}
                     onClose={this.handleCloseStyle}
                   >
-                    <MySnackbarContentWrapper
+                    <Alert
                       onClose={this.handleCloseStyle}
-                      variant="error"
-                      message={
-                        <small style={{ marginLeft: 15, fontSize: 15 }}>
-                          {error}
-                        </small>
-                      }
-                    />
+                      severity={"error"}
+                      sx={{ width: "100%" }}
+                    >
+                      <small style={{ marginLeft: 15, fontSize: 15 }}>
+                        {error}
+                      </small>
+                    </Alert>
                   </Snackbar>
                   <p style={{ color: "red" }}>{error}</p>
                 </div>
@@ -1213,15 +1257,15 @@ class MassEnergizeForm extends Component {
                     autoHideDuration={6000}
                     onClose={this.handleCloseStyle}
                   >
-                    <MySnackbarContentWrapper
+                    <Alert
                       onClose={this.handleCloseStyle}
-                      variant="success"
-                      message={
-                        <small style={{ marginLeft: 15, fontSize: 14 }}>
-                          {successMsg}
-                        </small>
-                      }
-                    />
+                      severity={"success"}
+                      sx={{ width: "100%" }}
+                    >
+                      <small style={{ marginLeft: 15, fontSize: 15 }}>
+                        {successMsg}
+                      </small>
+                    </Alert>
                   </Snackbar>
                   <p style={{ color: "green" }}>{successMsg}</p>
                 </div>
@@ -1240,9 +1284,9 @@ class MassEnergizeForm extends Component {
                   </div>
                 )}
                 <div>
-                  {formJson && formJson.cancelLink && (
+                  {/* {formJson && formJson.cancelLink && (
                     <Link to={formJson.cancelLink}>Cancel</Link>
-                  )}
+                  )} */}
                   {"    "}
                   {enableCancel && (
                     <Button
@@ -1250,6 +1294,8 @@ class MassEnergizeForm extends Component {
                       color="secondary"
                       onClick={(e) => {
                         e.preventDefault();
+                        const { clearProgress } = this.props;
+                        if (clearProgress) clearProgress(this.resetForm);
                         if (cancel) return cancel();
                         this.props.history.goBack();
                       }}
@@ -1281,7 +1327,7 @@ MassEnergizeForm.propTypes = {
   classes: PropTypes.object.isRequired,
   formJson: PropTypes.object.isRequired,
   enableCancel: PropTypes.bool,
-  cancel: PropTypes.func,
+  // cancel: PropTypes.func,
   /**
    * Any function you want to run when the form successfully does its job
    */

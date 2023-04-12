@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import states from "dan-api/data/states";
-import { withStyles } from "@material-ui/core/styles";
-import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
+import { withStyles } from "@mui/styles";
 import { groupSocialMediaFields, getMoreInfo } from "./utils";
 import fieldTypes from "../_FormGenerator/fieldTypes";
-
+import { withRouter } from "react-router-dom";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -25,7 +26,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -68,6 +69,9 @@ class CreateNewCommunityForm extends Component {
       { id: "COUNTRY", value: "Community defined by a country" },
       //{ id: "NON_GEOGRAPHIC", value:"A non-geographic community" },
     ];
+
+    const location = this.props.location;
+    const libOpen = location.state && location.state.libOpen;
     const formJson = {
       title: "Create New Community",
       subTitle: "",
@@ -182,35 +186,35 @@ class CreateNewCommunityForm extends Component {
               readOnly: false,
             },
             {
-                 name: 'city',
-                 label: 'City',
-                 placeholder: 'eg. Springfield',
-                 fieldType: 'TextField',
-                 contentType: 'text',
-                 isRequired: false,
-                 dbName: 'city',
-                 readOnly: false
-            },
-            {
-                 name: 'state',
-                 label: 'State',
-                 placeholder: 'eg. Massachusetts',
-                 fieldType: 'Dropdown',
-                 contentType: 'text',
-                 isRequired: false,
-                 data: states,
-                 dbName: 'state',
-                 readOnly: false
-            },
-            {
-              name: 'zipcode',
-              label: 'Zip code',
-              placeholder: 'eg. 01020',
-              fieldType: 'TextField',
-              contentType: 'text',
+              name: "city",
+              label: "City",
+              placeholder: "eg. Springfield",
+              fieldType: "TextField",
+              contentType: "text",
               isRequired: false,
-              dbName: 'zipcode',
-              readOnly: false
+              dbName: "city",
+              readOnly: false,
+            },
+            {
+              name: "state",
+              label: "State",
+              placeholder: "eg. Massachusetts",
+              fieldType: "Dropdown",
+              contentType: "text",
+              isRequired: false,
+              data: states,
+              dbName: "state",
+              readOnly: false,
+            },
+            {
+              name: "zipcode",
+              label: "Zip code",
+              placeholder: "eg. 01020",
+              fieldType: "TextField",
+              contentType: "text",
+              isRequired: false,
+              dbName: "zipcode",
+              readOnly: false,
             },
           ],
         },
@@ -322,6 +326,7 @@ class CreateNewCommunityForm extends Component {
           name: "image",
           placeholder: "Upload a Logo",
           fieldType: fieldTypes.MediaLibrary,
+          openState: libOpen,
           dbName: "image",
           label: "Upload a logo for this community",
           uploadMultiple: false,
@@ -371,7 +376,11 @@ class CreateNewCommunityForm extends Component {
     if (!formJson) return <div>Hold tight! Preparing your form ...</div>;
     return (
       <div>
-        <MassEnergizeForm classes={classes} formJson={formJson} />
+        <MassEnergizeForm
+          pageKey={PAGE_KEYS.CREATE_COMMUNITY.key}
+          classes={classes}
+          formJson={formJson}
+        />
       </div>
     );
   }
@@ -381,4 +390,6 @@ CreateNewCommunityForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(CreateNewCommunityForm);
+export default withStyles(styles, { withTheme: true })(
+  withRouter(CreateNewCommunityForm)
+);

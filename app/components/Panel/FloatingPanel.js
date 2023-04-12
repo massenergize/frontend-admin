@@ -1,18 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
+import { withStyles } from "@mui/styles";
+// import withWidth, { isWidthDown } from '@mui/material/withWidth';
 import classNames from 'classnames';
-import Tooltip from '@material-ui/core/Tooltip';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import ExpandIcon from '@material-ui/icons/CallMade';
-import MinimizeIcon from '@material-ui/icons/CallReceived';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import ExpandIcon from '@mui/icons-material/CallMade';
+import MinimizeIcon from '@mui/icons-material/CallReceived';
 import styles from './panel-jss';
 
+import { useMediaQuery, useTheme } from "@mui/material";
+
 class FloatingPanel extends React.Component {
+  theme = useTheme();
   state = {
-    expanded: false
+    expanded: false,
+    matches: false,
+  };
+
+  componentDidMount() {
+    this.setState({
+      matches: useMediaQuery(this.theme.breakpoints.up("sm")),
+    });
   }
 
   toggleExpand() {
@@ -29,36 +39,46 @@ class FloatingPanel extends React.Component {
       branch,
       title,
       extraSize,
-      width
+      width,
     } = this.props;
-    const { expanded } = this.state;
+    const { expanded,matches } = this.state;
     return (
       <div>
-        <div className={
-          classNames(
+        <div
+          className={classNames(
             classes.formOverlay,
-            openForm && (isWidthDown('sm', width) || expanded) ? classes.showForm : classes.hideForm
+            openForm && (matches || expanded)
+              ? classes.showForm
+              : classes.hideForm
           )}
         />
-        <section className={
-          classNames(
+        <section
+          className={classNames(
             !openForm ? classes.hideForm : classes.showForm,
-            expanded ? classes.expanded : '',
+            expanded ? classes.expanded : "",
             classes.floatingForm,
             classes.formTheme,
             extraSize && classes.large
           )}
         >
           <header>
-            { title }
+            {title}
             <div className={classes.btnOpt}>
-              <Tooltip title={expanded ? 'Exit Full Screen' : 'Full Screen'}>
-                <IconButton className={classes.expandButton} onClick={() => this.toggleExpand()} aria-label="Expand">
+              <Tooltip title={expanded ? "Exit Full Screen" : "Full Screen"}>
+                <IconButton
+                  className={classes.expandButton}
+                  onClick={() => this.toggleExpand()}
+                  aria-label="Expand"
+                >
                   {expanded ? <MinimizeIcon /> : <ExpandIcon />}
                 </IconButton>
               </Tooltip>
               <Tooltip title="Close">
-                <IconButton className={classes.closeButton} onClick={() => closeForm(branch)} aria-label="Close">
+                <IconButton
+                  className={classes.closeButton}
+                  onClick={() => closeForm(branch)}
+                  aria-label="Close"
+                >
                   <CloseIcon />
                 </IconButton>
               </Tooltip>
@@ -87,5 +107,5 @@ FloatingPanel.defaultProps = {
   extraSize: false,
 };
 
-const FloatingPanelResponsive = withWidth()(FloatingPanel);
+const FloatingPanelResponsive = (FloatingPanel);
 export default withStyles(styles)(FloatingPanelResponsive);

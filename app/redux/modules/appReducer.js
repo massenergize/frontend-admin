@@ -33,6 +33,22 @@ import {
   LOAD_ALL_TASKS,
   LOAD_SETTINGS,
   LOAD_FEATURE_FLAGS,
+  LOAD_ADMIN_ACTIVITIES,
+  ADD_NEW_FEATURE_FLAG_INFO,
+  SET_GALLERY_FILTERS,
+  LOAD_ADMINS_FOR_MY_COMMUNITY,
+  LOAD_SUPER_ADMIN_LIST,
+  LOAD_ALL_OTHER_COMMUNITIES,
+  LOAD_ALL_OTHER_EVENTS,
+  SAVE_OTHER_EVENT_STATES,
+  KEEP_FORM_CONTENT,
+  LOAD_ADMIN_NEXT_STEPS_SUMMARY,
+  SET_ENGAGMENT_OPTIONS,
+  LOAD_USER_ENGAGEMENTS,
+  TOGGLE_UNIVERSAL_TOAST,
+  LOAD_ALL_META_DATA,
+  ACTION_ENGAGMENTS,
+  LOAD_TABLE_FILTERS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -60,6 +76,113 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+export const reducerForTableFilters = (state = {}, action = {}) => {
+  switch (action.type) {
+    case LOAD_TABLE_FILTERS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForActionEngagements = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case ACTION_ENGAGMENTS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForUserEngagements = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_USER_ENGAGEMENTS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForEngagementOptions = (
+  state = { range: ["last-month"] },
+  action = {}
+) => {
+  switch (action.type) {
+    case SET_ENGAGMENT_OPTIONS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForNextStepsSummary = (state = {}, action = {}) => {
+  switch (action.type) {
+    case LOAD_ADMIN_NEXT_STEPS_SUMMARY:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForSavingOtherEventState = (state = {}, action = {}) => {
+  switch (action.type) {
+    case SAVE_OTHER_EVENT_STATES:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForLoadingOtherEvents = (state = [], action = {}) => {
+  switch (action.type) {
+    case LOAD_ALL_OTHER_EVENTS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForKeepingFormContent = (state = {}, action = {}) => {
+  switch (action.type) {
+    case KEEP_FORM_CONTENT:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForAdminActivities = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_ADMIN_ACTIVITIES:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForAllOtherCommunities = (state = [], action = {}) => {
+  switch (action.type) {
+    case LOAD_ALL_OTHER_COMMUNITIES:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForFlagInfo = (state = {}, action = {}) => {
+  switch (action.type) {
+    case ADD_NEW_FEATURE_FLAG_INFO:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForLoadingSuperAdmins = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_SUPER_ADMIN_LIST:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForLoadingAdmins = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_ADMINS_FOR_MY_COMMUNITY:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForFeatureFlags = (state = LOADING, action = {}) => {
   switch (action.type) {
     case LOAD_FEATURE_FLAGS:
@@ -77,9 +200,27 @@ export const reducerForSettings = (state = null, action = {}) => {
   }
 };
 
+export const reducerForGalleryFilters = (state = {}, action = {}) => {
+  switch (action.type) {
+    case SET_GALLERY_FILTERS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
 export const reducerForUniversalModal = (state = {}, action = {}) => {
   switch (action.type) {
     case TOGGLE_UNIVERSAL_MODAL:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+export const reducerForUniversalToast = (state = {}, action = {}) => {
+  switch (action.type) {
+    case TOGGLE_UNIVERSAL_TOAST:
       return action.payload;
 
     default:
@@ -316,6 +457,14 @@ export const allTaskFunctionsReducer = (state = [], action = {}) => {
 export const allTasksReducer = (state = [], action = {}) => {
   switch (action.type) {
     case LOAD_ALL_TASKS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const allMetaDataReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case LOAD_ALL_META_DATA:
       return action.payload;
     default:
       return state;

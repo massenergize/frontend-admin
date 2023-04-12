@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react';
 import { PropTypes } from 'prop-types';
 import classNames from 'classnames';
-import Fade from '@material-ui/core/Fade';
-import Typography from '@material-ui/core/Typography';
-import { withStyles } from '@material-ui/core/styles';
+import Fade from '@mui/material/Fade';
+import Typography from '@mui/material/Typography';
+import { withStyles } from "@mui/styles";
 import {
   Header,
   Sidebar,
