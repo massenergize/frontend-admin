@@ -2,10 +2,10 @@
   --app-cyan: #579ece;
 }
 
-.not-approved { 
-  width:110px; 
-  background: #bf0e0e !important; 
-  color:white !important; 
+.not-approved {
+  width: 110px;
+  background: #bf0e0e !important;
+  color: white !important;
 }
 .preview-content {
   margin-left: 30px;
@@ -44,6 +44,43 @@
   align-items: center;
 }
 
-/* .me-chip small {
-  font-size: 11px;
-} */
+.me-badge {
+  padding: 5px 6px;
+  border-radius: 55px;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  background: green;
+  margin-right: 7px;
+}
+.next-section-item {
+  margin-bottom: 15px;
+  /* flex-basis: 30%; */
+  margin: 10px;
+  cursor: pointer;
+}
+
+.next-section-item .text:hover {
+  border: dotted 0px #cfcfcf;
+  border-bottom-width: 2px;
+  opacity: 0.7;
+  transition: 0.1s ease-out;
+}
+.me-fade-in-down {
+  animation: me-fade-down 0.4s forwards;
+  -webkit-animation: me-fade-down 0.4s forwards;
+}
+@keyframes me-fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+.me-drop-override > .MuiSelect-outlined {
+  padding: 8px !important;
+}

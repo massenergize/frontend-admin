@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { createMuiTheme, withStyles } from '@material-ui/core/styles';
+import { createMuiTheme, withStyles } from '@mui/material/styles';
 import ThemePallete from 'dan-api/palette/themePalette';
-import blue from '@material-ui/core/colors/blue';
+import blue from '@mui/material/colors/blue';
 import {
   ComposedChart,
   Line,

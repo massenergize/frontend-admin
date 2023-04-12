@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import MassEnergizeForm from "../_FormGenerator";
 import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
@@ -28,7 +28,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -66,12 +66,12 @@ class CreateTaskForm extends Component {
     };
   }
 
-  onSuccess =(response)=>{
-    let {tasks}= this.props
-     let newTasks = (tasks|| []).filter((task) => task.id !== response.id);
-      newTasks.unshift(response);
+  onSuccess = (response) => {
+    let { tasks } = this.props;
+    let newTasks = (tasks || []).filter((task) => task.id !== response.id);
+    newTasks.unshift(response);
     this.props.putTasksInRedux(newTasks);
-  }
+  };
 
   render() {
     const { classes } = this.props;
@@ -109,7 +109,12 @@ function mapDispatchToProps(dispatch) {
   );
 }
 
-const NewTaskMapped = withRouter(connect(mapStateToProps, mapDispatchToProps)(CreateTaskForm));
+const NewTaskMapped = withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(CreateTaskForm)
+);
 export default withStyles(styles, { withTheme: true })(NewTaskMapped);
 
 const createFormJson = ({ taskFunctions, toEdit }) => {
@@ -129,32 +134,29 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
       functions.push(x);
     });
     return functions;
-  }
+  };
 
-
-  const getDateFromEditData = toEdit=>{
-    if(!toEdit.id) return
-    let {actual} = JSON.parse(toEdit.recurring_details);
+  const getDateFromEditData = (toEdit) => {
+    if (!toEdit.id) return;
+    let { actual } = JSON.parse(toEdit.recurring_details);
     return actual;
-    
-  }
-
+  };
 
   const preflightFxn = (values) => {
     let details = values && values.recurring_details;
     const d = new Date(details);
 
     let recurring_details = JSON.stringify({
-      day_of_month: d.getMonth(),
+      day_of_month: d.getDate(),
       day_of_week: d.getDay(),
-      month_of_year: d.getMonth(),
+      month_of_year: d.getMonth() + 1,
       minute: d.getMinutes(),
       hour: d.getHours(),
       year: d.getFullYear(),
       actual: values.recurring_details,
     });
 
-    if (toEdit &&  toEdit.id) {
+    if (toEdit && toEdit.id) {
       values.id = toEdit.id;
     }
 

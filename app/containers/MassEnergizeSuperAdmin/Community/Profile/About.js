@@ -1,34 +1,35 @@
 import React from 'react';
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { withStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
+import { withStyles } from "@mui/styles";
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
 import moment from 'moment';
-import Avatar from '@material-ui/core/Avatar';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import LocalPhone from '@material-ui/icons/LocalPhone';
-import Icon from '@material-ui/core/Icon';
-import DateRange from '@material-ui/icons/DateRange';
-import LocationOn from '@material-ui/icons/LocationOn';
-import Divider from '@material-ui/core/Divider';
-import Chip from '@material-ui/core/Chip';
-import Email from '@material-ui/icons/Email';
+import Avatar from '@mui/material/Avatar';
+import LinearProgress from '@mui/material/LinearProgress';
+import LocalPhone from '@mui/icons-material/LocalPhone';
+import Icon from '@mui/material/Icon';
+import DateRange from '@mui/icons-material/DateRange';
+import LocationOn from '@mui/icons-material/LocationOn';
+import Divider from '@mui/material/Divider';
+import Chip from '@mui/material/Chip';
+import Email from '@mui/icons-material/Email';
 import { Link, Redirect, withRouter } from 'react-router-dom';
-import Check from '@material-ui/icons/Check';
-import AcUnit from '@material-ui/icons/AcUnit';
+import Check from '@mui/icons-material/Check';
+import AcUnit from '@mui/icons-material/AcUnit';
 import Type from 'dan-styles/Typography.scss';
 import PapperBlock from 'dan-components/PapperBlock/PapperBlock';
 import styles from './profile-jss';
 import { getAddress, goHere } from '../../../../utils/common';
-import Snackbar from '@material-ui/core/Snackbar';
-import MySnackbarContentWrapper from '../../../../components/SnackBar/SnackbarContentWrapper';
+import Snackbar from '@mui/material/Snackbar';
 import { apiCallFile } from '../../../../utils/messenger';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CircularProgress from '@mui/material/CircularProgress';
+import { Alert } from '@mui/material';
+import ListItemIcon from "@mui/material/ListItemIcon";
 
 class About extends React.Component {
   constructor(props) {
@@ -153,22 +154,24 @@ class About extends React.Component {
       return <Redirect exact to="/admin/importcontacts"></Redirect>;
     }
     return (
-  
       <>
-
         {error && (
           <div>
             <Snackbar
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
               open={error != null}
               autoHideDuration={6000}
               onClose={this.handleCloseStyle}
             >
-              <MySnackbarContentWrapper
+              <Alert
                 onClose={this.handleCloseStyle}
-                variant="error"
-                message={`Unable to download: ${error}`}
-              />
+                severity={"error"}
+                sx={{ width: "100%" }}
+              >
+                <small style={{ marginLeft: 15, fontSize: 15 }}>
+                  {`Unable to download: ${error}`}
+                </small>
+              </Alert>
             </Snackbar>
           </div>
         )}
@@ -180,168 +183,292 @@ class About extends React.Component {
               autoHideDuration={3000}
               onClose={this.handleClose}
             >
-              <MySnackbarContentWrapper
+              <Alert
                 onClose={this.handleClose}
-                variant="success"
-                message={`Your request has been received. Please check your email for the file.`}
-              />
+                severity={"success"}
+                sx={{ width: "100%" }}
+              >
+                <small style={{ marginLeft: 15, fontSize: 15 }}>
+                  Your request has been received. Please check your email
+                  for the file.
+                </small>
+              </Alert>
             </Snackbar>
           </div>
         )}
 
-        <Grid
-          container
-          alignItems="flex-start"
-          justify="flex-start"
-          direction="row"
-          spacing={24}
-        >
-
+        <Grid container spacing={5}>
           <Grid item md={6} xs={12}>
             {/* Profile Progress */}
             <div className={classes.progressRoot}>
               <Paper className={classes.styledPaper} elevation={4}>
-                <Typography className={classes.title} variant="h5" component="h3">
-                  <center><span className={Type.light} style={{ textAlign: 'center' }}>#Actions Goal</span></center>
+                <Typography
+                  className={classes.title}
+                  variant="h5"
+                  component="h3"
+                >
+                  <center>
+                    <span
+                      className={Type.light}
+                      style={{ textAlign: "center" }}
+                    >
+                      #Actions Goal
+                    </span>
+                  </center>
                   {/* <span className={Type.bold}>Intermediate</span> */}
                 </Typography>
                 <Grid container justify="center">
                   <Chip
-                    avatar={(
+                    avatar={
                       <Avatar>
                         <Check />
                       </Avatar>
-                    )}
+                    }
                     label={`${this.actionsGoalPercentage()}% Progress`}
                     className={classes.chip}
                     color="primary"
                   />
                 </Grid>
-                <LinearProgress variant="determinate" className={classes.progress} value={this.actionsGoalPercentage()} />
+                <LinearProgress
+                  variant="determinate"
+                  className={classes.progress}
+                  value={this.actionsGoalPercentage()}
+                />
               </Paper>
             </div>
             {/* ----------------------------------------------------------------------*/}
             {/* About Me */}
-            <PapperBlock title="About Community" icon="ios-contact-outline" whiteBg noMargin desc={`${community ? community.about_community : ''}`}>
+            <PapperBlock
+              title="About Community"
+              icon="ios-contact-outline"
+              whiteBg
+              noMargin
+              desc={`${community ? community.about_community : ""}`}
+            >
               <Divider className={classes.divider} />
               <List dense className={classes.profileList}>
                 <ListItem>
-                  <Avatar>
-                    <DateRange />
-                  </Avatar>
-                  <ListItemText primary="Admin Name" secondary={`${community.owner_name}`} />
+                  <ListItemIcon>
+                    <Avatar>
+                      <DateRange />
+                    </Avatar>
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Admin Name"
+                    secondary={`${community.owner_name}`}
+                  />
                 </ListItem>
                 <ListItem>
-                  <Avatar>
-                    <Email />
-                  </Avatar>
-                  <ListItemText primary="Admin Email" secondary={`${community.owner_email}`} />
+                  <ListItemIcon>
+                    <Avatar>
+                        <Email />
+                    </Avatar>
+                  </ListItemIcon>
+
+                  <ListItemText
+                    primary="Admin Email"
+                    secondary={`${community.owner_email}`}
+                  />
                 </ListItem>
 
                 <ListItem>
-                  <Avatar>
-                    <DateRange />
-                  </Avatar>
-                  <ListItemText primary="Date Registered" secondary={`${moment(community.created_at).format('MMMM Do YYYY, h:mm:ss a')}`} />
+                   <ListItemIcon>
+                    <Avatar>
+                      <DateRange />
+                    </Avatar>
+                   </ListItemIcon>
+                  <ListItemText
+                    primary="Date Registered"
+                    secondary={`${moment(community.created_at).format(
+                      "MMMM Do YYYY, h:mm:ss a"
+                    )}`}
+                  />
                 </ListItem>
                 <ListItem>
+                   <ListItemIcon>
                   <Avatar>
                     <LocalPhone />
                   </Avatar>
-                  <ListItemText primary="Phone Number" secondary={`${community.owner_phone_number || 'No Phone Number Provided'}`} />
+                   </ListItemIcon>
+                  <ListItemText
+                    primary="Phone Number"
+                    secondary={`${community.owner_phone_number ||
+                      "No Phone Number Provided"}`}
+                  />
                 </ListItem>
               </List>
 
               <Divider className={classes.divider} />
 
               <List dense className={classes.profileList}>
-                {'Community Admins'}
-                {community && community.admins &&
-                  (community.admins.map(a => (
+                {"Community Admins"}
+                {community &&
+                  community.admins &&
+                  community.admins.map((a) => (
                     <ListItem key={a.email}>
-                      {a.profile_picture
-                        && <Avatar alt={a.initials} src={a.profile_picture.url} style={{ margin: 10 }} />
-                      }
-                      {!a.profile_picture
-                        && <Avatar style={{ margin: 10 }}>{a.preferred_name.substring(0, 2)}</Avatar>
-                      }
-                      <ListItemText primary={a.preferred_name} secondary={a.email} />
+                      {a.profile_picture && (
+                        <Avatar
+                          alt={a.initials}
+                          src={a.profile_picture.url}
+                          style={{ margin: 10 }}
+                        />
+                      )}
+                      {!a.profile_picture && (
+                        <Avatar style={{ margin: 10 }}>
+                          {a.preferred_name.substring(0, 2)}
+                        </Avatar>
+                      )}
+                      <ListItemText
+                        primary={a.preferred_name}
+                        secondary={a.email}
+                      />
                     </ListItem>
-                  )))
-                }
+                  ))}
               </List>
-
             </PapperBlock>
             <Divider className={classes.divider} />
 
             {/* ----------------------------------------------------------------------*/}
           </Grid>
 
-
           <Grid item md={6} xs={12}>
             <div className={classes.progressRoot}>
               <Paper className={classes.styledPaper} elevation={4}>
-                <Typography className={classes.title} variant="h5" component="h3">
-                  <center><span className={Type.light} style={{ textAlign: 'center' }}>#Household Goal</span></center>
+                <Typography
+                  className={classes.title}
+                  variant="h5"
+                  component="h3"
+                >
+                  <center>
+                    <span
+                      className={Type.light}
+                      style={{ textAlign: "center" }}
+                    >
+                      #Household Goal
+                    </span>
+                  </center>
                 </Typography>
                 <Grid container justify="center">
                   <Chip
-                    avatar={(
+                    avatar={
                       <Avatar>
                         <Check />
                       </Avatar>
-                    )}
+                    }
                     label={`${this.userGoalPercentage()}% Progress`}
                     className={classes.chip}
                     color="primary"
                   />
                 </Grid>
-                <LinearProgress variant="determinate" className={classes.progress} value={this.userGoalPercentage()} />
+                <LinearProgress
+                  variant="determinate"
+                  className={classes.progress}
+                  value={this.userGoalPercentage()}
+                />
               </Paper>
             </div>
             {/* ----------------------------------------------------------------------*/}
             {/* My Interests */}
-            <PapperBlock title="More Details" icon="ios-aperture-outline" whiteBg desc="">
-
+            <PapperBlock
+              title="More Details"
+              icon="ios-aperture-outline"
+              whiteBg
+              desc=""
+            >
               <Grid container className={classes.colList}>
                 <Grid item md={6}>
                   <ListItem>
-                    <Avatar className={classNames(classes.avatar, classes.purpleAvatar)}>
+                     <ListItemIcon>
+                    <Avatar
+                      className={classNames(
+                        classes.avatar,
+                        classes.purpleAvatar
+                      )}
+                    >
                       <AcUnit />
                     </Avatar>
-                    <ListItemText primary="Subdomain" secondary={`${community.subdomain}`} />
+
+                     </ListItemIcon>
+                    <ListItemText
+                      primary="Subdomain"
+                      secondary={`${community.subdomain}`}
+                    />
                   </ListItem>
                 </Grid>
                 <Grid item md={6}>
                   <ListItem>
-                    <Avatar className={classNames(classes.avatar, classes.greenAvatar)}>
+                     <ListItemIcon>
+                    <Avatar
+                      className={classNames(
+                        classes.avatar,
+                        classes.greenAvatar
+                      )}
+                    >
                       <AcUnit />
                     </Avatar>
-                    <ListItemText primary="Is Geographically Focused" secondary={`${community.is_geographically_focused}`} />
+
+                     </ListItemIcon>
+                    <ListItemText
+                      primary="Is Geographically Focused"
+                      secondary={`${community.is_geographically_focused}`}
+                    />
                   </ListItem>
                 </Grid>
                 <Grid item md={6}>
                   <ListItem>
-                    <Avatar className={classNames(classes.avatar, classes.pinkAvatar)}>
+                     <ListItemIcon>
+                    <Avatar
+                      className={classNames(
+                        classes.avatar,
+                        classes.pinkAvatar
+                      )}
+                    >
                       <AcUnit />
                     </Avatar>
-                    <ListItemText primary="Is Approved" secondary={`${community.is_approved}`} />
+
+                     </ListItemIcon>
+                    <ListItemText
+                      primary="Is Approved"
+                      secondary={`${community.is_approved}`}
+                    />
                   </ListItem>
                 </Grid>
                 <Grid item md={6}>
                   <ListItem>
-                    <Avatar className={classNames(classes.avatar, classes.orangeAvatar)}>
+                     <ListItemIcon>
+                    <Avatar
+                      className={classNames(
+                        classes.avatar,
+                        classes.orangeAvatar
+                      )}
+                    >
                       <LocationOn />
                     </Avatar>
-                    <ListItemText primary="Location" secondary={`${getAddress(community.location)}`} />
+
+                     </ListItemIcon>
+                    <ListItemText
+                      primary="Location"
+                      secondary={`${getAddress(community.location)}`}
+                    />
                   </ListItem>
                 </Grid>
               </Grid>
-              <Paper onClick={() => goHere(addRemoveCommuntyAdminLink, this.props.history)} className={`${classes.pageCard}`} elevation={1}>
-                <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                  Add/Remove Administrators for Community
-                {' '}
-                  <Icon style={{ paddingTop: 3, color: 'green' }}>forward</Icon>
+              <Paper
+                onClick={() =>
+                  goHere(addRemoveCommuntyAdminLink, this.props.history)
+                }
+                className={`${classes.pageCard}`}
+                elevation={1}
+              >
+                <Typography
+                  variant="h5"
+                  style={{ fontWeight: "600", fontSize: "1rem" }}
+                  component="h3"
+                >
+                  Add/Remove Administrators for Community{" "}
+                  <Icon style={{ paddingTop: 3, color: "green" }}>
+                    forward
+                  </Icon>
                 </Typography>
               </Paper>
               {/* <Paper onClick={() => goHere(goalsEditLink)} className={`${classes.pageCard}`} elevation={1}>
@@ -351,82 +478,195 @@ class About extends React.Component {
                 <Icon style={{ paddingTop: 3, color: 'green' }}>forward</Icon>
               </Typography>
             </Paper> */}
-              <Paper onClick={() => goHere(communityEditLink, this.props.history)} className={`${classes.pageCard}`} elevation={1}>
-                <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                  Edit Community Info
-                {' '}
-                  <Icon style={{ paddingTop: 3, color: 'green' }}>forward</Icon>
+              <Paper
+                onClick={() =>
+                  goHere(communityEditLink, this.props.history)
+                }
+                className={`${classes.pageCard}`}
+                elevation={1}
+              >
+                <Typography
+                  variant="h5"
+                  style={{ fontWeight: "600", fontSize: "1rem" }}
+                  component="h3"
+                >
+                  Edit Community Info{" "}
+                  <Icon style={{ paddingTop: 3, color: "green" }}>
+                    forward
+                  </Icon>
                 </Typography>
               </Paper>
-
             </PapperBlock>
           </Grid>
         </Grid>
         <Grid container className={classes.colList}>
           <Grid item xs={4}>
-            <Paper onClick={() => { !loadingCSVs.includes('users') && this.getCSV('users'); }} className={`${classes.pageCard}`} elevation={1}>
-              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                Request Users CSV
-                    {' '}
-                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
-                {loadingCSVs.includes('users') && <CircularProgress size={20} thickness={2} color="secondary" />}
+            <Paper
+              onClick={() => {
+                !loadingCSVs.includes("users") && this.getCSV("users");
+              }}
+              className={`${classes.pageCard}`}
+              elevation={1}
+            >
+              <Typography
+                variant="h5"
+                style={{ fontWeight: "600", fontSize: "1rem" }}
+                component="h3"
+              >
+                Request Users CSV{" "}
+                <Icon style={{ paddingTop: 3, color: "green" }}>
+                  arrow_downward
+                </Icon>
+                {loadingCSVs.includes("users") && (
+                  <CircularProgress
+                    size={20}
+                    thickness={2}
+                    color="secondary"
+                  />
+                )}
               </Typography>
             </Paper>
           </Grid>
           <Grid item xs={4}>
-            <Paper onClick={() => { !loadingCSVs.includes('actions') && this.getCSV('actions'); }} className={`${classes.pageCard}`} elevation={1}>
-              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                Request Actions CSV
-                    {' '}
-                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
-                {loadingCSVs.includes('actions') && <CircularProgress size={20} thickness={2} color="secondary" />}
+            <Paper
+              onClick={() => {
+                !loadingCSVs.includes("actions") && this.getCSV("actions");
+              }}
+              className={`${classes.pageCard}`}
+              elevation={1}
+            >
+              <Typography
+                variant="h5"
+                style={{ fontWeight: "600", fontSize: "1rem" }}
+                component="h3"
+              >
+                Request Actions CSV{" "}
+                <Icon style={{ paddingTop: 3, color: "green" }}>
+                  arrow_downward
+                </Icon>
+                {loadingCSVs.includes("actions") && (
+                  <CircularProgress
+                    size={20}
+                    thickness={2}
+                    color="secondary"
+                  />
+                )}
               </Typography>
             </Paper>
           </Grid>
           <Grid item xs={4}>
-            <Paper onClick={() => { !loadingCSVs.includes('teams') && this.getCSV('teams'); }} className={`${classes.pageCard}`} elevation={1}>
-              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                Request Teams CSV
-                    {' '}
-                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
-                {loadingCSVs.includes('teams') && <CircularProgress size={20} thickness={2} color="secondary" />}
+            <Paper
+              onClick={() => {
+                !loadingCSVs.includes("teams") && this.getCSV("teams");
+              }}
+              className={`${classes.pageCard}`}
+              elevation={1}
+            >
+              <Typography
+                variant="h5"
+                style={{ fontWeight: "600", fontSize: "1rem" }}
+                component="h3"
+              >
+                Request Teams CSV{" "}
+                <Icon style={{ paddingTop: 3, color: "green" }}>
+                  arrow_downward
+                </Icon>
+                {loadingCSVs.includes("teams") && (
+                  <CircularProgress
+                    size={20}
+                    thickness={2}
+                    color="secondary"
+                  />
+                )}
               </Typography>
             </Paper>
           </Grid>
           <Grid item xs={4}>
             <Paper className={`${classes.pageCard}`} elevation={1}>
-              <Link to={{pathname: "/admin/importcontacts", communityId: community.id}}>
-                <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                  Invite Users Through CSV Upload
-                      {' '}
-                  <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_upward</Icon>
-                  {loadingCSVs.includes('users') && <CircularProgress size={20} thickness={2} color="secondary" />}
+              <Link
+                to={{
+                  pathname: "/admin/importcontacts",
+                  communityId: community.id,
+                }}
+              >
+                <Typography
+                  variant="h5"
+                  style={{ fontWeight: "600", fontSize: "1rem" }}
+                  component="h3"
+                >
+                  Invite Users Through CSV Upload{" "}
+                  <Icon style={{ paddingTop: 3, color: "green" }}>
+                    arrow_upward
+                  </Icon>
+                  {loadingCSVs.includes("users") && (
+                    <CircularProgress
+                      size={20}
+                      thickness={2}
+                      color="secondary"
+                    />
+                  )}
                 </Typography>
               </Link>
             </Paper>
           </Grid>
           <Grid item xs={4}>
-            <Paper onClick={() => { !loadingCSVs.includes('actions.all') && this.getCSV('actions.all'); }} className={`${classes.pageCard}`} elevation={1}>
-              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem' }} component="h3">
-                Request All Actions CSV
-                    {' '}
-                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
-                {loadingCSVs.includes('actions.all') && <CircularProgress size={20} thickness={2} color="secondary" />}
+            <Paper
+              onClick={() => {
+                !loadingCSVs.includes("actions.all") &&
+                  this.getCSV("actions.all");
+              }}
+              className={`${classes.pageCard}`}
+              elevation={1}
+            >
+              <Typography
+                variant="h5"
+                style={{ fontWeight: "600", fontSize: "1rem" }}
+                component="h3"
+              >
+                Request All Actions CSV{" "}
+                <Icon style={{ paddingTop: 3, color: "green" }}>
+                  arrow_downward
+                </Icon>
+                {loadingCSVs.includes("actions.all") && (
+                  <CircularProgress
+                    size={20}
+                    thickness={2}
+                    color="secondary"
+                  />
+                )}
               </Typography>
             </Paper>
           </Grid>
+          {/* Removing all-metrics download button for all users
           <Grid item xs={4}>
-            <Paper onClick={() => { !loadingCSVs.includes('metrics') && this.getCSV('metrics'); }} className={`${classes.pageCard}`} elevation={1}>
-              <Typography variant="h5" style={{ fontWeight: '600', fontSize: '1rem'}} component="h3">
-                Request Metrics CSV
-                    {' '}
-                <Icon style={{ paddingTop: 3, color: 'green' }}>arrow_downward</Icon>
-                {loadingCSVs.includes('metrics') && <CircularProgress size={20} thickness={2} color="secondary" />}
+            <Paper
+              onClick={() => {
+                !loadingCSVs.includes("metrics") && this.getCSV("metrics");
+              }}
+              className={`${classes.pageCard}`}
+              elevation={1}
+            >
+              <Typography
+                variant="h5"
+                style={{ fontWeight: "600", fontSize: "1rem" }}
+                component="h3"
+              >
+                Request Metrics CSV{" "}
+                <Icon style={{ paddingTop: 3, color: "green" }}>
+                  arrow_downward
+                </Icon>
+                {loadingCSVs.includes("metrics") && (
+                  <CircularProgress
+                    size={20}
+                    thickness={2}
+                    color="secondary"
+                  />
+                )}
               </Typography>
             </Paper>
           </Grid>
+          */}
         </Grid>
-        
       </>
     );
   }

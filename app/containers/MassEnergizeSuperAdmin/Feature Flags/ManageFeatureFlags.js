@@ -1,17 +1,19 @@
-import FileCopy from "@material-ui/icons/FileCopy";
-import EditIcon from "@material-ui/icons/Edit";
-import React from "react";
+import FileCopy from "@mui/icons-material/FileCopy";
+import EditIcon from "@mui/icons-material/Edit";
+import React, { useState } from "react";
 import MEChip from "../../../components/MECustom/MEChip";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import Loading from "dan-components/Loading";
 import { Link } from "react-router-dom";
-import { Paper, Typography } from "@material-ui/core";
+import { Paper, Typography } from "@mui/material";
 import { apiCall } from "../../../utils/messenger";
 import { LOADING } from "../../../utils/constants";
+import ThemeModal from "../../../components/Widget/ThemeModal";
+import ListingComponent from "./ListingComponent";
 const hasExpired = (date) => {
-  if (!date) return false; // features do do not expire dont have dates so...
+  if (!date) return false; // features that do not expire dont have dates so...
   const now = new Date().getTime();
   date = new Date(date).getTime();
   return date < now;
@@ -22,7 +24,10 @@ function ManageFeatureFlags({
   toggleDeleteConfirmation,
   putFlagsInRedux,
   featureFlags,
+  toggleToast
 }) {
+  const [listingOptions, setShowListingModal] = useState({});
+
   if (featureFlags === LOADING) return <Loading />;
   var flags = featureFlags && featureFlags.features;
   if (!flags)
@@ -50,35 +55,62 @@ function ManageFeatureFlags({
         options: { filter: false },
       },
       {
-        name: "Is For Every Community",
+        name: "Communities",
         key: "is-for-every-community",
         options: {
           filter: true,
-          customBodyRender: (isForEveryone) => {
+          customBodyRender: ({ isForEveryone, id }) => {
             return (
-              <MEChip
-                label={isForEveryone ? "Yes" : "No"}
-                className={`${
-                  isForEveryone ? classes.yesLabel : classes.noLabel
-                } touchable-opacity`}
-              />
+              <Typography
+                variant="caption"
+                className="touchable-opacity"
+                style={{
+                  // color: "#9a5cc0",
+                  fontWeight: "bold",
+                  textDecoration: !isForEveryone ? "underline" : "none",
+                }}
+                onClick={() => {
+                  if (isForEveryone) return;
+                  setShowListingModal({ id, show: true, isCommunity: true }); // Only show modal if its for only a select number of communites
+                }}
+              >
+                <i
+                  className={!isForEveryone ? "fa fa-list" : "fa fa-globe"}
+                  style={{ marginRight: 5 }}
+                />
+
+                {isForEveryone ? "Everyone" : "Show List"}
+              </Typography>
             );
           },
         },
       },
       {
-        name: "Is For Every User",
+        name: "Users",
         key: "is-for-every-user",
         options: {
           filter: true,
-          customBodyRender: (isForEveryone) => {
+          customBodyRender: ({ isForEveryone, id }) => {
             return (
-              <MEChip
-                label={isForEveryone ? "Yes" : "No"}
-                className={`${
-                  isForEveryone ? classes.yesLabel : classes.noLabel
-                } touchable-opacity`}
-              />
+              <Typography
+                variant="caption"
+                className="touchable-opacity"
+                style={{
+                  // color: "#9a5cc0",
+                  fontWeight: "bold",
+                  textDecoration: !isForEveryone ? "underline" : "none",
+                }}
+                onClick={() => {
+                  if (isForEveryone) return;
+                  setShowListingModal({ id, show: true, isCommunity: false });
+                }}
+              >
+                <i
+                  className={!isForEveryone ? "fa fa-user" : "fa fa-globe"}
+                  style={{ marginRight: 5 }}
+                />
+                {isForEveryone ? "Everyone" : "Show List"}
+              </Typography>
             );
           },
         },
@@ -141,8 +173,15 @@ function ManageFeatureFlags({
       return [
         feature.id,
         feature.name,
-        feature.audience === flagKeys.audience.EVERYONE.key,
-        feature.user_audience === flagKeys.audience.EVERYONE.key,
+        {
+          isForEveryone: feature.audience === flagKeys.audience.EVERYONE.key,
+          id: feature.id,
+        },
+        {
+          isForEveryone:
+            feature.user_audience === flagKeys.audience.EVERYONE.key,
+          id: feature.id,
+        },
         hasExpired(feature.expires_on) ? "Expired" : "Active",
         feature.expires_on
           ? getHumanFriendlyDate(feature.expires_on, false, false)
@@ -159,9 +198,23 @@ function ManageFeatureFlags({
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/featureFlag.delete", { id: found }).catch((e) =>
-        console.log("FEATURE_DELETE_ERROR:", e)
-      );
+      apiCall("/featureFlag.delete", { id: found })
+        .then((response) => {
+          if (response.success) {
+            toggleToast({
+              open: true,
+              message: "Feature Flag successfully deleted",
+              variant: "success",
+            });
+          } else {
+            toggleToast({
+              open: true,
+              message: "An error occurred while deleting the feature flag",
+              variant: "error",
+            });
+          }
+        })
+        .catch((e) => console.log("FEATURE_DELETE_ERROR:", e));
     });
     var rem = (itemsInRedux || []).filter(
       ([_, com]) => !ids.includes(Number(com.id))
@@ -183,7 +236,7 @@ function ManageFeatureFlags({
   };
   const options = {
     filterType: "dropdown",
-    responsive: "stacked",
+    responsive: "standard",
     download: false,
     print: false,
     rowsPerPage: 25,
@@ -202,6 +255,19 @@ function ManageFeatureFlags({
 
   return (
     <div>
+
+      <ThemeModal
+        fullControl
+        open={listingOptions.show}
+        close={() => setShowListingModal({})}
+        contentStyle={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }}
+      >
+        <ListingComponent
+          {...listingOptions || {}}
+          close={() => setShowListingModal({})}
+        />
+      </ThemeModal>
+
       <METable
         page={PAGE_PROPERTIES.FEATURE_FLAGS}
         classes={classes}
