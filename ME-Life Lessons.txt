@@ -1,0 +1,7 @@
+
+LMFAO!
+----------------------------
+Dont delete this file!
+----------------------------
+Lesson 1: 
+Whatever you do, do not update mui-datatables in package.json. Keep it (v2.15.0)

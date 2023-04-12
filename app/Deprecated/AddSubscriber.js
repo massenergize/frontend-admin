@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import states from 'dan-api/data/states';
-import { withStyles } from '@material-ui/core/styles';
-import MassEnergizeForm from '../_FormGenerator';
-import { apiCall } from '../../../utils/messenger';
+import { withStyles } from "@mui/styles";
+import MassEnergizeForm from '../containers/MassEnergizeSuperAdmin/_FormGenerator';
+import { apiCall } from '../utils/messenger';
 
 const styles = theme => ({
   root: {
@@ -24,7 +24,7 @@ const styles = theme => ({
     flexDirection: 'row'
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: 'center'
   },
 });
@@ -42,6 +42,7 @@ class CreateNewVendorForm extends Component {
   async componentDidMount() {
     const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
     const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
+
     if (communitiesResponse && communitiesResponse.data) {
       const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
       await this.setStateAsync({ communities });

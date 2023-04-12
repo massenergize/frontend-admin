@@ -1,11 +1,17 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
-import MassEnergizeForm from "../_FormGenerator";
+// import MassEnergizeForm from "../_FormGenerator";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
-import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
+import fieldTypes from "../_FormGenerator/fieldTypes";
+import { bindActionCreators } from "redux";
+import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
+
+import { withRouter } from "react-router-dom";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -25,7 +31,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -40,13 +46,20 @@ class CreateNewTeamForm extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    var { communities } = props;
+    var { communities, formState, location } = props;
     communities = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
     }));
-    const formJson = createFormJson({ communities });
+
+    // const progress = (formState || {})[PAGE_KEYS.CREATE_TEAM.key] || {};
+    const libOpen = location.state && location.state.libOpen;
+    const formJson = createFormJson({
+      communities,
+      // progress,
+      autoOpenMediaLibrary: libOpen,
+    });
     const jobsDoneDontRunWhatsBelowEverAgain =
       !(communities && communities.length) || state.mounted;
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
@@ -58,14 +71,18 @@ class CreateNewTeamForm extends Component {
     };
   }
 
-
   render() {
     const { classes } = this.props;
     const { formJson } = this.state;
     if (!formJson) return <Loading />;
     return (
       <div>
-        <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
+        <MassEnergizeForm
+          pageKey={PAGE_KEYS.CREATE_TEAM.key}
+          classes={classes}
+          formJson={formJson}
+          enableCancel
+        />
       </div>
     );
   }
@@ -78,14 +95,27 @@ CreateNewTeamForm.propTypes = {
 const mapStateToProps = (state) => {
   return {
     communities: state.getIn(["communities"]),
+    formState: state.getIn(["tempForm"]),
   };
 };
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      saveFormTemporarily: reduxKeepFormContent,
+    },
+    dispatch
+  );
+};
 
-const NewTeamMapped = connect(mapStateToProps)(CreateNewTeamForm);
-export default withStyles(styles, { withTheme: true })(NewTeamMapped);
+const NewTeamMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreateNewTeamForm);
+export default withStyles(styles, { withTheme: true })(
+  withRouter(NewTeamMapped)
+);
 
-const createFormJson = ({ communities }) => {
-  // const { communities } = this.state;
+const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
   const formJson = {
     title: "Create New Team",
     subTitle: "",
@@ -103,7 +133,7 @@ const createFormJson = ({ communities }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            // defaultValue: progress.name || "",
             dbName: "name",
             readOnly: false,
           },
@@ -149,7 +179,7 @@ const createFormJson = ({ communities }) => {
               "eg. Provide email of valid registered users eg. teamadmin1@gmail.com, teamadmin2@gmail.com",
             fieldType: "TextField",
             isRequired: true,
-            defaultValue: null,
+            defaultValue:  null,
             dbName: "admin_emails",
           },
           {
@@ -160,7 +190,7 @@ const createFormJson = ({ communities }) => {
             contentType: "text",
             isRequired: true,
             isMultiline: false,
-            defaultValue: "",
+            // defaultValue: progress.tagline || "",
             dbName: "tagline",
             readOnly: false,
           },
@@ -172,7 +202,7 @@ const createFormJson = ({ communities }) => {
             contentType: "text",
             isRequired: true,
             isMultiline: true,
-            defaultValue: "",
+            // defaultValue: progress.description || "",
             dbName: "description",
             readOnly: false,
           },
@@ -182,13 +212,13 @@ const createFormJson = ({ communities }) => {
       {
         name: "logo",
         placeholder: "Select a Logo for this team",
-        fieldType: "File",
+        fieldType: fieldTypes.MediaLibrary,
         dbName: "logo",
         label: "Select a Logo for this team",
-        selectMany: false,
+        // defaultValue: progress.logo || [],
+        selected: [],
+        openState: autoOpenMediaLibrary,
         isRequired: false,
-        defaultValue: "",
-        filesLimit: 1,
       },
       {
         name: "is_published",

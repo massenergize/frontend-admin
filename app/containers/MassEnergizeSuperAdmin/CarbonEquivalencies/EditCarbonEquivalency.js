@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import { apiCall } from '../../../utils/messenger';
 import MassEnergizeForm from '../_FormGenerator';
 
@@ -23,7 +23,7 @@ const styles = theme => ({
     flexDirection: 'row'
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: 'center'
   },
 });
@@ -76,7 +76,7 @@ class EditCarbonEquivalencyForm extends Component {
               placeholder: 'eg. 2',
               fieldType: 'TextField',
               contentType: 'text',
-              isRequired: true,
+              isRequired: false,
               defaultValue: carbonEquivalency.id,
               dbName: 'id',
               readOnly: true
@@ -131,7 +131,7 @@ class EditCarbonEquivalencyForm extends Component {
               placeholder: '',
               fieldType: 'TextField',
               contentType: 'text',
-              isRequired: true,
+              isRequired: false,
               isMultiline: true,
               defaultValue: carbonEquivalency.explanation,
               dbName: 'explanation',
@@ -143,7 +143,7 @@ class EditCarbonEquivalencyForm extends Component {
               placeholder: '',
               fieldType: 'TextField',
               contentType: 'text',
-              isRequired: true,
+              isRequired: false,
               isMultiline: true,
               defaultValue: carbonEquivalency.reference,
               dbName: 'reference',

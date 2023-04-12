@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import MassEnergizeForm from '../_FormGenerator';
-import { apiCall } from '../../../utils/messenger';
+import { withStyles } from "@mui/styles";
+import MassEnergizeForm from '../containers/MassEnergizeSuperAdmin/_FormGenerator';
+import { apiCall } from '../utils/messenger';
 
 const styles = theme => ({
   root: {
@@ -23,13 +23,13 @@ const styles = theme => ({
     flexDirection: 'row'
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: 'center'
   },
 });
 
 
-class SigninPageEditForm extends Component {
+class RegisterPageEditForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -42,7 +42,7 @@ class SigninPageEditForm extends Component {
   async componentDidMount() {
     const { id } = this.props.match.params;
 
-    const pageData = await apiCall('/signin_page_settings.info', { community_id: id });
+    const pageData = await apiCall('/register_page_settings.info', { community_id: id });
     if (pageData && pageData.success) {
       await this.setStateAsync({ pageData: pageData.data });
     }
@@ -62,9 +62,9 @@ class SigninPageEditForm extends Component {
     const { community } = pageData;
 
     const formJson = {
-      title: `Edit ${community ? community.name + '\'s' : 'Community\'s'} - Sign-in Page`,
+      title: `Edit ${community ? community.name + '\'s' : 'Community\'s'} - Registration Page`,
       subTitle: '',
-      method: '/signin_page_settings.update',
+      method: '/register_page_settings.update',
       // successRedirectPage: `/admin/edit/${community.id}/about_us`,
       fields: [
         {
@@ -73,7 +73,6 @@ class SigninPageEditForm extends Component {
           placeholder: 'eg. 1',
           fieldType: 'TextField',
           contentType: 'number',
-          isRequired: true,
           defaultValue: `${pageData.id}`,
           dbName: 'id',
           readOnly: true
@@ -81,7 +80,7 @@ class SigninPageEditForm extends Component {
         {
           name: 'title',
           label: 'Main Title',
-          placeholder: 'eg. All Service Providers',
+          placeholder: '',
           fieldType: 'TextField',
           contentType: 'text',
           isRequired: false,
@@ -91,7 +90,7 @@ class SigninPageEditForm extends Component {
         },
         {
           name: 'description',
-          label: 'Additional information',
+          label: 'Additional text',
           placeholder: 'Tell us more ...',
           fieldType: 'TextField',
           contentType: 'text',
@@ -122,9 +121,9 @@ class SigninPageEditForm extends Component {
   }
 }
 
-SigninPageEditForm.propTypes = {
+RegisterPageEditForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
 
-export default withStyles(styles, { withTheme: true })(SigninPageEditForm);
+export default withStyles(styles, { withTheme: true })(RegisterPageEditForm);

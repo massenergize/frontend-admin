@@ -1,10 +1,13 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
-import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import Loading from "dan-components/Loading";
+import fieldTypes from "../_FormGenerator/fieldTypes";
+import { withRouter } from "react-router-dom";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -24,7 +27,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -32,8 +35,13 @@ const styles = (theme) => ({
 export const getSelectedIds = (selected, dataToCrossCheck) => {
   const res = [];
   (selected || []).forEach((s) => {
-    if (dataToCrossCheck.filter((d) => d.id === s.id).length > 0) {
-      res.push("" + s.id);
+    const isString = typeof s === "string"; // The selected tags dont always come in as array of objs, sometimes they come in as array of strings (like: when tracking progress)
+    const filtered = dataToCrossCheck.filter((d) => {
+      if (isString) return d.id.toString() === s;
+      return d.id === s.id;
+    });
+    if (filtered.length > 0) {
+      res.push("" + isString ? s : s.id);
     }
   });
   return res;
@@ -56,9 +64,19 @@ export const makeTagSection = ({ collections, action, defaults = true }) => {
     fieldType: "Section",
     children: [],
   };
-
   (collections || []).forEach((tCol) => {
+    var selected = (action && action.tags) || [];
+    let putDefaultsIfUpdating = {};
+    if (defaults) {
+      let data = selected.map((c) => c.id.toString());
+      putDefaultsIfUpdating = {
+        defaultValue: defaults && getSelectedIds(data || [], tCol.tags || []),
+      };
+    }
+
+    selected = (selected.length && selected) || [];
     const newField = {
+      isRequired: false,
       name: tCol.name,
       label: `${tCol.name} ${
         tCol.allow_multiple
@@ -68,8 +86,10 @@ export const makeTagSection = ({ collections, action, defaults = true }) => {
       placeholder: "",
       fieldType: "Checkbox",
       selectMany: tCol.allow_multiple,
-      defaultValue:
-        defaults && getSelectedIds(action.tags || [], tCol.tags || []),
+      ...putDefaultsIfUpdating,
+      processedDefaultValue: (selected) =>
+        getSelectedIds(selected || [], tCol.tags || []),
+
       dbName: "tags",
       data: (tCol.tags || []).map((t) => ({
         ...t,
@@ -98,6 +118,17 @@ class EditActionForm extends Component {
     };
   }
 
+  async componentDidMount() {
+    const { id } = this.props.match.params;
+    const actionResponse = await apiCall("/actions.info", {
+      id: id,
+    });
+    if (actionResponse && !actionResponse.success) {
+      return;
+    }
+    await this.setStateAsync({ action: actionResponse.data });
+  }
+
   static getDerivedStateFromProps(props, state) {
     const {
       match,
@@ -107,6 +138,7 @@ class EditActionForm extends Component {
       vendors,
       auth,
       ccActions,
+      location,
     } = props;
 
     const { id } = match.params;
@@ -120,12 +152,12 @@ class EditActionForm extends Component {
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRunPageFirstTime || state.mounted;
-
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
+    let action = state.action;
+    if (!action) {
+      action = (actions || []).find((a) => a.id.toString() === id.toString());
+    }
 
-    const action = (actions || []).find(
-      (a) => a.id.toString() === id.toString()
-    );
     const readOnly = checkIfReadOnly(action, auth);
     const coms = (communities || []).map((c) => ({
       ...c,
@@ -142,11 +174,15 @@ class EditActionForm extends Component {
       displayName: c.description,
       id: "" + c.id,
     }));
+    const libOpen = location.state && location.state.libOpen;
+
     const formJson = createFormJson({
       action,
       communities: coms,
       vendors: vends,
       ccActions: modifiedCCActions,
+      auth,
+      autoOpenMediaLibrary: libOpen,
     });
 
     const section = makeTagSection({ collections: tags, action });
@@ -162,11 +198,16 @@ class EditActionForm extends Component {
       readOnly,
     };
   }
-
+  setStateAsync(state) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve);
+    });
+  }
 
   render() {
     const { classes } = this.props;
     const { formJson, readOnly, action } = this.state;
+    const { id } = this.props.match.params;
     if (!action || !formJson) return <Loading />;
     return (
       <div>
@@ -174,6 +215,7 @@ class EditActionForm extends Component {
           classes={classes}
           formJson={formJson}
           readOnly={readOnly}
+          pageKey={`${PAGE_KEYS.EDIT_ACTION.key}-${id}`}
           enableCancel
         />
       </div>
@@ -197,10 +239,20 @@ EditActionForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(EditActionMapped);
+export default withStyles(styles, { withTheme: true })(
+  withRouter(EditActionMapped)
+);
 
-const createFormJson = ({ action, communities, ccActions, vendors }) => {
+const createFormJson = ({
+  action,
+  communities,
+  ccActions,
+  vendors,
+  auth,
+  autoOpenMediaLibrary,
+}) => {
   if (!action || !ccActions || !vendors || !communities) return;
+  const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Update Action",
     subTitle: "",
@@ -217,7 +269,7 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
             label: "Action ID",
             fieldType: "TextField",
             contentType: "text",
-            isRequired: true,
+            isRequired: false,
             defaultValue: action.id,
             dbName: "action_id",
             readOnly: true,
@@ -232,6 +284,7 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
             defaultValue: action.title,
             dbName: "title",
             readOnly: false,
+            maxLength: 40,
           },
           {
             name: "rank",
@@ -240,35 +293,51 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
             placeholder: "eg. 1",
             fieldType: "TextField",
             contentType: "number",
-            isRequired: true,
+            isRequired: false,
             defaultValue: action.rank,
             dbName: "rank",
             readOnly: false,
           },
-          {
-            name: "is_global",
-            label: "Is this Action a Template?",
-            fieldType: "Radio",
-            isRequired: false,
-            defaultValue: action.is_global ? "true" : "false",
-            dbName: "is_global",
-            readOnly: false,
-            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-            child: {
-              valueToCheck: "false",
-              fields: [
-                {
-                  name: "community",
-                  label: "Primary Community",
-                  placeholder: "",
-                  fieldType: "Dropdown",
-                  defaultValue: action.community && "" + action.community.id,
-                  dbName: "community_id",
-                  data: [{ displayName: "--", id: "" }, ...communities],
+          is_super_admin
+            ? {
+                name: "is_global",
+                label: "Is this Action a Template?",
+                fieldType: "Radio",
+                isRequired: false,
+                defaultValue: action.is_global ? "true" : "false",
+                dbName: "is_global",
+                readOnly: false,
+                data: [
+                  { id: "false", value: "No" },
+                  { id: "true", value: "Yes" },
+                ],
+                child: {
+                  valueToCheck: "false",
+                  fields: [
+                    {
+                      name: "community",
+                      label: "Primary Community (Select one)",
+                      placeholder: "",
+                      fieldType: "Dropdown",
+                      defaultValue:
+                        action.community && "" + action.community.id,
+                      dbName: "community_id",
+                      data: [{ displayName: "--", id: "" }, ...communities],
+                      isRequired: true,
+                    },
+                  ],
                 },
-              ],
-            },
-          },
+              }
+            : {
+                name: "community",
+                label: "Primary Community (Select one)",
+                placeholder: "",
+                fieldType: "Dropdown",
+                defaultValue: action.community && "" + action.community.id,
+                dbName: "community_id",
+                data: [{ displayName: "--", id: "" }, ...communities],
+                isRequired: true,
+              },
         ],
       },
       {
@@ -294,7 +363,7 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
       {
         name: "featured_summary",
         label: "Featured Summary",
-        placeholder: "eg. This event is happening in ...",
+        placeholder: "Short sentence promoting the action",
         fieldType: "TextField",
         isMulti: true,
         isRequired: false,
@@ -305,7 +374,7 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
       {
         name: "about",
         label: "Write some detailed description about this action",
-        placeholder: "eg. Write some detailed description about this action",
+        placeholder: "Key information people should know about the action",
         fieldType: "HTMLField",
         isRequired: true,
         defaultValue: action.about,
@@ -315,19 +384,19 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
       {
         name: "steps_to_take",
         label: "Please outline steps to take for your users",
-        placeholder: "eg. Please outline steps to take for your users",
+        placeholder: "Easy to follow steps to accomplish the action",
         fieldType: "HTMLField",
-        isRequired: true,
+        isRequired: false,
         defaultValue: action.steps_to_take,
         dbName: "steps_to_take",
         readOnly: false,
       },
       {
         name: "deep_dive",
-        label: "Deep dive into all the details",
-        placeholder: "eg. This action ...",
+        label: "Deep dive into all the details (optional)",
+        placeholder: "Further information some users might want to know",
         fieldType: "HTMLField",
-        isRequired: true,
+        isRequired: false,
         defaultValue: action.deep_dive,
         dbName: "deep_dive",
         readOnly: false,
@@ -335,7 +404,6 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
       {
         name: "vendors",
         label: "Select which vendors provide services for this action",
-        placeholder: "eg. Solarize Wayland",
         fieldType: "Checkbox",
         selectMany: true,
         defaultValue: action.vendors
@@ -347,13 +415,13 @@ const createFormJson = ({ action, communities, ccActions, vendors }) => {
       {
         name: "image",
         placeholder: "Select an Image",
-        fieldType: "File",
-        previewLink: action.image && action.image.url,
+        fieldType: fieldTypes.MediaLibrary,
+        selected: action.image ? [action.image] : [],
+        openState: autoOpenMediaLibrary,
         dbName: "image",
         label: "Upload Files",
         isRequired: false,
         defaultValue: "",
-        filesLimit: 1,
       },
       {
         name: "is_published",

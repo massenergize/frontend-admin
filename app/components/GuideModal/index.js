@@ -1,14 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import Slide from '@material-ui/core/Slide';
-import VideoLibraryIcon from '@material-ui/icons/VideoLibrary';
-import AssignmentIcon from '@material-ui/icons/Assignment';
+import { withStyles } from "@mui/styles";
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import Slide from '@mui/material/Slide';
+import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import styles from './guide-jss';
+
+const adminWrittenInstructionsLink = "https://docs.google.com/document/d/e/2PACX-1vT2ahP7U1gWS5ktfr7nG9CdH8cCazVo9qzOLHB5Ook2GhKD79GOWxRgvv-pOQRkIT1mogcAhzM8T5wE/pub"
+const adminVideoInstructionsLink = null
 
 function Transition(props) {
   return <Slide direction="up" {...props} />;
@@ -41,14 +44,18 @@ class GuideModal extends React.Component {
           <Typography variant="h4" align="center">Need Help?</Typography>
           {/*<Typography variant="body1" align="center">We have a variety of resources.</Typography> */}
           <Typography variant="body1" align="center">Take advantage of these helpful resources:</Typography>
-          <Button className={classes.button}
-            href="https://docs.google.com/document/d/1Xo7gn4wMRUpoTDlo7O2dfJL1THvMxl1jHFkH2OS7Vf8/edit?usp=sharing" target="_blank">
-            <AssignmentIcon /> &nbsp; Written Guides
-          </Button>
-          {/* <Button className={classes.button}
-            href="https://docs.google.com/document/d/1M4FZHv0PeXglXIS3esieDD330bCrg8wfK5Mju5FBt1w/edit?usp=sharing" target="_blank">
-            <VideoLibraryIcon /> &nbsp; Video Tutorials
-          </Button> */}
+          { adminWrittenInstructionsLink ? (
+            <Button className={classes.button}
+              href={adminWrittenInstructionsLink} target="_blank">
+              <AssignmentIcon /> &nbsp; Written Guides
+            </Button>
+           ) : null }
+          { adminVideoInstructionsLink ? (
+            <Button className={classes.button}
+              href={adminVideoInstructionsLink} target="_blank">
+              <VideoLibraryIcon /> &nbsp; Video Tutorials
+            </Button>
+          ) : null }
         </DialogContent>
       </Dialog>
     );

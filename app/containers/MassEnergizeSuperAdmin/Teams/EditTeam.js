@@ -1,18 +1,21 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
-import { Paper, Typography } from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
+import { Link, withRouter } from "react-router-dom";
+import { Paper, Typography } from "@mui/material";
+import { withStyles } from "@mui/styles";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
-import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import {
+  fetchLatestNextSteps,
   reduxAddToHeap,
   reduxGetAllCommunityTeams,
   reduxUpdateHeap,
 } from "../../../redux/redux-actions/adminActions";
 import Loading from "dan-components/Loading";
+import fieldTypes from "../_FormGenerator/fieldTypes";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -32,7 +35,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -78,7 +81,7 @@ class EditTeam extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    var { match, communities, teams, teamsInfos } = props;
+    var { match, communities, teams, teamsInfos, location } = props;
     const { id } = match.params;
     communities = (communities || []).map((c) => ({
       ...c,
@@ -93,80 +96,45 @@ class EditTeam extends Component {
     if (jobsDoneDontRunWhatsBelow) return null;
 
     if (team)
-      teams = teams.filter(
+      teams = teams && teams.filter(
         (t) => t.primary_community.id === team.primary_community.id
       );
     const parentTeamOptions = makeParentOptions({ teams, team });
-    const formJson = createFormJson({ team, parentTeamOptions, communities });
+    const libOpen = location.state && location.state.libOpen;
+    const formJson = createFormJson({
+      team,
+      parentTeamOptions,
+      communities,
+      autoOpenMediaLibrary: libOpen,
+    });
     return { team, formJson, parentTeamOptions, mounted: true };
   }
   async componentDidMount() {
     const { id } = this.props.match.params;
-    const { addTeamInfoToHeap, teamsInfos } = this.props;
+    const { addTeamInfoToHeap, teamsInfos,heap } = this.props;
     const teamResponse = await apiCall("/teams.info", { team_id: id });
     addTeamInfoToHeap({
       teamsInfos: { ...teamsInfos, [id.toString()]: teamResponse.data },
+    },heap);
+  }
+
+  onComplete(_, __, resetForm) {
+    const pathname = "/admin/read/teams";
+    const { location, history, match, updateNextSteps } = this.props;
+    const { id } = match.params;
+    var ids = location.state && location.state.ids;
+
+    resetForm && resetForm();
+    updateNextSteps();
+    // Just means admin just answered message normally, so form should just reset, and redirect back to the same page, just like the old fxnality
+    if (!ids || !ids.length) return history.push(pathname);
+
+    // -- Then follow up with going back to the msg list page, but with the id of the just-answered msg, removed
+    ids = ids.filter((_id) => _id.toString() !== id && id.toString());
+    history.push({
+      pathname,
+      state: { ids },
     });
-    /**
-     * Comments Will Be REmoved as soon as this is approved, re-tested, and deployed
-     */
-    // if (teamResponse && teamResponse.data) {
-    // const team = (teams || []).find((t) => t.id.toString() === id.toString());
-    // if (team && team.primary_community) {
-    //   // const teams = await this.props.callTeamsForNormalAdmin();
-    //   const comTeams = await apiCall("/teams.list", {
-    //     community_id: team.primary_community.id,
-    //   });
-    //   console.log("and then you get this", comTeams);
-    //   addTeamsToHeap({
-    //     ...heap,
-    //     communitySpecificTeams: {
-    //       ...comTeamsObj,
-    //       [id.toString()]: comTeams.data,
-    //     },
-    //   });
-    // }
-    // if other teams have us as a parent, can't set a parent ourselves
-    // from that point, can set parent teams that are not ourselves AND don't have parents themselves (i.e. aren't sub-teams)
-    // const parentTeams =
-    //   teams.data.filter(
-    //     (_team) => _team.parent && _team.parent.id === team.id
-    //   ).length === 0 &&
-    //   teams.data.filter((_team) => _team.id !== team.id && !_team.parent);
-    // if (parentTeams) {
-    //   parentTeamOptions = parentTeams.map((_team) => ({
-    //     id: _team.id,
-    //     displayName: _team.name,
-    //   }));
-    //   parentTeamOptions = [
-    //     { displayName: "NONE", id: "0" },
-    //     ...parentTeamOptions,
-    //   ];
-    // } else {
-    //   parentTeamOptions = [
-    //     {
-    //       displayName:
-    //         "Team cannot have a parent, because it is a parent of another team",
-    //       id: "0",
-    //     },
-    //   ];
-    // }
-    // }
-    // await this.setStateAsync({ team, parentTeamOptions });
-    // }
-    // const communitiesResponse = await apiCall(
-    //   "/communities.listForCommunityAdmin"
-    // );
-    // if (communitiesResponse && communitiesResponse.data) {
-    // const communities = communitiesResponse.data.map((c) => ({
-    //   ...c,
-    //   displayName: c.name,
-    //   id: "" + c.id,
-    // }));
-    //   await this.setStateAsync({ communities });
-    // }
-    // const formJson = await this.createFormJson();
-    // await this.setStateAsync({ formJson });
   }
 
   setStateAsync(state) {
@@ -178,6 +146,7 @@ class EditTeam extends Component {
   render() {
     const { classes } = this.props;
     const { formJson, team } = this.state;
+    const { id } = this.props.match.params;
     if (!formJson) return <Loading />;
     return (
       <div>
@@ -191,7 +160,14 @@ class EditTeam extends Component {
         </Paper>
 
         <br />
-        <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
+        
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+          pageKey={`${PAGE_KEYS.EDIT_TEAM.key}-${id}`}
+          enableCancel
+          onComplete={this.onComplete.bind(this)}
+        />
       </div>
     );
   }
@@ -207,6 +183,7 @@ function mapStateToProps(state) {
     communities: state.getIn(["communities"]),
     teams: state.getIn(["allTeams"]),
     teamsInfos: heap.teamsInfos || {},
+    heap
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -215,6 +192,7 @@ function mapDispatchToProps(dispatch) {
       callTeamsForNormalAdmin: reduxGetAllCommunityTeams,
       addTeamsToHeap: reduxUpdateHeap,
       addTeamInfoToHeap: reduxAddToHeap,
+      updateNextSteps: fetchLatestNextSteps,
     },
     dispatch
   );
@@ -222,10 +200,12 @@ function mapDispatchToProps(dispatch) {
 const EditTeamMapped = connect(
   mapStateToProps,
   mapDispatchToProps
-)(EditTeam);
+)(withRouter(EditTeam));
 
-export default withStyles(styles, { withTheme: true })(EditTeamMapped);
-const createFormJson = ({ communities, team, parentTeamOptions }) => {
+export default withStyles(styles, { withTheme: true })(
+  withRouter(EditTeamMapped)
+);
+const createFormJson = ({ communities, team, parentTeamOptions,  autoOpenMediaLibrary, }) => {
   // const { communities, team, parentTeamOptions } = this.state;
   const selectedCommunities = team.communities
     ? team.communities.map((e) => "" + e.id)
@@ -247,7 +227,6 @@ const createFormJson = ({ communities, team, parentTeamOptions }) => {
             placeholder: "eg. id",
             fieldType: "TextField",
             contentType: "text",
-            isRequired: true,
             defaultValue: team.id,
             dbName: "id",
             readOnly: true,
@@ -324,14 +303,12 @@ const createFormJson = ({ communities, team, parentTeamOptions }) => {
       {
         name: "logo",
         placeholder: "Select a Logo for this team",
-        fieldType: "File",
-        previewLink: team.logo && team.logo.url,
+        fieldType: fieldTypes.MediaLibrary,
+        openState: autoOpenMediaLibrary,
+        selected: team.logo ? [team.logo] : [],
         dbName: "logo",
         label: "Select a Logo for this team",
-        selectMany: false,
         isRequired: false,
-        defaultValue: "",
-        filesLimit: 1,
       },
       {
         name: "is_published",

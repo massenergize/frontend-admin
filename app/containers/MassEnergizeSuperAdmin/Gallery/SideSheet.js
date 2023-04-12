@@ -1,17 +1,21 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { Button, CircularProgress, Paper, Typography } from "@material-ui/core";
+import { Button, CircularProgress, Paper, Typography } from "@mui/material";
 import MediaLibrary from "./../ME  Tools/media library/MediaLibrary";
 import "./anime.css";
 import { ProgressCircleWithLabel } from "./utils";
+import { Link, withRouter } from "react-router-dom";
 
 export const SideSheet = (props) => {
-  const { classes, hide, infos, data, deleteImage } = props;
+  const { classes, hide, infos, data, deleteImage, is_super_admin } = props;
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const info = (data && data.info) || {};
-
+  const info = (data && data.relations) || {};
+  var informationAboutImage = (data && data.information) || {};
+  var uploader = informationAboutImage.user;
+  informationAboutImage = informationAboutImage.info || {};
+  const { size_text, description } = informationAboutImage;
   const getContent = () => {
     const isLoading = data && data === "loading";
     if (isLoading)
@@ -57,6 +61,33 @@ export const SideSheet = (props) => {
               });
             }}
           />
+          {(size_text || description || uploader) && (
+            <div style={{ marginBottom: 5, padding: 15 }}>
+              <Typography variant="body2">
+                <i>
+                  Uploaded by <b>{(uploader && uploader.full_name) || "..."}</b>
+                </i>
+              </Typography>
+              {size_text && (
+                <Typography
+                  variant="h6"
+                  color="primary"
+                  style={{ marginBottom: 6, marginTop: 5, fontSize: "medium" }}
+                >
+                  Size: {size_text}
+                </Typography>
+              )}
+              {description && (
+                <>
+                  <Typography variant="body2">
+                    <b>Description</b>
+                  </Typography>
+                  <Typography variant="body2">{description}</Typography>
+                </>
+              )}
+            </div>
+          )}
+          <ShowTagsOnPane tags={data.tags || []} />
           {Object.keys(info).map((key, index) => {
             const imageInfo = {
               name: key,
@@ -65,7 +96,10 @@ export const SideSheet = (props) => {
 
             return (
               <React.Fragment key={index.toString()}>
-                <ImageInfoArea {...imageInfo} />
+                <ImageInfoArea
+                  {...imageInfo}
+                  is_super_admin={is_super_admin}
+                />
               </React.Fragment>
             );
           })}
@@ -145,11 +179,11 @@ const DeleteVerificationBox = ({
   );
 };
 
-const ImageInfoArea = ({ name, data = [] }) => {
+const ImageInfoArea = ({ name, data = [], is_super_admin }) => {
   const desc =
     data.length === 0
-      ? `No ${name} use this image`
-      : `${name} that use this image : (${data.length})`;
+      ? `No ${name}(s) use this image`
+      : `${name}(s) that use this image : (${data.length})`;
   return (
     <div style={{}}>
       <div>
@@ -174,19 +208,19 @@ const ImageInfoArea = ({ name, data = [] }) => {
           {data.map((item, index) => {
             return (
               <div style={{ width: "100%" }} key={index.toString()}>
-                <small style={{ color: "#00BCD4", fontWeight: "bold" }}>
-                  {index + 1}. {item.title || item.name}
-                </small>
-                {/* <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                  }}
-                >
-                  <a href="#void">
-                    <small>View in admin</small>
+                {is_super_admin ? (
+                  <a
+                    href={`/admin/edit/${item.id}/${name}`}
+                    target="_blank"
+                    style={{ color: "#00BCD4", fontWeight: "bold" }}
+                  >
+                    {index + 1}. {item.title || item.name}
                   </a>
-                </div> */}
+                ) : (
+                  <small style={{ color: "#00BCD4", fontWeight: "bold" }}>
+                    {index + 1}. {item.title || item.name}
+                  </small>
+                )}
               </div>
             );
           })}
@@ -214,9 +248,26 @@ SideSheet.propTypes = {
 
 const mapStateToProps = (state) => ({});
 
-const mapDispatchToProps = {};
+export default connect(mapStateToProps)(withRouter(SideSheet));
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SideSheet);
+export const ShowTagsOnPane = ({ tags, style }) => {
+  if (!tags || !tags.length) return <></>;
+  return (
+    <div style={{ padding: 15, ...(style || {}) }}>
+      <small style={{ color: "grey" }}>Tags</small>
+      <br />
+      {(tags || []).map((tag) => {
+        return (
+          <Button
+            variant="outlined"
+            color="secondary"
+            size="small"
+            style={{ fontSize: 11, padding: "0px 5px", marginRight: 5 }}
+          >
+            {tag.name}
+          </Button>
+        );
+      })}
+    </div>
+  );
+};

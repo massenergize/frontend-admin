@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
 
 import MUIDataTable from 'mui-datatables';
-import EditIcon from '@material-ui/icons/Edit';
+import EditIcon from '@mui/icons-material/Edit';
 import { Link } from 'react-router-dom';
-import Paper from '@material-ui/core/Paper';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import Grid from '@material-ui/core/Grid';
+import Paper from '@mui/material/Paper';
+import LinearProgress from '@mui/material/LinearProgress';
+import Grid from '@mui/material/Grid';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
 
@@ -99,7 +99,8 @@ class AllCarbonEquivalencies extends React.Component {
       filterType: 'dropdown',
       responsive: 'stacked',
       print: true,
-      rowsPerPage: 100,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(d => {

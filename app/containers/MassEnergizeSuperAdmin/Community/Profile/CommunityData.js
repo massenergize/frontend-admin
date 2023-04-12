@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import MassEnergizeForm from '../../_FormGenerator';
 import { apiCall } from '../../../../utils/messenger';
 
@@ -23,7 +23,7 @@ const styles = theme => ({
     flexDirection: 'row'
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: 'center'
   },
 });
@@ -94,7 +94,6 @@ class CommunityData extends Component {
             placeholder: 'eg. 10',
             fieldType: 'TextField',
             contentType: 'number',
-            isRequired: true,
             defaultValue: d.value,
             dbName: `value_${d.id}`,
             readOnly: true

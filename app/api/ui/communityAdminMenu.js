@@ -61,15 +61,20 @@ module.exports = [
       },
       {
         key: "all-events",
-        name: "All Events & Campaigns",
+        name: "Events - My Community",
         link: "/admin/read/events",
+      },
+      {
+        key: "other-communities",
+        name: "Share Events from Other Communities",
+        link: "/admin/read/events/event-sharing",
       },
     ],
   },
   {
     key: "messages",
     name: "Messages",
-    icon: "md-reorder",
+    icon: "md-text",
     child: [
       {
         key: "all-messages",
@@ -113,7 +118,7 @@ module.exports = [
   {
     key: "subscribers",
     name: "Subscribers",
-    icon: "md-reorder",
+    icon: "md-notifications",
     child: [
       {
         key: "about-subscribers",
@@ -171,23 +176,24 @@ module.exports = [
       },
     ],
   },
-  {
-    icon: "ios-images",
-    key: "gallery",
-    name: "Gallery",
-    child: [
-      { key: "all-gallery-images", name: "All Images", link: "/admin/gallery" },
-      {
-        key: "add-to-gallery",
-        name: "Add To Gallery",
-        link: "/admin/gallery/add",
-      },
-    ],
-  },
+  // disabling media gallery for cadmins for now (admin issue 794)
+  //{
+  //  icon: "ios-images",
+  //  key: "gallery",
+  //  name: "Gallery",
+  //  child: [
+  //    { key: "all-gallery-images", name: "All Images", link: "/admin/gallery" },
+  //    {
+  //      key: "add-to-gallery",
+  //      name: "Add To Gallery",
+  //      link: "/admin/gallery/add",
+  //    },
+  //  ],
+  //},
   {
     key: "users",
     name: "Users",
-    icon: "ios-people",
+    icon: "md-people",
     child: [
       {
         key: "about-users",
@@ -198,6 +204,18 @@ module.exports = [
         key: "all-users",
         name: "All Users",
         link: "/admin/read/users",
+      },
+    ],
+  },
+  {
+    key: "settings",
+    name: "Settings",
+    icon: "md-cog",
+    child: [
+      {
+        key: "settings-page",
+        link: "/admin/profile/preferences",
+        name: "Communication preferences",
       },
     ],
   },

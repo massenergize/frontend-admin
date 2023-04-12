@@ -1,14 +1,18 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
-import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import Loading from "dan-components/Loading";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { getSelectedIds } from "../Actions/EditActionForm";
 import { makeTagSection } from "../Events/EditEventForm";
-import { Paper, Typography } from "@material-ui/core";
+import { Paper, Typography } from "@mui/material";
+import fieldTypes from "../_FormGenerator/fieldTypes";
+import { withRouter } from "react-router-dom";
+import { fetchLatestNextSteps } from "../../../redux/redux-actions/adminActions";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 
 const styles = (theme) => ({
   root: {
@@ -29,7 +33,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4) ,
     textAlign: "center",
   },
 });
@@ -50,34 +54,39 @@ class EditTestimonial extends Component {
     // you need: communities, actions, vendors, tags, testimonials, testimonial
     var { testimonials, vendors, actions, tags, communities, match } = props;
     const { id } = match.params;
-    const testimonial = (testimonials || []).find(
-      (t) => t.id.toString() === id.toString()
-    );
+    let testimonial = ((testimonials) || []).find((t) => t.id.toString() === id.toString());
+    if (!testimonial){
+      apiCall("/testimonials.info", {id: id }).then(response=>{
+        if (response.success){
+          testimonial = response.data
+        }
+      })
+    }
     const readyToRenderThePageFirstTime =
       testimonials &&
       testimonials.length &&
       vendors &&
       vendors.length &&
       actions &&
-      actions.length &&
+      actions.length&& 
       tags &&
       tags.length;
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderThePageFirstTime || state.mounted;
 
-    const coms = communities.map((c) => ({
+    const coms = ((communities) || []).map((c) => ({
       ...c,
       id: "" + c.id,
       displayName: c.name,
     }));
 
-    const vends = vendors.map((c) => ({
+    const vends = ((vendors) || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
     }));
-    const acts = actions.map((c) => ({
+    const acts = ((actions) || []).map((c) => ({
       ...c,
       id: "" + c.id,
       displayName: c.title + ` - ${c.community && c.community.name}`,
@@ -108,7 +117,25 @@ class EditTestimonial extends Component {
     };
   }
 
- 
+  onComplete(_, __, resetForm) {
+    const pathname = "/admin/read/testimonials";
+    const { location, history, match, updateNextSteps } = this.props;
+    const { id } = match.params;
+    var ids = location.state && location.state.ids;
+
+    resetForm && resetForm();
+    updateNextSteps();
+    // Just means admin just answered message normally, so form should just reset, and redirect back to the same page, just like the old fxnality
+    if (!ids || !ids.length) return history.push(pathname);
+
+    // -- Then follow up with going back to the msg list page, but with the id of the just-answered msg, removed
+    ids = ids.filter((_id) => _id.toString() !== id && id.toString());
+    history.push({
+      pathname,
+      state: { ids },
+    });
+  }
+
   getSelectedIds = (selected, dataToCrossCheck) => {
     const res = [];
     selected.forEach((s) => {
@@ -120,24 +147,31 @@ class EditTestimonial extends Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, match } = this.props;
     const { formJson, testimonial } = this.state;
+    const { id } = match.params;
     if (!formJson) return <Loading />;
     return (
       <>
         <Paper style={{ padding: 15 }}>
           <Typography variant="h6">Created By</Typography>
-          {testimonial.user && (
+          {testimonial && testimonial.user && (
             <Typography>
               {testimonial.user.full_name}
               ,&nbsp;
               {testimonial.user.email}
             </Typography>
           )}
-          {!testimonial.user && <p>Created By: Community Admin</p>}
+          {testimonial && !testimonial.user && <p>Created By: Community Admin</p>}
         </Paper>
         <br />
-        <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+          onComplete={this.onComplete.bind(this)}
+          pageKey={`${PAGE_KEYS.EDIT_TESTIMONIALS.key}-${id}`}
+          enableCancel
+        />
       </>
     );
   }
@@ -157,8 +191,19 @@ const mapStateToProps = (state) => {
   };
 };
 
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      updateNextSteps: fetchLatestNextSteps,
+    },
+    dispatch
+  );
+};
 
-const Wrapped = connect(mapStateToProps)(EditTestimonial);
+const Wrapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(EditTestimonial));
 
 export default withStyles(styles, { withTheme: true })(Wrapped);
 
@@ -179,7 +224,6 @@ const createFormJson = ({ communities, actions, vendors, testimonial }) => {
             placeholder: "0",
             fieldType: "TextField",
             contentType: "text",
-            isRequired: true,
             defaultValue: testimonial && testimonial.id,
             dbName: "testimonial_id",
             readOnly: true,
@@ -226,7 +270,7 @@ const createFormJson = ({ communities, actions, vendors, testimonial }) => {
             placeholder: "eg. 0",
             fieldType: "TextField",
             contentType: "number",
-            isRequired: true,
+            isRequired: false,
             defaultValue: testimonial && testimonial.rank,
             dbName: "rank",
             readOnly: false,
@@ -286,14 +330,13 @@ const createFormJson = ({ communities, actions, vendors, testimonial }) => {
       {
         name: "image",
         placeholder: "Select an Image",
-        fieldType: "File",
+        fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
-        previewLink: testimonial && testimonial.image && testimonial.image.url,
+        selected: testimonial && testimonial.file ? [testimonial.file] : [],
         label: "Upload a file for this testimonial",
-        selectMany: false,
-        isRequired: true,
-        defaultValue: "",
-        filesLimit: 1,
+        uploadMultiple: false,
+        multiple: false,
+        isRequired: false,
       },
       {
         name: "is_approved",

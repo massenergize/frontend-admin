@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import Paper from '@material-ui/core/Paper';
+import LinearProgress from '@mui/material/LinearProgress';
+import Paper from '@mui/material/Paper';
 import Type from 'dan-styles/Typography.scss';
-import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
-import Avatar from '@material-ui/core/Avatar';
-import Chip from '@material-ui/core/Chip';
-import Check from '@material-ui/icons/Check';
-import { withStyles } from '@material-ui/core/styles';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import Avatar from '@mui/material/Avatar';
+import Chip from '@mui/material/Chip';
+import Check from '@mui/icons-material/Check';
+import { withStyles } from "@mui/styles";
 import styles from './widget-jss';
 
 function ProgressWidget(props) {

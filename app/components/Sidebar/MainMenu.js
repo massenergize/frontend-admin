@@ -1,22 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles, withTheme } from '@material-ui/core/styles';
 import classNames from 'classnames';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { NavLink } from 'react-router-dom';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import Collapse from '@material-ui/core/Collapse';
-import Chip from '@material-ui/core/Chip';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import ListSubheader from '@mui/material/ListSubheader';
+import Collapse from '@mui/material/Collapse';
+import Chip from '@mui/material/Chip';
 import Ionicon from 'react-ionicons';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import styles from './sidebar-jss';
 import { reduxSignOut } from '../../redux/redux-actions/adminActions';
+import { withStyles } from '@mui/styles';
+import { ListItemButton } from "@mui/material";
 
 class MainMenu extends React.Component {
   handleClick() {
@@ -42,12 +43,12 @@ class MainMenu extends React.Component {
       open,
       dataMenu
     } = this.props;
-    const getMenus = menuArray => menuArray.map((item, index) => {
+    const getMenus = (menuArray, isChild=false) => menuArray.map((item, index) => {
       if (item.child) {
         return (
           <div key={index.toString()}>
-            <ListItem
-              button
+            <ListItem 
+            button
               className={
                 classNames(
                   classes.head,
@@ -62,7 +63,7 @@ class MainMenu extends React.Component {
                   <Ionicon icon={item.icon} />
                 </ListItemIcon>
               )}
-              <ListItemText classes={{ primary: classes.primary }} variant="inset" primary={item.name} />
+              <ListItemText classes={{ primary: classes.primary }} primary={item.name} />
               {open.indexOf(item.key) > -1 ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
             <Collapse
@@ -110,9 +111,17 @@ class MainMenu extends React.Component {
               <Ionicon icon={item.icon} />
             </ListItemIcon>
           )}
-          <ListItemText classes={{ primary: classes.primary }} inset primary={item.name}  />
+          <ListItemText
+            classes={{ primary: classes.primary }}
+            primary={item.name}
+            inset={isChild ? true:false}
+          />
           {item.badge && (
-            <Chip color="primary" label={item.badge} className={classes.badge} />
+            <Chip
+              color="primary"
+              label={item.badge}
+              className={classes.badge}
+            />
           )}
         </ListItem>
       );
@@ -154,4 +163,4 @@ const MainMenuMapped = connect(
   mapDispatchToProps
 )(MainMenu);
 
-export default withTheme()(withStyles(styles)(MainMenuMapped));
+export default withStyles(styles)(MainMenuMapped);

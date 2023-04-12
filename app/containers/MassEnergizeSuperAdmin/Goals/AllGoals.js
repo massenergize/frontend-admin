@@ -1,21 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import { Helmet } from 'react-helmet';
 import brand from 'dan-api/dummy/brand';
 
 import MUIDataTable from 'mui-datatables';
-import FileCopy from '@material-ui/icons/FileCopy';
-import EditIcon from '@material-ui/icons/Edit';
+import FileCopy from '@mui/icons-material/FileCopy';
+import EditIcon from '@mui/icons-material/Edit';
 import { Link } from 'react-router-dom';
-import Avatar from '@material-ui/core/Avatar';
+import Avatar from '@mui/material/Avatar';
 
 import messageStyles from 'dan-styles/Messages.scss';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
-import { reduxGetAllGoals, reduxGetAllCommunityGoals } from '../../../redux/redux-actions/adminActions';
+import { reduxGetAllGoals, reduxGetAllCommunityGoals, reduxToggleUniversalToast } from '../../../redux/redux-actions/adminActions';
 import CommunitySwitch from '../Summary/CommunitySwitch';
 
 class AllGoals extends React.Component {
@@ -186,14 +186,32 @@ class AllGoals extends React.Component {
       filterType: 'dropdown',
       responsive: 'stacked',
       print: true,
-      rowsPerPage: 100,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
       page: 1,
       indexColumn: 'id',
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach(async d => {
           const goalId = data[d.dataIndex][0];
-          await apiCall('/goals.delete', { goal_id: goalId });
+          await apiCall("/goals.delete", { goal_id: goalId }).then(
+            (response) => {
+              if (response.success) {
+                this.props.toggleToast({
+                  open: true,
+                  message: "Goal(s) successfully deleted",
+                  variant: "success",
+                });
+              } else {
+                this.props.toggleToast({
+                  open: true,
+                  message:
+                    "An error occurred while deleting the Goal(s). Please try again.",
+                  variant: "error",
+                });
+              }
+            }
+          );
         });
       }
     };
@@ -235,7 +253,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     callGoalsForSuperAdmin: reduxGetAllGoals,
-    callGoalsForNormalAdmin: reduxGetAllCommunityGoals
+    callGoalsForNormalAdmin: reduxGetAllCommunityGoals,
+    toggleToast:reduxToggleUniversalToast
   }, dispatch);
 }
 const GoalsMapped = connect(mapStateToProps, mapDispatchToProps)(AllGoals);

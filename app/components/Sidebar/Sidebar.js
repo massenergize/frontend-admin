@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import { connect } from 'react-redux';
 import classNames from 'classnames';
-import Hidden from '@material-ui/core/Hidden';
-import Drawer from '@material-ui/core/Drawer';
-import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
+import Hidden from '@mui/material/Hidden';
+import Drawer from '@mui/material/Drawer';
+import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import dummy from 'dan-api/dummy/dummyContents';
 import { bindActionCreators } from 'redux';
 import styles from './sidebar-jss';
@@ -65,6 +65,8 @@ class Sidebar extends React.Component {
       leftSidebar,
       auth,
     } = this.props;
+    const drawerWidth = 240;
+
     const { status, anchorEl, turnDarker } = this.state;
     const dataMenu = auth && auth.is_super_admin ? superAdminMenu : communityAdminMenu;
     return (
@@ -74,9 +76,9 @@ class Sidebar extends React.Component {
             onClose={toggleDrawerOpen}
             onOpen={toggleDrawerOpen}
             open={!open}
-            anchor={leftSidebar ? 'left' : 'right'}
+            anchor={leftSidebar ? "left" : "right"}
           >
-            <div className={classes.swipeDrawerPaper}>
+            <div className={classes && classes.swipeDrawerPaper}>
               <SidebarContent
                 drawerPaper
                 leftSidebar={leftSidebar}
@@ -97,10 +99,14 @@ class Sidebar extends React.Component {
             variant="permanent"
             onClose={toggleDrawerOpen}
             classes={{
-              paper: classNames(classes.drawer, classes.drawerPaper, !open ? classes.drawerPaperClose : ''),
+              paper: classNames(
+                classes.drawer,
+                classes.drawerPaper,
+                !open ? classes.drawerPaperClose : ""
+              ),
             }}
             open={open}
-            anchor={leftSidebar ? 'left' : 'right'}
+            anchor={leftSidebar ? "left" : "right"}
           >
             <SidebarContent
               auth={auth}

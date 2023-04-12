@@ -2,6 +2,24 @@ import React from "react";
 import Loading from "dan-components/Loading";
 import loadable from "../utils/loadable";
 
+export const EventFullView = loadable(
+  () => import("./MassEnergizeSuperAdmin/Events/EventFullView"),
+  {
+    fallback: <Loading />,
+  }
+);
+export const FeatureFlags = loadable(
+  () => import("./MassEnergizeSuperAdmin/Feature Flags/FeatureFlags"),
+  {
+    fallback: <Loading />,
+  }
+);
+export const Preferences = loadable(
+  () => import("./MassEnergizeSuperAdmin/Settings/Preferences"),
+  {
+    fallback: <Loading />,
+  }
+);
 export const AddToGallery = loadable(
   () => import("./MassEnergizeSuperAdmin/Gallery/AddToGallery"),
   {
@@ -34,6 +52,12 @@ export const ImpactPage = loadable(
 );
 export const SuperAllActions = loadable(
   () => import("./MassEnergizeSuperAdmin/Pages/Actions"),
+  {
+    fallback: <Loading />,
+  }
+);
+export const ActionEngagementList = loadable(
+  () => import("./MassEnergizeSuperAdmin/Pages/ActionEngagements"),
   {
     fallback: <Loading />,
   }
@@ -81,20 +105,6 @@ export const TeamsPage = loadable(
 // Testimonials page settings
 export const TestimonialsPage = loadable(
   () => import("./MassEnergizeSuperAdmin/Pages/Testimonials"),
-  {
-    fallback: <Loading />,
-  }
-);
-// Register page settings
-export const RegisterPage = loadable(
-  () => import("./MassEnergizeSuperAdmin/Pages/Register"),
-  {
-    fallback: <Loading />,
-  }
-);
-// Signin page settings
-export const SigninPage = loadable(
-  () => import("./MassEnergizeSuperAdmin/Pages/Signin"),
   {
     fallback: <Loading />,
   }
@@ -182,6 +192,8 @@ export const AddCategory = loadable(
   }
 );
 
+
+
 export const EditCategory = loadable(
   () => import("./MassEnergizeSuperAdmin/Categories/EditCategory"),
   {
@@ -251,6 +263,12 @@ export const EditAction = loadable(
 
 export const AllEvents = loadable(
   () => import("./MassEnergizeSuperAdmin/Events/AllEvents"),
+  {
+    fallback: <Loading />,
+  }
+);
+export const EventsFromOthers = loadable(
+  () => import("./MassEnergizeSuperAdmin/Events/OtherEventsWrapper"),
   {
     fallback: <Loading />,
   }
@@ -445,6 +463,20 @@ export const UsersList = loadable(
 );
 export const ImportContacts = loadable(
   () => import("./MassEnergizeSuperAdmin/Summary/ImportContacts"),
+  {
+    fallback: <Loading />,
+  }
+);
+
+export const AddTask = loadable(
+  () => import("./MassEnergizeSuperAdmin/Tasks/CreateTask"),
+  {
+    fallback: <Loading />,
+  }
+);
+
+export const ListTasks = loadable(
+  () => import("./MassEnergizeSuperAdmin/Tasks/AllTasks"),
   {
     fallback: <Loading />,
   }

@@ -1,33 +1,35 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
-import Icon from "@material-ui/core/Icon";
+import { withStyles } from "@mui/styles";
+import Paper from "@mui/material/Paper";
 import { Helmet } from "react-helmet";
 import { bindActionCreators } from "redux";
 import brand from "dan-api/dummy/brand";
-import MUIDataTable from "mui-datatables";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
-import AppBar from "@material-ui/core/AppBar";
-import Tabs from "@material-ui/core/Tabs";
-import classNames from "classnames";
-import Grid from "@material-ui/core/Grid";
-import Tab from "@material-ui/core/Tab";
-import PeopleIcon from "@material-ui/icons/People";
-import AddBoxIcon from "@material-ui/icons/AddBox";
+import AppBar from "@mui/material/AppBar";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import PeopleIcon from "@mui/icons-material/People";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 import Loading from "dan-components/Loading";
 import styles from "../../../components/Widget/widget-jss";
+import Snackbar from '@mui/material/Snackbar';
+import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
 import {
   reduxGetAllTeams,
   reduxGetAllCommunityTeams,
   reduxUpdateHeap,
+  reduxLoadMetaDataAction,
 } from "../../../redux/redux-actions/adminActions";
 import { apiCall, apiCallFile } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
-import { downloadFile } from "../../../utils/common";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
+import METable from "../ME  Tools/table /METable";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import { getLimit } from "../../../utils/helpers";
 
 function TabContainer(props) {
   const { children } = props;
@@ -53,6 +55,8 @@ class TeamMembers extends React.Component {
       value: 0,
       error: null,
       loadingCSVs: [],
+      success: false,
+      meta:{}
     };
   }
 
@@ -72,7 +76,7 @@ class TeamMembers extends React.Component {
     oldLoadingCSVs = this.state.loadingCSVs;
     oldLoadingCSVs.splice(oldLoadingCSVs.indexOf(endpoint), 1);
     if (csvResponse.success) {
-      downloadFile(csvResponse.file);
+      this.setState({success: true});
     } else {
       this.setState({ error: csvResponse.error });
     }
@@ -91,7 +95,7 @@ class TeamMembers extends React.Component {
   }
   async componentDidMount() {
     const { id } = this.props.match.params;
-    const { heap, addToHeap } = this.props;
+    const { heap, addToHeap, meta, putMetaDataToRedux} = this.props;
     const teamResponse = await apiCall("/teams.info", { team_id: id });
     if (teamResponse && teamResponse.data) {
       const team = teamResponse.data;
@@ -100,13 +104,17 @@ class TeamMembers extends React.Component {
 
     const allTeamMembersResponse = await apiCall("/teams.members", {
       team_id: id,
+      limit:getLimit(PAGE_PROPERTIES.ALL_TEAM_MEMBERS.key)
     });
+
     if (allTeamMembersResponse && allTeamMembersResponse.success) {
       await this.setStateAsync({
         loading: false,
         allTeamMembers: allTeamMembersResponse.data,
         data: this.fashionData(allTeamMembersResponse.data),
       });
+      putMetaDataToRedux({...meta, teamMembers: allTeamMembersResponse.cursor})
+
       addToHeap({
         ...heap,
         teamMembers: { [id]: allTeamMembersResponse.data },
@@ -187,7 +195,6 @@ class TeamMembers extends React.Component {
               placeholder: "eg. id",
               fieldType: "TextField",
               contentType: "text",
-              isRequired: true,
               defaultValue: team.id,
               dbName: "team_id",
               readOnly: true,
@@ -226,17 +233,38 @@ class TeamMembers extends React.Component {
     this.setState({ value });
   };
 
+  handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    this.setState({ success: false });
+  };
+
+  handleCloseStyle = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    this.setState({ error: null });
+  };
+
+
   render() {
     const title = brand.name + " - All Teams";
     const description = brand.desc;
     const { columns, data, team, formJson, value, loading } = this.state;
-    const { classes } = this.props;
-    const { loadingCSVs } = this.state;
+    const { classes, meta, putMetaDataToRedux, members} = this.props;
+    const { error, loadingCSVs, success } = this.state;
+    const metaData = meta && meta.teamMembers
+    const { id } = this.props.match.params;
+
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
-      rowsPerPage: 100,
+      rowsPerPage: 25,
+      rowsPerPageOptions: [10, 25, 100],
+      // count: metaData && metaData.count,
+      // confirmFilters: true,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach((d) => {
@@ -244,7 +272,27 @@ class TeamMembers extends React.Component {
           apiCall("/teams.removeMember", { team_id: team.id, email });
         });
       },
+      // customSearchRender: (
+      //   searchText,
+      //   handleSearch,
+      //   hideSearch,
+      //   options
+      // ) => (
+      //   <SearchBar
+      //     url={"/teams.members"}
+      //     reduxItems={members[id]}
+      //     updateReduxFunction={(data) => console.log("=== data ===", data)}
+      //     handleSearch={handleSearch}
+      //     hideSearch={hideSearch}
+      //     pageProp={PAGE_PROPERTIES.ALL_TEAM_MEMBERS}
+      //     updateMetaData={putMetaDataToRedux}
+      //     name="teamMembers"
+      //     meta={meta}
+      //     otherArgs={{ team_id:id}}
+      //   />
+      // ),
     };
+
     const nowLoadingMembers = loading && (!data || !data.length);
     if (loading && !team)
       return (
@@ -254,6 +302,39 @@ class TeamMembers extends React.Component {
       );
     return (
       <div>
+        {error && (
+          <div>
+            <Snackbar
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              open={error != null}
+              autoHideDuration={6000}
+              onClose={this.handleCloseStyle}
+            >
+              <MySnackbarContentWrapper
+                onClose={this.handleCloseStyle}
+                variant="error"
+                message={`Unable to download: ${error}`}
+              />
+            </Snackbar>
+          </div>
+        )}
+        {success && (
+          <div style={{ marginBottom: 20 }}>
+            <Snackbar
+              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+              open={success}
+              autoHideDuration={3000}
+              onClose={this.handleClose}
+            >
+              <MySnackbarContentWrapper
+                onClose={this.handleClose}
+                variant="success"
+                message={`Your request has been received. Please check your email for the file.`}
+              />
+            </Snackbar>
+          </div>
+        )}
+
         <Helmet>
           <title>{title}</title>
           <meta name="description" content={description} />
@@ -269,9 +350,10 @@ class TeamMembers extends React.Component {
           </Typography>
 
           <Typography variant="p" style={{ marginBottom: 5 }}>
-            <b>NOTE:</b> This page <b style={{ color: "#c74545" }}>does not</b>{" "}
-            list members of sub-teams. On the community portal, parent team
-            pages <b style={{ color: "#c74545" }}>do</b> list members of
+            <b>NOTE:</b> This page{" "}
+            <b style={{ color: "#c74545" }}>does not</b> list members of
+            sub-teams. On the community portal, parent team pages{" "}
+            <b style={{ color: "#c74545" }}>do</b> list members of
             sub-teams.
           </Typography>
 
@@ -284,7 +366,9 @@ class TeamMembers extends React.Component {
           >
             Go back
           </Link>
-          <Link onClick={() => this.props.history.push("/admin/read/teams")}>
+          <Link
+            onClick={() => this.props.history.push("/admin/read/teams")}
+          >
             Go to all teams
           </Link>
           <Link
@@ -294,7 +378,7 @@ class TeamMembers extends React.Component {
             }}
             style={{ marginLeft: 20 }}
           >
-            Download Users and Actions CSV
+            Request Users and Actions CSV
           </Link>
         </Paper>
 
@@ -310,7 +394,10 @@ class TeamMembers extends React.Component {
               textColor="primary"
             >
               <Tab label="Team Members & Admins" icon={<PeopleIcon />} />
-              <Tab label="Change Team Member Status" icon={<AddBoxIcon />} />
+              <Tab
+                label="Change Team Member Status"
+                icon={<AddBoxIcon />}
+              />
             </Tabs>
           </AppBar>
           {value === 0 &&
@@ -319,12 +406,15 @@ class TeamMembers extends React.Component {
             ) : (
               <TabContainer>
                 <div className={classes.table}>
-                  <MUIDataTable
-                    className={classes.tableShadowReset}
-                    title="Team Members"
-                    data={data}
-                    columns={columns}
-                    options={options}
+                  <METable
+                    classes={classes}
+                    page={PAGE_PROPERTIES.ALL_TEAM_MEMBERS}
+                    tableProps={{
+                      title: "Team Members",
+                      data: data,
+                      columns: columns,
+                      options: options,
+                    }}
                   />
                 </div>
               </TabContainer>
@@ -353,6 +443,7 @@ function mapStateToProps(state) {
     community: state.getIn(["selected_community"]),
     members: (heap && heap.teamMembers) || {},
     heap,
+    meta: state.getIn(["paginationMetaData"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -361,6 +452,7 @@ function mapDispatchToProps(dispatch) {
       callTeamsForSuperAdmin: reduxGetAllTeams,
       callTeamsForNormalAdmin: reduxGetAllCommunityTeams,
       addToHeap: reduxUpdateHeap,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
     },
     dispatch
   );

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import MassEnergizeForm from '../_FormGenerator';
 import { apiCall } from '../../../utils/messenger';
 
@@ -23,7 +23,7 @@ const styles = theme => ({
     flexDirection: 'row'
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: 'center'
   },
 });
@@ -73,7 +73,6 @@ class DonatePageEditForm extends Component {
           placeholder: 'eg. 1',
           fieldType: 'TextField',
           contentType: 'number',
-          isRequired: true,
           defaultValue: `${donatePageData.id}`,
           dbName: 'id',
           readOnly: true

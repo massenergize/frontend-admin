@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import TableCell from '@material-ui/core/TableCell';
+import TableCell from '@mui/material/TableCell';
 import classNames from 'classnames';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 import css from 'dan-styles/Table.scss';
 
 class ToggleCell extends React.Component {

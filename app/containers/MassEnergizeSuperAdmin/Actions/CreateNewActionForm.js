@@ -1,12 +1,17 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
-import MassEnergizeForm from "../_FormGenerator";
+// import MassEnergizeForm from "../_FormGenerator";
 import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
 import { checkIfReadOnly, makeTagSection } from "./EditActionForm";
-import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
+import fieldTypes from "../_FormGenerator/fieldTypes";
+import { bindActionCreators } from "redux";
+import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import { withRouter } from "react-router-dom";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -26,7 +31,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -39,13 +44,26 @@ class CreateNewActionForm extends Component {
       ccActions: [],
       vendors: [],
       formJson: null,
-      reRenderKey: "x-initial-key-x",
     };
   }
 
-  static getDerivedStateFromProps(props) {
-    const { communities, tags, vendors, ccActions } = props;
+  static getDerivedStateFromProps(props, state) {
+    const {
+      communities,
+      tags,
+      vendors,
+      ccActions,
+      auth,
+      location,
+    } = props;
+    const fullyMountedNeverRunThisAgain =
+      communities && communities.length &&
+      tags &&
+      tags.length &&
+      ccActions &&
+      ccActions.length;
 
+    if (!fullyMountedNeverRunThisAgain && !state.mounted) return null;
     const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
@@ -61,74 +79,33 @@ class CreateNewActionForm extends Component {
       displayName: c.description,
       id: "" + c.id,
     }));
+
+    const section = makeTagSection({
+      collections: tags,
+      defaults: false
+    });
+
+    const libOpen = location.state && location.state.libOpen;
+
     const formJson = createFormJson({
       communities: coms,
       vendors: vends,
       ccActions: modifiedCCActions,
+      auth,
+      autoOpenMediaLibrary: libOpen,
     });
-
-    const section = makeTagSection({ collections: tags, defaults: false });
 
     if (formJson) formJson.fields.splice(1, 0, section);
 
     return {
+      mounted: true,
       communities: coms,
       ccActions: modifiedCCActions,
       vendors: vends,
       formJson,
-      reRenderKey: getRandomStringKey(), // forces re-render when the prop data is actually available
     };
   }
 
-  componentDidMount() {
-    // const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
-    // const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
-    // const vendorsResponse = await apiCall('/vendors.listForCommunityAdmin');
-    // const ccActionsResponse = await apiCall('/cc/info/actions', {}, null, true);
-    // if (communitiesResponse && communitiesResponse.data) {
-    //   const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
-    //   await this.setStateAsync({ communities });
-    // }
-    // if (vendorsResponse && vendorsResponse.data) {
-    //   const vendors = vendorsResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
-    //   await this.setStateAsync({ vendors });
-    // }
-    // if (ccActionsResponse && ccActionsResponse.data && ccActionsResponse.data.actions) {
-    //   const ccActions = (ccActionsResponse.data.actions || []).map(c => ({ ...c, displayName: c.description, id: '' + c.id }));
-    //   await this.setStateAsync({ ccActions });
-    // }
-    // const formJson = await this.createFormJson();
-    // if (tagCollectionsResponse && tagCollectionsResponse.data) {
-    //   const section = {
-    //     label: 'Please select tag(s) that apply to this action',
-    //     fieldType: 'Section',
-    //     children: []
-    //   };
-    //   Object.values(tagCollectionsResponse.data).forEach(tCol => {
-    //     const newField = {
-    //       name: tCol.name,
-    //       label: `${tCol.name} ${tCol.allow_multiple ? '(You can select multiple)' : '(Only one selection allowed)'}`,
-    //       placeholder: '',
-    //       fieldType: 'Checkbox',
-    //       selectMany: tCol.allow_multiple,
-    //       defaultValue: [],
-    //       dbName: 'tags',
-    //       data: tCol.tags.map(t => ({ ...t, displayName: t.name, id: '' + t.id }))
-    //     };
-    //     // want this to be the 5th field
-    //     section.children.push(newField);
-    //   });
-    //   // want this to be the 2nd field
-    //   formJson.fields.splice(1, 0, section);
-    // }
-    // await this.setStateAsync({ formJson });
-  }
-
-  // setStateAsync(state) {
-  //   return new Promise((resolve) => {
-  //     this.setState(state, resolve);
-  //   });
-  // }
 
   render() {
     const { classes } = this.props;
@@ -136,7 +113,12 @@ class CreateNewActionForm extends Component {
     if (!formJson) return <Loading />;
     return (
       <div key={this.state.reRenderKey}>
-        <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
+        <MassEnergizeForm
+          classes={classes}
+          formJson={formJson}
+          pageKey={PAGE_KEYS.CREATE_ACTION.key}
+          enableCancel
+        />
       </div>
     );
   }
@@ -152,13 +134,36 @@ const mapStateToProps = (state) => ({
   vendors: state.getIn(["allVendors"]),
   ccActions: state.getIn(["ccActions"]),
   actions: state.getIn(["allActions"]),
+  auth: state.getIn(["auth"]),
+  formState: state.getIn(["tempForm"]),
 });
 
-const NewActionMapped = connect(mapStateToProps)(CreateNewActionForm);
-export default withStyles(styles, { withTheme: true })(NewActionMapped);
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      saveFormTemporarily: reduxKeepFormContent,
+    },
+    dispatch
+  );
+};
 
-const createFormJson = ({ communities, ccActions, vendors }) => {
-  // const { communities, ccActions, vendors } = this.state;
+const NewActionMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreateNewActionForm);
+export default withStyles(styles, { withTheme: true })(
+  withRouter(NewActionMapped)
+);
+
+const createFormJson = ({
+  communities,
+  ccActions,
+  vendors,
+  auth,
+  progress,
+  autoOpenMediaLibrary,
+}) => {
+  const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Create a New Action",
     subTitle: "",
@@ -176,9 +181,10 @@ const createFormJson = ({ communities, ccActions, vendors }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            // defaultValue: progress.title || "",
             dbName: "title",
             readOnly: false,
+            maxLength: 40,
           },
           {
             name: "rank",
@@ -187,37 +193,52 @@ const createFormJson = ({ communities, ccActions, vendors }) => {
             placeholder: "eg. 1",
             fieldType: "TextField",
             contentType: "number",
-            isRequired: true,
+            isRequired: false,
             defaultValue: "",
             dbName: "rank",
             readOnly: false,
           },
-          {
-            name: "is_global",
-            label: "Is this Action a Template?",
-            fieldType: "Radio",
-            isRequired: false,
-            defaultValue: "false",
-            dbName: "is_global",
-            readOnly: false,
-            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-            child: {
-              valueToCheck: "false",
-              fields: [
-                {
-                  name: "community",
-                  label: "Primary Community",
-                  placeholder: "eg. Wayland",
-                  fieldType: "Dropdown",
-                  defaultValue: null,
-                  dbName: "community_id",
-                  data: [{ displayName: "--", id: "" }, ...communities],
+          is_super_admin
+            ? {
+                name: "is_global",
+                label: "Is this Action a Template?",
+                fieldType: "Radio",
+                isRequired: false,
+                // defaultValue: progress.is_global || "false",
+                dbName: "is_global",
+                readOnly: false,
+                data: [
+                  { id: "false", value: "No" },
+                  { id: "true", value: "Yes" },
+                ],
+                child: {
+                  valueToCheck: "false",
+                  fields: [
+                    {
+                      name: "community",
+                      label: "Primary Community (select one)",
+                      fieldType: "Dropdown",
+                      // defaultValue: progress.community || null,
+                      dbName: "community_id",
+                      data: [{ displayName: "--", id: "" }, ...communities],
+                      isRequired: true,
+                    },
+                  ],
                 },
-              ],
-            },
-          },
+              }
+            : {
+                name: "community",
+                label: "Primary Community (select one)",
+                fieldType: "Dropdown",
+                // defaultValue: progress.community || communities[0].id, // for a cadmin default to first of their communities.  Need one.
+                defaultValue: communities[0].id, // for a cadmin default to first of their communities.  Need one.
+                dbName: "community_id",
+                data: [{ displayName: "--", id: "" }, ...communities],
+                isRequired: true,
+              },
         ],
       },
+
       {
         label:
           "Carbon Calculator - Link your Action to one of our Carbon Calculator Actions",
@@ -228,9 +249,9 @@ const createFormJson = ({ communities, ccActions, vendors }) => {
             label: "Calculator Action",
             placeholder: "eg. Wayland",
             fieldType: "Dropdown",
-            defaultValue: null,
+            // defaultValue: progress.calculator_action || null,
             dbName: "calculator_action",
-            data: ccActions,
+            data: [{ displayName: "--", id: "" }, ...ccActions],
             modalTitle: "Carbon Action List & Instructions",
             modalText:
               "Check out the instructions here: https://docs.google.com/document/d/1b-tCB83hKk9yWFcB15YdHBORAFOPyh63c8jt1i15WL4",
@@ -240,58 +261,59 @@ const createFormJson = ({ communities, ccActions, vendors }) => {
       {
         name: "featured_summary",
         label: "Featured Summary",
-        placeholder: "eg. This event is happening in ...",
+        placeholder: "Short sentence promoting the action",
         fieldType: "TextField",
         isMulti: true,
         isRequired: true,
-        defaultValue: null,
+        // defaultValue: progress.featured_summary || null,
         dbName: "featured_summary",
       },
       {
         name: "about",
         label: "Write some detailed description about this action",
-        placeholder: "eg. This event is happening in ...",
+        placeholder: "Key information people should know about the action",
         fieldType: "HTMLField",
         isRequired: true,
-        defaultValue: null,
+        // defaultValue: progress.about || null,
         dbName: "about",
       },
       {
         name: "steps_to_take",
         label: "Please outline steps to take for your users",
-        placeholder: "eg. This event is happening in ...",
+        placeholder: "Easy to follow steps to accomplish the action",
         fieldType: "HTMLField",
-        isRequired: true,
-        defaultValue: null,
+        isRequired: false,
+        // defaultValue: progress.steps_to_take || null,
         dbName: "steps_to_take",
       },
       {
         name: "deep_dive",
-        label: "Deep dive into all the details",
-        placeholder: "eg. This action ...",
+        label: "Deep dive into all the details (optional)",
+        placeholder: "Further information some users might want to know",
         fieldType: "HTMLField",
-        isRequired: true,
-        defaultValue: null,
+        isRequired: false,
+        // defaultValue: progress.deep_dive || null,
         dbName: "deep_dive",
       },
       {
         name: "vendors",
         label: "Select which vendors provide services for this action",
-        placeholder: "eg. Solarize Wayland",
         fieldType: "Checkbox",
         selectMany: true,
-        defaultValue: null,
+        // defaultValue: progress.vendors || null,
         dbName: "vendors",
         data: vendors,
       },
       {
         name: "image",
         placeholder: "Select an Image",
-        fieldType: "File",
+        fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload Files",
         isRequired: false,
-        defaultValue: "",
+        // selected: progress.image || [],
+        // defaultValue: progress.image || [],
+        openState: autoOpenMediaLibrary,
         filesLimit: 1,
       },
       {
@@ -299,7 +321,7 @@ const createFormJson = ({ communities, ccActions, vendors }) => {
         label: "Should this action go live?",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: "false",
+        // defaultValue: progress.is_published || "false",
         dbName: "is_published",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],

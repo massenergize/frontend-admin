@@ -9,5 +9,6 @@ export default {
   DateTime: 'DateTime',
   Section: 'Section',
   Paragraph:'Paragraph',
-  MediaLibrary: "media-library"
+  MediaLibrary: "media-library",
+  AutoComplete: "autocomplete"
 };
