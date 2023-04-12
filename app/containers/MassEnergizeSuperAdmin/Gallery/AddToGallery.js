@@ -1,20 +1,32 @@
-import { RadioGroup, Typography, withStyles } from "@material-ui/core";
-import Paper from "@material-ui/core/Paper";
+import { RadioGroup, Typography } from "@mui/material";
+
+import Paper from "@mui/material/Paper";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import LightAutoComplete from "./tools/LightAutoComplete";
-import { Radio } from "@material-ui/core";
-import { FormControlLabel } from "@material-ui/core";
-import { TextField } from "@material-ui/core";
+import { Radio } from "@mui/material";
+import { FormControlLabel } from "@mui/material";
+import { TextField } from "@mui/material";
 import { bindActionCreators } from "redux";
-import { reduxCallLibraryModalImages } from "../../../redux/redux-actions/adminActions";
-import { getFileSize,
-  smartString } from "../ME  Tools/media library/shared/utils/utils";
+import {
+  reduxAddToGalleryImages,
+  reduxAddToSearchedImages,
+  reduxCallLibraryModalImages,
+} from "../../../redux/redux-actions/adminActions";
+import {
+  getFileSize,
+  smartString,
+} from "../ME  Tools/media library/shared/utils/utils";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
-const styles = (theme) => {
-  const spacing = theme.spacing.unit;
+import {withStyles} from '@mui/styles'
+import PapperBlock from "../../../components/PapperBlock/PapperBlock";
+import { fetchParamsFromURL } from "../../../utils/common";
+import { makeStyles, } from "@mui/styles";
+import { withRouter } from "react-router-dom";
+import { styles } from "./styles";
+
   const error = {
     background: "rgb(255, 214, 214)",
     color: "rgb(170, 28, 28)",
@@ -24,25 +36,34 @@ const styles = (theme) => {
     borderRadius: 5,
     cursor: "pointer",
   };
-  return {
-    container: {
-      padding: spacing * 3,
-      borderRadius: 5,
-    },
-    header: {
-      marginBottom: spacing * 2,
-    },
-    dropdownArea: {
-      marginBottom: spacing * 1,
-    },
-    error: error,
-    success: {
-      ...error,
-      background: "rgb(174, 223, 174)",
-      color: "rgb(12, 131, 30)",
-    },
-  };
-};
+
+const useStyles = makeStyles((theme) => ({
+  container: {
+    padding: theme.spacing(3),
+    borderRadius: 5,
+  },
+  error: {
+    background: "rgb(255, 214, 214)",
+    color: "rgb(170, 28, 28)",
+    width: "100%",
+    marginTop: 6,
+    padding: "16px 25px",
+    borderRadius: 5,
+    cursor: "pointer",
+  },
+  header: {
+    marginBottom: theme.spacing(2),
+  },
+  dropdownArea: {
+    marginBottom: theme.spacing(1),
+  },
+  success: {
+    ...error,
+    background: "rgb(174, 223, 174)",
+    color: "rgb(12, 131, 30)",
+  }
+}));
+
 
 const UPLOAD_URL = "/gallery.add";
 const CHOICES = { MINE: "MINE", ALL: "ALL", SPECIFIC: "SPECIFIC" };
@@ -55,25 +76,33 @@ const defaultState = {
 function AddToGallery(props) {
   const {
     auth,
-    classes,
     communities = [],
     loadMoreModalImages,
     loadModalImages,
     modalImages,
     tags,
+    location,
+    history,
+    addImageToGalleryList,
+    addImageToSearchedList,
+    imagesFromGallery,
+    imagesFromSearchResults,
   } = props;
+
+  const classes = useStyles();
 
   const [chosenComs, setChosenComs] = useState([]);
   const [scope, setScope] = useState(CHOICES.SPECIFIC);
   const [state, setState] = useState(defaultState);
   const [resetAutoComplete, setResetorForAutoComplete] = useState(null);
   const [showTagAddingBox, setShowTagAddingBox] = useState(false);
+  const [needsToReturn, setNeedsToReturn] = useState(false); // user needs to return to the page they came from
   const [addedTags, setAddedTags] = useState({});
   const superAdmin = auth && auth.is_super_admin;
 
   const getCommunityList = () => {
-    if (auth.is_super_admin) return communities;
-    if (auth.is_community_admin) return auth.communities;
+    if (auth && auth.is_super_admin) return communities;
+    if (auth && auth.is_community_admin) return auth.communities;
     return [];
   };
 
@@ -125,6 +154,14 @@ function AddToGallery(props) {
           notify(response.error.message, "error");
           return;
         }
+        addImageToGalleryList({
+          old: imagesFromGallery,
+          data: [response.data.image],
+        });
+        addImageToSearchedList({
+          old: imagesFromSearchResults,
+          data: [response.data.image],
+        });
         resetThisComponent();
         notify("Upload to library was successful!", "success");
         reset();
@@ -159,14 +196,18 @@ function AddToGallery(props) {
   };
 
   useEffect(() => {
+    const { tmb } = fetchParamsFromURL(location, "tmb"); // tmb: take me back
+    setNeedsToReturn(tmb);
+
     loadModalImages({
       old: modalImages,
       ...makeCommunityListParamsForFetch(),
     });
   }, []);
 
+  const isError = state.notification_type === "error";
   return (
-    <Paper className={classes.container}>
+    <PapperBlock>
       <Typography variant="h5" className={classes.header}>
         Add an image to your community's library{" "}
       </Typography>
@@ -252,7 +293,7 @@ function AddToGallery(props) {
       )}
       <MediaLibrary
         onUpload={onUpload}
-        actionText="Add to Library"
+        actionText="Select Image"
         defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
         images={modalImages && modalImages.images}
         sourceExtractor={(item) => item && item.url}
@@ -261,17 +302,57 @@ function AddToGallery(props) {
       />
       {state.notification_type && (
         <p
-          className={
-            state.notification_type === "error"
-              ? classes.error
-              : classes.success
-          }
+          className={isError ? classes.error : classes.success}
           onClick={() => notify()}
         >
           {state.notification_msg}
+
+          {/* --------------------------------------- */}
+          {!isError && !needsToReturn && (
+            <Link
+              onClick={() =>
+                history.push({
+                  pathname: "/admin/gallery",
+                })
+              }
+              style={{ textDecoration: "underline" }}
+              className={isError ? classes.error : classes.success}
+            >
+              <i>
+                {" "}
+                Want to see what you just added?
+                <i
+                  style={{ marginLeft: 5 }}
+                  className="fa fa-long-arrow-right"
+                />
+              </i>
+            </Link>
+          )}
+          {/* -------------------- USER NEEDS TO RETURN TO CREATING CONTENT------------------- */}
+          {!isError && needsToReturn && (
+            <Link
+              onClick={() =>
+                history.push({
+                  pathname: needsToReturn,
+                  state: { libOpen: true },
+                })
+              }
+              style={{ textDecoration: "underline" }}
+              className={isError ? classes.error : classes.success}
+            >
+              <i>
+                {" "}
+                Return to the page you were on{" "}
+                <i
+                  style={{ marginLeft: 5 }}
+                  className="fa fa-long-arrow-right"
+                />
+              </i>
+            </Link>
+          )}
         </p>
       )}
-    </Paper>
+    </PapperBlock>
   );
 }
 
@@ -279,6 +360,8 @@ const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   communities: state.getIn(["communities"]),
   modalImages: state.getIn(["modalLibraryImages"]),
+  imagesFromGallery: state.getIn(["galleryImages"]),
+  imagesFromSearchResults: state.getIn(["searchedImages"]),
   tags: state.getIn(["allTags"]),
 });
 const mapDispatchToProps = (dispatch) => {
@@ -286,6 +369,8 @@ const mapDispatchToProps = (dispatch) => {
     {
       loadModalImages: reduxCallLibraryModalImages,
       loadMoreModalImages: reduxCallLibraryModalImages,
+      addImageToGalleryList: reduxAddToGalleryImages,
+      addImageToSearchedList: reduxAddToSearchedImages,
     },
     dispatch
   );
@@ -294,7 +379,7 @@ const GalleryWithProps = connect(
   mapStateToProps,
   mapDispatchToProps
 )(AddToGallery);
-export default withStyles(styles)(GalleryWithProps);
+export default withStyles(styles)(withRouter(GalleryWithProps));
 
 const AddTags = ({ tags, selections, handleOnChange }) => {
   if (!tags) return <></>;

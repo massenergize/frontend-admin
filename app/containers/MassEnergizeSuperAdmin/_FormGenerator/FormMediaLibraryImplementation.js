@@ -11,29 +11,25 @@ import {
   universalFetchFromGallery,
 } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
-import { Checkbox, FormControlLabel, Typography, Tooltip } from "@material-ui/core";
+import { Checkbox, FormControlLabel, Typography, Tooltip } from "@mui/material";
 import { makeLimitsFromImageArray } from "../../../utils/common";
 import { ProgressCircleWithLabel } from "../Gallery/utils";
 import { getMoreInfoOnImage } from "../Gallery/Gallery";
-import { Link } from "react-router-dom";
+//import { Link } from "react-router-dom";
 import GalleryFilter from "../Gallery/tools/GalleryFilter";
 import { filters } from "../Gallery/Gallery";
 import { ShowTagsOnPane } from "../Gallery/SideSheet";
 
 const DEFAULT_SCOPE = ["all", "uploads", "actions", "events", "testimonials"];
 export const FormMediaLibraryImplementation = (props) => {
-  const {
-    fetchImages,
-    auth,
-    imagesObject,
-    putImagesInRedux,
-    selected,
-    tags,
-  } = props;
+  const { fetchImages, auth, imagesObject, putImagesInRedux, tags } = props;
   const [available, setAvailable] = useState(auth && auth.is_super_admin);
   const [selectedTags, setSelectedTags] = useState({ scope: DEFAULT_SCOPE });
   const [queryHasChanged, setQueryHasChanged] = useState(false);
 
+  const defaultValue =
+    (props.selected && props.selected.length && props.selected) ||
+    (props.defaultValue && props.defaultValue.length && props.defaultValue);
   const loadMoreImages = (cb) => {
     if (!auth) return console.log("It does not look like you are signed in...");
 
@@ -158,6 +154,7 @@ export const FormMediaLibraryImplementation = (props) => {
           );
         }}
         {...props}
+        selected={defaultValue}
         loadMoreFunction={loadMoreImages}
       />
     </div>
@@ -165,7 +162,7 @@ export const FormMediaLibraryImplementation = (props) => {
 };
 
 FormMediaLibraryImplementation.propTypes = {
-  props: PropTypes,
+  props: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -204,6 +201,7 @@ const UploadIntroductionComponent = ({ auth, setAvailableTo, available }) => {
           </div>
         </>
       )}
+      {/* we are disabling sharing images to other communities for now
       {is_community_admin && (
         <FormControlLabel
           label="Make the image(s) available to other communities"
@@ -215,11 +213,12 @@ const UploadIntroductionComponent = ({ auth, setAvailableTo, available }) => {
           }
         />
       )}
-      <div>
+       <div>
         <Link to="/admin/gallery/add">
           Upload an image for specific communities instead
         </Link>
-      </div>
+        </div> 
+        */}
     </div>
   );
 };

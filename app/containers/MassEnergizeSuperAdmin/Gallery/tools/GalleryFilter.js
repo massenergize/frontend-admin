@@ -1,7 +1,9 @@
-import { Button, withStyles } from "@material-ui/core";
+import { Button } from "@mui/material";
+import { withStyles } from "@mui/styles";
 import React, { useEffect, useState } from "react";
 import MEDropdown from "../../ME  Tools/dropdown/MEDropdown";
 import { filterStyles } from "./../styles";
+
 function GalleryFilter({
   classes,
   children,

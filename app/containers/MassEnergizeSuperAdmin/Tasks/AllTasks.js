@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import MUIDataTable from "mui-datatables";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
@@ -9,15 +9,16 @@ import { connect } from "react-redux";
 import styles from "../../../components/Widget/widget-jss";
 import { apiCall } from "../../../utils/messenger";
 import { smartString } from "../../../utils/common";
-import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
+import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import {
   reduxToggleUniversalModal,
   loadTasksAction,
+  reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
 import { bindActionCreators } from "redux";
-import EditIcon from "@material-ui/icons/Edit";
-import PauseOutlinedIcon from "@material-ui/icons/PauseOutlined";
-import PlayArrowOutlinedIcon from "@material-ui/icons/PlayArrowOutlined";
+import EditIcon from "@mui/icons-material/Edit";
+import PauseOutlinedIcon from "@mui/icons-material/PauseOutlined";
+import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
 import { Link } from "react-router-dom";
 class AllTasks extends React.Component {
   constructor(props) {
@@ -230,7 +231,21 @@ class AllTasks extends React.Component {
     idsToDelete.forEach((d) => {
       const found = tasks[d.dataIndex].id;
       ids.push(found);
-      apiCall("/tasks.delete", { id: found });
+      apiCall("/tasks.delete", { id: found }).then((response) => {
+        if (response.success) {
+          this.props.toggleToast({
+            open: true,
+            message: "Task successfully deleted",
+            variant: "success",
+          });
+        } else {
+          this.props.toggleToast({
+            open: true,
+            message: "An error occurred while deleting the task",
+            variant: "error",
+          });
+        }
+      });
     });
     const rem = (tasks || []).filter((com) => !ids.includes(com.id));
     putTasksInRedux(rem);
@@ -255,7 +270,7 @@ class AllTasks extends React.Component {
     const { classes } = this.props;
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 30,
 
@@ -352,6 +367,7 @@ function mapDispatchToProps(dispatch) {
     {
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       putTasksInRedux: loadTasksAction,
+      toggleToast:reduxToggleUniversalToast
     },
     dispatch
   );
