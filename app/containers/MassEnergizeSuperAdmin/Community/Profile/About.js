@@ -30,6 +30,7 @@ import { apiCallFile } from '../../../../utils/messenger';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Alert } from '@mui/material';
 import ListItemIcon from "@mui/material/ListItemIcon";
+import { connect } from 'react-redux';
 
 class About extends React.Component {
   constructor(props) {
@@ -139,6 +140,42 @@ class About extends React.Component {
     }
     return 0;
   }
+
+  showAllCommunitiesAndActions = (loadingCSVs, classes) => {
+    const user = this.props.auth ? this.props.auth : {};
+    if (user.is_super_admin) {
+     return (
+      <Grid item xs={4}>
+            <Paper
+              onClick={() => {
+                !loadingCSVs.includes("actions.all") &&
+                  this.getCSV("actions.all");
+              }}
+              className={`${classes.pageCard}`}
+              elevation={1}
+            >
+              <Typography
+                variant="h5"
+                style={{ fontWeight: "600", fontSize: "1rem" }}
+                component="h3"
+              >
+                Request All Communities and Actions CSV{" "}
+                <Icon style={{ paddingTop: 3, color: "green" }}>
+                  arrow_downward
+                </Icon>
+                {loadingCSVs.includes("actions.all") && (
+                  <CircularProgress
+                    size={20}
+                    thickness={2}
+                    color="secondary"
+                  />
+                )}
+              </Typography>
+            </Paper>
+          </Grid>
+    );
+  }
+  };
 
   async importContacts() {
     return <Redirect exact to="/admin/importcontacts"></Redirect>;
@@ -540,7 +577,7 @@ class About extends React.Component {
                 style={{ fontWeight: "600", fontSize: "1rem" }}
                 component="h3"
               >
-                Request Actions CSV{" "}
+                Request All Actions CSV{" "}
                 <Icon style={{ paddingTop: 3, color: "green" }}>
                   arrow_downward
                 </Icon>
@@ -609,6 +646,7 @@ class About extends React.Component {
               </Link>
             </Paper>
           </Grid>
+          {this.showAllCommunitiesAndActions(loadingCSVs, classes)}
           <Grid item xs={4}>
             <Paper
               onClick={() => {
@@ -678,4 +716,11 @@ About.propTypes = {
   // data: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(withRouter (About));
+function mapStateToProps(state) {
+  return {
+    auth: state.getIn(['auth'])
+  };
+}
+
+const AboutMapped = connect(mapStateToProps, null)(About);
+export default withStyles(styles)(withRouter (AboutMapped));
