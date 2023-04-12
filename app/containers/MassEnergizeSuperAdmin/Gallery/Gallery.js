@@ -1,5 +1,6 @@
-import { Button, Checkbox, FormControlLabel, Icon } from "@material-ui/core";
-import { Paper, Typography, withStyles } from "@material-ui/core";
+import { Button, Checkbox, FormControlLabel, Icon } from "@mui/material";
+import { Paper, Typography } from "@mui/material";
+import { withStyles } from "@mui/styles";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -224,6 +225,7 @@ function Gallery(props) {
     fetchContent(makeRequestBody(limits), () => setLoadMore(false));
   };
 
+
   return (
     <div>
       {showMoreInfo && (
@@ -404,7 +406,7 @@ const ImageCollectionTray = ({
   if (searching)
     return <ProgressCircleWithLabel label="We are fetching your data..." />;
   return (
-    <div classesName={classes.thumbnailContainer}>
+    <div className={classes.thumbnailContainer}>
       {(images || []).map((image, index) => {
         return (
           <div key={index} style={{ display: "inline-block" }}>

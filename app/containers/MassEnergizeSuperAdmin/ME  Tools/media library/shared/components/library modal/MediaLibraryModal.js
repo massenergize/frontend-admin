@@ -194,6 +194,12 @@ function MediaLibraryModal({
               {/* --------------------- TAB HEADER AREA -------------- */}
               <div className="m-tab-header-area">
                 {Tabs.map((tab) => {
+                  // A simple logic to make sure the cropping tab button does not show, until an image is selected by a user to crop. (To reduce confusion)
+                  const imageForCroppingNotSelectedYet =
+                    currentTab !== TABS.CROPPING_TAB &&
+                    tab.key === TABS.CROPPING_TAB;
+                  if (imageForCroppingNotSelectedYet) return <></>;
+
                   const isCurrent = currentTab === tab.key;
                   return (
                     <div

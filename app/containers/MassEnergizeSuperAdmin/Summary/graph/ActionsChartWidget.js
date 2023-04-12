@@ -1,21 +1,21 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
+import { withStyles } from "@mui/styles";
+import Grid from '@mui/material/Grid';
 import classNames from 'classnames';
-import CardGiftcard from '@material-ui/icons/CardGiftcard';
-import LocalLibrary from '@material-ui/icons/LocalLibrary';
-import FlareIcon from '@material-ui/icons/Flare';
-import Computer from '@material-ui/icons/Computer';
-import Toys from '@material-ui/icons/Toys';
-import Avatar from '@material-ui/core/Avatar';
-import Divider from '@material-ui/core/Divider';
-import Style from '@material-ui/icons/Style';
-import Typography from '@material-ui/core/Typography';
-import purple from '@material-ui/core/colors/purple';
-import blue from '@material-ui/core/colors/blue';
-import cyan from '@material-ui/core/colors/cyan';
-import pink from '@material-ui/core/colors/pink';
+import CardGiftcard from '@mui/icons-material/CardGiftcard';
+import LocalLibrary from '@mui/icons-material/LocalLibrary';
+import FlareIcon from '@mui/icons-material/Flare';
+import Computer from '@mui/icons-material/Computer';
+import Toys from '@mui/icons-material/Toys';
+import Avatar from '@mui/material/Avatar';
+import Divider from '@mui/material/Divider';
+import Style from '@mui/icons-material/Style';
+import Typography from '@mui/material/Typography';
+import purple from '@mui/material/colors/purple';
+import blue from '@mui/material/colors/blue';
+import cyan from '@mui/material/colors/cyan';
+import pink from '@mui/material/colors/pink';
 import colorfull from 'dan-api/palette/colorfull';
 import {
   BarChart,
@@ -95,7 +95,7 @@ class ActionsChartWidget extends PureComponent {
 
     if (!communities && !dataToGraph) {
       return (
-        <PapperBlock whiteBg noMargin title="Community Engagement" icon="ios-stats-outline" desc="">
+        <PapperBlock whiteBg noMargin title="Community Engagement" icon="ios-stats-outline" desc="" >
           <Grid container spacing={16}>
             <LinearBuffer />
           </Grid>
@@ -103,36 +103,58 @@ class ActionsChartWidget extends PureComponent {
       );
     }
     return (
-      <PapperBlock whiteBg noMargin title="Community Engagement" icon="ios-stats-outline" desc="">
+      <PapperBlock
+        whiteBg
+        noMargin
+        title="Community Engagement"
+        icon="ios-stats-outline"
+        desc=""
+      >
         <Grid container spacing={16}>
           <Grid item md={8} xs={12}>
             <ul className={classes.bigResume}>
-              {communities && communities.map((c, i) => (
-                <li key={c}>
-                  <Avatar className={classNames(classes.avatar, avatarColor[i % avatarColor.length])}>
-                    <FlareIcon />
-                  </Avatar>
-                  <Typography variant="h6">
-                    <span className={avatarColor[i % texts.length]}>{' '}</span>
-                    <Typography>{c}</Typography>
-                  </Typography>
-                </li>
-              ))}
+              {communities &&
+                communities.map((c, i) => (
+                  <li key={c}>
+                    <Avatar
+                      className={classNames(
+                        classes.avatar,
+                        avatarColor[i % avatarColor.length]
+                      )}
+                    >
+                      <FlareIcon />
+                    </Avatar>
+                    <Typography variant="h6">
+                      <span className={avatarColor[i % texts.length]}>
+                        {" "}
+                      </span>
+                      <Typography>{c}</Typography>
+                    </Typography>
+                  </li>
+                ))}
             </ul>
             <div className={classes.chartWrap}>
               <div className={classes.chartFluid}>
                 <ResponsiveContainer>
-                  <BarChart
-                    data={dataToGraph}
-                  >
+                  <BarChart data={dataToGraph}>
                     <XAxis dataKey="name" tickLine={false} />
-                    <YAxis axisLine={false} tickSize={3} tickLine={false} tick={{ stroke: 'none' }} />
+                    <YAxis
+                      axisLine={false}
+                      tickSize={3}
+                      tickLine={false}
+                      tick={{ stroke: "none" }}
+                    />
                     <CartesianGrid vertical={false} strokeDasharray="3 3" />
                     <CartesianAxis />
                     <Tooltip />
-                    {communities && communities.map((c, i) => (
-                      <Bar key={c} dataKey={c} fill={colors[i % colors.length]} />
-                    ))}
+                    {communities &&
+                      communities.map((c, i) => (
+                        <Bar
+                          key={c}
+                          dataKey={c}
+                          fill={colors[i % colors.length]}
+                        />
+                      ))}
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -157,11 +179,18 @@ class ActionsChartWidget extends PureComponent {
                   paddingAngle={5}
                   label
                 >
-                  {
-                    householdsEngagedData.map((entry, index) => <Cell key={index.toString()} fill={colorsPie[index % colorsPie.length]} />)
-                  }
+                  {householdsEngagedData.map((entry, index) => (
+                    <Cell
+                      key={index.toString()}
+                      fill={colorsPie[index % colorsPie.length]}
+                    />
+                  ))}
                 </Pie>
-                <Legend iconType="circle" verticalALign="bottom" iconSize={10} />
+                <Legend
+                  iconType="circle"
+                  verticalALign="bottom"
+                  iconSize={10}
+                />
               </PieChart>
             </Grid>
           </Grid>

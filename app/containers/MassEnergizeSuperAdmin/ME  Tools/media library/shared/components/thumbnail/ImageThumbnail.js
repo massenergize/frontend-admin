@@ -52,6 +52,6 @@ function ImageThumbnail({ onClick, imageSource, style = {} }) {
 }
 ImageThumbnail.propTypes = {};
 ImageThumbnail.defaultProps = {
-  imageSource: "https://i.pravatar.cc/150",
+  // imageSource: "https://i.pravatar.cc/150",
 };
 export default ImageThumbnail;
