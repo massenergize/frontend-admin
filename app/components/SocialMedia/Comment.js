@@ -1,25 +1,25 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import Type from 'dan-styles/Typography.scss';
-import { withStyles } from '@material-ui/core/styles';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import Avatar from '@material-ui/core/Avatar';
-import Send from '@material-ui/icons/Send';
-import Input from '@material-ui/core/Input';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import IconButton from '@material-ui/core/IconButton';
-import Fab from '@material-ui/core/Fab';
-import Slide from '@material-ui/core/Slide';
-import Divider from '@material-ui/core/Divider';
-import CommentIcon from '@material-ui/icons/Comment';
-import CloseIcon from '@material-ui/icons/Close';
-import withMobileDialog from '@material-ui/core/withMobileDialog';
+import { withStyles } from "@mui/styles";
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import Avatar from '@mui/material/Avatar';
+import Send from '@mui/icons-material/Send';
+import Input from '@mui/material/Input';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
+import Fab from '@mui/material/Fab';
+import Slide from '@mui/material/Slide';
+import Divider from '@mui/material/Divider';
+import CommentIcon from '@mui/icons-material/Comment';
+import CloseIcon from '@mui/icons-material/Close';
+// import withMobileDialog from '@mui/material/withMobileDialog';
 import dummy from 'dan-api/dummy/dummyContents';
 import styles from './jss/socialMedia-jss';
 
@@ -131,5 +131,5 @@ Comment.defaultProps = {
   dataComment: undefined
 };
 
-const CommentResponsive = withMobileDialog()(Comment);
+const CommentResponsive = (Comment);
 export default withStyles(styles)(CommentResponsive);

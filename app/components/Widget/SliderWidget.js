@@ -1,32 +1,32 @@
 import React from 'react';
-import { fade } from '@material-ui/core/styles/colorManipulator';
+import { alpha, darken, lighten } from "@mui/material";
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import classNames from 'classnames';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
-import Icon from '@material-ui/core/Icon';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Icon from '@mui/material/Icon';
 import Type from 'dan-styles/Typography.scss';
 import Slider from 'react-animated-slider';
 import 'dan-styles/vendors/react-animated-slider/react-animated-slider.css';
 import imgApi from 'dan-api/images/photos';
 
-const styles = theme => ({
+const styles = (theme) => ({
   tag: {
-    background: fade(theme.palette.primary.light, 0.8),
+    background: alpha(theme.palette.primary.light, 0.8),
     color: theme.palette.primary.dark,
-    position: 'absolute',
+    position: "absolute",
     right: 10,
     top: 10,
-    padding: theme.spacing.unit,
+    padding: theme.spacing(1),
     borderRadius: theme.rounded.big,
     fontSize: 11,
     fontWeight: theme.typography.fontWeightMedium,
-    boxShadow: theme.shadows[3]
+    boxShadow: theme.shadows[3],
   },
   title: {
-    color: theme.palette.common.white
-  }
+    color: theme.palette.common.white,
+  },
 });
 
 const content = [
