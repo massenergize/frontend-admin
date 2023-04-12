@@ -262,6 +262,16 @@ class CreateNewCommunityForm extends Component {
                 ],
               },
             },
+            {
+              name: "is_demo",
+              label: "Is this community a demo community?",
+              fieldType: "Radio",
+              isRequired: false,
+              defaultValue: "false",
+              dbName: "is_demo",
+              readOnly: false,
+              data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+            },
           ],
         },
         {

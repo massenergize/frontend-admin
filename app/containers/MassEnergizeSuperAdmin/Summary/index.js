@@ -317,6 +317,29 @@ const CSVDownloads = ({ loadingCSVs, classes, getCSV}) => {
             </Typography>
           </Paper>
         </Grid>
+        <Grid item xs={12}>
+          <Paper
+            onClick={() => {
+              !loadingCSVs.includes("metrics") && getCSV("metrics");
+            }}
+            className={`${classes.pageCard}`}
+            elevation={1}
+          >
+            <Typography
+              variant="h5"
+              style={{ fontWeight: "600", fontSize: "1rem" }}
+              component="h3"
+            >
+              Request All Metrics CSV{" "}
+              <Icon style={{ paddingTop: 3, color: "green" }}>
+                arrow_downward
+              </Icon>
+              {loadingCSVs.includes("metrics") && (
+                <CircularProgress size={20} thickness={2} color="secondary" />
+              )}
+            </Typography>
+          </Paper>
+        </Grid>
       </Grid>
     </MEPaperBlock>
   );
