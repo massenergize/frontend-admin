@@ -46,7 +46,7 @@ const styles = (theme) => ({
     backgroundColor: green[500],
   },
   divider: {
-    margin: `${theme.spacing(1.5)}px 0`,
+    margin: `${theme.spacing(1)} 0`,
     background: "none",
   },
   albumRoot: {

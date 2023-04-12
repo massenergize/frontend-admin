@@ -29,6 +29,7 @@ import Snackbar from '@mui/material/Snackbar';
 import { apiCallFile } from '../../../../utils/messenger';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Alert } from '@mui/material';
+import ListItemIcon from "@mui/material/ListItemIcon";
 
 class About extends React.Component {
   constructor(props) {
@@ -196,13 +197,7 @@ class About extends React.Component {
           </div>
         )}
 
-        <Grid
-          container
-          alignItems="flex-start"
-          justify="flex-start"
-          direction="row"
-          spacing={24}
-        >
+        <Grid container spacing={5}>
           <Grid item md={6} xs={12}>
             {/* Profile Progress */}
             <div className={classes.progressRoot}>
@@ -253,18 +248,23 @@ class About extends React.Component {
               <Divider className={classes.divider} />
               <List dense className={classes.profileList}>
                 <ListItem>
-                  <Avatar>
-                    <DateRange />
-                  </Avatar>
+                  <ListItemIcon>
+                    <Avatar>
+                      <DateRange />
+                    </Avatar>
+                  </ListItemIcon>
                   <ListItemText
                     primary="Admin Name"
                     secondary={`${community.owner_name}`}
                   />
                 </ListItem>
                 <ListItem>
-                  <Avatar>
-                    <Email />
-                  </Avatar>
+                  <ListItemIcon>
+                    <Avatar>
+                        <Email />
+                    </Avatar>
+                  </ListItemIcon>
+
                   <ListItemText
                     primary="Admin Email"
                     secondary={`${community.owner_email}`}
@@ -272,9 +272,11 @@ class About extends React.Component {
                 </ListItem>
 
                 <ListItem>
-                  <Avatar>
-                    <DateRange />
-                  </Avatar>
+                   <ListItemIcon>
+                    <Avatar>
+                      <DateRange />
+                    </Avatar>
+                   </ListItemIcon>
                   <ListItemText
                     primary="Date Registered"
                     secondary={`${moment(community.created_at).format(
@@ -283,9 +285,11 @@ class About extends React.Component {
                   />
                 </ListItem>
                 <ListItem>
+                   <ListItemIcon>
                   <Avatar>
                     <LocalPhone />
                   </Avatar>
+                   </ListItemIcon>
                   <ListItemText
                     primary="Phone Number"
                     secondary={`${community.owner_phone_number ||
@@ -374,6 +378,7 @@ class About extends React.Component {
               <Grid container className={classes.colList}>
                 <Grid item md={6}>
                   <ListItem>
+                     <ListItemIcon>
                     <Avatar
                       className={classNames(
                         classes.avatar,
@@ -382,6 +387,8 @@ class About extends React.Component {
                     >
                       <AcUnit />
                     </Avatar>
+
+                     </ListItemIcon>
                     <ListItemText
                       primary="Subdomain"
                       secondary={`${community.subdomain}`}
@@ -390,6 +397,7 @@ class About extends React.Component {
                 </Grid>
                 <Grid item md={6}>
                   <ListItem>
+                     <ListItemIcon>
                     <Avatar
                       className={classNames(
                         classes.avatar,
@@ -398,6 +406,8 @@ class About extends React.Component {
                     >
                       <AcUnit />
                     </Avatar>
+
+                     </ListItemIcon>
                     <ListItemText
                       primary="Is Geographically Focused"
                       secondary={`${community.is_geographically_focused}`}
@@ -406,6 +416,7 @@ class About extends React.Component {
                 </Grid>
                 <Grid item md={6}>
                   <ListItem>
+                     <ListItemIcon>
                     <Avatar
                       className={classNames(
                         classes.avatar,
@@ -414,6 +425,8 @@ class About extends React.Component {
                     >
                       <AcUnit />
                     </Avatar>
+
+                     </ListItemIcon>
                     <ListItemText
                       primary="Is Approved"
                       secondary={`${community.is_approved}`}
@@ -422,6 +435,7 @@ class About extends React.Component {
                 </Grid>
                 <Grid item md={6}>
                   <ListItem>
+                     <ListItemIcon>
                     <Avatar
                       className={classNames(
                         classes.avatar,
@@ -430,6 +444,8 @@ class About extends React.Component {
                     >
                       <LocationOn />
                     </Avatar>
+
+                     </ListItemIcon>
                     <ListItemText
                       primary="Location"
                       secondary={`${getAddress(community.location)}`}
