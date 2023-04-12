@@ -7,7 +7,6 @@ import CreateNewActionForm from './CreateNewActionForm';
 class CreateNewAction extends React.Component {
   render() {
     const title = brand.name + ' - Create New Action';
-    console.log("Debug create action", title);
     const description = brand.desc;
     return (
       <div>

@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import VerifiedUser from '@material-ui/icons/VerifiedUser';
-import Info from '@material-ui/icons/Info';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { withStyles } from '@material-ui/core/styles';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import VerifiedUser from '@mui/icons-material/VerifiedUser';
+import Info from '@mui/icons-material/Info';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { withStyles } from "@mui/styles";
 import { PORTAL_HOST } from '../../config/constants';
 
 import styles from './jss/cover-jss';

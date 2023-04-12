@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers';
 import MomentUtils from '@date-io/moment';
-import { withStyles } from '@material-ui/core/styles';
-import TableCell from '@material-ui/core/TableCell';
+import { withStyles } from "@mui/styles";
+import TableCell from '@mui/material/TableCell';
 import css from 'dan-styles/Table.scss';
 
 const styles = {};

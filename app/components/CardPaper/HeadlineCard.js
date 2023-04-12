@@ -1,12 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
+import { Grid, Paper, ButtonBase, Hidden, Typography } from "@mui/material";
 import { Link } from 'react-router-dom';
-import ButtonBase from '@material-ui/core/ButtonBase';
-import Typography from '@material-ui/core/Typography';
-import Hidden from '@material-ui/core/Hidden';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@mui/styles";
 import styles from './cardStyle-jss';
 
 class HeadlineCard extends React.Component {

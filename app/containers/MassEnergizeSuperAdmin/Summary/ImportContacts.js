@@ -1,7 +1,7 @@
 import React from 'react';
 import { apiCall } from '../../../utils/messenger';
 import {CSVReader} from 'react-papaparse';
-import Button from '@material-ui/core/Button';
+import Button from '@mui/material/Button';
 import { PapperBlock } from 'dan-components';
 
 class ImportContacts extends React.Component {
