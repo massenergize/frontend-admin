@@ -27,9 +27,7 @@ export const FormMediaLibraryImplementation = (props) => {
   const [selectedTags, setSelectedTags] = useState({ scope: DEFAULT_SCOPE });
   const [queryHasChanged, setQueryHasChanged] = useState(false);
 
-  const defaultValue =
-    (props.selected && props.selected.length && props.selected) ||
-    (props.defaultValue && props.defaultValue.length && props.defaultValue);
+  const defaultValue = props?.selected || props?.defaultValue;
   const loadMoreImages = (cb) => {
     if (!auth) return console.log("It does not look like you are signed in...");
 

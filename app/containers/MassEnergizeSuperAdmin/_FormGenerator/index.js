@@ -829,7 +829,7 @@ class MassEnergizeForm extends Component {
             <br />
             <FormMediaLibraryImplementation
               {...field}
-              selected={this.getValue(field.name, field.defaultValue, field)}
+              selected={this.getValue(field.name, field.selected || field.defaultValue, field)}
               actionText={field.placeholder}
               onInsert={(files) => {
                 const formData = this.state.formData || {};
