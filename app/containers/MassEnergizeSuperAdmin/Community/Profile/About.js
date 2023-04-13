@@ -29,6 +29,8 @@ import Snackbar from '@mui/material/Snackbar';
 import { apiCallFile } from '../../../../utils/messenger';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Alert } from '@mui/material';
+import ListItemIcon from "@mui/material/ListItemIcon";
+import { connect } from 'react-redux';
 
 class About extends React.Component {
   constructor(props) {
@@ -139,6 +141,42 @@ class About extends React.Component {
     return 0;
   }
 
+  showAllCommunitiesAndActions = (loadingCSVs, classes) => {
+    const user = this.props.auth ? this.props.auth : {};
+    if (user.is_super_admin) {
+     return (
+      <Grid item xs={4}>
+            <Paper
+              onClick={() => {
+                !loadingCSVs.includes("actions.all") &&
+                  this.getCSV("actions.all");
+              }}
+              className={`${classes.pageCard}`}
+              elevation={1}
+            >
+              <Typography
+                variant="h5"
+                style={{ fontWeight: "600", fontSize: "1rem" }}
+                component="h3"
+              >
+                Request All Communities and Actions CSV{" "}
+                <Icon style={{ paddingTop: 3, color: "green" }}>
+                  arrow_downward
+                </Icon>
+                {loadingCSVs.includes("actions.all") && (
+                  <CircularProgress
+                    size={20}
+                    thickness={2}
+                    color="secondary"
+                  />
+                )}
+              </Typography>
+            </Paper>
+          </Grid>
+    );
+  }
+  };
+
   async importContacts() {
     return <Redirect exact to="/admin/importcontacts"></Redirect>;
   }
@@ -196,13 +234,7 @@ class About extends React.Component {
           </div>
         )}
 
-        <Grid
-          container
-          alignItems="flex-start"
-          justify="flex-start"
-          direction="row"
-          spacing={24}
-        >
+        <Grid container spacing={5}>
           <Grid item md={6} xs={12}>
             {/* Profile Progress */}
             <div className={classes.progressRoot}>
@@ -253,18 +285,23 @@ class About extends React.Component {
               <Divider className={classes.divider} />
               <List dense className={classes.profileList}>
                 <ListItem>
-                  <Avatar>
-                    <DateRange />
-                  </Avatar>
+                  <ListItemIcon>
+                    <Avatar>
+                      <DateRange />
+                    </Avatar>
+                  </ListItemIcon>
                   <ListItemText
                     primary="Admin Name"
                     secondary={`${community.owner_name}`}
                   />
                 </ListItem>
                 <ListItem>
-                  <Avatar>
-                    <Email />
-                  </Avatar>
+                  <ListItemIcon>
+                    <Avatar>
+                        <Email />
+                    </Avatar>
+                  </ListItemIcon>
+
                   <ListItemText
                     primary="Admin Email"
                     secondary={`${community.owner_email}`}
@@ -272,9 +309,11 @@ class About extends React.Component {
                 </ListItem>
 
                 <ListItem>
-                  <Avatar>
-                    <DateRange />
-                  </Avatar>
+                   <ListItemIcon>
+                    <Avatar>
+                      <DateRange />
+                    </Avatar>
+                   </ListItemIcon>
                   <ListItemText
                     primary="Date Registered"
                     secondary={`${moment(community.created_at).format(
@@ -283,9 +322,11 @@ class About extends React.Component {
                   />
                 </ListItem>
                 <ListItem>
+                   <ListItemIcon>
                   <Avatar>
                     <LocalPhone />
                   </Avatar>
+                   </ListItemIcon>
                   <ListItemText
                     primary="Phone Number"
                     secondary={`${community.owner_phone_number ||
@@ -374,6 +415,7 @@ class About extends React.Component {
               <Grid container className={classes.colList}>
                 <Grid item md={6}>
                   <ListItem>
+                     <ListItemIcon>
                     <Avatar
                       className={classNames(
                         classes.avatar,
@@ -382,6 +424,8 @@ class About extends React.Component {
                     >
                       <AcUnit />
                     </Avatar>
+
+                     </ListItemIcon>
                     <ListItemText
                       primary="Subdomain"
                       secondary={`${community.subdomain}`}
@@ -390,6 +434,7 @@ class About extends React.Component {
                 </Grid>
                 <Grid item md={6}>
                   <ListItem>
+                     <ListItemIcon>
                     <Avatar
                       className={classNames(
                         classes.avatar,
@@ -398,6 +443,8 @@ class About extends React.Component {
                     >
                       <AcUnit />
                     </Avatar>
+
+                     </ListItemIcon>
                     <ListItemText
                       primary="Is Geographically Focused"
                       secondary={`${community.is_geographically_focused}`}
@@ -406,6 +453,7 @@ class About extends React.Component {
                 </Grid>
                 <Grid item md={6}>
                   <ListItem>
+                     <ListItemIcon>
                     <Avatar
                       className={classNames(
                         classes.avatar,
@@ -414,6 +462,8 @@ class About extends React.Component {
                     >
                       <AcUnit />
                     </Avatar>
+
+                     </ListItemIcon>
                     <ListItemText
                       primary="Is Approved"
                       secondary={`${community.is_approved}`}
@@ -422,6 +472,7 @@ class About extends React.Component {
                 </Grid>
                 <Grid item md={6}>
                   <ListItem>
+                     <ListItemIcon>
                     <Avatar
                       className={classNames(
                         classes.avatar,
@@ -430,6 +481,8 @@ class About extends React.Component {
                     >
                       <LocationOn />
                     </Avatar>
+
+                     </ListItemIcon>
                     <ListItemText
                       primary="Location"
                       secondary={`${getAddress(community.location)}`}
@@ -524,7 +577,7 @@ class About extends React.Component {
                 style={{ fontWeight: "600", fontSize: "1rem" }}
                 component="h3"
               >
-                Request Actions CSV{" "}
+                Request All Actions CSV{" "}
                 <Icon style={{ paddingTop: 3, color: "green" }}>
                   arrow_downward
                 </Icon>
@@ -593,6 +646,7 @@ class About extends React.Component {
               </Link>
             </Paper>
           </Grid>
+          {this.showAllCommunitiesAndActions(loadingCSVs, classes)}
           <Grid item xs={4}>
             <Paper
               onClick={() => {
@@ -662,4 +716,11 @@ About.propTypes = {
   // data: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(withRouter (About));
+function mapStateToProps(state) {
+  return {
+    auth: state.getIn(['auth'])
+  };
+}
+
+const AboutMapped = connect(mapStateToProps, null)(About);
+export default withStyles(styles)(withRouter (AboutMapped));

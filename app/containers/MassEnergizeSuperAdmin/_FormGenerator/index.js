@@ -570,8 +570,7 @@ class MassEnergizeForm extends Component {
       if (clearProgress) clearProgress(this.resetForm);
 
       if (formJson.successRedirectPage) {
-        this.props.history.push(formJson.successRedirectPage);
-        // window.location.href = formJson.successRedirectPage;
+        window.location.href = formJson.successRedirectPage;
       }
     } else if (response && !response.success) {
       // we got an error from the backend so let's set it so the snackbar can pick it up
@@ -1041,7 +1040,7 @@ class MassEnergizeForm extends Component {
               this.getValue(field.name) === field.child.valueToCheck &&
               this.renderFields(field.child.fields)}
             {this.renderConditionalDisplays(field)}
-          </div>
+          </div> 
         );
       case FieldTypes.TextField:
         return (
@@ -1065,7 +1064,8 @@ class MassEnergizeForm extends Component {
                 shrink: true,
               }}
               disabled={field.readOnly || this.state.readOnly}
-              defaultValue={field.defaultValue}
+              // defaultValue={field.defaultValue}
+              value={this.getValue(field.name)}
               inputProps={{ maxLength: field.maxLength }}
               // maxLength={field.maxLength}
               variant="outlined"
@@ -1188,7 +1188,6 @@ class MassEnergizeForm extends Component {
       <div key={this.state.refreshKey}>
         <Grid
           container
-          spacing={24}
           alignItems="flex-start"
           direction="row"
           justify="center"
