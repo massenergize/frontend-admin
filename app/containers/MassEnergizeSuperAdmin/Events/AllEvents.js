@@ -10,13 +10,10 @@ import { Link, withRouter } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 
 import Paper from "@mui/material/Paper";
-import LinearProgress from "@mui/material/LinearProgress";
-import Grid from "@mui/material/Grid";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
-import StarsIcon from "@mui/icons-material/Stars";
 import Tooltip from "@mui/material/Tooltip";
 import {
   reduxGetAllEvents,
@@ -51,7 +48,6 @@ import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import CallMadeIcon from "@mui/icons-material/CallMade";
 import { FROM } from "../../../utils/constants";
 import Loader from "../../../utils/components/Loader";
-import StarRateIcon from "@mui/icons-material/StarRate";
 import HomeIcon from "@mui/icons-material/Home";
 class AllEvents extends React.Component {
   constructor(props) {

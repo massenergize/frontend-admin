@@ -890,17 +890,6 @@ const createFormJson = ({
         },
       },
       {
-        name: "exclude_from_nudge",
-        label:
-          "Would you want to exclude this event from the nudge sent your community Members?",
-        fieldType: "Radio",
-        isRequired: false,
-        defaultValue: "false",
-        dbName: "exclude_from_nudge",
-        readOnly: false,
-        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-      },
-      {
         name: "archive",
         label: "Archive this Event",
         fieldType: "Radio",
