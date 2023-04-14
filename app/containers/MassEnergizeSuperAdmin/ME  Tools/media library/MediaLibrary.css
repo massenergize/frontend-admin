@@ -1,11 +1,10 @@
 @import url(./../shared/css/universal.css);
 
-.ml-tray-image { 
+.ml-tray-image {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-
 }
 .ml-thumb-checkmark {
   display: inline;
@@ -73,19 +72,24 @@
   display: flex;
   flex-direction: row;
 }
+.m-tab-header-item p {
+  justify-items: center;
+  margin: 0px !important;
+}
 .m-tab-header-item {
-  padding: 0px 15px;
-  border-top-right-radius: 5px;
-  border-top-left-radius: 5px;
+  padding: 13px 25px;
   cursor: pointer;
+  display: flex;
 }
 .m-tab-header-item-selected {
-  border: solid 1px #ededed;
   border-bottom-width: 0px;
+  background: #268802;
+  color: white;
+  font-weight: bold;
 }
 .m-tab-header-item-unselected {
-  border: solid 0px #ededed;
-  border-bottom-width: 1px;
+  border: solid 2px #dfdfdf;
+  margin: 0px 4px;
 }
 
 .m-tab-header-item-unselected:hover {

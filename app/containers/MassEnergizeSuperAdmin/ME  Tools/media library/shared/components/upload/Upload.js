@@ -272,16 +272,6 @@ const PreviewElement = ({
         alignItems: "center",
       }}
     >
-      <img
-        src={src}
-        className="ml-preview-image"
-        style={{ height: 80, width: 100 }}
-        alt=""
-      />
-      <small>{smartString(file.name)}</small>
-      <small role="button">
-        Size: <b>{sizeText}</b>
-      </small>
       {!uploading && (
         <div
           style={{
@@ -302,6 +292,16 @@ const PreviewElement = ({
           )}
         </div>
       )}
+      <img
+        src={src}
+        className="ml-preview-image"
+        style={{ height: 80, width: 100 }}
+        alt=""
+      />
+      <small>{smartString(file.name)}</small>
+      <small role="button">
+        Size: <b>{sizeText}</b>
+      </small>
     </div>
   );
 };
