@@ -19,14 +19,14 @@ function RenderVisitLogs({ putLogsInRedux, logs, id, users }) {
   ]);
 
   const fetchLogs = (id) => {
-  
     apiCall("users.get.visits", { id }).then((response) => {
       setLoading(false);
       if (!response.success)
         return console.log("Error while loading logs: ", response.error);
-
-      setContent(response.data);
-      putLogsInRedux({ ...logs, [id]: response.data });
+      const isEmpty = Object.keys(response.data).length === 0;
+      const data = isEmpty ? [] : response.data;
+      setContent(data);
+      putLogsInRedux({ ...logs, [id]: data });
     });
   };
 
@@ -73,8 +73,7 @@ function RenderVisitLogs({ putLogsInRedux, logs, id, users }) {
           variant="body"
           style={{ marginBottom: 5, color: "#444040" }}
         >
-          Sorry, it appears this user has not had any login activity since March
-          2023...
+          Sorry, we could not find any sign in logs related to this user...
           {/* I am using March because its around that time that we started recording user portal signins with Footages  */}
         </Typography>
       </Container>
@@ -93,7 +92,7 @@ function RenderVisitLogs({ putLogsInRedux, logs, id, users }) {
                 className="fa fa-clock"
                 style={{ marginRight: 6, color: "#e8e8e8" }}
               />{" "}
-              <span> {getHumanFriendlyDate(log?.created_at, true, false)}</span>
+              <span> {getHumanFriendlyDate(log, true, false)}</span>
             </Typography>
           );
         })}
