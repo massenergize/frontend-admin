@@ -1,0 +1,46 @@
+
+on:
+  push:
+    branches:
+    - TA-deployment-auto
+      - master
+      - canary
+      - development
+
+    tags:
+      - '*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Deploy to Prod
+        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'prod') && github.ref == 'refs/heads/master'
+        run: |
+          echo "Deploy to development"
+          echo github.ref: $github.ref
+          echo github.sha: $github.sha
+      
+      - name: Deploy to Canary
+        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'canary') && github.ref == 'refs/heads/canary'
+        run: |
+          echo "Deploy to CANARY branch"
+          echo github.ref: $github.ref
+          echo github.sha: $github.sha
+          
+      - name: Deploy to development
+        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'dev') && github.ref == 'refs/heads/development'
+        run: |
+          echo "Deploy to Development"
+          echo github.ref: $github.ref
+          echo github.sha: $github.sha
+
+      - name: Deploy to development
+        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'test') && github.ref == 'refs/heads/TA-deployment-auto'
+        run: |
+          echo "Deploy to Development"
+          echo github.ref: $github.ref
+          echo github.sha: $github.sha
