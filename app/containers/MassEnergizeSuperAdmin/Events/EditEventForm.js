@@ -505,10 +505,7 @@ const createFormJson = ({
             defaultValue: event.is_recurring ? "true" : "false",
             dbName: "is_recurring",
             readOnly: false,
-            data: [
-              { id: "false", value: "No" },
-              { id: "true", value: "Yes" },
-            ],
+            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
             child: {
               dbName: "recurring_details",
               valueToCheck: "true",
