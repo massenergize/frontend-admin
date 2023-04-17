@@ -44,6 +44,6 @@ jobs:
         run: |
           echo "Deploy to TEST"
           echo '${{ toJSON(github) }}'
-          echo ${{id}}
+          echo ${{ steps.branch-name.outputs.branch }}
 
 
