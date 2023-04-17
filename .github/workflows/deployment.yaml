@@ -18,29 +18,25 @@ jobs:
         uses: actions/checkout@v2
       
       - name: Deploy to Prod
-        # if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'prod') && github.ref == 'refs/heads/master'
+        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'prod') && github.ref == 'refs/heads/master'
         run: |
-          echo "Deploy to development"
-          echo github.ref: $github.ref
-          echo github.sha: $github.sha
+          echo "Deploy to PROD"
+          echo ${{ github.ref }}
       
       - name: Deploy to Canary
         if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'canary') && github.ref == 'refs/heads/canary'
         run: |
           echo "Deploy to CANARY branch"
-          echo github.ref: $github.ref
-          echo github.sha: $github.sha
+          echo ${{ github.ref }}
           
       - name: Deploy to development
         if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'dev') && github.ref == 'refs/heads/development'
         run: |
           echo "Deploy to Development"
-          echo github.ref: $github.ref
-          echo github.sha: $github.sha
+          echo ${{ github.ref }}
 
       - name: Deploy to TEST BRANCH
-        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'test') && github.ref == 'refs/heads/TA-deployment-auto'
+        # if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'test') && github.ref == 'refs/heads/TA-deployment-auto'
         run: |
-          echo "Deploy to Development"
-          echo github.ref: $github.ref
-          echo github.sha: $github.sha
+          echo "Deploy to TEST"
+          echo ${{ github.ref }}
