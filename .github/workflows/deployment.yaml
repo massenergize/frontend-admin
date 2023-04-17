@@ -38,7 +38,7 @@ jobs:
           echo github.ref: $github.ref
           echo github.sha: $github.sha
 
-      - name: Deploy to development
+      - name: Deploy to TEST BRANCH
         if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'test') && github.ref == 'refs/heads/TA-deployment-auto'
         run: |
           echo "Deploy to Development"
