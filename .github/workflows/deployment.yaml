@@ -16,34 +16,29 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Get branch name from tag
-        id: branch-name
-        run: echo "${{ github.ref }}" | sed 's/refs\/tags\///' | sed 's/\(.*\)\/.*/\1/'
-
       
       - name: Deploy to Prod
-        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'prod') && github.ref == 'refs/heads/master'
+        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'prod') && github.event.base_ref == 'refs/heads/master'
         run: |
           echo "Deploy to PROD"
           echo ${{ github.ref }}
       
       - name: Deploy to Canary
-        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'canary') && github.ref == 'refs/heads/canary'
+        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'canary') && github.event.base_ref == 'refs/heads/canary'
         run: |
           echo "Deploy to CANARY branch"
           echo ${{ github.ref }}
           
       - name: Deploy to development
-        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'dev') && github.ref == 'refs/heads/development'
+        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'dev') && github.event.base_ref == 'refs/heads/development'
         run: |
           echo "Deploy to Development"
           echo ${{ github.ref }}
 
       - name: Deploy to TEST BRANCH
-        # if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'test') && github.ref == 'refs/heads/TA-deployment-auto'
+        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'test') && github.event.base_ref == 'refs/heads/TA-deployment-auto'
         run: |
           echo "Deploy to TEST"
-          echo '${{ toJSON(github) }}'
-          echo ${{ steps.branch-name.outputs.branch }}
+          echo ${{ github.event.base_ref}}
 
 
