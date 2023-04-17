@@ -39,4 +39,4 @@ jobs:
         # if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'test') && github.ref == 'refs/heads/TA-deployment-auto'
         run: |
           echo "Deploy to TEST"
-          echo ${{ github.ref }}
+          echo '${{ toJSON(github) }}'
