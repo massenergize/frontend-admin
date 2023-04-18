@@ -22,6 +22,7 @@ export const TABS = {
   CROPPING_TAB: "crop",
 };
 
+
 export const IMAGE_QUALITY = {
   LOW: { key: "LOW", value: 0.2 },
   MEDIUM: { key: "MEDIUM", value: 0.5 },

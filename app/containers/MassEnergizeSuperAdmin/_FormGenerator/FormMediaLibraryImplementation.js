@@ -27,9 +27,7 @@ export const FormMediaLibraryImplementation = (props) => {
   const [selectedTags, setSelectedTags] = useState({ scope: DEFAULT_SCOPE });
   const [queryHasChanged, setQueryHasChanged] = useState(false);
 
-  const defaultValue =
-    (props.selected && props.selected.length && props.selected) ||
-    (props.defaultValue && props.defaultValue.length && props.defaultValue);
+  const defaultValue = props?.selected || props?.defaultValue;
   const loadMoreImages = (cb) => {
     if (!auth) return console.log("It does not look like you are signed in...");
 
@@ -54,7 +52,7 @@ export const FormMediaLibraryImplementation = (props) => {
     });
   };
 
-  const handleUpload = (files, reset, _, changeTabTo) => {
+  const handleUpload = (files, reset, _, changeTabTo, immediately) => {
     const isUniversal = available ? { is_universal: true } : {};
     const apiJson = {
       user_id: auth.id,
@@ -81,6 +79,7 @@ export const FormMediaLibraryImplementation = (props) => {
           append: true,
           prepend: true,
         });
+        if (immediately) return immediately(images, response);
         reset();
         changeTabTo(MediaLibrary.Tabs.LIBRARY_TAB);
       })
@@ -102,6 +101,7 @@ export const FormMediaLibraryImplementation = (props) => {
   return (
     <div>
       <MediaLibrary
+        defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
         images={(imagesObject && imagesObject.images) || []}
         actionText="Select From Library"
         sourceExtractor={(item) => item && item.url}
@@ -152,6 +152,11 @@ export const FormMediaLibraryImplementation = (props) => {
               {children}
             </Tooltip>
           );
+        }}
+        tabModifiers={{
+          [MediaLibrary.Tabs.LIBRARY_TAB]: {
+            name: "Choose From Media Library",
+          },
         }}
         {...props}
         selected={defaultValue}

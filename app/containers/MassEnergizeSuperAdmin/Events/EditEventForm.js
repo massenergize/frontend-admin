@@ -377,23 +377,25 @@ const validator = (cleaned) => {
  * @param {*} publicity
  * @returns
  */
-const getAllowedCommunities = ({ adminOf, list, publicity }) => {
-  if (publicity === "OPEN") return adminOf;
-  list = (list || []).map((c) => c.id);
-  // This part happens when an admin has already copied an event, and is trying to edit, (we select only communities that are allowed) to be shown in the dropdown
-  var coms;
-  if (publicity === "OPEN_TO") {
-    coms = adminOf.filter((c) => list.includes(c.id));
-    return coms;
-  }
 
-  if (publicity === "CLOSED_TO") {
-    coms = adminOf.filter((c) => !list.includes(c.id));
-    return coms;
-  }
+//const getAllowedCommunities = ({ adminOf, list, publicity }) => {
+//  if (publicity === "OPEN") return adminOf;
+//  list = (list || []).map((c) => c.id);
+//  // This part happens when an admin has already copied an event, and is trying to edit, (we select only communities that are allowed) to be shown in the dropdown
+//  var coms;
+//  if (publicity === "OPEN_TO") {
+//    coms = adminOf.filter((c) => list.includes(c.id));
+//    return coms;
+//  }
+//
+//  if (publicity === "CLOSED_TO") {
+//    coms = adminOf.filter((c) => !list.includes(c.id));
+//    return coms;
+//  }
+//
+//  return [];
+//};
 
-  return [];
-};
 const createFormJson = ({
   event,
   rescheduledEvent,
@@ -407,13 +409,13 @@ const createFormJson = ({
 
   const is_super_admin = auth && auth.is_super_admin;
 
-  communities = is_super_admin
-    ? communities
-    : getAllowedCommunities({
-        adminOf: auth.admin_at,
-        list: event.communities_under_publicity,
-        publicity: event.publicity,
-      });
+  //communities = is_super_admin
+  //  ? communities
+  //  : getAllowedCommunities({
+  //      adminOf: auth.admin_at,
+  //      list: event.communities_under_publicity,
+  //      publicity: event.publicity,
+  //    });
 
   communities = (communities || []).map((c) => ({
     displayName: c.name,
@@ -503,7 +505,10 @@ const createFormJson = ({
             defaultValue: event.is_recurring ? "true" : "false",
             dbName: "is_recurring",
             readOnly: false,
-            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+            data: [
+              { id: "false", value: "No" },
+              { id: "true", value: "Yes" },
+            ],
             child: {
               dbName: "recurring_details",
               valueToCheck: "true",
