@@ -30,7 +30,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-            make init
+            npm  i --legacy-peer-deps
 
       - name: Build App 🏗
         run: |
