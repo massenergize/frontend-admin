@@ -75,6 +75,9 @@ import {
   EventFullView,
   EventsFromOthers,
   ActionEngagementList,
+  PolicyFullViewPage,
+  TermsOfServicePage,
+  PrivacyPolicyPage,
 } from "../pageListAsync";
 import EditVendor from "../MassEnergizeSuperAdmin/Vendors/EditVendor";
 import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
@@ -96,6 +99,33 @@ import { THREE_MINUTES, TIME_UNTIL_EXPIRATION } from "../../utils/constants";
 import ThemeToast from "../../components/Widget/ThemeToast";
 import { ME_FORM_PROGRESS } from "../MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 import { FILTER_OBJ_KEY } from "../MassEnergizeSuperAdmin/ME  Tools/table /METable";
+import { includes } from "lodash";
+
+//This function checks whether a user needs to sign an MOU and redirects them to the MOU page if necessary
+const checkIfUserNeedsMOUAttention = (auth, history) => {
+  // A list of routes that are allowed if a user has not signed their MOU
+  const allowedRoutes = [
+    "/admin/view/policy/terms-of-service",
+    "/admin/view/policy/privacy-policy",
+    "/admin/view/policy/mou",
+  ];
+  // Get current url path
+  const currentUrl = window.location.pathname;
+  let routeIsAllowed = false;
+
+  //Iterate through all the allowed routes listed.
+  allowedRoutes.forEach((route) => {
+    if (currentUrl.includes(route)) 
+      routeIsAllowed = true;
+  });
+
+  // Set the MOU URL
+  const MOU_URL = "/admin/view/policy/mou?ct=true"; // this will need to change if we ever change the "key" from "mou" when sadmin is creating the MOU policy. Same for PP and TOS routes.
+  
+  // If the user still needs to accept the MOU agreement and is accessing a route that is currently not allowed, redirect them to the MOU route with ct=true in the query string.
+  if (auth?.needs_to_accept_mou && !routeIsAllowed)
+    return history.push(MOU_URL);
+};
 
 class Application extends React.Component {
   componentDidMount() {
@@ -201,7 +231,7 @@ class Application extends React.Component {
         )}
       />,
     ];
-
+    checkIfUserNeedsMOUAttention(auth, history);
     const {
       component,
       show,
@@ -210,7 +240,11 @@ class Application extends React.Component {
       closeAfterConfirmation,
     } = modalOptions;
     return (
-      <Dashboard history={history} changeMode={changeMode}>
+      <Dashboard
+        history={history}
+        changeMode={changeMode}
+        lock={auth?.needs_to_accept_mou}
+      >
         <ThemeModal
           {...modalOptions || {}}
           open={show}
@@ -241,6 +275,10 @@ class Application extends React.Component {
           {user.is_super_admin && superAdminSpecialRoutes}
 
           <Route exact path="/blank" component={BlankPage} />
+          <Route
+            path="/admin/view/policy/:policyKey"
+            component={TermsOfServicePage}
+          />
           <Route
             exact
             path="/admin/profile/preferences"
@@ -354,6 +392,7 @@ class Application extends React.Component {
           <Route path="/admin/read/subscribers" component={AllSubscribers} />
           <Route path="/admin/read/policies" component={AllPolicies} />
           <Route path="/admin/add/policy" component={AddPolicy} />
+
           <Route path="/admin/edit/:id/policy" component={EditPolicy} />
           <Route path="/admin/read/goals" component={AllGoals} />
           <Route path="/admin/add/goal" component={AddGoal} />
