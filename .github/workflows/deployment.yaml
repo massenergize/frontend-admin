@@ -34,9 +34,9 @@ jobs:
 
       - name: Build App 🏗
         run: |
-            make build
+            npm run build
       
-      - name: Deploying to Prod 🚀
+      - name: Deploying to Prod 🚀 
         if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'prod') && github.event.base_ref == 'refs/heads/master'
         uses: data-intuitive/netlify-deploy-site@v1
         with:
