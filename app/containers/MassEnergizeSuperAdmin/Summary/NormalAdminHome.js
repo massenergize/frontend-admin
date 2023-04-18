@@ -9,7 +9,7 @@ import Divider from "@mui/material/Divider";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import Typography from "@mui/material/Typography";
-import { PapperBlock } from "dan-components";
+// import { PapperBlock } from "dan-components";
 import imgApi from "dan-api/images/photos";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -34,10 +34,8 @@ import WhatNext from "./WhatNext";
 import CommunityEngagement from "./CommunityEngagement";
 import Feature from "../../../components/FeatureFlags/Feature";
 import { FLAGS } from "../../../components/FeatureFlags/flags";
-import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import PapperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import ContinueWhereYouLeft from "./ContinueWhereYouLeft";
-
-
 
 class NormalAdminHome extends PureComponent {
   constructor(props) {
@@ -142,7 +140,7 @@ class NormalAdminHome extends PureComponent {
                           borderBottomWidth: 2,
                           marginLeft: 15,
                           textDecoration: "none",
-                          color: mode=="light"&& "black",
+                          color: mode == "light" && "black",
                         }}
                         className="touchable-opacity"
                         onClick={(e) => {

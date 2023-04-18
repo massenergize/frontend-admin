@@ -1,0 +1,80 @@
+name: Build and Deploy to Netlify CI/CD
+on:
+  push:
+    branches:
+      - master
+      - canary
+      - development
+
+    tags:
+      - 'dev@[0-9]+.[0-9]+.[0-9]+'
+      - 'prod@[0-9]+.[0-9]+.[0-9]+'
+      - 'canary@[0-9]+.[0-9]+.[0-9]+'
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+         node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies  
+        run: |
+            npm  i --legacy-peer-deps
+
+      - name: Build App 🏗
+        run: |
+            make build
+      
+      - name: Deploying to Prod 🚀 
+        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'prod') && github.event.base_ref == 'refs/heads/master'
+        uses: data-intuitive/netlify-deploy-site@v1
+        with:
+          auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          dir: 'build'
+          site: ${{ secrets.NETLIFY_PROD_SITE_ID }}
+          prod: true
+          message: 'Deploying ${{ github.ref }}'
+    
+      
+      - name: Deploying to Canary 🚀
+        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'canary') && github.event.base_ref == 'refs/heads/canary'
+        uses: data-intuitive/netlify-deploy-site@v1
+        with:
+          auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          dir: 'build'
+          site: ${{ secrets.NETLIFY_CANARY_SITE_ID }}
+          prod: true
+          message: 'Deploying ${{ github.ref }}'
+
+          
+      - name: Deploying  to Dev 🚀
+        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'dev') && github.event.base_ref == 'refs/heads/development'
+        uses: data-intuitive/netlify-deploy-site@v1
+        with:
+          auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          dir: 'build'
+          site: ${{ secrets.NETLIFY_DEV_SITE_ID }}
+          prod: true
+          message: 'Deploying ${{ github.ref }}'
+
+
+      - name: Report status to Slack 📢
+        uses: ravsamhq/notify-slack-action@master
+        if: always()
+        with:
+          status: ${{ job.status }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
+
+
+
