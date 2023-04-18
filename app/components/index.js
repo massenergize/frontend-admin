@@ -34,7 +34,7 @@ export SliderWidget from './Widget/SliderWidget';
 export CounterChartWidget from './Widget/CounterChartWidget';
 export CounterIconsWidget from './Widget/CounterIconsWidget';
 export PerformanceChartWidget from './Widget/PerformanceChartWidget';
-// export TableWidget from './Widget/TableWidget';
+export TableWidget from './Widget/TableWidget';
 export TaskWidget from './Widget/TaskWidget';
 export ProfileWidget from './Widget/ProfileWidget';
 export ProgressWidget from './Widget/ProgressWidget';
