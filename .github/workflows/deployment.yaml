@@ -31,6 +31,10 @@ jobs:
       - name: Install dependencies
         run: |
             make init
+
+      - name: Build App 🏗
+        run: |
+            make build
       
       - name: Deploying to Prod 🚀
         if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'prod') && github.event.base_ref == 'refs/heads/master'
