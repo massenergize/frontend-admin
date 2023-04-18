@@ -34,7 +34,7 @@ jobs:
 
       - name: Build App 🏗
         run: |
-            npm run build
+            make build
       
       - name: Deploying to Prod 🚀 
         if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'prod') && github.event.base_ref == 'refs/heads/master'
@@ -80,13 +80,13 @@ jobs:
           message: 'Deploying ${{ github.ref }}'
 
 
-      # - name: Report status to Slack 📢
-      #   uses: ravsamhq/notify-slack-action@master
-      #   if: always()
-      #   with:
-      #     status: ${{ job.status }}
-      #   env:
-      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
+      - name: Report status to Slack 📢
+        uses: ravsamhq/notify-slack-action@master
+        if: always()
+        with:
+          status: ${{ job.status }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
 
 
 
