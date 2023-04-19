@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { connect, useSelector } from "react-redux";
+import { connect } from "react-redux";
 import { LOADING } from "../../../../utils/constants";
 
 import MEPaperBlock from "../../ME  Tools/paper block/MEPaperBlock";
@@ -19,12 +19,12 @@ const MOU = "mou";
 const ACCEPT = "accept";
 const DECLINE = "decline";
 const DEFER = "defer";
-function ViewFullPolicy({ showModal, signOut, auth, putAdminInRedux }) {
+
+function ViewFullPolicy({ showModal, signOut, auth, policies }) {
   const history = useHistory();
   const [policy, setPolicy] = useState(LOADING);
   const [loading, setLoading] = useState(null);
 
-  const policies = useSelector((store) => store.getIn(["allPolicies"]));
   const { policyKey } = useParams();
   const isMOU = MOU === policyKey;
 
@@ -162,7 +162,8 @@ function ViewFullPolicy({ showModal, signOut, auth, putAdminInRedux }) {
   );
 }
 const mapStateToProps = (state) => {
-  return { auth: state.getIn(["auth"]) };
+  return { auth: state.getIn(["auth"]),
+  policies: state.getIn(["allPolicies"]) };
 };
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
