@@ -65,7 +65,6 @@ function ViewFullPolicy({ showModal, signOut, auth, putAdminInRedux }) {
           return console.log("ERROR RESPONDING:", response.error);
         if (!accept) signUserOut();
 
-        console.log("REPONSE AFTER ACCEPTING", response);
         // putAdminInRedux(response.data);
         window.location.href = "/";
       }
