@@ -1,11 +1,6 @@
 name: Build and Deploy to Netlify CI/CD
 on:
   push:
-    branches:
-      - master
-      - canary
-      - development
-
     tags:
       - 'dev@[0-9]+.[0-9]+.[0-9]+'
       - 'prod@[0-9]+.[0-9]+.[0-9]+'
