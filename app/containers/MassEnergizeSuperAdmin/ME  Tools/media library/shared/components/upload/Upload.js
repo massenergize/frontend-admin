@@ -167,29 +167,29 @@ function Upload({
         }}
         onDrop={(e) => handleDroppedFile(e)}
       >
-        {files.length > 0 ? (
-          <>
-            <p>
-              Upload ({files.length}) File
-              {files.length === 1 ? "" : "s"}
-            </p>
-            {uploading ? (
-              <img src={spinner} style={{ height: 70 }} alt="" />
-            ) : (
-              <MLButton
-                style={{
-                  height: "auto",
-                  borderRadius: 4,
-                  padding: "17px 40px",
-                  marginBottom: 5,
-                }}
-                backColor="green"
-                onClick={() => upload()}
-              >
-                UPLOAD
-              </MLButton>
-            )}
-          </>
+        {files.length > 0 ? ( <></>
+          // <>
+          //   <p>
+          //     Upload ({files.length}) File
+          //     {files.length === 1 ? "" : "s"}
+          //   </p>
+          //   {uploading ? (
+          //     <img src={spinner} style={{ height: 70 }} alt="" />
+          //   ) : (
+          //     <MLButton
+          //       style={{
+          //         height: "auto",
+          //         borderRadius: 4,
+          //         padding: "17px 40px",
+          //         marginBottom: 5,
+          //       }}
+          //       backColor="green"
+          //       onClick={() => upload()}
+          //     >
+          //       UPLOAD
+          //     </MLButton>
+          //   )}
+          // </>
         ) : (
           <>
             <img src={uploadDummy} style={{ width: 110, height: 66 }} alt="" />
