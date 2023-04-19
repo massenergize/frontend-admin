@@ -21,6 +21,7 @@ import {
   reduxCallFullCommunity,
   reduxLiveOrNot,
 } from "../../../redux/redux-actions/adminActions";
+import NewCommunityProfile from "./NewCommunityProfile";
 
 function TabContainer(props) {
   const { children } = props;
@@ -76,66 +77,67 @@ class CommunityProfile extends React.Component {
       return <div>Loading Data ...</div>;
     }
     return (
-      <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
-        {this.showCommunitySwitch()}
-        <Cover
-          liveOrNotFxn={this.props.liveOrNot}
-          coverImg={bgCover}
-          avatar={
-            community && community.logo ? community.logo.url : dummy.user.avatar
-          }
-          name={community && (community.name || "")}
-          desc={community && (community.about_community || "")}
-          community={community}
-        />
+      <NewCommunityProfile/>
+      // <div>
+      //   <Helmet>
+      //     <title>{title}</title>
+      //     <meta name="description" content={description} />
+      //     <meta property="og:title" content={title} />
+      //     <meta property="og:description" content={description} />
+      //     <meta property="twitter:title" content={title} />
+      //     <meta property="twitter:description" content={description} />
+      //   </Helmet>
+      //   {this.showCommunitySwitch()}
+      //   <Cover
+      //     liveOrNotFxn={this.props.liveOrNot}
+      //     coverImg={bgCover}
+      //     avatar={
+      //       community && community.logo ? community.logo.url : dummy.user.avatar
+      //     }
+      //     name={community && (community.name || "")}
+      //     desc={community && (community.about_community || "")}
+      //     community={community}
+      //   />
 
-        <AppBar position="static" className={classes.profileTab}>
-          <Hidden mdUp>
-            <Tabs
-              value={value}
-              onChange={this.handleChange}
-              variant="fullWidth"
-              indicatorColor="primary"
-              textColor="primary"
-              centered
-            >
-              <Tab icon={<AccountCircle />} />
-              <Tab icon={<PhotoLibrary />} />
-            </Tabs>
-          </Hidden>
-          <Hidden smDown>
-            <Tabs
-              value={value}
-              onChange={this.handleChange}
-              variant="fullWidth"
-              indicatorColor="primary"
-              textColor="primary"
-              centered
-            >
-              <Tab icon={<AccountCircle />} label="ABOUT" />
-              <Tab icon={<InsertChart />} label="Pages" />
-            </Tabs>
-          </Hidden>
-        </AppBar>
-        {value === 0 && (
-          <TabContainer>
-            <About data={dataProps} community={community} />
-          </TabContainer>
-        )}
-        {value === 1 && (
-          <TabContainer>
-            <Pages community={community} />
-          </TabContainer>
-        )}
-      </div>
+      //   <AppBar position="static" className={classes.profileTab}>
+      //     <Hidden mdUp>
+      //       <Tabs
+      //         value={value}
+      //         onChange={this.handleChange}
+      //         variant="fullWidth"
+      //         indicatorColor="primary"
+      //         textColor="primary"
+      //         centered
+      //       >
+      //         <Tab icon={<AccountCircle />} />
+      //         <Tab icon={<PhotoLibrary />} />
+      //       </Tabs>
+      //     </Hidden>
+      //     <Hidden smDown>
+      //       <Tabs
+      //         value={value}
+      //         onChange={this.handleChange}
+      //         variant="fullWidth"
+      //         indicatorColor="primary"
+      //         textColor="primary"
+      //         centered
+      //       >
+      //         <Tab icon={<AccountCircle />} label="ABOUT" />
+      //         <Tab icon={<InsertChart />} label="Pages" />
+      //       </Tabs>
+      //     </Hidden>
+      //   </AppBar>
+      //   {value === 0 && (
+      //     <TabContainer>
+      //       <About data={dataProps} community={community} />
+      //     </TabContainer>
+      //   )}
+      //   {value === 1 && (
+      //     <TabContainer>
+      //       <Pages community={community} />
+      //     </TabContainer>
+      //   )}
+      // </div>
     );
   }
 }

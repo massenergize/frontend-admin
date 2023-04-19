@@ -7,6 +7,7 @@ function MEPaperBlock({
   title,
   subtitle,
   containerStyle,
+  titleStyle
 }) {
   return (
     <div>
@@ -32,6 +33,7 @@ function MEPaperBlock({
                   color: "#8E24AA",
                   marginBottom: 8,
                   fontWeight: "bold",
+                  ...(titleStyle ||{})
                 }}
               >
                 {title}
