@@ -1,7 +1,10 @@
-// var autoprefixer = require('autoprefixer'); // eslint-disable-line
+var autoprefixer = require('autoprefixer'); // eslint-disable-line
 
-// module.exports = {
-//   plugins: [
-//     autoprefixer({ browsers: 'last 2 versions' })
-//   ]
-// };
+module.exports = {
+  plugins: [
+    autoprefixer({
+      overrideBrowserslist: ["last 2 versions", "> 1%"],
+    }),
+  ],
+};
+
