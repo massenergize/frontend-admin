@@ -1003,7 +1003,13 @@ class MassEnergizeForm extends Component {
                   ],
                   toolbar:
                     "undo redo | formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent |  fontselect | fontsizeselect",
-                }}
+                    // next 4 lines test to eliminate tiny cloud errors
+                    selector: 'textarea',
+                    init_instance_callback : function(editor) {
+                        var freeTiny = document.querySelector('.tox .tox-notification--in');
+                       freeTiny.style.display = 'none';
+                      },
+                  }}
                 apiKey={TINY_MCE_API_KEY}
               />
             </Grid>
