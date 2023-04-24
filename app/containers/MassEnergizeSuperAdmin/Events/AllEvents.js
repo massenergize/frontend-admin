@@ -49,6 +49,7 @@ import CallMadeIcon from "@mui/icons-material/CallMade";
 import { FROM } from "../../../utils/constants";
 import Loader from "../../../utils/components/Loader";
 import HomeIcon from "@mui/icons-material/Home";
+import StarsIcon from "@mui/icons-material/Stars";
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
@@ -176,9 +177,9 @@ class AllEvents extends React.Component {
                     closeAfterConfirmation: true,
                   })
                 }
-                label={d.isLive ? "Yes" : "No"}
+                label={d?.isLive ? "Yes" : "No"}
                 className={`${
-                  d.isLive ? classes.yesLabel : classes.noLabel
+                  d?.isLive ? classes.yesLabel : classes.noLabel
                 } touchable-opacity`}
               />
             );
@@ -238,7 +239,8 @@ class AllEvents extends React.Component {
               )}
               <Tooltip
                 title={`${is_on_home_page ? "Remove" : "Add"} event ${
-                  is_on_home_page ? "from" : "to" } community's homepage`}
+                  is_on_home_page ? "from" : "to"
+                } community's homepage`}
               >
                 <Link
                   onClick={() => {
@@ -252,7 +254,7 @@ class AllEvents extends React.Component {
                   }}
                 >
                   {is_on_home_page ? (
-                    <HomeIcon
+                    <StarsIcon
                       size="small"
                       variant="outlined"
                       sx={{
@@ -260,10 +262,13 @@ class AllEvents extends React.Component {
                       }}
                     />
                   ) : (
-                    <HomeIcon
+                    <StarsIcon
                       size="small"
                       variant="outlined"
-                      color={"secondary"}
+                      // color={"secondary"}
+                      sx={{
+                        color: "#bcbcbc",
+                      }}
                     />
                   )}
                 </Link>

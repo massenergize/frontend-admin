@@ -23,6 +23,7 @@ function METable(props) {
   const filterObject = useRef({});
   const pageTableProperties = useRef({});
   const [tableColumns, setTableColumns] = useState([]);
+  const [sortOrder, setSortOrder] = useState();
 
   const {
     classes,
@@ -65,32 +66,33 @@ function METable(props) {
     return columns;
   };
 
-  const retrieveSortOptionsAndSort = (columns) => {
+  const retrieveSortOptionsAndSort = (obj=null) => {
+    let { columns } = tableProps || {};
     const properties = getProperties();
-    if (!properties.sortDirections) return columns;
-    const [columnIndex, sortDirection] = Object.entries(
-      properties.sortDirections
-    )[0];
-    let columnThatNeedsToBeSorted = columns.splice(columnIndex, 1)[0];
+    if (!properties.sortOrder) return ;
+    if (obj) {
+       setSortOrder(obj);
+       return
+    }
+    const [columnIndex, sortDirection] = Object.entries( properties.sortOrder)[0];
+    let columnThatNeedsToBeSorted = columns[columnIndex];
     if (!columnThatNeedsToBeSorted) return columns;
-
-    const theOptionsOnThatColumn = columnThatNeedsToBeSorted.options || {};
-    // update the target column with the retrieved colum sort direction
-    columnThatNeedsToBeSorted = {
-      ...columnThatNeedsToBeSorted,
-      options: { ...theOptionsOnThatColumn, ...sortDirection },
-    };
-    columns.splice(columnIndex, 0, columnThatNeedsToBeSorted); // put the column back in the list,and in the same position
-    return columns;
+    let order = {name:columnThatNeedsToBeSorted?.name,direction:sortDirection?.sortOrder}
+    setSortOrder(order);
   };
+
+
+  useEffect(()=>{
+    retrieveSortOptionsAndSort();
+  }, [])
 
   useEffect(() => {
     let { columns } = tableProps || {};
     var modified;
     const properties = getProperties();
     pageTableProperties.current = properties;
-    columns = retrieveSortOptionsAndSort(columns);
     modified = retrieveFiltersFromLastVisit(columns);
+    retrieveSortOptionsAndSort();
     setTableColumns(modified);
   }, [filtersFromRedux]);
 
@@ -201,18 +203,23 @@ function METable(props) {
 
   const whenAdminSortsAColumn = (columnName, direction) => {
     const columnIndex = tableColumns.findIndex((c) => c.name === columnName); // get the index of the column thats been sorted
-    const obj = pageTableProperties.current.sortDirections || {}; // look for an existing list of already sorted colums
+    const obj = pageTableProperties.current.sortOrder || {}; // look for an existing list of already sorted colums
     if (columnIndex === -1) return;
+    retrieveSortOptionsAndSort({
+      name: columnName,
+      direction
+    });
     const newObj = {
-      [columnIndex]: { sortDirection: DIRECTIONS[direction] }, // make new sorting object (cos the table can only be sorted one column at a time)
+      [columnIndex]: { sortOrder: direction}, // make new sorting object (cos the table can only be sorted one column at a time)
     };
-    pageTableProperties.current.sortDirections = newObj; // update the page properties object with the new set of sortDirections
+    pageTableProperties.current.sortOrder = newObj; // update the page properties object with the new set of sortDirections
     savePageProperties(pageTableProperties.current); // then save these new changes to localStorage
   };
 
   var { search, rowsPerPage } = getProperties();
   const options = {
     onFilterChange,
+    sortOrder,
     ...(tableProps.options || {}),
     onSearchChange,
     searchText: search || "",
