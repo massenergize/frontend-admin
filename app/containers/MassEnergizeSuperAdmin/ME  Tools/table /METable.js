@@ -83,7 +83,17 @@ function METable(props) {
 
 
   useEffect(()=>{
+    let { columns } = tableProps || {};
     retrieveSortOptionsAndSort();
+
+    // reset sort on third click
+    columns = columns?.map(column=>{
+      column.options.sortThirdClickReset = true
+      return column
+    })
+
+    setTableColumns(columns)
+
   }, [])
 
   useEffect(() => {
