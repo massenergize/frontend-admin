@@ -160,10 +160,8 @@ class AllUsers extends React.Component {
   nowDelete({ idsToDelete, data }) {
     const { allUsers, putUsersInRedux } = this.props;
     const itemsInRedux = allUsers || [];
-    const ids = [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][6];
-      ids.push(found);
       apiCall("/users.delete", { id: found }).then((response) => {
         if (response.success) {
           this.props.toggleToast({
@@ -171,6 +169,8 @@ class AllUsers extends React.Component {
             message: "User(s) successfully deleted",
             variant: "success",
           });
+          const rem = (itemsInRedux || []).filter((com) => com?.id !== found);
+          putUsersInRedux(rem);
         } else {
           this.props.toggleToast({
             open: true,
@@ -180,8 +180,6 @@ class AllUsers extends React.Component {
         }
       });
     });
-    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putUsersInRedux(rem);
   }
 
   makeDeleteUI({ idsToDelete }) {
