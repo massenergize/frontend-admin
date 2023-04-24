@@ -174,7 +174,8 @@ class AllUsers extends React.Component {
         } else {
           this.props.toggleToast({
             open: true,
-            message: "An error occurred while deleting the user(s)",
+            message:
+              "Unable to delete users who are admins or members of multiple communities",
             variant: "error",
           });
         }
