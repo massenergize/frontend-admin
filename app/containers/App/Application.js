@@ -115,13 +115,12 @@ const checkIfUserNeedsMOUAttention = (auth, history) => {
 
   //Iterate through all the allowed routes listed.
   allowedRoutes.forEach((route) => {
-    if (currentUrl.includes(route)) 
-      routeIsAllowed = true;
+    if (currentUrl.includes(route)) routeIsAllowed = true;
   });
 
   // Set the MOU URL
   const MOU_URL = "/admin/view/policy/mou?ct=true"; // this will need to change if we ever change the "key" from "mou" when sadmin is creating the MOU policy. Same for PP and TOS routes.
-  
+
   // If the user still needs to accept the MOU agreement and is accessing a route that is currently not allowed, redirect them to the MOU route with ct=true in the query string.
   if (auth?.needs_to_accept_mou && !routeIsAllowed)
     return history.push(MOU_URL);
@@ -129,6 +128,17 @@ const checkIfUserNeedsMOUAttention = (auth, history) => {
 
 class Application extends React.Component {
   componentDidMount() {
+    // let url = "ws://localhost:8000/ws/me-client/connect/";
+    // const chatSocket = new WebSocket(url);
+    // chatSocket.onmessage = function(e) {
+    //   let data = JSON.parse(e.data);
+    //   console.log("RESPONSE FROM SOCKET", data);
+    // };
+
+    // chatSocket.onerror = function(e) {
+    //   console.log("There was an error", e);
+    // };
+
     this.props.reduxCallCommunities();
     this.props.checkFirebaseAuthentication();
     this.props.fetchInitialContent(this.props.auth);

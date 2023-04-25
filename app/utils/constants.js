@@ -7,7 +7,7 @@ export const LOADING = "LOADING";
 export const TWENTY_FOUR_HOURS = 1000 * 60 * 60 * 24;
 export const TIME_UNTIL_EXPIRATION = "TIME_UNTIL_EXPIRATION";
 export const THREE_MINUTES = 1000 * 60 * 3;
-
+export const CONNECTION_ESTABLISHED = "CONNECTION_ESTABLISHED"
 export const FROM = {
   MAIN_EVENTS: "main",
   OTHER_EVENTS: "others",

@@ -49,10 +49,12 @@ import {
   LOAD_ALL_META_DATA,
   ACTION_ENGAGMENTS,
   LOAD_TABLE_FILTERS,
+  SOCKET_CONNECTED,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
-import { LOADING } from "../../utils/constants";
+import { CONNECTION_ESTABLISHED, LOADING } from "../../utils/constants";
+import { API_HOST } from "../../config/constants";
 import {
   getLimit,
   prepareFilterAndSearchParamsFromLocal,
@@ -62,6 +64,39 @@ import { PAGE_PROPERTIES } from "../../containers/MassEnergizeSuperAdmin/ME  Too
 // TODO: REOMVE THIS FUNCTiON
 export const testRedux = (value) => {
   return { type: TEST_REDUX, payload: value };
+};
+
+export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
+  const [_, hostname] = API_HOST.split("//");
+  const url = `ws://${hostname}/ws/me-client/connect/`;
+  const TAG = "USER_SESSION_UPDATES: ";
+  // console.log(TAG, url, API_HOST);
+  const socket = new WebSocket(url);
+
+  socket.onopen = function(e) {
+    console.log(TAG, "B.E connection successfull...!");
+    dispatch({ type: SOCKET_CONNECTED, payload: socket });
+  };
+  socket.onmessage = (e) => {
+    let data = JSON.parse(e.data || "{}");
+    if (data?.type === CONNECTION_ESTABLISHED) {
+      socket.send(JSON.stringify({ token: document.cookie }));
+    }
+    console.log(TAG, data,[]);
+  };
+  socket.onclose = () => {
+    console.log(TAG, "Disconnected from B.E...!");
+    const message = `Hey ${auth?.preferred_name ||
+      "admin"}, are you still there meerhn?`;
+    alert(message);
+  };
+  socket.onerror = (e) => {
+    console.log(
+      TAG,
+      "Sorry, something happened. B.E connection could not proceed...!",
+      e
+    );
+  };
 };
 
 export const reduxLoadTableFilters = (data) => {
@@ -148,6 +183,8 @@ export const reduxLoadAdmins = (data = LOADING) => {
 export const reduxFetchInitialContent = (auth) => (dispatch) => {
   if (!auth) return;
   const isSuperAdmin = auth && auth.is_super_admin;
+  dispatch(setupSocketConnectionWithBackend(auth));
+
   Promise.all([
     apiCall("/policies.listForCommunityAdmin"),
     apiCall(
