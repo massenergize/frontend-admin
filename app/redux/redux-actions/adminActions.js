@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import firebase from "firebase/app";
+import React from "react";
 import "firebase/auth";
 import {
   LOAD_ALL_COMMUNITIES,
@@ -49,17 +50,22 @@ import {
   LOAD_ALL_META_DATA,
   ACTION_ENGAGMENTS,
   LOAD_TABLE_FILTERS,
-  SOCKET_CONNECTED,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
-import { CONNECTION_ESTABLISHED, LOADING } from "../../utils/constants";
+import {
+  CONNECTION_ESTABLISHED,
+  LOADING,
+  TIME_UNTIL_EXPIRATION,
+  USER_SESSION_EXPIRED,
+} from "../../utils/constants";
 import { API_HOST } from "../../config/constants";
 import {
   getLimit,
   prepareFilterAndSearchParamsFromLocal,
 } from "../../utils/helpers";
 import { PAGE_PROPERTIES } from "../../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
+import SocketNotificationModal from "../../containers/MassEnergizeSuperAdmin/Misc/SocketNotificationModal";
 
 // TODO: REOMVE THIS FUNCTiON
 export const testRedux = (value) => {
@@ -69,33 +75,52 @@ export const testRedux = (value) => {
 export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
   const [_, hostname] = API_HOST.split("//");
   const url = `ws://${hostname}/ws/me-client/connect/`;
-  const TAG = "USER_SESSION_UPDATES: ";
-  // console.log(TAG, url, API_HOST);
+  const TAG = "[SOCK]: ";
   const socket = new WebSocket(url);
 
-  socket.onopen = function(e) {
-    console.log(TAG, "B.E connection successfull...!");
-    dispatch({ type: SOCKET_CONNECTED, payload: socket });
-  };
+  socket.onopen = () => console.log(TAG, "connected");
+
   socket.onmessage = (e) => {
     let data = JSON.parse(e.data || "{}");
-    if (data?.type === CONNECTION_ESTABLISHED) {
-      socket.send(JSON.stringify({ token: document.cookie }));
+    const type = data?.type;
+    if (type === USER_SESSION_EXPIRED) {
+      const message = `Hi ${auth?.preferred_name ||
+        "admin"}, your session has expired. Please sign in again.`;
+      dispatch(
+        reduxToggleUniversalModal({
+          noTitle: true,
+          show: true,
+          noCancel: true,
+          okText: "Okay, Take Me There",
+          onConfirm: () => {
+            window.location.href = "/login";
+          },
+          component: <SocketNotificationModal message={message} />,
+        })
+      );
     }
-    console.log(TAG, data,[]);
   };
   socket.onclose = () => {
-    console.log(TAG, "Disconnected from B.E...!");
+    console.log(TAG, "disconnected :(");
     const message = `Hey ${auth?.preferred_name ||
-      "admin"}, are you still there meerhn?`;
-    alert(message);
+      "admin"}, are you still there?`;
+    dispatch(
+      reduxToggleUniversalModal({
+        noTitle: true,
+        show: true,
+        noCancel: true,
+        okText: "Yes, I'm Here",
+        onConfirm: () => {
+          console.log(TAG, "Reconnecting...");
+          dispatch(setupSocketConnectionWithBackend(auth));
+          dispatch(reduxToggleUniversalModal({ show: false, component: null }));
+        },
+        component: <SocketNotificationModal message={message} />,
+      })
+    );
   };
   socket.onerror = (e) => {
-    console.log(
-      TAG,
-      "Sorry, something happened. B.E connection could not proceed...!",
-      e
-    );
+    console.log(TAG, "Oops - ", e);
   };
 };
 

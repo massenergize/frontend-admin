@@ -77,14 +77,7 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
-export const reducerForKeepingSocketInstance = (state = null, action = {}) => {
-  switch (action.type) {
-    case SOCKET_CONNECTED:
-      return action.payload;
-    default:
-      return state;
-  }
-};
+
 export const reducerForTableFilters = (state = {}, action = {}) => {
   switch (action.type) {
     case LOAD_TABLE_FILTERS:

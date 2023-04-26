@@ -59,7 +59,6 @@ import app, {
   allMetaDataReducer,
   reducerForActionEngagements,
   reducerForTableFilters,
-  reducerForKeepingSocketInstance,
 } from "./modules/appReducer";
 
 /**
@@ -67,7 +66,6 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
-    sessionSocketInstance: reducerForKeepingSocketInstance,
     tableFilters: reducerForTableFilters,
     tempForm: reducerForKeepingFormContent,
     actionEngagements: reducerForActionEngagements,

@@ -19,6 +19,7 @@ function ThemeModal({
   noOk,
   fullControl = false,
   contentStyle = {},
+  noTitle, title
 }) {
   const fullControlStyles = { padding: 0 };
   return (
@@ -29,9 +30,9 @@ function ThemeModal({
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        {!fullControl && (
+        {!fullControl && !noTitle && (
           <DialogTitle id="alert-dialog-title">
-            {"Confirmation Dialog"}
+            {title || "Confirmation Dialog"}
           </DialogTitle>
         )}
         <DialogContent
