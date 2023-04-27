@@ -25,8 +25,8 @@ function MetricsPrefs({
 
   const ifApiIsSuccessful = (yes) => {
     if (!yes) return;
-
-    setTimeout(handleClose(), 7000)
+    const response = "response"
+    setTimeout(handleClose(response), 7000)
   };
 
   const formJson = createFormJson({

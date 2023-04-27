@@ -94,9 +94,11 @@ class SummaryDashboard extends PureComponent {
     this.setState({ openModal: true });
   };
 
-  handleCloseModal = () => {
+  handleCloseModal = (apiCall) => {
+    if (apiCall == "response"){
+      this.setState({ success: true });
+    }
     this.setState({ openModal: false });
-    this.setState({ success: true });
   };
 
   render() {

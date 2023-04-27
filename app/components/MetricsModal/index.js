@@ -14,9 +14,8 @@ function Transition(props) {
 }
 
 class MetricsModal extends React.Component {
-  handleClose = () => {
-    const { closeModal } = this.props;
-    closeModal();
+  handleClose = (response) => {
+    this.props.closeModal(response);
   }
 
   render() {
