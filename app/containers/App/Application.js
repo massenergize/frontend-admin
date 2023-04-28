@@ -128,29 +128,10 @@ const checkIfUserNeedsMOUAttention = (auth, history) => {
 
 class Application extends React.Component {
   componentDidMount() {
-    // let url = "ws://localhost:8000/ws/me-client/connect/";
-    // const chatSocket = new WebSocket(url);
-    // chatSocket.onmessage = function(e) {
-    //   let data = JSON.parse(e.data);
-    //   console.log("RESPONSE FROM SOCKET", data);
-    // };
-
-    // chatSocket.onerror = function(e) {
-    //   console.log("There was an error", e);
-    // };
-
     this.props.reduxCallCommunities();
     this.props.checkFirebaseAuthentication();
     this.props.fetchInitialContent(this.props.auth);
-    setInterval(() => {
-      const expirationTime = Number(
-        localStorage.getItem(TIME_UNTIL_EXPIRATION) || 0
-      );
-      const currentDateTime = Date.now();
-      const itsPassedADaySinceLogin = currentDateTime > expirationTime;
-      if (itsPassedADaySinceLogin) runAdminStatusCheck();
-    }, THREE_MINUTES);
-
+   
     // ---- UNCOMMENT THIS WHEN WE WANT TO CONTINUE WITH PERSISTING FORM PROGRESS TO LOCAL STORAGE
     // Collect form progress from local storage after page refresh
     // var progress = localStorage.getItem(ME_FORM_PROGRESS) || "{}";

@@ -136,25 +136,13 @@ export const loadUserEngagements = (data) => {
 export const setEngagementOptions = (data) => {
   return { type: SET_ENGAGMENT_OPTIONS, payload: data };
 };
-export const runAdminStatusCheck = async () => {
-  try {
-    const response = await apiCall("/auth.whoami");
-    if (response.success) return;
 
-    if (response.error === PERMISSION_DENIED)
-      return (window.location = "/login");
-  } catch (e) {
-    console.log("ADMIN_SESSION_STATUS_ERROR:", e.toString());
-    return (window.location = "/login");
-  }
-};
 
 export const fetchLatestNextSteps = (cb) => (dispatch) => {
   apiCall("/summary.next.steps.forAdmins").then((response) => {
     cb && cb(response); // Just in case a scenario needs to know when the request is done....
     if (!response.success)
       return console.log("Could not load in next steps", response);
-    console.log("I have just loaded in more next steps innit", response);
     dispatch(reduxLoadNextStepsSummary(response.data));
   });
 };
@@ -163,7 +151,7 @@ export const checkFirebaseAuthentication = () => {
   return () =>
     firebase.auth().onAuthStateChanged((user) => {
       if (!user) return (window.location = "/login");
-      runAdminStatusCheck();
+      // runAdminStatusCheck();
     });
 };
 export const loadSettings = (data = {}) => {
