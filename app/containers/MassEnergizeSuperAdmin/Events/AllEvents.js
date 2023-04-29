@@ -49,6 +49,7 @@ import CallMadeIcon from "@mui/icons-material/CallMade";
 import { FROM } from "../../../utils/constants";
 import Loader from "../../../utils/components/Loader";
 import HomeIcon from "@mui/icons-material/Home";
+import StarsIcon from "@mui/icons-material/Stars";
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
@@ -176,9 +177,9 @@ class AllEvents extends React.Component {
                     closeAfterConfirmation: true,
                   })
                 }
-                label={d.isLive ? "Yes" : "No"}
+                label={d?.isLive ? "Yes" : "No"}
                 className={`${
-                  d.isLive ? classes.yesLabel : classes.noLabel
+                  d?.isLive ? classes.yesLabel : classes.noLabel
                 } touchable-opacity`}
               />
             );
@@ -238,11 +239,11 @@ class AllEvents extends React.Component {
               )}
               <Tooltip
                 title={`${is_on_home_page ? "Remove" : "Add"} event ${
-                  is_on_home_page ? "from" : "to" } community's homepage`}
+                  is_on_home_page ? "from" : "to"
+                } community's homepage`}
               >
                 <Link
                   onClick={() => {
-                    console.log("clicked");
                     this.props.toggleLive({
                       show: true,
                       component: this.addToHomePageUI({ id }),
@@ -252,7 +253,7 @@ class AllEvents extends React.Component {
                   }}
                 >
                   {is_on_home_page ? (
-                    <HomeIcon
+                    <StarsIcon
                       size="small"
                       variant="outlined"
                       sx={{
@@ -260,10 +261,12 @@ class AllEvents extends React.Component {
                       }}
                     />
                   ) : (
-                    <HomeIcon
+                    <StarsIcon
                       size="small"
                       variant="outlined"
-                      color={"secondary"}
+                      sx={{
+                        color: "#bcbcbc",
+                      }}
                     />
                   )}
                 </Link>
@@ -363,17 +366,18 @@ class AllEvents extends React.Component {
   }
 
   addEventToHomePage = (id) => {
-     const { allEvents, putEventsInRedux } = this.props;
+    const { allEvents, putEventsInRedux } = this.props;
     const data = allEvents || [];
     let event =data?.find((item) => item.id?.toString() === id?.toString()) || {};
     const index = data.findIndex((a) => a.id?.toString() === id);
-
 
     const toSend = {
       event_id: id,
       community_id: event?.community?.id,
     };
-    if (new Date(event?.start_date_and_time) < Date.now()) {
+
+    // BHN - use end_date_and_time so ongoing events/campaigns can show on home page
+    if (new Date(event?.end_date_and_time) < Date.now()) {
       this.props.toggleToast({
         open: true,
         message: "Event is out of date",
@@ -381,6 +385,7 @@ class AllEvents extends React.Component {
       });
       return;
     }
+  
     apiCall("home_page_settings.addEvent", toSend).then((res) => {
       if (res.success) {
         event.is_on_home_page = res?.data?.status
