@@ -151,7 +151,6 @@ export const checkFirebaseAuthentication = () => {
   return () =>
     firebase.auth().onAuthStateChanged((user) => {
       if (!user) return (window.location = "/login");
-      // runAdminStatusCheck();
     });
 };
 export const loadSettings = (data = {}) => {
