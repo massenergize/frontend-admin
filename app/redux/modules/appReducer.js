@@ -49,6 +49,7 @@ import {
   LOAD_ALL_META_DATA,
   ACTION_ENGAGMENTS,
   LOAD_TABLE_FILTERS,
+  SOCKET_CONNECTED,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -76,6 +77,7 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+
 export const reducerForTableFilters = (state = {}, action = {}) => {
   switch (action.type) {
     case LOAD_TABLE_FILTERS:

@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import firebase from "firebase/app";
+import React from "react";
 import "firebase/auth";
 import {
   LOAD_ALL_COMMUNITIES,
@@ -52,16 +53,75 @@ import {
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
-import { LOADING } from "../../utils/constants";
+import {
+  CONNECTION_ESTABLISHED,
+  LOADING,
+  TIME_UNTIL_EXPIRATION,
+  USER_SESSION_EXPIRED,
+} from "../../utils/constants";
+import { API_HOST } from "../../config/constants";
 import {
   getLimit,
   prepareFilterAndSearchParamsFromLocal,
 } from "../../utils/helpers";
 import { PAGE_PROPERTIES } from "../../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
+import SocketNotificationModal from "../../containers/MassEnergizeSuperAdmin/Misc/SocketNotificationModal";
 
 // TODO: REOMVE THIS FUNCTiON
 export const testRedux = (value) => {
   return { type: TEST_REDUX, payload: value };
+};
+
+export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
+  const [_, hostname] = API_HOST.split("//");
+  const url = `ws://${hostname}/ws/me-client/connect/`;
+  const TAG = "[SOCK]: ";
+  const socket = new WebSocket(url);
+
+  socket.onopen = () => console.log(TAG, "connected");
+
+  socket.onmessage = (e) => {
+    let data = JSON.parse(e.data || "{}");
+    const type = data?.type;
+    if (type === USER_SESSION_EXPIRED) {
+      const message = `Hi ${auth?.preferred_name ||
+        "admin"}, your session has expired. Please sign in again.`;
+      dispatch(
+        reduxToggleUniversalModal({
+          noTitle: true,
+          show: true,
+          noCancel: true,
+          okText: "Okay, Take Me There",
+          onConfirm: () => {
+            window.location.href = "/login";
+          },
+          component: <SocketNotificationModal message={message} />,
+        })
+      );
+    }
+  };
+  socket.onclose = () => {
+    console.log(TAG, "disconnected :(");
+    const message = `Hey ${auth?.preferred_name ||
+      "admin"}, are you still there?`;
+    dispatch(
+      reduxToggleUniversalModal({
+        noTitle: true,
+        show: true,
+        noCancel: true,
+        okText: "Yes, I'm Here",
+        onConfirm: () => {
+          console.log(TAG, "Reconnecting...");
+          dispatch(setupSocketConnectionWithBackend(auth));
+          dispatch(reduxToggleUniversalModal({ show: false, component: null }));
+        },
+        component: <SocketNotificationModal message={message} />,
+      })
+    );
+  };
+  socket.onerror = (e) => {
+    console.log(TAG, "Oops - ", e);
+  };
 };
 
 export const reduxLoadTableFilters = (data) => {
@@ -76,25 +136,13 @@ export const loadUserEngagements = (data) => {
 export const setEngagementOptions = (data) => {
   return { type: SET_ENGAGMENT_OPTIONS, payload: data };
 };
-export const runAdminStatusCheck = async () => {
-  try {
-    const response = await apiCall("/auth.whoami");
-    if (response.success) return;
 
-    if (response.error === PERMISSION_DENIED)
-      return (window.location = "/login");
-  } catch (e) {
-    console.log("ADMIN_SESSION_STATUS_ERROR:", e.toString());
-    return (window.location = "/login");
-  }
-};
 
 export const fetchLatestNextSteps = (cb) => (dispatch) => {
   apiCall("/summary.next.steps.forAdmins").then((response) => {
     cb && cb(response); // Just in case a scenario needs to know when the request is done....
     if (!response.success)
       return console.log("Could not load in next steps", response);
-    console.log("I have just loaded in more next steps innit", response);
     dispatch(reduxLoadNextStepsSummary(response.data));
   });
 };
@@ -103,7 +151,6 @@ export const checkFirebaseAuthentication = () => {
   return () =>
     firebase.auth().onAuthStateChanged((user) => {
       if (!user) return (window.location = "/login");
-      runAdminStatusCheck();
     });
 };
 export const loadSettings = (data = {}) => {
@@ -148,6 +195,8 @@ export const reduxLoadAdmins = (data = LOADING) => {
 export const reduxFetchInitialContent = (auth) => (dispatch) => {
   if (!auth) return;
   const isSuperAdmin = auth && auth.is_super_admin;
+  dispatch(setupSocketConnectionWithBackend(auth));
+
   Promise.all([
     apiCall("/policies.listForCommunityAdmin"),
     apiCall(

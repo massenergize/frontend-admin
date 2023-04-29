@@ -13,7 +13,6 @@ import {
   reduxToggleUniversalModal,
   restoreFormProgress,
   reduxToggleUniversalToast,
-  runAdminStatusCheck,
   reduxLoadTableFilters,
 } from "../../redux/redux-actions/adminActions";
 import {
@@ -115,13 +114,12 @@ const checkIfUserNeedsMOUAttention = (auth, history) => {
 
   //Iterate through all the allowed routes listed.
   allowedRoutes.forEach((route) => {
-    if (currentUrl.includes(route)) 
-      routeIsAllowed = true;
+    if (currentUrl.includes(route)) routeIsAllowed = true;
   });
 
   // Set the MOU URL
   const MOU_URL = "/admin/view/policy/mou?ct=true"; // this will need to change if we ever change the "key" from "mou" when sadmin is creating the MOU policy. Same for PP and TOS routes.
-  
+
   // If the user still needs to accept the MOU agreement and is accessing a route that is currently not allowed, redirect them to the MOU route with ct=true in the query string.
   if (auth?.needs_to_accept_mou && !routeIsAllowed)
     return history.push(MOU_URL);
@@ -132,15 +130,7 @@ class Application extends React.Component {
     this.props.reduxCallCommunities();
     this.props.checkFirebaseAuthentication();
     this.props.fetchInitialContent(this.props.auth);
-    setInterval(() => {
-      const expirationTime = Number(
-        localStorage.getItem(TIME_UNTIL_EXPIRATION) || 0
-      );
-      const currentDateTime = Date.now();
-      const itsPassedADaySinceLogin = currentDateTime > expirationTime;
-      if (itsPassedADaySinceLogin) runAdminStatusCheck();
-    }, THREE_MINUTES);
-
+   
     // ---- UNCOMMENT THIS WHEN WE WANT TO CONTINUE WITH PERSISTING FORM PROGRESS TO LOCAL STORAGE
     // Collect form progress from local storage after page refresh
     // var progress = localStorage.getItem(ME_FORM_PROGRESS) || "{}";
