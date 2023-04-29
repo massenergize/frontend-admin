@@ -244,7 +244,6 @@ class AllEvents extends React.Component {
               >
                 <Link
                   onClick={() => {
-                    console.log("clicked");
                     this.props.toggleLive({
                       show: true,
                       component: this.addToHomePageUI({ id }),
@@ -265,7 +264,6 @@ class AllEvents extends React.Component {
                     <StarsIcon
                       size="small"
                       variant="outlined"
-                      // color={"secondary"}
                       sx={{
                         color: "#bcbcbc",
                       }}
@@ -368,17 +366,18 @@ class AllEvents extends React.Component {
   }
 
   addEventToHomePage = (id) => {
-     const { allEvents, putEventsInRedux } = this.props;
+    const { allEvents, putEventsInRedux } = this.props;
     const data = allEvents || [];
     let event =data?.find((item) => item.id?.toString() === id?.toString()) || {};
     const index = data.findIndex((a) => a.id?.toString() === id);
-
 
     const toSend = {
       event_id: id,
       community_id: event?.community?.id,
     };
-    if (new Date(event?.start_date_and_time) < Date.now()) {
+
+    // BHN - use end_date_and_time so ongoing events/campaigns can show on home page
+    if (new Date(event?.end_date_and_time) < Date.now()) {
       this.props.toggleToast({
         open: true,
         message: "Event is out of date",
@@ -386,6 +385,7 @@ class AllEvents extends React.Component {
       });
       return;
     }
+  
     apiCall("home_page_settings.addEvent", toSend).then((res) => {
       if (res.success) {
         event.is_on_home_page = res?.data?.status
