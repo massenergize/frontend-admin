@@ -17,7 +17,6 @@ import { bindActionCreators } from "redux";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import {
-  reduxGetAllActions,
   reduxGetAllCommunityActions,
   loadAllActions,
   reduxToggleUniversalModal,
@@ -32,13 +31,11 @@ import {
   getTimeStamp,
   isEmpty,
   isNotEmpty,
-  makeDeleteUI,
   ourCustomSort,
-  pop,
   reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
-import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
+import { Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable, { FILTERS } from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -368,6 +365,19 @@ class AllActions extends React.Component {
     });
   }
 
+  makeDeleteUI({ idsToDelete, templates }) {
+  const len = (idsToDelete && idsToDelete.length) || 0;
+  var text = `Are you sure you want to delete (
+    ${(idsToDelete && idsToDelete.length) || ""})
+    ${len === 1 ? " action? " : " actions? "}`;
+
+  if (templates && templates.length)
+    text = `Sorry, (${templates.length}) template${
+      templates.length === 1 ? "" : "s"
+    } selected. You can't delete templates. `;
+  return <Typography>{text}</Typography>;
+  }
+
   makeLiveUI({ data }) {
     const name = data && data.title;
     const isON = data.is_published;
@@ -533,7 +543,7 @@ class AllActions extends React.Component {
         const noTemplatesSelectedGoAhead = !found || !found.length;
         this.props.toggleDeleteConfirmation({
           show: true,
-          component: makeDeleteUI({
+          component: this.makeDeleteUI({
             idsToDelete,
             templates: found,
             noTemplates: noTemplatesSelectedGoAhead,
