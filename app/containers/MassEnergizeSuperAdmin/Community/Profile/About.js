@@ -577,7 +577,7 @@ class About extends React.Component {
                 style={{ fontWeight: "600", fontSize: "1rem" }}
                 component="h3"
               >
-                Request All Actions CSV{" "}
+                Request Community Actions CSV{" "}
                 <Icon style={{ paddingTop: 3, color: "green" }}>
                   arrow_downward
                 </Icon>
