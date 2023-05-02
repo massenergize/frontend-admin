@@ -59,7 +59,7 @@ import {
   TIME_UNTIL_EXPIRATION,
   USER_SESSION_EXPIRED,
 } from "../../utils/constants";
-import { API_HOST } from "../../config/constants";
+import { API_HOST, IS_LOCAL } from "../../config/constants";
 import {
   getLimit,
   prepareFilterAndSearchParamsFromLocal,
@@ -74,7 +74,7 @@ export const testRedux = (value) => {
 
 export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
   const [_, hostname] = API_HOST.split("//");
-  const url = `ws://${hostname}/ws/me-client/connect/`;
+  const url = IS_LOCAL ? `ws://${hostname}/ws/me-client/connect/` : `wss://${hostname}/ws/me-client/connect/`;
   const TAG = "[SOCK]: ";
   const socket = new WebSocket(url);
 
