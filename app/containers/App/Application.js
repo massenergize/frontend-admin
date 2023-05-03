@@ -222,6 +222,7 @@ class Application extends React.Component {
         )}
       />,
     ];
+
     if (!IS_LOCAL) checkIfUserNeedsMOUAttention(auth, history); // This check will not run in local mode
     const {
       component,
@@ -234,7 +235,7 @@ class Application extends React.Component {
       <Dashboard
         history={history}
         changeMode={changeMode}
-        lock={auth?.needs_to_accept_mou}
+        lock={ !IS_LOCAL && auth?.needs_to_accept_mou}
       >
         <ThemeModal
           {...modalOptions || {}}
