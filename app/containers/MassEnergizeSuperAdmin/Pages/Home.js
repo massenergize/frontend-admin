@@ -96,7 +96,7 @@ class HomePageEditForm extends Component {
   }
   createFormJson = async () => {
     const { homePageData, events } = this.state;
-    const { community, featured_events } = homePageData;
+    const { community } = homePageData;
 
     let { images, featured_links } = homePageData;
 
