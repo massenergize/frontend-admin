@@ -99,6 +99,7 @@ import ThemeToast from "../../components/Widget/ThemeToast";
 import { ME_FORM_PROGRESS } from "../MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 import { FILTER_OBJ_KEY } from "../MassEnergizeSuperAdmin/ME  Tools/table /METable";
 import { includes } from "lodash";
+import { IS_LOCAL } from "../../config/constants";
 
 //This function checks whether a user needs to sign an MOU and redirects them to the MOU page if necessary
 const checkIfUserNeedsMOUAttention = (auth, history) => {
@@ -130,7 +131,7 @@ class Application extends React.Component {
     this.props.reduxCallCommunities();
     this.props.checkFirebaseAuthentication();
     this.props.fetchInitialContent(this.props.auth);
-   
+
     // ---- UNCOMMENT THIS WHEN WE WANT TO CONTINUE WITH PERSISTING FORM PROGRESS TO LOCAL STORAGE
     // Collect form progress from local storage after page refresh
     // var progress = localStorage.getItem(ME_FORM_PROGRESS) || "{}";
@@ -221,7 +222,8 @@ class Application extends React.Component {
         )}
       />,
     ];
-    checkIfUserNeedsMOUAttention(auth, history);
+
+    if (!IS_LOCAL) checkIfUserNeedsMOUAttention(auth, history); // This check will not run in local mode
     const {
       component,
       show,
@@ -233,7 +235,7 @@ class Application extends React.Component {
       <Dashboard
         history={history}
         changeMode={changeMode}
-        lock={auth?.needs_to_accept_mou}
+        lock={ !IS_LOCAL && auth?.needs_to_accept_mou}
       >
         <ThemeModal
           {...modalOptions || {}}
