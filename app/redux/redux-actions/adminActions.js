@@ -441,6 +441,19 @@ export const reduxAddToGalleryImages = ({ old, data }) => {
     payload: { ...old, images: [...(data || []), ...(old.images || [])] },
   };
 };
+
+const removeDupes = (images) =>{
+  if(!images ||!images.length) return []
+  const recorded = []
+  const items = [] 
+  images.forEach(image => {
+    if(!recorded.includes(image.id)) {
+      items.push(image) 
+      recorded.push(image.id)
+    }
+  });
+  return items;
+}
 /**
  * When new content is loaded and all the limits need to be recorded, this
  * is the redux function to use
@@ -467,7 +480,7 @@ export const reduxLoadGalleryImages = ({
     lower_limit = Math.min(data.lower_limit || 0, old.lower_limit || 0);
   return {
     type: LOAD_GALLERY_IMAGES,
-    payload: { images, upper_limit, lower_limit },
+    payload: { images: removeDupes(images), upper_limit, lower_limit },
   };
 };
 
