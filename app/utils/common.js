@@ -8,6 +8,12 @@ import React from "react";
 import { ME_FORM_PROGRESS } from "../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 import { apiCall } from "./messenger";
 
+export const  isPastDate = (dateString) =>{
+  const date = new Date(dateString);
+  const now = new Date();
+  return date < now;
+}
+
 export const separate = (ids, dataSet = [], options = {}) => {
   const { valueExtractor } = options || {};
   const found = [];
