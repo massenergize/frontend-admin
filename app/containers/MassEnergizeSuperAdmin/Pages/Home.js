@@ -5,6 +5,7 @@ import MassEnergizeForm from "../_FormGenerator";
 import { apiCall } from "../../../utils/messenger";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { isPastDate } from "../../../utils/common";
+import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 
 const styles = (theme) => ({
   root: {
@@ -42,7 +43,8 @@ class HomePageEditForm extends Component {
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount() { 
+    // TODO: Restructure things on this page to make use of redux, so that it can load faster
     const { id } = this.props.match.params;
 
     const homePageResponse = await apiCall("/home_page_settings.info", {
@@ -55,17 +57,13 @@ class HomePageEditForm extends Component {
       return;
     }
 
-    // var currentdate = new Date().toISOString().split('T')[0];
-    // var currentdate = new Date();
-    // console.log("What is the current data", currentdate);
+  
     const eventsResponse = await apiCall("/events.list", { community_id: id });
     if (eventsResponse && eventsResponse.data) {
-      console.log("Events from the back", eventsResponse);
       const events = eventsResponse.data
         .filter((f) => {
          const hasNotPassed = !isPastDate(f.end_date_and_time) 
          return hasNotPassed
-          // return f.end_date_and_time > currentdate;
         })
         .map((c) => ({
           //
@@ -100,7 +98,6 @@ class HomePageEditForm extends Component {
     const { homePageData, events } = this.state;
     const { community, featured_events } = homePageData;
 
-    console.log("LET FEATURED ", featured_events);
     let { images, featured_links } = homePageData;
 
     if (!images) {
@@ -114,9 +111,7 @@ class HomePageEditForm extends Component {
     const [iconBox1, iconBox2, iconBox3, iconBox4] = featured_links;
 
     const selectedEvents = this.getFeaturedEvents()
-      // homePageData && featured_events
-      //   ? featured_events.map((e) => "" + e.id)
-      //   : [];
+  
     /*
         const archivedEvents = featured_events
       .filter((f) => !f.is_published)
@@ -127,13 +122,11 @@ class HomePageEditForm extends Component {
       }));
       */
 
-    console.log("LEts see selected events", selectedEvents);
 
     const eventsToDisplay = [...events]; //...archivedEvents,
 
     function sort_by_date(events_data) {
       events_data.sort((a, b) => (b.date < a.date ? 1 : -1));
-      console.log("Events data", events_data);
       return events?.map((c) => ({
         ...c,
         displayName: c.name,
@@ -567,7 +560,8 @@ class HomePageEditForm extends Component {
   render() {
     const { classes } = this.props;
     const { formJson, noDataFound } = this.state;
-    if (!formJson) return <div>Hold tight! Retrieving your data ...</div>;
+    
+    if (!formJson) return <LinearBuffer asCard message="Hold tight, we retrieving your data..." />;
     if (noDataFound)
       return (
         <div>Sorry no Home Page data available for this community ...</div>
