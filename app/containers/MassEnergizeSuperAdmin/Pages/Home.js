@@ -4,7 +4,8 @@ import { withStyles } from "@mui/styles";
 import MassEnergizeForm from "../_FormGenerator";
 import { apiCall } from "../../../utils/messenger";
 import fieldTypes from "../_FormGenerator/fieldTypes";
-
+import { isPastDate } from "../../../utils/common";
+import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 
 const styles = (theme) => ({
   root: {
@@ -42,7 +43,8 @@ class HomePageEditForm extends Component {
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount() { 
+    // TODO: Restructure things on this page to make use of redux, so that it can load faster
     const { id } = this.props.match.params;
 
     const homePageResponse = await apiCall("/home_page_settings.info", {
@@ -55,15 +57,21 @@ class HomePageEditForm extends Component {
       return;
     }
 
-    var currentdate = new Date().toISOString().split('T')[0]; 
+  
     const eventsResponse = await apiCall("/events.list", { community_id: id });
     if (eventsResponse && eventsResponse.data) {
-      const events = eventsResponse.data.filter((f) => f.end_date_and_time > currentdate).map((c) => ({  // 
-        ...c,
-        displayName: c.start_date_and_time.split("T", 1) + "  " + c.name ,
-        id: "" + c.id,
-        date: "" + c.start_date_and_time
-      }));
+      const events = eventsResponse.data
+        .filter((f) => {
+         const hasNotPassed = !isPastDate(f.end_date_and_time) 
+         return hasNotPassed
+        })
+        .map((c) => ({
+          //
+          ...c,
+          displayName: c.start_date_and_time.split("T", 1) + "  " + c.name,
+          id: "" + c.id,
+          date: "" + c.start_date_and_time,
+        }));
       await this.setStateAsync({ events });
     } else {
       await this.setStateAsync({ noDataFound: true, formJson: {} });
@@ -80,9 +88,16 @@ class HomePageEditForm extends Component {
     });
   }
 
+  getFeaturedEvents(){
+    const { featured_events } = this.state.homePageData || {} 
+    const stillActiveEvents = featured_events?.filter( ev => !isPastDate(ev.end_date_and_time))
+
+    return stillActiveEvents?.map(e => "" + e.id)
+  }
   createFormJson = async () => {
     const { homePageData, events } = this.state;
-    const { community, featured_events } = homePageData;
+    const { community } = homePageData;
+
     let { images, featured_links } = homePageData;
 
     if (!images) {
@@ -95,10 +110,8 @@ class HomePageEditForm extends Component {
 
     const [iconBox1, iconBox2, iconBox3, iconBox4] = featured_links;
 
-    const selectedEvents =
-      homePageData && featured_events
-        ? featured_events.map((e) => "" + e.id)
-        : [];
+    const selectedEvents = this.getFeaturedEvents()
+  
     /*
         const archivedEvents = featured_events
       .filter((f) => !f.is_published)
@@ -109,10 +122,16 @@ class HomePageEditForm extends Component {
       }));
       */
 
-    const eventsToDisplay = [ ...events]; //...archivedEvents,
+
+    const eventsToDisplay = [...events]; //...archivedEvents,
 
     function sort_by_date(events_data) {
-      return events_data.sort((a, b) => (b.date < a.date ? 1 : -1))
+      events_data.sort((a, b) => (b.date < a.date ? 1 : -1));
+      return events?.map((c) => ({
+        ...c,
+        displayName: c.name,
+        id: "" + c.id,
+      }));
     }
 
     const formJson = {
@@ -187,7 +206,7 @@ class HomePageEditForm extends Component {
               dbName: "images",
               uploadMultiple: true,
               multiple: true,
-              dragToOrder: true,              
+              dragToOrder: true,
               allowCropping: true,
               fileLimit: 3,
               selected: images,
@@ -541,7 +560,8 @@ class HomePageEditForm extends Component {
   render() {
     const { classes } = this.props;
     const { formJson, noDataFound } = this.state;
-    if (!formJson) return <div>Hold tight! Retrieving your data ...</div>;
+    
+    if (!formJson) return <LinearBuffer asCard message="Hold tight, we retrieving your data..." />;
     if (noDataFound)
       return (
         <div>Sorry no Home Page data available for this community ...</div>
