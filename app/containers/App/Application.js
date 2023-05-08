@@ -224,13 +224,7 @@ class Application extends React.Component {
     ];
 
     if (!IS_LOCAL) checkIfUserNeedsMOUAttention(auth, history); // This check will not run in local mode
-    const {
-      component,
-      show,
-      onConfirm,
-      onCancel,
-      closeAfterConfirmation,
-    } = modalOptions;
+    const { component, show, onConfirm, closeAfterConfirmation } = modalOptions;
     return (
       <Dashboard
         history={history}
@@ -241,9 +235,6 @@ class Application extends React.Component {
           {...modalOptions || {}}
           open={show}
           onConfirm={onConfirm}
-          onCancel={() => {
-            if (onCancel) onCancel();
-          }}
           close={() => {
             toggleUniversalModal({ show: false, component: null });
             return false;

@@ -50,6 +50,7 @@ import {
   LOAD_ALL_META_DATA,
   ACTION_ENGAGMENTS,
   LOAD_TABLE_FILTERS,
+  LOAD_VISIT_LOGS,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -124,6 +125,9 @@ export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
   };
 };
 
+export const reduxLoadVisitLogs = (data) => {
+  return { type: LOAD_VISIT_LOGS, payload: data };
+};
 export const reduxLoadTableFilters = (data) => {
   return { type: LOAD_TABLE_FILTERS, payload: data };
 };

@@ -59,6 +59,7 @@ import app, {
   allMetaDataReducer,
   reducerForActionEngagements,
   reducerForTableFilters,
+  reducerForVisitLogs,
 } from "./modules/appReducer";
 
 /**
@@ -66,6 +67,7 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    userVisitLogs: reducerForVisitLogs,
     tableFilters: reducerForTableFilters,
     tempForm: reducerForKeepingFormContent,
     actionEngagements: reducerForActionEngagements,
@@ -84,7 +86,7 @@ export default function createReducer(injectedReducers = {}) {
     settings: reducerForSettings,
     testRedux: testReduxReducer,
     modalOptions: reducerForUniversalModal,
-    toastOptions:reducerForUniversalToast,
+    toastOptions: reducerForUniversalToast,
     ccActions: reducerForCCAction,
     heap: reducerForHeap, // an object that is used to temporarily hold all kinds of random data.
     subscribers: subscribersReducer,
@@ -121,7 +123,7 @@ export default function createReducer(injectedReducers = {}) {
     ...injectedReducers,
     taskFunctions: allTaskFunctionsReducer,
     tasks: allTasksReducer,
-    paginationMetaData:allMetaDataReducer, // stores pagination data for all tables
+    paginationMetaData: allMetaDataReducer, // stores pagination data for all tables
   });
 
   // Wrap the root reducer and return a new root reducer with router state

@@ -19,18 +19,24 @@ function ThemeModal({
   noOk,
   fullControl = false,
   contentStyle = {},
-  noTitle, title
+  title,
+  noTitle = false,
 }) {
   const fullControlStyles = { padding: 0 };
+  const handleClose = () => {
+    if (onCancel) return onCancel();
+
+    close && close();
+  };
   return (
     <>
       <Dialog
         open={open}
-        onClose={onCancel}
+        onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        {!fullControl && !noTitle && (
+        {!noTitle && (
           <DialogTitle id="alert-dialog-title">
             {title || "Confirmation Dialog"}
           </DialogTitle>
