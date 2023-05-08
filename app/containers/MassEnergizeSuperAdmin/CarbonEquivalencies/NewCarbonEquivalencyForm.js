@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from "@mui/styles";
 import MassEnergizeForm from '../_FormGenerator';
+import Loading from "dan-components/Loading";
+import { PAGE_KEYS } from '../ME  Tools/MEConstants';
 
 const styles = theme => ({
   root: {
@@ -154,6 +156,6 @@ NewCarbonEquivalencyForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(
+export default withStyles(styles, {withTheme: true })(
   NewCarbonEquivalencyForm
 );

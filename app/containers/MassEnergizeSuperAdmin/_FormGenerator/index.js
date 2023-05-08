@@ -238,7 +238,7 @@ class MassEnergizeForm extends Component {
     const { onChangeMiddleware } = field || {};
     const setValueInForm = (newContent) =>
       this.setState({
-        formData: { ...formData, ...(newContent || {}) },
+        formData: { ...formData, [name]: value, ...(newContent || {}) },
       });
 
     if (onChangeMiddleware)
@@ -248,7 +248,6 @@ class MassEnergizeForm extends Component {
         formData,
         setValueInForm,
       });
-
     this.setState({
       formData: { ...formData, [name]: value },
     });
@@ -321,6 +320,7 @@ class MassEnergizeForm extends Component {
   getValue = (name, defaultValue = null, field = null) => {
     let { formData } = this.state;
     let val = formData[name];
+    if (field?.fieldType === FieldTypes.TextField && !val) return ""; // Now needed because I've had to make TextFields controlled inputs.[Makes sure that when field is cleared out, defalut value is not retrieved again]
     if (!val) {
       formData = { ...formData, [name]: defaultValue };
       // this.setState({ formData });
@@ -411,7 +411,9 @@ class MassEnergizeForm extends Component {
             cleanedValues[field.dbName] = fieldValueInForm;
             break;
           case FieldTypes.DateTime:
-            cleanedValues[field.dbName] = (moment.utc(fieldValueInForm)|| moment.now()).format();
+            cleanedValues[field.dbName] = (
+              moment.utc(fieldValueInForm) || moment.now()
+            ).format();
             break;
           case FieldTypes.Checkbox:
             // If two or more items have the same dbName, the get combined into an array
@@ -568,8 +570,7 @@ class MassEnergizeForm extends Component {
       if (clearProgress) clearProgress(this.resetForm);
 
       if (formJson.successRedirectPage) {
-        this.props.history.push(formJson.successRedirectPage);
-        // window.location.href = formJson.successRedirectPage;
+        window.location.href = formJson.successRedirectPage;
       }
     } else if (response && !response.success) {
       // we got an error from the backend so let's set it so the snackbar can pick it up
@@ -827,6 +828,7 @@ class MassEnergizeForm extends Component {
             <br />
             <FormMediaLibraryImplementation
               {...field}
+              selected={this.getValue(field.name, field.selected || field.defaultValue, field)}
               actionText={field.placeholder}
               onInsert={(files) => {
                 const formData = this.state.formData || {};
@@ -1001,7 +1003,13 @@ class MassEnergizeForm extends Component {
                   ],
                   toolbar:
                     "undo redo | formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent |  fontselect | fontsizeselect",
-                }}
+                    // next 4 lines test to eliminate tiny cloud errors
+                    selector: 'textarea',
+                    init_instance_callback : function(editor) {
+                        var freeTiny = document.querySelector('.tox .tox-notification--in');
+                       freeTiny.style.display = 'none';
+                      },
+                  }}
                 apiKey={TINY_MCE_API_KEY}
               />
             </Grid>
@@ -1038,7 +1046,7 @@ class MassEnergizeForm extends Component {
               this.getValue(field.name) === field.child.valueToCheck &&
               this.renderFields(field.child.fields)}
             {this.renderConditionalDisplays(field)}
-          </div>
+          </div> 
         );
       case FieldTypes.TextField:
         return (
@@ -1047,10 +1055,10 @@ class MassEnergizeForm extends Component {
             <TextField
               required={field.isRequired}
               name={field.name}
-              onChange={
+              onChange={(e) =>
                 field.name === "subdomain"
-                  ? this.handleSubDomainChange
-                  : this.handleFormDataChange
+                  ? this.handleSubDomainChange(e)
+                  : this.handleFormDataChange(e, field)
               }
               label={field.label}
               multiline={field.isMultiline}
@@ -1062,7 +1070,7 @@ class MassEnergizeForm extends Component {
                 shrink: true,
               }}
               disabled={field.readOnly || this.state.readOnly}
-              defaultValue={field.defaultValue}
+              value={this.getValue(field.name, field.defaultValue, field)}
               inputProps={{ maxLength: field.maxLength }}
               // maxLength={field.maxLength}
               variant="outlined"
@@ -1104,11 +1112,7 @@ class MassEnergizeForm extends Component {
                 <DateTimePicker
                   {...field}
                   renderInput={(props) => <TextField {...props} />}
-                  value={this.getValue(
-                    field.name,
-                    field.defaultValue,
-                    field
-                  )}
+                  value={this.getValue(field.name, field.defaultValue, field)}
                   onChange={(date) => {
                     this.handleFormDataChange(
                       {
@@ -1169,7 +1173,7 @@ class MassEnergizeForm extends Component {
   renderFields = (fields) =>
     fields.map((field, key) => (
       <div key={`${field.name}-${key.toString()}`}>
-        <div style={{marginBottom:15}}>{this.renderModalText(field)}</div>
+        <div style={{ marginBottom: 15 }}>{this.renderModalText(field)}</div>
 
         {this.renderField(field)}
       </div>
@@ -1189,7 +1193,6 @@ class MassEnergizeForm extends Component {
       <div key={this.state.refreshKey}>
         <Grid
           container
-          spacing={24}
           alignItems="flex-start"
           direction="row"
           justify="center"

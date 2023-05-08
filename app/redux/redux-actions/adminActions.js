@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import firebase from "firebase/app";
+import React from "react";
 import "firebase/auth";
 import {
   LOAD_ALL_COMMUNITIES,
@@ -53,15 +54,75 @@ import {
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
-import { LOADING } from "../../utils/constants";
-import { getLimit, prepareFilterAndSearchParamsFromLocal } from "../../utils/helpers";
+import {
+  CONNECTION_ESTABLISHED,
+  LOADING,
+  TIME_UNTIL_EXPIRATION,
+  USER_SESSION_EXPIRED,
+} from "../../utils/constants";
+import { API_HOST, IS_LOCAL } from "../../config/constants";
+import {
+  getLimit,
+  prepareFilterAndSearchParamsFromLocal,
+} from "../../utils/helpers";
 import { PAGE_PROPERTIES } from "../../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
-
-
+import SocketNotificationModal from "../../containers/MassEnergizeSuperAdmin/Misc/SocketNotificationModal";
 
 // TODO: REOMVE THIS FUNCTiON
 export const testRedux = (value) => {
   return { type: TEST_REDUX, payload: value };
+};
+
+export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
+  const [_, hostname] = API_HOST.split("//");
+  const url = IS_LOCAL ? `ws://${hostname}/ws/me-client/connect/` : `wss://${hostname}/ws/me-client/connect/`;
+  const TAG = "[SOCK]: ";
+  const socket = new WebSocket(url);
+
+  socket.onopen = () => console.log(TAG, "connected");
+
+  socket.onmessage = (e) => {
+    let data = JSON.parse(e.data || "{}");
+    const type = data?.type;
+    if (type === USER_SESSION_EXPIRED) {
+      const message = `Hi ${auth?.preferred_name ||
+        "admin"}, your session has expired. Please sign in again.`;
+      dispatch(
+        reduxToggleUniversalModal({
+          noTitle: true,
+          show: true,
+          noCancel: true,
+          okText: "Okay, Take Me There",
+          onConfirm: () => {
+            window.location.href = "/login";
+          },
+          component: <SocketNotificationModal message={message} />,
+        })
+      );
+    }
+  };
+  socket.onclose = () => {
+    console.log(TAG, "disconnected :(");
+    const message = `Hey ${auth?.preferred_name ||
+      "admin"}, are you still there?`;
+    dispatch(
+      reduxToggleUniversalModal({
+        noTitle: true,
+        show: true,
+        noCancel: true,
+        okText: "Yes, I'm Here",
+        onConfirm: () => {
+          console.log(TAG, "Reconnecting...");
+          dispatch(setupSocketConnectionWithBackend(auth));
+          dispatch(reduxToggleUniversalModal({ show: false, component: null }));
+        },
+        component: <SocketNotificationModal message={message} />,
+      })
+    );
+  };
+  socket.onerror = (e) => {
+    console.log(TAG, "Oops - ", e);
+  };
 };
 
 export const reduxLoadVisitLogs = (data) => {
@@ -79,25 +140,13 @@ export const loadUserEngagements = (data) => {
 export const setEngagementOptions = (data) => {
   return { type: SET_ENGAGMENT_OPTIONS, payload: data };
 };
-export const runAdminStatusCheck = async () => {
-  try {
-    const response = await apiCall("/auth.whoami");
-    if (response.success) return;
 
-    if (response.error === PERMISSION_DENIED)
-      return (window.location = "/login");
-  } catch (e) {
-    console.log("ADMIN_SESSION_STATUS_ERROR:", e.toString());
-    return (window.location = "/login");
-  }
-};
 
 export const fetchLatestNextSteps = (cb) => (dispatch) => {
   apiCall("/summary.next.steps.forAdmins").then((response) => {
     cb && cb(response); // Just in case a scenario needs to know when the request is done....
     if (!response.success)
       return console.log("Could not load in next steps", response);
-    console.log("I have just loaded in more next steps innit", response);
     dispatch(reduxLoadNextStepsSummary(response.data));
   });
 };
@@ -106,7 +155,6 @@ export const checkFirebaseAuthentication = () => {
   return () =>
     firebase.auth().onAuthStateChanged((user) => {
       if (!user) return (window.location = "/login");
-      runAdminStatusCheck();
     });
 };
 export const loadSettings = (data = {}) => {
@@ -151,7 +199,10 @@ export const reduxLoadAdmins = (data = LOADING) => {
 export const reduxFetchInitialContent = (auth) => (dispatch) => {
   if (!auth) return;
   const isSuperAdmin = auth && auth.is_super_admin;
+  dispatch(setupSocketConnectionWithBackend(auth));
+
   Promise.all([
+    apiCall("/policies.listForCommunityAdmin"),
     apiCall(
       isSuperAdmin
         ? "/communities.listForSuperAdmin"
@@ -273,10 +324,11 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     isSuperAdmin && apiCall("/tasks.list"),
     apiCall("/preferences.list"),
     isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
-    apiCall("/communities.others.listForCommunityAdmin", {limit:50}),
+    apiCall("/communities.others.listForCommunityAdmin", { limit: 50 }),
     apiCall("/summary.next.steps.forAdmins"),
   ]).then((response) => {
     const [
+      policies,
       communities,
       actions,
       events,
@@ -297,11 +349,12 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       otherCommunities,
       adminNextSteps,
     ] = response;
+    dispatch(loadAllPolicies(policies.data));
     dispatch(reduxLoadAllCommunities(communities.data));
     dispatch(loadAllActions(actions.data));
     dispatch(loadAllEvents(events.data));
     dispatch(loadAllAdminMessages(messages.data));
-    dispatch(loadTeamMessages(teamMessages.data))
+    dispatch(loadTeamMessages(teamMessages.data));
     dispatch(loadAllTeams(teams.data));
     dispatch(loadAllSubscribers(subscribers.data));
     dispatch(loadAllTestimonials(testimonials.data));
@@ -329,6 +382,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       tagCollections: tagCollections.cursor,
       otherCommunities: otherCommunities.cursor,
       testimonials: testimonials.cursor,
+      policies: policies.cursor,
     };
     dispatch(reduxLoadMetaDataAction(cursor));
   });
@@ -391,6 +445,19 @@ export const reduxAddToGalleryImages = ({ old, data }) => {
     payload: { ...old, images: [...(data || []), ...(old.images || [])] },
   };
 };
+
+const removeDupes = (images) =>{
+  if(!images ||!images.length) return []
+  const recorded = []
+  const items = [] 
+  images.forEach(image => {
+    if(!recorded.includes(image.id)) {
+      items.push(image) 
+      recorded.push(image.id)
+    }
+  });
+  return items;
+}
 /**
  * When new content is loaded and all the limits need to be recorded, this
  * is the redux function to use
@@ -417,7 +484,7 @@ export const reduxLoadGalleryImages = ({
     lower_limit = Math.min(data.lower_limit || 0, old.lower_limit || 0);
   return {
     type: LOAD_GALLERY_IMAGES,
-    payload: { images, upper_limit, lower_limit },
+    payload: { images: removeDupes(images), upper_limit, lower_limit },
   };
 };
 
@@ -427,7 +494,7 @@ export const loadTeamMessages = (data = null) => ({
 });
 export const loadAllAdminMessages = (data = null) => ({
   type: GET_ADMIN_MESSAGES,
-  payload:data,
+  payload: data,
 });
 export const loadAllPolicies = (data = null) => ({
   type: GET_ALL_POLICIES,
@@ -447,28 +514,30 @@ export const loadAllGoals = (data = null) => ({
 });
 export const loadAllTeams = (data = null) => ({
   type: GET_ALL_TEAMS,
-  payload: data
+  payload: data,
 });
 export const loadAllEvents = (data = null) => ({
   type: GET_ALL_EVENTS,
   payload: data,
 });
 export const fetchUsersFromBackend = (cb) => (dispatch) => {
-  apiCall("/users.listForCommunityAdmin", {limit:getLimit(PAGE_PROPERTIES.ALL_USERS.key)}).then((allUsersResponse) => {
-    cb && cb(allUsersResponse.data, !allUsersResponse.success)
+  apiCall("/users.listForCommunityAdmin", {
+    limit: getLimit(PAGE_PROPERTIES.ALL_USERS.key),
+  }).then((allUsersResponse) => {
+    cb && cb(allUsersResponse.data, !allUsersResponse.success);
     if (allUsersResponse && allUsersResponse.success) {
       dispatch(loadAllUsers(allUsersResponse.data));
     }
   });
 };
-export const loadAllUsers = (data) => ({ type: GET_ALL_USERS, payload:data });
+export const loadAllUsers = (data) => ({ type: GET_ALL_USERS, payload: data });
 export const loadAllSubscribers = (data) => ({
   type: GET_ALL_SUBSCRIBERS,
   payload: data,
 });
 export const loadAllTags = (data) => ({
   type: GET_ALL_TAG_COLLECTIONS,
-  payload:data,
+  payload: data,
 });
 export const loadAllActions = (data) => ({
   type: GET_ALL_ACTIONS,
@@ -557,7 +626,7 @@ export const reduxFetchImages = (community_ids = [], callback) => {
     .catch((e) => console.log("GALLERY_FETCH_ERROR:", e.toString()));
 };
 
-export const reduxSignOut = () => (dispatch) => {
+export const reduxSignOut = (cb) => (dispatch) => {
   if (firebase) {
     firebase
       .auth()
@@ -570,6 +639,7 @@ export const reduxSignOut = () => (dispatch) => {
       });
 
     apiCall("/auth.logout").then(() => {
+      cb && cb();
       console.log("Signed Out");
     });
   }
@@ -627,7 +697,10 @@ export const reduxGetAllCommunityGoals = (community_id) => (dispatch) => {
 };
 
 export const reduxGetAllCommunityTeams = (community_id) => (dispatch) => {
-  apiCall("/teams.listForCommunityAdmin", { community_id, limit: getLimit(PAGE_PROPERTIES.ALL_TEAMS.key) }).then((response) => {
+  apiCall("/teams.listForCommunityAdmin", {
+    community_id,
+    limit: getLimit(PAGE_PROPERTIES.ALL_TEAMS.key),
+  }).then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllTeams(response.data));
@@ -649,16 +722,17 @@ export const reduxGetAllCommunityUsers = (community_id) => (dispatch) => {
 };
 
 export const reduxGetAllCommunityEvents = (community_id, cb) => (dispatch) => {
-  apiCall("/events.listForCommunityAdmin", { community_id, limit:getLimit(PAGE_PROPERTIES.ALL_EVENTS.key) }).then(
-    (response) => {
-      if (response && response.success) {
-        redirectIfExpired(response);
-        dispatch(loadAllEvents(response.data));
-      }
-      cb && cb();
-      return { type: "DO_NOTHING", payload: null };
+  apiCall("/events.listForCommunityAdmin", {
+    community_id,
+    limit: getLimit(PAGE_PROPERTIES.ALL_EVENTS.key),
+  }).then((response) => {
+    if (response && response.success) {
+      redirectIfExpired(response);
+      dispatch(loadAllEvents(response.data));
     }
-  );
+    cb && cb();
+    return { type: "DO_NOTHING", payload: null };
+  });
   return { type: "DO_NOTHING", payload: null };
 };
 
@@ -711,7 +785,9 @@ export const reduxGetAllPolicies = () => (dispatch) => {
 };
 
 export const reduxGetAllEvents = () => (dispatch) => {
-  apiCall("/events.listForCommunityAdmin", {limit:getLimit(PAGE_PROPERTIES.ALL_EVENTS.key)}).then((response) => {
+  apiCall("/events.listForCommunityAdmin", {
+    limit: getLimit(PAGE_PROPERTIES.ALL_EVENTS.key),
+  }).then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllEvents(response.data));
@@ -897,7 +973,7 @@ export const reduxCallLibraryModalImages = (props) => {
 
 export const reduxCallCommunities = () => (dispatch) => {
   Promise.all([
-    apiCall("/communities.listForCommunityAdmin", {limit: 100}),
+    apiCall("/communities.listForCommunityAdmin", { limit: 100 }),
     apiCall("/summary.listForCommunityAdmin"),
     apiCall("/graphs.listForCommunityAdmin"),
     apiCall("/what.happened"),

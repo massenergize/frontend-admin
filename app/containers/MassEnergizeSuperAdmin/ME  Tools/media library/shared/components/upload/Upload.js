@@ -167,29 +167,29 @@ function Upload({
         }}
         onDrop={(e) => handleDroppedFile(e)}
       >
-        {files.length > 0 ? (
-          <>
-            <p>
-              Upload ({files.length}) File
-              {files.length === 1 ? "" : "s"}
-            </p>
-            {uploading ? (
-              <img src={spinner} style={{ height: 70 }} alt="" />
-            ) : (
-              <MLButton
-                style={{
-                  height: "auto",
-                  borderRadius: 4,
-                  padding: "17px 40px",
-                  marginBottom: 5,
-                }}
-                backColor="green"
-                onClick={() => upload()}
-              >
-                UPLOAD
-              </MLButton>
-            )}
-          </>
+        {files.length > 0 ? ( <></>
+          // <>
+          //   <p>
+          //     Upload ({files.length}) File
+          //     {files.length === 1 ? "" : "s"}
+          //   </p>
+          //   {uploading ? (
+          //     <img src={spinner} style={{ height: 70 }} alt="" />
+          //   ) : (
+          //     <MLButton
+          //       style={{
+          //         height: "auto",
+          //         borderRadius: 4,
+          //         padding: "17px 40px",
+          //         marginBottom: 5,
+          //       }}
+          //       backColor="green"
+          //       onClick={() => upload()}
+          //     >
+          //       UPLOAD
+          //     </MLButton>
+          //   )}
+          // </>
         ) : (
           <>
             <img src={uploadDummy} style={{ width: 110, height: 66 }} alt="" />
@@ -272,16 +272,6 @@ const PreviewElement = ({
         alignItems: "center",
       }}
     >
-      <img
-        src={src}
-        className="ml-preview-image"
-        style={{ height: 80, width: 100 }}
-        alt=""
-      />
-      <small>{smartString(file.name)}</small>
-      <small role="button">
-        Size: <b>{sizeText}</b>
-      </small>
       {!uploading && (
         <div
           style={{
@@ -302,6 +292,16 @@ const PreviewElement = ({
           )}
         </div>
       )}
+      <img
+        src={src}
+        className="ml-preview-image"
+        style={{ height: 80, width: 100 }}
+        alt=""
+      />
+      <small>{smartString(file.name)}</small>
+      <small role="button">
+        Size: <b>{sizeText}</b>
+      </small>
     </div>
   );
 };

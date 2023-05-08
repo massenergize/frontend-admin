@@ -5,6 +5,7 @@ import { bindActionCreators } from "redux";
 
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import {
+  reduxAddToGalleryImages,
   reduxLoadGalleryImages,
   reduxLoadImageInfos,
   testRedux,
@@ -22,14 +23,43 @@ import { ShowTagsOnPane } from "../Gallery/SideSheet";
 
 const DEFAULT_SCOPE = ["all", "uploads", "actions", "events", "testimonials"];
 export const FormMediaLibraryImplementation = (props) => {
-  const { fetchImages, auth, imagesObject, putImagesInRedux, tags } = props;
+  const {
+    fetchImages,
+    auth,
+    imagesObject,
+    putImagesInRedux,
+    tags,
+    selected,
+    defaultValue,
+    addOnToWhatImagesAreInRedux,
+  } = props;
   const [available, setAvailable] = useState(auth && auth.is_super_admin);
   const [selectedTags, setSelectedTags] = useState({ scope: DEFAULT_SCOPE });
   const [queryHasChanged, setQueryHasChanged] = useState(false);
+  const [userSelectedImages, setUserSelectedImages] = useState([]);
 
-  const defaultValue =
-    (props.selected && props.selected.length && props.selected) ||
-    (props.defaultValue && props.defaultValue.length && props.defaultValue);
+  useEffect(() => {
+    // The value of "preselected" could either be a list of numbers(ids), or a list of objects(json image objects from backend)
+    // This happens because when the page loads afresh, and we pass down images as default value in some "formGenerator JSON", it comes in as objects
+    // But then, when the user goes around and selects images from the library, the form generator is setup to only 
+    // make use of the ID values on the image objects (because that is all we need it to send to the backend)
+    const preselected = selected || defaultValue; 
+    if (!preselected || !preselected.length) return;
+
+    // ---- And whats happening here?
+    // So, in the case that a page is laoding for the first time and the images come in as objects, and not 
+    // as numbers, there is a big chance that images might not be in the list of the whole data set of  
+    // images given to the media library(because we load all images in small chunks...). 
+    // So here, we just add it on to the whole list in redux. Thats all we are doing here(just making them available in the whole set). 
+    // When the userSelected values get into the MediaLibrary component itself, it will still be able to retrieve the selected images whether they are a list of Ids, or the actual images objects
+    const theyAreImageObjects = typeof preselected[0] !== "number";
+    if (theyAreImageObjects) {
+      addOnToWhatImagesAreInRedux({ old: imagesObject, data: preselected });
+      setUserSelectedImages(preselected)
+    }
+   
+  }, []);
+
   const loadMoreImages = (cb) => {
     if (!auth) return console.log("It does not look like you are signed in...");
 
@@ -54,7 +84,7 @@ export const FormMediaLibraryImplementation = (props) => {
     });
   };
 
-  const handleUpload = (files, reset, _, changeTabTo) => {
+  const handleUpload = (files, reset, _, changeTabTo, immediately) => {
     const isUniversal = available ? { is_universal: true } : {};
     const apiJson = {
       user_id: auth.id,
@@ -81,6 +111,7 @@ export const FormMediaLibraryImplementation = (props) => {
           append: true,
           prepend: true,
         });
+        if (immediately) return immediately(images, response);
         reset();
         changeTabTo(MediaLibrary.Tabs.LIBRARY_TAB);
       })
@@ -102,6 +133,7 @@ export const FormMediaLibraryImplementation = (props) => {
   return (
     <div>
       <MediaLibrary
+        defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
         images={(imagesObject && imagesObject.images) || []}
         actionText="Select From Library"
         sourceExtractor={(item) => item && item.url}
@@ -153,8 +185,13 @@ export const FormMediaLibraryImplementation = (props) => {
             </Tooltip>
           );
         }}
+        tabModifiers={{
+          [MediaLibrary.Tabs.LIBRARY_TAB]: {
+            name: "Choose From Media Library",
+          },
+        }}
         {...props}
-        selected={defaultValue}
+        selected={userSelectedImages}
         loadMoreFunction={loadMoreImages}
       />
     </div>
@@ -177,6 +214,7 @@ const mapDispatchToProps = (dispatch) => {
       fetchImages: universalFetchFromGallery,
       fireTestFunction: testRedux,
       putImagesInRedux: reduxLoadGalleryImages,
+      addOnToWhatImagesAreInRedux: reduxAddToGalleryImages,
     },
     dispatch
   );

@@ -6,8 +6,8 @@ import { Paper, Typography } from "@mui/material";
 import { LOADING } from "../../../utils/constants";
 import Loading from "dan-components/Loading";
 import { makeTimeAgo } from "../../../utils/common";
-import PapperBlock from "../../../components/PapperBlock/PapperBlock";
-// import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+// import PapperBlock from "../../../components/PapperBlock/PapperBlock";
+import PapperBlock from "../ME  Tools/paper block/MEPaperBlock";
 function ReportingActivities({
   activities,
   style,

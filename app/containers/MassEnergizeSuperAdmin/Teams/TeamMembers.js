@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
-import Paper from "@mui/material/Paper";
+import {Paper, Alert} from "@mui/material";
 import { Helmet } from "react-helmet";
 import { bindActionCreators } from "redux";
 import brand from "dan-api/dummy/brand";
@@ -16,7 +16,6 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import Loading from "dan-components/Loading";
 import styles from "../../../components/Widget/widget-jss";
 import Snackbar from '@mui/material/Snackbar';
-import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
 import {
   reduxGetAllTeams,
   reduxGetAllCommunityTeams,
@@ -246,7 +245,7 @@ class TeamMembers extends React.Component {
     }
     this.setState({ error: null });
   };
-
+  
 
   render() {
     const title = brand.name + " - All Teams";
@@ -310,11 +309,15 @@ class TeamMembers extends React.Component {
               autoHideDuration={6000}
               onClose={this.handleCloseStyle}
             >
-              <MySnackbarContentWrapper
+              <Alert
                 onClose={this.handleCloseStyle}
-                variant="error"
-                message={`Unable to download: ${error}`}
-              />
+                severity={"error"}
+                sx={{ width: "100%" }}
+              >
+                <small style={{ marginLeft: 15, fontSize: 15 }}>
+                  {`Unable to download: ${error}`}
+                </small>
+              </Alert>
             </Snackbar>
           </div>
         )}
@@ -326,11 +329,16 @@ class TeamMembers extends React.Component {
               autoHideDuration={3000}
               onClose={this.handleClose}
             >
-              <MySnackbarContentWrapper
+              <Alert
                 onClose={this.handleClose}
-                variant="success"
-                message={`Your request has been received. Please check your email for the file.`}
-              />
+                severity={"success"}
+                sx={{ width: "100%" }}
+              >
+                <small style={{ marginLeft: 15, fontSize: 15 }}>
+                  Your request has been received. Please check your email for
+                  the file.
+                </small>
+              </Alert>
             </Snackbar>
           </div>
         )}

@@ -1,12 +1,12 @@
 import { Toolbar, Typography, Tooltip } from "@mui/material";
 import React from "react";
-import { PapperBlock } from "dan-components";
+// import { PapperBlock } from "dan-components";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { Link, useHistory, withRouter } from "react-router-dom";
 import Loading from "dan-components/Loading";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
-import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import PapperBlock from "../ME  Tools/paper block/MEPaperBlock";
 
 function WhatNext({ data }) {
   const { messages, teams, testimonials, users, team_messages } = data || {};

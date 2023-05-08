@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
@@ -38,7 +38,9 @@ function MassEnergizeForm(props) {
   const [json, setJson] = useState({});
   const { formState, saveFormTemporarily, formJson } = props;
   const pageKey = props.pageKey || PAGE_KEYS.PLACEHOLDER_PAGE.key;
-  const progress = (formState || {})[pageKey] || {};
+  const progress = useMemo(()=>  (formState || {})[pageKey] || {},[formState, pageKey])
+  
+ 
 
   const insertProgress = (children, progress) => {
     if (!children) return [];
@@ -97,7 +99,7 @@ function MassEnergizeForm(props) {
     };
 
     setJson(inflatedWithProgress);
-  }, [formJson, progress]);
+  }, [formJson,progress]);
 
   const preserveFormData = (currentFormState) => {
     const { formData } = currentFormState || {};
@@ -117,7 +119,6 @@ function MassEnergizeForm(props) {
     });
     removePageProgressFromStorage(pageKey);
   };
-
   if (!json.fields) return <></>;
 
   return (
