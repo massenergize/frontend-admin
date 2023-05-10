@@ -75,54 +75,87 @@ export const testRedux = (value) => {
 
 export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
   const [_, hostname] = API_HOST.split("//");
-  const url = IS_LOCAL ? `ws://${hostname}/ws/me-client/connect/` : `wss://${hostname}/ws/me-client/connect/`;
+  const url = IS_LOCAL
+    ? `ws://${hostname}/ws/me-client/connect/`
+    : `wss://${hostname}/ws/me-client/connect/`;
   const TAG = "[SOCK]: ";
-  const socket = new WebSocket(url);
+  let socket;
+  let numberOfRetries = 0;
+  const MAXIMUM_RETRIES = 5;
+  const WAIT_TIME = 4000 // 4 seconds before trying to reconnect, to give the server some time to recoup
 
-  socket.onopen = () => console.log(TAG, "connected");
+  const connectSocket = () => {
+    socket = new WebSocket(url);
 
-  socket.onmessage = (e) => {
-    let data = JSON.parse(e.data || "{}");
-    const type = data?.type;
-    if (type === USER_SESSION_EXPIRED) {
-      const message = `Hi ${auth?.preferred_name ||
-        "admin"}, your session has expired. Please sign in again.`;
-      dispatch(
-        reduxToggleUniversalModal({
-          noTitle: true,
-          show: true,
-          noCancel: true,
-          okText: "Okay, Take Me There",
-          onConfirm: () => {
-            window.location.href = "/login";
-          },
-          component: <SocketNotificationModal message={message} />,
-        })
-      );
-    }
-  };
-  socket.onclose = () => {
-    console.log(TAG, "disconnected :(");
-    const message = `Hey ${auth?.preferred_name ||
-      "admin"}, are you still there?`;
-    dispatch(
-      reduxToggleUniversalModal({
-        noTitle: true,
-        show: true,
-        noCancel: true,
-        okText: "Yes, I'm Here",
-        onConfirm: () => {
+    socket.onopen = () => {
+      console.log(TAG, "connected");
+      numberOfRetries = 0;
+    };
+
+    socket.onmessage = (e) => {
+      let data = JSON.parse(e.data || "{}");
+      const type = data?.type;
+      if (type === USER_SESSION_EXPIRED) {
+        const message = `Hi ${auth?.preferred_name ||
+          "admin"}, your session has expired. Please sign in again.`;
+        dispatch(
+          reduxToggleUniversalModal({
+            noTitle: true,
+            show: true,
+            noCancel: true,
+            okText: "Okay, Take Me There",
+            onConfirm: () => {
+              window.location.href = "/login";
+            },
+            component: <SocketNotificationModal message={message} />,
+          })
+        );
+      }
+    };
+
+    socket.onclose = () => {
+      console.log(TAG, "disconnected :(");
+      const message = `Hey ${auth?.preferred_name ||
+        "admin"}, are you still there?`;
+
+      if (numberOfRetries < MAXIMUM_RETRIES) {
+        setTimeout(() => {
           console.log(TAG, "Reconnecting...");
-          dispatch(setupSocketConnectionWithBackend(auth));
-          dispatch(reduxToggleUniversalModal({ show: false, component: null }));
-        },
-        component: <SocketNotificationModal message={message} />,
-      })
-    );
+          connectSocket();
+        }, WAIT_TIME);
+        numberOfRetries++;
+
+      } else {
+        // At this point, we have tried to reconnect 5 times, within "WAIT_TIME" intervals and still nothing, 
+        // So then we show the user the modal that says "Are you there?" Allowing them to manually reconnect, when they are ready
+        console.log(
+          TAG,
+          "Tried to re-connect multiple times, giving up now..."
+        );
+        dispatch(
+          reduxToggleUniversalModal({
+            noTitle: true,
+            show: true,
+            noCancel: true,
+            okText: "Yes, I'm Here",
+            onConfirm: () => {
+              console.log(TAG, "Reconnecting...");
+              dispatch(setupSocketConnectionWithBackend(auth));
+              dispatch(
+                reduxToggleUniversalModal({ show: false, component: null })
+              );
+            },
+            component: <SocketNotificationModal message={message} />,
+          })
+        );
+      }
+    };
+    socket.onerror = () => {
+      console.log(TAG, "Oops - Got an error, server did not response as expected :( ");
+    };
   };
-  socket.onerror = (e) => {
-    console.log(TAG, "Oops - ", e);
-  };
+
+  connectSocket();
 };
 
 export const reduxLoadVisitLogs = (data) => {
@@ -140,7 +173,6 @@ export const loadUserEngagements = (data) => {
 export const setEngagementOptions = (data) => {
   return { type: SET_ENGAGMENT_OPTIONS, payload: data };
 };
-
 
 export const fetchLatestNextSteps = (cb) => (dispatch) => {
   apiCall("/summary.next.steps.forAdmins").then((response) => {
@@ -446,18 +478,18 @@ export const reduxAddToGalleryImages = ({ old, data }) => {
   };
 };
 
-const removeDupes = (images) =>{
-  if(!images ||!images.length) return []
-  const recorded = []
-  const items = [] 
-  images.forEach(image => {
-    if(!recorded.includes(image.id)) {
-      items.push(image) 
-      recorded.push(image.id)
+const removeDupes = (images) => {
+  if (!images || !images.length) return [];
+  const recorded = [];
+  const items = [];
+  images.forEach((image) => {
+    if (!recorded.includes(image.id)) {
+      items.push(image);
+      recorded.push(image.id);
     }
   });
   return items;
-}
+};
 /**
  * When new content is loaded and all the limits need to be recorded, this
  * is the redux function to use
