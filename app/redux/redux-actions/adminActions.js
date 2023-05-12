@@ -151,7 +151,7 @@ export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
       }
     };
     socket.onerror = () => {
-      console.log(TAG, "Oops - Got an error, server did not response as expected :( ");
+      console.log(TAG, "Oops - Got an error, server did not respond as expected :( ");
     };
   };
 
