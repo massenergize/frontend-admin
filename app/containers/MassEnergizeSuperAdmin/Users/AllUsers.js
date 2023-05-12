@@ -111,6 +111,7 @@ class AllUsers extends React.Component {
         : d.is_guest
         ? "Guest"
         : "Member",
+      d,
       d.id,
     ]);
   };
@@ -167,7 +168,17 @@ class AllUsers extends React.Component {
       options: {
         filter: false,
         download: false,
-        customBodyRender: (id) => {
+        customBodyRender: (d) => {
+          const { id, user_portal_visits } =d ||{}
+          const isOneRecord = user_portal_visits?.length === 1;
+          const isEmpty = !user_portal_visits?.length;
+
+          if (isEmpty) return <span>-</span>;
+
+          const log = getHumanFriendlyDate(user_portal_visits[0], true, false);
+
+          if (isOneRecord) return <span>{log}</span>;
+
           return (
             <Link
               onClick={(e) => {
@@ -175,10 +186,19 @@ class AllUsers extends React.Component {
                 this.showVisitRecords(id);
               }}
             >
-              <span>View Records</span>
+              <span>{log}...</span>
             </Link>
           );
         },
+      },
+    },
+    {
+      name: "id",
+      key: "id",
+      options: {
+        filter: false,
+        display: false,
+        download: false,
       },
     },
   ];
@@ -187,7 +207,7 @@ class AllUsers extends React.Component {
     const { allUsers, putUsersInRedux } = this.props;
     const itemsInRedux = allUsers || [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][6];
+      const found = data[d.dataIndex][7];
       apiCall("/users.delete", { id: found }).then((response) => {
         if (response.success) {
           this.props.toggleToast({

@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { reduxLoadVisitLogs } from "../../../redux/redux-actions/adminActions";
-import { getHumanFriendlyDate } from "../../../utils/common";
+import { getHumanFriendlyDate, getUniqueDates } from "../../../utils/common";
 import { LOADING } from "../../../utils/constants";
 import { apiCall } from "../../../utils/messenger";
 
@@ -24,7 +24,8 @@ function RenderVisitLogs({ putLogsInRedux, logs, id, users }) {
       if (!response.success)
         return console.log("Error while loading logs: ", response.error);
       const isEmpty = Object.keys(response.data).length === 0;
-      const data = isEmpty ? [] : response.data;
+      let data = isEmpty ? [] : response.data;
+      data = getUniqueDates(data)
       setContent(data);
       putLogsInRedux({ ...logs, [id]: data });
     });
@@ -94,7 +95,7 @@ function RenderVisitLogs({ putLogsInRedux, logs, id, users }) {
               />{" "}
               {/*  Uncomment this if we are using logs instead of footages */}
               {/* <span> {getHumanFriendlyDate(log, true, false)}</span> */}
-              <span> {getHumanFriendlyDate(log.created_at, true, false)}</span>
+              <span> {getHumanFriendlyDate(log, true, false)}</span>
             </Typography>
           );
         })}
