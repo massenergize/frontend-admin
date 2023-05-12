@@ -175,7 +175,7 @@ class AllUsers extends React.Component {
 
           if (isEmpty) return <span>-</span>;
 
-          const log = getHumanFriendlyDate(user_portal_visits[0], true, false);
+          const log = getHumanFriendlyDate(user_portal_visits[0], false, false);
 
           if (isOneRecord) return <span>{log}</span>;
 

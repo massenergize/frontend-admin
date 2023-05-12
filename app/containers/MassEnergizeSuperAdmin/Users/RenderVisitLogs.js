@@ -93,9 +93,7 @@ function RenderVisitLogs({ putLogsInRedux, logs, id, users }) {
                 className="fa fa-clock"
                 style={{ marginRight: 6, color: "#e8e8e8" }}
               />{" "}
-              {/*  Uncomment this if we are using logs instead of footages */}
-              {/* <span> {getHumanFriendlyDate(log, true, false)}</span> */}
-              <span> {getHumanFriendlyDate(log, true, false)}</span>
+              <span> {getHumanFriendlyDate(log, false, false)}</span>
             </Typography>
           );
         })}
