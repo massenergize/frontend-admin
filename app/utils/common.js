@@ -8,6 +8,25 @@ import React from "react";
 import { ME_FORM_PROGRESS } from "../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 import { apiCall } from "./messenger";
 
+export const getUniqueDates = (dates) => {
+  if (!dates) return [];
+  const uniqueDates = new Set();
+
+  // Iterate over the dates and extract the date part
+  dates.forEach((date) => {
+    const dateStr = new Date(date).toISOString().slice(0, 10); // Get the date part of the ISO string
+    uniqueDates.add(dateStr);
+  });
+
+  // Return the unique dates as an array of strings
+  return Array.from(uniqueDates);
+};
+export const isPastDate = (dateString) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  return date < now;
+};
+
 export const separate = (ids, dataSet = [], options = {}) => {
   const { valueExtractor } = options || {};
   const found = [];

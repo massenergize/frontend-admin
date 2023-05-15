@@ -33,8 +33,14 @@ import {
 } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
-import { withRouter } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import Loader from "../../../utils/components/Loader";
+import {
+  ArrowRight,
+  ArrowRightTwoTone,
+  KeyboardArrowRight,
+} from "@mui/icons-material";
+import RenderVisitLogs from "./RenderVisitLogs";
 
 class AllUsers extends React.Component {
   constructor(props) {
@@ -105,6 +111,7 @@ class AllUsers extends React.Component {
         : d.is_guest
         ? "Guest"
         : "Member",
+      d,
       d.id,
     ]);
   };
@@ -155,15 +162,52 @@ class AllUsers extends React.Component {
         filter: true,
       },
     },
+    {
+      name: "Last Visited",
+      key: "last-visited",
+      options: {
+        filter: false,
+        download: false,
+        customBodyRender: (d) => {
+          const { id, user_portal_visits } =d ||{}
+          const isOneRecord = user_portal_visits?.length === 1;
+          const isEmpty = !user_portal_visits?.length;
+
+          if (isEmpty) return <span>-</span>;
+
+          const log = getHumanFriendlyDate(user_portal_visits[0], false, false);
+
+          if (isOneRecord) return <span>{log}</span>;
+
+          return (
+            <Link
+              onClick={(e) => {
+                e.preventDefault();
+                this.showVisitRecords(id);
+              }}
+            >
+              <span>{log}...</span>
+            </Link>
+          );
+        },
+      },
+    },
+    {
+      name: "id",
+      key: "id",
+      options: {
+        filter: false,
+        display: false,
+        download: false,
+      },
+    },
   ];
 
   nowDelete({ idsToDelete, data }) {
     const { allUsers, putUsersInRedux } = this.props;
     const itemsInRedux = allUsers || [];
-    const ids = [];
     idsToDelete.forEach((d) => {
-      const found = data[d.dataIndex][6];
-      ids.push(found);
+      const found = data[d.dataIndex][7];
       apiCall("/users.delete", { id: found }).then((response) => {
         if (response.success) {
           this.props.toggleToast({
@@ -171,17 +215,18 @@ class AllUsers extends React.Component {
             message: "User(s) successfully deleted",
             variant: "success",
           });
+          const rem = (itemsInRedux || []).filter((com) => com?.id !== found);
+          putUsersInRedux(rem);
         } else {
           this.props.toggleToast({
             open: true,
-            message: "An error occurred while deleting the user(s)",
+            message:
+              "Unable to delete users who are admins or members of multiple communities",
             variant: "error",
           });
         }
       });
     });
-    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putUsersInRedux(rem);
   }
 
   makeDeleteUI({ idsToDelete }) {
@@ -193,6 +238,20 @@ class AllUsers extends React.Component {
         {len === 1 ? " user? " : " users? "}
       </Typography>
     );
+  }
+
+  showVisitRecords(id) {
+    const { toggleModal } = this.props;
+    toggleModal({
+      show: true,
+      component: <RenderVisitLogs id={id} />,
+      onConfirm: () => toggleModal({ show: false, component: null }),
+      closeAfterConfirmation: true,
+      // title: "Visit Records",
+      noTitle: true,
+      noCancel: true,
+      okText: "Close",
+    });
   }
   render() {
     const title = brand.name + " - Users";
@@ -337,12 +396,14 @@ function mapStateToProps(state) {
     tableFilters: state.getIn(["tableFilters"]),
   };
 }
+
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
       fetchUsers: fetchUsersFromBackend,
       putUsersInRedux: loadAllUsers,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleModal: reduxToggleUniversalModal,
       toggleToast: reduxToggleUniversalToast,
       putMetaDataToRedux: reduxLoadMetaDataAction,
       updateTableFilters: reduxLoadTableFilters,

@@ -325,6 +325,16 @@ class EditCommunityForm extends Component {
                 ],
               },
             },
+            {
+              name: "is_demo",
+              label: "Is this community a demo community?",
+              fieldType: "Radio",
+              isRequired: false,
+              defaultValue: community.is_demo ? "true" : "false",
+              dbName: "is_demo",
+              readOnly: !superAdmin,
+              data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+            },
           ],
         },
         {

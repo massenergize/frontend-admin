@@ -28,6 +28,7 @@ import Feature from "../../../components/FeatureFlags/Feature";
 import { FLAGS } from "../../../components/FeatureFlags/flags";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import ContinueWhereYouLeft from "./ContinueWhereYouLeft";
+import { MetricsModal } from 'dan-components';
 
 // import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
 class SummaryDashboard extends PureComponent {
@@ -37,6 +38,7 @@ class SummaryDashboard extends PureComponent {
       error: null,
       loadingCSVs: [],
       success: false,
+      openModal: false,
     };
   }
 
@@ -88,6 +90,17 @@ class SummaryDashboard extends PureComponent {
     this.setState({ success: false });
   };
 
+  handleOpenModal = () => {
+    this.setState({ openModal: true });
+  };
+
+  handleCloseModal = (apiCall) => {
+    if (apiCall == "response"){
+      this.setState({ success: true });
+    }
+    this.setState({ openModal: false });
+  };
+
   render() {
     const title = brand.name + " - Summary Dashboard";
     const description = brand.desc;
@@ -98,8 +111,11 @@ class SummaryDashboard extends PureComponent {
       auth,
       summary_data,
       graph_data,
+      featureFlags,
     } = this.props;
     const { error, loadingCSVs, success } = this.state;
+    const { openModal } = this.state;
+    const featureToEdit = null;
 
     return (
       <div>
@@ -144,7 +160,13 @@ class SummaryDashboard extends PureComponent {
             </Snackbar>
           </div>
         )}
-
+        <MetricsModal 
+          openModal={openModal}
+          closeModal={this.handleCloseModal} 
+          communities={communities}
+          featureToEdit={featureToEdit}
+          featureFlags={featureFlags}
+        />
         <Helmet>
           <title>{title}</title>
           <meta name="description" content={description} />
@@ -176,6 +198,7 @@ class SummaryDashboard extends PureComponent {
                     loadingCSVs={loadingCSVs}
                     classes={classes}
                     getCSV={this.getCSV}
+                    handleOpenModal={this.handleOpenModal}
                   />
                 </Grid>
               </Grid>
@@ -192,6 +215,7 @@ class SummaryDashboard extends PureComponent {
                 loadingCSVs={loadingCSVs}
                 classes={classes}
                 getCSV={this.getCSV}
+                handleOpenModal={this.handleOpenModal}
               />
               <Grid>
                 <ReportingActivities
@@ -223,6 +247,7 @@ const mapStateToProps = (state) => ({
   selected_community: state.getIn(["selected_community"]),
   summary_data: state.getIn(["summary_data"]),
   graph_data: state.getIn(["graph_data"]) || {},
+  featureFlags: state.getIn(["featureFlags"]),
 });
 
 const mapDispatchToProps = (dispatch) =>
@@ -240,7 +265,7 @@ const summaryMapped = connect(
 
 export default withStyles(styles)(summaryMapped);
 
-const CSVDownloads = ({ loadingCSVs, classes, getCSV}) => {
+const CSVDownloads = ({ loadingCSVs, classes, getCSV, handleOpenModal}) => {
   return (
     <MEPaperBlock
       subtitle="Download your data as CSV here"
@@ -312,6 +337,27 @@ const CSVDownloads = ({ loadingCSVs, classes, getCSV}) => {
                 arrow_downward
               </Icon>
               {loadingCSVs.includes("communities") && (
+                <CircularProgress size={20} thickness={2} color="secondary" />
+              )}
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          <Paper
+            onClick ={() => {handleOpenModal();}}
+            className={`${classes.pageCard}`}
+            elevation={1}
+          >
+            <Typography
+              variant="h5"
+              style={{ fontWeight: "600", fontSize: "1rem" }}
+              component="h3"
+            >
+              Request All Metrics CSV{" "}
+              <Icon style={{ paddingTop: 3, color: "green" }}>
+                arrow_downward
+              </Icon>
+              {loadingCSVs.includes("metrics") && (
                 <CircularProgress size={20} thickness={2} color="secondary" />
               )}
             </Typography>
