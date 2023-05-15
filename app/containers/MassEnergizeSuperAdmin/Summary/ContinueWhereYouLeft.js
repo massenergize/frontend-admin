@@ -12,13 +12,17 @@ function ContinueWhereYouLeft() {
   const history = useHistory();
 
   const startExitTimer = () => {
+    const currentLocation = window.location.href.split(host)[1];
+    const weAreNoLongerOnDashboard = currentLocation !== "/";
     setTimeout(() => {
+      // If the user got out of the dashboard page before the timer finished counting, this operation is no longer needed.
+      if (weAreNoLongerOnDashboard) return;
       setSavedURL(null);
       history.push("/");
     }, WAIT_TIME);
   };
   useEffect(() => {
-    // This value will be available right after login everytime
+    // This value will be available right after login everytime (in the URL)
     let { atf } = fetchParamsFromURL(window.location, "atf");
     atf = atf === "true";
     // If there isnt any saved URL in local storage, dont bother!
@@ -26,7 +30,7 @@ function ContinueWhereYouLeft() {
     // If there is a URL saved, make sure it isnt the same as the dashboard URL
     const isNotDashboard = url.split(host)[1] !== "/";
     // If it isnt the same as the dashboard link, then ask tthe user if they want to go back to that page
-    // And start counting down to WAIT_TIME (The notification will be disabled with WAIT_TIME is reached)
+    // And start counting down to WAIT_TIME (The notification will be disabled when WAIT_TIME is reached)
     if (atf && isNotDashboard) {
       setSavedURL(url);
       startExitTimer();
