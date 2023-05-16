@@ -127,6 +127,7 @@ function CommunityEngagement({
       ".MuiOutlinedInput-notchedOutline": { border: 0 },
     },
   };
+
   return (
     <div>
       <MEPaperBlock
@@ -152,31 +153,65 @@ function CommunityEngagement({
                 >
                   Community Engagement Summary for{" "}
                   {hasOnlyOneCommunity ? <span>{first?.name}</span> : <></>}
-                </Typography>
-
-                {!hasOnlyOneCommunity && (
+                  {!hasOnlyOneCommunity && (
+                    <MEDropdown
+                      fullControl
+                      onHeaderRender={(labels) => (
+                        <span style={{ textDecoration: "underline" }}>
+                          {labels.join(",")}
+                        </span>
+                      )}
+                      generics={muiOverride}
+                      multiple={false}
+                      data={communities}
+                      valueExtractor={(c) => c.id}
+                      labelExtractor={(c) => c.name}
+                      containerStyle={{ width: "18%", marginTop: 0 }}
+                      defaultValue={[first.id]}
+                      onItemSelected={(selection) => {
+                        const item = selection && selection[0];
+                        const op = {
+                          ...options,
+                          communities: selection,
+                          mounted: true,
+                        };
+                        setOptions(op);
+                        fetchFromBackendAfterFilters({ options: op });
+                      }}
+                    />
+                  )}
                   <MEDropdown
+                    fullControl
+                    onHeaderRender={(labels) => (
+                      <span
+                        style={{ textDecoration: "underline", marginLeft: 10 }}
+                      >
+                        {labels.join(",")}
+                      </span>
+                    )}
                     generics={muiOverride}
                     multiple={false}
-                    data={communities}
-                    valueExtractor={(c) => c.id}
-                    labelExtractor={(c) => c.name}
-                    containerStyle={{ width: "18%", marginTop: 0 }}
-                    defaultValue={[first.id]}
+                    data={TIME_RANGE}
+                    valueExtractor={(t) => t.key}
+                    labelExtractor={(t) => t.name}
+                    containerStyle={{ width: "15%", marginTop: 0 }}
+                    defaultValue={rangeValue}
                     onItemSelected={(selection) => {
                       const item = selection && selection[0];
                       const op = {
                         ...options,
-                        communities: selection,
+                        range: selection,
                         mounted: true,
                       }; // It uses previous selection of communities
                       setOptions(op);
+                      if (item == "custom") return setSpecific(true);
+
                       fetchFromBackendAfterFilters({ options: op });
                     }}
                   />
-                )}
+                </Typography>
 
-                <Typography
+                {/* <Typography
                   variant="caption"
                   style={{
                     marginLeft: 5,
@@ -187,8 +222,8 @@ function CommunityEngagement({
                   }}
                 >
                   Time Interval
-                </Typography>
-                <MEDropdown
+                </Typography> */}
+                {/* <MEDropdown
                   generics={muiOverride}
                   multiple={false}
                   data={TIME_RANGE}
@@ -208,7 +243,7 @@ function CommunityEngagement({
 
                     fetchFromBackendAfterFilters({ options: op });
                   }}
-                />
+                /> */}
               </div>
               {loading && !specific && (
                 <>
