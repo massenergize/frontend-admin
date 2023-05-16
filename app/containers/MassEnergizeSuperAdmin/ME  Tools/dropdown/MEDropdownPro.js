@@ -46,6 +46,7 @@ function MEDropdownPro({
     if (!multiple) {
       items = [valueOf(item)];
       if (onItemSelected) onItemSelected(items);
+      setShow(false)
       return setSelected(items);
     }
     const [found, rest] = pop(selected, valueOf(item));
