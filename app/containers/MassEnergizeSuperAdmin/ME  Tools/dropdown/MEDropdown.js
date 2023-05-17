@@ -8,6 +8,7 @@ import { Chip, FormControl, FormLabel, Select } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { pop } from "../../../../utils/common";
 import LightAutoComplete from "../../Gallery/tools/LightAutoComplete";
+import MEDropdownPro from "./MEDropdownPro";
 function MEDropdown(props) {
   const {
     containerStyle,
@@ -20,6 +21,7 @@ function MEDropdown(props) {
     defaultValue,
     value,
     generics,
+    fullControl = false,
   } = props;
   const [selected, setSelected] = useState(defaultValue || value || []);
   const valueOf = (item) => {
@@ -33,13 +35,16 @@ function MEDropdown(props) {
   }, [defaultValue, value]);
 
   // -------------------------------------------------------------------
+  if (fullControl) return <MEDropdownPro {...props} />;
+  // -------------------------------------------------------------------
+
+  // -------------------------------------------------------------------
   // Always switch dropdown to auto complete dropdown if there are a lot of items. A lot = (>20 items)
   if (data && data.length > 20) {
     return (
       <LightAutoComplete
         onChange={(items) => {
           items = (items || []).map((a) => valueExtractor(a));
-          console.log("Here are the items", items);
           onItemSelected(items);
         }}
         {...props}
