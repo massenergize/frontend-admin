@@ -23,7 +23,7 @@ function MEPaperBlock({
         }}
       >
         {!customHeader ? (
-          <div style={{ marginBottom: 20 }}>
+          <div style={{ marginBottom: title ? 20 : 0 }}>
             {title && (
               <Typography
                 variant="h3"

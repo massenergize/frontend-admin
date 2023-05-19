@@ -37,6 +37,7 @@ import {
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
+import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 
 export const replyToMessage = ({ pathname, props, transfer }) => {
   // const pathname = `/admin/edit/${id}/message`;
@@ -98,7 +99,19 @@ class AllCommunityAdminMessages extends React.Component {
   componentWillUnmount() {
     // Clears location state when this component is unmounting
     window.history.replaceState({}, document.title);
+    const { comingFromDashboard } = this.state;
+    if (comingFromDashboard) this.removeFilters();
   }
+
+  removeFilters() {
+    const { tableFilters, updateTableFilters } = this.props;
+    const key = PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key + FILTERS;
+    updateTableFilters({
+      ...(tableFilters || {}),
+      [key]: {},
+    });
+  }
+
   componentDidMount() {
     const { state } = this.props.location;
     const {
@@ -111,14 +124,14 @@ class AllCommunityAdminMessages extends React.Component {
     const ids = state && state.ids;
     const comingFromDashboard = ids?.length;
     if (comingFromDashboard) {
-      this.setState({ saveFilters: false });
+      this.setState({ saveFilters: false, comingFromDashboard });
       const key = PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key + FILTERS;
       updateTableFilters({
         ...(tableFilters || {}),
         [key]: { 0: { list: ids } },
       });
-    }
-    
+    } else this.setState({ ignoreSavedFilters: true });
+
     apiCall("/messages.listForCommunityAdmin", {
       limit: getLimit(PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key),
     }).then((allMessagesResponse) => {
@@ -295,7 +308,7 @@ class AllCommunityAdminMessages extends React.Component {
   render() {
     const title = brand.name + " - Community Admin Messages";
     const description = brand.desc;
-    const { columns } = this.state;
+    const { columns, comingFromDashboard } = this.state;
     const {
       classes,
       messages,
@@ -399,6 +412,22 @@ class AllCommunityAdminMessages extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
+        {comingFromDashboard && (
+          <MEPaperBlock
+            containerStyle={{
+              minHeight: "auto",
+              padding: "15px 25px",
+              marginBottom: 10,
+              background: "#fefbf3",
+            }}
+          >
+            <Typography>
+              <i className="fa fa-bullhorn" /> The messages you have not
+              answered yet are currently preselected and sorted in the table
+              for you. Feel free to clear all selections with the filter panel.
+            </Typography>
+          </MEPaperBlock>
+        )}
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_ADMIN_MESSAGES}
