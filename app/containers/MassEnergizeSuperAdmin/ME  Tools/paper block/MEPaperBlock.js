@@ -7,7 +7,29 @@ function MEPaperBlock({
   title,
   subtitle,
   containerStyle,
+  banner,
+  icon,
 }) {
+  if (banner)
+    return (
+      <div
+        className="elevate-float"
+        style={{
+          width: "100%",
+          minHeight: "auto",
+          padding: "15px 25px",
+          marginBottom: 10,
+          background: "#fefbf3",
+          borderRadius: 10,
+          display: "flex",
+          alignItems: "center",
+          ...(containerStyle || {}),
+        }}
+      >
+        {icon && <i className={icon} style={{ marginRight: 7 }} />}
+        {children}
+      </div>
+    );
   return (
     <div>
       <div

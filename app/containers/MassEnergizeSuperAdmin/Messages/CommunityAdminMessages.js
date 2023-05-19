@@ -38,6 +38,7 @@ import ApplyFilterButton from "../../../utils/components/applyFilterButton/Apply
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import { renderInvisibleChips } from "../ME  Tools/table /utils";
 
 export const replyToMessage = ({ pathname, props, transfer }) => {
   // const pathname = `/admin/edit/${id}/message`;
@@ -99,18 +100,18 @@ class AllCommunityAdminMessages extends React.Component {
   componentWillUnmount() {
     // Clears location state when this component is unmounting
     window.history.replaceState({}, document.title);
-    const { comingFromDashboard } = this.state;
-    if (comingFromDashboard) this.removeFilters();
+    // const { comingFromDashboard } = this.state;
+    // if (comingFromDashboard) this.removeFilters();
   }
 
-  removeFilters() {
-    const { tableFilters, updateTableFilters } = this.props;
-    const key = PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key + FILTERS;
-    updateTableFilters({
-      ...(tableFilters || {}),
-      [key]: {},
-    });
-  }
+  // removeFilters() {
+  //   const { tableFilters, updateTableFilters } = this.props;
+  //   const key = PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key + FILTERS;
+  //   updateTableFilters({
+  //     ...(tableFilters || {}),
+  //     [key]: {},
+  //   });
+  // }
 
   componentDidMount() {
     const { state } = this.props.location;
@@ -124,13 +125,13 @@ class AllCommunityAdminMessages extends React.Component {
     const ids = state && state.ids;
     const comingFromDashboard = ids?.length;
     if (comingFromDashboard) {
-      this.setState({ saveFilters: false, comingFromDashboard });
-      const key = PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key + FILTERS;
-      updateTableFilters({
-        ...(tableFilters || {}),
-        [key]: { 0: { list: ids } },
-      });
-    } else this.setState({ ignoreSavedFilters: true });
+      this.setState({ saveFilters: false, comingFromDashboard, ids });
+      // const key = PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key + FILTERS;
+      // updateTableFilters({
+      //   ...(tableFilters || {}),
+      //   [key]: { 0: { list: ids } },
+      // });
+    } else this.setState({ comingFromDashboard: false });
 
     apiCall("/messages.listForCommunityAdmin", {
       limit: getLimit(PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key),
@@ -305,6 +306,14 @@ class AllCommunityAdminMessages extends React.Component {
     );
   }
 
+  getData(source) {
+    if (!source) return [];
+    const { ids, comingFromDashboard } = this.state;
+    if (!comingFromDashboard || !ids) return source;
+    const items = source.filter((item) => ids.includes(item.id));
+    // console.log("lets see items", items);
+    return items;
+  }
   render() {
     const title = brand.name + " - Community Admin Messages";
     const description = brand.desc;
@@ -316,7 +325,9 @@ class AllCommunityAdminMessages extends React.Component {
       meta,
       putMetaDataToRedux,
     } = this.props;
-    const data = this.fashionData(messages); // not ready for this yet: && this.props.messages.filter(item=>item.parent===null));
+    const content = this.getData(messages);
+    // console.log("THIS IS THE CONTENT", content)
+    const data = this.fashionData(content); // not ready for this yet: && this.props.messages.filter(item=>item.parent===null));
     const metaData = meta && meta.adminMessages;
     const options = {
       filterType: "dropdown",
@@ -413,18 +424,20 @@ class AllCommunityAdminMessages extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         {comingFromDashboard && (
-          <MEPaperBlock
-            containerStyle={{
-              minHeight: "auto",
-              padding: "15px 25px",
-              marginBottom: 10,
-              background: "#fefbf3",
-            }}
-          >
+          <MEPaperBlock icon="fa fa-bullhorn" banner>
             <Typography>
-              <i className="fa fa-bullhorn" /> The messages you have not
-              answered yet are currently preselected and sorted in the table
-              for you. Feel free to clear all selections with the filter panel.
+              The messages you have not answered yet are currently preselected
+              and sorted in the table for you. Feel free to
+              <Link
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.setState({ comingFromDashboard: false });
+                }}
+              >
+                {" "}
+                clear all selections.
+              </Link>
             </Typography>
           </MEPaperBlock>
         )}
@@ -436,14 +449,18 @@ class AllCommunityAdminMessages extends React.Component {
             data: data,
             columns: columns,
             options: options,
+            // components: {
+            //   TableFilterList: renderInvisibleChips(comingFromDashboard),
+            // },
           }}
-          customFilterObject={{
-            0: {
-              list: this.state.ids,
-            },
-          }} // "0" here is the index of the "ID" column in the table
-          ignoreSavedFilters={this.state.ignoreSavedFilters}
-          saveFilters={this.state.saveFilters}
+          // customFilterObject={{
+          //   0: {
+          //     list: this.state.ids,
+          //   },
+          // }} // "0" here is the index of the "ID" column in the table
+          // ignoreSavedFilters={this.state.ignoreSavedFilters}
+          ignoreSavedFilters={comingFromDashboard}
+          saveFilters={!comingFromDashboard}
         />
       </div>
     );
