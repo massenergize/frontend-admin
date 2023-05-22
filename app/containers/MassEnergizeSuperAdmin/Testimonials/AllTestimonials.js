@@ -43,6 +43,8 @@ import {
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
+import { getData } from "../Messages/CommunityAdminMessages";
+import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 
 class AllTestimonials extends React.Component {
   constructor(props) {
@@ -80,13 +82,13 @@ class AllTestimonials extends React.Component {
       },
     };
 
-    this.setState({ saveFilters: false });
-    const key = PAGE_PROPERTIES.ALL_TESTIMONIALS.key + FILTERS;
+    this.setState({ comingFromDashboard, ids });
+    // const key = PAGE_PROPERTIES.ALL_TESTIMONIALS.key + FILTERS;
 
-    updateTableFilters({
-      ...(tableFilters || {}),
-      [key]: { 0: { list: ids } },
-    });
+    // updateTableFilters({
+    //   ...(tableFilters || {}),
+    //   [key]: { 0: { list: ids } },
+    // });
 
     fetchTestimonials((data, failed) => {
       if (failed)
@@ -398,7 +400,7 @@ class AllTestimonials extends React.Component {
   render() {
     const title = brand.name + " - All Testimonials";
     const description = brand.desc;
-    const { columns, loading } = this.state;
+    const { columns, loading, comingFromDashboard, ids } = this.state;
     const {
       classes,
       allTestimonials,
@@ -407,8 +409,9 @@ class AllTestimonials extends React.Component {
       meta,
       putMetaDataToRedux,
     } = this.props;
-
-    const data = this.fashionData(allTestimonials || []);
+    
+    const content = getData({ source: allTestimonials || [], comingFromDashboard, ids });
+    const data = this.fashionData(content);
     const metaData = meta && meta.testimonials;
     const options = {
       filterType: "dropdown",
@@ -522,6 +525,25 @@ class AllTestimonials extends React.Component {
           <meta property="twitter:title" content={title} />
           <meta property="twitter:description" content={description} />
         </Helmet>
+        {comingFromDashboard && (
+          <MEPaperBlock icon="fa fa-bullhorn" banner>
+            <Typography>
+              The <b>{comingFromDashboard}</b> testimonial(s) you have not approved yet
+              are currently pre-selected and sorted in the table for you. Feel
+              free to
+              <Link
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.setState({ comingFromDashboard: false });
+                }}
+              >
+                {" "}
+                clear all selections.
+              </Link>
+            </Typography>
+          </MEPaperBlock>
+        )}
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_TESTIMONIALS}
@@ -531,7 +553,8 @@ class AllTestimonials extends React.Component {
             columns: columns,
             options: options,
           }}
-          saveFilters={this.state.saveFilters}
+          ignoreSavedFilters={comingFromDashboard}
+          saveFilters={!comingFromDashboard}
         />
       </div>
     );
