@@ -407,9 +407,9 @@ export const AddFilters = ({
 }) => {
   communities = (communities || []).sort((a, b) => (a.name > b.name ? 1 : -1));
   options = options || {};
-  const extraStyles = isSuperAdmin ? {} : { width: "auto", flex: "1" };
-  const rangeValue = options.range || [];
-  const comValue = options.communities;
+  // const extraStyles = isSuperAdmin ? {} : { width: "auto", flex: "1" };
+  // const rangeValue = options.range || [];
+  // const comValue = options.communities;
 
   const handleCommunitySelection = (selection) => {
     const last = selection[selection.length - 1];
@@ -427,10 +427,8 @@ export const AddFilters = ({
   };
   const disableButton =
     !options ||
-    !options.range ||
-    !options.range.length ||
-    !options.communities ||
-    !options.communities.length;
+    !options.startDate || !options.endDate
+
 
   return (
     <div
