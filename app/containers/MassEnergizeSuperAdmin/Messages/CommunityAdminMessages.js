@@ -51,6 +51,24 @@ export const replyToMessage = ({ pathname, props, transfer }) => {
   });
 };
 
+export const getData = ({
+  source,
+  comingFromDashboard,
+  ids,
+  valueExtractor,
+}) => {
+  if (!source) return [];
+  // const { ids, comingFromDashboard } = this.state;
+  if (!comingFromDashboard || !ids) return source;
+
+  const items = source.filter((item) => {
+    let value;
+    if (valueExtractor) value = valueExtractor(item);
+    else value = item.id;
+    return ids.includes(value);
+  });
+  return items;
+};
 class AllCommunityAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -100,18 +118,7 @@ class AllCommunityAdminMessages extends React.Component {
   componentWillUnmount() {
     // Clears location state when this component is unmounting
     window.history.replaceState({}, document.title);
-    // const { comingFromDashboard } = this.state;
-    // if (comingFromDashboard) this.removeFilters();
   }
-
-  // removeFilters() {
-  //   const { tableFilters, updateTableFilters } = this.props;
-  //   const key = PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key + FILTERS;
-  //   updateTableFilters({
-  //     ...(tableFilters || {}),
-  //     [key]: {},
-  //   });
-  // }
 
   componentDidMount() {
     const { state } = this.props.location;
@@ -124,14 +131,8 @@ class AllCommunityAdminMessages extends React.Component {
     } = this.props;
     const ids = state && state.ids;
     const comingFromDashboard = ids?.length;
-    if (comingFromDashboard) {
-      this.setState({ saveFilters: false, comingFromDashboard, ids });
-      // const key = PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key + FILTERS;
-      // updateTableFilters({
-      //   ...(tableFilters || {}),
-      //   [key]: { 0: { list: ids } },
-      // });
-    } else this.setState({ comingFromDashboard: false });
+    if (comingFromDashboard) this.setState({ comingFromDashboard, ids });
+    else this.setState({ comingFromDashboard: false });
 
     apiCall("/messages.listForCommunityAdmin", {
       limit: getLimit(PAGE_PROPERTIES.ALL_ADMIN_MESSAGES.key),
@@ -306,18 +307,10 @@ class AllCommunityAdminMessages extends React.Component {
     );
   }
 
-  getData(source) {
-    if (!source) return [];
-    const { ids, comingFromDashboard } = this.state;
-    if (!comingFromDashboard || !ids) return source;
-    const items = source.filter((item) => ids.includes(item.id));
-    // console.log("lets see items", items);
-    return items;
-  }
   render() {
     const title = brand.name + " - Community Admin Messages";
     const description = brand.desc;
-    const { columns, comingFromDashboard } = this.state;
+    const { columns, comingFromDashboard, ids } = this.state;
     const {
       classes,
       messages,
@@ -325,8 +318,7 @@ class AllCommunityAdminMessages extends React.Component {
       meta,
       putMetaDataToRedux,
     } = this.props;
-    const content = this.getData(messages);
-    // console.log("THIS IS THE CONTENT", content)
+    const content = getData({ source: messages, comingFromDashboard, ids });
     const data = this.fashionData(content); // not ready for this yet: && this.props.messages.filter(item=>item.parent===null));
     const metaData = meta && meta.adminMessages;
     const options = {
@@ -426,8 +418,9 @@ class AllCommunityAdminMessages extends React.Component {
         {comingFromDashboard && (
           <MEPaperBlock icon="fa fa-bullhorn" banner>
             <Typography>
-              The messages you have not answered yet are currently preselected
-              and sorted in the table for you. Feel free to
+              The <b>{comingFromDashboard}</b> message(s) you have not answered
+              yet are currently pre-selected and sorted in the table for you.
+              Feel free to
               <Link
                 href="#"
                 onClick={(e) => {
