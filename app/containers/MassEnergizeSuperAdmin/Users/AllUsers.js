@@ -86,7 +86,7 @@ class AllUsers extends React.Component {
       apiURL: "/users.listForCommunityAdmin",
       props: this.props,
       dataSource: [],
-      valueExtractor: (user) => user.email,
+      separationOptions:{valueExtractor: (user) => user.email,},
       reduxFxn: putUsersInRedux,
       args: {
         limit: getLimit(PAGE_PROPERTIES.ALL_USERS.key),
