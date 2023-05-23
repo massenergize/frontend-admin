@@ -22,6 +22,7 @@ import { useHistory, withRouter } from "react-router-dom";
 import { DatePicker } from "@mui/x-date-pickers";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import { getHumanFriendlyDateRange } from "../../../utils/common";
 
 // ------------------------------------------------------------------------------------
 export const TIME_RANGE = [
@@ -128,6 +129,14 @@ function CommunityEngagement({
     },
   };
 
+  const makeRangeLabel = (labels, selected) => {
+    const { startDate, endDate } = options || {};
+    const isNotCustom = !selected?.includes("custom");
+    const doesNotHaveDatesYet = !(startDate && endDate);
+    if (isNotCustom || doesNotHaveDatesYet) return labels?.join(",") || "...";
+    return getHumanFriendlyDateRange(startDate, endDate);
+  };
+
   return (
     <div>
       <MEPaperBlock
@@ -182,13 +191,20 @@ function CommunityEngagement({
                   )}
                   <MEDropdown
                     fullControl
-                    onHeaderRender={(labels) => (
-                      <span
-                        style={{ textDecoration: "underline", marginLeft: 10 }}
-                      >
-                        {labels.join(",")}
-                      </span>
-                    )}
+                    headerTrigger={options}
+                    onHeaderRender={(labels, selected) => {
+                      const label = makeRangeLabel(labels, selected);
+                      return (
+                        <span
+                          style={{
+                            textDecoration: "underline",
+                            marginLeft: 10,
+                          }}
+                        >
+                          {label}
+                        </span>
+                      );
+                    }}
                     generics={muiOverride}
                     multiple={false}
                     data={TIME_RANGE}
@@ -425,10 +441,7 @@ export const AddFilters = ({
   const handleDateSelection = (date, name) => {
     setOptions({ ...options, [name]: date, mounted: true });
   };
-  const disableButton =
-    !options ||
-    !options.startDate || !options.endDate
-
+  const disableButton = !options || !options.startDate || !options.endDate;
 
   return (
     <div
@@ -497,6 +510,7 @@ export const AddFilters = ({
                 />
                 <Typography style={{ marginRight: 10 }}>To</Typography>
                 <DatePicker
+                  minDate={options?.startDate || ""}
                   onChange={(date) => handleDateSelection(date, "endDate")}
                   renderInput={(props) => <TextField {...props} />}
                   value={(options && options.endDate) || ""}
