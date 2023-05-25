@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import PropTypes from "prop-types";
 import { Checkbox, Chip, Paper, TextField } from "@mui/material";
 import { pop } from "../../../../utils/common";
-import Typography from "@mui/material/Typography";
 import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../../utils/messenger";
 
