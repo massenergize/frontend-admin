@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import MassEnergizeForm from "../_FormGenerator";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import Loading from "dan-components/Loading";
 import { LOADING } from "../../../utils/constants";
 import { Paper } from "@mui/material";
+import { apiCall } from "../../../utils/messenger";
 
 function AddOrEditFeatureFlags({
   communities,
@@ -13,9 +14,19 @@ function AddOrEditFeatureFlags({
   featureFlags,
   featureToEdit,
 }) {
+  const [_communities, setCommunities] = useState(communities || []);
+  const [_users, setUsers] = useState(users || []);
+
+  useEffect(() => {
+    apiCall("/communities.listForSuperAdmin", {}).then(({ data }) => {
+      setCommunities(data || []);
+    });
+  }, []);
+
   const inEditMode = featureToEdit;
 
   if (featureFlags === LOADING) return <Loading />;
+
 
   const flagKeys = (featureFlags && featureFlags.keys) || {};
   if (!Object.keys(flagKeys).length)
@@ -33,15 +44,16 @@ function AddOrEditFeatureFlags({
     switchTabs();
   };
 
-  const formJson = createFormJson({
-    communities:communities,
+ const formJson = createFormJson({
+    communities: _communities,
     flagKeys,
-    users,
+    users: _users,
     putFlagsInRedux,
     ifApiIsSuccessful,
     inEditMode,
     featureToEdit,
-  });
+    setUsers,
+ });
 
   return (
     <MassEnergizeForm formJson={formJson} onComplete={ifApiIsSuccessful} />
@@ -58,7 +70,7 @@ const preflight = (data) => {
     scope,
     key: uniqueIdentifier(data.name),
   };
-  if (json.should_expire === "false") delete json.expires_on;  //json.expires_on = null;
+  if (json.should_expire === "false") delete json.expires_on; //json.expires_on = null;
   delete json.should_expire;
   return json;
 };
@@ -89,6 +101,7 @@ var createFormJson = ({
   users,
   inEditMode,
   featureToEdit,
+  setUsers,
 }) => {
   const labelExt = (user) => `${user.preferred_name} - (${user.email})`;
   const valueExt = (user) => user.id;
@@ -111,6 +124,15 @@ var createFormJson = ({
     userAudience,
     id,
   } = parseFeatureForEditMode(featureToEdit);
+  const fetchAllUsersInSelectedCommunities = (communityIDs) => {
+    if (!communityIDs?.length) return;
+    apiCall("/users.listForSuperAdmin", { community_ids: communityIDs }).then(({ data }) => {
+      setUsers(data || []);
+    });
+  };
+  const updateUsersWhenComIdsChange = (value) => {
+    fetchAllUsersInSelectedCommunities(value);
+  };
 
   const json = {
     title: inEditMode ? "Update a feature flag" : "Add a new feature flag",
@@ -146,7 +168,7 @@ var createFormJson = ({
             readOnly: false,
             maxLength: 60,
           },
-
+          
           {
             name: "notes",
             label: "Briefly describe this feature",
@@ -206,6 +228,7 @@ var createFormJson = ({
                     defaultValue: comIds || [],
                     dbName: "community_ids",
                     data: communities,
+                    onClose: updateUsersWhenComIdsChange,
                   },
                 ],
               },
