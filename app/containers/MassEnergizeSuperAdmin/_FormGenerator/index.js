@@ -40,7 +40,8 @@ import FormMediaLibraryImplementation from "./FormMediaLibraryImplementation";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { isValueEmpty } from "../Community/utils";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
-import AsyncDropDown from "./AsyncDropDown";
+import AsyncDropDown from "./AsyncCheckBoxDropDown";
+import MEDropDown from "./MEDropDown";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 const styles = (theme) => ({
@@ -774,46 +775,55 @@ class MassEnergizeForm extends Component {
         }
       case FieldTypes.Dropdown:
         return (
-          <div key={field.name}>
-            <FormControl className={classes.field}>
-              {this.renderGeneralContent(field)}
-              <InputLabel
-                htmlFor={field.label}
-                className={classes.selectFieldLabel}
-              >
-                {field.label}
-              </InputLabel>
-              <Select
-                native
-                label={field.label}
-                name={field.name}
-                onChange={async (newValue) => {
-                  await this.updateForm(field.name, newValue.target.value);
-                }}
-                inputProps={{
-                  id: "age-native-simple",
-                }}
-              >
-                <option value={this.getValue(field.name)}>
-                  {this.getDisplayName(
-                    field.name,
-                    this.getValue(field.name),
-                    field.data
-                  )}
-                </option>
-                {field.data &&
-                  field.data.map((c) => (
-                    <option value={c.id} key={c.id}>
-                      {c.displayName}
-                    </option>
-                  ))}
-              </Select>
-              {field.child &&
-                this.getValue(field.name) === field.child.valueToCheck &&
-                this.renderFields(field.child.fields)}
-            </FormControl>
-          </div>
+          <MEDropDown
+            field={field}
+            renderGeneralContent={this.renderGeneralContent}
+            updateForm={this.updateForm}
+            getValue={this.getValue}
+            renderFields={this.renderFields}
+            getDisplayName={this.getDisplayName}
+          />
         );
+          // <div key={field.name}>
+          //   <FormControl className={classes.field}>
+          //     {this.renderGeneralContent(field)}
+          //     <InputLabel
+          //       htmlFor={field.label}
+          //       className={classes.selectFieldLabel}
+          //     >
+          //       {field.label}
+          //     </InputLabel>
+          //     <Select
+          //       native
+          //       label={field.label}
+          //       name={field.name}
+          //       onChange={async (newValue) => {
+          //         await this.updateForm(field.name, newValue.target.value);
+          //       }}
+          //       inputProps={{
+          //         id: "age-native-simple",
+          //       }}
+          //     >
+          //       <option value={this.getValue(field.name)}>
+          //         {this.getDisplayName(
+          //           field.name,
+          //           this.getValue(field.name),
+          //           field.data
+          //         )}
+          //       </option>
+          //       {field.data &&
+          //         field.data.map((c) => (
+          //           <option value={c.id} key={c.id}>
+          //             {c.displayName}
+          //           </option>
+          //         ))}
+          //     </Select>
+          //     {field.child &&
+          //       this.getValue(field.name) === field.child.valueToCheck &&
+          //       this.renderFields(field.child.fields)}
+          //   </FormControl>
+          // </div>
+        // );
       case FieldTypes.Icon:
         return (
           <div key={field.name}>

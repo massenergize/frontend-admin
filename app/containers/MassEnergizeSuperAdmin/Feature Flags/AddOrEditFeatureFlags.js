@@ -113,11 +113,6 @@ var createFormJson = ({
     value: com.id.toString(),
   }));
 
-  users = (users || []).map((u) => ({
-    displayName: labelExt(u),
-    id: u.id,
-    value: valueExt(u),
-  }))
   const scopeArr = Object.entries(flagKeys.scope || {});
   const {
     scope,
@@ -283,36 +278,38 @@ var createFormJson = ({
               {
                 valueToCheck: audienceKeys.SPECIFIC.key,
                 fields: [
-                  // {
-                  //   name: "users",
-                  //   label:
-                  //     "Select all users that should have this feature activated",
-                  //   placeholder:
-                  //     "Search with their username, or email.. Eg. 'Mademoiselle Kaat'",
-                  //   fieldType: fieldTypes.AutoComplete,
-                  //   defaultValue: selectedUsers || [],
-                  //   selectMany: true,
-                  //   dbName: "user_ids",
-                  //   data: users || [],
-                  //   labelExtractor: labelExt,
-                  //   valueExtractor: valueExt,
-                  //   isAsync: true,
-                  // },
                   {
                     name: "users",
                     label:
                       "Select all users that should have this feature activated",
                     placeholder:
                       "Search with their username, or email.. Eg. 'Mademoiselle Kaat'",
-                    fieldType: fieldTypes.Checkbox,
-                    selectMany: true,
+                    fieldType: fieldTypes.AutoComplete,
                     defaultValue: selectedUsers || [],
+                    selectMany: true,
                     dbName: "user_ids",
-                    data: users,
+                    data: users || [],
+                    labelExtractor: labelExt,
+                    valueExtractor: valueExt,
                     isAsync: true,
                     endpoint: "/users.listForSuperAdmin",
-                    labelExtractor: labelExt,
+                    multiple:true,
                   },
+                  // {
+                  //   name: "users",
+                  //   label:
+                  //     "Select all users that should have this feature activated",
+                  //   placeholder:
+                  //     "Search with their username, or email.. Eg. 'Mademoiselle Kaat'",
+                  //   fieldType: fieldTypes.Checkbox,
+                  //   selectMany: true,
+                  //   defaultValue: selectedUsers || [],
+                  //   dbName: "user_ids",
+                  //   data: users,
+                  //   isAsync: true,
+                  //   endpoint: "/users.listForSuperAdmin",
+                  //   labelExtractor: labelExt,
+                  // },
                 ],
               },
               {

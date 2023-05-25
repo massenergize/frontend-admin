@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import { Checkbox, Chip, Paper, TextField } from "@mui/material";
 import { pop } from "../../../../utils/common";
 import Typography from "@mui/material/Typography";
 import { withStyles } from "@mui/styles";
+import { apiCall } from "../../../../utils/messenger";
 
 const styles = (theme) => {
   return {
@@ -73,12 +74,60 @@ function LightAutoComplete(props) {
     containerStyle,
     multiple,
     showSelectAll = true,
+    isAsync,
+    endpoint
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
+  const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
   const [showDropdown, setShowDropdown] = useState(false);
+  const [filteredItems, setFilteredItems] = useState([]);
   const [selected, setSelected] = useState([]); // keeps a list of all selected items
   const chipWrapperRef = useRef();
+// -------------------------------------------------------
+    const elementObserver = useRef(null);
+    const lastAutoCompleteItemRef = useCallback(
+    (node) => {
+      if (elementObserver.current) elementObserver.current.disconnect();
+
+      elementObserver.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && cursor.has_more) {
+          if (!endpoint) return;
+          apiCall(endpoint, { page: cursor.next, limit: 10 }).then(
+            (res) => {
+              setCursor({
+                has_more:
+                  res?.cursor?.count > optionsToDisplay?.length,
+                next: res?.cursor?.next,
+              });
+              let items = [
+                ...optionsToDisplay,
+                ...(res?.data || [])?.map((item) => {
+                  return {
+                    ...item,
+                    displayName: labelExtractor
+                      ? labelExtractor(item)
+                      : item?.name || item?.title,
+                  };
+                }),
+              ];
+
+              setOptionsToDisplay([
+                ...new Map(
+                  items.map((item) => [item["id"], item])
+                ).values(),
+              ]);
+            }
+          );
+        }
+      });
+
+      if (node) elementObserver.current.observe(node);
+    },
+    [cursor]
+  );
+
+    // ----------------------------------------------------
   const mount = () => {
     if (!onMount) return;
     onMount(() => setSelected([]));
@@ -123,11 +172,11 @@ function LightAutoComplete(props) {
   const handleOnChange = (e) => {
     const value = e.target.value.trim().toLowerCase();
     if (!multiple) setShowDropdown(false);
-    const filtered = data.filter((item) => {
+    const filtered = optionsToDisplay?.filter((item) => {
       var label = getLabel(item);
       if (label && label.toLowerCase().includes(value)) return item;
     });
-    setOptionsToDisplay(filtered);
+    setFilteredItems(filtered);
   };
 
   useEffect(() => mount(), []);
@@ -236,7 +285,7 @@ function LightAutoComplete(props) {
                 </div>
               )}
 
-              {optionsToDisplay.map((op, index) => {
+              {(filteredItems?.length ? filteredItems : optionsToDisplay).map((op, index) => {
                 return (
                   <div
                     key={index.toString()}
@@ -247,6 +296,13 @@ function LightAutoComplete(props) {
                       flexDirection: "row",
                       alignItems: "center",
                     }}
+                    ref={
+                      !filteredItems?.length &&
+                      (index === optionsToDisplay.length - 1 &&
+                      isAsync)
+                        ? lastAutoCompleteItemRef
+                        : null
+                    }
                   >
                     {multiple && (
                       <Checkbox
@@ -256,7 +312,7 @@ function LightAutoComplete(props) {
                         )}
                       />
                     )}
-                      {getLabel(op)}
+                    {getLabel(op)}
                   </div>
                 );
               })}
