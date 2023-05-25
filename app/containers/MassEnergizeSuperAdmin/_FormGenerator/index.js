@@ -40,6 +40,7 @@ import FormMediaLibraryImplementation from "./FormMediaLibraryImplementation";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { isValueEmpty } from "../Community/utils";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
+import AsyncDropDown from "./AsyncDropDown";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 const styles = (theme) => ({
@@ -286,8 +287,6 @@ class MassEnergizeForm extends Component {
    * Handle checkboxes when they are clicked
    */
   handleCheckBoxSelect = async (event, selectMany, field) => {
-
-    console.log("== event ===", event)
     const { target } = event;
     if (!target) return;
     const { formData } = this.state;
@@ -664,6 +663,20 @@ class MassEnergizeForm extends Component {
 
     switch (field.fieldType) {
       case FieldTypes.Checkbox:
+        if(field?.isAsync){
+            return (
+              <AsyncDropDown
+                field={field}
+                renderGeneralContent={this.renderGeneralContent}
+                getValue={this.getValue}
+                getDisplayName={this.getDisplayName}
+                isThisSelectedOrNot={this.isThisSelectedOrNot}
+                handleCheckBoxSelect={this.handleCheckBoxSelect}
+                handleCheckboxToggle={this.handleCheckboxToggle}
+                MenuProps={MenuProps}
+              />
+            );
+        }
         if (field.data) {
           return (
             <div key={field.name}>

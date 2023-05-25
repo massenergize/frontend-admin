@@ -112,6 +112,12 @@ var createFormJson = ({
     id: com.id,
     value: com.id.toString(),
   }));
+
+  users = (users || []).map((u) => ({
+    displayName: labelExt(u),
+    id: u.id,
+    value: valueExt(u),
+  }))
   const scopeArr = Object.entries(flagKeys.scope || {});
   const {
     scope,
@@ -124,13 +130,14 @@ var createFormJson = ({
     userAudience,
     id,
   } = parseFeatureForEditMode(featureToEdit);
-  const fetchAllUsersInSelectedCommunities = (communityIDs) => {
-    if (!communityIDs?.length) return;
-    apiCall("/users.listForSuperAdmin", { community_ids: communityIDs }).then(({ data }) => {
+  const fetchAllUsersInSelectedCommunities = (communityIDs=[]) => {
+    const args = communityIDs?.length ? { community_ids: communityIDs } : {};
+    apiCall("/users.listForSuperAdmin",args).then(({ data }) => {
       setUsers(data || []);
     });
   };
   const updateUsersWhenComIdsChange = (value) => {
+    if (!value?.length) return;
     fetchAllUsersInSelectedCommunities(value);
   };
 
@@ -168,7 +175,7 @@ var createFormJson = ({
             readOnly: false,
             maxLength: 60,
           },
-          
+
           {
             name: "notes",
             label: "Briefly describe this feature",
@@ -229,6 +236,8 @@ var createFormJson = ({
                     dbName: "community_ids",
                     data: communities,
                     onClose: updateUsersWhenComIdsChange,
+                    isAsync: true,
+                    endpoint: "/communities.listForSuperAdmin",
                   },
                 ],
               },
@@ -245,6 +254,7 @@ var createFormJson = ({
                     defaultValue: comIds || [],
                     dbName: "community_ids",
                     data: communities,
+                    isAsync: true,
                   },
                 ],
               },
@@ -273,18 +283,35 @@ var createFormJson = ({
               {
                 valueToCheck: audienceKeys.SPECIFIC.key,
                 fields: [
+                  // {
+                  //   name: "users",
+                  //   label:
+                  //     "Select all users that should have this feature activated",
+                  //   placeholder:
+                  //     "Search with their username, or email.. Eg. 'Mademoiselle Kaat'",
+                  //   fieldType: fieldTypes.AutoComplete,
+                  //   defaultValue: selectedUsers || [],
+                  //   selectMany: true,
+                  //   dbName: "user_ids",
+                  //   data: users || [],
+                  //   labelExtractor: labelExt,
+                  //   valueExtractor: valueExt,
+                  //   isAsync: true,
+                  // },
                   {
                     name: "users",
                     label:
                       "Select all users that should have this feature activated",
                     placeholder:
                       "Search with their username, or email.. Eg. 'Mademoiselle Kaat'",
-                    fieldType: fieldTypes.AutoComplete,
+                    fieldType: fieldTypes.Checkbox,
+                    selectMany: true,
                     defaultValue: selectedUsers || [],
                     dbName: "user_ids",
-                    data: users || [],
+                    data: users,
+                    isAsync: true,
+                    endpoint: "/users.listForSuperAdmin",
                     labelExtractor: labelExt,
-                    valueExtractor: valueExt,
                   },
                 ],
               },
@@ -293,7 +320,8 @@ var createFormJson = ({
                 fields: [
                   {
                     name: "users",
-                    label: "Select all users that should NOT have this feature",
+                    label:
+                      "Select all users that should NOT have this feature",
                     placeholder:
                       "Search with their username, or email.. Eg. 'Monsieur Brad'",
                     fieldType: fieldTypes.AutoComplete,
@@ -302,6 +330,7 @@ var createFormJson = ({
 
                     defaultValue: selectedUsers || [],
                     dbName: "user_ids",
+                    isAsync: true,
                     labelExtractor: labelExt,
                     valueExtractor: valueExt,
                     data: users || [],
