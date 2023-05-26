@@ -14,15 +14,7 @@ function AddOrEditFeatureFlags({
   featureFlags,
   featureToEdit,
 }) {
-  const [_communities, setCommunities] = useState(communities || []);
   const [_users, setUsers] = useState(users || []);
-
-  useEffect(() => {
-    apiCall("/communities.listForSuperAdmin", {}).then(({ data }) => {
-      setCommunities(data || []);
-    });
-  }, []);
-
   const inEditMode = featureToEdit;
 
   if (featureFlags === LOADING) return <Loading />;
@@ -45,7 +37,7 @@ function AddOrEditFeatureFlags({
   };
 
  const formJson = createFormJson({
-    communities: _communities,
+    communities,
     flagKeys,
     users: _users,
     putFlagsInRedux,
@@ -222,8 +214,7 @@ var createFormJson = ({
                 fields: [
                   {
                     name: "community_ids",
-                    label:
-                      "Select all communities that should have this feature activated",
+                    label: "Select all communities that should have this feature activated",
                     placeholder: "eg. Wayland",
                     fieldType: fieldTypes.Checkbox,
                     selectMany: true,
@@ -249,7 +240,9 @@ var createFormJson = ({
                     defaultValue: comIds || [],
                     dbName: "community_ids",
                     data: communities,
+                    onClose: updateUsersWhenComIdsChange,
                     isAsync: true,
+                    endpoint: "/communities.listForSuperAdmin",
                   },
                 ],
               },
@@ -280,10 +273,8 @@ var createFormJson = ({
                 fields: [
                   {
                     name: "users",
-                    label:
-                      "Select all users that should have this feature activated",
-                    placeholder:
-                      "Search with their username, or email.. Eg. 'Mademoiselle Kaat'",
+                    label:"Select all users that should have this feature activated",
+                    placeholder:"Search with their username, or email.. Eg. 'Mademoiselle Kaat'",
                     fieldType: fieldTypes.AutoComplete,
                     defaultValue: selectedUsers || [],
                     selectMany: true,
@@ -293,23 +284,8 @@ var createFormJson = ({
                     valueExtractor: valueExt,
                     isAsync: true,
                     endpoint: "/users.listForSuperAdmin",
-                    multiple:true,
+                    multiple: true,
                   },
-                  // {
-                  //   name: "users",
-                  //   label:
-                  //     "Select all users that should have this feature activated",
-                  //   placeholder:
-                  //     "Search with their username, or email.. Eg. 'Mademoiselle Kaat'",
-                  //   fieldType: fieldTypes.Checkbox,
-                  //   selectMany: true,
-                  //   defaultValue: selectedUsers || [],
-                  //   dbName: "user_ids",
-                  //   data: users,
-                  //   isAsync: true,
-                  //   endpoint: "/users.listForSuperAdmin",
-                  //   labelExtractor: labelExt,
-                  // },
                 ],
               },
               {
@@ -322,15 +298,16 @@ var createFormJson = ({
                     placeholder:
                       "Search with their username, or email.. Eg. 'Monsieur Brad'",
                     fieldType: fieldTypes.AutoComplete,
-                    selectMany: true,
                     contentType: "text",
-
                     defaultValue: selectedUsers || [],
                     dbName: "user_ids",
-                    isAsync: true,
                     labelExtractor: labelExt,
                     valueExtractor: valueExt,
                     data: users || [],
+                    isAsync: true,
+                    endpoint: "/users.listForSuperAdmin",
+                    multiple: true,
+                    selectMany: true,
                   },
                 ],
               },
