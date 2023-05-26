@@ -73,6 +73,14 @@ export const testRedux = (value) => {
   return { type: TEST_REDUX, payload: value };
 };
 
+const extendUserSession = () => {
+  fetchFirebaseToken((idToken, failed) => {
+    if (failed) window.location.href = "/login";
+    apiCall("auth.login", { idToken })
+      .then(() => window.location.reload())
+      .catch((e) => console.log(e));
+  });
+};
 export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
   const [_, hostname] = API_HOST.split("//");
   const url = IS_LOCAL
@@ -82,7 +90,7 @@ export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
   let socket;
   let numberOfRetries = 0;
   const MAXIMUM_RETRIES = 5;
-  const WAIT_TIME = 4000 // 4 seconds before trying to reconnect, to give the server some time to recoup
+  const WAIT_TIME = 4000; // 4 seconds before trying to reconnect, to give the server some time to recoup
 
   const connectSocket = () => {
     socket = new WebSocket(url);
@@ -97,16 +105,18 @@ export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
       const type = data?.type;
       if (type === USER_SESSION_EXPIRED) {
         const message = `Hi ${auth?.preferred_name ||
-          "admin"}, your session has expired. Please sign in again.`;
+          "admin"}, your session has expired. What would you like to do?`;
         dispatch(
           reduxToggleUniversalModal({
             noTitle: true,
             show: true,
-            noCancel: true,
-            okText: "Okay, Take Me There",
-            onConfirm: () => {
+            // noCancel: true,
+            cancelText: "Sign In Myself",
+            onCancel: () => {
               window.location.href = "/login";
             },
+            okText: "Extend My Session",
+            onConfirm: extendUserSession,
             component: <SocketNotificationModal message={message} />,
           })
         );
@@ -124,9 +134,8 @@ export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
           connectSocket();
         }, WAIT_TIME);
         numberOfRetries++;
-
       } else {
-        // At this point, we have tried to reconnect 5 times, within "WAIT_TIME" intervals and still nothing, 
+        // At this point, we have tried to reconnect 5 times, within "WAIT_TIME" intervals and still nothing,
         // So then we show the user the modal that says "Are you there?" Allowing them to manually reconnect, when they are ready
         console.log(
           TAG,
@@ -151,7 +160,10 @@ export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
       }
     };
     socket.onerror = () => {
-      console.log(TAG, "Oops - Got an error, server did not respond as expected :( ");
+      console.log(
+        TAG,
+        "Oops - Got an error, server did not respond as expected :( "
+      );
     };
   };
 
@@ -1026,17 +1038,35 @@ export const reduxCallCommunities = () => (dispatch) => {
   });
 };
 
-export const reduxCallIdToken = () => (dispatch) => {
+const fetchFirebaseToken = (cb) => {
   firebase
     .auth()
     .currentUser.getIdToken(true)
     .then((token) => {
-      localStorage.setItem("idToken", token.toString());
-      dispatch(reduxLoadIdToken(token));
+      cb && cb(token, false);
     })
     .catch((err) => {
+      cb && cb(null, true, err);
       console.log(err);
     });
+};
+
+export const reduxCallIdToken = () => (dispatch) => {
+  fetchFirebaseToken((token, failed, error) => {
+    if (failed) return console.log("Token fetch failed: ", error);
+    localStorage.setItem("idToken", token.toString());
+    dispatch(reduxLoadIdToken(token));
+  });
+  // firebase
+  //   .auth()
+  //   .currentUser.getIdToken(true)
+  //   .then((token) => {
+  //     localStorage.setItem("idToken", token.toString());
+  //     dispatch(reduxLoadIdToken(token));
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //   });
 };
 
 export const reduxCallFullCommunity = (id) => (dispatch) => {
