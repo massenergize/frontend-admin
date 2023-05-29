@@ -179,14 +179,21 @@ function CommunityEngagement({
                         fetchFromBackendAfterFilters({ options: op });
                       }}
                       isAsync={true}
-                      endpoint={"/communities.listForSuperAdmin"}
+                      endpoint={
+                        isSuperAdmin
+                          ? "/communities.listForSuperAdmin"
+                          : "/communities.listForCommunityAdmin"
+                      }
                     />
                   )}
                   <MEDropdown
                     fullControl
                     onHeaderRender={(labels) => (
                       <span
-                        style={{ textDecoration: "underline", marginLeft: 10 }}
+                        style={{
+                          textDecoration: "underline",
+                          marginLeft: 10,
+                        }}
                       >
                         {labels.join(",")}
                       </span>
