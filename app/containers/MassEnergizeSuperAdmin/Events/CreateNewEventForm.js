@@ -76,7 +76,7 @@ class CreateNewEventForm extends Component {
     const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
-      id: "" + c.id,
+      id:c.id,
     }));
 
     
