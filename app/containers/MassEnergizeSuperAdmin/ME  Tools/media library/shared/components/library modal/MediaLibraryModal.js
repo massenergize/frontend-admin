@@ -85,7 +85,7 @@ function MediaLibraryModal({
     );
   };
 
-  const handleInsert = (_content) => {
+  const handleInsert = (_content,reset) => {
    
     getSelected(_content, reset);
     close();
