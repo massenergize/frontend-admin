@@ -46,12 +46,13 @@ class CreateNewTeamForm extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    var { communities, formState, location } = props;
+    var { communities, formState, location, auth } = props;
     communities = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
       id: "" + c.id,
     }));
+      const isSuperAdmin = auth?.is_super_admin && !auth?.is_community_admin;
 
     // const progress = (formState || {})[PAGE_KEYS.CREATE_TEAM.key] || {};
     const libOpen = location.state && location.state.libOpen;
@@ -59,6 +60,7 @@ class CreateNewTeamForm extends Component {
       communities,
       // progress,
       autoOpenMediaLibrary: libOpen,
+      isSuperAdmin,
     });
     const jobsDoneDontRunWhatsBelowEverAgain =
       !(communities && communities.length) || state.mounted;
@@ -96,6 +98,7 @@ const mapStateToProps = (state) => {
   return {
     communities: state.getIn(["communities"]),
     formState: state.getIn(["tempForm"]),
+    auth: state.getIn(["auth"]),
   };
 };
 const mapDispatchToProps = (dispatch) => {
@@ -115,7 +118,12 @@ export default withStyles(styles, { withTheme: true })(
   withRouter(NewTeamMapped)
 );
 
-const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
+const createFormJson = ({
+  communities,
+  progress,
+  autoOpenMediaLibrary,
+  isSuperAdmin,
+}) => {
   const formJson = {
     title: "Create New Team",
     subTitle: "",
@@ -145,6 +153,10 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             defaultValue: null,
             dbName: "primary_community_id",
             data: [{ displayName: "--", id: "" }, ...communities],
+            isAsync: true,
+            endpoint: isSuperAdmin
+              ? "/communities.listForSuperAdmin"
+              : "/communities.listForCommunityAdmin",
           },
           {
             name: "communities",
@@ -155,6 +167,10 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             defaultValue: null,
             dbName: "communities",
             data: communities,
+            isAsync: true,
+            endpoint: isSuperAdmin
+              ? "/communities.listForSuperAdmin"
+              : "/communities.listForCommunityAdmin",
           },
           {
             name: "parent",
@@ -179,7 +195,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
               "eg. Provide email of valid registered users eg. teamadmin1@gmail.com, teamadmin2@gmail.com",
             fieldType: "TextField",
             isRequired: true,
-            defaultValue:  null,
+            defaultValue: null,
             dbName: "admin_emails",
           },
           {

@@ -108,6 +108,8 @@ function MEDropDown({
     [cursor]
   );
 
+
+  // console.log("=== lastDropDownItemRef ===", lastDropDownItemRef);
   return (
     <div key={field.name}>
       <FormControl className={classes.field}>
@@ -133,7 +135,7 @@ function MEDropDown({
             {getDisplayName(field.name, getValue(field.name), field.data)}
           </option>
           {data?.map((c, index) => (
-            <option value={c.id} key={c.id} ref={lastDropDownItemRef}>
+            <option value={c.id} key={c.id} ref={index === data?.length-1 && field?.isAsync ? lastDropDownItemRef : null}>
               {c.displayName}
             </option>
           ))}
