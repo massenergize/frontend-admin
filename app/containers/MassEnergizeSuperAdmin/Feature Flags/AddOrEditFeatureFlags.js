@@ -15,6 +15,7 @@ function AddOrEditFeatureFlags({
   featureToEdit,
 }) {
   const [_users, setUsers] = useState(users || []);
+  const [comIds, setComIds] = useState([]);
   const inEditMode = featureToEdit;
 
   if (featureFlags === LOADING) return <Loading />;
@@ -45,6 +46,8 @@ function AddOrEditFeatureFlags({
     inEditMode,
     featureToEdit,
     setUsers,
+    ids:comIds,
+    setComIds
  });
 
   return (
@@ -94,6 +97,8 @@ var createFormJson = ({
   inEditMode,
   featureToEdit,
   setUsers,
+  ids,
+  setComIds
 }) => {
   const labelExt = (user) => `${user.preferred_name} - (${user.email})`;
   const valueExt = (user) => user.id;
@@ -118,6 +123,7 @@ var createFormJson = ({
     id,
   } = parseFeatureForEditMode(featureToEdit);
   const fetchAllUsersInSelectedCommunities = (communityIDs=[]) => {
+
     const args = communityIDs?.length ? { community_ids: communityIDs } : {};
     apiCall("/users.listForSuperAdmin",args).then(({ data }) => {
       setUsers(data || []);
@@ -125,6 +131,7 @@ var createFormJson = ({
   };
   const updateUsersWhenComIdsChange = (value) => {
     if (!value?.length) return;
+    setComIds(value);
     fetchAllUsersInSelectedCommunities(value);
   };
 
@@ -285,6 +292,7 @@ var createFormJson = ({
                     isAsync: true,
                     endpoint: "/users.listForSuperAdmin",
                     multiple: true,
+                    args:{community_ids: ids}
                   },
                 ],
               },

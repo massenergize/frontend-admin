@@ -74,6 +74,7 @@ function LightAutoComplete(props) {
     showSelectAll = true,
     isAsync,
     endpoint,
+    args
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
@@ -95,9 +96,8 @@ function LightAutoComplete(props) {
           apiCall(endpoint, {
             page: cursor.next,
             limit: 10,
-            params: JSON.stringify({
-              search_text: query || "",
-            }),
+            ...(args || {}),
+            params: JSON.stringify({ search_text: query || ""}),
           }).then((res) => {
             setCursor({
               has_more: res?.cursor?.count > optionsToDisplay?.length,
@@ -116,7 +116,9 @@ function LightAutoComplete(props) {
             ];
 
             setOptionsToDisplay([
-              ...new Map(items.map((item) => [item["id"], item])).values(),
+              ...new Map(
+                items.map((item) => [item["id"], item])
+              ).values(),
             ]);
           });
         }
@@ -126,6 +128,7 @@ function LightAutoComplete(props) {
     },
     [cursor]
   );
+
 
   // ----------------------------------------------------
   const mount = () => {
