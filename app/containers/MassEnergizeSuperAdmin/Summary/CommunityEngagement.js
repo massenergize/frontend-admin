@@ -178,6 +178,8 @@ function CommunityEngagement({
                         setOptions(op);
                         fetchFromBackendAfterFilters({ options: op });
                       }}
+                      isAsync={true}
+                      endpoint={"/communities.listForSuperAdmin"}
                     />
                   )}
                   <MEDropdown

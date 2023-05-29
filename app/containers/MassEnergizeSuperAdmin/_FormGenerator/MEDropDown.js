@@ -133,15 +133,7 @@ function MEDropDown({
             {getDisplayName(field.name, getValue(field.name), field.data)}
           </option>
           {data?.map((c, index) => (
-            <option
-              value={c.id}
-              key={c.id}
-              ref={
-                index === data?.length - 1 && field?.isAsync
-                  ? lastDropDownItemRef
-                  : null
-              }
-            >
+            <option value={c.id} key={c.id} ref={lastDropDownItemRef}>
               {c.displayName}
             </option>
           ))}

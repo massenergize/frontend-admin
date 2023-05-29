@@ -128,8 +128,6 @@ function LightAutoComplete(props) {
     },
     [cursor]
   );
-
-
   // ----------------------------------------------------
   const mount = () => {
     if (!onMount) return;
