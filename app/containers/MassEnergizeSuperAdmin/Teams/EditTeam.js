@@ -83,6 +83,7 @@ class EditTeam extends Component {
   static getDerivedStateFromProps(props, state) {
     var { match, communities, teams, teamsInfos, location } = props;
     const { id } = match.params;
+    const isSuperAdmin = auth?.is_super_admin && !auth?.is_community_admin;
     communities = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
@@ -106,6 +107,7 @@ class EditTeam extends Component {
       parentTeamOptions,
       communities,
       autoOpenMediaLibrary: libOpen,
+      isSuperAdmin,
     });
     return { team, formJson, parentTeamOptions, mounted: true };
   }
@@ -183,7 +185,8 @@ function mapStateToProps(state) {
     communities: state.getIn(["communities"]),
     teams: state.getIn(["allTeams"]),
     teamsInfos: heap.teamsInfos || {},
-    heap
+    heap,
+    auth: state.getIn(["auth"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -205,7 +208,7 @@ const EditTeamMapped = connect(
 export default withStyles(styles, { withTheme: true })(
   withRouter(EditTeamMapped)
 );
-const createFormJson = ({ communities, team, parentTeamOptions,  autoOpenMediaLibrary, }) => {
+const createFormJson = ({ communities, team, parentTeamOptions,  autoOpenMediaLibrary,isSuperAdmin}) => {
   // const { communities, team, parentTeamOptions } = this.state;
   const selectedCommunities = team.communities
     ? team.communities.map((e) => "" + e.id)
@@ -252,6 +255,10 @@ const createFormJson = ({ communities, team, parentTeamOptions,  autoOpenMediaLi
             dbName: "primary_community_id",
             data: [{ displayName: "--", id: "0" }, ...communities],
             readOnly: false,
+            isAsync: true,
+            endpoint: isSuperAdmin
+              ? "/communities.listForSuperAdmin"
+              : "/communities.listForCommunityAdmin",
           },
           {
             name: "communities",
@@ -262,6 +269,10 @@ const createFormJson = ({ communities, team, parentTeamOptions,  autoOpenMediaLi
             defaultValue: selectedCommunities,
             dbName: "communities",
             data: communities,
+            isAsync: true,
+            endpoint: isSuperAdmin
+              ? "/communities.listForSuperAdmin"
+              : "/communities.listForCommunityAdmin",
           },
           {
             name: "parent",

@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback } from "react";
-import { InputLabel } from "@mui/material";
+import { Box, CircularProgress, InputLabel, LinearProgress, MenuItem } from "@mui/material";
 import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
 import { createStyles, makeStyles } from "@mui/styles";
@@ -108,12 +108,19 @@ function MEDropDown({
     [cursor]
   );
 
-
-  // console.log("=== lastDropDownItemRef ===", lastDropDownItemRef);
+  const ITEM_HEIGHT = 48;
+  const ITEM_PADDING_TOP = 8;
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+        width: 250,
+      },
+    },
+  };
   return (
     <div key={field.name}>
-      <FormControl className={classes.field}>
-        {/* {renderGeneralContent(field)} */}
+      <FormControl className={classes.field} fullWidth>
         <InputLabel
           htmlFor={field.label}
           className={classes.selectFieldLabel}
@@ -121,24 +128,31 @@ function MEDropDown({
           {field.label}
         </InputLabel>
         <Select
-          native
           label={field.label}
           name={field.name}
+          value={getValue(field.name) || ""}
           onChange={async (newValue) => {
             await updateForm(field.name, newValue.target.value);
           }}
-          inputProps={{
-            id: "age-native-simple",
-          }}
+          MenuProps={MenuProps}
         >
-          <option value={getValue(field.name)}>
-            {getDisplayName(field.name, getValue(field.name), field.data)}
-          </option>
           {data?.map((c, index) => (
-            <option value={c.id} key={c.id} ref={index === data?.length-1 && field?.isAsync ? lastDropDownItemRef : null}>
+            <MenuItem value={c.id} key={c.id}>
+              {" "}
               {c.displayName}
-            </option>
+            </MenuItem>
           ))}
+          {cursor.has_more && field?.isAsync && (
+            <MenuItem
+              value={cursor.next}
+              key={"fetcher-option"}
+              ref={lastDropDownItemRef}
+            >
+              <Box sx={{ width: "100%" }}>
+                <LinearProgress />
+              </Box>
+            </MenuItem>
+          )}
         </Select>
         {field.child &&
           getValue(field.name) === field.child.valueToCheck &&

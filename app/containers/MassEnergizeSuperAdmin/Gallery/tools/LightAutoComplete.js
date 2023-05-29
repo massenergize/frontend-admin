@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Checkbox, Chip, Paper, TextField } from "@mui/material";
+import { Box, Checkbox, Chip, LinearProgress, Paper, TextField } from "@mui/material";
 import { pop } from "../../../../utils/common";
 import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../../utils/messenger";
@@ -292,31 +292,36 @@ function LightAutoComplete(props) {
                 </div>
               )}
 
-              {((query && filteredItems?.length) ? filteredItems : optionsToDisplay).map(
-                (op, index) => {
-                  return (
-                    <div
-                      key={index.toString()}
-                      className={classes.dropdownItem}
-                      onClick={() => handleSelection(op)}
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                      }}
-                      ref={toggleRef(index)}
-                    >
-                      {multiple && (
-                        <Checkbox
-                          style={{ padding: 0, marginRight: 6 }}
-                          checked={onlyValues.includes(getValue(op))}
-                        />
-                      )}
-                      {getLabel(op)}
-                    </div>
-                  );
-                }
-              )}
+              {(query && filteredItems?.length
+                ? filteredItems
+                : optionsToDisplay
+              ).map((op, index) => {
+                return (
+                  <div
+                    key={index.toString()}
+                    className={classes.dropdownItem}
+                    onClick={() => handleSelection(op)}
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    {multiple && (
+                      <Checkbox
+                        style={{ padding: 0, marginRight: 6 }}
+                        checked={onlyValues.includes(getValue(op))}
+                      />
+                    )}
+                    {getLabel(op)}
+                  </div>
+                );
+              })}
+              {isAsync && cursor.has_more ? (
+                  <Box sx={{ width: "100%" }} ref={lastAutoCompleteItemRef}>
+                    <LinearProgress />
+                  </Box>
+              ) : null}
             </Paper>
           </>
         )}
