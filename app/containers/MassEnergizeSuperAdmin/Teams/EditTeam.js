@@ -81,13 +81,13 @@ class EditTeam extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    var { match, communities, teams, teamsInfos, location } = props;
+    var { match, communities, teams, teamsInfos, location, auth } = props;
     const { id } = match.params;
     const isSuperAdmin = auth?.is_super_admin && !auth?.is_community_admin;
     communities = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
-      id: "" + c.id,
+      id:c.id,
     }));
     const team = teamsInfos[id.toString()];
     const readyToRenderThePageFirstTime = team && teams && teams.length;
@@ -211,7 +211,7 @@ export default withStyles(styles, { withTheme: true })(
 const createFormJson = ({ communities, team, parentTeamOptions,  autoOpenMediaLibrary,isSuperAdmin}) => {
   // const { communities, team, parentTeamOptions } = this.state;
   const selectedCommunities = team.communities
-    ? team.communities.map((e) => "" + e.id)
+    ? team.communities.map((e) => e.id)
     : [];
 
   const formJson = {

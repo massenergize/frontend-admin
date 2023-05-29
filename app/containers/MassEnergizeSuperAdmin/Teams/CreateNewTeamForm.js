@@ -50,7 +50,7 @@ class CreateNewTeamForm extends Component {
     communities = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
-      id: "" + c.id,
+      id:c.id,
     }));
       const isSuperAdmin = auth?.is_super_admin && !auth?.is_community_admin;
 
