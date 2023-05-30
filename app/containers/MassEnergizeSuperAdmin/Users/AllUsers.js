@@ -41,6 +41,8 @@ import {
   KeyboardArrowRight,
 } from "@mui/icons-material";
 import RenderVisitLogs from "./RenderVisitLogs";
+import { getData } from "../Messages/CommunityAdminMessages";
+import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 
 class AllUsers extends React.Component {
   constructor(props) {
@@ -71,20 +73,20 @@ class AllUsers extends React.Component {
 
     if (!comingFromDashboard) return fetchUsers();
 
-    this.setState({ updating: true, saveFilters: false });
-    const key = PAGE_PROPERTIES.ALL_USERS.key + FILTERS;
+    this.setState({ updating: true, comingFromDashboard, ids });
+    // const key = PAGE_PROPERTIES.ALL_USERS.key + FILTERS;
 
-    updateTableFilters({
-      ...(tableFilters || {}),
-      [key]: { 3: { list: ids } },
-    });
+    // updateTableFilters({
+    //   ...(tableFilters || {}),
+    //   [key]: { 3: { list: ids } },
+    // });
 
     var content = {
       fieldKey: "user_emails",
       apiURL: "/users.listForCommunityAdmin",
       props: this.props,
       dataSource: [],
-      valueExtractor: (user) => user.email,
+      separationOptions:{valueExtractor: (user) => user.email,},
       reduxFxn: putUsersInRedux,
       args: {
         limit: getLimit(PAGE_PROPERTIES.ALL_USERS.key),
@@ -169,7 +171,7 @@ class AllUsers extends React.Component {
         filter: false,
         download: false,
         customBodyRender: (d) => {
-          const { id, user_portal_visits } =d ||{}
+          const { id, user_portal_visits } = d || {};
           const isOneRecord = user_portal_visits?.length === 1;
           const isEmpty = !user_portal_visits?.length;
 
@@ -256,7 +258,7 @@ class AllUsers extends React.Component {
   render() {
     const title = brand.name + " - Users";
     const description = brand.desc;
-    const { columns } = this.state;
+    const { columns, comingFromDashboard, ids, updating } = this.state;
     const {
       classes,
       allUsers,
@@ -265,7 +267,14 @@ class AllUsers extends React.Component {
       meta,
       putMetaDataToRedux,
     } = this.props;
-    const data = this.fashionData(allUsers || []);
+
+    const content = getData({
+      source: allUsers || [],
+      comingFromDashboard,
+      ids,
+      valueExtractor: (item) => item.email,
+    });
+    const data = this.fashionData(content);
     const metaData = meta && meta.users;
 
     const options = {
@@ -364,10 +373,28 @@ class AllUsers extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
 
-        {this.state.updating && (
+        {updating && (
           <LinearBuffer asCard message="Checking for updates..." lines={1} />
         )}
 
+        {comingFromDashboard && !updating && (
+          <MEPaperBlock icon="fa fa-bullhorn" banner>
+            <Typography>
+              The users involved in the interactions are currently pre-selected
+              and sorted in the table for you. Feel free to
+              <Link
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.setState({ comingFromDashboard: false });
+                }}
+              >
+                {" "}
+                clear all selections.
+              </Link>
+            </Typography>
+          </MEPaperBlock>
+        )}
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_USERS}
@@ -377,7 +404,8 @@ class AllUsers extends React.Component {
             columns: columns,
             options: options,
           }}
-          saveFilters={this.state.saveFilters}
+          ignoreSavedFilters={comingFromDashboard}
+          saveFilters={!comingFromDashboard}
         />
       </div>
     );
