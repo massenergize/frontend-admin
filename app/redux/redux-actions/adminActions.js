@@ -51,6 +51,7 @@ import {
   ACTION_ENGAGMENTS,
   LOAD_TABLE_FILTERS,
   LOAD_VISIT_LOGS,
+  LOAD_USER_ACTIVE_STATUS,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -58,6 +59,7 @@ import {
   CONNECTION_ESTABLISHED,
   LOADING,
   TIME_UNTIL_EXPIRATION,
+  USER_SESSION_ALMOST_EXPIRED,
   USER_SESSION_EXPIRED,
 } from "../../utils/constants";
 import { API_HOST, IS_LOCAL } from "../../config/constants";
@@ -73,15 +75,18 @@ export const testRedux = (value) => {
   return { type: TEST_REDUX, payload: value };
 };
 
-const extendUserSession = () => {
+const extendUserSession = (reload = false) => {
   fetchFirebaseToken((idToken, failed) => {
     if (failed) window.location.href = "/login";
     apiCall("auth.login", { idToken })
-      .then(() => window.location.reload())
+      .then(() => reload && window.location.reload())
       .catch((e) => console.log(e));
   });
 };
-export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
+export const setupSocketConnectionWithBackend = (auth) => (
+  dispatch,
+  getState
+) => {
   const [_, hostname] = API_HOST.split("//");
   const url = IS_LOCAL
     ? `ws://${hostname}/ws/me-client/connect/`
@@ -101,25 +106,45 @@ export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
     };
 
     socket.onmessage = (e) => {
+      const reduxState = getState();
+      const thereIsUserActivity = reduxState.getIn(["userIsActive"]);
       let data = JSON.parse(e.data || "{}");
       const type = data?.type;
       if (type === USER_SESSION_EXPIRED) {
-        const message = `Hi ${auth?.preferred_name ||
-          "admin"}, your session has expired. What would you like to do?`;
-        dispatch(
-          reduxToggleUniversalModal({
-            noTitle: true,
-            show: true,
-            // noCancel: true,
-            cancelText: "Sign In Myself",
-            onCancel: () => {
-              window.location.href = "/login";
-            },
-            okText: "Extend My Session",
-            onConfirm: extendUserSession,
-            component: <SocketNotificationModal message={message} />,
-          })
-        );
+        // If session has expired and no activity, just redirect to login
+        if (!thereIsUserActivity) window.location.href = "/login";
+        else {
+          // If session has expired and there is activity, then automatically extend session
+          extendUserSession();
+          // ---------------------------------------------------------------------------
+        }
+      } else if (type === USER_SESSION_ALMOST_EXPIRED) {
+        /**
+         * Almost expired will happen when its 10 minutes to full expiration
+         * Here, if there is user activity, we just renew right away
+         * If not, we will show a modal that will allow them extend their session via the modal
+         * i.e if they return soon enough before the session fully expires
+         */
+        console.log("ALMOST EXPIRED", data)
+        if (thereIsUserActivity) return extendUserSession();
+        else {
+          const message = `Hi ${auth?.preferred_name ||
+            "admin"}, your session has expired. What would you like to do?`;
+          dispatch(
+            reduxToggleUniversalModal({
+              noTitle: true,
+              show: true,
+              // noCancel: true,
+              cancelText: "Sign In Myself",
+              onCancel: () => {
+                window.location.href = "/login";
+              },
+              okText: "Extend My Session",
+              onConfirm: () => extendUserSession(true),
+              component: <SocketNotificationModal message={message} />,
+            })
+          );
+        }
       }
     };
 
@@ -170,6 +195,9 @@ export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
   connectSocket();
 };
 
+export const reduxLoadUserActiveStatus = (data) => {
+  return { type: LOAD_USER_ACTIVE_STATUS, payload: data };
+};
 export const reduxLoadVisitLogs = (data) => {
   return { type: LOAD_VISIT_LOGS, payload: data };
 };
