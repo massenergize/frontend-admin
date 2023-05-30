@@ -129,7 +129,7 @@ export const setupSocketConnectionWithBackend = (auth) => (
         if (thereIsUserActivity) return extendUserSession();
         else {
           const message = `Hi ${auth?.preferred_name ||
-            "admin"}, your session has expired. What would you like to do?`;
+            "admin"}, your session is about to expire. What would you like to do?`;
           dispatch(
             reduxToggleUniversalModal({
               noTitle: true,
