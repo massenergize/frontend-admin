@@ -7,7 +7,7 @@ import Chip from "@mui/material/Chip";
 import { createStyles, makeStyles } from "@mui/styles";
 import Checkbox from "@mui/material/Checkbox";
 import Input from "@mui/material/Input";
-import { MenuItem } from "@mui/material";
+import { Box, CircularProgress, MenuItem } from "@mui/material";
 import { apiCall } from "../../../utils/messenger";
 
 const useStyles = makeStyles((theme) =>
@@ -114,24 +114,7 @@ function AsyncDropDown({
               MenuProps={MenuProps}
             >
               {data.map((t, i) => {
-                return i === data?.length - 1 ? (
-                  <MenuItem key={t.id} ref={lastItemRef}>
-                    <FormControlLabel
-                      key={t.id}
-                      control={
-                        <Checkbox
-                          checked={isThisSelectedOrNot(field.name, t.id)}
-                          onChange={(event) =>
-                            handleCheckBoxSelect(event, field.selectMany, field)
-                          }
-                          value={t.id}
-                          name={field.name}
-                        />
-                      }
-                      label={t.displayName}
-                    />
-                  </MenuItem>
-                ) : (
+                return(
                   <MenuItem key={t.id}>
                     <FormControlLabel
                       key={t.id}
@@ -139,7 +122,11 @@ function AsyncDropDown({
                         <Checkbox
                           checked={isThisSelectedOrNot(field.name, t.id)}
                           onChange={(event) =>
-                            handleCheckBoxSelect(event, field.selectMany, field)
+                            handleCheckBoxSelect(
+                              event,
+                              field.selectMany,
+                              field
+                            )
                           }
                           value={t.id}
                           name={field.name}
@@ -148,8 +135,26 @@ function AsyncDropDown({
                       label={t.displayName}
                     />
                   </MenuItem>
-                );
+                ) 
               })}
+
+              {cursor.has_more && field?.isAsync && (
+                <MenuItem
+                  value={cursor.next}
+                  key={"fetcher-option"}
+                  ref={lastItemRef}
+                >
+                  <Box
+                    sx={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <CircularProgress size={20} />
+                  </Box>
+                </MenuItem>
+              )}
             </Select>
           </FormControl>
           <br />

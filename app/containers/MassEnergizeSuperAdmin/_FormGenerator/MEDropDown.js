@@ -108,7 +108,7 @@ function MEDropDown({
     [cursor]
   );
 
-  const ITEM_HEIGHT = 48;
+  const ITEM_HEIGHT = 60;
   const ITEM_PADDING_TOP = 8;
   const MenuProps = {
     PaperProps: {
@@ -137,7 +137,7 @@ function MEDropDown({
           MenuProps={MenuProps}
         >
           {data?.map((c, index) => (
-            <MenuItem value={c.id} key={c.id}>
+            <MenuItem value={c.id} key={c.id} sx={{ padding: "15px " }}>
               {" "}
               {c.displayName}
             </MenuItem>
@@ -148,8 +148,14 @@ function MEDropDown({
               key={"fetcher-option"}
               ref={lastDropDownItemRef}
             >
-              <Box sx={{ width: "100%" }}>
-                <LinearProgress />
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <CircularProgress size={20} />
               </Box>
             </MenuItem>
           )}

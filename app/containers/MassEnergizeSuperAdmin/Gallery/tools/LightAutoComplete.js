@@ -1,5 +1,13 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Box, Checkbox, Chip, LinearProgress, Paper, TextField } from "@mui/material";
+import {
+  Box,
+  Checkbox,
+  Chip,
+  CircularProgress,
+  LinearProgress,
+  Paper,
+  TextField,
+} from "@mui/material";
 import { pop } from "../../../../utils/common";
 import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../../utils/messenger";
@@ -74,7 +82,7 @@ function LightAutoComplete(props) {
     showSelectAll = true,
     isAsync,
     endpoint,
-    args
+    args,
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
@@ -97,7 +105,7 @@ function LightAutoComplete(props) {
             page: cursor.next,
             limit: 10,
             ...(args || {}),
-            params: JSON.stringify({ search_text: query || ""}),
+            params: JSON.stringify({ search_text: query || "" }),
           }).then((res) => {
             setCursor({
               has_more: res?.cursor?.count > optionsToDisplay?.length,
@@ -116,9 +124,7 @@ function LightAutoComplete(props) {
             ];
 
             setOptionsToDisplay([
-              ...new Map(
-                items.map((item) => [item["id"], item])
-              ).values(),
+              ...new Map(items.map((item) => [item["id"], item])).values(),
             ]);
           });
         }
@@ -197,11 +203,15 @@ function LightAutoComplete(props) {
   const thereAreNoOptionsToDisplay = optionsToDisplay.length === 0;
   const userHasSelectedStuff = selected.length;
 
-
-  const toggleRef = (index)=>{
-    if(((query && filteredItems.length-1 === index)|| (index === optionsToDisplay.length - 1) )&& isAsync) return lastAutoCompleteItemRef
-    return null
-  }
+  const toggleRef = (index) => {
+    if (
+      ((query && filteredItems.length - 1 === index) ||
+        index === optionsToDisplay.length - 1) &&
+      isAsync
+    )
+      return lastAutoCompleteItemRef;
+    return null;
+  };
 
   return (
     <div style={{ position: "relative", width: "100%", marginTop: 19 }}>
@@ -318,9 +328,16 @@ function LightAutoComplete(props) {
                 );
               })}
               {isAsync && cursor.has_more ? (
-                  <Box sx={{ width: "100%" }} ref={lastAutoCompleteItemRef}>
-                    <LinearProgress />
-                  </Box>
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                  ref={lastAutoCompleteItemRef}
+                >
+                  <CircularProgress size={20} />
+                </Box>
               ) : null}
             </Paper>
           </>
