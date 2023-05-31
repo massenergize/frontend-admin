@@ -231,6 +231,7 @@ class Application extends React.Component {
     return (
       <UserActivityMonitor
         minutes = {10}
+        // minutes = {0.2} // --- FOR TESTING 
         onStateChange={(status) => updateUserActiveStatus(status)}
       >
         <Dashboard

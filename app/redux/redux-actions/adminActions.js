@@ -61,6 +61,7 @@ import {
   TIME_UNTIL_EXPIRATION,
   USER_SESSION_ALMOST_EXPIRED,
   USER_SESSION_EXPIRED,
+  USER_SESSION_RENEWED,
 } from "../../utils/constants";
 import { API_HOST, IS_LOCAL } from "../../config/constants";
 import {
@@ -75,12 +76,15 @@ export const testRedux = (value) => {
   return { type: TEST_REDUX, payload: value };
 };
 
-const extendUserSession = (reload = false) => {
+const extendUserSession = (cb) => {
   fetchFirebaseToken((idToken, failed) => {
     if (failed) window.location.href = "/login";
     apiCall("auth.login", { idToken })
-      .then(() => reload && window.location.reload())
-      .catch((e) => console.log(e));
+      .then(() => cb && cb(true))
+      .catch((e) => {
+        cb && cb(false);
+        console.log(e);
+      });
   });
 };
 export const setupSocketConnectionWithBackend = (auth) => (
@@ -114,36 +118,12 @@ export const setupSocketConnectionWithBackend = (auth) => (
         // If session has expired and no activity, just redirect to login
         if (!thereIsUserActivity) window.location.href = "/login";
         else {
-          // If session has expired and there is activity, then automatically extend session
-          extendUserSession();
+          // If the session has expired and there is activity, then automatically extend session behind the scenes
+          extendUserSession((success) => {
+            if (success)
+              socket.send(JSON.stringify({ type: USER_SESSION_RENEWED }));
+          });
           // ---------------------------------------------------------------------------
-        }
-      } else if (type === USER_SESSION_ALMOST_EXPIRED) {
-        /**
-         * Almost expired will happen when its 10 minutes to full expiration
-         * Here, if there is user activity, we just renew right away
-         * If not, we will show a modal that will allow them extend their session via the modal
-         * i.e if they return soon enough before the session fully expires
-         */
-        console.log("ALMOST EXPIRED", data)
-        if (thereIsUserActivity) return extendUserSession();
-        else {
-          const message = `Hi ${auth?.preferred_name ||
-            "admin"}, your session is about to expire. What would you like to do?`;
-          dispatch(
-            reduxToggleUniversalModal({
-              noTitle: true,
-              show: true,
-              // noCancel: true,
-              cancelText: "Sign In Myself",
-              onCancel: () => {
-                window.location.href = "/login";
-              },
-              okText: "Extend My Session",
-              onConfirm: () => extendUserSession(true),
-              component: <SocketNotificationModal message={message} />,
-            })
-          );
         }
       }
     };
