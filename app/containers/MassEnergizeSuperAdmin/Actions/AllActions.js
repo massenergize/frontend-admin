@@ -225,21 +225,26 @@ class AllActions extends React.Component {
         options: {
           filter: false,
           download: false,
-          customBodyRender: ({id, count}) => (
-            <Link to={`/admin/read/${id}/action-users`}>
-              <Badge
-                badgeContent={count||0}
-                max={99}
-                showZero
-              >
+          customBodyRender: ({ id, count }) =>
+            count ? (
+              <Link to={`/admin/read/${id}/action-users`}>
+                <Badge badgeContent={count || 0} max={99} showZero>
+                  <PeopleIcon
+                    size="small"
+                    variant="outlined"
+                    color="secondary"
+                  />
+                </Badge>
+              </Link>
+            ) : (
+              <Badge badgeContent={count || 0} max={99} showZero>
                 <PeopleIcon
                   size="small"
                   variant="outlined"
                   color="secondary"
                 />
               </Badge>
-            </Link>
-          ),
+            ),
         },
       },
       {
