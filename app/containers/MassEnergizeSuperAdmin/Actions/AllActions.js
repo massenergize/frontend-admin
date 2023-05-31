@@ -82,7 +82,6 @@ class AllActions extends React.Component {
       ...(tableFilters || {}),
       [key]: { 0: { list: ids } },
     });
-
     var content = {
       fieldKey: "action_ids",
       apiURL: "/actions.listForCommunityAdmin",
@@ -120,12 +119,6 @@ class AllActions extends React.Component {
     );
     await this.setStateAsync({ data: fashionData(newData) });
   };
-
-  getActionUsers = (actionId)=>{
-    const { allActions } = this.props;
-    const action = allActions.filter((a) => a.id?.toString() === actionId?.toString());
-    return action[0]?.action_users?.length || 0;
-  }
 
   getColumns() {
     const { classes, putActionsInRedux, allActions } = this.props;
@@ -232,11 +225,11 @@ class AllActions extends React.Component {
         options: {
           filter: false,
           download: false,
-          customBodyRender: (id) => (
+          customBodyRender: ({id, count}) => (
             <Link to={`/admin/read/${id}/action-users`}>
               <Badge
-                badgeContent={this.getActionUsers(id)}
-                max={9}
+                badgeContent={count||0}
+                max={99}
                 showZero
               >
                 <PeopleIcon
@@ -385,7 +378,7 @@ class AllActions extends React.Component {
       { rank: d.rank, id: d.id },
       // `${smartString(d.tags.map((t) => t.name).join(", "), 30)} `,
       d.is_global ? "Template" : d.community && d.community.name,
-      d.id,
+      {id:d.id, count:d?.action_users},
       { isLive: d.is_published, item: d },
       d.id,
       d.is_published ? "Yes" : "No",

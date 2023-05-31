@@ -856,16 +856,17 @@ export const reduxGetAllTestimonials = () => (dispatch) => {
 };
 
 export const reduxGetAllCommunityActions = (community_id, cb) => (dispatch) => {
-  apiCall("/actions.listForCommunityAdmin", { community_id }).then(
-    (response) => {
-      cb && cb(response.data, !response.success, response.error);
-      if (response && response.success) {
-        redirectIfExpired(response);
-        dispatch(loadAllActions(response.data));
-      }
-      return { type: "DO_NOTHING", payload: null };
+  apiCall("/actions.listForCommunityAdmin", {
+    community_id,
+    limit: getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key),
+  }).then((response) => {
+    cb && cb(response.data, !response.success, response.error);
+    if (response && response.success) {
+      redirectIfExpired(response);
+      dispatch(loadAllActions(response.data));
     }
-  );
+    return { type: "DO_NOTHING", payload: null };
+  });
   return { type: "DO_NOTHING", payload: null };
 };
 
@@ -882,7 +883,9 @@ export const reduxGetAllTags = () => (dispatch) => {
 
 export const reduxGetAllActions = (cb) => (dispatch) => {
   console.log("reduxGetAllActions calls actions.listForCommunityAdmin");
-  apiCall("/actions.listForCommunityAdmin").then((response) => {
+  apiCall("/actions.listForCommunityAdmin", {
+    limit: getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key),
+  }).then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllActions(response.data));
