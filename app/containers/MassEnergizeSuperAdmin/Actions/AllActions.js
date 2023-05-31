@@ -35,7 +35,7 @@ import {
   reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
-import { Paper, Typography } from "@mui/material";
+import { Badge, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable, { FILTERS } from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -48,6 +48,7 @@ import {
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
+import PeopleIcon from "@mui/icons-material/People";
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -120,6 +121,12 @@ class AllActions extends React.Component {
     await this.setStateAsync({ data: fashionData(newData) });
   };
 
+  getActionUsers = (actionId)=>{
+    const { allActions } = this.props;
+    const action = allActions.filter((a) => a.id?.toString() === actionId?.toString());
+    return action[0]?.action_users?.length || 0;
+  }
+
   getColumns() {
     const { classes, putActionsInRedux, allActions } = this.props;
     return [
@@ -147,7 +154,9 @@ class AllActions extends React.Component {
                   style={{ margin: 10 }}
                 />
               )}
-              {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
+              {!d.image && (
+                <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
+              )}
             </div>
           ),
         },
@@ -201,20 +210,43 @@ class AllActions extends React.Component {
           },
         },
       },
-      {
-        name: "Tags",
-        key: "tags",
-        options: {
-          filter: true,
-          filterType: "textField",
-        },
-      },
+      // {
+      //   name: "Tags",
+      //   key: "tags",
+      //   options: {
+      //     filter: true,
+      //     filterType: "textField",
+      //   },
+      // },
       {
         name: "Community",
         key: "community",
         options: {
           filter: true,
           filterType: "multiselect",
+        },
+      },
+      {
+        name: "Users list",
+        key: "users-list",
+        options: {
+          filter: false,
+          download: false,
+          customBodyRender: (id) => (
+            <Link to={`/admin/read/${id}/action-users`}>
+              <Badge
+                badgeContent={this.getActionUsers(id)}
+                max={9}
+                showZero
+              >
+                <PeopleIcon
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
+              </Badge>
+            </Link>
+          ),
         },
       },
       {
@@ -253,16 +285,26 @@ class AllActions extends React.Component {
           customBodyRender: (id) => (
             <div>
               <Link to={`/admin/edit/${id}/action`}>
-                <EditIcon size="small" variant="outlined" color="secondary" />
+                <EditIcon
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
               &nbsp;&nbsp;
               <Link
                 onClick={async () => {
-                  const copiedActionResponse = await apiCall("/actions.copy", {
-                    action_id: id,
-                  });
+                  const copiedActionResponse = await apiCall(
+                    "/actions.copy",
+                    {
+                      action_id: id,
+                    }
+                  );
 
-                  if (copiedActionResponse && copiedActionResponse.success) {
+                  if (
+                    copiedActionResponse &&
+                    copiedActionResponse.success
+                  ) {
                     const newAction =
                       copiedActionResponse && copiedActionResponse.data;
                     putActionsInRedux([newAction, ...(allActions || [])]);
@@ -273,7 +315,11 @@ class AllActions extends React.Component {
                 }}
                 to="/admin/read/actions"
               >
-                <FileCopy size="small" variant="outlined" color="secondary" />
+                <FileCopy
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
             </div>
           ),
@@ -337,8 +383,9 @@ class AllActions extends React.Component {
       },
       smartString(d.title), // limit to first 30 chars
       { rank: d.rank, id: d.id },
-      `${smartString(d.tags.map((t) => t.name).join(", "), 30)} `,
+      // `${smartString(d.tags.map((t) => t.name).join(", "), 30)} `,
       d.is_global ? "Template" : d.community && d.community.name,
+      d.id,
       { isLive: d.is_published, item: d },
       d.id,
       d.is_published ? "Yes" : "No",
@@ -633,3 +680,4 @@ const ActionsMapped = connect(
   mapDispatchToProps
 )(AllActions);
 export default withStyles(styles)(withRouter(ActionsMapped));
+
