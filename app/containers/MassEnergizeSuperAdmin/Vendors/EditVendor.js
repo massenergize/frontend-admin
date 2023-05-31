@@ -50,8 +50,7 @@ class CreateNewVendorForm extends Component {
   static getDerivedStateFromProps(props, state) {
     // you need: communities, vendor, vendors, tags
     const { match, communities, vendors, tags, vendorsInfos, location, auth } = props;
-          const isSuperAdmin =
-            auth?.is_super_admin && !auth?.is_community_admin;
+          const isSuperAdmin =auth?.is_super_admin
     const { id } = match.params;
     const vendor = vendorsInfos[id.toString()];
     const readyToRenderPageFirstTime =

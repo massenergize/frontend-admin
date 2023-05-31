@@ -71,7 +71,7 @@ class EditTestimonial extends Component {
       actions.length&& 
       tags &&
       tags.length;
-      const isSuperAdmin = auth?.is_super_admin && !auth?.is_community_admin;
+      const isSuperAdmin = auth?.is_super_admin
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderThePageFirstTime || state.mounted;

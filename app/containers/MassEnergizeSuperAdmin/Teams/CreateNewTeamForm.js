@@ -52,7 +52,7 @@ class CreateNewTeamForm extends Component {
       displayName: c.name,
       id:c.id,
     }));
-      const isSuperAdmin = auth?.is_super_admin && !auth?.is_community_admin;
+      const isSuperAdmin = auth?.is_super_admin
 
     // const progress = (formState || {})[PAGE_KEYS.CREATE_TEAM.key] || {};
     const libOpen = location.state && location.state.libOpen;
