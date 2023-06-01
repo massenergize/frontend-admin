@@ -49,6 +49,7 @@ import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
 import { getData } from "../Messages/CommunityAdminMessages";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import Seo from "../../../../app/components/Seo/Seo";
 
 class AllTeams extends React.Component {
   constructor(props) {
@@ -470,14 +471,7 @@ class AllTeams extends React.Component {
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"All Teams"} />
 
         {comingFromDashboard && (
           <MEPaperBlock icon="fa fa-bullhorn" banner>
