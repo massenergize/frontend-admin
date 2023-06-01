@@ -8,6 +8,7 @@ import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { withRouter } from "react-router-dom";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import Seo from "../../../components/Seo/Seo";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -211,6 +212,7 @@ class EditActionForm extends Component {
     if (!action || !formJson) return <Loading />;
     return (
       <div>
+        <Seo name={`Edit Action -  ${action?.title}`}/>
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
