@@ -42,6 +42,7 @@ class CreateNewTeamForm extends Component {
     this.state = {
       communities: [],
       formJson: null,
+      parents:[]
     };
   }
 
@@ -53,12 +54,16 @@ class CreateNewTeamForm extends Component {
       id: "" + c.id,
     }));
 
-    // const progress = (formState || {})[PAGE_KEYS.CREATE_TEAM.key] || {};
+    const progress = (formState || {})[PAGE_KEYS.CREATE_TEAM.key] || {};
     const libOpen = location.state && location.state.libOpen;
     const formJson = createFormJson({
       communities,
-      // progress,
+      progress,
       autoOpenMediaLibrary: libOpen,
+      parents: state.parents,
+      setParents: (parents) => {
+        this.setState({ parents });
+      }
     });
     const jobsDoneDontRunWhatsBelowEverAgain =
       !(communities && communities.length) || state.mounted;
@@ -115,7 +120,32 @@ export default withStyles(styles, { withTheme: true })(
   withRouter(NewTeamMapped)
 );
 
-const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
+const createFormJson = ({ communities, progress, autoOpenMediaLibrary, parents, setParents }) => {
+
+ const fetchAllTeamsInSelectedCommunities = (communityID) => {
+  console.log("=== communityID ===", communityID)
+   const args = communityID ? { community_id: communityID } : {};
+   apiCall("/teams.listForSuperAdmin", args).then(({ data }) => {
+    console.log("=== data ===", data)
+     setParents(data || []);
+   });
+ };
+   const updateParentWhenComIdsChange = (value) => {
+    console.log("== value ===", value)
+     if (!value) return;
+    //  setComIds(value);
+     fetchAllTeamsInSelectedCommunities(value);
+   };
+
+   parents = (parents || []).map((p) => ({
+     displayName: p.name,
+     id:p.id,
+   }))
+
+
+   console.log("=== parents ===", parents)
+
+
   const formJson = {
     title: "Create New Team",
     subTitle: "",
@@ -145,6 +175,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             defaultValue: null,
             dbName: "primary_community_id",
             data: [{ displayName: "--", id: "" }, ...communities],
+            onClose: updateParentWhenComIdsChange,
           },
           {
             name: "communities",
@@ -162,13 +193,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             fieldType: "Dropdown",
             defaultValue: null,
             dbName: "parent_id",
-            data: [
-              {
-                id: null,
-                displayName:
-                  "Please choose a community and save the team.  Then edit it to set a parent team",
-              },
-            ],
+            data: parents,
             readOnly: true,
           },
           {
@@ -179,7 +204,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
               "eg. Provide email of valid registered users eg. teamadmin1@gmail.com, teamadmin2@gmail.com",
             fieldType: "TextField",
             isRequired: true,
-            defaultValue:  null,
+            defaultValue: null,
             dbName: "admin_emails",
           },
           {

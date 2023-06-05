@@ -113,6 +113,12 @@ class MassEnergizeForm extends Component {
       this.setState(state, resolve);
     });
   }
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.formJson !== prevState.formJson) {
+      return { formJson: nextProps.formJson };
+    }
+    return null;
+  }
 
   // showPreviewModal() {
   //  const fieldName = this.state.activeModal;
@@ -655,6 +661,7 @@ class MassEnergizeForm extends Component {
                     name={field.name}
                     value={this.getValue(field.name) || []}
                     input={<Input id="select-multiple-chip" />}
+                    onClose = {()=> field?.onClose && field.onClose(value)}
                     renderValue={(selected) => {
                       return (
                         <div
@@ -747,8 +754,12 @@ class MassEnergizeForm extends Component {
                 native
                 label={field.label}
                 name={field.name}
+                onClose={() => console.log("== onClose")}
                 onChange={async (newValue) => {
-                  await this.updateForm(field.name, newValue.target.value);
+                  await this.updateForm(
+                    field.name,
+                    newValue.target.value
+                  );
                 }}
                 inputProps={{
                   id: "age-native-simple",
@@ -769,7 +780,8 @@ class MassEnergizeForm extends Component {
                   ))}
               </Select>
               {field.child &&
-                this.getValue(field.name) === field.child.valueToCheck &&
+                this.getValue(field.name) ===
+                  field.child.valueToCheck &&
                 this.renderFields(field.child.fields)}
             </FormControl>
           </div>
@@ -828,7 +840,11 @@ class MassEnergizeForm extends Component {
             <br />
             <FormMediaLibraryImplementation
               {...field}
-              selected={this.getValue(field.name, field.selected || field.defaultValue, field)}
+              selected={this.getValue(
+                field.name,
+                field.selected || field.defaultValue,
+                field
+              )}
               actionText={field.placeholder}
               onInsert={(files) => {
                 const formData = this.state.formData || {};
@@ -1003,13 +1019,15 @@ class MassEnergizeForm extends Component {
                   ],
                   toolbar:
                     "undo redo | formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent |  fontselect | fontsizeselect",
-                    // next 4 lines test to eliminate tiny cloud errors
-                    selector: 'textarea',
-                    init_instance_callback : function(editor) {
-                        var freeTiny = document.querySelector('.tox .tox-notification--in');
-                       freeTiny.style.display = 'none';
-                      },
-                  }}
+                  // next 4 lines test to eliminate tiny cloud errors
+                  selector: "textarea",
+                  init_instance_callback: function(editor) {
+                    var freeTiny = document.querySelector(
+                      ".tox .tox-notification--in"
+                    );
+                    freeTiny.style.display = "none";
+                  },
+                }}
                 apiKey={TINY_MCE_API_KEY}
               />
             </Grid>
@@ -1046,7 +1064,7 @@ class MassEnergizeForm extends Component {
               this.getValue(field.name) === field.child.valueToCheck &&
               this.renderFields(field.child.fields)}
             {this.renderConditionalDisplays(field)}
-          </div> 
+          </div>
         );
       case FieldTypes.TextField:
         return (
