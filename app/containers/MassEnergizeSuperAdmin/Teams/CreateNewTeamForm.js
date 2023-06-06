@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
@@ -36,61 +36,32 @@ const styles = (theme) => ({
   },
 });
 
-class CreateNewTeamForm extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      communities: [],
-      formJson: null,
-      parents:[]
-    };
-  }
+ function CreateNewTeamForm({
+  classes,
+  communities,
+  location,
+ }) {
+  const [parents, setParents] = React.useState([]);
 
-  static getDerivedStateFromProps(props, state) {
-    var { communities, formState, location } = props;
-    communities = (communities || []).map((c) => ({
-      ...c,
-      displayName: c.name,
-      id: "" + c.id,
-    }));
+  const formJson = createFormJson({
+    communities,
+    autoOpenMediaLibrary: location?.state?.libOpen,
+    parents: parents,
+    setParents: setParents,
+  });
 
-    const progress = (formState || {})[PAGE_KEYS.CREATE_TEAM.key] || {};
-    const libOpen = location.state && location.state.libOpen;
-    const formJson = createFormJson({
-      communities,
-      progress,
-      autoOpenMediaLibrary: libOpen,
-      parents: state.parents,
-      setParents: (parents) => {
-        this.setState({ parents });
-      }
-    });
-    const jobsDoneDontRunWhatsBelowEverAgain =
-      !(communities && communities.length) || state.mounted;
-    if (jobsDoneDontRunWhatsBelowEverAgain) return null;
+  if(!formJson || !communities?.length) return <Loading />
 
-    return {
-      communities,
-      formJson,
-      mounted: true,
-    };
-  }
-
-  render() {
-    const { classes } = this.props;
-    const { formJson } = this.state;
-    if (!formJson) return <Loading />;
-    return (
-      <div>
-        <MassEnergizeForm
-          pageKey={PAGE_KEYS.CREATE_TEAM.key}
-          classes={classes}
-          formJson={formJson}
-          enableCancel
-        />
-      </div>
-    );
-  }
+  return (
+    <div>
+      <MassEnergizeForm
+        pageKey={PAGE_KEYS.CREATE_TEAM.key}
+        classes={classes}
+        formJson={formJson}
+        enableCancel
+      />
+    </div>
+  );
 }
 
 CreateNewTeamForm.propTypes = {
@@ -120,20 +91,21 @@ export default withStyles(styles, { withTheme: true })(
   withRouter(NewTeamMapped)
 );
 
-const createFormJson = ({ communities, progress, autoOpenMediaLibrary, parents, setParents }) => {
+const createFormJson = ({ communities, autoOpenMediaLibrary, parents, setParents }) => {
+  communities = (communities || []).map((c) => ({
+    ...c,
+    displayName: c.name,
+    id: "" + c.id,
+  }));
 
  const fetchAllTeamsInSelectedCommunities = (communityID) => {
-  console.log("=== communityID ===", communityID)
-   const args = communityID ? { community_id: communityID } : {};
-   apiCall("/teams.listForSuperAdmin", args).then(({ data }) => {
-    console.log("=== data ===", data)
+   const args = communityID ? { community_id: communityID, } : {};
+   apiCall("/teams.listForCommunityAdmin", args).then(({ data }) => {
      setParents(data || []);
    });
  };
    const updateParentWhenComIdsChange = (value) => {
-    console.log("== value ===", value)
      if (!value) return;
-    //  setComIds(value);
      fetchAllTeamsInSelectedCommunities(value);
    };
 
@@ -141,11 +113,6 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary, parents, 
      displayName: p.name,
      id:p.id,
    }))
-
-
-   console.log("=== parents ===", parents)
-
-
   const formJson = {
     title: "Create New Team",
     subTitle: "",
@@ -168,6 +135,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary, parents, 
             readOnly: false,
           },
           {
+            onClose: updateParentWhenComIdsChange,
             name: "primary_community",
             label: "Primary Community",
             placeholder: "",
@@ -175,7 +143,6 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary, parents, 
             defaultValue: null,
             dbName: "primary_community_id",
             data: [{ displayName: "--", id: "" }, ...communities],
-            onClose: updateParentWhenComIdsChange,
           },
           {
             name: "communities",

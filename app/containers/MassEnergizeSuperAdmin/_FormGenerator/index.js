@@ -66,7 +66,7 @@ const styles = (theme) => ({
   },
 });
 
-const ITEM_HEIGHT = 48;
+const ITEM_HEIGHT = 60;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
   PaperProps: {
@@ -751,32 +751,34 @@ class MassEnergizeForm extends Component {
                 {field.label}
               </InputLabel>
               <Select
-                native
                 label={field.label}
                 name={field.name}
-                onClose={() => console.log("== onClose")}
+                value={this.getValue(field.name) || ""}
                 onChange={async (newValue) => {
                   await this.updateForm(
                     field.name,
                     newValue.target.value
                   );
                 }}
-                inputProps={{
-                  id: "age-native-simple",
-                }}
+                MenuProps={MenuProps}
+                onClose={() => field?.onClose && field.onClose(value)}
               >
-                <option value={this.getValue(field.name)}>
+                {/* <option value={this.getValue(field.name)}>
                   {this.getDisplayName(
                     field.name,
                     this.getValue(field.name),
                     field.data
                   )}
-                </option>
+                </option> */}
                 {field.data &&
                   field.data.map((c) => (
-                    <option value={c.id} key={c.id}>
+                    <MenuItem
+                      value={c.id}
+                      key={c.id}
+                      sx={{ padding: "15px " }}
+                    >
                       {c.displayName}
-                    </option>
+                    </MenuItem>
                   ))}
               </Select>
               {field.child &&
