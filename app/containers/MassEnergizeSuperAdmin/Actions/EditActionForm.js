@@ -303,7 +303,7 @@ const createFormJson = ({
                 name: "is_global",
                 label: "Is this Action a Template?",
                 fieldType: "Radio",
-                isRequired: false,
+                isRequired: true,
                 defaultValue: action.is_global ? "true" : "false",
                 dbName: "is_global",
                 readOnly: false,
