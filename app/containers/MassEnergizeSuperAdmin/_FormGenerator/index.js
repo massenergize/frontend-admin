@@ -378,8 +378,13 @@ class MassEnergizeForm extends Component {
         culprits = { ...culprits, ...result[1] };
       }
       else if(field.child) {
-        const result = this.requiredValuesAreProvided(formData, field?.child?.fields);
-        culprits = { ...culprits, ...result[1] };
+        let value = this.getValue(field.name);
+        if(value === field?.child?.valueToCheck){
+          const result = this.requiredValuesAreProvided(formData, field?.child.fields);
+          culprits = { ...culprits, ...result[1] };
+
+        }
+
       }
       else {
         const value = formData[field.name]; //field.name is what is used to set value, b4 cleaned up onSubmit
@@ -518,7 +523,6 @@ class MassEnergizeForm extends Component {
       formJson.fields
     );
     if (No) return this.setState({ requiredFields: culprits });
-
 
     // lets set the startCircularSpinner Value so the spinner starts spinning
     await this.setStateAsync({ startCircularSpinner: true });

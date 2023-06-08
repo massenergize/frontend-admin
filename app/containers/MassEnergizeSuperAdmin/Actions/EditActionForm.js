@@ -311,22 +311,22 @@ const createFormJson = ({
                   { id: "false", value: "No" },
                   { id: "true", value: "Yes" },
                 ],
-                child: {
-                  valueToCheck: "false",
-                  fields: [
-                    {
-                      name: "community",
-                      label: "Primary Community (Select one)",
-                      placeholder: "",
-                      fieldType: "Dropdown",
-                      defaultValue:
-                        action.community && "" + action.community.id,
-                      dbName: "community_id",
-                      data: [{ displayName: "--", id: "" }, ...communities],
-                      isRequired: true,
-                    },
-                  ],
-                },
+                conditionalDisplays: [
+                  {
+                    valueToCheck: "false",
+                    fields: [
+                      {
+                        name: "community",
+                        label: "Primary Community (select one)",
+                        fieldType: "Dropdown",
+                        // defaultValue: progress.community || null,
+                        dbName: "community_id",
+                        data: [{ displayName: "--", id: "" }, ...communities],
+                        isRequired: true,
+                      },
+                    ],
+                  },
+                ],
               }
             : {
                 name: "community",
