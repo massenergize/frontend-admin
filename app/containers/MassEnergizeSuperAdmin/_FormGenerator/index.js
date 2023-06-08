@@ -1339,11 +1339,16 @@ class MassEnergizeForm extends Component {
                 </div>
                 {Object.keys(requiredFields).length > 0 && (
                   <div
-                    style={{ display: "flex", justifyContent: "flex-end" }}
+                    style={{ display: "flex", justifyContent: "center", marginTop:10 }}
                   >
                     <Alert severity="warning">
-                      Oops! Looks like you missed something. Please complete
-                      all required fields
+                      Oops! Looks like you missed these required fields{" "}
+                      {Object.keys(requiredFields).map((key, index) => (
+                        <span style={{ color: "tomato" }} key={key}>
+                          {key} {index !== Object.keys(requiredFields).length - 1 && ", "}
+                        </span>
+                      ))}
+                      . Please fill them out.
                     </Alert>
                   </div>
                 )}
