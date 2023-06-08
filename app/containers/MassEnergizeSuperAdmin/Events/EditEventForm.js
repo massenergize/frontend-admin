@@ -409,8 +409,6 @@ const createFormJson = ({
 
   const is_super_admin = auth && auth.is_super_admin;
 
-  console.log("=== event ===", event)
-
   //communities = is_super_admin
   //  ? communities
   //  : getAllowedCommunities({
