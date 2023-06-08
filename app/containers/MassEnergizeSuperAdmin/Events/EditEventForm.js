@@ -409,6 +409,8 @@ const createFormJson = ({
 
   const is_super_admin = auth && auth.is_super_admin;
 
+  console.log("=== event ===", event)
+
   //communities = is_super_admin
   //  ? communities
   //  : getAllowedCommunities({
@@ -510,7 +512,7 @@ const createFormJson = ({
               { id: "true", value: "Yes" },
             ],
             child: {
-              dbName: "recurring_details",
+              // dbName: "recurring_details",
               valueToCheck: "true",
               fields: [
                 {

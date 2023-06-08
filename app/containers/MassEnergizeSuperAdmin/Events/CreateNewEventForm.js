@@ -257,7 +257,7 @@ const createFormJson = ({
               { id: "true", value: "Yes" },
             ],
             child: {
-              dbName: "recurring_details",
+              // dbName: "recurring_details",
               valueToCheck: "true",
               fields: [
                 {
