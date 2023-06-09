@@ -87,6 +87,7 @@ class MassEnergizeForm extends Component {
       error: null,
       formJson: null,
       readOnly: false,
+      requiredFields:{},
       // activeModal: null,
       // activeModalTitle: null,
       refreshKey: "default-form-state", // Change this value to any different string force a re-render in the form.
@@ -375,7 +376,17 @@ class MassEnergizeForm extends Component {
       if (field.children) {
         const result = this.requiredValuesAreProvided(formData, field.children);
         culprits = { ...culprits, ...result[1] };
-      } else {
+      }
+      else if(field.child) {
+        let value = this.getValue(field.name);
+        if(value === field?.child?.valueToCheck){
+          const result = this.requiredValuesAreProvided(formData, field?.child.fields);
+          culprits = { ...culprits, ...result[1] };
+
+        }
+
+      }
+      else {
         const value = formData[field.name]; //field.name is what is used to set value, b4 cleaned up onSubmit
         // if field is readOnly - ignore the isRequired if present
         if (field.isRequired && !field.readOnly) {
@@ -645,9 +656,11 @@ class MassEnergizeForm extends Component {
           return (
             <div key={field.name}>
               <div className={classes.field}>
-                <FormControl component="fieldset">
+                <FormControl component="fieldset" required={field.isRequired}>
                   {this.renderGeneralContent(field)}
-                  <FormLabel component="legend">{field.label}</FormLabel>
+                  <FormLabel component="legend">
+                    {field.label}
+                  </FormLabel>
 
                   <Select
                     multiple
@@ -655,6 +668,7 @@ class MassEnergizeForm extends Component {
                     name={field.name}
                     value={this.getValue(field.name) || []}
                     input={<Input id="select-multiple-chip" />}
+                    required={field.isRequired}
                     renderValue={(selected) => {
                       return (
                         <div
@@ -726,6 +740,7 @@ class MassEnergizeForm extends Component {
                     name={field.name}
                     onChange={this.handleCheckboxToggle}
                     disabled={field.readOnly}
+                    required={field.isRequired}
                   />
                 }
               />
@@ -735,7 +750,7 @@ class MassEnergizeForm extends Component {
       case FieldTypes.Dropdown:
         return (
           <div key={field.name}>
-            <FormControl className={classes.field}>
+            <FormControl className={classes.field} required={field.isRequired}>
               {this.renderGeneralContent(field)}
               <InputLabel
                 htmlFor={field.label}
@@ -748,11 +763,15 @@ class MassEnergizeForm extends Component {
                 label={field.label}
                 name={field.name}
                 onChange={async (newValue) => {
-                  await this.updateForm(field.name, newValue.target.value);
+                  await this.updateForm(
+                    field.name,
+                    newValue.target.value
+                  );
                 }}
                 inputProps={{
                   id: "age-native-simple",
                 }}
+                required={field.isRequired}
               >
                 <option value={this.getValue(field.name)}>
                   {this.getDisplayName(
@@ -769,7 +788,8 @@ class MassEnergizeForm extends Component {
                   ))}
               </Select>
               {field.child &&
-                this.getValue(field.name) === field.child.valueToCheck &&
+                this.getValue(field.name) ===
+                  field.child.valueToCheck &&
                 this.renderFields(field.child.fields)}
             </FormControl>
           </div>
@@ -1029,6 +1049,7 @@ class MassEnergizeForm extends Component {
               value={value}
               onChange={this.handleFormDataChange}
               disabled={field.readOnly || this.state.readOnly}
+              
             >
               {field.data.map((d) => (
                 <FormControlLabel
@@ -1187,6 +1208,7 @@ class MassEnergizeForm extends Component {
       successMsg,
       startCircularSpinner,
       readOnly,
+      requiredFields,
     } = this.state;
     if (!formJson) return <Loading />;
     return (
@@ -1287,6 +1309,7 @@ class MassEnergizeForm extends Component {
                     <CircularProgress className={classes.progress} />
                   </div>
                 )}
+
                 <div>
                   {/* {formJson && formJson.cancelLink && (
                     <Link to={formJson.cancelLink}>Cancel</Link>
@@ -1308,6 +1331,7 @@ class MassEnergizeForm extends Component {
                       Cancel
                     </Button>
                   )}
+
                   <Button
                     variant="contained"
                     color="secondary"
@@ -1317,6 +1341,21 @@ class MassEnergizeForm extends Component {
                     Submit
                   </Button>
                 </div>
+                {Object.keys(requiredFields).length > 0 && (
+                  <div
+                    style={{ display: "flex", justifyContent: "center", marginTop:10 }}
+                  >
+                    <Alert severity="warning">
+                      Oops! Looks like you missed these required fields{" "}
+                      {Object.keys(requiredFields).map((key, index) => (
+                        <span style={{ color: "tomato" }} key={key}>
+                          {key} {index !== Object.keys(requiredFields).length - 1 && ", "}
+                        </span>
+                      ))}
+                      . Please fill them out.
+                    </Alert>
+                  </div>
+                )}
               </form>
             </Paper>
           </Grid>
