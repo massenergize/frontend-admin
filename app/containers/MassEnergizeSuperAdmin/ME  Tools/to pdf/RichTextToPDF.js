@@ -23,6 +23,7 @@ function RichTextToPDF({ render, richText, style, filename }) {
           margin: 0, // Set the margin to 0
           // Set the filename of the downloaded PDF to the provided filename or use a default value
           filename: filename || "download.pdf",
+          pagebreak: { mode: "avoid-all" },
           image: { type: "jpeg", quality: 1 }, // Set the image format and quality
           html2canvas: { scale: 2 }, // Set the scale factor for html2canvas
           jsPDF: { unit: "pt", format: "letter", orientation: "portrait" }, // Set jsPDF options such as unit, format, and orientation
