@@ -856,7 +856,10 @@ export const reduxGetAllTestimonials = () => (dispatch) => {
 };
 
 export const reduxGetAllCommunityActions = (community_id, cb) => (dispatch) => {
-  apiCall("/actions.listForCommunityAdmin", { community_id }).then(
+  apiCall("/actions.listForCommunityAdmin", { community_id, 
+        params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_ACTIONS.key),
+        limit: getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key),
+    }).then(
     (response) => {
       cb && cb(response.data, !response.success, response.error);
       if (response && response.success) {
