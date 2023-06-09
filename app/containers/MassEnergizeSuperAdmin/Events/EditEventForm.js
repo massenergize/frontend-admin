@@ -18,6 +18,7 @@ import {
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import Seo from "../../../components/Seo/Seo";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -292,6 +293,7 @@ class EditEventForm extends Component {
     if (!formJson) return <Loading />;
     return (
       <div>
+        <Seo name={`Edit Event - ${event?.name}`} />
         {!readOnly && event.rsvp_enabled ? (
           <Paper style={{ padding: 20, marginBottom: 15 }}>
             <Typography>
@@ -510,7 +512,7 @@ const createFormJson = ({
               { id: "true", value: "Yes" },
             ],
             child: {
-              dbName: "recurring_details",
+              // dbName: "recurring_details",
               valueToCheck: "true",
               fields: [
                 {

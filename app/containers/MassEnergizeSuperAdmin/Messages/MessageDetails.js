@@ -11,6 +11,7 @@ import { Link, withRouter } from "react-router-dom";
 import { getHumanFriendlyDate } from "../../../utils/common";
 import { bindActionCreators } from "redux";
 import { fetchLatestNextSteps } from "../../../redux/redux-actions/adminActions";
+import Seo from "../../../components/Seo/Seo";
 
 const styles = (theme) => ({
   root: {
@@ -230,6 +231,7 @@ class MessageDetails extends Component {
 
     return (
       <div>
+        <Seo name={`Message Details`} />
         <div>
           <Paper className={classes.root} elevation={4}>
             <div className={classes.mainHead}>

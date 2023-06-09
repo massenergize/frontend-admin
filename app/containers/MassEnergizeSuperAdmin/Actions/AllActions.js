@@ -3,7 +3,6 @@ import React from "react";
 import PropTypes from "prop-types";
 
 import brand from "dan-api/dummy/brand";
-import { Helmet } from "react-helmet";
 import { withStyles } from "@mui/styles";
 
 import FileCopy from "@mui/icons-material/FileCopy";
@@ -48,6 +47,7 @@ import {
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
+import Seo from '../../../../app/components/Seo/Seo'
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -578,14 +578,7 @@ class AllActions extends React.Component {
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={`All Actions`} />
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_ACTIONS}

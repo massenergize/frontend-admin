@@ -26,6 +26,7 @@ import { fetchParamsFromURL } from "../../../utils/common";
 import { makeStyles, } from "@mui/styles";
 import { withRouter } from "react-router-dom";
 import { styles } from "./styles";
+import Seo from "../../../components/Seo/Seo";
 
   const error = {
     background: "rgb(255, 214, 214)",
@@ -208,6 +209,7 @@ function AddToGallery(props) {
   const isError = state.notification_type === "error";
   return (
     <PapperBlock>
+      <Seo name={"Add to gallery"} />
       <Typography variant="h5" className={classes.header}>
         Add an image to your community's library{" "}
       </Typography>

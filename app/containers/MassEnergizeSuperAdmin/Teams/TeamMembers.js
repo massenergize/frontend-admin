@@ -29,6 +29,7 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import { getLimit } from "../../../utils/helpers";
+import Seo from "../../../components/Seo/Seo";
 
 function TabContainer(props) {
   const { children } = props;
@@ -335,22 +336,15 @@ class TeamMembers extends React.Component {
                 sx={{ width: "100%" }}
               >
                 <small style={{ marginLeft: 15, fontSize: 15 }}>
-                  Your request has been received. Please check your email for
-                  the file.
+                  Your request has been received. Please check your email
+                  for the file.
                 </small>
               </Alert>
             </Snackbar>
           </div>
         )}
 
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={`Team Members - ${team?.name || ""}`} />
 
         <Paper style={{ padding: 20, marginBottom: 15 }}>
           <Typography variant="h5" style={{ marginBottom: 10 }}>
