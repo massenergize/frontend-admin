@@ -16,6 +16,7 @@ import CallMadeIcon from "@mui/icons-material/CallMade";
 import { getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import Seo from "../../../components/Seo/Seo";
 
 function EventsFromOtherCommunities({
   putOtherEventsInRedux,
@@ -295,6 +296,7 @@ const ids = (communities || []).map((it) => it.id);
 
   return (
     <div>
+      <Seo name={`Events from other communities`} />
       <Paper style={{ marginBottom: 15 }}>
         <div style={{ padding: 20 }}>
           <Typography variant="h6">

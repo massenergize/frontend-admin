@@ -9,6 +9,7 @@ import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { bindActionCreators } from "redux";
 import { reduxAddToHeap } from "../../../redux/redux-actions/adminActions";
 import { connect } from "react-redux";
+import Seo from "../../../components/Seo/Seo";
 
 const styles = (theme) => ({
   root: {
@@ -92,8 +93,9 @@ class HomePageEditForm extends Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, homepageData, match } = this.props;
     const { formJson, noDataFound } = this.state;
+    const {id} = match?.params
 
     if (!formJson)
       return (
@@ -103,8 +105,10 @@ class HomePageEditForm extends Component {
       return (
         <div>Sorry no Home Page data available for this community ...</div>
       );
+
     return (
       <div>
+        <Seo name={`Edit - ${homepageData[id]?.community?.name}'s HomePage`} />
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}

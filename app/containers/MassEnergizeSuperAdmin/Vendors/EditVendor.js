@@ -12,6 +12,7 @@ import { reduxAddToHeap } from "../../../redux/redux-actions/adminActions";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { withRouter } from "react-router-dom";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import Seo from "../../../components/Seo/Seo";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -111,12 +112,13 @@ class CreateNewVendorForm extends Component {
 
   render() {
     const { classes, match } = this.props;
-    const { formJson } = this.state;
+    const { formJson,vendor } = this.state;
     const { id } = match.params;
 
     if (!formJson) return <Loading />;
     return (
       <div>
+        <Seo name={`Edit Vendor - ${vendor?.name}`} />
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
