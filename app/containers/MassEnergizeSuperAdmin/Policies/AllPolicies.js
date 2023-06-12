@@ -20,6 +20,7 @@ import {
 } from "../../../redux/redux-actions/adminActions";
 import { Typography } from "@mui/material";
 import { ArrowRight, ArrowRightAlt } from "@mui/icons-material";
+import Seo from "../../../components/Seo/Seo";
 class AllPolicies extends React.Component {
   constructor(props) {
     super(props);
@@ -176,14 +177,7 @@ class AllPolicies extends React.Component {
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"All Policies"} />
         <div className={classes.table}>
           <MUIDataTable
             title="All Policies"

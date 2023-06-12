@@ -66,7 +66,7 @@ const styles = (theme) => ({
   },
 });
 
-const ITEM_HEIGHT = 48;
+const ITEM_HEIGHT = 60;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
   PaperProps: {
@@ -87,6 +87,7 @@ class MassEnergizeForm extends Component {
       error: null,
       formJson: null,
       readOnly: false,
+      requiredFields:{},
       // activeModal: null,
       // activeModalTitle: null,
       refreshKey: "default-form-state", // Change this value to any different string force a re-render in the form.
@@ -112,6 +113,12 @@ class MassEnergizeForm extends Component {
     return new Promise((resolve) => {
       this.setState(state, resolve);
     });
+  }
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.formJson !== prevState.formJson) {
+      return { formJson: nextProps.formJson };
+    }
+    return null;
   }
 
   // showPreviewModal() {
@@ -375,7 +382,17 @@ class MassEnergizeForm extends Component {
       if (field.children) {
         const result = this.requiredValuesAreProvided(formData, field.children);
         culprits = { ...culprits, ...result[1] };
-      } else {
+      }
+      else if(field.child) {
+        let value = this.getValue(field.name);
+        if(value === field?.child?.valueToCheck){
+          const result = this.requiredValuesAreProvided(formData, field?.child.fields);
+          culprits = { ...culprits, ...result[1] };
+
+        }
+
+      }
+      else {
         const value = formData[field.name]; //field.name is what is used to set value, b4 cleaned up onSubmit
         // if field is readOnly - ignore the isRequired if present
         if (field.isRequired && !field.readOnly) {
@@ -645,9 +662,11 @@ class MassEnergizeForm extends Component {
           return (
             <div key={field.name}>
               <div className={classes.field}>
-                <FormControl component="fieldset">
+                <FormControl component="fieldset" required={field.isRequired}>
                   {this.renderGeneralContent(field)}
-                  <FormLabel component="legend">{field.label}</FormLabel>
+                  <FormLabel component="legend">
+                    {field.label}
+                  </FormLabel>
 
                   <Select
                     multiple
@@ -655,6 +674,8 @@ class MassEnergizeForm extends Component {
                     name={field.name}
                     value={this.getValue(field.name) || []}
                     input={<Input id="select-multiple-chip" />}
+                    onClose = {()=> field?.onClose && field.onClose(value)}
+                    required={field.isRequired}
                     renderValue={(selected) => {
                       return (
                         <div
@@ -726,6 +747,7 @@ class MassEnergizeForm extends Component {
                     name={field.name}
                     onChange={this.handleCheckboxToggle}
                     disabled={field.readOnly}
+                    required={field.isRequired}
                   />
                 }
               />
@@ -735,7 +757,7 @@ class MassEnergizeForm extends Component {
       case FieldTypes.Dropdown:
         return (
           <div key={field.name}>
-            <FormControl className={classes.field}>
+            <FormControl className={classes.field} required={field.isRequired}>
               {this.renderGeneralContent(field)}
               <InputLabel
                 htmlFor={field.label}
@@ -744,32 +766,44 @@ class MassEnergizeForm extends Component {
                 {field.label}
               </InputLabel>
               <Select
-                native
                 label={field.label}
                 name={field.name}
+                value={this.getValue(field.name) || ""}
                 onChange={async (newValue) => {
-                  await this.updateForm(field.name, newValue.target.value);
+                  await this.updateForm(
+                    field.name,
+                    newValue.target.value
+                  );
+                }}
+                MenuProps={MenuProps}
+                onClose={() => field?.onClose && field.onClose(value)}
                 }}
                 inputProps={{
                   id: "age-native-simple",
                 }}
+                required={field.isRequired}
               >
-                <option value={this.getValue(field.name)}>
+                {/* <option value={this.getValue(field.name)}>
                   {this.getDisplayName(
                     field.name,
                     this.getValue(field.name),
                     field.data
                   )}
-                </option>
+                </option> */}
                 {field.data &&
                   field.data.map((c) => (
-                    <option value={c.id} key={c.id}>
+                    <MenuItem
+                      value={c.id}
+                      key={c.id}
+                      sx={{ padding: "15px " }}
+                    >
                       {c.displayName}
-                    </option>
+                    </MenuItem>
                   ))}
               </Select>
               {field.child &&
-                this.getValue(field.name) === field.child.valueToCheck &&
+                this.getValue(field.name) ===
+                  field.child.valueToCheck &&
                 this.renderFields(field.child.fields)}
             </FormControl>
           </div>
@@ -828,7 +862,11 @@ class MassEnergizeForm extends Component {
             <br />
             <FormMediaLibraryImplementation
               {...field}
-              selected={this.getValue(field.name, field.selected || field.defaultValue, field)}
+              selected={this.getValue(
+                field.name,
+                field.selected || field.defaultValue,
+                field
+              )}
               actionText={field.placeholder}
               onInsert={(files) => {
                 const formData = this.state.formData || {};
@@ -1003,13 +1041,15 @@ class MassEnergizeForm extends Component {
                   ],
                   toolbar:
                     "undo redo | formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent |  fontselect | fontsizeselect",
-                    // next 4 lines test to eliminate tiny cloud errors
-                    selector: 'textarea',
-                    init_instance_callback : function(editor) {
-                        var freeTiny = document.querySelector('.tox .tox-notification--in');
-                       freeTiny.style.display = 'none';
-                      },
-                  }}
+                  // next 4 lines test to eliminate tiny cloud errors
+                  selector: "textarea",
+                  init_instance_callback: function(editor) {
+                    var freeTiny = document.querySelector(
+                      ".tox .tox-notification--in"
+                    );
+                    freeTiny.style.display = "none";
+                  },
+                }}
                 apiKey={TINY_MCE_API_KEY}
               />
             </Grid>
@@ -1029,6 +1069,7 @@ class MassEnergizeForm extends Component {
               value={value}
               onChange={this.handleFormDataChange}
               disabled={field.readOnly || this.state.readOnly}
+              
             >
               {field.data.map((d) => (
                 <FormControlLabel
@@ -1046,7 +1087,7 @@ class MassEnergizeForm extends Component {
               this.getValue(field.name) === field.child.valueToCheck &&
               this.renderFields(field.child.fields)}
             {this.renderConditionalDisplays(field)}
-          </div> 
+          </div>
         );
       case FieldTypes.TextField:
         return (
@@ -1187,6 +1228,7 @@ class MassEnergizeForm extends Component {
       successMsg,
       startCircularSpinner,
       readOnly,
+      requiredFields,
     } = this.state;
     if (!formJson) return <Loading />;
     return (
@@ -1287,6 +1329,7 @@ class MassEnergizeForm extends Component {
                     <CircularProgress className={classes.progress} />
                   </div>
                 )}
+
                 <div>
                   {/* {formJson && formJson.cancelLink && (
                     <Link to={formJson.cancelLink}>Cancel</Link>
@@ -1308,6 +1351,7 @@ class MassEnergizeForm extends Component {
                       Cancel
                     </Button>
                   )}
+
                   <Button
                     variant="contained"
                     color="secondary"
@@ -1317,6 +1361,21 @@ class MassEnergizeForm extends Component {
                     Submit
                   </Button>
                 </div>
+                {Object.keys(requiredFields).length > 0 && (
+                  <div
+                    style={{ display: "flex", justifyContent: "center", marginTop:10 }}
+                  >
+                    <Alert severity="warning">
+                      Oops! Looks like you missed these required fields{" "}
+                      {Object.keys(requiredFields).map((key, index) => (
+                        <span style={{ color: "tomato" }} key={key}>
+                          {key} {index !== Object.keys(requiredFields).length - 1 && ", "}
+                        </span>
+                      ))}
+                      . Please fill them out.
+                    </Alert>
+                  </div>
+                )}
               </form>
             </Paper>
           </Grid>

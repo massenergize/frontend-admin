@@ -45,6 +45,7 @@ import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
 import { getData } from "../Messages/CommunityAdminMessages";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import Seo from "../../../components/Seo/Seo";
 
 class AllTestimonials extends React.Component {
   constructor(props) {
@@ -517,14 +518,7 @@ class AllTestimonials extends React.Component {
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"All Testimonials"} />
         {comingFromDashboard && (
           <MEPaperBlock icon="fa fa-bullhorn" banner>
             <Typography>

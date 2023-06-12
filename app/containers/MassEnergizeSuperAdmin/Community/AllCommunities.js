@@ -1,17 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
-import { Helmet } from "react-helmet";
-import brand from "dan-api/dummy/brand";
 
 import CallMadeIcon from "@mui/icons-material/CallMade";
 import EditIcon from "@mui/icons-material/Edit";
 import { Link } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 
-import Paper from "@mui/material/Paper";
-import LinearProgress from "@mui/material/LinearProgress";
-import Grid from "@mui/material/Grid";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import { connect } from "react-redux";
@@ -31,6 +26,7 @@ import { getAdminApiEndpoint, getLimit, handleFilterChange, onTableStateChange }
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
+import Seo from "../../../components/Seo/Seo";
 
 class AllCommunities extends React.Component {
   constructor(props) {
@@ -266,8 +262,6 @@ class AllCommunities extends React.Component {
   }
 
   render() {
-    const title = brand.name + " - All Communities";
-    const description = brand.desc;
     const { columns } = this.state;
     const { classes, toggleDeleteConfirmation, communities, putCommunitiesInRedux, auth, meta, putMetaDataToRedux } = this.props;
     const data = this.fashionData(communities || []);
@@ -308,9 +302,7 @@ class AllCommunities extends React.Component {
       customSearchRender: (
         searchText,
         handleSearch,
-        hideSearch,
-        options
-      ) => (
+        hideSearch      ) => (
         <SearchBar
           url={getAdminApiEndpoint(auth, "/communities")}
           reduxItems={communities}
@@ -341,10 +333,7 @@ class AllCommunities extends React.Component {
       whenFilterChanges: (
         changedColumn,
         filterList,
-        type,
-        changedColumnIndex,
-        displayData
-      ) =>
+        type      ) =>
         handleFilterChange({
           filterList,
           type,
@@ -365,14 +354,7 @@ class AllCommunities extends React.Component {
     const { idsToDelete, toastData } = this.state;
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"All Communities"}  />
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_COMMUNITIES}

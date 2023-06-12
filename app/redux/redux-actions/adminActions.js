@@ -82,7 +82,7 @@ export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
   let socket;
   let numberOfRetries = 0;
   const MAXIMUM_RETRIES = 5;
-  const WAIT_TIME = 4000 // 4 seconds before trying to reconnect, to give the server some time to recoup
+  const WAIT_TIME = 4000; // 4 seconds before trying to reconnect, to give the server some time to recoup
 
   const connectSocket = () => {
     socket = new WebSocket(url);
@@ -124,9 +124,8 @@ export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
           connectSocket();
         }, WAIT_TIME);
         numberOfRetries++;
-
       } else {
-        // At this point, we have tried to reconnect 5 times, within "WAIT_TIME" intervals and still nothing, 
+        // At this point, we have tried to reconnect 5 times, within "WAIT_TIME" intervals and still nothing,
         // So then we show the user the modal that says "Are you there?" Allowing them to manually reconnect, when they are ready
         console.log(
           TAG,
@@ -151,7 +150,10 @@ export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
       }
     };
     socket.onerror = () => {
-      console.log(TAG, "Oops - Got an error, server did not respond as expected :( ");
+      console.log(
+        TAG,
+        "Oops - Got an error, server did not respond as expected :( "
+      );
     };
   };
 
@@ -858,6 +860,9 @@ export const reduxGetAllTestimonials = () => (dispatch) => {
 export const reduxGetAllCommunityActions = (community_id, cb) => (dispatch) => {
   apiCall("/actions.listForCommunityAdmin", {
     community_id,
+    params: prepareFilterAndSearchParamsFromLocal(
+      PAGE_PROPERTIES.ALL_ACTIONS.key
+    ),
     limit: getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key),
   }).then((response) => {
     cb && cb(response.data, !response.success, response.error);
@@ -867,7 +872,6 @@ export const reduxGetAllCommunityActions = (community_id, cb) => (dispatch) => {
     }
     return { type: "DO_NOTHING", payload: null };
   });
-  return { type: "DO_NOTHING", payload: null };
 };
 
 export const reduxGetAllTags = () => (dispatch) => {

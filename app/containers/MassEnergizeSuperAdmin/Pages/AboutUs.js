@@ -7,6 +7,7 @@ import MassEnergizeForm from "../_FormGenerator";
 import { apiCall } from "../../../utils/messenger";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import Seo from "../../../components/Seo/Seo";
 
 const styles = (theme) => ({
   root: {
@@ -156,7 +157,7 @@ class AboutUsPageEditForm extends Component {
 
   render() {
     const { classes } = this.props;
-    const { formJson } = this.state;
+    const { formJson, aboutUsPageData } = this.state;
     if (!formJson)
       return (
         <LinearBuffer asCard message="Hold tight! Retrieving your data..." />
@@ -165,6 +166,7 @@ class AboutUsPageEditForm extends Component {
     // <div>Hold tight! Retrieving your data ...</div>;
     return (
       <div>
+        <Seo name={`Edit - ${aboutUsPageData?.community?.name}'s About Page`}/>
         <MassEnergizeForm classes={classes} formJson={formJson} />
       </div>
     );

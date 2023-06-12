@@ -13,6 +13,7 @@ import fieldTypes from "../_FormGenerator/fieldTypes";
 import { withRouter } from "react-router-dom";
 import { fetchLatestNextSteps } from "../../../redux/redux-actions/adminActions";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import Seo from "../../../components/Seo/Seo";
 
 const styles = (theme) => ({
   root: {
@@ -153,6 +154,7 @@ class EditTestimonial extends Component {
     if (!formJson) return <Loading />;
     return (
       <>
+      <Seo name={`Edit Testimonial - ${testimonial?.title}`} />
         <Paper style={{ padding: 15 }}>
           <Typography variant="h6">Created By</Typography>
           {testimonial && testimonial.user && (
