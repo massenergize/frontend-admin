@@ -777,7 +777,7 @@ class MassEnergizeForm extends Component {
                 }}
                 MenuProps={MenuProps}
                 onClose={() => field?.onClose && field.onClose(value)}
-                }}
+                // }}
                 inputProps={{
                   id: "age-native-simple",
                 }}
