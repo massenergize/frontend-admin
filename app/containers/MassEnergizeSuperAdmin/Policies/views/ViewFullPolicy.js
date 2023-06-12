@@ -151,7 +151,7 @@ function ViewFullPolicy({ showModal, signOut, auth, policies }) {
               document={
                 <RichTextToPDF
                   richText={policy?.description}
-                  style={{ marginLeft: "auto" }}
+                  style={{ marginLeft: "auto",}}
                 />
               }
               fileName="Memorandum of Understanding (MOU) - MassEnergize"

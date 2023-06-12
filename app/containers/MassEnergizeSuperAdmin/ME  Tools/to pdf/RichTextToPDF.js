@@ -59,13 +59,15 @@ function RichTextToPDF({ render, richText, style, filename }) {
     body: {
       textAlign: "justify",
       padding: "10px 10px",
+      fontSize: 12,
+      
     },
     title: {
       fontSize: 24,
       textAlign: "center",
     },
     text: {
-      fontSize: "1rem",
+      fontSize: 12,
       // textAlign: "justify",
       fontSize: 13,
       margin:"10px 15px",
