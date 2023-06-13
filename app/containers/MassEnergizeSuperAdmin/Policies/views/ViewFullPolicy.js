@@ -14,7 +14,7 @@ import {
   reduxSignOut,
   reduxToggleUniversalModal,
 } from "../../../../redux/redux-actions/adminActions";
-import {PDFDownloadLink } from '@react-pdf/renderer'
+
 
 
 const MOU = "mou";
@@ -125,7 +125,7 @@ function ViewFullPolicy({ showModal, signOut, auth, policies }) {
               Please scroll down to read the entire document
             </Typography>
           </div>
-          {/* <RichTextToPDF
+          <RichTextToPDF
             filename={"Memorandum of Understanding (MOU) - MassEnergize"}
             style={{ marginLeft: "auto" }}
             richText={policy?.description}
@@ -145,33 +145,8 @@ function ViewFullPolicy({ showModal, signOut, auth, policies }) {
                 </Button>
               );
             }}
-          /> */}
-          <div>
-            <PDFDownloadLink
-              document={
-                <RichTextToPDF
-                  richText={policy?.description}
-                  style={{ marginLeft: "auto",}}
-                />
-              }
-              fileName="Memorandum of Understanding (MOU) - MassEnergize"
-            >
-              {({ loading }) => (
-                <Button
-                  variant="contained"
-                  disabled={loading}
-                  style={{
-                    borderRadius: 0,
-                    fontWeight: "bold",
-                    width: 190,
-                    padding: 10,
-                  }}
-                >
-                  {loading ? "Loading.." : " Download As PDF"}
-                </Button>
-              )}
-            </PDFDownloadLink>
-          </div>
+          />
+
         </div>
       </MEPaperBlock>
       {/* --------------------------------------------------- */}
