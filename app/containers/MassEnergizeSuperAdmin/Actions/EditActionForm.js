@@ -8,6 +8,7 @@ import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { withRouter } from "react-router-dom";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import Seo from "../../../components/Seo/Seo";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -211,6 +212,7 @@ class EditActionForm extends Component {
     if (!action || !formJson) return <Loading />;
     return (
       <div>
+        <Seo name={`Edit Action -  ${action?.title}`}/>
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
@@ -303,7 +305,7 @@ const createFormJson = ({
                 name: "is_global",
                 label: "Is this Action a Template?",
                 fieldType: "Radio",
-                isRequired: false,
+                isRequired: true,
                 defaultValue: action.is_global ? "true" : "false",
                 dbName: "is_global",
                 readOnly: false,
@@ -311,22 +313,22 @@ const createFormJson = ({
                   { id: "false", value: "No" },
                   { id: "true", value: "Yes" },
                 ],
-                child: {
-                  valueToCheck: "false",
-                  fields: [
-                    {
-                      name: "community",
-                      label: "Primary Community (Select one)",
-                      placeholder: "",
-                      fieldType: "Dropdown",
-                      defaultValue:
-                        action.community && "" + action.community.id,
-                      dbName: "community_id",
-                      data: [{ displayName: "--", id: "" }, ...communities],
-                      isRequired: true,
-                    },
-                  ],
-                },
+                conditionalDisplays: [
+                  {
+                    valueToCheck: "false",
+                    fields: [
+                      {
+                        name: "community",
+                        label: "Primary Community (select one)",
+                        fieldType: "Dropdown",
+                        // defaultValue: progress.community || null,
+                        dbName: "community_id",
+                        data: [{ displayName: "--", id: "" }, ...communities],
+                        isRequired: true,
+                      },
+                    ],
+                  },
+                ],
               }
             : {
                 name: "community",

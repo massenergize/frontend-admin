@@ -43,6 +43,7 @@ import {
 import RenderVisitLogs from "./RenderVisitLogs";
 import { getData } from "../Messages/CommunityAdminMessages";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import Seo from "../../../components/Seo/Seo";
 
 class AllUsers extends React.Component {
   constructor(props) {
@@ -364,14 +365,7 @@ class AllUsers extends React.Component {
     }
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"All Users"} />
 
         {updating && (
           <LinearBuffer asCard message="Checking for updates..." lines={1} />

@@ -20,6 +20,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import PauseOutlinedIcon from "@mui/icons-material/PauseOutlined";
 import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
 import { Link } from "react-router-dom";
+import Seo from "../../../components/Seo/Seo";
 class AllTasks extends React.Component {
   constructor(props) {
     super(props);
@@ -331,14 +332,7 @@ class AllTasks extends React.Component {
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"All Tasks"} />
         <div className={classes.table}>
           <MUIDataTable
             title="All Tasks"

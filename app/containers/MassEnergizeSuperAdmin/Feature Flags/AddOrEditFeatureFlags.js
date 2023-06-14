@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import MassEnergizeForm from "../_FormGenerator";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import Loading from "dan-components/Loading";
 import { LOADING } from "../../../utils/constants";
 import { Paper } from "@mui/material";
+import { apiCall } from "../../../utils/messenger";
 
 function AddOrEditFeatureFlags({
   communities,
@@ -13,9 +14,12 @@ function AddOrEditFeatureFlags({
   featureFlags,
   featureToEdit,
 }) {
+  const [_users, setUsers] = useState(users || []);
+  const [comIds, setComIds] = useState([]);
   const inEditMode = featureToEdit;
 
   if (featureFlags === LOADING) return <Loading />;
+
 
   const flagKeys = (featureFlags && featureFlags.keys) || {};
   if (!Object.keys(flagKeys).length)
@@ -33,15 +37,18 @@ function AddOrEditFeatureFlags({
     switchTabs();
   };
 
-  const formJson = createFormJson({
-    communities:communities,
+ const formJson = createFormJson({
+    communities,
     flagKeys,
-    users,
+    users: _users,
     putFlagsInRedux,
     ifApiIsSuccessful,
     inEditMode,
     featureToEdit,
-  });
+    setUsers,
+    ids:comIds,
+    setComIds
+ });
 
   return (
     <MassEnergizeForm formJson={formJson} onComplete={ifApiIsSuccessful} />
@@ -58,7 +65,7 @@ const preflight = (data) => {
     scope,
     key: uniqueIdentifier(data.name),
   };
-  if (json.should_expire === "false") delete json.expires_on;  //json.expires_on = null;
+  if (json.should_expire === "false") delete json.expires_on; //json.expires_on = null;
   delete json.should_expire;
   return json;
 };
@@ -89,6 +96,9 @@ var createFormJson = ({
   users,
   inEditMode,
   featureToEdit,
+  setUsers,
+  ids,
+  setComIds
 }) => {
   const labelExt = (user) => `${user.preferred_name} - (${user.email})`;
   const valueExt = (user) => user.id;
@@ -99,6 +109,7 @@ var createFormJson = ({
     id: com.id,
     value: com.id.toString(),
   }));
+
   const scopeArr = Object.entries(flagKeys.scope || {});
   const {
     scope,
@@ -111,6 +122,18 @@ var createFormJson = ({
     userAudience,
     id,
   } = parseFeatureForEditMode(featureToEdit);
+  const fetchAllUsersInSelectedCommunities = (communityIDs=[]) => {
+
+    const args = communityIDs?.length ? { community_ids: communityIDs } : {};
+    apiCall("/users.listForSuperAdmin",args).then(({ data }) => {
+      setUsers(data || []);
+    });
+  };
+  const updateUsersWhenComIdsChange = (value) => {
+    if (!value?.length) return;
+    setComIds(value);
+    fetchAllUsersInSelectedCommunities(value);
+  };
 
   const json = {
     title: inEditMode ? "Update a feature flag" : "Add a new feature flag",
@@ -198,14 +221,16 @@ var createFormJson = ({
                 fields: [
                   {
                     name: "community_ids",
-                    label:
-                      "Select all communities that should have this feature activated",
+                    label: "Select all communities that should have this feature activated",
                     placeholder: "eg. Wayland",
                     fieldType: fieldTypes.Checkbox,
                     selectMany: true,
                     defaultValue: comIds || [],
                     dbName: "community_ids",
                     data: communities,
+                    onClose: updateUsersWhenComIdsChange,
+                    isAsync: true,
+                    endpoint: "/communities.listForSuperAdmin",
                   },
                 ],
               },
@@ -222,6 +247,9 @@ var createFormJson = ({
                     defaultValue: comIds || [],
                     dbName: "community_ids",
                     data: communities,
+                    onClose: updateUsersWhenComIdsChange,
+                    isAsync: true,
+                    endpoint: "/communities.listForSuperAdmin",
                   },
                 ],
               },
@@ -252,16 +280,19 @@ var createFormJson = ({
                 fields: [
                   {
                     name: "users",
-                    label:
-                      "Select all users that should have this feature activated",
-                    placeholder:
-                      "Search with their username, or email.. Eg. 'Mademoiselle Kaat'",
+                    label:"Select all users that should have this feature activated",
+                    placeholder:"Search with their username, or email.. Eg. 'Mademoiselle Kaat'",
                     fieldType: fieldTypes.AutoComplete,
                     defaultValue: selectedUsers || [],
+                    selectMany: true,
                     dbName: "user_ids",
                     data: users || [],
                     labelExtractor: labelExt,
                     valueExtractor: valueExt,
+                    isAsync: true,
+                    endpoint: "/users.listForSuperAdmin",
+                    multiple: true,
+                    args:{community_ids: ids}
                   },
                 ],
               },
@@ -270,18 +301,21 @@ var createFormJson = ({
                 fields: [
                   {
                     name: "users",
-                    label: "Select all users that should NOT have this feature",
+                    label:
+                      "Select all users that should NOT have this feature",
                     placeholder:
                       "Search with their username, or email.. Eg. 'Monsieur Brad'",
                     fieldType: fieldTypes.AutoComplete,
-                    selectMany: true,
                     contentType: "text",
-
                     defaultValue: selectedUsers || [],
                     dbName: "user_ids",
                     labelExtractor: labelExt,
                     valueExtractor: valueExt,
                     data: users || [],
+                    isAsync: true,
+                    endpoint: "/users.listForSuperAdmin",
+                    multiple: true,
+                    selectMany: true,
                   },
                 ],
               },

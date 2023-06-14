@@ -1,9 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
-import PropTypes from "prop-types";
-import { Checkbox, Chip, Paper, TextField } from "@mui/material";
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import {
+  Box,
+  Checkbox,
+  Chip,
+  CircularProgress,
+  LinearProgress,
+  Paper,
+  TextField,
+} from "@mui/material";
 import { pop } from "../../../../utils/common";
-import Typography from "@mui/material/Typography";
 import { withStyles } from "@mui/styles";
+import { apiCall } from "../../../../utils/messenger";
 
 const styles = (theme) => {
   return {
@@ -73,12 +80,61 @@ function LightAutoComplete(props) {
     containerStyle,
     multiple,
     showSelectAll = true,
+    isAsync,
+    endpoint,
+    args,
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
+  const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
   const [showDropdown, setShowDropdown] = useState(false);
+  const [query, setQuery] = useState("");
+  const [filteredItems, setFilteredItems] = useState([]);
   const [selected, setSelected] = useState([]); // keeps a list of all selected items
   const chipWrapperRef = useRef();
+  // -------------------------------------------------------
+  const elementObserver = useRef(null);
+  const lastAutoCompleteItemRef = useCallback(
+    (node) => {
+      if (elementObserver.current) elementObserver.current.disconnect();
+
+      elementObserver.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && cursor.has_more) {
+          if (!endpoint) return;
+          apiCall(endpoint, {
+            page: cursor.next,
+            limit: 10,
+            ...(args || {}),
+            params: JSON.stringify({ search_text: query || "" }),
+          }).then((res) => {
+            setCursor({
+              has_more: res?.cursor?.count > optionsToDisplay?.length,
+              next: res?.cursor?.next,
+            });
+            let items = [
+              ...optionsToDisplay,
+              ...(res?.data || [])?.map((item) => {
+                return {
+                  ...item,
+                  displayName: labelExtractor
+                    ? labelExtractor(item)
+                    : item?.name || item?.title,
+                };
+              }),
+            ];
+
+            setOptionsToDisplay([
+              ...new Map(items.map((item) => [item["id"], item])).values(),
+            ]);
+          });
+        }
+      });
+
+      if (node) elementObserver.current.observe(node);
+    },
+    [cursor]
+  );
+  // ----------------------------------------------------
   const mount = () => {
     if (!onMount) return;
     onMount(() => setSelected([]));
@@ -122,12 +178,13 @@ function LightAutoComplete(props) {
 
   const handleOnChange = (e) => {
     const value = e.target.value.trim().toLowerCase();
+    setQuery(value);
     if (!multiple) setShowDropdown(false);
-    const filtered = data.filter((item) => {
+    const filtered = optionsToDisplay?.filter((item) => {
       var label = getLabel(item);
       if (label && label.toLowerCase().includes(value)) return item;
     });
-    setOptionsToDisplay(filtered);
+    setFilteredItems(filtered);
   };
 
   useEffect(() => mount(), []);
@@ -142,9 +199,19 @@ function LightAutoComplete(props) {
       : 0;
     return height;
   };
-  const onlyValues = (selected||[]).map((itm) => getValue(itm));
+  const onlyValues = (selected || []).map((itm) => getValue(itm));
   const thereAreNoOptionsToDisplay = optionsToDisplay.length === 0;
   const userHasSelectedStuff = selected.length;
+
+  const toggleRef = (index) => {
+    if (
+      ((query && filteredItems.length - 1 === index) ||
+        index === optionsToDisplay.length - 1) &&
+      isAsync
+    )
+      return lastAutoCompleteItemRef;
+    return null;
+  };
 
   return (
     <div style={{ position: "relative", width: "100%", marginTop: 19 }}>
@@ -193,8 +260,7 @@ function LightAutoComplete(props) {
             />
             <Paper
               className={classes.dropdown}
-              style={{ top: 70 + increasedRatio(),}}
-
+              style={{ top: 70 + increasedRatio() }}
             >
               {thereAreNoOptionsToDisplay && (
                 <p style={{ padding: 10, color: "lightgray" }}>
@@ -236,7 +302,10 @@ function LightAutoComplete(props) {
                 </div>
               )}
 
-              {optionsToDisplay.map((op, index) => {
+              {(query && filteredItems?.length
+                ? filteredItems
+                : optionsToDisplay
+              ).map((op, index) => {
                 return (
                   <div
                     key={index.toString()}
@@ -251,15 +320,25 @@ function LightAutoComplete(props) {
                     {multiple && (
                       <Checkbox
                         style={{ padding: 0, marginRight: 6 }}
-                        checked={onlyValues.includes(
-                          getValue(op)
-                        )}
+                        checked={onlyValues.includes(getValue(op))}
                       />
                     )}
-                      {getLabel(op)}
+                    {getLabel(op)}
                   </div>
                 );
               })}
+              {isAsync && cursor.has_more ? (
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                  ref={lastAutoCompleteItemRef}
+                >
+                  <CircularProgress size={20} />
+                </Box>
+              ) : null}
             </Paper>
           </>
         )}

@@ -18,6 +18,7 @@ import SnackbarContent from "@mui/material/SnackbarContent";
 import styles from "../../../components/Widget/widget-jss";
 import { apiCall } from "../../../utils/messenger";
 import { Paper } from "@mui/material";
+import Seo from "../../../components/Seo/Seo";
 
 function TabContainer(props) {
   const { children } = props;
@@ -147,14 +148,7 @@ class EventRSVPs extends React.Component {
     };
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={`Event RSVPs - ${event?.name}`}/>
         <div style={{ padding: 20 }}>
           <Paper
             style={{

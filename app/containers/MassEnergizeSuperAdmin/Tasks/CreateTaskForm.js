@@ -8,6 +8,7 @@ import { TASK_INTERVALS } from "./taskConstants";
 import { withRouter } from "react-router-dom";
 import { loadTasksAction } from "../../../redux/redux-actions/adminActions";
 import { bindActionCreators } from "redux";
+import Seo from "../../../components/Seo/Seo";
 
 const styles = (theme) => ({
   root: {
@@ -74,11 +75,13 @@ class CreateTaskForm extends Component {
   };
 
   render() {
-    const { classes } = this.props;
-    const { formJson } = this.state;
+    const { classes, match} = this.props;
+    const { formJson,toEdit } = this.state;
     if (!formJson) return <Loading />;
+    const {id} = match.params
     return (
       <div>
+        <Seo name={id?`Edit Task - ${toEdit?.name}`:"Create New Task" } />
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}

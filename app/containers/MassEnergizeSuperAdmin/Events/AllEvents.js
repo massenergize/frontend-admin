@@ -50,6 +50,7 @@ import { FROM } from "../../../utils/constants";
 import Loader from "../../../utils/components/Loader";
 import HomeIcon from "@mui/icons-material/Home";
 import StarsIcon from "@mui/icons-material/Stars";
+import Seo from "../../../../app/components/Seo/Seo";
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
@@ -588,14 +589,7 @@ class AllEvents extends React.Component {
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"All Events"} />
         <Paper style={{ marginBottom: 10 }}>
           <METable
             classes={classes}

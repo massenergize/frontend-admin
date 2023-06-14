@@ -11,6 +11,7 @@ import { bindActionCreators } from "redux";
 import { loadAllPolicies } from "../../../redux/redux-actions/adminActions";
 import { withRouter } from "react-router-dom";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import Seo from "../../../components/Seo/Seo";
 
 // validation functions
 // const required = value => (value == null ? 'Required' : undefined);
@@ -203,10 +204,12 @@ class EditPolicyForm extends Component {
     const { classes } = this.props;
     const formJson = this.createFormJson();
     const id = this.fetchId();
+    const {policy} = this.state;
     if (!formJson)
       return <LinearBuffer message="Retrieving policy..." asCard />;
     return (
       <div>
+        <Seo name={`Edit Policy - ${policy?.name}`} />
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}

@@ -16,6 +16,7 @@ import { reduxToggleUniversalModal, reduxToggleUniversalToast } from '../../../r
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Typography } from '@mui/material';
+import Seo from '../../../components/Seo/Seo';
 
 
 class AllCarbonEquivalencies extends React.Component {
@@ -176,14 +177,7 @@ class AllCarbonEquivalencies extends React.Component {
     }
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"All Carbon Equivalencies"} />
         <div className={classes.table}>
           <MUIDataTable
             title="All Carbon Equivalencies"

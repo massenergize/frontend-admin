@@ -119,6 +119,7 @@ function MassEnergizeForm(props) {
     });
     removePageProgressFromStorage(pageKey);
   };
+
   if (!json.fields) return <></>;
 
   return (

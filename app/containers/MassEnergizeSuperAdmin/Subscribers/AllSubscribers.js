@@ -23,6 +23,7 @@ import ApplyFilterButton from "../../../utils/components/applyFilterButton/Apply
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import { isEmpty } from "../../../utils/common";
 import Loader from "../../../utils/components/Loader";
+import Seo from "../../../components/Seo/Seo";
 
 class AllSubscribers extends React.Component {
   constructor(props) {
@@ -271,15 +272,7 @@ class AllSubscribers extends React.Component {
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
-
+        <Seo name={"All Subscribers"}/>
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_SUBSCRIBERS}
