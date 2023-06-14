@@ -68,7 +68,7 @@ const styles = (theme) => ({
   },
 });
 
-const ITEM_HEIGHT = 48;
+const ITEM_HEIGHT = 60;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
   PaperProps: {
@@ -89,6 +89,7 @@ class MassEnergizeForm extends Component {
       error: null,
       formJson: null,
       readOnly: false,
+      requiredFields:{},
       // activeModal: null,
       // activeModalTitle: null,
       refreshKey: "default-form-state", // Change this value to any different string force a re-render in the form.
@@ -114,6 +115,12 @@ class MassEnergizeForm extends Component {
     return new Promise((resolve) => {
       this.setState(state, resolve);
     });
+  }
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.formJson !== prevState.formJson) {
+      return { formJson: nextProps.formJson };
+    }
+    return null;
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -398,7 +405,17 @@ class MassEnergizeForm extends Component {
       if (field.children) {
         const result = this.requiredValuesAreProvided(formData, field.children);
         culprits = { ...culprits, ...result[1] };
-      } else {
+      }
+      else if(field.child) {
+        let value = this.getValue(field.name);
+        if(value === field?.child?.valueToCheck){
+          const result = this.requiredValuesAreProvided(formData, field?.child.fields);
+          culprits = { ...culprits, ...result[1] };
+
+        }
+
+      }
+      else {
         const value = formData[field.name]; //field.name is what is used to set value, b4 cleaned up onSubmit
         // if field is readOnly - ignore the isRequired if present
         if (field.isRequired && !field.readOnly) {
@@ -682,7 +699,7 @@ class MassEnergizeForm extends Component {
           return (
             <div key={field.name}>
               <div className={classes.field}>
-                <FormControl component="fieldset">
+                <FormControl component="fieldset" required={field.isRequired}>
                   {this.renderGeneralContent(field)}
                   <FormLabel component="legend">
                     {field.label}
@@ -695,6 +712,7 @@ class MassEnergizeForm extends Component {
                     value={this.getValue(field.name) || []}
                     input={<Input id="select-multiple-chip" />}
                     onClose = {()=> field?.onClose && field.onClose(value)}
+                    required={field.isRequired}
                     renderValue={(selected) => {
                       return (
                         <div
@@ -767,6 +785,7 @@ class MassEnergizeForm extends Component {
                     name={field.name}
                     onChange={this.handleCheckboxToggle}
                     disabled={field.readOnly}
+                    required={field.isRequired}
                   />
                 }
               />
@@ -1085,6 +1104,7 @@ class MassEnergizeForm extends Component {
               value={value}
               onChange={this.handleFormDataChange}
               disabled={field.readOnly || this.state.readOnly}
+              
             >
               {field.data.map((d) => (
                 <FormControlLabel
@@ -1243,6 +1263,7 @@ class MassEnergizeForm extends Component {
       successMsg,
       startCircularSpinner,
       readOnly,
+      requiredFields,
     } = this.state;
     if (!formJson) return <Loading />;
     return (
@@ -1343,6 +1364,7 @@ class MassEnergizeForm extends Component {
                     <CircularProgress className={classes.progress} />
                   </div>
                 )}
+
                 <div>
                   {/* {formJson && formJson.cancelLink && (
                     <Link to={formJson.cancelLink}>Cancel</Link>
@@ -1364,6 +1386,7 @@ class MassEnergizeForm extends Component {
                       Cancel
                     </Button>
                   )}
+
                   <Button
                     variant="contained"
                     color="secondary"
@@ -1373,6 +1396,21 @@ class MassEnergizeForm extends Component {
                     Submit
                   </Button>
                 </div>
+                {Object.keys(requiredFields).length > 0 && (
+                  <div
+                    style={{ display: "flex", justifyContent: "center", marginTop:10 }}
+                  >
+                    <Alert severity="warning">
+                      Oops! Looks like you missed these required fields{" "}
+                      {Object.keys(requiredFields).map((key, index) => (
+                        <span style={{ color: "tomato" }} key={key}>
+                          {key} {index !== Object.keys(requiredFields).length - 1 && ", "}
+                        </span>
+                      ))}
+                      . Please fill them out.
+                    </Alert>
+                  </div>
+                )}
               </form>
             </Paper>
           </Grid>

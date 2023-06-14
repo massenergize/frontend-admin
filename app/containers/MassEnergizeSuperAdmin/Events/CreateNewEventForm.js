@@ -15,6 +15,7 @@ import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions"
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 import { removePageProgressFromStorage } from "../../../utils/common";
 import { withRouter } from "react-router-dom";
+import Seo from "../../../components/Seo/Seo";
 
 const styles = (theme) => ({
   root: {
@@ -111,6 +112,7 @@ class CreateNewEventForm extends Component {
     if (!formJson) return <Loading />;
     return (
       <div>
+        <Seo name={"Create New Event or Campaign"} />
         <MassEnergizeForm
           pageKey={PAGE_KEYS.CREATE_EVENT.key}
           classes={classes}
@@ -257,7 +259,7 @@ const createFormJson = ({
               { id: "true", value: "Yes" },
             ],
             child: {
-              dbName: "recurring_details",
+              // dbName: "recurring_details",
               valueToCheck: "true",
               fields: [
                 {

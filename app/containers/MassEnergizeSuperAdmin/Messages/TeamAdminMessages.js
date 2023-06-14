@@ -38,6 +38,7 @@ import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import { getData, replyToMessage } from "./CommunityAdminMessages";
 import Loader from "../../../utils/components/Loader";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import Seo from "../../../components/Seo/Seo";
 class AllTeamAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -365,14 +366,7 @@ class AllTeamAdminMessages extends React.Component {
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"Team Admin Messages"} />
         {comingFromDashboard && (
           <MEPaperBlock icon="fa fa-bullhorn" banner>
             <Typography>

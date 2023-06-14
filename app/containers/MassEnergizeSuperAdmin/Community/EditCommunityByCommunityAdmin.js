@@ -7,11 +7,10 @@ import { apiCall } from "../../../utils/messenger";
 import { getMoreInfo, groupSocialMediaFields } from "./utils";
 import { connect } from "react-redux";
 import fieldTypes from "../_FormGenerator/fieldTypes";
-import brand from "dan-api/dummy/brand";
-import { Helmet } from "react-helmet";
 import { PapperBlock } from "dan-components";
 import EditCommunityForm from "./EditCommunityForm";
 import { withRouter } from "react-router-dom";
+import Seo from "../../../components/Seo/Seo";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -84,22 +83,14 @@ class EditCommunityByCommunityAdmin extends Component {
   }
 
   render() {
-    const description = brand.desc;
     const auth = this.props.auth;
     const superAdmin =auth?.is_super_admin
     const formTitle = "Edit Community Infomation";
-    const title = brand.name + " - " + formTitle;
+     const { community } = this.state;
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={`Edit - ${community?.name}'s Information`} />
         <PapperBlock title="Edit Community Information" desc="">
           <EditCommunityForm {...this.props} superAdmin={superAdmin} />
         </PapperBlock>

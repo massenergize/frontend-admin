@@ -16,6 +16,7 @@ import {
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import Seo from "../../../components/Seo/Seo";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -152,6 +153,7 @@ class EditTeam extends Component {
     if (!formJson) return <Loading />;
     return (
       <div>
+        <Seo name={`Edit - ${team && team.name} Team Information`} />
         <Paper style={{ padding: 15 }}>
           <Typography>
             Want to see a list of all members and admins in this team?

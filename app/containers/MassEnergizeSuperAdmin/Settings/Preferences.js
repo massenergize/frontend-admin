@@ -22,6 +22,7 @@ import { apiCall } from "../../../utils/messenger";
 import { Snackbar, Alert } from "@mui/material";
 import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
 import { withStyles } from "@mui/styles";
+import Seo from "../../../components/Seo/Seo";
 
 const CHECKBOX = "checkbox";
 const RADIO = "radio";
@@ -116,6 +117,7 @@ function Preferences({ settings, auth, communities, updateAdminObject }) {
 
   return (
     <div>
+      <Seo name={"Preferences"} />
       <Paper>
         {/*  TODO: The text here is just a placeholder. Text description from Kaat or Brad will be used here... */}
         <Typography variant="body1" style={{ padding: 20, margin: 20 }}>

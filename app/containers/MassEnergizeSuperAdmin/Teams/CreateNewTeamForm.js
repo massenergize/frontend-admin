@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
@@ -36,58 +36,32 @@ const styles = (theme) => ({
   },
 });
 
-class CreateNewTeamForm extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      communities: [],
-      formJson: null,
-    };
-  }
+ function CreateNewTeamForm({
+  classes,
+  communities,
+  location,
+ }) {
+  const [parents, setParents] = React.useState([]);
 
-  static getDerivedStateFromProps(props, state) {
-    var { communities, formState, location, auth } = props;
-    communities = (communities || []).map((c) => ({
-      ...c,
-      displayName: c.name,
-      id:c.id,
-    }));
-      const isSuperAdmin = auth?.is_super_admin
+  const formJson = createFormJson({
+    communities,
+    autoOpenMediaLibrary: location?.state?.libOpen,
+    parents: parents,
+    setParents: setParents,
+  });
 
-    // const progress = (formState || {})[PAGE_KEYS.CREATE_TEAM.key] || {};
-    const libOpen = location.state && location.state.libOpen;
-    const formJson = createFormJson({
-      communities,
-      // progress,
-      autoOpenMediaLibrary: libOpen,
-      isSuperAdmin,
-    });
-    const jobsDoneDontRunWhatsBelowEverAgain =
-      !(communities && communities.length) || state.mounted;
-    if (jobsDoneDontRunWhatsBelowEverAgain) return null;
+  if(!formJson || !communities?.length) return <Loading />
 
-    return {
-      communities,
-      formJson,
-      mounted: true,
-    };
-  }
-
-  render() {
-    const { classes } = this.props;
-    const { formJson } = this.state;
-    if (!formJson) return <Loading />;
-    return (
-      <div>
-        <MassEnergizeForm
-          pageKey={PAGE_KEYS.CREATE_TEAM.key}
-          classes={classes}
-          formJson={formJson}
-          enableCancel
-        />
-      </div>
-    );
-  }
+  return (
+    <div>
+      <MassEnergizeForm
+        pageKey={PAGE_KEYS.CREATE_TEAM.key}
+        classes={classes}
+        formJson={formJson}
+        enableCancel
+      />
+    </div>
+  );
 }
 
 CreateNewTeamForm.propTypes = {
@@ -118,12 +92,28 @@ export default withStyles(styles, { withTheme: true })(
   withRouter(NewTeamMapped)
 );
 
-const createFormJson = ({
-  communities,
-  progress,
-  autoOpenMediaLibrary,
-  isSuperAdmin,
-}) => {
+const createFormJson = ({ communities, autoOpenMediaLibrary, parents, setParents }) => {
+  communities = (communities || []).map((c) => ({
+    ...c,
+    displayName: c.name,
+    id: "" + c.id,
+  }));
+
+ const fetchAllTeamsInSelectedCommunities = (communityID) => {
+   const args = communityID ? { community_id: communityID, } : {};
+   apiCall("/teams.listForCommunityAdmin", args).then(({ data }) => {
+     setParents(data || []);
+   });
+ };
+   const updateParentWhenComIdsChange = (value) => {
+     if (!value) return;
+     fetchAllTeamsInSelectedCommunities(value);
+   };
+
+   parents = (parents || []).map((p) => ({
+     displayName: p.name,
+     id:p.id,
+   }))
   const formJson = {
     title: "Create New Team",
     subTitle: "",
@@ -146,6 +136,7 @@ const createFormJson = ({
             readOnly: false,
           },
           {
+            onClose: updateParentWhenComIdsChange,
             name: "primary_community",
             label: "Primary Community",
             placeholder: "",
@@ -178,13 +169,7 @@ const createFormJson = ({
             fieldType: "Dropdown",
             defaultValue: null,
             dbName: "parent_id",
-            data: [
-              {
-                id: null,
-                displayName:
-                  "Please choose a community and save the team.  Then edit it to set a parent team",
-              },
-            ],
+            data: parents,
             readOnly: true,
           },
           {

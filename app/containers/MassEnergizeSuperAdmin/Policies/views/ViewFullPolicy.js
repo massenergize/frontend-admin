@@ -14,6 +14,8 @@ import {
   reduxSignOut,
   reduxToggleUniversalModal,
 } from "../../../../redux/redux-actions/adminActions";
+import { getHumanFriendlyDate } from "../../../../utils/common";
+import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
 const MOU = "mou";
 const ACCEPT = "accept";
@@ -27,6 +29,12 @@ function ViewFullPolicy({ showModal, signOut, auth, policies }) {
 
   const { policyKey } = useParams();
   const isMOU = MOU === policyKey;
+  const alreadyAcceptedMOU = !auth?.needs_to_accept_mou;
+  const signedMouAt = getHumanFriendlyDate(
+    auth?.mou_details?.signed_at,
+    false,
+    false
+  );
 
   const toggleConfirmationDialog = (show, options = {}) => {
     showModal({
@@ -64,8 +72,6 @@ function ViewFullPolicy({ showModal, signOut, auth, policies }) {
         if (!response.success)
           return console.log("ERROR RESPONDING:", response.error);
         if (!accept) signUserOut();
-
-        // putAdminInRedux(response.data);
         window.location.href = "/";
       }
     );
@@ -92,59 +98,106 @@ function ViewFullPolicy({ showModal, signOut, auth, policies }) {
       </Typography>
 
       {/* --------------------------------------------------- */}
-      <MEPaperBlock
-        containerStyle={{ padding: 0, height: "auto", minHeight: "auto" }}
-      >
-        <div style={{ padding: "25px 65px" }}>
-          <Typography variant="h6">
-            Hi <b>{auth?.full_name || "..."}</b>, please do one of the
-            following:{" "}
-          </Typography>
-          <ol style={{ listStyleType: "decimal", marginTop: 6 }}>
-            <li>
-              Review, <b>accept</b> and continue as admin
-            </li>
-            <li>Review, don't accept and become inactive as an admin</li>
-            <li>Delete your admin access</li>
-          </ol>
-        </div>
-
-        {/* --------------------------------------------------- */}
-        <div
-          style={{
-            background: "#fbfbfb",
-            display: "flex",
-            alignItems: "center",
+      {alreadyAcceptedMOU ? (
+        <MEPaperBlock
+          containerStyle={{
+            minHeight: 100,
+            marginTop: 25,
+            padding:"16px 30px",
+            background: "#198754",
+            color: "white",
           }}
         >
-          <div style={{ padding: "10px 30px" }}>
-            <Typography variant="body">
-              Please scroll down to read the entire document
+          <Typography variant="h6">
+            Hi <b>{auth?.full_name || "..."},</b>
+          </Typography>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <span
+              className="fa fa-check-circle"
+              style={{ marginRight: 8, color: "white", fontSize: 24 }}
+            />
+            <Typography variant="h6" style={{fontSize:"1.1rem"}}>
+              You already signed the MOU on{" "}
+              <b style={{ textDecoration: "underline" }}>
+                {signedMouAt || "..."}
+              </b>
+              unless you've changed your mind, please
+              <Link to="/" style={{ marginLeft: 5, color: "white" }}>
+                click here to proceed to the dashboard
+              </Link>
             </Typography>
           </div>
-          <RichTextToPDF
-            filename={"Memorandum of Understanding (MOU) - MassEnergize"}
-            style={{ marginLeft: "auto" }}
-            richText={policy?.description}
-            render={(downloadFunction) => {
-              return (
-                <Button
-                  variant="contained"
-                  style={{
-                    borderRadius: 0,
-                    fontWeight: "bold",
-                    width: 190,
-                    padding: 10,
-                  }}
-                  onClick={() => downloadFunction(policy?.description)}
-                >
-                  Download As PDF
-                </Button>
-              );
+        </MEPaperBlock>
+      ) : (
+        <MEPaperBlock
+          containerStyle={{
+            padding: 0,
+            height: "auto",
+            minHeight: "auto",
+            marginTop: 25,
+          }}
+        >
+          <div style={{ padding: "25px 35px" }}>
+            <Typography variant="h6">
+              Hi <b>{auth?.full_name || "..."}</b>, please do one of the
+              following:{" "}
+            </Typography>
+            <ol
+              style={{ listStyleType: "decimal", marginLeft: 20, marginTop: 6 }}
+            >
+              <li>
+                Review, <b>accept</b> and continue as admin
+              </li>
+              <li>Review, don't accept and become inactive as an admin</li>
+              <li>Delete your admin access</li>
+            </ol>
+          </div>
+
+          {/* --------------------------------------------------- */}
+          <div
+            style={{
+              background: "#fbfbfb",
+              display: "flex",
+              alignItems: "center",
             }}
-          />
-        </div>
-      </MEPaperBlock>
+          >
+            <div style={{ padding: "10px 30px" }}>
+              <Typography variant="body">
+                Please scroll down to read the entire document
+              </Typography>
+            </div>
+            <RichTextToPDF
+              filename={"Memorandum of Understanding (MOU) - MassEnergize"}
+              style={{ marginLeft: "auto" }}
+              richText={policy?.description}
+              render={(downloadFunction) => {
+                return (
+                  <Button
+                    variant="contained"
+                    style={{
+                      borderRadius: 0,
+                      fontWeight: "bold",
+                      width: 190,
+                      padding: 10,
+                    }}
+                    onClick={() => downloadFunction(policy?.description)}
+                  >
+                    Download As PDF
+                  </Button>
+                );
+              }}
+            />
+          </div>
+        </MEPaperBlock>
+      )}
+
       {/* --------------------------------------------------- */}
       <MEPaperBlock>
         <div
@@ -153,7 +206,9 @@ function ViewFullPolicy({ showModal, signOut, auth, policies }) {
           }}
         />
       </MEPaperBlock>
+
       <BFooter
+        alreadySigned={alreadyAcceptedMOU}
         isMOU={isMOU}
         loading={loading}
         confirm={toggleConfirmationDialog}
@@ -162,8 +217,10 @@ function ViewFullPolicy({ showModal, signOut, auth, policies }) {
   );
 }
 const mapStateToProps = (state) => {
-  return { auth: state.getIn(["auth"]),
-  policies: state.getIn(["allPolicies"]) };
+  return {
+    auth: state.getIn(["auth"]),
+    policies: state.getIn(["allPolicies"]),
+  };
 };
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
@@ -307,7 +364,7 @@ const ConfirmationModal = ({
     </div>
   );
 };
-const BFooter = ({ isMOU, loading, confirm }) => {
+const BFooter = ({ isMOU, loading, confirm, alreadySigned }) => {
   if (!isMOU) return <></>;
   const btnStyles = {
     borderRadius: 0,
@@ -324,44 +381,57 @@ const BFooter = ({ isMOU, loading, confirm }) => {
         padding: "0px",
       }}
     >
-      <div style={{ padding: "15px 30px" }}>
-        <Typography variant="h6" style={{ marginBottom: 10 }}>
-          Please proceed to <b>"Accept"</b> the terms, or choose <b>"No"</b> to
-          deactivate your role as an admin
-        </Typography>
-        <Typography variant="body" style={{ marginBottom: 10 }}>
-          A copy of the signed agreement will be sent to you and the{" "}
-          massenergize team via email when you accept.
-        </Typography>
-      </div>
+      {alreadySigned ? (
+        <div style={{ padding: "30px" }}>
+          <Typography variant="body" style={{ marginBottom: 10 }}>
+            Use the button below to revoke your admin rights and deactivate your account if you
+            no longer agree to the terms.
+          </Typography>
+        </div>
+      ) : (
+        <div style={{ padding: "30px" }}>
+          <Typography variant="h6" style={{ marginBottom: 10 }}>
+            Please proceed to <b>"Accept"</b> the terms, or choose <b>"No"</b>{" "}
+            to deactivate your role as an admin
+          </Typography>
+          <Typography variant="body" style={{ marginBottom: 10 }}>
+            A copy of the signed agreement will be sent to you and the{" "}
+            massenergize team via email when you accept.
+          </Typography>
+        </div>
+      )}
       <div style={{ background: "#fbfbfb" }}>
-        <Button
-          className="touchable-opacity"
-          style={{ ...btnStyles }}
-          variant="contained"
-          color="success"
-          disabled={loading && loading !== ACCEPT}
-          onClick={() => confirm("accept", { type: "accept" })}
-        >
-          {loading === ACCEPT && (
-            <i
-              style={{ color: "white", marginRight: 6 }}
-              className="fa fa-spinner fa-spin"
-            />
-          )}
-          Yes, I accept
-        </Button>
+        {!alreadySigned && (
+          <>
+            <Button
+              className="touchable-opacity"
+              style={{ ...btnStyles }}
+              variant="contained"
+              color="success"
+              disabled={loading && loading !== ACCEPT}
+              onClick={() => confirm("accept", { type: "accept" })}
+            >
+              {loading === ACCEPT && (
+                <i
+                  style={{ color: "white", marginRight: 6 }}
+                  className="fa fa-spinner fa-spin"
+                />
+              )}
+              Yes, I accept
+            </Button>
 
-        <Button
-          className="touchable-opacity"
-          style={{ ...btnStyles }}
-          variant="contained"
-          color="secondary"
-          disabled={loading && loading !== DEFER}
-          onClick={() => confirm("defer", { type: "defer" })}
-        >
-          Defer
-        </Button>
+            <Button
+              className="touchable-opacity"
+              style={{ ...btnStyles }}
+              variant="contained"
+              color="secondary"
+              disabled={loading && loading !== DEFER}
+              onClick={() => confirm("defer", { type: "defer" })}
+            >
+              Defer
+            </Button>
+          </>
+        )}
         <Button
           className="touchable-opacity"
           style={{ ...btnStyles, minWidth: 240 }}

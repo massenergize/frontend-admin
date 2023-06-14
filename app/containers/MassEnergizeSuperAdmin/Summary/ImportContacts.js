@@ -3,6 +3,7 @@ import { apiCall } from '../../../utils/messenger';
 import {CSVReader} from 'react-papaparse';
 import Button from '@mui/material/Button';
 import { PapperBlock } from 'dan-components';
+import Seo from '../../../components/Seo/Seo';
 
 class ImportContacts extends React.Component {
     constructor(props) {
@@ -130,7 +131,9 @@ class ImportContacts extends React.Component {
 
     render() {
         return(
-            <PapperBlock title="Invite Users through CSV upload" desc="">
+            <>
+            <Seo name="Import Contacts" />
+             <PapperBlock title="Invite Users through CSV upload" desc="">
                 <h6>Step 1: Prepare your CSV file.</h6>
                     <ul
                         style={{
@@ -208,6 +211,7 @@ class ImportContacts extends React.Component {
                     </Button>
                 </form>
             </PapperBlock>
+            </>
         );
     }
 };

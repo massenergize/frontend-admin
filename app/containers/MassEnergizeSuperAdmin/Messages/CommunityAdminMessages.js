@@ -39,6 +39,7 @@ import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import { renderInvisibleChips } from "../ME  Tools/table /utils";
+import Seo from "../../../../app/components/Seo/Seo";
 
 export const replyToMessage = ({ pathname, props, transfer }) => {
   // const pathname = `/admin/edit/${id}/message`;
@@ -407,14 +408,7 @@ class AllCommunityAdminMessages extends React.Component {
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"Community Admin Messages"}/>
         {comingFromDashboard && (
           <MEPaperBlock icon="fa fa-bullhorn" banner>
             <Typography>
