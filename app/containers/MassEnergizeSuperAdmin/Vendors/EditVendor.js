@@ -50,7 +50,8 @@ class CreateNewVendorForm extends Component {
 
   static getDerivedStateFromProps(props, state) {
     // you need: communities, vendor, vendors, tags
-    const { match, communities, vendors, tags, vendorsInfos, location } = props;
+    const { match, communities, vendors, tags, vendorsInfos, location, auth } = props;
+          const isSuperAdmin =auth?.is_super_admin
     const { id } = match.params;
     const vendor = vendorsInfos[id.toString()];
     const readyToRenderPageFirstTime =
@@ -70,7 +71,7 @@ class CreateNewVendorForm extends Component {
     const coms = communities.map((c) => ({
       ...c,
       displayName: c.name,
-      id: "" + c.id,
+      id:c.id,
     }));
 
     const libOpen = location.state && location.state.libOpen;
@@ -78,6 +79,7 @@ class CreateNewVendorForm extends Component {
       vendor,
       communities: coms,
       autoOpenMediaLibrary: libOpen,
+      isSuperAdmin
     });
     formJson.fields.splice(1, 0, section);
 
@@ -141,6 +143,7 @@ const mapStateToProps = (state) => {
     communities: state.getIn(["communities"]),
     vendorsInfos: heap.vendorsInfos || {},
     heap,
+    auth: state.getIn(["auth"]),
   };
 };
 const mapDispatchToProps = (dispatch) => {
@@ -159,7 +162,7 @@ const Wrapped = connect(
 
 export default withStyles(styles, { withTheme: true })(withRouter(Wrapped));
 
-const createFormJson = ({ vendor, communities, autoOpenMediaLibrary }) => {
+const createFormJson = ({ vendor, communities, autoOpenMediaLibrary, isSuperAdmin}) => {
   // const { vendor, communities } = this.state;
   const formJson = {
     title: "Update Vendor",
@@ -213,11 +216,15 @@ const createFormJson = ({ vendor, communities, autoOpenMediaLibrary }) => {
             selectMany: true,
             defaultValue:
               vendor && vendor.communities
-                ? vendor.communities.map((c) => "" + c.id)
+                ? vendor.communities.map((c) => c.id)
                 : [],
             dbName: "communities",
             readOnly: false,
             data: communities || [],
+            isAsync: true,
+            endpoint: isSuperAdmin
+              ? "/communities.listForSuperAdmin"
+              : "/communities.listForCommunityAdmin",
           },
           {
             name: "email",
@@ -261,7 +268,10 @@ const createFormJson = ({ vendor, communities, autoOpenMediaLibrary }) => {
             defaultValue: vendor.location ? "true" : "false",
             dbName: "have_address",
             readOnly: false,
-            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+            data: [
+              { id: "false", value: "No" },
+              { id: "true", value: "Yes" },
+            ],
             child: {
               valueToCheck: "true",
               fields: [
@@ -331,7 +341,11 @@ const createFormJson = ({ vendor, communities, autoOpenMediaLibrary }) => {
             readOnly: false,
             data: [
               { id: "national", value: "National", displayName: "National" },
-              { id: "statewide", value: "Statewide", displayName: "Statewide" },
+              {
+                id: "statewide",
+                value: "Statewide",
+                displayName: "Statewide",
+              },
             ],
             child: {
               valueToCheck: "statewide",

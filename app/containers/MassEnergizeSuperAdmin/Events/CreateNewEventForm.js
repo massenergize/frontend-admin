@@ -77,7 +77,7 @@ class CreateNewEventForm extends Component {
     const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
-      id: "" + c.id,
+      id:c.id,
     }));
 
     
@@ -207,7 +207,7 @@ const createFormJson = ({
             // defaultValue: progress.name || "",
             dbName: "name",
             readOnly: false,
-            maxLength: 100, // matches max length in the BE 
+            maxLength: 100, // matches max length in the BE
           },
           {
             name: "featured_summary",
@@ -361,7 +361,9 @@ const createFormJson = ({
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
                       isRequired: true,
-                    },
+                      isAsync: true,
+                      endpoint: "/communities.listForSuperAdmin"
+                    }
                   ],
                 },
               }

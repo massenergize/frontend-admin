@@ -187,6 +187,12 @@ function CommunityEngagement({
                         setOptions(op);
                         fetchFromBackendAfterFilters({ options: op });
                       }}
+                      isAsync={true}
+                      endpoint={
+                        isSuperAdmin
+                          ? "/communities.listForSuperAdmin"
+                          : "/communities.listForCommunityAdmin"
+                      }
                     />
                   )}
                   <MEDropdown
