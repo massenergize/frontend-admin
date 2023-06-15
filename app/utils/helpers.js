@@ -13,9 +13,12 @@ export const getLimit = (key) => {
   return (tableProp && tableProp.rowsPerPage) || 50;
 };
 export const getFilterParamsFromLocalStorage = (key) => {
-  var tableProp = localStorage.getItem(key + FILTERS);
+  var tableProp = localStorage.getItem("MAIN_FILTER_OBJECT");
   tableProp = JSON.parse(tableProp || null) || {};
+  key = key + FILTERS;
   let filters = {};
+  tableProp = tableProp[key] || {};
+
   Object.values(tableProp).forEach((value) => {
     if (value.list.length) {
       filters[
@@ -132,7 +135,7 @@ export const onTableStateChange = ({
   name,
   updateMetaData,
   meta,
-  otherArgs,
+  otherArgs
 }) => {
   switch (action) {
     case "changePage":

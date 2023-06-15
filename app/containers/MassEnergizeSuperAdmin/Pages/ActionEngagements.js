@@ -10,6 +10,7 @@ import { apiCall } from "../../../utils/messenger";
 import { bindActionCreators } from "redux";
 import { reduxLoadActionEngagements } from "../../../redux/redux-actions/adminActions";
 import { TIME_RANGE } from "../Summary/CommunityEngagement";
+import Seo from "../../../components/Seo/Seo";
 
 const NO_DATA = "NO_DATA";
 const DONE = "DONE";
@@ -140,6 +141,7 @@ function ActionEngagements({ engagements, putItemsInRedux }) {
 
   return (
     <div>
+      <Seo name={"Action Engagements"}/>
       <METable
         // classes={classes}
         page={PAGE_PROPERTIES.ACTION_ENGAGEMENTS}

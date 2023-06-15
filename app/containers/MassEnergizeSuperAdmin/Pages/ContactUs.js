@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from "@mui/styles";
 import MassEnergizeForm from '../_FormGenerator';
 import { apiCall } from '../../../utils/messenger';
+import Seo from '../../../components/Seo/Seo';
 
 const styles = theme => ({
   root: {
@@ -129,10 +130,11 @@ class ContactUsPageEditForm extends Component {
 
   render() {
     const { classes } = this.props;
-    const { formJson } = this.state;
+    const { formJson, contactUsPageData } = this.state;
     if (!formJson) return (<div>Hold tight! Retrieving your data ...</div>);
     return (
       <div>
+        <Seo name={`Edit - ${contactUsPageData?.community?.name}'s Contact Us Page`}/>
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}

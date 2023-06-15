@@ -11,6 +11,7 @@ import {
 } from "../../../redux/redux-actions/adminActions";
 import AddOrEditFeatureFlags from "./AddOrEditFeatureFlags";
 import ManageFeatureFlags from "./ManageFeatureFlags";
+import Seo from "../../../components/Seo/Seo";
 
 function FeatureFlags({
   classes,
@@ -64,6 +65,7 @@ function FeatureFlags({
 
   return (
     <div>
+      <Seo name={"Feature Flags"} />
       <Paper>
         <div style={{ padding: 20 }}>
           <Typography variant="body">

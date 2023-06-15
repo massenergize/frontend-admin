@@ -20,6 +20,7 @@ import EventShareModal from "./EventShareModal";
 import { PORTAL_HOST } from "../../../config/constants";
 import { dateFormatString } from "../Community/utils";
 import EditEventForm from "./EditEventForm";
+import Seo from "../../../components/Seo/Seo";
 
 const open = {
   background: "#4faa4f",
@@ -236,6 +237,7 @@ function EventFullView(props) {
   };
   return (
     <div>
+      <Seo name={`Full View - ${event?.name}`}/>
       <EventShareModal
         auth={auth}
         communities={communities}
