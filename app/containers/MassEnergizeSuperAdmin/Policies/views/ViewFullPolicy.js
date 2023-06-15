@@ -130,7 +130,7 @@ function ViewFullPolicy({ showModal, signOut, auth, policies }) {
       </Typography>
 
       {/* --------------------------------------------------- */}
-      {!alreadyAcceptedMOU ? (
+      {alreadyAcceptedMOU ? (
         <MEPaperBlock
           containerStyle={{
             minHeight: 100,
