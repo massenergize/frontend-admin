@@ -4,7 +4,7 @@ import { LOADING } from "../../../../utils/constants";
 
 import MEPaperBlock from "../../ME  Tools/paper block/MEPaperBlock";
 import LinearBuffer from "../../../../components/Massenergize/LinearBuffer";
-import { Button, Typography } from "@mui/material";
+import { Button, Typography, Snackbar, Alert } from "@mui/material";
 import { useHistory, useParams } from "react-router-dom";
 import RichTextToPDF from "../../ME  Tools/to pdf/RichTextToPDF";
 import { apiCall } from "../../../../utils/messenger";
@@ -17,8 +17,6 @@ import {
 import { getHumanFriendlyDate } from "../../../../utils/common";
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
-
-
 const MOU = "mou";
 const ACCEPT = "accept";
 const DECLINE = "decline";
@@ -28,6 +26,7 @@ function ViewFullPolicy({ showModal, signOut, auth, policies }) {
   const history = useHistory();
   const [policy, setPolicy] = useState(LOADING);
   const [loading, setLoading] = useState(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const { policyKey } = useParams();
   const isMOU = MOU === policyKey;
@@ -90,8 +89,39 @@ function ViewFullPolicy({ showModal, signOut, auth, policies }) {
       </MEPaperBlock>
     );
 
+  const requestPDF = (id, title) => {
+    apiCall("/downloads.policy", { policy_id: id, title }).then((res) => {
+      if (res.success) {
+        setOpenSnackbar(true);
+      }
+    });
+  };
+  const handleCloseStyle = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpenSnackbar(false);
+  };
   return (
     <div style={{ marginTop: -70 }}>
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "cen" }}
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseStyle}
+      >
+        <Alert
+          onClose={handleCloseStyle}
+          severity={"success"}
+          sx={{ width: "100%" }}
+        >
+          <small style={{ marginLeft: 15, fontSize: 15 }}>
+            Your request has been received. Please check your email for the
+            file.
+          </small>
+        </Alert>
+      </Snackbar>
+
       <Typography
         variant="h3"
         style={{ fontWeight: "700", fontSize: "2.125rem", color: "white" }}
@@ -100,12 +130,12 @@ function ViewFullPolicy({ showModal, signOut, auth, policies }) {
       </Typography>
 
       {/* --------------------------------------------------- */}
-      {alreadyAcceptedMOU ? (
+      {!alreadyAcceptedMOU ? (
         <MEPaperBlock
           containerStyle={{
             minHeight: 100,
             marginTop: 25,
-            padding:"16px 30px",
+            padding: "16px 30px",
             background: "#198754",
             color: "white",
           }}
@@ -125,7 +155,7 @@ function ViewFullPolicy({ showModal, signOut, auth, policies }) {
               className="fa fa-check-circle"
               style={{ marginRight: 8, color: "white", fontSize: 24 }}
             />
-            <Typography variant="h6" style={{fontSize:"1.1rem"}}>
+            <Typography variant="h6" style={{ fontSize: "1.1rem" }}>
               You already signed the MOU on{" "}
               <b style={{ textDecoration: "underline" }}>
                 {signedMouAt || "..."}
@@ -152,7 +182,11 @@ function ViewFullPolicy({ showModal, signOut, auth, policies }) {
               following:{" "}
             </Typography>
             <ol
-              style={{ listStyleType: "decimal", marginLeft: 20, marginTop: 6 }}
+              style={{
+                listStyleType: "decimal",
+                marginLeft: 20,
+                marginTop: 6,
+              }}
             >
               <li>
                 Review, <b>accept</b> and continue as admin
@@ -168,6 +202,7 @@ function ViewFullPolicy({ showModal, signOut, auth, policies }) {
               background: "#fbfbfb",
               display: "flex",
               alignItems: "center",
+              justifyContent: "space-between",
             }}
           >
             <div style={{ padding: "10px 30px" }}>
@@ -175,27 +210,23 @@ function ViewFullPolicy({ showModal, signOut, auth, policies }) {
                 Please scroll down to read the entire document
               </Typography>
             </div>
-            <RichTextToPDF
-              filename={"Memorandum of Understanding (MOU) - MassEnergize"}
-              style={{ marginLeft: "auto" }}
-              richText={policy?.description}
-              render={(downloadFunction) => {
-                return (
-                  <Button
-                    variant="contained"
-                    style={{
-                      borderRadius: 0,
-                      fontWeight: "bold",
-                      width: 190,
-                      padding: 10,
-                    }}
-                    onClick={() => downloadFunction(policy?.description)}
-                  >
-                    Download As PDF
-                  </Button>
-                );
+            <Button
+              variant="contained"
+              style={{
+                borderRadius: 0,
+                fontWeight: "bold",
+                width: 190,
+                padding: 10,
               }}
-            />
+              onClick={() =>
+                requestPDF(
+                  policy?.id,
+                  "Memorandum of Understanding (MOU) - MassEnergize"
+                )
+              }
+            >
+              Download As PDF
+            </Button>
           </div>
         </MEPaperBlock>
       )}
@@ -386,8 +417,8 @@ const BFooter = ({ isMOU, loading, confirm, alreadySigned }) => {
       {alreadySigned ? (
         <div style={{ padding: "30px" }}>
           <Typography variant="body" style={{ marginBottom: 10 }}>
-            Use the button below to revoke your admin rights and deactivate your account if you
-            no longer agree to the terms.
+            Use the button below to revoke your admin rights and deactivate your
+            account if you no longer agree to the terms.
           </Typography>
         </div>
       ) : (
