@@ -202,7 +202,7 @@ class EditEventForm extends Component {
     const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
-      id: "" + c.id,
+      id: c.id,
     }));
 
     const libOpen = location.state && location.state.libOpen;
@@ -433,7 +433,7 @@ const createFormJson = ({
 
   const otherCommunityList = otherCommunities.map((c) => ({
     displayName: c.name,
-    id: c.id.toString(),
+    id: c.id,
   }));
 
   const formJson = {
@@ -695,6 +695,8 @@ const createFormJson = ({
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
                       isRequired: true,
+                      isAsync: true,
+                      endpoint: "/communities.listForSuperAdmin",
                     },
                   ],
                 },
@@ -748,6 +750,10 @@ const createFormJson = ({
                     defaultValue: publicityCommunities,
                     dbName: "publicity_selections",
                     data: otherCommunityList,
+                    isAsync: true,
+                    endpoint: is_super_admin
+                      ? "/communities.listForSuperAdmin"
+                      : "/communities.others.listForCommunityAdmin",
                   },
                 ],
               },

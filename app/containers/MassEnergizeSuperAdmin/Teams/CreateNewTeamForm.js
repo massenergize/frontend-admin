@@ -72,6 +72,7 @@ const mapStateToProps = (state) => {
   return {
     communities: state.getIn(["communities"]),
     formState: state.getIn(["tempForm"]),
+    auth: state.getIn(["auth"]),
   };
 };
 const mapDispatchToProps = (dispatch) => {
@@ -143,6 +144,10 @@ const createFormJson = ({ communities, autoOpenMediaLibrary, parents, setParents
             defaultValue: null,
             dbName: "primary_community_id",
             data: [{ displayName: "--", id: "" }, ...communities],
+            isAsync: true,
+            endpoint: isSuperAdmin
+              ? "/communities.listForSuperAdmin"
+              : "/communities.listForCommunityAdmin",
           },
           {
             name: "communities",
@@ -153,6 +158,10 @@ const createFormJson = ({ communities, autoOpenMediaLibrary, parents, setParents
             defaultValue: null,
             dbName: "communities",
             data: communities,
+            isAsync: true,
+            endpoint: isSuperAdmin
+              ? "/communities.listForSuperAdmin"
+              : "/communities.listForCommunityAdmin",
           },
           {
             name: "parent",
