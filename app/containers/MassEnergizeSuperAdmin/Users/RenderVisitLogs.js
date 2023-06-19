@@ -93,7 +93,7 @@ function RenderVisitLogs({ putLogsInRedux, logs, id, users }) {
                 className="fa fa-clock"
                 style={{ marginRight: 6, color: "#e8e8e8" }}
               />{" "}
-              <span> {getHumanFriendlyDate(log, false, false)}</span>
+              <span> {getHumanFriendlyDate(log, false, true)}</span>
             </Typography>
           );
         })}
