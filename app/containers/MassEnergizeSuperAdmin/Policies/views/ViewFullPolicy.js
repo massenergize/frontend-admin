@@ -6,7 +6,6 @@ import MEPaperBlock from "../../ME  Tools/paper block/MEPaperBlock";
 import LinearBuffer from "../../../../components/Massenergize/LinearBuffer";
 import { Button, Typography, Snackbar, Alert } from "@mui/material";
 import { useHistory, useParams } from "react-router-dom";
-import RichTextToPDF from "../../ME  Tools/to pdf/RichTextToPDF";
 import { apiCall } from "../../../../utils/messenger";
 import { bindActionCreators } from "redux";
 import {
