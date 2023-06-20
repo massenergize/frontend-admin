@@ -45,6 +45,7 @@ import RenderVisitLogs from "./RenderVisitLogs";
 import { getData } from "../Messages/CommunityAdminMessages";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import Seo from "../../../components/Seo/Seo";
+import CustomOptions from "../ME  Tools/table /CustomOptions";
 
 class AllUsers extends React.Component {
   constructor(props) {
@@ -120,7 +121,9 @@ class AllUsers extends React.Component {
     ]);
   };
 
-  getColumns = (classes) => [
+  getColumns = (classes) => {
+    const { auth, communities } = this.props;
+    return [
     {
       name: "Full Name",
       key: "full_name",
@@ -184,10 +187,16 @@ class AllUsers extends React.Component {
     {
       name: "Community",
       key: "community",
-      options: {
-        filter: true,
-        filterType: "multiselect",
-      },
+      options: auth?.is_super_admin
+        ? CustomOptions({
+            data: communities,
+            label: "community",
+            endpoint: "/communities.listForSuperAdmin",
+          })
+        : {
+            filter: true,
+            filterType: "multiselect",
+          },
     },
     {
       name: "Membership",
@@ -206,7 +215,8 @@ class AllUsers extends React.Component {
         download: false,
       },
     },
-  ];
+  ]
+}
 
   nowDelete({ idsToDelete, data }) {
     const { allUsers, putUsersInRedux } = this.props;
@@ -438,6 +448,7 @@ function mapStateToProps(state) {
     allUsers: state.getIn(["allUsers"]),
     meta: state.getIn(["paginationMetaData"]),
     tableFilters: state.getIn(["tableFilters"]),
+    communities: state.getIn(["communities"]),
   };
 }
 

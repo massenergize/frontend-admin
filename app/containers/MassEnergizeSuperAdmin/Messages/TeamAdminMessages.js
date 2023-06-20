@@ -39,6 +39,7 @@ import { getData, replyToMessage } from "./CommunityAdminMessages";
 import Loader from "../../../utils/components/Loader";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import Seo from "../../../components/Seo/Seo";
+import CustomOptions from "../ME  Tools/table /CustomOptions";
 class AllTeamAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -125,7 +126,12 @@ class AllTeamAdminMessages extends React.Component {
     ]);
   };
 
-  getColumns = (classes) => [
+  getColumns = (classes) =>{
+    const {
+      auth,
+      communities,
+    } = this.props;
+   return [
     {
       name: "ID",
       key: "id",
@@ -166,10 +172,16 @@ class AllTeamAdminMessages extends React.Component {
     {
       name: "Community",
       key: "community",
-      options: {
-        filter: true,
-        filterType: "multiselect",
-      },
+      options: auth?.is_super_admin
+        ? CustomOptions({
+            data: communities,
+            label: "community",
+            endpoint: "/communities.listForSuperAdmin",
+          })
+        : {
+            filter: true,
+            filterType: "multiselect",
+          },
     },
     {
       name: "Team",
@@ -221,6 +233,7 @@ class AllTeamAdminMessages extends React.Component {
       },
     },
   ];
+}
 
   nowDelete({ idsToDelete, data }) {
     const { teamMessages, putTeamMessagesInRedux } = this.props;
@@ -371,8 +384,8 @@ class AllTeamAdminMessages extends React.Component {
           <MEPaperBlock icon="fa fa-bullhorn" banner>
             <Typography>
               The <b>{comingFromDashboard}</b> team message(s) you have not
-              answered yet are currently pre-selected and sorted in the table for
-              you. Feel free to
+              answered yet are currently pre-selected and sorted in the table
+              for you. Feel free to
               <Link
                 href="#"
                 onClick={(e) => {
@@ -413,6 +426,7 @@ function mapStateToProps(state) {
     teamMessages: state.getIn(["teamMessages"]),
     meta: state.getIn(["paginationMetaData"]),
     tableFilters: state.getIn(["tableFilters"]),
+    communities: state.getIn(["communities"]),
   };
 }
 function mapDispatchToProps(dispatch) {
