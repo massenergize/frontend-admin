@@ -11,6 +11,7 @@ import { reduxLoadAdmins } from "../../../redux/redux-actions/adminActions";
 import { LOADING } from "../../../utils/constants";
 import Loading from "dan-components/Loading";
 import MEChip from "../../../components/MECustom/MEChip";
+import Seo from "../../../components/Seo/Seo";
 
 const styles = (theme) => ({
   root: {
@@ -202,6 +203,7 @@ class AddRemoveAdmin extends Component {
 
     return (
       <div>
+        <Seo name={`${community?.name} Admins`} />
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
@@ -211,7 +213,8 @@ class AddRemoveAdmin extends Component {
         <br />
         <div className={classes.table}>
           <MUIDataTable
-            title={`Community Admins ${community && " In " + community.name}`}
+            title={`Community Admins ${community &&
+              " In " + community.name}`}
             data={data}
             columns={columns}
             options={options}

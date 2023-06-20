@@ -19,6 +19,8 @@ import {
   reduxToggleUniversalModal,
 } from "../../../redux/redux-actions/adminActions";
 import { Typography } from "@mui/material";
+import { ArrowRight, ArrowRightAlt } from "@mui/icons-material";
+import Seo from "../../../components/Seo/Seo";
 class AllPolicies extends React.Component {
   constructor(props) {
     super(props);
@@ -30,30 +32,16 @@ class AllPolicies extends React.Component {
     if (user.is_super_admin) {
       this.props.callPoliciesForSuperAdmin();
     }
-    if (user.is_community_admin) {
-      const com = user.admin_at[0];
-      this.props.callPoliciesForNormalAdmin((com && com.id) || null);
-    }
   }
-
-  showCommunitySwitch = () => {
-    const user = this.props.auth ? this.props.auth : {};
-    if (user.is_community_admin) {
-      return <CommunitySwitch actionToPerform={this.handleCommunityChange} />;
-    }
-  };
-
-  handleCommunityChange = (id) => {
-    this.props.callPoliciesForNormalAdmin(id);
-  };
 
   fashionData = (data) => {
     const fashioned = data.map((d) => [
       d.id,
       d.name,
       d.is_global ? "Template" : d.community && d.community.name,
-      "" + d.is_published ? "Yes": "No",
+      "" + d.is_published ? "Yes" : "No",
       d.id,
+      d.key,
     ]);
     return fashioned;
   };
@@ -117,6 +105,24 @@ class AllPolicies extends React.Component {
           </div>
         ),
       },
+    }, 
+    {
+      name: "Full View",
+      key: "view",
+      options: {
+        filter: false,
+        customBodyRender: (key) => (
+          <div>
+            <Link to={`/admin/view/policy/${key}?ct=true`}>
+              <ArrowRightAlt
+                size="small"
+                variant="outlined"
+                color="secondary"
+              />
+            </Link>
+          </div>
+        ),
+      },
     },
   ];
 
@@ -149,7 +155,6 @@ class AllPolicies extends React.Component {
     const { columns } = this.state;
     const { classes } = this.props;
     const data = this.fashionData(this.props.allPolicies);
-
     const options = {
       filterType: "dropdown",
       responsive: "standard",
@@ -167,27 +172,13 @@ class AllPolicies extends React.Component {
           closeAfterConfirmation: true,
         });
         return false;
-
-        // const idsToDelete = rowsDeleted.data;
-        // idsToDelete.forEach(d => {
-        //   const policyId = data[d.dataIndex][0];
-        //   apiCall('/policies.delete', { policy_id: policyId });
-        // });
       },
     };
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"All Policies"} />
         <div className={classes.table}>
-          {this.showCommunitySwitch()}
           <MUIDataTable
             title="All Policies"
             data={data}
@@ -214,7 +205,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
       callPoliciesForSuperAdmin: reduxGetAllPolicies,
-      callPoliciesForNormalAdmin: reduxGetAllCommunityPolicies,
+      // callPoliciesForNormalAdmin: reduxGetAllCommunityPolicies,
       putPoliciesInRedux: loadAllPolicies,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
     },

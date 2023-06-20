@@ -5,6 +5,9 @@ import MassEnergizeForm from "../_FormGenerator";
 // TODO: change image to use MediaLibrary
 //import fieldTypes from "../_FormGenerator/fieldTypes";
 import { apiCall } from "../../../utils/messenger";
+import fieldTypes from "../_FormGenerator/fieldTypes";
+import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import Seo from "../../../components/Seo/Seo";
 
 const styles = (theme) => ({
   root: {
@@ -155,10 +158,16 @@ class AboutUsPageEditForm extends Component {
 
   render() {
     const { classes } = this.props;
-    const { formJson } = this.state;
-    if (!formJson) return <div>Hold tight! Retrieving your data ...</div>;
+    const { formJson, aboutUsPageData } = this.state;
+    if (!formJson)
+      return (
+        <LinearBuffer asCard message="Hold tight! Retrieving your data..." />
+      );
+
+    // <div>Hold tight! Retrieving your data ...</div>;
     return (
       <div>
+        <Seo name={`Edit - ${aboutUsPageData?.community?.name}'s About Page`}/>
         <MassEnergizeForm classes={classes} formJson={formJson} />
       </div>
     );

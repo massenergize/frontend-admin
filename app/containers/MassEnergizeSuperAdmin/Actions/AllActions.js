@@ -3,7 +3,6 @@ import React from "react";
 import PropTypes from "prop-types";
 
 import brand from "dan-api/dummy/brand";
-import { Helmet } from "react-helmet";
 import { withStyles } from "@mui/styles";
 
 import FileCopy from "@mui/icons-material/FileCopy";
@@ -17,7 +16,6 @@ import { bindActionCreators } from "redux";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import {
-  reduxGetAllActions,
   reduxGetAllCommunityActions,
   loadAllActions,
   reduxToggleUniversalModal,
@@ -32,13 +30,11 @@ import {
   getTimeStamp,
   isEmpty,
   isNotEmpty,
-  makeDeleteUI,
   ourCustomSort,
-  pop,
   reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
-import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
+import { Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable, { FILTERS } from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -51,6 +47,7 @@ import {
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
+import Seo from '../../../../app/components/Seo/Seo'
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -368,6 +365,19 @@ class AllActions extends React.Component {
     });
   }
 
+  makeDeleteUI({ idsToDelete, templates }) {
+  const len = (idsToDelete && idsToDelete.length) || 0;
+  var text = `Are you sure you want to delete (
+    ${(idsToDelete && idsToDelete.length) || ""})
+    ${len === 1 ? " action? " : " actions? "}`;
+
+  if (templates && templates.length)
+    text = `Sorry, (${templates.length}) template${
+      templates.length === 1 ? "" : "s"
+    } selected. You can't delete templates. `;
+  return <Typography>{text}</Typography>;
+  }
+
   makeLiveUI({ data }) {
     const name = data && data.title;
     const isON = data.is_published;
@@ -533,7 +543,7 @@ class AllActions extends React.Component {
         const noTemplatesSelectedGoAhead = !found || !found.length;
         this.props.toggleDeleteConfirmation({
           show: true,
-          component: makeDeleteUI({
+          component: this.makeDeleteUI({
             idsToDelete,
             templates: found,
             noTemplates: noTemplatesSelectedGoAhead,
@@ -568,14 +578,7 @@ class AllActions extends React.Component {
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={`All Actions`} />
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_ACTIONS}

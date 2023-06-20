@@ -32,6 +32,7 @@ import styles from './contact-jss';
 import CommunitySwitch from '../Summary/CommunitySwitch';
 import { apiCall } from '../../../utils/messenger';
 import { reduxGetAllCommunityUsers, reduxGetAllUsers } from '../../../redux/redux-actions/adminActions';
+import Seo from '../../../components/Seo/Seo';
 
 class Contact extends React.Component {
   async componentDidMount() {
@@ -89,14 +90,7 @@ class Contact extends React.Component {
     } = this.props;
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"Contact"} />
         {/* {this.showCommunitySwitch()} */}
         <Notification close={() => closeNotif()} message={messageNotif} />
         <div className={classes.root}>

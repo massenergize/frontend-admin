@@ -46,7 +46,9 @@ class CreateNewVendorForm extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    const { communities, tags, formState, location } = props;
+    const { communities, tags, formState, location, auth } = props;
+
+      const isSuperAdmin =auth?.is_super_admin 
 
     const section = makeTagSection({
       collections: tags,
@@ -56,7 +58,7 @@ class CreateNewVendorForm extends Component {
     const coms = (communities ||[]).map((c) => ({
       ...c,
       displayName: c.name,
-      id: "" + c.id,
+      id:c.id,
     }));
 
     const jobsDoneDontRunWhatsBelowEverAgain =
@@ -69,6 +71,7 @@ class CreateNewVendorForm extends Component {
     const formJson = createFormJson({
       communities: coms,
       autoOpenMediaLibrary: libOpen,
+      isSuperAdmin,
     });
     formJson.fields.splice(1, 0, section);
 
@@ -103,6 +106,7 @@ const mapStateToProps = (state) => {
     communities: state.getIn(["communities"]),
     tags: state.getIn(["allTags"]),
     formState: state.getIn(["tempForm"]),
+    auth: state.getIn(["auth"]),
   };
 };
 
@@ -120,7 +124,7 @@ const Mapped = connect(
 )(withRouter(CreateNewVendorForm));
 export default withStyles(styles, { withTheme: true })(Mapped);
 
-const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
+const createFormJson = ({ communities, progress, autoOpenMediaLibrary, isSuperAdmin}) => {
   const formJson = {
     title: "Create New Vendor",
     subTitle: "",
@@ -164,6 +168,10 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             dbName: "communities",
             readOnly: false,
             data: communities || [],
+            isAsync: true,
+            endpoint: isSuperAdmin
+              ? "/communities.listForSuperAdmin"
+              : "/communities.listForCommunityAdmin",
           },
           {
             name: "email",
@@ -207,7 +215,10 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             defaultValue: "false",
             dbName: "have_address",
             readOnly: false,
-            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+            data: [
+              { id: "false", value: "No" },
+              { id: "true", value: "Yes" },
+            ],
             child: {
               valueToCheck: "true",
               fields: [
@@ -269,12 +280,16 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
             fieldType: "Radio",
             contentType: "text",
             isRequired: true,
-            defaultValue:  "national",
+            defaultValue: "national",
             dbName: "service_area",
             readOnly: false,
             data: [
               { id: "national", value: "National", displayName: "National" },
-              { id: "statewide", value: "Statewide", displayName: "Statewide" },
+              {
+                id: "statewide",
+                value: "Statewide",
+                displayName: "Statewide",
+              },
             ],
             child: {
               valueToCheck: "statewide",
@@ -288,7 +303,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
                   data: states,
                   selectMany: true,
                   isRequired: false,
-                  defaultValue:  [],
+                  defaultValue: [],
                   dbName: "service_area_states",
                   readOnly: false,
                 },
@@ -387,7 +402,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary }) => {
         label: "Should this vendor go live?",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue:"false",
+        defaultValue: "false",
         dbName: "is_published",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],

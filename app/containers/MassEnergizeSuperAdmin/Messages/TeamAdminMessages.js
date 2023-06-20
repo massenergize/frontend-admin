@@ -35,8 +35,10 @@ import {
 } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
-import { replyToMessage } from "./CommunityAdminMessages";
+import { getData, replyToMessage } from "./CommunityAdminMessages";
 import Loader from "../../../utils/components/Loader";
+import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import Seo from "../../../components/Seo/Seo";
 class AllTeamAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -64,13 +66,15 @@ class AllTeamAdminMessages extends React.Component {
     const comingFromDashboard = ids && ids.length;
 
     const key = PAGE_PROPERTIES.ALL_TEAM_MESSAGES.key + FILTERS;
-    if (comingFromDashboard) {
-      this.setState({ saveFilters: false });
-      updateTableFilters({
-        ...(tableFilters || {}),
-        [key]: { 0: { list: ids } },
-      });
-    }
+    if (comingFromDashboard) this.setState({ comingFromDashboard, ids });
+    else this.setState({ comingFromDashboard: false });
+    // if (comingFromDashboard) {
+    //   this.setState({ saveFilters: false });
+    //   updateTableFilters({
+    //     ...(tableFilters || {}),
+    //     [key]: { 0: { list: ids } },
+    //   });
+    // }
 
     apiCall("/messages.listTeamAdminMessages", {
       limit: getLimit(PAGE_PROPERTIES.ALL_TEAM_MESSAGES.key),
@@ -258,7 +262,7 @@ class AllTeamAdminMessages extends React.Component {
   render() {
     const title = brand.name + " - Team Admin Messages";
     const description = brand.desc;
-    const { columns } = this.state;
+    const { columns, comingFromDashboard, ids } = this.state;
     const {
       classes,
       teamMessages,
@@ -266,7 +270,13 @@ class AllTeamAdminMessages extends React.Component {
       meta,
       putMetaDataToRedux,
     } = this.props;
-    const data = this.fashionData((teamMessages && teamMessages) || []);
+
+    const content = getData({
+      source: (teamMessages && teamMessages) || [],
+      comingFromDashboard,
+      ids,
+    });
+    const data = this.fashionData(content);
 
     const metaData = meta && meta.teamMessages;
     const options = {
@@ -356,14 +366,26 @@ class AllTeamAdminMessages extends React.Component {
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"Team Admin Messages"} />
+        {comingFromDashboard && (
+          <MEPaperBlock icon="fa fa-bullhorn" banner>
+            <Typography>
+              The <b>{comingFromDashboard}</b> team message(s) you have not
+              answered yet are currently pre-selected and sorted in the table for
+              you. Feel free to
+              <Link
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.setState({ comingFromDashboard: false });
+                }}
+              >
+                {" "}
+                clear all selections.
+              </Link>
+            </Typography>
+          </MEPaperBlock>
+        )}
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_TEAM_MESSAGES}
@@ -373,7 +395,8 @@ class AllTeamAdminMessages extends React.Component {
             columns: columns,
             options: options,
           }}
-          saveFilters={this.state.saveFilters}
+          ignoreSavedFilters={comingFromDashboard}
+          saveFilters={!comingFromDashboard}
         />
       </div>
     );

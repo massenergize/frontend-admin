@@ -5,9 +5,11 @@ import {
   Typography,
 } from "@mui/material";
 import { Chip, FormControl, FormLabel, Select } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { pop } from "../../../../utils/common";
 import LightAutoComplete from "../../Gallery/tools/LightAutoComplete";
+import MEDropdownPro from "./MEDropdownPro";
+import { apiCall } from "../../../../utils/messenger";
 function MEDropdown(props) {
   const {
     containerStyle,
@@ -20,8 +22,12 @@ function MEDropdown(props) {
     defaultValue,
     value,
     generics,
+    fullControl = false,
+    ...rest
   } = props;
   const [selected, setSelected] = useState(defaultValue || value || []);
+  const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
+    const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
   const valueOf = (item) => {
     if (!item) return;
     if (valueExtractor) return valueExtractor(item);
@@ -33,13 +39,50 @@ function MEDropdown(props) {
   }, [defaultValue, value]);
 
   // -------------------------------------------------------------------
+  if (fullControl) return <MEDropdownPro {...props} />;
+  // -------------------------------------------------------------------
+  const elementObserver = useRef(null);
+  const lastDropDownItemRef = useCallback(
+    (node) => {
+      if (elementObserver.current) elementObserver.current.disconnect();
+      elementObserver.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && cursor.has_more) {
+          if (!rest?.endpoint) return;
+          apiCall(rest?.endpoint, { page: cursor.next,limit: 10,}).then((res) => {
+            setCursor({
+              has_more: res?.cursor?.count > optionsToDisplay?.length,
+              next: res?.cursor?.next,
+            });
+            let items = [
+              ...optionsToDisplay,
+              ...(res?.data || [])?.map((item) => {
+                return {
+                  ...item,
+                  displayName: labelExtractor
+                    ? labelExtractor(item)
+                    : item?.name || item?.title,
+                };
+              }),
+            ];
+
+            setOptionsToDisplay([
+              ...new Map(items.map((item) => [item["id"], item])).values(),
+            ]);
+          });
+        }
+      });
+
+      if (node) elementObserver.current.observe(node);
+    },
+    [cursor]
+  );
+  // -------------------------------------------------------------------
   // Always switch dropdown to auto complete dropdown if there are a lot of items. A lot = (>20 items)
-  if (data && data.length > 20) {
+  if (optionsToDisplay && optionsToDisplay.length > 20) {
     return (
       <LightAutoComplete
         onChange={(items) => {
           items = (items || []).map((a) => valueExtractor(a));
-          console.log("Here are the items", items);
           onItemSelected(items);
         }}
         {...props}
@@ -47,6 +90,9 @@ function MEDropdown(props) {
     );
   }
   // -------------------------------------------------------------------
+
+  // -------------------------------------------------------------------
+
 
   const labelOf = (item, fromValue) => {
     if (!item) return;
@@ -105,9 +151,9 @@ function MEDropdown(props) {
         )}
         value={selected || []}
       >
-        {(data || []).map((d, i) => {
+        {(optionsToDisplay || []).map((d, i) => {
           return (
-            <MenuItem key={i}>
+            <MenuItem key={i} ref={(i === optionsToDisplay.length - 1) && isAsync ? lastDropDownItemRef:null}>
               <FormControlLabel
                 onClick={() => handleOnChange(d)}
                 key={i}

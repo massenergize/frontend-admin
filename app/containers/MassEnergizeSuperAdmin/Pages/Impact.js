@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from "@mui/styles";
 import MassEnergizeForm from '../_FormGenerator';
 import { apiCall } from '../../../utils/messenger';
+import Seo from '../../../components/Seo/Seo';
 
 const styles = theme => ({
   root: {
@@ -282,10 +283,11 @@ class Impact extends Component {
 
   render() {
     const { classes } = this.props;
-    const { formJson } = this.state;
+    const { formJson, graph } = this.state;
     if (!formJson) return (<div>Hold tight! Fetching Data ...</div>);
     return (
       <div>
+        <Seo name={`Edit - ${graph?.community?.name}'s Goals & Impacts`}/>
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}

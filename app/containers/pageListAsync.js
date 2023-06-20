@@ -2,6 +2,24 @@ import React from "react";
 import Loading from "dan-components/Loading";
 import loadable from "../utils/loadable";
 
+export const TermsOfServicePage = loadable(
+  () => import("./MassEnergizeSuperAdmin/Policies/views/ViewFullPolicy"),
+  {
+    fallback: <Loading />,
+  }
+);
+export const PrivacyPolicyPage = loadable(
+  () => import("./MassEnergizeSuperAdmin/Policies/views/PrivacyPolicyPage"),
+  {
+    fallback: <Loading />,
+  }
+);
+export const MOUPage = loadable(
+  () => import("./MassEnergizeSuperAdmin/Policies/views/MOUPage"),
+  {
+    fallback: <Loading />,
+  }
+);
 export const EventFullView = loadable(
   () => import("./MassEnergizeSuperAdmin/Events/EventFullView"),
   {
@@ -191,8 +209,6 @@ export const AddCategory = loadable(
     fallback: <Loading />,
   }
 );
-
-
 
 export const EditCategory = loadable(
   () => import("./MassEnergizeSuperAdmin/Categories/EditCategory"),

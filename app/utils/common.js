@@ -8,11 +8,49 @@ import React from "react";
 import { ME_FORM_PROGRESS } from "../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 import { apiCall } from "./messenger";
 
-export const  isPastDate = (dateString) =>{
+export const getHumanFriendlyDateRange = (startDate, endDate) => {
+  const start = moment(startDate);
+  const end = moment(endDate);
+
+  // Check if start and end dates are on the same day
+  const sameDay = start.isSame(end, "day");
+
+  if (sameDay) {
+    // Format start and end times
+    const formattedStart = start.format("h:mm A");
+    const formattedEnd = end.format("h:mm A");
+
+    const formattedRange = `${start.format(
+      "Do MMMM YYYY"
+    )} from ${formattedStart} to ${formattedEnd}`;
+    return formattedRange;
+  } else {
+    const formattedStart = start.format("Do MMMM YYYY");
+    const formattedEnd = end.format("Do MMMM YYYY");
+
+    const formattedRange = `${formattedStart} to ${formattedEnd}`;
+    return formattedRange;
+  }
+};
+
+export const getUniqueDates = (dates) => {
+  if (!dates) return [];
+  const uniqueDates = new Set();
+
+  // Iterate over the dates and extract the date part
+  dates.forEach((date) => {
+    const dateStr = new Date(date).toISOString().slice(0, 10); // Get the date part of the ISO string
+    uniqueDates.add(dateStr);
+  });
+
+  // Return the unique dates as an array of strings
+  return Array.from(uniqueDates);
+};
+export const isPastDate = (dateString) => {
   const date = new Date(dateString);
   const now = new Date();
   return date < now;
-}
+};
 
 export const separate = (ids, dataSet = [], options = {}) => {
   const { valueExtractor } = options || {};
@@ -108,7 +146,7 @@ export const pop = (arr = [], value, finder) => {
   var found = null;
   arr.forEach((item) => {
     const val = finder ? finder(item) : item;
-    if (val === value) found = item;
+    if (val?.toString() === value.toString()) found = item;
     else rest.push(item);
   });
 
@@ -194,6 +232,8 @@ export const ourCustomSort = ({ a, b, colIndex, order, compare }) => {
   a = a.data[colIndex];
   b = b.data[colIndex];
   if (compare) return compare({ a, b }) * directionConstant;
+  if (typeof a === "string" && typeof b === "string") // Forcing comparison to be done in lowercase when dealing with strings otherwise results will be off
+    return (a.toLowerCase() < b.toLowerCase() ? -1 : 1) * directionConstant;
   return (a < b ? -1 : 1) * directionConstant;
 };
 

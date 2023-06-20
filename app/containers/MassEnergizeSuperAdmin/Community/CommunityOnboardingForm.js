@@ -7,6 +7,7 @@ import { groupSocialMediaFields, getMoreInfo } from "./utils";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { withRouter } from "react-router-dom";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import Seo from "../../../components/Seo/Seo";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -262,6 +263,16 @@ class CreateNewCommunityForm extends Component {
                 ],
               },
             },
+            {
+              name: "is_demo",
+              label: "Is this community a demo community?",
+              fieldType: "Radio",
+              isRequired: false,
+              defaultValue: "false",
+              dbName: "is_demo",
+              readOnly: false,
+              data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+            },
           ],
         },
         {
@@ -376,6 +387,7 @@ class CreateNewCommunityForm extends Component {
     if (!formJson) return <div>Hold tight! Preparing your form ...</div>;
     return (
       <div>
+        <Seo name={"Create New Community"}/>
         <MassEnergizeForm
           pageKey={PAGE_KEYS.CREATE_COMMUNITY.key}
           classes={classes}

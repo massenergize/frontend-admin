@@ -7,11 +7,10 @@ import { apiCall } from "../../../utils/messenger";
 import { getMoreInfo, groupSocialMediaFields } from "./utils";
 import { connect } from "react-redux";
 import fieldTypes from "../_FormGenerator/fieldTypes";
-import brand from "dan-api/dummy/brand";
-import { Helmet } from "react-helmet";
 import { PapperBlock } from "dan-components";
 import EditCommunityForm from "./EditCommunityForm";
 import { withRouter } from "react-router-dom";
+import Seo from "../../../components/Seo/Seo";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -47,7 +46,7 @@ class EditCommunityByCommunityAdmin extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    const { communities, match, location } = props;
+    const { communities, match, location, auth } = props;
     const { id } = match.params;
     if (state.community === undefined) {
       const community = (communities || []).find((c) => c.id.toString() === id);
@@ -55,6 +54,7 @@ class EditCommunityByCommunityAdmin extends Component {
       const formJson = createFormJson({
         community,
         autoOpenMediaLibrary: libOpen,
+        superAdmin: auth?.is_super_admin,
       });
       return { community, formJson };
     }
@@ -62,6 +62,7 @@ class EditCommunityByCommunityAdmin extends Component {
   }
   async componentDidMount() {
     const { id } = this.props.match.params;
+    const {auth} = this.props;
     const communityResponse = await apiCall("/communities.info", {
       community_id: id,
     });
@@ -71,8 +72,7 @@ class EditCommunityByCommunityAdmin extends Component {
 
     const community = communityResponse.data;
     await this.setStateAsync({ community });
-
-    const formJson = createFormJson({ community });
+    const formJson = createFormJson({ community, superAdmin: auth?.is_super_admin });
     await this.setStateAsync({ formJson });
   }
 
@@ -83,22 +83,14 @@ class EditCommunityByCommunityAdmin extends Component {
   }
 
   render() {
-    const description = brand.desc;
     const auth = this.props.auth;
     const superAdmin =auth?.is_super_admin
     const formTitle = "Edit Community Infomation";
-    const title = brand.name + " - " + formTitle;
+     const { community } = this.state;
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={`Edit - ${community?.name}'s Information`} />
         <PapperBlock title="Edit Community Information" desc="">
           <EditCommunityForm {...this.props} superAdmin={superAdmin} />
         </PapperBlock>
@@ -121,7 +113,7 @@ const mapStateToProps = (state) => {
 const Wrapped = connect(mapStateToProps)(EditCommunityByCommunityAdmin);
 export default withStyles(styles, { withTheme: true })(withRouter(Wrapped));
 
-const createFormJson = ({ community, autoOpenMediaLibrary }) => {
+const createFormJson = ({ community, autoOpenMediaLibrary, superAdmin }) => {
   if (!community) return null;
   // quick and dirty - duplicated code - needs to be consistant between pages and with the API
   // could read these options from the API or share the databaseFieldChoices json
@@ -360,6 +352,16 @@ const createFormJson = ({ community, autoOpenMediaLibrary }) => {
                 },
               ],
             },
+          },
+          {
+           name: "is_demo",
+           label: "Is this community a demo community?",
+           fieldType: "Radio",
+           isRequired: false,
+           defaultValue: community.is_demo ? "true" : "false",
+           dbName: "is_demo",
+           readOnly: !superAdmin,
+           data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
           },
         ],
       },

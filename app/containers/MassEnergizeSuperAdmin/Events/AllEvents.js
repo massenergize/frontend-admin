@@ -49,6 +49,9 @@ import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import CallMadeIcon from "@mui/icons-material/CallMade";
 import { FROM } from "../../../utils/constants";
 import Loader from "../../../utils/components/Loader";
+import HomeIcon from "@mui/icons-material/Home";
+import StarsIcon from "@mui/icons-material/Stars";
+import Seo from "../../../../app/components/Seo/Seo";
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
@@ -174,9 +177,9 @@ class AllEvents extends React.Component {
                     closeAfterConfirmation: true,
                   })
                 }
-                label={d.isLive ? "Yes" : "No"}
+                label={d?.isLive ? "Yes" : "No"}
                 className={`${
-                  d.isLive ? classes.yesLabel : classes.noLabel
+                  d?.isLive ? classes.yesLabel : classes.noLabel
                 } touchable-opacity`}
               />
             );
@@ -234,6 +237,40 @@ class AllEvents extends React.Component {
                   />
                 </Link>
               )}
+              <Tooltip
+                title={`${is_on_home_page ? "Remove" : "Add"} event ${
+                  is_on_home_page ? "from" : "to"
+                } community's homepage`}
+              >
+                <Link
+                  onClick={() => {
+                    this.props.toggleLive({
+                      show: true,
+                      component: this.addToHomePageUI({ id }),
+                      onConfirm: () => this.addEventToHomePage(id),
+                      closeAfterConfirmation: true,
+                    });
+                  }}
+                >
+                  {is_on_home_page ? (
+                    <StarsIcon
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        color: "rgb(65 172 65)",
+                      }}
+                    />
+                  ) : (
+                    <StarsIcon
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        color: "#bcbcbc",
+                      }}
+                    />
+                  )}
+                </Link>
+              </Tooltip>
             </div>
           ),
         },
@@ -311,6 +348,63 @@ class AllEvents extends React.Component {
       </div>
     );
   }
+
+  addToHomePageUI({ id }) {
+    const data = this.props.allEvents || [];
+    let event =
+      data?.find((item) => item.id?.toString() === id?.toString()) || {};
+    return (
+      <div>
+        <Typography>
+          would you like to {event?.is_on_home_page ? "remove" : "add"}{" "}
+          <b>{event?.name}</b> {event?.is_on_home_page ? "from" : "to"}{" "}
+          <b>{event?.community?.name}</b>
+          {"'s "} community homepage?
+        </Typography>
+      </div>
+    );
+  }
+
+  addEventToHomePage = (id) => {
+    const { allEvents, putEventsInRedux } = this.props;
+    const data = allEvents || [];
+    let event =data?.find((item) => item.id?.toString() === id?.toString()) || {};
+    const index = data.findIndex((a) => a.id?.toString() === id);
+
+    const toSend = {
+      event_id: id,
+      community_id: event?.community?.id,
+    };
+
+    // BHN - use end_date_and_time so ongoing events/campaigns can show on home page
+    if (new Date(event?.end_date_and_time) < Date.now()) {
+      this.props.toggleToast({
+        open: true,
+        message: "Event is out of date",
+        variant: "error",
+      });
+      return;
+    }
+  
+    apiCall("home_page_settings.addEvent", toSend).then((res) => {
+      if (res.success) {
+        event.is_on_home_page = res?.data?.status
+        data.splice(index, 1, event);
+        putEventsInRedux([...data]);
+        this.props.toggleToast({
+          open: true,
+          message: res.data?.msg,
+          variant: res?.data?.msg?.includes("removed") ? "warning" : "success",
+        });
+      } else {
+        this.props.toggleToast({
+          open: true,
+          message: res?.error,
+          variant: "error",
+        });
+      }
+    });
+  };
 
   customSort(data, colIndex, order) {
     const isComparingLive = colIndex === 6;
@@ -495,14 +589,7 @@ class AllEvents extends React.Component {
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"All Events"} />
         <Paper style={{ marginBottom: 10 }}>
           <METable
             classes={classes}

@@ -1,10 +1,7 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import brand from "dan-api/dummy/brand";
-import { Helmet } from "react-helmet";
 import { withStyles } from "@mui/styles";
 import Grid from "@mui/material/Grid";
-import Divider from "@mui/material/Divider";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from "./dashboard-jss";
@@ -23,11 +20,12 @@ import ReportingActivities from "./ReportingActivities";
 import CircularProgress from "@mui/material/CircularProgress";
 import WhatNext from "./WhatNext";
 import CommunityEngagement from "./CommunityEngagement";
-import { PapperBlock } from "dan-components";
 import Feature from "../../../components/FeatureFlags/Feature";
 import { FLAGS } from "../../../components/FeatureFlags/flags";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import ContinueWhereYouLeft from "./ContinueWhereYouLeft";
+import { MetricsModal } from 'dan-components';
+import Seo from "../../../components/Seo/Seo";
 
 // import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
 class SummaryDashboard extends PureComponent {
@@ -37,6 +35,7 @@ class SummaryDashboard extends PureComponent {
       error: null,
       loadingCSVs: [],
       success: false,
+      openModal: false,
     };
   }
 
@@ -88,18 +87,28 @@ class SummaryDashboard extends PureComponent {
     this.setState({ success: false });
   };
 
+  handleOpenModal = () => {
+    this.setState({ openModal: true });
+  };
+
+  handleCloseModal = (apiCall) => {
+    if (apiCall == "response"){
+      this.setState({ success: true });
+    }
+    this.setState({ openModal: false });
+  };
+
   render() {
-    const title = brand.name + " - Summary Dashboard";
-    const description = brand.desc;
     const {
       classes,
       communities,
-      selected_community,
-      auth,
       summary_data,
       graph_data,
+      featureFlags,
     } = this.props;
     const { error, loadingCSVs, success } = this.state;
+    const { openModal } = this.state;
+    const featureToEdit = null;
 
     return (
       <div>
@@ -137,22 +146,21 @@ class SummaryDashboard extends PureComponent {
                 sx={{ width: "100%" }}
               >
                 <small style={{ marginLeft: 15, fontSize: 15 }}>
-                  Your request has been received. Please check your email for
-                  the file.
+                  Your request has been received. Please check your email
+                  for the file.
                 </small>
               </Alert>
             </Snackbar>
           </div>
         )}
-
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <MetricsModal
+          openModal={openModal}
+          closeModal={this.handleCloseModal}
+          communities={communities}
+          featureToEdit={featureToEdit}
+          featureFlags={featureFlags}
+        />
+        <Seo name={"Summary Dashboard"} />
 
         <Grid container className={classes.root}>
           <SummaryChart data={summary_data} />
@@ -164,7 +172,12 @@ class SummaryDashboard extends PureComponent {
           fallback={
             <>
               {graph_data && <ActionsChartWidget data={graph_data || {}} />}
-              <Grid container md={12} columnGap={2} style={{ marginTop: 20 }}>
+              <Grid
+                container
+                md={12}
+                columnGap={2}
+                style={{ marginTop: 20 }}
+              >
                 <Grid md={8}>
                   <ReportingActivities
                     super_admin_mode
@@ -176,6 +189,7 @@ class SummaryDashboard extends PureComponent {
                     loadingCSVs={loadingCSVs}
                     classes={classes}
                     getCSV={this.getCSV}
+                    handleOpenModal={this.handleOpenModal}
                   />
                 </Grid>
               </Grid>
@@ -192,6 +206,7 @@ class SummaryDashboard extends PureComponent {
                 loadingCSVs={loadingCSVs}
                 classes={classes}
                 getCSV={this.getCSV}
+                handleOpenModal={this.handleOpenModal}
               />
               <Grid>
                 <ReportingActivities
@@ -223,6 +238,7 @@ const mapStateToProps = (state) => ({
   selected_community: state.getIn(["selected_community"]),
   summary_data: state.getIn(["summary_data"]),
   graph_data: state.getIn(["graph_data"]) || {},
+  featureFlags: state.getIn(["featureFlags"]),
 });
 
 const mapDispatchToProps = (dispatch) =>
@@ -240,7 +256,7 @@ const summaryMapped = connect(
 
 export default withStyles(styles)(summaryMapped);
 
-const CSVDownloads = ({ loadingCSVs, classes, getCSV}) => {
+const CSVDownloads = ({ loadingCSVs, classes, getCSV, handleOpenModal}) => {
   return (
     <MEPaperBlock
       subtitle="Download your data as CSV here"
@@ -312,6 +328,27 @@ const CSVDownloads = ({ loadingCSVs, classes, getCSV}) => {
                 arrow_downward
               </Icon>
               {loadingCSVs.includes("communities") && (
+                <CircularProgress size={20} thickness={2} color="secondary" />
+              )}
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          <Paper
+            onClick ={() => {handleOpenModal();}}
+            className={`${classes.pageCard}`}
+            elevation={1}
+          >
+            <Typography
+              variant="h5"
+              style={{ fontWeight: "600", fontSize: "1rem" }}
+              component="h3"
+            >
+              Request All Metrics CSV{" "}
+              <Icon style={{ paddingTop: 3, color: "green" }}>
+                arrow_downward
+              </Icon>
+              {loadingCSVs.includes("metrics") && (
                 <CircularProgress size={20} thickness={2} color="secondary" />
               )}
             </Typography>

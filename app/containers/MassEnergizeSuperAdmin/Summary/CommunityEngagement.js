@@ -22,6 +22,7 @@ import { useHistory, withRouter } from "react-router-dom";
 import { DatePicker } from "@mui/x-date-pickers";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import { getHumanFriendlyDateRange } from "../../../utils/common";
 
 // ------------------------------------------------------------------------------------
 export const TIME_RANGE = [
@@ -127,6 +128,15 @@ function CommunityEngagement({
       ".MuiOutlinedInput-notchedOutline": { border: 0 },
     },
   };
+
+  const makeRangeLabel = (labels, selected) => {
+    const { startDate, endDate } = options || {};
+    const isNotCustom = !selected?.includes("custom");
+    const doesNotHaveDatesYet = !(startDate && endDate);
+    if (isNotCustom || doesNotHaveDatesYet) return labels?.join(",") || "...";
+    return getHumanFriendlyDateRange(startDate, endDate);
+  };
+
   return (
     <div>
       <MEPaperBlock
@@ -152,31 +162,78 @@ function CommunityEngagement({
                 >
                   Community Engagement Summary for{" "}
                   {hasOnlyOneCommunity ? <span>{first?.name}</span> : <></>}
-                </Typography>
-
-                {!hasOnlyOneCommunity && (
+                  {!hasOnlyOneCommunity && (
+                    <MEDropdown
+                      fullControl
+                      onHeaderRender={(labels) => (
+                        <span style={{ textDecoration: "underline" }}>
+                          {labels.join(",")}
+                        </span>
+                      )}
+                      generics={muiOverride}
+                      multiple={false}
+                      data={communities}
+                      valueExtractor={(c) => c.id}
+                      labelExtractor={(c) => c.name}
+                      containerStyle={{ width: "18%", marginTop: 0 }}
+                      defaultValue={[first.id]}
+                      onItemSelected={(selection) => {
+                        const item = selection && selection[0];
+                        const op = {
+                          ...options,
+                          communities: selection,
+                          mounted: true,
+                        };
+                        setOptions(op);
+                        fetchFromBackendAfterFilters({ options: op });
+                      }}
+                      isAsync={true}
+                      endpoint={
+                        isSuperAdmin
+                          ? "/communities.listForSuperAdmin"
+                          : "/communities.listForCommunityAdmin"
+                      }
+                    />
+                  )}
                   <MEDropdown
+                    fullControl
+                    headerTrigger={options}
+                    onHeaderRender={(labels, selected) => {
+                      const label = makeRangeLabel(labels, selected);
+                      return (
+                        <span
+                          style={{
+                            textDecoration: "underline",
+                            marginLeft: 10,
+                          }}
+                        >
+                          {label}
+                        </span>
+                      );
+                    }}
                     generics={muiOverride}
                     multiple={false}
-                    data={communities}
-                    valueExtractor={(c) => c.id}
-                    labelExtractor={(c) => c.name}
-                    containerStyle={{ width: "18%", marginTop: 0 }}
-                    defaultValue={[first.id]}
+                    data={TIME_RANGE}
+                    valueExtractor={(t) => t.key}
+                    labelExtractor={(t) => t.name}
+                    containerStyle={{ width: "15%", marginTop: 0 }}
+                    defaultValue={rangeValue}
                     onItemSelected={(selection) => {
                       const item = selection && selection[0];
                       const op = {
                         ...options,
-                        communities: selection,
+                        range: selection,
                         mounted: true,
                       }; // It uses previous selection of communities
                       setOptions(op);
+                      if (item == "custom") return setSpecific(true);
+
                       fetchFromBackendAfterFilters({ options: op });
                     }}
                   />
-                )}
+                </Typography>
 
-                <Typography
+                {/* <Typography
                   variant="caption"
                   style={{
                     marginLeft: 5,
@@ -187,8 +244,8 @@ function CommunityEngagement({
                   }}
                 >
                   Time Interval
-                </Typography>
-                <MEDropdown
+                </Typography> */}
+                {/* <MEDropdown
                   generics={muiOverride}
                   multiple={false}
                   data={TIME_RANGE}
@@ -208,7 +265,7 @@ function CommunityEngagement({
 
                     fetchFromBackendAfterFilters({ options: op });
                   }}
-                />
+                /> */}
               </div>
               {loading && !specific && (
                 <>
@@ -372,9 +429,9 @@ export const AddFilters = ({
 }) => {
   communities = (communities || []).sort((a, b) => (a.name > b.name ? 1 : -1));
   options = options || {};
-  const extraStyles = isSuperAdmin ? {} : { width: "auto", flex: "1" };
-  const rangeValue = options.range || [];
-  const comValue = options.communities;
+  // const extraStyles = isSuperAdmin ? {} : { width: "auto", flex: "1" };
+  // const rangeValue = options.range || [];
+  // const comValue = options.communities;
 
   const handleCommunitySelection = (selection) => {
     const last = selection[selection.length - 1];
@@ -390,12 +447,7 @@ export const AddFilters = ({
   const handleDateSelection = (date, name) => {
     setOptions({ ...options, [name]: date, mounted: true });
   };
-  const disableButton =
-    !options ||
-    !options.range ||
-    !options.range.length ||
-    !options.communities ||
-    !options.communities.length;
+  const disableButton = !options || !options.startDate || !options.endDate;
 
   return (
     <div
@@ -464,6 +516,7 @@ export const AddFilters = ({
                 />
                 <Typography style={{ marginRight: 10 }}>To</Typography>
                 <DatePicker
+                  minDate={options?.startDate || ""}
                   onChange={(date) => handleDateSelection(date, "endDate")}
                   renderInput={(props) => <TextField {...props} />}
                   value={(options && options.endDate) || ""}

@@ -41,24 +41,21 @@ export const FormMediaLibraryImplementation = (props) => {
   useEffect(() => {
     // The value of "preselected" could either be a list of numbers(ids), or a list of objects(json image objects from backend)
     // This happens because when the page loads afresh, and we pass down images as default value in some "formGenerator JSON", it comes in as objects
-    // But then, when the user goes around and selects images from the library, the form generator is setup to only 
+    // But then, when the user goes around and selects images from the library, the form generator is setup to only
     // make use of the ID values on the image objects (because that is all we need it to send to the backend)
-    const preselected = selected || defaultValue; 
+    const preselected = selected || defaultValue;
     if (!preselected || !preselected.length) return;
-
     // ---- And whats happening here?
-    // So, in the case that a page is laoding for the first time and the images come in as objects, and not 
-    // as numbers, there is a big chance that images might not be in the list of the whole data set of  
-    // images given to the media library(because we load all images in small chunks...). 
-    // So here, we just add it on to the whole list in redux. Thats all we are doing here(just making them available in the whole set). 
+    // So, in the case that a page is laoding for the first time and the images come in as objects, and not
+    // as numbers, there is a big chance that images might not be in the list of the whole data set of
+    // images given to the media library(because we load all images in small chunks...).
+    // So here, we just add it on to the whole list in redux. Thats all we are doing here(just making them available in the whole set).
     // When the userSelected values get into the MediaLibrary component itself, it will still be able to retrieve the selected images whether they are a list of Ids, or the actual images objects
     const theyAreImageObjects = typeof preselected[0] !== "number";
-    if (theyAreImageObjects) {
+    if (theyAreImageObjects)
       addOnToWhatImagesAreInRedux({ old: imagesObject, data: preselected });
-      setUserSelectedImages(preselected)
-    }
-   
-  }, []);
+    setUserSelectedImages(preselected);
+  }, [selected, defaultValue]);
 
   const loadMoreImages = (cb) => {
     if (!auth) return console.log("It does not look like you are signed in...");

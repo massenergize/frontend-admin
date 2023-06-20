@@ -8,6 +8,7 @@ import { getMoreInfo, groupSocialMediaFields } from "./utils";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { withRouter } from "react-router-dom";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import Seo from "../../../components/Seo/Seo";
 // @NB: Looks like this file isnt being used anymore
 const styles = (theme) => ({
   root: {
@@ -311,10 +312,8 @@ class EditCommunityForm extends Component {
                   },
                   {
                     name: "locations",
-                    label:
-                      "List of all such regions (zipcodes or town-state, city-state, states) within the community, separated by commas ",
-                    placeholder:
-                      "eg. 01101, 01102, 01103, 01104 or Springfield-MA",
+                    label:"List of all such regions (zipcodes or town-state, city-state, states) within the community, separated by commas ",
+                    placeholder:"eg. 01101, 01102, 01103, 01104 or Springfield-MA",
                     fieldType: "TextField",
                     contentType: "text",
                     isRequired: true,
@@ -324,6 +323,16 @@ class EditCommunityForm extends Component {
                   },
                 ],
               },
+            },
+            {
+              name: "is_demo",
+              label: "Is this community a demo community?",
+              fieldType: "Radio",
+              isRequired: false,
+              defaultValue: community.is_demo ? "true" : "false",
+              dbName: "is_demo",
+              readOnly: !superAdmin,
+              data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
             },
           ],
         },
@@ -429,12 +438,13 @@ class EditCommunityForm extends Component {
 
   render() {
     const { classes } = this.props;
-    const { formJson } = this.state;
+    const { formJson, community } = this.state;
     const { id } = this.props.match.params;
     if (!formJson) return <div>Hold tight! Preparing your form ...</div>;
 
     return (
       <div>
+        <Seo name={`Edit- ${community?.name} Information`}/>
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
