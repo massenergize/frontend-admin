@@ -34,7 +34,6 @@ import {
   reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
-import { Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable, { FILTERS } from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -48,6 +47,7 @@ import ApplyFilterButton from "../../../utils/components/applyFilterButton/Apply
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
 import Seo from '../../../../app/components/Seo/Seo'
+import CustomOptions from "../ME  Tools/table /CustomOptions";
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -121,7 +121,7 @@ class AllActions extends React.Component {
   };
 
   getColumns() {
-    const { classes, putActionsInRedux, allActions } = this.props;
+    const { classes, putActionsInRedux, allActions, auth, communities } = this.props;
     return [
       {
         name: "ID",
@@ -147,7 +147,9 @@ class AllActions extends React.Component {
                   style={{ margin: 10 }}
                 />
               )}
-              {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
+              {!d.image && (
+                <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
+              )}
             </div>
           ),
         },
@@ -212,10 +214,18 @@ class AllActions extends React.Component {
       {
         name: "Community",
         key: "community",
-        options: {
-          filter: true,
-          filterType: "multiselect",
-        },
+        options:
+        auth?.is_super_admin
+          ? CustomOptions({
+              data:communities,
+              label:"community",
+              endpoint:"/communities.listForSuperAdmin"
+            })
+          : 
+          {
+              filter: true,
+              filterType: "multiselect",
+            },
       },
       {
         name: "Live?",
@@ -253,16 +263,26 @@ class AllActions extends React.Component {
           customBodyRender: (id) => (
             <div>
               <Link to={`/admin/edit/${id}/action`}>
-                <EditIcon size="small" variant="outlined" color="secondary" />
+                <EditIcon
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
               &nbsp;&nbsp;
               <Link
                 onClick={async () => {
-                  const copiedActionResponse = await apiCall("/actions.copy", {
-                    action_id: id,
-                  });
+                  const copiedActionResponse = await apiCall(
+                    "/actions.copy",
+                    {
+                      action_id: id,
+                    }
+                  );
 
-                  if (copiedActionResponse && copiedActionResponse.success) {
+                  if (
+                    copiedActionResponse &&
+                    copiedActionResponse.success
+                  ) {
                     const newAction =
                       copiedActionResponse && copiedActionResponse.data;
                     putActionsInRedux([newAction, ...(allActions || [])]);
@@ -273,7 +293,11 @@ class AllActions extends React.Component {
                 }}
                 to="/admin/read/actions"
               >
-                <FileCopy size="small" variant="outlined" color="secondary" />
+                <FileCopy
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
             </div>
           ),
@@ -321,6 +345,7 @@ class AllActions extends React.Component {
       },
     ];
   }
+
   /**
    * NOTE: If you add or remove a field in here, make sure your changes reflect in nowDelete.
    * Deleting heavily relies on the index arrangement of the items in here. Merci!
@@ -605,6 +630,7 @@ const mapStateToProps = (state) => ({
   community: state.getIn(["selected_community"]),
   meta: state.getIn(["paginationMetaData"]),
   tableFilters: state.getIn(["tableFilters"]),
+  communities: state.getIn(["communities"]),
 });
 const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
