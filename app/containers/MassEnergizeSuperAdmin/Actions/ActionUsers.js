@@ -35,14 +35,14 @@ function ActionUsers({ classes }) {
 
   const columns = [
     {
-      name: "Recorded At",
+      name: "Recorded On",
       key: "recorded_at",
       options: {
         filter: false,
       },
     },
     {
-      name: "Completed At",
+      name: "Completed On",
       key: "completed_at",
       options: {
         filter: false,
@@ -115,8 +115,8 @@ function ActionUsers({ classes }) {
   const fashionData = (data) => {
     if (!data) return [];
     const fashioned = data.map((d) => [
-      getHumanFriendlyDate(d?.recorded_at, true, false),
-      getHumanFriendlyDate(d?.completed_at, true, false) || "N/A",
+      getHumanFriendlyDate(d?.recorded_at, false, true),
+      getHumanFriendlyDate(d?.completed_at, false, true) || "N/A",
       d?.full_name,
       d?.email,
       d?.real_estate_unit?.name,
@@ -151,7 +151,7 @@ function ActionUsers({ classes }) {
           classes={classes}
           page={PAGE_PROPERTIES.ALL_ACTION_USERS}
           tableProps={{
-            title: "Action Users",
+            title: "Users that have recorded this action",
             data: fashionData(action?.action_users),
             columns: columns,
             options: options,
