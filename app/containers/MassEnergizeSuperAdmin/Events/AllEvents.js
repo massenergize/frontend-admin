@@ -10,12 +10,11 @@ import { Link, withRouter } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 
 import Paper from "@mui/material/Paper";
-import LinearProgress from "@mui/material/LinearProgress";
-import Grid from "@mui/material/Grid";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
+import Tooltip from "@mui/material/Tooltip";
 import {
   reduxGetAllEvents,
   reduxGetAllCommunityEvents,
@@ -82,11 +81,13 @@ class AllEvents extends React.Component {
         image: d.image,
         initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`,
       },
-      smartString(d.name), // limit to first 30 chars
-      `${smartString(d.tags.map((t) => t.name).join(", "), 30)}`,
+      smartString(d.name),
+      `${
+        smartString(d.tags.map((t) => t.name).join(", "), 30) // limit to first 30 chars
+      }`,
       d.is_global ? "Template" : d.community && d.community.name,
       { isLive: d.is_published, item: d },
-      d.id,
+      { id: d.id,  is_on_home_page: d.is_on_home_page},
       d.is_published ? "Yes" : "No",
       d.is_global,
       getHumanFriendlyDate(d.start_date_and_time, true, false),
@@ -193,7 +194,7 @@ class AllEvents extends React.Component {
           filter: false,
           download: false,
           sort: false,
-          customBodyRender: (id) => (
+          customBodyRender: ({ id, is_on_home_page }) => (
             <div style={{ display: "flex" }}>
               <Link to={`/admin/edit/${id}/event`}>
                 <EditIcon
@@ -326,7 +327,7 @@ class AllEvents extends React.Component {
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
-    putInRedux( [...data]);
+    putInRedux([...data]);
     const community = item.community;
     apiCall("/events.update", {
       event_id: item.id,
@@ -441,9 +442,8 @@ class AllEvents extends React.Component {
       });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
-    putEventsInRedux( rem);
+    putEventsInRedux(rem);
   }
-  
 
   fetchOtherEvents() {
     const { community_ids, exclude } = this.state;
@@ -453,9 +453,9 @@ class AllEvents extends React.Component {
     apiCall("/events.others.listForCommunityAdmin", {
       community_ids: ids,
       exclude: exclude || false,
-      limit:getLimit(PAGE_PROPERTIES.ALL_EVENTS.key),
-      params:json.stringify({}),
-      page:1,
+      limit: getLimit(PAGE_PROPERTIES.ALL_EVENTS.key),
+      params: json.stringify({}),
+      page: 1,
     })
       .then((response) => {
         this.setState({ loading: false });
@@ -472,10 +472,16 @@ class AllEvents extends React.Component {
     const description = brand.desc;
     const { columns } = this.state;
     const { classes } = this.props;
-    const { allEvents, putEventsInRedux, auth, meta, putMetaDataToRedux } = this.props;
+    const {
+      allEvents,
+      putEventsInRedux,
+      auth,
+      meta,
+      putMetaDataToRedux,
+    } = this.props;
     const data = this.fashionData(allEvents || []);
     const metaData = meta && meta.events;
-    
+
     const options = {
       filterType: "dropdown",
       responsive: "standard",
@@ -498,12 +504,7 @@ class AllEvents extends React.Component {
           name: "events",
           meta: meta,
         }),
-      customSearchRender: (
-        searchText,
-        handleSearch,
-        hideSearch,
-        options
-      ) => (
+      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
         <SearchBar
           url={getAdminApiEndpoint(auth, "/events")}
           reduxItems={allEvents}
@@ -571,8 +572,7 @@ class AllEvents extends React.Component {
             noTemplates: noTemplatesSelectedGoAhead,
           }),
           onConfirm: () =>
-            noTemplatesSelectedGoAhead &&
-            this.nowDelete({ idsToDelete, data }),
+            noTemplatesSelectedGoAhead && this.nowDelete({ idsToDelete, data }),
           closeAfterConfirmation: true,
           cancelText: noTemplatesSelectedGoAhead
             ? "No"
@@ -583,9 +583,9 @@ class AllEvents extends React.Component {
       },
     };
 
-     if (isEmpty(metaData)) {
-       return <Loader />;
-     }
+    if (isEmpty(metaData)) {
+      return <Loader />;
+    }
 
     return (
       <div>
