@@ -254,7 +254,10 @@ const createFormJson = ({
             defaultValue: "false",
             dbName: "is_recurring",
             readOnly: false,
-            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+            data: [
+              { id: "false", value: "No" },
+              { id: "true", value: "Yes" },
+            ],
             child: {
               // dbName: "recurring_details",
               valueToCheck: "true",
@@ -540,6 +543,16 @@ const createFormJson = ({
             },
           ],
         },
+      },
+      {
+        name: "add_to_home_page",
+        label: "Would you want this Event to be added to your homepage?",
+        fieldType: "Radio",
+        isRequired: false,
+        defaultValue: "false",
+        dbName: "add_to_home_page",
+        readOnly: false,
+        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
       },
       {
         name: "archive",
