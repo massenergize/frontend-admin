@@ -19,6 +19,7 @@ import {
 import {
   getHumanFriendlyDate,
   isEmpty,
+  ourCustomSort,
   reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
@@ -43,6 +44,7 @@ import {
 import RenderVisitLogs from "./RenderVisitLogs";
 import { getData } from "../Messages/CommunityAdminMessages";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import Seo from "../../../components/Seo/Seo";
 
 class AllUsers extends React.Component {
   constructor(props) {
@@ -86,7 +88,7 @@ class AllUsers extends React.Component {
       apiURL: "/users.listForCommunityAdmin",
       props: this.props,
       dataSource: [],
-      separationOptions:{valueExtractor: (user) => user.email,},
+      separationOptions: { valueExtractor: (user) => user.email },
       reduxFxn: putUsersInRedux,
       args: {
         limit: getLimit(PAGE_PROPERTIES.ALL_USERS.key),
@@ -102,6 +104,7 @@ class AllUsers extends React.Component {
   fashionData = (data) => {
     return data.map((d) => [
       d.full_name,
+      d,
       getHumanFriendlyDate(d.joined),
       d.preferred_name,
       d.email,
@@ -113,7 +116,6 @@ class AllUsers extends React.Component {
         : d.is_guest
         ? "Guest"
         : "Member",
-      d,
       d.id,
     ]);
   };
@@ -124,6 +126,36 @@ class AllUsers extends React.Component {
       key: "full_name",
       options: {
         filter: false,
+      },
+    },
+    {
+      name: "Last Visited",
+      key: "last-visited",
+      options: {
+        filter: false,
+        download: false,
+        customBodyRender: (d) => {
+          const { id, user_portal_visits } = d || {};
+          const isOneRecord = user_portal_visits?.length === 1;
+          const isEmpty = !user_portal_visits?.length;
+
+          if (isEmpty) return <span>-</span>;
+
+          const log = getHumanFriendlyDate(user_portal_visits[0], false, true);
+
+          if (isOneRecord) return <span>{log}</span>;
+
+          return (
+            <Link
+              onClick={(e) => {
+                e.preventDefault();
+                this.showVisitRecords(id);
+              }}
+            >
+              <span>{log}...</span>
+            </Link>
+          );
+        },
       },
     },
     {
@@ -164,36 +196,7 @@ class AllUsers extends React.Component {
         filter: true,
       },
     },
-    {
-      name: "Last Visited",
-      key: "last-visited",
-      options: {
-        filter: false,
-        download: false,
-        customBodyRender: (d) => {
-          const { id, user_portal_visits } = d || {};
-          const isOneRecord = user_portal_visits?.length === 1;
-          const isEmpty = !user_portal_visits?.length;
 
-          if (isEmpty) return <span>-</span>;
-
-          const log = getHumanFriendlyDate(user_portal_visits[0], false, false);
-
-          if (isOneRecord) return <span>{log}</span>;
-
-          return (
-            <Link
-              onClick={(e) => {
-                e.preventDefault();
-                this.showVisitRecords(id);
-              }}
-            >
-              <span>{log}...</span>
-            </Link>
-          );
-        },
-      },
-    },
     {
       name: "id",
       key: "id",
@@ -255,10 +258,29 @@ class AllUsers extends React.Component {
       okText: "Close",
     });
   }
+
+  customSort(data, colIndex, order) {
+    const isSortingDate = colIndex === 1;
+    const sortDate = ({ a, b }) => {
+      if (a.user_portal_visits.length === 0) return 1;
+      if (b.user_portal_visits.length === 0) return -1;
+      const aFirstVisit = (a.user_portal_visits || [])[0];
+      const bFirstVisit = (b.user_portal_visits || [])[0];
+      return new Date(aFirstVisit) < new Date(bFirstVisit) ? 1 : -1;
+    };
+    var params = {
+      colIndex,
+      order,
+      compare: isSortingDate && sortDate,
+    };
+    return data.sort((a, b) => ourCustomSort({ ...params, a, b }));
+  }
+
   render() {
-    const title = brand.name + " - Users";
-    const description = brand.desc;
+    // const title = brand.name + " - Users";
+    // const description = brand.desc;
     const { columns, comingFromDashboard, ids, updating } = this.state;
+
     const {
       classes,
       allUsers,
@@ -280,6 +302,7 @@ class AllUsers extends React.Component {
     const options = {
       filterType: "dropdown",
       responsive: "standard",
+      customSort: this.customSort,
       print: true,
       count: metaData && metaData.count,
       rowsPerPage: 25,
@@ -364,14 +387,7 @@ class AllUsers extends React.Component {
     }
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"All Users"} />
 
         {updating && (
           <LinearBuffer asCard message="Checking for updates..." lines={1} />

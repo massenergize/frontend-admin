@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from "@mui/styles";
 import { apiCall } from '../../../utils/messenger';
 import MassEnergizeForm from '../_FormGenerator';
+import Seo from '../../../components/Seo/Seo';
 
 const styles = theme => ({
   root: {
@@ -159,10 +160,11 @@ class EditCarbonEquivalencyForm extends Component {
 
   render() {
     const { classes } = this.props;
-    const { formJson } = this.state;
+    const { formJson, carbonEquivalency } = this.state;
     if (!formJson) return (<div />);
     return (
       <div>
+        <Seo name={`Edit Carbon Equivalency - ${carbonEquivalency?.name}`} />
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}

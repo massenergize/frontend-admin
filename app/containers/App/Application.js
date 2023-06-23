@@ -78,6 +78,7 @@ import {
   PolicyFullViewPage,
   TermsOfServicePage,
   PrivacyPolicyPage,
+  ActionUsers,
 } from "../pageListAsync";
 import EditVendor from "../MassEnergizeSuperAdmin/Vendors/EditVendor";
 import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
@@ -265,130 +266,125 @@ class Application extends React.Component {
             {user.is_community_admin && communityAdminSpecialRoutes}
             {user.is_super_admin && superAdminSpecialRoutes}
 
-            <Route exact path="/blank" component={BlankPage} />
-            <Route
-              path="/admin/view/policy/:policyKey"
-              component={TermsOfServicePage}
-            />
-            <Route
-              exact
-              path="/admin/profile/preferences"
-              component={Preferences}
-            />
-            <Route
-              exact
-              path="/admin/settings/feature-flags"
-              component={FeatureFlags}
-            />
-            <Route path="/admin/read/users" component={UsersList} />
-            <Route
-              path="/admin/read/community-admin-messages"
-              exact
-              component={CommunityAdminMessages}
-            />
-            <Route
-              path="/admin/read/team-admin-messages"
-              exact
-              component={TeamAdminMessages}
-            />
-            <Route
-              path="/admin/edit/:id/message"
-              exact
-              component={MessageDetails}
-            />
-            <Route path="/admin/read/communities" component={AllCommunities} />
-            <Route path="/admin/add/community" component={OnboardCommunity} />
-            <Route
-              path="/admin/community/:id"
-              component={CommunityProfile}
-              exact
-            />
-            <Route
-              path="/admin/community/:id/preview"
-              component={CommunityProfile}
-              exact
-            />
-            <Route
-              path="/admin/community/:id/profile"
-              component={CommunityProfile}
-              exact
-            />
-            <Route
-              path="/admin/edit/:id/community/community-admin"
-              component={EditCommunityByCommunityAdmin}
-              exact
-            />
-            <Route
-              path="/admin/edit/:id/community"
-              component={OnboardCommunity}
-              exact
-            />
-            <Route
-              path="/admin/add/:id/community-admins"
-              component={AddRemoveAdmin}
-              exact
-            />
-            <Route
-              path="/admin/edit/:id/community-admins"
-              component={AddRemoveAdmin}
-              exact
-            />
-            <Route
-              path="/admin/add-super-admin"
-              component={AddRemoveSuperAdmin}
-              exact
-            />
-            <Route path="/admin/read/actions" component={AllActions} />
-            <Route path="/admin/add/action" component={AddAction} />
-            <Route path="/admin/edit/:id/action" component={EditAction} exact />
-            <Route path="/admin/add/action/:id" component={EditAction} />
-            <Route
-              path="/admin/read/carbon-equivalencies"
-              component={AllCarbonEquivalencies}
-            />
-            <Route
-              path="/admin/add/carbon-equivalency"
-              component={AddCarbonEquivalency}
-            />
-            <Route
-              path="/admin/edit/:id/carbon-equivalency"
-              component={EditCarbonEquivalency}
-              exact
-            />
-            <Route path="/admin/read/categories" component={AllCategories} />
-            <Route path="/admin/add/category" component={AddCategory} />
-            <Route
-              path="/admin/read/tag-collections"
-              component={AllCategories}
-            />
-            <Route path="/admin/add/tag-collection" component={AddCategory} />
-            <Route
-              path="/admin/edit/:id/tag-collection"
-              component={EditCategory}
-            />
-            <Route
-              path="/admin/read/event/:id/event-view"
-              component={EventFullView}
-            />
-            <Route path="/admin/read/events" exact component={AllEvents} />
-            <Route
-              path="/admin/read/events/event-sharing"
-              exact
-              component={EventsFromOthers}
-            />
-            <Route path="/admin/add/event" component={AddEvent} />
-            <Route path="/admin/edit/:id/event" component={EditEvent} />
-            <Route path="/admin/edit/:id/event-rsvps" component={EventRSVPs} />
-            <Route path="/admin/read/teams" exact component={AllTeams} />
-            <Route path="/admin/add/team" component={AddTeam} />
-            <Route path="/admin/edit/:id/team" component={EditTeam} />
-            <Route
-              path="/admin/edit/:id/team-members"
-              component={TeamMembers}
-            />
-            <Route path="/admin/read/subscribers" component={AllSubscribers} />
-            <Route path="/admin/read/policies" component={AllPolicies} />
-            <Route path="/admin/add/policy" component={AddPolicy} />
+          <Route exact path="/blank" component={BlankPage} />
+          <Route
+            path="/admin/view/policy/:policyKey"
+            component={TermsOfServicePage}
+          />
+          <Route
+            exact
+            path="/admin/profile/preferences"
+            component={Preferences}
+          />
+          <Route
+            exact
+            path="/admin/settings/feature-flags"
+            component={FeatureFlags}
+          />
+          <Route path="/admin/read/users" component={UsersList} />
+          <Route
+            path="/admin/read/community-admin-messages"
+            exact
+            component={CommunityAdminMessages}
+          />
+          <Route
+            path="/admin/read/team-admin-messages"
+            exact
+            component={TeamAdminMessages}
+          />
+          <Route
+            path="/admin/edit/:id/message"
+            exact
+            component={MessageDetails}
+          />
+          <Route path="/admin/read/communities" component={AllCommunities} />
+          <Route path="/admin/add/community" component={OnboardCommunity} />
+          <Route
+            path="/admin/community/:id"
+            component={CommunityProfile}
+            exact
+          />
+          <Route
+            path="/admin/community/:id/preview"
+            component={CommunityProfile}
+            exact
+          />
+          <Route
+            path="/admin/community/:id/profile"
+            component={CommunityProfile}
+            exact
+          />
+          <Route
+            path="/admin/edit/:id/community/community-admin"
+            component={EditCommunityByCommunityAdmin}
+            exact
+          />
+          <Route
+            path="/admin/edit/:id/community"
+            component={OnboardCommunity}
+            exact
+          />
+          <Route
+            path="/admin/add/:id/community-admins"
+            component={AddRemoveAdmin}
+            exact
+          />
+          <Route
+            path="/admin/edit/:id/community-admins"
+            component={AddRemoveAdmin}
+            exact
+          />
+          <Route
+            path="/admin/add-super-admin"
+            component={AddRemoveSuperAdmin}
+            exact
+          />
+          <Route path="/admin/read/actions" component={AllActions} />
+          <Route path="/admin/read/:id/action-users" component={ActionUsers} />
+          <Route path="/admin/add/action" component={AddAction} />
+          <Route path="/admin/edit/:id/action" component={EditAction} exact />
+          <Route path="/admin/add/action/:id" component={EditAction} />
+          <Route
+            path="/admin/read/carbon-equivalencies"
+            component={AllCarbonEquivalencies}
+          />
+          <Route
+            path="/admin/add/carbon-equivalency"
+            component={AddCarbonEquivalency}
+          />
+          <Route
+            path="/admin/edit/:id/carbon-equivalency"
+            component={EditCarbonEquivalency}
+            exact
+          />
+          <Route path="/admin/read/categories" component={AllCategories} />
+          <Route path="/admin/add/category" component={AddCategory} />
+          <Route path="/admin/read/tag-collections" component={AllCategories} />
+          <Route path="/admin/add/tag-collection" component={AddCategory} />
+          <Route
+            path="/admin/edit/:id/tag-collection"
+            component={EditCategory}
+          />
+          <Route
+            path="/admin/read/event/:id/event-view"
+            component={EventFullView}
+          />
+          <Route path="/admin/read/events" exact component={AllEvents} />
+          <Route
+            path="/admin/read/events/event-sharing"
+            exact
+            component={EventsFromOthers}
+          />
+          <Route path="/admin/add/event" component={AddEvent} />
+          <Route path="/admin/edit/:id/event" component={EditEvent} />
+          <Route path="/admin/edit/:id/event-rsvps" component={EventRSVPs} />
+          <Route path="/admin/read/teams" exact component={AllTeams} />
+          <Route path="/admin/add/team" component={AddTeam} />
+          <Route path="/admin/edit/:id/team" component={EditTeam} />
+          <Route path="/admin/edit/:id/team-members" component={TeamMembers} />
+          <Route path="/admin/read/subscribers" component={AllSubscribers} />
+          <Route path="/admin/read/policies" component={AllPolicies} />
+          <Route path="/admin/add/policy" component={AddPolicy} />
 
             <Route path="/admin/edit/:id/policy" component={EditPolicy} />
             <Route path="/admin/read/goals" component={AllGoals} />

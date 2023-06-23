@@ -44,14 +44,14 @@ class CreateNewTestimonialForm extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    var { vendors, actions, tags, communities } = props;
+    var { vendors, actions, tags, communities, auth } = props;
     const readyToRenderThePageFirstTime =
       vendors &&
       actions &&
       actions.length &&
       tags &&
       tags.length;
-
+    const isSuperAdmin = auth?.is_super_admin
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderThePageFirstTime || state.mounted;
 
@@ -59,18 +59,18 @@ class CreateNewTestimonialForm extends Component {
 
     const coms = (communities ||[]).map((c) => ({
       ...c,
-      id: "" + c.id,
+      id: c.id,
       displayName: c.name,
     }));
 
     const vends = (vendors ||[]).map((c) => ({
       ...c,
       displayName: c.name,
-      id: "" + c.id,
+      id:c.id,
     }));
     const acts = (actions ||[]).map((c) => ({
       ...c,
-      id: "" + c.id,
+      id: c.id,
       displayName: c.title + ` - ${c.community && c.community.name}`,
     }));
 
@@ -92,6 +92,7 @@ class CreateNewTestimonialForm extends Component {
       vendors: vends,
       communities: coms,
       mounted: true,
+      isSuperAdmin
     };
   }
 
@@ -116,14 +117,14 @@ const mapStateToProps = (state) => {
     vendors: state.getIn(["allVendors"]),
     actions: state.getIn(["allActions"]),
     tags: state.getIn(["allTags"]),
-
+    auth: state.getIn(["auth"]),
     communities: state.getIn(["communities"]),
   };
 };
 const Mapped = connect(mapStateToProps)(CreateNewTestimonialForm);
 export default withStyles(styles, { withTheme: true })(Mapped);
 
-const createFormJson = ({ communities, actions, vendors }) => {
+const createFormJson = ({ communities, actions, vendors,isSuperAdmin }) => {
   // const { communities, actions, vendors } = this.state;
   const formJson = {
     title: "Create New Testimonial",
@@ -185,6 +186,10 @@ const createFormJson = ({ communities, actions, vendors }) => {
             defaultValue: null,
             dbName: "community_id",
             data: [{ displayName: "--", id: "" }, ...communities],
+            isAsync: true,
+            endpoint: isSuperAdmin
+              ? "/communities.listForSuperAdmin"
+              : "/communities.listForCommunityAdmin",
           },
           {
             name: "action",
@@ -194,6 +199,10 @@ const createFormJson = ({ communities, actions, vendors }) => {
             defaultValue: null,
             dbName: "action_id",
             data: [{ displayName: "--", id: "" }, ...actions],
+            isAsync: true,
+            endpoint: isSuperAdmin
+              ? "/actions.listForSuperAdmin"
+              : "/actions.listForCommunityAdmin",
           },
           {
             name: "vendor",
@@ -203,6 +212,10 @@ const createFormJson = ({ communities, actions, vendors }) => {
             defaultValue: null,
             dbName: "vendor_id",
             data: [{ displayName: "--", id: "" }, ...vendors],
+            isAsync: true,
+            endpoint: isSuperAdmin
+              ? "/vendors.listForSuperAdmin"
+              : "/vendors.listForCommunityAdmin",
           },
           {
             name: "other_vendor",

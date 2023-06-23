@@ -13,6 +13,7 @@ import fieldTypes from "../_FormGenerator/fieldTypes";
 import { withRouter } from "react-router-dom";
 import { fetchLatestNextSteps } from "../../../redux/redux-actions/adminActions";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import Seo from "../../../components/Seo/Seo";
 
 const styles = (theme) => ({
   root: {
@@ -52,7 +53,7 @@ class EditTestimonial extends Component {
 
   static getDerivedStateFromProps(props, state) {
     // you need: communities, actions, vendors, tags, testimonials, testimonial
-    var { testimonials, vendors, actions, tags, communities, match } = props;
+    var { testimonials, vendors, actions, tags, communities, match, auth } = props;
     const { id } = match.params;
     let testimonial = ((testimonials) || []).find((t) => t.id.toString() === id.toString());
     if (!testimonial){
@@ -71,24 +72,25 @@ class EditTestimonial extends Component {
       actions.length&& 
       tags &&
       tags.length;
+      const isSuperAdmin = auth?.is_super_admin
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderThePageFirstTime || state.mounted;
 
     const coms = ((communities) || []).map((c) => ({
       ...c,
-      id: "" + c.id,
+      id:c.id,
       displayName: c.name,
     }));
 
     const vends = ((vendors) || []).map((c) => ({
       ...c,
       displayName: c.name,
-      id: "" + c.id,
+      id:c.id,
     }));
     const acts = ((actions) || []).map((c) => ({
       ...c,
-      id: "" + c.id,
+      id:c.id,
       displayName: c.title + ` - ${c.community && c.community.name}`,
     }));
 
@@ -104,6 +106,7 @@ class EditTestimonial extends Component {
       actions: acts,
       vendors: vends,
       testimonial,
+      isSuperAdmin,
     });
     formJson.fields.splice(1, 0, section);
 
@@ -153,6 +156,7 @@ class EditTestimonial extends Component {
     if (!formJson) return <Loading />;
     return (
       <>
+      <Seo name={`Edit Testimonial - ${testimonial?.title}`} />
         <Paper style={{ padding: 15 }}>
           <Typography variant="h6">Created By</Typography>
           {testimonial && testimonial.user && (
@@ -188,6 +192,7 @@ const mapStateToProps = (state) => {
     tags: state.getIn(["allTags"]),
     testimonials: state.getIn(["allTestimonials"]),
     communities: state.getIn(["communities"]),
+    auth: state.getIn(["auth"]),
   };
 };
 
@@ -207,7 +212,7 @@ const Wrapped = connect(
 
 export default withStyles(styles, { withTheme: true })(Wrapped);
 
-const createFormJson = ({ communities, actions, vendors, testimonial }) => {
+const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdmin }) => {
   const formJson = {
     title: "Edit Testimonial",
     subTitle: "",
@@ -286,35 +291,39 @@ const createFormJson = ({ communities, actions, vendors, testimonial }) => {
             label: "Primary Community",
             placeholder: "eg. Wayland",
             fieldType: "Dropdown",
-            defaultValue:
-              testimonial &&
-              testimonial.community &&
-              "" + testimonial.community.id,
+            defaultValue: testimonial?.community?.id,
             dbName: "community_id",
             data: [{ displayName: "--", id: "" }, ...communities],
+            isAsync: true,
+            endpoint: isSuperAdmin
+              ? "/communities.listForSuperAdmin"
+              : "/communities.listForCommunityAdmin",
           },
           {
             name: "action",
             label: "Primary Action",
             placeholder: "eg. Action",
             fieldType: "Dropdown",
-            defaultValue:
-              testimonial && testimonial.action && "" + testimonial.action.id,
+            defaultValue:testimonial?.action?.id,
             dbName: "action_id",
             data: [{ displayName: "--", id: "" }, ...actions],
+            isAsync: true,
+            endpoint: isSuperAdmin
+              ? "/actions.listForSuperAdmin"
+              : "/actions.listForCommunityAdmin",
           },
           {
             name: "vendor",
             label: "Which Vendor did you use?",
             placeholder: "eg. Wayland",
             fieldType: "Dropdown",
-            defaultValue:
-              testimonial &&
-              testimonial.vendor &&
-              testimonial &&
-              "" + testimonial.vendor.id,
+            defaultValue:testimonial?.vendor?.id,
             dbName: "vendor_id",
             data: [{ displayName: "--", id: "" }, ...vendors],
+            isAsync: true,
+            endpoint: isSuperAdmin
+              ? "/vendors.listForSuperAdmin"
+              : "/vendors.listForCommunityAdmin",
           },
           {
             name: "other_vendor",
@@ -343,7 +352,8 @@ const createFormJson = ({ communities, actions, vendors, testimonial }) => {
         label: "Do you approve this testimonial?",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: testimonial && testimonial.is_approved ? "true" : "false",
+        defaultValue:
+          testimonial && testimonial.is_approved ? "true" : "false",
         dbName: "is_approved",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],

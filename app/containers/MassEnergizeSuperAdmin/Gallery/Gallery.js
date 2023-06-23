@@ -17,6 +17,7 @@ import { styles } from "./styles";
 import GalleryFilter from "./tools/GalleryFilter";
 import LightAutoComplete from "./tools/LightAutoComplete";
 import { ProgressCircleWithLabel } from "./utils";
+import Seo from "../../../components/Seo/Seo";
 
 const ALL_COMMUNITIES = "all-communities";
 export const filters = [
@@ -228,6 +229,7 @@ function Gallery(props) {
 
   return (
     <div>
+      <Seo name={"Gallery"} />
       {showMoreInfo && (
         <SideSheet
           classes={classes}

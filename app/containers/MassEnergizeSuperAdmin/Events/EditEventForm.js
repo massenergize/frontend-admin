@@ -18,6 +18,7 @@ import {
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import Seo from "../../../components/Seo/Seo";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -201,7 +202,7 @@ class EditEventForm extends Component {
     const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
-      id: "" + c.id,
+      id: c.id,
     }));
 
     const libOpen = location.state && location.state.libOpen;
@@ -292,6 +293,7 @@ class EditEventForm extends Component {
     if (!formJson) return <Loading />;
     return (
       <div>
+        <Seo name={`Edit Event - ${event?.name}`} />
         {!readOnly && event.rsvp_enabled ? (
           <Paper style={{ padding: 20, marginBottom: 15 }}>
             <Typography>
@@ -431,7 +433,7 @@ const createFormJson = ({
 
   const otherCommunityList = otherCommunities.map((c) => ({
     displayName: c.name,
-    id: c.id.toString(),
+    id: c.id,
   }));
 
   const formJson = {
@@ -510,7 +512,7 @@ const createFormJson = ({
               { id: "true", value: "Yes" },
             ],
             child: {
-              dbName: "recurring_details",
+              // dbName: "recurring_details",
               valueToCheck: "true",
               fields: [
                 {
@@ -693,6 +695,8 @@ const createFormJson = ({
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
                       isRequired: true,
+                      isAsync: true,
+                      endpoint: "/communities.listForSuperAdmin",
                     },
                   ],
                 },
@@ -746,6 +750,10 @@ const createFormJson = ({
                     defaultValue: publicityCommunities,
                     dbName: "publicity_selections",
                     data: otherCommunityList,
+                    isAsync: true,
+                    endpoint: is_super_admin
+                      ? "/communities.listForSuperAdmin"
+                      : "/communities.others.listForCommunityAdmin",
                   },
                 ],
               },
