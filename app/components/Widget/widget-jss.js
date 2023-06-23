@@ -26,6 +26,10 @@ const styles = (theme) => ({
     ...tableLabel,
     background: "#bcbcbc",
   },
+  todoLabel: {
+    ...tableLabel,
+    background: "#ff7600",
+  },
   rootCounter: {
     flexGrow: 1,
   },
@@ -49,7 +53,7 @@ const styles = (theme) => ({
   },
   centerItem: {},
   smallTitle: {
-    padding: `0 ${theme.spacing(2) }px`,
+    padding: `0 ${theme.spacing(2)}px`,
     color:
       theme.palette.type === "dark"
         ? theme.palette.primary.light
@@ -254,7 +258,7 @@ const styles = (theme) => ({
     color: theme.palette.primary.main,
   },
   productPhoto: {
-    borderRadius: theme.spacing(1/2),
+    borderRadius: theme.spacing(1 / 2),
     marginRight: theme.spacing(1),
     width: theme.spacing(10),
     height: theme.spacing(10),

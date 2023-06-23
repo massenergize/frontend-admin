@@ -77,6 +77,7 @@ import {
   PolicyFullViewPage,
   TermsOfServicePage,
   PrivacyPolicyPage,
+  ActionUsers,
 } from "../pageListAsync";
 import EditVendor from "../MassEnergizeSuperAdmin/Vendors/EditVendor";
 import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
@@ -331,6 +332,7 @@ class Application extends React.Component {
             exact
           />
           <Route path="/admin/read/actions" component={AllActions} />
+          <Route path="/admin/read/:id/action-users" component={ActionUsers} />
           <Route path="/admin/add/action" component={AddAction} />
           <Route path="/admin/edit/:id/action" component={EditAction} exact />
           <Route path="/admin/add/action/:id" component={EditAction} />

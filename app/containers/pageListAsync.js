@@ -263,6 +263,12 @@ export const AllActions = loadable(
     fallback: <Loading />,
   }
 );
+export const ActionUsers = loadable(
+  () => import("./MassEnergizeSuperAdmin/Actions/ActionUsers"),
+  {
+    fallback: <Loading />,
+  }
+);
 export const AddAction = loadable(
   () => import("./MassEnergizeSuperAdmin/Actions/CreateNewAction"),
   {
