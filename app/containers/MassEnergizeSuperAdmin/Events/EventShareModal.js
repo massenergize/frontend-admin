@@ -1,4 +1,4 @@
-import { Checkbox, Tab, Tabs, Tooltip } from "@mui/material";
+import { Checkbox, Tooltip, CircularProgress, Box } from "@mui/material";
 import { Button, FormControlLabel, Typography } from "@mui/material";
 
 import React, { useEffect, useState } from "react";
@@ -6,7 +6,7 @@ import ThemeModal from "../../../components/Widget/ThemeModal";
 import { fetchParamsFromURL } from "../../../utils/common";
 import { FROM } from "../../../utils/constants";
 import { apiCall } from "../../../utils/messenger";
-
+import useObserver from "../../../utils/UseObserve";
 /**
  * This component lists all communities that an admin
  * viewing an event is allowed to share to
@@ -167,7 +167,18 @@ function EventShareModal({
     return rem;
   };
 
+
+  const [availableCommunities, setAvailableCommunities] = useState(getAllowedCommunities());
+
+  const { ref, data, cursor } = useObserver({data: availableCommunities, endpoint: isSuperAdmin && "/communities.listForSuperAdmin",});
   //   -------------------------------------------------------------------
+    useEffect(() => {
+      let items = [...(availableCommunities || []), ...(data || [])]?.filter((e) => e?.id !==event?.community?.id);
+      const uniqueItems = [
+        ...new Map(items.map((item) => [item["id"], item])).values(),
+      ];
+      setAvailableCommunities(uniqueItems);
+    }, [data]);
 
   return (
     <div>
@@ -207,18 +218,30 @@ function EventShareModal({
               display: "flex",
               flexDirection: "row",
               flexWrap: "wrap",
-              maxHeight: 400,
-              overflowY: "scroll",
+              maxHeight: 250,
+              overflowY: "auto",
             }}
           >
             <ShareWith
               selected={communitiesToShareTo}
-              communities={getAllowedCommunities()}
+              communities={availableCommunities}
               addSelected={(id) => {
                 setCommunities(add(id, communitiesToShareTo));
                 setChanged(true);
               }}
             />
+            {(cursor?.has_more && ref && isSuperAdmin) && (
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+                ref={isSuperAdmin && ref}
+              >
+                <CircularProgress size={20} />
+              </Box>
+            )}
           </div>
           {/* ----------- Footer -------------- */}
           <div

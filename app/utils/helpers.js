@@ -230,3 +230,9 @@ export const handleFilterChange = ({
 export const isTrue = (value) => {
   if ([true, "True", "Yes", "yes"].includes(value)) return true;
 };
+
+
+export const removeDuplicates = (first, second) => {
+   const uniqueItems = [...new Set([...(first||[]), ...(second||[])])];
+   return uniqueItems;
+}
