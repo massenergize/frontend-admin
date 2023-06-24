@@ -14,6 +14,7 @@ import {
   restoreFormProgress,
   reduxToggleUniversalToast,
   reduxLoadTableFilters,
+  reduxLoadUserActiveStatus,
 } from "../../redux/redux-actions/adminActions";
 import {
   Parent,
@@ -101,6 +102,7 @@ import { ME_FORM_PROGRESS } from "../MassEnergizeSuperAdmin/ME  Tools/MEConstant
 import { FILTER_OBJ_KEY } from "../MassEnergizeSuperAdmin/ME  Tools/table /METable";
 import { includes } from "lodash";
 import { IS_LOCAL } from "../../config/constants";
+import UserActivityMonitor from "../../components/Widget/UserActivityMonitor";
 
 //This function checks whether a user needs to sign an MOU and redirects them to the MOU page if necessary
 const checkIfUserNeedsMOUAttention = (auth, history) => {
@@ -163,6 +165,7 @@ class Application extends React.Component {
       toggleUniversalModal,
       toastOptions,
       toggleUniversalToast,
+      updateUserActiveStatus,
     } = this.props;
     const user = auth || {};
 
@@ -227,36 +230,41 @@ class Application extends React.Component {
     if (!IS_LOCAL) checkIfUserNeedsMOUAttention(auth, history); // This check will not run in local mode
     const { component, show, onConfirm, closeAfterConfirmation } = modalOptions;
     return (
-      <Dashboard
-        history={history}
-        changeMode={changeMode}
-        lock={ !IS_LOCAL && auth?.needs_to_accept_mou}
+      <UserActivityMonitor
+        minutes = {10}
+        // minutes = {0.2} // --- FOR TESTING 
+        onStateChange={(status) => updateUserActiveStatus(status)}
       >
-        <ThemeModal
-          {...modalOptions || {}}
-          open={show}
-          onConfirm={onConfirm}
-          close={() => {
-            toggleUniversalModal({ show: false, component: null });
-            return false;
-          }}
-          closeAfterConfirmation={closeAfterConfirmation}
+        <Dashboard
+          history={history}
+          changeMode={changeMode}
+          lock={!IS_LOCAL && auth?.needs_to_accept_mou}
         >
-          {component}
-        </ThemeModal>
-        <ThemeToast
-          {...toastOptions || {}}
-          open={toastOptions?.open}
-          onClose={() => {
-            toggleUniversalToast({ open: false, component: null });
-            return false;
-          }}
-          message={toastOptions?.message}
-        />
+          <ThemeModal
+            {...modalOptions || {}}
+            open={show}
+            onConfirm={onConfirm}
+            close={() => {
+              toggleUniversalModal({ show: false, component: null });
+              return false;
+            }}
+            closeAfterConfirmation={closeAfterConfirmation}
+          >
+            {component}
+          </ThemeModal>
+          <ThemeToast
+            {...toastOptions || {}}
+            open={toastOptions?.open}
+            onClose={() => {
+              toggleUniversalToast({ open: false, component: null });
+              return false;
+            }}
+            message={toastOptions?.message}
+          />
 
-        <Switch>
-          {user.is_community_admin && communityAdminSpecialRoutes}
-          {user.is_super_admin && superAdminSpecialRoutes}
+          <Switch>
+            {user.is_community_admin && communityAdminSpecialRoutes}
+            {user.is_super_admin && superAdminSpecialRoutes}
 
           <Route exact path="/blank" component={BlankPage} />
           <Route
@@ -378,63 +386,70 @@ class Application extends React.Component {
           <Route path="/admin/read/policies" component={AllPolicies} />
           <Route path="/admin/add/policy" component={AddPolicy} />
 
-          <Route path="/admin/edit/:id/policy" component={EditPolicy} />
-          <Route path="/admin/read/goals" component={AllGoals} />
-          <Route path="/admin/add/goal" component={AddGoal} />
-          <Route path="/admin/edit/:id/goal" component={EditGoal} />
-          <Route path="/admin/read/testimonials" component={AllTestimonials} />
-          <Route path="/admin/add/testimonial" component={AddTestimonial} />
-          <Route
-            path="/admin/edit/:id/testimonial"
-            component={EditTestimonial}
-          />
-          <Route path="/admin/read/vendors" component={AllVendors} />
-          <Route path="/admin/add/vendor" component={AddVendor} />
-          <Route path="/admin/edit/:id/vendor" component={EditVendor} />
-          <Route path="/admin/export" component={Export} />
-          <Route path="/admin/customize" component={CustomizePages} />
-          <Route path="/admin/read/categories" component={AllCategories} />
-          <Route path="/admin/add/category" component={AddCategory} />
-          <Route path="/admin/form" component={Form} />
-          <Route path="/admin/table" component={Table} />
-          <Route path="/admin/page-list" component={Parent} />
-          <Route path="/admin/pages/not-found" component={NotFound} />
-          <Route path="/admin/pages/error" component={Error} />
-          <Route path="/admin/edit/:id/home" component={SuperHome} />
-          <Route path="/admin/edit/:id/impacts" component={Impact} />
-          <Route path="/admin/edit/:id/impact" component={ImpactPage} />
-          <Route path="/admin/edit/:id/actions" component={SuperAllActions} />
-          <Route
-            path="/admin/edit/:id/all-actions"
-            component={SuperAllActions}
-          />
-          <Route path="/admin/edit/:id/events" component={EventsPage} />
-          <Route path="/admin/edit/:id/teams" component={TeamsPage} />
-          <Route path="/admin/edit/:id/vendors" component={VendorsPage} />
-          <Route
-            path="/admin/edit/:id/testimonials"
-            component={TestimonialsPage}
-          />
-          <Route path="/admin/edit/:id/contact_us" component={SuperContactUs} />
-          <Route path="/admin/edit/:id/donate" component={SuperDonate} />
-          <Route path="/admin/edit/:id/about" component={SuperAboutUs} />
-          <Route path="/admin/edit/:id/about_us" component={SuperAboutUs} />
-          <Route path="/admin/read/about-us" component={SuperAboutUs} />
-          <Route path="/admin/add/donate" component={SuperDonate} />
-          <Route path="/admin/read/contact-us" component={SuperContactUs} />
-          <Route
-            path="/admin/read/action-engagements"
-            component={ActionEngagementList}
-          />
-          <Route path="/admin/read/all-actions" component={SuperAllActions} />
-          <Route exact path="/admin/gallery/" component={GalleryPage} />
-          <Route exact path="/admin/gallery/add" component={AddToGallery} />
-          <Route exact path="/admin/tasks/add" component={AddTask} />
-          <Route exact path="/admin/edit/:id/task" component={AddTask} />
-          <Route exact path="/admin/read/tasks" component={ListTasks} />
-          <Route component={NotFound} />
-        </Switch>
-      </Dashboard>
+            <Route path="/admin/edit/:id/policy" component={EditPolicy} />
+            <Route path="/admin/read/goals" component={AllGoals} />
+            <Route path="/admin/add/goal" component={AddGoal} />
+            <Route path="/admin/edit/:id/goal" component={EditGoal} />
+            <Route
+              path="/admin/read/testimonials"
+              component={AllTestimonials}
+            />
+            <Route path="/admin/add/testimonial" component={AddTestimonial} />
+            <Route
+              path="/admin/edit/:id/testimonial"
+              component={EditTestimonial}
+            />
+            <Route path="/admin/read/vendors" component={AllVendors} />
+            <Route path="/admin/add/vendor" component={AddVendor} />
+            <Route path="/admin/edit/:id/vendor" component={EditVendor} />
+            <Route path="/admin/export" component={Export} />
+            <Route path="/admin/customize" component={CustomizePages} />
+            <Route path="/admin/read/categories" component={AllCategories} />
+            <Route path="/admin/add/category" component={AddCategory} />
+            <Route path="/admin/form" component={Form} />
+            <Route path="/admin/table" component={Table} />
+            <Route path="/admin/page-list" component={Parent} />
+            <Route path="/admin/pages/not-found" component={NotFound} />
+            <Route path="/admin/pages/error" component={Error} />
+            <Route path="/admin/edit/:id/home" component={SuperHome} />
+            <Route path="/admin/edit/:id/impacts" component={Impact} />
+            <Route path="/admin/edit/:id/impact" component={ImpactPage} />
+            <Route path="/admin/edit/:id/actions" component={SuperAllActions} />
+            <Route
+              path="/admin/edit/:id/all-actions"
+              component={SuperAllActions}
+            />
+            <Route path="/admin/edit/:id/events" component={EventsPage} />
+            <Route path="/admin/edit/:id/teams" component={TeamsPage} />
+            <Route path="/admin/edit/:id/vendors" component={VendorsPage} />
+            <Route
+              path="/admin/edit/:id/testimonials"
+              component={TestimonialsPage}
+            />
+            <Route
+              path="/admin/edit/:id/contact_us"
+              component={SuperContactUs}
+            />
+            <Route path="/admin/edit/:id/donate" component={SuperDonate} />
+            <Route path="/admin/edit/:id/about" component={SuperAboutUs} />
+            <Route path="/admin/edit/:id/about_us" component={SuperAboutUs} />
+            <Route path="/admin/read/about-us" component={SuperAboutUs} />
+            <Route path="/admin/add/donate" component={SuperDonate} />
+            <Route path="/admin/read/contact-us" component={SuperContactUs} />
+            <Route
+              path="/admin/read/action-engagements"
+              component={ActionEngagementList}
+            />
+            <Route path="/admin/read/all-actions" component={SuperAllActions} />
+            <Route exact path="/admin/gallery/" component={GalleryPage} />
+            <Route exact path="/admin/gallery/add" component={AddToGallery} />
+            <Route exact path="/admin/tasks/add" component={AddTask} />
+            <Route exact path="/admin/edit/:id/task" component={AddTask} />
+            <Route exact path="/admin/read/tasks" component={ListTasks} />
+            <Route component={NotFound} />
+          </Switch>
+        </Dashboard>
+      </UserActivityMonitor>
     );
   }
 }
@@ -464,6 +479,7 @@ function mapDispatchToProps(dispatch) {
       restoreFormProgress: restoreFormProgress,
       toggleUniversalToast: reduxToggleUniversalToast,
       putFiltersInRedux: reduxLoadTableFilters,
+      updateUserActiveStatus: reduxLoadUserActiveStatus,
     },
     dispatch
   );

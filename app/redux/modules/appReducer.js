@@ -51,6 +51,7 @@ import {
   LOAD_TABLE_FILTERS,
   SOCKET_CONNECTED,
   LOAD_VISIT_LOGS,
+  LOAD_USER_ACTIVE_STATUS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -79,6 +80,14 @@ export default function reducer(state = initialImmutableState, action = {}) {
   }
 }
 
+export const reducerForUserActiveStatus = (state = false, action = {}) => {
+  switch (action.type) {
+    case LOAD_USER_ACTIVE_STATUS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForTableFilters = (state = {}, action = {}) => {
   switch (action.type) {
     case LOAD_TABLE_FILTERS:
