@@ -51,6 +51,7 @@ import {
   ACTION_ENGAGMENTS,
   LOAD_TABLE_FILTERS,
   LOAD_VISIT_LOGS,
+  LOAD_USER_ACTIVE_STATUS,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -58,7 +59,9 @@ import {
   CONNECTION_ESTABLISHED,
   LOADING,
   TIME_UNTIL_EXPIRATION,
+  USER_SESSION_ALMOST_EXPIRED,
   USER_SESSION_EXPIRED,
+  USER_SESSION_RENEWED,
 } from "../../utils/constants";
 import { API_HOST, IS_LOCAL } from "../../config/constants";
 import {
@@ -73,7 +76,21 @@ export const testRedux = (value) => {
   return { type: TEST_REDUX, payload: value };
 };
 
-export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
+const extendUserSession = (cb) => {
+  fetchFirebaseToken((idToken, failed) => {
+    if (failed) window.location.href = "/login";
+    apiCall("auth.login", { idToken })
+      .then(() => cb && cb(true))
+      .catch((e) => {
+        cb && cb(false);
+        console.log(e);
+      });
+  });
+};
+export const setupSocketConnectionWithBackend = (auth) => (
+  dispatch,
+  getState
+) => {
   const [_, hostname] = API_HOST.split("//");
   const url = IS_LOCAL
     ? `ws://${hostname}/ws/me-client/connect/`
@@ -82,7 +99,7 @@ export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
   let socket;
   let numberOfRetries = 0;
   const MAXIMUM_RETRIES = 5;
-  const WAIT_TIME = 4000 // 4 seconds before trying to reconnect, to give the server some time to recoup
+  const WAIT_TIME = 4000; // 4 seconds before trying to reconnect, to give the server some time to recoup
 
   const connectSocket = () => {
     socket = new WebSocket(url);
@@ -93,23 +110,21 @@ export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
     };
 
     socket.onmessage = (e) => {
+      const reduxState = getState();
+      const thereIsUserActivity = reduxState.getIn(["userIsActive"]);
       let data = JSON.parse(e.data || "{}");
       const type = data?.type;
       if (type === USER_SESSION_EXPIRED) {
-        const message = `Hi ${auth?.preferred_name ||
-          "admin"}, your session has expired. Please sign in again.`;
-        dispatch(
-          reduxToggleUniversalModal({
-            noTitle: true,
-            show: true,
-            noCancel: true,
-            okText: "Okay, Take Me There",
-            onConfirm: () => {
-              window.location.href = "/login";
-            },
-            component: <SocketNotificationModal message={message} />,
-          })
-        );
+        // If session has expired and no activity, just redirect to login
+        if (!thereIsUserActivity) window.location.href = "/login";
+        else {
+          // If the session has expired and there is activity, then automatically extend session behind the scenes
+          extendUserSession((success) => {
+            if (success)
+              socket.send(JSON.stringify({ type: USER_SESSION_RENEWED }));
+          });
+          // ---------------------------------------------------------------------------
+        }
       }
     };
 
@@ -124,9 +139,8 @@ export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
           connectSocket();
         }, WAIT_TIME);
         numberOfRetries++;
-
       } else {
-        // At this point, we have tried to reconnect 5 times, within "WAIT_TIME" intervals and still nothing, 
+        // At this point, we have tried to reconnect 5 times, within "WAIT_TIME" intervals and still nothing,
         // So then we show the user the modal that says "Are you there?" Allowing them to manually reconnect, when they are ready
         console.log(
           TAG,
@@ -151,13 +165,19 @@ export const setupSocketConnectionWithBackend = (auth) => (dispatch) => {
       }
     };
     socket.onerror = () => {
-      console.log(TAG, "Oops - Got an error, server did not respond as expected :( ");
+      console.log(
+        TAG,
+        "Oops - Got an error, server did not respond as expected :( "
+      );
     };
   };
 
   connectSocket();
 };
 
+export const reduxLoadUserActiveStatus = (data) => {
+  return { type: LOAD_USER_ACTIVE_STATUS, payload: data };
+};
 export const reduxLoadVisitLogs = (data) => {
   return { type: LOAD_VISIT_LOGS, payload: data };
 };
@@ -856,20 +876,20 @@ export const reduxGetAllTestimonials = () => (dispatch) => {
 };
 
 export const reduxGetAllCommunityActions = (community_id, cb) => (dispatch) => {
-  apiCall("/actions.listForCommunityAdmin", { community_id, 
-        params: prepareFilterAndSearchParamsFromLocal(PAGE_PROPERTIES.ALL_ACTIONS.key),
-        limit: getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key),
-    }).then(
-    (response) => {
-      cb && cb(response.data, !response.success, response.error);
-      if (response && response.success) {
-        redirectIfExpired(response);
-        dispatch(loadAllActions(response.data));
-      }
-      return { type: "DO_NOTHING", payload: null };
+  apiCall("/actions.listForCommunityAdmin", {
+    community_id,
+    params: prepareFilterAndSearchParamsFromLocal(
+      PAGE_PROPERTIES.ALL_ACTIONS.key
+    ),
+    limit: getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key),
+  }).then((response) => {
+    cb && cb(response.data, !response.success, response.error);
+    if (response && response.success) {
+      redirectIfExpired(response);
+      dispatch(loadAllActions(response.data));
     }
-  );
-  return { type: "DO_NOTHING", payload: null };
+    return { type: "DO_NOTHING", payload: null };
+  });
 };
 
 export const reduxGetAllTags = () => (dispatch) => {
@@ -885,7 +905,9 @@ export const reduxGetAllTags = () => (dispatch) => {
 
 export const reduxGetAllActions = (cb) => (dispatch) => {
   console.log("reduxGetAllActions calls actions.listForCommunityAdmin");
-  apiCall("/actions.listForCommunityAdmin").then((response) => {
+  apiCall("/actions.listForCommunityAdmin", {
+    limit: getLimit(PAGE_PROPERTIES.ALL_ACTIONS.key),
+  }).then((response) => {
     if (response && response.success) {
       redirectIfExpired(response);
       dispatch(loadAllActions(response.data));
@@ -1029,17 +1051,35 @@ export const reduxCallCommunities = () => (dispatch) => {
   });
 };
 
-export const reduxCallIdToken = () => (dispatch) => {
+const fetchFirebaseToken = (cb) => {
   firebase
     .auth()
     .currentUser.getIdToken(true)
     .then((token) => {
-      localStorage.setItem("idToken", token.toString());
-      dispatch(reduxLoadIdToken(token));
+      cb && cb(token, false);
     })
     .catch((err) => {
+      cb && cb(null, true, err);
       console.log(err);
     });
+};
+
+export const reduxCallIdToken = () => (dispatch) => {
+  fetchFirebaseToken((token, failed, error) => {
+    if (failed) return console.log("Token fetch failed: ", error);
+    localStorage.setItem("idToken", token.toString());
+    dispatch(reduxLoadIdToken(token));
+  });
+  // firebase
+  //   .auth()
+  //   .currentUser.getIdToken(true)
+  //   .then((token) => {
+  //     localStorage.setItem("idToken", token.toString());
+  //     dispatch(reduxLoadIdToken(token));
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //   });
 };
 
 export const reduxCallFullCommunity = (id) => (dispatch) => {
