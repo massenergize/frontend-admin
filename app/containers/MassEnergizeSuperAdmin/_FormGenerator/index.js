@@ -1060,7 +1060,7 @@ class MassEnergizeForm extends Component {
                 onEditorChange={(content, editor) => {
                   this.handleEditorChange(content, editor, field.name);
                 }}
-                toolbar="undo redo | formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent | fontfamily | fontsize |"
+                toolbar="undo redo | blocks | formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent | fontfamily | fontsize |"
                 plugins="advlist autolink lists link image charmap print preview anchor forecolor"
                 
                 init={{
