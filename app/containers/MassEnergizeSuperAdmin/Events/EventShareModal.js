@@ -173,7 +173,7 @@ function EventShareModal({
   const { ref, data, cursor } = useObserver({data: availableCommunities, endpoint: isSuperAdmin && "/communities.listForSuperAdmin",});
   //   -------------------------------------------------------------------
     useEffect(() => {
-      let items = [...(availableCommunities || []), ...(data || [])]?.filter((e) => e?.id !==event?.community?.id);
+      let items = [...(availableCommunities || []), ...(data || [])];
       const uniqueItems = [
         ...new Map(items.map((item) => [item["id"], item])).values(),
       ];
