@@ -1060,6 +1060,7 @@ class MassEnergizeForm extends Component {
                 onEditorChange={(content, editor) => {
                   this.handleEditorChange(content, editor, field.name);
                 }}
+                // Toolbar Docs:  https://www.tiny.cloud/docs/tinymce/6/migration-from-5x/#things-we-renamed
                 toolbar="undo redo | blocks | formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent | fontfamily | fontsize |"
                 plugins="advlist autolink lists link image charmap print preview anchor forecolor"
                 
