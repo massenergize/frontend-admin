@@ -28,7 +28,7 @@ const open = {
 const close = {
   background: "#d87c7b",
 };
-const PUBLICITY_PROPS = {
+export const PUBLICITY_PROPS = {
   OPEN: {
     style: open,
     info: "This event/campaign can be shared to any community",
