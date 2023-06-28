@@ -51,7 +51,10 @@ import Loader from "../../../utils/components/Loader";
 import HomeIcon from "@mui/icons-material/Home";
 import StarsIcon from "@mui/icons-material/Stars";
 import Seo from "../../../../app/components/Seo/Seo";
-import { EventNotSharedWithAnyone } from "./EventSharedStateComponents";
+import {
+  EventNotSharedWithAnyone,
+  EventSharedWithCommunity,
+} from "./EventSharedStateComponents";
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
@@ -642,13 +645,17 @@ const EventsMapped = connect(
 )(AllEvents);
 export default withStyles(styles)(withRouter(EventsMapped));
 
-const EventSharedState = ({
-  shared_to,
-  name,
-  classes,
-  toggleModalOnClick,
-  publicity,
-}) => {
+const EventSharedState = (props) => {
+  const {
+    shared_to,
+    name,
+    classes,
+    toggleModalOnClick,
+    publicity,
+    communities_under_publicity,
+    id,
+  } = props;
+
   const numberOfSharers = shared_to?.length || 0;
   const commonClasses = "touchable-opacity";
 
@@ -657,11 +664,47 @@ const EventSharedState = ({
       toggleModalOnClick({
         show: true,
         title: smartString(name, 50),
-        component: <EventNotSharedWithAnyone publicity={publicity} />,
+        component: (
+          <EventNotSharedWithAnyone
+            publicity={publicity}
+            shareable_to={communities_under_publicity}
+            id={id}
+          />
+        ),
         cancelText: "Close",
-        okText: "Change Event Settings",
+        noOk: true,
+        // okText: "Change Event Settings",
       });
   };
+  const sharedWithDialog = () => {
+    toggleModalOnClick &&
+      toggleModalOnClick({
+        show: true,
+        title: smartString(name, 50),
+        component: (
+          <EventSharedWithCommunity
+            publicity={publicity}
+            shared_to={shared_to}
+            id={id}
+            shareable_to={communities_under_publicity}
+          />
+        ),
+        noOk: true,
+        cancelText: "Close",
+        // okText: "ADD/REMOVE COMMUNITIES",
+      });
+  };
+
+  const yesProps = {
+    className: `${classes.yesLabel} ${commonClasses}`,
+    onClick: () => sharedWithDialog(),
+  };
+
+  //   const Wrapper = ({ children, style }) => (
+  //     <Typography style={style || {}} variant="body1">
+  //       {children}
+  //     </Typography>
+  //   );
 
   if (numberOfSharers === 0)
     return (
@@ -671,22 +714,16 @@ const EventSharedState = ({
         onClick={() => notSharedYetDialog()}
       />
     );
-  if (numberOfSharers === 1)
-    return (
-      <MEChip label="Yes" className={`${classes.yesLabel} ${commonClasses}`} />
-    );
+  if (numberOfSharers === 1) return <MEChip label="Yes" {...yesProps} />;
   if (numberOfSharers > 9)
-    return (
-      <MEChip className={`${classes.yesLabel} ${commonClasses}`}>
-        ({numberOfSharers})
-      </MEChip>
-    );
+    return <MEChip {...yesProps}>({numberOfSharers})</MEChip>;
   return (
-    <MEChip
-      className={`${classes.yesLabel} ${commonClasses}`}
-      containerStyle={{ padding: "0px 0px" }}
-    >
+    <MEChip {...yesProps} style={{ padding: "0px 15px" }}>
       Yes({numberOfSharers})
     </MEChip>
   );
+
+  //   <Wrapper style={{ color: "rgb(65 169 65)" }}>
+  //       <b>Yes({numberOfSharers})</b>
+  //     </Wrapper>
 };
