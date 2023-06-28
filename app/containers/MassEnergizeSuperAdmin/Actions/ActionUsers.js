@@ -33,6 +33,8 @@ function ActionUsers({ classes }) {
     });
   }, [id]);
 
+  console.log("==== action ===", action?.action_users)
+
   const columns = [
     {
       name: "Recorded On",
@@ -116,7 +118,7 @@ function ActionUsers({ classes }) {
     if (!data) return [];
     const fashioned = data.map((d) => [
       getHumanFriendlyDate(d?.recorded_at, false, true),
-      getHumanFriendlyDate(d?.completed_at, false, true) || "N/A",
+      getHumanFriendlyDate(d?.date_completed, false, true) || "N/A",
       d?.full_name,
       d?.email,
       d?.real_estate_unit?.name,
