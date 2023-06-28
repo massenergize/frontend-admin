@@ -60,6 +60,7 @@ import app, {
   reducerForActionEngagements,
   reducerForTableFilters,
   reducerForVisitLogs,
+  reducerForUserActiveStatus,
 } from "./modules/appReducer";
 
 /**
@@ -67,6 +68,7 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    userIsActive: reducerForUserActiveStatus,
     userVisitLogs: reducerForVisitLogs,
     tableFilters: reducerForTableFilters,
     tempForm: reducerForKeepingFormContent,

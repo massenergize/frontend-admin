@@ -8,6 +8,8 @@ import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { withRouter } from "react-router-dom";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import { Paper, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 import Seo from "../../../components/Seo/Seo";
 const styles = (theme) => ({
   root: {
@@ -213,6 +215,17 @@ class EditActionForm extends Component {
     return (
       <div>
         <Seo name={`Edit Action -  ${action?.title}`}/>
+        <Paper style={{ padding: 15 }}>
+          <Typography>
+            Want to see a list of users who have taken this action or marked
+            as todo ?
+          </Typography>
+          <Link to={`/admin/read/${id}/action-users`}>
+            Action Users
+          </Link>
+        </Paper>
+
+        <br />
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
