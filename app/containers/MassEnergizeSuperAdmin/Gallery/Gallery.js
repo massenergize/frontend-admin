@@ -287,6 +287,8 @@ function Gallery(props) {
             disabled={targetAllComs}
             defaultSelected={targetComs}
             allowChipRemove={!targetAllComs}
+            isAsync={true}
+            endpoint={auth?.is_super_admin ? "communities.listForSuperAdmin" : "communities.listForCommunityAdmin"}
           />
           {/* <div
             style={{

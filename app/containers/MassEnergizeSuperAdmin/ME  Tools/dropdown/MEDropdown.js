@@ -153,7 +153,7 @@ function MEDropdown(props) {
       >
         {(optionsToDisplay || []).map((d, i) => {
           return (
-            <MenuItem key={i} ref={(i === optionsToDisplay.length - 1) && isAsync ? lastDropDownItemRef:null}>
+            <MenuItem key={i} ref={(i === optionsToDisplay.length - 1) && rest?.isAsync ? lastDropDownItemRef:null}>
               <FormControlLabel
                 onClick={() => handleOnChange(d)}
                 key={i}
