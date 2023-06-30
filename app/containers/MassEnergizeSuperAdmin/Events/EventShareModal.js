@@ -127,7 +127,7 @@ function EventShareModal({
         if (!response.success)
           return console.log("SHARING_ERROR_BE:", response.error);
 
-        close && close()
+        close && close();
         setCommunities([]);
         setChanged(false);
 
@@ -172,6 +172,7 @@ function EventShareModal({
   return (
     <div>
       <ThemeModal
+        noTitle
         open={show}
         fullControl
         close={() => toggleModal && toggleModal(false)}

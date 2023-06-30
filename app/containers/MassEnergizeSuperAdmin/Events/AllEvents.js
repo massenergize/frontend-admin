@@ -157,6 +157,7 @@ class AllEvents extends React.Component {
             <EventSharedState
               {...d || {}}
               classes={classes}
+              history={this.props.history}
               toggleModalOnClick={(props) => this.props.toggleModal(props)}
             />
           ),
@@ -654,10 +655,15 @@ const EventSharedState = (props) => {
     publicity,
     communities_under_publicity,
     id,
+    history,
   } = props;
 
   const numberOfSharers = shared_to?.length || 0;
   const commonClasses = "touchable-opacity";
+
+  const closeModal = () => {
+    toggleModalOnClick && toggleModalOnClick({ show: false });
+  };
 
   const notSharedYetDialog = () => {
     toggleModalOnClick &&
@@ -668,6 +674,8 @@ const EventSharedState = (props) => {
           <EventNotSharedWithAnyone
             publicity={publicity}
             shareable_to={communities_under_publicity}
+            closeModal={closeModal}
+            history={history}
             id={id}
           />
         ),
@@ -686,7 +694,10 @@ const EventSharedState = (props) => {
             publicity={publicity}
             shared_to={shared_to}
             id={id}
+            close={close}
             shareable_to={communities_under_publicity}
+            closeModal={closeModal}
+            history={history}
           />
         ),
         noOk: true,
