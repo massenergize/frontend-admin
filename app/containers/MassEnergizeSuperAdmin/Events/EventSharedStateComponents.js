@@ -88,7 +88,7 @@ export const EventSharedWithCommunity = ({
           }}
           // to={`/admin/edit/${id}/event`}
         >
-          Change who can we this event
+          Change who can see this event
         </Link>
       </div>
     </div>

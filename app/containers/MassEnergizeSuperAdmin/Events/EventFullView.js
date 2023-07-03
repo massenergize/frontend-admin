@@ -249,6 +249,7 @@ function EventFullView(props) {
         toggleModal={setshowShareModal}
         event={event}
         updateEventInHeap={putEventInHeap}
+        hasControl = {hasControl}
         otherEvents={events}
         myEvents={myEvents}
         updateNormalEventListInRedux={putEventsInRedux}
