@@ -33,7 +33,7 @@ export const EventNotSharedWithAnyone = ({
             history.push(`/admin/edit/${id}/event`);
           }}
         >
-          Change Who Can See This Event
+          Change who can see this event
         </Link>
       </div>
     </div>
