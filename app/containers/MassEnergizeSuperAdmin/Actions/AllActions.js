@@ -34,6 +34,7 @@ import {
   reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
+import { Badge, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable, { FILTERS } from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -46,6 +47,7 @@ import {
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
+import PeopleIcon from "@mui/icons-material/People";
 import Seo from '../../../../app/components/Seo/Seo'
 import CustomOptions from "../ME  Tools/table /CustomOptions";
 
@@ -81,7 +83,6 @@ class AllActions extends React.Component {
       ...(tableFilters || {}),
       [key]: { 0: { list: ids } },
     });
-
     var content = {
       fieldKey: "action_ids",
       apiURL: "/actions.listForCommunityAdmin",
@@ -203,14 +204,14 @@ class AllActions extends React.Component {
           },
         },
       },
-      {
-        name: "Tags",
-        key: "tags",
-        options: {
-          filter: true,
-          filterType: "textField",
-        },
-      },
+      // {
+      //   name: "Tags",
+      //   key: "tags",
+      //   options: {
+      //     filter: true,
+      //     filterType: "textField",
+      //   },
+      // },
       {
         name: "Community",
         key: "community",
@@ -226,6 +227,34 @@ class AllActions extends React.Component {
               filter: true,
               filterType: "multiselect",
             },
+      },
+      {
+        name: "Users list",
+        key: "users-list",
+        options: {
+          filter: false,
+          download: false,
+          customBodyRender: ({ id, count }) =>
+            count ? (
+              <Link to={`/admin/read/${id}/action-users`}>
+                <Badge badgeContent={count || 0} max={99} showZero>
+                  <PeopleIcon
+                    size="small"
+                    variant="outlined"
+                    color="secondary"
+                  />
+                </Badge>
+              </Link>
+            ) : (
+              <Badge badgeContent={count || 0} max={99} showZero>
+                <PeopleIcon
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
+              </Badge>
+            ),
+        },
       },
       {
         name: "Live?",
@@ -362,8 +391,9 @@ class AllActions extends React.Component {
       },
       smartString(d.title), // limit to first 30 chars
       { rank: d.rank, id: d.id },
-      `${smartString(d.tags.map((t) => t.name).join(", "), 30)} `,
+      // `${smartString(d.tags.map((t) => t.name).join(", "), 30)} `,
       d.is_global ? "Template" : d.community && d.community.name,
+      {id:d.id, count:d?.action_users},
       { isLive: d.is_published, item: d },
       d.id,
       d.is_published ? "Yes" : "No",
@@ -652,3 +682,4 @@ const ActionsMapped = connect(
   mapDispatchToProps
 )(AllActions);
 export default withStyles(styles)(withRouter(ActionsMapped));
+
