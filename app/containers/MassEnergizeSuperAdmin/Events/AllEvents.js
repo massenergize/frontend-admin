@@ -51,6 +51,7 @@ import Loader from "../../../utils/components/Loader";
 import HomeIcon from "@mui/icons-material/Home";
 import StarsIcon from "@mui/icons-material/Stars";
 import Seo from "../../../../app/components/Seo/Seo";
+import CustomOptions from "../ME  Tools/table /CustomOptions";
 import {
   EventNotSharedWithAnyone,
   EventSharedWithCommunity,
@@ -102,7 +103,7 @@ class AllEvents extends React.Component {
   }
 
   getColumns() {
-    const { classes, putEventsInRedux, allEvents, auth } = this.props;
+    const { classes, putEventsInRedux, allEvents, auth, communities } = this.props;
 
     return [
       {
@@ -174,10 +175,16 @@ class AllEvents extends React.Component {
       {
         name: "Community",
         key: "community",
-        options: {
-          filter: true,
-          filterType: "multiselect",
-        },
+        options: auth?.is_super_admin
+          ? CustomOptions({
+              data: communities,
+              label: "community",
+              endpoint: "/communities.listForSuperAdmin",
+            })
+          : {
+              filter: true,
+              filterType: "multiselect",
+            },
       },
       {
         name: "Live?",
@@ -623,6 +630,7 @@ function mapStateToProps(state) {
     allEvents: state.getIn(["allEvents"]),
     community: state.getIn(["selected_community"]),
     meta: state.getIn(["paginationMetaData"]),
+    communities: state.getIn(["communities"]),
   };
 }
 function mapDispatchToProps(dispatch) {

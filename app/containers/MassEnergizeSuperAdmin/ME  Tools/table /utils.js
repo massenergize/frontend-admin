@@ -26,3 +26,11 @@ export const renderInvisibleChips = (invisible) => {
   };
   return CustomFilterList;
 };
+
+export const customFilterListOptions = {
+  render: (v) => v.map((l) => l),
+  update: (filterList, filterPos, index) => {
+    filterList[index].splice(filterPos, 1);
+    return filterList;
+  },
+};

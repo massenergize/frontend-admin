@@ -46,6 +46,7 @@ import Loader from "../../../utils/components/Loader";
 import { getData } from "../Messages/CommunityAdminMessages";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import Seo from "../../../components/Seo/Seo";
+import CustomOptions from "../ME  Tools/table /CustomOptions";
 
 class AllTestimonials extends React.Component {
   constructor(props) {
@@ -142,7 +143,7 @@ class AllTestimonials extends React.Component {
   };
 
   getColumns() {
-    const { classes } = this.props;
+    const { classes, auth, communities} = this.props;
     return [
       {
         name: "ID",
@@ -209,9 +210,16 @@ class AllTestimonials extends React.Component {
       {
         name: "Community",
         key: "community",
-        options: {
-          filter: true,
-        },
+        options: auth?.is_super_admin
+          ? CustomOptions({
+              data: communities,
+              label: "community",
+              endpoint: "/communities.listForSuperAdmin",
+            })
+          : {
+              filter: true,
+              filterType: "multiselect",
+            },
       },
       {
         name: "Live?",
@@ -238,7 +246,9 @@ class AllTestimonials extends React.Component {
                 label={
                   d.is_approved ? (d.isLive ? "Yes" : "No") : "Not Approved"
                 }
-                className={`${d.isLive ? classes.yesLabel : classes.noLabel}  ${
+                className={`${
+                  d.isLive ? classes.yesLabel : classes.noLabel
+                }  ${
                   !d.is_approved ? "not-approved" : ""
                 } touchable-opacity`}
               />
@@ -281,7 +291,11 @@ class AllTestimonials extends React.Component {
                   });
                 }}
               >
-                <EditIcon size="small" variant="outlined" color="secondary" />
+                <EditIcon
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
             </div>
           ),
@@ -566,6 +580,7 @@ function mapStateToProps(state) {
     community: state.getIn(["selected_community"]),
     meta: state.getIn(["paginationMetaData"]),
     tableFilters: state.getIn(["tableFilters"]),
+    communities: state.getIn(["communities"]),
   };
 }
 function mapDispatchToProps(dispatch) {
