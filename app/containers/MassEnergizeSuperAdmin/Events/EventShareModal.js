@@ -6,7 +6,7 @@ import ThemeModal from "../../../components/Widget/ThemeModal";
 import { fetchParamsFromURL } from "../../../utils/common";
 import { FROM } from "../../../utils/constants";
 import { apiCall } from "../../../utils/messenger";
-import useObserver from "../../../utils/UseObserve";
+import useObserver from "../../../utils/useObserver";
 /**
  * This component lists all communities that an admin
  * viewing an event is allowed to share to
