@@ -25,6 +25,7 @@ function EventShareModal({
   updateEventInHeap,
   updateOtherEventListInRedux,
   updateNormalEventListInRedux,
+  hasControl,
 }) {
   const [communitiesToShareTo, setCommunities] = useState([]); // Selected communities to share to
   const [changed, setChanged] = useState(false);
@@ -53,14 +54,27 @@ function EventShareModal({
    * @returns
    */
   const getAllowedCommunities = () => {
-    const { is_open, is_open_to, communities_under_publicity, is_closed_to } =
-      event || {};
+    const {
+      is_open,
+      is_open_to,
+      communities_under_publicity,
+      is_closed_to,
+      shared_to,
+    } = event || {};
+
     const allowedCommunities = (communities_under_publicity || []).map(
       (c) => c.id
     );
     const adminCommunities = (auth && auth.admin_at) || [];
-    // Event is open and user is a cadmin, they can share to any of their communities
-    if (is_open && isCommunityAdmin) return (auth && auth.admin_at) || [];
+
+    // Event is open or open_to and user is a cadmin (also owner of the event) then
+    // it should show communities that have shared it(so they can remove)
+    if ((is_open || is_open_to) && isCommunityAdmin && hasControl)
+      return shared_to || [];
+
+    // Event is open and user is a cadmin(not owner), they can share to any of their communities
+    if (is_open && isCommunityAdmin && !hasControl)
+      return (auth && auth.admin_at) || [];
     // Event is open and use is a super admin, they can share to any commmunity on the site
     if (is_open && isSuperAdmin) return communities || [];
     // Event is only open to a selection of communities, check the admin's community list
@@ -99,20 +113,6 @@ function EventShareModal({
     return [];
   };
 
-  const groupTheOptions = () => {
-    const allowed = getAllowedCommunities();
-    // Collect all communities that this event has been shared to
-    var sharedTo = (event || {}).shared_to || [];
-    var alreadySharedTo = sharedTo.map((c) => c.id);
-    // Given the allowed communities based on the admin's communties(they manage), only retrieve the communities that the event has not been shared to
-    var shareTo = allowed.filter((c) => !alreadySharedTo.includes(c.id));
-    const shareIds = shareTo.map((c) => c.id);
-
-    var unShare = allowed.filter((c) => !shareIds.includes(c.id));
-
-    return { shareTo, unShare };
-  };
-
   /**
    * Sends a request to the backend to update the content
    */
@@ -127,7 +127,7 @@ function EventShareModal({
         if (!response.success)
           return console.log("SHARING_ERROR_BE:", response.error);
 
-        close && close()
+        close && close();
         setCommunities([]);
         setChanged(false);
 
@@ -172,6 +172,7 @@ function EventShareModal({
   return (
     <div>
       <ThemeModal
+        noTitle
         open={show}
         fullControl
         close={() => toggleModal && toggleModal(false)}
@@ -287,8 +288,7 @@ const ShareWith = ({ communities, addSelected, selected }) => {
         variant="caption"
         style={{ padding: 15, textAlign: "center", color: "grey" }}
       >
-        No communities on this list, you must have shared this to all available
-        communities already
+        None of the communities you manage are on the list...
       </Typography>
     );
   }
@@ -305,32 +305,6 @@ const ShareWith = ({ communities, addSelected, selected }) => {
               checked={selected.includes(comm.id)}
             />
           }
-          label={comm.name}
-        />
-      </div>
-    );
-  });
-};
-
-const UnShare = ({ communities, addSelected }) => {
-  if (!communities || !communities.length) {
-    return (
-      <Typography
-        variant="caption"
-        style={{ padding: 15, textAlign: "center", color: "grey" }}
-      >
-        If you already shared to a community on your list, it will appear here
-      </Typography>
-    );
-  }
-  (communities || []).sort((a, b) => (a.name < b.name ? -1 : 1));
-
-  return communities.map((comm, index) => {
-    return (
-      <div style={{ width: "50%" }} key={index.toString()}>
-        <FormControlLabel
-          key={index.toString()}
-          control={<Checkbox onChange={(e) => addSelected(comm.id)} />}
           label={comm.name}
         />
       </div>
