@@ -1056,6 +1056,7 @@ class MassEnergizeForm extends Component {
               /> */}
 
               <TinyEditor
+                id={field?.name || "" + field?.dbName || ""}
                 value={this.getValue(field.name, null)}
                 onEditorChange={(content, editor) => {
                   this.handleEditorChange(content, editor, field.name);
@@ -1063,19 +1064,18 @@ class MassEnergizeForm extends Component {
                 // Toolbar Docs:  https://www.tiny.cloud/docs/tinymce/6/migration-from-5x/#things-we-renamed
                 toolbar="undo redo | blocks | formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent | fontfamily | fontsize |"
                 plugins="advlist autolink lists link image charmap print preview anchor forecolor"
-                
                 init={{
                   height: 350,
                   menubar: false,
                   default_link_target: "_blank",
                   // next 4 lines test to eliminate tiny cloud errors
-                  selector: "textarea",
-                  init_instance_callback: function(editor) {
-                    var freeTiny = document.querySelector(
-                      ".tox .tox-notification--in"
-                    );
-                    freeTiny.style.display = "none";
-                  },
+                  // selector: "textarea",
+                  // init_instance_callback: function(editor) {
+                  //   var freeTiny = document.querySelector(
+                  //     ".tox .tox-notification--in"
+                  //   );
+                  //   freeTiny.style.display = "none";
+                  // },
                 }}
                 apiKey={TINY_MCE_API_KEY}
               />
