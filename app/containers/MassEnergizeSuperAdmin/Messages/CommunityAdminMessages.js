@@ -40,6 +40,7 @@ import Loader from "../../../utils/components/Loader";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import { renderInvisibleChips } from "../ME  Tools/table /utils";
 import Seo from "../../../../app/components/Seo/Seo";
+import CustomOptions from "../ME  Tools/table /CustomOptions";
 
 export const replyToMessage = ({ pathname, props, transfer }) => {
   // const pathname = `/admin/edit/${id}/message`;
@@ -179,97 +180,110 @@ class AllCommunityAdminMessages extends React.Component {
     ]);
   };
 
-  getColumns = (classes) => [
-    {
-      name: "ID",
-      key: "id",
-      options: {
-        filter: false,
-        filterType: "multiselect",
-      },
-    },
-    {
-      name: "Date",
-      key: "date",
-      options: {
-        filter: false,
-      },
-    },
-    {
-      name: "Title",
-      key: "title",
-      options: {
-        filter: false,
-      },
-    },
-    {
-      name: "User Name",
-      key: "user_name",
-      options: {
-        filter: false,
-        filterType: "textField",
-      },
-    },
-    {
-      name: "Email",
-      key: "email",
-      options: {
-        filter: false,
-        filterType: "textField",
-      },
-    },
-    {
-      name: "Community",
-      key: "community",
-      options: {
-        filter: true,
-        filterType: "multiSelect",
-      },
-    },
-    {
-      name: "Replied?",
-      key: "replied?",
-      options: {
-        filter: true,
-        customBodyRender: (d) => {
-          return (
-            <Chip
-              label={isTrue(d) ? "Yes" : "No"}
-              className={isTrue(d) ? classes.yesLabel : classes.noLabel}
-            />
-          );
-        },
-      },
-    },
-    {
-      name: "See Details",
-      key: "edit_or_copy",
-      options: {
-        filter: false,
-        download: false,
-        sort: false,
-        customBodyRender: (id) => (
-          <div>
-            {/* <Link to={`/admin/edit/${id}/message`}>
+  getColumns = (classes) => {
+    const {auth, communities } = this.props;
+
+   return [
+     {
+       name: "ID",
+       key: "id",
+       options: {
+         filter: false,
+         filterType: "multiselect",
+       },
+     },
+     {
+       name: "Date",
+       key: "date",
+       options: {
+         filter: false,
+       },
+     },
+     {
+       name: "Title",
+       key: "title",
+       options: {
+         filter: false,
+       },
+     },
+     {
+       name: "User Name",
+       key: "user_name",
+       options: {
+         filter: false,
+         filterType: "textField",
+       },
+     },
+     {
+       name: "Email",
+       key: "email",
+       options: {
+         filter: false,
+         filterType: "textField",
+       },
+     },
+     {
+       name: "Community",
+       key: "community",
+       options: auth?.is_super_admin
+         ? CustomOptions({
+             data: communities,
+             label: "community",
+             endpoint: "/communities.listForSuperAdmin",
+           })
+         : {
+             filter: true,
+             filterType: "multiselect",
+           },
+     },
+     {
+       name: "Replied?",
+       key: "replied?",
+       options: {
+         filter: true,
+         customBodyRender: (d) => {
+           return (
+             <Chip
+               label={isTrue(d) ? "Yes" : "No"}
+               className={isTrue(d) ? classes.yesLabel : classes.noLabel}
+             />
+           );
+         },
+       },
+     },
+     {
+       name: "See Details",
+       key: "edit_or_copy",
+       options: {
+         filter: false,
+         download: false,
+         sort: false,
+         customBodyRender: (id) => (
+           <div>
+             {/* <Link to={`/admin/edit/${id}/message`}>
               <DetailsIcon size="small" variant="outlined" color="secondary" />
             </Link> */}
-            <Link
-              onClick={(e) => {
-                e.preventDefault();
-                replyToMessage({
-                  pathname: `/admin/edit/${id}/message`,
-                  props: this.props,
-                });
-              }}
-            >
-              <DetailsIcon size="small" variant="outlined" color="secondary" />
-            </Link>
-          </div>
-        ),
-      },
-    },
-  ];
-
+             <Link
+               onClick={(e) => {
+                 e.preventDefault();
+                 replyToMessage({
+                   pathname: `/admin/edit/${id}/message`,
+                   props: this.props,
+                 });
+               }}
+             >
+               <DetailsIcon
+                 size="small"
+                 variant="outlined"
+                 color="secondary"
+               />
+             </Link>
+           </div>
+         ),
+       },
+     },
+   ];
+  };
   nowDelete({ idsToDelete, data }) {
     const { messages, putMessagesInRedux } = this.props;
     const itemsInRedux = messages;
@@ -408,7 +422,7 @@ class AllCommunityAdminMessages extends React.Component {
 
     return (
       <div>
-        <Seo name={"Community Admin Messages"}/>
+        <Seo name={"Community Admin Messages"} />
         {comingFromDashboard && (
           <MEPaperBlock icon="fa fa-bullhorn" banner>
             <Typography>
@@ -464,6 +478,7 @@ function mapStateToProps(state) {
     messages: state.getIn(["messages"]),
     meta: state.getIn(["paginationMetaData"]),
     tableFilters: state.getIn(["tableFilters"]),
+    communities: state.getIn(["communities"]),
   };
 }
 function mapDispatchToProps(dispatch) {

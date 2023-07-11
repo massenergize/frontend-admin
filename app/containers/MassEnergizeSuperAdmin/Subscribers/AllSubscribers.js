@@ -24,6 +24,7 @@ import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import { isEmpty } from "../../../utils/common";
 import Loader from "../../../utils/components/Loader";
 import Seo from "../../../components/Seo/Seo";
+import CustomOptions from "../ME  Tools/table /CustomOptions";
 
 class AllSubscribers extends React.Component {
   constructor(props) {
@@ -37,14 +38,13 @@ class AllSubscribers extends React.Component {
   }
 
   async componentDidMount() {
-    let {auth, meta, putMetaDataToRedux, putSubscribersInRedux} = this.props;
+    let { auth, meta, putMetaDataToRedux, putSubscribersInRedux } = this.props;
     const user = auth ? auth : {};
     let allSubscribersResponse = null;
     if (user.is_super_admin) {
-      allSubscribersResponse = await apiCall(
-        "/subscribers.listForSuperAdmin",
-        { limit: getLimit(PAGE_PROPERTIES.ALL_SUBSCRIBERS.key) }
-      );
+      allSubscribersResponse = await apiCall("/subscribers.listForSuperAdmin", {
+        limit: getLimit(PAGE_PROPERTIES.ALL_SUBSCRIBERS.key),
+      });
     } else if (user.is_community_admin) {
       allSubscribersResponse = await apiCall(
         "/subscribers.listForCommunityAdmin",
@@ -57,7 +57,10 @@ class AllSubscribers extends React.Component {
 
     if (allSubscribersResponse?.data) {
       putSubscribersInRedux(allSubscribersResponse.data);
-      putMetaDataToRedux({...meta, subscribers:allSubscribersResponse.cursor})
+      putMetaDataToRedux({
+        ...meta,
+        subscribers: allSubscribersResponse.cursor,
+      });
     }
   }
 
@@ -81,14 +84,14 @@ class AllSubscribers extends React.Component {
     await this.setStateAsync({ dataFiltered: filteredData });
   };
 
-  fashionData = (data) =>{
+  fashionData = (data) => {
     return data.map((d) => [
       d.id,
       d.name,
       d.email,
       d.community && d.community.name,
     ]);
-  }
+  };
 
   getStatus = (isApproved) => {
     switch (isApproved) {
@@ -101,7 +104,9 @@ class AllSubscribers extends React.Component {
     }
   };
 
-  getColumns = (classes) => [
+  getColumns = (classes) => {
+    const { communities, auth} = this.props;
+    return [
     {
       name: "ID",
       key: "id",
@@ -126,11 +131,19 @@ class AllSubscribers extends React.Component {
     {
       name: "Community",
       key: "community",
-      options: {
-        filter: true,
-      },
+      options: auth?.is_super_admin
+        ? CustomOptions({
+            data: communities,
+            label: "community",
+            endpoint: "/communities.listForSuperAdmin",
+          })
+        : {
+            filter: true,
+            filterType: "multiselect",
+          },
     },
-  ];
+  ]
+}
 
   nowDelete({ idsToDelete, data }) {
     const { subscribers, putSubscribersInRedux } = this.props;
@@ -157,9 +170,7 @@ class AllSubscribers extends React.Component {
         }
       );
     });
-    const rem = ((itemsInRedux) || []).filter(
-      (com) => !ids.includes(com.id)
-    );
+    const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putSubscribersInRedux(rem);
   }
 
@@ -178,8 +189,15 @@ class AllSubscribers extends React.Component {
     const title = brand.name + " - All Subscribers";
     const description = brand.desc;
     const { columns, dataFiltered } = this.state;
-    const { classes, subscribers, putSubscribersInRedux, auth, meta, putMetaDataToRedux } = this.props;
-    const data = this.fashionData((subscribers) || []);
+    const {
+      classes,
+      subscribers,
+      putSubscribersInRedux,
+      auth,
+      meta,
+      putMetaDataToRedux,
+    } = this.props;
+    const data = this.fashionData(subscribers || []);
     let metaData = meta && meta.subscribers;
 
     const options = {
@@ -190,12 +208,7 @@ class AllSubscribers extends React.Component {
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
       confirmFilters: true,
-      customSearchRender: (
-        searchText,
-        handleSearch,
-        hideSearch,
-        options
-      ) => (
+      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
         <SearchBar
           url={getAdminApiEndpoint(auth, "/subscribers")}
           reduxItems={subscribers}
@@ -266,13 +279,13 @@ class AllSubscribers extends React.Component {
           meta: meta,
         }),
     };
-        if (isEmpty(metaData)) {
-          return <Loader />;
-        }
+    if (isEmpty(metaData)) {
+      return <Loader />;
+    }
 
     return (
       <div>
-        <Seo name={"All Subscribers"}/>
+        <Seo name={"All Subscribers"} />
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_SUBSCRIBERS}
@@ -298,6 +311,7 @@ function mapStateToProps(state) {
     community: state.getIn(["selected_community"]),
     subscribers: state.getIn(["subscribers"]),
     meta: state.getIn(["paginationMetaData"]),
+    communities: state.getIn(["communities"]),
   };
 }
 function mapDispatchToProps(dispatch) {

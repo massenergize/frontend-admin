@@ -443,6 +443,13 @@ const applicationTheme = (color, mode) => ({
         },
       },
     },
+    MUIDataTableToolbar: {
+      styleOverrides: {
+        filterPaper: {
+          width: "350px",
+        },
+      },
+    },
   },
 });
 

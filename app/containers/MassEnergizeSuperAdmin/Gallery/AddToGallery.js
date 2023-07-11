@@ -24,7 +24,7 @@ import {withStyles} from '@mui/styles'
 import PapperBlock from "../../../components/PapperBlock/PapperBlock";
 import { fetchParamsFromURL } from "../../../utils/common";
 import { makeStyles, } from "@mui/styles";
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 import { styles } from "./styles";
 import Seo from "../../../components/Seo/Seo";
 
@@ -248,6 +248,12 @@ function AddToGallery(props) {
             labelExtractor={(com) => com.name}
             onChange={(communities) => setChosenComs(communities)}
             onMount={(reset) => setResetorForAutoComplete(() => reset)}
+            isAsync={true}
+            endpoint={
+              superAdmin
+                ? "communities.listForSuperAdmin"
+                : "communities.listForCommunityAdmin"
+            }
           />
           <Typography style={{ color: "gray" }}>
             <i>
