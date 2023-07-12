@@ -53,6 +53,12 @@ export default function SearchBar({url, reduxItems, updateReduxFunction, handleS
             setText(e.target.value);
           }}
           value={text}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleBackendSearch();
+            }
+          }}
+          
         />
         <div
           style={{
