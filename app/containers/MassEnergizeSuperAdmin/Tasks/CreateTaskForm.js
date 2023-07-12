@@ -148,14 +148,16 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
   const preflightFxn = (values) => {
     let details = values && values.recurring_details;
     const d = new Date(details);
-
+    
+    // datetime format is in user's timezone. We convert to UTC timezone for the api
+    // and keep the original timezone for display. 
     let recurring_details = JSON.stringify({
-      day_of_month: d.getDate(),
-      day_of_week: d.getDay(),
-      month_of_year: d.getMonth() + 1,
-      minute: d.getMinutes(),
-      hour: d.getHours(),
-      year: d.getFullYear(),
+      day_of_month: d.getUTCDate(),
+      day_of_week: d.getUTCDay(),
+      month_of_year: d.getUTCMonth() + 1,
+      minute: d.getUTCMinutes(),
+      hour: d.getUTCHours(),
+      year: d.getUTCFullYear(),
       actual: values.recurring_details,
     });
 
@@ -172,7 +174,7 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
     title: `${toEdit && toEdit.id ? "Update" : "Create New"}  Task`,
     subTitle: "",
     method: toEdit && toEdit.id ? "/tasks.update" : "/tasks.create",
-    successRedirectPage: "/admin/read/tasks",
+    // successRedirectPage: "/admin/read/tasks",
     preflightFxn: preflightFxn,
     fields: [
       {
