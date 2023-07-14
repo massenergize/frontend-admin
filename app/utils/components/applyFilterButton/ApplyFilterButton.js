@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import React from "react";
+import React, {useEffect} from "react";
 import { generateFilterParams, getFilterData } from "../../helpers";
 import { apiCall } from "../../messenger";
 
@@ -19,6 +19,20 @@ export default function ApplyFilterButton({ url, reduxItems, updateReduxFunction
       }
     });
   };
+
+    useEffect(() => {
+      const keyDownHandler = (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          handleFilterSubmit()
+        }
+      };
+      document.addEventListener("keydown", keyDownHandler);
+      return () => {
+        document.removeEventListener("keydown", keyDownHandler);
+      };
+    }, []);
+
   return (
     <div
       style={{

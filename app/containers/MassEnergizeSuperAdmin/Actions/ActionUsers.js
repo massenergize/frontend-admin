@@ -33,8 +33,6 @@ function ActionUsers({ classes }) {
     });
   }, [id]);
 
-  console.log("==== action ===", action?.action_users)
-
   const columns = [
     {
       name: "Recorded On",
@@ -69,22 +67,22 @@ function ActionUsers({ classes }) {
       key: "unit_name",
       options: {
         filter: false,
+        customBodyRender: ({ zipCode, unit }) => {
+          return (
+            <p>
+              {unit} {zipCode && `(${zipCode})`}
+            </p>
+          );
+        },
       },
     },
-    // {
-    //   name: "Unit Type",
-    //   key: "unit_type",
-    //   options: {
-    //     filter: false,
-    //   },
-    // },
-    // {
-    //   name: "Carbon Impact",
-    //   key: "carbon_impact",
-    //   options: {
-    //     filter: false,
-    //   },
-    // },
+    {
+      name: "Carbon Impact",
+      key: "carbon_impact",
+      options: {
+        filter: false,
+      },
+    },
     {
       name: "Status",
       key: "status",
@@ -115,15 +113,18 @@ function ActionUsers({ classes }) {
   };
 
   const fashionData = (data) => {
+    console.log("== data ===", data)
     if (!data) return [];
     const fashioned = data.map((d) => [
       getHumanFriendlyDate(d?.recorded_at, false, true),
       getHumanFriendlyDate(d?.date_completed, false, true) || "N/A",
       d?.full_name,
       d?.email,
-      d?.real_estate_unit?.name,
-      // d?.real_estate_unit?.unit_type,
-      // d?.carbon_impact,
+      {
+        unit: d?.real_estate_unit?.name,
+        zipCode: d?.real_estate_unit?.zip_code,
+      },
+      d?.carbon_impact,
       d?.status,
     ]);
     return fashioned;

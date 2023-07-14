@@ -2,8 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
 import MUIDataTable from "mui-datatables";
-import { Helmet } from "react-helmet";
-import brand from "dan-api/dummy/brand";
 
 import { connect } from "react-redux";
 import styles from "../../../components/Widget/widget-jss";
@@ -264,8 +262,6 @@ class AllTasks extends React.Component {
   }
 
   render() {
-    const title = brand.name + " - All Tasks";
-    const description = brand.desc;
     const { columns } = this.state;
     const data = this.fashionData(this.props.tasks);
     const { classes } = this.props;

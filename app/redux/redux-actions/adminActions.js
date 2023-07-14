@@ -251,7 +251,7 @@ export const reduxLoadAdmins = (data = LOADING) => {
 export const reduxFetchInitialContent = (auth) => (dispatch) => {
   if (!auth) return;
   const isSuperAdmin = auth && auth.is_super_admin;
-  dispatch(setupSocketConnectionWithBackend(auth));
+  // dispatch(setupSocketConnectionWithBackend(auth)); Deactivated as of 30/06/23 (Will return when the PROD disconnection bug is fixed) 
 
   Promise.all([
     apiCall("/policies.listForCommunityAdmin"),

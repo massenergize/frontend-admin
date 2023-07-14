@@ -137,7 +137,9 @@ export const onTableStateChange = ({
   meta,
   otherArgs
 }) => {
+
   switch (action) {
+  
     case "changePage":
       if (
         tableState.rowsPerPage * tableState.page ===
@@ -210,7 +212,7 @@ export const handleFilterChange = ({
   updateMetaData,
   otherArgs,
 }) => {
-  if (type === "chip") {
+  if (type === "chip" || type === "custom") {
     let arr = generateFilterParams(filterList, columns);
     apiCall(url, {
       params: JSON.stringify(arr),
@@ -230,3 +232,9 @@ export const handleFilterChange = ({
 export const isTrue = (value) => {
   if ([true, "True", "Yes", "yes"].includes(value)) return true;
 };
+
+
+export const removeDuplicates = (first, second) => {
+   const uniqueItems = [...new Set([...(first||[]), ...(second||[])])];
+   return uniqueItems;
+}

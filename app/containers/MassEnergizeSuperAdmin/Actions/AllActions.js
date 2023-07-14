@@ -49,6 +49,7 @@ import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
 import PeopleIcon from "@mui/icons-material/People";
 import Seo from '../../../../app/components/Seo/Seo'
+import CustomOptions from "../ME  Tools/table /CustomOptions";
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -121,7 +122,7 @@ class AllActions extends React.Component {
   };
 
   getColumns() {
-    const { classes, putActionsInRedux, allActions } = this.props;
+    const { classes, putActionsInRedux, allActions, auth, communities } = this.props;
     return [
       {
         name: "ID",
@@ -214,10 +215,18 @@ class AllActions extends React.Component {
       {
         name: "Community",
         key: "community",
-        options: {
-          filter: true,
-          filterType: "multiselect",
-        },
+        options:
+        auth?.is_super_admin
+          ? CustomOptions({
+              data:communities,
+              label:"community",
+              endpoint:"/communities.listForSuperAdmin"
+            })
+          : 
+          {
+              filter: true,
+              filterType: "multiselect",
+            },
       },
       {
         name: "Users list",
@@ -365,6 +374,7 @@ class AllActions extends React.Component {
       },
     ];
   }
+
   /**
    * NOTE: If you add or remove a field in here, make sure your changes reflect in nowDelete.
    * Deleting heavily relies on the index arrangement of the items in here. Merci!
@@ -650,6 +660,7 @@ const mapStateToProps = (state) => ({
   community: state.getIn(["selected_community"]),
   meta: state.getIn(["paginationMetaData"]),
   tableFilters: state.getIn(["tableFilters"]),
+  communities: state.getIn(["communities"]),
 });
 const mapDispatchToProps = (dispatch) =>
   bindActionCreators(

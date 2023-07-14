@@ -3,6 +3,12 @@
   --app-purple: rgb(156, 39, 176);
 }
 
+
+.tox-notification--warning {
+  display: none !important;
+}
+
+
 .drop-children-area {
   position: absolute;
   background: white;
@@ -94,6 +100,7 @@
   font-size: 11px;
   align-items: center;
   justify-content: center;
+  margin: 0px;
 }
 
 .me-chip-container {
