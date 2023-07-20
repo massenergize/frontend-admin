@@ -179,92 +179,77 @@ const createFormJson = ({
     id: c.id.toString(),
   }));
 
-  const ADD_LINK = {
-    name: "has_link",
-    label: "Want to add a registration link? or directly add the link to join?",
-    fieldType: "Radio",
-    isRequired: false,
-    defaultValue: "false",
-    dbName: "has_link",
-    readOnly: false,
-    data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-    child: {
-      valueToCheck: "true",
-      fields: [
-        {
-          name: "external_link",
-          label: "Registration Link",
-          placeholder: "Add a registration Link",
-          fieldType: "TextField",
-          contentType: "text",
-          isRequired: true,
-          defaultValue: "",
-          dbName: "external_link",
-          readOnly: false,
-        },
+  const ADD_LINK = [
+    {
+      name: "external_link",
+      label: "Link",
+      placeholder: "Enter link to the event",
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: false,
+      defaultValue: "",
+      dbName: "external_link",
+      readOnly: false,
+    },
+    {
+      name: "external_link_type",
+      label:"Is the link specified to join the event, or to register (with join link sent separately)?",
+      fieldType: "Dropdown",
+      dbName: "external_link_type",
+      defaultValue:  "",
+      data: [
+        { id: "Join", displayName: "Join" },
+        { id: "Register", displayName: "Register" },
       ],
     },
-  };
+  ];
 
-  const ADD_ADDRESS = {
-    name: "have_address",
-    label: "Want to add an address for this event?",
-    fieldType: "Radio",
-    isRequired: false,
-    defaultValue: "false",
-    dbName: "have_address",
-    readOnly: false,
-    data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-    child: {
-      valueToCheck: "true",
-      fields: [
-        {
-          name: "address",
-          label: "Street Address",
-          placeholder: "Street Address or Public Facility",
-          fieldType: "TextField",
-          contentType: "text",
-          isRequired: true,
-          defaultValue: "",
-          dbName: "address",
-          readOnly: false,
-        },
-        {
-          name: "unit",
-          label: "Unit Number",
-          placeholder: 'eg. "2A"',
-          fieldType: "TextField",
-          contentType: "text",
-          isRequired: false,
-          defaultValue: "",
-          dbName: "unit",
-          readOnly: false,
-        },
-        {
-          name: "city",
-          label: "City",
-          placeholder: "eg. Springfield",
-          fieldType: "TextField",
-          contentType: "text",
-          isRequired: true,
-          defaultValue: "",
-          dbName: "city",
-          readOnly: false,
-        },
-        {
-          name: "state",
-          label: "State ",
-          fieldType: "Dropdown",
-          contentType: "text",
-          isRequired: false,
-          data: states,
-          defaultValue: "Massachusetts",
-          dbName: "state",
-          readOnly: false,
-        },
-      ],
+  const ADD_ADDRESS = [
+    {
+      name: "address",
+      label: "Street Address",
+      placeholder: "Street Address or Public Facility",
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: false,
+      defaultValue: "",
+      dbName: "address",
+      readOnly: false,
     },
-  };
+    {
+      name: "unit",
+      label: "Unit Number",
+      placeholder: 'eg. "2A"',
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: false,
+      defaultValue: "",
+      dbName: "unit",
+      readOnly: false,
+    },
+    {
+      name: "city",
+      label: "City",
+      placeholder: "eg. Springfield",
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: false,
+      defaultValue: "",
+      dbName: "city",
+      readOnly: false,
+    },
+    {
+      name: "state",
+      label: "State ",
+      fieldType: "Dropdown",
+      contentType: "text",
+      isRequired: false,
+      data: states,
+      defaultValue: "Massachusetts",
+      dbName: "state",
+      readOnly: false,
+    },
+  ];
 
   const formJson = {
     title: "Create New Event or Campaign",
@@ -513,15 +498,15 @@ const createFormJson = ({
         conditionalDisplays: [
           {
             valueToCheck: "online",
-            fields: [ADD_LINK],
+            fields: ADD_LINK,
           },
           {
             valueToCheck: "in-person",
-            fields: [ADD_ADDRESS],
+            fields: ADD_ADDRESS,
           },
           {
             valueToCheck: "both",
-            fields: [ADD_ADDRESS, ADD_LINK],
+            fields: [...ADD_ADDRESS, ...ADD_LINK],
           },
         ],
       },

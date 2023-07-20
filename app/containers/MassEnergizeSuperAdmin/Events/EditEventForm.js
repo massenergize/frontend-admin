@@ -436,96 +436,78 @@ const createFormJson = ({
     id: c.id,
   }));
 
-    const ADD_LINK = {
-      name: "has_link",
-      label:"Want to add a registration link? or directly add the link to join?",
-      fieldType: "Radio",
-      isRequired: false,
-      defaultValue: event?.external_link ? "true" : "false",
-      dbName: "has_link",
+  const ADD_LINK = [
+    {
+      name: "external_link",
+      label: "Link",
+      placeholder: "Enter Link",
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: true,
+      defaultValue: event?.external_link || "",
+      dbName: "external_link",
       readOnly: false,
-      data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-      child: {
-        valueToCheck: "true",
-        fields: [
-          {
-            name: "external_link",
-            label: "Registration Link",
-            placeholder: "Add a registration Link",
-            fieldType: "TextField",
-            contentType: "text",
-            isRequired: true,
-            defaultValue: event?.external_link ||"",
-            dbName: "external_link",
-            readOnly: false,
-          },
-        ],
-      },
-    };
+    },
+    {
+      name: "external_link_type",
+      label:"Is the link specified to join the event, or to register (with join link sent separately)?",
+      fieldType: "Dropdown",
+      dbName: "external_link_type",
+      defaultValue: event?.external_link_type || "",
+      data: [
+        { id: "Join", displayName: "Join" },
+        { id: "Register", displayName: "Register" },
+      ],
+    },
+  ];
 
-    const ADD_ADDRESS = {
-      name: "have_address",
-      label: "Do you have an address?",
-      fieldType: "Radio",
-      isRequired: false,
-      defaultValue: event.location ? "true" : "false",
-      dbName: "have_address",
+  const ADD_ADDRESS = [
+    {
+      name: "address",
+      label: "Street Address",
+      placeholder: "Street address or public facility",
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: true,
+      defaultValue: event.location && event.location.address,
+      dbName: "address",
       readOnly: false,
-      data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-      child: {
-        valueToCheck: "true",
-        fields: [
-          {
-            name: "address",
-            label: "Street Address",
-            placeholder: "Street address or public facility",
-            fieldType: "TextField",
-            contentType: "text",
-            isRequired: true,
-            defaultValue: event.location && event.location.address,
-            dbName: "address",
-            readOnly: false,
-          },
-          {
-            name: "unit",
-            label: "Unit Number",
-            placeholder: 'eg. "2A"',
-            fieldType: "TextField",
-            contentType: "text",
-            isRequired: false,
-            defaultValue: event.location && event.location.unit,
-            dbName: "unit",
-            readOnly: false,
-          },
-          {
-            name: "city",
-            label: "City",
-            placeholder: "eg. Springfield",
-            fieldType: "TextField",
-            contentType: "text",
-            isRequired: true,
-            defaultValue: event.location && event.location.city,
-            dbName: "city",
-            readOnly: false,
-          },
-          {
-            name: "state",
-            label: "State ",
-            placeholder: "eg. Massachusetts",
-            fieldType: "Dropdown",
-            contentType: "text",
-            isRequired: true,
-            data: states,
-            defaultValue: event.location && event.location.state,
-            dbName: "state",
-            readOnly: false,
-          },
-        ],
-      },
-    };
-
-
-
+    },
+    {
+      name: "unit",
+      label: "Unit Number",
+      placeholder: 'eg. "2A"',
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: false,
+      defaultValue: event.location && event.location.unit,
+      dbName: "unit",
+      readOnly: false,
+    },
+    {
+      name: "city",
+      label: "City",
+      placeholder: "eg. Springfield",
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: true,
+      defaultValue: event.location && event.location.city,
+      dbName: "city",
+      readOnly: false,
+    },
+    {
+      name: "state",
+      label: "State ",
+      placeholder: "eg. Massachusetts",
+      fieldType: "Dropdown",
+      contentType: "text",
+      isRequired: true,
+      data: states,
+      defaultValue: event.location && event.location.state,
+      dbName: "state",
+      readOnly: false,
+    },
+  ];
 
   const formJson = {
     title: "Edit Event or Campaign",
@@ -598,10 +580,7 @@ const createFormJson = ({
             defaultValue: event.is_recurring ? "true" : "false",
             dbName: "is_recurring",
             readOnly: false,
-            data: [
-              { id: "false", value: "No" },
-              { id: "true", value: "Yes" },
-            ],
+            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
             child: {
               // dbName: "recurring_details",
               valueToCheck: "true",
@@ -883,15 +862,15 @@ const createFormJson = ({
         conditionalDisplays: [
           {
             valueToCheck: "online",
-            fields: [ADD_LINK],
+            fields: ADD_LINK,
           },
           {
             valueToCheck: "in-person",
-            fields: [ADD_ADDRESS],
+            fields: ADD_ADDRESS,
           },
           {
             valueToCheck: "both",
-            fields: [ADD_ADDRESS, ADD_LINK],
+            fields: [...ADD_ADDRESS, ...ADD_LINK],
           },
         ],
       },
