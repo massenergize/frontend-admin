@@ -49,24 +49,41 @@ class GuideModal extends React.Component {
               textAlign: "left",
             }}
           >
-            Need Help?
+            Need Help
           </Typography>
           {/*<Typography variant="body1" align="center">We have a variety of resources.</Typography> */}
           <Typography
             variant="body1"
-            align="center"
-            style={{ margin: "10px 0px", textAlign: "left" }}
+            style={{
+              margin: "10px 0px",
+              textAlign: "left",
+            }}
           >
-            Visit our Resource Center. Check out the{" "}
+            Visit our Resource Center, check out the
             <Button
-              style={{ textTransform: "capitalize" }}
+              style={{
+                textTransform: "capitalize",
+                fontSize: "1rem",
+                padding: "2px 5px",
+              }}
               href={adminWrittenInstructionsLink}
               target="_blank"
             >
               {" "}
-              Website Training Course
+              Website Admin Training course,
             </Button>{" "}
-            and sign up by email.
+            and sign up by emailing{" "}
+            <Button
+              style={{
+                textTransform: "lowercase",
+                fontSize: "1rem",
+                padding: "2px 5px",
+              }}
+              href={`mailto:support@massenergize.org`}
+              target="_blank"
+            >
+              support@massenergize.org
+            </Button>
           </Typography>
           {/* {adminWrittenInstructionsLink ? (
             <Button
