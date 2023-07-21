@@ -9,6 +9,7 @@ import Slide from "@mui/material/Slide";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import styles from "./guide-jss";
+import { Link } from "@mui/material";
 
 // const adminWrittenInstructionsLink = "https://docs.google.com/document/d/e/2PACX-1vT2ahP7U1gWS5ktfr7nG9CdH8cCazVo9qzOLHB5Ook2GhKD79GOWxRgvv-pOQRkIT1mogcAhzM8T5wE/pub"
 const adminWrittenInstructionsLink =
@@ -54,11 +55,20 @@ class GuideModal extends React.Component {
           <Typography
             variant="body1"
             align="center"
-            style={{ margin: "10px 0px" }}
+            style={{ margin: "10px 0px", textAlign: "left" }}
           >
-            Take advantage of these helpful resources:
+            Visit our Resource Center. Check out the{" "}
+            <Button
+              style={{ textTransform: "capitalize" }}
+              href={adminWrittenInstructionsLink}
+              target="_blank"
+            >
+              {" "}
+              Website Training Course
+            </Button>{" "}
+            and sign up by email.
           </Typography>
-          {adminWrittenInstructionsLink ? (
+          {/* {adminWrittenInstructionsLink ? (
             <Button
               className={classes.button}
               href={adminWrittenInstructionsLink}
@@ -76,7 +86,7 @@ class GuideModal extends React.Component {
             >
               <VideoLibraryIcon /> &nbsp; Video Tutorials
             </Button>
-          ) : null}
+          ) : null} */}
         </DialogContent>
       </Dialog>
     );
