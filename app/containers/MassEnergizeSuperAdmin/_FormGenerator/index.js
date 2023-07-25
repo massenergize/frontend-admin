@@ -1062,8 +1062,10 @@ class MassEnergizeForm extends Component {
                   this.handleEditorChange(content, editor, field.name);
                 }}
                 // Toolbar Docs:  https://www.tiny.cloud/docs/tinymce/6/migration-from-5x/#things-we-renamed
-                toolbar="undo redo | blocks | formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent | fontfamily | fontsize |"
-                plugins="advlist autolink lists link image charmap print preview anchor forecolor"
+                // toolbar="undo redo | blocks | formatselect | media_library | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent | fontfamily | fontsize |"
+                // plugins="advlist media_library autolink lists link image charmap print preview anchor forecolor"
+                toolbar="undo redo | blocks | formatselect | media_library | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | bullist numlist outdent indent | fontfamily | fontsize |"
+                plugins="advlist media_library autolink lists link charmap print preview anchor forecolor"
                 init={{
                   height: 350,
                   menubar: false,
@@ -1079,6 +1081,13 @@ class MassEnergizeForm extends Component {
                   //   );
                   //   freeTiny.style.display = "none";
                   // },
+                  setup: (editor) => {
+                    editor.ui.registry.addButton("media_library", {
+                      text: "Media Library",
+                      onAction: () =>
+                        console.log("I am the trigger for the media library!"),
+                    });
+                  },
                 }}
                 apiKey={TINY_MCE_API_KEY}
               />
