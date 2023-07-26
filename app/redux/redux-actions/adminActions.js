@@ -59,6 +59,7 @@ import {
   MEDIA_LIBRARY_MODAL_FILTERS,
   SET_MEDIA_LIBRARY_MODAL_FILTERS,
   SET_GALLERY_META_DATA,
+  LOAD_EMAIL_TEMPLATES,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -403,6 +404,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
     apiCall("/communities.others.listForCommunityAdmin", { limit: 50 }),
     apiCall("/summary.next.steps.forAdmins"),
+    isSuperAdmin && apiCall("email.templates.list"),
   ]).then((response) => {
     const [
       policies,
@@ -425,6 +427,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       featureFlags,
       otherCommunities,
       adminNextSteps,
+      emailTemplates,
     ] = response;
     dispatch(loadAllPolicies(policies.data));
     dispatch(reduxLoadAllCommunities(communities.data));

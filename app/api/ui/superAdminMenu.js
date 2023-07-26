@@ -302,6 +302,12 @@ module.exports = [
         link: "/admin/settings/feature-flags",
         name: "Feature Flags",
       },
-    ],
+      {
+        key: "email-templates",
+        link: "/admin/settings/email-templates",
+        name:"Email Templates"
+      },
+    
+    ]  
   },
 ];

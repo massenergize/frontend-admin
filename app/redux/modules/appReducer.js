@@ -58,6 +58,7 @@ import {
   LOAD_OTHER_ADMINS,
   SET_MEDIA_LIBRARY_MODAL_FILTERS,
   SET_GALLERY_META_DATA,
+  LOAD_EMAIL_TEMPLATES,
 } from "../ReduxConstants";
 
 const initialState = Map({
