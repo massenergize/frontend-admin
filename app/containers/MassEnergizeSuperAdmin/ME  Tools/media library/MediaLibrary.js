@@ -405,6 +405,7 @@ MediaLibrary.propTypes = {
    * A function that should return a tooltip component.
    */
   TooltipWrapper: PropTypes.string,
+
 };
 
 MediaLibrary.Button = MLButton;

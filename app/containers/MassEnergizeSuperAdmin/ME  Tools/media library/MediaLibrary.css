@@ -18,7 +18,7 @@
   margin: 0px;
 }
 .ml-footer-btn {
-  padding: 20px 40px;
+  padding: 15px 40px;
   height: 100%;
   border: 0px;
   border-radius: 0px;
@@ -26,6 +26,7 @@
   background-color: var(--btn-background);
   color: var(--btn-color);
   font-weight: bold;
+  font-size: 15px;
 }
 .ml-footer-btn:active {
   background-color: #282828 !important;
@@ -61,7 +62,7 @@
   opacity: 0;
 }
 .m-title-bar {
-  padding: 10px 30px;
+  padding: 20px 30px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -77,9 +78,11 @@
   margin: 0px !important;
 }
 .m-tab-header-item {
-  padding: 13px 25px;
+  padding: 8px 15px;
+  /* padding: 13px 25px; */
   cursor: pointer;
   display: flex;
+  border-radius: 4px;
 }
 .m-tab-header-item-selected {
   border-bottom-width: 0px;

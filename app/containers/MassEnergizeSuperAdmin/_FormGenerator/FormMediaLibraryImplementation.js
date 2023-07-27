@@ -81,6 +81,7 @@ export const FormMediaLibraryImplementation = (props) => {
     });
   };
 
+  // This is the fxn that is being used in the modal footer "upload & insert"
   const handleUpload = (files, reset, _, changeTabTo, immediately) => {
     const isUniversal = available ? { is_universal: true } : {};
     const apiJson = {

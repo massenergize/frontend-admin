@@ -44,6 +44,7 @@ function MediaLibraryModal({
   renderBeforeImages,
   TooltipWrapper,
   tabModifiers,
+  customTabs,
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -85,8 +86,7 @@ function MediaLibraryModal({
     );
   };
 
-  const handleInsert = (_content,reset) => {
-   
+  const handleInsert = (_content, reset) => {
     getSelected(_content, reset);
     close();
   };
@@ -109,7 +109,10 @@ function MediaLibraryModal({
     const modifier = (tabModifiers || {})[key];
     return modifier?.name || _default || "...";
   };
-
+  const formatCustomTabs = () => {
+    if (!customTabs) return [];
+    return customTabs.map((obj) => obj.tab);
+  };
   var Tabs = [
     {
       headerName: customName(TABS.UPLOAD_TAB, "Upload"),
@@ -160,20 +163,7 @@ function MediaLibraryModal({
         </Suspense>
       ),
     },
-    {
-      headerName: customName(TABS.CROPPING_TAB, "crop"),
-      key: TABS.CROPPING_TAB,
-      component: (
-        <Cropping
-          setCurrentTab={setCurrentTab}
-          cropLoot={cropLoot}
-          cropped={cropped}
-          setCropped={setCropped}
-          setCroppedSource={setCroppedSource}
-          croppedSource={croppedSource}
-        />
-      ),
-    },
+    ...formatCustomTabs(),
   ];
 
   Tabs = Tabs.filter((tab) => !(excludeTabs || []).includes(tab.key));
@@ -256,6 +246,7 @@ function MediaLibraryModal({
             currentTab={currentTab}
             cropLoot={cropLoot}
             finaliseCropping={finaliseCropping}
+            customTabs={customTabs}
           />
         </div>
       </Modal>
@@ -273,8 +264,9 @@ const ContextButton = ({
   TooltipWrapper,
   uploading,
   upload,
+  customTabs,
 }) => {
-  const withWrapper = (text, tooltipMessage) => {;
+  const withWrapper = (text, tooltipMessage) => {
     if (!TooltipWrapper) return <span>{text}</span>;
     return (
       <TooltipWrapper title={tooltipMessage || ""} placement="top">
@@ -283,6 +275,16 @@ const ContextButton = ({
     );
   };
   const len = content && content.length;
+  const formatCustomContextButtons = () => {
+    if (!customTabs) return {};
+    let train = {};
+
+    for (let obj of customTabs) {
+      train[obj.tab.key] = obj.renderContextButton && obj.renderContextButton();
+    }
+
+    return train;
+  };
   const availableButtons = {
     [TABS.LIBRARY_TAB]: (
       <button
@@ -329,6 +331,7 @@ const ContextButton = ({
         )}
       </button>
     ),
+    ...formatCustomContextButtons(),
   };
 
   return availableButtons[currentTab] || <></>;

@@ -42,6 +42,7 @@ import { isValueEmpty } from "../Community/utils";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
 import AsyncDropDown from "./AsyncCheckBoxDropDown";
 import MEDropDown from "./MEDropDown";
+import MediaLibraryForm from "./MediaLibraryForm";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 const styles = (theme) => ({
@@ -898,6 +899,18 @@ class MassEnergizeForm extends Component {
                 field
               )}
               actionText={field.placeholder}
+              customTabs={[
+                {
+                  tab: {
+                    headerName: "Information",
+                    key: "upload-form",
+                    component: <MediaLibraryForm />,
+                  },
+                  renderContextButton: () => (
+                    <button>Here in the context thing</button>
+                  ),
+                },
+              ]}
               onInsert={(files) => {
                 const formData = this.state.formData || {};
                 const isEmpty = !files || !files.length;
@@ -1030,20 +1043,20 @@ class MassEnergizeForm extends Component {
               <div style={{ padding: 20, color: "#d28818" }}>
                 <Typography>{field.label}</Typography>
                 <small>
-                  <b>PLEASE NOTE:</b> the wide spacing between two lines
-                  in the editor, is not what you will get when you
-                  content gets to users.
+                  <b>PLEASE NOTE:</b> the wide spacing between two lines in the
+                  editor, is not what you will get when you content gets to
+                  users.
                   <br />
                   If you need a{" "}
                   <b>
                     <i>gap </i>
                   </b>
-                  between two lines, press your <b>Enter Key twice </b>{" "}
-                  or more, instead of <b>once</b>
+                  between two lines, press your <b>Enter Key twice </b> or more,
+                  instead of <b>once</b>
                   <br />
                   <b>
-                    Pressing Once, will only show items right on the
-                    next line, without any gap
+                    Pressing Once, will only show items right on the next line,
+                    without any gap
                   </b>
                 </small>
               </div>
