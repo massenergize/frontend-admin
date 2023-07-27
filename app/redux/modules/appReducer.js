@@ -212,7 +212,7 @@ export const reducerForFeatureFlags = (state = LOADING, action = {}) => {
       return state;
   }
 };
-export const reducerForEmailTemplates = (state = [], action = {}) => {
+export const reducerForEmailTemplates = (state = LOADING, action = {}) => {
   switch (action.type) {
     case LOAD_EMAIL_TEMPLATES:
       return action.payload;

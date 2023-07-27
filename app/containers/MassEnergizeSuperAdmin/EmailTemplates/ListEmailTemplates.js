@@ -6,6 +6,8 @@ import METable from "../ME  Tools/table /METable";
 import { Link } from "react-router-dom";
 import { Typography } from "@mui/material";
 import { apiCall } from "../../../utils/messenger";
+import { LOADING } from "../../../utils/constants";
+import Loading from "dan-components/Loading";
 
 export default function ListEmailTemplates({
   classes,
@@ -15,6 +17,8 @@ export default function ListEmailTemplates({
   toggleToast,
   editEmailTemplate
 }) {
+
+      if (emailTemplates === LOADING) return <Loading />;
   const columns = () => {
     return [
       {

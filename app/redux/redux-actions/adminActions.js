@@ -470,10 +470,10 @@ export const loadFeatureFlags = (data = LOADING) => ({
   type: LOAD_FEATURE_FLAGS,
   payload: data,
 });
-export const loadEmailTemplates = (data =[]) => ({
-  type: LOAD_EMAIL_TEMPLATES,
-  payload: data,
-});
+export const loadEmailTemplates = (data = LOADING) => ({
+         type: LOAD_EMAIL_TEMPLATES,
+         payload: data,
+       });
 export const reduxToggleUniversalModal = (data = {}) => ({
   type: TOGGLE_UNIVERSAL_MODAL,
   payload: data,

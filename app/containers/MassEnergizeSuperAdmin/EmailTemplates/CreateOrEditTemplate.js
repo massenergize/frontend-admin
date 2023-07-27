@@ -38,19 +38,25 @@ export default function CreateOrEditTemplate({
 }
 
 var createFormJson = ({ inEditMode, toEdit }) => {
+  const uniqueIdentifier = (text) => {
+    if (!text || !text.trim()) return "";
+    var arr = text.split(" ");
+    return arr.join("-").toLowerCase() + "-template-id";
+  };
   const json = {
     title: inEditMode ? "Update email template" : "Add a new email template",
     subTitle: "",
     method: inEditMode ? "/email.templates.update" : "/email.templates.create",
     preflightFxn: (data)=>{
+        data = {...data, key: uniqueIdentifier(data.name)};
         if(!inEditMode) return data
         return {...data, id: toEdit?.id}
     },
     fields: [
       {
         name: "name",
-        label: "Name of template(eg. 'GuestAuthentication')",
-        placeholder: "Eg. 'Guest Authentication'",
+        label: "Name of template(eg. 'Data Download')",
+        placeholder: "Eg. 'Data Download' for DATA_DOWNLOAD_TEMPLATE_ID",
         fieldType: fieldTypes.TextField,
         contentType: "text",
         isRequired: true,
