@@ -52,6 +52,7 @@ import {
   SOCKET_CONNECTED,
   LOAD_VISIT_LOGS,
   LOAD_USER_ACTIVE_STATUS,
+  LOAD_EMAIL_TEMPLATES,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -206,6 +207,14 @@ export const reducerForLoadingAdmins = (state = LOADING, action = {}) => {
 export const reducerForFeatureFlags = (state = LOADING, action = {}) => {
   switch (action.type) {
     case LOAD_FEATURE_FLAGS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForEmailTemplates = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_EMAIL_TEMPLATES:
       return action.payload;
     default:
       return state;

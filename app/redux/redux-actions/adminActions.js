@@ -52,6 +52,7 @@ import {
   LOAD_TABLE_FILTERS,
   LOAD_VISIT_LOGS,
   LOAD_USER_ACTIVE_STATUS,
+  LOAD_EMAIL_TEMPLATES,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -378,6 +379,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
     apiCall("/communities.others.listForCommunityAdmin", { limit: 50 }),
     apiCall("/summary.next.steps.forAdmins"),
+    isSuperAdmin && apiCall("email.templates.list"),
   ]).then((response) => {
     const [
       policies,
@@ -400,6 +402,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       featureFlags,
       otherCommunities,
       adminNextSteps,
+      emailTemplates,
     ] = response;
     dispatch(loadAllPolicies(policies.data));
     dispatch(reduxLoadAllCommunities(communities.data));
@@ -421,6 +424,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadFeatureFlags(featureFlags.data || {}));
     dispatch(reduxLoadAllOtherCommunities(otherCommunities.data));
     dispatch(reduxLoadNextStepsSummary(adminNextSteps.data));
+    dispatch(loadEmailTemplates(emailTemplates.data));
     const cursor = {
       communities: communities.cursor,
       actions: actions.cursor,
@@ -466,6 +470,10 @@ export const loadFeatureFlags = (data = LOADING) => ({
   type: LOAD_FEATURE_FLAGS,
   payload: data,
 });
+export const loadEmailTemplates = (data = LOADING) => ({
+         type: LOAD_EMAIL_TEMPLATES,
+         payload: data,
+       });
 export const reduxToggleUniversalModal = (data = {}) => ({
   type: TOGGLE_UNIVERSAL_MODAL,
   payload: data,
