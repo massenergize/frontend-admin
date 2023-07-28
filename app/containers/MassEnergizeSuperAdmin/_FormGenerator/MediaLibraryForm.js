@@ -1,4 +1,5 @@
 import {
+  Chip,
   FormControlLabel,
   Link,
   Radio,
@@ -15,6 +16,10 @@ import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 export default function MediaLibraryForm({ auth }) {
   const [copyright, setCopyright] = useState("No");
   const [underAge, setUnderAge] = useState("No");
+  const [copyrightAtt, setCopyrightAtt] = useState("");
+  const [guardianInfo, setGuardianInfo] = useState("");
+  const [tags, setTags] = useState("");
+  const [communities, setCommunities] = useState([]);
 
   // --------------------------------------------------------------------
   const doesNotHaveCopyrightPermission = !copyright || copyright === "No";
@@ -25,6 +30,17 @@ export default function MediaLibraryForm({ auth }) {
   const getCommunitiesToSelectFrom = () => {
     if (isCommunityAdmin) return auth?.admin_at;
     return [];
+  };
+
+  const showChips = () => {
+    const items = tags?.split(",");
+    const empty = !items.length || items[0].trim() === "";
+    // console.log("As list", items);
+    if (empty) return <></>;
+
+    return items?.map((tag) => (
+      <Chip label={tag?.trim()} style={{ margin: "5px 3px" }} />
+    ));
   };
 
   return (
@@ -93,8 +109,9 @@ export default function MediaLibraryForm({ auth }) {
                 InputLabelProps={{
                   shrink: true,
                 }}
+                onChange={(ev) => setCopyrightAtt(ev.target.value)}
                 inputProps={{ style: { padding: "12.5px 14px" } }}
-                // value="Frimpong Opoku"
+                value={copyrightAtt}
               />
             )}
           </div>
@@ -131,8 +148,9 @@ export default function MediaLibraryForm({ auth }) {
                 InputLabelProps={{
                   shrink: true,
                 }}
+                onChange={(ev) => setGuardianInfo(ev.target.value)}
                 inputProps={{ style: { padding: "12.5px 14px" } }}
-                // value="Frimpong Opoku"
+                value={guardianInfo}
               />
             )}
           </div>
@@ -142,6 +160,8 @@ export default function MediaLibraryForm({ auth }) {
             data={["Action", "Event", "Vendor"]}
             placeholder="What are you uploading this image for? (Event, Action, Vendor, Testimonial etc...)"
           />
+
+          <div style={{ margin: "10px 0px" }}>{showChips()}</div>
           <Typography
             variant="body2"
             style={{ marginTop: 10, marginBottom: 10 }}
@@ -156,8 +176,8 @@ export default function MediaLibraryForm({ auth }) {
               shrink: true,
             }}
             inputProps={{ style: { padding: "12.5px 14px" } }}
-            value="Frimpong Opoku"
-            disabled
+            onChange={(ev) => setTags(ev.target.value)}
+            value={tags}
           />
 
           {/* <MEDropdown
