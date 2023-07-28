@@ -404,7 +404,6 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
     apiCall("/communities.others.listForCommunityAdmin", { limit: 50 }),
     apiCall("/summary.next.steps.forAdmins"),
-    isSuperAdmin && apiCall("email.templates.list"),
   ]).then((response) => {
     const [
       policies,
@@ -427,7 +426,6 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       featureFlags,
       otherCommunities,
       adminNextSteps,
-      emailTemplates,
     ] = response;
     dispatch(loadAllPolicies(policies.data));
     dispatch(reduxLoadAllCommunities(communities.data));

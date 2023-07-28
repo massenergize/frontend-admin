@@ -279,11 +279,11 @@ class Application extends React.Component {
               path="/admin/settings/feature-flags"
               component={FeatureFlags}
             />
-            <Route
+            {/* <Route
               exact
               path="/admin/settings/email-templates"
               component={EmailTemplates}
-            />
+            /> */}
             <Route path="/admin/read/users" component={UsersList} />
             <Route
               path="/admin/read/community-admin-messages"

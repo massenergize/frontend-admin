@@ -67,6 +67,7 @@ import app, {
   mlibFiltersReducer,
   setGalleryMetadataReducer,
   reducerForEmailTemplates,
+  // reducerForEmailTemplates,
 } from "./modules/appReducer";
 
 /**
