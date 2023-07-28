@@ -20,6 +20,7 @@ import { getMoreInfoOnImage } from "../Gallery/Gallery";
 import GalleryFilter from "../Gallery/tools/GalleryFilter";
 import { filters } from "../Gallery/Gallery";
 import { ShowTagsOnPane } from "../Gallery/SideSheet";
+import MediaLibraryForm from "./MediaLibraryForm";
 
 const DEFAULT_SCOPE = ["all", "uploads", "actions", "events", "testimonials"];
 export const FormMediaLibraryImplementation = (props) => {
@@ -191,6 +192,18 @@ export const FormMediaLibraryImplementation = (props) => {
         {...props}
         selected={userSelectedImages}
         loadMoreFunction={loadMoreImages}
+        customTabs={[
+          {
+            tab: {
+              headerName: "Information",
+              key: "upload-form",
+              component: <MediaLibraryForm auth={auth} />,
+            },
+            renderContextButton: () => (
+              <button>Here in the context thing</button>
+            ),
+          },
+        ]}
       />
     </div>
   );

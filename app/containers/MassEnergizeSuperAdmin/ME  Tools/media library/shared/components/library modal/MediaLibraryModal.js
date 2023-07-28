@@ -228,7 +228,7 @@ function MediaLibraryModal({
 
             {/* ------------------------ MAIN TAB DISPLAY AREA ------------------- */}
             <div
-              style={{ maxHeight: 530, minHeight: 530, overflowY: "scroll" }}
+              style={{ maxHeight: 550, minHeight: 550, overflowY: "scroll" }}
             >
               {TabComponent}
             </div>

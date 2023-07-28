@@ -42,7 +42,6 @@ import { isValueEmpty } from "../Community/utils";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
 import AsyncDropDown from "./AsyncCheckBoxDropDown";
 import MEDropDown from "./MEDropDown";
-import MediaLibraryForm from "./MediaLibraryForm";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 const styles = (theme) => ({
@@ -899,18 +898,6 @@ class MassEnergizeForm extends Component {
                 field
               )}
               actionText={field.placeholder}
-              customTabs={[
-                {
-                  tab: {
-                    headerName: "Information",
-                    key: "upload-form",
-                    component: <MediaLibraryForm />,
-                  },
-                  renderContextButton: () => (
-                    <button>Here in the context thing</button>
-                  ),
-                },
-              ]}
               onInsert={(files) => {
                 const formData = this.state.formData || {};
                 const isEmpty = !files || !files.length;
