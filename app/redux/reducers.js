@@ -61,7 +61,7 @@ import app, {
   reducerForTableFilters,
   reducerForVisitLogs,
   reducerForUserActiveStatus,
-  reducerForEmailTemplates,
+  // reducerForEmailTemplates,
 } from "./modules/appReducer";
 
 /**
@@ -86,7 +86,7 @@ export default function createReducer(injectedReducers = {}) {
     sadmins: reducerForLoadingSuperAdmins,
     admins: reducerForLoadingAdmins,
     featureFlags: reducerForFeatureFlags,
-    emailTemplates: reducerForEmailTemplates,
+    // emailTemplates: reducerForEmailTemplates,
     settings: reducerForSettings,
     testRedux: testReduxReducer,
     modalOptions: reducerForUniversalModal,
