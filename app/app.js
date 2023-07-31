@@ -43,10 +43,13 @@ import * as Sentry from "@sentry/react";
 import { BrowserTracing } from "@sentry/tracing";
 import { StyledEngineProvider } from "@mui/material/styles";
 
-const SENTRY_DSN =
-  IS_PROD || IS_CANARY
-    ? process.env.REACT_APP_SENTRY_PROD_DSN
-    : process.env.REACT_APP_SENTRY_DEV_DSN;
+// const SENTRY_DSN =
+//   IS_PROD || IS_CANARY
+//     ? process.env.REACT_APP_SENTRY_PROD_DSN
+//     : process.env.REACT_APP_SENTRY_DEV_DSN;
+
+
+const SENTRY_DSN="https://f2e6d5eedbc744ff821b6a98f73914ef@o415460.ingest.sentry.io/5306645"
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -54,8 +57,11 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0,
   integrations: [
     new Sentry.Replay({ stickySession: true }),
-    new BrowserTracing(),
+    new Sentry.BrowserTracing({
+      routingInstrumentation: Sentry.reactRouterV5Instrumentation(history),
+    }),
   ],
+  tracesSampleRate: 1.0,
 });
 
 // Create redux store with history
