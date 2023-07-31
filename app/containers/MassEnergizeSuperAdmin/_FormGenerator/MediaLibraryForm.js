@@ -7,19 +7,33 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 // import MEDropDown from "./MEDropDown";
 import MEDropdownPro from "../ME  Tools/dropdown/MEDropdownPro";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
+import AsyncDropDown from "./AsyncCheckBoxDropDown";
 
-export default function MediaLibraryForm({ auth }) {
+export default function MediaLibraryForm({ auth, communities, onChange }) {
   const [copyright, setCopyright] = useState("No");
   const [underAge, setUnderAge] = useState("No");
   const [copyrightAtt, setCopyrightAtt] = useState("");
   const [guardianInfo, setGuardianInfo] = useState("");
   const [tags, setTags] = useState("");
-  const [communities, setCommunities] = useState([]);
+  const [chosenComms, setCommunities] = useState([]);
+
+  useEffect(() => {
+    // idea here is that we want to export all the changes that happen in form data when they happen
+    const formData = {
+      copyright,
+      underAge,
+      copyright_att: copyrightAtt,
+      guardian_info: guardianInfo,
+      communities: chosenComms,
+      tags
+    };
+    onChange && onChange(formData);
+  }, [copyright, underAge, copyrightAtt, guardianInfo, tags, chosenComms]);
 
   // --------------------------------------------------------------------
   const doesNotHaveCopyrightPermission = !copyright || copyright === "No";
@@ -29,7 +43,7 @@ export default function MediaLibraryForm({ auth }) {
 
   const getCommunitiesToSelectFrom = () => {
     if (isCommunityAdmin) return auth?.admin_at;
-    return [];
+    return communities || [];
   };
 
   const showChips = () => {
@@ -47,7 +61,7 @@ export default function MediaLibraryForm({ auth }) {
     <div style={{ padding: "25px 50px" }}>
       <Typography variant="h6">Hi {auth?.preferred_name || "..."},</Typography>
       <Typography variant="body2">
-        Before you upload, there a few details you need to provide. Please not
+        Before you upload, there a few details you need to provide. Please note
         that the items marked (*) are compulsory.
       </Typography>
       <div style={{ padding: "20px 0px" }}>
@@ -75,7 +89,7 @@ export default function MediaLibraryForm({ auth }) {
           <Typography variant="h6">Copyright </Typography>
           <div style={{ marginTop: 10 }}>
             <Typography variant="body2">
-              Do you have permission to use this item? As per the
+              Do you have permission to use the selected items? As per the
               <Link to="#" style={{ marginLeft: 4 }}>
                 <b>MassEnergize MOU</b>
               </Link>
@@ -180,18 +194,10 @@ export default function MediaLibraryForm({ auth }) {
             value={tags}
           />
 
-          {/* <MEDropdown
-              multiple
-              data={["Action", "Event", "Vendor"]}
-              placeholder="Add a few tags that describe this image"
-            /> */}
-          {/* <LightAutoComplete
-             
-              // data={["Action", "Event", "Vendor"]}
-              placeholder="Whats the light auto complete shit meerhn, fuck oss"
-            /> */}
+          {/* ---- TODO: Change to async dropdown if user is a superadmin  */}
           <MEDropdown
             multiple
+            onItemSelected={(items) => setCommunities(items)}
             labelExtractor={(item) => item?.name}
             valueExtractor={(item) => item?.id}
             data={getCommunitiesToSelectFrom()}

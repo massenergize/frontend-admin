@@ -83,7 +83,7 @@ function MEDropdown(props) {
       <LightAutoComplete
         onChange={(items) => {
           items = (items || []).map((a) => valueExtractor(a));
-          onItemSelected(items);
+           onItemSelected && onItemSelected(items);
         }}
         {...props}
       />

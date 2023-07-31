@@ -33,11 +33,13 @@ export const FormMediaLibraryImplementation = (props) => {
     selected,
     defaultValue,
     addOnToWhatImagesAreInRedux,
+    communities,
   } = props;
   const [available, setAvailable] = useState(auth && auth.is_super_admin);
   const [selectedTags, setSelectedTags] = useState({ scope: DEFAULT_SCOPE });
   const [queryHasChanged, setQueryHasChanged] = useState(false);
   const [userSelectedImages, setUserSelectedImages] = useState([]);
+  const [mlibraryFormData, setmlibraryFormData] = useState({});
 
   useEffect(() => {
     // The value of "preselected" could either be a list of numbers(ids), or a list of objects(json image objects from backend)
@@ -83,7 +85,12 @@ export const FormMediaLibraryImplementation = (props) => {
   };
 
   // This is the fxn that is being used in the modal footer "upload & insert"
+  // Now, it just switches to the media library form
   const handleUpload = (files, reset, _, changeTabTo, immediately) => {
+    changeTabTo("upload-form");
+  };
+
+  const doUpload = (files, reset, _, changeTabTo, immediately) => {
     const isUniversal = available ? { is_universal: true } : {};
     const apiJson = {
       user_id: auth.id,
@@ -127,6 +134,10 @@ export const FormMediaLibraryImplementation = (props) => {
         setAvailableTo={setAvailable}
       />
     ),
+  };
+
+  const uploadAndSaveForm = (props) => {
+    console.log("HEre it is I have been clicked man", mlibraryFormData);
   };
 
   return (
@@ -197,10 +208,18 @@ export const FormMediaLibraryImplementation = (props) => {
             tab: {
               headerName: "Information",
               key: "upload-form",
-              component: <MediaLibraryForm auth={auth} />,
+              component: (
+                <MediaLibraryForm
+                  auth={auth}
+                  onChange={(data) => setmlibraryFormData(data)}
+                  communities={communities}
+                />
+              ),
             },
-            renderContextButton: () => (
-              <button>Here in the context thing</button>
+            renderContextButton: (props) => (
+              <MediaLibrary.Button onClick={() => uploadAndSaveForm(props)}>
+                DONE!
+              </MediaLibrary.Button>
             ),
           },
         ]}
@@ -217,6 +236,7 @@ const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   imagesObject: state.getIn(["galleryImages"]),
   tags: state.getIn(["allTags"]),
+  communities: state.getIn(["communities"]),
 });
 
 const mapDispatchToProps = (dispatch) => {
