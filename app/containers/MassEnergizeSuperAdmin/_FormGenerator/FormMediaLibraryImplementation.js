@@ -84,9 +84,9 @@ export const FormMediaLibraryImplementation = (props) => {
     });
   };
 
-  // This is the fxn that is being used in the modal footer "upload & insert"
-  // Now, it just switches to the media library form
-  const handleUpload = (files, reset, _, changeTabTo, immediately) => {
+  // As of 1st August 2023, handleUpload is not what actually does the upload
+  // Now, it just switches to the media library form. And the context button there is what validates the form, and process to upload & insert if all checks out
+  const handleUpload = () => {
     changeTabTo("upload-form");
   };
 
@@ -139,6 +139,11 @@ export const FormMediaLibraryImplementation = (props) => {
   const uploadAndSaveForm = (props) => {
     console.log("HEre it is I have been clicked man", props);
   };
+  const liveFormValidation = () => {
+    return { invalid: false, message: "All is working well" };
+  };
+
+  const validation = liveFormValidation();
 
   return (
     <div>
@@ -217,8 +222,13 @@ export const FormMediaLibraryImplementation = (props) => {
               ),
             },
             renderContextButton: (props) => (
-              <MediaLibrary.Button onClick={() => uploadAndSaveForm(props)}>
-                DONE!
+              <MediaLibrary.Button
+                disabled={validation?.invalid}
+                onClick={() => uploadAndSaveForm(props)}
+              >
+                <Tooltip title={validation?.message} placement="top">
+                  DONE!
+                </Tooltip>
               </MediaLibrary.Button>
             ),
           },

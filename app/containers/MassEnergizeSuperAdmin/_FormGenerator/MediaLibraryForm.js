@@ -30,7 +30,7 @@ export default function MediaLibraryForm({ auth, communities, onChange }) {
       copyright_att: copyrightAtt,
       guardian_info: guardianInfo,
       communities: chosenComms,
-      tags
+      tags,
     };
     onChange && onChange(formData);
   }, [copyright, underAge, copyrightAtt, guardianInfo, tags, chosenComms]);
@@ -90,7 +90,11 @@ export default function MediaLibraryForm({ auth, communities, onChange }) {
           <div style={{ marginTop: 10 }}>
             <Typography variant="body2">
               Do you have permission to use the selected items? As per the
-              <Link to="#" style={{ marginLeft: 4 }}>
+              <Link
+                href="/admin/view/policy/mou"
+                target="_blank"
+                style={{ marginLeft: 4 }}
+              >
                 <b>MassEnergize MOU</b>
               </Link>
               , you are required to have permission before uploading other
