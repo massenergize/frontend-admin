@@ -73,17 +73,31 @@ function MediaLibraryModal({
   const returnRightAfterUpload = (images) => {
     handleInsert(images, reset);
   };
+
+  // Here, we gather a few items that can be passed to any external functions. Its simply to allow the mediaLibrary to be controlled from outside as well 
+  // E.g. the items here are passed down into the "renderContextButton" fxn, so that custom tabs can have the necessary 
+  // tools to implement any complex flows needed
+  const gatherUtils = (quickReturn) => {
+    return {
+      files: clean(files), // Files that have been selected in the upload tab, and are ready to be shipped
+      reset, // The media library's internal reset function. 
+      close, // Mlibrary's internal close funciton 
+      changeTabTo: setCurrentTab,// The Mlibrary's internal function that controls tab switching
+      immediately: quickReturn && returnRightAfterUpload,
+    };
+  };
   const handleUpload = ({ quickReturn = false }) => {
     if (!onUpload) return;
     setState((prev) => ({ ...prev, uploading: true }));
 
-    onUpload(
-      clean(files),
-      reset,
-      close,
-      setCurrentTab,
-      quickReturn && returnRightAfterUpload
-    );
+    onUpload(gatherUtils(quickReturn));
+    // onUpload(
+    //   clean(files),
+    //   reset,
+    //   close,
+    //   setCurrentTab,
+    // quickReturn && returnRightAfterUpload;
+    // );
   };
 
   const handleInsert = (_content, reset) => {
@@ -247,6 +261,7 @@ function MediaLibraryModal({
             cropLoot={cropLoot}
             finaliseCropping={finaliseCropping}
             customTabs={customTabs}
+            luggage = {gatherUtils()}
           />
         </div>
       </Modal>
@@ -265,6 +280,7 @@ const ContextButton = ({
   uploading,
   upload,
   customTabs,
+  luggage
 }) => {
   const withWrapper = (text, tooltipMessage) => {
     if (!TooltipWrapper) return <span>{text}</span>;
@@ -275,12 +291,12 @@ const ContextButton = ({
     );
   };
   const len = content && content.length;
-  const formatCustomContextButtons = () => {
+  const formatCustomContextButtons = (props) => {
     if (!customTabs) return {};
     let train = {};
 
     for (let obj of customTabs) {
-      train[obj.tab.key] = obj.renderContextButton && obj.renderContextButton();
+      train[obj.tab.key] = obj.renderContextButton && obj.renderContextButton(props);
     }
 
     return train;
@@ -331,7 +347,7 @@ const ContextButton = ({
         )}
       </button>
     ),
-    ...formatCustomContextButtons(),
+    ...formatCustomContextButtons(luggage),
   };
 
   return availableButtons[currentTab] || <></>;

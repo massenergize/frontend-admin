@@ -137,7 +137,7 @@ export const FormMediaLibraryImplementation = (props) => {
   };
 
   const uploadAndSaveForm = (props) => {
-    console.log("HEre it is I have been clicked man", mlibraryFormData);
+    console.log("HEre it is I have been clicked man", props);
   };
 
   return (
