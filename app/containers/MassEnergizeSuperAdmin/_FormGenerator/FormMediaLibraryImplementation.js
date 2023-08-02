@@ -90,13 +90,14 @@ export const FormMediaLibraryImplementation = (props) => {
     changeTabTo("upload-form");
   };
 
-  const doUpload = (files, reset, _, changeTabTo, immediately) => {
+  const doUpload = ({ files, reset, changeTabTo, immediately, json }) => {
     const isUniversal = available ? { is_universal: true } : {};
     const apiJson = {
       user_id: auth.id,
       community_ids: ((auth && auth.admin_at) || []).map((com) => com.id),
       title: "Media library upload",
       ...isUniversal,
+      ...(json || {}),
     };
     /**
      * Upload all selected files to the backend,
@@ -137,10 +138,20 @@ export const FormMediaLibraryImplementation = (props) => {
   };
 
   const uploadAndSaveForm = (props) => {
-    console.log("HEre it is I have been clicked man", props);
+    doUpload({ ...props, json: { ...mlibraryFormData, user_id: auth?.id } });
   };
   const liveFormValidation = () => {
-    return { invalid: false, message: "All is working well" };
+    const { copyright, copyright_att } = mlibraryFormData || {};
+    if (!copyright && !copyright_att)
+      return {
+        invalid: true,
+        message:
+          "Please indicate who owns the item(s) if you dont have permission to use",
+      };
+    return {
+      invalid: false,
+      message: "Items will be uploaded and inserted when you click",
+    };
   };
 
   const validation = liveFormValidation();
@@ -223,6 +234,7 @@ export const FormMediaLibraryImplementation = (props) => {
             },
             renderContextButton: (props) => (
               <MediaLibrary.Button
+                loading={props?.uploading}
                 disabled={validation?.invalid}
                 onClick={() => uploadAndSaveForm(props)}
               >

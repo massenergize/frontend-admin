@@ -84,6 +84,7 @@ function MediaLibraryModal({
       close, // Mlibrary's internal close funciton 
       changeTabTo: setCurrentTab,// The Mlibrary's internal function that controls tab switching
       immediately: quickReturn && returnRightAfterUpload,
+      uploading
     };
   };
   const handleUpload = ({ quickReturn = false }) => {

@@ -8,6 +8,7 @@ export default function MLButton({
   className,
   children,
   disabled,
+  loading,
 }) {
   return (
     <button
@@ -16,10 +17,17 @@ export default function MLButton({
       style={{
         "--btn-color": btnColor,
         "--btn-background": backColor,
+        alignItems: "center",
         ...style,
       }}
       onClick={(e) => (onClick ? onClick(e) : null)}
     >
+      {loading && (
+        <i
+          className="fa fa-spinner fa-spin"
+          style={{ fontSize: 13, color: "white", marginRight: 5 }}
+        />
+      )}
       {children}
     </button>
   );

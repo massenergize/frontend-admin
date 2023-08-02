@@ -25,8 +25,8 @@ export default function MediaLibraryForm({ auth, communities, onChange }) {
   useEffect(() => {
     // idea here is that we want to export all the changes that happen in form data when they happen
     const formData = {
-      copyright,
-      underAge,
+      copyright: copyright === "Yes" ?  true : false,
+      underAge : underAge  === "Yes" ? true : false,
       copyright_att: copyrightAtt,
       guardian_info: guardianInfo,
       communities: chosenComms,
