@@ -51,7 +51,7 @@ function MediaLibraryModal({
   const [previews, setPreviews] = useState([]);
 
   const [content, setSelectedContent] = useState(selected); // all the selected items from library will always be available in an array here
-  const [state, setState] = useState({ uploading: uploading });
+  const [state, setState] = useState({ uploading: uploading }); // this value is controlled both externally, and internally by the Mlibrary itself
   const [loadingMore, setLoadingMore] = useState(false);
   const [shouldWait, setShouldWait] = useState(useAwait);
 
@@ -74,24 +74,23 @@ function MediaLibraryModal({
     handleInsert(images, reset);
   };
 
-  // Here, we gather a few items that can be passed to any external functions. Its simply to allow the mediaLibrary to be controlled from outside as well 
-  // E.g. the items here are passed down into the "renderContextButton" fxn, so that custom tabs can have the necessary 
+  // Here, we gather a few items that can be passed to any external functions. Its simply to allow the mediaLibrary to be controlled from outside as well
+  // E.g. the items here are passed down into the "renderContextButton" fxn, so that custom tabs can have the necessary
   // tools to implement any complex flows needed
-  const gatherUtils = (quickReturn) => {
+  const gatherUtils = () => {
     return {
       files: clean(files), // Files that have been selected in the upload tab, and are ready to be shipped
-      reset, // The media library's internal reset function. 
-      close, // Mlibrary's internal close funciton 
-      changeTabTo: setCurrentTab,// The Mlibrary's internal function that controls tab switching
-      immediately: quickReturn && returnRightAfterUpload,
-      uploading
+      reset, // The media library's internal reset function.
+      close, // Mlibrary's internal close funciton
+      changeTabTo: setCurrentTab, // The Mlibrary's internal function that controls tab switching
+      insertSelectedImages:returnRightAfterUpload, // Export a function that lets you insert uploaded items outside of the MLibrary.
+      uploading,
     };
   };
-  const handleUpload = ({ quickReturn = false }) => {
+  const handleUpload = () => {
     if (!onUpload) return;
     setState((prev) => ({ ...prev, uploading: true }));
-
-    onUpload(gatherUtils(quickReturn));
+    onUpload(gatherUtils());
     // onUpload(
     //   clean(files),
     //   reset,
@@ -262,7 +261,7 @@ function MediaLibraryModal({
             cropLoot={cropLoot}
             finaliseCropping={finaliseCropping}
             customTabs={customTabs}
-            luggage = {gatherUtils()}
+            luggage={gatherUtils()}
           />
         </div>
       </Modal>
@@ -281,7 +280,7 @@ const ContextButton = ({
   uploading,
   upload,
   customTabs,
-  luggage
+  luggage,
 }) => {
   const withWrapper = (text, tooltipMessage) => {
     if (!TooltipWrapper) return <span>{text}</span>;
@@ -297,7 +296,8 @@ const ContextButton = ({
     let train = {};
 
     for (let obj of customTabs) {
-      train[obj.tab.key] = obj.renderContextButton && obj.renderContextButton(props);
+      train[obj.tab.key] =
+        obj.renderContextButton && obj.renderContextButton(props);
     }
 
     return train;
@@ -338,13 +338,14 @@ const ContextButton = ({
         style={{ "--btn-color": "white", "--btn-background": "green" }}
         onClick={(e) => {
           e.preventDefault();
-          upload({ quickReturn: true });
+          upload();
         }}
         disabled={uploading || !files.length}
       >
         {withWrapper(
-          "UPLOAD & INSERT",
-          "Your chosen image will be uploaded and inserted right away"
+          // "UPLOAD & INSERT",
+          "CONTINUE",
+          "You will be prompted to provide a few details on your selected items"
         )}
       </button>
     ),

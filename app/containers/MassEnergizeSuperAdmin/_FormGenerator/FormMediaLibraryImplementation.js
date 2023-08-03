@@ -40,6 +40,7 @@ export const FormMediaLibraryImplementation = (props) => {
   const [queryHasChanged, setQueryHasChanged] = useState(false);
   const [userSelectedImages, setUserSelectedImages] = useState([]);
   const [mlibraryFormData, setmlibraryFormData] = useState({});
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     // The value of "preselected" could either be a list of numbers(ids), or a list of objects(json image objects from backend)
@@ -86,11 +87,17 @@ export const FormMediaLibraryImplementation = (props) => {
 
   // As of 1st August 2023, handleUpload is not what actually does the upload
   // Now, it just switches to the media library form. And the context button there is what validates the form, and process to upload & insert if all checks out
-  const handleUpload = () => {
+  const handleUpload = ({ changeTabTo }) => {
     changeTabTo("upload-form");
   };
 
-  const doUpload = ({ files, reset, changeTabTo, immediately, json }) => {
+  const doUpload = ({
+    files,
+    reset,
+    changeTabTo,
+    insertSelectedImages,
+    json,
+  }) => {
     const isUniversal = available ? { is_universal: true } : {};
     const apiJson = {
       user_id: auth.id,
@@ -99,6 +106,10 @@ export const FormMediaLibraryImplementation = (props) => {
       ...isUniversal,
       ...(json || {}),
     };
+    setUploading(true);
+
+    // return console.log("Lets see merrhn", insertSelectedImages);
+
     /**
      * Upload all selected files to the backend,
      * B.E will return the URL of all the images uploaded successfully,
@@ -109,6 +120,7 @@ export const FormMediaLibraryImplementation = (props) => {
       files.map((file) => apiCall("/gallery.add", { ...apiJson, file: file }))
     )
       .then((response) => {
+        setUploading(false);
         var images = response.map(
           (res) => (res.data && res.data.image) || null
         );
@@ -118,9 +130,9 @@ export const FormMediaLibraryImplementation = (props) => {
           append: true,
           prepend: true,
         });
-        if (immediately) return immediately(images, response);
-        reset();
-        changeTabTo(MediaLibrary.Tabs.LIBRARY_TAB);
+        insertSelectedImages(images, response);
+        // reset();
+        // changeTabTo(MediaLibrary.Tabs.LIBRARY_TAB);
       })
       .catch((e) => {
         console.log("Sorry, there was a problem uploading some items...: ", e);
@@ -187,6 +199,7 @@ export const FormMediaLibraryImplementation = (props) => {
             apply={loadMoreImages}
           />
         }
+        insertAfterUpload
         useAwait={true}
         onUpload={handleUpload}
         uploadMultiple
@@ -234,12 +247,15 @@ export const FormMediaLibraryImplementation = (props) => {
             },
             renderContextButton: (props) => (
               <MediaLibrary.Button
-                loading={props?.uploading}
-                disabled={validation?.invalid}
-                onClick={() => uploadAndSaveForm(props)}
+                loading={uploading}
+                disabled={validation?.invalid || uploading}
+                onClick={(e) => {
+                  e?.preventDefault();
+                  uploadAndSaveForm(props);
+                }}
               >
                 <Tooltip title={validation?.message} placement="top">
-                  DONE!
+                  {uploading ? "UPLOADING..." : "UPLOAD & INSERT"}
                 </Tooltip>
               </MediaLibrary.Button>
             ),
@@ -285,13 +301,17 @@ const UploadIntroductionComponent = ({ auth, setAvailableTo, available }) => {
 
   return (
     <div>
-      {comms && is_community_admin && (
+      <Typography variant="body">
+        After selecting items, click <b>"Continue"</b>. You will be asked to
+        provide a few details about your items before uploading
+      </Typography>
+      {/* {comms && is_community_admin && (
         <>
           <div>
             The images you upload here will be available to <b>{comms}</b>{" "}
           </div>
         </>
-      )}
+      )} */}
       {/* we are disabling sharing images to other communities for now
       {is_community_admin && (
         <FormControlLabel

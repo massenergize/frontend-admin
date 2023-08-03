@@ -25,8 +25,8 @@ export default function MediaLibraryForm({ auth, communities, onChange }) {
   useEffect(() => {
     // idea here is that we want to export all the changes that happen in form data when they happen
     const formData = {
-      copyright: copyright === "Yes" ?  true : false,
-      underAge : underAge  === "Yes" ? true : false,
+      copyright: copyright === "Yes" ? true : false,
+      underAge: underAge === "Yes" ? true : false,
       copyright_att: copyrightAtt,
       guardian_info: guardianInfo,
       communities: chosenComms,
@@ -174,10 +174,10 @@ export default function MediaLibraryForm({ auth, communities, onChange }) {
           </div>
         </div>
         <div>
-          <MEDropdown
+          {/* <MEDropdown
             data={["Action", "Event", "Vendor"]}
             placeholder="What are you uploading this image for? (Event, Action, Vendor, Testimonial etc...)"
-          />
+          /> */}
 
           <div style={{ margin: "10px 0px" }}>{showChips()}</div>
           <Typography
@@ -196,6 +196,7 @@ export default function MediaLibraryForm({ auth, communities, onChange }) {
             inputProps={{ style: { padding: "12.5px 14px" } }}
             onChange={(ev) => setTags(ev.target.value)}
             value={tags}
+            required={false}
           />
 
           {/* ---- TODO: Change to async dropdown if user is a superadmin  */}
