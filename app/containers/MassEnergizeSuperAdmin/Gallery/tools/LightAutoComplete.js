@@ -1,16 +1,15 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   Checkbox,
   Chip,
   CircularProgress,
-  LinearProgress,
   Paper,
   TextField,
 } from "@mui/material";
 import { pop } from "../../../../utils/common";
 import { withStyles } from "@mui/styles";
-import { apiCall } from "../../../../utils/messenger";
+import useObserver from "../../../../utils/useObserver";
 
 const styles = (theme) => {
   return {
@@ -86,55 +85,38 @@ function LightAutoComplete(props) {
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
-  const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
+  // const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
   const [showDropdown, setShowDropdown] = useState(false);
   const [query, setQuery] = useState("");
   const [filteredItems, setFilteredItems] = useState([]);
   const [selected, setSelected] = useState([]); // keeps a list of all selected items
   const chipWrapperRef = useRef();
   // -------------------------------------------------------
-  const elementObserver = useRef(null);
-  const lastAutoCompleteItemRef = useCallback(
-    (node) => {
-      if (elementObserver.current) elementObserver.current.disconnect();
 
-      elementObserver.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && cursor.has_more) {
-          if (!endpoint) return;
-          apiCall(endpoint, {
-            page: cursor.next,
-            limit: 10,
-            ...(args || {}),
-            params: JSON.stringify({ search_text: query || "" }),
-          }).then((res) => {
-            setCursor({
-              has_more: res?.cursor?.count > optionsToDisplay?.length,
-              next: res?.cursor?.next,
-            });
-            let items = [
-              ...optionsToDisplay,
-              ...(res?.data || [])?.map((item) => {
-                return {
-                  ...item,
-                  displayName: labelExtractor
-                    ? labelExtractor(item)
-                    : item?.name || item?.title,
-                };
-              }),
-            ];
+  const items = query ? filteredItems : optionsToDisplay;
+  const { ref, data: newItems, cursor } = useObserver({
+    data: items,
+    endpoint,
+    args,
+    params: { search_text: query },
+  });
+  useEffect(() => {
+    let newItemsConstructed = (newItems || [])?.map((item) => {
+      return {
+        ...item,
+        displayName: labelExtractor
+          ? labelExtractor(item)
+          : item?.name || item?.title,
+      };
+    });
+    let all = [...(items || []), ...(newItemsConstructed || [])];
+    const uniqueItems = [
+      ...new Map(all.map((item) => [item["id"], item])).values(),
+    ];
+    if(query) setFilteredItems(uniqueItems);
+    setOptionsToDisplay(uniqueItems);
+  }, [newItems]);
 
-            setOptionsToDisplay([
-              ...new Map(items.map((item) => [item["id"], item])).values(),
-            ]);
-          });
-        }
-      });
-
-      if (node) elementObserver.current.observe(node);
-    },
-    [cursor]
-  );
-  // ----------------------------------------------------
   const mount = () => {
     if (!onMount) return;
     onMount(() => setSelected([]));
@@ -200,18 +182,10 @@ function LightAutoComplete(props) {
     return height;
   };
   const onlyValues = (selected || []).map((itm) => getValue(itm));
-  const thereAreNoOptionsToDisplay = optionsToDisplay.length === 0;
+  const thereAreNoOptionsToDisplay = query
+    ? filteredItems?.length === 0
+    : optionsToDisplay.length === 0;
   const userHasSelectedStuff = selected.length;
-
-  const toggleRef = (index) => {
-    if (
-      ((query && filteredItems.length - 1 === index) ||
-        index === optionsToDisplay.length - 1) &&
-      isAsync
-    )
-      return lastAutoCompleteItemRef;
-    return null;
-  };
 
   return (
     <div style={{ position: "relative", width: "100%", marginTop: 19 }}>
@@ -302,10 +276,7 @@ function LightAutoComplete(props) {
                 </div>
               )}
 
-              {(query && filteredItems?.length
-                ? filteredItems
-                : optionsToDisplay
-              ).map((op, index) => {
+              {(query ? filteredItems : optionsToDisplay).map((op, index) => {
                 return (
                   <div
                     key={index.toString()}
@@ -327,14 +298,14 @@ function LightAutoComplete(props) {
                   </div>
                 );
               })}
-              {isAsync && cursor.has_more ? (
+              {endpoint && cursor?.has_more ? (
                 <Box
                   sx={{
                     width: "100%",
                     display: "flex",
                     justifyContent: "center",
                   }}
-                  ref={lastAutoCompleteItemRef}
+                  ref={ref}
                 >
                   <CircularProgress size={20} />
                 </Box>

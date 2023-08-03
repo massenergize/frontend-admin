@@ -32,6 +32,12 @@ export const FeatureFlags = loadable(
     fallback: <Loading />,
   }
 );
+export const EmailTemplates = loadable(
+  () => import("./MassEnergizeSuperAdmin/EmailTemplates/EmailTemplates"),
+  {
+    fallback: <Loading />,
+  }
+);
 export const Preferences = loadable(
   () => import("./MassEnergizeSuperAdmin/Settings/Preferences"),
   {

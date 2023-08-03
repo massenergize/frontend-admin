@@ -53,13 +53,7 @@ class CreateNewEventForm extends Component {
   }
 
   static getDerivedStateFromProps = (props, state) => {
-    const {
-      communities,
-      tags,
-      auth,
-      location,
-      otherCommunities,
-    } = props;
+    const { communities, tags, auth, location, otherCommunities } = props;
 
     const readyToRenderPageFirstTime =
       communities &&
@@ -77,10 +71,9 @@ class CreateNewEventForm extends Component {
     const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
-      id:c.id,
+      id: c.id,
     }));
 
-    
     const section = makeTagSection({
       collections: tags,
       defaults: false,
@@ -103,8 +96,6 @@ class CreateNewEventForm extends Component {
       mounted: true,
     };
   };
-
- 
 
   render() {
     const { classes } = this.props;
@@ -187,6 +178,79 @@ const createFormJson = ({
     displayName: c.name,
     id: c.id.toString(),
   }));
+
+  const ADD_LINK = [
+    {
+      name: "external_link",
+      label: "Link",
+      placeholder: "Enter link to the event",
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: false,
+      defaultValue: "",
+      dbName: "external_link",
+      readOnly: false,
+    },
+    {
+      name: "external_link_type",
+      label:"Is the link specified to join the event, or to register (with join link sent separately)?",
+      fieldType: "Dropdown",
+      dbName: "external_link_type",
+      defaultValue:  "",
+      data: [
+        { id: "Join", displayName: "Join" },
+        { id: "Register", displayName: "Register" },
+      ],
+    },
+  ];
+
+  const ADD_ADDRESS = [
+    {
+      name: "address",
+      label: "Street Address",
+      placeholder: "Street Address or Public Facility",
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: false,
+      defaultValue: "",
+      dbName: "address",
+      readOnly: false,
+    },
+    {
+      name: "unit",
+      label: "Unit Number",
+      placeholder: 'eg. "2A"',
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: false,
+      defaultValue: "",
+      dbName: "unit",
+      readOnly: false,
+    },
+    {
+      name: "city",
+      label: "City",
+      placeholder: "eg. Springfield",
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: false,
+      defaultValue: "",
+      dbName: "city",
+      readOnly: false,
+    },
+    {
+      name: "state",
+      label: "State ",
+      fieldType: "Dropdown",
+      contentType: "text",
+      isRequired: false,
+      data: states,
+      defaultValue: "Massachusetts",
+      dbName: "state",
+      readOnly: false,
+    },
+  ];
+
   const formJson = {
     title: "Create New Event or Campaign",
     subTitle: "",
@@ -254,10 +318,7 @@ const createFormJson = ({
             defaultValue: "false",
             dbName: "is_recurring",
             readOnly: false,
-            data: [
-              { id: "false", value: "No" },
-              { id: "true", value: "Yes" },
-            ],
+            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
             child: {
               // dbName: "recurring_details",
               valueToCheck: "true",
@@ -362,8 +423,8 @@ const createFormJson = ({
                       data: [{ displayName: "--", id: "" }, ...communities],
                       isRequired: true,
                       isAsync: true,
-                      endpoint: "/communities.listForSuperAdmin"
-                    }
+                      endpoint: "/communities.listForSuperAdmin",
+                    },
                   ],
                 },
               }
@@ -422,64 +483,34 @@ const createFormJson = ({
         ],
       },
       {
-        name: "have_address",
-        label: "Want to add an address for this event?",
+        name: "event_type",
+        label: "Is this event",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: "false",
-        dbName: "have_address",
+        defaultValue: "in-person",
+        dbName: "event_type",
         readOnly: false,
-        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-        child: {
-          valueToCheck: "true",
-          fields: [
-            {
-              name: "address",
-              label: "Street Address",
-              placeholder: "Street Address or Public Facility",
-              fieldType: "TextField",
-              contentType: "text",
-              isRequired: true,
-              defaultValue: "",
-              dbName: "address",
-              readOnly: false,
-            },
-            {
-              name: "unit",
-              label: "Unit Number",
-              placeholder: 'eg. "2A"',
-              fieldType: "TextField",
-              contentType: "text",
-              isRequired: false,
-              defaultValue: "",
-              dbName: "unit",
-              readOnly: false,
-            },
-            {
-              name: "city",
-              label: "City",
-              placeholder: "eg. Springfield",
-              fieldType: "TextField",
-              contentType: "text",
-              isRequired: true,
-              defaultValue: "",
-              dbName: "city",
-              readOnly: false,
-            },
-            {
-              name: "state",
-              label: "State ",
-              fieldType: "Dropdown",
-              contentType: "text",
-              isRequired: false,
-              data: states,
-              defaultValue: "Massachusetts",
-              dbName: "state",
-              readOnly: false,
-            },
-          ],
-        },
+        data: [
+          { id: "in-person", value: "In-Person" },
+          { id: "online", value: "Online" },
+          { id: "both", value: "Both" },
+        ],
+        conditionalDisplays: [
+          {
+            valueToCheck: "online",
+            fields: ADD_LINK,
+          },
+          {
+            valueToCheck: "in-person",
+            fields: ADD_ADDRESS,
+          },
+          {
+            valueToCheck: "both",
+            fields: [...ADD_ADDRESS, ...ADD_LINK],
+          },
+        ],
       },
+
       {
         name: "description",
         label: "Event Description",

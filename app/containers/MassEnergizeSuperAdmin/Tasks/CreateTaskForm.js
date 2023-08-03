@@ -174,7 +174,7 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
     title: `${toEdit && toEdit.id ? "Update" : "Create New"}  Task`,
     subTitle: "",
     method: toEdit && toEdit.id ? "/tasks.update" : "/tasks.create",
-    // successRedirectPage: "/admin/read/tasks",
+    successRedirectPage: "/admin/read/tasks",
     preflightFxn: preflightFxn,
     fields: [
       {
