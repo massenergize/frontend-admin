@@ -96,10 +96,7 @@ export const SideSheet = (props) => {
 
             return (
               <React.Fragment key={index.toString()}>
-                <ImageInfoArea
-                  {...imageInfo}
-                  is_super_admin={is_super_admin}
-                />
+                <ImageInfoArea {...imageInfo} is_super_admin={is_super_admin} />
               </React.Fragment>
             );
           })}
@@ -253,10 +250,23 @@ export default connect(mapStateToProps)(withRouter(SideSheet));
 export const ShowTagsOnPane = ({ tags, style }) => {
   if (!tags || !tags.length) return <></>;
   return (
-    <div style={{ padding: 15, ...(style || {}) }}>
-      <small style={{ color: "grey" }}>Tags</small>
-      <br />
-      {(tags || []).map((tag) => {
+    <div
+      style={{
+        padding: "15px 0px",
+
+        ...(style || {}),
+      }}
+    >
+      <Typography variant="body2" style={{ textDecoration: "underline" }}>
+        <b>Related Tags</b>
+      </Typography>
+      {/* <small style={{ color: "grey" }}>Tags</small> */}
+
+      <Typography variant="body2">
+        {(tags || []).map((tag) => tag.name).join(", ")}
+      </Typography>
+      {/* <br /> */}
+      {/* {(tags || []).map((tag) => {
         return (
           <Button
             variant="outlined"
@@ -267,7 +277,7 @@ export const ShowTagsOnPane = ({ tags, style }) => {
             {tag.name}
           </Button>
         );
-      })}
+      })} */}
     </div>
   );
 };

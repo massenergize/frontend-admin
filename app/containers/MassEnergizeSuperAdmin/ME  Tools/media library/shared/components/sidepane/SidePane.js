@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ImageThumbnail from "../thumbnail/ImageThumbnail";
 import { getRandomStringKey } from "../../utils/utils";
 import MLButton from "../button/MLButton";
@@ -9,6 +9,7 @@ export default function SidePane({
   sourceExtractor,
   sideExtraComponent,
 }) {
+  const [copy, setCopying] = useState(false);
   const url =
     (sourceExtractor && sourceExtractor(activeImage)) ||
     (activeImage && activeImage.url) ||
@@ -20,10 +21,15 @@ export default function SidePane({
     <div className="ml-sidepane-container elevate-float side-pane-slide-animation">
       <div style={{ position: "relative", height: "100%", padding: 15 }}>
         <h5 style={{ margin: 0, marginBottom: 10, fontSize: 18 }}>
-          IMAGE DETAILS
+          Imade Details
         </h5>
         <ImageThumbnail
-          style={{ width: "100%", height: 200, objectFit: "contain" }}
+          style={{
+            width: "100%",
+            height: 200,
+            objectFit: "contain",
+            marginBottom: 15,
+          }}
           imageSource={url}
           key={getRandomStringKey()}
         />
@@ -31,35 +37,55 @@ export default function SidePane({
           style={{ overflowY: "scroll", maxHeight: "36vh", paddingBottom: 30 }}
         >
           {sideExtraComponent && sideExtraComponent({ image: activeImage })}
-          <h6 style={{ margin: 0, fontSize: 14 }}>URL</h6>
-          <textarea
+          <h6
+            className="touchable-opacity"
             style={{
-              padding: 10,
-              width: "100%",
-              border: "solid 0px cornflowerblue",
-              borderBottomWidth: 2,
-              borderRadius: 3,
-              fontSize: "small",
-              marginTop: 5,
-              background: "#fafeff",
-              resize: "none",
-              marginBottom: 0,
+              margin: 0,
+              fontSize: "0.875rem",
+              color: "var(--app-cyan)",
+              textDecoration: "underline",
             }}
-            rows="4"
-            value={url}
-          />
+            onClick={(e) => {
+              e.preventDefault();
+              setCopying(!copy);
+            }}
+          >
+            Copy Image URL
+          </h6>
+          {copy && (
+            <textarea
+              style={{
+                padding: 10,
+                width: "100%",
+                border: "solid 0px cornflowerblue",
+                borderBottomWidth: 2,
+                borderRadius: 3,
+                fontSize: "small",
+                marginTop: 5,
+                background: "#fafeff",
+                resize: "none",
+                marginBottom: 0,
+              }}
+              rows="4"
+              value={url}
+            />
+          )}
           <a
             href={url}
             target="_blank"
             className="touchable-opacity"
             style={{
-              fontSize: 13,
-              color: "cornflowerblue",
-              padding: "10px 15px",
-              background: "rgb(241 248 255)",
+              color: "var(--app-cyan)",
+              marginTop: 3,
+              fontSize: "0.875rem",
+              // color: "cornflowerblue",
+              padding: 0,
+              // background: "rgb(241 248 255)",
               textDecoration: "none",
               display: "block",
               width: "100%",
+              fontWeight: "bold",
+              textDecoration: "underline",
             }}
           >
             See Full Image Here

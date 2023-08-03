@@ -212,7 +212,7 @@ export const FormMediaLibraryImplementation = (props) => {
               <SideExtraComponent {...props} />{" "}
               <ShowTagsOnPane
                 tags={props.image && props.image.tags}
-                style={{ padding: 5 }}
+                // style={{ padding: 5 }}
               />
             </>
           );
@@ -355,11 +355,12 @@ const ComponentForSidePane = ({ image, imageInfos, putImageInfoInRedux }) => {
   return (
     <>
       {(size_text || description || uploader) && (
-        <div style={{ marginBottom: 15 }}>
+        <div style={{ marginBottom: 5 }}>
           <Typography variant="body2" style={{ marginBottom: 5 }}>
-            <i>
-              Uploaded by <b>{(uploader && uploader.full_name) || "..."}</b>
-            </i>
+            Uploaded by{" "}
+            <b style={{ color: "rgb(156, 39, 176)" }}>
+              {(uploader && uploader.full_name) || "..."}
+            </b>
           </Typography>
           {size_text && (
             <Typography
