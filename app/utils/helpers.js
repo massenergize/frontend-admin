@@ -237,6 +237,13 @@ export const removeDuplicates = (first, second) => {
   return uniqueItems;
 };
 
+export const getOrigin = ()=>{
+  if(IS_PROD) return "https://api.massenergize.org"
+  else if (IS_CANARY) return "https://api-canary.massenergize.org";
+  else if(IS_LOCAL) return "http://127.0.0.1:8000";
+  return "https://api.massenergize.dev";
+}
+
 
 export function sortByField(arr, field) {
   return arr.sort((a, b) => {
@@ -267,3 +274,5 @@ export function removeDuplicateObjects(arr) {
 
   return resultArray;
 }
+
+
