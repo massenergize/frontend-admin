@@ -21,6 +21,7 @@ import GalleryFilter from "../Gallery/tools/GalleryFilter";
 import { filters } from "../Gallery/Gallery";
 import { ShowTagsOnPane } from "../Gallery/SideSheet";
 import MediaLibraryForm from "./MediaLibraryForm";
+import { getFileSize } from "../ME  Tools/media library/shared/utils/utils";
 
 const DEFAULT_SCOPE = ["all", "uploads", "actions", "events", "testimonials"];
 export const FormMediaLibraryImplementation = (props) => {
@@ -117,7 +118,15 @@ export const FormMediaLibraryImplementation = (props) => {
      * So that users see the effect of thier upload right away
      */
     Promise.all(
-      files.map((file) => apiCall("/gallery.add", { ...apiJson, file: file }))
+      files.map((file) => {
+        const info = {
+          title: "Media library upload-" + file?.name,
+          size: file?.size?.toString(),
+          size_text: getFileSize(file),
+        };
+        console.log("Thats what INFO LOOKED LIKE", info);
+        return apiCall("/gallery.add", { ...apiJson, ...info, file: file });
+      })
     )
       .then((response) => {
         setUploading(false);
@@ -344,13 +353,22 @@ const ComponentForSidePane = ({ image, imageInfos, putImageInfoInRedux }) => {
       updateReduxWith: putImageInfoInRedux,
       imageInfos,
     });
-  }, []);
+  }, [image]);
   if (imageInfo === "loading") return <ProgressCircleWithLabel />;
   if (!imageInfo) return <></>;
   var informationAboutImage = (imageInfo && imageInfo.information) || {};
   var uploader = informationAboutImage.user;
   informationAboutImage = informationAboutImage.info || {};
-  const { size_text, description } = informationAboutImage;
+  const {
+    size_text,
+    description,
+    has_children,
+    has_copyright_permission,
+    copyright_att,
+  } = informationAboutImage;
+  const permBelongsTo = has_copyright_permission
+    ? auth?.preferred_name || "..."
+    : copyright_att;
 
   return (
     <>
@@ -365,15 +383,22 @@ const ComponentForSidePane = ({ image, imageInfos, putImageInfoInRedux }) => {
           {size_text && (
             <Typography
               variant="h6"
-              color="primary"
-              style={{ marginBottom: 6, fontSize: "medium" }}
+              // color="primary"
+              style={{
+                marginBottom: 6,
+                fontSize: "0.875rem",
+                fontWeight: "bold",
+              }}
             >
               Size: {size_text}
             </Typography>
           )}
           {description && (
             <>
-              <Typography variant="body2">
+              <Typography
+                variant="body2"
+                style={{ textDecoration: "underline" }}
+              >
                 <b>Description</b>
               </Typography>
               <Typography variant="body2">{description}</Typography>
@@ -381,6 +406,43 @@ const ComponentForSidePane = ({ image, imageInfos, putImageInfoInRedux }) => {
           )}
         </div>
       )}
+
+      <div
+        style={{
+          width: "100%",
+          background: "#faebd74d",
+          border: "solid 2px navajowhite",
+          padding: 10,
+          borderRadius: 4,
+        }}
+      >
+        <Typography
+          variant="body2"
+          style={{ textDecoration: "none", fontWeight: "bold" }}
+        >
+          <i className="fa fa-copyright" />
+          <span>opyright Information</span>
+        </Typography>
+        <Typography variant="caption" styl={{}}>
+          Image rights belong to <b>{permBelongsTo}</b>
+        </Typography>
+
+        <Typography
+          variant="body2"
+          style={{
+            textDecoration: "none",
+            fontWeight: "bold",
+            // color: "#389a38",
+            color: has_children ? "rgb(199 102 102)" : "#389a38",
+          }}
+        >
+          <i className="fa fa-child" style={{ marginRight: 10 }} />
+          {/* <span>No kids under 13 depicted</span> */}
+          <span>
+            {has_children ? "Shows kids under 13" : "No kids under 13 depicted"}
+          </span>
+        </Typography>
+      </div>
     </>
   );
 };

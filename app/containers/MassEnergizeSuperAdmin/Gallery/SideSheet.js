@@ -72,7 +72,11 @@ export const SideSheet = (props) => {
                 <Typography
                   variant="h6"
                   color="primary"
-                  style={{ marginBottom: 6, marginTop: 5, fontSize: "medium" }}
+                  style={{
+                    marginBottom: 6,
+                    marginTop: 5,
+                    fontSize: "0.875rem",
+                  }}
                 >
                   Size: {size_text}
                 </Typography>

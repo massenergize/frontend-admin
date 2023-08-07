@@ -226,7 +226,6 @@ function Gallery(props) {
     fetchContent(makeRequestBody(limits), () => setLoadMore(false));
   };
 
-
   return (
     <div>
       <Seo name={"Gallery"} />
@@ -288,7 +287,11 @@ function Gallery(props) {
             defaultSelected={targetComs}
             allowChipRemove={!targetAllComs}
             isAsync={true}
-            endpoint={auth?.is_super_admin ? "communities.listForSuperAdmin" : "communities.listForCommunityAdmin"}
+            endpoint={
+              auth?.is_super_admin
+                ? "communities.listForSuperAdmin"
+                : "communities.listForCommunityAdmin"
+            }
           />
           {/* <div
             style={{
