@@ -21,6 +21,8 @@ import {
   TIME_UNTIL_EXPIRATION,
   TWENTY_FOUR_HOURS,
 } from "../../utils/constants";
+import * as Sentry from "@sentry/react";
+
 
 window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
 
@@ -318,7 +320,9 @@ function mapDispatchToProps(dispatch) {
   );
 }
 
+const sentryWrapped = Sentry.withProfiler(App);
+
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(App);
+)(sentryWrapped);

@@ -40,16 +40,16 @@ import { translationMessages } from "./i18n";
 import { IS_CANARY, IS_PROD } from "./config/constants";
 
 import * as Sentry from "@sentry/react";
-import { BrowserTracing } from "@sentry/tracing";
 import { StyledEngineProvider } from "@mui/material/styles";
-
-// const SENTRY_DSN =
-//   IS_PROD || IS_CANARY
-//     ? process.env.REACT_APP_SENTRY_PROD_DSN
-//     : process.env.REACT_APP_SENTRY_DEV_DSN;
+import { getOrigin } from "./utils/helpers";
 
 
-const SENTRY_DSN="https://f2e6d5eedbc744ff821b6a98f73914ef@o415460.ingest.sentry.io/5306645"
+
+const SENTRY_DSN =
+  IS_PROD || IS_CANARY
+    ? process.env.REACT_APP_SENTRY_PROD_DSN
+    : process.env.REACT_APP_SENTRY_DEV_DSN;
+
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -59,6 +59,7 @@ Sentry.init({
     new Sentry.Replay({ stickySession: true }),
     new Sentry.BrowserTracing({
       routingInstrumentation: Sentry.reactRouterV5Instrumentation(history),
+      tracingOrigins: [getOrigin()],
     }),
   ],
   tracesSampleRate: 1.0,

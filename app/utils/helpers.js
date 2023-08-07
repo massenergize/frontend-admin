@@ -1,3 +1,4 @@
+import { IS_CANARY, IS_LOCAL, IS_PROD } from "../config/constants";
 import { apiCall } from "./messenger";
 const TABLE_PROPERTIES = "_TABLE_PROPERTIES";
 const FILTERS = "_FILTERS";
@@ -237,4 +238,11 @@ export const isTrue = (value) => {
 export const removeDuplicates = (first, second) => {
    const uniqueItems = [...new Set([...(first||[]), ...(second||[])])];
    return uniqueItems;
+}
+
+export const getOrigin = ()=>{
+  if(IS_PROD) return "https://api.massenergize.org"
+  else if (IS_CANARY) return "https://api-canary.massenergize.org";
+  else if(IS_LOCAL) return "http://127.0.0.1:8000";
+  return "https://api.massenergize.dev";
 }
