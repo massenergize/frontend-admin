@@ -173,8 +173,8 @@ function CommunityEngagement({
                       generics={muiOverride}
                       multiple={false}
                       data={communities}
-                      valueExtractor={(c) => c.id}
-                      labelExtractor={(c) => c.name}
+                      valueExtractor={(c) => c?.id}
+                      labelExtractor={(c) => c?.name}
                       containerStyle={{ width: "18%", marginTop: 0 }}
                       defaultValue={[first.id]}
                       onItemSelected={(selection) => {
@@ -214,8 +214,8 @@ function CommunityEngagement({
                     generics={muiOverride}
                     multiple={false}
                     data={TIME_RANGE}
-                    valueExtractor={(t) => t.key}
-                    labelExtractor={(t) => t.name}
+                    valueExtractor={(t) => t?.key}
+                    labelExtractor={(t) => t?.name}
                     containerStyle={{ width: "15%", marginTop: 0 }}
                     defaultValue={rangeValue}
                     onItemSelected={(selection) => {
