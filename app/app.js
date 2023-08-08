@@ -58,7 +58,7 @@ Sentry.init({
     new Sentry.Replay({ stickySession: true }),
     new Sentry.BrowserTracing({
       routingInstrumentation: Sentry.reactRouterV5Instrumentation(history),
-      tracingOrigins: [API_HOST],
+      tracePropagationTargets: [API_HOST],
     }),
   ],
   tracesSampleRate: 1.0,
