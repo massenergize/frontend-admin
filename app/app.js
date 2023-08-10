@@ -42,8 +42,6 @@ import {IS_PROD } from "./config/constants";
 import * as Sentry from "@sentry/react";
 import { StyledEngineProvider } from "@mui/material/styles";
 
-
-
 const SENTRY_DSN =
   IS_PROD
     ? process.env.REACT_APP_SENTRY_PROD_DSN
