@@ -39,6 +39,7 @@ function MEDropdownPro({
                  let items = [
                    ...optionsToDisplay,
                    ...(res?.data || [])?.map((item) => {
+                    console.log("=== item ==", item)
                      return {
                        ...item,
                        displayName: labelExtractor
