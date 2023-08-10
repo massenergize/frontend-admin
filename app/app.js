@@ -37,7 +37,7 @@ import "./styles/ME Custom/extra.css";
 
 // Import i18n messages
 import { translationMessages } from "./i18n";
-import { API_HOST, IS_CANARY, IS_PROD } from "./config/constants";
+import { IS_CANARY, IS_PROD } from "./config/constants";
 
 import * as Sentry from "@sentry/react";
 import { StyledEngineProvider } from "@mui/material/styles";
@@ -58,7 +58,7 @@ Sentry.init({
     new Sentry.Replay({ stickySession: true }),
     new Sentry.BrowserTracing({
       routingInstrumentation: Sentry.reactRouterV5Instrumentation(history),
-      tracePropagationTargets: [API_HOST],
+      // tracePropagationTargets: [API_HOST],
     }),
   ],
   tracesSampleRate: 1.0,
