@@ -39,7 +39,6 @@ function MEDropdownPro({
                  let items = [
                    ...optionsToDisplay,
                    ...(res?.data || [])?.map((item) => {
-                    console.log("=== item ==", item)
                      return {
                        ...item,
                        displayName: labelExtractor
@@ -68,6 +67,10 @@ function MEDropdownPro({
      useEffect(() => {
        setSelected(defaultValue || value || []);
      }, [defaultValue, value]);
+     
+     useEffect(() => {
+       setOptionsToDisplay(data|| []);
+     }, [data]);
 
      const labelOf = (item, getItemFromValue) => {
        if (!item) return;
@@ -113,7 +116,6 @@ function MEDropdownPro({
        );
        return found;
      };
-     console.log("==== value ==", value);
      const renderChildren = () => {
        if (!show) return <></>;
        return optionsToDisplay?.map((d, i) => {

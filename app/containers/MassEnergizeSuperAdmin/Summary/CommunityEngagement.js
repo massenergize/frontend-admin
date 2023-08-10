@@ -55,8 +55,6 @@ function CommunityEngagement({
   };
   const first = selectedCommunity();
 
-  console.log("=== first ==", first)
-
   // ----------------------------------------------------------------------
   const loadEngagements = ({ body }) => {
     apiCall("/summary.get.engagements", body).then((response) => {
@@ -178,7 +176,7 @@ function CommunityEngagement({
                       valueExtractor={(c) => c?.id}
                       labelExtractor={(c) => c?.name}
                       containerStyle={{ width: "18%", marginTop: 0 }}
-                      defaultValue={[first]}
+                      defaultValue={[first.id]}
                       onItemSelected={(selection) => {
                         const item = selection && selection[0];
                         const op = {
