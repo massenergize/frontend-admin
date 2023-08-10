@@ -101,7 +101,7 @@ export default function SidePane({
               />
             )}
           </div>
-          {sideExtraComponent && sideExtraComponent({ image: activeImage })}
+          {sideExtraComponent && sideExtraComponent({ image: activeImage, toggleSidePane: setShowSidePane })}
         </div>
 
         <MLButton

@@ -27,6 +27,28 @@ export const filters = [
   { name: "My Uploads", value: "uploads" },
 ];
 
+export const deleteImage = (id, cb, options = {}) => {
+  if (!id) return;
+  const { searchResults } = options;
+  apiCall("/gallery.remove", { media_id: id })
+    .then((response) => {
+      if (!response.success)
+        return console.log("REMOVE IMAGE ERROR_BE", response.error);
+      const images = (searchResults && searchResults.images) || [];
+      const rem = images.filter((img) => img.id !== id);
+      putSearchResultsInRedux({
+        data: { ...(searchResults || {}), images: rem },
+        old: searchResults,
+        append: false,
+      });
+      if (cb) cb();
+    })
+    .catch((e) => {
+      console.log("REMOVE IMAGE ERROR_SYNT", e.toString());
+      if (cb) cb();
+    });
+};
+
 export const getMoreInfoOnImage = ({
   id,
   updateStateWith,
@@ -35,6 +57,7 @@ export const getMoreInfoOnImage = ({
 }) => {
   if (!id) return console.log("The image id provided is invalid...", id);
   const found = (imageInfos || {})[id];
+  console.log("I DID COME HERE FOUND: ", found);
   if (found) return updateStateWith(found);
   updateStateWith("loading");
   apiCall("/gallery.image.info", { media_id: id })
@@ -43,6 +66,7 @@ export const getMoreInfoOnImage = ({
         updateStateWith(null);
         return console.log("IMAGE INFO REQ BE: ", response.error);
       }
+      // console.log("A DON FIND AM ", response.data)
       updateStateWith(response.data);
       updateReduxWith({
         oldInfos: imageInfos,
@@ -87,27 +111,6 @@ function Gallery(props) {
   const [queryHasChanged, setQueryHasChanged] = useState(false);
   const [noResults, setNoResults] = useState(false);
   const [oneImageInfo, setOneImageInfo] = useState(null);
-
-  const deleteImage = (id, cb) => {
-    if (!id) return;
-    apiCall("/gallery.remove", { media_id: id })
-      .then((response) => {
-        if (!response.success)
-          return console.log("REMOVE IMAGE ERROR_BE", response.error);
-        const images = (searchResults && searchResults.images) || [];
-        const rem = images.filter((img) => img.id !== id);
-        putSearchResultsInRedux({
-          data: { ...(searchResults || {}), images: rem },
-          old: searchResults,
-          append: false,
-        });
-        if (cb) cb();
-      })
-      .catch((e) => {
-        console.log("REMOVE IMAGE ERROR_SYNT", e.toString());
-        if (cb) cb();
-      });
-  };
 
   const fetchContent = (body = {}, cb) => {
     setSearching(true); // activate circular spinner to show loading to user

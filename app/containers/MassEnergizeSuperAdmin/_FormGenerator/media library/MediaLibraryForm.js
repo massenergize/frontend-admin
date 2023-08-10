@@ -9,10 +9,10 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 // import MEDropDown from "./MEDropDown";
-import MEDropdownPro from "../ME  Tools/dropdown/MEDropdownPro";
-import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
-import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
-import AsyncDropDown from "./AsyncCheckBoxDropDown";
+import MEDropdownPro from "../../ME  Tools/dropdown/MEDropdownPro";
+import MEDropdown from "../../ME  Tools/dropdown/MEDropdown";
+import LightAutoComplete from "../../Gallery/tools/LightAutoComplete";
+import AsyncDropDown from "../AsyncCheckBoxDropDown";
 
 export default function MediaLibraryForm({ auth, communities, onChange }) {
   const [copyright, setCopyright] = useState("No");
@@ -128,7 +128,10 @@ export default function MediaLibraryForm({ auth, communities, onChange }) {
                   shrink: true,
                 }}
                 onChange={(ev) => setCopyrightAtt(ev.target.value)}
-                inputProps={{ style: { padding: "12.5px 14px" } }}
+                inputProps={{
+                  style: { padding: "12.5px 14px" },
+                  maxLength: 40,
+                }}
                 value={copyrightAtt}
               />
             )}
@@ -167,7 +170,10 @@ export default function MediaLibraryForm({ auth, communities, onChange }) {
                   shrink: true,
                 }}
                 onChange={(ev) => setGuardianInfo(ev.target.value)}
-                inputProps={{ style: { padding: "12.5px 14px" } }}
+                inputProps={{
+                  style: { padding: "12.5px 14px" },
+                  maxLength: 40,
+                }}
                 value={guardianInfo}
               />
             )}

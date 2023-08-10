@@ -3,25 +3,26 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
-import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
+import MediaLibrary from "../../ME  Tools/media library/MediaLibrary";
 import {
   reduxAddToGalleryImages,
   reduxLoadGalleryImages,
   reduxLoadImageInfos,
   testRedux,
   universalFetchFromGallery,
-} from "../../../redux/redux-actions/adminActions";
-import { apiCall } from "../../../utils/messenger";
+} from "../../../../redux/redux-actions/adminActions";
+import { apiCall } from "../../../../utils/messenger";
 import { Checkbox, FormControlLabel, Typography, Tooltip } from "@mui/material";
-import { makeLimitsFromImageArray } from "../../../utils/common";
-import { ProgressCircleWithLabel } from "../Gallery/utils";
-import { getMoreInfoOnImage } from "../Gallery/Gallery";
+import { makeLimitsFromImageArray } from "../../../../utils/common";
+import { ProgressCircleWithLabel } from "../../Gallery/utils";
+import { getMoreInfoOnImage } from "../../Gallery/Gallery";
 //import { Link } from "react-router-dom";
-import GalleryFilter from "../Gallery/tools/GalleryFilter";
-import { filters } from "../Gallery/Gallery";
-import { ShowTagsOnPane } from "../Gallery/SideSheet";
+import GalleryFilter from "../../Gallery/tools/GalleryFilter";
+import { filters } from "../../Gallery/Gallery";
+import { ShowTagsOnPane, ImageInfoArea } from "../../Gallery/SideSheet";
 import MediaLibraryForm from "./MediaLibraryForm";
-import { getFileSize } from "../ME  Tools/media library/shared/utils/utils";
+import { getFileSize } from "../../ME  Tools/media library/shared/utils/utils";
+import SidebarForMediaLibraryModal from "./SidebarForMediaLibraryModal";
 
 const DEFAULT_SCOPE = ["all", "uploads", "actions", "events", "testimonials"];
 export const FormMediaLibraryImplementation = (props) => {
@@ -120,7 +121,7 @@ export const FormMediaLibraryImplementation = (props) => {
     Promise.all(
       files.map((file) => {
         const info = {
-          title: "Media library upload-" + file?.name,
+          title: file?.name + "-media library upload",
           size: file?.size?.toString(),
           size_text: getFileSize(file),
         };
@@ -175,6 +176,27 @@ export const FormMediaLibraryImplementation = (props) => {
     };
   };
 
+  const renderImageRelations = (props) => {
+    console.log("This is the props coming", props.image);
+    return <></>;
+    // return (
+    //   <>
+    //     {Object.keys(info).map((key, index) => {
+    //       const imageInfo = {
+    //         name: key,
+    //         data: info[key] || {},
+    //       };
+
+    //       return (
+    //         <React.Fragment key={index.toString()}>
+    //           <ImageInfoArea {...imageInfo} is_super_admin={is_super_admin} />
+    //         </React.Fragment>
+    //       );
+    //     })}
+    //   </>
+    // );
+  };
+
   const validation = liveFormValidation();
 
   return (
@@ -217,13 +239,14 @@ export const FormMediaLibraryImplementation = (props) => {
         extras={extras}
         sideExtraComponent={(props) => {
           return (
-            <>
-              <SideExtraComponent {...props} />{" "}
-              <ShowTagsOnPane
-                tags={props.image && props.image.tags}
-                // style={{ padding: 5 }}
-              />
-            </>
+            <SidebarForMediaLibraryModal {...props} />
+            // <>
+            //   <SideExtraComponent {...props} />{" "}
+            //   <ShowTagsOnPane
+            //     tags={props.image && props.image.tags}
+            //   />
+
+            // </>
           );
         }}
         TooltipWrapper={({ children, title, placement }) => {
@@ -343,123 +366,123 @@ const UploadIntroductionComponent = ({ auth, setAvailableTo, available }) => {
   );
 };
 
-// ------------------------------------
-const ComponentForSidePane = ({ image, imageInfos, putImageInfoInRedux }) => {
-  const [imageInfo, setImageInfo] = useState("loading");
-  useEffect(() => {
-    getMoreInfoOnImage({
-      id: image && image.id,
-      updateStateWith: setImageInfo,
-      updateReduxWith: putImageInfoInRedux,
-      imageInfos,
-    });
-  }, [image]);
-  if (imageInfo === "loading") return <ProgressCircleWithLabel />;
-  if (!imageInfo) return <></>;
-  var informationAboutImage = (imageInfo && imageInfo.information) || {};
-  var uploader = informationAboutImage.user;
-  informationAboutImage = informationAboutImage.info || {};
-  const {
-    size_text,
-    description,
-    has_children,
-    has_copyright_permission,
-    copyright_att,
-  } = informationAboutImage;
-  const permBelongsTo = has_copyright_permission
-    ? auth?.preferred_name || "..."
-    : copyright_att;
+// // ------------------------------------
+// const ComponentForSidePane = ({ image, imageInfos, putImageInfoInRedux }) => {
+//   const [imageInfo, setImageInfo] = useState("loading");
+//   useEffect(() => {
+//     getMoreInfoOnImage({
+//       id: image && image.id,
+//       updateStateWith: setImageInfo,
+//       updateReduxWith: putImageInfoInRedux,
+//       imageInfos,
+//     });
+//   }, [image]);
+//   if (imageInfo === "loading") return <ProgressCircleWithLabel />;
+//   if (!imageInfo) return <></>;
+//   var informationAboutImage = (imageInfo && imageInfo.information) || {};
+//   var uploader = informationAboutImage.user;
+//   informationAboutImage = informationAboutImage.info || {};
+//   const {
+//     size_text,
+//     description,
+//     has_children,
+//     has_copyright_permission,
+//     copyright_att,
+//   } = informationAboutImage;
+//   const permBelongsTo = has_copyright_permission
+//     ? auth?.preferred_name || "..."
+//     : copyright_att;
 
-  return (
-    <>
-      {(size_text || description || uploader) && (
-        <div style={{ marginBottom: 5 }}>
-          <Typography variant="body2" style={{ marginBottom: 5 }}>
-            Uploaded by{" "}
-            <b style={{ color: "rgb(156, 39, 176)" }}>
-              {(uploader && uploader.full_name) || "..."}
-            </b>
-          </Typography>
-          {size_text && (
-            <Typography
-              variant="h6"
-              // color="primary"
-              style={{
-                marginBottom: 6,
-                fontSize: "0.875rem",
-                fontWeight: "bold",
-              }}
-            >
-              Size: {size_text}
-            </Typography>
-          )}
-          {description && (
-            <>
-              <Typography
-                variant="body2"
-                style={{ textDecoration: "underline" }}
-              >
-                <b>Description</b>
-              </Typography>
-              <Typography variant="body2">{description}</Typography>
-            </>
-          )}
-        </div>
-      )}
+//   return (
+//     <>
+//       {(size_text || description || uploader) && (
+//         <div style={{ marginBottom: 5 }}>
+//           <Typography variant="body2" style={{ marginBottom: 5 }}>
+//             Uploaded by{" "}
+//             <b style={{ color: "rgb(156, 39, 176)" }}>
+//               {(uploader && uploader.full_name) || "..."}
+//             </b>
+//           </Typography>
+//           {size_text && (
+//             <Typography
+//               variant="h6"
+//               // color="primary"
+//               style={{
+//                 marginBottom: 6,
+//                 fontSize: "0.875rem",
+//                 fontWeight: "bold",
+//               }}
+//             >
+//               Size: {size_text}
+//             </Typography>
+//           )}
+//           {description && (
+//             <>
+//               <Typography
+//                 variant="body2"
+//                 style={{ textDecoration: "underline" }}
+//               >
+//                 <b>Description</b>
+//               </Typography>
+//               <Typography variant="body2">{description}</Typography>
+//             </>
+//           )}
+//         </div>
+//       )}
 
-      <div
-        style={{
-          width: "100%",
-          background: "#faebd74d",
-          border: "solid 2px navajowhite",
-          padding: 10,
-          borderRadius: 4,
-        }}
-      >
-        <Typography
-          variant="body2"
-          style={{ textDecoration: "none", fontWeight: "bold" }}
-        >
-          <i className="fa fa-copyright" />
-          <span>opyright Information</span>
-        </Typography>
-        <Typography variant="caption" styl={{}}>
-          Image rights belong to <b>{permBelongsTo}</b>
-        </Typography>
+//       <div
+//         style={{
+//           width: "100%",
+//           background: "#faebd74d",
+//           border: "solid 2px navajowhite",
+//           padding: 10,
+//           borderRadius: 4,
+//         }}
+//       >
+//         <Typography
+//           variant="body2"
+//           style={{ textDecoration: "none", fontWeight: "bold" }}
+//         >
+//           <i className="fa fa-copyright" />
+//           <span>opyright Information</span>
+//         </Typography>
+//         <Typography variant="caption" styl={{}}>
+//           Image rights belong to <b>{permBelongsTo}</b>
+//         </Typography>
 
-        <Typography
-          variant="body2"
-          style={{
-            textDecoration: "none",
-            fontWeight: "bold",
-            // color: "#389a38",
-            color: has_children ? "rgb(199 102 102)" : "#389a38",
-          }}
-        >
-          <i className="fa fa-child" style={{ marginRight: 10 }} />
-          {/* <span>No kids under 13 depicted</span> */}
-          <span>
-            {has_children ? "Shows kids under 13" : "No kids under 13 depicted"}
-          </span>
-        </Typography>
-      </div>
-    </>
-  );
-};
+//         <Typography
+//           variant="body2"
+//           style={{
+//             textDecoration: "none",
+//             fontWeight: "bold",
+//             // color: "#389a38",
+//             color: has_children ? "rgb(199 102 102)" : "#389a38",
+//           }}
+//         >
+//           <i className="fa fa-child" style={{ marginRight: 10 }} />
+//           {/* <span>No kids under 13 depicted</span> */}
+//           <span>
+//             {has_children ? "Shows kids under 13" : "No kids under 13 depicted"}
+//           </span>
+//         </Typography>
+//       </div>
+//     </>
+//   );
+// };
 
-const stateToProps = (state) => {
-  return {
-    imageInfos: state.getIn(["imageInfos"]),
-  };
-};
+// const stateToProps = (state) => {
+//   return {
+//     imageInfos: state.getIn(["imageInfos"]),
+//   };
+// };
 
-const dispatchToProps = (dispatch) => {
-  return bindActionCreators(
-    { putImageInfoInRedux: reduxLoadImageInfos },
-    dispatch
-  );
-};
-const SideExtraComponent = connect(
-  stateToProps,
-  dispatchToProps
-)(ComponentForSidePane);
+// const dispatchToProps = (dispatch) => {
+//   return bindActionCreators(
+//     { putImageInfoInRedux: reduxLoadImageInfos },
+//     dispatch
+//   );
+// };
+// const SideExtraComponent = connect(
+//   stateToProps,
+//   dispatchToProps
+// )(ComponentForSidePane);
