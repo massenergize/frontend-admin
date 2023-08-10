@@ -1030,20 +1030,20 @@ class MassEnergizeForm extends Component {
               <div style={{ padding: 20, color: "#d28818" }}>
                 <Typography>{field.label}</Typography>
                 <small>
-                  <b>PLEASE NOTE:</b> the wide spacing between two lines in the
-                  editor, is not what you will get when you content gets to
-                  users.
+                  <b>PLEASE NOTE:</b> the wide spacing between two lines
+                  in the editor, is not what you will get when you
+                  content gets to users.
                   <br />
                   If you need a{" "}
                   <b>
                     <i>gap </i>
                   </b>
-                  between two lines, press your <b>Enter Key twice </b> or more,
-                  instead of <b>once</b>
+                  between two lines, press your <b>Enter Key twice </b>{" "}
+                  or more, instead of <b>once</b>
                   <br />
                   <b>
-                    Pressing Once, will only show items right on the next line,
-                    without any gap
+                    Pressing Once, will only show items right on the
+                    next line, without any gap
                   </b>
                 </small>
               </div>
@@ -1068,6 +1068,9 @@ class MassEnergizeForm extends Component {
                   height: 350,
                   menubar: false,
                   default_link_target: "_blank",
+                  force_br_newlines: true,
+                  force_p_newlines: false,
+                  forced_root_block: "", // Needed for 3.x
                   // next 4 lines test to eliminate tiny cloud errors
                   // selector: "textarea",
                   // init_instance_callback: function(editor) {
