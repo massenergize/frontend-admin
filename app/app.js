@@ -37,15 +37,13 @@ import "./styles/ME Custom/extra.css";
 
 // Import i18n messages
 import { translationMessages } from "./i18n";
-import { IS_CANARY, IS_PROD } from "./config/constants";
+import {IS_PROD } from "./config/constants";
 
 import * as Sentry from "@sentry/react";
 import { StyledEngineProvider } from "@mui/material/styles";
 
-
-
 const SENTRY_DSN =
-  IS_PROD || IS_CANARY
+  IS_PROD
     ? process.env.REACT_APP_SENTRY_PROD_DSN
     : process.env.REACT_APP_SENTRY_DEV_DSN;
 
