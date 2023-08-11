@@ -28,25 +28,34 @@ export const filters = [
 ];
 
 export const deleteImage = (id, cb, options = {}) => {
+  console.log("THIS IS THE ID", id)
   if (!id) return;
-  const { searchResults } = options;
-  apiCall("/gallery.remove", { media_id: id })
-    .then((response) => {
-      if (!response.success)
-        return console.log("REMOVE IMAGE ERROR_BE", response.error);
-      const images = (searchResults && searchResults.images) || [];
-      const rem = images.filter((img) => img.id !== id);
-      putSearchResultsInRedux({
-        data: { ...(searchResults || {}), images: rem },
-        old: searchResults,
-        append: false,
-      });
-      if (cb) cb();
-    })
-    .catch((e) => {
-      console.log("REMOVE IMAGE ERROR_SYNT", e.toString());
-      if (cb) cb();
-    });
+  const { oldData, putNewListInRedux } = options;
+  const images = (oldData && oldData.images) || [];
+  const rem = images.filter((img) => img.id !== id);
+  putNewListInRedux({
+    data: { ...(oldData || {}), images: rem },
+    old: oldData,
+    append: false,
+  });
+  if (cb) cb();
+  // apiCall("/gallery.remove", { media_id: id })
+  //   .then((response) => {
+  //     if (!response.success)
+  //       return console.log("REMOVE IMAGE ERROR_BE", response.error);
+  //     const images = (oldData && oldData.images) || [];
+  //     const rem = images.filter((img) => img.id !== id);
+  //     putNewListInRedux({
+  //       data: { ...(oldData || {}), images: rem },
+  //       old: oldData,
+  //       append: false,
+  //     });
+  //     if (cb) cb();
+  //   })
+  //   .catch((e) => {
+  //     console.log("REMOVE IMAGE ERROR_SYNT", e.toString());
+  //     if (cb) cb();
+  //   });
 };
 
 export const getMoreInfoOnImage = ({
@@ -57,7 +66,6 @@ export const getMoreInfoOnImage = ({
 }) => {
   if (!id) return console.log("The image id provided is invalid...", id);
   const found = (imageInfos || {})[id];
-  console.log("I DID COME HERE FOUND: ", found);
   if (found) return updateStateWith(found);
   updateStateWith("loading");
   apiCall("/gallery.image.info", { media_id: id })

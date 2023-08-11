@@ -8,6 +8,7 @@ export default function SidePane({
   setShowSidePane,
   sourceExtractor,
   sideExtraComponent,
+  updateSelectedImages
 }) {
   const [copy, setCopying] = useState(false);
   const url =
@@ -35,7 +36,13 @@ export default function SidePane({
           key={getRandomStringKey()}
         />
         <div
-          style={{ overflowY: "scroll", maxHeight: "36vh", paddingBottom: 30 }}
+          style={{
+            overflowY: "scroll",
+            maxHeight: "36vh",
+            paddingBottom: 30,
+            boxSizing: "border-box",
+            paddingRight: 9,
+          }}
         >
           <div>
             <div
@@ -101,7 +108,12 @@ export default function SidePane({
               />
             )}
           </div>
-          {sideExtraComponent && sideExtraComponent({ image: activeImage, toggleSidePane: setShowSidePane })}
+          {sideExtraComponent &&
+            sideExtraComponent({
+              image: activeImage,
+              toggleSidePane: setShowSidePane,
+              updateSelectedImages
+            })}
         </div>
 
         <MLButton

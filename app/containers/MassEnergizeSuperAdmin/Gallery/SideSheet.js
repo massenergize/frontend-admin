@@ -165,7 +165,7 @@ export const DeleteVerificationBox = ({
         background: "#fff7f3",
         border: "solid 2px #ffe7e7",
         borderRadius: 5,
-        marginRight: 10,
+        marginRight: 0,
         textAlign: "center",
         padding: "15px 0px",
       }}

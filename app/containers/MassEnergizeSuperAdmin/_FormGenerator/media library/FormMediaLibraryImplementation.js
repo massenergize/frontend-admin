@@ -43,6 +43,7 @@ export const FormMediaLibraryImplementation = (props) => {
   const [userSelectedImages, setUserSelectedImages] = useState([]);
   const [mlibraryFormData, setmlibraryFormData] = useState({});
   const [uploading, setUploading] = useState(false);
+  console.log("THIS IS THE OBJECT FROM MLIBIMPLEMENTATION", imagesObject);
 
   useEffect(() => {
     // The value of "preselected" could either be a list of numbers(ids), or a list of objects(json image objects from backend)
@@ -58,9 +59,10 @@ export const FormMediaLibraryImplementation = (props) => {
     // So here, we just add it on to the whole list in redux. Thats all we are doing here(just making them available in the whole set).
     // When the userSelected values get into the MediaLibrary component itself, it will still be able to retrieve the selected images whether they are a list of Ids, or the actual images objects
     const theyAreImageObjects = typeof preselected[0] !== "number";
-    if (theyAreImageObjects)
+    const justResetting = preselected[0] === "reset";
+    if (theyAreImageObjects && !justResetting)
       addOnToWhatImagesAreInRedux({ old: imagesObject, data: preselected });
-    setUserSelectedImages(preselected);
+    if (!justResetting) setUserSelectedImages(preselected);
   }, [selected, defaultValue]);
 
   const loadMoreImages = (cb) => {
@@ -176,27 +178,6 @@ export const FormMediaLibraryImplementation = (props) => {
     };
   };
 
-  const renderImageRelations = (props) => {
-    console.log("This is the props coming", props.image);
-    return <></>;
-    // return (
-    //   <>
-    //     {Object.keys(info).map((key, index) => {
-    //       const imageInfo = {
-    //         name: key,
-    //         data: info[key] || {},
-    //       };
-
-    //       return (
-    //         <React.Fragment key={index.toString()}>
-    //           <ImageInfoArea {...imageInfo} is_super_admin={is_super_admin} />
-    //         </React.Fragment>
-    //       );
-    //     })}
-    //   </>
-    // );
-  };
-
   const validation = liveFormValidation();
 
   return (
@@ -237,18 +218,9 @@ export const FormMediaLibraryImplementation = (props) => {
         accept={MediaLibrary.AcceptedFileTypes.Images}
         multiple={false}
         extras={extras}
-        sideExtraComponent={(props) => {
-          return (
-            <SidebarForMediaLibraryModal {...props} />
-            // <>
-            //   <SideExtraComponent {...props} />{" "}
-            //   <ShowTagsOnPane
-            //     tags={props.image && props.image.tags}
-            //   />
-
-            // </>
-          );
-        }}
+        sideExtraComponent={(props) => (
+          <SidebarForMediaLibraryModal {...props} />
+        )}
         TooltipWrapper={({ children, title, placement }) => {
           return (
             <Tooltip title={title} placement={placement || "top"}>
@@ -365,124 +337,3 @@ const UploadIntroductionComponent = ({ auth, setAvailableTo, available }) => {
     </div>
   );
 };
-
-// // ------------------------------------
-// const ComponentForSidePane = ({ image, imageInfos, putImageInfoInRedux }) => {
-//   const [imageInfo, setImageInfo] = useState("loading");
-//   useEffect(() => {
-//     getMoreInfoOnImage({
-//       id: image && image.id,
-//       updateStateWith: setImageInfo,
-//       updateReduxWith: putImageInfoInRedux,
-//       imageInfos,
-//     });
-//   }, [image]);
-//   if (imageInfo === "loading") return <ProgressCircleWithLabel />;
-//   if (!imageInfo) return <></>;
-//   var informationAboutImage = (imageInfo && imageInfo.information) || {};
-//   var uploader = informationAboutImage.user;
-//   informationAboutImage = informationAboutImage.info || {};
-//   const {
-//     size_text,
-//     description,
-//     has_children,
-//     has_copyright_permission,
-//     copyright_att,
-//   } = informationAboutImage;
-//   const permBelongsTo = has_copyright_permission
-//     ? auth?.preferred_name || "..."
-//     : copyright_att;
-
-//   return (
-//     <>
-//       {(size_text || description || uploader) && (
-//         <div style={{ marginBottom: 5 }}>
-//           <Typography variant="body2" style={{ marginBottom: 5 }}>
-//             Uploaded by{" "}
-//             <b style={{ color: "rgb(156, 39, 176)" }}>
-//               {(uploader && uploader.full_name) || "..."}
-//             </b>
-//           </Typography>
-//           {size_text && (
-//             <Typography
-//               variant="h6"
-//               // color="primary"
-//               style={{
-//                 marginBottom: 6,
-//                 fontSize: "0.875rem",
-//                 fontWeight: "bold",
-//               }}
-//             >
-//               Size: {size_text}
-//             </Typography>
-//           )}
-//           {description && (
-//             <>
-//               <Typography
-//                 variant="body2"
-//                 style={{ textDecoration: "underline" }}
-//               >
-//                 <b>Description</b>
-//               </Typography>
-//               <Typography variant="body2">{description}</Typography>
-//             </>
-//           )}
-//         </div>
-//       )}
-
-//       <div
-//         style={{
-//           width: "100%",
-//           background: "#faebd74d",
-//           border: "solid 2px navajowhite",
-//           padding: 10,
-//           borderRadius: 4,
-//         }}
-//       >
-//         <Typography
-//           variant="body2"
-//           style={{ textDecoration: "none", fontWeight: "bold" }}
-//         >
-//           <i className="fa fa-copyright" />
-//           <span>opyright Information</span>
-//         </Typography>
-//         <Typography variant="caption" styl={{}}>
-//           Image rights belong to <b>{permBelongsTo}</b>
-//         </Typography>
-
-//         <Typography
-//           variant="body2"
-//           style={{
-//             textDecoration: "none",
-//             fontWeight: "bold",
-//             // color: "#389a38",
-//             color: has_children ? "rgb(199 102 102)" : "#389a38",
-//           }}
-//         >
-//           <i className="fa fa-child" style={{ marginRight: 10 }} />
-//           {/* <span>No kids under 13 depicted</span> */}
-//           <span>
-//             {has_children ? "Shows kids under 13" : "No kids under 13 depicted"}
-//           </span>
-//         </Typography>
-//       </div>
-//     </>
-//   );
-// };
-
-// const stateToProps = (state) => {
-//   return {
-//     imageInfos: state.getIn(["imageInfos"]),
-//   };
-// };
-
-// const dispatchToProps = (dispatch) => {
-//   return bindActionCreators(
-//     { putImageInfoInRedux: reduxLoadImageInfos },
-//     dispatch
-//   );
-// };
-// const SideExtraComponent = connect(
-//   stateToProps,
-//   dispatchToProps
-// )(ComponentForSidePane);

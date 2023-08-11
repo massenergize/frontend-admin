@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { reduxLoadImageInfos } from "../../../../redux/redux-actions/adminActions";
+import {
+  reduxLoadGalleryImages,
+  reduxLoadImageInfos,
+} from "../../../../redux/redux-actions/adminActions";
 import { Typography } from "@mui/material";
 import { ProgressCircleWithLabel } from "../../Gallery/utils";
 import { deleteImage, getMoreInfoOnImage } from "../../Gallery/Gallery";
@@ -13,6 +16,9 @@ export const SidebarForMediaLibraryModal = ({
   image,
   putImageInfoInRedux,
   toggleSidePane,
+  imagesObject,
+  putImagesInRedux,
+  updateSelectedImages,
 }) => {
   const [imageInfo, setImageInfo] = useState("loading");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -51,11 +57,16 @@ export const SidebarForMediaLibraryModal = ({
             // setIsDeleting(false);
             setDeleteLoading(true);
             //   setDeleteLoading(true);
-            deleteImage(image?.id, () => {
-              setIsDeleting(false);
-              toggleSidePane();
-              console.log(`Your image(${image?.id}) was deleted...`);
-            });
+            deleteImage(
+              image?.id,
+              () => {
+                setIsDeleting(false);
+                toggleSidePane();
+                updateSelectedImages([]);
+                console.log(`Your image(${image?.id}) was deleted...`);
+              },
+              { oldData: imagesObject, putNewListInRedux: putImagesInRedux }
+            );
           }}
         />
       )}
@@ -91,12 +102,16 @@ const mapStateToProps = (state) => {
   return {
     imageInfos: state.getIn(["imageInfos"]),
     auth: state.getIn(["auth"]),
+    imagesObject: state.getIn(["galleryImages"]),
   };
 };
 
 const dispatchToProps = (dispatch) => {
   return bindActionCreators(
-    { putImageInfoInRedux: reduxLoadImageInfos },
+    {
+      putImageInfoInRedux: reduxLoadImageInfos,
+      putImagesInRedux: reduxLoadGalleryImages,
+    },
     dispatch
   );
 };
@@ -198,7 +213,7 @@ const ShowMoreInformationAboutImage = ({
             color: has_children ? "rgb(199 102 102)" : "#389a38",
           }}
         >
-          <i className="fa fa-child" style={{ marginRight: 10 }} />
+          <i className="fa fa-child" style={{ marginRight: 6 }} />
           <span>
             {has_children ? "Shows kids under 13" : "No kids under 13 shown"}
           </span>

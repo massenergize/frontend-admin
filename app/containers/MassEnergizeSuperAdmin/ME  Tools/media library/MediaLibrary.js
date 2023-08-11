@@ -91,15 +91,17 @@ function MediaLibrary(props) {
 
   useEffect(() => {}, [cropped]);
 
+  // TODO LATER: this part can be abstracted out of the mlibrary 
   const preselectDefaultImages = () => {
     if (!selected || !selected.length) return images;
     var bank = (images || []).map((img) => img.id);
-    // sometimes an image that is preselected, my not be in the library's first load
+    // sometimes an image that is preselected, may not be in the library's first load
     // in that case just add it to the library's list
     var isNotThere = selected.filter((img) => {
       if (typeof img === "number") return !bank.includes(img);
       return !bank.includes(img.id);
     });
+
     if (!isNotThere.length) return images;
 
     return [...isNotThere, ...images];
@@ -405,7 +407,6 @@ MediaLibrary.propTypes = {
    * A function that should return a tooltip component.
    */
   TooltipWrapper: PropTypes.string,
-
 };
 
 MediaLibrary.Button = MLButton;

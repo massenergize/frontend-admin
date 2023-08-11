@@ -83,7 +83,7 @@ function MediaLibraryModal({
       reset, // The media library's internal reset function.
       close, // Mlibrary's internal close funciton
       changeTabTo: setCurrentTab, // The Mlibrary's internal function that controls tab switching
-      insertSelectedImages:returnRightAfterUpload, // Export a function that lets you insert uploaded items outside of the MLibrary.
+      insertSelectedImages: returnRightAfterUpload, // Export a function that lets you insert uploaded items outside of the MLibrary.
       uploading,
     };
   };
@@ -207,6 +207,7 @@ function MediaLibraryModal({
               setShowSidePane={setShowSidePane}
               sourceExtractor={sourceExtractor}
               sideExtraComponent={sideExtraComponent}
+              updateSelectedImages = {setSelectedContent}
             />
           )}
           <div className="m-inner-container">
