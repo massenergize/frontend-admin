@@ -1,5 +1,23 @@
 @import url(./../shared/css/universal.css);
 
+.ml-noti-banner {
+  background: white;
+  padding: 10px 25px;
+  position: absolute;
+  left: 0px;
+  bottom: 20px;
+  border-top-right-radius: 55px;
+  border-bottom-right-radius: 55px;
+  z-index: 1;
+  /* opacity: 0.5; */
+  cursor: pointer;
+  box-shadow: var(--elevate-3);
+}
+
+.ml-noti-banner:hover {
+  /* opacity: 0.3; */
+  transition: 0.2s ease-in;
+}
 .ml-tray-image {
   display: flex;
   align-items: center;

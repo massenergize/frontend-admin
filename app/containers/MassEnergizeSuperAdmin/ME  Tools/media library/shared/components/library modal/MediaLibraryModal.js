@@ -45,6 +45,9 @@ function MediaLibraryModal({
   TooltipWrapper,
   tabModifiers,
   customTabs,
+  notification,
+  renderCustomNotification,
+  setNotification,
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -184,6 +187,35 @@ function MediaLibraryModal({
 
   useEffect(() => {}, [images, shouldWait]);
 
+  const renderNotificationArea = () => {
+    if (!notification) return <></>;
+    const { message, close, loading, theme, textTheme } = notification;
+    return (
+      <div className="ml-noti-banner" style={theme || {}}>
+        {/* {renderCustomNotification ? (
+          renderCustomNotification()
+        ) : ( */}
+        <p
+          style={{
+            margin: 0,
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            ...(textTheme || {}),
+          }}
+        >
+          {loading && <i className="fa fa-spinner fa-spin" />}
+          <span style={{ margin: "0px 10px" }}>{message}</span>{" "}
+          <i
+            className="fa fa-times touchable-opacity"
+            onClick={() => close && close()}
+          />
+        </p>
+        {/* )} */}
+      </div>
+    );
+  };
+
   const TabComponent = Tabs.find((tab) => tab.key === currentTab).component;
   const last = content.length - 1;
   const activeImage = (content || [])[last]; // if multiple selection is active, just show the last selected item in the side pane
@@ -207,10 +239,10 @@ function MediaLibraryModal({
               setShowSidePane={setShowSidePane}
               sourceExtractor={sourceExtractor}
               sideExtraComponent={sideExtraComponent}
-              updateSelectedImages = {setSelectedContent}
+              updateSelectedImages={setSelectedContent}
             />
           )}
-          <div className="m-inner-container">
+          <div className="m-inner-container" style={{ position: "relative" }}>
             <div className="m-title-bar">
               <h3 style={{ marginBottom: 0 }}>Media Library</h3>
               {/* --------------------- TAB HEADER AREA -------------- */}
@@ -240,7 +272,9 @@ function MediaLibraryModal({
                 })}
               </div>
             </div>
-
+            {/* ------------------------ NOTIFICATION AREA ------------------- */}
+            {renderNotificationArea()}
+            {/* ---------------------------------------------- ------------------- */}
             {/* ------------------------ MAIN TAB DISPLAY AREA ------------------- */}
             <div
               style={{ maxHeight: 550, minHeight: 550, overflowY: "scroll" }}

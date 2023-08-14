@@ -98,7 +98,7 @@ export default function MediaLibraryForm({ auth, communities, onChange }) {
                 <b>MassEnergize MOU</b>
               </Link>
               , you are required to have permission before uploading other
-              people's content. If No, plese provide information about the owner
+              people's content. If No, please provide information about the owner
               of this item's copyright in the box that will be provided.
             </Typography>
             <RadioGroup

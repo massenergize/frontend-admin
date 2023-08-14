@@ -43,26 +43,61 @@ export const FormMediaLibraryImplementation = (props) => {
   const [userSelectedImages, setUserSelectedImages] = useState([]);
   const [mlibraryFormData, setmlibraryFormData] = useState({});
   const [uploading, setUploading] = useState(false);
+  const [outsideNotification, setOutsideNotification] = useState(null);
   console.log("THIS IS THE OBJECT FROM MLIBIMPLEMENTATION", imagesObject);
+
+  const fetchNeededImages = (ids, cb) => {
+    setOutsideNotification({
+      message: "Finding selected images that are not here yet...",
+      loading: true,
+      close: () => setOutsideNotification(null),
+    });
+    apiCall("/gallery.find", { ids }).then((response) => {
+      console.log("FOUND THIS RESPONSE AFTER FIND IMAGES: ", response);
+      setOutsideNotification(null);
+      if (!response.success) {
+        setError(response.error);
+        return console.log("Error finding images from B.E", response.error);
+      }
+      cb && cb(response.data);
+    });
+  };
+  const useIdsToFindObjs = (ids) => {
+    const images = imagesObject.images;
+    if (!selected || !selected.length) return images;
+    var bank = (images || []).map((img) => img.id);
+    // sometimes an image that is preselected, may not be in the library's first load
+    // in that case just add it to the library's list
+    var isNotThere = selected.filter((img) => !bank.includes(img));
+    const alreadyAvailableHere = images.filter((img) => ids.includes(img.id)); // Needed because there is a chance that some might be available in the list, but not all
+
+    if (!isNotThere.length)
+      return fetchNeededImages(ids, (fromBackend) => {
+        const together = [...alreadyAvailableHere, ...(fromBackend || [])];
+        addOnToWhatImagesAreInRedux({ old: imagesObject, data: fromBackend });
+        setUserSelectedImages(together);
+      });
+  };
 
   useEffect(() => {
     // The value of "preselected" could either be a list of numbers(ids), or a list of objects(json image objects from backend)
     // This happens because when the page loads afresh, and we pass down images as default value in some "formGenerator JSON", it comes in as objects
-    // But then, when the user goes around and selects images from the library, the form generator is setup to only
-    // make use of the ID values on the image objects (because that is all we need it to send to the backend)
+    // But then when the user goes around and selects images from the library, the form generator is setup to only
+    // make use of the ID values on the image objects (because that is all we need to send to the backend)
     const preselected = selected || defaultValue;
     if (!preselected || !preselected.length) return;
-    // ---- And whats happening here?
-    // So, in the case that a page is laoding for the first time and the images come in as objects, and not
-    // as numbers, there is a big chance that images might not be in the list of the whole data set of
-    // images given to the media library(because we load all images in small chunks...).
-    // So here, we just add it on to the whole list in redux. Thats all we are doing here(just making them available in the whole set).
-    // When the userSelected values get into the MediaLibrary component itself, it will still be able to retrieve the selected images whether they are a list of Ids, or the actual images objects
+    // so over here all that is happening is that
+    // We are checking if the items that are preselected have come as objects. If they are objects,
+    // then we know we can easily check them on the list right away
+    // If they are not, we use the id to fetch them as objects and put them in the list
     const theyAreImageObjects = typeof preselected[0] !== "number";
     const justResetting = preselected[0] === "reset";
-    if (theyAreImageObjects && !justResetting)
+    if (theyAreImageObjects && !justResetting) {
       addOnToWhatImagesAreInRedux({ old: imagesObject, data: preselected });
-    if (!justResetting) setUserSelectedImages(preselected);
+      return setUserSelectedImages(preselected);
+    }
+    // if (!justResetting) setUserSelectedImages(preselected);
+    if (!justResetting) useIdsToFindObjs(preselected);
   }, [selected, defaultValue]);
 
   const loadMoreImages = (cb) => {
@@ -183,6 +218,11 @@ export const FormMediaLibraryImplementation = (props) => {
   return (
     <div>
       <MediaLibrary
+        // passedNotification={{
+        //   message: "Here we go...",
+        //   loading: true,
+        //   theme: { background: "red", color: "white" },
+        // }}
         defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
         images={(imagesObject && imagesObject.images) || []}
         actionText="Select From Library"
