@@ -71,7 +71,7 @@ export const FormMediaLibraryImplementation = (props) => {
     var isNotThere = selected.filter((img) => !bank.includes(img));
     const alreadyAvailableHere = images.filter((img) => ids.includes(img.id)); // Needed because there is a chance that some might be available in the list, but not all
 
-    if (!isNotThere.length)
+    if (isNotThere?.length)
       return fetchNeededImages(ids, (fromBackend) => {
         const together = [...alreadyAvailableHere, ...(fromBackend || [])];
         addOnToWhatImagesAreInRedux({ old: imagesObject, data: fromBackend });
@@ -218,11 +218,7 @@ export const FormMediaLibraryImplementation = (props) => {
   return (
     <div>
       <MediaLibrary
-        // passedNotification={{
-        //   message: "Here we go...",
-        //   loading: true,
-        //   theme: { background: "red", color: "white" },
-        // }}
+        passedNotification={outsideNotification}
         defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
         images={(imagesObject && imagesObject.images) || []}
         actionText="Select From Library"

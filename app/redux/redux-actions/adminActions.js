@@ -252,7 +252,7 @@ export const reduxLoadAdmins = (data = LOADING) => {
 export const reduxFetchInitialContent = (auth) => (dispatch) => {
   if (!auth) return;
   const isSuperAdmin = auth && auth.is_super_admin;
-  // dispatch(setupSocketConnectionWithBackend(auth)); Deactivated as of 30/06/23 (Will return when the PROD disconnection bug is fixed) 
+  // dispatch(setupSocketConnectionWithBackend(auth)); Deactivated as of 30/06/23 (Will return when the PROD disconnection bug is fixed)
 
   Promise.all([
     apiCall("/policies.listForCommunityAdmin"),
@@ -498,9 +498,10 @@ export const reduxUpdateHeap = (heap = {}) => ({
  * and nothing more!
  */
 export const reduxAddToGalleryImages = ({ old, data }) => {
+  const images = [...(data || []), ...(old.images || [])];
   return {
     type: LOAD_GALLERY_IMAGES,
-    payload: { ...old, images: [...(data || []), ...(old.images || [])] },
+    payload: { ...old, images: removeDupes(images) },
   };
 };
 
