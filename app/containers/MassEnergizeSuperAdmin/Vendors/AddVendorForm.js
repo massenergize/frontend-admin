@@ -48,22 +48,21 @@ class CreateNewVendorForm extends Component {
   static getDerivedStateFromProps(props, state) {
     const { communities, tags, formState, location, auth } = props;
 
-      const isSuperAdmin =auth?.is_super_admin 
+    const isSuperAdmin = auth?.is_super_admin;
 
     const section = makeTagSection({
       collections: tags,
       defaults: true,
       title: "Please select tag(s) that apply to this service provider",
     });
-    const coms = (communities ||[]).map((c) => ({
+    const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
-      id:c.id,
+      id: c.id,
     }));
 
     const jobsDoneDontRunWhatsBelowEverAgain =
-      !(communities && communities.length && tags.length) ||
-      state.mounted;
+      !(communities && communities.length && tags.length) || state.mounted;
 
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
@@ -77,8 +76,6 @@ class CreateNewVendorForm extends Component {
 
     return { formJson, communities, mounted: true };
   }
-
-  
 
   render() {
     const { classes } = this.props;
@@ -124,7 +121,12 @@ const Mapped = connect(
 )(withRouter(CreateNewVendorForm));
 export default withStyles(styles, { withTheme: true })(Mapped);
 
-const createFormJson = ({ communities, progress, autoOpenMediaLibrary, isSuperAdmin}) => {
+const createFormJson = ({
+  communities,
+  progress,
+  autoOpenMediaLibrary,
+  isSuperAdmin,
+}) => {
   const formJson = {
     title: "Create New Vendor",
     subTitle: "",
@@ -215,10 +217,7 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary, isSuperAd
             defaultValue: "false",
             dbName: "have_address",
             readOnly: false,
-            data: [
-              { id: "false", value: "No" },
-              { id: "true", value: "Yes" },
-            ],
+            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
             child: {
               valueToCheck: "true",
               fields: [
@@ -382,10 +381,17 @@ const createFormJson = ({ communities, progress, autoOpenMediaLibrary, isSuperAd
         fieldType: fieldTypes.MediaLibrary,
         openState: autoOpenMediaLibrary,
         dbName: "image",
-        openState:true, //remove when you are done
-        defaultTab:"upload-form", //remove when you are done
+        openState: true, //remove when you are done
+        defaultTab: "upload-form", //remove when you are done
 
-        selected: [],
+        // selected: [],
+        selected: [
+          {
+            id: 1796,
+            url:
+              "https://massenergize-files.s3.amazonaws.com/media/Screenshot_2023-06-28_at_11.03.32-230803-074149.png",
+          },
+        ],
         label: "Upload a logo for this Vendor",
         isRequired: false,
       },

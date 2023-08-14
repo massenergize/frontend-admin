@@ -47,9 +47,12 @@ export const FormMediaLibraryImplementation = (props) => {
   console.log("THIS IS THE OBJECT FROM MLIBIMPLEMENTATION", imagesObject);
 
   const fetchNeededImages = (ids, cb) => {
+    console.log("Finding image from B.E");
     setOutsideNotification({
       message: "Finding selected images that are not here yet...",
       loading: true,
+      theme: { background: "green" },
+      textTheme: { color: "white" },
       close: () => setOutsideNotification(null),
     });
     apiCall("/gallery.find", { ids }).then((response) => {
@@ -62,21 +65,30 @@ export const FormMediaLibraryImplementation = (props) => {
       cb && cb(response.data);
     });
   };
+
   const useIdsToFindObjs = (ids) => {
     const images = imagesObject.images;
-    if (!selected || !selected.length) return images;
+
+    if (!ids.length) return;
     var bank = (images || []).map((img) => img.id);
+    console.log("I have just entered here", ids);
     // sometimes an image that is preselected, may not be in the library's first load
     // in that case just add it to the library's list
     var isNotThere = selected.filter((img) => !bank.includes(img));
     const alreadyAvailableHere = images.filter((img) => ids.includes(img.id)); // Needed because there is a chance that some might be available in the list, but not all
+    console.log("Is it there", isNotThere);
 
     if (isNotThere?.length)
+      // only run this if some items are not found in the already loaded redux content
       return fetchNeededImages(ids, (fromBackend) => {
         const together = [...alreadyAvailableHere, ...(fromBackend || [])];
         addOnToWhatImagesAreInRedux({ old: imagesObject, data: fromBackend });
         setUserSelectedImages(together);
       });
+
+    if (alreadyAvailableHere.length)
+      //all items were found here, so we move without any B.E requests
+      setUserSelectedImages(alreadyAvailableHere);
   };
 
   useEffect(() => {
@@ -84,17 +96,19 @@ export const FormMediaLibraryImplementation = (props) => {
     // This happens because when the page loads afresh, and we pass down images as default value in some "formGenerator JSON", it comes in as objects
     // But then when the user goes around and selects images from the library, the form generator is setup to only
     // make use of the ID values on the image objects (because that is all we need to send to the backend)
-    const preselected = selected || defaultValue;
+    let preselected = selected || defaultValue;
     if (!preselected || !preselected.length) return;
-    // so over here all that is happening is that
+    // so over here all that is happening is:
     // We are checking if the items that are preselected have come as objects. If they are objects,
     // then we know we can easily check them on the list right away
     // If they are not, we use the id to fetch them as objects and put them in the list
     const theyAreImageObjects = typeof preselected[0] !== "number";
     const justResetting = preselected[0] === "reset";
-    if (theyAreImageObjects && !justResetting) {
-      addOnToWhatImagesAreInRedux({ old: imagesObject, data: preselected });
-      return setUserSelectedImages(preselected);
+    if (theyAreImageObjects) {
+      console.log("It happened here");
+      preselected = preselected.map((img) => img.id);
+      // addOnToWhatImagesAreInRedux({ old: imagesObject, data: preselected });
+      // return setUserSelectedImages(preselected);
     }
     // if (!justResetting) setUserSelectedImages(preselected);
     if (!justResetting) useIdsToFindObjs(preselected);
