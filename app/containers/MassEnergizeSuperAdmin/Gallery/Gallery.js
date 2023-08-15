@@ -28,7 +28,6 @@ export const filters = [
 ];
 
 export const deleteImage = (id, cb, options = {}) => {
-  console.log("THIS IS THE ID", id)
   if (!id) return;
   const { oldData, putNewListInRedux } = options;
   const images = (oldData && oldData.images) || [];

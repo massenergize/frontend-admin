@@ -384,14 +384,7 @@ const createFormJson = ({
         openState: true, //remove when you are done
         defaultTab: "upload-form", //remove when you are done
 
-        // selected: [],
-        selected: [
-          {
-            id: 1796,
-            url:
-              "https://massenergize-files.s3.amazonaws.com/media/Screenshot_2023-06-28_at_11.03.32-230803-074149.png",
-          },
-        ],
+        selected: [],
         label: "Upload a logo for this Vendor",
         isRequired: false,
       },

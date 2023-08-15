@@ -35,7 +35,7 @@ function MediaLibrary(props) {
   const [currentTab, setCurrentTab] = useState(defaultTab);
   const [files, setFiles] = useState([]); // all files that have been selected from user's device [Schema: {id, file}]
   const [croppedSource, setCroppedSource] = useState();
-  const [notification, setNotification] = useState(null); // just used to mark when the mlib is working on something(that isnt the typical 'loading' state), and the user needs to be updated
+  const [notification, setNotification] = useState(null); // just used to communicate when the mlib is working on something(that isnt the typical 'loading' state), and the user needs to be updated
 
   // --------------------------------------------------
   const oldPosition = useRef(null);
@@ -79,18 +79,13 @@ function MediaLibrary(props) {
     onStateChange({ show, state });
   }, [show, state]);
 
-  // TODO: FIX THIS Before PR (BPR).. There is no need for it now because of whats implemented in FormMedialibraryImplementation
+
   useEffect(() => {
     setHasMountedTo(true);
-    // const preSelected = (selected || []).map((img) => {
-    //   if (typeof img === "number") {
-    //     // Sometimes, default values for the media library comes in the form of Ids, instead of objects. When that happens, use the Ids to find teh real objects
-    //     const found = (images || []).find((im) => im.id === img);
-    //     return found || {};
-    //   }
-    //   return img;
-    // });
-    setTrayImages(selected);
+    const imagesMap = new Map(images.map((item) => [item.id, item]));
+    const selectedAndExists =
+      selected?.map((item) => imagesMap.get(item.id)).filter(Boolean) || [];
+    setTrayImages(selectedAndExists);
   }, [images, selected]);
 
   useEffect(() => {}, [cropped]);
@@ -99,24 +94,7 @@ function MediaLibrary(props) {
     setNotification(passedNotification);
   }, [passedNotification]);
 
-  // // TODO LATER: this part can be abstracted out of the mlibrary
-  // const addPreselectedImagesToList = () => {
-  //   if (!selected || !selected.length) return images;
-  //   var bank = (images || []).map((img) => img.id);
-  //   // sometimes an image that is preselected, may not be in the library's first load
-  //   // in that case just add it to the library's list
-  //   var isNotThere = selected.filter((img) => {
-  //     if (typeof img === "number") return !bank.includes(img);
-  //     return !bank.includes(img.id);
-  //   });
-  //   // The images that are preselected are already available in the list, or there were no preselected items. In that case just return the list we have
-  //   if (!isNotThere.length) return images;
-
-  //   // In this case, the preselected items were not found in the list. So we need to collect them from the backend
-  //   console.log("HERE IS THE CULPRIT", [...isNotThere, ...images])
-
-  //   return [...isNotThere, ...images];
-  // };
+  
   const close = () => {
     setShow(false);
     setFiles([]);

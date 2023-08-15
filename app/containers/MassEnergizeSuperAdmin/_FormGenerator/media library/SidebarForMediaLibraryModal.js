@@ -18,7 +18,6 @@ export const SidebarForMediaLibraryModal = ({
   toggleSidePane,
   imagesObject,
   putImagesInRedux,
-  updateSelectedImages,
 }) => {
   const [imageInfo, setImageInfo] = useState("loading");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -62,7 +61,6 @@ export const SidebarForMediaLibraryModal = ({
               () => {
                 setIsDeleting(false);
                 toggleSidePane();
-                updateSelectedImages([]);
                 console.log(`Your image(${image?.id}) was deleted...`);
               },
               { oldData: imagesObject, putNewListInRedux: putImagesInRedux }

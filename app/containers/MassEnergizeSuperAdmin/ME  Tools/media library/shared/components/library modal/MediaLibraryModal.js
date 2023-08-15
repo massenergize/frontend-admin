@@ -46,7 +46,6 @@ function MediaLibraryModal({
   tabModifiers,
   customTabs,
   notification,
-  renderCustomNotification,
   setNotification,
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
@@ -185,7 +184,12 @@ function MediaLibraryModal({
 
   Tabs = Tabs.filter((tab) => !(excludeTabs || []).includes(tab.key));
 
-  useEffect(() => {}, [images, shouldWait]);
+  useEffect(() => {
+    const imagesMap = new Map(images.map((item) => [item.id, item]));
+    const selectedAndExists =
+      selected?.map((item) => imagesMap.get(item.id)).filter(Boolean) || [];
+    setSelectedContent(selectedAndExists);
+  }, [images, selected]);
 
   const renderNotificationArea = () => {
     if (!notification) return <></>;

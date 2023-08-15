@@ -44,10 +44,7 @@ export const FormMediaLibraryImplementation = (props) => {
   const [mlibraryFormData, setmlibraryFormData] = useState({});
   const [uploading, setUploading] = useState(false);
   const [outsideNotification, setOutsideNotification] = useState(null);
-  console.log("THIS IS THE OBJECT FROM MLIBIMPLEMENTATION", imagesObject);
-
   const fetchNeededImages = (ids, cb) => {
-    console.log("Finding image from B.E");
     setOutsideNotification({
       message: "Finding selected images that are not here yet...",
       loading: true,
@@ -71,12 +68,10 @@ export const FormMediaLibraryImplementation = (props) => {
 
     if (!ids.length) return;
     var bank = (images || []).map((img) => img.id);
-    console.log("I have just entered here", ids);
     // sometimes an image that is preselected, may not be in the library's first load
     // in that case just add it to the library's list
     var isNotThere = selected.filter((img) => !bank.includes(img));
     const alreadyAvailableHere = images.filter((img) => ids.includes(img.id)); // Needed because there is a chance that some might be available in the list, but not all
-    console.log("Is it there", isNotThere);
 
     if (isNotThere?.length)
       // only run this if some items are not found in the already loaded redux content
@@ -176,7 +171,6 @@ export const FormMediaLibraryImplementation = (props) => {
           size: file?.size?.toString(),
           size_text: getFileSize(file),
         };
-        console.log("Thats what INFO LOOKED LIKE", info);
         return apiCall("/gallery.add", { ...apiJson, ...info, file: file });
       })
     )
