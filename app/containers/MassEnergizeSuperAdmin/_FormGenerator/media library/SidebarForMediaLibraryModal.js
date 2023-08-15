@@ -9,6 +9,7 @@ import { Typography } from "@mui/material";
 import { ProgressCircleWithLabel } from "../../Gallery/utils";
 import { deleteImage, getMoreInfoOnImage } from "../../Gallery/Gallery";
 import { DeleteVerificationBox, ImageInfoArea } from "../../Gallery/SideSheet";
+import { Link } from "react-router-dom";
 
 export const SidebarForMediaLibraryModal = ({
   auth,
@@ -46,27 +47,43 @@ export const SidebarForMediaLibraryModal = ({
           {(uploader && uploader.full_name) || "..."}
         </b>
       </Typography>
+
       {userCanDelete && (
-        <DeleteVerificationBox
-          active={isDeleting}
-          close={() => setIsDeleting(false)}
-          onDelete={() => setIsDeleting(true)}
-          loading={deleteLoading}
-          onConfirm={() => {
-            // setIsDeleting(false);
-            setDeleteLoading(true);
-            //   setDeleteLoading(true);
-            deleteImage(
-              image?.id,
-              () => {
-                setIsDeleting(false);
-                toggleSidePane();
-                console.log(`Your image(${image?.id}) was deleted...`);
-              },
-              { oldData: imagesObject, putNewListInRedux: putImagesInRedux }
-            );
-          }}
-        />
+        <>
+          <Link
+            to="#"
+            style={{
+              color: "var(--app-cyan)",
+              fontWeight: "bold",
+              fontSize: "0.875rem",
+              display: "block",
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              // NOw send the currently selected image to redux to be used in the mlib form
+            }}
+          >
+            Edit Image Details
+          </Link>
+          <DeleteVerificationBox
+            active={isDeleting}
+            close={() => setIsDeleting(false)}
+            onDelete={() => setIsDeleting(true)}
+            loading={deleteLoading}
+            onConfirm={() => {
+              setDeleteLoading(true);
+              deleteImage(
+                image?.id,
+                () => {
+                  setIsDeleting(false);
+                  toggleSidePane();
+                  console.log(`Your image(${image?.id}) was deleted...`);
+                },
+                { oldData: imagesObject, putNewListInRedux: putImagesInRedux }
+              );
+            }}
+          />
+        </>
       )}
       {tags?.length ? (
         <div
@@ -227,7 +244,7 @@ const ShowMoreInformationAboutImage = ({
             >
               <span>Guardian Information</span>
             </Typography>
-            <Typography variant="caption">Kejetia Ketia@gmail.com</Typography>
+            <Typography variant="caption">{guardian_info}</Typography>
           </div>
         )}
       </div>
@@ -237,7 +254,7 @@ const ShowMoreInformationAboutImage = ({
           variant="body2"
           style={{ textDecoration: "underline", marginBottom: 10 }}
         >
-          <b>Image Relations</b>
+          <b>Image Usage</b>
         </Typography>
         {Object.keys(relations).map((key, index) => {
           const imageInfo = {

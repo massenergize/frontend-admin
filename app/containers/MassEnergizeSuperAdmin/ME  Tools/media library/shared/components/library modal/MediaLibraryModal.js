@@ -239,6 +239,7 @@ function MediaLibraryModal({
         <div style={{ position: "relative", height: "100%" }}>
           {showSidePane && (
             <SidePane
+              changeTabTo={setCurrentTab}
               activeImage={activeImage}
               setShowSidePane={setShowSidePane}
               sourceExtractor={sourceExtractor}

@@ -141,13 +141,13 @@ export const DeleteVerificationBox = ({
     return (
       <Link
         to="#"
-        style={{ color: "red", fontWeight: "bold" }}
+        style={{ color: "red", fontWeight: "bold", fontSize: "0.875rem" }}
         onClick={(e) => {
           e.preventDefault();
           onDelete && onDelete();
         }}
       >
-        Delete from library
+        Delete from Library
       </Link>
       // <Button
       //   onClick={() => onDelete && onDelete()}

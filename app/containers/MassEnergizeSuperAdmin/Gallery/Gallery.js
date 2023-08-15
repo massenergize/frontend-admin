@@ -37,24 +37,24 @@ export const deleteImage = (id, cb, options = {}) => {
     old: oldData,
     append: false,
   });
-  if (cb) cb();
-  // apiCall("/gallery.remove", { media_id: id })
-  //   .then((response) => {
-  //     if (!response.success)
-  //       return console.log("REMOVE IMAGE ERROR_BE", response.error);
-  //     const images = (oldData && oldData.images) || [];
-  //     const rem = images.filter((img) => img.id !== id);
-  //     putNewListInRedux({
-  //       data: { ...(oldData || {}), images: rem },
-  //       old: oldData,
-  //       append: false,
-  //     });
-  //     if (cb) cb();
-  //   })
-  //   .catch((e) => {
-  //     console.log("REMOVE IMAGE ERROR_SYNT", e.toString());
-  //     if (cb) cb();
-  //   });
+  // if (cb) cb();
+  apiCall("/gallery.remove", { media_id: id })
+    .then((response) => {
+      if (!response.success)
+        return console.log("REMOVE IMAGE ERROR_BE", response.error);
+      const images = (oldData && oldData.images) || [];
+      const rem = images.filter((img) => img.id !== id);
+      putNewListInRedux({
+        data: { ...(oldData || {}), images: rem },
+        old: oldData,
+        append: false,
+      });
+      if (cb) cb(true);
+    })
+    .catch((e) => {
+      console.log("REMOVE IMAGE ERROR_SYNT", e.toString());
+      if (cb) cb(false);
+    });
 };
 
 export const getMoreInfoOnImage = ({

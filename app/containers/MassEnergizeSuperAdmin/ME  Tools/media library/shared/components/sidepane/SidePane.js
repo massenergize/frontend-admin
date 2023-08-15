@@ -8,7 +8,8 @@ export default function SidePane({
   setShowSidePane,
   sourceExtractor,
   sideExtraComponent,
-  updateSelectedImages
+  updateSelectedImages,
+  changeTabTo,
 }) {
   const [copy, setCopying] = useState(false);
   const url =
@@ -73,7 +74,7 @@ export default function SidePane({
               >
                 Full Image Here
               </a>
-              <h6
+              {/* <h6
                 className="touchable-opacity"
                 style={{
                   margin: 0,
@@ -87,9 +88,9 @@ export default function SidePane({
                 }}
               >
                 Copy URL
-              </h6>
+              </h6> */}
             </div>
-            {copy && (
+            {/* {copy && (
               <textarea
                 style={{
                   padding: 10,
@@ -106,13 +107,14 @@ export default function SidePane({
                 rows="4"
                 value={url}
               />
-            )}
+            )} */}
           </div>
           {sideExtraComponent &&
             sideExtraComponent({
               image: activeImage,
               toggleSidePane: setShowSidePane,
-              updateSelectedImages
+              updateSelectedImages,
+              changeTabTo,
             })}
         </div>
 
