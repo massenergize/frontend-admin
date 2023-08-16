@@ -40,7 +40,7 @@ const MediaLibraryForm = ({
       underAge: underAge === "Yes" ? true : false,
       copyright_att: copyrightAtt,
       guardian_info: guardianInfo,
-      communities: chosenComms,
+      community_ids: chosenComms,
       tags,
     };
     onChange && onChange(formData);
@@ -94,16 +94,16 @@ const MediaLibraryForm = ({
       <Typography variant="h6">Hi {auth?.preferred_name || "..."},</Typography>
       {isInEditMode ? (
         <Typography variant="body2">
-          <span>You are currently editing the details of an item.</span>
+          <span>You are currently editing the details of</span>
           <Link
             to="#"
             onClick={(e) => {
               e.preventDefault();
               toggleSidePane(true);
             }}
-            style={{ marginLeft: 6, cursor: "pointer" }}
+            style={{ marginLeft: 4, cursor: "pointer" }}
           >
-            Which item am I editing?
+            this item
           </Link>
         </Typography>
       ) : (

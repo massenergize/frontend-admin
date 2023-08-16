@@ -48,6 +48,17 @@ export const FormMediaLibraryImplementation = (props) => {
   const [uploading, setUploading] = useState(false);
   const [outsideNotification, setOutsideNotification] = useState(null);
   const isInEditMode = imageForEdit;
+  const notify = (message, error = false, extras) => {
+    const obj = {
+      message: message,
+      // loading: true,
+      theme: { background: error ? "#c30707" : "green" },
+      textTheme: { color: "white" },
+      close: () => setOutsideNotification(null),
+      ...(extras || {}),
+    };
+    setOutsideNotification(obj);
+  };
   const fetchNeededImages = (ids, cb) => {
     setOutsideNotification({
       message: "Finding selected images that are not here yet...",
@@ -153,8 +164,8 @@ export const FormMediaLibraryImplementation = (props) => {
     const isUniversal = available ? { is_universal: true } : {};
     const apiJson = {
       user_id: auth.id,
-      community_ids: ((auth && auth.admin_at) || []).map((com) => com.id),
-      title: "Media library upload",
+      // community_ids: ((auth && auth.admin_at) || []).map((com) => com.id),
+      // title: "Media library upload",
       ...isUniversal,
       ...(json || {}),
     };
@@ -192,12 +203,29 @@ export const FormMediaLibraryImplementation = (props) => {
         // changeTabTo(MediaLibrary.Tabs.LIBRARY_TAB);
       })
       .catch((e) => {
+        setUploading(false);
         console.log("Sorry, there was a problem uploading some items...: ", e);
       });
   };
 
-  const saveImageEdits = (props) => {
-    console.log("Yes, we are editing now meerhn", props);
+  const saveImageEdits = ({ json }) => {
+    // return console.log("THESE ARE THE NEW DETS", json);
+    setUploading(true);
+    setOutsideNotification(null);
+    apiCall("/gallery.item.edit", {
+      ...json,
+      user_upload_id: imageForEdit?.information?.id,
+      media_id : imageForEdit?.id
+    })
+      .then((response) => {
+        setUploading(false);
+        console.log("RESPONSE AFTER UPDATING BACKEND", response);
+        if (!response.success) return notify(response.error, true);
+      })
+      .catch((e) => {
+        setUploading(false);
+        console.log("ERROR_UPDATING_ITEM_DETAILS", e.toString());
+      });
   };
 
   const uploadAndSaveForm = (props) => {
