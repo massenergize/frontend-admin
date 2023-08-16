@@ -87,6 +87,7 @@ function MediaLibraryModal({
       changeTabTo: setCurrentTab, // The Mlibrary's internal function that controls tab switching
       insertSelectedImages: returnRightAfterUpload, // Export a function that lets you insert uploaded items outside of the MLibrary.
       uploading,
+      toggleSidePane: setShowSidePane,
     };
   };
   const handleUpload = () => {
@@ -125,15 +126,20 @@ function MediaLibraryModal({
     const modifier = (tabModifiers || {})[key];
     return modifier?.name || _default || "...";
   };
-  const formatCustomTabs = () => {
+  const formatCustomTabs = (props) => {
     if (!customTabs) return [];
-    return customTabs.map((obj) => obj.tab);
+    return customTabs.map((obj) => {
+      return {
+        ...(obj?.tab || {}),
+        component: () => obj?.tab?.component(props),
+      };
+    });
   };
   var Tabs = [
     {
       headerName: customName(TABS.UPLOAD_TAB, "Upload"),
       key: TABS.UPLOAD_TAB,
-      component: (
+      component: (_) => (
         <Upload
           maximumImageSize={maximumImageSize}
           compress={compress}
@@ -158,7 +164,7 @@ function MediaLibraryModal({
     {
       headerName: customName(TABS.LIBRARY_TAB, "Library"),
       key: TABS.LIBRARY_TAB,
-      component: (
+      component: (_) => (
         <Suspense fallback={<p>Loading...</p>}>
           <Library
             renderBeforeImages={renderBeforeImages}
@@ -179,7 +185,7 @@ function MediaLibraryModal({
         </Suspense>
       ),
     },
-    ...formatCustomTabs(),
+    ...formatCustomTabs(gatherUtils()),
   ];
 
   Tabs = Tabs.filter((tab) => !(excludeTabs || []).includes(tab.key));
@@ -220,7 +226,7 @@ function MediaLibraryModal({
     );
   };
 
-  const TabComponent = Tabs.find((tab) => tab.key === currentTab).component;
+  const tabComponent = Tabs.find((tab) => tab.key === currentTab).component;
   const last = content.length - 1;
   const activeImage = (content || [])[last]; // if multiple selection is active, just show the last selected item in the side pane
 
@@ -284,7 +290,7 @@ function MediaLibraryModal({
             <div
               style={{ maxHeight: 550, minHeight: 550, overflowY: "scroll" }}
             >
-              {TabComponent}
+              {tabComponent(gatherUtils)}
             </div>
           </div>
           <Footer

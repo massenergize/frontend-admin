@@ -4,6 +4,7 @@ import { bindActionCreators } from "redux";
 import {
   reduxLoadGalleryImages,
   reduxLoadImageInfos,
+  setImageForEditAction,
 } from "../../../../redux/redux-actions/adminActions";
 import { Typography } from "@mui/material";
 import { ProgressCircleWithLabel } from "../../Gallery/utils";
@@ -19,6 +20,8 @@ export const SidebarForMediaLibraryModal = ({
   toggleSidePane,
   imagesObject,
   putImagesInRedux,
+  putImageInReduxForEdit, 
+  changeTabTo
 }) => {
   const [imageInfo, setImageInfo] = useState("loading");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -61,6 +64,8 @@ export const SidebarForMediaLibraryModal = ({
             onClick={(e) => {
               e.preventDefault();
               // NOw send the currently selected image to redux to be used in the mlib form
+              putImageInReduxForEdit(imageInfo)
+              changeTabTo("upload-form")
             }}
           >
             Edit Image Details
@@ -126,6 +131,7 @@ const dispatchToProps = (dispatch) => {
     {
       putImageInfoInRedux: reduxLoadImageInfos,
       putImagesInRedux: reduxLoadGalleryImages,
+      putImageInReduxForEdit: setImageForEditAction
     },
     dispatch
   );

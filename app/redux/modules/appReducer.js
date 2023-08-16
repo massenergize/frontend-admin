@@ -53,6 +53,7 @@ import {
   LOAD_VISIT_LOGS,
   LOAD_USER_ACTIVE_STATUS,
   // LOAD_EMAIL_TEMPLATES,
+  SET_IMAGE_FOR_EDIT,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -313,6 +314,15 @@ export const modalLibraryReducer = (state = {}, action = {}) => {
 export const imageInfosReducer = (state = {}, action = {}) => {
   switch (action.type) {
     case KEEP_LOADED_IMAGE_INFO:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+export const setImageForEditReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case SET_IMAGE_FOR_EDIT:
       return action.payload;
 
     default:

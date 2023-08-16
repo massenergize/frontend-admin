@@ -53,6 +53,7 @@ import {
   LOAD_VISIT_LOGS,
   LOAD_USER_ACTIVE_STATUS,
   LOAD_EMAIL_TEMPLATES,
+  SET_IMAGE_FOR_EDIT,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -176,6 +177,9 @@ export const setupSocketConnectionWithBackend = (auth) => (
   connectSocket();
 };
 
+export const setImageForEditAction = (data) => {
+  return { type: SET_IMAGE_FOR_EDIT, payload: data };
+};
 export const reduxLoadUserActiveStatus = (data) => {
   return { type: LOAD_USER_ACTIVE_STATUS, payload: data };
 };

@@ -17,7 +17,7 @@ export default function SidePane({
     (activeImage && activeImage.url) ||
     "...";
 
-  useEffect(() => {}, [activeImage]);
+  // useEffect(() => {}, [activeImage]);
 
   return (
     <div className="ml-sidepane-container elevate-float side-pane-slide-animation">

@@ -8,6 +8,7 @@ import {
   reduxAddToGalleryImages,
   reduxLoadGalleryImages,
   reduxLoadImageInfos,
+  setImageForEditAction,
   testRedux,
   universalFetchFromGallery,
 } from "../../../../redux/redux-actions/adminActions";
@@ -36,6 +37,8 @@ export const FormMediaLibraryImplementation = (props) => {
     defaultValue,
     addOnToWhatImagesAreInRedux,
     communities,
+    sendImageToReduxForEdit,
+    imageForEdit,
   } = props;
   const [available, setAvailable] = useState(auth && auth.is_super_admin);
   const [selectedTags, setSelectedTags] = useState({ scope: DEFAULT_SCOPE });
@@ -44,6 +47,7 @@ export const FormMediaLibraryImplementation = (props) => {
   const [mlibraryFormData, setmlibraryFormData] = useState({});
   const [uploading, setUploading] = useState(false);
   const [outsideNotification, setOutsideNotification] = useState(null);
+  const isInEditMode = imageForEdit;
   const fetchNeededImages = (ids, cb) => {
     setOutsideNotification({
       message: "Finding selected images that are not here yet...",
@@ -100,7 +104,6 @@ export const FormMediaLibraryImplementation = (props) => {
     const theyAreImageObjects = typeof preselected[0] !== "number";
     const justResetting = preselected[0] === "reset";
     if (theyAreImageObjects) {
-      console.log("It happened here");
       preselected = preselected.map((img) => img.id);
       // addOnToWhatImagesAreInRedux({ old: imagesObject, data: preselected });
       // return setUserSelectedImages(preselected);
@@ -136,6 +139,7 @@ export const FormMediaLibraryImplementation = (props) => {
   // As of 1st August 2023, handleUpload is not what actually does the upload
   // Now, it just switches to the media library form. And the context button there is what validates the form, and process to upload & insert if all checks out
   const handleUpload = ({ changeTabTo }) => {
+    sendImageToReduxForEdit(null); // Empty whatever value is in there before switching
     changeTabTo("upload-form");
   };
 
@@ -155,8 +159,6 @@ export const FormMediaLibraryImplementation = (props) => {
       ...(json || {}),
     };
     setUploading(true);
-
-    // return console.log("Lets see merrhn", insertSelectedImages);
 
     /**
      * Upload all selected files to the backend,
@@ -194,18 +196,17 @@ export const FormMediaLibraryImplementation = (props) => {
       });
   };
 
-  const extras = {
-    [MediaLibrary.Tabs.UPLOAD_TAB]: (
-      <UploadIntroductionComponent
-        auth={auth}
-        available={available}
-        setAvailableTo={setAvailable}
-      />
-    ),
+  const saveImageEdits = (props) => {
+    console.log("Yes, we are editing now meerhn", props);
   };
 
   const uploadAndSaveForm = (props) => {
-    doUpload({ ...props, json: { ...mlibraryFormData, user_id: auth?.id } });
+    const train = {
+      ...props,
+      json: { ...mlibraryFormData, user_id: auth?.id },
+    };
+    if (isInEditMode) return saveImageEdits(train);
+    doUpload(train);
   };
   const liveFormValidation = () => {
     const { copyright, copyright_att } = mlibraryFormData || {};
@@ -217,8 +218,28 @@ export const FormMediaLibraryImplementation = (props) => {
       };
     return {
       invalid: false,
-      message: "Items will be uploaded and inserted when you click",
+      message: isInEditMode
+        ? "Your changes will be saved when you click here"
+        : "Items will be uploaded and inserted when you click",
     };
+  };
+
+  const buttonText = () => {
+    if (isInEditMode && !uploading) return "UPDATE";
+    if (isInEditMode && uploading) return "UPDATING...";
+
+    if (uploading) return "UPLOADING...";
+    return "UPLOAD & INSERT";
+  };
+
+  const extras = {
+    [MediaLibrary.Tabs.UPLOAD_TAB]: (
+      <UploadIntroductionComponent
+        auth={auth}
+        available={available}
+        setAvailableTo={setAvailable}
+      />
+    ),
   };
 
   const validation = liveFormValidation();
@@ -285,8 +306,9 @@ export const FormMediaLibraryImplementation = (props) => {
             tab: {
               headerName: "Information",
               key: "upload-form",
-              component: (
+              component: (props) => (
                 <MediaLibraryForm
+                  {...props}
                   auth={auth}
                   onChange={(data) => setmlibraryFormData(data)}
                   communities={communities}
@@ -303,7 +325,8 @@ export const FormMediaLibraryImplementation = (props) => {
                 }}
               >
                 <Tooltip title={validation?.message} placement="top">
-                  {uploading ? "UPLOADING..." : "UPLOAD & INSERT"}
+                  {/* {uploading ? "UPLOADING..." : "UPLOAD & INSERT"} */}
+                  {buttonText()}
                 </Tooltip>
               </MediaLibrary.Button>
             ),
@@ -323,6 +346,7 @@ const mapStateToProps = (state) => ({
   imagesObject: state.getIn(["galleryImages"]),
   tags: state.getIn(["allTags"]),
   communities: state.getIn(["communities"]),
+  imageForEdit: state.getIn(["imageBeingEdited"]),
 });
 
 const mapDispatchToProps = (dispatch) => {
@@ -332,6 +356,7 @@ const mapDispatchToProps = (dispatch) => {
       fireTestFunction: testRedux,
       putImagesInRedux: reduxLoadGalleryImages,
       addOnToWhatImagesAreInRedux: reduxAddToGalleryImages,
+      sendImageToReduxForEdit: setImageForEditAction,
     },
     dispatch
   );

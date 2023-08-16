@@ -13,14 +13,25 @@ import MEDropdownPro from "../../ME  Tools/dropdown/MEDropdownPro";
 import MEDropdown from "../../ME  Tools/dropdown/MEDropdown";
 import LightAutoComplete from "../../Gallery/tools/LightAutoComplete";
 import AsyncDropDown from "../AsyncCheckBoxDropDown";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+// import { Link } from "react-router-dom";
 
-export default function MediaLibraryForm({ auth, communities, onChange }) {
+const MediaLibraryForm = ({
+  auth,
+  communities,
+  onChange,
+  imageForEdit,
+  toggleSidePane,
+}) => {
+  console.log("I jus arrived", imageForEdit);
   const [copyright, setCopyright] = useState("No");
   const [underAge, setUnderAge] = useState("No");
   const [copyrightAtt, setCopyrightAtt] = useState("");
   const [guardianInfo, setGuardianInfo] = useState("");
   const [tags, setTags] = useState("");
   const [chosenComms, setCommunities] = useState([]);
+  const isInEditMode = imageForEdit;
 
   useEffect(() => {
     // idea here is that we want to export all the changes that happen in form data when they happen
@@ -34,6 +45,28 @@ export default function MediaLibraryForm({ auth, communities, onChange }) {
     };
     onChange && onChange(formData);
   }, [copyright, underAge, copyrightAtt, guardianInfo, tags, chosenComms]);
+
+  useEffect(() => {
+    if (!imageForEdit) return;
+    const info = imageForEdit?.information?.info || {};
+    const _tags = imageForEdit?.tags || [];
+    const comms = imageForEdit?.information?.communities;
+    const {
+      guardian_info,
+      copyright_att,
+      has_children,
+      has_copyright_permission,
+    } = info;
+
+    setCopyrightAtt(copyright_att);
+    setCopyright(has_copyright_permission ? "Yes" : "No");
+
+    setGuardianInfo(guardian_info);
+    setUnderAge(has_children ? "Yes" : "No");
+    setCommunities(comms?.map((com) => com.id) || []);
+
+    setTags(_tags?.map((t) => t.name).join(","));
+  }, [imageForEdit]);
 
   // --------------------------------------------------------------------
   const doesNotHaveCopyrightPermission = !copyright || copyright === "No";
@@ -49,7 +82,6 @@ export default function MediaLibraryForm({ auth, communities, onChange }) {
   const showChips = () => {
     const items = tags?.split(",");
     const empty = !items.length || items[0].trim() === "";
-    // console.log("As list", items);
     if (empty) return <></>;
 
     return items?.map((tag) => (
@@ -60,10 +92,26 @@ export default function MediaLibraryForm({ auth, communities, onChange }) {
   return (
     <div style={{ padding: "25px 50px" }}>
       <Typography variant="h6">Hi {auth?.preferred_name || "..."},</Typography>
-      <Typography variant="body2">
-        Before you upload, there a few details you need to provide. Please note
-        that the items marked (*) are compulsory.
-      </Typography>
+      {isInEditMode ? (
+        <Typography variant="body2">
+          <span>You are currently editing the details of an item.</span>
+          <Link
+            to="#"
+            onClick={(e) => {
+              e.preventDefault();
+              toggleSidePane(true);
+            }}
+            style={{ marginLeft: 6, cursor: "pointer" }}
+          >
+            Which item am I editing?
+          </Link>
+        </Typography>
+      ) : (
+        <Typography variant="body2">
+          Before you upload, there a few details you need to provide. Please
+          note that the items marked (*) are compulsory.
+        </Typography>
+      )}
       <div style={{ padding: "20px 0px" }}>
         {/* <Typography variant="body2">Name of the uploader</Typography> */}
         <TextField
@@ -75,6 +123,16 @@ export default function MediaLibraryForm({ auth, communities, onChange }) {
           inputProps={{ style: { padding: "12.5px 14px" } }}
           value={auth?.preferred_name || "..."}
           disabled
+        />
+        {/* ---- TODO: Change to async dropdown if user is a superadmin  */}
+        <MEDropdown
+          multiple
+          onItemSelected={(items) => setCommunities(items)}
+          defaultValue={chosenComms}
+          labelExtractor={(item) => item?.name}
+          valueExtractor={(item) => item?.id}
+          data={getCommunitiesToSelectFrom()}
+          placeholder="Which communities would you like this item to be available to?"
         />
 
         <div
@@ -98,8 +156,8 @@ export default function MediaLibraryForm({ auth, communities, onChange }) {
                 <b>MassEnergize MOU</b>
               </Link>
               , you are required to have permission before uploading other
-              people's content. If No, please provide information about the owner
-              of this item's copyright in the box that will be provided.
+              people's content. If No, please provide information about the
+              owner of this item's copyright in the box that will be provided.
             </Typography>
             <RadioGroup
               value={copyright}
@@ -204,18 +262,19 @@ export default function MediaLibraryForm({ auth, communities, onChange }) {
             value={tags}
             required={false}
           />
-
-          {/* ---- TODO: Change to async dropdown if user is a superadmin  */}
-          <MEDropdown
-            multiple
-            onItemSelected={(items) => setCommunities(items)}
-            labelExtractor={(item) => item?.name}
-            valueExtractor={(item) => item?.id}
-            data={getCommunitiesToSelectFrom()}
-            placeholder="Which communities would you like this item to be available to?"
-          />
         </div>
       </div>
     </div>
   );
-}
+};
+
+const mapStateToProps = (state) => {
+  return { imageForEdit: state.getIn(["imageBeingEdited"]) };
+};
+
+const mapDispatchToProps = (dispatch) => bindActionCreators({}, dispatch);
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(MediaLibraryForm);

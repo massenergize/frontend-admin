@@ -62,6 +62,7 @@ import app, {
   reducerForVisitLogs,
   reducerForUserActiveStatus,
   // reducerForEmailTemplates,
+  setImageForEditReducer,
 } from "./modules/appReducer";
 
 /**
@@ -128,6 +129,7 @@ export default function createReducer(injectedReducers = {}) {
     taskFunctions: allTaskFunctionsReducer,
     tasks: allTasksReducer,
     paginationMetaData: allMetaDataReducer, // stores pagination data for all tables
+    imageBeingEdited: setImageForEditReducer // This is what holds  the image whose details are being edited in the mlibrary modal
   });
 
   // Wrap the root reducer and return a new root reducer with router state
