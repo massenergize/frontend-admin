@@ -60,6 +60,7 @@ import {
   SET_GALLERY_META_DATA,
   LOAD_EMAIL_TEMPLATES,
   // LOAD_EMAIL_TEMPLATES,
+  SET_IMAGE_FOR_EDIT,
 } from "../ReduxConstants";
 
 const initialState = Map({

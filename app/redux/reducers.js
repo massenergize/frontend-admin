@@ -68,6 +68,7 @@ import app, {
   setGalleryMetadataReducer,
   reducerForEmailTemplates,
   // reducerForEmailTemplates,
+  setImageForEditReducer,
 } from "./modules/appReducer";
 
 /**

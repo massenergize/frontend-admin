@@ -60,6 +60,7 @@ import {
   SET_MEDIA_LIBRARY_MODAL_FILTERS,
   SET_GALLERY_META_DATA,
   LOAD_EMAIL_TEMPLATES,
+  SET_IMAGE_FOR_EDIT,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
