@@ -93,7 +93,7 @@ function MediaLibraryModal({
   };
   const handleUpload = () => {
     if (!onUpload) return;
-    setState((prev) => ({ ...prev, uploading: true }));
+    // setState((prev) => ({ ...prev, uploading: true }));
     onUpload(gatherUtils());
     // onUpload(
     //   clean(files),
@@ -186,6 +186,21 @@ function MediaLibraryModal({
         </Suspense>
       ),
     },
+    {
+      headerName: customName(TABS.CROPPING_TAB, "Crop"),
+      key: TABS.CROPPING_TAB,
+      onlyShowOnDemand: true, // makes sure it doesnt show as part of the listed tabs until triggered
+      component: (_) => (
+        <Cropping
+          setCurrentTab={setCurrentTab}
+          cropLoot={cropLoot}
+          cropped={cropped}
+          setCropped={setCropped}
+          setCroppedSource={setCroppedSource}
+          croppedSource={croppedSource}
+        />
+      ),
+    },
     ...formatCustomTabs(gatherUtils()),
   ];
   Tabs = arrangeTabsByOrder(Tabs);
@@ -261,10 +276,12 @@ function MediaLibraryModal({
               <div className="m-tab-header-area">
                 {Tabs.map((tab) => {
                   // A simple logic to make sure the cropping tab button does not show, until an image is selected by a user to crop. (To reduce confusion)
-                  const imageForCroppingNotSelectedYet =
-                    currentTab !== TABS.CROPPING_TAB &&
-                    tab.key === TABS.CROPPING_TAB;
-                  if (imageForCroppingNotSelectedYet) return <></>;
+                  // const imageForCroppingNotSelectedYet =
+                  //   currentTab !== TABS.CROPPING_TAB &&
+                  //   tab.key === TABS.CROPPING_TAB;
+                  const dontShowHeader =
+                    tab.onlyShowOnDemand && currentTab !== tab.key;
+                  if (dontShowHeader) return <></>;
 
                   const isCurrent = currentTab === tab.key;
                   return (

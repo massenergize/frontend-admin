@@ -336,6 +336,7 @@ export const FormMediaLibraryImplementation = (props) => {
             tab: {
               headerName: "About Image",
               key: "upload-form",
+              onlyShowOnDemand: true,
               order: 1,
               component: (props) => (
                 <MediaLibraryForm
