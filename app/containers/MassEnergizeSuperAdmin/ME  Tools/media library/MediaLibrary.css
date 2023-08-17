@@ -105,7 +105,8 @@
 }
 .m-tab-header-item-selected {
   border-bottom-width: 0px;
-  background: #268802;
+  /* background: #268802; */
+  background: #ab47bc;
   color: white;
   font-weight: bold;
 }
