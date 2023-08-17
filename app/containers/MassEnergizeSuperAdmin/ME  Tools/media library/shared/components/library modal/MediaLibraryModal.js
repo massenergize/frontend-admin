@@ -170,7 +170,9 @@ function MediaLibraryModal({
       component: (_) => (
         <Suspense fallback={<p>Loading...</p>}>
           <Library
-            renderBeforeImages={renderBeforeImages}
+            renderBeforeImages={() =>
+              renderBeforeImages && renderBeforeImages(gatherUtils())
+            }
             sourceExtractor={sourceExtractor}
             setSelectedContent={setSelectedContent}
             content={content}

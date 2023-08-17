@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 
 import ImageThumbnail from "../thumbnail/ImageThumbnail";
 import { blank, DEFAULT_FILE_LIMIT } from "../../utils/values";
-import { LoadMoreContainer } from "../../../../../Gallery/Gallery";
 import { ProgressCircleWithLabel } from "../../../../../Gallery/utils";
 
 function Library({
@@ -74,7 +73,7 @@ function Library({
   }
   return (
     <div>
-      {renderBeforeImages}
+      {renderBeforeImages()}
       {fileLimit && (
         <div style={{ padding: "10px 25px", fontWeight: "bold" }}>
           <small>

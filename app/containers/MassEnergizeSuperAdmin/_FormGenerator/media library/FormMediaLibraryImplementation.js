@@ -24,6 +24,7 @@ import { ShowTagsOnPane, ImageInfoArea } from "../../Gallery/SideSheet";
 import MediaLibraryForm from "./MediaLibraryForm";
 import { getFileSize } from "../../ME  Tools/media library/shared/utils/utils";
 import SidebarForMediaLibraryModal from "./SidebarForMediaLibraryModal";
+import FilterBarForMediaLibrary from "./FilterBarForMediaLibrary";
 
 const DEFAULT_SCOPE = ["all", "uploads", "actions", "events", "testimonials"];
 export const FormMediaLibraryImplementation = (props) => {
@@ -293,7 +294,7 @@ export const FormMediaLibraryImplementation = (props) => {
         >
           <MediaLibrary.Button
             disabled={loadingMore}
-            backColor="black"
+            backColor="#363738"
             onClick={() => {
               loadMoreImages();
             }}
@@ -316,30 +317,32 @@ export const FormMediaLibraryImplementation = (props) => {
         images={(imagesObject && imagesObject.images) || []}
         actionText="Select From Library"
         sourceExtractor={(item) => item && item.url}
-        renderBeforeImages={
-          <GalleryFilter
-            dropPosition="left"
-            style={{
-              marginLeft: 10,
-              color: "#00BCD4",
-              fontWeight: "bold",
-            }}
-            selections={selectedTags}
-            onChange={(items) => {
-              setSelectedTags(items);
-              setQueryHasChanged(true);
-            }}
-            scopes={[{ name: "All", value: "all" }, ...filters]}
-            tags={tags}
-            label={
-              <small style={{ marginRight: 7 }}>
-                Add filters to tune your search
-              </small>
-            }
-            reset={() => setSelectedTags({})}
-            apply={loadMoreImages}
-          />
-        }
+        renderBeforeImages={(props) => (
+          <FilterBarForMediaLibrary {...props} />
+          // <GalleryFilter
+          //   {...props}
+          //   dropPosition="left"
+          //   style={{
+          //     marginLeft: 10,
+          //     color: "#00BCD4",
+          //     fontWeight: "bold",
+          //   }}
+          //   selections={selectedTags}
+          //   onChange={(items) => {
+          //     setSelectedTags(items);
+          //     setQueryHasChanged(true);
+          //   }}
+          //   scopes={[{ name: "All", value: "all" }, ...filters]}
+          //   tags={tags}
+          //   label={
+          //     <small style={{ marginRight: 7 }}>
+          //       Add filters to tune your search
+          //     </small>
+          //   }
+          //   reset={() => setSelectedTags({})}
+          //   apply={loadMoreImages}
+          // />
+        )}
         insertAfterUpload
         useAwait={true}
         onUpload={handleUpload}
