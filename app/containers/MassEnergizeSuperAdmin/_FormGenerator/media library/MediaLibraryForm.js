@@ -24,7 +24,6 @@ const MediaLibraryForm = ({
   imageForEdit,
   toggleSidePane,
 }) => {
-  console.log("I jus arrived", imageForEdit);
   const [copyright, setCopyright] = useState("No");
   const [underAge, setUnderAge] = useState("No");
   const [copyrightAtt, setCopyrightAtt] = useState("");
@@ -103,7 +102,7 @@ const MediaLibraryForm = ({
             }}
             style={{ marginLeft: 4, cursor: "pointer" }}
           >
-            this item
+            this item!
           </Link>
         </Typography>
       ) : (

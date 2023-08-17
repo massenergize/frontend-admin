@@ -20,15 +20,17 @@ export const SidebarForMediaLibraryModal = ({
   toggleSidePane,
   imagesObject,
   putImagesInRedux,
-  putImageInReduxForEdit, 
-  changeTabTo
+  putImageInReduxForEdit,
+  changeTabTo,
 }) => {
   const [imageInfo, setImageInfo] = useState("loading");
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const isSuperAdmin = !auth?.is_community_admin && auth?.is_super_admin;
 
+
   useEffect(() => {
+    setImageInfo(image)
     getMoreInfoOnImage({
       id: image && image.id,
       updateStateWith: setImageInfo,
@@ -39,7 +41,7 @@ export const SidebarForMediaLibraryModal = ({
 
   var informationAboutImage = (imageInfo && imageInfo.information) || {};
   var uploader = informationAboutImage.user;
-  const tags = image?.tags;
+  const tags = imageInfo?.tags;
   const userCanDelete = isSuperAdmin || uploader?.id === auth?.id;
 
   return (
@@ -64,8 +66,9 @@ export const SidebarForMediaLibraryModal = ({
             onClick={(e) => {
               e.preventDefault();
               // NOw send the currently selected image to redux to be used in the mlib form
-              putImageInReduxForEdit(imageInfo)
-              changeTabTo("upload-form")
+              putImageInReduxForEdit(imageInfo);
+              changeTabTo("upload-form");
+              toggleSidePane(false);
             }}
           >
             Edit Image Details
@@ -131,7 +134,7 @@ const dispatchToProps = (dispatch) => {
     {
       putImageInfoInRedux: reduxLoadImageInfos,
       putImagesInRedux: reduxLoadGalleryImages,
-      putImageInReduxForEdit: setImageForEditAction
+      putImageInReduxForEdit: setImageForEditAction,
     },
     dispatch
   );

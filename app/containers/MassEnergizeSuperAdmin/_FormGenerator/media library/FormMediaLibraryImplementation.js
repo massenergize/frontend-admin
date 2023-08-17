@@ -39,6 +39,8 @@ export const FormMediaLibraryImplementation = (props) => {
     communities,
     sendImageToReduxForEdit,
     imageForEdit,
+    imageInfos,
+    putImageInfosInRedux,
   } = props;
   const [available, setAvailable] = useState(auth && auth.is_super_admin);
   const [selectedTags, setSelectedTags] = useState({ scope: DEFAULT_SCOPE });
@@ -68,7 +70,6 @@ export const FormMediaLibraryImplementation = (props) => {
       close: () => setOutsideNotification(null),
     });
     apiCall("/gallery.find", { ids }).then((response) => {
-      console.log("FOUND THIS RESPONSE AFTER FIND IMAGES: ", response);
       setOutsideNotification(null);
       if (!response.success) {
         setError(response.error);
@@ -208,19 +209,20 @@ export const FormMediaLibraryImplementation = (props) => {
       });
   };
 
-  const saveImageEdits = ({ json }) => {
-    // return console.log("THESE ARE THE NEW DETS", json);
+  const saveImageEdits = ({ json, toggleSidePane, changeTabTo }) => {
     setUploading(true);
     setOutsideNotification(null);
     apiCall("/gallery.item.edit", {
       ...json,
       user_upload_id: imageForEdit?.information?.id,
-      media_id : imageForEdit?.id
+      media_id: imageForEdit?.id,
     })
       .then((response) => {
         setUploading(false);
-        console.log("RESPONSE AFTER UPDATING BACKEND", response);
         if (!response.success) return notify(response.error, true);
+        putImageInfosInRedux({ oldInfos: imageInfos, newInfo: response.data });
+        toggleSidePane(true);
+        changeTabTo(MediaLibrary.Tabs.LIBRARY_TAB);
       })
       .catch((e) => {
         setUploading(false);
@@ -323,7 +325,7 @@ export const FormMediaLibraryImplementation = (props) => {
         }}
         tabModifiers={{
           [MediaLibrary.Tabs.LIBRARY_TAB]: {
-            name: "Choose From Media Library",
+            name: "Choose From Library",
           },
         }}
         {...props}
@@ -332,8 +334,9 @@ export const FormMediaLibraryImplementation = (props) => {
         customTabs={[
           {
             tab: {
-              headerName: "Information",
+              headerName: "About Image",
               key: "upload-form",
+              order: 1,
               component: (props) => (
                 <MediaLibraryForm
                   {...props}
@@ -375,6 +378,7 @@ const mapStateToProps = (state) => ({
   tags: state.getIn(["allTags"]),
   communities: state.getIn(["communities"]),
   imageForEdit: state.getIn(["imageBeingEdited"]),
+  imageInfos: state.getIn(["imageInfos"]),
 });
 
 const mapDispatchToProps = (dispatch) => {
@@ -385,6 +389,7 @@ const mapDispatchToProps = (dispatch) => {
       putImagesInRedux: reduxLoadGalleryImages,
       addOnToWhatImagesAreInRedux: reduxAddToGalleryImages,
       sendImageToReduxForEdit: setImageForEditAction,
+      putImageInfosInRedux: reduxLoadImageInfos,
     },
     dispatch
   );

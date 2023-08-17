@@ -99,7 +99,7 @@ export default function createReducer(injectedReducers = {}) {
     messages: adminMessagesReducer,
     galleryImages: galleryImagesReducer, // This is what the modal in the form generator uses
     searchedImages: searchedImagesReducer, // This is what the "all images" gallery page uses
-    imageInfos: imageInfosReducer,
+    imageInfos: imageInfosReducer, // When the sidepane of the modal loads in the fullJson object of an image from the B.E, this is where its kept
     modalLibraryImages: modalLibraryReducer, // TODO: Look into this. It might not be in use anymore
     app,
     form,

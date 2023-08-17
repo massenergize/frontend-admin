@@ -5,6 +5,7 @@ import Upload from "../upload/Upload";
 import MLButton from "../button/MLButton";
 import Cropping from "../cropping/Cropping";
 import { TABS } from "../../utils/values";
+import { arrangeTabsByOrder } from "../../utils/utils";
 const Library = React.lazy(() => import("../library/Library")); // so that library component only loads when needed
 
 function MediaLibraryModal({
@@ -83,7 +84,7 @@ function MediaLibraryModal({
     return {
       files: clean(files), // Files that have been selected in the upload tab, and are ready to be shipped
       reset, // The media library's internal reset function.
-      close, // Mlibrary's internal close funciton
+      close, // Mlibrary's internal close function
       changeTabTo: setCurrentTab, // The Mlibrary's internal function that controls tab switching
       insertSelectedImages: returnRightAfterUpload, // Export a function that lets you insert uploaded items outside of the MLibrary.
       uploading,
@@ -135,7 +136,7 @@ function MediaLibraryModal({
       };
     });
   };
-  var Tabs = [
+  let Tabs = [
     {
       headerName: customName(TABS.UPLOAD_TAB, "Upload"),
       key: TABS.UPLOAD_TAB,
@@ -187,7 +188,7 @@ function MediaLibraryModal({
     },
     ...formatCustomTabs(gatherUtils()),
   ];
-
+  Tabs = arrangeTabsByOrder(Tabs);
   Tabs = Tabs.filter((tab) => !(excludeTabs || []).includes(tab.key));
 
   useEffect(() => {
@@ -226,7 +227,7 @@ function MediaLibraryModal({
     );
   };
 
-  const tabComponent = Tabs.find((tab) => tab.key === currentTab).component;
+  const tabComponent = Tabs.find((tab) => tab.key === currentTab)?.component;
   const last = content.length - 1;
   const activeImage = (content || [])[last]; // if multiple selection is active, just show the last selected item in the side pane
 
@@ -290,7 +291,7 @@ function MediaLibraryModal({
             <div
               style={{ maxHeight: 550, minHeight: 550, overflowY: "scroll" }}
             >
-              {tabComponent(gatherUtils)}
+              {tabComponent && tabComponent(gatherUtils)}
             </div>
           </div>
           <Footer
