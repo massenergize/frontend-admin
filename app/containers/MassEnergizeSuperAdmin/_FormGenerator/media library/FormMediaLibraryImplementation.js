@@ -126,7 +126,10 @@ export const FormMediaLibraryImplementation = (props) => {
 
   const loadMoreImages = (cb) => {
     if (!auth) return console.log("It does not look like you are signed in...");
-
+    notify("Collecting more images...", false, {
+      loading: true,
+      type: "loading-more",
+    });
     const scopes = (selectedTags.scope || []).filter((s) => s != "all");
     var tags = Object.values(selectedTags.tags || []);
     var spread = [];
@@ -141,6 +144,7 @@ export const FormMediaLibraryImplementation = (props) => {
       },
       old: queryHasChanged ? {} : imagesObject,
       cb: () => {
+        setOutsideNotification(null);
         cb && cb();
         setQueryHasChanged(false);
       },
@@ -274,9 +278,39 @@ export const FormMediaLibraryImplementation = (props) => {
 
   const validation = liveFormValidation();
 
+  const renderOnFooter = ({ currentTab }) => {
+    const isOnLibraryTab = currentTab === MediaLibrary.Tabs.LIBRARY_TAB;
+    const loadingMore = outsideNotification?.type === "loading-more";
+    const images = imagesObject?.images || [];
+    if (isOnLibraryTab)
+      return (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <MediaLibrary.Button
+            disabled={loadingMore}
+            backColor="black"
+            onClick={() => {
+              loadMoreImages();
+            }}
+          >
+            LOAD MORE
+          </MediaLibrary.Button>
+          <small style={{ fontWeight: "bold", marginLeft: 15 }}>
+            <i className="fa fa-images" /> {(images && images.length) || 0}{" "}
+            items
+          </small>
+        </div>
+      );
+  };
   return (
     <div>
       <MediaLibrary
+        renderOnFooter={renderOnFooter}
         passedNotification={outsideNotification}
         defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
         images={(imagesObject && imagesObject.images) || []}

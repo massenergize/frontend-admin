@@ -13,7 +13,7 @@ function Library({
   setShowSidePane,
   images,
   sourceExtractor,
-  loadMoreFunction,
+  // loadMoreFunction,
   loadingMore,
   limited,
   shouldWait,
@@ -104,7 +104,7 @@ function Library({
           );
         })}
       </div>
-      {!limited && (
+      {/* {!limited && (
         <div className="" style={{ width: "100%", textAlign: "center" }}>
           <LoadMoreContainer
             loading={loadingMore}
@@ -112,7 +112,7 @@ function Library({
             loadMoreFunction={loadMoreFunction}
           />
         </div>
-      )}
+      )} */}
     </div>
   );
 }

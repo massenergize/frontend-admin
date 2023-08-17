@@ -73,7 +73,8 @@
   right: 0;
   top: 0;
   height: 90%;
-  width: 262px;
+  /* width: 262px; */
+  width: 294px;
   background: white;
   border-top-right-radius: 6px;
   border-bottom-right-radius: 6px;

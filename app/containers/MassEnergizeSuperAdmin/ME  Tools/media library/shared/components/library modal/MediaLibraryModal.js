@@ -18,8 +18,8 @@ function MediaLibraryModal({
   getSelected, // the function that is used to retrieve all selected items out of the modal
   uploadMultiple,
   uploading,
-  loadMoreFunction,
-  limited,
+  // loadMoreFunction,
+  // limited,
   excludeTabs,
   useAwait,
   awaitSeconds,
@@ -48,6 +48,7 @@ function MediaLibraryModal({
   customTabs,
   notification,
   setNotification,
+  renderOnFooter,
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -89,6 +90,7 @@ function MediaLibraryModal({
       insertSelectedImages: returnRightAfterUpload, // Export a function that lets you insert uploaded items outside of the MLibrary.
       uploading,
       toggleSidePane: setShowSidePane,
+      currentTab,
     };
   };
   const handleUpload = () => {
@@ -117,11 +119,11 @@ function MediaLibraryModal({
     setCropped({});
   };
 
-  const fireLoadMoreFunction = () => {
-    if (!loadMoreFunction) return;
-    setLoadingMore(true);
-    loadMoreFunction(() => setLoadingMore(false), close);
-  };
+  // const fireLoadMoreFunction = () => {
+  //   if (!loadMoreFunction) return;
+  //   setLoadingMore(true);
+  //   loadMoreFunction(() => setLoadingMore(false), close);
+  // };
 
   const customName = (key, _default) => {
     const modifier = (tabModifiers || {})[key];
@@ -176,8 +178,8 @@ function MediaLibraryModal({
             multiple={multiple}
             images={images}
             loadingMore={loadingMore}
-            loadMoreFunction={fireLoadMoreFunction}
-            limited={limited}
+            // loadMoreFunction={fireLoadMoreFunction}
+            // limited={limited}
             shouldWait={shouldWait}
             setShouldWait={setShouldWait}
             awaitSeconds={awaitSeconds}
@@ -312,6 +314,7 @@ function MediaLibraryModal({
             </div>
           </div>
           <Footer
+            renderOnFooter={renderOnFooter}
             uploading={state.uploading}
             upload={handleUpload}
             TooltipWrapper={TooltipWrapper}
@@ -420,26 +423,31 @@ const ContextButton = ({
 };
 
 const Footer = (props) => {
-  const { cancel, images, currentTab } = props;
+  const { cancel, images, currentTab, luggage, renderOnFooter } = props;
   const isCropping = currentTab === TABS.CROPPING_TAB;
-  const isUploadTab = currentTab === TABS.UPLOAD_TAB;
 
   return (
     <div className="ml-footer">
-      <h3
-        style={{
-          margin: 0,
-          marginLeft: 10,
-          color: "rgb(128 103 71)",
-          fontSize: 12,
-        }}
-      >
-        @massenergize
-      </h3>
-      {!isCropping && images && images.length && (
-        <small style={{ fontWeight: "bold", marginLeft: 15 }}>
-          [{(images && images.length) || 0} items]
-        </small>
+      {renderOnFooter ? (
+        renderOnFooter(luggage)
+      ) : (
+        <>
+          <h3
+            style={{
+              margin: 0,
+              marginLeft: 10,
+              color: "rgb(128 103 71)",
+              fontSize: 12,
+            }}
+          >
+            @massenergize
+          </h3>
+          {!isCropping && images && images.length && (
+            <small style={{ fontWeight: "bold", marginLeft: 15 }}>
+              [{(images && images.length) || 0} items]
+            </small>
+          )}{" "}
+        </>
       )}
       <div style={{ marginLeft: "auto" }}>
         <MLButton backColor="maroon" btnColor="white" onClick={cancel}>

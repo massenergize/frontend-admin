@@ -120,7 +120,8 @@ export default function SidePane({
 
         <MLButton
           onClick={() => setShowSidePane(false)}
-          backColor="#245a93"
+          // backColor="#245a93"
+          backColor="#363738"
           style={{
             position: "absolute",
             bottom: 0,
