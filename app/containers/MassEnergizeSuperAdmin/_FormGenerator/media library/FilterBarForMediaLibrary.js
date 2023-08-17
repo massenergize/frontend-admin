@@ -5,10 +5,16 @@ import {
   Radio,
   RadioGroup,
   TextField,
+<<<<<<< HEAD
   Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
+=======
+  Typography,
+} from "@mui/material";
+import React, { useState } from "react";
+>>>>>>> b26e0e4a (implemented new filter features with dummy valures)
 import { connect } from "react-redux";
 import MEDropdown from "../../ME  Tools/dropdown/MEDropdown";
 import {
@@ -272,15 +278,66 @@ export const FilterBarForMediaLibrary = ({
       );
   };
 
+<<<<<<< HEAD
   return (
     <div style={{ padding: "0px 27px" }}>
       <div className="me-ml-filter-root">
+=======
+export const FilterBarForMediaLibrary = (props) => {
+  const [currentFilter, setCurrentFilter] = useState("keywords");
+  const [keywords, setKeywords] = useState("");
+
+  const FILTER_OPTIONS = [
+    {
+      name: "My Uploads",
+      key: "my-uploads",
+      context: "Only images you have uploaded will show up",
+    },
+    {
+      name: "Use Keywords",
+      key: "keywords",
+      context: "Enter keywords that describe the image you are looking for ",
+      component: (
+        <WithKeywords
+          keywords={keywords}
+          onChange={(e) => setKeywords(e.target.value)}
+        />
+      ),
+    },
+    {
+      name: "From Other Admins",
+      key: "from-others",
+      context: "See images that have been uploaded by other admins",
+    },
+    {
+      name: "By Community",
+      key: "by-community",
+      context: "See images that belong to specific communities you manage",
+    },
+  ];
+
+  const getComponent = () => {
+    return FILTER_OPTIONS.find((f) => f.key === currentFilter)?.component;
+  };
+
+  return (
+    <div style={{ padding: "0px 27px" }}>
+      <div
+        className="me-ml-filter-root"
+        // style={{
+        //   padding: "15px 20px",
+        //   background: "navajowhite",
+        //   border: "solid 2px antiquewhite",
+        // }}
+      >
+>>>>>>> b26e0e4a (implemented new filter features with dummy valures)
         <div style={{ padding: "10px 20px" }}>
           <Typography variant="body2">
             Use the options below to filter images
           </Typography>
 
           <RadioGroup
+<<<<<<< HEAD
             value={currentFilter}
             style={{ display: "flex", flexDirection: "row" }}
             onChange={(ev) => {
@@ -291,6 +348,13 @@ export const FilterBarForMediaLibrary = ({
             }}
           >
             {options.map((option) => (
+=======
+            defaultValue={"keywords"}
+            style={{ display: "flex", flexDirection: "row" }}
+            onChange={(ev) => setCurrentFilter(ev?.target.value)}
+          >
+            {FILTER_OPTIONS.map((option) => (
+>>>>>>> b26e0e4a (implemented new filter features with dummy valures)
               <FormControlLabel
                 name={option.key}
                 key={option.key}
@@ -301,6 +365,7 @@ export const FilterBarForMediaLibrary = ({
                     variant="body2"
                     style={{ fontSize: "0.8rem", fontWeight: "bold" }}
                   >
+<<<<<<< HEAD
                     <Tooltip
                       title={option.context}
                       placement="top"
@@ -308,18 +373,28 @@ export const FilterBarForMediaLibrary = ({
                     >
                       {option.name}
                     </Tooltip>
+=======
+                    {option.name}
+>>>>>>> b26e0e4a (implemented new filter features with dummy valures)
                   </Typography>
                 }
               />
             ))}
           </RadioGroup>
 
+<<<<<<< HEAD
           {renderContextualOptions(currentFilter)}
         </div>
         <div style={{ display: "flex", flexDirection: "row" }}>
           <Button
             disabled={!queryHasChanged() || loading}
             onClick={() => handleApply()}
+=======
+          <div>{getComponent()}</div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "row" }}>
+          <Button
+>>>>>>> b26e0e4a (implemented new filter features with dummy valures)
             style={{
               marginLeft: "auto",
               borderRadius: 0,
@@ -333,6 +408,7 @@ export const FilterBarForMediaLibrary = ({
           </Button>
         </div>
       </div>
+<<<<<<< HEAD
       <div style={{ margin: "10px 0px" }}>
         <Typography variant="h6">Images</Typography>
         <Typography
@@ -344,6 +420,11 @@ export const FilterBarForMediaLibrary = ({
           recent entries compared to those further down.
         </Typography>
       </div>
+=======
+      <Typography variant="body2" color="#b2b2b2">
+        Items below are sorted by date. The most recent items show up first!
+      </Typography>
+>>>>>>> b26e0e4a (implemented new filter features with dummy valures)
     </div>
   );
 };
@@ -370,6 +451,7 @@ export default connect(
   mapDispatchToProps
 )(FilterBarForMediaLibrary);
 
+<<<<<<< HEAD
 const WithKeywords = ({ keywords, onChange, remove }) => {
   const renderChips = (data) => {
     const items = data?.split(",").filter(Boolean);
@@ -381,13 +463,25 @@ const WithKeywords = ({ keywords, onChange, remove }) => {
         style={{ margin: "5px 3px" }}
         onDelete={() => remove(item, items)}
       />
+=======
+const WithKeywords = ({ keywords, onChange }) => {
+  const renderChips = (data) => {
+    const items = data?.split(",");
+    const empty = !items?.length || items[0].trim() === "";
+    if (empty) return <></>;
+    return items?.map((item) => (
+      <Chip label={item?.trim()} style={{ margin: "5px 3px" }} />
+>>>>>>> b26e0e4a (implemented new filter features with dummy valures)
     ));
   };
   return (
     <>
       <TextField
         onChange={onChange}
+<<<<<<< HEAD
         value={keywords}
+=======
+>>>>>>> b26e0e4a (implemented new filter features with dummy valures)
         label="Keywords here will be used to search image names, tags, and descriptions"
         placeholder="Add keywords separated by commas (E.g. Solar,Sun,green-house etc)"
         style={{ width: "100%", marginTop: 6 }}
@@ -395,9 +489,13 @@ const WithKeywords = ({ keywords, onChange, remove }) => {
           style: { padding: "12.5px 14px", width: "100%" },
         }}
       />
+<<<<<<< HEAD
       <div style={{ marginTop: 6, textTransform: "capitalize" }}>
         {renderChips(keywords)}
       </div>
+=======
+      <div style={{ marginTop: 6 }}>{renderChips(keywords)}</div>
+>>>>>>> b26e0e4a (implemented new filter features with dummy valures)
     </>
   );
 };
