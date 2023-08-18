@@ -50,7 +50,8 @@
   background-color: #282828 !important;
 }
 .ml-footer-btn:hover {
-  background-color: cornflowerblue;
+  /* background-color: cornflowerblue; */
+  background-color: #ab47bc;
   color: white;
   /* transition: 0.2s ease-out; */
 }

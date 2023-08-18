@@ -17,26 +17,28 @@ function MEDropdown(props) {
     valueExtractor,
     onItemSelected,
     multiple,
-    data,
+    // data,
     placeholder,
     defaultValue,
     value,
     generics,
     fullControl = false,
+    name,
     ...rest
   } = props;
-  const [selected, setSelected] = useState(defaultValue || value || []);
-  const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
-    const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
+  const [selected, setSelected] = useState([]);
+  const [optionsToDisplay, setOptionsToDisplay] = useState([]);
+  const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
   const valueOf = (item) => {
     if (!item) return;
     if (valueExtractor) return valueExtractor(item);
     return (item && item.name) || (item && item.toString());
   };
-
   useEffect(() => {
     setSelected(defaultValue || value || []);
   }, [defaultValue, value]);
+
+  useEffect(() => setOptionsToDisplay(props.data), [props.data]);
 
   // -------------------------------------------------------------------
   if (fullControl) return <MEDropdownPro {...props} />;
@@ -48,27 +50,29 @@ function MEDropdown(props) {
       elementObserver.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && cursor.has_more) {
           if (!rest?.endpoint) return;
-          apiCall(rest?.endpoint, { page: cursor.next,limit: 10,}).then((res) => {
-            setCursor({
-              has_more: res?.cursor?.count > optionsToDisplay?.length,
-              next: res?.cursor?.next,
-            });
-            let items = [
-              ...optionsToDisplay,
-              ...(res?.data || [])?.map((item) => {
-                return {
-                  ...item,
-                  displayName: labelExtractor
-                    ? labelExtractor(item)
-                    : item?.name || item?.title,
-                };
-              }),
-            ];
+          apiCall(rest?.endpoint, { page: cursor.next, limit: 10 }).then(
+            (res) => {
+              setCursor({
+                has_more: res?.cursor?.count > optionsToDisplay?.length,
+                next: res?.cursor?.next,
+              });
+              let items = [
+                ...optionsToDisplay,
+                ...(res?.data || [])?.map((item) => {
+                  return {
+                    ...item,
+                    displayName: labelExtractor
+                      ? labelExtractor(item)
+                      : item?.name || item?.title,
+                  };
+                }),
+              ];
 
-            setOptionsToDisplay([
-              ...new Map(items.map((item) => [item["id"], item])).values(),
-            ]);
-          });
+              setOptionsToDisplay([
+                ...new Map(items.map((item) => [item["id"], item])).values(),
+              ]);
+            }
+          );
         }
       });
 
@@ -83,7 +87,7 @@ function MEDropdown(props) {
       <LightAutoComplete
         onChange={(items) => {
           items = (items || []).map((a) => valueExtractor(a));
-           onItemSelected && onItemSelected(items);
+          onItemSelected && onItemSelected(items);
         }}
         {...props}
       />
@@ -93,8 +97,8 @@ function MEDropdown(props) {
 
   // -------------------------------------------------------------------
 
-
   const labelOf = (item, fromValue) => {
+    const data = optionsToDisplay;
     if (!item) return;
     if (fromValue) {
       item = (data || []).find((it) => valueOf(it) === item);
@@ -122,8 +126,10 @@ function MEDropdown(props) {
     const found = (selected || []).find((it) => it === item);
     return found;
   };
+
   return (
     <FormControl
+      key={name || "me-dropdown"}
       style={{ width: "100%", marginTop: 10, ...(containerStyle || {}) }}
     >
       {placeholder && <FormLabel component="legend">{placeholder}</FormLabel>}
@@ -153,7 +159,14 @@ function MEDropdown(props) {
       >
         {(optionsToDisplay || []).map((d, i) => {
           return (
-            <MenuItem key={i} ref={(i === optionsToDisplay.length - 1) && rest?.isAsync ? lastDropDownItemRef:null}>
+            <MenuItem
+              key={i}
+              ref={
+                i === optionsToDisplay.length - 1 && rest?.isAsync
+                  ? lastDropDownItemRef
+                  : null
+              }
+            >
               <FormControlLabel
                 onClick={() => handleOnChange(d)}
                 key={i}

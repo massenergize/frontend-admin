@@ -8,81 +8,107 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import MEDropdown from "../../ME  Tools/dropdown/MEDropdown";
+
 export const FilterBarForMediaLibrary = ({ auth, communities }) => {
   const [currentFilter, setCurrentFilter] = useState("keywords");
-  const [keywords, setKeywords] = useState("");
+  const [usersQuery, setQuery] = useState({});
+  // const [keywords, setKeywords] = useState("");
+  // const [chosenComs, setChosenComs] = useState([]);
+  // const [otherAdmins, setOtherAdmins] = useState([]);
+  const [options, setOptions] = useState([]);
+
+  const isCommunityAdmin = auth?.is_community_admin && !auth?.is_super_admin;
+
+  const buildQuery = (name, item) => {
+    const obj = { ...usersQuery, [name]: item };
+    setQuery(obj);
+  };
+
+  const getValue = (name, _default = null) => {
+    if (!name) return null;
+    return usersQuery[name] || _default;
+  };
 
   const getCommunitiesToSelectFrom = () => {
     if (isCommunityAdmin) return auth?.admin_at;
     return communities || [];
   };
 
-  const FILTER_OPTIONS = [
-    {
-      name: "My Uploads",
-      key: "my-uploads",
-      context: "Only images you have uploaded will show up",
-    },
-    {
-      name: "Use Keywords",
-      key: "keywords",
-      context: "Keywords that describe the image",
-      component: (
-        <WithKeywords
-          keywords={keywords}
-          onChange={(e) => setKeywords(e.target.value)}
-        />
-      ),
-    },
-    {
-      name: "From Other Admins",
-      key: "from-others",
-      context: "See what other admins have uploaded",
-      component: (
+  useEffect(() => {
+    const opts = [
+      {
+        name: "My Uploads",
+        key: "my-uploads",
+        context: "Only images you have uploaded will show up",
+      },
+      {
+        name: "Use Keywords",
+        key: "keywords",
+        context: "Keywords that describe the image",
+      },
+      {
+        name: "From Other Admins",
+        key: "from-others",
+        context: "See what other admins have uploaded",
+      },
+      {
+        name: "By Community",
+        key: "by-community",
+        context: "Show only community specific items",
+      },
+    ];
+
+    setOptions(opts);
+  }, []);
+
+  const renderContextualOptions = (currentFilter) => {
+    // NOTE: attaching these components to the options objects itself is the best way to implement it. But it causes dropdowns to conflict unless implemented this way (the way its done below).
+    // When there is time, remember to look into it
+    if (currentFilter === "by-community")
+      return (
         <div>
           <MEDropdown
+            onItemSelected={(items) => buildQuery(currentFilter, items)}
+            value={getValue(currentFilter, [])}
+            name="by-community"
+            multiple
+            labelExtractor={(item) => item?.name}
+            valueExtractor={(item) => item?.id}
+            data={getCommunitiesToSelectFrom()}
+            placeholder="Select communities and 'Apply'"
+          />
+        </div>
+      );
+
+    if (currentFilter === "from-others")
+      return (
+        <div>
+          <MEDropdown
+            onItemSelected={(items) => buildQuery(currentFilter, items)}
+            value={getValue(currentFilter, [])}
+            name="from-others"
             multiple
             data={["actions", "events", "something"]}
             placeholder="Select admins and 'Apply'"
           />
         </div>
-      ),
-    },
-    {
-      name: "By Community",
-      key: "by-community",
-      context: "Show only community specific items",
-      component: (
-        <div>
-          <MEDropdown
-            multiple
-            labelExtractor={(item) => item?.name}
-            valueExtractor={(item) => item?.id}
-            data={communities}
-            placeholder="Select communities and 'Apply'"
-          />
-        </div>
-      ),
-    },
-  ];
+      );
 
-  const getComponent = () => {
-    return FILTER_OPTIONS.find((f) => f.key === currentFilter)?.component;
+    if (currentFilter === "keywords")
+      return (
+        <WithKeywords
+          keywords={getValue(currentFilter, "")}
+          onChange={(e) => buildQuery(currentFilter, e.target.value)}
+        />
+      );
   };
 
   return (
     <div style={{ padding: "0px 27px" }}>
-      <div
-        className="me-ml-filter-root"
-        // style={{
-        //   padding: "15px 20px",
-        //   background: "navajowhite",
-        //   border: "solid 2px antiquewhite",
-        // }}
-      >
+      <div className="me-ml-filter-root">
         <div style={{ padding: "10px 20px" }}>
           <Typography variant="body2">
             Use the options below to filter images
@@ -93,7 +119,7 @@ export const FilterBarForMediaLibrary = ({ auth, communities }) => {
             style={{ display: "flex", flexDirection: "row" }}
             onChange={(ev) => setCurrentFilter(ev?.target.value)}
           >
-            {FILTER_OPTIONS.map((option) => (
+            {options.map((option) => (
               <FormControlLabel
                 name={option.key}
                 key={option.key}
@@ -113,7 +139,7 @@ export const FilterBarForMediaLibrary = ({ auth, communities }) => {
             ))}
           </RadioGroup>
 
-          <div>{getComponent()}</div>
+          {renderContextualOptions(currentFilter)}
         </div>
         <div style={{ display: "flex", flexDirection: "row" }}>
           <Button
