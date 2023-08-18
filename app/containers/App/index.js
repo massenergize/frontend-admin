@@ -16,9 +16,24 @@ import {
   reduxCallIdToken,
   reduxLoadAuthAdmin,
 } from "../../redux/redux-actions/adminActions";
-import { LAST_VISITED, TIME_UNTIL_EXPIRATION, TWENTY_FOUR_HOURS } from "../../utils/constants";
+import {
+  LAST_VISITED,
+  TIME_UNTIL_EXPIRATION,
+  TWENTY_FOUR_HOURS,
+} from "../../utils/constants";
+import * as Sentry from "@sentry/react";
+
 
 window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
+
+const saveCurrentLocation = () => {
+  var old = window.localStorage.getItem(LAST_VISITED);
+  var url = window.location.href;
+  if (old === url) return;
+  const canSaveThisURL = !["login", "atf"].find((kw) => url.includes(kw));
+  // Save the last visited url in local storage unless its the login page or dashboard url after login
+  if (canSaveThisURL) window.localStorage.setItem(LAST_VISITED, url);
+};
 
 /*
     1. Collect user Auth user From Firebase
@@ -50,11 +65,15 @@ class App extends React.Component {
       error: null,
       started: false,
     };
-    this.saveCurrentLocation();
     this.signOut = this.signOut.bind(this);
     this.loginWithFacebook = this.loginWithFacebook.bind(this);
     this.loginWithGoogle = this.loginWithGoogle.bind(this);
     this.normalLogin = this.normalLogin.bind(this);
+  }
+
+  static getDerivedStateFromProps(_, __) {
+    saveCurrentLocation();
+    return null;
   }
 
   async componentDidMount() {
@@ -102,7 +121,8 @@ class App extends React.Component {
     this.setState({ error: null });
     const me = this;
     const body = { idToken: fireToken };
-    var successURL = localStorage.getItem(LAST_VISITED) || "/";
+    // var successURL = localStorage.getItem(LAST_VISITED) || "/";
+    var successURL = "/?atf=true"; // atf = Ask to forward
     apiCall("auth.login", body)
       .then((res) => {
         const { error } = res;
@@ -203,13 +223,6 @@ class App extends React.Component {
       });
   };
 
-  saveCurrentLocation() {
-    var url = window.location.href;
-    const canSaveThisURL = !["login"].find((kw) => url.includes(kw));
-    // Save the last visited url in local storage unless its the login page
-    if (canSaveThisURL) window.localStorage.setItem(LAST_VISITED, url);
-  }
-
   render() {
     const { error, started } = this.state;
     const { auth } = this.props;
@@ -307,7 +320,9 @@ function mapDispatchToProps(dispatch) {
   );
 }
 
+const sentryWrapped = Sentry.withProfiler(App);
+
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(App);
+)(sentryWrapped);

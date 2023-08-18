@@ -1,14 +1,21 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import states from "dan-api/data/states";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import moment from "moment";
-import MassEnergizeForm from "../_FormGenerator";
+// import MassEnergizeForm from "../_FormGenerator";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
 import { makeTagSection } from "./EditEventForm";
 import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
 import fieldTypes from "../_FormGenerator/fieldTypes";
+import { bindActionCreators } from "redux";
+import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import { removePageProgressFromStorage } from "../../../utils/common";
+import { withRouter } from "react-router-dom";
+import Seo from "../../../components/Seo/Seo";
 
 const styles = (theme) => ({
   root: {
@@ -29,7 +36,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -46,10 +53,16 @@ class CreateNewEventForm extends Component {
   }
 
   static getDerivedStateFromProps = (props, state) => {
-    const { communities, tags, auth } = props;
+    const { communities, tags, auth, location, otherCommunities } = props;
 
     const readyToRenderPageFirstTime =
-      communities && communities.length && tags && tags.length && auth;
+      communities &&
+      communities.length &&
+      tags &&
+      tags.length &&
+      auth &&
+      otherCommunities &&
+      otherCommunities.length;
 
     const jobsDoneDontRunWhatsBelowEverAgain =
       !readyToRenderPageFirstTime || state.mounted;
@@ -58,15 +71,22 @@ class CreateNewEventForm extends Component {
     const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
-      id: "" + c.id,
+      id: c.id,
     }));
+
+    const section = makeTagSection({
+      collections: tags,
+      defaults: false,
+    });
+
+    const libOpen = location.state && location.state.libOpen;
 
     const formJson = createFormJson({
       communities: coms,
       auth,
+      autoOpenMediaLibrary: libOpen,
+      otherCommunities: otherCommunities || [],
     });
-
-    const section = makeTagSection({ collections: tags, defaults: false });
 
     if (formJson) formJson.fields.splice(1, 0, section);
 
@@ -83,10 +103,13 @@ class CreateNewEventForm extends Component {
     if (!formJson) return <Loading />;
     return (
       <div>
+        <Seo name={"Create New Event or Campaign"} />
         <MassEnergizeForm
+          pageKey={PAGE_KEYS.CREATE_EVENT.key}
           classes={classes}
           formJson={formJson}
           validator={validator}
+          enableCancel
         />
       </div>
     );
@@ -102,12 +125,28 @@ const mapStateToProps = (state) => {
     tags: state.getIn(["allTags"]),
     communities: state.getIn(["communities"]),
     auth: state.getIn(["auth"]),
+    formState: state.getIn(["tempForm"]),
+    otherCommunities: state.getIn(["otherCommunities"]),
   };
 };
 
-const CreateEventMapped = connect(mapStateToProps)(CreateNewEventForm);
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      saveFormTemporarily: reduxKeepFormContent,
+    },
+    dispatch
+  );
+};
 
-export default withStyles(styles, { withTheme: true })(CreateEventMapped);
+const CreateEventMapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreateNewEventForm);
+
+export default withStyles(styles, { withTheme: true })(
+  withRouter(CreateEventMapped)
+);
 
 const validator = (cleaned) => {
   const start = (cleaned || {})["start_date_and_time"];
@@ -120,18 +159,98 @@ const validator = (cleaned) => {
   ];
 };
 
-const whenStartDateChanges = ({
-  newValue,
-  formData,
-  setValueInForm,
-}) => {
+const whenStartDateChanges = ({ newValue, formData, setValueInForm }) => {
   formData = formData || {};
   const newEnd = moment(newValue).add(1, "hours");
   setValueInForm({ start_date_and_time: newValue, end_date_and_time: newEnd });
 };
 
-const createFormJson = ({ communities, auth }) => {
+const createFormJson = ({
+  communities,
+  auth,
+  progress,
+  autoOpenMediaLibrary,
+  otherCommunities,
+}) => {
   const is_super_admin = auth && auth.is_super_admin;
+  otherCommunities = otherCommunities || [];
+  const otherCommunityList = otherCommunities.map((c) => ({
+    displayName: c.name,
+    id: c.id.toString(),
+  }));
+
+  const ADD_LINK = [
+    {
+      name: "external_link",
+      label: "Link",
+      placeholder: "Enter link to the event",
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: false,
+      defaultValue: "",
+      dbName: "external_link",
+      readOnly: false,
+    },
+    {
+      name: "external_link_type",
+      label:"Is the link specified to join the event, or to register (with join link sent separately)?",
+      fieldType: "Dropdown",
+      dbName: "external_link_type",
+      defaultValue:  "",
+      data: [
+        { id: "Join", displayName: "Join" },
+        { id: "Register", displayName: "Register" },
+      ],
+    },
+  ];
+
+  const ADD_ADDRESS = [
+    {
+      name: "address",
+      label: "Street Address",
+      placeholder: "Street Address or Public Facility",
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: false,
+      defaultValue: "",
+      dbName: "address",
+      readOnly: false,
+    },
+    {
+      name: "unit",
+      label: "Unit Number",
+      placeholder: 'eg. "2A"',
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: false,
+      defaultValue: "",
+      dbName: "unit",
+      readOnly: false,
+    },
+    {
+      name: "city",
+      label: "City",
+      placeholder: "eg. Springfield",
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: false,
+      defaultValue: "",
+      dbName: "city",
+      readOnly: false,
+    },
+    {
+      name: "state",
+      label: "State ",
+      fieldType: "Dropdown",
+      contentType: "text",
+      isRequired: false,
+      data: states,
+      defaultValue: "Massachusetts",
+      dbName: "state",
+      readOnly: false,
+    },
+  ];
+
   const formJson = {
     title: "Create New Event or Campaign",
     subTitle: "",
@@ -149,9 +268,10 @@ const createFormJson = ({ communities, auth }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            // defaultValue: progress.name || "",
             dbName: "name",
             readOnly: false,
+            maxLength: 100, // matches max length in the BE
           },
           {
             name: "featured_summary",
@@ -160,20 +280,8 @@ const createFormJson = ({ communities, auth }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            // defaultValue: progress.featured_summary || "",
             dbName: "featured_summary",
-            readOnly: false,
-          },
-          {
-            name: "rank",
-            label:
-              "Rank (Which order should this event appear in?  Lower numbers come first)",
-            placeholder: "eg. 1",
-            fieldType: "TextField",
-            contentType: "number",
-            isRequired: true,
-            defaultValue: "",
-            dbName: "rank",
             readOnly: false,
           },
           {
@@ -201,6 +309,7 @@ const createFormJson = ({ communities, auth }) => {
             minDate: moment().startOf("hour"),
             readOnly: false,
           },
+
           {
             name: "is_recurring",
             label: "Make this a recurring event",
@@ -211,7 +320,7 @@ const createFormJson = ({ communities, auth }) => {
             readOnly: false,
             data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
             child: {
-              dbName: "recurring_details",
+              // dbName: "recurring_details",
               valueToCheck: "true",
               fields: [
                 {
@@ -236,7 +345,7 @@ const createFormJson = ({ communities, auth }) => {
                   label: "",
                   fieldType: "Radio",
                   dbName: "recurring_type",
-                  defaultValue: null,
+                  // defaultValue: progress.recurring_type || null,
                   data: [
                     { id: "week", value: "weeks" },
                     { id: "month", value: "months" },
@@ -312,7 +421,9 @@ const createFormJson = ({ communities, auth }) => {
                       defaultValue: null,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
-                      isRequired:true,
+                      isRequired: true,
+                      isAsync: true,
+                      endpoint: "/communities.listForSuperAdmin",
                     },
                   ],
                 },
@@ -324,69 +435,82 @@ const createFormJson = ({ communities, auth }) => {
                 defaultValue: communities[0] && communities[0].id,
                 dbName: "community_id",
                 data: [{ displayName: "--", id: "" }, ...communities],
-                isRequired:true,
+                isRequired: true,
               },
         ],
       },
       {
-        name: "have_address",
-        label: "Want to add an address for this event?",
+        label: "Who can see this event?",
+        fieldType: "Section",
+        children: [
+          {
+            name: "publicity",
+            label: "Who should be able to see this event?",
+            fieldType: "Radio",
+            isRequired: false,
+            defaultValue: "OPEN",
+            dbName: "publicity",
+            readOnly: false,
+            data: [
+              { id: "OPEN", value: "All communities can see this event " },
+              {
+                id: "OPEN_TO",
+                value: "Only communities I select should see this",
+              },
+              {
+                id: "CLOSE",
+                value: "No one can see this, keep this in my community only ",
+              },
+            ],
+            conditionalDisplays: [
+              {
+                valueToCheck: "OPEN_TO",
+                fields: [
+                  {
+                    name: "can-view-event",
+                    label: `Select the communities that can see this event`,
+                    placeholder: "",
+                    fieldType: "Checkbox",
+                    selectMany: true,
+                    defaultValue: [],
+                    dbName: "publicity_selections",
+                    data: otherCommunityList,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: "event_type",
+        label: "Is this event",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: "false",
-        dbName: "have_address",
+        defaultValue: "in-person",
+        dbName: "event_type",
         readOnly: false,
-        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-        child: {
-          valueToCheck: "true",
-          fields: [
-            {
-              name: "address",
-              label: "Street Address",
-              placeholder: "Street Address or Public Facility",
-              fieldType: "TextField",
-              contentType: "text",
-              isRequired: true,
-              defaultValue: "",
-              dbName: "address",
-              readOnly: false,
-            },
-            {
-              name: "unit",
-              label: "Unit Number",
-              placeholder: 'eg. "2A"',
-              fieldType: "TextField",
-              contentType: "text",
-              isRequired: false,
-              defaultValue: "",
-              dbName: "unit",
-              readOnly: false,
-            },
-            {
-              name: "city",
-              label: "City",
-              placeholder: "eg. Springfield",
-              fieldType: "TextField",
-              contentType: "text",
-              isRequired: true,
-              defaultValue: "",
-              dbName: "city",
-              readOnly: false,
-            },
-            {
-              name: "state",
-              label: "State ",
-              fieldType: "Dropdown",
-              contentType: "text",
-              isRequired: false,
-              data: states,
-              defaultValue: "Massachusetts",
-              dbName: "state",
-              readOnly: false,
-            },
-          ],
-        },
+        data: [
+          { id: "in-person", value: "In-Person" },
+          { id: "online", value: "Online" },
+          { id: "both", value: "Both" },
+        ],
+        conditionalDisplays: [
+          {
+            valueToCheck: "online",
+            fields: ADD_LINK,
+          },
+          {
+            valueToCheck: "in-person",
+            fields: ADD_ADDRESS,
+          },
+          {
+            valueToCheck: "both",
+            fields: [...ADD_ADDRESS, ...ADD_LINK],
+          },
+        ],
       },
+
       {
         name: "description",
         label: "Event Description",
@@ -402,6 +526,9 @@ const createFormJson = ({ communities, auth }) => {
         fieldType: fieldTypes.MediaLibrary,
         dbName: "image",
         label: "Upload Files",
+        selected: [],
+        // defaultValue: progress.image || [],
+        openState: autoOpenMediaLibrary,
         isRequired: false,
       },
       {
@@ -414,7 +541,6 @@ const createFormJson = ({ communities, auth }) => {
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
         child: {
-          dbName: "rsvp_communication",
           valueToCheck: "true",
           fields: [
             {
@@ -450,12 +576,32 @@ const createFormJson = ({ communities, auth }) => {
         },
       },
       {
+        name: "add_to_home_page",
+        label: "Would you want this Event to be added to your homepage?",
+        fieldType: "Radio",
+        isRequired: false,
+        defaultValue: "false",
+        dbName: "add_to_home_page",
+        readOnly: false,
+        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+      },
+      {
         name: "archive",
         label: "Archive this Event",
         fieldType: "Radio",
         isRequired: false,
         defaultValue: "false",
         dbName: "archive",
+        readOnly: false,
+        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+      },
+      {
+        name: "is_approved",
+        label: "Do you approve this event?",
+        fieldType: "Radio",
+        isRequired: false,
+        defaultValue: "true",
+        dbName: "is_approved",
         readOnly: false,
         data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
       },

@@ -1,10 +1,7 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import brand from "dan-api/dummy/brand";
-import { Helmet } from "react-helmet";
-import { withStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
-import Divider from "@material-ui/core/Divider";
+import { withStyles } from "@mui/styles";
+import Grid from "@mui/material/Grid";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from "./dashboard-jss";
@@ -14,14 +11,21 @@ import {
   reduxLoadSelectedCommunity,
   reduxCheckUser,
 } from "../../../redux/redux-actions/adminActions";
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import Icon from "@material-ui/core/Icon";
-import Snackbar from "@material-ui/core/Snackbar";
-import MySnackbarContentWrapper from "../../../components/SnackBar/SnackbarContentWrapper";
+import { Paper, Alert } from "@mui/material";
+import Typography from "@mui/material/Typography";
+import Icon from "@mui/material/Icon";
+import Snackbar from "@mui/material/Snackbar";
 import { apiCallFile } from "../../../utils/messenger";
 import ReportingActivities from "./ReportingActivities";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import CircularProgress from "@mui/material/CircularProgress";
+import WhatNext from "./WhatNext";
+import CommunityEngagement from "./CommunityEngagement";
+import Feature from "../../../components/FeatureFlags/Feature";
+import { FLAGS } from "../../../components/FeatureFlags/flags";
+import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import ContinueWhereYouLeft from "./ContinueWhereYouLeft";
+import { MetricsModal } from 'dan-components';
+import Seo from "../../../components/Seo/Seo";
 
 // import LinearBuffer from '../../../components/Massenergize/LinearBuffer';
 class SummaryDashboard extends PureComponent {
@@ -31,10 +35,11 @@ class SummaryDashboard extends PureComponent {
       error: null,
       loadingCSVs: [],
       success: false,
+      openModal: false,
     };
   }
 
-  async getCSV(endpoint) {
+  getCSV = async (endpoint) => {
     let oldLoadingCSVs = this.state.loadingCSVs;
     this.setState({ loadingCSVs: oldLoadingCSVs.concat(endpoint) });
     const csvResponse = await apiCallFile("/downloads." + endpoint);
@@ -48,7 +53,7 @@ class SummaryDashboard extends PureComponent {
     }
     this.setState({ loadingCSVs: oldLoadingCSVs });
     this.forceUpdate();
-  }
+  };
 
   handleCloseStyle = (event, reason) => {
     if (reason === "clickaway") {
@@ -82,18 +87,28 @@ class SummaryDashboard extends PureComponent {
     this.setState({ success: false });
   };
 
+  handleOpenModal = () => {
+    this.setState({ openModal: true });
+  };
+
+  handleCloseModal = (apiCall) => {
+    if (apiCall == "response"){
+      this.setState({ success: true });
+    }
+    this.setState({ openModal: false });
+  };
+
   render() {
-    const title = brand.name + " - Summary Dashboard";
-    const description = brand.desc;
     const {
       classes,
       communities,
-      selected_community,
-      auth,
       summary_data,
       graph_data,
+      featureFlags,
     } = this.props;
     const { error, loadingCSVs, success } = this.state;
+    const { openModal } = this.state;
+    const featureToEdit = null;
 
     return (
       <div>
@@ -105,11 +120,15 @@ class SummaryDashboard extends PureComponent {
               autoHideDuration={6000}
               onClose={this.handleCloseStyle}
             >
-              <MySnackbarContentWrapper
+              <Alert
                 onClose={this.handleCloseStyle}
-                variant="error"
-                message={`Unable to download: ${error}`}
-              />
+                severity={"error"}
+                sx={{ width: "100%" }}
+              >
+                <small style={{ marginLeft: 15, fontSize: 15 }}>
+                  {`Unable to download: ${error}`}
+                </small>
+              </Alert>
             </Snackbar>
           </div>
         )}
@@ -121,109 +140,90 @@ class SummaryDashboard extends PureComponent {
               autoHideDuration={3000}
               onClose={this.handleClose}
             >
-              <MySnackbarContentWrapper
+              <Alert
                 onClose={this.handleClose}
-                variant="success"
-                message={`Your request has been received. Please check your email for the file.`}
-              />
+                severity={"success"}
+                sx={{ width: "100%" }}
+              >
+                <small style={{ marginLeft: 15, fontSize: 15 }}>
+                  Your request has been received. Please check your email
+                  for the file.
+                </small>
+              </Alert>
             </Snackbar>
           </div>
         )}
-
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <MetricsModal
+          openModal={openModal}
+          closeModal={this.handleCloseModal}
+          communities={communities}
+          featureToEdit={featureToEdit}
+          featureFlags={featureFlags}
+        />
+        <Seo name={"Summary Dashboard"} />
 
         <Grid container className={classes.root}>
           <SummaryChart data={summary_data} />
         </Grid>
-        <Divider className={classes.divider} />
+        <br />
+        <ContinueWhereYouLeft />
+        <Feature
+          name={FLAGS.NEW_USER_ENGAGEMENT_VIEW}
+          fallback={
+            <>
+              {graph_data && <ActionsChartWidget data={graph_data || {}} />}
+              <Grid
+                container
+                md={12}
+                columnGap={2}
+                style={{ marginTop: 20 }}
+              >
+                <Grid md={8}>
+                  <ReportingActivities
+                    super_admin_mode
+                    style={{ maxHeight: 300, overflowY: "scroll" }}
+                  />
+                </Grid>
+                <Grid md={3}>
+                  <CSVDownloads
+                    loadingCSVs={loadingCSVs}
+                    classes={classes}
+                    getCSV={this.getCSV}
+                    handleOpenModal={this.handleOpenModal}
+                  />
+                </Grid>
+              </Grid>
+            </>
+          }
+        >
+          <Grid container columnGap={2} style={{ marginBottom: 15 }}>
+            <Grid item xs={7} style={{ marginRight: 10 }}>
+              <WhatNext />
+              <CommunityEngagement />
+            </Grid>
+            <Grid item xs={4}>
+              <CSVDownloads
+                loadingCSVs={loadingCSVs}
+                classes={classes}
+                getCSV={this.getCSV}
+                handleOpenModal={this.handleOpenModal}
+              />
+              <Grid>
+                <ReportingActivities
+                  super_admin_mode
+                  style={{ maxHeight: 600, overflowY: "scroll" }}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+        </Feature>
 
-        {graph_data && <ActionsChartWidget data={graph_data || {}} />}
-        <Grid container className={classes.colList}>
-          <Grid item xs={4}>
-            <Paper
-              onClick={() => {
-                !loadingCSVs.includes("users") && this.getCSV("users");
-              }}
-              className={`${classes.pageCard}`}
-              elevation={1}
-            >
-              <Typography
-                variant="h5"
-                style={{ fontWeight: "600", fontSize: "1rem" }}
-                component="h3"
-              >
-                Request All Users CSV{" "}
-                <Icon style={{ paddingTop: 3, color: "green" }}>
-                  arrow_downward
-                </Icon>
-                {loadingCSVs.includes("users") && (
-                  <CircularProgress size={20} thickness={2} color="secondary" />
-                )}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              onClick={() => {
-                !loadingCSVs.includes("actions") && this.getCSV("actions");
-              }}
-              className={`${classes.pageCard}`}
-              elevation={1}
-            >
-              <Typography
-                variant="h5"
-                style={{ fontWeight: "600", fontSize: "1rem" }}
-                component="h3"
-              >
-                Request All Actions CSV{" "}
-                <Icon style={{ paddingTop: 3, color: "green" }}>
-                  arrow_downward
-                </Icon>
-                {loadingCSVs.includes("actions") && (
-                  <CircularProgress size={20} thickness={2} color="secondary" />
-                )}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              onClick={() => {
-                !loadingCSVs.includes("communities") &&
-                  this.getCSV("communities");
-              }}
-              className={`${classes.pageCard}`}
-              elevation={1}
-            >
-              <Typography
-                variant="h5"
-                style={{ fontWeight: "600", fontSize: "1rem" }}
-                component="h3"
-              >
-                Request All Communities CSV{" "}
-                <Icon style={{ paddingTop: 3, color: "green" }}>
-                  arrow_downward
-                </Icon>
-                {loadingCSVs.includes("communities") && (
-                  <CircularProgress size={20} thickness={2} color="secondary" />
-                )}
-              </Typography>
-            </Paper>
-          </Grid>
-        </Grid>
-
-        <Grid>
+        {/* <Grid>
           <ReportingActivities
             super_admin_mode
             style={{ maxHeight: 600, overflowY: "scroll" }}
           />
-        </Grid>
+        </Grid> */}
       </div>
     );
   }
@@ -238,6 +238,7 @@ const mapStateToProps = (state) => ({
   selected_community: state.getIn(["selected_community"]),
   summary_data: state.getIn(["summary_data"]),
   graph_data: state.getIn(["graph_data"]) || {},
+  featureFlags: state.getIn(["featureFlags"]),
 });
 
 const mapDispatchToProps = (dispatch) =>
@@ -254,3 +255,106 @@ const summaryMapped = connect(
 )(SummaryDashboard);
 
 export default withStyles(styles)(summaryMapped);
+
+const CSVDownloads = ({ loadingCSVs, classes, getCSV, handleOpenModal}) => {
+  return (
+    <MEPaperBlock
+      subtitle="Download your data as CSV here"
+      title="CSV Downloads"
+    >
+      <Grid container className={classes.colList}>
+        <Grid item xs={12}>
+          <Paper
+            onClick={() => {
+              !loadingCSVs.includes("users") && getCSV("users");
+            }}
+            className={`${classes.pageCard}`}
+            elevation={1}
+          >
+            <Typography
+              variant="h5"
+              style={{ fontWeight: "600", fontSize: "1rem" }}
+              component="h3"
+            >
+              Request All Users CSV{" "}
+              <Icon style={{ paddingTop: 3, color: "green" }}>
+                arrow_downward
+              </Icon>
+              {loadingCSVs.includes("users") && (
+                <CircularProgress size={20} thickness={2} color="secondary" />
+              )}
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          <Paper
+            onClick={() => {
+              !loadingCSVs.includes("actions") && getCSV("actions");
+            }}
+            className={`${classes.pageCard}`}
+            elevation={1}
+          >
+            <Typography
+              variant="h5"
+              style={{ fontWeight: "600", fontSize: "1rem" }}
+              component="h3"
+            >
+              Request All Actions CSV{" "}
+              <Icon style={{ paddingTop: 3, color: "green" }}>
+                arrow_downward
+              </Icon>
+              {loadingCSVs.includes("actions") && (
+                <CircularProgress size={20} thickness={2} color="secondary" />
+              )}
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          <Paper
+            onClick={() => {
+              !loadingCSVs.includes("communities") &&
+                getCSV("communities");
+            }}
+            className={`${classes.pageCard}`}
+            elevation={1}
+          >
+            <Typography
+              variant="h5"
+              style={{ fontWeight: "600", fontSize: "1rem" }}
+              component="h3"
+            >
+              Request All Communities CSV{" "}
+              <Icon style={{ paddingTop: 3, color: "green" }}>
+                arrow_downward
+              </Icon>
+              {loadingCSVs.includes("communities") && (
+                <CircularProgress size={20} thickness={2} color="secondary" />
+              )}
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          <Paper
+            onClick ={() => {handleOpenModal();}}
+            className={`${classes.pageCard}`}
+            elevation={1}
+          >
+            <Typography
+              variant="h5"
+              style={{ fontWeight: "600", fontSize: "1rem" }}
+              component="h3"
+            >
+              Request All Metrics CSV{" "}
+              <Icon style={{ paddingTop: 3, color: "green" }}>
+                arrow_downward
+              </Icon>
+              {loadingCSVs.includes("metrics") && (
+                <CircularProgress size={20} thickness={2} color="secondary" />
+              )}
+            </Typography>
+          </Paper>
+        </Grid>
+      </Grid>
+    </MEPaperBlock>
+  );
+};

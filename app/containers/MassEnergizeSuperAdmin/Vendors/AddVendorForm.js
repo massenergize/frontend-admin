@@ -1,15 +1,17 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import states from "dan-api/data/states";
-import { withStyles } from "@material-ui/core/styles";
-import MassEnergizeForm from "../_FormGenerator";
+import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
 import { makeTagSection } from "../Events/EditEventForm";
 import { connect } from "react-redux";
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
-
-
+import { bindActionCreators } from "redux";
+import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import { withRouter } from "react-router-dom";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -29,7 +31,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -44,77 +46,39 @@ class CreateNewVendorForm extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    const { communities, tags } = props;
+    const { communities, tags, formState, location, auth } = props;
+
+      const isSuperAdmin =auth?.is_super_admin 
 
     const section = makeTagSection({
       collections: tags,
-      defaults: false,
+      defaults: true,
       title: "Please select tag(s) that apply to this service provider",
     });
-    const coms = communities.map((c) => ({
+    const coms = (communities ||[]).map((c) => ({
       ...c,
       displayName: c.name,
-      id: "" + c.id,
+      id:c.id,
     }));
 
     const jobsDoneDontRunWhatsBelowEverAgain =
-      !(communities && communities.length && tags && tags.length) ||
+      !(communities && communities.length && tags.length) ||
       state.mounted;
 
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
 
-    const formJson = createFormJson({ communities: coms });
+    const libOpen = location.state && location.state.libOpen;
+    const formJson = createFormJson({
+      communities: coms,
+      autoOpenMediaLibrary: libOpen,
+      isSuperAdmin,
+    });
     formJson.fields.splice(1, 0, section);
 
     return { formJson, communities, mounted: true };
   }
 
-  // async componentDidMount() {
-  //   const tagCollectionsResponse = await apiCall('/tag_collections.listForCommunityAdmin');
-  //   const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
-  //   if (communitiesResponse && communitiesResponse.data) {
-  //     const communities = communitiesResponse.data.map(c => ({ ...c, displayName: c.name, id: '' + c.id }));
-  //     await this.setStateAsync({ communities });
-  //   }
-
-  //   const formJson = await this.createFormJson();
-  //   if (tagCollectionsResponse && tagCollectionsResponse.data) {
-  //     const section = {
-  //       label: 'Please select tag(s) that apply to this service provider',
-  //       fieldType: 'Section',
-  //       children: []
-  //     };
-
-  //     Object.values(tagCollectionsResponse.data).forEach(tCol => {
-  //       const newField = {
-  //         name: tCol.name,
-  //         label: `${tCol.name} ${tCol.allow_multiple ? '(You can select multiple)' : '(Only one selection allowed)'}`,
-  //         placeholder: '',
-  //         fieldType: 'Checkbox',
-  //         selectMany: tCol.allow_multiple,
-  //         defaultValue: [],
-  //         dbName: 'tags',
-  //         data: tCol.tags.map(t => ({ ...t, displayName: t.name, id: '' + t.id }))
-  //       };
-
-  //       // want this to be the 5th field
-  //       if (tCol.name === 'Category') {
-  //         section.children.push(newField);
-  //       }
-  //     });
-
-  //     // want this to be the 2nd field
-  //     formJson.fields.splice(1, 0, section);
-  //   }
-
-  //   await this.setStateAsync({ formJson });
-  // }
-
-  // setStateAsync(state) {
-  //   return new Promise((resolve) => {
-  //     this.setState(state, resolve);
-  //   });
-  // }
+  
 
   render() {
     const { classes } = this.props;
@@ -122,7 +86,12 @@ class CreateNewVendorForm extends Component {
     if (!formJson) return <Loading />;
     return (
       <div>
-        <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
+        <MassEnergizeForm
+          classes={classes}
+          pageKey={PAGE_KEYS.CREATE_VENDOR.key}
+          formJson={formJson}
+          enableCancel
+        />
       </div>
     );
   }
@@ -136,13 +105,26 @@ const mapStateToProps = (state) => {
   return {
     communities: state.getIn(["communities"]),
     tags: state.getIn(["allTags"]),
+    formState: state.getIn(["tempForm"]),
+    auth: state.getIn(["auth"]),
   };
 };
-const Mapped = connect(mapStateToProps)(CreateNewVendorForm);
+
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      saveFormTemporarily: reduxKeepFormContent,
+    },
+    dispatch
+  );
+};
+const Mapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(CreateNewVendorForm));
 export default withStyles(styles, { withTheme: true })(Mapped);
 
-const createFormJson = ({ communities }) => {
-  // const { communities } = this.state;
+const createFormJson = ({ communities, progress, autoOpenMediaLibrary, isSuperAdmin}) => {
   const formJson = {
     title: "Create New Vendor",
     subTitle: "",
@@ -160,7 +142,7 @@ const createFormJson = ({ communities }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            // defaultValue: progress.name || "",
             dbName: "name",
             readOnly: false,
           },
@@ -171,7 +153,7 @@ const createFormJson = ({ communities }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: false,
-            defaultValue: "",
+            // defaultValue: progress.phone_number || "",
             dbName: "phone_number",
             readOnly: false,
           },
@@ -182,10 +164,14 @@ const createFormJson = ({ communities }) => {
             contentType: "text",
             isRequired: true,
             selectMany: true,
-            defaultValue: [],
+            // defaultValue: progress.communities || [],
             dbName: "communities",
             readOnly: false,
             data: communities || [],
+            isAsync: true,
+            endpoint: isSuperAdmin
+              ? "/communities.listForSuperAdmin"
+              : "/communities.listForCommunityAdmin",
           },
           {
             name: "email",
@@ -194,7 +180,7 @@ const createFormJson = ({ communities }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            // defaultValue: progress.email || "",
             dbName: "email",
             readOnly: false,
           },
@@ -206,7 +192,7 @@ const createFormJson = ({ communities }) => {
             contentType: "text",
             isRequired: true,
             isMultiline: true,
-            defaultValue: "",
+            // defaultValue: progress.description || "",
             dbName: "description",
             readOnly: false,
           },
@@ -216,6 +202,7 @@ const createFormJson = ({ communities }) => {
             placeholder: "eg. https://www.vendorwebsite.com",
             fieldType: "TextField",
             contentType: "text",
+            // defaultValue: progress.website || "",
             isRequired: false,
             dbName: "website",
             readOnly: false,
@@ -228,7 +215,10 @@ const createFormJson = ({ communities }) => {
             defaultValue: "false",
             dbName: "have_address",
             readOnly: false,
-            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+            data: [
+              { id: "false", value: "No" },
+              { id: "true", value: "Yes" },
+            ],
             child: {
               valueToCheck: "true",
               fields: [
@@ -239,7 +229,7 @@ const createFormJson = ({ communities }) => {
                   fieldType: "TextField",
                   contentType: "text",
                   isRequired: true,
-                  defaultValue: "",
+                  // defaultValue: progress.address || "",
                   dbName: "address",
                   readOnly: false,
                 },
@@ -250,7 +240,7 @@ const createFormJson = ({ communities }) => {
                   fieldType: "TextField",
                   contentType: "text",
                   isRequired: true,
-                  defaultValue: "",
+                  // defaultValue: progress.city || "",
                   dbName: "city",
                   readOnly: false,
                 },
@@ -272,6 +262,7 @@ const createFormJson = ({ communities }) => {
                   contentType: "text",
                   isRequired: true,
                   dbName: "zipcode",
+                  // defaultValue: progress.zipcode || "",
                   readOnly: false,
                 },
               ],
@@ -294,7 +285,11 @@ const createFormJson = ({ communities }) => {
             readOnly: false,
             data: [
               { id: "national", value: "National", displayName: "National" },
-              { id: "statewide", value: "Statewide", displayName: "Statewide" },
+              {
+                id: "statewide",
+                value: "Statewide",
+                displayName: "Statewide",
+              },
             ],
             child: {
               valueToCheck: "statewide",
@@ -352,7 +347,7 @@ const createFormJson = ({ communities }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: true,
-            defaultValue: "",
+            // defaultValue: progress.key_contact_full_name || "",
             dbName: "key_contact_name",
             readOnly: false,
           },
@@ -364,7 +359,7 @@ const createFormJson = ({ communities }) => {
             fieldType: "TextField",
             contentType: "text",
             isRequired: false,
-            defaultValue: "",
+            // defaultValue: progress.key_contact_full_name || "",
             dbName: "key_contact_email",
             readOnly: false,
           },
@@ -377,7 +372,7 @@ const createFormJson = ({ communities }) => {
         fieldType: "TextField",
         contentType: "text",
         isRequired: true,
-        defaultValue: "",
+        // defaultValue: progress.onboarding_contact_email || "",
         dbName: "onboarding_contact_email",
         readOnly: false,
       },
@@ -385,10 +380,12 @@ const createFormJson = ({ communities }) => {
         name: "image",
         placeholder: "Add a Logo",
         fieldType: fieldTypes.MediaLibrary,
+        openState: autoOpenMediaLibrary,
         dbName: "image",
+
+        selected: [],
         label: "Upload a logo for this Vendor",
         isRequired: false,
-    
       },
       {
         name: "is_verified",

@@ -45,8 +45,23 @@ import app, {
   reducerForFeatureFlags,
   reducerForAdminActivities,
   reducerForFlagInfo,
+  reducerForGalleryFilters,
   reducerForLoadingAdmins,
   reducerForLoadingSuperAdmins,
+  reducerForAllOtherCommunities,
+  reducerForLoadingOtherEvents,
+  reducerForSavingOtherEventState,
+  reducerForKeepingFormContent,
+  reducerForNextStepsSummary,
+  reducerForEngagementOptions,
+  reducerForUserEngagements,
+  reducerForUniversalToast,
+  allMetaDataReducer,
+  reducerForActionEngagements,
+  reducerForTableFilters,
+  reducerForVisitLogs,
+  reducerForUserActiveStatus,
+  // reducerForEmailTemplates,
 } from "./modules/appReducer";
 
 /**
@@ -54,23 +69,37 @@ import app, {
  */
 export default function createReducer(injectedReducers = {}) {
   const rootReducer = combineReducers({
+    userIsActive: reducerForUserActiveStatus,
+    userVisitLogs: reducerForVisitLogs,
+    tableFilters: reducerForTableFilters,
+    tempForm: reducerForKeepingFormContent,
+    actionEngagements: reducerForActionEngagements,
+    userEngagements: reducerForUserEngagements,
+    engagementOptions: reducerForEngagementOptions,
+    nextStepsSummary: reducerForNextStepsSummary,
     activities: reducerForAdminActivities,
+    otherCommunities: reducerForAllOtherCommunities,
+    otherEventsState: reducerForSavingOtherEventState,
+    otherEvents: reducerForLoadingOtherEvents,
     flagInfos: reducerForFlagInfo,
+    galleryFilters: reducerForGalleryFilters,
     sadmins: reducerForLoadingSuperAdmins,
     admins: reducerForLoadingAdmins,
     featureFlags: reducerForFeatureFlags,
+    // emailTemplates: reducerForEmailTemplates,
     settings: reducerForSettings,
     testRedux: testReduxReducer,
     modalOptions: reducerForUniversalModal,
+    toastOptions: reducerForUniversalToast,
     ccActions: reducerForCCAction,
     heap: reducerForHeap, // an object that is used to temporarily hold all kinds of random data.
     subscribers: subscribersReducer,
     teamMessages: teamMessagesReducer,
     messages: adminMessagesReducer,
-    galleryImages: galleryImagesReducer,
-    searchedImages: searchedImagesReducer,
+    galleryImages: galleryImagesReducer, // This is what the modal in the form generator uses
+    searchedImages: searchedImagesReducer, // This is what the "all images" gallery page uses
     imageInfos: imageInfosReducer,
-    modalLibraryImages: modalLibraryReducer,
+    modalLibraryImages: modalLibraryReducer, // TODO: Look into this. It might not be in use anymore
     app,
     form,
     login,
@@ -98,6 +127,7 @@ export default function createReducer(injectedReducers = {}) {
     ...injectedReducers,
     taskFunctions: allTaskFunctionsReducer,
     tasks: allTasksReducer,
+    paginationMetaData: allMetaDataReducer, // stores pagination data for all tables
   });
 
   // Wrap the root reducer and return a new root reducer with router state

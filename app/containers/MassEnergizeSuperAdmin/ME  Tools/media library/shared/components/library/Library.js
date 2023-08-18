@@ -20,6 +20,7 @@ function Library({
   setShouldWait,
   awaitSeconds,
   fileLimit,
+  renderBeforeImages,
 }) {
   const handleSelection = (image) => {
     if (!multiple) {
@@ -73,6 +74,7 @@ function Library({
   }
   return (
     <div>
+      {renderBeforeImages}
       {fileLimit && (
         <div style={{ padding: "10px 25px", fontWeight: "bold" }}>
           <small>
@@ -91,7 +93,12 @@ function Library({
                 onClick={() => handleSelection(image)}
               />
               {selected && (
-                <p className="ml-thumb-checkmark elevate-float">&#10004;</p>
+                <p
+                  onClick={() => handleSelection(image)}
+                  className="ml-thumb-checkmark elevate-float touchable-opacity"
+                >
+                  &#10004;
+                </p>
               )}
             </div>
           );

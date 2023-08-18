@@ -1,55 +1,47 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
-import Snackbar from '@material-ui/core/Snackbar';
-import SnackbarContent from '@material-ui/core/SnackbarContent';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import ErrorIcon from '@material-ui/icons/Error';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import Select2 from '@material-ui/core/Select';
-import TextField from '@material-ui/core/TextField';
-import green from '@material-ui/core/colors/green';
-import MySnackbarContentWrapper from '../../../components/SnackBar/SnackbarContentWrapper';
-import MassEnergizeForm from '../_FormGenerator';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@mui/styles";
+import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 
-import { apiCall } from '../../../utils/messenger';
-
+import { apiCall } from "../../../utils/messenger";
+import { makeKeyFromName } from "./CreatePolicyForm";
+import { connect } from "react-redux";
+import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import { bindActionCreators } from "redux";
+import { loadAllPolicies } from "../../../redux/redux-actions/adminActions";
+import { withRouter } from "react-router-dom";
+import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import Seo from "../../../components/Seo/Seo";
 
 // validation functions
 // const required = value => (value == null ? 'Required' : undefined);
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     flexGrow: 1,
-    padding: 30
+    padding: 30,
   },
   field: {
-    width: '100%',
-    marginBottom: 20
+    width: "100%",
+    marginBottom: 20,
   },
   fieldBasic: {
-    width: '100%',
+    width: "100%",
     marginBottom: 20,
-    marginTop: 10
+    marginTop: 10,
   },
   inlineWrap: {
-    display: 'flex',
-    flexDirection: 'row'
+    display: "flex",
+    flexDirection: "row",
   },
   container: {
-    display: 'flex',
-    flexWrap: 'wrap',
+    display: "flex",
+    flexWrap: "wrap",
   },
   menu: {
     width: 200,
   },
 });
-
 
 class EditPolicyForm extends Component {
   constructor(props) {
@@ -57,28 +49,40 @@ class EditPolicyForm extends Component {
     this.state = {
       formData: {},
       policy: null,
-      communities: []
-
+      communities: [],
     };
   }
 
-
   async componentDidMount() {
-    const { id } = this.props.match.params;    
-    const policyResponse = await apiCall('/policies.info', { policy_id: id });
-    const communitiesResponse = await apiCall('/communities.listForCommunityAdmin');
+    const { policies, communities } = this.props;
+    const id = this.fetchId();
+    const comMap = (c) => ({
+      ...c,
+      id: "" + c.id,
+      displayName: c.name,
+    });
+    const policy = (policies || []).find(
+      (p) => p.id?.toString() === id?.toString()
+    );
 
+    this.setState({ policy, communities: (communities || []).map(comMap) });
+    // Even if we find policy and communities locally, we still want to run a request to bring up the latest updates
+    try {
+      const policyResponse = await apiCall("/policies.info", { policy_id: id });
+      const communitiesResponse = await apiCall(
+        "/communities.listForCommunityAdmin"
+      );
 
-    if (policyResponse && policyResponse.success) {
-      await this.setStateAsync({ policy: policyResponse.data });
+      if (policyResponse && policyResponse.success)
+        this.setState({ policy: policyResponse.data });
+
+      if (communitiesResponse && communitiesResponse.data) {
+        const communities = communitiesResponse.data.map(comMap);
+        this.setState({ communities });
+      }
+    } catch (error) {
+      console.log("Error: ", error);
     }
-    if (communitiesResponse && communitiesResponse.data) {
-      const communities = communitiesResponse.data.map(c => ({ ...c, id: '' + c.id, displayName: c.name }));
-      await this.setStateAsync({ communities });
-    }
-
-    const formJson = await this.createFormJson();
-    await this.setStateAsync({ formJson });
   }
 
   setStateAsync(state) {
@@ -86,99 +90,132 @@ class EditPolicyForm extends Component {
       this.setState(state, resolve);
     });
   }
+  fetchId() {
+    const { id } = this.props.match.params;
+    return id;
+  }
 
-  createFormJson = async () => {
+  createFormJson = () => {
     const { communities, policy } = this.state;
-    const { pathname } = window.location;
+    if (!communities?.length || !policy) return;
 
     const formJson = {
-      title: 'Create New Policy',
-      subTitle: '',
-      method: '/policies.update',
-      cancelLink: '/admin/read/policies',
-      successRedirectPage: pathname || '/admin/read/policies',
+      title: "Edit Policy",
+      subTitle: "",
+      method: "/policies.update",
+      cancelLink: "/admin/read/policies",
+
       fields: [
         {
-          label: 'About this Policy',
-          fieldType: 'Section',
+          label: "About this Policy",
+          fieldType: "Section",
           children: [
             {
-              name: 'ID',
-              label: 'ID',
-              placeholder: 'eg. 1',
-              fieldType: 'TextField',
-              contentType: 'text',
+              name: "ID",
+              label: "ID",
+              placeholder: "eg. 1",
+              fieldType: "TextField",
+              contentType: "text",
               defaultValue: policy && policy.id,
-              dbName: 'policy_id',
-              readOnly: true
+              dbName: "policy_id",
+              readOnly: true,
             },
             {
-              name: 'name',
-              label: 'Name of Policy',
-              placeholder: 'eg. Terms and Conditions',
-              fieldType: 'TextField',
-              contentType: 'text',
+              name: "name",
+              label: "Name of Policy",
+              placeholder: "eg. Terms and Conditions",
+              fieldType: "TextField",
+              contentType: "text",
               isRequired: true,
               defaultValue: policy && policy.name,
-              dbName: 'name',
-              readOnly: false
+              dbName: "name",
+              readOnly: false,
+              onChangeMiddleware: makeKeyFromName,
             },
             {
-              name: 'is_global',
-              label: 'Is this Policy a Template?',
-              fieldType: 'Radio',
+              name: "key",
+              label: "Key (auto generated, but can be edited)",
+              placeholder: "Unique Key",
+              fieldType: "TextField",
+              contentType: "text",
+              isRequired: true,
+              defaultValue: (policy && policy.key) || "",
+              dbName: "key",
+              readOnly: false,
+            },
+            {
+              name: "is_global",
+              label: "Is this Policy a Template?",
+              fieldType: "Radio",
               isRequired: false,
-              defaultValue: policy && policy.is_global ? 'true' : 'false',
-              dbName: 'is_global',
+              defaultValue: policy && policy.is_global ? "true" : "false",
+              dbName: "is_global",
               readOnly: false,
               data: [
-                { id: 'false', value: 'No' },
-                { id: 'true', value: 'Yes' }
+                { id: "false", value: "No" },
+                { id: "true", value: "Yes" },
               ],
               child: {
-                valueToCheck: 'false',
+                valueToCheck: "false",
                 fields: [
                   {
-                    name: 'community',
-                    label: 'Primary Community',
-                    placeholder: 'eg. Wayland',
-                    fieldType: 'Dropdown',
-                    defaultValue: policy && policy.community && '' + policy.community.id,
-                    dbName: 'community_id',
-                    data: [{displayName:"--", id:""}, ...communities],
+                    name: "community",
+                    label: "Primary Community",
+                    placeholder: "eg. Wayland",
+                    fieldType: "Dropdown",
+                    defaultValue:
+                      policy && policy.community && "" + policy.community.id,
+                    dbName: "community_id",
+                    data: [{ displayName: "--", id: "" }, ...communities],
                   },
-                ]
-              }
+                ],
+              },
             },
-          ]
+          ],
         },
         {
-          name: 'description',
-          label: 'Policy Details',
-          placeholder: 'eg. Provide details about this Policy ...',
-          fieldType: 'HTMLField',
-          contentType: 'text',
+          name: "description",
+          label: "Policy Details",
+          placeholder: "eg. Provide details about this Policy ...",
+          fieldType: "HTMLField",
+          contentType: "text",
           isRequired: true,
           isMultiline: true,
           defaultValue: policy && policy.description,
-          dbName: 'description',
-          readOnly: false
+          dbName: "description",
+          readOnly: false,
         },
-      ]
+      ],
     };
     return formJson;
+  };
+
+  onComplete(data, passed) {
+    const { policies, updatePoliciesInRedux, history } = this.props;
+    const id = this.fetchId();
+    if (!passed) return;
+    const rem = (policies || []).filter(
+      (p) => p?.id?.toString() !== id?.toString()
+    );
+    updatePoliciesInRedux([data, ...rem]);
+    history.goBack();
   }
-
-
   render() {
     const { classes } = this.props;
-    const { formJson } = this.state;
-    if (!formJson) return (<div />);
+    const formJson = this.createFormJson();
+    const id = this.fetchId();
+    const {policy} = this.state;
+    if (!formJson)
+      return <LinearBuffer message="Retrieving policy..." asCard />;
     return (
       <div>
+        <Seo name={`Edit Policy - ${policy?.name}`} />
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
+          onComplete={this.onComplete.bind(this)}
+          pageKey={`${PAGE_KEYS.EDIT_POLICY.key}-${id}`}
+          enableCancel
         />
       </div>
     );
@@ -189,5 +226,22 @@ EditPolicyForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-
-export default withStyles(styles, { withTheme: true })(EditPolicyForm);
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      updatePoliciesInRedux: loadAllPolicies,
+    },
+    dispatch
+  );
+};
+const mapStateToProps = (state) => {
+  return {
+    policies: state.getIn(["allPolicies"]),
+    communities: state.getIn(["communities"]),
+  };
+};
+const Mapped = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(EditPolicyForm);
+export default withStyles(styles, { withTheme: true })(withRouter(Mapped));

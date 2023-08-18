@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import MassEnergizeForm from "../_FormGenerator";
 import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
@@ -8,6 +8,7 @@ import { TASK_INTERVALS } from "./taskConstants";
 import { withRouter } from "react-router-dom";
 import { loadTasksAction } from "../../../redux/redux-actions/adminActions";
 import { bindActionCreators } from "redux";
+import Seo from "../../../components/Seo/Seo";
 
 const styles = (theme) => ({
   root: {
@@ -28,7 +29,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -66,19 +67,21 @@ class CreateTaskForm extends Component {
     };
   }
 
-  onSuccess =(response)=>{
-    let {tasks}= this.props
-     let newTasks = (tasks|| []).filter((task) => task.id !== response.id);
-      newTasks.unshift(response);
+  onSuccess = (response) => {
+    let { tasks } = this.props;
+    let newTasks = (tasks || []).filter((task) => task.id !== response.id);
+    newTasks.unshift(response);
     this.props.putTasksInRedux(newTasks);
-  }
+  };
 
   render() {
-    const { classes } = this.props;
-    const { formJson } = this.state;
+    const { classes, match} = this.props;
+    const { formJson,toEdit } = this.state;
     if (!formJson) return <Loading />;
+    const {id} = match.params
     return (
       <div>
+        <Seo name={id?`Edit Task - ${toEdit?.name}`:"Create New Task" } />
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
@@ -109,7 +112,12 @@ function mapDispatchToProps(dispatch) {
   );
 }
 
-const NewTaskMapped = withRouter(connect(mapStateToProps, mapDispatchToProps)(CreateTaskForm));
+const NewTaskMapped = withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(CreateTaskForm)
+);
 export default withStyles(styles, { withTheme: true })(NewTaskMapped);
 
 const createFormJson = ({ taskFunctions, toEdit }) => {
@@ -129,32 +137,31 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
       functions.push(x);
     });
     return functions;
-  }
+  };
 
-
-  const getDateFromEditData = toEdit=>{
-    if(!toEdit.id) return
-    let {actual} = JSON.parse(toEdit.recurring_details);
+  const getDateFromEditData = (toEdit) => {
+    if (!toEdit.id) return;
+    let { actual } = JSON.parse(toEdit.recurring_details);
     return actual;
-    
-  }
-
+  };
 
   const preflightFxn = (values) => {
     let details = values && values.recurring_details;
     const d = new Date(details);
-
+    
+    // datetime format is in user's timezone. We convert to UTC timezone for the api
+    // and keep the original timezone for display. 
     let recurring_details = JSON.stringify({
-      day_of_month: d.getMonth(),
-      day_of_week: d.getDay(),
-      month_of_year: d.getMonth(),
-      minute: d.getMinutes(),
-      hour: d.getHours(),
-      year: d.getFullYear(),
+      day_of_month: d.getUTCDate(),
+      day_of_week: d.getUTCDay(),
+      month_of_year: d.getUTCMonth() + 1,
+      minute: d.getUTCMinutes(),
+      hour: d.getUTCHours(),
+      year: d.getUTCFullYear(),
       actual: values.recurring_details,
     });
 
-    if (toEdit &&  toEdit.id) {
+    if (toEdit && toEdit.id) {
       values.id = toEdit.id;
     }
 

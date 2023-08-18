@@ -1,27 +1,25 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Helmet } from "react-helmet";
-import brand from "dan-api/dummy/brand";
-import AppBar from "@material-ui/core/AppBar";
+import AppBar from "@mui/material/AppBar";
 import dummy from "dan-api/dummy/dummyContents";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import Hidden from "@material-ui/core/Hidden";
-import AccountCircle from "@material-ui/icons/AccountCircle";
-import SupervisorAccount from "@material-ui/icons/SupervisorAccount";
-import PhotoLibrary from "@material-ui/icons/PhotoLibrary";
-import InsertChart from "@material-ui/icons/InsertChart";
-import { withStyles } from "@material-ui/core/styles";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Hidden from "@mui/material/Hidden";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import PhotoLibrary from "@mui/icons-material/PhotoLibrary";
+import InsertChart from "@mui/icons-material/InsertChart";
+import { withStyles } from "@mui/styles";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import bgCover from "dan-images/petal_bg.svg";
 import styles from "dan-components/SocialMedia/jss/cover-jss";
 import CommunitySwitch from "../Summary/CommunitySwitch";
-import { Cover, About, Connection, Pages } from "./Profile";
+import { Cover, About, Pages } from "./Profile";
 import {
   reduxCallFullCommunity,
   reduxLiveOrNot,
 } from "../../../redux/redux-actions/adminActions";
+import Seo from "../../../components/Seo/Seo";
 
 function TabContainer(props) {
   const { children } = props;
@@ -65,10 +63,8 @@ class CommunityProfile extends React.Component {
   };
 
   render() {
-    const title = brand.name + " - Profile";
-    const description = brand.desc;
     const { dataProps, classes } = this.props;
-    const { value, id } = this.state;
+    const { value } = this.state;
     const community = this.props.full_community
       ? this.props.full_community
       : {};
@@ -76,17 +72,9 @@ class CommunityProfile extends React.Component {
     if (!community) {
       return <div>Loading Data ...</div>;
     }
-
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={`${community?.name} - Profile`} />
         {this.showCommunitySwitch()}
         <Cover
           liveOrNotFxn={this.props.liveOrNot}
@@ -146,7 +134,6 @@ CommunityProfile.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-const reducer = "socmed";
 const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   force: state, // force state from reducer

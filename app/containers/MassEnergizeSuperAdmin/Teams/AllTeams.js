@@ -1,17 +1,17 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
 import MUIDataTable from "mui-datatables";
-import FileCopy from "@material-ui/icons/FileCopy";
-import EditIcon from "@material-ui/icons/Edit";
-import { Link } from "react-router-dom";
-import Avatar from "@material-ui/core/Avatar";
-import Icon from "@material-ui/core/Icon";
-import Edit from "@material-ui/icons/Edit";
-import Language from "@material-ui/icons/Language";
-import PeopleIcon from "@material-ui/icons/People";
+import FileCopy from "@mui/icons-material/FileCopy";
+import EditIcon from "@mui/icons-material/Edit";
+import { Link, withRouter } from "react-router-dom";
+import Avatar from "@mui/material/Avatar";
+import Icon from "@mui/material/Icon";
+import Edit from "@mui/icons-material/Edit";
+import Language from "@mui/icons-material/Language";
+import PeopleIcon from "@mui/icons-material/People";
 import messageStyles from "dan-styles/Messages.scss";
 import { connect } from "react-redux";
 import styles from "../../../components/Widget/widget-jss";
@@ -21,18 +21,36 @@ import {
   reduxGetAllCommunityTeams,
   loadAllTeams,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
+  reduxLoadMetaDataAction,
+  reduxLoadTableFilters,
 } from "../../../redux/redux-actions/adminActions";
 import CommunitySwitch from "../Summary/CommunitySwitch";
 import { apiCall } from "../../../utils/messenger";
 import {
+  isEmpty,
   objArrayToString,
   ourCustomSort,
+  reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
-import { Grid, LinearProgress, Paper, Typography } from "@material-ui/core";
+import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import METable from "../ME  Tools/table /METable";
+import METable, { FILTERS } from "../ME  Tools/table /METable";
+import {
+  getAdminApiEndpoint,
+  getLimit,
+  handleFilterChange,
+  onTableStateChange,
+} from "../../../utils/helpers";
+import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import Loader from "../../../utils/components/Loader";
+import { getData } from "../Messages/CommunityAdminMessages";
+import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import Seo from "../../../../app/components/Seo/Seo";
+import CustomOptions from "../ME  Tools/table /CustomOptions";
 
 class AllTeams extends React.Component {
   constructor(props) {
@@ -40,14 +58,43 @@ class AllTeams extends React.Component {
     this.state = { data: [], loading: true, columns: this.getColumns() };
   }
 
+  componentWillUnmount() {
+    window.history.replaceState({}, document.title);
+  }
+
   componentDidMount() {
-    const user = this.props.auth ? this.props.auth : {};
-    if (user.is_super_admin) {
-      this.props.callTeamsForSuperAdmin();
-    }
-    if (user.is_community_admin) {
-      this.props.callTeamsForNormalAdmin();
-    }
+    const {
+      putTeamsInRedux,
+      fetchTeams,
+      location,
+      updateTableFilters,
+      tableFilters,
+    } = this.props;
+    const { state } = location;
+    const ids = state && state.ids;
+    const comingFromDashboard = ids && ids.length;
+
+    if (!comingFromDashboard) return fetchTeams();
+    this.setState({ saveFilters: false, comingFromDashboard, ids });
+
+    // const key = PAGE_PROPERTIES.ALL_TEAMS.key + FILTERS;
+
+    // updateTableFilters({
+    //   ...(tableFilters || {}),
+    //   [key]: { 0: { list: ids } },
+    // });
+
+    var content = {
+      fieldKey: "team_ids",
+      apiURL: "/teams.listForCommunityAdmin",
+      props: this.props,
+      dataSource: [],
+      reduxFxn: putTeamsInRedux,
+    };
+    fetchTeams((data, failed) => {
+      if (failed) return console.log("Could not fetch team list from B.E...");
+      reArrangeForAdmin({ ...content, dataSource: data });
+    });
   }
 
   getStatus = (isApproved) => {
@@ -98,13 +145,15 @@ class AllTeams extends React.Component {
   }
 
   getColumns() {
-    const { classes } = this.props;
+    const { classes, auth, communities} = this.props;
     return [
       {
         name: "ID",
         key: "id",
+
         options: {
           filter: false,
+          filterType: "multiselect",
         },
       },
       {
@@ -144,10 +193,16 @@ class AllTeams extends React.Component {
       {
         name: "Community",
         key: "community",
-        options: {
-          filter: true,
-          filterType: "multiselect",
-        },
+        options: auth?.is_super_admin
+          ? CustomOptions({
+              data: communities,
+              label: "community",
+              endpoint: "/communities.listForSuperAdmin",
+            })
+          : {
+              filter: true,
+              filterType: "multiselect",
+            },
       },
       {
         name: "Parent",
@@ -191,7 +246,11 @@ class AllTeams extends React.Component {
           download: false,
           customBodyRender: (id) => (
             <Link to={`/admin/edit/${id}/team-members`}>
-              <PeopleIcon size="small" variant="outlined" color="secondary" />
+              <PeopleIcon
+                size="small"
+                variant="outlined"
+                color="secondary"
+              />
             </Link>
           ),
         },
@@ -202,8 +261,17 @@ class AllTeams extends React.Component {
         options: {
           filter: false,
           download: false,
+          sort: false,
           customBodyRender: (id) => (
-            <Link to={`/admin/edit/${id}/team`}>
+            <Link
+              onClick={(e) => {
+                e.preventDefault();
+                this.props.history.push({
+                  pathname: `/admin/edit/${id}/team`,
+                  state: { ids: this.state.ids },
+                });
+              }}
+            >
               <EditIcon size="small" variant="outlined" color="secondary" />
             </Link>
           ),
@@ -235,13 +303,13 @@ class AllTeams extends React.Component {
   }
 
   makeLiveOrNot(item) {
-    const putInRedux = this.props.putTeamsInRedux;
-    const data = this.props.allTeams || [];
+    let { putTeamsInRedux, allTeams } = this.props;
+    const data = allTeams || [];
     const status = item.is_published;
     const index = data.findIndex((a) => a.id === item.id);
     item.is_published = !status;
     data.splice(index, 1, item);
-    putInRedux([...data]);
+    putTeamsInRedux([...data]);
     apiCall("/teams.update", {
       id: item.id,
       is_published: !status,
@@ -268,7 +336,23 @@ class AllTeams extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][1];
       ids.push(found && found.id);
-      apiCall("/teams.delete", { team_id: found && found.id });
+      apiCall("/teams.delete", { team_id: found && found.id }).then(
+        (response) => {
+          if (response.success) {
+            this.props.toggleToast({
+              open: true,
+              message: "Team(s) successfully deleted",
+              variant: "success",
+            });
+          } else {
+            this.props.toggleToast({
+              open: true,
+              message: "An error occurred while deleting the Team(s)",
+              variant: "error",
+            });
+          }
+        }
+      );
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putTeamsInRedux(rem);
@@ -298,15 +382,69 @@ class AllTeams extends React.Component {
   render() {
     const title = brand.name + " - All Teams";
     const description = brand.desc;
-    const { columns } = this.state;
-    const data = this.fashionData(this.props.allTeams);
-    const { classes } = this.props;
+    const { columns, comingFromDashboard, ids } = this.state;
+    const {
+      classes,
+      allTeams,
+      putTeamsInRedux,
+      auth,
+      meta,
+      putMetaDataToRedux,
+    } = this.props;
+
+    const content = getData({ source: allTeams, comingFromDashboard, ids });
+    const data = this.fashionData(content);
+    const metaData = meta && meta.teams;
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
+      count: metaData && metaData.count,
       rowsPerPageOptions: [10, 25, 100],
+      confirmFilters: true,
+      onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: data,
+          metaData,
+          updateReduxFunction: putTeamsInRedux,
+          reduxItems: allTeams,
+          apiUrl: getAdminApiEndpoint(auth, "/teams"),
+          pageProp: PAGE_PROPERTIES.ALL_TEAMS,
+          updateMetaData: putMetaDataToRedux,
+          name: "teams",
+          meta: meta,
+        }),
+      customFilterDialogFooter: (currentFilterList, applyFilters) => {
+        return (
+          <ApplyFilterButton
+            url={getAdminApiEndpoint(auth, "/teams")}
+            reduxItems={allTeams}
+            updateReduxFunction={putTeamsInRedux}
+            columns={columns}
+            limit={getLimit(PAGE_PROPERTIES.ALL_TEAMS.key)}
+            applyFilters={applyFilters}
+            updateMetaData={putMetaDataToRedux}
+            name="teams"
+            meta={meta}
+          />
+        );
+      },
+      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
+        <SearchBar
+          url={getAdminApiEndpoint(auth, "/teams")}
+          reduxItems={allTeams}
+          updateReduxFunction={putTeamsInRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.ALL_TEAMS}
+          updateMetaData={putMetaDataToRedux}
+          name="teams"
+          meta={meta}
+        />
+      ),
       customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
@@ -317,42 +455,54 @@ class AllTeams extends React.Component {
           closeAfterConfirmation: true,
         });
       },
+      whenFilterChanges: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.ALL_TEAMS,
+          updateReduxFunction: putTeamsInRedux,
+          reduxItems: allTeams,
+          url: getAdminApiEndpoint(auth, "/teams"),
+          updateMetaData: putMetaDataToRedux,
+          name: "teams",
+          meta: meta,
+        }),
     };
 
-    if (!data || !data.length) {
-      return (
-        <Grid
-          container
-          spacing={24}
-          alignItems="flex-start"
-          direction="row"
-          justify="center"
-        >
-          <Grid item xs={12} md={6}>
-            <Paper className={classes.root} style={{ padding: 15 }}>
-              <div className={classes.root}>
-                <LinearProgress />
-                <h1>Fetching all Teams. This may take a while...</h1>
-                <br />
-                <LinearProgress color="secondary" />
-              </div>
-            </Paper>
-          </Grid>
-        </Grid>
-      );
+    if (isEmpty(metaData)) {
+      return <Loader />;
     }
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
-        {/* {this.showCommunitySwitch()} */}
+        <Seo name={"All Teams"} />
+
+        {comingFromDashboard && (
+          <MEPaperBlock icon="fa fa-bullhorn" banner>
+            <Typography>
+              The <b>{comingFromDashboard}</b> team(s) you have not approved yet
+              are currently pre-selected and sorted in the table for you. Feel
+              free to
+              <Link
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.setState({ comingFromDashboard: false });
+                }}
+              >
+                {" "}
+                clear all selections.
+              </Link>
+            </Typography>
+          </MEPaperBlock>
+        )}
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_TEAMS}
@@ -362,6 +512,8 @@ class AllTeams extends React.Component {
             columns: columns,
             options: options,
           }}
+          ignoreSavedFilters={comingFromDashboard}
+          saveFilters={!comingFromDashboard}
         />
       </div>
     );
@@ -376,16 +528,23 @@ function mapStateToProps(state) {
     auth: state.getIn(["auth"]),
     allTeams: state.getIn(["allTeams"]),
     community: state.getIn(["selected_community"]),
+    meta: state.getIn(["paginationMetaData"]),
+    tableFilters: state.getIn(["tableFilters"]),
+    communities: state.getIn(["communities"]),
   };
 }
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
-      callTeamsForSuperAdmin: reduxGetAllTeams,
+      fetchTeams: reduxGetAllTeams, // B.E already knows whether user is cadmin, or sadmin
+      // callTeamsForSuperAdmin: reduxGetAllTeams,
       callTeamsForNormalAdmin: reduxGetAllCommunityTeams,
       putTeamsInRedux: loadAllTeams,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
+      toggleToast: reduxToggleUniversalToast,
+      putMetaDataToRedux: reduxLoadMetaDataAction,
+      updateTableFilters: reduxLoadTableFilters,
     },
     dispatch
   );
@@ -395,4 +554,4 @@ const TeamsMapped = connect(
   mapDispatchToProps
 )(AllTeams);
 
-export default withStyles(styles)(TeamsMapped);
+export default withStyles(styles)(withRouter(TeamsMapped));

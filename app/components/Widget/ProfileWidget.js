@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import LocalPhone from '@material-ui/icons/LocalPhone';
-import DateRange from '@material-ui/icons/DateRange';
-import LocationOn from '@material-ui/icons/LocationOn';
-import Divider from '@material-ui/core/Divider';
-import Avatar from '@material-ui/core/Avatar';
+import { withStyles } from "@mui/styles";
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import LocalPhone from '@mui/icons-material/LocalPhone';
+import DateRange from '@mui/icons-material/DateRange';
+import LocationOn from '@mui/icons-material/LocationOn';
+import Divider from '@mui/material/Divider';
+import Avatar from '@mui/material/Avatar';
 import PapperBlock from '../PapperBlock/PapperBlock';
 import styles from './widget-jss';
 

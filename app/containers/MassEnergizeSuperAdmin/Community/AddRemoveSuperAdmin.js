@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import MUIDataTable from "mui-datatables";
-import Avatar from "@material-ui/core/Avatar";
+import Avatar from "@mui/material/Avatar";
 import { apiCall } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
 import { bindActionCreators } from "redux";
@@ -10,6 +10,7 @@ import { connect } from "react-redux";
 import { reduxLoadSuperAdmins } from "../../../redux/redux-actions/adminActions";
 import Loading from "dan-components/Loading";
 import { LOADING } from "../../../utils/constants";
+import Seo from "../../../components/Seo/Seo";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -29,20 +30,21 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
 
 const fetchSadmins = async ({ reduxFunction }) => {
-  const superAdminResponse = await apiCall("/admins.super.list");
+  const superAdminResponse = await apiCall("/admins.super.list", {
+    limit: 50,
+  });
   if (
     !superAdminResponse ||
     !superAdminResponse.success ||
     !superAdminResponse.data
   )
     return reduxFunction([]);
-
   const data = superAdminResponse.data;
   reduxFunction(data);
 };
@@ -54,6 +56,11 @@ class AddRemoveSuperAdmin extends Component {
       data: [],
       columns: this.getColumns(),
     };
+  }
+
+  componentDidMount(){
+    const { sadmins, putSadminsInRedux } = this.props;
+    fetchSadmins({ reduxFunction: putSadminsInRedux });
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -143,7 +150,7 @@ class AddRemoveSuperAdmin extends Component {
 
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
@@ -160,6 +167,7 @@ class AddRemoveSuperAdmin extends Component {
     if (!formJson) return <Loading />;
     return (
       <div>
+        <Seo name={"Super Admins"}/>
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}

@@ -1,11 +1,77 @@
 :root {
   --app-cyan: #579ece;
+  --app-purple: rgb(156, 39, 176);
 }
 
-.not-approved { 
-  width:110px; 
-  background: #bf0e0e !important; 
-  color:white !important; 
+
+.tox-notification--warning {
+  display: none !important;
+}
+
+
+.drop-children-area {
+  position: absolute;
+  background: white;
+  width: 100%;
+  min-width: 190px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 6;
+  border-radius: 8px;
+  padding: 8px 0px;
+  box-shadow: 0px 5px 5px -3px rgba(80, 80, 80, 0.2),
+    0px 8px 10px 1px rgba(80, 80, 80, 0.14),
+    0px 3px 14px 2px rgba(80, 80, 80, 0.12);
+}
+
+.drop-pro-child {
+  margin: 0;
+  font-family: Open Sans, sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: 13px 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color:black;
+  /* margin:5px 0px; */
+}
+
+.drop-pro-child:hover {
+  background: rgba(80, 80, 80, 0.05);
+}
+
+.drop-ghost-curtain {
+  position: absolute;
+  background: transparent;
+  height: 120vh;
+  width: 120vw;
+  z-index: 5;
+  top: -50vh;
+  left: -10vw;
+  opacity: 0;
+}
+.drop-pro-trigger {
+  cursor: pointer;
+  border: solid 2px transparent;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+}
+.drop-pro-trigger:active {
+  border-color: var(--app-purple);
+}
+.drop-pro-trigger p {
+  padding: 10px 15px;
+  font-weight: bold;
+  margin: 0px;
+}
+
+.not-approved {
+  width: 110px;
+  background: #bf0e0e !important;
+  color: white !important;
 }
 .preview-content {
   margin-left: 30px;
@@ -34,6 +100,7 @@
   font-size: 11px;
   align-items: center;
   justify-content: center;
+  margin: 0px;
 }
 
 .me-chip-container {
@@ -44,6 +111,47 @@
   align-items: center;
 }
 
-/* .me-chip small {
-  font-size: 11px;
-} */
+.me-badge {
+  padding: 5px 6px;
+  border-radius: 55px;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  background: green;
+  margin-right: 7px;
+}
+.next-section-item {
+  margin-bottom: 15px;
+  /* flex-basis: 30%; */
+  margin: 10px;
+  cursor: pointer;
+}
+
+.next-section-item .text:hover {
+  border: dotted 0px #cfcfcf;
+  border-bottom-width: 2px;
+  opacity: 0.7;
+  transition: 0.1s ease-out;
+}
+.me-fade-in-down {
+  animation: me-fade-down 0.4s forwards;
+  -webkit-animation: me-fade-down 0.4s forwards;
+}
+@keyframes me-fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+.me-drop-override > .MuiSelect-outlined {
+  padding: 8px !important;
+}
+
+.css-1cggros-MuiBadge-badge{
+  padding: 0px !important;
+}

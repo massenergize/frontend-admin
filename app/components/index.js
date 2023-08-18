@@ -9,6 +9,8 @@ export SearchUi from './Search/SearchUi';
 // Guide
 export GuideSlider from './GuideSlider';
 export GuideModal from './GuideModal';
+//MetricsDialog
+export MetricsModal from './MetricsModal';
 // Form
 export LoginForm from './Forms/LoginForm';
 export FloatingPanel from './Panel/FloatingPanel';

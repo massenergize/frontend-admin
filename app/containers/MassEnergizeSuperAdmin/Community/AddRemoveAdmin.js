@@ -1,11 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import MUIDataTable from "mui-datatables";
-import CallMadeIcon from "@material-ui/icons/CallMade";
-import EditIcon from "@material-ui/icons/Edit";
-import { Link } from "react-router-dom";
-import Avatar from "@material-ui/core/Avatar";
-import { withStyles } from "@material-ui/core/styles";
+import Avatar from "@mui/material/Avatar";
+import { withStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
 import MassEnergizeForm from "../_FormGenerator";
 import { connect } from "react-redux";
@@ -14,6 +11,7 @@ import { reduxLoadAdmins } from "../../../redux/redux-actions/adminActions";
 import { LOADING } from "../../../utils/constants";
 import Loading from "dan-components/Loading";
 import MEChip from "../../../components/MECustom/MEChip";
+import Seo from "../../../components/Seo/Seo";
 
 const styles = (theme) => ({
   root: {
@@ -34,7 +32,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -45,12 +43,8 @@ const fetchAdmins = async ({ id, reduxFunction, admins }) => {
     community_id: id,
   });
   if (!response || !response.data) return reduxFunction({});
-
-  var pending = (response.data.pending_admins || []).map((user) => ({
-    ...user,
-    isPending: true,
-  }));
-  const content = [...(response.data.members || []), ...pending];
+ 
+  const content = [...(response.data.members || [])];
   reduxFunction({ ...(admins || {}), [id]: content });
 };
 
@@ -75,11 +69,12 @@ class AddRemoveAdmin extends Component {
     if (firstTime || notFirstTimeButNeedToFetchAdminsForDifferentCommunity)
       return fetchAdmins({ id, reduxFunction: putAdminsInRedux, admins });
 
-    const loadedRequirements = communities && communities.length;
+    const loadedRequirements = communities.length;
     if (!loadedRequirements || state.mounted) return null;
-    const community = (communities || []).find(
-      (c) => c.id.toString() === id.toString()
-    );
+    const community = (
+      (communities) ||
+      []
+    ).find((c) => c.id.toString() === id.toString());
 
     const formJson = createFormJson({ community });
     return {
@@ -188,7 +183,7 @@ class AddRemoveAdmin extends Component {
 
     const options = {
       filterType: "dropdown",
-      responsive: "stacked",
+      responsive: "standard",
       print: true,
       rowsPerPage: 25,
       rowsPerPageOptions: [10, 25, 100],
@@ -208,6 +203,7 @@ class AddRemoveAdmin extends Component {
 
     return (
       <div>
+        <Seo name={`${community?.name} Admins`} />
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
@@ -217,7 +213,8 @@ class AddRemoveAdmin extends Component {
         <br />
         <div className={classes.table}>
           <MUIDataTable
-            title={`Community Admins ${community && " In " + community.name}`}
+            title={`Community Admins ${community &&
+              " In " + community.name}`}
             data={data}
             columns={columns}
             options={options}

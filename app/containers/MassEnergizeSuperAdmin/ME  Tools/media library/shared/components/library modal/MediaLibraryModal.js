@@ -40,7 +40,10 @@ function MediaLibraryModal({
   maximumImageSize,
   compress,
   compressedQuality,
+  sideExtraComponent,
+  renderBeforeImages,
   TooltipWrapper,
+  tabModifiers,
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
@@ -53,7 +56,7 @@ function MediaLibraryModal({
 
   excludeTabs = [
     ...(excludeTabs || []),
-    (!allowCropping && TABS.CROPPING_TAB) || "", // if allowCropping is false, exclude it from the tabs
+    allowCropping ? "" : TABS.CROPPING_TAB, // if allowCropping is false, exclude it from the tabs
   ];
   const clean = (files) => {
     // just a function that retrieves only the FileObject from the file jsons provided
@@ -66,14 +69,25 @@ function MediaLibraryModal({
       return file;
     });
   };
-  const handleUpload = () => {
+  const returnRightAfterUpload = (images) => {
+    handleInsert(images, reset);
+  };
+  const handleUpload = ({ quickReturn = false }) => {
     if (!onUpload) return;
     setState((prev) => ({ ...prev, uploading: true }));
-    onUpload(clean(files), reset, close, setCurrentTab);
+
+    onUpload(
+      clean(files),
+      reset,
+      close,
+      setCurrentTab,
+      quickReturn && returnRightAfterUpload
+    );
   };
 
-  const handleInsert = () => {
-    getSelected(content, reset);
+  const handleInsert = (_content,reset) => {
+   
+    getSelected(_content, reset);
     close();
   };
 
@@ -91,10 +105,15 @@ function MediaLibraryModal({
     loadMoreFunction(() => setLoadingMore(false), close);
   };
 
+  const customName = (key, _default) => {
+    const modifier = (tabModifiers || {})[key];
+    return modifier?.name || _default || "...";
+  };
+
   var Tabs = [
     {
-      headerName: "Upload",
-      key: "upload",
+      headerName: customName(TABS.UPLOAD_TAB, "Upload"),
+      key: TABS.UPLOAD_TAB,
       component: (
         <Upload
           maximumImageSize={maximumImageSize}
@@ -118,11 +137,12 @@ function MediaLibraryModal({
       ),
     },
     {
-      headerName: "Library",
-      key: "library",
+      headerName: customName(TABS.LIBRARY_TAB, "Library"),
+      key: TABS.LIBRARY_TAB,
       component: (
         <Suspense fallback={<p>Loading...</p>}>
           <Library
+            renderBeforeImages={renderBeforeImages}
             sourceExtractor={sourceExtractor}
             setSelectedContent={setSelectedContent}
             content={content}
@@ -141,8 +161,8 @@ function MediaLibraryModal({
       ),
     },
     {
-      headerName: "Crop",
-      key: "crop",
+      headerName: customName(TABS.CROPPING_TAB, "crop"),
+      key: TABS.CROPPING_TAB,
       component: (
         <Cropping
           setCurrentTab={setCurrentTab}
@@ -182,6 +202,7 @@ function MediaLibraryModal({
               activeImage={activeImage}
               setShowSidePane={setShowSidePane}
               sourceExtractor={sourceExtractor}
+              sideExtraComponent={sideExtraComponent}
             />
           )}
           <div className="m-inner-container">
@@ -190,6 +211,12 @@ function MediaLibraryModal({
               {/* --------------------- TAB HEADER AREA -------------- */}
               <div className="m-tab-header-area">
                 {Tabs.map((tab) => {
+                  // A simple logic to make sure the cropping tab button does not show, until an image is selected by a user to crop. (To reduce confusion)
+                  const imageForCroppingNotSelectedYet =
+                    currentTab !== TABS.CROPPING_TAB &&
+                    tab.key === TABS.CROPPING_TAB;
+                  if (imageForCroppingNotSelectedYet) return <></>;
+
                   const isCurrent = currentTab === tab.key;
                   return (
                     <div
@@ -210,18 +237,22 @@ function MediaLibraryModal({
             </div>
 
             {/* ------------------------ MAIN TAB DISPLAY AREA ------------------- */}
-            <div style={{ maxHeight: 530, overflowY: "scroll" }}>
+            <div
+              style={{ maxHeight: 530, minHeight: 530, overflowY: "scroll" }}
+            >
               {TabComponent}
             </div>
           </div>
           <Footer
+            uploading={state.uploading}
+            upload={handleUpload}
             TooltipWrapper={TooltipWrapper}
             images={images}
             files={files}
             content={content}
             multiple={multiple}
             cancel={close}
-            insert={handleInsert}
+            insert={() => handleInsert(content)}
             currentTab={currentTab}
             cropLoot={cropLoot}
             finaliseCropping={finaliseCropping}
@@ -232,22 +263,82 @@ function MediaLibraryModal({
   );
 }
 
-const Footer = ({
+const ContextButton = ({
   content,
-  cancel,
-  insert,
-  images,
   currentTab,
+  files,
+  insert,
   cropLoot,
   finaliseCropping,
   TooltipWrapper,
+  uploading,
+  upload,
 }) => {
+  const withWrapper = (text, tooltipMessage) => {;
+    if (!TooltipWrapper) return <span>{text}</span>;
+    return (
+      <TooltipWrapper title={tooltipMessage || ""} placement="top">
+        <span>{text}</span>
+      </TooltipWrapper>
+    );
+  };
+  const len = content && content.length;
+  const availableButtons = {
+    [TABS.LIBRARY_TAB]: (
+      <button
+        className="ml-footer-btn"
+        style={{ "--btn-color": "white", "--btn-background": "green" }}
+        onClick={(e) => {
+          e.preventDefault();
+          insert();
+        }}
+        disabled={!len}
+      >
+        {withWrapper(
+          `INSERT ${len > 0 ? `(${len})` : ""}`,
+          "Select an image from the list to insert"
+        )}
+      </button>
+    ),
+    [TABS.CROPPING_TAB]: (
+      <button
+        className="ml-footer-btn"
+        style={{ "--btn-color": "white", "--btn-background": "green" }}
+        onClick={(e) => {
+          e.preventDefault();
+          finaliseCropping && finaliseCropping();
+        }}
+        disabled={!cropLoot}
+      >
+        CROP
+      </button>
+    ),
+    [TABS.UPLOAD_TAB]: (
+      <button
+        className="ml-footer-btn"
+        style={{ "--btn-color": "white", "--btn-background": "green" }}
+        onClick={(e) => {
+          e.preventDefault();
+          upload({ quickReturn: true });
+        }}
+        disabled={uploading || !files.length}
+      >
+        {withWrapper(
+          "UPLOAD & INSERT",
+          "Your chosen image will be uploaded and inserted right away"
+        )}
+      </button>
+    ),
+  };
+
+  return availableButtons[currentTab] || <></>;
+};
+
+const Footer = (props) => {
+  const { cancel, images, currentTab } = props;
   const isCropping = currentTab === TABS.CROPPING_TAB;
   const isUploadTab = currentTab === TABS.UPLOAD_TAB;
-  const tooltipMessageWhenDisabled = isUploadTab
-    ? "Click the upload button to upload first, then you can insert your image"
-    : "Select an image from the list to insert";
-  const len = content && content.length;
+
   return (
     <div className="ml-footer">
       <h3
@@ -269,38 +360,7 @@ const Footer = ({
         <MLButton backColor="maroon" btnColor="white" onClick={cancel}>
           CANCEL
         </MLButton>
-
-        {isCropping ? (
-          <button
-            className="ml-footer-btn"
-            style={{ "--btn-color": "white", "--btn-background": "green" }}
-            onClick={finaliseCropping}
-            disabled={!cropLoot}
-          >
-            CROP
-          </button>
-        ) : (
-          <button
-            className="ml-footer-btn"
-            style={{ "--btn-color": "white", "--btn-background": "green" }}
-            onClick={(e) => {
-              e.preventDefault();
-              insert();
-            }}
-            disabled={!len}
-          >
-            {TooltipWrapper ? (
-              <TooltipWrapper
-                title={tooltipMessageWhenDisabled}
-                placement="top"
-              >
-                <span>INSERT {len > 0 ? `(${len})` : ""}</span>
-              </TooltipWrapper>
-            ) : (
-              `INSERT ${len > 0 ? `(${len})` : ""}`
-            )}
-          </button>
-        )}
+        <ContextButton {...props} />
       </div>
     </div>
   );

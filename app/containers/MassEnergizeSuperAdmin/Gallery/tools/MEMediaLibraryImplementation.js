@@ -45,7 +45,7 @@ export const MEMediaLibraryImplementation = (props) => {
         images={(modalImageResponse && modalImageResponse.images) || []}
         actionText="Choose From Library"
         sourceExtractor={(item) => item && item.url}
-        excludeTabs={["upload"]}
+        excludeTabs={[MediaLibrary.Tabs.UPLOAD_TAB]}
         useAwait={true}
         {...props}
         onInsert={handleInsert}

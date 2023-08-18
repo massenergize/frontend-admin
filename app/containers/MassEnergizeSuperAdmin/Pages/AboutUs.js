@@ -1,10 +1,13 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "@mui/styles";
 import MassEnergizeForm from "../_FormGenerator";
 // TODO: change image to use MediaLibrary
 //import fieldTypes from "../_FormGenerator/fieldTypes";
 import { apiCall } from "../../../utils/messenger";
+import fieldTypes from "../_FormGenerator/fieldTypes";
+import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import Seo from "../../../components/Seo/Seo";
 
 const styles = (theme) => ({
   root: {
@@ -25,7 +28,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing.unit * 4,
+    margin: theme.spacing(4),
     textAlign: "center",
   },
 });
@@ -62,7 +65,7 @@ class AboutUsPageEditForm extends Component {
   createFormJson = async () => {
     const { aboutUsPageData } = this.state;
     const { community } = aboutUsPageData;
-    const image = aboutUsPageData && aboutUsPageData.images[0] && aboutUsPageData.images[0].url;
+
     const formJson = {
       title: `Edit ${
         community ? community.name + "'s" : "Community's"
@@ -82,22 +85,22 @@ class AboutUsPageEditForm extends Component {
           readOnly: true,
         },
         {
-          name: 'title',
-          label: 'Main Title',
-          placeholder: 'eg. About our community',
-          fieldType: 'TextField',
-          contentType: 'text',
+          name: "title",
+          label: "Main Title",
+          placeholder: "eg. About our community",
+          fieldType: "TextField",
+          contentType: "text",
           isRequired: false,
           defaultValue: `${aboutUsPageData.title}`,
           dbName: "title",
           readOnly: false,
         },
         {
-          name: 'sub-title',
-          label: 'Optional Sub-title',
-          placeholder: 'eg. a tagline about our community',
-          fieldType: 'TextField',
-          contentType: 'text',
+          name: "sub-title",
+          label: "Optional Sub-title",
+          placeholder: "eg. a tagline about our community",
+          fieldType: "TextField",
+          contentType: "text",
           isRequired: false,
           defaultValue: `${aboutUsPageData.sub_title}`,
           dbName: "sub_title",
@@ -129,13 +132,12 @@ class AboutUsPageEditForm extends Component {
         {
           name: "image",
           placeholder: "Select an Image",
-          // TODO: change to use media library (backend changes required)
-          //fieldType: fieldTypes.MediaLibrary,
-          fieldType: "File",
+          fieldType: fieldTypes.MediaLibrary,
+          // fieldType: "File",
           dbName: "image",
           label: "Upload File",
-          previewLink: image,
-          defaultValue: image,
+          // previewLink: image,
+          defaultValue: aboutUsPageData?.images,
           allowReset: true,
           filesLimit: 1,
         },
@@ -155,10 +157,16 @@ class AboutUsPageEditForm extends Component {
 
   render() {
     const { classes } = this.props;
-    const { formJson } = this.state;
-    if (!formJson) return <div>Hold tight! Retrieving your data ...</div>;
+    const { formJson, aboutUsPageData } = this.state;
+    if (!formJson)
+      return (
+        <LinearBuffer asCard message="Hold tight! Retrieving your data..." />
+      );
+
+    // <div>Hold tight! Retrieving your data ...</div>;
     return (
       <div>
+        <Seo name={`Edit - ${aboutUsPageData?.community?.name}'s About Page`}/>
         <MassEnergizeForm classes={classes} formJson={formJson} />
       </div>
     );

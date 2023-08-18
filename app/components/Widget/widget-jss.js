@@ -1,16 +1,13 @@
 import colorfull from "dan-api/palette/colorfull";
-import {
-  darken,
-  fade,
-  lighten,
-} from "@material-ui/core/styles/colorManipulator";
+import { alpha, darken, lighten } from "@mui/material";
 import {
   gradientBgLight,
   gradientBgDark,
 } from "containers/Templates/appStyles-jss";
-import green from "@material-ui/core/colors/green";
-import red from "@material-ui/core/colors/red";
+import green from "@mui/material/colors/green";
+import red from "@mui/material/colors/red";
 import images from "dan-api/images/photos";
+
 const tableLabel = {
   fontWeight: "bold",
   background: "rgb(65 169 65)",
@@ -19,8 +16,8 @@ const tableLabel = {
   height: 21,
 };
 const styles = (theme) => ({
-  tableShadowReset: { 
-    boxShadow:"0px 0px !important",
+  tableShadowReset: {
+    boxShadow: "0px 0px !important",
   },
   yesLabel: {
     ...tableLabel,
@@ -28,6 +25,10 @@ const styles = (theme) => ({
   noLabel: {
     ...tableLabel,
     background: "#bcbcbc",
+  },
+  todoLabel: {
+    ...tableLabel,
+    background: "#ff7600",
   },
   rootCounter: {
     flexGrow: 1,
@@ -45,24 +46,24 @@ const styles = (theme) => ({
     },
   },
   divider: {
-    margin: `${theme.spacing.unit * 3}px 0`,
+    margin: `${theme.spacing(3)}px 0`,
   },
   dividerBig: {
-    margin: `${theme.spacing.unit * 2}px 0`,
+    margin: `${theme.spacing(3)}px 0`,
   },
   centerItem: {},
   smallTitle: {
-    padding: `0 ${theme.spacing.unit * 2}px`,
+    padding: `0 ${theme.spacing(2)}px`,
     color:
       theme.palette.type === "dark"
         ? theme.palette.primary.light
         : theme.palette.primary.dark,
   },
   leftIcon: {
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(1),
   },
   secondaryWrap: {
-    padding: `1px ${theme.spacing.unit * 2}px`,
+    padding: `1px ${theme.spacing(2)}px`,
     borderRadius: 4,
     justifyContent: "space-around",
     "& > $centerItem": {
@@ -82,7 +83,7 @@ const styles = (theme) => ({
     },
   },
   bigResume: {
-    marginBottom: theme.spacing.unit * 5,
+    marginBottom: theme.spacing(5),
     justifyContent: "space-between",
     display: "flex",
     [theme.breakpoints.down("xs")]: {
@@ -90,13 +91,13 @@ const styles = (theme) => ({
       display: "block",
     },
     "& li": {
-      paddingRight: theme.spacing.unit * 3,
+      paddingRight: theme.spacing(3),
       display: "flex",
       alignItems: "center",
       justifyContent: "flex-start",
       [theme.breakpoints.down("xs")]: {
         paddingRight: 0,
-        paddingBottom: theme.spacing.unit * 2,
+        paddingBottom: theme.spacing(2),
         width: "50%",
         float: "left",
       },
@@ -114,7 +115,7 @@ const styles = (theme) => ({
   sm: {},
   mc: {},
   avatar: {
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(1),
     boxShadow: theme.glow.light,
     "& svg": {
       fontSize: 24,
@@ -228,7 +229,7 @@ const styles = (theme) => ({
   },
   root: {
     width: "100%",
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing(3),
     overflowX: "auto",
   },
   chip: {
@@ -257,10 +258,10 @@ const styles = (theme) => ({
     color: theme.palette.primary.main,
   },
   productPhoto: {
-    borderRadius: theme.spacing.unit / 2,
-    marginRight: theme.spacing.unit,
-    width: theme.spacing.unit * 10,
-    height: theme.spacing.unit * 10,
+    borderRadius: theme.spacing(1 / 2),
+    marginRight: theme.spacing(1),
+    width: theme.spacing(10),
+    height: theme.spacing(10),
   },
   done: {},
   listItem: {
@@ -376,20 +377,20 @@ const styles = (theme) => ({
     flexDirection: "column",
     fontWeight: 500,
     fontSize: 20,
-    marginBottom: theme.spacing.unit * 10,
+    marginBottom: theme.spacing(10),
   },
   carouselDesc: {
     color: theme.palette.common.white,
   },
   chartWrap: {
     overflow: "auto",
-    marginTop: theme.spacing.unit * 2,
+    marginTop: theme.spacing(2),
   },
   chartFluid: {
     width: "100%",
     minWidth: 400,
     height: 300,
-    marginLeft: theme.spacing.unit * -3,
+    marginLeft: theme.spacing(-3),
   },
   tabNotif: {
     "& > span": {
@@ -398,7 +399,7 @@ const styles = (theme) => ({
     },
   },
   button: {
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(1),
   },
   wrapperDate: {
     overflow: "hidden",
@@ -420,12 +421,12 @@ const styles = (theme) => ({
       background: "none",
       width: "auto",
       color: "#FFF",
-      padding: theme.spacing.unit,
+      padding: theme.spacing(1),
       "& button": {
         color: "#FFF",
         fontSize: 12,
         borderRadius: theme.rounded.big,
-        padding: theme.spacing.unit,
+        padding: theme.spacing(1),
         '&[class*="navigation__label"]': {
           fontSize: 18,
         },
@@ -459,7 +460,7 @@ const styles = (theme) => ({
       },
       '& div[class*="__navigation"] button': {
         minWidth: 0,
-        padding: theme.spacing.unit,
+        padding: theme.spacing(1),
         height: "auto",
       },
     },
@@ -475,14 +476,14 @@ const styles = (theme) => ({
         ? theme.palette.secondary.dark
         : theme.palette.secondary.main,
     [theme.breakpoints.down("sm")]: {
-      paddingTop: theme.spacing.unit * 3,
+      paddingTop: theme.spacing(3),
     },
     "& > time": {
       border: `10px solid ${theme.palette.secondary.main}`,
       boxShadow:
         theme.palette.type === "dark"
-          ? `0 0 0 10px ${fade(theme.palette.secondary.main, 0.6)}`
-          : `0 0 0 10px ${fade(theme.palette.secondary.light, 0.6)}`,
+          ? `0 0 0 10px ${alpha(theme.palette.secondary.main, 0.6)}`
+          : `0 0 0 10px ${alpha(theme.palette.secondary.light, 0.6)}`,
       borderRadius: "50%",
       "& > div": {
         background: theme.palette.secondary.main,
@@ -495,7 +496,7 @@ const styles = (theme) => ({
   },
   today: {
     fontSize: 18,
-    margin: theme.spacing.unit * 3,
+    margin: theme.spacing(3),
     fontWeight: theme.typography.fontWeightRegular,
     color: theme.palette.primary.light,
   },
@@ -504,14 +505,14 @@ const styles = (theme) => ({
     textAlign: "center",
     justifyContent: "center",
     "& li": {
-      margin: `${theme.spacing.unit * 3}px ${theme.spacing.unit}px ${theme
-        .spacing.unit * 2}px`,
+      margin: `${theme.spacing(3)}px ${theme.spacing(1)}px ${theme.spacing
+        .unit * 2}px`,
     },
   },
   buttonReadMore: {
     borderColor: "#FFF",
     color: "#FFF",
-    marginTop: theme.spacing.unit,
+    marginTop: theme.spacing(1),
   },
   sliderWrap: {
     height: 360,
@@ -528,7 +529,7 @@ const styles = (theme) => ({
     boxShadow: "none",
   },
   mobileStepper: {
-    margin: `0 auto ${theme.spacing.unit * 4}px`,
+    margin: `0 auto ${theme.spacing(4)}px`,
     textAlign: "center",
     borderRadius: "0 0 12px 12px",
     [theme.breakpoints.down("sm")]: {
@@ -556,13 +557,13 @@ const styles = (theme) => ({
   rootCalculator: {
     width: "100%",
     height: 420,
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing(2),
     backgroundImage:
       theme.palette.type === "dark"
         ? gradientBgDark(theme)
         : gradientBgLight(theme),
     "& button": {
-      background: fade(theme.palette.background.paper, 0.3),
+      background: alpha(theme.palette.background.paper, 0.3),
       color: theme.palette.common.white,
       borderRadius: theme.rounded.medium,
     },
@@ -571,7 +572,7 @@ const styles = (theme) => ({
     "& tbody tr:nth-child(even)": {
       background:
         theme.palette.type === "dark"
-          ? fade(theme.palette.grey[900], 0.5)
+          ? alpha(theme.palette.grey[900], 0.5)
           : theme.palette.grey[50],
     },
   },
@@ -618,13 +619,13 @@ const styles = (theme) => ({
   },
   formControl: {
     width: "100%",
-    marginBottom: theme.spacing.unit * 3,
-    marginTop: theme.spacing.unit * -2,
+    marginBottom: theme.spacing(3),
+    marginTop: theme.spacing(-2),
   },
   formControlTrade: {
     width: "100%",
-    marginTop: theme.spacing.unit * -2,
-    marginBottom: theme.spacing.unit * 2,
+    marginTop: theme.spacing(-2),
+    marginBottom: theme.spacing(2),
   },
   tradeUp: {
     color: green[500],
@@ -653,15 +654,15 @@ const styles = (theme) => ({
     },
     "& button": {
       [theme.breakpoints.down("xs")]: {
-        marginTop: theme.spacing.unit * 2,
+        marginTop: theme.spacing(2),
       },
     },
   },
   walletLabel: {
-    marginBottom: theme.spacing.unit * 3,
+    marginBottom: theme.spacing(3),
   },
   tabContainer: {
-    margin: `0 ${theme.spacing.unit * -3}px`,
+    margin: `0 ${theme.spacing(-3)}px`,
   },
   rootTable: {
     width: "100%",

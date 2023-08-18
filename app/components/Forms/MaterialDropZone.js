@@ -2,42 +2,42 @@ import React from 'react';
 import Dropzone from 'react-dropzone';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import FileIcon from '@material-ui/icons/Description';
-import ActionDelete from '@material-ui/icons/Delete';
-import IconButton from '@material-ui/core/IconButton';
-import Snackbar from '@material-ui/core/Snackbar';
+import { withStyles } from "@mui/styles";
+import Button from '@mui/material/Button';
+import FileIcon from '@mui/icons-material/Description';
+import ActionDelete from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
+import Snackbar from '@mui/material/Snackbar';
 import Ionicon from 'react-ionicons';
 import 'dan-styles/vendors/react-dropzone/react-dropzone.css';
 import CropModal from '../CropModal/CropModal';
 import isImage from './helpers/helpers.js';
 
-const styles = theme => ({
+const styles = (theme) => ({
   dropItem: {
     borderColor: theme.palette.divider,
     background: theme.palette.background.default,
     borderRadius: theme.rounded.medium,
     color: theme.palette.text.disabled,
-    textAlign: 'center'
+    textAlign: "center",
   },
   uploadIconSize: {
     width: 72,
     height: 72,
-    display: 'inline-block',
-    '& svg': {
+    display: "inline-block",
+    "& svg": {
       fill: theme.palette.secondary.main,
-    }
+    },
   },
   rightIcon: {
-    marginLeft: theme.spacing.unit,
-    '& svg': {
-      fill: theme.palette.common.white
-    }
+    marginLeft: theme.spacing(1),
+    "& svg": {
+      fill: theme.palette.common.white,
+    },
   },
   button: {
-    marginTop: 20
-  }
+    marginTop: 20,
+  },
 });
 
 class MaterialDropZone extends React.Component {
