@@ -5,14 +5,20 @@ import {
   Radio,
   RadioGroup,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
 import { connect } from "react-redux";
-
-export const FilterBarForMediaLibrary = (props) => {
+import MEDropdown from "../../ME  Tools/dropdown/MEDropdown";
+export const FilterBarForMediaLibrary = ({ auth, communities }) => {
   const [currentFilter, setCurrentFilter] = useState("keywords");
   const [keywords, setKeywords] = useState("");
+
+  const getCommunitiesToSelectFrom = () => {
+    if (isCommunityAdmin) return auth?.admin_at;
+    return communities || [];
+  };
 
   const FILTER_OPTIONS = [
     {
@@ -23,7 +29,7 @@ export const FilterBarForMediaLibrary = (props) => {
     {
       name: "Use Keywords",
       key: "keywords",
-      context: "Enter keywords that describe the image you are looking for ",
+      context: "Keywords that describe the image",
       component: (
         <WithKeywords
           keywords={keywords}
@@ -34,12 +40,32 @@ export const FilterBarForMediaLibrary = (props) => {
     {
       name: "From Other Admins",
       key: "from-others",
-      context: "See images that have been uploaded by other admins",
+      context: "See what other admins have uploaded",
+      component: (
+        <div>
+          <MEDropdown
+            multiple
+            data={["actions", "events", "something"]}
+            placeholder="Select admins and 'Apply'"
+          />
+        </div>
+      ),
     },
     {
       name: "By Community",
       key: "by-community",
-      context: "See images that belong to specific communities you manage",
+      context: "Show only community specific items",
+      component: (
+        <div>
+          <MEDropdown
+            multiple
+            labelExtractor={(item) => item?.name}
+            valueExtractor={(item) => item?.id}
+            data={communities}
+            placeholder="Select communities and 'Apply'"
+          />
+        </div>
+      ),
     },
   ];
 
@@ -78,7 +104,9 @@ export const FilterBarForMediaLibrary = (props) => {
                     variant="body2"
                     style={{ fontSize: "0.8rem", fontWeight: "bold" }}
                   >
-                    {option.name}
+                    <Tooltip title={option.context} placement="top">
+                      {option.name}
+                    </Tooltip>
                   </Typography>
                 }
               />
@@ -103,13 +131,17 @@ export const FilterBarForMediaLibrary = (props) => {
         </div>
       </div>
       <Typography variant="body2" color="#b2b2b2">
-        Items below are sorted by date. The most recent items show up first!
+        Items below are sorted by date. The most recent items show up first,
+        from left, to right on each row!
       </Typography>
     </div>
   );
 };
 
-const mapStateToProps = (state) => ({});
+const mapStateToProps = (state) => ({
+  auth: state.getIn(["auth"]),
+  communities: state.getIn(["communities"]),
+});
 
 const mapDispatchToProps = {};
 
@@ -120,8 +152,8 @@ export default connect(
 
 const WithKeywords = ({ keywords, onChange }) => {
   const renderChips = (data) => {
-    const items = data?.split(",");
-    const empty = !items?.length || items[0].trim() === "";
+    const items = data?.split(",").filter(Boolean);
+    const empty = !items?.length;
     if (empty) return <></>;
     return items?.map((item) => (
       <Chip label={item?.trim()} style={{ margin: "5px 3px" }} />

@@ -79,8 +79,8 @@ const MediaLibraryForm = ({
   };
 
   const showChips = () => {
-    const items = tags?.split(",");
-    const empty = !items.length || items[0].trim() === "";
+    const items = tags?.split(",").filter(Boolean);
+    const empty = !items?.length;
     if (empty) return <></>;
 
     return items?.map((tag) => (
