@@ -108,6 +108,33 @@ export const FilterBarForMediaLibrary = ({
     if (isCommunityAdmin) return auth?.admin_at;
     return communities || [];
   };
+  // console.log("OTHER ADMINS", otherAdmins);
+  useEffect(() => {
+    if (!otherAdminsFromRedux) return;
+    const values = Object.values(otherAdminsFromRedux);
+    if (!values?.length) return;
+    const asList = values?.map((group) => group.members || {});
+    let data = Object.assign({}, ...asList);
+    data = Object.values(data);
+    data = sortByField(data, "full_name");
+    setOtherAdmins(data);
+  }, [otherAdminsFromRedux]);
+
+  useEffect(() => {
+    const otherAdminsListIsntAvailableYet =
+      otherAdminsFromRedux === !otherAdminsFromRedux ||
+      !Object.keys(otherAdminsFromRedux)?.length;
+
+    if (!otherAdminsListIsntAvailableYet) return;
+
+    const coms = getCommunitiesToSelectFrom()?.map((com) => com.id) || [];
+    findOtherAdminsInMyCommunities(
+      { community_ids: coms },
+      (_, failed, error) => {
+        if (failed) return notify(error, true);
+      }
+    );
+  }, []);
 
   useEffect(() => {
     setCurrentFilter(filters?.currentFilter || FILTERS.MOST_RECENT.key);

@@ -21,7 +21,7 @@ export const SidebarForMediaLibraryModal = ({
   imagesObject,
   putImagesInRedux,
   putImageInReduxForEdit,
-  changeTabTo,
+  changeTabTo, 
 }) => {
   const [imageInfo, setImageInfo] = useState("loading");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -125,7 +125,7 @@ const mapStateToProps = (state) => {
   return {
     imageInfos: state.getIn(["imageInfos"]),
     auth: state.getIn(["auth"]),
-    imagesObject: state.getIn(["galleryImages"]),
+    imagesObject: state.getIn(["galleryImages"])
   };
 };
 
