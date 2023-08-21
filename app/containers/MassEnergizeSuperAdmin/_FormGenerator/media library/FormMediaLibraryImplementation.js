@@ -318,7 +318,7 @@ export const FormMediaLibraryImplementation = (props) => {
         actionText="Select From Library"
         sourceExtractor={(item) => item && item.url}
         renderBeforeImages={(props) => (
-          <FilterBarForMediaLibrary {...props} />
+          <FilterBarForMediaLibrary {...props} notify={notify} />
           // <GalleryFilter
           //   {...props}
           //   dropPosition="left"

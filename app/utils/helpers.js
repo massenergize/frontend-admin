@@ -136,11 +136,9 @@ export const onTableStateChange = ({
   name,
   updateMetaData,
   meta,
-  otherArgs
+  otherArgs,
 }) => {
-
   switch (action) {
-  
     case "changePage":
       if (
         tableState.rowsPerPage * tableState.page ===
@@ -234,8 +232,38 @@ export const isTrue = (value) => {
   if ([true, "True", "Yes", "yes"].includes(value)) return true;
 };
 
-
 export const removeDuplicates = (first, second) => {
-   const uniqueItems = [...new Set([...(first||[]), ...(second||[])])];
-   return uniqueItems;
+  const uniqueItems = [...new Set([...(first || []), ...(second || [])])];
+  return uniqueItems;
+};
+
+
+export function sortByField(arr, field) {
+  return arr.sort((a, b) => {
+    const valueA = a[field].toUpperCase();
+    const valueB = b[field].toUpperCase();
+
+    if (valueA < valueB) {
+      return -1;
+    }
+    if (valueA > valueB) {
+      return 1;
+    }
+    return 0;
+  });
+}
+
+export function removeDuplicateObjects(arr) {
+  const uniqueObjects = {};
+  const resultArray = [];
+
+  for (const obj of arr) {
+    const id = obj.Id;
+    if (!uniqueObjects[id]) {
+      uniqueObjects[id] = true;
+      resultArray.push(obj);
+    }
+  }
+
+  return resultArray;
 }

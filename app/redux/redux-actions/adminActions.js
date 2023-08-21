@@ -54,6 +54,8 @@ import {
   LOAD_USER_ACTIVE_STATUS,
   LOAD_EMAIL_TEMPLATES,
   SET_IMAGE_FOR_EDIT,
+  LOAD_ADMINS_OTHER_ADMINS,
+  LOAD_OTHER_ADMINS,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -177,6 +179,19 @@ export const setupSocketConnectionWithBackend = (auth) => (
   connectSocket();
 };
 
+export const reduxLoadOtherAdmins = (data) => {
+  return { type: LOAD_OTHER_ADMINS, payload: data };
+};
+export const fetchOtherAdminsInMyCommunities = (body, cb) => (dispatch) => {
+  console.log("You don enter here? ", body);
+  apiCall("/communities.adminsOf", body).then((response) => {
+    cb && cb(response.data, !response.success, response.error);
+    if (!response.success)
+      return console.log("Could not load other admins", response);
+    dispatch(reduxLoadOtherAdmins(response.data));
+  });
+  // return { type: LOAD_OTHER_ADMINS, payload: data };
+};
 export const setImageForEditAction = (data) => {
   return { type: SET_IMAGE_FOR_EDIT, payload: data };
 };

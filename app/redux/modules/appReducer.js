@@ -54,6 +54,8 @@ import {
   LOAD_USER_ACTIVE_STATUS,
   // LOAD_EMAIL_TEMPLATES,
   SET_IMAGE_FOR_EDIT,
+  LOAD_ADMINS_OTHER_ADMINS,
+  LOAD_OTHER_ADMINS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -144,6 +146,14 @@ export const reducerForNextStepsSummary = (state = {}, action = {}) => {
 export const reducerForSavingOtherEventState = (state = {}, action = {}) => {
   switch (action.type) {
     case SAVE_OTHER_EVENT_STATES:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForLoadingOtherAdmins = (state = {}, action = {}) => {
+  switch (action.type) {
+    case LOAD_OTHER_ADMINS:
       return action.payload;
     default:
       return state;

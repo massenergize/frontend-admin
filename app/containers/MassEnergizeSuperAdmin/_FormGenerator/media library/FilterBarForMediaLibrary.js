@@ -11,13 +11,21 @@ import {
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import MEDropdown from "../../ME  Tools/dropdown/MEDropdown";
+import { LOADING } from "../../../../utils/constants";
+import { fetchOtherAdminsInMyCommunities } from "../../../../redux/redux-actions/adminActions";
+import { bindActionCreators } from "redux";
+import { removeDuplicateObjects, sortByField } from "../../../../utils/helpers";
 
-export const FilterBarForMediaLibrary = ({ auth, communities }) => {
+export const FilterBarForMediaLibrary = ({
+  auth,
+  communities,
+  otherAdminsFromRedux,
+  findOtherAdminsInMyCommunities,
+  notify,
+}) => {
   const [currentFilter, setCurrentFilter] = useState("keywords");
   const [usersQuery, setQuery] = useState({});
-  // const [keywords, setKeywords] = useState("");
-  // const [chosenComs, setChosenComs] = useState([]);
-  // const [otherAdmins, setOtherAdmins] = useState([]);
+  const [otherAdmins, setOtherAdmins] = useState([]);
   const [options, setOptions] = useState([]);
 
   const isCommunityAdmin = auth?.is_community_admin && !auth?.is_super_admin;
@@ -36,6 +44,33 @@ export const FilterBarForMediaLibrary = ({ auth, communities }) => {
     if (isCommunityAdmin) return auth?.admin_at;
     return communities || [];
   };
+  // console.log("OTHER ADMINS", otherAdmins);
+  useEffect(() => {
+    if (!otherAdminsFromRedux) return;
+    const values = Object.values(otherAdminsFromRedux);
+    if (!values?.length) return;
+    const asList = values?.map((group) => group.members || {});
+    let data = Object.assign({}, ...asList);
+    data = Object.values(data);
+    data = sortByField(data, "full_name");
+    setOtherAdmins(data);
+  }, [otherAdminsFromRedux]);
+
+  useEffect(() => {
+    const otherAdminsListIsntAvailableYet =
+      otherAdminsFromRedux === !otherAdminsFromRedux ||
+      !Object.keys(otherAdminsFromRedux)?.length;
+
+    if (!otherAdminsListIsntAvailableYet) return;
+
+    const coms = getCommunitiesToSelectFrom()?.map((com) => com.id) || [];
+    findOtherAdminsInMyCommunities(
+      { community_ids: coms },
+      (_, failed, error) => {
+        if (failed) return notify(error, true);
+      }
+    );
+  }, []);
 
   useEffect(() => {
     const opts = [
@@ -90,8 +125,10 @@ export const FilterBarForMediaLibrary = ({ auth, communities }) => {
             onItemSelected={(items) => buildQuery(currentFilter, items)}
             value={getValue(currentFilter, [])}
             name="from-others"
+            labelExtractor={(item) => item?.full_name}
+            valueExtractor={(item) => item?.id}
             multiple
-            data={["actions", "events", "something"]}
+            data={otherAdmins}
             placeholder="Select admins and 'Apply'"
           />
         </div>
@@ -167,9 +204,17 @@ export const FilterBarForMediaLibrary = ({ auth, communities }) => {
 const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   communities: state.getIn(["communities"]),
+  otherAdminsFromRedux: state.getIn(["otherAdmins"]),
 });
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      findOtherAdminsInMyCommunities: fetchOtherAdminsInMyCommunities,
+    },
+    dispatch
+  );
+};
 
 export default connect(
   mapStateToProps,

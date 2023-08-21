@@ -21,13 +21,12 @@ export const SidebarForMediaLibraryModal = ({
   imagesObject,
   putImagesInRedux,
   putImageInReduxForEdit,
-  changeTabTo,
+  changeTabTo, 
 }) => {
   const [imageInfo, setImageInfo] = useState("loading");
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const isSuperAdmin = !auth?.is_community_admin && auth?.is_super_admin;
-
 
   useEffect(() => {
     setImageInfo(image)
@@ -65,7 +64,7 @@ export const SidebarForMediaLibraryModal = ({
             }}
             onClick={(e) => {
               e.preventDefault();
-              // NOw send the currently selected image to redux to be used in the mlib form
+              // Now send the currently selected image to redux to be used in the mlib form
               putImageInReduxForEdit(imageInfo);
               changeTabTo("upload-form");
               toggleSidePane(false);
@@ -125,7 +124,7 @@ const mapStateToProps = (state) => {
   return {
     imageInfos: state.getIn(["imageInfos"]),
     auth: state.getIn(["auth"]),
-    imagesObject: state.getIn(["galleryImages"]),
+    imagesObject: state.getIn(["galleryImages"])
   };
 };
 

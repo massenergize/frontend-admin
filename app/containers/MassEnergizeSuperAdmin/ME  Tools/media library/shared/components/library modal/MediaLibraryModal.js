@@ -91,6 +91,7 @@ function MediaLibraryModal({
       uploading,
       toggleSidePane: setShowSidePane,
       currentTab,
+      setNotification,
     };
   };
   const handleUpload = () => {
