@@ -34,6 +34,10 @@ export const FilterBarForMediaLibrary = ({
     setQuery(obj);
   };
 
+  const removeKeyword = (word, data) => {
+    let items = data.filter((w) => w !== word);
+    setQuery({ ...usersQuery, keywords: items.join(",") });
+  };
   const getValue = (name, _default = null) => {
     if (!name) return null;
     return usersQuery[name] || _default;
@@ -44,7 +48,6 @@ export const FilterBarForMediaLibrary = ({
     return communities || [];
   };
 
-  
   useEffect(() => {
     if (!otherAdminsFromRedux) return;
     const values = Object.values(otherAdminsFromRedux);
@@ -139,6 +142,7 @@ export const FilterBarForMediaLibrary = ({
     if (currentFilter === "keywords")
       return (
         <WithKeywords
+          remove={removeKeyword}
           keywords={getValue(currentFilter, "")}
           onChange={(e) => buildQuery(currentFilter, e.target.value)}
         />
@@ -223,19 +227,24 @@ export default connect(
   mapDispatchToProps
 )(FilterBarForMediaLibrary);
 
-const WithKeywords = ({ keywords, onChange }) => {
+const WithKeywords = ({ keywords, onChange, remove }) => {
   const renderChips = (data) => {
     const items = data?.split(",").filter(Boolean);
     const empty = !items?.length;
     if (empty) return <></>;
     return items?.map((item) => (
-      <Chip label={item?.trim()} style={{ margin: "5px 3px" }} />
+      <Chip
+        label={item?.trim()}
+        style={{ margin: "5px 3px" }}
+        onDelete={() => remove(item, items)}
+      />
     ));
   };
   return (
     <>
       <TextField
         onChange={onChange}
+        value={keywords}
         label="Keywords here will be used to search image names, tags, and descriptions"
         placeholder="Add keywords separated by commas (E.g. Solar,Sun,green-house etc)"
         style={{ width: "100%", marginTop: 6 }}
@@ -243,7 +252,9 @@ const WithKeywords = ({ keywords, onChange }) => {
           style: { padding: "12.5px 14px", width: "100%" },
         }}
       />
-      <div style={{ marginTop: 6 }}>{renderChips(keywords)}</div>
+      <div style={{ marginTop: 6, textTransform: "capitalize" }}>
+        {renderChips(keywords)}
+      </div>
     </>
   );
 };
