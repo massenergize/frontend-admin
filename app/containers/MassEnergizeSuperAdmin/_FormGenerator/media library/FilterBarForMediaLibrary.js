@@ -11,10 +11,9 @@ import {
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import MEDropdown from "../../ME  Tools/dropdown/MEDropdown";
-import { LOADING } from "../../../../utils/constants";
 import { fetchOtherAdminsInMyCommunities } from "../../../../redux/redux-actions/adminActions";
 import { bindActionCreators } from "redux";
-import { removeDuplicateObjects, sortByField } from "../../../../utils/helpers";
+import { sortByField } from "../../../../utils/helpers";
 
 export const FilterBarForMediaLibrary = ({
   auth,
@@ -44,7 +43,8 @@ export const FilterBarForMediaLibrary = ({
     if (isCommunityAdmin) return auth?.admin_at;
     return communities || [];
   };
-  // console.log("OTHER ADMINS", otherAdmins);
+
+  
   useEffect(() => {
     if (!otherAdminsFromRedux) return;
     const values = Object.values(otherAdminsFromRedux);
@@ -128,6 +128,8 @@ export const FilterBarForMediaLibrary = ({
             labelExtractor={(item) => item?.full_name}
             valueExtractor={(item) => item?.id}
             multiple
+            allowClearAndSelectAll
+            allowChipRemove
             data={otherAdmins}
             placeholder="Select admins and 'Apply'"
           />

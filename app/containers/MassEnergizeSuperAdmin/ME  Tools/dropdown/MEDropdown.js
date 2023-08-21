@@ -24,13 +24,19 @@ function MEDropdown(props) {
     generics,
     fullControl = false,
     name,
+    allowClearAndSelectAll,
     ...rest
   } = props;
   const [selected, setSelected] = useState([]);
   const [optionsToDisplay, setOptionsToDisplay] = useState([]);
   const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
+
+  const isAll = (item) => {
+    return typeof item === "string" && item?.toLowerCase() === "all";
+  };
   const valueOf = (item) => {
     if (!item) return;
+    if (multiple && isAll(item)) return "all";
     if (valueExtractor) return valueExtractor(item);
     return (item && item.name) || (item && item.toString());
   };
@@ -100,6 +106,7 @@ function MEDropdown(props) {
   const labelOf = (item, fromValue) => {
     const data = optionsToDisplay;
     if (!item) return;
+    if (multiple && isAll(item)) return "All";
     if (fromValue) {
       item = (data || []).find((it) => valueOf(it) === item);
     }
@@ -114,10 +121,10 @@ function MEDropdown(props) {
       if (onItemSelected) onItemSelected(items);
       return setSelected(items);
     }
-
+    const first = selected[0];
     const [found, rest] = pop(selected, valueOf(item));
     if (found) items = rest;
-    else items = [...rest, valueOf(item)];
+    else items = [...(isAll(first) ? [] : rest), valueOf(item)];
     setSelected(items);
     if (onItemSelected) return onItemSelected(items);
   };
@@ -126,70 +133,126 @@ function MEDropdown(props) {
     const found = (selected || []).find((it) => it === item);
     return found;
   };
+  const allOrNothing = ({ nothing }) => {
+    if (nothing) {
+      setSelected([]);
+      onItemSelected([]);
+      return;
+    }
+    setSelected(["all"]);
+    onItemSelected(["all"]);
+  };
 
   return (
-    <FormControl
-      key={name || "me-dropdown"}
-      style={{ width: "100%", marginTop: 10, ...(containerStyle || {}) }}
-    >
-      {placeholder && <FormLabel component="legend">{placeholder}</FormLabel>}
-      <Select
-        {...generics || {}}
-        className="me-drop-override"
-        multiple={multiple}
-        displayEmpty
-        renderValue={(itemsToDisplay) => (
+    <>
+      <FormControl
+        key={name || "me-dropdown"}
+        style={{ width: "100%", marginTop: 10, ...(containerStyle || {}) }}
+      >
+        {placeholder && <FormLabel component="legend">{placeholder}</FormLabel>}
+        <Select
+          {...generics || {}}
+          className="me-drop-override"
+          multiple={multiple}
+          displayEmpty
+          renderValue={(itemsToDisplay) => (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                flexWrap: "wrap",
+              }}
+            >
+              {itemsToDisplay.map((item, id) => {
+                return (
+                  <Chip
+                    key={id.toString()}
+                    label={labelOf(item, true)}
+                    style={{ margin: 5 }}
+                  />
+                );
+              })}
+            </div>
+          )}
+          value={selected || []}
+        >
+          {(optionsToDisplay || []).map((d, i) => {
+            return (
+              <MenuItem
+                key={i}
+                ref={
+                  i === optionsToDisplay.length - 1 && rest?.isAsync
+                    ? lastDropDownItemRef
+                    : null
+                }
+              >
+                <FormControlLabel
+                  onClick={() => handleOnChange(d)}
+                  key={i}
+                  control={
+                    multiple ? (
+                      <Checkbox
+                        checked={itemIsSelected(valueOf(d))}
+                        value={valueOf(d)}
+                        name={labelOf(d)}
+                      />
+                    ) : (
+                      <Typography style={{ padding: "7px 15px" }}>
+                        {labelOf(d)}
+                      </Typography>
+                    )
+                  }
+                  label={multiple ? labelOf(d) : ""}
+                />
+              </MenuItem>
+            );
+          })}
+        </Select>
+      </FormControl>
+      {allowClearAndSelectAll && multiple && (
+        <div>
           <div
             style={{
               display: "flex",
               flexDirection: "row",
-              flexWrap: "wrap",
+              alignItems: "center",
+              padding: "3px 0px",
+              fontSize: "0.87rem",
             }}
           >
-            {itemsToDisplay.map((item, id) => (
-              <Chip
-                key={id.toString()}
-                label={labelOf(item, true)}
-                style={{ margin: 5 }}
-              />
-            ))}
-          </div>
-        )}
-        value={selected || []}
-      >
-        {(optionsToDisplay || []).map((d, i) => {
-          return (
-            <MenuItem
-              key={i}
-              ref={
-                i === optionsToDisplay.length - 1 && rest?.isAsync
-                  ? lastDropDownItemRef
-                  : null
-              }
+            <span
+              onClick={() => allOrNothing({})}
+              className={`touchable-opacity`}
+              style={{
+                marginRight: 15,
+                textDecoration: "underline",
+                fontWeight: "bold",
+                // color: "var(--app-purple)",
+              }}
             >
-              <FormControlLabel
-                onClick={() => handleOnChange(d)}
-                key={i}
-                control={
-                  multiple ? (
-                    <Checkbox
-                      checked={itemIsSelected(valueOf(d))}
-                      value={valueOf(d)}
-                      name={labelOf(d)}
-                    />
-                  ) : (
-                    <Typography style={{ padding: "7px 15px" }}>
-                      {labelOf(d)}
-                    </Typography>
-                  )
-                }
-                label={multiple ? labelOf(d) : ""}
-              />
-            </MenuItem>
-          );
-        })}
-      </Select>
-    </FormControl>
+              {" "}
+              Select All
+            </span>
+            {selected?.length ? (
+              <span
+                className={` touchable-opacity`}
+                style={{
+                  textDecoration: "underline",
+                  fontWeight: "bold",
+                  color: "#c74d4d",
+                }}
+                onClick={() => allOrNothing({ nothing: true })}
+              >
+                Clear All
+              </span>
+            ) : (
+              <></>
+            )}
+          </div>
+          {/* <hr style={{ margin: 0 }} /> */}
+        </div>
+      )}
+    </>
   );
 }
 
@@ -197,5 +260,6 @@ export default MEDropdown;
 
 MEDropdown.defaultValues = {
   multiple: false,
+  allowClearAndSelectAll: false,
   placeholder: "Enter placeholder text for your dropdown",
 };

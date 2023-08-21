@@ -13,7 +13,8 @@ span {
 
 :root {
   --app-cyan: #579ece;
-  --app-purple: rgb(156, 39, 176);
+  /* --app-purple: rgb(156, 39, 176); */
+  --app-purple: #AB47BC;
 }
 
 .tox-notification--warning {
