@@ -4,11 +4,11 @@ import { apiCall } from '../../../utils/messenger';
 
 export default function ImportButton(props) {
   const [openPicker, data, authResponse] = useDrivePicker();
-  const DOC_API_KEY = process.env.REACT_APP_DOC_API_KEY
+  const DOC_API_KEY ="AIzaSyC0tJevezDFawBFirRHRs7AfFyzrFYt1sc"|| process.env.REACT_APP_DOC_API_KEY
 
   const handleOnClick = () => {
     openPicker({
-      clientId: "941856327176-691hf1ndva0423cch73k9ok0a6do0gs8.apps.googleusercontent.com", // web client credentials
+      clientId: "117359409582-ed9ergkmfu10rg6mkq35a1fcrkiua8n8.apps.googleusercontent.com", // web client credentials
       developerKey: DOC_API_KEY,
       viewId: "DOCS",
       showUploadView: true,

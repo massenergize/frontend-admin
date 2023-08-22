@@ -10,6 +10,6 @@ export default {
   Section: 'Section',
   Paragraph:'Paragraph',
   MediaLibrary: "media-library",
-  AutoComplete: "autocomplete"
+  AutoComplete: "autocomplete",
   ImportButton: "ImportButton",
 };

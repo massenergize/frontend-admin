@@ -120,7 +120,7 @@ class CreateNewActionForm extends Component {
         />
         <br />
         <br /> */}
-        <MassEnergizeForm classes={classes} formJson={formJson} enableCancel />
+        {/* <MassEnergizeForm classes={classes} formJson={formJson} enableCancel /> */}
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
