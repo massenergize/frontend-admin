@@ -2,11 +2,12 @@ import React from 'react'
 import AsyncSelect from '../../../../utils/components/AsyncSelect/AsyncSelect';
 import { customFilterListOptions } from './utils';
 
-export default function CustomOptions({ data , label, endpoint}) {
+export default function CustomOptions({ data , label, endpoint, customBodyRender}) {
    return {
      filter: true,
      filterType: "custom",
      display: "true",
+     customBodyRender,
      customFilterListOptions: customFilterListOptions,
      filterOptions: {
        logic: (location, filters, row) => {
