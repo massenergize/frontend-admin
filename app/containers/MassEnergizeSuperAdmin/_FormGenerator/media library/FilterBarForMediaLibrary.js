@@ -297,11 +297,14 @@ export const FilterBarForMediaLibrary = ({
           </Button>
         </div>
       </div>
-      <Typography variant="body2" color="#b2b2b2">
-        Items are arranged by date. The latest items are displayed first, moving
-        from left to right in each row. Rows at the top represent more recent
-        entries compared to those further down.
-      </Typography>
+      <div style={{ margin: "10px 0px" }}>
+        <Typography variant="h6">IMAGES</Typography>
+        <Typography variant="body2" style={{ opacity: "0.6" }}>
+          Items are arranged by date. The latest items are displayed first,
+          moving from left to right in each row. Rows at the top represent more
+          recent entries compared to those further down.
+        </Typography>
+      </div>
     </div>
   );
 };
