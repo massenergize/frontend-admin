@@ -57,6 +57,7 @@ import {
   LOAD_ADMINS_OTHER_ADMINS,
   LOAD_OTHER_ADMINS,
   SET_MEDIA_LIBRARY_MODAL_FILTERS,
+  SET_GALLERY_META_DATA,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -481,6 +482,14 @@ export const allTestimonialsReducer = (state = [], action = {}) => {
   }
 };
 
+export const setGalleryMetadataReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case SET_GALLERY_META_DATA:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const mlibFiltersReducer = (state = {}, action = {}) => {
   switch (action.type) {
     case SET_MEDIA_LIBRARY_MODAL_FILTERS:

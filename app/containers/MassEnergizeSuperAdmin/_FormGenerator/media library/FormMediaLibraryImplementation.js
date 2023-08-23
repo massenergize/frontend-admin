@@ -8,6 +8,7 @@ import {
   reduxAddToGalleryImages,
   reduxLoadGalleryImages,
   reduxLoadImageInfos,
+  setGalleryMetaAction,
   setImageForEditAction,
   testRedux,
   universalFetchFromGallery,
@@ -42,6 +43,8 @@ export const FormMediaLibraryImplementation = (props) => {
     imageForEdit,
     imageInfos,
     putImageInfosInRedux,
+    meta,
+    putMetaInRedux,
   } = props;
   const [available, setAvailable] = useState(auth && auth.is_super_admin);
   // const [selectedTags, setSelectedTags] = useState({ scope: DEFAULT_SCOPE });
@@ -126,7 +129,7 @@ export const FormMediaLibraryImplementation = (props) => {
   }, [selected, defaultValue]);
 
   const fetchWithQuery = (body, cb) => {
-    // return console.log("BODY IN FETCHWITHQUERY", body);
+    const loadMoreMeta = meta?.loadMoreMeta || {};
     notify("Hold on tight...", false, {
       loading: true,
       type: "loading-more",
@@ -134,25 +137,19 @@ export const FormMediaLibraryImplementation = (props) => {
 
     apiCall("/gallery.search", body)
       .then((response) => {
-        console.log("RESPONSE", response);
         setOutsideNotification(null);
         cb && cb(response.data, !response.success, response.error);
         if (!response.success) return notify(response.error, true);
         putImagesInRedux({ data: response.data });
+        putMetaInRedux({
+          ...meta,
+          loadMoreMeta: { ...loadMoreMeta, query: body },
+        });
       })
       .catch((e) => {
         notify(e?.toString(), true);
         console.log("CATCH_ERROR", e?.toString());
       });
-    // fetchImages({
-    //   ...props,
-    //   cb: (data, failed, err) => {
-    //     setOutsideNotification(null);
-    //     cb && cb(data, failed, err);
-    //   },
-    //   old: imagesObject,
-    //   append: false, //Query Changes? Dont append new  content retrieved. If it doesnt, append all new search results
-    // });
   };
 
   const loadMoreImages = (cb) => {
@@ -161,36 +158,26 @@ export const FormMediaLibraryImplementation = (props) => {
       loading: true,
       type: "loading-more",
     });
-    // const scopes = (selectedTags.scope || []).filter((s) => s != "all");
-    // var tags = Object.values(selectedTags.tags || []);
-    // var spread = [];
-    // for (let t of tags) spread = [...spread, ...t];
-
-    fetchImages({
-      body: {},
-      old: imagesObject,
-      cb: () => {
+    const { upper_limit, lower_limit } = imagesObject;
+    const query = meta?.loadMoreMeta?.query || {};
+    const limits =
+      upper_limit && lower_limit ? { upper_limit, lower_limit } : {};
+    const body = { ...query, ...limits };
+    apiCall("/gallery.search", body)
+      .then((response) => {
         setOutsideNotification(null);
-        cb && cb();
-        // setQueryHasChanged(false);
-      },
-      append: true, //Query Changes? Dont append new  content retrieved. If it doesnt, append all new search results
-    });
-    // fetchImages({
-    //   body: {
-    //     any_community: auth.is_super_admin && !auth.is_community_admin,
-    //     filters: scopes,
-    //     target_communities: (auth.admin_at || []).map((c) => c.id),
-    //     tags: spread,
-    //   },
-    //   old: queryHasChanged ? {} : imagesObject,
-    //   cb: () => {
-    //     setOutsideNotification(null);
-    //     cb && cb();
-    //     setQueryHasChanged(false);
-    //   },
-    //   append: !queryHasChanged, //Query Changes? Dont append new  content retrieved. If it doesnt, append all new search results
-    // });
+        cb && cb(response.data, !response.success, response.error);
+        if (!response.success) return notify(response.error, true);
+        putImagesInRedux({
+          data: response.data,
+          old: imagesObject,
+          append: true,
+        });
+      })
+      .catch((e) => {
+        notify(e?.toString(), true);
+        console.log("LOADMORE_CATCH_ERROR", e?.toString());
+      });
   };
 
   // As of 1st August 2023, handleUpload is not what actually does the upload
@@ -466,6 +453,7 @@ const mapStateToProps = (state) => ({
   communities: state.getIn(["communities"]),
   imageForEdit: state.getIn(["imageBeingEdited"]),
   imageInfos: state.getIn(["imageInfos"]),
+  meta: state.getIn(["galleryMeta"]),
 });
 
 const mapDispatchToProps = (dispatch) => {
@@ -477,6 +465,7 @@ const mapDispatchToProps = (dispatch) => {
       addOnToWhatImagesAreInRedux: reduxAddToGalleryImages,
       sendImageToReduxForEdit: setImageForEditAction,
       putImageInfosInRedux: reduxLoadImageInfos,
+      putMetaInRedux: setGalleryMetaAction,
     },
     dispatch
   );

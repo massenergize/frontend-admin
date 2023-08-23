@@ -59,9 +59,7 @@ export const FilterBarForMediaLibrary = ({
 
   const queryHasChanged = () => {
     const reqQuery = requestBody();
-    console.log("STASH, BODY", queryStash, reqQuery);
     if (!queryStash) return true;
-
     return JSON.stringify(queryStash) !== JSON.stringify(reqQuery);
   };
 
@@ -88,11 +86,9 @@ export const FilterBarForMediaLibrary = ({
   };
   const handleApply = () => {
     const body = requestBody();
-    // console.log("this ist he current user query bro", body);
     setLoading(true);
     const readyForBackend = forBackend(body);
-    fetchWithQuery(readyForBackend, (data, failed, error) => {
-      console.log("LE DATA", data);
+    fetchWithQuery(readyForBackend, (data, failed) => {
       setLoading(false);
       if (failed) return;
       setQueryStash(body);
@@ -223,7 +219,6 @@ export const FilterBarForMediaLibrary = ({
             valueExtractor={(item) => item?.id}
             multiple
             allowClearAndSelectAll
-            // allowChipRemove
             data={otherAdmins}
             placeholder="Select admins and 'Apply'"
           />

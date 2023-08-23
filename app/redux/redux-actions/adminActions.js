@@ -58,6 +58,7 @@ import {
   LOAD_OTHER_ADMINS,
   MEDIA_LIBRARY_MODAL_FILTERS,
   SET_MEDIA_LIBRARY_MODAL_FILTERS,
+  SET_GALLERY_META_DATA,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -181,6 +182,9 @@ export const setupSocketConnectionWithBackend = (auth) => (
   connectSocket();
 };
 
+export const setGalleryMetaAction = (data) => {
+  return { type: SET_GALLERY_META_DATA, payload: data };
+};
 export const reduxLoadOtherAdmins = (data) => {
   return { type: LOAD_OTHER_ADMINS, payload: data };
 };

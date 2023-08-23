@@ -65,6 +65,7 @@ import app, {
   setImageForEditReducer,
   reducerForLoadingOtherAdmins,
   mlibFiltersReducer,
+  setGalleryMetadataReducer,
 } from "./modules/appReducer";
 
 /**
@@ -130,6 +131,7 @@ export default function createReducer(injectedReducers = {}) {
     ...injectedReducers,
     taskFunctions: allTaskFunctionsReducer,
     tasks: allTasksReducer,
+    galleryMeta: setGalleryMetadataReducer,
     mlibFilters: mlibFiltersReducer,
     paginationMetaData: allMetaDataReducer, // stores pagination data for all tables
     imageBeingEdited: setImageForEditReducer, // This is what holds  the image whose details are being edited in the mlibrary modal
