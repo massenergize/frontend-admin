@@ -147,6 +147,16 @@ export const FilterBarForMediaLibrary = ({
   }, [queryStash, usersQuery, currentFilter]);
 
   useEffect(() => {
+    setCurrentFilter(filters?.currentFilter || FILTERS.MOST_RECENT.key);
+    setQuery(filters?.usersQuery || { most_recent: true });
+    setQueryStash(filters?.queryStash || null);
+  }, []);
+
+  useEffect(() => {
+    keepFiltersInRedux({ ...filters, usersQuery, currentFilter, queryStash });
+  }, [queryStash, usersQuery, currentFilter]);
+
+  useEffect(() => {
     if (!otherAdminsFromRedux) return;
     const values = Object.values(otherAdminsFromRedux);
     if (!values?.length) return;

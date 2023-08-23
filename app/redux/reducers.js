@@ -70,6 +70,7 @@ import app, {
   // reducerForEmailTemplates,
   setImageForEditReducer,
   reducerForLoadingOtherAdmins,
+  mlibFiltersReducer,
 } from "./modules/appReducer";
 
 /**

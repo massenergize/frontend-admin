@@ -63,6 +63,7 @@ import {
   SET_IMAGE_FOR_EDIT,
   LOAD_ADMINS_OTHER_ADMINS,
   LOAD_OTHER_ADMINS,
+  SET_MEDIA_LIBRARY_MODAL_FILTERS,
 } from "../ReduxConstants";
 
 const initialState = Map({

@@ -63,6 +63,8 @@ import {
   SET_IMAGE_FOR_EDIT,
   LOAD_ADMINS_OTHER_ADMINS,
   LOAD_OTHER_ADMINS,
+  MEDIA_LIBRARY_MODAL_FILTERS,
+  SET_MEDIA_LIBRARY_MODAL_FILTERS,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
