@@ -56,6 +56,8 @@ import {
   SET_IMAGE_FOR_EDIT,
   LOAD_ADMINS_OTHER_ADMINS,
   LOAD_OTHER_ADMINS,
+  MEDIA_LIBRARY_MODAL_FILTERS,
+  SET_MEDIA_LIBRARY_MODAL_FILTERS,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -191,6 +193,9 @@ export const fetchOtherAdminsInMyCommunities = (body, cb) => (dispatch) => {
     dispatch(reduxLoadOtherAdmins(response.data));
   });
   // return { type: LOAD_OTHER_ADMINS, payload: data };
+};
+export const setLibraryModalFiltersAction = (data) => {
+  return { type: SET_MEDIA_LIBRARY_MODAL_FILTERS, payload: data };
 };
 export const setImageForEditAction = (data) => {
   return { type: SET_IMAGE_FOR_EDIT, payload: data };
@@ -388,9 +393,10 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       }
     ),
     apiCall("/gallery.search", {
-      any_community: true,
-      filters: ["uploads", "actions", "events", "testimonials"],
-      target_communities: [],
+      most_recent: true,
+      // any_community: true,
+      // filters: ["uploads", "actions", "events", "testimonials"],
+      // target_communities: [],
     }),
     isSuperAdmin && apiCall("/tasks.functions.list"),
     isSuperAdmin && apiCall("/tasks.list"),
@@ -1001,7 +1007,7 @@ export const universalFetchFromGallery = (props) => {
   return (dispatch) => {
     apiCall(url, requestBody)
       .then((response) => {
-        if (cb) cb(response);
+        if (cb) cb(response?.data, !response?.success, response?.error);
         if (!response || !response.success)
           return console.log(" FETCH ERROR_BE: ", response.error);
         return dispatch(
@@ -1013,11 +1019,12 @@ export const universalFetchFromGallery = (props) => {
         );
       })
       .catch((e) => {
-        if (cb) cb();
+        if (cb) cb(null, true, e.toString());
         console.log("FETCH ERROR_SYNT: ", e.toString());
       });
   };
 };
+// No longer being used, will be remove soon!
 export const reduxCallLibraryModalImages = (props) => {
   let { community_ids, old = {}, cb } = props;
   old = old || {};

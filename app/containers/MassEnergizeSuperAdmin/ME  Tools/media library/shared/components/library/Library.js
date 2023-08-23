@@ -56,18 +56,21 @@ function Library({
 
   if (!images || images.length == 0) {
     return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          height: "100%",
-          marginTop: "10%",
-        }}
-      >
-        <img src={blank} style={{ height: 180 }} />
-        <p style={{ color: "grey" }}>No images available to choose from</p>
+      <div style={{ overflowY: "scroll" }}>
+        {renderBeforeImages()}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            height: "100%",
+            marginTop: "10%",
+          }}
+        >
+          <img src={blank} style={{ height: 180 }} />
+          <p style={{ color: "grey" }}>No images available to choose from</p>
+        </div>
       </div>
     );
   }

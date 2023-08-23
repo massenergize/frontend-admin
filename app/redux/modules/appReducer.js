@@ -56,6 +56,7 @@ import {
   SET_IMAGE_FOR_EDIT,
   LOAD_ADMINS_OTHER_ADMINS,
   LOAD_OTHER_ADMINS,
+  SET_MEDIA_LIBRARY_MODAL_FILTERS,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -474,6 +475,15 @@ export const allUsersReducer = (state = [], action = {}) => {
 export const allTestimonialsReducer = (state = [], action = {}) => {
   switch (action.type) {
     case GET_ALL_TESTIMONIALS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
+export const mlibFiltersReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case SET_MEDIA_LIBRARY_MODAL_FILTERS:
       return action.payload;
     default:
       return state;

@@ -44,8 +44,8 @@ export const FormMediaLibraryImplementation = (props) => {
     putImageInfosInRedux,
   } = props;
   const [available, setAvailable] = useState(auth && auth.is_super_admin);
-  const [selectedTags, setSelectedTags] = useState({ scope: DEFAULT_SCOPE });
-  const [queryHasChanged, setQueryHasChanged] = useState(false);
+  // const [selectedTags, setSelectedTags] = useState({ scope: DEFAULT_SCOPE });
+  // const [queryHasChanged, setQueryHasChanged] = useState(false);
   const [userSelectedImages, setUserSelectedImages] = useState([]);
   const [mlibraryFormData, setmlibraryFormData] = useState({});
   const [uploading, setUploading] = useState(false);
@@ -125,32 +125,72 @@ export const FormMediaLibraryImplementation = (props) => {
     if (!justResetting) useIdsToFindObjs(preselected);
   }, [selected, defaultValue]);
 
-  const loadMoreImages = (cb) => {
-    if (!auth) return console.log("It does not look like you are signed in...");
-    notify("Collecting more images...", false, {
+  const fetchWithQuery = (body, cb) => {
+    // return console.log("BODY IN FETCHWITHQUERY", body);
+    notify("Hold on tight...", false, {
       loading: true,
       type: "loading-more",
     });
-    const scopes = (selectedTags.scope || []).filter((s) => s != "all");
-    var tags = Object.values(selectedTags.tags || []);
-    var spread = [];
-    for (let t of tags) spread = [...spread, ...t];
+
+    apiCall("/gallery.search", body)
+      .then((response) => {
+        console.log("RESPONSE", response);
+        setOutsideNotification(null);
+        cb && cb(response.data, !response.success, response.error);
+        if (!response.success) return notify(response.error, true);
+        putImagesInRedux({ data: response.data });
+      })
+      .catch((e) => {
+        notify(e?.toString(), true);
+        console.log("CATCH_ERROR", e?.toString());
+      });
+    // fetchImages({
+    //   ...props,
+    //   cb: (data, failed, err) => {
+    //     setOutsideNotification(null);
+    //     cb && cb(data, failed, err);
+    //   },
+    //   old: imagesObject,
+    //   append: false, //Query Changes? Dont append new  content retrieved. If it doesnt, append all new search results
+    // });
+  };
+
+  const loadMoreImages = (cb) => {
+    if (!auth) return console.log("It does not look like you are signed in...");
+    notify("Collecting more items...", false, {
+      loading: true,
+      type: "loading-more",
+    });
+    // const scopes = (selectedTags.scope || []).filter((s) => s != "all");
+    // var tags = Object.values(selectedTags.tags || []);
+    // var spread = [];
+    // for (let t of tags) spread = [...spread, ...t];
 
     fetchImages({
-      body: {
-        any_community: auth.is_super_admin && !auth.is_community_admin,
-        filters: scopes,
-        target_communities: (auth.admin_at || []).map((c) => c.id),
-        tags: spread,
-      },
-      old: queryHasChanged ? {} : imagesObject,
+      body: {},
+      old: imagesObject,
       cb: () => {
         setOutsideNotification(null);
         cb && cb();
-        setQueryHasChanged(false);
+        // setQueryHasChanged(false);
       },
-      append: !queryHasChanged, //Query Changes? Dont append new  content retrieved. If it doesnt, append all new search results
+      append: true, //Query Changes? Dont append new  content retrieved. If it doesnt, append all new search results
     });
+    // fetchImages({
+    //   body: {
+    //     any_community: auth.is_super_admin && !auth.is_community_admin,
+    //     filters: scopes,
+    //     target_communities: (auth.admin_at || []).map((c) => c.id),
+    //     tags: spread,
+    //   },
+    //   old: queryHasChanged ? {} : imagesObject,
+    //   cb: () => {
+    //     setOutsideNotification(null);
+    //     cb && cb();
+    //     setQueryHasChanged(false);
+    //   },
+    //   append: !queryHasChanged, //Query Changes? Dont append new  content retrieved. If it doesnt, append all new search results
+    // });
   };
 
   // As of 1st August 2023, handleUpload is not what actually does the upload
@@ -299,7 +339,12 @@ export const FormMediaLibraryImplementation = (props) => {
               loadMoreImages();
             }}
           >
-            LOAD MORE
+            <Tooltip
+              title="When you load more, the items that are loaded are added to the bottom of the pile (scroll)"
+              placement="top"
+            >
+              LOAD MORE
+            </Tooltip>
           </MediaLibrary.Button>
           <small style={{ fontWeight: "bold", marginLeft: 15 }}>
             <i className="fa fa-images" /> {(images && images.length) || 0}{" "}
@@ -318,7 +363,11 @@ export const FormMediaLibraryImplementation = (props) => {
         actionText="Select From Library"
         sourceExtractor={(item) => item && item.url}
         renderBeforeImages={(props) => (
-          <FilterBarForMediaLibrary {...props} notify={notify} />
+          <FilterBarForMediaLibrary
+            {...props}
+            notify={notify}
+            fetchWithQuery={fetchWithQuery}
+          />
           // <GalleryFilter
           //   {...props}
           //   dropPosition="left"

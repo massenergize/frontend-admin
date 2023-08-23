@@ -11,27 +11,92 @@ import {
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import MEDropdown from "../../ME  Tools/dropdown/MEDropdown";
-import { fetchOtherAdminsInMyCommunities } from "../../../../redux/redux-actions/adminActions";
+import {
+  fetchOtherAdminsInMyCommunities,
+  setLibraryModalFiltersAction,
+} from "../../../../redux/redux-actions/adminActions";
 import { bindActionCreators } from "redux";
 import { sortByField } from "../../../../utils/helpers";
+import { apiCall } from "../../../../utils/messenger";
 
+const FILTERS = {
+  MOST_RECENT: { key: "most_recent" },
+  MY_UPLOADS: { key: "my_uploads" },
+  WITH_KEYWORDS: { key: "keywords" },
+  FROM_OTHER_ADMINS: { key: "user_ids" },
+  BY_COMMUNITY: { key: "target_communities" },
+};
+
+const NO_MOD_LIST = [FILTERS.MOST_RECENT.key, FILTERS.MY_UPLOADS.key];
 export const FilterBarForMediaLibrary = ({
   auth,
   communities,
   otherAdminsFromRedux,
   findOtherAdminsInMyCommunities,
   notify,
+  keepFiltersInRedux,
+  filters,
+  fetchWithQuery,
 }) => {
-  const [currentFilter, setCurrentFilter] = useState("keywords");
+  // const { currentFilter, usersQuery, queryStash } = filters;
+  const [currentFilter, setCurrentFilter] = useState("most_recent");
   const [usersQuery, setQuery] = useState({});
-  const [otherAdmins, setOtherAdmins] = useState([]);
+  const [queryStash, setQueryStash] = useState(null);
+  const [otherAdmins, setOtherAdmins] = useState([]); // list of other admins in a user's communities used in the dropdown
   const [options, setOptions] = useState([]);
+  const [loading, setLoading] = useState(false); // for when user clicks "apply"
 
   const isCommunityAdmin = auth?.is_community_admin && !auth?.is_super_admin;
+
+  const requestBody = () => {
+    return { [currentFilter]: usersQuery[currentFilter] };
+  };
 
   const buildQuery = (name, item) => {
     const obj = { ...usersQuery, [name]: item };
     setQuery(obj);
+  };
+
+  const queryHasChanged = () => {
+    const reqQuery = requestBody();
+    console.log("STASH, BODY", queryStash, reqQuery);
+    if (!queryStash) return true;
+
+    return JSON.stringify(queryStash) !== JSON.stringify(reqQuery);
+  };
+
+  const forBackend = (body) => {
+    // Because some of the selections need to be modified in a way the backend expects
+    if (NO_MOD_LIST.includes(currentFilter)) return body;
+
+    let value = (body || {})[currentFilter];
+    if (currentFilter === FILTERS.WITH_KEYWORDS.key)
+      return { [currentFilter]: value?.split(",") };
+
+    const item = (value || [])[0];
+    if (currentFilter === FILTERS.FROM_OTHER_ADMINS.key && item === "all") {
+      value = otherAdmins?.map((ad) => ad.id);
+      return { [currentFilter]: value };
+    }
+
+    if (currentFilter === FILTERS.BY_COMMUNITY.key && item === "all") {
+      value = getCommunitiesToSelectFrom()?.map((ad) => ad.id);
+      return { [currentFilter]: value };
+    }
+
+    return body;
+  };
+  const handleApply = () => {
+    const body = requestBody();
+    // console.log("this ist he current user query bro", body);
+    setLoading(true);
+    const readyForBackend = forBackend(body);
+    fetchWithQuery(readyForBackend, (data, failed, error) => {
+      console.log("LE DATA", data);
+      setLoading(false);
+      if (failed) return;
+      setQueryStash(body);
+    });
   };
 
   const removeKeyword = (word, data) => {
@@ -47,6 +112,16 @@ export const FilterBarForMediaLibrary = ({
     if (isCommunityAdmin) return auth?.admin_at;
     return communities || [];
   };
+
+  useEffect(() => {
+    setCurrentFilter(filters?.currentFilter || FILTERS.MOST_RECENT.key);
+    setQuery(filters?.usersQuery || { most_recent: true });
+    setQueryStash(filters?.queryStash || null);
+  }, []);
+
+  useEffect(() => {
+    keepFiltersInRedux({ ...filters, usersQuery, currentFilter, queryStash });
+  }, [queryStash, usersQuery, currentFilter]);
 
   useEffect(() => {
     if (!otherAdminsFromRedux) return;
@@ -78,23 +153,28 @@ export const FilterBarForMediaLibrary = ({
   useEffect(() => {
     const opts = [
       {
-        name: "My Uploads",
-        key: "my-uploads",
-        context: "Only images you have uploaded will show up",
+        name: "Most Recent (Default)",
+        key: FILTERS.MOST_RECENT.key,
+        context: "Most recent uploads",
       },
       {
-        name: "Use Keywords",
-        key: "keywords",
+        name: "My Uploads",
+        key: FILTERS.MY_UPLOADS.key,
+        context: "Items uploaded by you",
+      },
+      {
+        name: "With Keywords",
+        key: FILTERS.WITH_KEYWORDS.key,
         context: "Keywords that describe the image",
       },
       {
         name: "From Other Admins",
-        key: "from-others",
+        key: FILTERS.FROM_OTHER_ADMINS.key,
         context: "See what other admins have uploaded",
       },
       {
         name: "By Community",
-        key: "by-community",
+        key: FILTERS.BY_COMMUNITY.key,
         context: "Show only community specific items",
       },
     ];
@@ -103,16 +183,27 @@ export const FilterBarForMediaLibrary = ({
   }, []);
 
   const renderContextualOptions = (currentFilter) => {
-    // NOTE: attaching these components to the options objects itself is the best way to implement it. But it causes dropdowns to conflict unless implemented this way (the way its done below).
-    // When there is time, remember to look into it
-    if (currentFilter === "by-community")
+    if (currentFilter == FILTERS.MY_UPLOADS.key)
+      return (
+        <Typography variant="body2" style={{ opacity: 0.6 }}>
+          Only shows items uploaded by you
+        </Typography>
+      );
+    if (currentFilter == FILTERS.MOST_RECENT.key)
+      return (
+        <Typography variant="body2" style={{ opacity: 0.6 }}>
+          Shows recently uploaded items across all the communities you manage
+        </Typography>
+      );
+    if (currentFilter === FILTERS.BY_COMMUNITY.key)
       return (
         <div>
           <MEDropdown
             onItemSelected={(items) => buildQuery(currentFilter, items)}
             value={getValue(currentFilter, [])}
-            name="by-community"
+            // name="by_community"
             multiple
+            allowClearAndSelectAll
             labelExtractor={(item) => item?.name}
             valueExtractor={(item) => item?.id}
             data={getCommunitiesToSelectFrom()}
@@ -121,25 +212,25 @@ export const FilterBarForMediaLibrary = ({
         </div>
       );
 
-    if (currentFilter === "from-others")
+    if (currentFilter === FILTERS.FROM_OTHER_ADMINS.key)
       return (
         <div>
           <MEDropdown
             onItemSelected={(items) => buildQuery(currentFilter, items)}
             value={getValue(currentFilter, [])}
-            name="from-others"
+            // name="from_others"
             labelExtractor={(item) => item?.full_name}
             valueExtractor={(item) => item?.id}
             multiple
             allowClearAndSelectAll
-            allowChipRemove
+            // allowChipRemove
             data={otherAdmins}
             placeholder="Select admins and 'Apply'"
           />
         </div>
       );
 
-    if (currentFilter === "keywords")
+    if (currentFilter === FILTERS.WITH_KEYWORDS.key)
       return (
         <WithKeywords
           remove={removeKeyword}
@@ -158,9 +249,14 @@ export const FilterBarForMediaLibrary = ({
           </Typography>
 
           <RadioGroup
-            defaultValue={"keywords"}
+            value={currentFilter}
             style={{ display: "flex", flexDirection: "row" }}
-            onChange={(ev) => setCurrentFilter(ev?.target.value)}
+            onChange={(ev) => {
+              const value = ev.target.value;
+              if (NO_MOD_LIST.includes(value)) buildQuery(value, true);
+              // updateInRedux("currentFilter", ev?.target.value);
+              setCurrentFilter(value);
+            }}
           >
             {options.map((option) => (
               <FormControlLabel
@@ -186,6 +282,8 @@ export const FilterBarForMediaLibrary = ({
         </div>
         <div style={{ display: "flex", flexDirection: "row" }}>
           <Button
+            disabled={!queryHasChanged() || loading}
+            onClick={() => handleApply()}
             style={{
               marginLeft: "auto",
               borderRadius: 0,
@@ -200,8 +298,9 @@ export const FilterBarForMediaLibrary = ({
         </div>
       </div>
       <Typography variant="body2" color="#b2b2b2">
-        Items below are sorted by date. The most recent items show up first,
-        from left, to right on each row!
+        Items are arranged by date. The latest items are displayed first, moving
+        from left to right in each row. Rows at the top represent more recent
+        entries compared to those further down.
       </Typography>
     </div>
   );
@@ -211,12 +310,14 @@ const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   communities: state.getIn(["communities"]),
   otherAdminsFromRedux: state.getIn(["otherAdmins"]),
+  filters: state.getIn(["mlibFilters"]),
 });
 
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       findOtherAdminsInMyCommunities: fetchOtherAdminsInMyCommunities,
+      keepFiltersInRedux: setLibraryModalFiltersAction,
     },
     dispatch
   );
