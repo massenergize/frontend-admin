@@ -92,7 +92,7 @@ const MediaLibraryForm = ({
     <div style={{ padding: "25px 50px" }}>
       <Typography variant="h6">Hi {auth?.preferred_name || "..."},</Typography>
       {isInEditMode ? (
-        <Typography variant="body2">
+        <Typography variant="body2" style={{marginBottom:20}}>
           <span>You are currently editing the details of</span>
           <Link
             to="#"
