@@ -21,7 +21,7 @@ export const SidebarForMediaLibraryModal = ({
   imagesObject,
   putImagesInRedux,
   putImageInReduxForEdit,
-  changeTabTo, 
+  changeTabTo,
 }) => {
   const [imageInfo, setImageInfo] = useState("loading");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -29,7 +29,7 @@ export const SidebarForMediaLibraryModal = ({
   const isSuperAdmin = !auth?.is_community_admin && auth?.is_super_admin;
 
   useEffect(() => {
-    setImageInfo(image)
+    setImageInfo(image);
     getMoreInfoOnImage({
       id: image && image.id,
       updateStateWith: setImageInfo,
@@ -124,7 +124,7 @@ const mapStateToProps = (state) => {
   return {
     imageInfos: state.getIn(["imageInfos"]),
     auth: state.getIn(["auth"]),
-    imagesObject: state.getIn(["galleryImages"])
+    imagesObject: state.getIn(["galleryImages"]),
   };
 };
 
@@ -196,7 +196,12 @@ const ShowMoreInformationAboutImage = ({
               >
                 <b>Description</b>
               </Typography>
-              <Typography variant="body2">{description}</Typography>
+              <Typography
+                variant="body2"
+                style={{ fontWeight: "400", marginBottom: 10 }}
+              >
+                {description}
+              </Typography>
             </>
           )}
         </div>

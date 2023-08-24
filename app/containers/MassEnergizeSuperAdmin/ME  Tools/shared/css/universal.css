@@ -6,3 +6,17 @@
   font-family: "Google Sans", sans-serif;
   box-sizing: border-box;
 }
+p,
+span,
+small,
+div {
+  font-weight: 400;
+}
+
+th {
+  font-family: "Google Sans", sans-serif !important;
+}
+
+thead * {
+  font-weight: bold !important;
+}

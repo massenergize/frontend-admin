@@ -180,7 +180,7 @@ const MediaLibraryForm = ({
             {doesNotHaveCopyrightPermission && (
               <TextField
                 style={{ width: "100%", marginTop: 10 }}
-                label="Who should this item be attributed to? *"
+                label="Who should this item be attributed to? (40 chars) *"
                 InputLabelProps={{
                   shrink: true,
                 }}
@@ -222,7 +222,7 @@ const MediaLibraryForm = ({
             {hasUnderAgeContent && (
               <TextField
                 style={{ width: "100%", marginTop: 10 }}
-                label="Add information of guardians"
+                label="Add information of guardians (40 chars)"
                 InputLabelProps={{
                   shrink: true,
                 }}
