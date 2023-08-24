@@ -381,9 +381,6 @@ const createFormJson = ({
         fieldType: fieldTypes.MediaLibrary,
         openState: autoOpenMediaLibrary,
         dbName: "image",
-        openState: true, //remove when you are done
-        defaultTab: "library", //remove when you are done (BPR)
-
         selected: [],
         label: "Upload a logo for this Vendor",
         isRequired: false,
