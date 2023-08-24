@@ -449,7 +449,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
-      putSearchResultsInRedux: reduxLoadSearchedImages,
+      // putSearchResultsInRedux: reduxLoadSearchedImages,
       putImageInfoInRedux: reduxLoadImageInfos,
       putFiltersInRedux: reduxSetGalleryFilters,
     },

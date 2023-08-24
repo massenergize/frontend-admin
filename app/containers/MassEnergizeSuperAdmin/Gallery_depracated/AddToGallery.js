@@ -12,8 +12,6 @@ import { TextField } from "@mui/material";
 import { bindActionCreators } from "redux";
 import {
   reduxAddToGalleryImages,
-  reduxAddToSearchedImages,
-  reduxCallLibraryModalImages,
 } from "../../../redux/redux-actions/adminActions";
 import {
   getFileSize,
@@ -376,10 +374,10 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
-      loadModalImages: reduxCallLibraryModalImages,
+      // loadModalImages: reduxCallLibraryModalImages,
       loadMoreModalImages: reduxCallLibraryModalImages,
       addImageToGalleryList: reduxAddToGalleryImages,
-      addImageToSearchedList: reduxAddToSearchedImages,
+      // addImageToSearchedList: reduxAddToSearchedImages,
     },
     dispatch
   );

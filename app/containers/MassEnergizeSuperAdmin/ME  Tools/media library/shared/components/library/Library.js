@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import ImageThumbnail from "../thumbnail/ImageThumbnail";
 import { blank, DEFAULT_FILE_LIMIT } from "../../utils/values";
-import { ProgressCircleWithLabel } from "../../../../../Gallery/utils";
+import { ProgressCircleWithLabel } from "../../../../../Gallery_depracated/utils";
 
 function Library({
   multiple,

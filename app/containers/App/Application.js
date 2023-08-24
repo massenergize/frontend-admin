@@ -7,7 +7,6 @@ import Dashboard from "../Templates/Dashboard";
 import {
   checkFirebaseAuthentication,
   reduxCallCommunities,
-  reduxCallLibraryModalImages,
   reduxCheckUser,
   reduxFetchInitialContent,
   reduxToggleUniversalModal,
@@ -66,8 +65,6 @@ import {
   AddCarbonEquivalency,
   AllCarbonEquivalencies,
   EditCarbonEquivalency,
-  GalleryPage,
-  AddToGallery,
   AddTask,
   ListTasks,
   Preferences,
@@ -496,12 +493,6 @@ class Application extends React.Component {
               path="/admin/read/all-actions"
               component={SuperAllActions}
             />
-            <Route exact path="/admin/gallery/" component={GalleryPage} />
-            <Route
-              exact
-              path="/admin/gallery/add"
-              component={AddToGallery}
-            />
             <Route exact path="/admin/tasks/add" component={AddTask} />
             <Route exact path="/admin/edit/:id/task" component={AddTask} />
             <Route exact path="/admin/read/tasks" component={ListTasks} />
@@ -531,7 +522,6 @@ function mapDispatchToProps(dispatch) {
     {
       reduxCallCommunities,
       checkUser: reduxCheckUser,
-      loadModalImages: reduxCallLibraryModalImages,
       fetchInitialContent: reduxFetchInitialContent,
       toggleUniversalModal: reduxToggleUniversalModal,
       checkFirebaseAuthentication,

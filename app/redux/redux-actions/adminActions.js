@@ -282,6 +282,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
   const isSuperAdmin = auth && auth.is_super_admin;
   // dispatch(setupSocketConnectionWithBackend(auth)); Deactivated as of 30/06/23 (Will return when the PROD disconnection bug is fixed)
 
+  const galleryQuery = { most_recent: true };
   Promise.all([
     apiCall("/policies.listForCommunityAdmin"),
     apiCall(
@@ -396,12 +397,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
         limit: getLimit(PAGE_PROPERTIES.ALL_TAG_COLLECTS.key),
       }
     ),
-    apiCall("/gallery.search", {
-      most_recent: true,
-      // any_community: true,
-      // filters: ["uploads", "actions", "events", "testimonials"],
-      // target_communities: [],
-    }),
+    apiCall("/gallery.search", galleryQuery),
     isSuperAdmin && apiCall("/tasks.functions.list"),
     isSuperAdmin && apiCall("/tasks.list"),
     apiCall("/preferences.list"),
@@ -445,6 +441,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(reduxLoadCCActions(ccActions.data.actions));
     dispatch(loadAllTags(tagCollections.data));
     dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
+    dispatch(setGalleryMetaAction({ loadMoreMeta: { query: galleryQuery } }));
     dispatch(loadTaskFunctionsAction(tasksFunctions.data));
     dispatch(loadTasksAction(tasks.data));
     dispatch(loadSettings(preferences.data || {}));
@@ -643,37 +640,14 @@ export const reduxLoadImageInfos = ({ oldInfos, newInfo }) => ({
   type: KEEP_LOADED_IMAGE_INFO,
   payload: { ...(oldInfos || {}), [newInfo.id]: newInfo },
 });
-/**
- * Use this function if you just need to add images to the list in "all images page"
- * and nothing more!
- */
-export const reduxAddToSearchedImages = ({ old, data }) => {
-  return {
-    type: LOAD_SEARCHED_IMAGES,
-    payload: { ...old, images: [...(data || []), ...(old.images || [])] },
-  };
-};
+
 
 export const reduxLoadMetaDataAction = (meta) => ({
   type: LOAD_ALL_META_DATA,
   payload: meta,
 });
 
-export const reduxLoadSearchedImages = ({ data, old, append = true }) => {
-  var images;
-  if (append) images = [...((old && old.images) || []), ...data.images];
-  else images = data.images;
-  var upper_limit = data.upper_limit;
-  var lower_limit = data.lower_limit;
-  if (old.upper_limit)
-    upper_limit = Math.max(data.upper_limit || 0, old.upper_limit || 0);
-  if (old.lower_limit)
-    lower_limit = Math.min(data.lower_limit || 0, old.lower_limit || 0);
-  return {
-    type: LOAD_SEARCHED_IMAGES,
-    payload: { images, upper_limit, lower_limit },
-  };
-};
+
 
 function redirectIfExpired(response) {
   if (!response.data && response.error === "session_expired") {
@@ -704,15 +678,6 @@ export const reduxLoadAdminActivities = (data = LOADING) => ({
   payload: data,
 });
 
-export const reduxFetchImages = (community_ids = [], callback) => {
-  apiCall("gallery.fetch", { community_ids })
-    .then((response) => {
-      if (!response.success)
-        console.log("GALLERY_FETCH_ERROR:", response.error);
-      if (callback) callback(response.data || []);
-    })
-    .catch((e) => console.log("GALLERY_FETCH_ERROR:", e.toString()));
-};
 
 export const reduxSignOut = (cb) => (dispatch) => {
   if (firebase) {
@@ -990,80 +955,6 @@ export const reduxLoadLibraryModalData = (props) => {
   };
 };
 
-export const universalFetchFromGallery = (props) => {
-  let {
-    body = {},
-    community_ids,
-    old = {},
-    cb,
-    url = "/gallery.search",
-    reduxFunction = reduxLoadGalleryImages,
-    append,
-  } = props;
-  old = old || {};
-  community_ids = community_ids || [];
-  var requestBody = { target_communities: community_ids, ...body };
-  if (old.upper_limit)
-    requestBody = { ...requestBody, upper_limit: old.upper_limit };
-  if (old.lower_limit)
-    requestBody = { ...requestBody, lower_limit: old.lower_limit };
-
-  return (dispatch) => {
-    apiCall(url, requestBody)
-      .then((response) => {
-        if (cb) cb(response?.data, !response?.success, response?.error);
-        if (!response || !response.success)
-          return console.log(" FETCH ERROR_BE: ", response.error);
-        return dispatch(
-          reduxFunction({
-            data: response.data,
-            old,
-            append,
-          })
-        );
-      })
-      .catch((e) => {
-        if (cb) cb(null, true, e.toString());
-        console.log("FETCH ERROR_SYNT: ", e.toString());
-      });
-  };
-};
-// No longer being used, will be remove soon!
-export const reduxCallLibraryModalImages = (props) => {
-  let { community_ids, old = {}, cb } = props;
-  old = old || {};
-  community_ids = community_ids || [];
-  var requestBody = { community_ids };
-
-  if (old.upper_limit)
-    requestBody = { ...requestBody, upper_limit: old.upper_limit };
-  if (old.lower_limit)
-    requestBody = { ...requestBody, lower_limit: old.lower_limit };
-
-  return (dispatch) => {
-    apiCall("/gallery.fetch", requestBody)
-      .then((response) => {
-        if (cb) cb(response);
-        if (!response || !response.success)
-          return console.log(" FETCH ERROR_BE: ", response.error);
-        const newData = [
-          ...((old && old.images) || []),
-          ...((response.data && response.data.images) || []),
-        ];
-        return dispatch(
-          reduxLoadLibraryModalData({
-            data: { ...response.data, images: newData },
-            old,
-            append: true,
-          })
-        );
-      })
-      .catch((e) => {
-        if (cb) cb(response);
-        console.log("FETCH ERROR_SYNT: ", e.toString());
-      });
-  };
-};
 
 export const reduxCallCommunities = () => (dispatch) => {
   Promise.all([
@@ -1107,16 +998,6 @@ export const reduxCallIdToken = () => (dispatch) => {
     localStorage.setItem("idToken", token.toString());
     dispatch(reduxLoadIdToken(token));
   });
-  // firebase
-  //   .auth()
-  //   .currentUser.getIdToken(true)
-  //   .then((token) => {
-  //     localStorage.setItem("idToken", token.toString());
-  //     dispatch(reduxLoadIdToken(token));
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //   });
 };
 
 export const reduxCallFullCommunity = (id) => (dispatch) => {

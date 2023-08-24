@@ -27,14 +27,11 @@ import { getFileSize } from "../../ME  Tools/media library/shared/utils/utils";
 import SidebarForMediaLibraryModal from "./SidebarForMediaLibraryModal";
 import FilterBarForMediaLibrary from "./FilterBarForMediaLibrary";
 
-const DEFAULT_SCOPE = ["all", "uploads", "actions", "events", "testimonials"];
 export const FormMediaLibraryImplementation = (props) => {
   const {
-    fetchImages,
     auth,
     imagesObject,
     putImagesInRedux,
-    tags,
     selected,
     defaultValue,
     addOnToWhatImagesAreInRedux,
@@ -47,8 +44,6 @@ export const FormMediaLibraryImplementation = (props) => {
     putMetaInRedux,
   } = props;
   const [available, setAvailable] = useState(auth && auth.is_super_admin);
-  // const [selectedTags, setSelectedTags] = useState({ scope: DEFAULT_SCOPE });
-  // const [queryHasChanged, setQueryHasChanged] = useState(false);
   const [userSelectedImages, setUserSelectedImages] = useState([]);
   const [mlibraryFormData, setmlibraryFormData] = useState({});
   const [uploading, setUploading] = useState(false);
@@ -328,7 +323,7 @@ export const FormMediaLibraryImplementation = (props) => {
           >
             <Tooltip
               title="When you load more, the items that are loaded are added to the bottom of the pile (scroll)"
-              placement="top"
+              placement="bottom"
             >
               LOAD MORE
             </Tooltip>
@@ -355,29 +350,6 @@ export const FormMediaLibraryImplementation = (props) => {
             notify={notify}
             fetchWithQuery={fetchWithQuery}
           />
-          // <GalleryFilter
-          //   {...props}
-          //   dropPosition="left"
-          //   style={{
-          //     marginLeft: 10,
-          //     color: "#00BCD4",
-          //     fontWeight: "bold",
-          //   }}
-          //   selections={selectedTags}
-          //   onChange={(items) => {
-          //     setSelectedTags(items);
-          //     setQueryHasChanged(true);
-          //   }}
-          //   scopes={[{ name: "All", value: "all" }, ...filters]}
-          //   tags={tags}
-          //   label={
-          //     <small style={{ marginRight: 7 }}>
-          //       Add filters to tune your search
-          //     </small>
-          //   }
-          //   reset={() => setSelectedTags({})}
-          //   apply={loadMoreImages}
-          // />
         )}
         insertAfterUpload
         useAwait={true}
@@ -459,7 +431,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
-      fetchImages: universalFetchFromGallery,
+      // fetchImages: universalFetchFromGallery,
       fireTestFunction: testRedux,
       putImagesInRedux: reduxLoadGalleryImages,
       addOnToWhatImagesAreInRedux: reduxAddToGalleryImages,
