@@ -149,12 +149,12 @@ export const FilterBarForMediaLibrary = ({
   useEffect(() => {
     const opts = [
       {
-        name: "Most Recent (Default)",
+        name: "Recent (Default)",
         key: FILTERS.MOST_RECENT.key,
         context: "Most recent uploads",
       },
       {
-        name: "My Uploads",
+        name: "Mine",
         key: FILTERS.MY_UPLOADS.key,
         context: "Items uploaded by you",
       },
@@ -164,7 +164,7 @@ export const FilterBarForMediaLibrary = ({
         context: "Keywords that describe the image",
       },
       {
-        name: "From Other Admins",
+        name: "Other Admins",
         key: FILTERS.FROM_OTHER_ADMINS.key,
         context: "See what other admins have uploaded",
       },
@@ -264,7 +264,11 @@ export const FilterBarForMediaLibrary = ({
                     variant="body2"
                     style={{ fontSize: "0.8rem", fontWeight: "bold" }}
                   >
-                    <Tooltip title={option.context} placement="top">
+                    <Tooltip
+                      title={option.context}
+                      placement="top"
+                      style={{ fontWeight: "bold" }}
+                    >
                       {option.name}
                     </Tooltip>
                   </Typography>
@@ -293,8 +297,11 @@ export const FilterBarForMediaLibrary = ({
         </div>
       </div>
       <div style={{ margin: "10px 0px" }}>
-        <Typography variant="h6">IMAGES</Typography>
-        <Typography variant="body2" style={{ opacity: "0.6" }}>
+        <Typography variant="h6">Images</Typography>
+        <Typography
+          variant="body2"
+          style={{ opacity: "0.6", fontWeight: "400" }}
+        >
           Items are arranged by date. The latest items are displayed first,
           moving from left to right in each row. Rows at the top represent more
           recent entries compared to those further down.

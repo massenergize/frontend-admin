@@ -226,6 +226,7 @@ export const FormMediaLibraryImplementation = (props) => {
           append: true,
           prepend: true,
         });
+        changeTabTo(MediaLibrary.Tabs.LIBRARY_TAB);
         insertSelectedImages(images, response);
         // reset();
         // changeTabTo(MediaLibrary.Tabs.LIBRARY_TAB);
@@ -266,7 +267,14 @@ export const FormMediaLibraryImplementation = (props) => {
     doUpload(train);
   };
   const liveFormValidation = () => {
-    const { copyright, copyright_att } = mlibraryFormData || {};
+    const { copyright, copyright_att, community_ids } = mlibraryFormData || {};
+
+    if (!community_ids || !community_ids?.length)
+      return {
+        invalid: true,
+        message:
+          "Please indicate the communities that should see the item(s) you are about to upload",
+      };
     if (!copyright && !copyright_att)
       return {
         invalid: true,
@@ -324,6 +332,7 @@ export const FormMediaLibraryImplementation = (props) => {
             <Tooltip
               title="When you load more, the items that are loaded are added to the bottom of the pile (scroll)"
               placement="bottom"
+              style={{ fontWeight: "bold" }}
             >
               LOAD MORE
             </Tooltip>
@@ -401,7 +410,11 @@ export const FormMediaLibraryImplementation = (props) => {
                   uploadAndSaveForm(props);
                 }}
               >
-                <Tooltip title={validation?.message} placement="top">
+                <Tooltip
+                  title={validation?.message}
+                  placement="top"
+                  style={{ fontWeight: "bold" }}
+                >
                   {/* {uploading ? "UPLOADING..." : "UPLOAD & INSERT"} */}
                   {buttonText()}
                 </Tooltip>
@@ -454,8 +467,9 @@ const UploadIntroductionComponent = ({ auth, setAvailableTo, available }) => {
     auth && auth.is_community_admin && !auth.is_super_admin;
 
   return (
-    <div>
-      <Typography variant="body">
+    <div style={{ marginTop: -40 }}>
+      <Typography variant="h6">Hi {auth?.preferred_name || "..."},</Typography>
+      <Typography variant="body2">
         After selecting items, click <b>"Continue"</b>. You will be asked to
         provide a few details about your items before uploading
       </Typography>

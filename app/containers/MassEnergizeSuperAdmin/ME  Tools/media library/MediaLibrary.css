@@ -96,6 +96,7 @@
 .m-tab-header-item p {
   justify-items: center;
   margin: 0px !important;
+  font-weight: bold;
 }
 .m-tab-header-item {
   padding: 8px 15px;

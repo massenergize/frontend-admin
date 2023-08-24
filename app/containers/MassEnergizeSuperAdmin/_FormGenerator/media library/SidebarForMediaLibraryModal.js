@@ -115,6 +115,7 @@ export const SidebarForMediaLibraryModal = ({
         imageInfo={imageInfo}
         setImageInfo={setImageInfo}
         isSuperAdmin={isSuperAdmin}
+        auth={auth}
       />
     </>
   );
@@ -146,6 +147,7 @@ export default connect(
 
 // --------------------------------------------------------
 const ShowMoreInformationAboutImage = ({
+  auth,
   image,
   imageInfos,
   putImageInfoInRedux,

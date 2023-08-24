@@ -356,7 +356,7 @@ const ContextButton = ({
     if (!TooltipWrapper) return <span>{text}</span>;
     return (
       <TooltipWrapper title={tooltipMessage || ""} placement="top">
-        <span>{text}</span>
+        <span style={{ fontWeight: "bold" }}>{text}</span>
       </TooltipWrapper>
     );
   };

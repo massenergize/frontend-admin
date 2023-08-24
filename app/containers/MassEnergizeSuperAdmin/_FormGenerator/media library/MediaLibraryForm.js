@@ -107,11 +107,21 @@ const MediaLibraryForm = ({
         </Typography>
       ) : (
         <Typography variant="body2">
-          Before you upload, there a few details you need to provide. Please
-          note that the items marked (*) are compulsory.
+          Before you upload, there a few details you need to provide.
+          <ul style={{ margin: "5px 0px" }}>
+            <li>
+              {" "}
+              Please note that the items marked <b>(*)</b> are compulsory.
+            </li>
+            <li>
+              Whenever the <b>"Upload & Insert"</b> button is disabled, hover
+              your mouse over it. It will tell you what you are missing!
+            </li>
+          </ul>
+          <br />
         </Typography>
       )}
-      <div style={{ padding: "20px 0px" }}>
+      <div style={{ padding: 0 }}>
         {/* <Typography variant="body2">Name of the uploader</Typography> */}
         <TextField
           style={{ width: "100%" }}
@@ -131,7 +141,7 @@ const MediaLibraryForm = ({
           labelExtractor={(item) => item?.name}
           valueExtractor={(item) => item?.id}
           data={getCommunitiesToSelectFrom()}
-          placeholder="Which communities would you like this item to be available to?"
+          placeholder="Which communities would you like this item to be available to? *"
         />
 
         <div
