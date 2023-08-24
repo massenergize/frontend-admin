@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Button, CircularProgress, Paper, Typography } from "@mui/material";
-import MediaLibrary from "./../ME  Tools/media library/MediaLibrary";
+import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import "./anime.css";
 import { ProgressCircleWithLabel } from "./utils";
 import { Link, withRouter } from "react-router-dom";

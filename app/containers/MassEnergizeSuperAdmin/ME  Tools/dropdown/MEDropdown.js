@@ -7,7 +7,7 @@ import {
 import { Chip, FormControl, FormLabel, Select } from "@mui/material";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { pop } from "../../../../utils/common";
-import LightAutoComplete from "../../Gallery_depracated/tools/LightAutoComplete";
+import LightAutoComplete from "../../Gallery/tools/LightAutoComplete";
 import MEDropdownPro from "./MEDropdownPro";
 import { apiCall } from "../../../../utils/messenger";
 function MEDropdown(props) {

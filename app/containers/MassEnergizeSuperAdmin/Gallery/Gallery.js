@@ -73,7 +73,6 @@ export const getMoreInfoOnImage = ({
         updateStateWith(null);
         return console.log("IMAGE INFO REQ BE: ", response.error);
       }
-      // console.log("A DON FIND AM ", response.data)
       updateStateWith(response.data);
       updateReduxWith({
         oldInfos: imageInfos,

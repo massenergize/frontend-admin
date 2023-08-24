@@ -12,6 +12,7 @@ import { deleteImage, getMoreInfoOnImage } from "../../Gallery/Gallery";
 import { DeleteVerificationBox, ImageInfoArea } from "../../Gallery/SideSheet";
 import { Link } from "react-router-dom";
 
+
 export const SidebarForMediaLibraryModal = ({
   auth,
   imageInfos,

@@ -11,17 +11,10 @@ import {
   setGalleryMetaAction,
   setImageForEditAction,
   testRedux,
-  universalFetchFromGallery,
 } from "../../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../../utils/messenger";
-import { Checkbox, FormControlLabel, Typography, Tooltip } from "@mui/material";
+import { Typography, Tooltip } from "@mui/material";
 import { makeLimitsFromImageArray } from "../../../../utils/common";
-import { ProgressCircleWithLabel } from "../../Gallery/utils";
-import { getMoreInfoOnImage } from "../../Gallery/Gallery";
-//import { Link } from "react-router-dom";
-import GalleryFilter from "../../Gallery/tools/GalleryFilter";
-import { filters } from "../../Gallery/Gallery";
-import { ShowTagsOnPane, ImageInfoArea } from "../../Gallery/SideSheet";
 import MediaLibraryForm from "./MediaLibraryForm";
 import { getFileSize } from "../../ME  Tools/media library/shared/utils/utils";
 import SidebarForMediaLibraryModal from "./SidebarForMediaLibraryModal";

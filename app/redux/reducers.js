@@ -66,11 +66,6 @@ import app, {
   reducerForLoadingOtherAdmins,
   mlibFiltersReducer,
   setGalleryMetadataReducer,
-  reducerForEmailTemplates,
-  // reducerForEmailTemplates,
-  setImageForEditReducer,
-  reducerForLoadingOtherAdmins,
-  mlibFiltersReducer,
 } from "./modules/appReducer";
 
 /**
