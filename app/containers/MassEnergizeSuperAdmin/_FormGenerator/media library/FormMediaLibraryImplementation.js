@@ -80,14 +80,12 @@ export const FormMediaLibraryImplementation = (props) => {
 
   const useIdsToFindObjs = (ids) => {
     const images = imagesObject.images;
-
     if (!ids.length) return;
     var bank = (images || []).map((img) => img.id);
     // sometimes an image that is preselected, may not be in the library's first load
     // in that case just add it to the library's list
-    var isNotThere = selected.filter((img) => !bank.includes(img));
+    var isNotThere = ids.filter((img) => !bank.includes(img));
     const alreadyAvailableHere = images.filter((img) => ids.includes(img.id)); // Needed because there is a chance that some might be available in the list, but not all
-
     if (isNotThere?.length)
       // only run this if some items are not found in the already loaded redux content
       return fetchNeededImages(ids, (fromBackend) => {
@@ -95,7 +93,6 @@ export const FormMediaLibraryImplementation = (props) => {
         addOnToWhatImagesAreInRedux({ old: imagesObject, data: fromBackend });
         setUserSelectedImages(together);
       });
-
     if (alreadyAvailableHere.length)
       //all items were found here, so we move without any B.E requests
       setUserSelectedImages(alreadyAvailableHere);
@@ -116,10 +113,7 @@ export const FormMediaLibraryImplementation = (props) => {
     const justResetting = preselected[0] === "reset";
     if (theyAreImageObjects) {
       preselected = preselected.map((img) => img.id);
-      // addOnToWhatImagesAreInRedux({ old: imagesObject, data: preselected });
-      // return setUserSelectedImages(preselected);
     }
-    // if (!justResetting) setUserSelectedImages(preselected);
     if (!justResetting) useIdsToFindObjs(preselected);
   }, [selected, defaultValue]);
 

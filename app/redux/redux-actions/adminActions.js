@@ -189,7 +189,6 @@ export const reduxLoadOtherAdmins = (data) => {
   return { type: LOAD_OTHER_ADMINS, payload: data };
 };
 export const fetchOtherAdminsInMyCommunities = (body, cb) => (dispatch) => {
-  console.log("You don enter here? ", body);
   apiCall("/communities.adminsOf", body).then((response) => {
     cb && cb(response.data, !response.success, response.error);
     if (!response.success)
@@ -641,13 +640,10 @@ export const reduxLoadImageInfos = ({ oldInfos, newInfo }) => ({
   payload: { ...(oldInfos || {}), [newInfo.id]: newInfo },
 });
 
-
 export const reduxLoadMetaDataAction = (meta) => ({
   type: LOAD_ALL_META_DATA,
   payload: meta,
 });
-
-
 
 function redirectIfExpired(response) {
   if (!response.data && response.error === "session_expired") {
@@ -677,7 +673,6 @@ export const reduxLoadAdminActivities = (data = LOADING) => ({
   type: LOAD_ADMIN_ACTIVITIES,
   payload: data,
 });
-
 
 export const reduxSignOut = (cb) => (dispatch) => {
   if (firebase) {
@@ -954,7 +949,6 @@ export const reduxLoadLibraryModalData = (props) => {
     payload,
   };
 };
-
 
 export const reduxCallCommunities = () => (dispatch) => {
   Promise.all([
