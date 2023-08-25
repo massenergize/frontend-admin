@@ -11,7 +11,10 @@ export default function CustomOptions({ data , label, endpoint, customBodyRender
      customFilterListOptions: customFilterListOptions,
      filterOptions: {
        logic: (location, filters, row) => {
-         if (filters.length) return !filters.includes(location);
+        if(typeof(location)=== "string"){
+          if (filters.length) return !filters?.includes(location);
+        }
+         if (filters?.length) return !filters?.some((item) => location?.includes(item));
          return false;
        },
        display: (filterList, onChange, index, column) => {
