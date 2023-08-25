@@ -10,6 +10,8 @@ export default function CustomOptions({ data , label, endpoint}) {
      customFilterListOptions: customFilterListOptions,
      filterOptions: {
        logic: (location, filters, row) => {
+        console.log("=== location ===", location);
+        console.log("=== filters ===", filters);
          if (filters.length) return !filters.includes(location);
          return false;
        },
