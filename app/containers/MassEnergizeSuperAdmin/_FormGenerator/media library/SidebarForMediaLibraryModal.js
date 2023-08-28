@@ -58,8 +58,6 @@ export const SidebarForMediaLibraryModal = ({
     };
   };
 
-  console.log("IMAGE INFO", imageData());
-
   const { created_at } = imageInfo || {};
 
   const communityString = () => {
@@ -83,7 +81,7 @@ export const SidebarForMediaLibraryModal = ({
       <InfoBox title="Details" hidden={!uploader} outlined>
         <Typography
           variant="body2"
-          style={{ marginBottom: 5, color: "dimgrey", fontWeight: "400" }}
+          style={{ marginBottom: 5, fontWeight: "400" }}
         >
           Uploaded by{" "}
           <b color="primary" style={{ color: "rgb(156, 39, 176)" }}>
@@ -117,7 +115,7 @@ export const SidebarForMediaLibraryModal = ({
           </>
         )}
       </InfoBox>
-      <InfoBox title="Take Action" color="#363738" hidden={!userCanDelete}>
+      <InfoBox title="Take Action" hidden={!userCanDelete}>
         <>
           <Link
             to="#"
@@ -158,27 +156,17 @@ export const SidebarForMediaLibraryModal = ({
         </>
       </InfoBox>
 
-      <InfoBox
-        color="#363738"
-        title="Available to"
-        outlined
-        hidden={!availableTo}
-      >
+      <InfoBox title="Available to" outlined hidden={!availableTo}>
         <Typography variant="body2">{availableTo}</Typography>
       </InfoBox>
 
-      <InfoBox
-        color="#363738"
-        title="Related Keywords"
-        outlined
-        hidden={!tags?.length}
-      >
+      <InfoBox title="Related Keywords" outlined hidden={!tags?.length}>
         <Typography variant="body2">
           {(tags || []).map((tag) => tag.name).join(", ")}
         </Typography>{" "}
       </InfoBox>
 
-      <InfoBox color="#363738" title="Copyright Information" hidden={false}>
+      <InfoBox title="Copyright Information" hidden={false}>
         <>
           {!has_copyright_permission ? (
             <Typography variant="body2">Not provided...</Typography>
@@ -333,7 +321,8 @@ const InfoBox = ({
   outlined = false,
 }) => {
   if (hidden) return <></>;
-  color = color || "var(--app-purple)";
+  // color = color || "var(--app-purple)";
+  color = color || "#363738";
   const _default = {
     background: color,
     padding: "6px 15px",
