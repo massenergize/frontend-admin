@@ -432,7 +432,7 @@ class AllEvents extends React.Component {
   }
 
   nowDelete({ idsToDelete, data }) {
-    const { allEvents, putEventsInRedux } = this.props;
+    const { allEvents, putEventsInRedux, putMetaDataToRedux, meta } = this.props;
     const itemsInRedux = allEvents;
     const ids = [];
     idsToDelete.forEach((d) => {
@@ -440,6 +440,13 @@ class AllEvents extends React.Component {
       ids.push(found);
       apiCall("/events.delete", { event_id: found }).then((response) => {
         if (response.success) {
+          putMetaDataToRedux({
+            ...meta,
+            ["events"]: {
+              ...meta["events"],
+              count: meta["events"].count - 1,
+            },
+          });
           this.props.toggleToast({
             open: true,
             message: "Event(s) successfully deleted",
