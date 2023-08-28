@@ -384,6 +384,7 @@ const createFormJson = ({
         selected: [],
         label: "Upload a logo for this Vendor",
         isRequired: false,
+        openState: true, // REMOVE BEFOR PR (BPR)
       },
       {
         name: "is_verified",

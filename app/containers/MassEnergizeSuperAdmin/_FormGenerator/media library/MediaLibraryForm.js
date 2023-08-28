@@ -92,7 +92,7 @@ const MediaLibraryForm = ({
     <div style={{ padding: "25px 50px" }}>
       <Typography variant="h6">Hi {auth?.preferred_name || "..."},</Typography>
       {isInEditMode ? (
-        <Typography variant="body2" style={{marginBottom:20}}>
+        <Typography variant="body2" style={{ marginBottom: 20 }}>
           <span>You are currently editing the details of</span>
           <Link
             to="#"
@@ -156,17 +156,19 @@ const MediaLibraryForm = ({
           <Typography variant="h6">Copyright </Typography>
           <div style={{ marginTop: 10 }}>
             <Typography variant="body2">
-              Do you have permission to use the selected items? As per the
+              Do you have permission to use the selected item(s) - written
+              permission from the person whose it is, or is the item under
+              copyright license that allows it to be used in this circumstance?
+              As per the
               <Link
                 href="/admin/view/policy/mou"
                 target="_blank"
                 style={{ marginLeft: 4 }}
               >
-                <b>MassEnergize MOU</b>
+                <b>Admin MOU</b>
               </Link>
               , you are required to have permission before uploading other
-              people's content. If No, please provide information about the
-              owner of this item's copyright in the box that will be provided.
+              people's content. Please tick "Yes" that you do.
             </Typography>
             <RadioGroup
               value={copyright}
@@ -187,10 +189,10 @@ const MediaLibraryForm = ({
                 label="No"
               />
             </RadioGroup>
-            {doesNotHaveCopyrightPermission && (
+            {!doesNotHaveCopyrightPermission && (
               <TextField
                 style={{ width: "100%", marginTop: 10 }}
-                label="Who should this item be attributed to? (40 chars) *"
+                label="If this item needs to be attributed, please type in the name of the owner of the copyright (40 chars)"
                 InputLabelProps={{
                   shrink: true,
                 }}

@@ -453,7 +453,7 @@ const Footer = (props) => {
         </>
       )}
       <div style={{ marginLeft: "auto" }}>
-        <MLButton backColor="maroon" btnColor="white" onClick={cancel}>
+        <MLButton backColor="#d31919" btnColor="white" onClick={cancel}>
           CANCEL
         </MLButton>
         <ContextButton {...props} />

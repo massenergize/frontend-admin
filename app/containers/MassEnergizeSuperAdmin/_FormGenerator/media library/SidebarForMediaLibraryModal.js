@@ -11,7 +11,7 @@ import { ProgressCircleWithLabel } from "../../Gallery/utils";
 import { deleteImage, getMoreInfoOnImage } from "../../Gallery/Gallery";
 import { DeleteVerificationBox, ImageInfoArea } from "../../Gallery/SideSheet";
 import { Link } from "react-router-dom";
-
+import { getHumanFriendlyDate } from "../../../../utils/common";
 
 export const SidebarForMediaLibraryModal = ({
   auth,
@@ -22,7 +22,7 @@ export const SidebarForMediaLibraryModal = ({
   imagesObject,
   putImagesInRedux,
   putImageInReduxForEdit,
-  changeTabTo, 
+  changeTabTo,
 }) => {
   const [imageInfo, setImageInfo] = useState("loading");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -44,16 +44,80 @@ export const SidebarForMediaLibraryModal = ({
   const tags = imageInfo?.tags;
   const userCanDelete = isSuperAdmin || uploader?.id === auth?.id;
 
+  const imageData = () => {
+    const { information } = imageInfo || {};
+    const info = information?.info || {};
+
+    return {
+      ...imageInfo,
+      ...(information || {}),
+      id: imageInfo?.id,
+      user_upload_id: information?.id,
+      uploader: information?.user,
+      ...info,
+    };
+  };
+
+  console.log("IMAGE INFO", imageData());
+
+  const { created_at } = imageInfo || {};
+
+  const communityString = () => {
+    const { communities } = informationAboutImage;
+    return (communities || []).map((c) => c.name).join(" ,");
+  };
+
+  const availableTo = communityString();
+
+  const {
+    size_text,
+    description,
+    has_copyright_permission,
+    copyright_att,
+    has_children,
+    guardian_info,
+  } = imageData();
+
   return (
     <>
-      <Typography variant="body2" style={{ marginBottom: 5 }}>
-        Uploaded by{" "}
-        <b color="primary" style={{ color: "rgb(156, 39, 176)" }}>
-          {(uploader && uploader.full_name) || "..."}
-        </b>
-      </Typography>
-
-      {userCanDelete && (
+      <InfoBox title="Details" hidden={!uploader} outlined>
+        <Typography
+          variant="body2"
+          style={{ marginBottom: 5, color: "dimgrey", fontWeight: "400" }}
+        >
+          Uploaded by{" "}
+          <b color="primary" style={{ color: "rgb(156, 39, 176)" }}>
+            {(uploader && uploader.full_name) || "..."}
+          </b>{" "}
+          on {getHumanFriendlyDate(created_at, true, false)}
+        </Typography>
+        {size_text && (
+          <Typography
+            variant="h6"
+            style={{
+              marginBottom: 6,
+              fontSize: "0.875rem",
+              fontWeight: "bold",
+            }}
+          >
+            Size: {size_text}
+          </Typography>
+        )}
+        {description && (
+          <>
+            <Typography variant="body2" style={{ textDecoration: "underline" }}>
+              <b>Description</b>
+            </Typography>
+            <Typography
+              variant="body2"
+              style={{ fontWeight: "400", marginBottom: 10 }}
+            >
+              {description}
+            </Typography>
+          </>
+        )}
+      </InfoBox>
+      <InfoBox title="Take Action" color="#363738" hidden={!userCanDelete}>
         <>
           <Link
             to="#"
@@ -92,23 +156,92 @@ export const SidebarForMediaLibraryModal = ({
             }}
           />
         </>
-      )}
-      {tags?.length ? (
-        <div
-          style={{
-            padding: "15px 0px",
-          }}
-        >
-          <Typography variant="body2" style={{ textDecoration: "underline" }}>
-            <b>Related Tags</b>
+      </InfoBox>
+
+      <InfoBox
+        color="#363738"
+        title="Available to"
+        outlined
+        hidden={!availableTo}
+      >
+        <Typography variant="body2">{availableTo}</Typography>
+      </InfoBox>
+
+      <InfoBox
+        color="#363738"
+        title="Related Keywords"
+        outlined
+        hidden={!tags?.length}
+      >
+        <Typography variant="body2">
+          {(tags || []).map((tag) => tag.name).join(", ")}
+        </Typography>{" "}
+      </InfoBox>
+
+      <InfoBox color="#363738" title="Copyright Information" hidden={false}>
+        <>
+          {!has_copyright_permission ? (
+            <Typography variant="body2">Not provided...</Typography>
+          ) : (
+            <>
+              <Typography variant="body2">
+                <b>{uploader?.preferred_name}</b> has permission to upload this
+                image
+              </Typography>
+              {copyright_att ? (
+                <Typography variant="body2">
+                  Image rights belong to <b>{copyright_att}</b>
+                </Typography>
+              ) : (
+                <></>
+              )}
+            </>
+          )}
+        </>
+      </InfoBox>
+      <InfoBox
+        title="Underage Information"
+        color={has_children ? "#d31919" : "green"}
+        hidden={false}
+      >
+        <>
+          <Typography
+            variant="body2"
+            style={{
+              textDecoration: "none",
+              fontWeight: "500",
+              color: has_children ? "#d31919" : "#389a38",
+            }}
+          >
+            <i className="fa fa-child" style={{ marginRight: 6 }} />
+            <span>
+              <b>
+                {" "}
+                {has_children
+                  ? "Shows kids under 13"
+                  : "No kids under 13 shown"}
+              </b>
+            </span>
           </Typography>
-          <Typography variant="body2">
-            {(tags || []).map((tag) => tag.name).join(", ")}
-          </Typography>{" "}
-        </div>
-      ) : (
-        <></>
-      )}
+          {guardian_info && (
+            <div>
+              <Typography
+                variant="body2"
+                style={{
+                  textDecoration: "underline",
+                  marginTop: 6,
+                }}
+              >
+                <span style={{ fontWeight: "500" }}>Guardian Information</span>
+              </Typography>
+              <Typography style={{ fontWeight: "400" }} variant="body2">
+                {guardian_info}
+              </Typography>
+            </div>
+          )}
+        </>
+      </InfoBox>
+
       <ShowMoreInformationAboutImage
         imageInfos={imageInfos}
         image={image}
@@ -126,7 +259,7 @@ const mapStateToProps = (state) => {
   return {
     imageInfos: state.getIn(["imageInfos"]),
     auth: state.getIn(["auth"]),
-    imagesObject: state.getIn(["galleryImages"])
+    imagesObject: state.getIn(["galleryImages"]),
   };
 };
 
@@ -147,15 +280,7 @@ export default connect(
 )(SidebarForMediaLibraryModal);
 
 // --------------------------------------------------------
-const ShowMoreInformationAboutImage = ({
-  auth,
-  image,
-  imageInfos,
-  putImageInfoInRedux,
-  imageInfo,
-  setImageInfo,
-  isSuperAdmin,
-}) => {
+const ShowMoreInformationAboutImage = ({ auth, imageInfo, isSuperAdmin }) => {
   if (imageInfo === "loading") return <ProgressCircleWithLabel />;
   if (!imageInfo) return <></>;
   var informationAboutImage = (imageInfo && imageInfo.information) || {};
@@ -163,8 +288,6 @@ const ShowMoreInformationAboutImage = ({
   informationAboutImage = informationAboutImage.info || {};
   const guardian_info = informationAboutImage?.guardian_info;
   const {
-    size_text,
-    description,
     has_children,
     has_copyright_permission,
     copyright_att,
@@ -177,93 +300,6 @@ const ShowMoreInformationAboutImage = ({
 
   return (
     <>
-      {(size_text || description || uploader) && (
-        <div style={{ marginBottom: 5 }}>
-          {size_text && (
-            <Typography
-              variant="h6"
-              style={{
-                marginBottom: 6,
-                fontSize: "0.875rem",
-                fontWeight: "bold",
-              }}
-            >
-              Size: {size_text}
-            </Typography>
-          )}
-          {description && (
-            <>
-              <Typography
-                variant="body2"
-                style={{ textDecoration: "underline" }}
-              >
-                <b>Description</b>
-              </Typography>
-              <Typography
-                variant="body2"
-                style={{ fontWeight: "400", marginBottom: 10 }}
-              >
-                {description}
-              </Typography>
-            </>
-          )}
-        </div>
-      )}
-
-      <div
-        style={{
-          width: "100%",
-          //   background: "#faebd74d",
-          background: "rgb(232 232 232 / 30%)",
-          border: "2px solid #e9e9e9",
-          padding: 10,
-          borderRadius: 4,
-        }}
-      >
-        <Typography
-          variant="body2"
-          style={{ textDecoration: "none", fontWeight: "bold" }}
-        >
-          <i className="fa fa-copyright" />
-          <span>opyright Information</span>
-        </Typography>
-        {!has_copyright_permission && !copyright_att ? (
-          <Typography variant="caption">Not provided...</Typography>
-        ) : (
-          <Typography variant="caption">
-            Image rights belong to <b>{permBelongsTo}</b>
-          </Typography>
-        )}
-
-        <Typography
-          variant="body2"
-          style={{
-            textDecoration: "none",
-            fontWeight: "bold",
-            // color: "#389a38",
-            color: has_children ? "rgb(199 102 102)" : "#389a38",
-          }}
-        >
-          <i className="fa fa-child" style={{ marginRight: 6 }} />
-          <span>
-            {has_children ? "Shows kids under 13" : "No kids under 13 shown"}
-          </span>
-        </Typography>
-        {guardian_info && (
-          <div>
-            <Typography
-              variant="body2"
-              style={{
-                textDecoration: "none",
-                fontWeight: "bold",
-              }}
-            >
-              <span>Guardian Information</span>
-            </Typography>
-            <Typography variant="caption">{guardian_info}</Typography>
-          </div>
-        )}
-      </div>
       <div>
         <br />
         <Typography
@@ -286,5 +322,46 @@ const ShowMoreInformationAboutImage = ({
         })}
       </div>
     </>
+  );
+};
+
+const InfoBox = ({
+  title,
+  children,
+  color,
+  hidden = false,
+  outlined = false,
+}) => {
+  if (hidden) return <></>;
+  color = color || "var(--app-purple)";
+  const _default = {
+    background: color,
+    padding: "6px 15px",
+    borderRadius: 3,
+    color: "white",
+    fontWeight: "500",
+  };
+
+  const outlineStyle = {
+    border: `solid 2px ${color}`,
+    background: "white",
+    color,
+  };
+
+  const theme = outlined ? outlineStyle : {};
+  return (
+    <div
+      style={{
+        marginBottom: 10,
+        background: "#FCFCFC",
+        marginTop: 6,
+      }}
+    >
+      <Typography variant="body2" style={{ ..._default, ...theme }}>
+        {title}
+      </Typography>
+
+      <div style={{ padding: 10 }}>{children}</div>
+    </div>
   );
 };

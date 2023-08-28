@@ -262,11 +262,13 @@ export const FormMediaLibraryImplementation = (props) => {
         message:
           "Please indicate the communities that should see the item(s) you are about to upload",
       };
-    if (!copyright && !copyright_att)
+
+    const doesNotHaveCopyrightPermission = !copyright || copyright === "No";
+    if (doesNotHaveCopyrightPermission)
       return {
         invalid: true,
         message:
-          "Please indicate who owns the item(s) if you dont have permission to use",
+          "Copyright: Please make sure you have permission to upload the item(s) you have selected",
       };
     return {
       invalid: false,
