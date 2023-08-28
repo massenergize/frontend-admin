@@ -108,7 +108,7 @@ export const FilterBarForMediaLibrary = ({
     if (isCommunityAdmin) return auth?.admin_at;
     return communities || [];
   };
-  // console.log("OTHER ADMINS", otherAdmins);
+
   useEffect(() => {
     if (!otherAdminsFromRedux) return;
     const values = Object.values(otherAdminsFromRedux);
@@ -236,6 +236,7 @@ export const FilterBarForMediaLibrary = ({
             onItemSelected={(items) => buildQuery(currentFilter, items)}
             value={getValue(currentFilter, [])}
             // name="by_community"
+            smartDropdown={false}
             multiple
             allowClearAndSelectAll
             labelExtractor={(item) => item?.name}
@@ -253,6 +254,7 @@ export const FilterBarForMediaLibrary = ({
             onItemSelected={(items) => buildQuery(currentFilter, items)}
             value={getValue(currentFilter, [])}
             // name="from_others"
+            smartDropdown={false}
             labelExtractor={(item) => item?.full_name}
             valueExtractor={(item) => item?.id}
             multiple

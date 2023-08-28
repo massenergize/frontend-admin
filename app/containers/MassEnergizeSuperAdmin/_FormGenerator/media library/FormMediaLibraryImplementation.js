@@ -456,7 +456,7 @@ const UploadIntroductionComponent = ({ auth, setAvailableTo, available }) => {
     auth && auth.is_community_admin && !auth.is_super_admin;
 
   return (
-    <div style={{ marginTop: -40 }}>
+    <div style={{ marginTop: -40, marginLeft: 27, width: "100%" }}>
       <Typography variant="h6">Hi {auth?.preferred_name || "..."},</Typography>
       <Typography variant="body2">
         After selecting items, click <b>"Continue"</b>. You will be asked to

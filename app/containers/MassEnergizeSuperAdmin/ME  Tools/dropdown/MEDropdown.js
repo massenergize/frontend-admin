@@ -25,6 +25,7 @@ function MEDropdown(props) {
     fullControl = false,
     name,
     allowClearAndSelectAll,
+    smartDropdown = true,
     ...rest
   } = props;
   const [selected, setSelected] = useState([]);
@@ -88,7 +89,7 @@ function MEDropdown(props) {
   );
   // -------------------------------------------------------------------
   // Always switch dropdown to auto complete dropdown if there are a lot of items. A lot = (>20 items)
-  if (optionsToDisplay && optionsToDisplay.length > 20) {
+  if (smartDropdown && optionsToDisplay && optionsToDisplay.length > 20) {
     return (
       <LightAutoComplete
         onChange={(items) => {

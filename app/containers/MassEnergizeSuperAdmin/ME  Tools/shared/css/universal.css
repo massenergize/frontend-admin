@@ -13,6 +13,14 @@ div {
   font-weight: 400;
 }
 
+.fa,
+.fas {
+  font-family: "Font Awesome 5 Pro" !important;
+}
+
+.material-icons {
+  font-family: "Material Icons" !important;
+}
 th {
   font-family: "Google Sans", sans-serif !important;
 }
