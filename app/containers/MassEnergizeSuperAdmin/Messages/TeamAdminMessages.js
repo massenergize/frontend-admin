@@ -236,7 +236,7 @@ class AllTeamAdminMessages extends React.Component {
 }
 
   nowDelete({ idsToDelete, data }) {
-    const { teamMessages, putTeamMessagesInRedux } = this.props;
+    const { teamMessages, putTeamMessagesInRedux, meta,putMetaDataToRedux } = this.props;
     const itemsInRedux = teamMessages && teamMessages;
     const ids = [];
     idsToDelete.forEach((d) => {
@@ -244,6 +244,13 @@ class AllTeamAdminMessages extends React.Component {
       ids.push(found);
       apiCall("/messages.delete", { message_id: found }).then((response) => {
         if (response.success) {
+          putMetaDataToRedux({
+            ...meta,
+            ["teamMessages"]: {
+              ...meta["teamMessages"],
+              count: meta["teamMessages"].count - 1,
+            },
+          });
           this.props.toggleToast({
             open: true,
             message: "Team Message(s) successfully deleted",
