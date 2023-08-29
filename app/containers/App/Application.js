@@ -76,7 +76,6 @@ import {
   TermsOfServicePage,
   PrivacyPolicyPage,
   ActionUsers,
-  EmailTemplates,
 } from "../pageListAsync";
 import EditVendor from "../MassEnergizeSuperAdmin/Vendors/EditVendor";
 import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
