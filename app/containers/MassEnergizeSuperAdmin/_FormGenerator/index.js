@@ -1027,9 +1027,9 @@ class MassEnergizeForm extends Component {
                 borderWidth: "thin",
               }}
             >
-              <div style={{ padding: 20, color: "#d28818" }}>
+              <div style={{ padding: 20 }}>
                 <Typography>{field.label}</Typography>
-                <small>
+                {/* <small>
                   <b>PLEASE NOTE:</b> the wide spacing between two lines
                   in the editor, is not what you will get when you
                   content gets to users.
@@ -1045,7 +1045,7 @@ class MassEnergizeForm extends Component {
                     Pressing Once, will only show items right on the
                     next line, without any gap
                   </b>
-                </small>
+                </small> */}
               </div>
               {/* <Editor
                 editorState={this.getValue(field.name, EditorState.createEmpty())}
@@ -1068,9 +1068,8 @@ class MassEnergizeForm extends Component {
                   height: 350,
                   menubar: false,
                   default_link_target: "_blank",
-                  force_br_newlines: true,
-                  force_p_newlines: false,
-                  forced_root_block: "", // Needed for 3.x
+                  forced_root_blocks: true,
+                  forced_root_block: false,
                   // next 4 lines test to eliminate tiny cloud errors
                   // selector: "textarea",
                   // init_instance_callback: function(editor) {
