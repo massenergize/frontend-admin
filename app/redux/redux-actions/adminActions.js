@@ -52,7 +52,6 @@ import {
   LOAD_TABLE_FILTERS,
   LOAD_VISIT_LOGS,
   LOAD_USER_ACTIVE_STATUS,
-  LOAD_EMAIL_TEMPLATES,
   SET_IMAGE_FOR_EDIT,
   LOAD_OTHER_ADMINS,
   SET_MEDIA_LIBRARY_MODAL_FILTERS,
@@ -445,7 +444,6 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadFeatureFlags(featureFlags.data || {}));
     dispatch(reduxLoadAllOtherCommunities(otherCommunities.data));
     dispatch(reduxLoadNextStepsSummary(adminNextSteps.data));
-    // dispatch(loadEmailTemplates(emailTemplates.data));
     const cursor = {
       communities: communities.cursor,
       actions: actions.cursor,
@@ -491,10 +489,6 @@ export const loadFeatureFlags = (data = LOADING) => ({
   type: LOAD_FEATURE_FLAGS,
   payload: data,
 });
-// export const loadEmailTemplates = (data = LOADING) => ({
-//          type: LOAD_EMAIL_TEMPLATES,
-//          payload: data,
-//        });
 export const reduxToggleUniversalModal = (data = {}) => ({
   type: TOGGLE_UNIVERSAL_MODAL,
   payload: data,
