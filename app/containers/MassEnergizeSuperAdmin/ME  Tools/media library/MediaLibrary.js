@@ -25,6 +25,7 @@ function MediaLibrary(props) {
     defaultTab,
     dragToOrder,
     floatingMode,
+    passedNotification,
   } = props;
   const [show, setShow] = useState(false);
   const [imageTray, setTrayImages] = useState([]);
@@ -35,6 +36,8 @@ function MediaLibrary(props) {
   const [currentTab, setCurrentTab] = useState(defaultTab);
   const [files, setFiles] = useState([]); // all files that have been selected from user's device [Schema: {id, file}]
   const [croppedSource, setCroppedSource] = useState();
+  const [notification, setNotification] = useState(null); // just used to communicate when the mlib is working on something(that isnt the typical 'loading' state), and the user needs to be updated
+
   // --------------------------------------------------
   const oldPosition = useRef(null);
   const newPosition = useRef(null);
@@ -81,34 +84,22 @@ function MediaLibrary(props) {
     onStateChange({ show, state });
   }, [show, state]);
 
+
   useEffect(() => {
     setHasMountedTo(true);
-    const preSelected = (selected || []).map((img) => {
-      if (typeof img === "number") {
-        // Sometimes, default values for the media library comes in the form of Ids, instead of objects. When that happens, use the Ids to find teh real objects
-        const found = (images || []).find((im) => im.id === img);
-        return found || {};
-      }
-      return img;
-    });
-    setTrayImages(preSelected);
+    const imagesMap = new Map(images.map((item) => [item.id, item]));
+    const selectedAndExists =
+      selected?.map((item) => imagesMap.get(item.id)).filter(Boolean) || [];
+    setTrayImages(selectedAndExists);
   }, [images, selected]);
 
   useEffect(() => {}, [cropped]);
 
-  const preselectDefaultImages = () => {
-    if (!selected || !selected.length) return images;
-    var bank = (images || []).map((img) => img.id);
-    // sometimes an image that is preselected, my not be in the library's first load
-    // in that case just add it to the library's list
-    var isNotThere = selected.filter((img) => {
-      if (typeof img === "number") return !bank.includes(img);
-      return !bank.includes(img.id);
-    });
-    if (!isNotThere.length) return images;
+  useEffect(() => {
+    setNotification(passedNotification);
+  }, [passedNotification]);
 
-    return [...isNotThere, ...images];
-  };
+  
   const close = () => {
     setShow(false);
     setFiles([]);
@@ -136,7 +127,9 @@ function MediaLibrary(props) {
         >
           <MediaLibraryModal
             {...props}
-            images={preselectDefaultImages()}
+            notification={notification}
+            setNotification={setNotification}
+            // images={addPreselectedImagesToList()}
             close={close}
             getSelected={handleSelected}
             selected={imageTray}

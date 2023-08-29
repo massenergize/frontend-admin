@@ -37,6 +37,7 @@ import "./styles/ME Custom/extra.css";
 
 // Import i18n messages
 import { translationMessages } from "./i18n";
+import { API_HOST, IS_CANARY, IS_PROD } from "./config/constants";
 
 import * as Sentry from "@sentry/react";
 import { StyledEngineProvider } from "@mui/material/styles";

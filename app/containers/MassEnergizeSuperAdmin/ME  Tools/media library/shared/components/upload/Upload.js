@@ -211,7 +211,7 @@ function Upload({
                 fileOpenerRef.current.click();
               }}
             >
-              browse
+              <b>browse</b>
             </a>
             {compress && (
               <>

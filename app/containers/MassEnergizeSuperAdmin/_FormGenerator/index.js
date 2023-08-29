@@ -38,7 +38,7 @@ import Modal from "./Modal";
 // import PreviewModal from './PreviewModal';
 import Loading from "dan-components/Loading";
 import IconDialog from "../ME  Tools/icon dialog/IconDialog";
-import FormMediaLibraryImplementation from "./FormMediaLibraryImplementation";
+import FormMediaLibraryImplementation from "./media library/FormMediaLibraryImplementation";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { isValueEmpty } from "../Community/utils";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";

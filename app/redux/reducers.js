@@ -62,6 +62,10 @@ import app, {
   reducerForVisitLogs,
   reducerForUserActiveStatus,
   // reducerForEmailTemplates,
+  setImageForEditReducer,
+  reducerForLoadingOtherAdmins,
+  mlibFiltersReducer,
+  setGalleryMetadataReducer,
 } from "./modules/appReducer";
 
 /**
@@ -98,7 +102,7 @@ export default function createReducer(injectedReducers = {}) {
     messages: adminMessagesReducer,
     galleryImages: galleryImagesReducer, // This is what the modal in the form generator uses
     searchedImages: searchedImagesReducer, // This is what the "all images" gallery page uses
-    imageInfos: imageInfosReducer,
+    imageInfos: imageInfosReducer, // When the sidepane of the modal loads in the fullJson object of an image from the B.E, this is where its kept
     modalLibraryImages: modalLibraryReducer, // TODO: Look into this. It might not be in use anymore
     app,
     form,
@@ -127,7 +131,11 @@ export default function createReducer(injectedReducers = {}) {
     ...injectedReducers,
     taskFunctions: allTaskFunctionsReducer,
     tasks: allTasksReducer,
+    galleryMeta: setGalleryMetadataReducer,
+    mlibFilters: mlibFiltersReducer,
     paginationMetaData: allMetaDataReducer, // stores pagination data for all tables
+    imageBeingEdited: setImageForEditReducer, // This is what holds  the image whose details are being edited in the mlibrary modal
+    otherAdmins: reducerForLoadingOtherAdmins // If a user is admin of multiple communities, other admins in each of their communities will be grouped here (Used in the Media Library Modal)
   });
 
   // Wrap the root reducer and return a new root reducer with router state
