@@ -25,7 +25,9 @@ import { Link, withRouter } from "react-router-dom";
 import { MaterialDropZone } from "dan-components";
 import Snackbar from "@mui/material/Snackbar";
 import CircularProgress from "@mui/material/CircularProgress";
-import { Editor as TinyEditor } from "@tinymce/tinymce-react";
+// import { Editor as TinyEditor } from "@tinymce/tinymce-react";
+import TinyEditor from "./TinyMassEnergizeEditor";
+
 import { MenuItem, Alert } from "@mui/material";
 import TextField from "@mui/material/TextField";
 // import Icon from '@mui/material/Icon';
@@ -1030,30 +1032,23 @@ class MassEnergizeForm extends Component {
               <div style={{ padding: 20, color: "#d28818" }}>
                 <Typography>{field.label}</Typography>
                 <small>
-                  <b>PLEASE NOTE:</b> the wide spacing between two lines
-                  in the editor, is not what you will get when you
-                  content gets to users.
+                  <b>PLEASE NOTE:</b> the wide spacing between two lines in the
+                  editor, is not what you will get when you content gets to
+                  users.
                   <br />
                   If you need a{" "}
                   <b>
                     <i>gap </i>
                   </b>
-                  between two lines, press your <b>Enter Key twice </b>{" "}
-                  or more, instead of <b>once</b>
+                  between two lines, press your <b>Enter Key twice </b> or more,
+                  instead of <b>once</b>
                   <br />
                   <b>
-                    Pressing Once, will only show items right on the
-                    next line, without any gap
+                    Pressing Once, will only show items right on the next line,
+                    without any gap
                   </b>
                 </small>
               </div>
-              {/* <Editor
-                editorState={this.getValue(field.name, EditorState.createEmpty())}
-                editorClassName="editorClassName"
-                onEditorStateChange={(e) => this.onEditorStateChange(field.name, e)}
-                toolbarClassName="toolbarClassName"
-                wrapperClassName="wrapperClassName"
-              /> */}
 
               <TinyEditor
                 id={field?.name || "" + field?.dbName || ""}
@@ -1061,35 +1056,6 @@ class MassEnergizeForm extends Component {
                 onEditorChange={(content, editor) => {
                   this.handleEditorChange(content, editor, field.name);
                 }}
-                // Toolbar Docs:  https://www.tiny.cloud/docs/tinymce/6/migration-from-5x/#things-we-renamed
-                // toolbar="undo redo | blocks | formatselect | media_library | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent | fontfamily | fontsize |"
-                // plugins="advlist media_library autolink lists link image charmap print preview anchor forecolor"
-                toolbar="undo redo | blocks | formatselect | media_library | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | bullist numlist outdent indent | fontfamily | fontsize |"
-                plugins="advlist media_library autolink lists link charmap print preview anchor forecolor"
-                init={{
-                  height: 350,
-                  menubar: false,
-                  default_link_target: "_blank",
-                  force_br_newlines: true,
-                  force_p_newlines: false,
-                  forced_root_block: "", // Needed for 3.x
-                  // next 4 lines test to eliminate tiny cloud errors
-                  // selector: "textarea",
-                  // init_instance_callback: function(editor) {
-                  //   var freeTiny = document.querySelector(
-                  //     ".tox .tox-notification--in"
-                  //   );
-                  //   freeTiny.style.display = "none";
-                  // },
-                  setup: (editor) => {
-                    editor.ui.registry.addButton("media_library", {
-                      text: "Media Library",
-                      onAction: () =>
-                        console.log("I am the trigger for the media library!"),
-                    });
-                  },
-                }}
-                apiKey={TINY_MCE_API_KEY}
               />
             </Grid>
             <br />
