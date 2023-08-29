@@ -1029,12 +1029,12 @@ class MassEnergizeForm extends Component {
                 borderWidth: "thin",
               }}
             >
-              <div style={{ padding: 20, color: "#d28818" }}>
+              <div style={{ padding: 20 }}>
                 <Typography>{field.label}</Typography>
-                <small>
-                  <b>PLEASE NOTE:</b> the wide spacing between two lines in the
-                  editor, is not what you will get when you content gets to
-                  users.
+                {/* <small>
+                  <b>PLEASE NOTE:</b> the wide spacing between two lines
+                  in the editor, is not what you will get when you
+                  content gets to users.
                   <br />
                   If you need a{" "}
                   <b>
@@ -1047,7 +1047,7 @@ class MassEnergizeForm extends Component {
                     Pressing Once, will only show items right on the next line,
                     without any gap
                   </b>
-                </small>
+                </small> */}
               </div>
 
               <TinyEditor
@@ -1056,6 +1056,25 @@ class MassEnergizeForm extends Component {
                 onEditorChange={(content, editor) => {
                   this.handleEditorChange(content, editor, field.name);
                 }}
+                // Toolbar Docs:  https://www.tiny.cloud/docs/tinymce/6/migration-from-5x/#things-we-renamed
+                toolbar="undo redo | blocks | formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent | fontfamily | fontsize |"
+                plugins="advlist autolink lists link image charmap print preview anchor forecolor"
+                init={{
+                  height: 350,
+                  menubar: false,
+                  default_link_target: "_blank",
+                  forced_root_blocks: true,
+                  forced_root_block: false,
+                  // next 4 lines test to eliminate tiny cloud errors
+                  // selector: "textarea",
+                  // init_instance_callback: function(editor) {
+                  //   var freeTiny = document.querySelector(
+                  //     ".tox .tox-notification--in"
+                  //   );
+                  //   freeTiny.style.display = "none";
+                  // },
+                }}
+                apiKey={TINY_MCE_API_KEY}
               />
             </Grid>
             <br />
