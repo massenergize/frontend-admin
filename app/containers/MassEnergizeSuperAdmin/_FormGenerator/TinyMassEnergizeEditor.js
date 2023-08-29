@@ -11,9 +11,10 @@ function TinyMassEnergizeEditor(props) {
 
   useEffect(() => {
     if (!image || !editor) return;
-    editor.insertContent(
-      `<img style='object-fit:contain;' src="${image}" alt="Google Image" />`
-    );
+    editor.insertContent &&
+      editor.insertContent(
+        `<img style='object-fit:contain;' src="${image}" alt="Google Image" />`
+      );
   }, [image]);
 
   const config = {
@@ -34,6 +35,7 @@ function TinyMassEnergizeEditor(props) {
       <FormMediaLibraryImplementation
         onStateChange={({ show }) => setOpen(show)}
         openState={open}
+        defaultTab="library"
         onInsert={(files) => {
           const img = (files || [])[0];
           setImage(img?.url);
@@ -41,6 +43,10 @@ function TinyMassEnergizeEditor(props) {
         floatingMode
       />
       <TinyEditor
+        onInit={(editor) => {
+          let ed = editor?.target?.editorCommands || {};
+          setEditor(ed?.editor);
+        }}
         {...props}
         onEditorChange={handleEditorChange}
         toolbar="undo redo | blocks | formatselect | media_library | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | bullist numlist outdent indent | fontfamily | fontsize |"
