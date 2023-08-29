@@ -146,7 +146,7 @@ class AllSubscribers extends React.Component {
 }
 
   nowDelete({ idsToDelete, data }) {
-    const { subscribers, putSubscribersInRedux } = this.props;
+    const { subscribers, putSubscribersInRedux, meta,putMetaDataToRedux } = this.props;
     const itemsInRedux = subscribers;
     const ids = [];
     idsToDelete.forEach((d) => {
@@ -155,6 +155,13 @@ class AllSubscribers extends React.Component {
       apiCall("/subscribers.delete", { subscriber_id: found }).then(
         (response) => {
           if (response.success) {
+            putMetaDataToRedux({
+              ...meta,
+              ["subscribers"]: {
+                ...meta["subscribers"],
+                count: meta["subscribers"].count - 1,
+              },
+            });
             this.props.toggleToast({
               open: true,
               message: "Subscriber(s) successfully deleted",

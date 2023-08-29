@@ -20,6 +20,8 @@ function MEDropdownPro({
       const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
       const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
 
+  
+
      // -------------------------------------------------------------------
      const elementObserver = useRef(null);
      const lastDropDownItemRef = useCallback(
@@ -65,13 +67,19 @@ function MEDropdownPro({
      useEffect(() => {
        setSelected(defaultValue || value || []);
      }, [defaultValue, value]);
+     
+     useEffect(() => {
+       setOptionsToDisplay(data|| []);
+     }, [data]);
 
      const labelOf = (item, getItemFromValue) => {
        if (!item) return;
        if (getItemFromValue) {
          item = (optionsToDisplay || []).find((it) => valueOf(it) === item);
        }
-       if (labelExtractor) return labelExtractor(item);
+       if (labelExtractor){
+        return labelExtractor(item);
+       };
        return (item && item.name) || (item && item.toString());
      };
 
@@ -108,10 +116,10 @@ function MEDropdownPro({
        );
        return found;
      };
-
      const renderChildren = () => {
        if (!show) return <></>;
        return optionsToDisplay?.map((d, i) => {
+
          return (
            <p
            ref={(i === optionsToDisplay.length - 1) && rest?.isAsync ? lastDropDownItemRef:null}

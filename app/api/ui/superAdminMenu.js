@@ -204,19 +204,6 @@ module.exports = [
     ],
   },
   {
-    icon: "ios-images",
-    key: "gallery",
-    name: "Gallery",
-    child: [
-      { key: "all-gallery-images", name: "All Images", link: "/admin/gallery" },
-      {
-        key: "add-to-gallery",
-        name: "Add To Gallery",
-        link: "/admin/gallery/add",
-      },
-    ],
-  },
-  {
     key: "users",
     name: "Users",
     icon: "md-people",
@@ -304,18 +291,17 @@ module.exports = [
     key: "settings",
     name: "Settings",
     icon: "md-cog",
-    child: [ 
+    child: [
       {
-        key:"settings-page",
+        key: "settings-page",
         link: "/admin/profile/preferences",
-        name:"Communication preferences"
+        name: "Communication preferences",
       },
       {
         key: "feature-flags",
         link: "/admin/settings/feature-flags",
-        name:"Feature Flags"
+        name: "Feature Flags",
       },
-    
-    ]  
+    ],
   },
 ];

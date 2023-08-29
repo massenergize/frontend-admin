@@ -113,7 +113,7 @@ function LightAutoComplete(props) {
     const uniqueItems = [
       ...new Map(all.map((item) => [item["id"], item])).values(),
     ];
-    if(query) setFilteredItems(uniqueItems);
+    if (query) setFilteredItems(uniqueItems);
     setOptionsToDisplay(uniqueItems);
   }, [newItems]);
 
@@ -189,22 +189,24 @@ function LightAutoComplete(props) {
 
   return (
     <div style={{ position: "relative", width: "100%", marginTop: 19 }}>
-      {selected && selected.length > 0 && (
-        <div ref={chipWrapperRef}>
-          {selected.map((option, index) => {
-            var deleteOptions = { onDelete: () => handleSelection(option) };
-            deleteOptions = allowChipRemove ? deleteOptions : {};
-            return (
-              <Chip
-                key={index.toString()}
-                label={getLabel(option)}
-                {...deleteOptions}
-                className={classes.chips}
-              />
-            );
-          })}
-        </div>
-      )}
+      <div ref={chipWrapperRef}>
+        {selected?.length > 0 && (
+          <>
+            {selected.map((option, index) => {
+              var deleteOptions = { onDelete: () => handleSelection(option) };
+              deleteOptions = allowChipRemove ? deleteOptions : {};
+              return (
+                <Chip
+                  key={index.toString()}
+                  label={getLabel(option)}
+                  {...deleteOptions}
+                  className={classes.chips}
+                />
+              );
+            })}
+          </>
+        )}
+      </div>
       <GhostDropdown
         show={showDropdown}
         close={() => setShowDropdown(false)}
@@ -234,7 +236,7 @@ function LightAutoComplete(props) {
             />
             <Paper
               className={classes.dropdown}
-              style={{ top: 70 + increasedRatio() }}
+              style={{ top: 80 + increasedRatio() }}
             >
               {thereAreNoOptionsToDisplay && (
                 <p style={{ padding: 10, color: "lightgray" }}>

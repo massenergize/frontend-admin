@@ -37,26 +37,27 @@ import "./styles/ME Custom/extra.css";
 
 // Import i18n messages
 import { translationMessages } from "./i18n";
-import { IS_CANARY, IS_PROD } from "./config/constants";
+import { API_HOST, IS_CANARY, IS_PROD } from "./config/constants";
 
 import * as Sentry from "@sentry/react";
-import { BrowserTracing } from "@sentry/tracing";
 import { StyledEngineProvider } from "@mui/material/styles";
 
-const SENTRY_DSN =
-  IS_PROD || IS_CANARY
-    ? process.env.REACT_APP_SENTRY_PROD_DSN
-    : process.env.REACT_APP_SENTRY_DEV_DSN;
-
-Sentry.init({
-  dsn: SENTRY_DSN,
-  replaysSessionSampleRate: 1.0,
-  replaysOnErrorSampleRate: 1.0,
-  integrations: [
-    new Sentry.Replay({ stickySession: true }),
-    new BrowserTracing(),
-  ],
-});
+const SENTRY_DSN = process.env.REACT_APP_SENTRY_DSN;
+if (SENTRY_DSN) {
+  Sentry.init({
+    dsn: SENTRY_DSN,
+    replaysSessionSampleRate: 1.0,
+    replaysOnErrorSampleRate: 1.0,
+    integrations: [
+      new Sentry.Replay({ stickySession: true }),
+      new Sentry.BrowserTracing({
+        routingInstrumentation: Sentry.reactRouterV5Instrumentation(history),
+        // tracePropagationTargets: [API_HOST],
+      }),
+    ],
+    tracesSampleRate: 1.0,
+  });
+};
 
 // Create redux store with history
 const initialState = {};
