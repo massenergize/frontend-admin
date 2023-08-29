@@ -140,12 +140,9 @@ export const onTableStateChange = ({
 }) => {
   switch (action) {
     case "changePage":
-      if (
-        tableState.rowsPerPage * tableState.page ===
-        tableState.displayData.length
-      ) {
+      if (metaData?.next === tableState?.page+1) {
         callMoreData(
-          metaData.next,
+          tableState?.page + 1,
           updateReduxFunction,
           reduxItems,
           apiUrl,
@@ -172,6 +169,7 @@ export const onTableStateChange = ({
         otherArgs
       );
       break;
+    
     default:
   }
 };
@@ -274,5 +272,3 @@ export function removeDuplicateObjects(arr) {
 
   return resultArray;
 }
-
-

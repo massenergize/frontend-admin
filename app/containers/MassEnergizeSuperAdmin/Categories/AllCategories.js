@@ -143,7 +143,7 @@ class AllTagCollections extends React.Component {
   }
 
   nowDelete({ idsToDelete, data }) {
-    const { tags, putTagsInRedux } = this.props;
+    const { tags, putTagsInRedux, meta, putMetaDataToRedux } = this.props;
     const itemsInRedux = tags || [];
     const ids = [];
     idsToDelete.forEach((d) => {
@@ -153,6 +153,14 @@ class AllTagCollections extends React.Component {
         tag_collection_id: found,
       }).then((response) => {
         if (response.success) {
+          putMetaDataToRedux({
+            ...meta,
+            ["tagCollections"]: {
+              ...meta["tagCollections"],
+              count:
+                meta["tagCollections"].count - 1,
+            },
+          });
           this.props.toggleToast({
             open: true,
             message: `Tag(s) successfully deleted`,

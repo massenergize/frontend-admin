@@ -194,7 +194,7 @@ class AllVendors extends React.Component {
   ];
 
   nowDelete({ idsToDelete, data }) {
-    const { allVendors, putVendorsInRedux } = this.props;
+    const { allVendors, putVendorsInRedux, meta,putMetaDataToRedux } = this.props;
     const itemsInRedux = allVendors || [];
     const ids = [];
     idsToDelete.forEach((d) => {
@@ -202,6 +202,14 @@ class AllVendors extends React.Component {
       ids.push(found);
       apiCall("/vendors.delete", { vendor_id: found }).then((response) => {
         if (response.success) {
+          putMetaDataToRedux({
+            ...meta,
+            ["vendors"]: {
+              ...meta["vendors"],
+              count:
+                meta["vendors"].count - 1,
+            },
+          });
           this.props.toggleToast({
             open: true,
             message: "Vendor(s) successfully deleted",
