@@ -25,7 +25,9 @@ import { Link, withRouter } from "react-router-dom";
 import { MaterialDropZone } from "dan-components";
 import Snackbar from "@mui/material/Snackbar";
 import CircularProgress from "@mui/material/CircularProgress";
-import { Editor as TinyEditor } from "@tinymce/tinymce-react";
+// import { Editor as TinyEditor } from "@tinymce/tinymce-react";
+import TinyEditor from "./TinyMassEnergizeEditor";
+
 import { MenuItem, Alert } from "@mui/material";
 import TextField from "@mui/material/TextField";
 // import Icon from '@mui/material/Icon';
@@ -1047,13 +1049,6 @@ class MassEnergizeForm extends Component {
                   </b>
                 </small>
               </div>
-              {/* <Editor
-                editorState={this.getValue(field.name, EditorState.createEmpty())}
-                editorClassName="editorClassName"
-                onEditorStateChange={(e) => this.onEditorStateChange(field.name, e)}
-                toolbarClassName="toolbarClassName"
-                wrapperClassName="wrapperClassName"
-              /> */}
 
               <TinyEditor
                 id={field?.name || "" + field?.dbName || ""}
@@ -1061,26 +1056,6 @@ class MassEnergizeForm extends Component {
                 onEditorChange={(content, editor) => {
                   this.handleEditorChange(content, editor, field.name);
                 }}
-                // Toolbar Docs:  https://www.tiny.cloud/docs/tinymce/6/migration-from-5x/#things-we-renamed
-                toolbar="undo redo | blocks | formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent | fontfamily | fontsize |"
-                plugins="advlist autolink lists link image charmap print preview anchor forecolor"
-                init={{
-                  height: 350,
-                  menubar: false,
-                  default_link_target: "_blank",
-                  force_br_newlines: true,
-                  force_p_newlines: false,
-                  forced_root_block: "", // Needed for 3.x
-                  // next 4 lines test to eliminate tiny cloud errors
-                  // selector: "textarea",
-                  // init_instance_callback: function(editor) {
-                  //   var freeTiny = document.querySelector(
-                  //     ".tox .tox-notification--in"
-                  //   );
-                  //   freeTiny.style.display = "none";
-                  // },
-                }}
-                apiKey={TINY_MCE_API_KEY}
               />
             </Grid>
             <br />

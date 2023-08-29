@@ -24,9 +24,10 @@ function MediaLibrary(props) {
     images,
     defaultTab,
     dragToOrder,
+    floatingMode,
     passedNotification,
   } = props;
-  const [show, setShow] = useState(openState);
+  const [show, setShow] = useState(false);
   const [imageTray, setTrayImages] = useState([]);
   const [state, setState] = useState({});
   const [hasMounted, setHasMountedTo] = useState(undefined);
@@ -72,6 +73,10 @@ function MediaLibrary(props) {
     setTrayImages(rest);
     transfer(rest, state.resetor);
   };
+
+  useEffect(() => {
+    setShow(openState);
+  }, [openState]);
 
   useEffect(() => {
     const isMountingForTheFirstTime = hasMounted === undefined;
@@ -143,54 +148,56 @@ function MediaLibrary(props) {
         </div>
       )}
 
-      <div
-        style={{
-          width: "100%",
-          minHeight: 380,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          border: "dashed 2px #e3e3e3",
-          borderRadius: 10,
-          marginBottom: 20,
-          padding: 20,
-        }}
-      >
-        {!imageTray || imageTray.length === 0 ? (
-          <img src={libraryImage} style={{ height: 150 }} />
-        ) : (
-          <ImageTray
-            sourceExtractor={sourceExtractor}
-            content={imageTray}
-            remove={remove}
-            multiple={multiple}
-            dragToOrder={dragToOrder}
-            oldPosition={oldPosition}
-            newPosition={newPosition}
-            swapPositions={swapPositions}
-
-            // switchToCropping={switchToCropping}
-          />
-        )}
-
+      {!floatingMode && (
         <div
-          onClick={(e) => {
-            e.preventDefault();
-            setShow(true);
-          }}
-          className={`ml-footer-btn `}
           style={{
-            "--btn-color": "white",
-            "--btn-background": "green",
-            borderRadius: 5,
-            marginTop: 20,
-            padding: "15px 40px",
+            width: "100%",
+            minHeight: 380,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            border: "dashed 2px #e3e3e3",
+            borderRadius: 10,
+            marginBottom: 20,
+            padding: 20,
           }}
         >
-          {actionText}
+          {!imageTray || imageTray.length === 0 ? (
+            <img src={libraryImage} style={{ height: 150 }} />
+          ) : (
+            <ImageTray
+              sourceExtractor={sourceExtractor}
+              content={imageTray}
+              remove={remove}
+              multiple={multiple}
+              dragToOrder={dragToOrder}
+              oldPosition={oldPosition}
+              newPosition={newPosition}
+              swapPositions={swapPositions}
+
+              // switchToCropping={switchToCropping}
+            />
+          )}
+
+          <div
+            onClick={(e) => {
+              e.preventDefault();
+              setShow(true);
+            }}
+            className={`ml-footer-btn `}
+            style={{
+              "--btn-color": "white",
+              "--btn-background": "green",
+              borderRadius: 5,
+              marginTop: 20,
+              padding: "15px 40px",
+            }}
+          >
+            {actionText}
+          </div>
         </div>
-      </div>
+      )}
     </React.Fragment>
   );
 }
@@ -398,6 +405,11 @@ MediaLibrary.propTypes = {
    * A function that should return a tooltip component.
    */
   TooltipWrapper: PropTypes.string,
+  /**
+   * In some situations, the tray images that display when a user has inserted an images from the mlibrary, is not needed. Typical example is how mlib is being used in TinyMCE
+   * So, this value is used to toggle the image tray ON/OFF. (true = No image Tray)
+   */
+  floatingMode: PropTypes.bool,
 };
 
 MediaLibrary.Button = MLButton;
@@ -425,5 +437,6 @@ MediaLibrary.defaultProps = {
   compressedQuality: IMAGE_QUALITY.MEDIUM.key,
   maximumImageSize: DEFFAULT_MAX_SIZE,
   renderBeforeImages: null,
+  floatingMode: false,
 };
 export default MediaLibrary;
