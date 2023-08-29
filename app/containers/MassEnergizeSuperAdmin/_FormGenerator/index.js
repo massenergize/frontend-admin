@@ -36,7 +36,7 @@ import Modal from "./Modal";
 // import PreviewModal from './PreviewModal';
 import Loading from "dan-components/Loading";
 import IconDialog from "../ME  Tools/icon dialog/IconDialog";
-import FormMediaLibraryImplementation from "./FormMediaLibraryImplementation";
+import FormMediaLibraryImplementation from "./media library/FormMediaLibraryImplementation";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { isValueEmpty } from "../Community/utils";
 import { getRandomStringKey } from "../ME  Tools/media library/shared/utils/utils";
@@ -1030,20 +1030,20 @@ class MassEnergizeForm extends Component {
               <div style={{ padding: 20, color: "#d28818" }}>
                 <Typography>{field.label}</Typography>
                 <small>
-                  <b>PLEASE NOTE:</b> the wide spacing between two lines
-                  in the editor, is not what you will get when you
-                  content gets to users.
+                  <b>PLEASE NOTE:</b> the wide spacing between two lines in the
+                  editor, is not what you will get when you content gets to
+                  users.
                   <br />
                   If you need a{" "}
                   <b>
                     <i>gap </i>
                   </b>
-                  between two lines, press your <b>Enter Key twice </b>{" "}
-                  or more, instead of <b>once</b>
+                  between two lines, press your <b>Enter Key twice </b> or more,
+                  instead of <b>once</b>
                   <br />
                   <b>
-                    Pressing Once, will only show items right on the
-                    next line, without any gap
+                    Pressing Once, will only show items right on the next line,
+                    without any gap
                   </b>
                 </small>
               </div>
