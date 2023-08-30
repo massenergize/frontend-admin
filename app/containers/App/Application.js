@@ -7,7 +7,6 @@ import Dashboard from "../Templates/Dashboard";
 import {
   checkFirebaseAuthentication,
   reduxCallCommunities,
-  reduxCallLibraryModalImages,
   reduxCheckUser,
   reduxFetchInitialContent,
   reduxToggleUniversalModal,
@@ -66,8 +65,6 @@ import {
   AddCarbonEquivalency,
   AllCarbonEquivalencies,
   EditCarbonEquivalency,
-  GalleryPage,
-  AddToGallery,
   AddTask,
   ListTasks,
   Preferences,
@@ -79,7 +76,6 @@ import {
   TermsOfServicePage,
   PrivacyPolicyPage,
   ActionUsers,
-  EmailTemplates,
 } from "../pageListAsync";
 import EditVendor from "../MassEnergizeSuperAdmin/Vendors/EditVendor";
 import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
@@ -282,11 +278,6 @@ class Application extends React.Component {
               path="/admin/settings/feature-flags"
               component={FeatureFlags}
             />
-            {/* <Route
-              exact
-              path="/admin/settings/email-templates"
-              component={EmailTemplates}
-            /> */}
             <Route path="/admin/read/users" component={UsersList} />
             <Route
               path="/admin/read/community-admin-messages"
@@ -496,12 +487,6 @@ class Application extends React.Component {
               path="/admin/read/all-actions"
               component={SuperAllActions}
             />
-            <Route exact path="/admin/gallery/" component={GalleryPage} />
-            <Route
-              exact
-              path="/admin/gallery/add"
-              component={AddToGallery}
-            />
             <Route exact path="/admin/tasks/add" component={AddTask} />
             <Route exact path="/admin/edit/:id/task" component={AddTask} />
             <Route exact path="/admin/read/tasks" component={ListTasks} />
@@ -531,7 +516,6 @@ function mapDispatchToProps(dispatch) {
     {
       reduxCallCommunities,
       checkUser: reduxCheckUser,
-      loadModalImages: reduxCallLibraryModalImages,
       fetchInitialContent: reduxFetchInitialContent,
       toggleUniversalModal: reduxToggleUniversalModal,
       checkFirebaseAuthentication,

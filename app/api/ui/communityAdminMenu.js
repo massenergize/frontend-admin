@@ -176,20 +176,6 @@ module.exports = [
       },
     ],
   },
-  // disabling media gallery for cadmins for now (admin issue 794)
-  //{
-  //  icon: "ios-images",
-  //  key: "gallery",
-  //  name: "Gallery",
-  //  child: [
-  //    { key: "all-gallery-images", name: "All Images", link: "/admin/gallery" },
-  //    {
-  //      key: "add-to-gallery",
-  //      name: "Add To Gallery",
-  //      link: "/admin/gallery/add",
-  //    },
-  //  ],
-  //},
   {
     key: "users",
     name: "Users",

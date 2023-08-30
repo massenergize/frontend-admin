@@ -20,6 +20,7 @@ export const TABS = {
   UPLOAD_TAB: "upload",
   LIBRARY_TAB: "library",
   CROPPING_TAB: "crop",
+  // UPLOAD_FORM: "upload-form",
 };
 
 

@@ -1,10 +1,15 @@
 import React, { useRef, useState, useCallback } from "react";
-import { Box, CircularProgress, InputLabel, LinearProgress, MenuItem } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  InputLabel,
+  LinearProgress,
+  MenuItem,
+} from "@mui/material";
 import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
 import { createStyles, makeStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
-
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -56,7 +61,6 @@ const useStyles = makeStyles((theme) =>
     success: {},
   })
 );
-
 
 function MEDropDown({
   renderGeneralContent,
@@ -119,20 +123,17 @@ function MEDropDown({
     },
   };
   return (
-    <div key={field.name}>
+    <div key={field?.name}>
       <FormControl className={classes.field} fullWidth>
-        <InputLabel
-          htmlFor={field.label}
-          className={classes.selectFieldLabel}
-        >
-          {field.label}
+        <InputLabel htmlFor={field?.label} className={classes.selectFieldLabel}>
+          {field?.label}
         </InputLabel>
         <Select
-          label={field.label}
-          name={field.name}
-          value={getValue(field.name) || ""}
+          label={field?.label}
+          name={field?.name}
+          value={(getValue && getValue(field?.name)) || ""}
           onChange={async (newValue) => {
-            await updateForm(field.name, newValue.target.value);
+            await updateForm(field?.name, newValue.target.value);
           }}
           MenuProps={MenuProps}
         >
@@ -160,12 +161,13 @@ function MEDropDown({
             </MenuItem>
           )}
         </Select>
-        {field.child &&
-          getValue(field.name) === field.child.valueToCheck &&
+        {field?.child &&
+          getValue &&
+          getValue(field?.name) === field.child.valueToCheck &&
           renderFields(field.child.fields)}
       </FormControl>
     </div>
   );
 }
 
-export default MEDropDown
+export default MEDropDown;

@@ -12,8 +12,6 @@ import { TextField } from "@mui/material";
 import { bindActionCreators } from "redux";
 import {
   reduxAddToGalleryImages,
-  reduxAddToSearchedImages,
-  reduxCallLibraryModalImages,
 } from "../../../redux/redux-actions/adminActions";
 import {
   getFileSize,
@@ -145,7 +143,8 @@ function AddToGallery(props) {
       size: (file && file.size) || null,
       size_text: getFileSize(file),
       description: state.title,
-      tags: spread,
+      // AS OF 2nd August 2023, tags passed into gallery.add are treated differently. B.E no longer uses list of IDS. So in case this page is ever Reactivated, Watchout!
+      // tags: spread, 
     };
 
     apiCall(UPLOAD_URL, apiJson)
@@ -375,10 +374,10 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
-      loadModalImages: reduxCallLibraryModalImages,
+      // loadModalImages: reduxCallLibraryModalImages,
       loadMoreModalImages: reduxCallLibraryModalImages,
       addImageToGalleryList: reduxAddToGalleryImages,
-      addImageToSearchedList: reduxAddToSearchedImages,
+      // addImageToSearchedList: reduxAddToSearchedImages,
     },
     dispatch
   );

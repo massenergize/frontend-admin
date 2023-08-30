@@ -66,7 +66,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
-    { loadModalImages: reduxCallLibraryModalImages },
+    // { loadModalImages: reduxCallLibraryModalImages },
     dispatch
   );
 };

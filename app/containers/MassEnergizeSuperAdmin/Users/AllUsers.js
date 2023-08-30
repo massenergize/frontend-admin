@@ -249,7 +249,7 @@ class AllUsers extends React.Component {
   };
 
   nowDelete({ idsToDelete, data }) {
-    const { allUsers, putUsersInRedux } = this.props;
+    const { allUsers, putUsersInRedux, putMetaDataToRedux, meta } = this.props;
     const itemsInRedux = allUsers || [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][7];
@@ -262,6 +262,13 @@ class AllUsers extends React.Component {
           });
           const rem = (itemsInRedux || []).filter((com) => com?.id !== found);
           putUsersInRedux(rem);
+          putMetaDataToRedux({
+            ...meta,
+            ["users"]: {
+              ...meta["users"],
+              count: meta["users"].count - 1,
+            },
+          });
         } else {
           this.props.toggleToast({
             open: true,

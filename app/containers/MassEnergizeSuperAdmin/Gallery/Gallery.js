@@ -27,6 +27,36 @@ export const filters = [
   { name: "My Uploads", value: "uploads" },
 ];
 
+export const deleteImage = (id, cb, options = {}) => {
+  if (!id) return;
+  const { oldData, putNewListInRedux } = options;
+  const images = (oldData && oldData.images) || [];
+  const rem = images.filter((img) => img.id !== id);
+  putNewListInRedux({
+    data: { ...(oldData || {}), images: rem },
+    old: oldData,
+    append: false,
+  });
+  // if (cb) cb();
+  apiCall("/gallery.remove", { media_id: id })
+    .then((response) => {
+      if (!response.success)
+        return console.log("REMOVE IMAGE ERROR_BE", response.error);
+      const images = (oldData && oldData.images) || [];
+      const rem = images.filter((img) => img.id !== id);
+      putNewListInRedux({
+        data: { ...(oldData || {}), images: rem },
+        old: oldData,
+        append: false,
+      });
+      if (cb) cb(true);
+    })
+    .catch((e) => {
+      console.log("REMOVE IMAGE ERROR_SYNT", e.toString());
+      if (cb) cb(false);
+    });
+};
+
 export const getMoreInfoOnImage = ({
   id,
   updateStateWith,
@@ -87,27 +117,6 @@ function Gallery(props) {
   const [queryHasChanged, setQueryHasChanged] = useState(false);
   const [noResults, setNoResults] = useState(false);
   const [oneImageInfo, setOneImageInfo] = useState(null);
-
-  const deleteImage = (id, cb) => {
-    if (!id) return;
-    apiCall("/gallery.remove", { media_id: id })
-      .then((response) => {
-        if (!response.success)
-          return console.log("REMOVE IMAGE ERROR_BE", response.error);
-        const images = (searchResults && searchResults.images) || [];
-        const rem = images.filter((img) => img.id !== id);
-        putSearchResultsInRedux({
-          data: { ...(searchResults || {}), images: rem },
-          old: searchResults,
-          append: false,
-        });
-        if (cb) cb();
-      })
-      .catch((e) => {
-        console.log("REMOVE IMAGE ERROR_SYNT", e.toString());
-        if (cb) cb();
-      });
-  };
 
   const fetchContent = (body = {}, cb) => {
     setSearching(true); // activate circular spinner to show loading to user
@@ -226,7 +235,6 @@ function Gallery(props) {
     fetchContent(makeRequestBody(limits), () => setLoadMore(false));
   };
 
-
   return (
     <div>
       <Seo name={"Gallery"} />
@@ -288,7 +296,11 @@ function Gallery(props) {
             defaultSelected={targetComs}
             allowChipRemove={!targetAllComs}
             isAsync={true}
-            endpoint={auth?.is_super_admin ? "communities.listForSuperAdmin" : "communities.listForCommunityAdmin"}
+            endpoint={
+              auth?.is_super_admin
+                ? "communities.listForSuperAdmin"
+                : "communities.listForCommunityAdmin"
+            }
           />
           {/* <div
             style={{
@@ -436,7 +448,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
-      putSearchResultsInRedux: reduxLoadSearchedImages,
+      // putSearchResultsInRedux: reduxLoadSearchedImages,
       putImageInfoInRedux: reduxLoadImageInfos,
       putFiltersInRedux: reduxSetGalleryFilters,
     },

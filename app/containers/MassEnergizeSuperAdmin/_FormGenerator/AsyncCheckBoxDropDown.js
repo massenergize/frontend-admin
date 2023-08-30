@@ -56,17 +56,29 @@ function AsyncDropDown({
       elementRef.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && cursor.has_more) {
           if (!field?.endpoint) return;
-          apiCall(field?.endpoint, { page: cursor.next , limit: 10}).then((res) => {
-            setCursor({ has_more: res?.cursor?.count > data?.length, next: res?.cursor?.next });
-            let items = [...data, ...(res?.data||[])?.map((item) => {
-              return {
-                ...item,
-                displayName: field?.labelExtractor ? field?.labelExtractor(item) : item?.name || item?.title,
-              };
-            })];
+          apiCall(field?.endpoint, { page: cursor.next, limit: 10 }).then(
+            (res) => {
+              setCursor({
+                has_more: res?.cursor?.count > data?.length,
+                next: res?.cursor?.next,
+              });
+              let items = [
+                ...data,
+                ...(res?.data || [])?.map((item) => {
+                  return {
+                    ...item,
+                    displayName: field?.labelExtractor
+                      ? field?.labelExtractor(item)
+                      : item?.name || item?.title,
+                  };
+                }),
+              ];
 
-            setData([...new Map(items.map((item) => [item["id"], item])).values() ]);
-          });
+              setData([
+                ...new Map(items.map((item) => [item["id"], item])).values(),
+              ]);
+            }
+          );
         }
       });
 
@@ -76,7 +88,7 @@ function AsyncDropDown({
   );
 
   if (field.data) {
-    let value = getValue(field.name);
+    let value = getValue && getValue(field.name);
     return (
       <div key={field.name}>
         <div className={classes.field}>
@@ -114,19 +126,18 @@ function AsyncDropDown({
               MenuProps={MenuProps}
             >
               {data.map((t, i) => {
-                return(
+                return (
                   <MenuItem key={t.id}>
                     <FormControlLabel
                       key={t.id}
                       control={
                         <Checkbox
-                          checked={isThisSelectedOrNot(field.name, t.id)}
+                          checked={
+                            isThisSelectedOrNot &&
+                            isThisSelectedOrNot(field.name, t.id)
+                          }
                           onChange={(event) =>
-                            handleCheckBoxSelect(
-                              event,
-                              field.selectMany,
-                              field
-                            )
+                            handleCheckBoxSelect(event, field.selectMany, field)
                           }
                           value={t.id}
                           name={field.name}
@@ -135,7 +146,7 @@ function AsyncDropDown({
                       label={t.displayName}
                     />
                   </MenuItem>
-                ) 
+                );
               })}
 
               {cursor.has_more && field?.isAsync && (

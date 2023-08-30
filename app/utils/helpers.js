@@ -136,18 +136,13 @@ export const onTableStateChange = ({
   name,
   updateMetaData,
   meta,
-  otherArgs
+  otherArgs,
 }) => {
-
   switch (action) {
-  
     case "changePage":
-      if (
-        tableState.rowsPerPage * tableState.page ===
-        tableState.displayData.length
-      ) {
+      if (metaData?.next === tableState?.page+1) {
         callMoreData(
-          metaData.next,
+          tableState?.page + 1,
           updateReduxFunction,
           reduxItems,
           apiUrl,
@@ -174,6 +169,7 @@ export const onTableStateChange = ({
         otherArgs
       );
       break;
+    
     default:
   }
 };
@@ -234,8 +230,45 @@ export const isTrue = (value) => {
   if ([true, "True", "Yes", "yes"].includes(value)) return true;
 };
 
-
 export const removeDuplicates = (first, second) => {
-   const uniqueItems = [...new Set([...(first||[]), ...(second||[])])];
-   return uniqueItems;
+  const uniqueItems = [...new Set([...(first || []), ...(second || [])])];
+  return uniqueItems;
+};
+
+export const getOrigin = ()=>{
+  if(IS_PROD) return "https://api.massenergize.org"
+  else if (IS_CANARY) return "https://api-canary.massenergize.org";
+  else if(IS_LOCAL) return "http://127.0.0.1:8000";
+  return "https://api.massenergize.dev";
+}
+
+
+export function sortByField(arr, field) {
+  return arr.sort((a, b) => {
+    const valueA = a[field].toUpperCase();
+    const valueB = b[field].toUpperCase();
+
+    if (valueA < valueB) {
+      return -1;
+    }
+    if (valueA > valueB) {
+      return 1;
+    }
+    return 0;
+  });
+}
+
+export function removeDuplicateObjects(arr) {
+  const uniqueObjects = {};
+  const resultArray = [];
+
+  for (const obj of arr) {
+    const id = obj.Id;
+    if (!uniqueObjects[id]) {
+      uniqueObjects[id] = true;
+      resultArray.push(obj);
+    }
+  }
+
+  return resultArray;
 }
