@@ -179,6 +179,17 @@ const createFormJson = ({
     id: c.id.toString(),
   }));
 
+  const getCommunityLocation = (id) => {
+    const community = communities.find((c) => c?.id?.toString() === id?.toString());
+    return {city: community?.location?.city, state: community?.location?.state}
+  }
+
+  const updateCityState = ({field,newValue,formData, setValueInForm,}) => {
+    const { city, state } = getCommunityLocation(newValue);
+    let d = {...formData, [field?.name]:newValue, city, state}
+    setValueInForm(d)  
+  }
+
   const ADD_LINK = [
     {
       name: "external_link",
@@ -257,7 +268,7 @@ const createFormJson = ({
       fieldType: "TextField",
       contentType: "text",
       isRequired: false,
-      defaultValue: "",
+      defaultValue:getCommunityLocation(communities[0].id)?.city ||"",
       dbName: "city",
       readOnly: false,
     },
@@ -268,7 +279,7 @@ const createFormJson = ({
       contentType: "text",
       isRequired: false,
       data: states,
-      defaultValue: "Massachusetts",
+      defaultValue: getCommunityLocation(communities[0].id)?.state||"Massachusetts",
       dbName: "state",
       readOnly: false,
     },
@@ -447,6 +458,7 @@ const createFormJson = ({
                       isRequired: true,
                       isAsync: true,
                       endpoint: "/communities.listForSuperAdmin",
+                      onChangeMiddleware: updateCityState,
                     },
                   ],
                 },
@@ -459,6 +471,7 @@ const createFormJson = ({
                 dbName: "community_id",
                 data: [{ displayName: "--", id: "" }, ...communities],
                 isRequired: true,
+                onChangeMiddleware: updateCityState,
               },
         ],
       },

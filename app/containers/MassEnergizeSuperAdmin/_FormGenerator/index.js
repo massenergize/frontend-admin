@@ -271,6 +271,14 @@ class MassEnergizeForm extends Component {
     });
   };
 
+
+
+  setValueInForm = (content)=>{
+    this.setState({
+      formData:{...this.state.formData, ...(content||{})}
+    })
+  }
+
   handleSubDomainChange = async (event) => {
     const { target } = event;
     if (!target) return;
@@ -798,48 +806,11 @@ class MassEnergizeForm extends Component {
             getValue={this.getValue}
             renderFields={this.renderFields}
             getDisplayName={this.getDisplayName}
+            formData = {this.state.formData}
+            setValueInForm={this.setValueInForm}
+
           />
         );
-      // <div key={field.name}>
-      //   <FormControl className={classes.field}>
-      //     {this.renderGeneralContent(field)}
-      //     <InputLabel
-      //       htmlFor={field.label}
-      //       className={classes.selectFieldLabel}
-      //     >
-      //       {field.label}
-      //     </InputLabel>
-      //     <Select
-      //       native
-      //       label={field.label}
-      //       name={field.name}
-      //       onChange={async (newValue) => {
-      //         await this.updateForm(field.name, newValue.target.value);
-      //       }}
-      //       inputProps={{
-      //         id: "age-native-simple",
-      //       }}
-      //     >
-      //       <option value={this.getValue(field.name)}>
-      //         {this.getDisplayName(
-      //           field.name,
-      //           this.getValue(field.name),
-      //           field.data
-      //         )}
-      //       </option>
-      //       {field.data &&
-      //         field.data.map((c) => (
-      //           <option value={c.id} key={c.id}>
-      //             {c.displayName}
-      //           </option>
-      //         ))}
-      //     </Select>
-      //     {field.child &&
-      //       this.getValue(field.name) === field.child.valueToCheck &&
-      //       this.renderFields(field.child.fields)}
-      //   </FormControl>
-      // </div>
-      // );
       case FieldTypes.Icon:
         return (
           <div key={field.name}>
