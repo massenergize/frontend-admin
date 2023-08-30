@@ -463,17 +463,6 @@ const createFormJson = ({
 
   const ADD_ADDRESS = [
     {
-      name: "address",
-      label: "Street Address",
-      placeholder: "Street address or public facility",
-      fieldType: "TextField",
-      contentType: "text",
-      isRequired: true,
-      defaultValue: event.location && event.location.address,
-      dbName: "address",
-      readOnly: false,
-    },
-    {
       name: "building",
       label: "Building Name",
       placeholder: 'eg. "Main Building"',
@@ -495,6 +484,18 @@ const createFormJson = ({
       dbName: "room",
       readOnly: false,
     },
+    {
+      name: "address",
+      label: "Street Address",
+      placeholder: "Street address or public facility",
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: true,
+      defaultValue: event.location && event.location.address,
+      dbName: "address",
+      readOnly: false,
+    },
+
     {
       name: "unit",
       label: "Unit Number",
