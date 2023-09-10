@@ -69,6 +69,8 @@ function MEDropDown({
   renderFields,
   field,
   getDisplayName,
+  formData,
+  setValueInForm
 }) {
   const classes = useStyles();
   const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
@@ -122,6 +124,7 @@ function MEDropDown({
       },
     },
   };
+  const value = getValue && getValue(field?.name) || ""
   return (
     <div key={field?.name}>
       <FormControl className={classes.field} fullWidth>
@@ -131,8 +134,16 @@ function MEDropDown({
         <Select
           label={field?.label}
           name={field?.name}
-          value={(getValue && getValue(field?.name)) || ""}
-          onChange={async (newValue) => {
+          value={value}
+          onChange={async(newValue) => {
+            if(field?.onChangeMiddleware){
+              return field?.onChangeMiddleware({
+                field,
+                newValue:newValue?.target?.value,
+                formData,
+                setValueInForm,
+              });
+            }
             await updateForm(field?.name, newValue.target.value);
           }}
           MenuProps={MenuProps}
