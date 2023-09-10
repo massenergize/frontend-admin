@@ -1,26 +1,27 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 
-function Cropping({
-  cropLoot,
-  maxWidth,
-  maxHeight,
-  ratioWidth, 
-  ratioHeight, 
-  setCroppedSource,
-}) {
-  const crop = {
-    aspect: ratioWidth / ratioHeight,
-    unit: "%",
-    width: 50,
-    height: 50,
-    x: 25,
-    y: 25,
-  };
-  const [dimensions, setDimensions] = useState(crop);
-
+function Cropping({ cropLoot, maxWidth, maxHeight, setCroppedSource }) {
+  const [dimensions, setDimensions] = useState({});
   const imageRef = useRef(null);
+  const aspectRatioOptions = [
+    { label: "Free Crop (Default)", value: null },
+    { label: "16:9", value: 16 / 9 },
+    { label: "4:3", value: 4 / 3 },
+    { label: "1:1", value: 1 },
+  ];
+  useEffect(() => {
+    const crop = {
+      aspect: null,
+      unit: "%",
+      width: 50,
+      height: 50,
+      x: 25,
+      y: 25,
+    };
+    setDimensions(crop);
+  }, []);
 
   /**
    * Update reference to image when it is fully loaded
@@ -52,6 +53,28 @@ function Cropping({
   const { image } = cropLoot;
   return (
     <div>
+      <div style={{ padding: "10px 30px" }}>
+        <p>Choose any of the options below to crop with aspect ratio</p>
+        <div>
+          {aspectRatioOptions.map((option) => (
+            <label
+              key={option.value}
+              style={{ margin: "5px 6px", fontWeight: "bold" }}
+            >
+              <input
+                type="radio"
+                name="aspectRatio"
+                value={option.value}
+                checked={dimensions.aspect === option.value}
+                onChange={() =>
+                  setDimensions({ ...dimensions, aspect: option.value })
+                }
+              />
+              {option.label}
+            </label>
+          ))}
+        </div>
+      </div>
       <center>
         <ReactCrop
           src={image}
@@ -70,7 +93,7 @@ function Cropping({
 export default Cropping;
 
 /**
- * This is the function that creates the new image from the cutout that users make with the 
+ * This is the function that creates the new image from the cutout that users make with the
  * cropping frame
  * @param {HTMLImageElement} image - Image File Object
  * @param {Object} crop - crop Object
