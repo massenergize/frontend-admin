@@ -79,6 +79,8 @@ class App extends React.Component {
   async componentDidMount() {
     const { data } = await apiCall("auth.whoami");
 
+    let params = window.location.href.split("?cred=");
+
     let user = null;
     if (data && Object.keys(data).length > 0) {
       user = data;
@@ -91,6 +93,14 @@ class App extends React.Component {
     }
 
     if (user) {
+      // if admin is from an external source(email link)
+      if (params[1]) {
+        // decode the token
+        let decodedData = JSON.parse(atob(params[1]));
+        // check if admin is logged in with same email from the external source
+        // if no log the admin out
+        if(decodedData?.email !== user.email) return this.signOut()
+      }
       // set the user in the redux state
       this.props.reduxLoadAuthAdmin(user);
       this.goHome();
