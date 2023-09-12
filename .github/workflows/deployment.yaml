@@ -9,6 +9,12 @@ on:
 env:
   REACT_APP_SENTRY_DSN: ${{ secrets.REACT_APP_SENTRY_DSN }}
   REACT_APP_TINY_MCE_KEY: ${{ secrets.REACT_APP_TINY_MCE_KEY }}
+  REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
+  REACT_APP_FIREBASE_DATABASE_URL: ${{ secrets.REACT_APP_FIREBASE_DATABASE_URL }}
+  REACT_APP_FIREBASE_STORAGE_BUCKET: ${{ secrets.REACT_APP_FIREBASE_STORAGE_BUCKET }}
+  REACT_APP_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }}
+  REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
+  REACT_APP_FIREBASE_MEASUREMENT_ID: ${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID }}
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -66,14 +72,13 @@ jobs:
           prod: true
           message: 'Deploying ${{ github.ref }}'
 
-
       - name: Report status to Slack 📢
-        uses: ravsamhq/notify-slack-action@master
-        if: always()
-        with:
-          status: ${{ job.status }}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          MESSAGE="Workflow *${{ github.workflow }}* has completed with status: *${{ job.status }}*"
+          PAYLOAD="{\"text\": \"$MESSAGE\"}"
+          curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_WEBHOOK_URL
 
 
 

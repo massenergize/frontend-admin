@@ -22,28 +22,21 @@ if (IS_LOCAL) {
 const CC_HOST = API_HOST.replace('//api', '//cc'); // local should stay the same
 
 //  ---- setting  Firebase Config routes
-let FIREBASE_CONFIG = {};
-if (IS_PROD || IS_CANARY) {
+let FIREBASE_CONFIG = {
+  apiKey:  process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: 'massenergize-prod-auth.firebaseapp.com',
+  databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
+  projectId: 'massenergize-prod-auth',
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+};
+if (IS_PROD) {
   FIREBASE_CONFIG = {
-    apiKey: 'AIzaSyDgSkiZGtco0b8ntN9Yo7U-urRzXhQNOo8',
-    authDomain: 'massenergize-prod-auth.firebaseapp.com',
-    databaseURL: 'https://massenergize-prod-auth.firebaseio.com',
-    projectId: 'massenergize-prod-auth',
-    storageBucket: 'massenergize-prod-auth.appspot.com',
-    messagingSenderId: '738582671182',
-    appId: '1:738582671182:web:1cb9c3353cff73a4e3381f',
-    measurementId: 'G-4FPTY0R9S6'
+    ...FIREBASE_CONFIG,
+    measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
   };
-} else {
-  FIREBASE_CONFIG = {
-    apiKey: 'AIzaSyBjcwjC_0H1bgGKqPyqKnbWaGmAtzc4BJQ',
-    authDomain: 'massenergize-auth.firebaseapp.com',
-    databaseURL: 'https://massenergize-auth.firebaseio.com',
-    projectId: 'massenergize-auth',
-    messagingSenderId: '72842344535',
-    appId: '1:72842344535:web:9b1517b1b3d2e818'
-  };
-}
+} 
 
 
 //  ---- setting  Community Portal routes
