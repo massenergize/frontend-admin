@@ -132,7 +132,7 @@ class App extends React.Component {
         const token = await firebase
           .auth()
           .currentUser.getIdToken(/* forceRefresh */ true);
-        this.requestMassToken(token);
+        this.requestMassToken({fireToken:token, login_method:"facebook"});
       })
       .catch((err) => {
         console.log("Error", err);
@@ -140,10 +140,10 @@ class App extends React.Component {
       });
   };
 
-  requestMassToken = (fireToken) => {
+  requestMassToken = ({fireToken,login_method}) => {
     this.setState({ error: null });
     const me = this;
-    const body = { idToken: fireToken };
+    const body = login_method? { idToken: fireToken, login_method }: { idToken: fireToken };
     // var successURL = localStorage.getItem(LAST_VISITED) || "/";
     var successURL = "/?atf=true"; // atf = Ask to forward
     apiCall("auth.login", body)
@@ -178,7 +178,7 @@ class App extends React.Component {
         const token = await firebase
           .auth()
           .currentUser.getIdToken(/* forceRefresh */ true);
-        this.requestMassToken(token);
+        this.requestMassToken({fireToken:token, login_method:"google"});
       })
       .catch((err) => {
         this.setState({ error: err.message, started: false });
@@ -194,7 +194,7 @@ class App extends React.Component {
         const token = await firebase
           .auth()
           .currentUser.getIdToken(/* forceRefresh */ true);
-        this.requestMassToken(token);
+        this.requestMassToken({fireToken:token, login_method:"email-password"});
       })
       .catch((err) => {
         console.log("Error:", err.message);
