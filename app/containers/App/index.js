@@ -23,7 +23,6 @@ import {
 } from "../../utils/constants";
 import * as Sentry from "@sentry/react";
 
-
 window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
 
 const saveCurrentLocation = () => {
@@ -99,7 +98,21 @@ class App extends React.Component {
         let decodedData = JSON.parse(atob(params[1]));
         // check if admin is logged in with same email from the external source
         // if no log the admin out
-        if(decodedData?.email !== user.email) return this.signOut()
+        if (decodedData?.email !== user.email) {
+          const confirm = window.confirm(
+            `You are logged in with a different email(${
+              user?.email
+            }). Are you sure you want to continue to change the communication preferences for ${
+              decodedData?.email
+            } ?`
+          );
+          if (confirm) {
+            this.signOut();
+          } else {
+            this.props.reduxLoadAuthAdmin(user);
+            return (window.location.href = "/");
+          }
+        }
       }
       // set the user in the redux state
       this.props.reduxLoadAuthAdmin(user);
