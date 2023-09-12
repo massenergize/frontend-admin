@@ -23,7 +23,6 @@ import {
 } from "../../utils/constants";
 import * as Sentry from "@sentry/react";
 
-
 window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
 
 const saveCurrentLocation = () => {
@@ -79,6 +78,8 @@ class App extends React.Component {
   async componentDidMount() {
     const { data } = await apiCall("auth.whoami");
 
+    let params = window.location.href.split("?cred=");
+
     let user = null;
     if (data && Object.keys(data).length > 0) {
       user = data;
@@ -91,6 +92,28 @@ class App extends React.Component {
     }
 
     if (user) {
+      // if admin is from an external source(email link)
+      if (params[1]) {
+        // decode the token
+        let decodedData = JSON.parse(atob(params[1]));
+        // check if admin is logged in with same email from the external source
+        // if no log the admin out
+        if (decodedData?.email !== user.email) {
+          const confirm = window.confirm(
+            `You are logged in with a different email(${
+              user?.email
+            }). Are you sure you want to continue to change the communication preferences for ${
+              decodedData?.email
+            } ?`
+          );
+          if (confirm) {
+            this.signOut();
+          } else {
+            this.props.reduxLoadAuthAdmin(user);
+            return (window.location.href = "/");
+          }
+        }
+      }
       // set the user in the redux state
       this.props.reduxLoadAuthAdmin(user);
       this.goHome();
@@ -109,7 +132,7 @@ class App extends React.Component {
         const token = await firebase
           .auth()
           .currentUser.getIdToken(/* forceRefresh */ true);
-        this.requestMassToken(token);
+        this.requestMassToken({fireToken:token, login_method:"facebook"});
       })
       .catch((err) => {
         console.log("Error", err);
@@ -117,10 +140,10 @@ class App extends React.Component {
       });
   };
 
-  requestMassToken = (fireToken) => {
+  requestMassToken = ({fireToken,login_method}) => {
     this.setState({ error: null });
     const me = this;
-    const body = { idToken: fireToken };
+    const body = login_method? { idToken: fireToken, login_method }: { idToken: fireToken };
     // var successURL = localStorage.getItem(LAST_VISITED) || "/";
     var successURL = "/?atf=true"; // atf = Ask to forward
     apiCall("auth.login", body)
@@ -155,7 +178,7 @@ class App extends React.Component {
         const token = await firebase
           .auth()
           .currentUser.getIdToken(/* forceRefresh */ true);
-        this.requestMassToken(token);
+        this.requestMassToken({fireToken:token, login_method:"google"});
       })
       .catch((err) => {
         this.setState({ error: err.message, started: false });
@@ -171,7 +194,7 @@ class App extends React.Component {
         const token = await firebase
           .auth()
           .currentUser.getIdToken(/* forceRefresh */ true);
-        this.requestMassToken(token);
+        this.requestMassToken({fireToken:token, login_method:"email-password"});
       })
       .catch((err) => {
         console.log("Error:", err.message);
