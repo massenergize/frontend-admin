@@ -76,7 +76,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          MESSAGE="Workflow *${{ github.workflow }}* has completed with status: *${{ job.status }}*"
+          MESSAGE="Workflow *${{ github.ref}}* has completed with status: *${{ job.status }}*"
           PAYLOAD="{\"text\": \"$MESSAGE\"}"
           curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_WEBHOOK_URL
 
