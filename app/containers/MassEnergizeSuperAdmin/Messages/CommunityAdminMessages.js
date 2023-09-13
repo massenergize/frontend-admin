@@ -285,7 +285,7 @@ class AllCommunityAdminMessages extends React.Component {
    ];
   };
   nowDelete({ idsToDelete, data }) {
-    const { messages, putMessagesInRedux } = this.props;
+    const { messages, putMessagesInRedux, putMetaDataToRedux,meta } = this.props;
     const itemsInRedux = messages;
     const ids = [];
     idsToDelete.forEach((d) => {
@@ -293,6 +293,13 @@ class AllCommunityAdminMessages extends React.Component {
       ids.push(found);
       apiCall("/messages.delete", { message_id: found }).then((response) => {
         if (response.success) {
+          putMetaDataToRedux({
+            ...meta,
+            ["adminMessages"]: {
+              ...meta["adminMessages"],
+              count: meta["adminMessages"].count - 1,
+            },
+          });
           this.props.toggleToast({
             open: true,
             message: "Message(s) successfully deleted",

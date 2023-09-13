@@ -52,7 +52,10 @@ import {
   LOAD_TABLE_FILTERS,
   LOAD_VISIT_LOGS,
   LOAD_USER_ACTIVE_STATUS,
-  LOAD_EMAIL_TEMPLATES,
+  SET_IMAGE_FOR_EDIT,
+  LOAD_OTHER_ADMINS,
+  SET_MEDIA_LIBRARY_MODAL_FILTERS,
+  SET_GALLERY_META_DATA,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -176,6 +179,27 @@ export const setupSocketConnectionWithBackend = (auth) => (
   connectSocket();
 };
 
+export const setGalleryMetaAction = (data) => {
+  return { type: SET_GALLERY_META_DATA, payload: data };
+};
+export const reduxLoadOtherAdmins = (data) => {
+  return { type: LOAD_OTHER_ADMINS, payload: data };
+};
+export const fetchOtherAdminsInMyCommunities = (body, cb) => (dispatch) => {
+  apiCall("/communities.adminsOf", body).then((response) => {
+    cb && cb(response.data, !response.success, response.error);
+    if (!response.success)
+      return console.log("Could not load other admins", response);
+    dispatch(reduxLoadOtherAdmins(response.data));
+  });
+  // return { type: LOAD_OTHER_ADMINS, payload: data };
+};
+export const setLibraryModalFiltersAction = (data) => {
+  return { type: SET_MEDIA_LIBRARY_MODAL_FILTERS, payload: data };
+};
+export const setImageForEditAction = (data) => {
+  return { type: SET_IMAGE_FOR_EDIT, payload: data };
+};
 export const reduxLoadUserActiveStatus = (data) => {
   return { type: LOAD_USER_ACTIVE_STATUS, payload: data };
 };
@@ -252,8 +276,9 @@ export const reduxLoadAdmins = (data = LOADING) => {
 export const reduxFetchInitialContent = (auth) => (dispatch) => {
   if (!auth) return;
   const isSuperAdmin = auth && auth.is_super_admin;
-  // dispatch(setupSocketConnectionWithBackend(auth)); Deactivated as of 30/06/23 (Will return when the PROD disconnection bug is fixed) 
+  // dispatch(setupSocketConnectionWithBackend(auth)); Deactivated as of 30/06/23 (Will return when the PROD disconnection bug is fixed)
 
+  const galleryQuery = { most_recent: true };
   Promise.all([
     apiCall("/policies.listForCommunityAdmin"),
     apiCall(
@@ -368,11 +393,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
         limit: getLimit(PAGE_PROPERTIES.ALL_TAG_COLLECTS.key),
       }
     ),
-    apiCall("/gallery.search", {
-      any_community: true,
-      filters: ["uploads", "actions", "events", "testimonials"],
-      target_communities: [],
-    }),
+    apiCall("/gallery.search", galleryQuery),
     isSuperAdmin && apiCall("/tasks.functions.list"),
     isSuperAdmin && apiCall("/tasks.list"),
     apiCall("/preferences.list"),
@@ -416,13 +437,13 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(reduxLoadCCActions(ccActions.data.actions));
     dispatch(loadAllTags(tagCollections.data));
     dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
+    dispatch(setGalleryMetaAction({ loadMoreMeta: { query: galleryQuery } }));
     dispatch(loadTaskFunctionsAction(tasksFunctions.data));
     dispatch(loadTasksAction(tasks.data));
     dispatch(loadSettings(preferences.data || {}));
     dispatch(loadFeatureFlags(featureFlags.data || {}));
     dispatch(reduxLoadAllOtherCommunities(otherCommunities.data));
     dispatch(reduxLoadNextStepsSummary(adminNextSteps.data));
-    // dispatch(loadEmailTemplates(emailTemplates.data));
     const cursor = {
       communities: communities.cursor,
       actions: actions.cursor,
@@ -468,10 +489,6 @@ export const loadFeatureFlags = (data = LOADING) => ({
   type: LOAD_FEATURE_FLAGS,
   payload: data,
 });
-// export const loadEmailTemplates = (data = LOADING) => ({
-//          type: LOAD_EMAIL_TEMPLATES,
-//          payload: data,
-//        });
 export const reduxToggleUniversalModal = (data = {}) => ({
   type: TOGGLE_UNIVERSAL_MODAL,
   payload: data,
@@ -498,9 +515,10 @@ export const reduxUpdateHeap = (heap = {}) => ({
  * and nothing more!
  */
 export const reduxAddToGalleryImages = ({ old, data }) => {
+  const images = [...(data || []), ...(old.images || [])];
   return {
     type: LOAD_GALLERY_IMAGES,
-    payload: { ...old, images: [...(data || []), ...(old.images || [])] },
+    payload: { ...old, images: removeDupes(images) },
   };
 };
 
@@ -613,37 +631,11 @@ export const reduxLoadImageInfos = ({ oldInfos, newInfo }) => ({
   type: KEEP_LOADED_IMAGE_INFO,
   payload: { ...(oldInfos || {}), [newInfo.id]: newInfo },
 });
-/**
- * Use this function if you just need to add images to the list in "all images page"
- * and nothing more!
- */
-export const reduxAddToSearchedImages = ({ old, data }) => {
-  return {
-    type: LOAD_SEARCHED_IMAGES,
-    payload: { ...old, images: [...(data || []), ...(old.images || [])] },
-  };
-};
 
 export const reduxLoadMetaDataAction = (meta) => ({
   type: LOAD_ALL_META_DATA,
   payload: meta,
 });
-
-export const reduxLoadSearchedImages = ({ data, old, append = true }) => {
-  var images;
-  if (append) images = [...((old && old.images) || []), ...data.images];
-  else images = data.images;
-  var upper_limit = data.upper_limit;
-  var lower_limit = data.lower_limit;
-  if (old.upper_limit)
-    upper_limit = Math.max(data.upper_limit || 0, old.upper_limit || 0);
-  if (old.lower_limit)
-    lower_limit = Math.min(data.lower_limit || 0, old.lower_limit || 0);
-  return {
-    type: LOAD_SEARCHED_IMAGES,
-    payload: { images, upper_limit, lower_limit },
-  };
-};
 
 function redirectIfExpired(response) {
   if (!response.data && response.error === "session_expired") {
@@ -673,16 +665,6 @@ export const reduxLoadAdminActivities = (data = LOADING) => ({
   type: LOAD_ADMIN_ACTIVITIES,
   payload: data,
 });
-
-export const reduxFetchImages = (community_ids = [], callback) => {
-  apiCall("gallery.fetch", { community_ids })
-    .then((response) => {
-      if (!response.success)
-        console.log("GALLERY_FETCH_ERROR:", response.error);
-      if (callback) callback(response.data || []);
-    })
-    .catch((e) => console.log("GALLERY_FETCH_ERROR:", e.toString()));
-};
 
 export const reduxSignOut = (cb) => (dispatch) => {
   if (firebase) {
@@ -960,80 +942,6 @@ export const reduxLoadLibraryModalData = (props) => {
   };
 };
 
-export const universalFetchFromGallery = (props) => {
-  let {
-    body = {},
-    community_ids,
-    old = {},
-    cb,
-    url = "/gallery.search",
-    reduxFunction = reduxLoadGalleryImages,
-    append,
-  } = props;
-  old = old || {};
-  community_ids = community_ids || [];
-  var requestBody = { target_communities: community_ids, ...body };
-  if (old.upper_limit)
-    requestBody = { ...requestBody, upper_limit: old.upper_limit };
-  if (old.lower_limit)
-    requestBody = { ...requestBody, lower_limit: old.lower_limit };
-
-  return (dispatch) => {
-    apiCall(url, requestBody)
-      .then((response) => {
-        if (cb) cb(response);
-        if (!response || !response.success)
-          return console.log(" FETCH ERROR_BE: ", response.error);
-        return dispatch(
-          reduxFunction({
-            data: response.data,
-            old,
-            append,
-          })
-        );
-      })
-      .catch((e) => {
-        if (cb) cb();
-        console.log("FETCH ERROR_SYNT: ", e.toString());
-      });
-  };
-};
-export const reduxCallLibraryModalImages = (props) => {
-  let { community_ids, old = {}, cb } = props;
-  old = old || {};
-  community_ids = community_ids || [];
-  var requestBody = { community_ids };
-
-  if (old.upper_limit)
-    requestBody = { ...requestBody, upper_limit: old.upper_limit };
-  if (old.lower_limit)
-    requestBody = { ...requestBody, lower_limit: old.lower_limit };
-
-  return (dispatch) => {
-    apiCall("/gallery.fetch", requestBody)
-      .then((response) => {
-        if (cb) cb(response);
-        if (!response || !response.success)
-          return console.log(" FETCH ERROR_BE: ", response.error);
-        const newData = [
-          ...((old && old.images) || []),
-          ...((response.data && response.data.images) || []),
-        ];
-        return dispatch(
-          reduxLoadLibraryModalData({
-            data: { ...response.data, images: newData },
-            old,
-            append: true,
-          })
-        );
-      })
-      .catch((e) => {
-        if (cb) cb(response);
-        console.log("FETCH ERROR_SYNT: ", e.toString());
-      });
-  };
-};
-
 export const reduxCallCommunities = () => (dispatch) => {
   Promise.all([
     apiCall("/communities.listForCommunityAdmin", { limit: 100 }),
@@ -1076,16 +984,6 @@ export const reduxCallIdToken = () => (dispatch) => {
     localStorage.setItem("idToken", token.toString());
     dispatch(reduxLoadIdToken(token));
   });
-  // firebase
-  //   .auth()
-  //   .currentUser.getIdToken(true)
-  //   .then((token) => {
-  //     localStorage.setItem("idToken", token.toString());
-  //     dispatch(reduxLoadIdToken(token));
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //   });
 };
 
 export const reduxCallFullCommunity = (id) => (dispatch) => {

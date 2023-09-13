@@ -1,10 +1,15 @@
 import React, { useRef, useState, useCallback } from "react";
-import { Box, CircularProgress, InputLabel, LinearProgress, MenuItem } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  InputLabel,
+  LinearProgress,
+  MenuItem,
+} from "@mui/material";
 import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
 import { createStyles, makeStyles } from "@mui/styles";
 import { apiCall } from "../../../utils/messenger";
-
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -57,7 +62,6 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-
 function MEDropDown({
   renderGeneralContent,
   updateForm,
@@ -65,6 +69,8 @@ function MEDropDown({
   renderFields,
   field,
   getDisplayName,
+  formData,
+  setValueInForm
 }) {
   const classes = useStyles();
   const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
@@ -118,21 +124,27 @@ function MEDropDown({
       },
     },
   };
+  const value = getValue && getValue(field?.name) || ""
   return (
-    <div key={field.name}>
+    <div key={field?.name}>
       <FormControl className={classes.field} fullWidth>
-        <InputLabel
-          htmlFor={field.label}
-          className={classes.selectFieldLabel}
-        >
-          {field.label}
+        <InputLabel htmlFor={field?.label} className={classes.selectFieldLabel}>
+          {field?.label}
         </InputLabel>
         <Select
-          label={field.label}
-          name={field.name}
-          value={getValue(field.name) || ""}
-          onChange={async (newValue) => {
-            await updateForm(field.name, newValue.target.value);
+          label={field?.label}
+          name={field?.name}
+          value={value}
+          onChange={async(newValue) => {
+            if(field?.onChangeMiddleware){
+              return field?.onChangeMiddleware({
+                field,
+                newValue:newValue?.target?.value,
+                formData,
+                setValueInForm,
+              });
+            }
+            await updateForm(field?.name, newValue.target.value);
           }}
           MenuProps={MenuProps}
         >
@@ -160,12 +172,13 @@ function MEDropDown({
             </MenuItem>
           )}
         </Select>
-        {field.child &&
-          getValue(field.name) === field.child.valueToCheck &&
+        {field?.child &&
+          getValue &&
+          getValue(field?.name) === field.child.valueToCheck &&
           renderFields(field.child.fields)}
       </FormControl>
     </div>
   );
 }
 
-export default MEDropDown
+export default MEDropDown;

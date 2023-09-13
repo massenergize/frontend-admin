@@ -34,6 +34,15 @@ class LoginForm extends React.Component {
     emailError: "",
   }
 
+  componentDidMount = () => {
+    const lastVisited = localStorage.getItem("LAST_VISITED_URL"); 
+    const encodedData = lastVisited?.split("?cred=")[1]
+    if (encodedData) {
+      const decodedData = JSON.parse(atob(encodedData))
+      this.setState({ email: decodedData.email })
+    }
+  }
+
   handleClickShowPassword = () => {
     const { showPassword } = this.state;
     this.setState({ showPassword: !showPassword });
@@ -177,6 +186,7 @@ class LoginForm extends React.Component {
                     placeholder="Your Email"
                     variant="outlined"
                     helperText={this.state.emailError}
+                    value={this.state.email}
                   />
                 </FormControl>
               </div>
