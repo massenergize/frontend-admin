@@ -24,9 +24,9 @@ const CC_HOST = API_HOST.replace('//api', '//cc'); // local should stay the same
 //  ---- setting  Firebase Config routes
 let FIREBASE_CONFIG = {
   apiKey:  process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: 'massenergize-prod-auth.firebaseapp.com',
+  authDomain: 'massenergize-auth.firebaseapp.com',
   databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
-  projectId: 'massenergize-prod-auth',
+  projectId: 'massenergize-auth',
   storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.REACT_APP_FIREBASE_APP_ID,
@@ -34,6 +34,8 @@ let FIREBASE_CONFIG = {
 if (IS_PROD) {
   FIREBASE_CONFIG = {
     ...FIREBASE_CONFIG,
+    authDomain: 'massenergize-prod-auth.firebaseapp.com',
+    projectId: 'massenergize-prod-auth',
     measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
   };
 } 
