@@ -42,6 +42,7 @@ class CreateNewActionForm extends Component {
     this.state = {
       communities: [],
       ccActions: [],
+      ccCategories: [],
       vendors: [],
       formJson: null,
     };
@@ -53,6 +54,7 @@ class CreateNewActionForm extends Component {
       tags,
       vendors,
       ccActions,
+      ccCategories,
       auth,
       location,
     } = props;
@@ -62,6 +64,7 @@ class CreateNewActionForm extends Component {
       tags.length &&
       ccActions &&
       ccActions.length;
+      //add ccCategories here?
 
     if (!fullyMountedNeverRunThisAgain && !state.mounted) return null;
     const coms = (communities || []).map((c) => ({
@@ -80,6 +83,13 @@ class CreateNewActionForm extends Component {
       id: "" + c.id,
     }));
 
+    const modifiedCCCategories = (ccCategories || []).map((c) => ({
+      ...c,
+      value: c.name,
+      id: "" + c.id,
+    }));
+
+
     const section = makeTagSection({
       collections: tags,
       defaults: false
@@ -87,11 +97,28 @@ class CreateNewActionForm extends Component {
 
     const libOpen = location.state && location.state.libOpen;
 
+    const calculator_actions = ( ccCategories || []).map((c) => ({
+        valueToCheck: String(c.id),
+        fields: [
+          {
+            name: "calculator_action",
+            label: "Calculator Action",
+            placeholder: "eg. Wayland",
+            fieldType: "Dropdown",
+            isRequired: true,
+            dbName: "calculator_action",
+            data: [{ displayName: "--", id: "" }, ...modifiedCCActions.filter((d) => d.category == c.name)], //ccActions for a category
+          },
+        ],
+      }));
+
     const formJson = createFormJson({
       communities: coms,
       vendors: vends,
       ccActions: modifiedCCActions,
+      ccCategories: modifiedCCCategories,
       auth,
+      cc_actions: calculator_actions,
       autoOpenMediaLibrary: libOpen,
     });
 
@@ -101,6 +128,7 @@ class CreateNewActionForm extends Component {
       mounted: true,
       communities: coms,
       ccActions: modifiedCCActions,
+      ccCategories: modifiedCCCategories,
       vendors: vends,
       formJson,
     };
@@ -133,6 +161,7 @@ const mapStateToProps = (state) => ({
   communities: state.getIn(["communities"]),
   vendors: state.getIn(["allVendors"]),
   ccActions: state.getIn(["ccActions"]),
+  ccCategories: state.getIn(["ccCategories"]),
   actions: state.getIn(["allActions"]),
   auth: state.getIn(["auth"]),
   formState: state.getIn(["tempForm"]),
@@ -158,9 +187,11 @@ export default withStyles(styles, { withTheme: true })(
 const createFormJson = ({
   communities,
   ccActions,
+  ccCategories,
   vendors,
   auth,
   progress,
+  cc_actions,
   autoOpenMediaLibrary,
 }) => {
   const is_super_admin = auth && auth.is_super_admin;
@@ -245,16 +276,23 @@ const createFormJson = ({
         fieldType: "Section",
         children: [
           {
-            name: "calculator_action",
-            label: "Calculator Action",
+            name: "calculator_category",
+            label: "Category",
             placeholder: "eg. Wayland",
-            fieldType: "Dropdown",
+            fieldType: "Radio",
+            isRequired: true,
             // defaultValue: progress.calculator_action || null,
-            dbName: "calculator_action",
-            data: [{ displayName: "--", id: "" }, ...ccActions],
+            dbName: "calculator_category", 
+            data: [...ccCategories],
             modalTitle: "Carbon Action List & Instructions",
             modalText:
               "Check out the instructions here: https://docs.google.com/document/d/1b-tCB83hKk9yWFcB15YdHBORAFOPyh63c8jt1i15WL4",
+            
+          
+            conditionalDisplays: 
+              cc_actions
+
+          
           },
         ],
       },

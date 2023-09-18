@@ -60,6 +60,8 @@ class CreateNewTagCollectionForm extends Component {
   createFormJson = async () => {
     const { tagCollection } = this.state;
     const { pathname } = window.location;
+    const isCategoryCollection = tagCollection.name == "Category" ? true : false;
+
     const formJson = {
       title: 'Edit Tag Collection',
       subTitle: '',
@@ -90,7 +92,7 @@ class CreateNewTagCollectionForm extends Component {
               isRequired: true,
               defaultValue: tagCollection.name,
               dbName: 'name',
-              readOnly: false
+              readOnly: isCategoryCollection
             },
             {
               name: 'rank',

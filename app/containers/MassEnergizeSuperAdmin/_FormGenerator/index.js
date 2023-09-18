@@ -375,6 +375,11 @@ class MassEnergizeForm extends Component {
       if (field.children) {
         const result = this.requiredValuesAreProvided(formData, field.children);
         culprits = { ...culprits, ...result[1] };
+      }  else if (field.conditionalDisplays){
+        (field.conditionalDisplays || []).forEach((item) => {
+          const result = this.requiredValuesAreProvided(formData, item.fields);
+        culprits = { ...culprits, ...result[1] };
+      });
       } else {
         const value = formData[field.name]; //field.name is what is used to set value, b4 cleaned up onSubmit
         // if field is readOnly - ignore the isRequired if present

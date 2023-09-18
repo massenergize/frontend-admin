@@ -28,6 +28,7 @@ import {
   GET_TEAM_MESSAGES,
   UPDATE_HEAP,
   LOAD_CC_ACTIONS,
+  LOAD_CC_CATEGORIES,
   TOGGLE_UNIVERSAL_MODAL,
   TEST_REDUX,
   LOAD_ALL_TASK_FUNCTIONS,
@@ -393,6 +394,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadAllUsers(users.data));
     dispatch(loadAllVendors(vendors.data));
     dispatch(reduxLoadCCActions(ccActions.data.actions));
+    dispatch(reduxLoadCCCategories(ccActions.data.categories));
     dispatch(loadAllTags(tagCollections.data));
     dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
     dispatch(loadTaskFunctionsAction(tasksFunctions.data));
@@ -456,6 +458,11 @@ export const reduxToggleUniversalToast = (data = {}) => ({
 });
 export const reduxLoadCCActions = (data = []) => ({
   type: LOAD_CC_ACTIONS,
+  payload: data,
+});
+
+export const reduxLoadCCCategories = (data = []) => ({
+  type: LOAD_CC_CATEGORIES,
   payload: data,
 });
 
