@@ -50,6 +50,12 @@ import { FROM } from "../../../utils/constants";
 import Loader from "../../../utils/components/Loader";
 import HomeIcon from "@mui/icons-material/Home";
 import StarsIcon from "@mui/icons-material/Stars";
+import Seo from "../../../../app/components/Seo/Seo";
+import CustomOptions from "../ME  Tools/table /CustomOptions";
+import {
+  EventNotSharedWithAnyone,
+  EventSharedWithCommunity,
+} from "./EventSharedStateComponents";
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
@@ -81,12 +87,13 @@ class AllEvents extends React.Component {
         initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`,
       },
       smartString(d.name),
+      d,
       `${
         smartString(d.tags.map((t) => t.name).join(", "), 30) // limit to first 30 chars
       }`,
       d.is_global ? "Template" : d.community && d.community.name,
       { isLive: d.is_published, item: d },
-      { id: d.id,  is_on_home_page: d.is_on_home_page},
+      { id: d.id, is_on_home_page: d.is_on_home_page },
       d.is_published ? "Yes" : "No",
       d.is_global,
       getHumanFriendlyDate(d.start_date_and_time, true, false),
@@ -96,7 +103,7 @@ class AllEvents extends React.Component {
   }
 
   getColumns() {
-    const { classes, putEventsInRedux, allEvents, auth } = this.props;
+    const { classes, putEventsInRedux, allEvents, auth, communities } = this.props;
 
     return [
       {
@@ -130,9 +137,7 @@ class AllEvents extends React.Component {
                   style={{ margin: 10 }}
                 />
               )}
-              {!d.image && (
-                <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
-              )}
+              {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
             </div>
           ),
         },
@@ -142,6 +147,21 @@ class AllEvents extends React.Component {
         key: "name",
         options: {
           filter: false,
+        },
+      },
+      {
+        name: "Shared",
+        key: "shared",
+        options: {
+          filter: false,
+          customBodyRender: (d) => (
+            <EventSharedState
+              {...d || {}}
+              classes={classes}
+              history={this.props.history}
+              toggleModalOnClick={(props) => this.props.toggleModal(props)}
+            />
+          ),
         },
       },
       {
@@ -155,10 +175,16 @@ class AllEvents extends React.Component {
       {
         name: "Community",
         key: "community",
-        options: {
-          filter: true,
-          filterType: "multiselect",
-        },
+        options: auth?.is_super_admin
+          ? CustomOptions({
+              data: communities,
+              label: "community",
+              endpoint: "/communities.listForSuperAdmin",
+            })
+          : {
+              filter: true,
+              filterType: "multiselect",
+            },
       },
       {
         name: "Live?",
@@ -196,37 +222,24 @@ class AllEvents extends React.Component {
           customBodyRender: ({ id, is_on_home_page }) => (
             <div style={{ display: "flex" }}>
               <Link to={`/admin/edit/${id}/event`}>
-                <EditIcon
-                  size="small"
-                  variant="outlined"
-                  color="secondary"
-                />
+                <EditIcon size="small" variant="outlined" color="secondary" />
               </Link>
               &nbsp;&nbsp;
               <Link
                 onClick={async () => {
-                  const copiedEventResponse = await apiCall(
-                    "/events.copy",
-                    {
-                      event_id: id,
-                    }
-                  );
+                  const copiedEventResponse = await apiCall("/events.copy", {
+                    event_id: id,
+                  });
                   if (copiedEventResponse && copiedEventResponse.success) {
                     const newEvent =
                       copiedEventResponse && copiedEventResponse.data;
-                    this.props.history.push(
-                      `/admin/edit/${newEvent.id}/event`
-                    );
+                    this.props.history.push(`/admin/edit/${newEvent.id}/event`);
                     putEventsInRedux([newEvent, ...(allEvents || [])]);
                   }
                 }}
                 to="/admin/read/events"
               >
-                <FileCopy
-                  size="small"
-                  variant="outlined"
-                  color="secondary"
-                />
+                <FileCopy size="small" variant="outlined" color="secondary" />
               </Link>
               {auth && auth.is_super_admin && (
                 <Link to={`/admin/read/event/${id}/event-view?from=main`}>
@@ -368,7 +381,8 @@ class AllEvents extends React.Component {
   addEventToHomePage = (id) => {
     const { allEvents, putEventsInRedux } = this.props;
     const data = allEvents || [];
-    let event =data?.find((item) => item.id?.toString() === id?.toString()) || {};
+    let event =
+      data?.find((item) => item.id?.toString() === id?.toString()) || {};
     const index = data.findIndex((a) => a.id?.toString() === id);
 
     const toSend = {
@@ -385,10 +399,10 @@ class AllEvents extends React.Component {
       });
       return;
     }
-  
+
     apiCall("home_page_settings.addEvent", toSend).then((res) => {
       if (res.success) {
-        event.is_on_home_page = res?.data?.status
+        event.is_on_home_page = res?.data?.status;
         data.splice(index, 1, event);
         putEventsInRedux([...data]);
         this.props.toggleToast({
@@ -418,7 +432,7 @@ class AllEvents extends React.Component {
   }
 
   nowDelete({ idsToDelete, data }) {
-    const { allEvents, putEventsInRedux } = this.props;
+    const { allEvents, putEventsInRedux, putMetaDataToRedux, meta } = this.props;
     const itemsInRedux = allEvents;
     const ids = [];
     idsToDelete.forEach((d) => {
@@ -426,6 +440,13 @@ class AllEvents extends React.Component {
       ids.push(found);
       apiCall("/events.delete", { event_id: found }).then((response) => {
         if (response.success) {
+          putMetaDataToRedux({
+            ...meta,
+            ["events"]: {
+              ...meta["events"],
+              count: meta["events"].count - 1,
+            },
+          });
           this.props.toggleToast({
             open: true,
             message: "Event(s) successfully deleted",
@@ -563,7 +584,7 @@ class AllEvents extends React.Component {
           return f[9]; // this index should be changed if anyone modifies (adds/removes) an item in fashioData()
         });
         const noTemplatesSelectedGoAhead = !found || !found.length;
-        this.props.toggleDeleteConfirmation({
+        this.props.toggleModal({
           show: true,
           component: makeDeleteUI({
             idsToDelete,
@@ -588,14 +609,7 @@ class AllEvents extends React.Component {
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"All Events"} />
         <Paper style={{ marginBottom: 10 }}>
           <METable
             classes={classes}
@@ -623,6 +637,7 @@ function mapStateToProps(state) {
     allEvents: state.getIn(["allEvents"]),
     community: state.getIn(["selected_community"]),
     meta: state.getIn(["paginationMetaData"]),
+    communities: state.getIn(["communities"]),
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -631,7 +646,7 @@ function mapDispatchToProps(dispatch) {
       callForSuperAdminEvents: reduxGetAllEvents,
       callForNormalAdminEvents: reduxGetAllCommunityEvents,
       putEventsInRedux: loadAllEvents,
-      toggleDeleteConfirmation: reduxToggleUniversalModal,
+      toggleModal: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
       toggleToast: reduxToggleUniversalToast,
       putMetaDataToRedux: reduxLoadMetaDataAction,
@@ -645,3 +660,96 @@ const EventsMapped = connect(
   mapDispatchToProps
 )(AllEvents);
 export default withStyles(styles)(withRouter(EventsMapped));
+
+const EventSharedState = (props) => {
+  const {
+    shared_to,
+    name,
+    classes,
+    toggleModalOnClick,
+    publicity,
+    communities_under_publicity,
+    id,
+    history,
+  } = props;
+
+  const numberOfSharers = shared_to?.length || 0;
+  const commonClasses = "touchable-opacity";
+
+  const closeModal = () => {
+    toggleModalOnClick && toggleModalOnClick({ show: false });
+  };
+
+  const notSharedYetDialog = () => {
+    toggleModalOnClick &&
+      toggleModalOnClick({
+        show: true,
+        title: smartString(name, 50),
+        component: (
+          <EventNotSharedWithAnyone
+            publicity={publicity}
+            shareable_to={communities_under_publicity}
+            closeModal={closeModal}
+            history={history}
+            id={id}
+          />
+        ),
+        cancelText: "Close",
+        noOk: true,
+        // okText: "Change Event Settings",
+      });
+  };
+  const sharedWithDialog = () => {
+    toggleModalOnClick &&
+      toggleModalOnClick({
+        show: true,
+        title: smartString(name, 50),
+        component: (
+          <EventSharedWithCommunity
+            publicity={publicity}
+            shared_to={shared_to}
+            id={id}
+            close={close}
+            shareable_to={communities_under_publicity}
+            closeModal={closeModal}
+            history={history}
+          />
+        ),
+        noOk: true,
+        cancelText: "Close",
+        // okText: "ADD/REMOVE COMMUNITIES",
+      });
+  };
+
+  const yesProps = {
+    className: `${classes.yesLabel} ${commonClasses}`,
+    onClick: () => sharedWithDialog(),
+  };
+
+  //   const Wrapper = ({ children, style }) => (
+  //     <Typography style={style || {}} variant="body1">
+  //       {children}
+  //     </Typography>
+  //   );
+
+  if (numberOfSharers === 0)
+    return (
+      <MEChip
+        label="No"
+        className={`${classes.noLabel} ${commonClasses}`}
+        onClick={() => notSharedYetDialog()}
+      />
+    );
+  if (numberOfSharers === 1) return <MEChip label="Yes" {...yesProps} />;
+  if (numberOfSharers > 9)
+    return <MEChip {...yesProps}>({numberOfSharers})</MEChip>;
+  return (
+    <MEChip {...yesProps} style={{ padding: "0px 15px" }}>
+      Yes({numberOfSharers})
+    </MEChip>
+  );
+
+  //   <Wrapper style={{ color: "rgb(65 169 65)" }}>
+  //       <b>Yes({numberOfSharers})</b>
+  //     </Wrapper>
+};

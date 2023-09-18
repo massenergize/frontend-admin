@@ -6,6 +6,7 @@ import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 import Loading from "dan-components/Loading";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 import { connect } from "react-redux";
+import Seo from "../../../components/Seo/Seo";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -165,6 +166,7 @@ class CreateNewPolicyForm extends Component {
 
     return (
       <div>
+        <Seo name={"Create New Policy"} />
         <MassEnergizeForm
           pageKey={PAGE_KEYS.CREATE_POLICY.key}
           classes={classes}

@@ -1,8 +1,33 @@
-:root {
-  --app-cyan: #579ece;
-  --app-purple: rgb(156, 39, 176);
+@import url("https://fonts.googleapis.com/css?family=Google+Sans:400,400i,500,500i,600,600i,700,700i,900,900i");
+
+h1,
+h2,
+h3,
+h5,
+h6,
+small,
+p,
+span {
+  font-family: "Google Sans", Open Sans, sans-serif !important ;
 }
 
+:root {
+  --app-cyan: #579ece;
+  /* --app-purple: rgb(156, 39, 176); */
+  --app-purple: #ab47bc;
+}
+
+.tox-notification--warning {
+  display: none !important;
+}
+
+.me-ml-filter-root {
+  border-radius: 5px;
+  border: 2px solid #ab47bc;
+  /* background: #fcfcfc; */
+  background: #fdf5ff;
+  margin-bottom: 6px;
+}
 .drop-children-area {
   position: absolute;
   background: white;
@@ -28,7 +53,7 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  color:black;
+  color: black;
   /* margin:5px 0px; */
 }
 
@@ -94,6 +119,7 @@
   font-size: 11px;
   align-items: center;
   justify-content: center;
+  margin: 0px;
 }
 
 .me-chip-container {
@@ -143,4 +169,17 @@
 
 .me-drop-override > .MuiSelect-outlined {
   padding: 8px !important;
+}
+
+.css-1cggros-MuiBadge-badge {
+  padding: 0px !important;
+}
+
+.user-community-item{
+  cursor: pointer;
+  color: #3c9bda;
+}
+
+.user-community-item:hover{
+  opacity: 0.7;
 }

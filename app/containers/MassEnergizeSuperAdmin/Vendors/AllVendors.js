@@ -35,6 +35,7 @@ import {
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
+import Seo from "../../../components/Seo/Seo";
 
 class AllVendors extends React.Component {
   constructor(props) {
@@ -193,7 +194,7 @@ class AllVendors extends React.Component {
   ];
 
   nowDelete({ idsToDelete, data }) {
-    const { allVendors, putVendorsInRedux } = this.props;
+    const { allVendors, putVendorsInRedux, meta,putMetaDataToRedux } = this.props;
     const itemsInRedux = allVendors || [];
     const ids = [];
     idsToDelete.forEach((d) => {
@@ -201,6 +202,14 @@ class AllVendors extends React.Component {
       ids.push(found);
       apiCall("/vendors.delete", { vendor_id: found }).then((response) => {
         if (response.success) {
+          putMetaDataToRedux({
+            ...meta,
+            ["vendors"]: {
+              ...meta["vendors"],
+              count:
+                meta["vendors"].count - 1,
+            },
+          });
           this.props.toggleToast({
             open: true,
             message: "Vendor(s) successfully deleted",
@@ -329,14 +338,7 @@ class AllVendors extends React.Component {
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"All Vendors"}/>
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_VENDORS}

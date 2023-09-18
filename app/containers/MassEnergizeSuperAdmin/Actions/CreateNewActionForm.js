@@ -270,7 +270,7 @@ const createFormJson = ({
                 name: "is_global",
                 label: "Is this Action a Template?",
                 fieldType: "Radio",
-                isRequired: false,
+                isRequired: true,
                 // defaultValue: progress.is_global || "false",
                 dbName: "is_global",
                 readOnly: false,

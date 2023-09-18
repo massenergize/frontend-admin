@@ -19,6 +19,7 @@ import {
 import {
   getHumanFriendlyDate,
   isEmpty,
+  ourCustomSort,
   reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
@@ -41,6 +42,10 @@ import {
   KeyboardArrowRight,
 } from "@mui/icons-material";
 import RenderVisitLogs from "./RenderVisitLogs";
+import { getData } from "../Messages/CommunityAdminMessages";
+import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import Seo from "../../../components/Seo/Seo";
+import CustomOptions from "../ME  Tools/table /CustomOptions";
 
 class AllUsers extends React.Component {
   constructor(props) {
@@ -71,20 +76,20 @@ class AllUsers extends React.Component {
 
     if (!comingFromDashboard) return fetchUsers();
 
-    this.setState({ updating: true, saveFilters: false });
-    const key = PAGE_PROPERTIES.ALL_USERS.key + FILTERS;
+    this.setState({ updating: true, comingFromDashboard, ids });
+    // const key = PAGE_PROPERTIES.ALL_USERS.key + FILTERS;
 
-    updateTableFilters({
-      ...(tableFilters || {}),
-      [key]: { 3: { list: ids } },
-    });
+    // updateTableFilters({
+    //   ...(tableFilters || {}),
+    //   [key]: { 3: { list: ids } },
+    // });
 
     var content = {
       fieldKey: "user_emails",
       apiURL: "/users.listForCommunityAdmin",
       props: this.props,
       dataSource: [],
-      valueExtractor: (user) => user.email,
+      separationOptions: { valueExtractor: (user) => user.email },
       reduxFxn: putUsersInRedux,
       args: {
         limit: getLimit(PAGE_PROPERTIES.ALL_USERS.key),
@@ -100,10 +105,11 @@ class AllUsers extends React.Component {
   fashionData = (data) => {
     return data.map((d) => [
       d.full_name,
+      d,
       getHumanFriendlyDate(d.joined),
       d.preferred_name,
       d.email,
-      smartString(d.communities.join(", "), 30),
+      d.communities,
       d.is_super_admin
         ? "Super Admin"
         : d.is_community_admin
@@ -111,100 +117,139 @@ class AllUsers extends React.Component {
         : d.is_guest
         ? "Guest"
         : "Member",
-      d,
       d.id,
     ]);
   };
 
-  getColumns = (classes) => [
-    {
-      name: "Full Name",
-      key: "full_name",
-      options: {
-        filter: false,
-      },
-    },
-    {
-      name: "Joined",
-      key: "joined",
-      options: {
-        filter: false,
-        filterType: "textField",
-      },
-    },
-    {
-      name: "Preferred Name",
-      key: "preferred_name",
-      options: {
-        filter: false,
-      },
-    },
-    {
-      name: "Email",
-      key: "email",
-      options: {
-        filter: false,
-        filterType: "multiselect",
-      },
-    },
-    {
-      name: "Community",
-      key: "community",
-      options: {
-        filter: true,
-        filterType: "multiselect",
-      },
-    },
-    {
-      name: "Membership",
-      key: "status",
-      options: {
-        filter: true,
-      },
-    },
-    {
-      name: "Last Visited",
-      key: "last-visited",
-      options: {
-        filter: false,
-        download: false,
-        customBodyRender: (d) => {
-          const { id, user_portal_visits } =d ||{}
-          const isOneRecord = user_portal_visits?.length === 1;
-          const isEmpty = !user_portal_visits?.length;
-
-          if (isEmpty) return <span>-</span>;
-
-          const log = getHumanFriendlyDate(user_portal_visits[0], false, false);
-
-          if (isOneRecord) return <span>{log}</span>;
-
-          return (
-            <Link
-              onClick={(e) => {
-                e.preventDefault();
-                this.showVisitRecords(id);
-              }}
-            >
-              <span>{log}...</span>
-            </Link>
-          );
+  getColumns = (classes) => {
+    const { auth, communities } = this.props;
+    return [
+      {
+        name: "Full Name",
+        key: "full_name",
+        options: {
+          filter: false,
         },
       },
-    },
-    {
-      name: "id",
-      key: "id",
-      options: {
-        filter: false,
-        display: false,
-        download: false,
+      {
+        name: "Last Visited",
+        key: "last-visited",
+        options: {
+          filter: false,
+          download: false,
+          customBodyRender: (d) => {
+            const { id, user_portal_visits } = d || {};
+            const isOneRecord = user_portal_visits?.length === 1;
+            const isEmpty = !user_portal_visits?.length;
+
+            if (isEmpty) return <span>-</span>;
+
+            const log = getHumanFriendlyDate(
+              user_portal_visits[0],
+              false,
+              true
+            );
+
+            if (isOneRecord) return <span>{log}</span>;
+
+            return (
+              <Link
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.showVisitRecords(id);
+                }}
+              >
+                <span>{log}...</span>
+              </Link>
+            );
+          },
+        },
       },
-    },
-  ];
+      {
+        name: "Joined",
+        key: "joined",
+        options: {
+          filter: false,
+          filterType: "textField",
+        },
+      },
+      {
+        name: "Preferred Name",
+        key: "preferred_name",
+        options: {
+          filter: false,
+        },
+      },
+      {
+        name: "Email",
+        key: "email",
+        options: {
+          filter: false,
+          filterType: "multiselect",
+        },
+      },
+      {
+        name: "Community",
+        key: "community",
+        options: auth?.is_super_admin
+          ? CustomOptions({
+              data: communities,
+              label: "community",
+              endpoint: "/communities.listForSuperAdmin",
+              customBodyRender: (d) => {
+                if (d?.length > 1) {
+                  return (
+                    <span
+                      className="user-community-item"
+                      onClick={() => this.showAllCommunities(d)}
+                    >
+                      {smartString(d.join(", "), 30)}
+                    </span>
+                  );
+                }
+                return <span>{smartString(d.join(", "), 30)}</span>;
+              },
+            })
+          : {
+              filter: true,
+              filterType: "multiselect",
+              customBodyRender: (d) => {
+                if (d?.length > 1) {
+                  return (
+                    <span
+                      className="user-community-item"
+                      onClick={() => this.showAllCommunities(d)}
+                    >
+                      {smartString(d.join(", "), 30)}
+                    </span>
+                  );
+                }
+                return <span>{smartString(d.join(", "), 30)}</span>;
+              },
+            },
+      },
+      {
+        name: "Membership",
+        key: "status",
+        options: {
+          filter: true,
+        },
+      },
+
+      {
+        name: "id",
+        key: "id",
+        options: {
+          filter: false,
+          display: false,
+          download: false,
+        },
+      },
+    ];
+  };
 
   nowDelete({ idsToDelete, data }) {
-    const { allUsers, putUsersInRedux } = this.props;
+    const { allUsers, putUsersInRedux, putMetaDataToRedux, meta } = this.props;
     const itemsInRedux = allUsers || [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][7];
@@ -217,6 +262,13 @@ class AllUsers extends React.Component {
           });
           const rem = (itemsInRedux || []).filter((com) => com?.id !== found);
           putUsersInRedux(rem);
+          putMetaDataToRedux({
+            ...meta,
+            ["users"]: {
+              ...meta["users"],
+              count: meta["users"].count - 1,
+            },
+          });
         } else {
           this.props.toggleToast({
             open: true,
@@ -240,6 +292,26 @@ class AllUsers extends React.Component {
     );
   }
 
+  showAllCommunities(communities) {
+    const { toggleModal } = this.props;
+    toggleModal({
+      show: true,
+      component: this.renderFullCommunitiesList(communities),
+      onConfirm: () => toggleModal({ show: false, component: null }),
+      closeAfterConfirmation: true,
+      title: "Full Communities List",
+      noTitle: false,
+      noCancel: true,
+      okText: "Close",
+    });
+  }
+
+  renderFullCommunitiesList = (communities)=>{
+    return communities.map((d, index)=>{
+      return <p>{index+1}. {d}</p>
+    })
+  }
+
   showVisitRecords(id) {
     const { toggleModal } = this.props;
     toggleModal({
@@ -253,10 +325,29 @@ class AllUsers extends React.Component {
       okText: "Close",
     });
   }
+
+  customSort(data, colIndex, order) {
+    const isSortingDate = colIndex === 1;
+    const sortDate = ({ a, b }) => {
+      if (a.user_portal_visits.length === 0) return 1;
+      if (b.user_portal_visits.length === 0) return -1;
+      const aFirstVisit = (a.user_portal_visits || [])[0];
+      const bFirstVisit = (b.user_portal_visits || [])[0];
+      return new Date(aFirstVisit) < new Date(bFirstVisit) ? 1 : -1;
+    };
+    var params = {
+      colIndex,
+      order,
+      compare: isSortingDate && sortDate,
+    };
+    return data.sort((a, b) => ourCustomSort({ ...params, a, b }));
+  }
+
   render() {
-    const title = brand.name + " - Users";
-    const description = brand.desc;
-    const { columns } = this.state;
+    // const title = brand.name + " - Users";
+    // const description = brand.desc;
+    const { columns, comingFromDashboard, ids, updating } = this.state;
+
     const {
       classes,
       allUsers,
@@ -265,12 +356,20 @@ class AllUsers extends React.Component {
       meta,
       putMetaDataToRedux,
     } = this.props;
-    const data = this.fashionData(allUsers || []);
+
+    const content = getData({
+      source: allUsers || [],
+      comingFromDashboard,
+      ids,
+      valueExtractor: (item) => item.email,
+    });
+    const data = this.fashionData(content);
     const metaData = meta && meta.users;
 
     const options = {
       filterType: "dropdown",
       responsive: "standard",
+      customSort: this.customSort,
       print: true,
       count: metaData && metaData.count,
       rowsPerPage: 25,
@@ -355,19 +454,30 @@ class AllUsers extends React.Component {
     }
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"All Users"} />
 
-        {this.state.updating && (
+        {updating && (
           <LinearBuffer asCard message="Checking for updates..." lines={1} />
         )}
 
+        {comingFromDashboard && !updating && (
+          <MEPaperBlock icon="fa fa-bullhorn" banner>
+            <Typography>
+              The users involved in the interactions are currently pre-selected
+              and sorted in the table for you. Feel free to
+              <Link
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.setState({ comingFromDashboard: false });
+                }}
+              >
+                {" "}
+                clear all selections.
+              </Link>
+            </Typography>
+          </MEPaperBlock>
+        )}
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_USERS}
@@ -377,7 +487,8 @@ class AllUsers extends React.Component {
             columns: columns,
             options: options,
           }}
-          saveFilters={this.state.saveFilters}
+          ignoreSavedFilters={comingFromDashboard}
+          saveFilters={!comingFromDashboard}
         />
       </div>
     );
@@ -394,6 +505,7 @@ function mapStateToProps(state) {
     allUsers: state.getIn(["allUsers"]),
     meta: state.getIn(["paginationMetaData"]),
     tableFilters: state.getIn(["tableFilters"]),
+    communities: state.getIn(["communities"]),
   };
 }
 

@@ -1,7 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Helmet } from "react-helmet";
-import brand from "dan-api/dummy/brand";
 import AppBar from "@mui/material/AppBar";
 import dummy from "dan-api/dummy/dummyContents";
 import Tabs from "@mui/material/Tabs";
@@ -21,6 +19,7 @@ import {
   reduxCallFullCommunity,
   reduxLiveOrNot,
 } from "../../../redux/redux-actions/adminActions";
+import Seo from "../../../components/Seo/Seo";
 
 function TabContainer(props) {
   const { children } = props;
@@ -64,10 +63,8 @@ class CommunityProfile extends React.Component {
   };
 
   render() {
-    const title = brand.name + " - Profile";
-    const description = brand.desc;
     const { dataProps, classes } = this.props;
-    const { value, id } = this.state;
+    const { value } = this.state;
     const community = this.props.full_community
       ? this.props.full_community
       : {};
@@ -77,14 +74,7 @@ class CommunityProfile extends React.Component {
     }
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={`${community?.name} - Profile`} />
         {this.showCommunitySwitch()}
         <Cover
           liveOrNotFxn={this.props.liveOrNot}
@@ -144,7 +134,6 @@ CommunityProfile.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-const reducer = "socmed";
 const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   force: state, // force state from reducer

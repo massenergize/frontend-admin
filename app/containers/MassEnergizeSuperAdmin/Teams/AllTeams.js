@@ -47,6 +47,10 @@ import {
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
+import { getData } from "../Messages/CommunityAdminMessages";
+import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import Seo from "../../../../app/components/Seo/Seo";
+import CustomOptions from "../ME  Tools/table /CustomOptions";
 
 class AllTeams extends React.Component {
   constructor(props) {
@@ -71,14 +75,14 @@ class AllTeams extends React.Component {
     const comingFromDashboard = ids && ids.length;
 
     if (!comingFromDashboard) return fetchTeams();
-    this.setState({ saveFilters: false });
+    this.setState({ saveFilters: false, comingFromDashboard, ids });
 
-    const key = PAGE_PROPERTIES.ALL_TEAMS.key + FILTERS;
+    // const key = PAGE_PROPERTIES.ALL_TEAMS.key + FILTERS;
 
-    updateTableFilters({
-      ...(tableFilters || {}),
-      [key]: { 0: { list: ids } },
-    });
+    // updateTableFilters({
+    //   ...(tableFilters || {}),
+    //   [key]: { 0: { list: ids } },
+    // });
 
     var content = {
       fieldKey: "team_ids",
@@ -141,7 +145,7 @@ class AllTeams extends React.Component {
   }
 
   getColumns() {
-    const { classes } = this.props;
+    const { classes, auth, communities} = this.props;
     return [
       {
         name: "ID",
@@ -189,10 +193,16 @@ class AllTeams extends React.Component {
       {
         name: "Community",
         key: "community",
-        options: {
-          filter: true,
-          filterType: "multiselect",
-        },
+        options: auth?.is_super_admin
+          ? CustomOptions({
+              data: communities,
+              label: "community",
+              endpoint: "/communities.listForSuperAdmin",
+            })
+          : {
+              filter: true,
+              filterType: "multiselect",
+            },
       },
       {
         name: "Parent",
@@ -236,7 +246,11 @@ class AllTeams extends React.Component {
           download: false,
           customBodyRender: (id) => (
             <Link to={`/admin/edit/${id}/team-members`}>
-              <PeopleIcon size="small" variant="outlined" color="secondary" />
+              <PeopleIcon
+                size="small"
+                variant="outlined"
+                color="secondary"
+              />
             </Link>
           ),
         },
@@ -316,7 +330,7 @@ class AllTeams extends React.Component {
   }
 
   nowDelete({ idsToDelete, data }) {
-    const { allTeams, putTeamsInRedux } = this.props;
+    const { allTeams, putTeamsInRedux,meta, putMetaDataToRedux } = this.props;
     const itemsInRedux = allTeams;
     const ids = [];
     idsToDelete.forEach((d) => {
@@ -325,6 +339,13 @@ class AllTeams extends React.Component {
       apiCall("/teams.delete", { team_id: found && found.id }).then(
         (response) => {
           if (response.success) {
+            putMetaDataToRedux({
+              ...meta,
+              ["teams"]: {
+                ...meta["teams"],
+                count: meta["teams"].count - 1,
+              },
+            });
             this.props.toggleToast({
               open: true,
               message: "Team(s) successfully deleted",
@@ -368,7 +389,7 @@ class AllTeams extends React.Component {
   render() {
     const title = brand.name + " - All Teams";
     const description = brand.desc;
-    const { columns } = this.state;
+    const { columns, comingFromDashboard, ids } = this.state;
     const {
       classes,
       allTeams,
@@ -377,7 +398,9 @@ class AllTeams extends React.Component {
       meta,
       putMetaDataToRedux,
     } = this.props;
-    const data = this.fashionData(allTeams);
+
+    const content = getData({ source: allTeams, comingFromDashboard, ids });
+    const data = this.fashionData(content);
     const metaData = meta && meta.teams;
     const options = {
       filterType: "dropdown",
@@ -466,15 +489,27 @@ class AllTeams extends React.Component {
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
-        {/* {this.showCommunitySwitch()} */}
+        <Seo name={"All Teams"} />
+
+        {comingFromDashboard && (
+          <MEPaperBlock icon="fa fa-bullhorn" banner>
+            <Typography>
+              The <b>{comingFromDashboard}</b> team(s) you have not approved yet
+              are currently pre-selected and sorted in the table for you. Feel
+              free to
+              <Link
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.setState({ comingFromDashboard: false });
+                }}
+              >
+                {" "}
+                clear all selections.
+              </Link>
+            </Typography>
+          </MEPaperBlock>
+        )}
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_TEAMS}
@@ -484,7 +519,8 @@ class AllTeams extends React.Component {
             columns: columns,
             options: options,
           }}
-          saveFilters={this.state.saveFilters}
+          ignoreSavedFilters={comingFromDashboard}
+          saveFilters={!comingFromDashboard}
         />
       </div>
     );
@@ -501,6 +537,7 @@ function mapStateToProps(state) {
     community: state.getIn(["selected_community"]),
     meta: state.getIn(["paginationMetaData"]),
     tableFilters: state.getIn(["tableFilters"]),
+    communities: state.getIn(["communities"]),
   };
 }
 function mapDispatchToProps(dispatch) {

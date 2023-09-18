@@ -3,7 +3,6 @@ import React from "react";
 import PropTypes from "prop-types";
 
 import brand from "dan-api/dummy/brand";
-import { Helmet } from "react-helmet";
 import { withStyles } from "@mui/styles";
 
 import FileCopy from "@mui/icons-material/FileCopy";
@@ -35,7 +34,7 @@ import {
   reArrangeForAdmin,
   smartString,
 } from "../../../utils/common";
-import { Paper, Typography } from "@mui/material";
+import { Badge, Paper, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable, { FILTERS } from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -48,6 +47,9 @@ import {
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
+import PeopleIcon from "@mui/icons-material/People";
+import Seo from '../../../../app/components/Seo/Seo'
+import CustomOptions from "../ME  Tools/table /CustomOptions";
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -81,7 +83,6 @@ class AllActions extends React.Component {
       ...(tableFilters || {}),
       [key]: { 0: { list: ids } },
     });
-
     var content = {
       fieldKey: "action_ids",
       apiURL: "/actions.listForCommunityAdmin",
@@ -121,7 +122,7 @@ class AllActions extends React.Component {
   };
 
   getColumns() {
-    const { classes, putActionsInRedux, allActions } = this.props;
+    const { classes, putActionsInRedux, allActions, auth, communities } = this.props;
     return [
       {
         name: "ID",
@@ -147,7 +148,9 @@ class AllActions extends React.Component {
                   style={{ margin: 10 }}
                 />
               )}
-              {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
+              {!d.image && (
+                <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>
+              )}
             </div>
           ),
         },
@@ -201,20 +204,56 @@ class AllActions extends React.Component {
           },
         },
       },
-      {
-        name: "Tags",
-        key: "tags",
-        options: {
-          filter: true,
-          filterType: "textField",
-        },
-      },
+      // {
+      //   name: "Tags",
+      //   key: "tags",
+      //   options: {
+      //     filter: true,
+      //     filterType: "textField",
+      //   },
+      // },
       {
         name: "Community",
         key: "community",
+        options:
+        auth?.is_super_admin
+          ? CustomOptions({
+              data:communities,
+              label:"community",
+              endpoint:"/communities.listForSuperAdmin"
+            })
+          : 
+          {
+              filter: true,
+              filterType: "multiselect",
+            },
+      },
+      {
+        name: "Users list",
+        key: "users-list",
         options: {
-          filter: true,
-          filterType: "multiselect",
+          filter: false,
+          download: false,
+          customBodyRender: ({ id, count }) =>
+            count ? (
+              <Link to={`/admin/read/${id}/action-users`}>
+                <Badge badgeContent={count || 0} max={99} showZero>
+                  <PeopleIcon
+                    size="small"
+                    variant="outlined"
+                    color="secondary"
+                  />
+                </Badge>
+              </Link>
+            ) : (
+              <Badge badgeContent={count || 0} max={99} showZero>
+                <PeopleIcon
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
+              </Badge>
+            ),
         },
       },
       {
@@ -253,16 +292,26 @@ class AllActions extends React.Component {
           customBodyRender: (id) => (
             <div>
               <Link to={`/admin/edit/${id}/action`}>
-                <EditIcon size="small" variant="outlined" color="secondary" />
+                <EditIcon
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
               &nbsp;&nbsp;
               <Link
                 onClick={async () => {
-                  const copiedActionResponse = await apiCall("/actions.copy", {
-                    action_id: id,
-                  });
+                  const copiedActionResponse = await apiCall(
+                    "/actions.copy",
+                    {
+                      action_id: id,
+                    }
+                  );
 
-                  if (copiedActionResponse && copiedActionResponse.success) {
+                  if (
+                    copiedActionResponse &&
+                    copiedActionResponse.success
+                  ) {
                     const newAction =
                       copiedActionResponse && copiedActionResponse.data;
                     putActionsInRedux([newAction, ...(allActions || [])]);
@@ -273,7 +322,11 @@ class AllActions extends React.Component {
                 }}
                 to="/admin/read/actions"
               >
-                <FileCopy size="small" variant="outlined" color="secondary" />
+                <FileCopy
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
             </div>
           ),
@@ -321,6 +374,7 @@ class AllActions extends React.Component {
       },
     ];
   }
+
   /**
    * NOTE: If you add or remove a field in here, make sure your changes reflect in nowDelete.
    * Deleting heavily relies on the index arrangement of the items in here. Merci!
@@ -337,8 +391,9 @@ class AllActions extends React.Component {
       },
       smartString(d.title), // limit to first 30 chars
       { rank: d.rank, id: d.id },
-      `${smartString(d.tags.map((t) => t.name).join(", "), 30)} `,
+      // `${smartString(d.tags.map((t) => t.name).join(", "), 30)} `,
       d.is_global ? "Template" : d.community && d.community.name,
+      {id:d.id, count:d?.action_users},
       { isLive: d.is_published, item: d },
       d.id,
       d.is_published ? "Yes" : "No",
@@ -392,7 +447,7 @@ class AllActions extends React.Component {
   }
 
   nowDelete({ idsToDelete, data }) {
-    const { allActions, putActionsInRedux } = this.props;
+    const { allActions, putActionsInRedux, putMetaDataToRedux, meta } = this.props;
     const itemsInRedux = allActions;
     const ids = [];
     idsToDelete.forEach((d) => {
@@ -401,6 +456,13 @@ class AllActions extends React.Component {
       apiCall("/actions.delete", { action_id: found })
         .then((res) => {
           if (res.success) {
+               putMetaDataToRedux({
+                 ...meta,
+                 ["actions"]: {
+                   ...meta["actions"],
+                   count: meta["actions"].count - 1,
+                 },
+               });
             this.props.toggleToast({
               open: true,
               message: "Action(s) successfully deleted",
@@ -578,14 +640,7 @@ class AllActions extends React.Component {
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={`All Actions`} />
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_ACTIONS}
@@ -612,6 +667,7 @@ const mapStateToProps = (state) => ({
   community: state.getIn(["selected_community"]),
   meta: state.getIn(["paginationMetaData"]),
   tableFilters: state.getIn(["tableFilters"]),
+  communities: state.getIn(["communities"]),
 });
 const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
@@ -633,3 +689,4 @@ const ActionsMapped = connect(
   mapDispatchToProps
 )(AllActions);
 export default withStyles(styles)(withRouter(ActionsMapped));
+

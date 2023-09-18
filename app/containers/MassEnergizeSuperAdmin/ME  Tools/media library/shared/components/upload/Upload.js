@@ -167,7 +167,9 @@ function Upload({
         }}
         onDrop={(e) => handleDroppedFile(e)}
       >
-        {files.length > 0 ? ( <></>
+        {files.length > 0 ? (
+          <></>
+        ) : (
           // <>
           //   <p>
           //     Upload ({files.length}) File
@@ -190,13 +192,15 @@ function Upload({
           //     </MLButton>
           //   )}
           // </>
-        ) : (
           <>
             <img src={uploadDummy} style={{ width: 110, height: 66 }} alt="" />
           </>
         )}
         {uploading ? (
-          <p style={{ color: "#de8b28" }}>Uploading, please be patient...</p>
+          <>
+            <img src={spinner} style={{ height: 70 }} alt="" />
+            <p style={{ color: "#de8b28" }}>Uploading, please be patient...</p>
+          </>
         ) : (
           <p style={{ textAlign: "center" }}>
             Drag and drop image here or{" "}
@@ -207,7 +211,7 @@ function Upload({
                 fileOpenerRef.current.click();
               }}
             >
-              browse
+              <b>browse</b>
             </a>
             {compress && (
               <>

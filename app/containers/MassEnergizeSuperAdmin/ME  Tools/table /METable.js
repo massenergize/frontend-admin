@@ -8,6 +8,7 @@ export const FILTER_OBJ_KEY = "MAIN_FILTER_OBJECT";
 export const FILTERS = "_FILTERS";
 const TABLE_PROPERTIES = "_TABLE_PROPERTIES";
 const DIRECTIONS = { descending: "desc", ascending: "asc" };
+const RESET = "reset";
 /**
  * This is a wrapper around MUIDatatables, which will allow us to easily implement
  * features that are general to tables on all of our pages
@@ -47,11 +48,20 @@ function METable(props) {
    * just like MUI datatable expects.
    */
   const retrieveFiltersFromLastVisit = (columns) => {
-    let filterObj = (filtersFromRedux || {})[CURRENT_TABLE_KEY] || {};
+    let filterObj;
+    if (ignoreSavedFilters) filterObj = RESET;
+    else filterObj = (filtersFromRedux || {})[CURRENT_TABLE_KEY] || {};
     return inflateWithFilters(columns, filterObj);
   };
 
+  const resetFilterList = (columns) => {
+    return columns.map((col) => {
+      const options = col.options || {};
+      return { ...col, options: { ...options, filterList: [] } };
+    });
+  };
   const inflateWithFilters = (columns, filterObj) => {
+    if (filterObj === RESET) return resetFilterList(columns);
     const arr = Object.keys(filterObj);
     if (!arr || !arr.length) return columns;
 
@@ -66,35 +76,38 @@ function METable(props) {
     return columns;
   };
 
-  const retrieveSortOptionsAndSort = (obj=null) => {
+  const retrieveSortOptionsAndSort = (obj = null) => {
     let { columns } = tableProps || {};
     const properties = getProperties();
-    if (!properties.sortOrder) return ;
+    if (!properties.sortOrder) return;
     if (obj) {
-       setSortOrder(obj);
-       return
+      setSortOrder(obj);
+      return;
     }
-    const [columnIndex, sortDirection] = Object.entries( properties.sortOrder)[0];
+    const [columnIndex, sortDirection] = Object.entries(
+      properties.sortOrder
+    )[0];
     let columnThatNeedsToBeSorted = columns[columnIndex];
     if (!columnThatNeedsToBeSorted) return columns;
-    let order = {name:columnThatNeedsToBeSorted?.name,direction:sortDirection?.sortOrder}
+    let order = {
+      name: columnThatNeedsToBeSorted?.name,
+      direction: sortDirection?.sortOrder,
+    };
     setSortOrder(order);
   };
 
-
-  useEffect(()=>{
+  useEffect(() => {
     let { columns } = tableProps || {};
     retrieveSortOptionsAndSort();
 
     // reset sort on third click
-    columns = columns?.map(column=>{
-      column.options.sortThirdClickReset = true
-      return column
-    })
+    columns = columns?.map((column) => {
+      column.options.sortThirdClickReset = true;
+      return column;
+    });
 
-    setTableColumns(columns)
-
-  }, [])
+    setTableColumns(columns);
+  }, []);
 
   useEffect(() => {
     let { columns } = tableProps || {};
@@ -104,7 +117,7 @@ function METable(props) {
     modified = retrieveFiltersFromLastVisit(columns);
     retrieveSortOptionsAndSort();
     setTableColumns(modified);
-  }, [filtersFromRedux]);
+  }, [filtersFromRedux, ignoreSavedFilters]);
 
   /**
   
@@ -217,10 +230,10 @@ function METable(props) {
     if (columnIndex === -1) return;
     retrieveSortOptionsAndSort({
       name: columnName,
-      direction
+      direction,
     });
     const newObj = {
-      [columnIndex]: { sortOrder: direction}, // make new sorting object (cos the table can only be sorted one column at a time)
+      [columnIndex]: { sortOrder: direction }, // make new sorting object (cos the table can only be sorted one column at a time)
     };
     pageTableProperties.current.sortOrder = newObj; // update the page properties object with the new set of sortDirections
     savePageProperties(pageTableProperties.current); // then save these new changes to localStorage

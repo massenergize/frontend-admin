@@ -45,10 +45,11 @@ function ContinueWhereYouLeft() {
       style={{
         display: "flex",
         alignItems: "center",
-        background: "rgb(253 235 222)",
+        background: "#fefbf3",
         color: "black",
         padding: "15px 20px",
         marginBottom: 20,
+        borderRadius: 10,
       }}
     >
       <Typography

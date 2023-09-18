@@ -8,6 +8,31 @@ import React from "react";
 import { ME_FORM_PROGRESS } from "../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 import { apiCall } from "./messenger";
 
+export const getHumanFriendlyDateRange = (startDate, endDate) => {
+  const start = moment(startDate);
+  const end = moment(endDate);
+
+  // Check if start and end dates are on the same day
+  const sameDay = start.isSame(end, "day");
+
+  if (sameDay) {
+    // Format start and end times
+    const formattedStart = start.format("h:mm A");
+    const formattedEnd = end.format("h:mm A");
+
+    const formattedRange = `${start.format(
+      "Do MMMM YYYY"
+    )} from ${formattedStart} to ${formattedEnd}`;
+    return formattedRange;
+  } else {
+    const formattedStart = start.format("Do MMMM YYYY");
+    const formattedEnd = end.format("Do MMMM YYYY");
+
+    const formattedRange = `${formattedStart} to ${formattedEnd}`;
+    return formattedRange;
+  }
+};
+
 export const getUniqueDates = (dates) => {
   if (!dates) return [];
   const uniqueDates = new Set();
@@ -207,6 +232,8 @@ export const ourCustomSort = ({ a, b, colIndex, order, compare }) => {
   a = a.data[colIndex];
   b = b.data[colIndex];
   if (compare) return compare({ a, b }) * directionConstant;
+  if (typeof a === "string" && typeof b === "string") // Forcing comparison to be done in lowercase when dealing with strings otherwise results will be off
+    return (a.toLowerCase() < b.toLowerCase() ? -1 : 1) * directionConstant;
   return (a < b ? -1 : 1) * directionConstant;
 };
 

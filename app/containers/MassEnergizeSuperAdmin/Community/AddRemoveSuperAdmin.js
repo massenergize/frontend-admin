@@ -10,6 +10,7 @@ import { connect } from "react-redux";
 import { reduxLoadSuperAdmins } from "../../../redux/redux-actions/adminActions";
 import Loading from "dan-components/Loading";
 import { LOADING } from "../../../utils/constants";
+import Seo from "../../../components/Seo/Seo";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -166,6 +167,7 @@ class AddRemoveSuperAdmin extends Component {
     if (!formJson) return <Loading />;
     return (
       <div>
+        <Seo name={"Super Admins"}/>
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}

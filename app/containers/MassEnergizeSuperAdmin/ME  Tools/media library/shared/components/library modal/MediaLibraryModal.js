@@ -5,6 +5,7 @@ import Upload from "../upload/Upload";
 import MLButton from "../button/MLButton";
 import Cropping from "../cropping/Cropping";
 import { TABS } from "../../utils/values";
+import { arrangeTabsByOrder } from "../../utils/utils";
 const Library = React.lazy(() => import("../library/Library")); // so that library component only loads when needed
 
 function MediaLibraryModal({
@@ -17,8 +18,8 @@ function MediaLibraryModal({
   getSelected, // the function that is used to retrieve all selected items out of the modal
   uploadMultiple,
   uploading,
-  loadMoreFunction,
-  limited,
+  // loadMoreFunction,
+  // limited,
   excludeTabs,
   useAwait,
   awaitSeconds,
@@ -44,13 +45,17 @@ function MediaLibraryModal({
   renderBeforeImages,
   TooltipWrapper,
   tabModifiers,
+  customTabs,
+  notification,
+  setNotification,
+  renderOnFooter,
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
   const [previews, setPreviews] = useState([]);
 
   const [content, setSelectedContent] = useState(selected); // all the selected items from library will always be available in an array here
-  const [state, setState] = useState({ uploading: uploading });
+  const [state, setState] = useState({ uploading: uploading }); // this value is controlled both externally, and internally by the Mlibrary itself
   const [loadingMore, setLoadingMore] = useState(false);
   const [shouldWait, setShouldWait] = useState(useAwait);
 
@@ -72,21 +77,37 @@ function MediaLibraryModal({
   const returnRightAfterUpload = (images) => {
     handleInsert(images, reset);
   };
-  const handleUpload = ({ quickReturn = false }) => {
-    if (!onUpload) return;
-    setState((prev) => ({ ...prev, uploading: true }));
 
-    onUpload(
-      clean(files),
-      reset,
-      close,
-      setCurrentTab,
-      quickReturn && returnRightAfterUpload
-    );
+  // Here, we gather a few items that can be passed to any external functions. Its simply to allow the mediaLibrary to be controlled from outside as well
+  // E.g. the items here are passed down into the "renderContextButton" fxn, so that custom tabs can have the necessary
+  // tools to implement any complex flows needed
+  const gatherUtils = () => {
+    return {
+      files: clean(files), // Files that have been selected in the upload tab, and are ready to be shipped
+      reset, // The media library's internal reset function.
+      close, // Mlibrary's internal close function
+      changeTabTo: setCurrentTab, // The Mlibrary's internal function that controls tab switching
+      insertSelectedImages: returnRightAfterUpload, // Export a function that lets you insert uploaded items outside of the MLibrary.
+      uploading,
+      toggleSidePane: setShowSidePane,
+      currentTab,
+      setNotification,
+    };
+  };
+  const handleUpload = () => {
+    if (!onUpload) return;
+    // setState((prev) => ({ ...prev, uploading: true }));
+    onUpload(gatherUtils());
+    // onUpload(
+    //   clean(files),
+    //   reset,
+    //   close,
+    //   setCurrentTab,
+    // quickReturn && returnRightAfterUpload;
+    // );
   };
 
-  const handleInsert = (_content) => {
-   
+  const handleInsert = (_content, reset) => {
     getSelected(_content, reset);
     close();
   };
@@ -99,22 +120,30 @@ function MediaLibraryModal({
     setCropped({});
   };
 
-  const fireLoadMoreFunction = () => {
-    if (!loadMoreFunction) return;
-    setLoadingMore(true);
-    loadMoreFunction(() => setLoadingMore(false), close);
-  };
+  // const fireLoadMoreFunction = () => {
+  //   if (!loadMoreFunction) return;
+  //   setLoadingMore(true);
+  //   loadMoreFunction(() => setLoadingMore(false), close);
+  // };
 
   const customName = (key, _default) => {
     const modifier = (tabModifiers || {})[key];
     return modifier?.name || _default || "...";
   };
-
-  var Tabs = [
+  const formatCustomTabs = (props) => {
+    if (!customTabs) return [];
+    return customTabs.map((obj) => {
+      return {
+        ...(obj?.tab || {}),
+        component: () => obj?.tab?.component(props),
+      };
+    });
+  };
+  let Tabs = [
     {
       headerName: customName(TABS.UPLOAD_TAB, "Upload"),
       key: TABS.UPLOAD_TAB,
-      component: (
+      component: (_) => (
         <Upload
           maximumImageSize={maximumImageSize}
           compress={compress}
@@ -139,10 +168,12 @@ function MediaLibraryModal({
     {
       headerName: customName(TABS.LIBRARY_TAB, "Library"),
       key: TABS.LIBRARY_TAB,
-      component: (
+      component: (_) => (
         <Suspense fallback={<p>Loading...</p>}>
           <Library
-            renderBeforeImages={renderBeforeImages}
+            renderBeforeImages={() =>
+              renderBeforeImages && renderBeforeImages(gatherUtils())
+            }
             sourceExtractor={sourceExtractor}
             setSelectedContent={setSelectedContent}
             content={content}
@@ -150,8 +181,8 @@ function MediaLibraryModal({
             multiple={multiple}
             images={images}
             loadingMore={loadingMore}
-            loadMoreFunction={fireLoadMoreFunction}
-            limited={limited}
+            // loadMoreFunction={fireLoadMoreFunction}
+            // limited={limited}
             shouldWait={shouldWait}
             setShouldWait={setShouldWait}
             awaitSeconds={awaitSeconds}
@@ -161,9 +192,10 @@ function MediaLibraryModal({
       ),
     },
     {
-      headerName: customName(TABS.CROPPING_TAB, "crop"),
+      headerName: customName(TABS.CROPPING_TAB, "Crop"),
       key: TABS.CROPPING_TAB,
-      component: (
+      onlyShowOnDemand: true, // makes sure it doesnt show as part of the listed tabs until triggered
+      component: (_) => (
         <Cropping
           setCurrentTab={setCurrentTab}
           cropLoot={cropLoot}
@@ -174,13 +206,48 @@ function MediaLibraryModal({
         />
       ),
     },
+    ...formatCustomTabs(gatherUtils()),
   ];
-
+  Tabs = arrangeTabsByOrder(Tabs);
   Tabs = Tabs.filter((tab) => !(excludeTabs || []).includes(tab.key));
 
-  useEffect(() => {}, [images, shouldWait]);
+  useEffect(() => {
+    const imagesMap = new Map(images.map((item) => [item.id, item]));
+    const selectedAndExists =
+      selected?.map((item) => imagesMap.get(item.id)).filter(Boolean) || [];
+    setSelectedContent(selectedAndExists);
+  }, [images, selected]);
 
-  const TabComponent = Tabs.find((tab) => tab.key === currentTab).component;
+  const renderNotificationArea = () => {
+    if (!notification) return <></>;
+    const { message, close, loading, theme, textTheme } = notification;
+    return (
+      <div className="ml-noti-banner" style={theme || {}}>
+        {/* {renderCustomNotification ? (
+          renderCustomNotification()
+        ) : ( */}
+        <p
+          style={{
+            margin: 0,
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            ...(textTheme || {}),
+          }}
+        >
+          {loading && <i className="fa fa-spinner fa-spin" />}
+          <span style={{ margin: "0px 10px" }}>{message}</span>{" "}
+          <i
+            className="fa fa-times touchable-opacity"
+            onClick={() => close && close()}
+          />
+        </p>
+        {/* )} */}
+      </div>
+    );
+  };
+
+  const tabComponent = Tabs.find((tab) => tab.key === currentTab)?.component;
   const last = content.length - 1;
   const activeImage = (content || [])[last]; // if multiple selection is active, just show the last selected item in the side pane
 
@@ -199,23 +266,27 @@ function MediaLibraryModal({
         <div style={{ position: "relative", height: "100%" }}>
           {showSidePane && (
             <SidePane
+              changeTabTo={setCurrentTab}
               activeImage={activeImage}
               setShowSidePane={setShowSidePane}
               sourceExtractor={sourceExtractor}
               sideExtraComponent={sideExtraComponent}
+              updateSelectedImages={setSelectedContent}
             />
           )}
-          <div className="m-inner-container">
+          <div className="m-inner-container" style={{ position: "relative" }}>
             <div className="m-title-bar">
               <h3 style={{ marginBottom: 0 }}>Media Library</h3>
               {/* --------------------- TAB HEADER AREA -------------- */}
               <div className="m-tab-header-area">
                 {Tabs.map((tab) => {
                   // A simple logic to make sure the cropping tab button does not show, until an image is selected by a user to crop. (To reduce confusion)
-                  const imageForCroppingNotSelectedYet =
-                    currentTab !== TABS.CROPPING_TAB &&
-                    tab.key === TABS.CROPPING_TAB;
-                  if (imageForCroppingNotSelectedYet) return <></>;
+                  // const imageForCroppingNotSelectedYet =
+                  //   currentTab !== TABS.CROPPING_TAB &&
+                  //   tab.key === TABS.CROPPING_TAB;
+                  const dontShowHeader =
+                    tab.onlyShowOnDemand && currentTab !== tab.key;
+                  if (dontShowHeader) return <></>;
 
                   const isCurrent = currentTab === tab.key;
                   return (
@@ -235,15 +306,18 @@ function MediaLibraryModal({
                 })}
               </div>
             </div>
-
+            {/* ------------------------ NOTIFICATION AREA ------------------- */}
+            {renderNotificationArea()}
+            {/* ---------------------------------------------- ------------------- */}
             {/* ------------------------ MAIN TAB DISPLAY AREA ------------------- */}
             <div
-              style={{ maxHeight: 530, minHeight: 530, overflowY: "scroll" }}
+              style={{ maxHeight: 550, minHeight: 550, overflowY: "scroll" }}
             >
-              {TabComponent}
+              {tabComponent && tabComponent(gatherUtils)}
             </div>
           </div>
           <Footer
+            renderOnFooter={renderOnFooter}
             uploading={state.uploading}
             upload={handleUpload}
             TooltipWrapper={TooltipWrapper}
@@ -256,6 +330,8 @@ function MediaLibraryModal({
             currentTab={currentTab}
             cropLoot={cropLoot}
             finaliseCropping={finaliseCropping}
+            customTabs={customTabs}
+            luggage={gatherUtils()}
           />
         </div>
       </Modal>
@@ -273,16 +349,29 @@ const ContextButton = ({
   TooltipWrapper,
   uploading,
   upload,
+  customTabs,
+  luggage,
 }) => {
-  const withWrapper = (text, tooltipMessage) => {;
+  const withWrapper = (text, tooltipMessage) => {
     if (!TooltipWrapper) return <span>{text}</span>;
     return (
       <TooltipWrapper title={tooltipMessage || ""} placement="top">
-        <span>{text}</span>
+        <span style={{ fontWeight: "bold" }}>{text}</span>
       </TooltipWrapper>
     );
   };
   const len = content && content.length;
+  const formatCustomContextButtons = (props) => {
+    if (!customTabs) return {};
+    let train = {};
+
+    for (let obj of customTabs) {
+      train[obj.tab.key] =
+        obj.renderContextButton && obj.renderContextButton(props);
+    }
+
+    return train;
+  };
   const availableButtons = {
     [TABS.LIBRARY_TAB]: (
       <button
@@ -319,45 +408,52 @@ const ContextButton = ({
         style={{ "--btn-color": "white", "--btn-background": "green" }}
         onClick={(e) => {
           e.preventDefault();
-          upload({ quickReturn: true });
+          upload();
         }}
         disabled={uploading || !files.length}
       >
         {withWrapper(
-          "UPLOAD & INSERT",
-          "Your chosen image will be uploaded and inserted right away"
+          // "UPLOAD & INSERT",
+          "CONTINUE",
+          "You will be prompted to provide a few details on your selected items"
         )}
       </button>
     ),
+    ...formatCustomContextButtons(luggage),
   };
 
   return availableButtons[currentTab] || <></>;
 };
 
 const Footer = (props) => {
-  const { cancel, images, currentTab } = props;
+  const { cancel, images, currentTab, luggage, renderOnFooter } = props;
   const isCropping = currentTab === TABS.CROPPING_TAB;
-  const isUploadTab = currentTab === TABS.UPLOAD_TAB;
 
   return (
     <div className="ml-footer">
-      <h3
-        style={{
-          margin: 0,
-          marginLeft: 10,
-          color: "rgb(128 103 71)",
-          fontSize: 12,
-        }}
-      >
-        @massenergize
-      </h3>
-      {!isCropping && images && images.length && (
-        <small style={{ fontWeight: "bold", marginLeft: 15 }}>
-          [{(images && images.length) || 0} items]
-        </small>
+      {renderOnFooter ? (
+        renderOnFooter(luggage)
+      ) : (
+        <>
+          <h3
+            style={{
+              margin: 0,
+              marginLeft: 10,
+              color: "rgb(128 103 71)",
+              fontSize: 12,
+            }}
+          >
+            @massenergize
+          </h3>
+          {!isCropping && images && images.length && (
+            <small style={{ fontWeight: "bold", marginLeft: 15 }}>
+              [{(images && images.length) || 0} items]
+            </small>
+          )}{" "}
+        </>
       )}
       <div style={{ marginLeft: "auto" }}>
-        <MLButton backColor="maroon" btnColor="white" onClick={cancel}>
+        <MLButton backColor="#d31919" btnColor="white" onClick={cancel}>
           CANCEL
         </MLButton>
         <ContextButton {...props} />

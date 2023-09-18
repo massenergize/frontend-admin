@@ -26,6 +26,7 @@ import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import METable from "../ME  Tools/table /METable";
 import { isEmpty } from "../../../utils/common";
 import Loader from "../../../utils/components/Loader";
+import Seo from "../../../components/Seo/Seo";
 class AllTagCollections extends React.Component {
   constructor(props) {
     super(props);
@@ -142,7 +143,7 @@ class AllTagCollections extends React.Component {
   }
 
   nowDelete({ idsToDelete, data }) {
-    const { tags, putTagsInRedux } = this.props;
+    const { tags, putTagsInRedux, meta, putMetaDataToRedux } = this.props;
     const itemsInRedux = tags || [];
     const ids = [];
     idsToDelete.forEach((d) => {
@@ -152,6 +153,14 @@ class AllTagCollections extends React.Component {
         tag_collection_id: found,
       }).then((response) => {
         if (response.success) {
+          putMetaDataToRedux({
+            ...meta,
+            ["tagCollections"]: {
+              ...meta["tagCollections"],
+              count:
+                meta["tagCollections"].count - 1,
+            },
+          });
           this.props.toggleToast({
             open: true,
             message: `Tag(s) successfully deleted`,
@@ -257,14 +266,7 @@ class AllTagCollections extends React.Component {
    }
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"All Tag Collections"} />
 
         <Paper style={{ marginBottom: 10 }}>
           <METable

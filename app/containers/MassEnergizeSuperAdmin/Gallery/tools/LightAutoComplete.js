@@ -1,9 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
-import PropTypes from "prop-types";
-import { Checkbox, Chip, Paper, TextField } from "@mui/material";
+import {
+  Box,
+  Checkbox,
+  Chip,
+  CircularProgress,
+  Paper,
+  TextField,
+} from "@mui/material";
 import { pop } from "../../../../utils/common";
-import Typography from "@mui/material/Typography";
 import { withStyles } from "@mui/styles";
+import useObserver from "../../../../utils/useObserver";
 
 const styles = (theme) => {
   return {
@@ -73,12 +79,44 @@ function LightAutoComplete(props) {
     containerStyle,
     multiple,
     showSelectAll = true,
+    isAsync,
+    endpoint,
+    args,
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
+  // const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
   const [showDropdown, setShowDropdown] = useState(false);
+  const [query, setQuery] = useState("");
+  const [filteredItems, setFilteredItems] = useState([]);
   const [selected, setSelected] = useState([]); // keeps a list of all selected items
   const chipWrapperRef = useRef();
+  // -------------------------------------------------------
+
+  const items = query ? filteredItems : optionsToDisplay;
+  const { ref, data: newItems, cursor } = useObserver({
+    data: items,
+    endpoint,
+    args,
+    params: { search_text: query },
+  });
+  useEffect(() => {
+    let newItemsConstructed = (newItems || [])?.map((item) => {
+      return {
+        ...item,
+        displayName: labelExtractor
+          ? labelExtractor(item)
+          : item?.name || item?.title,
+      };
+    });
+    let all = [...(items || []), ...(newItemsConstructed || [])];
+    const uniqueItems = [
+      ...new Map(all.map((item) => [item["id"], item])).values(),
+    ];
+    if (query) setFilteredItems(uniqueItems);
+    setOptionsToDisplay(uniqueItems);
+  }, [newItems]);
+
   const mount = () => {
     if (!onMount) return;
     onMount(() => setSelected([]));
@@ -122,12 +160,13 @@ function LightAutoComplete(props) {
 
   const handleOnChange = (e) => {
     const value = e.target.value.trim().toLowerCase();
+    setQuery(value);
     if (!multiple) setShowDropdown(false);
-    const filtered = data.filter((item) => {
+    const filtered = optionsToDisplay?.filter((item) => {
       var label = getLabel(item);
       if (label && label.toLowerCase().includes(value)) return item;
     });
-    setOptionsToDisplay(filtered);
+    setFilteredItems(filtered);
   };
 
   useEffect(() => mount(), []);
@@ -142,28 +181,32 @@ function LightAutoComplete(props) {
       : 0;
     return height;
   };
-  const onlyValues = (selected||[]).map((itm) => getValue(itm));
-  const thereAreNoOptionsToDisplay = optionsToDisplay.length === 0;
+  const onlyValues = (selected || []).map((itm) => getValue(itm));
+  const thereAreNoOptionsToDisplay = query
+    ? filteredItems?.length === 0
+    : optionsToDisplay.length === 0;
   const userHasSelectedStuff = selected.length;
 
   return (
     <div style={{ position: "relative", width: "100%", marginTop: 19 }}>
-      {selected && selected.length > 0 && (
-        <div ref={chipWrapperRef}>
-          {selected.map((option, index) => {
-            var deleteOptions = { onDelete: () => handleSelection(option) };
-            deleteOptions = allowChipRemove ? deleteOptions : {};
-            return (
-              <Chip
-                key={index.toString()}
-                label={getLabel(option)}
-                {...deleteOptions}
-                className={classes.chips}
-              />
-            );
-          })}
-        </div>
-      )}
+      <div ref={chipWrapperRef}>
+        {selected?.length > 0 && (
+          <>
+            {selected.map((option, index) => {
+              var deleteOptions = { onDelete: () => handleSelection(option) };
+              deleteOptions = allowChipRemove ? deleteOptions : {};
+              return (
+                <Chip
+                  key={index.toString()}
+                  label={getLabel(option)}
+                  {...deleteOptions}
+                  className={classes.chips}
+                />
+              );
+            })}
+          </>
+        )}
+      </div>
       <GhostDropdown
         show={showDropdown}
         close={() => setShowDropdown(false)}
@@ -193,8 +236,7 @@ function LightAutoComplete(props) {
             />
             <Paper
               className={classes.dropdown}
-              style={{ top: 70 + increasedRatio(),}}
-
+              style={{ top: 80 + increasedRatio() }}
             >
               {thereAreNoOptionsToDisplay && (
                 <p style={{ padding: 10, color: "lightgray" }}>
@@ -236,7 +278,7 @@ function LightAutoComplete(props) {
                 </div>
               )}
 
-              {optionsToDisplay.map((op, index) => {
+              {(query ? filteredItems : optionsToDisplay).map((op, index) => {
                 return (
                   <div
                     key={index.toString()}
@@ -251,15 +293,25 @@ function LightAutoComplete(props) {
                     {multiple && (
                       <Checkbox
                         style={{ padding: 0, marginRight: 6 }}
-                        checked={onlyValues.includes(
-                          getValue(op)
-                        )}
+                        checked={onlyValues.includes(getValue(op))}
                       />
                     )}
-                      {getLabel(op)}
+                    {getLabel(op)}
                   </div>
                 );
               })}
+              {endpoint && cursor?.has_more ? (
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                  ref={ref}
+                >
+                  <CircularProgress size={20} />
+                </Box>
+              ) : null}
             </Paper>
           </>
         )}

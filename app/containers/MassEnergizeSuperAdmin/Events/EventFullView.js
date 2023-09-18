@@ -20,6 +20,7 @@ import EventShareModal from "./EventShareModal";
 import { PORTAL_HOST } from "../../../config/constants";
 import { dateFormatString } from "../Community/utils";
 import EditEventForm from "./EditEventForm";
+import Seo from "../../../components/Seo/Seo";
 
 const open = {
   background: "#4faa4f",
@@ -27,14 +28,16 @@ const open = {
 const close = {
   background: "#d87c7b",
 };
-const PUBLICITY_PROPS = {
+export const PUBLICITY_PROPS = {
   OPEN: {
+    icon: "fa-globe",
     style: open,
     info: "This event/campaign can be shared to any community",
     label: "Open",
     tooltip: "Share with any community",
   },
   OPEN_TO: {
+    icon: "fa-users",
     style: open,
     info:
       "This event/campaign can only be shared with the listed communities below",
@@ -42,6 +45,7 @@ const PUBLICITY_PROPS = {
     tooltip: "Share with a few selected",
   },
   CLOSE: {
+    icon: "fa-lock",
     style: close,
     info:
       "This event/compaign is closed. It can't be shared with any community",
@@ -49,13 +53,24 @@ const PUBLICITY_PROPS = {
     tooltip: "Cannot be shared",
   },
   CLOSED_TO: {
+    icon: "fa-users",
     style: { ...close, background: "#e79157" },
     info: "This event/campaign is only closed to the communities listed below",
     label: "Closed To",
     tooltip: "Open to all except a few listed",
   },
 };
+export const listToString = (list) => {
+  if (!list || !list.length) return "";
 
+  var str = "";
+  for (var i in list) {
+    const com = list[i];
+    if (Number(i) === 0) str += com.name;
+    else str += `, ${com.name}`;
+  }
+  return str;
+};
 function EventFullView(props) {
   const {
     events,
@@ -182,17 +197,6 @@ function EventFullView(props) {
       });
   };
 
-  const listToString = (list) => {
-    if (!list || !list.length) return "";
-
-    var str = "";
-    for (var i in list) {
-      const com = list[i];
-      if (Number(i) === 0) str += com.name;
-      else str += `, ${com.name}`;
-    }
-    return str;
-  };
   //   ----------------------------------------------------------------------------------------
   const pageIsLoading = event === undefined;
   const couldNotFindEvent = event === null;
@@ -236,14 +240,16 @@ function EventFullView(props) {
   };
   return (
     <div>
+      <Seo name={`Full View - ${event?.name}`} />
       <EventShareModal
         auth={auth}
         communities={communities}
         show={showShareModal}
-        close = {()=> setshowShareModal(false)}
+        close={() => setshowShareModal(false)}
         toggleModal={setshowShareModal}
         event={event}
         updateEventInHeap={putEventInHeap}
+        hasControl = {hasControl}
         otherEvents={events}
         myEvents={myEvents}
         updateNormalEventListInRedux={putEventsInRedux}
@@ -334,7 +340,7 @@ function EventFullView(props) {
         </div>
       </Paper>
 
-      <EditEventForm passedEvent = {event} />
+      <EditEventForm passedEvent={event} />
     </div>
   );
 }

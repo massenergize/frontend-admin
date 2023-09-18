@@ -23,10 +23,19 @@ export default function SearchBar({url, reduxItems, updateReduxFunction, handleS
         }),
         ...(otherArgs || {}),
       }).then((res) => {
-        if (res && res.success) {
-          updateReduxFunction(res.data);
+        if (res?.success) {
+          updateReduxFunction(res?.data || [])
           updateMetaData({ ...meta, [name]: res.cursor });
-          handleSearch(reset ? "" : text);
+
+          const newPromise = new Promise((resolve, reject) => {
+            setTimeout(() => {
+              resolve(res);
+            }, 100);
+          })
+
+          newPromise.then((res) => {
+            handleSearch(reset ? "" : text);
+          })
         }
       });
     };
@@ -53,6 +62,13 @@ export default function SearchBar({url, reduxItems, updateReduxFunction, handleS
             setText(e.target.value);
           }}
           value={text}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleBackendSearch()
+              setText(e.target.value);
+            }
+          }}
+          
         />
         <div
           style={{

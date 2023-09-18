@@ -1,11 +1,7 @@
 import React from 'react';
-import { Helmet } from 'react-helmet';
-import brand from 'dan-api/dummy/brand';
 import { Route } from 'react-router-dom';
 import { ErrorWrap } from 'dan-components';
-
-const title = brand.name + ' - Page Not Found';
-const description = brand.desc;
+import Seo from '../../components/Seo/Seo';
 
 const NotFound = () => (
   <Route
@@ -15,14 +11,7 @@ const NotFound = () => (
       }
       return (
         <div>
-          <Helmet>
-            <title>{title}</title>
-            <meta name="description" content={description} />
-            <meta property="og:title" content={title} />
-            <meta property="og:description" content={description} />
-            <meta property="twitter:title" content={title} />
-            <meta property="twitter:description" content={description} />
-          </Helmet>
+          <Seo name={"Page Not Found"} />
           <ErrorWrap title="404" desc="Oops, Page Not Found:(" />
         </div>
       );

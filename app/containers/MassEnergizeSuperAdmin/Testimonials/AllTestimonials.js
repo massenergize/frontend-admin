@@ -43,6 +43,10 @@ import {
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
+import { getData } from "../Messages/CommunityAdminMessages";
+import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
+import Seo from "../../../components/Seo/Seo";
+import CustomOptions from "../ME  Tools/table /CustomOptions";
 
 class AllTestimonials extends React.Component {
   constructor(props) {
@@ -80,13 +84,13 @@ class AllTestimonials extends React.Component {
       },
     };
 
-    this.setState({ saveFilters: false });
-    const key = PAGE_PROPERTIES.ALL_TESTIMONIALS.key + FILTERS;
+    this.setState({ comingFromDashboard, ids });
+    // const key = PAGE_PROPERTIES.ALL_TESTIMONIALS.key + FILTERS;
 
-    updateTableFilters({
-      ...(tableFilters || {}),
-      [key]: { 0: { list: ids } },
-    });
+    // updateTableFilters({
+    //   ...(tableFilters || {}),
+    //   [key]: { 0: { list: ids } },
+    // });
 
     fetchTestimonials((data, failed) => {
       if (failed)
@@ -139,7 +143,7 @@ class AllTestimonials extends React.Component {
   };
 
   getColumns() {
-    const { classes } = this.props;
+    const { classes, auth, communities} = this.props;
     return [
       {
         name: "ID",
@@ -206,9 +210,16 @@ class AllTestimonials extends React.Component {
       {
         name: "Community",
         key: "community",
-        options: {
-          filter: true,
-        },
+        options: auth?.is_super_admin
+          ? CustomOptions({
+              data: communities,
+              label: "community",
+              endpoint: "/communities.listForSuperAdmin",
+            })
+          : {
+              filter: true,
+              filterType: "multiselect",
+            },
       },
       {
         name: "Live?",
@@ -235,7 +246,9 @@ class AllTestimonials extends React.Component {
                 label={
                   d.is_approved ? (d.isLive ? "Yes" : "No") : "Not Approved"
                 }
-                className={`${d.isLive ? classes.yesLabel : classes.noLabel}  ${
+                className={`${
+                  d.isLive ? classes.yesLabel : classes.noLabel
+                }  ${
                   !d.is_approved ? "not-approved" : ""
                 } touchable-opacity`}
               />
@@ -278,7 +291,11 @@ class AllTestimonials extends React.Component {
                   });
                 }}
               >
-                <EditIcon size="small" variant="outlined" color="secondary" />
+                <EditIcon
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
               </Link>
             </div>
           ),
@@ -327,7 +344,7 @@ class AllTestimonials extends React.Component {
   }
 
   nowDelete({ idsToDelete, data }) {
-    const { allTestimonials, putTestimonialsInRedux } = this.props;
+    const { allTestimonials, putTestimonialsInRedux, meta, putMetaDataToRedux } = this.props;
     const itemsInRedux = allTestimonials || [];
     const ids = [];
     idsToDelete.forEach((d) => {
@@ -336,6 +353,13 @@ class AllTestimonials extends React.Component {
       apiCall("/testimonials.delete", { testimonial_id: found }).then(
         (response) => {
           if (response.success) {
+          putMetaDataToRedux({
+            ...meta,
+            ["testimonials"]: {
+              ...meta["testimonials"],
+              count: meta["testimonials"].count - 1,
+            },
+          });
             this.props.toggleToast({
               open: true,
               message: "Testimonial successfully deleted",
@@ -398,7 +422,7 @@ class AllTestimonials extends React.Component {
   render() {
     const title = brand.name + " - All Testimonials";
     const description = brand.desc;
-    const { columns, loading } = this.state;
+    const { columns, loading, comingFromDashboard, ids } = this.state;
     const {
       classes,
       allTestimonials,
@@ -407,8 +431,9 @@ class AllTestimonials extends React.Component {
       meta,
       putMetaDataToRedux,
     } = this.props;
-
-    const data = this.fashionData(allTestimonials || []);
+    
+    const content = getData({ source: allTestimonials || [], comingFromDashboard, ids });
+    const data = this.fashionData(content);
     const metaData = meta && meta.testimonials;
     const options = {
       filterType: "dropdown",
@@ -514,14 +539,26 @@ class AllTestimonials extends React.Component {
 
     return (
       <div>
-        <Helmet>
-          <title>{title}</title>
-          <meta name="description" content={description} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="twitter:title" content={title} />
-          <meta property="twitter:description" content={description} />
-        </Helmet>
+        <Seo name={"All Testimonials"} />
+        {comingFromDashboard && (
+          <MEPaperBlock icon="fa fa-bullhorn" banner>
+            <Typography>
+              The <b>{comingFromDashboard}</b> testimonial(s) you have not approved yet
+              are currently pre-selected and sorted in the table for you. Feel
+              free to
+              <Link
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.setState({ comingFromDashboard: false });
+                }}
+              >
+                {" "}
+                clear all selections.
+              </Link>
+            </Typography>
+          </MEPaperBlock>
+        )}
         <METable
           classes={classes}
           page={PAGE_PROPERTIES.ALL_TESTIMONIALS}
@@ -531,7 +568,8 @@ class AllTestimonials extends React.Component {
             columns: columns,
             options: options,
           }}
-          saveFilters={this.state.saveFilters}
+          ignoreSavedFilters={comingFromDashboard}
+          saveFilters={!comingFromDashboard}
         />
       </div>
     );
@@ -549,6 +587,7 @@ function mapStateToProps(state) {
     community: state.getIn(["selected_community"]),
     meta: state.getIn(["paginationMetaData"]),
     tableFilters: state.getIn(["tableFilters"]),
+    communities: state.getIn(["communities"]),
   };
 }
 function mapDispatchToProps(dispatch) {

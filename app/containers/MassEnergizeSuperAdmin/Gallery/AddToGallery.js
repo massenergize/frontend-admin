@@ -12,8 +12,6 @@ import { TextField } from "@mui/material";
 import { bindActionCreators } from "redux";
 import {
   reduxAddToGalleryImages,
-  reduxAddToSearchedImages,
-  reduxCallLibraryModalImages,
 } from "../../../redux/redux-actions/adminActions";
 import {
   getFileSize,
@@ -24,8 +22,9 @@ import {withStyles} from '@mui/styles'
 import PapperBlock from "../../../components/PapperBlock/PapperBlock";
 import { fetchParamsFromURL } from "../../../utils/common";
 import { makeStyles, } from "@mui/styles";
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 import { styles } from "./styles";
+import Seo from "../../../components/Seo/Seo";
 
   const error = {
     background: "rgb(255, 214, 214)",
@@ -144,7 +143,8 @@ function AddToGallery(props) {
       size: (file && file.size) || null,
       size_text: getFileSize(file),
       description: state.title,
-      tags: spread,
+      // AS OF 2nd August 2023, tags passed into gallery.add are treated differently. B.E no longer uses list of IDS. So in case this page is ever Reactivated, Watchout!
+      // tags: spread, 
     };
 
     apiCall(UPLOAD_URL, apiJson)
@@ -208,6 +208,7 @@ function AddToGallery(props) {
   const isError = state.notification_type === "error";
   return (
     <PapperBlock>
+      <Seo name={"Add to gallery"} />
       <Typography variant="h5" className={classes.header}>
         Add an image to your community's library{" "}
       </Typography>
@@ -246,6 +247,12 @@ function AddToGallery(props) {
             labelExtractor={(com) => com.name}
             onChange={(communities) => setChosenComs(communities)}
             onMount={(reset) => setResetorForAutoComplete(() => reset)}
+            isAsync={true}
+            endpoint={
+              superAdmin
+                ? "communities.listForSuperAdmin"
+                : "communities.listForCommunityAdmin"
+            }
           />
           <Typography style={{ color: "gray" }}>
             <i>
@@ -367,10 +374,10 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
-      loadModalImages: reduxCallLibraryModalImages,
+      // loadModalImages: reduxCallLibraryModalImages,
       loadMoreModalImages: reduxCallLibraryModalImages,
       addImageToGalleryList: reduxAddToGalleryImages,
-      addImageToSearchedList: reduxAddToSearchedImages,
+      // addImageToSearchedList: reduxAddToSearchedImages,
     },
     dispatch
   );

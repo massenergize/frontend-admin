@@ -18,6 +18,7 @@ import {
 import Loading from "dan-components/Loading";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { PAGE_KEYS } from "../ME  Tools/MEConstants";
+import Seo from "../../../components/Seo/Seo";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -201,7 +202,7 @@ class EditEventForm extends Component {
     const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
-      id: "" + c.id,
+      id: c.id,
     }));
 
     const libOpen = location.state && location.state.libOpen;
@@ -292,6 +293,7 @@ class EditEventForm extends Component {
     if (!formJson) return <Loading />;
     return (
       <div>
+        <Seo name={`Edit Event - ${event?.name}`} />
         {!readOnly && event.rsvp_enabled ? (
           <Paper style={{ padding: 20, marginBottom: 15 }}>
             <Typography>
@@ -431,8 +433,104 @@ const createFormJson = ({
 
   const otherCommunityList = otherCommunities.map((c) => ({
     displayName: c.name,
-    id: c.id.toString(),
+    id: c.id,
   }));
+
+  const ADD_LINK = [
+    {
+      name: "external_link",
+      label: "Link",
+      placeholder: "Enter Link",
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: true,
+      defaultValue: event?.external_link || "",
+      dbName: "external_link",
+      readOnly: false,
+    },
+    {
+      name: "external_link_type",
+      label:"Is the link specified to join the event, or to register (with join link sent separately)?",
+      fieldType: "Dropdown",
+      dbName: "external_link_type",
+      defaultValue: event?.external_link_type || "",
+      data: [
+        { id: "Join", displayName: "Join" },
+        { id: "Register", displayName: "Register" },
+      ],
+    },
+  ];
+
+  const ADD_ADDRESS = [
+    {
+      name: "building",
+      label: "Building Name",
+      placeholder: 'eg. "Main Building"',
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: false,
+      defaultValue: event.location && event.location.building,
+      dbName: "building",
+      readOnly: false,
+    },
+    {
+      name: "room",
+      label: "Room Number",
+      placeholder: 'eg. "2A"',
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: false,
+      defaultValue: event.location && event.location.room,
+      dbName: "room",
+      readOnly: false,
+    },
+    {
+      name: "address",
+      label: "Street Address",
+      placeholder: "Street address or public facility",
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: true,
+      defaultValue: event.location && event.location.address,
+      dbName: "address",
+      readOnly: false,
+    },
+
+    {
+      name: "unit",
+      label: "Unit Number",
+      placeholder: 'eg. "2A"',
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: false,
+      defaultValue: event.location && event.location.unit,
+      dbName: "unit",
+      readOnly: false,
+    },
+    {
+      name: "city",
+      label: "City",
+      placeholder: "eg. Springfield",
+      fieldType: "TextField",
+      contentType: "text",
+      isRequired: true,
+      defaultValue: event.location && event.location.city,
+      dbName: "city",
+      readOnly: false,
+    },
+    {
+      name: "state",
+      label: "State ",
+      placeholder: "eg. Massachusetts",
+      fieldType: "Dropdown",
+      contentType: "text",
+      isRequired: true,
+      data: states,
+      defaultValue: event.location && event.location.state,
+      dbName: "state",
+      readOnly: false,
+    },
+  ];
 
   const formJson = {
     title: "Edit Event or Campaign",
@@ -505,12 +603,9 @@ const createFormJson = ({
             defaultValue: event.is_recurring ? "true" : "false",
             dbName: "is_recurring",
             readOnly: false,
-            data: [
-              { id: "false", value: "No" },
-              { id: "true", value: "Yes" },
-            ],
+            data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
             child: {
-              dbName: "recurring_details",
+              // dbName: "recurring_details",
               valueToCheck: "true",
               fields: [
                 {
@@ -693,6 +788,8 @@ const createFormJson = ({
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
                       isRequired: true,
+                      isAsync: true,
+                      endpoint: "/communities.listForSuperAdmin",
                     },
                   ],
                 },
@@ -746,6 +843,10 @@ const createFormJson = ({
                     defaultValue: publicityCommunities,
                     dbName: "publicity_selections",
                     data: otherCommunityList,
+                    isAsync: true,
+                    endpoint: is_super_admin
+                      ? "/communities.listForSuperAdmin"
+                      : "/communities.others.listForCommunityAdmin",
                   },
                 ],
               },
@@ -769,64 +870,32 @@ const createFormJson = ({
         ],
       },
       {
-        name: "have_address",
-        label: "Do you have an address?",
+        name: "event_type",
+        label: "Is this event",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue: event.location ? "true" : "false",
-        dbName: "have_address",
+        defaultValue: event?.event_type,
+        dbName: "event_type",
         readOnly: false,
-        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-        child: {
-          valueToCheck: "true",
-          fields: [
-            {
-              name: "address",
-              label: "Street Address",
-              placeholder: "Street address or public facility",
-              fieldType: "TextField",
-              contentType: "text",
-              isRequired: true,
-              defaultValue: event.location && event.location.address,
-              dbName: "address",
-              readOnly: false,
-            },
-            {
-              name: "unit",
-              label: "Unit Number",
-              placeholder: 'eg. "2A"',
-              fieldType: "TextField",
-              contentType: "text",
-              isRequired: false,
-              defaultValue: event.location && event.location.unit,
-              dbName: "unit",
-              readOnly: false,
-            },
-            {
-              name: "city",
-              label: "City",
-              placeholder: "eg. Spriingfield",
-              fieldType: "TextField",
-              contentType: "text",
-              isRequired: true,
-              defaultValue: event.location && event.location.city,
-              dbName: "city",
-              readOnly: false,
-            },
-            {
-              name: "state",
-              label: "State ",
-              placeholder: "eg. Massachusetts",
-              fieldType: "Dropdown",
-              contentType: "text",
-              isRequired: true,
-              data: states,
-              defaultValue: event.location && event.location.state,
-              dbName: "state",
-              readOnly: false,
-            },
-          ],
-        },
+        data: [
+          { id: "in-person", value: "In-Person" },
+          { id: "online", value: "Online" },
+          { id: "both", value: "Both" },
+        ],
+        conditionalDisplays: [
+          {
+            valueToCheck: "online",
+            fields: ADD_LINK,
+          },
+          {
+            valueToCheck: "in-person",
+            fields: ADD_ADDRESS,
+          },
+          {
+            valueToCheck: "both",
+            fields: [...ADD_ADDRESS, ...ADD_LINK],
+          },
+        ],
       },
       {
         name: "description",

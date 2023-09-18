@@ -8,6 +8,7 @@ import { TASK_INTERVALS } from "./taskConstants";
 import { withRouter } from "react-router-dom";
 import { loadTasksAction } from "../../../redux/redux-actions/adminActions";
 import { bindActionCreators } from "redux";
+import Seo from "../../../components/Seo/Seo";
 
 const styles = (theme) => ({
   root: {
@@ -74,11 +75,13 @@ class CreateTaskForm extends Component {
   };
 
   render() {
-    const { classes } = this.props;
-    const { formJson } = this.state;
+    const { classes, match} = this.props;
+    const { formJson,toEdit } = this.state;
     if (!formJson) return <Loading />;
+    const {id} = match.params
     return (
       <div>
+        <Seo name={id?`Edit Task - ${toEdit?.name}`:"Create New Task" } />
         <MassEnergizeForm
           classes={classes}
           formJson={formJson}
@@ -145,14 +148,16 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
   const preflightFxn = (values) => {
     let details = values && values.recurring_details;
     const d = new Date(details);
-
+    
+    // datetime format is in user's timezone. We convert to UTC timezone for the api
+    // and keep the original timezone for display. 
     let recurring_details = JSON.stringify({
-      day_of_month: d.getDate(),
-      day_of_week: d.getDay(),
-      month_of_year: d.getMonth() + 1,
-      minute: d.getMinutes(),
-      hour: d.getHours(),
-      year: d.getFullYear(),
+      day_of_month: d.getUTCDate(),
+      day_of_week: d.getUTCDay(),
+      month_of_year: d.getUTCMonth() + 1,
+      minute: d.getUTCMinutes(),
+      hour: d.getUTCHours(),
+      year: d.getUTCFullYear(),
       actual: values.recurring_details,
     });
 

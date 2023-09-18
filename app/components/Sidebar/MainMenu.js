@@ -84,16 +84,7 @@ class MainMenu extends React.Component {
         ); 
       }
       if (item.title) {
-        return (
-          <ListSubheader
-            disableSticky
-            key={index.toString()}
-            component="div"
-            className={classes.title}
-          >
-            {item.name}
-          </ListSubheader>
-        );
+        return <></>;
       }
       return (
         <ListItem
