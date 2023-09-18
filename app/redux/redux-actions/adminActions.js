@@ -29,6 +29,7 @@ import {
   UPDATE_HEAP,
   LOAD_CC_ACTIONS,
   LOAD_CC_CATEGORIES,
+  LOAD_CC_SUBCATEGORIES,
   TOGGLE_UNIVERSAL_MODAL,
   TEST_REDUX,
   LOAD_ALL_TASK_FUNCTIONS,
@@ -395,6 +396,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadAllVendors(vendors.data));
     dispatch(reduxLoadCCActions(ccActions.data.actions));
     dispatch(reduxLoadCCCategories(ccActions.data.categories));
+    dispatch(reduxLoadCCSubcategories(ccActions.data.subcategories));
     dispatch(loadAllTags(tagCollections.data));
     dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
     dispatch(loadTaskFunctionsAction(tasksFunctions.data));
@@ -463,6 +465,11 @@ export const reduxLoadCCActions = (data = []) => ({
 
 export const reduxLoadCCCategories = (data = []) => ({
   type: LOAD_CC_CATEGORIES,
+  payload: data,
+});
+
+export const reduxLoadCCSubcategories = (data = []) => ({
+  type: LOAD_CC_SUBCATEGORIES,
   payload: data,
 });
 

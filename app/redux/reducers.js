@@ -38,6 +38,7 @@ import app, {
   reducerForHeap,
   reducerForCCAction,
   reducerForCCCategories,
+  reducerForCCSubcategories,
   reducerForUniversalModal,
   testReduxReducer,
   allTaskFunctionsReducer,
@@ -90,6 +91,7 @@ export default function createReducer(injectedReducers = {}) {
     toastOptions: reducerForUniversalToast,
     ccActions: reducerForCCAction,
     ccCategories: reducerForCCCategories,
+    ccSubcategories: reducerForCCSubcategories,
     heap: reducerForHeap, // an object that is used to temporarily hold all kinds of random data.
     subscribers: subscribersReducer,
     teamMessages: teamMessagesReducer,
