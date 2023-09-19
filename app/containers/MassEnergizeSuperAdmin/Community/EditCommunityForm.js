@@ -218,6 +218,17 @@ class EditCommunityForm extends Component {
               dbName: "owner_phone_number",
               readOnly: false,
             },
+            {
+              name: "sender_signature_name",
+              label: "The name that should appear on all emails to your community members",
+              placeholder: "eg. The 'Community Name' Team",
+              fieldType: "TextField",
+              contentType: "text",
+              isRequired: false,
+              defaultValue: community.sender_signature_name || "",
+              dbName: "sender_signature_name",
+              readOnly: false,
+            },
           ],
         },
         {
@@ -273,7 +284,8 @@ class EditCommunityForm extends Component {
               fieldType: "TextField",
               contentType: "text",
               isRequired: false,
-              defaultValue: community.location && community.location.zipcode,
+              defaultValue:
+                community.location && community.location.zipcode,
               dbName: "zipcode",
               readOnly: false,
             },
@@ -312,8 +324,10 @@ class EditCommunityForm extends Component {
                   },
                   {
                     name: "locations",
-                    label:"List of all such regions (zipcodes or town-state, city-state, states) within the community, separated by commas ",
-                    placeholder:"eg. 01101, 01102, 01103, 01104 or Springfield-MA",
+                    label:
+                      "List of all such regions (zipcodes or town-state, city-state, states) within the community, separated by commas ",
+                    placeholder:
+                      "eg. 01101, 01102, 01103, 01104 or Springfield-MA",
                     fieldType: "TextField",
                     contentType: "text",
                     isRequired: true,
@@ -332,7 +346,10 @@ class EditCommunityForm extends Component {
               defaultValue: community.is_demo ? "true" : "false",
               dbName: "is_demo",
               readOnly: !superAdmin,
-              data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+              data: [
+                { id: "false", value: "No" },
+                { id: "true", value: "Yes" },
+              ],
             },
           ],
         },
@@ -362,7 +379,8 @@ class EditCommunityForm extends Component {
                 fields: [
                   {
                     name: "com_facebook_link",
-                    label: "Provide a link to your community's Facebook page",
+                    label:
+                      "Provide a link to your community's Facebook page",
                     placeholder: "www.facebook.com/your-community",
                     fieldType: "TextField",
                     contentType: "text",
@@ -373,7 +391,8 @@ class EditCommunityForm extends Component {
                   },
                   {
                     name: "com_twitter_link",
-                    label: "Provide a link to your community's Twitter page",
+                    label:
+                      "Provide a link to your community's Twitter page",
                     placeholder: "eg. www.twitter.com/your-community",
                     fieldType: "TextField",
                     contentType: "text",
@@ -384,7 +403,8 @@ class EditCommunityForm extends Component {
                   },
                   {
                     name: "com_instagram_link",
-                    label: "Provide a link to your community's Instagram page",
+                    label:
+                      "Provide a link to your community's Instagram page",
                     placeholder: "eg. www.instagram.com/your-community",
                     fieldType: "TextField",
                     contentType: "text",
@@ -418,7 +438,10 @@ class EditCommunityForm extends Component {
           defaultValue: community.is_approved ? "true" : "false",
           dbName: "is_approved",
           readOnly: !superAdmin, // readonly if just a cadmin
-          data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+          data: [
+            { id: "false", value: "No" },
+            { id: "true", value: "Yes" },
+          ],
         },
         {
           name: "is_published",
@@ -428,7 +451,10 @@ class EditCommunityForm extends Component {
           defaultValue: community.is_published ? "true" : "false",
           dbName: "is_published",
           readOnly: false,
-          data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+          data: [
+            { id: "false", value: "No" },
+            { id: "true", value: "Yes" },
+          ],
         },
       ],
     };

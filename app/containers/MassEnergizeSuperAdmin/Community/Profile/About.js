@@ -307,6 +307,18 @@ class About extends React.Component {
                     secondary={`${community.owner_email}`}
                   />
                 </ListItem>
+                <ListItem>
+                  <ListItemIcon>
+                    <Avatar>
+                        <Email />
+                    </Avatar>
+                  </ListItemIcon>
+
+                  <ListItemText
+                    primary="Sender Email Signature Name"
+                    secondary={`${community?.sender_signature_name || "N/A"}`}
+                  />
+                </ListItem>
 
                 <ListItem>
                    <ListItemIcon>

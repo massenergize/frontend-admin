@@ -78,7 +78,7 @@ export const FormMediaLibraryImplementation = (props) => {
     // sometimes an image that is preselected, may not be in the library's first load
     // in that case just add it to the library's list
     var isNotThere = ids.filter((img) => !bank.includes(img));
-    const alreadyAvailableHere = images.filter((img) => ids.includes(img.id)); // Needed because there is a chance that some might be available in the list, but not all
+    const alreadyAvailableHere = images?.filter((img) => ids.includes(img.id)); // Needed because there is a chance that some might be available in the list, but not all
     if (isNotThere?.length)
       // only run this if some items are not found in the already loaded redux content
       return fetchNeededImages(ids, (fromBackend) => {
