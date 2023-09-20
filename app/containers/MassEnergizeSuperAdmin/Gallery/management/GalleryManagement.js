@@ -2,11 +2,15 @@ import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 import MEPaperBlock from "../../ME  Tools/paper block/MEPaperBlock";
-import { Typography } from "@mui/material";
+import { Avatar, Link, Typography } from "@mui/material";
 import METable from "../../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../../ME  Tools/MEConstants";
+import { bindActionCreators } from "redux";
+import { reduxToggleUniversalModal } from "../../../../redux/redux-actions/adminActions";
+import MergeAndRemove from "./MergeAndRemove";
 
 export const GalleryManagement = (props) => {
+  const { toggleModal, summary } = props;
   const getColumns = (classes) => [
     {
       name: "ID",
@@ -22,18 +26,15 @@ export const GalleryManagement = (props) => {
         sort: false,
         filter: false,
         download: false,
-        //     customBodyRender: (d) => (
-        //       <div>
-        //         {d.image && (
-        //           <Avatar
-        //             alt={d.initials}
-        //             src={d.image.url}
-        //             style={{ margin: 10 }}
-        //           />
-        //         )}
-        //         {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
-        //       </div>
-        //     ),
+        customBodyRender: (d) => (
+          <div>
+            <Avatar
+              alt={d.initials}
+              src={"https://placehold.co/400"}
+              style={{ margin: 10 }}
+            />
+          </div>
+        ),
       },
     },
     {
@@ -66,29 +67,20 @@ export const GalleryManagement = (props) => {
         filter: false,
         download: false,
         sort: false,
-        // customBodyRender: (id) => (
-        //   <div>
-        //     <Link to={`/admin/edit/${id}/vendor`}>
-        //       <EditIcon size="small" variant="outlined" color="secondary" />
-        //     </Link>
-        //     &nbsp;&nbsp;
-        //     <Link
-        //       onClick={async () => {
-        //         const copiedVendorResponse = await apiCall("/vendors.copy", {
-        //           vendor_id: id,
-        //         });
-        //         if (copiedVendorResponse && copiedVendorResponse.success) {
-        //           const newVendor =
-        //             copiedVendorResponse && copiedVendorResponse.data;
-        //           this.props.history.push(`/admin/edit/${newVendor.id}/vendor`);
-        //         }
-        //       }}
-        //       to="/admin/read/vendors"
-        //     >
-        //       <FileCopy size="small" variant="outlined" color="secondary" />
-        //     </Link>
-        //   </div>
-        // ),
+        customBodyRender: (id) => (
+          <div>
+            <Link
+              onClick={(e) => {
+                e.preventDefault();
+                reviewAndMerge();
+              }}
+              to={`#`}
+              style={{ fontWeight: "bold", cursor: "pointer" }}
+            >
+              Review & Merge
+            </Link>
+          </div>
+        ),
       },
     },
   ];
@@ -227,6 +219,20 @@ export const GalleryManagement = (props) => {
 
     rowsPerPageOptions: [10, 25, 100],
   };
+
+  const reviewAndMerge = (props) => {
+    toggleModal({
+      show: true,
+      component: <MergeAndRemove />,
+      onConfirm: () => toggleModal({ show: false, component: null }),
+      closeAfterConfirmation: true,
+      title: "Summary of duplicates",
+      noTitle: false,
+      fullControl:true,
+      // noCancel: true,
+      okText: "Merge & Remove Duplicates",
+    });
+  };
   return (
     <div>
       <MEPaperBlock>
@@ -242,7 +248,7 @@ export const GalleryManagement = (props) => {
       <METable
         page={PAGE_PROPERTIES.DUPLICATE_MEDIA_MANAGEMENT}
         tableProps={{
-          title: "All Duplicate Images",
+          title: "Duplicates",
           data: fashionData(),
           columns: getColumns(),
           options,
@@ -252,9 +258,18 @@ export const GalleryManagement = (props) => {
   );
 };
 
-const mapStateToProps = (state) => ({});
+const mapStateToProps = (state) => ({
+  summary: {},
+});
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      toggleModal: reduxToggleUniversalModal,
+    },
+    dispatch
+  );
+};
 
 export default connect(
   mapStateToProps,
