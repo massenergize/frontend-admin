@@ -16,6 +16,7 @@ export const PAGE_PROPERTIES = {
          ALL_TEAM_MEMBERS: { key: "ALL_TEAM_MEMBERS" },
          ACTION_ENGAGEMENTS: { key: "ACTION_ENGAGEMENTS" },
          EMAIL_TEMPLATES: { key: "EMAIL_TEMPLATES" },
+         DUPLICATE_MEDIA_MANAGEMENT: { key: "DUPLICATE_MEDIA_MANAGEMENT" },
        }; 
 
 

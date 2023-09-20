@@ -76,6 +76,7 @@ import {
   TermsOfServicePage,
   PrivacyPolicyPage,
   ActionUsers,
+  GalleryManagement,
 } from "../pageListAsync";
 import EditVendor from "../MassEnergizeSuperAdmin/Vendors/EditVendor";
 import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
@@ -280,6 +281,10 @@ class Application extends React.Component {
             />
             <Route path="/admin/read/users" component={UsersList} />
             <Route
+              path="/admin/gallery/manage-duplicates"
+              component={GalleryManagement}
+            />
+            <Route
               path="/admin/read/community-admin-messages"
               exact
               component={CommunityAdminMessages}
@@ -294,14 +299,8 @@ class Application extends React.Component {
               exact
               component={MessageDetails}
             />
-            <Route
-              path="/admin/read/communities"
-              component={AllCommunities}
-            />
-            <Route
-              path="/admin/add/community"
-              component={OnboardCommunity}
-            />
+            <Route path="/admin/read/communities" component={AllCommunities} />
+            <Route path="/admin/add/community" component={OnboardCommunity} />
             <Route
               path="/admin/community/:id"
               component={CommunityProfile}
@@ -348,11 +347,7 @@ class Application extends React.Component {
               component={ActionUsers}
             />
             <Route path="/admin/add/action" component={AddAction} />
-            <Route
-              path="/admin/edit/:id/action"
-              component={EditAction}
-              exact
-            />
+            <Route path="/admin/edit/:id/action" component={EditAction} exact />
             <Route path="/admin/add/action/:id" component={EditAction} />
             <Route
               path="/admin/read/carbon-equivalencies"
@@ -367,19 +362,13 @@ class Application extends React.Component {
               component={EditCarbonEquivalency}
               exact
             />
-            <Route
-              path="/admin/read/categories"
-              component={AllCategories}
-            />
+            <Route path="/admin/read/categories" component={AllCategories} />
             <Route path="/admin/add/category" component={AddCategory} />
             <Route
               path="/admin/read/tag-collections"
               component={AllCategories}
             />
-            <Route
-              path="/admin/add/tag-collection"
-              component={AddCategory}
-            />
+            <Route path="/admin/add/tag-collection" component={AddCategory} />
             <Route
               path="/admin/edit/:id/tag-collection"
               component={EditCategory}
@@ -396,10 +385,7 @@ class Application extends React.Component {
             />
             <Route path="/admin/add/event" component={AddEvent} />
             <Route path="/admin/edit/:id/event" component={EditEvent} />
-            <Route
-              path="/admin/edit/:id/event-rsvps"
-              component={EventRSVPs}
-            />
+            <Route path="/admin/edit/:id/event-rsvps" component={EventRSVPs} />
             <Route path="/admin/read/teams" exact component={AllTeams} />
             <Route path="/admin/add/team" component={AddTeam} />
             <Route path="/admin/edit/:id/team" component={EditTeam} />
@@ -407,10 +393,7 @@ class Application extends React.Component {
               path="/admin/edit/:id/team-members"
               component={TeamMembers}
             />
-            <Route
-              path="/admin/read/subscribers"
-              component={AllSubscribers}
-            />
+            <Route path="/admin/read/subscribers" component={AllSubscribers} />
             <Route path="/admin/read/policies" component={AllPolicies} />
             <Route path="/admin/add/policy" component={AddPolicy} />
 
@@ -422,10 +405,7 @@ class Application extends React.Component {
               path="/admin/read/testimonials"
               component={AllTestimonials}
             />
-            <Route
-              path="/admin/add/testimonial"
-              component={AddTestimonial}
-            />
+            <Route path="/admin/add/testimonial" component={AddTestimonial} />
             <Route
               path="/admin/edit/:id/testimonial"
               component={EditTestimonial}
@@ -435,10 +415,7 @@ class Application extends React.Component {
             <Route path="/admin/edit/:id/vendor" component={EditVendor} />
             <Route path="/admin/export" component={Export} />
             <Route path="/admin/customize" component={CustomizePages} />
-            <Route
-              path="/admin/read/categories"
-              component={AllCategories}
-            />
+            <Route path="/admin/read/categories" component={AllCategories} />
             <Route path="/admin/add/category" component={AddCategory} />
             <Route path="/admin/form" component={Form} />
             <Route path="/admin/table" component={Table} />
@@ -448,10 +425,7 @@ class Application extends React.Component {
             <Route path="/admin/edit/:id/home" component={SuperHome} />
             <Route path="/admin/edit/:id/impacts" component={Impact} />
             <Route path="/admin/edit/:id/impact" component={ImpactPage} />
-            <Route
-              path="/admin/edit/:id/actions"
-              component={SuperAllActions}
-            />
+            <Route path="/admin/edit/:id/actions" component={SuperAllActions} />
             <Route
               path="/admin/edit/:id/all-actions"
               component={SuperAllActions}
@@ -469,24 +443,15 @@ class Application extends React.Component {
             />
             <Route path="/admin/edit/:id/donate" component={SuperDonate} />
             <Route path="/admin/edit/:id/about" component={SuperAboutUs} />
-            <Route
-              path="/admin/edit/:id/about_us"
-              component={SuperAboutUs}
-            />
+            <Route path="/admin/edit/:id/about_us" component={SuperAboutUs} />
             <Route path="/admin/read/about-us" component={SuperAboutUs} />
             <Route path="/admin/add/donate" component={SuperDonate} />
-            <Route
-              path="/admin/read/contact-us"
-              component={SuperContactUs}
-            />
+            <Route path="/admin/read/contact-us" component={SuperContactUs} />
             <Route
               path="/admin/read/action-engagements"
               component={ActionEngagementList}
             />
-            <Route
-              path="/admin/read/all-actions"
-              component={SuperAllActions}
-            />
+            <Route path="/admin/read/all-actions" component={SuperAllActions} />
             <Route exact path="/admin/tasks/add" component={AddTask} />
             <Route exact path="/admin/edit/:id/task" component={AddTask} />
             <Route exact path="/admin/read/tasks" component={ListTasks} />

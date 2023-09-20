@@ -483,6 +483,12 @@ export const UsersList = loadable(
     fallback: <Loading />,
   }
 );
+export const GalleryManagement = loadable(
+  () => import("./MassEnergizeSuperAdmin/Gallery/management/GalleryManagement"),
+  {
+    fallback: <Loading />,
+  }
+);
 export const ImportContacts = loadable(
   () => import("./MassEnergizeSuperAdmin/Summary/ImportContacts"),
   {

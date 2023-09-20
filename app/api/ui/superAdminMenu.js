@@ -221,6 +221,24 @@ module.exports = [
     ],
   },
   {
+    key: "gallery-management",
+    name: "Gallery Management",
+    icon: "md-image",
+    // link: "/admin/gallery/manage-gallery"
+    child: [
+      {
+        key: "about-categories",
+        name: "Tags & Tag Collections",
+        title: true,
+      },
+      {
+        key: "duplicates",
+        name: "Manage Duplicates",
+        link: "/admin/gallery/manage-duplicates",
+      },
+    ],
+  },
+  {
     key: "add-new-super-admin",
     name: "New Super admin",
     icon: "ios-add-circle",
