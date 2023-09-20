@@ -316,7 +316,7 @@ class About extends React.Component {
 
                   <ListItemText
                     primary="Sender Email Signature Name"
-                    secondary={`${community?.sender_signature_name || "N/A"}`}
+                    secondary={`${community?.contact_sender_alias || "N/A"}`}
                   />
                 </ListItem>
 
