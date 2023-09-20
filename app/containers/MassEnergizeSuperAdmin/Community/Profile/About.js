@@ -77,7 +77,39 @@ class About extends React.Component {
 
   getTags = tags => (tags.map(t => (t.name))).join(', ');
 
-  
+  csvDownloader(whichCSV, displayText) {
+    const { classes } = this.props;
+    const { loadingCSVs } = this.state;
+    return (
+      <Grid item xs={4}>
+        <Paper
+          onClick={() => {
+            !loadingCSVs.includes(whichCSV) && this.getCSV(whichCSV);
+          }}
+          className={`${classes.pageCard}`}
+          elevation={1}
+        >
+          <Typography
+            variant="h5"
+            style={{ fontWeight: "600", fontSize: "1rem" }}
+            component="h3"
+          >
+            {displayText}{" "}
+            <Icon style={{ paddingTop: 3, color: "green" }}>
+              arrow_downward
+            </Icon>
+            {loadingCSVs.includes(whichCSV) && (
+              <CircularProgress
+                size={20}
+                thickness={2}
+                color="secondary"
+              />
+            )}
+          </Typography>
+        </Paper>
+      </Grid>
+    );    
+  }
 
   getGoalPercentage() {
     const community = this.props.community ? this.props.community : 0;
@@ -141,41 +173,6 @@ class About extends React.Component {
     return 0;
   }
 
-  showAllCommunitiesAndActions = (loadingCSVs, classes) => {
-    const user = this.props.auth ? this.props.auth : {};
-    if (user.is_super_admin) {
-     return (
-      <Grid item xs={4}>
-            <Paper
-              onClick={() => {
-                !loadingCSVs.includes("actions.all") &&
-                  this.getCSV("actions.all");
-              }}
-              className={`${classes.pageCard}`}
-              elevation={1}
-            >
-              <Typography
-                variant="h5"
-                style={{ fontWeight: "600", fontSize: "1rem" }}
-                component="h3"
-              >
-                Request All Communities and Actions CSV{" "}
-                <Icon style={{ paddingTop: 3, color: "green" }}>
-                  arrow_downward
-                </Icon>
-                {loadingCSVs.includes("actions.all") && (
-                  <CircularProgress
-                    size={20}
-                    thickness={2}
-                    color="secondary"
-                  />
-                )}
-              </Typography>
-            </Paper>
-          </Grid>
-    );
-  }
-  };
 
   async importContacts() {
     return <Redirect exact to="/admin/importcontacts"></Redirect>;
@@ -185,7 +182,7 @@ class About extends React.Component {
     const goalsEditLink = `/admin/edit/${community ? community.id : null}/goal`;
     const communityEditLink = `/admin/edit/${community ? community.id : null}/community/community-admin`;
     const addRemoveCommuntyAdminLink = `/admin/edit/${community ? community.id : null}/community-admins`;
-
+    const user = this.props.auth ? this.props.auth : {};
     const { error, loadingCSVs, success } = this.state;
     if (this.state.wantImport) {
       return <Redirect exact to="/admin/importcontacts"></Redirect>;
@@ -537,87 +534,9 @@ class About extends React.Component {
           </Grid>
         </Grid>
         <Grid container className={classes.colList}>
-          <Grid item xs={4}>
-            <Paper
-              onClick={() => {
-                !loadingCSVs.includes("users") && this.getCSV("users");
-              }}
-              className={`${classes.pageCard}`}
-              elevation={1}
-            >
-              <Typography
-                variant="h5"
-                style={{ fontWeight: "600", fontSize: "1rem" }}
-                component="h3"
-              >
-                Request Users CSV{" "}
-                <Icon style={{ paddingTop: 3, color: "green" }}>
-                  arrow_downward
-                </Icon>
-                {loadingCSVs.includes("users") && (
-                  <CircularProgress
-                    size={20}
-                    thickness={2}
-                    color="secondary"
-                  />
-                )}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              onClick={() => {
-                !loadingCSVs.includes("actions") && this.getCSV("actions");
-              }}
-              className={`${classes.pageCard}`}
-              elevation={1}
-            >
-              <Typography
-                variant="h5"
-                style={{ fontWeight: "600", fontSize: "1rem" }}
-                component="h3"
-              >
-                Request Community Actions CSV{" "}
-                <Icon style={{ paddingTop: 3, color: "green" }}>
-                  arrow_downward
-                </Icon>
-                {loadingCSVs.includes("actions") && (
-                  <CircularProgress
-                    size={20}
-                    thickness={2}
-                    color="secondary"
-                  />
-                )}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              onClick={() => {
-                !loadingCSVs.includes("teams") && this.getCSV("teams");
-              }}
-              className={`${classes.pageCard}`}
-              elevation={1}
-            >
-              <Typography
-                variant="h5"
-                style={{ fontWeight: "600", fontSize: "1rem" }}
-                component="h3"
-              >
-                Request Teams CSV{" "}
-                <Icon style={{ paddingTop: 3, color: "green" }}>
-                  arrow_downward
-                </Icon>
-                {loadingCSVs.includes("teams") && (
-                  <CircularProgress
-                    size={20}
-                    thickness={2}
-                    color="secondary"
-                  />
-                )}
-              </Typography>
-            </Paper>
-          </Grid>
+          {this.csvDownloader("users", "Request Users CSV")}
+          {this.csvDownloader("actions", "Request Community Actions CSV")}
+          {this.csvDownloader("teams", "Request Teams CSV")}
           <Grid item xs={4}>
             <Paper className={`${classes.pageCard}`} elevation={1}>
               <Link
@@ -635,73 +554,13 @@ class About extends React.Component {
                   <Icon style={{ paddingTop: 3, color: "green" }}>
                     arrow_upward
                   </Icon>
-                  {loadingCSVs.includes("users") && (
-                    <CircularProgress
-                      size={20}
-                      thickness={2}
-                      color="secondary"
-                    />
-                  )}
                 </Typography>
               </Link>
             </Paper>
           </Grid>
-          {this.showAllCommunitiesAndActions(loadingCSVs, classes)}
-          <Grid item xs={4}>
-            <Paper
-              onClick={() => {
-                !loadingCSVs.includes("actions.all") &&
-                  this.getCSV("actions.all");
-              }}
-              className={`${classes.pageCard}`}
-              elevation={1}
-            >
-              <Typography
-                variant="h5"
-                style={{ fontWeight: "600", fontSize: "1rem" }}
-                component="h3"
-              >
-                Request All Actions CSV{" "}
-                <Icon style={{ paddingTop: 3, color: "green" }}>
-                  arrow_downward
-                </Icon>
-                {loadingCSVs.includes("actions.all") && (
-                  <CircularProgress
-                    size={20}
-                    thickness={2}
-                    color="secondary"
-                  />
-                )}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              onClick={() => {
-                !loadingCSVs.includes("metrics") && this.getCSV("metrics");
-              }}
-              className={`${classes.pageCard}`}
-              elevation={1}
-            >
-              <Typography
-                variant="h5"
-                style={{ fontWeight: "600", fontSize: "1rem" }}
-                component="h3"
-              >
-                Request Metrics CSV{" "}
-                <Icon style={{ paddingTop: 3, color: "green" }}>
-                  arrow_downward
-                </Icon>
-                {loadingCSVs.includes("metrics") && (
-                  <CircularProgress
-                    size={20}
-                    thickness={2}
-                    color="secondary"
-                  />
-                )}
-              </Typography>
-            </Paper>
-          </Grid>
+          {this.csvDownloader("actions.all", "Request All Actions CSV")}
+          {this.csvDownloader("metrics", "Request Metrics CSV")}
+          {this.csvDownloader("pagemap", "Request Community Page Map")}
         </Grid>
       </>
     );
