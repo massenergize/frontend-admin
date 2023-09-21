@@ -56,6 +56,7 @@ import {
   LOAD_OTHER_ADMINS,
   SET_MEDIA_LIBRARY_MODAL_FILTERS,
   SET_GALLERY_META_DATA,
+  SET_DUPLICATE_SUMMARY,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -266,6 +267,29 @@ export const reduxLoadSuperAdmins = (data = LOADING) => {
     payload: data,
   };
 };
+export const reduxSetDuplicateSummary = (data = null) => {
+  return {
+    type: SET_DUPLICATE_SUMMARY,
+    payload: data,
+  };
+};
+
+export const fetchAllDuplicateMedia = (cb) => (dispatch) => {
+  apiCall("/gallery.duplicates.summarize")
+    .then((response) => {
+      if (!response.success) {
+        console.log("ERROR_FETCHING_DUPES_BE:", response.error);
+        return cb && cb(response.data, !response.success, response.error);
+      }
+      cb && cb(response.data);
+      dispatch(reduxSetDuplicateSummary(response.data));
+    })
+    .catch((e) => {
+      console.log("ERROR_FETCHING_DUPES: ", e?.toString());
+      cb && cb(null, true, e?.toString());
+    });
+};
+
 export const reduxLoadAdmins = (data = LOADING) => {
   return {
     type: LOAD_ADMINS_FOR_MY_COMMUNITY,

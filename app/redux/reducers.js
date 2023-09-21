@@ -65,6 +65,7 @@ import app, {
   reducerForLoadingOtherAdmins,
   mlibFiltersReducer,
   setGalleryMetadataReducer,
+  reducerForDuplicateSummary,
 } from "./modules/appReducer";
 
 /**
@@ -133,7 +134,8 @@ export default function createReducer(injectedReducers = {}) {
     mlibFilters: mlibFiltersReducer,
     paginationMetaData: allMetaDataReducer, // stores pagination data for all tables
     imageBeingEdited: setImageForEditReducer, // This is what holds  the image whose details are being edited in the mlibrary modal
-    otherAdmins: reducerForLoadingOtherAdmins // If a user is admin of multiple communities, other admins in each of their communities will be grouped here (Used in the Media Library Modal)
+    otherAdmins: reducerForLoadingOtherAdmins, // If a user is admin of multiple communities, other admins in each of their communities will be grouped here (Used in the Media Library Modal)
+    duplicateSummary: reducerForDuplicateSummary // When the summarised info of duplicate media is retrieved from the B.E, this is where its stored
   });
 
   // Wrap the root reducer and return a new root reducer with router state

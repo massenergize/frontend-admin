@@ -57,6 +57,7 @@ import {
   LOAD_OTHER_ADMINS,
   SET_MEDIA_LIBRARY_MODAL_FILTERS,
   SET_GALLERY_META_DATA,
+  SET_DUPLICATE_SUMMARY,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -219,6 +220,14 @@ export const reducerForLoadingAdmins = (state = LOADING, action = {}) => {
 export const reducerForFeatureFlags = (state = LOADING, action = {}) => {
   switch (action.type) {
     case LOAD_FEATURE_FLAGS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForDuplicateSummary = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case SET_DUPLICATE_SUMMARY:
       return action.payload;
     default:
       return state;

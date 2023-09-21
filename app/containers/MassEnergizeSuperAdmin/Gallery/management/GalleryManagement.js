@@ -1,16 +1,22 @@
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import MEPaperBlock from "../../ME  Tools/paper block/MEPaperBlock";
-import { Avatar, Link, Typography } from "@mui/material";
+import { Avatar, Button, Link, Paper, Typography } from "@mui/material";
 import METable from "../../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../../ME  Tools/MEConstants";
 import { bindActionCreators } from "redux";
-import { reduxToggleUniversalModal } from "../../../../redux/redux-actions/adminActions";
+import {
+  fetchAllDuplicateMedia,
+  reduxToggleUniversalModal,
+} from "../../../../redux/redux-actions/adminActions";
 import MergeAndRemove from "./MergeAndRemove";
+import LinearBuffer from "../../../../components/Massenergize/LinearBuffer";
+import { LOADING } from "../../../../utils/constants";
 
 export const GalleryManagement = (props) => {
-  const { toggleModal, summary } = props;
+  const { toggleModal, summary, fetchSummary } = props;
+  const [loading, setLoading] = useState(false);
   const getColumns = (classes) => [
     {
       name: "ID",
@@ -211,6 +217,14 @@ export const GalleryManagement = (props) => {
     return arrays;
   };
 
+  console.log("LETS SEE SUMMARY", summary);
+
+  useEffect(() => {
+    if (summary !== LOADING) return;
+    setLoading(true);
+    fetchSummary(() => setLoading(false));
+  }, []);
+
   const options = {
     filterType: "dropdown",
     responsive: "standard",
@@ -228,22 +242,71 @@ export const GalleryManagement = (props) => {
       closeAfterConfirmation: true,
       title: "Summary of duplicates",
       noTitle: false,
-      fullControl:true,
+      fullControl: true,
       // noCancel: true,
       okText: "Merge & Remove Duplicates",
     });
   };
+
+  if (loading)
+    return (
+      <LinearBuffer
+        asCard
+        lines={1}
+        message="Please be patient, this may take a while. We are reviewing all platform media items for duplicates..."
+      />
+    );
   return (
     <div>
-      <MEPaperBlock>
-        <Typography>
-          The table below is a summary of all duplicate images that exist on the
-          platform. Images that are the exact copy of the other are grouped and
-          represented as one row. On each raw, relevant information on where the
-          images are being used on the platform, as well as links for previews
-          are provided. Click on<b> "View More"</b> for a thorough breakdown.
-        </Typography>
-      </MEPaperBlock>
+      <Paper elevation={2} style={{ marginBottom: 20 }}>
+        <div style={{ padding: "20px 25px" }}>
+          <Typography>
+            The table below is a summary of all duplicate images that exist on
+            the platform. Images that are the exact copy of the other are
+            grouped and represented as one row. On each raw, relevant
+            information on where the images are being used on the platform, as
+            well as links for previews are provided. Click on<b> "View More"</b>{" "}
+            for a thorough breakdown.
+          </Typography>
+        </div>
+
+        <div
+          style={{
+            width: "100%",
+            background: "#fcfcfc",
+            display: "flex",
+            flexDirection: "row",
+          }}
+        >
+          <Button
+            variant="contained"
+            color="primary"
+            className="touchable-opacity"
+            style={{
+              borderRadius: 0,
+              padding: "10px 30px",
+              fontSize: 14,
+              margin: 0,
+            }}
+          >
+            Reload
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            className="touchable-opacity"
+            style={{
+              borderRadius: 0,
+              padding: "10px 30px",
+              fontSize: 14,
+              margin: 0,
+              // marginLeft: "auto",
+            }}
+          >
+            Merge All
+          </Button>
+        </div>
+      </Paper>
 
       <METable
         page={PAGE_PROPERTIES.DUPLICATE_MEDIA_MANAGEMENT}
@@ -259,13 +322,14 @@ export const GalleryManagement = (props) => {
 };
 
 const mapStateToProps = (state) => ({
-  summary: {},
+  summary: state.getIn(["duplicateSummary"]),
 });
 
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       toggleModal: reduxToggleUniversalModal,
+      fetchSummary: fetchAllDuplicateMedia,
     },
     dispatch
   );
