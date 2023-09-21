@@ -31,7 +31,7 @@ let FIREBASE_CONFIG = {
   messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
-console.log(FIREBASE_CONFIG);
+
 if (IS_PROD) {
   FIREBASE_CONFIG = {
     ...FIREBASE_CONFIG,
