@@ -39,7 +39,6 @@ if (IS_PROD) {
   };
 } 
 
-
 //  ---- setting  Community Portal routes
 let PORTAL_HOST = 'https://community.massenergize.org';
 if (IS_LOCAL) {
