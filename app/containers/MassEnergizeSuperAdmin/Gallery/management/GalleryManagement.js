@@ -249,7 +249,7 @@ export const GalleryManagement = (props) => {
               margin: 0,
             }}
           >
-            Reload
+            Refresh
           </Button>
           <Button
             disabled={downloading}

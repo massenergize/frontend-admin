@@ -38,6 +38,13 @@ function MergeAndRemove({
             backgroundColor: "#e8e8e8",
           }}
         />
+        <Link
+          href={media?.url}
+          target="_blank"
+          style={{ margin: "10px 0px", fontWeight: "bold", display: "block" }}
+        >
+          Original - {media?.name}
+        </Link>
         <Typography
           style={{
             padding: "5px 10px",
@@ -54,7 +61,7 @@ function MergeAndRemove({
               key={index?.toString()}
               href={dupe?.url}
               target="_blank"
-              style={{ marginBottom: 10, display: "block" }}
+              style={{ marginBottom: 10, display: "block", fontWeight: "bold" }}
             >
               <b>{dupe?.id}</b>: {dupe?.name}
             </Link>
