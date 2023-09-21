@@ -170,6 +170,17 @@ class CreateNewCommunityForm extends Component {
               dbName: "owner_phone_number",
               readOnly: false,
             },
+            {
+              name: "contact_sender_alias",
+              label:"The name that should appear on all emails to your community members",
+              placeholder: "eg. The 'Community Name' Team",
+              fieldType: "TextField",
+              contentType: "text",
+              isRequired: false,
+              defaultValue: "",
+              dbName: "contact_sender_alias",
+              readOnly: false,
+            },
           ],
         },
         {
@@ -271,7 +282,10 @@ class CreateNewCommunityForm extends Component {
               defaultValue: "false",
               dbName: "is_demo",
               readOnly: false,
-              data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+              data: [
+                { id: "false", value: "No" },
+                { id: "true", value: "Yes" },
+              ],
             },
           ],
         },
@@ -298,7 +312,8 @@ class CreateNewCommunityForm extends Component {
                 fields: [
                   {
                     name: "com_facebook_link",
-                    label: "Provide a link to your community's Facebook page",
+                    label:
+                      "Provide a link to your community's Facebook page",
                     placeholder: "www.facebook.com/your-community",
                     fieldType: "TextField",
                     contentType: "text",
@@ -308,7 +323,8 @@ class CreateNewCommunityForm extends Component {
                   },
                   {
                     name: "com_twitter_link",
-                    label: "Provide a link to your community's Twitter page",
+                    label:
+                      "Provide a link to your community's Twitter page",
                     placeholder: "eg. www.twitter.com/your-community",
                     fieldType: "TextField",
                     contentType: "text",
@@ -319,7 +335,8 @@ class CreateNewCommunityForm extends Component {
                   },
                   {
                     name: "com_instagram_link",
-                    label: "Provide a link to your community's Instagram page",
+                    label:
+                      "Provide a link to your community's Instagram page",
                     placeholder: "eg. www.instagram.com/your-community",
                     fieldType: "TextField",
                     contentType: "text",
@@ -353,7 +370,10 @@ class CreateNewCommunityForm extends Component {
           defaultValue: "false",
           dbName: "accepted_terms_and_conditions",
           readOnly: false,
-          data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+          data: [
+            { id: "false", value: "No" },
+            { id: "true", value: "Yes" },
+          ],
         },
         {
           name: "is_approved",
@@ -364,7 +384,10 @@ class CreateNewCommunityForm extends Component {
           defaultValue: "true",
           dbName: "is_approved",
           readOnly: false,
-          data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+          data: [
+            { id: "false", value: "No" },
+            { id: "true", value: "Yes" },
+          ],
         },
         {
           name: "is_published",
@@ -374,7 +397,10 @@ class CreateNewCommunityForm extends Component {
           defaultValue: "false",
           dbName: "is_published",
           readOnly: false,
-          data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+          data: [
+            { id: "false", value: "No" },
+            { id: "true", value: "Yes" },
+          ],
         },
       ],
     };
