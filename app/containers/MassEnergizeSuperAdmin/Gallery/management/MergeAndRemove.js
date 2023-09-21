@@ -1,31 +1,63 @@
 import { Button, Link, Tooltip, Typography } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 
-function MergeAndRemove() {
+function MergeAndRemove({
+  media,
+  disposable,
+  breakdown,
+  close,
+  mergeAndDelete,
+  hash,
+}) {
+  const [loading, setLoading] = useState(false);
+  const { usageSummary, usedBy } = breakdown || {};
+  const merge = () => {
+    setLoading(true);
+    mergeAndDelete(hash, () => {
+      setLoading(false);
+      close && close();
+    });
+  };
   return (
-    <div style={{ minHeight: 500, minWidth: 600 }}>
+    <div
+      style={{
+        minHeight: 500,
+        maxHeight: 500,
+        overflowY: "scroll",
+        minWidth: 600,
+        paddingBottom: 50,
+      }}
+    >
       <div style={{ padding: 20 }}>
         <img
-          src="https://placehold.co/400"
-          style={{ width: "100%", height: 150, objectFit: "contain" }}
+          src={media?.url}
+          style={{
+            width: "100%",
+            height: 150,
+            objectFit: "contain",
+            backgroundColor: "#e8e8e8",
+          }}
         />
         <Typography
           style={{
             padding: "5px 10px",
             background: "#f9f9f9",
             fontWeight: "bold",
-            margin: "10px 0px",
+            margin: "15px 0px",
           }}
         >
-          Other images that are the same (6)
+          Other images that are the same ({disposable?.length})
         </Typography>
-        {[2, 3, 4, 5, 4].map((item, index) => (
+        {disposable?.map((dupe, index) => (
           <>
-            <Link key={index?.toString()} to="#" style={{ marginBottom: 10 }}>
-              First image here
-              asdjfkas;djflaksdjf;laksjdf;laksjdf;alksdjf;alksdjf;laksjdf;
+            <Link
+              key={index?.toString()}
+              href={dupe?.url}
+              target="_blank"
+              style={{ marginBottom: 10, display: "block" }}
+            >
+              <b>{dupe?.id}</b>: {dupe?.name}
             </Link>
-            <br />
           </>
         ))}
         <Typography
@@ -33,15 +65,13 @@ function MergeAndRemove() {
             padding: "5px 10px",
             background: "#f9f9f9",
             fontWeight: "bold",
-            margin: "10px 0px",
+            margin: "15px 0px",
           }}
         >
           Where they are being used
         </Typography>
 
-        <Typography>
-          actions(45), events(3), teams(12), homepages(11)
-        </Typography>
+        <Typography>{usedBy ? usageSummary : "Not used anywhere"}</Typography>
       </div>
       <div
         style={{
@@ -54,8 +84,24 @@ function MergeAndRemove() {
         }}
       >
         <div style={{ marginLeft: "auto" }}>
+          <Button
+            variant="contained"
+            color="secondary"
+            className="touchable-opacity"
+            style={{
+              backgroundColor: "#ad4b4b",
+              borderRadius: 0,
+              padding: "10px 20px",
+              fontSize: 14,
+              margin: 0,
+            }}
+            onClick={() => close && close()}
+          >
+            Close
+          </Button>
           <Tooltip title="When you merge & delete, only one image is going to be used in all use cases, all remaining will be deleted">
             <Button
+              disabled={loading}
               variant="contained"
               color="secondary"
               className="touchable-opacity"
@@ -65,8 +111,15 @@ function MergeAndRemove() {
                 fontSize: 14,
                 margin: 0,
               }}
+              onClick={() => merge()}
             >
-              Merge & Delete
+              {loading && (
+                <i
+                  className=" fa fa-spinner fa-spin"
+                  style={{ marginRight: 5 }}
+                />
+              )}
+              <span style={{ fontWeight: "800" }}>Merge & Delete </span>
             </Button>
           </Tooltip>
         </div>

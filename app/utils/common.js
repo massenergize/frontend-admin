@@ -232,7 +232,8 @@ export const ourCustomSort = ({ a, b, colIndex, order, compare }) => {
   a = a.data[colIndex];
   b = b.data[colIndex];
   if (compare) return compare({ a, b }) * directionConstant;
-  if (typeof a === "string" && typeof b === "string") // Forcing comparison to be done in lowercase when dealing with strings otherwise results will be off
+  if (typeof a === "string" && typeof b === "string")
+    // Forcing comparison to be done in lowercase when dealing with strings otherwise results will be off
     return (a.toLowerCase() < b.toLowerCase() ? -1 : 1) * directionConstant;
   return (a < b ? -1 : 1) * directionConstant;
 };
@@ -326,4 +327,15 @@ export const reArrangeForAdmin = ({
     data.sort(_sort);
     reduxFxn(data);
   });
+};
+
+export const triggerFileDownload = (
+  file,
+  filename = "new-download",
+  ext = ".csv"
+) => {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(file);
+  a.download = filename + ext;
+  a.click();
 };

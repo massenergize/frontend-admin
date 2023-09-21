@@ -8,15 +8,37 @@ import { PAGE_PROPERTIES } from "../../ME  Tools/MEConstants";
 import { bindActionCreators } from "redux";
 import {
   fetchAllDuplicateMedia,
+  reduxSetDuplicateSummary,
   reduxToggleUniversalModal,
 } from "../../../../redux/redux-actions/adminActions";
 import MergeAndRemove from "./MergeAndRemove";
 import LinearBuffer from "../../../../components/Massenergize/LinearBuffer";
 import { LOADING } from "../../../../utils/constants";
+import { smartString, triggerFileDownload } from "../../../../utils/common";
+import { apiCall, apiCallFile } from "../../../../utils/messenger";
 
+const usageBreakdown = (usageObj) => {
+  const items = Object.entries(usageObj || {});
+  let count = 0;
+  let str = "";
+  items.forEach(([key, array]) => {
+    const length = array.length;
+    if (length) {
+      if (str) str += `, ${key}(${length})`;
+      else str = `${key}(${length})`;
+      count += length;
+    }
+  });
+
+  return { usedBy: count, usageSummary: str };
+};
 export const GalleryManagement = (props) => {
-  const { toggleModal, summary, fetchSummary } = props;
+  const { toggleModal, summary, fetchSummary, updateDuplicates } = props;
   const [loading, setLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
+  const nowMounting = summary === LOADING;
+
   const getColumns = (classes) => [
     {
       name: "ID",
@@ -32,11 +54,11 @@ export const GalleryManagement = (props) => {
         sort: false,
         filter: false,
         download: false,
-        customBodyRender: (d) => (
+        customBodyRender: (url) => (
           <div>
             <Avatar
-              alt={d.initials}
-              src={"https://placehold.co/400"}
+              // alt={d.initials}
+              src={url}
               style={{ margin: 10 }}
             />
           </div>
@@ -59,7 +81,7 @@ export const GalleryManagement = (props) => {
       },
     },
     {
-      name: "# duplicates",
+      name: "Ids of duplicates",
       key: "communities",
       options: {
         filter: true,
@@ -73,12 +95,12 @@ export const GalleryManagement = (props) => {
         filter: false,
         download: false,
         sort: false,
-        customBodyRender: (id) => (
+        customBodyRender: (bag) => (
           <div>
             <Link
               onClick={(e) => {
                 e.preventDefault();
-                reviewAndMerge();
+                reviewAndMerge(bag);
               }}
               to={`#`}
               style={{ fontWeight: "bold", cursor: "pointer" }}
@@ -92,158 +114,95 @@ export const GalleryManagement = (props) => {
   ];
 
   const fashionData = () => {
-    const arrays = [
-      [
-        3,
-        "image-url-1",
-        52,
-        "actions(45), events(3), teams(12), homepages(11)",
-        "23,43,54...",
-        12,
-      ],
-      [
-        5,
-        "image-url-2",
-        37,
-        "actions(20), events(8), teams(7), homepages(2)",
-        "17,31,49...",
-        9,
-      ],
-      [
-        2,
-        "image-url-3",
-        64,
-        "actions(55), events(10), teams(21), homepages(13)",
-        "37,58,67...",
-        15,
-      ],
-      [
-        1,
-        "image-url-4",
-        48,
-        "actions(33), events(5), teams(16), homepages(9)",
-        "28,47,51...",
-        11,
-      ],
-      [
-        4,
-        "image-url-5",
-        56,
-        "actions(38), events(6), teams(18), homepages(14)",
-        "22,41,53...",
-        13,
-      ],
-      [
-        6,
-        "image-url-6",
-        42,
-        "actions(29), events(4), teams(8), homepages(5)",
-        "19,36,44...",
-        8,
-      ],
-      [
-        8,
-        "image-url-7",
-        39,
-        "actions(27), events(7), teams(15), homepages(10)",
-        "26,40,55...",
-        10,
-      ],
-      [
-        7,
-        "image-url-8",
-        61,
-        "actions(50), events(12), teams(26), homepages(17)",
-        "35,59,68...",
-        16,
-      ],
-      [
-        9,
-        "image-url-9",
-        33,
-        "actions(22), events(9), teams(11), homepages(7)",
-        "21,32,46...",
-        14,
-      ],
-      [
-        10,
-        "image-url-10",
-        47,
-        "actions(32), events(5), teams(17), homepages(8)",
-        "24,42,57...",
-        12,
-      ],
-      [
-        11,
-        "image-url-11",
-        55,
-        "actions(41), events(11), teams(20), homepages(12)",
-        "31,50,63...",
-        15,
-      ],
-      [
-        12,
-        "image-url-12",
-        36,
-        "actions(25), events(3), teams(10), homepages(6)",
-        "18,38,49...",
-        9,
-      ],
-      [
-        13,
-        "image-url-13",
-        59,
-        "actions(48), events(7), teams(25), homepages(15)",
-        "34,54,65...",
-        16,
-      ],
-      [
-        14,
-        "image-url-14",
-        41,
-        "actions(30), events(6), teams(9), homepages(4)",
-        "20,35,48...",
-        10,
-      ],
-      [
-        15,
-        "image-url-15",
-        44,
-        "actions(31), events(8), teams(13), homepages(9)",
-        "25,45,52...",
-        11,
-      ],
-    ];
-    return arrays;
+    if (nowMounting) return [];
+    const rows = Object.entries(summary);
+
+    return rows.map(([hash, bag]) => {
+      const { media, disposable, usage } = bag;
+      const breakdown = usageBreakdown(usage);
+      const { usedBy, usageSummary } = breakdown;
+      let dupes = disposable?.map((m) => m.id);
+      dupes = dupes.join(", ");
+      dupes = smartString(dupes, 50);
+      return [
+        media?.id,
+        media?.url,
+        usedBy,
+        !usageSummary ? "Not used anywhere" : usageSummary,
+        dupes,
+        { ...bag, hash, breakdown },
+      ];
+    });
   };
 
-  console.log("LETS SEE SUMMARY", summary);
-
-  useEffect(() => {
-    if (summary !== LOADING) return;
+  const loadDuplicates = () => {
     setLoading(true);
     fetchSummary(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    if (!nowMounting) return;
+    loadDuplicates();
   }, []);
+
+  const downloadAsCSV = async () => {
+    setDownloading(true);
+    try {
+      const response = await apiCallFile("/gallery.duplicates.summary.print");
+      triggerFileDownload(
+        response?.file,
+        `summary_of_duplicates_${new Date().toISOString()}`
+      );
+      setDownloading(false);
+    } catch (e) {
+      setDownloading(false);
+      console.log("ERROR_DOWNLOADING_CSV:", e?.toString());
+    }
+  };
+
+  const mergeAndDelete = (hash, cb) => {
+    apiCall("/gallery.duplicates.clean", { hash })
+      .then((response) => {
+        if (!response?.success)
+          return console.log("ERROR_MERGING_DUPLICATES_BE:", response.error);
+
+        delete summary[hash];
+        updateDuplicates(summary);
+        cb && cb();
+      })
+      .catch((e) => {
+        console.log("ERROR_MERGING_DUPLICATES:", e?.toString());
+        cb && cb();
+      });
+  };
 
   const options = {
     filterType: "dropdown",
     responsive: "standard",
     print: true,
     rowsPerPage: 25,
-
-    rowsPerPageOptions: [10, 25, 100],
+    selectableRows: "none",
+    search: false,
+    print: false,
+    download: false,
+    filter: false,
+    rowsPerPageOptions: [10, 25, 50, 100],
   };
 
   const reviewAndMerge = (props) => {
     toggleModal({
       show: true,
-      component: <MergeAndRemove />,
-      onConfirm: () => toggleModal({ show: false, component: null }),
+      component: (
+        <MergeAndRemove
+          {...props}
+          mergeAndDelete={mergeAndDelete}
+          close={() => toggleModal({ show: false, component: null })}
+        />
+      ),
       closeAfterConfirmation: true,
       title: "Summary of duplicates",
       noTitle: false,
       fullControl: true,
-      // noCancel: true,
       okText: "Merge & Remove Duplicates",
     });
   };
@@ -279,6 +238,7 @@ export const GalleryManagement = (props) => {
           }}
         >
           <Button
+            onClick={() => loadDuplicates()}
             variant="contained"
             color="primary"
             className="touchable-opacity"
@@ -292,6 +252,8 @@ export const GalleryManagement = (props) => {
             Reload
           </Button>
           <Button
+            disabled={downloading}
+            onClick={() => downloadAsCSV()}
             variant="contained"
             color="secondary"
             className="touchable-opacity"
@@ -300,10 +262,15 @@ export const GalleryManagement = (props) => {
               padding: "10px 30px",
               fontSize: 14,
               margin: 0,
-              // marginLeft: "auto",
             }}
           >
-            Merge All
+            {downloading && (
+              <i
+                className=" fa fa-spinner fa-spin"
+                style={{ marginRight: 5 }}
+              />
+            )}
+            <span style={{ fontWeight: "800" }}>Download</span>
           </Button>
         </div>
       </Paper>
@@ -330,6 +297,7 @@ const mapDispatchToProps = (dispatch) => {
     {
       toggleModal: reduxToggleUniversalModal,
       fetchSummary: fetchAllDuplicateMedia,
+      updateDuplicates: reduxSetDuplicateSummary,
     },
     dispatch
   );
