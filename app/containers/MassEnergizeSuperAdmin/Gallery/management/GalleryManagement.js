@@ -10,6 +10,7 @@ import {
   fetchAllDuplicateMedia,
   reduxSetDuplicateSummary,
   reduxToggleUniversalModal,
+  reduxToggleUniversalToast,
 } from "../../../../redux/redux-actions/adminActions";
 import MergeAndRemove from "./MergeAndRemove";
 import LinearBuffer from "../../../../components/Massenergize/LinearBuffer";
@@ -33,7 +34,13 @@ const usageBreakdown = (usageObj) => {
   return { usedBy: count, usageSummary: str };
 };
 export const GalleryManagement = (props) => {
-  const { toggleModal, summary, fetchSummary, updateDuplicates } = props;
+  const {
+    toggleModal,
+    summary,
+    fetchSummary,
+    updateDuplicates,
+    toggleToast,
+  } = props;
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
 
@@ -168,9 +175,19 @@ export const GalleryManagement = (props) => {
 
         delete summary[hash];
         updateDuplicates(summary);
+        toggleToast({
+          open: true,
+          message: "Duplicates have been merged!",
+          variant: "success",
+        });
         cb && cb();
       })
       .catch((e) => {
+        toggleToast({
+          open: true,
+          message: e?.toString(),
+          variant: "error",
+        });
         console.log("ERROR_MERGING_DUPLICATES:", e?.toString());
         cb && cb();
       });
@@ -298,6 +315,7 @@ const mapDispatchToProps = (dispatch) => {
       toggleModal: reduxToggleUniversalModal,
       fetchSummary: fetchAllDuplicateMedia,
       updateDuplicates: reduxSetDuplicateSummary,
+      toggleToast: reduxToggleUniversalToast,
     },
     dispatch
   );
