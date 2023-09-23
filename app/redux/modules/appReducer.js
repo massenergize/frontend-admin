@@ -52,7 +52,11 @@ import {
   SOCKET_CONNECTED,
   LOAD_VISIT_LOGS,
   LOAD_USER_ACTIVE_STATUS,
-  // LOAD_EMAIL_TEMPLATES,
+  SET_IMAGE_FOR_EDIT,
+  LOAD_ADMINS_OTHER_ADMINS,
+  LOAD_OTHER_ADMINS,
+  SET_MEDIA_LIBRARY_MODAL_FILTERS,
+  SET_GALLERY_META_DATA,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -148,6 +152,14 @@ export const reducerForSavingOtherEventState = (state = {}, action = {}) => {
       return state;
   }
 };
+export const reducerForLoadingOtherAdmins = (state = {}, action = {}) => {
+  switch (action.type) {
+    case LOAD_OTHER_ADMINS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForLoadingOtherEvents = (state = [], action = {}) => {
   switch (action.type) {
     case LOAD_ALL_OTHER_EVENTS:
@@ -212,14 +224,6 @@ export const reducerForFeatureFlags = (state = LOADING, action = {}) => {
       return state;
   }
 };
-// export const reducerForEmailTemplates = (state = LOADING, action = {}) => {
-//   switch (action.type) {
-//     case LOAD_EMAIL_TEMPLATES:
-//       return action.payload;
-//     default:
-//       return state;
-//   }
-// };
 export const reducerForSettings = (state = null, action = {}) => {
   switch (action.type) {
     case LOAD_SETTINGS:
@@ -313,6 +317,15 @@ export const modalLibraryReducer = (state = {}, action = {}) => {
 export const imageInfosReducer = (state = {}, action = {}) => {
   switch (action.type) {
     case KEEP_LOADED_IMAGE_INFO:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+export const setImageForEditReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case SET_IMAGE_FOR_EDIT:
       return action.payload;
 
     default:
@@ -454,6 +467,23 @@ export const allUsersReducer = (state = [], action = {}) => {
 export const allTestimonialsReducer = (state = [], action = {}) => {
   switch (action.type) {
     case GET_ALL_TESTIMONIALS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
+export const setGalleryMetadataReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case SET_GALLERY_META_DATA:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const mlibFiltersReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case SET_MEDIA_LIBRARY_MODAL_FILTERS:
       return action.payload;
     default:
       return state;

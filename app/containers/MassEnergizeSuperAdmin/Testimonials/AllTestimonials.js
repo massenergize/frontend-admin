@@ -344,7 +344,7 @@ class AllTestimonials extends React.Component {
   }
 
   nowDelete({ idsToDelete, data }) {
-    const { allTestimonials, putTestimonialsInRedux } = this.props;
+    const { allTestimonials, putTestimonialsInRedux, meta, putMetaDataToRedux } = this.props;
     const itemsInRedux = allTestimonials || [];
     const ids = [];
     idsToDelete.forEach((d) => {
@@ -353,6 +353,13 @@ class AllTestimonials extends React.Component {
       apiCall("/testimonials.delete", { testimonial_id: found }).then(
         (response) => {
           if (response.success) {
+          putMetaDataToRedux({
+            ...meta,
+            ["testimonials"]: {
+              ...meta["testimonials"],
+              count: meta["testimonials"].count - 1,
+            },
+          });
             this.props.toggleToast({
               open: true,
               message: "Testimonial successfully deleted",

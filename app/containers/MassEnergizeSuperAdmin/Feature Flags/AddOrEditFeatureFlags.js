@@ -65,7 +65,7 @@ const preflight = (data) => {
     scope,
     key: uniqueIdentifier(data.name),
   };
-  if (json.should_expire === "false") delete json.expires_on; //json.expires_on = null;
+  if (json.should_expire === "false") json.expires_on = null;   // provide null to clear the date
   delete json.should_expire;
   return json;
 };

@@ -37,11 +37,13 @@ import "./styles/ME Custom/extra.css";
 
 // Import i18n messages
 import { translationMessages } from "./i18n";
+import { API_HOST, IS_CANARY, IS_PROD } from "./config/constants";
 
 import * as Sentry from "@sentry/react";
 import { StyledEngineProvider } from "@mui/material/styles";
 
 const SENTRY_DSN = process.env.REACT_APP_SENTRY_DSN;
+console.log("=== SENTRY DSN ====", SENTRY_DSN)
 if (SENTRY_DSN) {
   Sentry.init({
     dsn: SENTRY_DSN,

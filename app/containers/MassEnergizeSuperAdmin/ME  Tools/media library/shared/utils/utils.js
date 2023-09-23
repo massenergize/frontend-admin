@@ -98,3 +98,24 @@ const toFile = (base64String, options = {}) => {
     type: mime,
   });
 };
+
+export function arrangeTabsByOrder(inputArray) {
+  const resultArray = [];
+
+  inputArray.forEach((item) => {
+    if (
+      item.hasOwnProperty("order") &&
+      typeof item.order === "number" &&
+      item.order >= 0 &&
+      item.order < inputArray.length
+    ) {
+      const old = resultArray[item.order];
+      resultArray[item.order] = item;
+      if (old) resultArray.push(old);
+    } else {
+      resultArray.push(item);
+    }
+  });
+
+  return resultArray;
+}

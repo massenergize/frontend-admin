@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Button, CircularProgress, Paper, Typography } from "@mui/material";
-import MediaLibrary from "./../ME  Tools/media library/MediaLibrary";
+import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import "./anime.css";
 import { ProgressCircleWithLabel } from "./utils";
 import { Link, withRouter } from "react-router-dom";
@@ -72,7 +72,11 @@ export const SideSheet = (props) => {
                 <Typography
                   variant="h6"
                   color="primary"
-                  style={{ marginBottom: 6, marginTop: 5, fontSize: "medium" }}
+                  style={{
+                    marginBottom: 6,
+                    marginTop: 5,
+                    fontSize: "0.875rem",
+                  }}
                 >
                   Size: {size_text}
                 </Typography>
@@ -96,10 +100,7 @@ export const SideSheet = (props) => {
 
             return (
               <React.Fragment key={index.toString()}>
-                <ImageInfoArea
-                  {...imageInfo}
-                  is_super_admin={is_super_admin}
-                />
+                <ImageInfoArea {...imageInfo} is_super_admin={is_super_admin} />
               </React.Fragment>
             );
           })}
@@ -122,7 +123,7 @@ export const SideSheet = (props) => {
   );
 };
 
-const DeleteVerificationBox = ({
+export const DeleteVerificationBox = ({
   onDelete,
   active = false,
   close,
@@ -138,18 +139,38 @@ const DeleteVerificationBox = ({
 
   if (!active)
     return (
-      <Button
-        onClick={() => onDelete && onDelete()}
-        variant="contained"
-        style={{ borderRadius: 0, background: "#c95353", color: "white" }}
+      <Link
+        to="#"
+        style={{ color: "red", fontWeight: "bold", fontSize: "0.875rem" }}
+        onClick={(e) => {
+          e.preventDefault();
+          onDelete && onDelete();
+        }}
       >
-        Delete
-      </Button>
+        Delete from Library
+      </Link>
+      // <Button
+      //   onClick={() => onDelete && onDelete()}
+      //   variant="contained"
+      //   style={{ borderRadius: 0, background: "#c95353", color: "white" }}
+      // >
+      //   Delete
+      // </Button>
     );
 
   return (
-    <div style={{ marginBottom: 10 }}>
-      <Typography style={{ padding: "5px 15px" }}>
+    <div
+      style={{
+        marginBottom: 10,
+        background: "#fff7f3",
+        border: "solid 2px #ffe7e7",
+        borderRadius: 5,
+        marginRight: 0,
+        textAlign: "center",
+        padding: "15px 0px",
+      }}
+    >
+      <Typography variant="body2" style={{ padding: "5px 15px" }}>
         Are you sure you want to delete this image?
       </Typography>
       <div
@@ -157,9 +178,31 @@ const DeleteVerificationBox = ({
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
           borderRadius: 0,
+          fontWeight: "bold",
         }}
       >
-        <Button
+        <Link
+          to="#"
+          style={{ color: "red", fontWeight: "bold", textDecoration: "none" }}
+          onClick={(e) => {
+            e.preventDefault();
+            close && close();
+          }}
+        >
+          NO
+        </Link>
+
+        <Link
+          to="#"
+          style={{ color: "black", fontWeight: "bold", textDecoration: "none" }}
+          onClick={(e) => {
+            e.preventDefault();
+            onConfirm && onConfirm();
+          }}
+        >
+          YES
+        </Link>
+        {/* <Button
           variant="contained"
           style={{ borderRadius: 0, background: "#c95353" }}
           color="secondary"
@@ -173,17 +216,17 @@ const DeleteVerificationBox = ({
           onClick={() => onConfirm && onConfirm()}
         >
           YES
-        </Button>
+        </Button> */}
       </div>
     </div>
   );
 };
 
-const ImageInfoArea = ({ name, data = [], is_super_admin }) => {
+export const ImageInfoArea = ({ name, data = [], is_super_admin }) => {
   const desc =
     data.length === 0
       ? `No ${name}(s) use this image`
-      : `${name}(s) that use this image : (${data.length})`;
+      : `${name}(s) that use this image (${data.length})`;
   return (
     <div style={{}}>
       <div>
@@ -197,7 +240,7 @@ const ImageInfoArea = ({ name, data = [], is_super_admin }) => {
         >
           <Typography
             variant="h6"
-            style={{ fontSize: 14, textTransform: "uppercase" }}
+            style={{ fontSize: "0.875rem", textTransform: "capitalize" }}
           >
             {name}
           </Typography>
@@ -253,10 +296,23 @@ export default connect(mapStateToProps)(withRouter(SideSheet));
 export const ShowTagsOnPane = ({ tags, style }) => {
   if (!tags || !tags.length) return <></>;
   return (
-    <div style={{ padding: 15, ...(style || {}) }}>
-      <small style={{ color: "grey" }}>Tags</small>
-      <br />
-      {(tags || []).map((tag) => {
+    <div
+      style={{
+        padding: "15px 0px",
+
+        ...(style || {}),
+      }}
+    >
+      <Typography variant="body2" style={{ textDecoration: "underline" }}>
+        <b>Related Tags</b>
+      </Typography>
+      {/* <small style={{ color: "grey" }}>Tags</small> */}
+
+      <Typography variant="body2">
+        {(tags || []).map((tag) => tag.name).join(", ")}
+      </Typography>
+      {/* <br /> */}
+      {/* {(tags || []).map((tag) => {
         return (
           <Button
             variant="outlined"
@@ -267,7 +323,7 @@ export const ShowTagsOnPane = ({ tags, style }) => {
             {tag.name}
           </Button>
         );
-      })}
+      })} */}
     </div>
   );
 };

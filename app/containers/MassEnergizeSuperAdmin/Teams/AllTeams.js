@@ -330,7 +330,7 @@ class AllTeams extends React.Component {
   }
 
   nowDelete({ idsToDelete, data }) {
-    const { allTeams, putTeamsInRedux } = this.props;
+    const { allTeams, putTeamsInRedux,meta, putMetaDataToRedux } = this.props;
     const itemsInRedux = allTeams;
     const ids = [];
     idsToDelete.forEach((d) => {
@@ -339,6 +339,13 @@ class AllTeams extends React.Component {
       apiCall("/teams.delete", { team_id: found && found.id }).then(
         (response) => {
           if (response.success) {
+            putMetaDataToRedux({
+              ...meta,
+              ["teams"]: {
+                ...meta["teams"],
+                count: meta["teams"].count - 1,
+              },
+            });
             this.props.toggleToast({
               open: true,
               message: "Team(s) successfully deleted",
