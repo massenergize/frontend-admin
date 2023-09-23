@@ -32,12 +32,13 @@ let FIREBASE_CONFIG = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
 
-if (IS_PROD) {
+if (IS_PROD || IS_CANARY) {
   FIREBASE_CONFIG = {
     ...FIREBASE_CONFIG,
     measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
   };
 } 
+console.log(firebase_config)
 
 //  ---- setting  Community Portal routes
 let PORTAL_HOST = 'https://community.massenergize.org';
