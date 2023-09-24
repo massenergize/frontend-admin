@@ -38,7 +38,7 @@ if (IS_PROD || IS_CANARY) {
     measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
   };
 } 
-console.log(firebase_config)
+console.log(FIREBASE_CONFIG)
 
 //  ---- setting  Community Portal routes
 let PORTAL_HOST = 'https://community.massenergize.org';
