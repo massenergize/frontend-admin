@@ -6,14 +6,28 @@ on:
       - 'prod@[0-9]+.[0-9]+.[0-9]+'
       - 'canary@[0-9]+.[0-9]+.[0-9]+'
 
-jobs:
+
+
+
+jobs:    
   build-and-deploy:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         node-version: [16.x]
-
+    
+    env:
+      REACT_APP_SENTRY_DSN: ${{ secrets.REACT_APP_SENTRY_DSN }}
+      REACT_APP_TINY_MCE_KEY: ${{ secrets.REACT_APP_TINY_MCE_KEY }}
+      REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
+      REACT_APP_FIREBASE_DATABASE_URL: ${{ secrets.REACT_APP_FIREBASE_DATABASE_URL }}
+      REACT_APP_FIREBASE_STORAGE_BUCKET: ${{ secrets.REACT_APP_FIREBASE_STORAGE_BUCKET }}
+      REACT_APP_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }}
+      REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
+      REACT_APP_FIREBASE_MEASUREMENT_ID: ${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID }}
+      REACT_APP_FIREBASE_PROJECT_ID: ${{ secrets.REACT_APP_FIREBASE_PROJECT_ID }}
+      REACT_APP_FIREBASE_AUTH_DOMAIN: ${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -33,17 +47,6 @@ jobs:
       
       - name: Deploying to Prod 🚀 
         if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'prod') && github.event.base_ref == 'refs/heads/master'
-        env:
-          REACT_APP_SENTRY_DSN: ${{ secrets.REACT_APP_SENTRY_DSN }}
-          REACT_APP_TINY_MCE_KEY: ${{ secrets.REACT_APP_TINY_MCE_KEY }}
-          REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
-          REACT_APP_FIREBASE_DATABASE_URL: ${{ secrets.REACT_APP_FIREBASE_DATABASE_URL }}
-          REACT_APP_FIREBASE_STORAGE_BUCKET: ${{ secrets.REACT_APP_FIREBASE_STORAGE_BUCKET }}
-          REACT_APP_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }}
-          REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
-          REACT_APP_FIREBASE_MEASUREMENT_ID: ${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID }}
-          REACT_APP_FIREBASE_PROJECT_ID: ${{ secrets.REACT_APP_FIREBASE_PROJECT_ID }}
-          REACT_APP_FIREBASE_AUTH_DOMAIN: ${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}
         uses: data-intuitive/netlify-deploy-site@v1
         with:
           auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
@@ -55,17 +58,6 @@ jobs:
       
       - name: Deploying to Canary 🚀
         if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'canary') && github.event.base_ref == 'refs/heads/canary'
-        env:
-          REACT_APP_SENTRY_DSN: ${{ secrets.REACT_APP_SENTRY_DSN }}
-          REACT_APP_TINY_MCE_KEY: ${{ secrets.REACT_APP_TINY_MCE_KEY }}
-          REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
-          REACT_APP_FIREBASE_DATABASE_URL: ${{ secrets.REACT_APP_FIREBASE_DATABASE_URL }}
-          REACT_APP_FIREBASE_STORAGE_BUCKET: ${{ secrets.REACT_APP_FIREBASE_STORAGE_BUCKET }}
-          REACT_APP_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }}
-          REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
-          REACT_APP_FIREBASE_MEASUREMENT_ID: ${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID }}
-          REACT_APP_FIREBASE_PROJECT_ID: ${{ secrets.REACT_APP_FIREBASE_PROJECT_ID }}
-          REACT_APP_FIREBASE_AUTH_DOMAIN: ${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}
         uses: data-intuitive/netlify-deploy-site@v1
         with:
           auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
@@ -77,15 +69,6 @@ jobs:
           
       - name: Deploying  to Dev 🚀
         if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'dev') && github.event.base_ref == 'refs/heads/development'
-        env:
-          REACT_APP_SENTRY_DSN: ${{ secrets.REACT_APP_SENTRY_DSN }}
-          REACT_APP_TINY_MCE_KEY: ${{ secrets.REACT_APP_TINY_MCE_KEY }}
-          REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
-          REACT_APP_FIREBASE_DATABASE_URL: ${{ secrets.REACT_APP_FIREBASE_DATABASE_URL }}
-          REACT_APP_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }}
-          REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
-          REACT_APP_FIREBASE_PROJECT_ID: ${{ secrets.REACT_APP_FIREBASE_PROJECT_ID }}
-          REACT_APP_FIREBASE_AUTH_DOMAIN: ${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}
         uses: data-intuitive/netlify-deploy-site@v1
         with:
           auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
