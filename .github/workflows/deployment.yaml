@@ -23,13 +23,6 @@ jobs:
         with:
          node-version: ${{ matrix.node-version }}
 
-      - name: Install dependencies  
-        run: |
-            npm  i --legacy-peer-deps
-      - name: Determine Branch
-        id: branch
-        run: echo "BRANCH=$(echo $GITHUB_REF | cut -d '/' -f 3)" >> $GITHUB_ENV
-
       - name: Set Environment Variables 🚀
         run: |
           if [[ $BRANCH == 'master' || $BRANCH == 'canary' ]]; then
@@ -56,6 +49,9 @@ jobs:
             export REACT_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}
           fi
 
+      - name: Install dependencies  
+        run: |
+            npm  i --legacy-peer-deps
       - name: Build App 🏗
         run: |
             make build
