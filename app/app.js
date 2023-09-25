@@ -43,7 +43,6 @@ import * as Sentry from "@sentry/react";
 import { StyledEngineProvider } from "@mui/material/styles";
 
 const SENTRY_DSN = process.env.REACT_APP_SENTRY_DSN;
-console.log("=== SENTRY DSN ====", SENTRY_DSN)
 if (SENTRY_DSN) {
   Sentry.init({
     dsn: SENTRY_DSN,
