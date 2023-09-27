@@ -25,13 +25,10 @@ jobs:
         with:
          node-version: ${{ matrix.node-version }}
 
-      - name: Determine Branch
-        id: branch
-        run: echo "BRANCH=$(echo $GITHUB_REF | cut -d '/' -f 2)" >> $GITHUB_ENV
 
-      - name: Set Environment Variables 🚀
+      - name: Set Prof Environment Variables 🚀
+        if: ${{  github.event.base_ref == 'refs/heads/master' || github.event.base_ref == 'refs/heads/canary' }}
         run: |
-          if [[ $BRANCH == 'master' || $BRANCH == 'canary' ]]; then
             echo "Setting prod branch secrets..."
             echo "REACT_APP_SENTRY_DSN=${{ secrets.PROD_REACT_APP_SENTRY_DSN }}" >> $GITHUB_ENV
             echo "REACT_APP_TINY_MCE_KEY=${{ secrets.REACT_APP_TINY_MCE_KEY }}" >> $GITHUB_ENV
@@ -43,7 +40,11 @@ jobs:
             echo "REACT_APP_FIREBASE_MEASUREMENT_ID=${{ secrets.PROD_REACT_APP_FIREBASE_MEASUREMENT_ID }}" >> $GITHUB_ENV
             echo "REACT_APP_FIREBASE_PROJECT_ID=${{ secrets.PROD_REACT_APP_FIREBASE_PROJECT_ID }}" >> $GITHUB_ENV
             echo "REACT_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.PROD_REACT_APP_FIREBASE_AUTH_DOMAIN }}" >> $GITHUB_ENV
-          elif [[ $BRANCH == 'development' ]]; then
+
+      - name: Set Dev Environment Variables 🚀
+        if: ${{github.event.base_ref == 'refs/heads/development' }}
+        run: |
+            echo "Setting Development branch secrets..."
             echo "Using repository secrets for $BRANCH branch..."
             echo "REACT_APP_SENTRY_DSN=${{ secrets.REACT_APP_SENTRY_DSN }}" >> $GITHUB_ENV
             echo "REACT_APP_TINY_MCE_KEY=${{ secrets.REACT_APP_TINY_MCE_KEY }}" >> $GITHUB_ENV
@@ -53,7 +54,6 @@ jobs:
             echo "REACT_APP_FIREBASE_APP_ID=${{ secrets.REACT_APP_FIREBASE_APP_ID }}" >> $GITHUB_ENV
             echo "REACT_APP_FIREBASE_PROJECT_ID=${{ secrets.REACT_APP_FIREBASE_PROJECT_ID }}" >> $GITHUB_ENV
             echo "REACT_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}" >> $GITHUB_ENV
-          fi
 
       - name: Install dependencies  
         run: |
