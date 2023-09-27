@@ -12,6 +12,9 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x]
+    environment:
+      name: Production
+
 
     steps:
       - name: Checkout code
@@ -22,12 +25,16 @@ jobs:
         with:
          node-version: ${{ matrix.node-version }}
 
+      - name: Determine Branch
+        id: branch
+        run: echo "BRANCH=$(echo $GITHUB_REF | cut -d '/' -f 3)" >> $GITHUB_ENV
+
       - name: Set Environment Variables 🚀
         run: |
           if [[ $BRANCH == 'master' || $BRANCH == 'canary' ]]; then
             echo "Setting prod branch secrets..."
             echo "REACT_APP_SENTRY_DSN=${{ secrets.PROD_REACT_APP_SENTRY_DSN }}" >> $GITHUB_ENV
-            echo "REACT_APP_TINY_MCE_KEY=${{ secrets.PROD_REACT_APP_TINY_MCE_KEY }}" >> $GITHUB_ENV
+            echo "REACT_APP_TINY_MCE_KEY=${{ secrets.REACT_APP_TINY_MCE_KEY }}" >> $GITHUB_ENV
             echo "REACT_APP_FIREBASE_API_KEY=${{ secrets.PROD_REACT_APP_FIREBASE_API_KEY }}" >> $GITHUB_ENV
             echo "REACT_APP_FIREBASE_DATABASE_URL=${{ secrets.PROD_REACT_APP_FIREBASE_DATABASE_URL }}" >> $GITHUB_ENV
             echo "REACT_APP_FIREBASE_STORAGE_BUCKET=${{ secrets.PROD_REACT_APP_FIREBASE_STORAGE_BUCKET }}" >> $GITHUB_ENV
