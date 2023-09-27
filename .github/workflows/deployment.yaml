@@ -27,7 +27,7 @@ jobs:
 
       - name: Determine Branch
         id: branch
-        run: echo "BRANCH=$(echo $GITHUB_REF | cut -d '/' -f 3)" >> $GITHUB_ENV
+        run: echo "BRANCH=$(echo $GITHUB_REF | cut -d '/' -f 2)" >> $GITHUB_ENV
 
       - name: Set Environment Variables 🚀
         run: |
@@ -43,7 +43,7 @@ jobs:
             echo "REACT_APP_FIREBASE_MEASUREMENT_ID=${{ secrets.PROD_REACT_APP_FIREBASE_MEASUREMENT_ID }}" >> $GITHUB_ENV
             echo "REACT_APP_FIREBASE_PROJECT_ID=${{ secrets.PROD_REACT_APP_FIREBASE_PROJECT_ID }}" >> $GITHUB_ENV
             echo "REACT_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.PROD_REACT_APP_FIREBASE_AUTH_DOMAIN }}" >> $GITHUB_ENV
-          else
+          elif [[ $BRANCH == 'development' ]]; then
             echo "Using repository secrets for $BRANCH branch..."
             echo "REACT_APP_SENTRY_DSN=${{ secrets.REACT_APP_SENTRY_DSN }}" >> $GITHUB_ENV
             echo "REACT_APP_TINY_MCE_KEY=${{ secrets.REACT_APP_TINY_MCE_KEY }}" >> $GITHUB_ENV
