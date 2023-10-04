@@ -5,25 +5,16 @@ on:
       - 'dev@[0-9]+.[0-9]+.[0-9]+'
       - 'prod@[0-9]+.[0-9]+.[0-9]+'
       - 'canary@[0-9]+.[0-9]+.[0-9]+'
-
-env:
-  REACT_APP_SENTRY_DSN: ${{ secrets.REACT_APP_SENTRY_DSN }}
-  REACT_APP_TINY_MCE_KEY: ${{ secrets.REACT_APP_TINY_MCE_KEY }}
-  REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
-  REACT_APP_FIREBASE_DATABASE_URL: ${{ secrets.REACT_APP_FIREBASE_DATABASE_URL }}
-  REACT_APP_FIREBASE_STORAGE_BUCKET: ${{ secrets.REACT_APP_FIREBASE_STORAGE_BUCKET }}
-  REACT_APP_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }}
-  REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
-  REACT_APP_FIREBASE_MEASUREMENT_ID: ${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID }}
-  REACT_APP_FIREBASE_PROJECT_ID: ${{ secrets.REACT_APP_FIREBASE_PROJECT_ID }}
-  REACT_APP_FIREBASE_AUTH_DOMAIN: ${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}
 jobs:
+    
   build-and-deploy:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [16.x]
+    environment:
+      name: Production
+
 
     steps:
       - name: Checkout code
@@ -34,10 +25,39 @@ jobs:
         with:
          node-version: ${{ matrix.node-version }}
 
+
+      - name: Set Prod Environment Variables 🚀
+        if: ${{  github.event.base_ref == 'refs/heads/master' || github.event.base_ref == 'refs/heads/canary' }}
+        run: |
+            echo "Setting prod branch secrets..."
+            echo "REACT_APP_SENTRY_DSN=${{ secrets.PROD_REACT_APP_SENTRY_DSN }}" >> $GITHUB_ENV
+            echo "REACT_APP_TINY_MCE_KEY=${{ secrets.REACT_APP_TINY_MCE_KEY }}" >> $GITHUB_ENV
+            echo "REACT_APP_FIREBASE_API_KEY=${{ secrets.PROD_REACT_APP_FIREBASE_API_KEY }}" >> $GITHUB_ENV
+            echo "REACT_APP_FIREBASE_DATABASE_URL=${{ secrets.PROD_REACT_APP_FIREBASE_DATABASE_URL }}" >> $GITHUB_ENV
+            echo "REACT_APP_FIREBASE_STORAGE_BUCKET=${{ secrets.PROD_REACT_APP_FIREBASE_STORAGE_BUCKET }}" >> $GITHUB_ENV
+            echo "REACT_APP_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.PROD_REACT_APP_FIREBASE_MESSAGING_SENDER_ID }}" >> $GITHUB_ENV
+            echo "REACT_APP_FIREBASE_APP_ID=${{ secrets.PROD_REACT_APP_FIREBASE_APP_ID }}" >> $GITHUB_ENV
+            echo "REACT_APP_FIREBASE_MEASUREMENT_ID=${{ secrets.PROD_REACT_APP_FIREBASE_MEASUREMENT_ID }}" >> $GITHUB_ENV
+            echo "REACT_APP_FIREBASE_PROJECT_ID=${{ secrets.PROD_REACT_APP_FIREBASE_PROJECT_ID }}" >> $GITHUB_ENV
+            echo "REACT_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.PROD_REACT_APP_FIREBASE_AUTH_DOMAIN }}" >> $GITHUB_ENV
+
+      - name: Set Dev Environment Variables 🚀
+        if: ${{github.event.base_ref == 'refs/heads/development' }}
+        run: |
+            echo "Setting Development branch secrets..."
+            echo "Using repository secrets for $BRANCH branch..."
+            echo "REACT_APP_SENTRY_DSN=${{ secrets.REACT_APP_SENTRY_DSN }}" >> $GITHUB_ENV
+            echo "REACT_APP_TINY_MCE_KEY=${{ secrets.REACT_APP_TINY_MCE_KEY }}" >> $GITHUB_ENV
+            echo "REACT_APP_FIREBASE_API_KEY=${{ secrets.REACT_APP_FIREBASE_API_KEY }}" >> $GITHUB_ENV
+            echo "REACT_APP_FIREBASE_DATABASE_URL=${{ secrets.REACT_APP_FIREBASE_DATABASE_URL }}" >> $GITHUB_ENV
+            echo "REACT_APP_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }}" >> $GITHUB_ENV
+            echo "REACT_APP_FIREBASE_APP_ID=${{ secrets.REACT_APP_FIREBASE_APP_ID }}" >> $GITHUB_ENV
+            echo "REACT_APP_FIREBASE_PROJECT_ID=${{ secrets.REACT_APP_FIREBASE_PROJECT_ID }}" >> $GITHUB_ENV
+            echo "REACT_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}" >> $GITHUB_ENV
+
       - name: Install dependencies  
         run: |
             npm  i --legacy-peer-deps
-
       - name: Build App 🏗
         run: |
             make build
