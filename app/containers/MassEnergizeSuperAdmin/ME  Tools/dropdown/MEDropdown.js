@@ -28,6 +28,7 @@ function MEDropdown(props) {
     smartDropdown = true,
     ...rest
   } = props;
+  const [dropOpen, setOpenDropdown] = useState(false);
   const [selected, setSelected] = useState([]);
   const [optionsToDisplay, setOptionsToDisplay] = useState([]);
   const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
@@ -153,6 +154,9 @@ function MEDropdown(props) {
         {placeholder && <FormLabel component="legend">{placeholder}</FormLabel>}
         <Select
           {...generics || {}}
+          open={dropOpen}
+          onOpen={() => setOpenDropdown(true)}
+          onClose={() => setOpenDropdown(false)}
           className="me-drop-override"
           multiple={multiple}
           displayEmpty
@@ -177,6 +181,41 @@ function MEDropdown(props) {
           )}
           value={selected || []}
         >
+          {allowClearAndSelectAll && multiple && (
+            <div
+              style={{
+                border: "solid 0px #f6f6f6fc",
+                padding: "15px 20px",
+                borderBottomWidth: 2,
+              }}
+            >
+              <a
+                onClick={(e) => {
+                  e.preventDefault();
+                  allOrNothing({});
+                  setOpenDropdown(false);
+                }}
+                href="#"
+                style={{ marginRight: 15, fontWeight: "bold", color: "black" }}
+              >
+                Select All{" "}
+              </a>
+              {selected?.length ? (
+                <a
+                  onClick={(e) => {
+                    e.preventDefault();
+                    allOrNothing({ nothing: true });
+                  }}
+                  href="#"
+                  style={{ color: "#ca1f1f", fontWeight: "bold" }}
+                >
+                  Clear All{" "}
+                </a>
+              ) : (
+                <></>
+              )}
+            </div>
+          )}
           {(optionsToDisplay || []).map((d, i) => {
             return (
               <MenuItem
@@ -210,7 +249,7 @@ function MEDropdown(props) {
           })}
         </Select>
       </FormControl>
-      {allowClearAndSelectAll && multiple && (
+      {/* {allowClearAndSelectAll && multiple && (
         <div>
           <div
             style={{
@@ -250,9 +289,9 @@ function MEDropdown(props) {
               <></>
             )}
           </div>
-          {/* <hr style={{ margin: 0 }} /> */}
+     
         </div>
-      )}
+      )} */}
     </>
   );
 }

@@ -5,6 +5,7 @@ import {
   Radio,
   RadioGroup,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -16,7 +17,7 @@ import AsyncDropDown from "../AsyncCheckBoxDropDown";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 // import { Link } from "react-router-dom";
-
+const PUB_MODES = { OPEN: "OPEN", OPEN_TO: "OPEN_TO" };
 const MediaLibraryForm = ({
   auth,
   communities,
@@ -30,6 +31,7 @@ const MediaLibraryForm = ({
   const [guardianInfo, setGuardianInfo] = useState("");
   const [tags, setTags] = useState("");
   const [chosenComms, setCommunities] = useState([]);
+  const [publicity, setPublicityChoice] = useState(PUB_MODES.OPEN_TO);
   const isInEditMode = imageForEdit;
 
   useEffect(() => {
@@ -67,15 +69,27 @@ const MediaLibraryForm = ({
     setTags(_tags?.map((t) => t.name).join(","));
   }, [imageForEdit]);
 
+  useEffect(() => {
+    // if user is an admin
+    if (auth?.is_community_admin) {
+      setCommunities((auth?.admin_at || []).map((c) => c.id));
+    }
+  }, []);
   // --------------------------------------------------------------------
   const doesNotHaveCopyrightPermission = !copyright || copyright === "No";
   const hasUnderAgeContent = underAge === "Yes";
   const isSuperAdmin = !auth?.is_community_admin && auth?.is_super_admin;
   const isCommunityAdmin = auth?.is_community_admin && !auth?.is_super_admin;
 
+  const chooseCommunity =
+    (publicity === "OPEN_TO" && isCommunityAdmin) || isSuperAdmin;
+
   const getCommunitiesToSelectFrom = () => {
-    if (isCommunityAdmin) return auth?.admin_at;
-    return communities || [];
+    let list = [];
+    if (isCommunityAdmin) list = auth?.admin_at;
+    else if (isSuperAdmin) list = communities || [];
+    return list;
+    // return [{ name: "All Communities", id: "all-communities" }, ...list];
   };
 
   const showChips = () => {
@@ -137,15 +151,68 @@ const MediaLibraryForm = ({
           />
         </div>
         {/* ---- TODO: Change to async dropdown if user is a superadmin  */}
-        <MEDropdown
-          multiple
-          onItemSelected={(items) => setCommunities(items)}
-          defaultValue={chosenComms}
-          labelExtractor={(item) => item?.name}
-          valueExtractor={(item) => item?.id}
-          data={getCommunitiesToSelectFrom()}
-          placeholder="Which communities would you like this item to be available to? *"
-        />
+
+        <div style={{ marginTop: 10 }}>
+          <Typography variant="body2" style={{ fontSize: "0.875rem" }}>
+            Which communities would you like this item to be available to?
+          </Typography>
+          <div>
+            <RadioGroup
+              onChange={(e) => console.log("Lets see", e.target.value)}
+              name="com-choices"
+              value={publicity}
+            >
+              <FormControlLabel
+                value={PUB_MODES.OPEN}
+                control={<Radio />}
+                label={
+                  <Typography
+                    variant="body2"
+                    style={{ fontSize: "0.875rem", fontWeight: "bold" }}
+                  >
+                    <Tooltip
+                      title="Every community that exists on the platform"
+                      placement="top"
+                      style={{ fontWeight: "bold" }}
+                    >
+                      All Communities
+                    </Tooltip>
+                  </Typography>
+                }
+              />
+              <FormControlLabel
+                value={PUB_MODES.OPEN_TO}
+                control={<Radio />}
+                label={
+                  <Typography
+                    variant="body2"
+                    style={{ fontSize: "0.875rem", fontWeight: "bold" }}
+                  >
+                    <Tooltip
+                      title="Select all or some of the communities you manage"
+                      placement="top"
+                      style={{ fontWeight: "bold" }}
+                    >
+                      Choose from communities you manage
+                    </Tooltip>
+                  </Typography>
+                }
+              />
+            </RadioGroup>
+          </div>
+          {chooseCommunity && (
+            <MEDropdown
+              multiple
+              onItemSelected={(items) => setCommunities(items)}
+              defaultValue={chosenComms}
+              labelExtractor={(item) => item?.name}
+              valueExtractor={(item) => item?.id}
+              data={getCommunitiesToSelectFrom()}
+              allowClearAndSelectAll
+              placeholder="Which communities would you like this item to be available to? *"
+            />
+          )}
+        </div>
 
         <div
           style={{
@@ -212,7 +279,9 @@ const MediaLibraryForm = ({
             <Typography variant="h6">Underage Consent </Typography>
             <Typography variant="body2" style={{ marginTop: 10 }}>
               Do any of the items contain recognizable images or visible
-              depictions of children <b>under the age of 13,</b> and if so, do you have written consent from their guardians? If you do not have written consent, please do not use the image
+              depictions of children <b>under the age of 13,</b> and if so, do
+              you have written consent from their guardians? If you do not have
+              written consent, please do not use the image
             </Typography>
             <RadioGroup
               value={underAge}
@@ -261,7 +330,9 @@ const MediaLibraryForm = ({
             variant="body2"
             style={{ marginTop: 10, marginBottom: 10 }}
           >
-            Tags: Add words that describe the image subject, to make it more searchable in the image library. Separate multiple tags with a comma(,). (Example: Heat pump, Solar, Composting)
+            Tags: Add words that describe the image subject, to make it more
+            searchable in the image library. Separate multiple tags with a
+            comma(,). (Example: Heat pump, Solar, Composting)
           </Typography>
           <TextField
             style={{ width: "100%" }}
