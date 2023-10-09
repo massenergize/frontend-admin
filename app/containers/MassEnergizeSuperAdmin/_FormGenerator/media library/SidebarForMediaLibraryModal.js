@@ -76,6 +76,7 @@ export const SidebarForMediaLibraryModal = ({
     guardian_info,
   } = imageData();
 
+  const underage_dets_not_provided = has_children === undefined;
   return (
     <>
       <InfoBox title="Details" hidden={!uploader} outlined>
@@ -189,7 +190,13 @@ export const SidebarForMediaLibraryModal = ({
       </InfoBox>
       <InfoBox
         title="Underage Information"
-        color={has_children ? "#d31919" : "green"}
+        color={
+          underage_dets_not_provided
+            ? "black"
+            : has_children
+            ? "#d31919"
+            : "green"
+        }
         hidden={false}
       >
         <>
@@ -198,16 +205,22 @@ export const SidebarForMediaLibraryModal = ({
             style={{
               textDecoration: "none",
               fontWeight: "500",
-              color: has_children ? "#d31919" : "#389a38",
+              color: underage_dets_not_provided
+                ? "black"
+                : has_children
+                ? "#d31919"
+                : "#389a38",
             }}
           >
             <i className="fa fa-child" style={{ marginRight: 6 }} />
             <span>
               <b>
                 {" "}
-                {has_children
-                  ? "Shows kids under 13"
-                  : "No kids under 13 shown"}
+                {underage_dets_not_provided
+                  ? "Not provided..."
+                  : has_children
+                  ? "Shows children under 13"
+                  : "No children under 13 shown"}
               </b>
             </span>
           </Typography>

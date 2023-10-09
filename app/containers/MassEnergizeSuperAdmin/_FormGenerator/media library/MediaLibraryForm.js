@@ -107,8 +107,9 @@ const MediaLibraryForm = ({
         </Typography>
       ) : (
         <Typography variant="body2">
-          Before you upload, there a few details you need to provide.
-          <ul style={{ margin: "5px 0px" }}>
+          To finish uploading to the media library, please provide the following
+          information:
+          {/* <ul style={{ margin: "5px 0px" }}>
             <li>
               {" "}
               Please note that the items marked <b>(*)</b> are compulsory.
@@ -117,22 +118,24 @@ const MediaLibraryForm = ({
               Whenever the <b>"Upload & Insert"</b> button is disabled, hover
               your mouse over it. It will tell you what you are missing!
             </li>
-          </ul>
+          </ul> */}
           <br />
         </Typography>
       )}
       <div style={{ padding: 0 }}>
         {/* <Typography variant="body2">Name of the uploader</Typography> */}
-        <TextField
-          style={{ width: "100%" }}
-          label="You are marked as the uploader (autofilled) *"
-          InputLabelProps={{
-            shrink: true,
-          }}
-          inputProps={{ style: { padding: "12.5px 14px" } }}
-          value={auth?.preferred_name || "..."}
-          disabled
-        />
+        <div style={{ width: 5, height: 5, opacity: 0 }}>
+          <TextField
+            style={{ width: "100%" }}
+            label="You are marked as the uploader (autofilled) *"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{ style: { padding: "12.5px 14px" } }}
+            value={auth?.preferred_name || "..."}
+            disabled
+          />
+        </div>
         {/* ---- TODO: Change to async dropdown if user is a superadmin  */}
         <MEDropdown
           multiple
@@ -153,7 +156,7 @@ const MediaLibraryForm = ({
             borderRadius: 6,
           }}
         >
-          <Typography variant="h6">Copyright </Typography>
+          <Typography variant="h6">Permissions </Typography>
           <div style={{ marginTop: 10 }}>
             <Typography variant="body2">
               Do you have permission to use the selected item(s) - written
@@ -192,14 +195,14 @@ const MediaLibraryForm = ({
             {!doesNotHaveCopyrightPermission && (
               <TextField
                 style={{ width: "100%", marginTop: 10 }}
-                label="If this item needs to be attributed, please type in the name of the owner of the copyright (40 chars)"
+                label="If this item needs to be attributed, please type in the name of the owner of the copyright (200 chars)"
                 InputLabelProps={{
                   shrink: true,
                 }}
                 onChange={(ev) => setCopyrightAtt(ev.target.value)}
                 inputProps={{
                   style: { padding: "12.5px 14px" },
-                  maxLength: 40,
+                  maxLength: 200,
                 }}
                 value={copyrightAtt}
               />
@@ -209,8 +212,7 @@ const MediaLibraryForm = ({
             <Typography variant="h6">Underage Consent </Typography>
             <Typography variant="body2" style={{ marginTop: 10 }}>
               Do any of the items contain recognizable images or visible
-              depictions of children <b>under the age of 13</b>? If yes, please
-              provide consent information in the box shown below
+              depictions of children <b>under the age of 13,</b> and if so, do you have written consent from their guardians? If you do not have written consent, please do not use the image
             </Typography>
             <RadioGroup
               value={underAge}
@@ -234,14 +236,14 @@ const MediaLibraryForm = ({
             {hasUnderAgeContent && (
               <TextField
                 style={{ width: "100%", marginTop: 10 }}
-                label="Add information of guardians (40 chars)"
+                label="Add information of guardians (200 chars)"
                 InputLabelProps={{
                   shrink: true,
                 }}
                 onChange={(ev) => setGuardianInfo(ev.target.value)}
                 inputProps={{
                   style: { padding: "12.5px 14px" },
-                  maxLength: 40,
+                  maxLength: 200,
                 }}
                 value={guardianInfo}
               />
@@ -259,8 +261,7 @@ const MediaLibraryForm = ({
             variant="body2"
             style={{ marginTop: 10, marginBottom: 10 }}
           >
-            Tags: Add words that describe what this item is about. Separate each
-            with a comma(,) (E.g. climate,solar,green etc)
+            Tags: Add words that describe the image subject, to make it more searchable in the image library. Separate multiple tags with a comma(,). (Example: Heat pump, Solar, Composting)
           </Typography>
           <TextField
             style={{ width: "100%" }}

@@ -342,9 +342,8 @@ export const FilterBarForMediaLibrary = ({
           variant="body2"
           style={{ opacity: "0.6", fontWeight: "400" }}
         >
-          Items are arranged by date. The latest items are displayed first,
-          moving from left to right in each row. Rows at the top represent more
-          recent entries compared to those further down.
+          Items are arranged by date, most recently uploaded up top. Click on an
+          image to see information about it
         </Typography>
       </div>
     </div>
