@@ -258,8 +258,6 @@ export const FormMediaLibraryImplementation = (props) => {
     const { copyright, copyright_att, community_ids, publicity } =
       mlibraryFormData || {};
 
-      console.log("PUBLICITY", publicity)
-
     const openToSpecificCommunities = publicity === PUB_MODES.OPEN_TO;
     if (openToSpecificCommunities && (!community_ids || !community_ids?.length))
       return {
@@ -385,7 +383,7 @@ export const FormMediaLibraryImplementation = (props) => {
             tab: {
               headerName: "About Image",
               key: "upload-form",
-              // onlyShowOnDemand: true, #UNCHECK THIS BEFORE PR (BPR)
+              onlyShowOnDemand: true,
               order: 1,
               component: (props) => (
                 <MediaLibraryForm

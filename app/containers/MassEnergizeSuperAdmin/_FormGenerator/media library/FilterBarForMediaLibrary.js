@@ -136,21 +136,30 @@ export const FilterBarForMediaLibrary = ({
     );
   }, []);
 
+  const makeDefaults = () => {
+    let forAdminField = [];
+    if (isCommunityAdmin) forAdminField = [auth?.id];
+    else forAdminField = ["all"];
+    return { forAdminField };
+  };
   useEffect(() => {
     setCurrentFilter(filters?.currentFilter || FILTERS.MOST_RECENT.key);
     setQuery(filters?.usersQuery || { most_recent: true });
     setQueryStash(filters?.queryStash || null);
+    
+    const { forAdminField } = makeDefaults();
+    buildQuery(FILTERS.FROM_OTHER_ADMINS.key, forAdminField);
   }, []);
 
   useEffect(() => {
     keepFiltersInRedux({ ...filters, usersQuery, currentFilter, queryStash });
   }, [queryStash, usersQuery, currentFilter]);
 
-  useEffect(() => {
-    setCurrentFilter(filters?.currentFilter || FILTERS.MOST_RECENT.key);
-    setQuery(filters?.usersQuery || { most_recent: true });
-    setQueryStash(filters?.queryStash || null);
-  }, []);
+  // useEffect(() => {
+  //   setCurrentFilter(filters?.currentFilter || FILTERS.MOST_RECENT.key);
+  //   setQuery(filters?.usersQuery || { most_recent: true });
+  //   setQueryStash(filters?.queryStash || null);
+  // }, []);
 
   useEffect(() => {
     keepFiltersInRedux({ ...filters, usersQuery, currentFilter, queryStash });
@@ -201,11 +210,11 @@ export const FilterBarForMediaLibrary = ({
         key: FILTERS.FROM_OTHER_ADMINS.key,
         context: "See what other admins in your community have uploaded",
       },
-      {
-        name: "Uploaded by me",
-        key: FILTERS.MY_UPLOADS.key,
-        context: "Items uploaded by you",
-      },
+      // {
+      //   name: "Uploaded by me",
+      //   key: FILTERS.MY_UPLOADS.key,
+      //   context: "Items uploaded by you",
+      // },
       {
         name: "By Keywords",
         key: FILTERS.WITH_KEYWORDS.key,
@@ -217,12 +226,12 @@ export const FilterBarForMediaLibrary = ({
   }, []);
 
   const renderContextualOptions = (currentFilter) => {
-    if (currentFilter == FILTERS.MY_UPLOADS.key)
-      return (
-        <Typography variant="body2" style={{ opacity: 0.6 }}>
-          Only shows items uploaded by you
-        </Typography>
-      );
+    // if (currentFilter == FILTERS.MY_UPLOADS.key)
+    //   return (
+    //     <Typography variant="body2" style={{ opacity: 0.6 }}>
+    //       Only shows items uploaded by you
+    //     </Typography>
+    //   );
     if (currentFilter == FILTERS.MOST_RECENT.key)
       return (
         <Typography variant="body2" style={{ opacity: 0.6 }}>
@@ -255,7 +264,10 @@ export const FilterBarForMediaLibrary = ({
             value={getValue(currentFilter, [])}
             // name="from_others"
             smartDropdown={false}
-            labelExtractor={(item) => item?.full_name}
+            labelExtractor={(item) => {
+              if (item?.id === auth?.id) return item?.full_name + " (you)";
+              return item?.full_name;
+            }}
             valueExtractor={(item) => item?.id}
             multiple
             allowClearAndSelectAll
