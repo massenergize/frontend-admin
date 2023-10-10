@@ -186,30 +186,30 @@ export const FilterBarForMediaLibrary = ({
   useEffect(() => {
     const opts = [
       {
-        name: "My Community (Default)",
+        name: "Available to my community",
         key: FILTERS.MOST_RECENT.key,
         context:
           "Uploads from any of the communities you manage. Most recent items show up first!",
       },
       {
-        name: "I Uploaded",
-        key: FILTERS.MY_UPLOADS.key,
-        context: "Items uploaded by you",
+        name: "Uploaded by Community",
+        key: FILTERS.BY_COMMUNITY.key,
+        context: "Show only community specific items",
       },
       {
-        name: "With Keywords",
-        key: FILTERS.WITH_KEYWORDS.key,
-        context: "Keywords that describe the image",
-      },
-      {
-        name: "By Admins",
+        name: "Uploaded by Admins",
         key: FILTERS.FROM_OTHER_ADMINS.key,
         context: "See what other admins in your community have uploaded",
       },
       {
-        name: "By Community",
-        key: FILTERS.BY_COMMUNITY.key,
-        context: "Show only community specific items",
+        name: "Uploaded by me",
+        key: FILTERS.MY_UPLOADS.key,
+        context: "Items uploaded by you",
+      },
+      {
+        name: "By Keywords",
+        key: FILTERS.WITH_KEYWORDS.key,
+        context: "Keywords that describe the image",
       },
     ];
 

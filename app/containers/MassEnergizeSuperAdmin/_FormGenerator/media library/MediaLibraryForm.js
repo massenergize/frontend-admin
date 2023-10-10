@@ -16,8 +16,12 @@ import LightAutoComplete from "../../Gallery/tools/LightAutoComplete";
 import AsyncDropDown from "../AsyncCheckBoxDropDown";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import {
+  COPYRIGHT_OPTIONS,
+  PUB_MODES,
+} from "../../ME  Tools/media library/shared/utils/values";
 // import { Link } from "react-router-dom";
-const PUB_MODES = { OPEN: "OPEN", OPEN_TO: "OPEN_TO" };
+
 const MediaLibraryForm = ({
   auth,
   communities,
@@ -25,7 +29,7 @@ const MediaLibraryForm = ({
   imageForEdit,
   toggleSidePane,
 }) => {
-  const [copyright, setCopyright] = useState("No");
+  const [copyright, setCopyright] = useState(COPYRIGHT_OPTIONS.NO.key);
   const [underAge, setUnderAge] = useState("No");
   const [copyrightAtt, setCopyrightAtt] = useState("");
   const [guardianInfo, setGuardianInfo] = useState("");
@@ -34,18 +38,34 @@ const MediaLibraryForm = ({
   const [publicity, setPublicityChoice] = useState(PUB_MODES.OPEN_TO);
   const isInEditMode = imageForEdit;
 
+  const fetchPermissionValue = (key) => {
+    return COPYRIGHT_OPTIONS[key] || COPYRIGHT_OPTIONS.NO;
+  };
   useEffect(() => {
     // idea here is that we want to export all the changes that happen in form data when they happen
+
+    const permission = fetchPermissionValue(copyright);
     const formData = {
-      copyright: copyright === "Yes" ? true : false,
+      permission_key: permission?.key,
+      permission_notes: permission?.notes,
+      copyright: permission?.value || false,
       underAge: underAge === "Yes" ? true : false,
       copyright_att: copyrightAtt,
       guardian_info: guardianInfo,
       community_ids: chosenComms,
+      publicity,
       tags,
     };
     onChange && onChange(formData);
-  }, [copyright, underAge, copyrightAtt, guardianInfo, tags, chosenComms]);
+  }, [
+    copyright,
+    underAge,
+    copyrightAtt,
+    guardianInfo,
+    tags,
+    chosenComms,
+    publicity,
+  ]);
 
   useEffect(() => {
     if (!imageForEdit) return;
@@ -57,14 +77,19 @@ const MediaLibraryForm = ({
       copyright_att,
       has_children,
       has_copyright_permission,
+      permission_key,
     } = info;
 
     setCopyrightAtt(copyright_att);
-    setCopyright(has_copyright_permission ? "Yes" : "No");
+    // setCopyright(has_copyright_permission ? "Yes" : "No");
+    setCopyright(permission_key);
 
     setGuardianInfo(guardian_info);
     setUnderAge(has_children ? "Yes" : "No");
     setCommunities(comms?.map((com) => com.id) || []);
+    setPublicityChoice(
+      imageForEdit?.information?.publicity || PUB_MODES.OPEN_TO
+    );
 
     setTags(_tags?.map((t) => t.name).join(","));
   }, [imageForEdit]);
@@ -76,13 +101,14 @@ const MediaLibraryForm = ({
     }
   }, []);
   // --------------------------------------------------------------------
-  const doesNotHaveCopyrightPermission = !copyright || copyright === "No";
+  const permission = fetchPermissionValue(copyright)
+  const doesNotHaveCopyrightPermission = !permission?.value;
   const hasUnderAgeContent = underAge === "Yes";
   const isSuperAdmin = !auth?.is_community_admin && auth?.is_super_admin;
   const isCommunityAdmin = auth?.is_community_admin && !auth?.is_super_admin;
 
   const chooseCommunity =
-    (publicity === "OPEN_TO" && isCommunityAdmin) || isSuperAdmin;
+    (publicity === PUB_MODES.OPEN_TO && isCommunityAdmin) || isSuperAdmin;
 
   const getCommunitiesToSelectFrom = () => {
     let list = [];
@@ -101,6 +127,7 @@ const MediaLibraryForm = ({
       <Chip label={tag?.trim()} style={{ margin: "5px 3px" }} />
     ));
   };
+
 
   return (
     <div style={{ padding: "25px 50px" }}>
@@ -158,11 +185,11 @@ const MediaLibraryForm = ({
           </Typography>
           <div>
             <RadioGroup
-              onChange={(e) => console.log("Lets see", e.target.value)}
-              name="com-choices"
+              onChange={(e) => setPublicityChoice(e.target.value)}
               value={publicity}
             >
               <FormControlLabel
+                name="open"
                 value={PUB_MODES.OPEN}
                 control={<Radio />}
                 label={
@@ -172,7 +199,7 @@ const MediaLibraryForm = ({
                   >
                     <Tooltip
                       title="Every community that exists on the platform"
-                      placement="top"
+                      placement="auto"
                       style={{ fontWeight: "bold" }}
                     >
                       All Communities
@@ -181,6 +208,7 @@ const MediaLibraryForm = ({
                 }
               />
               <FormControlLabel
+                open="open-to"
                 value={PUB_MODES.OPEN_TO}
                 control={<Radio />}
                 label={
@@ -190,7 +218,7 @@ const MediaLibraryForm = ({
                   >
                     <Tooltip
                       title="Select all or some of the communities you manage"
-                      placement="top"
+                      placement="auto"
                       style={{ fontWeight: "bold" }}
                     >
                       Choose from communities you manage
@@ -209,7 +237,7 @@ const MediaLibraryForm = ({
               valueExtractor={(item) => item?.id}
               data={getCommunitiesToSelectFrom()}
               allowClearAndSelectAll
-              placeholder="Which communities would you like this item to be available to? *"
+              placeholder="Select communities"
             />
           )}
         </div>
@@ -226,37 +254,53 @@ const MediaLibraryForm = ({
           <Typography variant="h6">Permissions </Typography>
           <div style={{ marginTop: 10 }}>
             <Typography variant="body2">
-              Do you have permission to use the selected item(s) - written
-              permission from the person whose it is, or is the item under
-              copyright license that allows it to be used in this circumstance?
-              As per the
-              <Link
-                href="/admin/view/policy/mou"
-                target="_blank"
-                style={{ marginLeft: 4 }}
-              >
-                <b>Admin MOU</b>
-              </Link>
-              , you are required to have permission before uploading other
-              people's content. Please tick "Yes" that you do.
+              Do you have permission to upload this image?
             </Typography>
             <RadioGroup
               value={copyright}
               name="copyright"
-              style={{ display: "inline" }}
+              // style={{ display: "inline" }}
               onChange={(ev) => setCopyright(ev.target.value)}
             >
               <FormControlLabel
-                value="Yes"
+                value={COPYRIGHT_OPTIONS.YES.key}
                 name="copyright"
                 control={<Radio />}
-                label="Yes"
+                label={
+                  <Typography variant="body2">
+                    Yes. I took the photo or made the image, or was given
+                    permission by the person who made the image
+                  </Typography>
+                }
               />
               <FormControlLabel
-                value="No"
+                value={COPYRIGHT_OPTIONS.YES_CHECKED.key}
                 name="copyright"
                 control={<Radio />}
-                label="No"
+                label={
+                  <Typography variant="body2">
+                    Yes. I have checked that the image is not copyright
+                    protected.
+                    <Link
+                      href="https://www.pixsy.com/academy/image-user/verify-image-source-copyright-owner/"
+                      target="_blank"
+                      style={{ marginLeft: 5 }}
+                    >
+                      How can I check?
+                    </Link>
+                  </Typography>
+                }
+              />
+              <FormControlLabel
+                value={COPYRIGHT_OPTIONS.NO.key}
+                name="copyright"
+                control={<Radio />}
+                label={
+                  <Typography variant="body2">
+                    No. The image may be protected by copyright, and I don’t
+                    have permission.
+                  </Typography>
+                }
               />
             </RadioGroup>
             {!doesNotHaveCopyrightPermission && (

@@ -19,6 +19,7 @@ import MediaLibraryForm from "./MediaLibraryForm";
 import { getFileSize } from "../../ME  Tools/media library/shared/utils/utils";
 import SidebarForMediaLibraryModal from "./SidebarForMediaLibraryModal";
 import FilterBarForMediaLibrary from "./FilterBarForMediaLibrary";
+import { PUB_MODES } from "../../ME  Tools/media library/shared/utils/values";
 
 export const FormMediaLibraryImplementation = (props) => {
   const {
@@ -254,13 +255,17 @@ export const FormMediaLibraryImplementation = (props) => {
     doUpload(train);
   };
   const liveFormValidation = () => {
-    const { copyright, copyright_att, community_ids } = mlibraryFormData || {};
+    const { copyright, copyright_att, community_ids, publicity } =
+      mlibraryFormData || {};
 
-    if (!community_ids || !community_ids?.length)
+      console.log("PUBLICITY", publicity)
+
+    const openToSpecificCommunities = publicity === PUB_MODES.OPEN_TO;
+    if (openToSpecificCommunities && (!community_ids || !community_ids?.length))
       return {
         invalid: true,
         message:
-          "Please indicate the communities that should see the item(s) you are about to upload",
+          "Please indicate the communities that can use the item(s) you are about to upload",
       };
 
     const doesNotHaveCopyrightPermission = !copyright || copyright === "No";
@@ -338,7 +343,8 @@ export const FormMediaLibraryImplementation = (props) => {
       <MediaLibrary
         renderOnFooter={renderOnFooter}
         passedNotification={outsideNotification}
-        defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
+        // defaultTab={MediaLibrary.Tabs.UPLOAD_TAB} // UNCOMMENT BEFORE PR (BPR)
+        defaultTab={"upload-form"}
         images={(imagesObject && imagesObject.images) || []}
         actionText="Select From Library"
         sourceExtractor={(item) => item && item.url}
@@ -379,7 +385,7 @@ export const FormMediaLibraryImplementation = (props) => {
             tab: {
               headerName: "About Image",
               key: "upload-form",
-              onlyShowOnDemand: true,
+              // onlyShowOnDemand: true, #UNCHECK THIS BEFORE PR (BPR)
               order: 1,
               component: (props) => (
                 <MediaLibraryForm
