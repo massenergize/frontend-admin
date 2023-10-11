@@ -156,7 +156,9 @@ export const FilterBarForMediaLibrary = ({
     return { forAdminField, byCommunities };
   };
   useEffect(() => {
-    setCurrentFilter(filters?.currentFilter || FILTERS.MOST_RECENT.key);
+    if (isCommunityAdmin)
+      setCurrentFilter(filters?.currentFilter || FILTERS.MOST_RECENT.key);
+    else setCurrentFilter(filters?.currentFilter || FILTERS.BY_COMMUNITY.key);
     setQuery(filters?.usersQuery || { most_recent: true });
     setQueryStash(filters?.queryStash || null);
 

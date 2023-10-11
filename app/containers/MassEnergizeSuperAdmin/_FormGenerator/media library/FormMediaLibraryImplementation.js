@@ -346,8 +346,7 @@ export const FormMediaLibraryImplementation = (props) => {
       <MediaLibrary
         renderOnFooter={renderOnFooter}
         passedNotification={outsideNotification}
-        // defaultTab={MediaLibrary.Tabs.UPLOAD_TAB} // UNCOMMENT BEFORE PR (BPR)
-        defaultTab={"upload-form"}
+        defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
         images={(imagesObject && imagesObject.images) || []}
         actionText="Select From Library"
         sourceExtractor={(item) => item && item.url}
