@@ -269,7 +269,7 @@ const MediaLibraryForm = ({
                 label={
                   <Typography variant="body2">
                     Yes. I took the photo or made the image, or was given
-                    permission by the person who made the image
+                    permission by the person who made the image.
                   </Typography>
                 }
               />
