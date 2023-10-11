@@ -145,52 +145,52 @@ function MEDropdown(props) {
     onItemSelected(["all"]);
   };
 
-  // const renderSpotlight = () => {
-  //   const { spotlight } = props;
-  //   if (!spotlight) return <></>;
-  //   const { text, data } = spotlight || {};
-  //   return (
-  //     <div
-  //       style={{
-  //         border: "solid 0px #f6f6f6fc",
-  //         borderBottomWidth: 2,
-  //       }}
-  //     >
-  //       {text && (
-  //         <Typography
-  //           variant="body2"
-  //           style={{ padding: "10px 20px", color: "grey" }}
-  //         >
-  //           {text}
-  //         </Typography>
-  //       )}
-  //       {data.map((d, i) => {
-  //         return (
-  //           <MenuItem key={i}>
-  //             <FormControlLabel
-  //               onClick={() => handleOnChange(d)}
-  //               key={i}
-  //               control={
-  //                 multiple ? (
-  //                   <Checkbox
-  //                     checked={itemIsSelected(valueOf(d))}
-  //                     value={valueOf(d)}
-  //                     name={labelOf(d)}
-  //                   />
-  //                 ) : (
-  //                   <Typography style={{ padding: "7px 15px" }}>
-  //                     {labelOf(d)}
-  //                   </Typography>
-  //                 )
-  //               }
-  //               label={multiple ? labelOf(d) : ""}
-  //             />
-  //           </MenuItem>
-  //         );
-  //       })}
-  //     </div>
-  //   );
-  // };
+  const renderSpotlight = () => {
+    const { spotlightExtractor, spotlightText } = props;
+    if (!spotlightExtractor) return <></>;
+    const itemsInSpotlight = optionsToDisplay?.filter(spotlightExtractor);
+    return (
+      <div
+        style={{
+          border: "solid 0px #f6f6f6fc",
+          borderBottomWidth: 2,
+        }}
+      >
+        {spotlightText && (
+          <Typography
+            variant="body2"
+            style={{ padding: "10px 20px", color: "grey" }}
+          >
+            {spotlightText}
+          </Typography>
+        )}
+        {itemsInSpotlight.map((d, i) => {
+          return (
+            <MenuItem key={i}>
+              <FormControlLabel
+                onClick={() => handleOnChange(d)}
+                key={i}
+                control={
+                  multiple ? (
+                    <Checkbox
+                      checked={itemIsSelected(valueOf(d))}
+                      value={valueOf(d)}
+                      name={labelOf(d)}
+                    />
+                  ) : (
+                    <Typography style={{ padding: "7px 15px" }}>
+                      {labelOf(d)}
+                    </Typography>
+                  )
+                }
+                label={multiple ? labelOf(d) : ""}
+              />
+            </MenuItem>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <>
@@ -264,7 +264,7 @@ function MEDropdown(props) {
             </div>
           )}
 
-          {/* {renderSpotlight()} */}
+          {renderSpotlight()}
           {(optionsToDisplay || []).map((d, i) => {
             return (
               <MenuItem

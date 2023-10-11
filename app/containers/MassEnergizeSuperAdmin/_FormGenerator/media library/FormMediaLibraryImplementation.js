@@ -37,6 +37,7 @@ export const FormMediaLibraryImplementation = (props) => {
     meta,
     putMetaInRedux,
   } = props;
+
   const [available, setAvailable] = useState(auth && auth.is_super_admin);
   const [userSelectedImages, setUserSelectedImages] = useState([]);
   const [mlibraryFormData, setmlibraryFormData] = useState({});
@@ -123,10 +124,12 @@ export const FormMediaLibraryImplementation = (props) => {
         setOutsideNotification(null);
         cb && cb(response.data, !response.success, response.error);
         if (!response.success) return notify(response.error, true);
+        const metaFromBE = response.data?.meta || {}; // contains "total" count of items for the just-run query
         putImagesInRedux({ data: response.data });
         putMetaInRedux({
           ...meta,
           loadMoreMeta: { ...loadMoreMeta, query: body },
+          ...metaFromBE,
         });
       })
       .catch((e) => {
@@ -305,6 +308,7 @@ export const FormMediaLibraryImplementation = (props) => {
     const isOnLibraryTab = currentTab === MediaLibrary.Tabs.LIBRARY_TAB;
     const loadingMore = outsideNotification?.type === "loading-more";
     const images = imagesObject?.images || [];
+    const total = meta?.total || "...";
     if (isOnLibraryTab)
       return (
         <div
@@ -330,7 +334,8 @@ export const FormMediaLibraryImplementation = (props) => {
             </Tooltip>
           </MediaLibrary.Button>
           <small style={{ fontWeight: "bold", marginLeft: 15 }}>
-            <i className="fa fa-images" /> {(images && images.length) || 0}{" "}
+            <i className="fa fa-images" /> {(images && images.length) || 0}
+            {" / "} {total + " "}
             items
           </small>
         </div>
