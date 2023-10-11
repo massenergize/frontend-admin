@@ -138,17 +138,27 @@ export const FilterBarForMediaLibrary = ({
 
   const makeDefaults = () => {
     let forAdminField = [];
-    if (isCommunityAdmin) forAdminField = [auth?.id];
-    else forAdminField = ["all"];
-    return { forAdminField };
+    let byCommunities = [];
+    if (isCommunityAdmin) {
+      forAdminField = [auth?.id];
+      byCommunities = ["all"];
+    } else {
+      forAdminField = ["all"];
+      byCommunities = ["all"];
+    }
+    return { forAdminField, byCommunities };
   };
   useEffect(() => {
     setCurrentFilter(filters?.currentFilter || FILTERS.MOST_RECENT.key);
     setQuery(filters?.usersQuery || { most_recent: true });
     setQueryStash(filters?.queryStash || null);
-    
-    const { forAdminField } = makeDefaults();
-    buildQuery(FILTERS.FROM_OTHER_ADMINS.key, forAdminField);
+
+    const { forAdminField, byCommunities } = makeDefaults();
+    setQuery({
+      ...usersQuery,
+      [FILTERS.FROM_OTHER_ADMINS.key]: forAdminField,
+      [FILTERS.BY_COMMUNITY.key]: byCommunities,
+    });
   }, []);
 
   useEffect(() => {
@@ -193,13 +203,25 @@ export const FilterBarForMediaLibrary = ({
   }, []);
 
   useEffect(() => {
+    let extras = [];
+    if (isCommunityAdmin)
+      extras = [
+        {
+          name: "Available to my community",
+          key: FILTERS.MOST_RECENT.key,
+          context:
+            "Uploads from any of the communities you manage. Most recent items show up first!",
+        },
+      ];
+
     const opts = [
-      {
-        name: "Available to my community",
-        key: FILTERS.MOST_RECENT.key,
-        context:
-          "Uploads from any of the communities you manage. Most recent items show up first!",
-      },
+      ...extras,
+      // {
+      //   name: "Available to my community",
+      //   key: FILTERS.MOST_RECENT.key,
+      //   context:
+      //     "Uploads from any of the communities you manage. Most recent items show up first!",
+      // },
       {
         name: "Uploaded by Community",
         key: FILTERS.BY_COMMUNITY.key,
