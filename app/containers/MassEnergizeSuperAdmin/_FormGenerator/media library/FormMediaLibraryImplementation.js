@@ -159,6 +159,11 @@ export const FormMediaLibraryImplementation = (props) => {
           old: imagesObject,
           append: true,
         });
+        const metaFromBE = response.data?.meta || {};
+        putMetaInRedux({
+          ...meta,
+          ...metaFromBE,
+        });
       })
       .catch((e) => {
         notify(e?.toString(), true);
