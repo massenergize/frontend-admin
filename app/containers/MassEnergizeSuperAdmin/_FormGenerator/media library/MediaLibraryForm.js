@@ -28,6 +28,7 @@ const MediaLibraryForm = ({
   onChange,
   imageForEdit,
   toggleSidePane,
+  otherCommunities,
 }) => {
   const [copyright, setCopyright] = useState(COPYRIGHT_OPTIONS.NO.key);
   const [underAge, setUnderAge] = useState("No");
@@ -101,7 +102,7 @@ const MediaLibraryForm = ({
     }
   }, []);
   // --------------------------------------------------------------------
-  const permission = fetchPermissionValue(copyright)
+  const permission = fetchPermissionValue(copyright);
   const doesNotHaveCopyrightPermission = !permission?.value;
   const hasUnderAgeContent = underAge === "Yes";
   const isSuperAdmin = !auth?.is_community_admin && auth?.is_super_admin;
@@ -110,12 +111,26 @@ const MediaLibraryForm = ({
   const chooseCommunity =
     (publicity === PUB_MODES.OPEN_TO && isCommunityAdmin) || isSuperAdmin;
 
+  const isAnAdminCommunity = (com) => {
+    let list = auth?.admin_at || [];
+    list = list.map((c) => c.id);
+    return list.includes(com?.id);
+  };
+
   const getCommunitiesToSelectFrom = () => {
     let list = [];
-    if (isCommunityAdmin) list = auth?.admin_at;
-    else if (isSuperAdmin) list = communities || [];
+    if (isCommunityAdmin) {
+      list = auth?.admin_at || [];
+      const ids = list.map((c) => c.id.toString());
+      const without = otherCommunities.filter(
+        (c) => !ids.includes(c.id.toString())
+      );
+      list = [...list, ...without];
+    } else if (isSuperAdmin) list = communities || [];
+    list.sort((a, b) =>
+      b?.name.toLowerCase() > a?.name.toLowerCase() ? -1 : 1
+    );
     return list;
-    // return [{ name: "All Communities", id: "all-communities" }, ...list];
   };
 
   const showChips = () => {
@@ -127,7 +142,6 @@ const MediaLibraryForm = ({
       <Chip label={tag?.trim()} style={{ margin: "5px 3px" }} />
     ));
   };
-
 
   return (
     <div style={{ padding: "25px 50px" }}>
@@ -231,7 +245,10 @@ const MediaLibraryForm = ({
           {chooseCommunity && (
             <MEDropdown
               multiple
+              smartDropdown={!isCommunityAdmin}
               onItemSelected={(items) => setCommunities(items)}
+              spotlightText="Communities you manage"
+              spotlightExtractor={(com) => isAnAdminCommunity(com)}
               defaultValue={chosenComms}
               labelExtractor={(item) => item?.name}
               valueExtractor={(item) => item?.id}
@@ -396,7 +413,10 @@ const MediaLibraryForm = ({
 };
 
 const mapStateToProps = (state) => {
-  return { imageForEdit: state.getIn(["imageBeingEdited"]) };
+  return {
+    imageForEdit: state.getIn(["imageBeingEdited"]),
+    otherCommunities: state.getIn(["otherCommunities"]),
+  };
 };
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({}, dispatch);
