@@ -43,6 +43,7 @@ export const FormMediaLibraryImplementation = (props) => {
   const [mlibraryFormData, setmlibraryFormData] = useState({});
   const [uploading, setUploading] = useState(false);
   const [outsideNotification, setOutsideNotification] = useState(null);
+  const [mounted, setMounted] = useState(false);
   const isInEditMode = imageForEdit;
   const notify = (message, error = false, extras) => {
     const obj = {
@@ -94,6 +95,7 @@ export const FormMediaLibraryImplementation = (props) => {
   };
 
   useEffect(() => {
+    if (mounted) return;
     // The value of "preselected" could either be a list of numbers(ids), or a list of objects(json image objects from backend)
     // This happens because when the page loads afresh, and we pass down images as default value in some "formGenerator JSON", it comes in as objects
     // But then when the user goes around and selects images from the library, the form generator is setup to only
@@ -385,6 +387,11 @@ export const FormMediaLibraryImplementation = (props) => {
           },
         }}
         {...props}
+        onInsert={(files) => {
+          const { onInsert } = props;
+          if (onInsert) onInsert(files);
+          setMounted(true);
+        }}
         selected={userSelectedImages}
         loadMoreFunction={loadMoreImages}
         customTabs={[

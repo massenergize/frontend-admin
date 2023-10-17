@@ -84,7 +84,6 @@ function MediaLibrary(props) {
     onStateChange({ show, state });
   }, [show, state]);
 
-
   useEffect(() => {
     setHasMountedTo(true);
     const imagesMap = new Map(images.map((item) => [item.id, item]));
@@ -93,13 +92,12 @@ function MediaLibrary(props) {
     setTrayImages(selectedAndExists);
   }, [images, selected]);
 
-  useEffect(() => {}, [cropped]);
+  // useEffect(() => {}, [cropped]);
 
   useEffect(() => {
     setNotification(passedNotification);
   }, [passedNotification]);
 
-  
   const close = () => {
     setShow(false);
     setFiles([]);

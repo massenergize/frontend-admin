@@ -266,7 +266,8 @@ function MEDropdown(props) {
 
           {renderSpotlight()}
           {(optionsToDisplay || []).map((d, i) => {
-            if (props?.spotlightExtractor(d)) return <></>;
+            const { spotlightExtractor } = props;
+            if (spotlightExtractor && spotlightExtractor(d)) return <></>;
             return (
               <MenuItem
                 key={i}
