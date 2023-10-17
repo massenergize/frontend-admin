@@ -19,6 +19,7 @@ import MediaLibraryForm from "./MediaLibraryForm";
 import { getFileSize } from "../../ME  Tools/media library/shared/utils/utils";
 import SidebarForMediaLibraryModal from "./SidebarForMediaLibraryModal";
 import FilterBarForMediaLibrary from "./FilterBarForMediaLibrary";
+import { PUB_MODES } from "../../ME  Tools/media library/shared/utils/values";
 
 export const FormMediaLibraryImplementation = (props) => {
   const {
@@ -36,11 +37,13 @@ export const FormMediaLibraryImplementation = (props) => {
     meta,
     putMetaInRedux,
   } = props;
+
   const [available, setAvailable] = useState(auth && auth.is_super_admin);
   const [userSelectedImages, setUserSelectedImages] = useState([]);
   const [mlibraryFormData, setmlibraryFormData] = useState({});
   const [uploading, setUploading] = useState(false);
   const [outsideNotification, setOutsideNotification] = useState(null);
+  const [mounted, setMounted] = useState(false);
   const isInEditMode = imageForEdit;
   const notify = (message, error = false, extras) => {
     const obj = {
@@ -92,6 +95,7 @@ export const FormMediaLibraryImplementation = (props) => {
   };
 
   useEffect(() => {
+    if (mounted) return;
     // The value of "preselected" could either be a list of numbers(ids), or a list of objects(json image objects from backend)
     // This happens because when the page loads afresh, and we pass down images as default value in some "formGenerator JSON", it comes in as objects
     // But then when the user goes around and selects images from the library, the form generator is setup to only
@@ -122,10 +126,12 @@ export const FormMediaLibraryImplementation = (props) => {
         setOutsideNotification(null);
         cb && cb(response.data, !response.success, response.error);
         if (!response.success) return notify(response.error, true);
+        const metaFromBE = response.data?.meta || {}; // contains "total" count of items for the just-run query
         putImagesInRedux({ data: response.data });
         putMetaInRedux({
           ...meta,
           loadMoreMeta: { ...loadMoreMeta, query: body },
+          ...metaFromBE,
         });
       })
       .catch((e) => {
@@ -154,6 +160,11 @@ export const FormMediaLibraryImplementation = (props) => {
           data: response.data,
           old: imagesObject,
           append: true,
+        });
+        const metaFromBE = response.data?.meta || {};
+        putMetaInRedux({
+          ...meta,
+          ...metaFromBE,
         });
       })
       .catch((e) => {
@@ -254,13 +265,15 @@ export const FormMediaLibraryImplementation = (props) => {
     doUpload(train);
   };
   const liveFormValidation = () => {
-    const { copyright, copyright_att, community_ids } = mlibraryFormData || {};
+    const { copyright, copyright_att, community_ids, publicity } =
+      mlibraryFormData || {};
 
-    if (!community_ids || !community_ids?.length)
+    const openToSpecificCommunities = publicity === PUB_MODES.OPEN_TO;
+    if (openToSpecificCommunities && (!community_ids || !community_ids?.length))
       return {
         invalid: true,
         message:
-          "Please indicate the communities that should see the item(s) you are about to upload",
+          "Please indicate the communities that can use the item(s) you are about to upload",
       };
 
     const doesNotHaveCopyrightPermission = !copyright || copyright === "No";
@@ -302,6 +315,7 @@ export const FormMediaLibraryImplementation = (props) => {
     const isOnLibraryTab = currentTab === MediaLibrary.Tabs.LIBRARY_TAB;
     const loadingMore = outsideNotification?.type === "loading-more";
     const images = imagesObject?.images || [];
+    const total = meta?.total || "...";
     if (isOnLibraryTab)
       return (
         <div
@@ -327,7 +341,8 @@ export const FormMediaLibraryImplementation = (props) => {
             </Tooltip>
           </MediaLibrary.Button>
           <small style={{ fontWeight: "bold", marginLeft: 15 }}>
-            <i className="fa fa-images" /> {(images && images.length) || 0}{" "}
+            <i className="fa fa-images" /> {(images && images.length) || 0}
+            {" / "} {total + " "}
             items
           </small>
         </div>
@@ -372,6 +387,11 @@ export const FormMediaLibraryImplementation = (props) => {
           },
         }}
         {...props}
+        onInsert={(files) => {
+          const { onInsert } = props;
+          if (onInsert) onInsert(files);
+          setMounted(true);
+        }}
         selected={userSelectedImages}
         loadMoreFunction={loadMoreImages}
         customTabs={[
@@ -459,8 +479,8 @@ const UploadIntroductionComponent = ({ auth, setAvailableTo, available }) => {
     <div style={{ marginTop: -40, marginLeft: 27, width: "100%" }}>
       <Typography variant="h6">Hi {auth?.preferred_name || "..."},</Typography>
       <Typography variant="body2">
-        After selecting items, click <b>"Continue"</b>. You will be asked to
-        provide a few details about your items before uploading
+        After selecting an item, click <b>"Continue"</b>. You will be asked to
+        provide details about your item before uploading
       </Typography>
       {/* {comms && is_community_admin && (
         <>
