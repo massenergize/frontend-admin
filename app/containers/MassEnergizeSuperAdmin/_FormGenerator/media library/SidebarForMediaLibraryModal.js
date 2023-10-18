@@ -12,6 +12,10 @@ import { deleteImage, getMoreInfoOnImage } from "../../Gallery/Gallery";
 import { DeleteVerificationBox, ImageInfoArea } from "../../Gallery/SideSheet";
 import { Link } from "react-router-dom";
 import { getHumanFriendlyDate } from "../../../../utils/common";
+import {
+  COPYRIGHT_OPTIONS,
+  PUB_MODES,
+} from "../../ME  Tools/media library/shared/utils/values";
 
 export const SidebarForMediaLibraryModal = ({
   auth,
@@ -74,8 +78,12 @@ export const SidebarForMediaLibraryModal = ({
     copyright_att,
     has_children,
     guardian_info,
+    publicity,
+    permission_key,
   } = imageData();
-
+  const underage_dets_not_provided = has_children === undefined;
+  const openToEveryone = publicity === PUB_MODES.OPEN;
+  const permission = COPYRIGHT_OPTIONS[permission_key] || COPYRIGHT_OPTIONS.YES; // images that have permission but dont have permission_key (cos it wasnt implemented) can default to "Yes, its my work"
   return (
     <>
       <InfoBox title="Details" hidden={!uploader} outlined>
@@ -156,8 +164,18 @@ export const SidebarForMediaLibraryModal = ({
         </>
       </InfoBox>
 
-      <InfoBox title="Available to" outlined hidden={!availableTo}>
-        <Typography variant="body2">{availableTo}</Typography>
+      <InfoBox
+        title={openToEveryone ? "Availability" : "Available to"}
+        outlined
+        hidden={!availableTo}
+      >
+        {openToEveryone ? (
+          <Typography variant="body2">
+            Open to every community on the platform
+          </Typography>
+        ) : (
+          <Typography variant="body2">{availableTo}</Typography>
+        )}
       </InfoBox>
 
       <InfoBox title="Related Keywords" outlined hidden={!tags?.length}>
@@ -166,15 +184,15 @@ export const SidebarForMediaLibraryModal = ({
         </Typography>{" "}
       </InfoBox>
 
-      <InfoBox title="Copyright Information" hidden={false}>
+      <InfoBox title="Copyright Permissions" hidden={false}>
         <>
           {!has_copyright_permission ? (
             <Typography variant="body2">Not provided...</Typography>
           ) : (
             <>
               <Typography variant="body2">
-                <b>{uploader?.preferred_name}</b> has permission to upload this
-                image
+                <b>{uploader?.preferred_name}</b>{" "}
+                {permission?.notes?.toLowerCase()}
               </Typography>
               {copyright_att ? (
                 <Typography variant="body2">
@@ -189,7 +207,13 @@ export const SidebarForMediaLibraryModal = ({
       </InfoBox>
       <InfoBox
         title="Underage Information"
-        color={has_children ? "#d31919" : "green"}
+        color={
+          underage_dets_not_provided
+            ? "black"
+            : has_children
+            ? "#d31919"
+            : "green"
+        }
         hidden={false}
       >
         <>
@@ -198,16 +222,22 @@ export const SidebarForMediaLibraryModal = ({
             style={{
               textDecoration: "none",
               fontWeight: "500",
-              color: has_children ? "#d31919" : "#389a38",
+              color: underage_dets_not_provided
+                ? "black"
+                : has_children
+                ? "#d31919"
+                : "#389a38",
             }}
           >
             <i className="fa fa-child" style={{ marginRight: 6 }} />
             <span>
               <b>
                 {" "}
-                {has_children
-                  ? "Shows kids under 13"
-                  : "No kids under 13 shown"}
+                {underage_dets_not_provided
+                  ? "Not provided..."
+                  : has_children
+                  ? "Shows children under 13"
+                  : "No children under 13 shown"}
               </b>
             </span>
           </Typography>

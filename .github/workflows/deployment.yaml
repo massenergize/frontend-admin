@@ -26,7 +26,7 @@ jobs:
          node-version: ${{ matrix.node-version }}
 
 
-      - name: Set Prof Environment Variables 🚀
+      - name: Set Prod Environment Variables 🚀
         if: ${{  github.event.base_ref == 'refs/heads/master' || github.event.base_ref == 'refs/heads/canary' }}
         run: |
             echo "Setting prod branch secrets..."
