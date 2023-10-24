@@ -49,11 +49,12 @@ function MediaLibraryModal({
   notification,
   setNotification,
   renderOnFooter,
+  previews, 
+  setPreviews
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
-  const [previews, setPreviews] = useState([]);
-
+ 
   const [content, setSelectedContent] = useState(selected); // all the selected items from library will always be available in an array here
   const [state, setState] = useState({ uploading: uploading }); // this value is controlled both externally, and internally by the Mlibrary itself
   const [loadingMore, setLoadingMore] = useState(false);
