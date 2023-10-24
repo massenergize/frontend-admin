@@ -82,6 +82,7 @@ function LightAutoComplete(props) {
     isAsync,
     endpoint,
     args,
+    params,
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
@@ -98,7 +99,7 @@ function LightAutoComplete(props) {
     data: items,
     endpoint,
     args,
-    params: { search_text: query },
+    params: { search_text: query, ...(params||{}) },
   });
   useEffect(() => {
     let newItemsConstructed = (newItems || [])?.map((item) => {
@@ -188,7 +189,7 @@ function LightAutoComplete(props) {
   const userHasSelectedStuff = selected.length;
 
   return (
-    <div style={{ position: "relative", width: "100%", marginTop: 19 }}>
+    <div style={{ position: "relative", width: "100%", marginTop: 0 }}>
       <div ref={chipWrapperRef}>
         {selected?.length > 0 && (
           <>

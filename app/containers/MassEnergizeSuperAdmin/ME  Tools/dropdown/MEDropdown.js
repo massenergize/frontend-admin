@@ -57,29 +57,33 @@ function MEDropdown(props) {
       elementObserver.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && cursor.has_more) {
           if (!rest?.endpoint) return;
-          apiCall(rest?.endpoint, { page: cursor.next, limit: 10 }).then(
-            (res) => {
-              setCursor({
-                has_more: res?.cursor?.count > optionsToDisplay?.length,
-                next: res?.cursor?.next,
-              });
-              let items = [
-                ...optionsToDisplay,
-                ...(res?.data || [])?.map((item) => {
-                  return {
-                    ...item,
-                    displayName: labelExtractor
-                      ? labelExtractor(item)
-                      : item?.name || item?.title,
-                  };
-                }),
-              ];
+          apiCall(rest?.endpoint, {
+            page: cursor.next,
+            limit: 10,
+            params: JSON.stringify({ ...(rest?.params || {}) }),
+          }).then((res) => {
+            setCursor({
+              has_more: res?.cursor?.count > optionsToDisplay?.length,
+              next: res?.cursor?.next,
+            });
+            let items = [
+              ...optionsToDisplay,
+              ...(res?.data || [])?.map((item) => {
+                return {
+                  ...item,
+                  displayName: labelExtractor
+                    ? labelExtractor(item)
+                    : item?.name || item?.title,
+                };
+              }),
+            ];
 
-              setOptionsToDisplay([
-                ...new Map(items.map((item) => [item["id"], item])).values(),
-              ]);
-            }
-          );
+            setOptionsToDisplay([
+              ...new Map(
+                items.map((item) => [item["id"], item])
+              ).values(),
+            ]);
+          });
         }
       });
 
@@ -176,6 +180,7 @@ function MEDropdown(props) {
             </div>
           )}
           value={selected || []}
+          sx={rest.sx || {}}
         >
           {(optionsToDisplay || []).map((d, i) => {
             return (

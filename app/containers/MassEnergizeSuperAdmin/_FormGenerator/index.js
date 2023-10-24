@@ -1054,13 +1054,17 @@ class MassEnergizeForm extends Component {
         );
       case FieldTypes.Radio:
         return (
-          <div className={classes.fieldBasic} key={field.name + field.label}>
+          <div
+            className={classes.fieldBasic}
+            key={field.name + field.label}
+          >
             {this.renderGeneralContent(field)}
             <FormLabel component="label">{field.label}</FormLabel>
             <RadioGroup
               aria-label={field.label}
               name={field.name}
               className={classes.group}
+              sx={{ display: "flex", flexDirection:field?.variant === "horizontal" ? "row" : "column" }}
               value={value}
               onChange={this.handleFormDataChange}
               disabled={field.readOnly || this.state.readOnly}
@@ -1352,7 +1356,7 @@ class MassEnergizeForm extends Component {
                     type="submit"
                     disabled={this.state.readOnly}
                   >
-                    Submit
+                    {formJson.submitText || "Submit"}
                   </Button>
                 </div>
                 {Object.keys(requiredFields).length > 0 && (
