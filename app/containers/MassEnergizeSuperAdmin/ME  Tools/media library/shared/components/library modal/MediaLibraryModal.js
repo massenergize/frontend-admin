@@ -97,15 +97,7 @@ function MediaLibraryModal({
   };
   const handleUpload = () => {
     if (!onUpload) return;
-    // setState((prev) => ({ ...prev, uploading: true }));
     onUpload(gatherUtils());
-    // onUpload(
-    //   clean(files),
-    //   reset,
-    //   close,
-    //   setCurrentTab,
-    // quickReturn && returnRightAfterUpload;
-    // );
   };
 
   const handleInsert = (_content, reset) => {
@@ -120,12 +112,6 @@ function MediaLibraryModal({
     setCroppedSource(null);
     setCropped({});
   };
-
-  // const fireLoadMoreFunction = () => {
-  //   if (!loadMoreFunction) return;
-  //   setLoadingMore(true);
-  //   loadMoreFunction(() => setLoadingMore(false), close);
-  // };
 
   const customName = (key, _default) => {
     const modifier = (tabModifiers || {})[key];

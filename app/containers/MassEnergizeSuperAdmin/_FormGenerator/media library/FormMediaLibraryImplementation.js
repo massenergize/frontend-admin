@@ -229,7 +229,7 @@ export const FormMediaLibraryImplementation = (props) => {
         });
         changeTabTo(MediaLibrary.Tabs.LIBRARY_TAB);
         insertSelectedImages(images, response);
-        // reset();
+        reset();
         // changeTabTo(MediaLibrary.Tabs.LIBRARY_TAB);
       })
       .catch((e) => {
