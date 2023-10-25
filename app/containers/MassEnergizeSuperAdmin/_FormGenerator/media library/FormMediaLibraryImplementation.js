@@ -98,7 +98,7 @@ export const FormMediaLibraryImplementation = (props) => {
   };
 
   useEffect(() => {
-    if (mounted) return;
+    if (mounted) return useIdsToFindObjs(selected);
     // The value of "preselected" could either be a list of numbers(ids), or a list of objects(json image objects from backend)
     // This happens because when the page loads afresh, and we pass down images as default value in some "formGenerator JSON", it comes in as objects
     // But then when the user goes around and selects images from the library, the form generator is setup to only

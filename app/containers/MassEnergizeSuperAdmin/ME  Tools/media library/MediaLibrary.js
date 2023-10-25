@@ -11,8 +11,6 @@ import {
   TABS,
 } from "./shared/utils/values";
 import { EXTENSIONS, functionsToExport } from "./shared/utils/utils";
-import { apiCall } from "../../../../utils/messenger";
-
 function MediaLibrary(props) {
   const {
     actionText,
@@ -29,7 +27,6 @@ function MediaLibrary(props) {
     passedNotification,
     handleCropFromLink,
     uploadMultiple,
-    maximumImageSize,
   } = props;
   const [show, setShow] = useState(false);
   const [imageTray, setTrayImages] = useState([]);
