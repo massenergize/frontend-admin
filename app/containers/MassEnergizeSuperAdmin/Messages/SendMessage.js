@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { withStyles, makeStyles } from "@mui/styles";
+import { withStyles } from "@mui/styles";
 
 import { withRouter, useParams } from "react-router-dom";
 import PapperBlock from "../../../components/PapperBlock/PapperBlock";
@@ -16,15 +16,16 @@ import {
   Tooltip,
   Typography,
   FormLabel,
+  LinearProgress,
+  Box,
 } from "@mui/material";
 import TinyEditor from "../_FormGenerator/TinyMassEnergizeEditor";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import ScheduleMessageModal from "./ScheduleMessageModal";
 import { apiCall } from "../../../utils/messenger";
-import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import { LOADING } from "../../../utils/constants";
 import Loading from "dan-components/Loading";
-import AsyncDropDown from "../_FormGenerator/AsyncCheckBoxDropDown";
+import { reduxLoadMetaDataAction, reduxLoadScheduledMessages, reduxToggleUniversalToast } from "../../../redux/redux-actions/adminActions";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 /**
@@ -50,6 +51,8 @@ function SendMessage({ classes, communities, users, ...props }) {
   const [selectedCommunities, setSelectedCommunities] = React.useState([]);
   const [audience, setAudience] = React.useState([]);
   const [sub_audience_type, setSubAudienceType] = React.useState("ALL");
+  const [loading, setLoading] = React.useState(false);
+
 
   const UrlParams = useParams();
 
@@ -73,6 +76,7 @@ function SendMessage({ classes, communities, users, ...props }) {
         audience,
         community_ids,
       } = message?.schedule_info?.recipients;
+
       setCurrentFilter(audience_type);
       setSubAudienceType(sub_audience_type);
       setQuery({
@@ -146,6 +150,8 @@ function SendMessage({ classes, communities, users, ...props }) {
   };
 
   const onFormSubmit = (data = usersQuery) => {
+    setLoading(true);
+     let msgs = props?.messages || [];
     data = {
       ...data,
       audience: isAll(audience) ? audience : audience?.map((a) => a.id),
@@ -156,15 +162,40 @@ function SendMessage({ classes, communities, users, ...props }) {
     if(UrlParams?.id){
       data.id = UrlParams.id;
     }
+    setOpen(false);
     apiCall("/messages.send", data).then((res) => {
-      console.log("== res ===", res);
+      setLoading(false);
       if (res?.success) {
-        setOpen(false);
+
+        if(!UrlParams?.id){
+          props.putScheduledMessagesToRedux([res?.data, ...msgs]);
+          props.updateTableMeta({
+            ...meta,
+            ["scheduledMessages"]: {
+              ...meta["scheduledMessages"],
+              count: meta["scheduledMessages"].count + 1,
+            },
+          });
+
+        }
+        else{
+          let filtered = msgs.filter((m) => m.id?.toString() !== UrlParams.id?.toString());
+          props.putScheduledMessagesToRedux([res?.data, ...filtered]);
+        }
         props.history.push(
           data?.schedule
             ? "/admin/scheduled/messages"
             : "/admin/read/community-admin-messages"
         );
+      }
+      else{
+        console.log("MESSAGE_SEND_ERROR", res?.error);
+        toggleToast({
+          open: true,
+          message:
+            "An error occurred while deleting the message",
+          variant: "error",
+        });
       }
       setOpen(false);
     });
@@ -342,44 +373,52 @@ function SendMessage({ classes, communities, users, ...props }) {
           />
         </div>
 
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <div>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={() => {
-                props.history.push("/admin/scheduled/messages");
+        <>
+          {loading ? (
+            <Box sx={{ width: "100%", marginTop: 2 }}>
+              <LinearProgress />
+            </Box>
+          ) : (
+            <div
+              style={{
+                marginTop: 20,
+                display: "flex",
+                justifyContent: "space-between",
               }}
             >
-              Cancel
-            </Button>
-          </div>
-          <div>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                onFormSubmit();
-              }}
-            >
-              Send Now
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => setOpen(true)}
-              sx={{ marginLeft: 2 }}
-            >
-              Schedule
-            </Button>
-          </div>
-        </div>
+              <div>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={() => {
+                    props.history.push("/admin/scheduled/messages");
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+              <div>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => {
+                    onFormSubmit();
+                  }}
+                >
+                  Send Now
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => setOpen(true)}
+                  sx={{ marginLeft: 2 }}
+                >
+                  Schedule
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
       </>
       <ScheduleMessageModal
         open={open}
@@ -398,7 +437,14 @@ const mapStateToProps = (state) => ({
   messages: state.getIn(["scheduledMessages"]),
 });
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({}, dispatch);
+  return bindActionCreators(
+    {
+      putScheduledMessagesToRedux: reduxLoadScheduledMessages,
+      updateTableMeta: reduxLoadMetaDataAction,
+      toggleToast: reduxToggleUniversalToast,
+    },
+    dispatch
+  );
 };
 const SendMessageWithProps = connect(
   mapStateToProps,

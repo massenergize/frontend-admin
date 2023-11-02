@@ -1,9 +1,8 @@
-import PapperBlock from "../../../components/PapperBlock/PapperBlock";
 import Seo from "../../../components/Seo/Seo";
-import React, { useEffect, useState } from "react";
+import React, {  } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { withStyles, makeStyles } from "@mui/styles";
+import { withStyles } from "@mui/styles";
 import styles from "../../../components/Widget/widget-jss";
 
 import { withRouter, Link} from "react-router-dom";
@@ -12,11 +11,8 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import {
   convertToScheduledFor,
-  getHumanFriendlyDate,
 } from "../../../utils/common";
-import FileCopy from "@mui/icons-material/FileCopy";
 import EditIcon from "@mui/icons-material/Edit";
-import { DeleteOutline } from "@mui/icons-material";
 import { Typography } from "@mui/material";
 import { reduxLoadMetaDataAction, reduxLoadScheduledMessages, reduxToggleUniversalModal, reduxToggleUniversalToast } from "../../../redux/redux-actions/adminActions";
 import { LOADING } from "../../../utils/constants";
@@ -99,10 +95,8 @@ function ScheduledMessages({
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      console.log("===found===", found);
       apiCall("/messages.delete", { message_id: found })
         .then((response) => {
-            console.log("=== response ===", response);
           if (response.success) {
             let updated = itemsInRedux?.filter(item=>item?.id !== found)
             putScheduledMessagesToRedux(updated)

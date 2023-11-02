@@ -67,7 +67,7 @@ export default function ScheduleMessageModal({
           </LocalizationProvider>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onDateSelect}>Schedule</Button>
+          <Button onClick={onDateSelect}>Set Schedule</Button>
           <Button onClick={handleClose}>Cancel</Button>
         </DialogActions>
       </Dialog>
