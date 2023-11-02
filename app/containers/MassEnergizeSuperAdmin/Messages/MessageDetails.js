@@ -229,8 +229,6 @@ class MessageDetails extends Component {
     const { formJson, message, loading } = this.state;
     if (loading || !formJson) return <Loading />;
 
-    console.log("==message==", message)
-
     return (
       <div>
         <Seo name={`Message Details`} />
