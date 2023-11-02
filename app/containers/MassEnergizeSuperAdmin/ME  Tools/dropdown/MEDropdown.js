@@ -1,15 +1,23 @@
 import {
+  Box,
   Checkbox,
   FormControlLabel,
   MenuItem,
   Typography,
 } from "@mui/material";
-import { Chip, FormControl, FormLabel, Select } from "@mui/material";
+import {
+  Chip,
+  FormControl,
+  FormLabel,
+  Select,
+  CircularProgress,
+} from "@mui/material";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { pop } from "../../../../utils/common";
 import LightAutoComplete from "../../Gallery/tools/LightAutoComplete";
 import MEDropdownPro from "./MEDropdownPro";
 import { apiCall } from "../../../../utils/messenger";
+import useObserver from "../../../../utils/useObserver";
 function MEDropdown(props) {
   const {
     containerStyle,
@@ -30,7 +38,8 @@ function MEDropdown(props) {
   } = props;
   const [selected, setSelected] = useState([]);
   const [optionsToDisplay, setOptionsToDisplay] = useState([]);
-  const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
+  // const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
+
 
   const isAll = (item) => {
     return typeof item === "string" && item?.toLowerCase() === "all";
@@ -45,52 +54,79 @@ function MEDropdown(props) {
     setSelected(defaultValue || value || []);
   }, [defaultValue, value]);
 
-  useEffect(() => setOptionsToDisplay(props.data), [props.data]);
+  useEffect(() =>{
+    if(!rest?.isAsync){
+       setOptionsToDisplay(props.data);
+    }
+  }, [props.data]);
 
   // -------------------------------------------------------------------
   if (fullControl) return <MEDropdownPro {...props} />;
   // -------------------------------------------------------------------
-  const elementObserver = useRef(null);
-  const lastDropDownItemRef = useCallback(
-    (node) => {
-      if (elementObserver.current) elementObserver.current.disconnect();
-      elementObserver.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && cursor.has_more) {
-          if (!rest?.endpoint) return;
-          apiCall(rest?.endpoint, {
-            page: cursor.next,
-            limit: 10,
-            params: JSON.stringify({ ...(rest?.params || {}) }),
-          }).then((res) => {
-            setCursor({
-              has_more: res?.cursor?.count > optionsToDisplay?.length,
-              next: res?.cursor?.next,
-            });
-            let items = [
-              ...optionsToDisplay,
-              ...(res?.data || [])?.map((item) => {
-                return {
-                  ...item,
-                  displayName: labelExtractor
-                    ? labelExtractor(item)
-                    : item?.name || item?.title,
-                };
-              }),
-            ];
+  const { ref, data: newItems, cursor } = useObserver({
+    data: optionsToDisplay,
+    endpoint: rest?.endpoint,
+    args: { limit: 10 },
+    params: { ...(rest?.params || {}) },
+  });
+   useEffect(() => {
+     let newItemsConstructed = (newItems || [])?.map((item) => {
+       return {
+         ...item,
+         displayName: labelExtractor
+           ? labelExtractor(item)
+           : item?.name || item?.title,
+       };
+     });
+     let all = [...(optionsToDisplay || []), ...(newItemsConstructed || [])];
+     const uniqueItems = [
+       ...new Map(all.map((item) => [item["id"], item])).values(),
+     ];
+     setOptionsToDisplay(uniqueItems);
+   }, [newItems]);
 
-            setOptionsToDisplay([
-              ...new Map(
-                items.map((item) => [item["id"], item])
-              ).values(),
-            ]);
-          });
-        }
-      });
 
-      if (node) elementObserver.current.observe(node);
-    },
-    [cursor]
-  );
+  // const elementObserver = useRef(null);
+  // const lastDropDownItemRef = useCallback(
+  //   (node) => {
+  //     if (elementObserver.current) elementObserver.current.disconnect();
+  //     elementObserver.current = new IntersectionObserver((entries) => {
+  //       if (entries[0].isIntersecting && cursor.has_more) {
+  //         if (!rest?.endpoint) return;
+  //         apiCall(rest?.endpoint, {
+  //           page: cursor.next,
+  //           limit: 10,
+  //           params: JSON.stringify({ ...(rest?.params || {}) }),
+  //         }).then((res) => {
+  //           setCursor({
+  //             has_more: res?.cursor?.count > optionsToDisplay?.length,
+  //             next: res?.cursor?.next,
+  //           });
+  //           let items = [
+  //             ...optionsToDisplay,
+  //             ...(res?.data || [])?.map((item) => {
+  //               return {
+  //                 ...item,
+  //                 displayName: labelExtractor
+  //                   ? labelExtractor(item)
+  //                   : item?.name || item?.title,
+  //               };
+  //             }),
+  //           ];
+
+  //           setOptionsToDisplay([
+  //             ...new Map(
+  //               items.map((item) => [item["id"], item])
+  //             ).values(),
+  //           ]);
+  //         });
+  //       }
+  //     });
+
+  //     if (node) elementObserver.current.observe(node);
+  //   },
+  //   [cursor]
+  // );
   // -------------------------------------------------------------------
   // Always switch dropdown to auto complete dropdown if there are a lot of items. A lot = (>20 items)
   if (smartDropdown && optionsToDisplay && optionsToDisplay.length > 20) {
@@ -148,13 +184,26 @@ function MEDropdown(props) {
     onItemSelected(["all"]);
   };
 
+    const ITEM_HEIGHT = 60;
+    const ITEM_PADDING_TOP = 8;
+    const MenuProps = {
+      PaperProps: {
+        style: {
+          maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+          // width: 250,
+        },
+      },
+    };
+
   return (
     <>
       <FormControl
         key={name || "me-dropdown"}
         style={{ width: "100%", marginTop: 10, ...(containerStyle || {}) }}
       >
-        {placeholder && <FormLabel component="legend">{placeholder}</FormLabel>}
+        {placeholder && (
+          <FormLabel component="legend">{placeholder}</FormLabel>
+        )}
         <Select
           {...generics || {}}
           className="me-drop-override"
@@ -181,16 +230,17 @@ function MEDropdown(props) {
           )}
           value={selected || []}
           sx={rest.sx || {}}
+          MenuProps={MenuProps}
         >
           {(optionsToDisplay || []).map((d, i) => {
             return (
               <MenuItem
                 key={i}
-                ref={
-                  i === optionsToDisplay.length - 1 && rest?.isAsync
-                    ? lastDropDownItemRef
-                    : null
-                }
+                // ref={
+                //   i === optionsToDisplay.length - 1 && rest?.isAsync
+                //     ? ref
+                //     : null
+                // }
               >
                 <FormControlLabel
                   onClick={() => handleOnChange(d)}
@@ -213,6 +263,23 @@ function MEDropdown(props) {
               </MenuItem>
             );
           })}
+          {cursor.has_more && rest?.isAsync && (
+            <MenuItem
+              value={cursor.next}
+              key={"fetcher-option"}
+              ref={ref}
+            >
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <CircularProgress size={20} />
+              </Box>
+            </MenuItem>
+          )}
         </Select>
       </FormControl>
       {allowClearAndSelectAll && multiple && (

@@ -302,6 +302,11 @@ class Application extends React.Component {
               component={SendMessage}
             />
             <Route
+              path="/admin/edit/:id/scheduled-message"
+              exact
+              component={SendMessage}
+            />
+            <Route
               path="/admin/scheduled/messages"
               exact
               component={ScheduledMessages}

@@ -83,6 +83,7 @@ function LightAutoComplete(props) {
     endpoint,
     args,
     params,
+    selectAllV2,
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
@@ -127,6 +128,7 @@ function LightAutoComplete(props) {
     return item;
   };
   const allOrNothing = ({ nothing, data }) => {
+    if(selectAllV2) return allOrNothing2({ nothing });
     if (nothing) {
       setSelected([]);
       return transfer([]);
@@ -136,7 +138,22 @@ function LightAutoComplete(props) {
     transfer(data);
   };
 
+    const allOrNothing2 = ({ nothing }) => {
+      if (nothing) {
+        setSelected([]);
+        onChange([]);
+        return;
+      }
+      setSelected(["all"]);
+      onChange(["all"]);
+    };
+
+    const isAll = (item) => {
+      return typeof item === "string" && item?.toLowerCase() === "all";
+    };
+
   const getLabel = (item) => {
+     if (multiple && isAll(item)) return "All";
     if (labelExtractor) return labelExtractor(item);
     return item;
   };
@@ -176,6 +193,7 @@ function LightAutoComplete(props) {
     setSelected(defaultSelected);
   }, [defaultSelected]);
 
+
   const increasedRatio = () => {
     const height = chipWrapperRef.current
       ? chipWrapperRef.current.clientHeight
@@ -189,7 +207,7 @@ function LightAutoComplete(props) {
   const userHasSelectedStuff = selected.length;
 
   return (
-    <div style={{ position: "relative", width: "100%", marginTop: 0 }}>
+    <div style={{ position: "relative", width: "100%", marginTop: 0 }} key={props?.key}>
       <div ref={chipWrapperRef}>
         {selected?.length > 0 && (
           <>

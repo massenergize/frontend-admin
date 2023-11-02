@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { withStyles, makeStyles } from "@mui/styles";
 
-import { withRouter } from "react-router-dom";
+import { withRouter, useParams } from "react-router-dom";
 import PapperBlock from "../../../components/PapperBlock/PapperBlock";
 import Seo from "../../../components/Seo/Seo";
 import styles from "../../../components/Widget/widget-jss";
@@ -22,48 +22,15 @@ import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import ScheduleMessageModal from "./ScheduleMessageModal";
 import { apiCall } from "../../../utils/messenger";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
+import { LOADING } from "../../../utils/constants";
+import Loading from "dan-components/Loading";
+import AsyncDropDown from "../_FormGenerator/AsyncCheckBoxDropDown";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 /**
- * 
+ *
  * whenever audience type changes reset audience
  */
-const error = {
-  background: "rgb(255, 214, 214)",
-  color: "rgb(170, 28, 28)",
-  width: "100%",
-  marginTop: 6,
-  padding: "16px 25px",
-  borderRadius: 5,
-  cursor: "pointer",
-};
-
-const useStyles = makeStyles((theme) => ({
-  container: {
-    padding: theme.spacing(3),
-    borderRadius: 5,
-  },
-  error: {
-    background: "rgb(255, 214, 214)",
-    color: "rgb(170, 28, 28)",
-    width: "100%",
-    marginTop: 6,
-    padding: "16px 25px",
-    borderRadius: 5,
-    cursor: "pointer",
-  },
-  header: {
-    marginBottom: theme.spacing(2),
-  },
-  dropdownArea: {
-    marginBottom: theme.spacing(1),
-  },
-  success: {
-    ...error,
-    background: "rgb(174, 223, 174)",
-    color: "rgb(12, 131, 30)",
-  },
-}));
 
 const AUDIENCE_TYPE = [
   { id: "SUPER_ADMIN", value: "Super Admins" },
@@ -73,15 +40,48 @@ const AUDIENCE_TYPE = [
 ];
 
 const getAudienceType = (id) => {
-  return AUDIENCE_TYPE.find((a) => a.id === id).value
-}
-
-
+  return AUDIENCE_TYPE.find((a) => a.id === id).value;
+};
 
 function SendMessage({ classes, communities, users, ...props }) {
   const [currentFilter, setCurrentFilter] = useState("SUPER_ADMIN");
-  const [usersQuery, setQuery] = useState({ audience_type: "SUPER_ADMIN", sub_audience_type: "ALL" });
+  const [usersQuery, setQuery] = useState({});
   const [open, setOpen] = React.useState(false);
+  const [selectedCommunities, setSelectedCommunities] = React.useState([]);
+  const [audience, setAudience] = React.useState([]);
+  const [sub_audience_type, setSubAudienceType] = React.useState("ALL");
+
+  const UrlParams = useParams();
+
+  useEffect(() => {
+    setSelectedCommunities([]);
+    setAudience([]);
+  }, [currentFilter]);
+
+  useEffect(() => {
+    const { id } = UrlParams;
+    if (!id) return;
+
+    if (props?.messages === LOADING) return;
+    let message = (props.messages || [])?.filter(
+      (m) => m.id?.toString() === id?.toString()
+    )[0];
+    if (message) {
+      let {
+        audience_type,
+        sub_audience_type,
+        audience,
+        community_ids,
+      } = message?.schedule_info?.recipients;
+      setCurrentFilter(audience_type);
+      setSubAudienceType(sub_audience_type);
+      setQuery({
+        message: message?.body,
+        subject: message?.title,
+      });
+      fetchListOfAudience(audience, community_ids, audience_type);
+    }
+  }, [UrlParams?.id, props?.messages]);
 
   const SUB_AUDIENCE_TYPE = [
     { id: "ALL", value: "All" },
@@ -89,15 +89,32 @@ function SendMessage({ classes, communities, users, ...props }) {
     { id: "SPECIFIC", value: `Specific ${getAudienceType(currentFilter)}` },
   ];
 
+  if (props?.messages === LOADING) return <Loading />;
 
-  useEffect(() => {
-    setQuery({
-      ...usersQuery,
-      audience:[],
-      sub_audience_type:"ALL"
-    })
-    
-  }, [currentFilter]);
+  const fetchListOfAudience = (audience_ids, community_id, audience_type) => {
+    if (community_id) {
+      apiCall("/communities.listForCommunityAdmin", {
+        community_ids: community_id?.split(","),
+      }).then((res) => {
+        if (res?.success) {
+          setSelectedCommunities(res?.data);
+        }
+      });
+    }
+
+    if (!isAll(audience_ids)) {
+      let args = ["COMMUNITY_CONTACTS"].includes(audience_type)
+        ? { community_ids: audience_ids }
+        : { user_ids: audience_ids };
+      if (audience_ids) {
+        apiCall(getEndpoint(audience_type), args).then((res) => {
+          if (res?.success) {
+            setAudience(res?.data);
+          }
+        });
+      }
+    }
+  };
 
   const buildQuery = (name, item) => {
     const obj = { ...usersQuery, [name]: item };
@@ -108,6 +125,12 @@ function SendMessage({ classes, communities, users, ...props }) {
     return usersQuery[name] || _default;
   };
 
+  const getEndpoint = (audience_type = currentFilter) => {
+    if (audience_type === "COMMUNITY_CONTACTS")
+      return "/communities.listForCommunityAdmin";
+    return "/users.listForSuperAdmin";
+  };
+
   const toggleMembership = () => {
     if (currentFilter === "SUPER_ADMIN") return ["Super Admin"];
     else if (currentFilter === "COMMUNITY_ADMIN") return ["Community Admin"];
@@ -116,28 +139,47 @@ function SendMessage({ classes, communities, users, ...props }) {
     return ["Member"];
   };
 
+  const isAll = (item) => {
+    if (!item) return false;
+    if (item?.includes("all")) return true;
+    return false;
+  };
+
   const onFormSubmit = (data = usersQuery) => {
     data = {
       ...data,
-      audience: currentFilter==="COMMUNITY_CONTACTS" ? data?.audience: data?.audience?.map((a)=>a.id),
+      audience: isAll(audience) ? audience : audience?.map((a) => a.id),
+      community_ids: selectedCommunities?.length ? selectedCommunities?.map((a) => a.id): null,
+      audience_type:currentFilter,
+      sub_audience_type: sub_audience_type,
+    };
+    if(UrlParams?.id){
+      data.id = UrlParams.id;
     }
     apiCall("/messages.send", data).then((res) => {
       console.log("== res ===", res);
+      if (res?.success) {
+        setOpen(false);
+        props.history.push(
+          data?.schedule
+            ? "/admin/scheduled/messages"
+            : "/admin/read/community-admin-messages"
+        );
+      }
       setOpen(false);
     });
   };
-
   const renderSubAudience = () => {
     if (["COMMUNITY_ADMIN", "USERS"].includes(currentFilter)) {
       return (
         <div>
           <FormLabel component="label">{"Filter Down the Audience"}</FormLabel>
           <RadioGroup
-            value={getValue("sub_audience_type", "")}
+            value={sub_audience_type}
             style={{ display: "flex", flexDirection: "row" }}
             onChange={(ev) => {
               const value = ev.target.value;
-              buildQuery("sub_audience_type", value);
+              setSubAudienceType(value);
             }}
           >
             {SUB_AUDIENCE_TYPE.map((option) => (
@@ -173,11 +215,11 @@ function SendMessage({ classes, communities, users, ...props }) {
       <>
         <FormLabel component="label">{"Communities"}</FormLabel>
         <LightAutoComplete
-          defaultSelected={getValue("community", []) || []}
+          defaultSelected={selectedCommunities || []}
           multiple={true}
           isAsync={true}
           endpoint={"/communities.listForSuperAdmin"}
-          onChange={(selected) => buildQuery("community", selected)}
+          onChange={(selected) => setSelectedCommunities(selected)}
           data={[]}
           labelExtractor={(item) => item?.name}
           valueExtractor={(item) => item?.id}
@@ -188,54 +230,33 @@ function SendMessage({ classes, communities, users, ...props }) {
   };
 
   const renderAudienceForm = () => {
-    let community = getValue("community", []);
-    let {sub_audience_type} = usersQuery
-    if(sub_audience_type === "FROM_COMMUNITY" && community?.length > 0) {
+    let community = selectedCommunities || [];
+    if (sub_audience_type === "FROM_COMMUNITY" && community?.length > 0) {
       community = community?.map((c) => c.name);
     }
-
-    if (currentFilter === "COMMUNITY_CONTACTS") 
-      return (
-          <div>
-            <MEDropdown
-              onItemSelected={(selected) => buildQuery("audience", selected)}
-              value={getValue("audience", [])}
-              smartDropdown={false}
-              multiple
-              allowClearAndSelectAll
-              labelExtractor={(item) => item?.name}
-              valueExtractor={(item) => item?.id}
-              data={(communities || [])}
-              placeholder="Select communities"
-            />
-          </div>
-      );
-
- 
     return (
       <>
         <FormLabel component="label">{"Audience"}</FormLabel>
         <LightAutoComplete
-          defaultSelected={getValue("audience", []) || []}
+          defaultSelected={audience || []}
           multiple={true}
           isAsync={true}
-          endpoint={"/users.listForSuperAdmin"}
+          endpoint={getEndpoint()}
           params={{ membership: toggleMembership(), community }}
-          onChange={(selected) =>{
-            console.log("=== selected ===", selected)
-             buildQuery("audience", selected);
-          }}
+          onChange={(selected) => setAudience(selected)}
           data={[]}
-          labelExtractor={(item) => item?.full_name}
+          labelExtractor={(item) => item?.full_name || item?.name}
           valueExtractor={(item) => item?.id}
           placeholder="Select audience"
+          selectAllV2={true}
+          key={currentFilter}
         />
       </>
     );
   };
 
   const renderAudienceList = () => {
-    const {sub_audience_type} = usersQuery
+    // const {sub_audience_type} = usersQuery
     if (["SUPER_ADMIN", "COMMUNITY_CONTACTS"].includes(currentFilter)) {
       return renderAudienceForm();
     }
@@ -243,9 +264,9 @@ function SendMessage({ classes, communities, users, ...props }) {
       return renderAudienceForm();
     }
 
-    if(sub_audience_type === "FROM_COMMUNITY") {
+    if (sub_audience_type === "FROM_COMMUNITY") {
       return renderFromCommunities();
-    } 
+    }
   };
 
   return (
@@ -373,6 +394,8 @@ const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   communities: state.getIn(["communities"]),
   users: state.getIn(["allUsers"]),
+  sadmins: state.getIn(["sadmins"]),
+  messages: state.getIn(["scheduledMessages"]),
 });
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators({}, dispatch);
