@@ -24,8 +24,10 @@ function MediaLibrary(props) {
     images,
     defaultTab,
     dragToOrder,
+    floatingMode,
+    passedNotification,
   } = props;
-  const [show, setShow] = useState(openState);
+  const [show, setShow] = useState(false);
   const [imageTray, setTrayImages] = useState([]);
   const [state, setState] = useState({});
   const [hasMounted, setHasMountedTo] = useState(undefined);
@@ -34,6 +36,8 @@ function MediaLibrary(props) {
   const [currentTab, setCurrentTab] = useState(defaultTab);
   const [files, setFiles] = useState([]); // all files that have been selected from user's device [Schema: {id, file}]
   const [croppedSource, setCroppedSource] = useState();
+  const [notification, setNotification] = useState(null); // just used to communicate when the mlib is working on something(that isnt the typical 'loading' state), and the user needs to be updated
+
   // --------------------------------------------------
   const oldPosition = useRef(null);
   const newPosition = useRef(null);
@@ -71,6 +75,10 @@ function MediaLibrary(props) {
   };
 
   useEffect(() => {
+    setShow(openState);
+  }, [openState]);
+
+  useEffect(() => {
     const isMountingForTheFirstTime = hasMounted === undefined;
     if (!onStateChange || isMountingForTheFirstTime) return;
     onStateChange({ show, state });
@@ -78,32 +86,18 @@ function MediaLibrary(props) {
 
   useEffect(() => {
     setHasMountedTo(true);
-    const preSelected = (selected || []).map((img) => {
-      if (typeof img === "number") {
-        // Sometimes, default values for the media library comes in the form of Ids, instead of objects. When that happens, use the Ids to find teh real objects
-        const found = (images || []).find((im) => im.id === img);
-        return found || {};
-      }
-      return img;
-    });
-    setTrayImages(preSelected);
+    const imagesMap = new Map(images.map((item) => [item.id, item]));
+    const selectedAndExists =
+      selected?.map((item) => imagesMap.get(item.id)).filter(Boolean) || [];
+    setTrayImages(selectedAndExists);
   }, [images, selected]);
 
-  useEffect(() => {}, [cropped]);
+  // useEffect(() => {}, [cropped]);
 
-  const preselectDefaultImages = () => {
-    if (!selected || !selected.length) return images;
-    var bank = (images || []).map((img) => img.id);
-    // sometimes an image that is preselected, my not be in the library's first load
-    // in that case just add it to the library's list
-    var isNotThere = selected.filter((img) => {
-      if (typeof img === "number") return !bank.includes(img);
-      return !bank.includes(img.id);
-    });
-    if (!isNotThere.length) return images;
+  useEffect(() => {
+    setNotification(passedNotification);
+  }, [passedNotification]);
 
-    return [...isNotThere, ...images];
-  };
   const close = () => {
     setShow(false);
     setFiles([]);
@@ -131,7 +125,9 @@ function MediaLibrary(props) {
         >
           <MediaLibraryModal
             {...props}
-            images={preselectDefaultImages()}
+            notification={notification}
+            setNotification={setNotification}
+            // images={addPreselectedImagesToList()}
             close={close}
             getSelected={handleSelected}
             selected={imageTray}
@@ -150,54 +146,56 @@ function MediaLibrary(props) {
         </div>
       )}
 
-      <div
-        style={{
-          width: "100%",
-          minHeight: 380,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          border: "dashed 2px #e3e3e3",
-          borderRadius: 10,
-          marginBottom: 20,
-          padding: 20,
-        }}
-      >
-        {!imageTray || imageTray.length === 0 ? (
-          <img src={libraryImage} style={{ height: 150 }} />
-        ) : (
-          <ImageTray
-            sourceExtractor={sourceExtractor}
-            content={imageTray}
-            remove={remove}
-            multiple={multiple}
-            dragToOrder={dragToOrder}
-            oldPosition={oldPosition}
-            newPosition={newPosition}
-            swapPositions={swapPositions}
-
-            // switchToCropping={switchToCropping}
-          />
-        )}
-
+      {!floatingMode && (
         <div
-          onClick={(e) => {
-            e.preventDefault();
-            setShow(true);
-          }}
-          className={`ml-footer-btn `}
           style={{
-            "--btn-color": "white",
-            "--btn-background": "green",
-            borderRadius: 5,
-            marginTop: 20,
-            padding: "15px 40px",
+            width: "100%",
+            minHeight: 380,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            border: "dashed 2px #e3e3e3",
+            borderRadius: 10,
+            marginBottom: 20,
+            padding: 20,
           }}
         >
-          {actionText}
+          {!imageTray || imageTray.length === 0 ? (
+            <img src={libraryImage} style={{ height: 150 }} />
+          ) : (
+            <ImageTray
+              sourceExtractor={sourceExtractor}
+              content={imageTray}
+              remove={remove}
+              multiple={multiple}
+              dragToOrder={dragToOrder}
+              oldPosition={oldPosition}
+              newPosition={newPosition}
+              swapPositions={swapPositions}
+
+              // switchToCropping={switchToCropping}
+            />
+          )}
+
+          <div
+            onClick={(e) => {
+              e.preventDefault();
+              setShow(true);
+            }}
+            className={`ml-footer-btn `}
+            style={{
+              "--btn-color": "white",
+              "--btn-background": "green",
+              borderRadius: 5,
+              marginTop: 20,
+              padding: "15px 40px",
+            }}
+          >
+            {actionText}
+          </div>
         </div>
-      </div>
+      )}
     </React.Fragment>
   );
 }
@@ -405,6 +403,11 @@ MediaLibrary.propTypes = {
    * A function that should return a tooltip component.
    */
   TooltipWrapper: PropTypes.string,
+  /**
+   * In some situations, the tray images that display when a user has inserted an images from the mlibrary, is not needed. Typical example is how mlib is being used in TinyMCE
+   * So, this value is used to toggle the image tray ON/OFF. (true = No image Tray)
+   */
+  floatingMode: PropTypes.bool,
 };
 
 MediaLibrary.Button = MLButton;
@@ -432,5 +435,6 @@ MediaLibrary.defaultProps = {
   compressedQuality: IMAGE_QUALITY.MEDIUM.key,
   maximumImageSize: DEFFAULT_MAX_SIZE,
   renderBeforeImages: null,
+  floatingMode: false,
 };
 export default MediaLibrary;

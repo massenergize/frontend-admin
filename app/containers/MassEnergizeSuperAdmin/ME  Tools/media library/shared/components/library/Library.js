@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 
 import ImageThumbnail from "../thumbnail/ImageThumbnail";
 import { blank, DEFAULT_FILE_LIMIT } from "../../utils/values";
-import { LoadMoreContainer } from "../../../../../Gallery/Gallery";
 import { ProgressCircleWithLabel } from "../../../../../Gallery/utils";
 
 function Library({
@@ -13,7 +12,7 @@ function Library({
   setShowSidePane,
   images,
   sourceExtractor,
-  loadMoreFunction,
+  // loadMoreFunction,
   loadingMore,
   limited,
   shouldWait,
@@ -57,24 +56,27 @@ function Library({
 
   if (!images || images.length == 0) {
     return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          height: "100%",
-          marginTop: "10%",
-        }}
-      >
-        <img src={blank} style={{ height: 180 }} />
-        <p style={{ color: "grey" }}>No images available to choose from</p>
+      <div style={{ overflowY: "scroll" }}>
+        {renderBeforeImages()}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            height: "100%",
+            marginTop: "10%",
+          }}
+        >
+          <img src={blank} style={{ height: 180 }} />
+          <p style={{ color: "grey" }}>No images available to choose from</p>
+        </div>
       </div>
     );
   }
   return (
     <div>
-      {renderBeforeImages}
+      {renderBeforeImages()}
       {fileLimit && (
         <div style={{ padding: "10px 25px", fontWeight: "bold" }}>
           <small>
@@ -104,7 +106,7 @@ function Library({
           );
         })}
       </div>
-      {!limited && (
+      {/* {!limited && (
         <div className="" style={{ width: "100%", textAlign: "center" }}>
           <LoadMoreContainer
             loading={loadingMore}
@@ -112,7 +114,7 @@ function Library({
             loadMoreFunction={loadMoreFunction}
           />
         </div>
-      )}
+      )} */}
     </div>
   );
 }

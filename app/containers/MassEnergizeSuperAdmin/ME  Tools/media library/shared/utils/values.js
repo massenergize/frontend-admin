@@ -20,8 +20,8 @@ export const TABS = {
   UPLOAD_TAB: "upload",
   LIBRARY_TAB: "library",
   CROPPING_TAB: "crop",
+  // UPLOAD_FORM: "upload-form",
 };
-
 
 export const IMAGE_QUALITY = {
   LOW: { key: "LOW", value: 0.2 },
@@ -31,4 +31,24 @@ export const IMAGE_QUALITY = {
 
 export const DEFAULT_FILE_LIMIT = 10; // There is no significant reason for 10 as the default number. We can change it to anything later...
 
-export const DEFFAULT_MAX_SIZE = 1500000 // like 1.5MB
+export const DEFFAULT_MAX_SIZE = 1500000; // like 1.5MB
+
+export const PUB_MODES = { OPEN: "OPEN", OPEN_TO: "OPEN_TO" };
+export const COPYRIGHT_OPTIONS = {
+  YES: {
+    value: true,
+    key: "YES",
+    notes:
+      "Took the photo or made the image, or was given permission by the person who made the image",
+  },
+  YES_CHECKED: {
+    value: true,
+    key: "YES_CHECKED",
+    notes: "Checked that the image is not copyright protected",
+  },
+  NO: {
+    value: false,
+    key: "NO",
+    notes: "Image may be protected by copyright, and I don't have permission",
+  },
+};

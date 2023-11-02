@@ -17,26 +17,36 @@ function MEDropdown(props) {
     valueExtractor,
     onItemSelected,
     multiple,
-    data,
+    // data,
     placeholder,
     defaultValue,
     value,
     generics,
     fullControl = false,
+    name,
+    allowClearAndSelectAll,
+    smartDropdown = true,
     ...rest
   } = props;
-  const [selected, setSelected] = useState(defaultValue || value || []);
-  const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
-    const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
+  const [dropOpen, setOpenDropdown] = useState(false);
+  const [selected, setSelected] = useState([]);
+  const [optionsToDisplay, setOptionsToDisplay] = useState([]);
+  const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
+
+  const isAll = (item) => {
+    return typeof item === "string" && item?.toLowerCase() === "all";
+  };
   const valueOf = (item) => {
     if (!item) return;
+    if (multiple && isAll(item)) return "all";
     if (valueExtractor) return valueExtractor(item);
     return (item && item.name) || (item && item.toString());
   };
-
   useEffect(() => {
     setSelected(defaultValue || value || []);
   }, [defaultValue, value]);
+
+  useEffect(() => setOptionsToDisplay(props.data), [props.data]);
 
   // -------------------------------------------------------------------
   if (fullControl) return <MEDropdownPro {...props} />;
@@ -48,27 +58,29 @@ function MEDropdown(props) {
       elementObserver.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && cursor.has_more) {
           if (!rest?.endpoint) return;
-          apiCall(rest?.endpoint, { page: cursor.next,limit: 10,}).then((res) => {
-            setCursor({
-              has_more: res?.cursor?.count > optionsToDisplay?.length,
-              next: res?.cursor?.next,
-            });
-            let items = [
-              ...optionsToDisplay,
-              ...(res?.data || [])?.map((item) => {
-                return {
-                  ...item,
-                  displayName: labelExtractor
-                    ? labelExtractor(item)
-                    : item?.name || item?.title,
-                };
-              }),
-            ];
+          apiCall(rest?.endpoint, { page: cursor.next, limit: 10 }).then(
+            (res) => {
+              setCursor({
+                has_more: res?.cursor?.count > optionsToDisplay?.length,
+                next: res?.cursor?.next,
+              });
+              let items = [
+                ...optionsToDisplay,
+                ...(res?.data || [])?.map((item) => {
+                  return {
+                    ...item,
+                    displayName: labelExtractor
+                      ? labelExtractor(item)
+                      : item?.name || item?.title,
+                  };
+                }),
+              ];
 
-            setOptionsToDisplay([
-              ...new Map(items.map((item) => [item["id"], item])).values(),
-            ]);
-          });
+              setOptionsToDisplay([
+                ...new Map(items.map((item) => [item["id"], item])).values(),
+              ]);
+            }
+          );
         }
       });
 
@@ -78,12 +90,12 @@ function MEDropdown(props) {
   );
   // -------------------------------------------------------------------
   // Always switch dropdown to auto complete dropdown if there are a lot of items. A lot = (>20 items)
-  if (optionsToDisplay && optionsToDisplay.length > 20) {
+  if (smartDropdown && optionsToDisplay && optionsToDisplay.length > 20) {
     return (
       <LightAutoComplete
         onChange={(items) => {
           items = (items || []).map((a) => valueExtractor(a));
-          onItemSelected(items);
+          onItemSelected && onItemSelected(items);
         }}
         {...props}
       />
@@ -93,9 +105,10 @@ function MEDropdown(props) {
 
   // -------------------------------------------------------------------
 
-
   const labelOf = (item, fromValue) => {
+    const data = optionsToDisplay;
     if (!item) return;
+    if (multiple && isAll(item)) return "All";
     if (fromValue) {
       item = (data || []).find((it) => valueOf(it) === item);
     }
@@ -110,10 +123,10 @@ function MEDropdown(props) {
       if (onItemSelected) onItemSelected(items);
       return setSelected(items);
     }
-
+    const first = selected[0];
     const [found, rest] = pop(selected, valueOf(item));
     if (found) items = rest;
-    else items = [...rest, valueOf(item)];
+    else items = [...(isAll(first) ? [] : rest), valueOf(item)];
     setSelected(items);
     if (onItemSelected) return onItemSelected(items);
   };
@@ -122,38 +135,38 @@ function MEDropdown(props) {
     const found = (selected || []).find((it) => it === item);
     return found;
   };
-  return (
-    <FormControl
-      style={{ width: "100%", marginTop: 10, ...(containerStyle || {}) }}
-    >
-      {placeholder && <FormLabel component="legend">{placeholder}</FormLabel>}
-      <Select
-        {...generics || {}}
-        className="me-drop-override"
-        multiple={multiple}
-        displayEmpty
-        renderValue={(itemsToDisplay) => (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              flexWrap: "wrap",
-            }}
-          >
-            {itemsToDisplay.map((item, id) => (
-              <Chip
-                key={id.toString()}
-                label={labelOf(item, true)}
-                style={{ margin: 5 }}
-              />
-            ))}
-          </div>
-        )}
-        value={selected || []}
+  const allOrNothing = ({ nothing }) => {
+    if (nothing) {
+      setSelected([]);
+      onItemSelected([]);
+      return;
+    }
+    setSelected(["all"]);
+    onItemSelected(["all"]);
+  };
+
+  const renderSpotlight = () => {
+    const { spotlightExtractor, spotlightText } = props;
+    if (!spotlightExtractor) return <></>;
+    const itemsInSpotlight = optionsToDisplay?.filter(spotlightExtractor);
+    return (
+      <div
+        style={{
+          border: "solid 0px #f6f6f6fc",
+          borderBottomWidth: 2,
+        }}
       >
-        {(optionsToDisplay || []).map((d, i) => {
+        {spotlightText && (
+          <Typography
+            variant="body2"
+            style={{ padding: "10px 20px", color: "grey" }}
+          >
+            {spotlightText}
+          </Typography>
+        )}
+        {itemsInSpotlight.map((d, i) => {
           return (
-            <MenuItem key={i} ref={(i === optionsToDisplay.length - 1) && rest?.isAsync ? lastDropDownItemRef:null}>
+            <MenuItem key={i}>
               <FormControlLabel
                 onClick={() => handleOnChange(d)}
                 key={i}
@@ -175,8 +188,162 @@ function MEDropdown(props) {
             </MenuItem>
           );
         })}
-      </Select>
-    </FormControl>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <FormControl
+        key={name || "me-dropdown"}
+        style={{ width: "100%", marginTop: 10, ...(containerStyle || {}) }}
+      >
+        {placeholder && <FormLabel component="legend">{placeholder}</FormLabel>}
+        <Select
+          {...generics || {}}
+          open={dropOpen}
+          onOpen={() => setOpenDropdown(true)}
+          onClose={() => setOpenDropdown(false)}
+          className="me-drop-override"
+          multiple={multiple}
+          displayEmpty
+          renderValue={(itemsToDisplay) => (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                flexWrap: "wrap",
+              }}
+            >
+              {itemsToDisplay.map((item, id) => {
+                return (
+                  <Chip
+                    key={id.toString()}
+                    label={labelOf(item, true)}
+                    style={{ margin: 5 }}
+                  />
+                );
+              })}
+            </div>
+          )}
+          value={selected || []}
+        >
+          {allowClearAndSelectAll && multiple && (
+            <div
+              style={{
+                border: "solid 0px #f6f6f6fc",
+                padding: "15px 20px",
+                borderBottomWidth: 2,
+              }}
+            >
+              <a
+                onClick={(e) => {
+                  e.preventDefault();
+                  allOrNothing({});
+                  setOpenDropdown(false);
+                }}
+                href="#"
+                style={{ marginRight: 15, fontWeight: "bold", color: "black" }}
+              >
+                Select All{" "}
+              </a>
+              {selected?.length ? (
+                <a
+                  onClick={(e) => {
+                    e.preventDefault();
+                    allOrNothing({ nothing: true });
+                  }}
+                  href="#"
+                  style={{ color: "#ca1f1f", fontWeight: "bold" }}
+                >
+                  Clear All{" "}
+                </a>
+              ) : (
+                <></>
+              )}
+            </div>
+          )}
+
+          {renderSpotlight()}
+          {(optionsToDisplay || []).map((d, i) => {
+            const { spotlightExtractor } = props;
+            if (spotlightExtractor && spotlightExtractor(d)) return <></>;
+            return (
+              <MenuItem
+                key={i}
+                ref={
+                  i === optionsToDisplay.length - 1 && rest?.isAsync
+                    ? lastDropDownItemRef
+                    : null
+                }
+              >
+                <FormControlLabel
+                  onClick={() => handleOnChange(d)}
+                  key={i}
+                  control={
+                    multiple ? (
+                      <Checkbox
+                        checked={itemIsSelected(valueOf(d))}
+                        value={valueOf(d)}
+                        name={labelOf(d)}
+                      />
+                    ) : (
+                      <Typography style={{ padding: "7px 15px" }}>
+                        {labelOf(d)}
+                      </Typography>
+                    )
+                  }
+                  label={multiple ? labelOf(d) : ""}
+                />
+              </MenuItem>
+            );
+          })}
+        </Select>
+      </FormControl>
+      {/* {allowClearAndSelectAll && multiple && (
+        <div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              padding: "3px 0px",
+              fontSize: "0.87rem",
+            }}
+          >
+            <span
+              onClick={() => allOrNothing({})}
+              className={`touchable-opacity`}
+              style={{
+                marginRight: 15,
+                textDecoration: "underline",
+                fontWeight: "bold",
+                // color: "var(--app-purple)",
+              }}
+            >
+              {" "}
+              Select All
+            </span>
+            {selected?.length ? (
+              <span
+                className={` touchable-opacity`}
+                style={{
+                  textDecoration: "underline",
+                  fontWeight: "bold",
+                  color: "#c74d4d",
+                }}
+                onClick={() => allOrNothing({ nothing: true })}
+              >
+                Clear All
+              </span>
+            ) : (
+              <></>
+            )}
+          </div>
+     
+        </div>
+      )} */}
+    </>
   );
 }
 
@@ -184,5 +351,6 @@ export default MEDropdown;
 
 MEDropdown.defaultValues = {
   multiple: false,
+  allowClearAndSelectAll: false,
   placeholder: "Enter placeholder text for your dropdown",
 };

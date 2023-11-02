@@ -214,7 +214,7 @@ class AllCommunities extends React.Component {
   }
 
   nowDelete({ idsToDelete, data }) {
-    const { communities, putCommunitiesInRedux } = this.props;
+    const { communities, putCommunitiesInRedux, putMetaDataToRedux, meta } = this.props;
     const ids = [];
     /**
      * TODO: We should probably let the backend accept an array of items to remove instead of looping api calls....
@@ -224,6 +224,13 @@ class AllCommunities extends React.Component {
       ids.push(communityId);
       apiCall("/communities.delete", { community_id: communityId }).then(response => {
         if(response.success){
+                    putMetaDataToRedux({
+                      ...meta,
+                      ["communities"]: {
+                        ...meta["communities"],
+                        count: meta["communities"].count - 1,
+                      },
+                    });
           this.props.toggleToast({
             open: true,
             message:"Community successfully deleted",

@@ -109,7 +109,7 @@ class AllUsers extends React.Component {
       getHumanFriendlyDate(d.joined),
       d.preferred_name,
       d.email,
-      smartString(d.communities.join(", "), 30),
+      d.communities,
       d.is_super_admin
         ? "Super Admin"
         : d.is_community_admin
@@ -124,102 +124,132 @@ class AllUsers extends React.Component {
   getColumns = (classes) => {
     const { auth, communities } = this.props;
     return [
-    {
-      name: "Full Name",
-      key: "full_name",
-      options: {
-        filter: false,
-      },
-    },
-    {
-      name: "Last Visited",
-      key: "last-visited",
-      options: {
-        filter: false,
-        download: false,
-        customBodyRender: (d) => {
-          const { id, user_portal_visits } = d || {};
-          const isOneRecord = user_portal_visits?.length === 1;
-          const isEmpty = !user_portal_visits?.length;
-
-          if (isEmpty) return <span>-</span>;
-
-          const log = getHumanFriendlyDate(user_portal_visits[0], false, true);
-
-          if (isOneRecord) return <span>{log}</span>;
-
-          return (
-            <Link
-              onClick={(e) => {
-                e.preventDefault();
-                this.showVisitRecords(id);
-              }}
-            >
-              <span>{log}...</span>
-            </Link>
-          );
+      {
+        name: "Full Name",
+        key: "full_name",
+        options: {
+          filter: false,
         },
       },
-    },
-    {
-      name: "Joined",
-      key: "joined",
-      options: {
-        filter: false,
-        filterType: "textField",
-      },
-    },
-    {
-      name: "Preferred Name",
-      key: "preferred_name",
-      options: {
-        filter: false,
-      },
-    },
-    {
-      name: "Email",
-      key: "email",
-      options: {
-        filter: false,
-        filterType: "multiselect",
-      },
-    },
-    {
-      name: "Community",
-      key: "community",
-      options: auth?.is_super_admin
-        ? CustomOptions({
-            data: communities,
-            label: "community",
-            endpoint: "/communities.listForSuperAdmin",
-          })
-        : {
-            filter: true,
-            filterType: "multiselect",
-          },
-    },
-    {
-      name: "Membership",
-      key: "status",
-      options: {
-        filter: true,
-      },
-    },
+      {
+        name: "Last Visited",
+        key: "last-visited",
+        options: {
+          filter: false,
+          download: false,
+          customBodyRender: (d) => {
+            const { id, user_portal_visits } = d || {};
+            const isOneRecord = user_portal_visits?.length === 1;
+            const isEmpty = !user_portal_visits?.length;
 
-    {
-      name: "id",
-      key: "id",
-      options: {
-        filter: false,
-        display: false,
-        download: false,
+            if (isEmpty) return <span>-</span>;
+
+            const log = getHumanFriendlyDate(
+              user_portal_visits[0],
+              false,
+              true
+            );
+
+            if (isOneRecord) return <span>{log}</span>;
+
+            return (
+              <Link
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.showVisitRecords(id);
+                }}
+              >
+                <span>{log}...</span>
+              </Link>
+            );
+          },
+        },
       },
-    },
-  ]
-}
+      {
+        name: "Joined",
+        key: "joined",
+        options: {
+          filter: false,
+          filterType: "textField",
+        },
+      },
+      {
+        name: "Preferred Name",
+        key: "preferred_name",
+        options: {
+          filter: false,
+        },
+      },
+      {
+        name: "Email",
+        key: "email",
+        options: {
+          filter: false,
+          filterType: "multiselect",
+        },
+      },
+      {
+        name: "Community",
+        key: "community",
+        options: auth?.is_super_admin
+          ? CustomOptions({
+              data: communities,
+              label: "community",
+              endpoint: "/communities.listForSuperAdmin",
+              customBodyRender: (d) => {
+                if (d?.length > 1) {
+                  return (
+                    <span
+                      className="user-community-item"
+                      onClick={() => this.showAllCommunities(d)}
+                    >
+                      {smartString(d.join(", "), 30)}
+                    </span>
+                  );
+                }
+                return <span>{smartString(d.join(", "), 30)}</span>;
+              },
+            })
+          : {
+              filter: true,
+              filterType: "multiselect",
+              customBodyRender: (d) => {
+                if (d?.length > 1) {
+                  return (
+                    <span
+                      className="user-community-item"
+                      onClick={() => this.showAllCommunities(d)}
+                    >
+                      {smartString(d.join(", "), 30)}
+                    </span>
+                  );
+                }
+                return <span>{smartString(d.join(", "), 30)}</span>;
+              },
+            },
+      },
+      {
+        name: "Membership",
+        key: "status",
+        options: {
+          filter: true,
+        },
+      },
+
+      {
+        name: "id",
+        key: "id",
+        options: {
+          filter: false,
+          display: false,
+          download: false,
+        },
+      },
+    ];
+  };
 
   nowDelete({ idsToDelete, data }) {
-    const { allUsers, putUsersInRedux } = this.props;
+    const { allUsers, putUsersInRedux, putMetaDataToRedux, meta } = this.props;
     const itemsInRedux = allUsers || [];
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][7];
@@ -232,6 +262,13 @@ class AllUsers extends React.Component {
           });
           const rem = (itemsInRedux || []).filter((com) => com?.id !== found);
           putUsersInRedux(rem);
+          putMetaDataToRedux({
+            ...meta,
+            ["users"]: {
+              ...meta["users"],
+              count: meta["users"].count - 1,
+            },
+          });
         } else {
           this.props.toggleToast({
             open: true,
@@ -253,6 +290,26 @@ class AllUsers extends React.Component {
         {len === 1 ? " user? " : " users? "}
       </Typography>
     );
+  }
+
+  showAllCommunities(communities) {
+    const { toggleModal } = this.props;
+    toggleModal({
+      show: true,
+      component: this.renderFullCommunitiesList(communities),
+      onConfirm: () => toggleModal({ show: false, component: null }),
+      closeAfterConfirmation: true,
+      title: "Full Communities List",
+      noTitle: false,
+      noCancel: true,
+      okText: "Close",
+    });
+  }
+
+  renderFullCommunitiesList = (communities)=>{
+    return communities.map((d, index)=>{
+      return <p>{index+1}. {d}</p>
+    })
   }
 
   showVisitRecords(id) {
