@@ -25,9 +25,14 @@ const FILTERS = {
   WITH_KEYWORDS: { key: "keywords" },
   FROM_OTHER_ADMINS: { key: "user_ids" },
   BY_COMMUNITY: { key: "target_communities" },
+  PUBLIC: { key: "public" },
 };
 
-const NO_MOD_LIST = [FILTERS.MOST_RECENT.key, FILTERS.MY_UPLOADS.key];
+const NO_MOD_LIST = [
+  FILTERS.MOST_RECENT.key,
+  FILTERS.MY_UPLOADS.key,
+  FILTERS.PUBLIC.key,
+];
 export const FilterBarForMediaLibrary = ({
   auth,
   communities,
@@ -88,6 +93,8 @@ export const FilterBarForMediaLibrary = ({
     const body = requestBody();
     setLoading(true);
     const readyForBackend = forBackend(body);
+
+    console.log("lets see ready for backendt", readyForBackend);
     fetchWithQuery(readyForBackend, (data, failed) => {
       setLoading(false);
       if (failed) return;
@@ -136,91 +143,94 @@ export const FilterBarForMediaLibrary = ({
     );
   }, []);
 
+  const makeDefaults = () => {
+    let forAdminField = [];
+    let byCommunities = [];
+    if (isCommunityAdmin) {
+      forAdminField = [auth?.id];
+      byCommunities = ["all"];
+    } else {
+      forAdminField = ["all"];
+      byCommunities = ["all"];
+    }
+    return { forAdminField, byCommunities };
+  };
   useEffect(() => {
-    setCurrentFilter(filters?.currentFilter || FILTERS.MOST_RECENT.key);
+    if (isCommunityAdmin)
+      setCurrentFilter(filters?.currentFilter || FILTERS.MOST_RECENT.key);
+    else setCurrentFilter(filters?.currentFilter || FILTERS.BY_COMMUNITY.key);
     setQuery(filters?.usersQuery || { most_recent: true });
     setQueryStash(filters?.queryStash || null);
+
+    const { forAdminField, byCommunities } = makeDefaults();
+    setQuery({
+      ...usersQuery,
+      [FILTERS.FROM_OTHER_ADMINS.key]: forAdminField,
+      [FILTERS.BY_COMMUNITY.key]: byCommunities,
+    });
   }, []);
 
   useEffect(() => {
     keepFiltersInRedux({ ...filters, usersQuery, currentFilter, queryStash });
   }, [queryStash, usersQuery, currentFilter]);
-
-  useEffect(() => {
-    setCurrentFilter(filters?.currentFilter || FILTERS.MOST_RECENT.key);
-    setQuery(filters?.usersQuery || { most_recent: true });
-    setQueryStash(filters?.queryStash || null);
-  }, []);
-
-  useEffect(() => {
-    keepFiltersInRedux({ ...filters, usersQuery, currentFilter, queryStash });
-  }, [queryStash, usersQuery, currentFilter]);
-
-  useEffect(() => {
-    if (!otherAdminsFromRedux) return;
-    const values = Object.values(otherAdminsFromRedux);
-    if (!values?.length) return;
-    const asList = values?.map((group) => group.members || {});
-    let data = Object.assign({}, ...asList);
-    data = Object.values(data);
-    data = sortByField(data, "full_name");
-    setOtherAdmins(data);
-  }, [otherAdminsFromRedux]);
-
-  useEffect(() => {
-    const otherAdminsListIsntAvailableYet =
-      otherAdminsFromRedux === !otherAdminsFromRedux ||
-      !Object.keys(otherAdminsFromRedux)?.length;
-
-    if (!otherAdminsListIsntAvailableYet) return;
-
-    const coms = getCommunitiesToSelectFrom()?.map((com) => com.id) || [];
-    findOtherAdminsInMyCommunities(
-      { community_ids: coms },
-      (_, failed, error) => {
-        if (failed) return notify(error, true);
-      }
-    );
-  }, []);
 
   useEffect(() => {
     const opts = [
-      {
-        name: "My Community (Default)",
+      isCommunityAdmin && {
+        name: "Available to my community",
         key: FILTERS.MOST_RECENT.key,
         context:
           "Uploads from any of the communities you manage. Most recent items show up first!",
       },
       {
-        name: "I Uploaded",
-        key: FILTERS.MY_UPLOADS.key,
-        context: "Items uploaded by you",
+        name: "Uploaded by Community",
+        key: FILTERS.BY_COMMUNITY.key,
+        context: "Show only community specific items",
       },
       {
-        name: "With Keywords",
+        name: "Uploaded by Admins",
+        key: FILTERS.FROM_OTHER_ADMINS.key,
+        context: "See what other admins in your community have uploaded",
+      },
+      // {
+      //   name: "Uploaded by me",
+      //   key: FILTERS.MY_UPLOADS.key,
+      //   context: "Items uploaded by you",
+      // },
+      {
+        name: "By Keywords",
         key: FILTERS.WITH_KEYWORDS.key,
         context: "Keywords that describe the image",
       },
       {
-        name: "By Admins",
-        key: FILTERS.FROM_OTHER_ADMINS.key,
-        context: "See what other admins in your community have uploaded",
-      },
-      {
-        name: "By Community",
-        key: FILTERS.BY_COMMUNITY.key,
-        context: "Show only community specific items",
+        name: "Public",
+        key: FILTERS.PUBLIC.key,
+        context: "Images that communities have made public",
       },
     ];
 
     setOptions(opts);
   }, []);
 
+  // const makeCadminOptions = () => {
+  //   let adminAt = auth?.admin_at || [];
+  //   adminAt = adminAt.map((c) => c.id);
+  //   return {
+  //     spotlightExtractor: (com) => adminAt.includes(com.id),
+  //     spotlightText: "Your Communities",
+  //   };
+  // };
   const renderContextualOptions = (currentFilter) => {
-    if (currentFilter == FILTERS.MY_UPLOADS.key)
+    // if (currentFilter == FILTERS.MY_UPLOADS.key)
+    //   return (
+    //     <Typography variant="body2" style={{ opacity: 0.6 }}>
+    //       Only shows items uploaded by you
+    //     </Typography>
+    //   );
+    if (currentFilter == FILTERS.PUBLIC.key)
       return (
         <Typography variant="body2" style={{ opacity: 0.6 }}>
-          Only shows items uploaded by you
+          Shows items that any community on the platform has marked as public
         </Typography>
       );
     if (currentFilter == FILTERS.MOST_RECENT.key)
@@ -229,7 +239,7 @@ export const FilterBarForMediaLibrary = ({
           Shows recently uploaded items across all the communities you manage
         </Typography>
       );
-    if (currentFilter === FILTERS.BY_COMMUNITY.key)
+    if (currentFilter === FILTERS.BY_COMMUNITY.key) {
       return (
         <div>
           <MEDropdown
@@ -243,9 +253,11 @@ export const FilterBarForMediaLibrary = ({
             valueExtractor={(item) => item?.id}
             data={getCommunitiesToSelectFrom()}
             placeholder="Select communities and 'Apply'"
+            // {...makeCadminOptions()}
           />
         </div>
       );
+    }
 
     if (currentFilter === FILTERS.FROM_OTHER_ADMINS.key)
       return (
@@ -255,7 +267,10 @@ export const FilterBarForMediaLibrary = ({
             value={getValue(currentFilter, [])}
             // name="from_others"
             smartDropdown={false}
-            labelExtractor={(item) => item?.full_name}
+            labelExtractor={(item) => {
+              if (item?.id === auth?.id) return item?.full_name + " (you)";
+              return item?.full_name;
+            }}
             valueExtractor={(item) => item?.id}
             multiple
             allowClearAndSelectAll
@@ -293,28 +308,31 @@ export const FilterBarForMediaLibrary = ({
               setCurrentFilter(value);
             }}
           >
-            {options.map((option) => (
-              <FormControlLabel
-                name={option.key}
-                key={option.key}
-                value={option.key}
-                control={<Radio />}
-                label={
-                  <Typography
-                    variant="body2"
-                    style={{ fontSize: "0.8rem", fontWeight: "bold" }}
-                  >
-                    <Tooltip
-                      title={option.context}
-                      placement="top"
-                      style={{ fontWeight: "bold" }}
+            {options.map((option) => {
+              if (!option.name) return <></>;
+              return (
+                <FormControlLabel
+                  name={option.key}
+                  key={option.key}
+                  value={option.key}
+                  control={<Radio />}
+                  label={
+                    <Typography
+                      variant="body2"
+                      style={{ fontSize: "0.8rem", fontWeight: "bold" }}
                     >
-                      {option.name}
-                    </Tooltip>
-                  </Typography>
-                }
-              />
-            ))}
+                      <Tooltip
+                        title={option.context}
+                        placement="top"
+                        style={{ fontWeight: "bold" }}
+                      >
+                        {option.name}
+                      </Tooltip>
+                    </Typography>
+                  }
+                />
+              );
+            })}
           </RadioGroup>
 
           {renderContextualOptions(currentFilter)}
@@ -342,9 +360,8 @@ export const FilterBarForMediaLibrary = ({
           variant="body2"
           style={{ opacity: "0.6", fontWeight: "400" }}
         >
-          Items are arranged by date. The latest items are displayed first,
-          moving from left to right in each row. Rows at the top represent more
-          recent entries compared to those further down.
+          Items are arranged by date, most recently uploaded up top. Click on an
+          image to see information about it
         </Typography>
       </div>
     </div>
@@ -391,8 +408,8 @@ const WithKeywords = ({ keywords, onChange, remove }) => {
       <TextField
         onChange={onChange}
         value={keywords}
-        label="Keywords here will be used to search image names, tags, and descriptions"
-        placeholder="Add keywords separated by commas (E.g. Solar,Sun,green-house etc)"
+        label="Add keywords separated by commas (E.g. Solar,Sun,green-house etc)"
+        placeholder="Keywords here will be used to search image names, tags, and descriptions"
         style={{ width: "100%", marginTop: 6 }}
         inputProps={{
           style: { padding: "12.5px 14px", width: "100%" },

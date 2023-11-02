@@ -440,7 +440,13 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(reduxLoadCCActions(ccActions.data.actions));
     dispatch(loadAllTags(tagCollections.data));
     dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
-    dispatch(setGalleryMetaAction({ loadMoreMeta: { query: galleryQuery } }));
+
+    dispatch(
+      setGalleryMetaAction({
+        loadMoreMeta: { query: galleryQuery },
+        ...(galleryImages?.data?.meta || {}),
+      })
+    );
     dispatch(loadTaskFunctionsAction(tasksFunctions.data));
     dispatch(loadTasksAction(tasks.data));
     dispatch(loadSettings(preferences.data || {}));
