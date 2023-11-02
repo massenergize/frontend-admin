@@ -29,7 +29,7 @@ export default function ScheduleMessageModal({
     let dateText = date?._d;
     data = {
       ...data,
-      schedule: dateText,
+      schedule: new Date(dateText).toUTCString(),
     };
     handleClose();
     onSubmit(data);

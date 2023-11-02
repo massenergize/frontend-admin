@@ -44,7 +44,7 @@ const getAudienceType = (id) => {
   return AUDIENCE_TYPE.find((a) => a.id === id).value;
 };
 
-function SendMessage({ classes, communities, users, ...props }) {
+function SendMessage({ classes, communities, users, meta, ...props }) {
   const [currentFilter, setCurrentFilter] = useState("SUPER_ADMIN");
   const [usersQuery, setQuery] = useState({});
   const [open, setOpen] = React.useState(false);
@@ -190,7 +190,7 @@ function SendMessage({ classes, communities, users, ...props }) {
       }
       else{
         console.log("MESSAGE_SEND_ERROR", res?.error);
-        toggleToast({
+        props?.toggleToast({
           open: true,
           message:
             "An error occurred while deleting the message",
@@ -435,6 +435,7 @@ const mapStateToProps = (state) => ({
   users: state.getIn(["allUsers"]),
   sadmins: state.getIn(["sadmins"]),
   messages: state.getIn(["scheduledMessages"]),
+  meta: state.getIn(["paginationMetaData"]),
 });
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
