@@ -327,3 +327,28 @@ export const reArrangeForAdmin = ({
     reduxFxn(data);
   });
 };
+
+
+export const convertToScheduledFor = (dateTimeString) => {
+  if (!dateTimeString) return "---";
+  const inputDate = new Date(dateTimeString);
+  const currentDate = new Date();
+  let options = {
+    // year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  };
+
+  if (inputDate.toDateString() === currentDate.toDateString()) {
+      options = {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      };
+  }
+
+  return inputDate.toLocaleString("en-US", options);
+};

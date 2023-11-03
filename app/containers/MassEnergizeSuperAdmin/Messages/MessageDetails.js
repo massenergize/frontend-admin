@@ -256,11 +256,13 @@ class MessageDetails extends Component {
             </div>
             <hr style={{ color: "#EBEBEB" }} />
             <div>
-              <Typography variant="h6">{message && message.title}</Typography>
+              <Typography variant="h6">
+                {message && message.title}
+              </Typography>
               <br />
 
               <Typography variant="paragraph" color="textPrimary">
-                {(message && message.body) || "..."}
+                <div dangerouslySetInnerHTML={{ __html:message?.body || ""}}></div>
               </Typography>
               <br />
 
@@ -270,7 +272,9 @@ class MessageDetails extends Component {
                 style={{ display: "flex", alignItems: "center" }}
               >
                 <b>
-                  {(message && message.community && message.community.name) ||
+                  {(message &&
+                    message.community &&
+                    message.community.name) ||
                     "..."}
                 </b>
                 {message && message.is_team_admin_message && (
@@ -279,10 +283,13 @@ class MessageDetails extends Component {
                     style={{ marginLeft: "auto" }}
                     variant="small"
                   >
-                    <small style={{ marginRight: 10 }}>Message from Team</small>
+                    <small style={{ marginRight: 10 }}>
+                      Message from Team
+                    </small>
                     <br />
                     <b>
-                      {(message && message.team && message.team.name) || "..."}
+                      {(message && message.team && message.team.name) ||
+                        "..."}
                     </b>
                   </Typography>
                 )}
@@ -336,7 +343,10 @@ class MessageDetails extends Component {
                       </div>
                     </div>
                     <div>
-                      <Typography variant="h9" style={{ fontWeight: "bold" }}>
+                      <Typography
+                        variant="h9"
+                        style={{ fontWeight: "bold" }}
+                      >
                         {reply && reply.title}
                       </Typography>
                     </div>

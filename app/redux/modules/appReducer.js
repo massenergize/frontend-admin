@@ -57,6 +57,7 @@ import {
   LOAD_OTHER_ADMINS,
   SET_MEDIA_LIBRARY_MODAL_FILTERS,
   SET_GALLERY_META_DATA,
+  LOAD_SCHEDULED_MESSAGES,
   ADD_BLOB_STRING,
 } from "../ReduxConstants";
 
@@ -121,6 +122,14 @@ export const reducerForVisitLogs = (state = null, action = {}) => {
 export const reducerForActionEngagements = (state = LOADING, action = {}) => {
   switch (action.type) {
     case ACTION_ENGAGMENTS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForScheduledMessages = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_SCHEDULED_MESSAGES:
       return action.payload;
     default:
       return state;

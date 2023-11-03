@@ -81,6 +81,11 @@ module.exports = [
         name: "All Messages",
         title: true,
       },
+      // {
+      //   key: "send-message",
+      //   name: "Send Message",
+      //   link: "/admin/send/message",
+      // },
       {
         key: "all-team-admin-messages",
         name: "Team Admin Messages",

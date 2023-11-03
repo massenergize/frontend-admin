@@ -503,3 +503,16 @@ export const ListTasks = loadable(
     fallback: <Loading />,
   }
 );
+export const SendMessage = loadable(
+  () => import("./MassEnergizeSuperAdmin/Messages/SendMessage"),
+  {
+    fallback: <Loading />,
+  }
+);
+export const ScheduledMessages = loadable(
+         () =>
+           import("./MassEnergizeSuperAdmin/Messages/ScheduledMessages"),
+         {
+           fallback: <Loading />,
+         }
+       );
