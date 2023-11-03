@@ -76,6 +76,8 @@ import {
   TermsOfServicePage,
   PrivacyPolicyPage,
   ActionUsers,
+  SendMessage,
+  ScheduledMessages,
 } from "../pageListAsync";
 import EditVendor from "../MassEnergizeSuperAdmin/Vendors/EditVendor";
 import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
@@ -293,6 +295,21 @@ class Application extends React.Component {
               path="/admin/edit/:id/message"
               exact
               component={MessageDetails}
+            />
+            <Route
+              path="/admin/send/message"
+              exact
+              component={SendMessage}
+            />
+            <Route
+              path="/admin/edit/:id/scheduled-message"
+              exact
+              component={SendMessage}
+            />
+            <Route
+              path="/admin/scheduled/messages"
+              exact
+              component={ScheduledMessages}
             />
             <Route
               path="/admin/read/communities"
