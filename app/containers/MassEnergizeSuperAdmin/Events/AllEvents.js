@@ -581,7 +581,7 @@ class AllEvents extends React.Component {
         const idsToDelete = rowsDeleted.data;
         const [found] = findMatchesAndRest(idsToDelete, (it) => {
           const f = data[it.dataIndex];
-          return f[9]; // this index should be changed if anyone modifies (adds/removes) an item in fashioData()
+          return f[10]; // this index should be changed if anyone modifies (adds/removes) an item in fashioData()
         });
         const noTemplatesSelectedGoAhead = !found || !found.length;
         this.props.toggleModal({
