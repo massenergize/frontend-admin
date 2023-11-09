@@ -56,6 +56,7 @@ import {
   LOAD_OTHER_ADMINS,
   SET_MEDIA_LIBRARY_MODAL_FILTERS,
   SET_GALLERY_META_DATA,
+  LOAD_SCHEDULED_MESSAGES,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -400,6 +401,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
     apiCall("/communities.others.listForCommunityAdmin", { limit: 50 }),
     apiCall("/summary.next.steps.forAdmins"),
+    apiCall("/messages.listForCommunityAdmin", {params: JSON.stringify({is_scheduled: true})}),
   ]).then((response) => {
     const [
       policies,
@@ -422,6 +424,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       featureFlags,
       otherCommunities,
       adminNextSteps,
+      scheduledMessages
     ] = response;
     dispatch(loadAllPolicies(policies.data));
     dispatch(reduxLoadAllCommunities(communities.data));
@@ -450,6 +453,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadFeatureFlags(featureFlags.data || {}));
     dispatch(reduxLoadAllOtherCommunities(otherCommunities.data));
     dispatch(reduxLoadNextStepsSummary(adminNextSteps.data));
+    dispatch(reduxLoadScheduledMessages(scheduledMessages.data));
     const cursor = {
       communities: communities.cursor,
       actions: actions.cursor,
@@ -464,6 +468,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       otherCommunities: otherCommunities.cursor,
       testimonials: testimonials.cursor,
       policies: policies.cursor,
+      scheduledMessages: scheduledMessages.cursor,
     };
     dispatch(reduxLoadMetaDataAction(cursor));
   });
@@ -495,6 +500,10 @@ export const loadFeatureFlags = (data = LOADING) => ({
   type: LOAD_FEATURE_FLAGS,
   payload: data,
 });
+export const reduxLoadScheduledMessages = (data = LOADING) => ({
+         type: LOAD_SCHEDULED_MESSAGES,
+         payload: data,
+       });
 export const reduxToggleUniversalModal = (data = {}) => ({
   type: TOGGLE_UNIVERSAL_MODAL,
   payload: data,
