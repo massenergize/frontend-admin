@@ -421,7 +421,8 @@ class AllEvents extends React.Component {
   };
 
   customSort(data, colIndex, order) {
-    const isComparingLive = colIndex === 6;
+    // this specifying the column index as a number leads to bugs over and over again
+    const isComparingLive = colIndex === 7;
     const sortForLive = ({ a, b }) => (a.isLive && !b.isLive ? -1 : 1);
     var params = {
       colIndex,
