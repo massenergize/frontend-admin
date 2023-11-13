@@ -42,6 +42,8 @@ class CreateNewActionForm extends Component {
     this.state = {
       communities: [],
       ccActions: [],
+      ccCategories: [],
+      ccSubcategories:[],
       vendors: [],
       formJson: null,
     };
@@ -53,6 +55,8 @@ class CreateNewActionForm extends Component {
       tags,
       vendors,
       ccActions,
+      ccCategories,
+      ccSubcategories,
       auth,
       location,
     } = props;
@@ -62,6 +66,7 @@ class CreateNewActionForm extends Component {
       tags.length &&
       ccActions &&
       ccActions.length;
+      //add ccCategories here?
 
     if (!fullyMountedNeverRunThisAgain && !state.mounted) return null;
     const coms = (communities || []).map((c) => ({
@@ -76,9 +81,24 @@ class CreateNewActionForm extends Component {
     }));
     const modifiedCCActions = (ccActions || []).map((c) => ({
       ...c,
-      displayName: c.description,
+      displayName: c.title,
       id: "" + c.id,
     }));
+
+    const modifiedCCCategories = (ccCategories || []).map((c) => ({
+      ...c,
+      value: c.name,
+      displayName: c.name,
+      id: "" + c.id,
+    }));
+
+    const modifiedSubcategories = (ccSubcategories || []).map((c) => ({
+      ...c,
+      value: c.name,
+      displayName: c.name,
+      id: "" + c.id,
+    }));
+
 
     const section = makeTagSection({
       collections: tags,
@@ -87,11 +107,50 @@ class CreateNewActionForm extends Component {
 
     const libOpen = location.state && location.state.libOpen;
 
+    const calculator_actions = ( ccSubcategories || []).map((c) => ({
+        valueToCheck: String(c.id),
+        fields: [
+        {
+          name: "calculator_action",
+          label: "Calculator Action *",
+          placeholder: "eg. Wayland",
+          fieldType: "Dropdown",
+          isRequired: true,
+          dbName: "calculator_action",
+          data: [{ displayName: "--", id: "" }, ...modifiedCCActions.filter((d) => d.subcategory == c.name && d.category == c.category )],// .filter((d) => d.category == c.name) //ccActions for a category
+        },
+        ],
+        
+      })
+      );
+
+    const subcategories = ( ccCategories || []).map((c) => ({
+      valueToCheck: String(c.id),
+      fields: [
+        {
+          name: "calculator_subcategory",
+          label: "Calculator Subcategory *",
+          placeholder: "eg. Wayland",
+          fieldType: "Dropdown",
+          //isRequired: true,
+          dbName: "calculator_subcategory",
+          data: [...modifiedSubcategories.filter((d) => d.category == c.name)], //ccActions for a category
+
+          conditionalDisplays:
+            calculator_actions
+        },
+      ],
+    }));
+
     const formJson = createFormJson({
       communities: coms,
       vendors: vends,
       ccActions: modifiedCCActions,
+      ccCategories: modifiedCCCategories,
+      ccSubcategories: modifiedSubcategories,
       auth,
+      cc_actions: calculator_actions,
+      cc_subcats: subcategories,
       autoOpenMediaLibrary: libOpen,
     });
 
@@ -101,6 +160,8 @@ class CreateNewActionForm extends Component {
       mounted: true,
       communities: coms,
       ccActions: modifiedCCActions,
+      ccCategories: modifiedCCCategories,
+      ccSubcategories:modifiedSubcategories,
       vendors: vends,
       formJson,
     };
@@ -133,6 +194,8 @@ const mapStateToProps = (state) => ({
   communities: state.getIn(["communities"]),
   vendors: state.getIn(["allVendors"]),
   ccActions: state.getIn(["ccActions"]),
+  ccCategories: state.getIn(["ccCategories"]),
+  ccSubcategories: state.getIn(["ccSubcategories"]),
   actions: state.getIn(["allActions"]),
   auth: state.getIn(["auth"]),
   formState: state.getIn(["tempForm"]),
@@ -158,9 +221,13 @@ export default withStyles(styles, { withTheme: true })(
 const createFormJson = ({
   communities,
   ccActions,
+  ccCategories,
+  ccSubcategories,
   vendors,
   auth,
   progress,
+  cc_actions,
+  cc_subcats,
   autoOpenMediaLibrary,
 }) => {
   const is_super_admin = auth && auth.is_super_admin;
@@ -245,17 +312,32 @@ const createFormJson = ({
         fieldType: "Section",
         children: [
           {
-            name: "calculator_action",
-            label: "Calculator Action",
+            name: "calculator_category",
+            label: "Category *",
             placeholder: "eg. Wayland",
             fieldType: "Dropdown",
-            // defaultValue: progress.calculator_action || null,
-            dbName: "calculator_action",
-            data: [{ displayName: "--", id: "" }, ...ccActions],
+            isRequired: true,
+            dbName: "calculator_category", 
+            data: [{ displayName: "--", id: "" }, ...ccCategories],
             modalTitle: "Carbon Action List & Instructions",
             modalText:
               "Check out the instructions here: https://docs.google.com/document/d/1b-tCB83hKk9yWFcB15YdHBORAFOPyh63c8jt1i15WL4",
+            
+            
+            conditionalDisplays:
+              cc_subcats,    
+          
           },
+          // {
+          //   name: "calculator_action",
+          //   label: "Calculator Action",
+          //   placeholder: "eg. Wayland",
+          //   fieldType: "Dropdown",
+          //   isRequired: true,
+          //   dbName: "calculator_action",
+          //   data: [{ displayName: "--", id: "" }, ...ccActions],
+          // },
+          
         ],
       },
       {

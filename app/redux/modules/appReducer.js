@@ -27,6 +27,8 @@ import {
   GET_ALL_SUBSCRIBERS,
   UPDATE_HEAP,
   LOAD_CC_ACTIONS,
+  LOAD_CC_CATEGORIES,
+  LOAD_CC_SUBCATEGORIES,
   TOGGLE_UNIVERSAL_MODAL,
   TEST_REDUX,
   LOAD_ALL_TASK_FUNCTIONS,
@@ -278,6 +280,27 @@ export const reducerForCCAction = (state = [], action = {}) => {
       return state;
   }
 };
+
+export const reducerForCCCategories = (state = [], action = {}) => {
+  switch (action.type) {
+    case LOAD_CC_CATEGORIES:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+
+export const reducerForCCSubcategories = (state = [], action = {}) => {
+  switch (action.type) {
+    case LOAD_CC_SUBCATEGORIES:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+
 export const reducerForHeap = (state = {}, action = {}) => {
   switch (action.type) {
     case UPDATE_HEAP:

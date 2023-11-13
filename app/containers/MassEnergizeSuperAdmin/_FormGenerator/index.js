@@ -382,6 +382,7 @@ class MassEnergizeForm extends Component {
   };
 
   getDisplayName = (fieldName, id, data) => {
+    console.log("field name!", fieldName, id, data)
     const { formData } = this.state;
     if (id) {
       const [result] = data.filter(
@@ -1199,9 +1200,13 @@ class MassEnergizeForm extends Component {
     // use conditional displays to render other fields based on user's radio btn selection
     // you can have as many conditions as possible defined in the user form json props
     if (!field || !field.conditionalDisplays) return;
+    
     const toRender = field.conditionalDisplays.filter(
       (f) => this.getValue(field.name) === f.valueToCheck
     )[0];
+    if (field.name.includes("calculator")) {
+      console.log("TO RENDER:" , toRender)
+    }
     if (toRender && toRender.fields) return this.renderFields(toRender.fields);
   };
 
