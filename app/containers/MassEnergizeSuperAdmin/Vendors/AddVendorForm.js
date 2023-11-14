@@ -384,6 +384,7 @@ const createFormJson = ({
         selected: [],
         label: "Upload a logo for this Vendor",
         isRequired: false,
+        uploadMultiple:false
       },
       {
         name: "is_verified",

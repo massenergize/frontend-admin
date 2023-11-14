@@ -57,6 +57,7 @@ import {
   SET_MEDIA_LIBRARY_MODAL_FILTERS,
   SET_GALLERY_META_DATA,
   LOAD_SCHEDULED_MESSAGES,
+  ADD_BLOB_STRING,
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -180,6 +181,9 @@ export const setupSocketConnectionWithBackend = (auth) => (
   connectSocket();
 };
 
+export const reduxAddBlobString = (data) => {
+  return { type: ADD_BLOB_STRING, payload: data };
+};
 export const setGalleryMetaAction = (data) => {
   return { type: SET_GALLERY_META_DATA, payload: data };
 };

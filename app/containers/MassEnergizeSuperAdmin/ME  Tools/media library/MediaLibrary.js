@@ -10,8 +10,7 @@ import {
   libraryImage,
   TABS,
 } from "./shared/utils/values";
-import { EXTENSIONS } from "./shared/utils/utils";
-
+import { EXTENSIONS, functionsToExport } from "./shared/utils/utils";
 function MediaLibrary(props) {
   const {
     actionText,
@@ -26,6 +25,8 @@ function MediaLibrary(props) {
     dragToOrder,
     floatingMode,
     passedNotification,
+    handleCropFromLink,
+    uploadMultiple,
   } = props;
   const [show, setShow] = useState(false);
   const [imageTray, setTrayImages] = useState([]);
@@ -37,7 +38,7 @@ function MediaLibrary(props) {
   const [files, setFiles] = useState([]); // all files that have been selected from user's device [Schema: {id, file}]
   const [croppedSource, setCroppedSource] = useState();
   const [notification, setNotification] = useState(null); // just used to communicate when the mlib is working on something(that isnt the typical 'loading' state), and the user needs to be updated
-
+  const [previews, setPreviews] = useState([]);
   // --------------------------------------------------
   const oldPosition = useRef(null);
   const newPosition = useRef(null);
@@ -51,13 +52,31 @@ function MediaLibrary(props) {
     return false;
   };
 
-  const switchToCropping = (content) => {
+  const switchToCropping = (content, options = {}) => {
+    const { external } = options || {};
     const loot = { source: content, image: content && content.src };
     setCropLoot(loot);
     setShow(true);
     setCurrentTab("crop");
+    if (external) fitIntoNormalFlow(content);
   };
 
+  const fitIntoNormalFlow = (content) => {
+    // The function makes sure the image Obj that has been created from an external link is
+    // put into the file & preview trays, so that it follows normal procedure.
+    // (The function is used when cropping from Link)
+    if (uploadMultiple) {
+      const func = (im) => im.id !== content.id;
+      const filesRem = files.filter(func);
+      const prevRem = previews.filter(func);
+      setFiles([content, ...filesRem]);
+      setPreviews([content, ...prevRem]);
+    } else {
+      content = [content];
+      setFiles(content);
+      setPreviews(content);
+    }
+  };
   const transfer = (content, reset) => {
     if (onInsert) return onInsert(content, reset);
   };
@@ -142,6 +161,8 @@ function MediaLibrary(props) {
             setCroppedSource={setCroppedSource}
             croppedSource={croppedSource}
             finaliseCropping={finaliseCropping}
+            previews={previews}
+            setPreviews={setPreviews}
           />
         </div>
       )}
@@ -173,8 +194,8 @@ function MediaLibrary(props) {
               oldPosition={oldPosition}
               newPosition={newPosition}
               swapPositions={swapPositions}
-
-              // switchToCropping={switchToCropping}
+              switchToCropping={switchToCropping}
+              handleCropFromLink={handleCropFromLink}
             />
           )}
 
@@ -209,6 +230,8 @@ const ImageTray = ({
   newPosition,
   oldPosition,
   swapPositions,
+  switchToCropping,
+  handleCropFromLink,
 }) => {
   return (
     <>
@@ -241,7 +264,8 @@ const ImageTray = ({
                 setNewPosition={() => (newPosition.current = index)}
                 onDragEnd={() => swapPositions()}
                 dragToOrder={dragToOrder}
-                // switchToCropping={switchToCropping}
+                switchToCropping={switchToCropping}
+                handleCropFromLink={handleCropFromLink}
               />
             </React.Fragment>
           );
@@ -257,16 +281,44 @@ const ImageTray = ({
  * Component that shows a preview of the image that a user has selected
  * @returns
  */
-const TrayImage = ({
-  src,
-  remove,
-  id,
-  setOldPosition,
-  setNewPosition,
-  onDragEnd,
-  dragToOrder,
-}) => {
+const TrayImage = (props) => {
+  const {
+    src,
+    remove,
+    id,
+    setOldPosition,
+    setNewPosition,
+    onDragEnd,
+    dragToOrder,
+    switchToCropping,
+    handleCropFromLink,
+  } = props;
+  const [loading, setLoading] = useState(false);
   const cssOptions = dragToOrder ? {} : { pointerEvents: "none" };
+
+  const cropFromLink = (imageObj) => {
+    if (!handleCropFromLink) return;
+    setLoading(true);
+    handleCropFromLink(imageObj, (base64String) => {
+      setLoading(false);
+      if (!base64String) return;
+      const content = createCropData(base64String);
+      switchToCropping(content, { external: true });
+    });
+  };
+
+  const createCropData = (base64String) => {
+    const { getRandomStringKey, toFile, getFileSize } = MediaLibrary.Functions;
+    const file = toFile(base64String);
+    const content = {
+      id: getRandomStringKey(),
+      file,
+      src: base64String,
+      size: getFileSize(file),
+    };
+    return content;
+  };
+
   return (
     <div className="ml-tray-image">
       <img
@@ -279,16 +331,24 @@ const TrayImage = ({
         onDragOver={(e) => e.preventDefault()}
         onDragEnd={onDragEnd}
       />
-      <small className="ml-prev-el-remove" onClick={() => remove(id)}>
-        Remove
-      </small>
-      {/* <small
-      className="ml-prev-el-remove"
-      style={{ color: "blue" }}
-      onClick={() => switchToCropping(id, "library-content")}
-    >
-      Crop
-    </small> */}
+      <div style={{ display: "flex", flexDirection: "row" }}>
+        <small className="ml-prev-el-remove" onClick={() => remove(id)}>
+          Remove
+        </small>
+        {loading ? (
+          <small style={{ marginLeft: 6 }}>
+            <i className="fa fa-spinner fa-spin" /> One moment...
+          </small>
+        ) : (
+          <small
+            className="ml-prev-el-remove"
+            style={{ color: "blue", marginLeft: 6 }}
+            onClick={() => cropFromLink(props)}
+          >
+            Crop
+          </small>
+        )}
+      </div>
     </div>
   );
 };
@@ -417,6 +477,7 @@ MediaLibrary.AcceptedFileTypes = {
   Images: ["image/jpg", "image/png", "image/jpeg"].join(", "),
   All: EXTENSIONS.join(", "),
 };
+MediaLibrary.Functions = functionsToExport;
 MediaLibrary.CompressedQuality = IMAGE_QUALITY;
 MediaLibrary.defaultProps = {
   multiple: true,

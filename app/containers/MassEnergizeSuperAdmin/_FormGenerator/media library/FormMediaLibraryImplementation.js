@@ -5,6 +5,7 @@ import { bindActionCreators } from "redux";
 
 import MediaLibrary from "../../ME  Tools/media library/MediaLibrary";
 import {
+  reduxAddBlobString,
   reduxAddToGalleryImages,
   reduxLoadGalleryImages,
   reduxLoadImageInfos,
@@ -36,6 +37,8 @@ export const FormMediaLibraryImplementation = (props) => {
     putImageInfosInRedux,
     meta,
     putMetaInRedux,
+    blobTray,
+    putBlobStringInRedux,
   } = props;
 
   const [available, setAvailable] = useState(auth && auth.is_super_admin);
@@ -226,7 +229,7 @@ export const FormMediaLibraryImplementation = (props) => {
         });
         changeTabTo(MediaLibrary.Tabs.LIBRARY_TAB);
         insertSelectedImages(images, response);
-        // reset();
+        reset();
         // changeTabTo(MediaLibrary.Tabs.LIBRARY_TAB);
       })
       .catch((e) => {
@@ -348,9 +351,35 @@ export const FormMediaLibraryImplementation = (props) => {
         </div>
       );
   };
+
+  const cropFromLink = (props, cb) => {
+    const found = (blobTray || {})[props.id];
+    if (found) return cb(found);
+    apiCall("/gallery.image.read", { media_id: props.id })
+      .then((response) => {
+        cb && cb(response.data);
+        putBlobStringInRedux({
+          ...(blobTray || {}),
+          [props.id]: response.data,
+        });
+        if (!response.success) {
+          return console.log(
+            "ERROR_PREPARING_IMAGE_FOR_CROP_BE:",
+            response.error
+          );
+        }
+      })
+      .catch((e) => {
+        // Add a toast for real User to know what happend (DO BEFORE PR : BPR)
+        cb && cb(null);
+        console.log("ERROR_READING_IMAGE::", e?.toString());
+      });
+  };
+
   return (
     <div>
       <MediaLibrary
+        handleCropFromLink={cropFromLink}
         renderOnFooter={renderOnFooter}
         passedNotification={outsideNotification}
         defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
@@ -448,6 +477,7 @@ const mapStateToProps = (state) => ({
   imageForEdit: state.getIn(["imageBeingEdited"]),
   imageInfos: state.getIn(["imageInfos"]),
   meta: state.getIn(["galleryMeta"]),
+  blobTray: state.getIn(["blobTray"]),
 });
 
 const mapDispatchToProps = (dispatch) => {
@@ -460,6 +490,7 @@ const mapDispatchToProps = (dispatch) => {
       sendImageToReduxForEdit: setImageForEditAction,
       putImageInfosInRedux: reduxLoadImageInfos,
       putMetaInRedux: setGalleryMetaAction,
+      putBlobStringInRedux: reduxAddBlobString,
     },
     dispatch
   );
