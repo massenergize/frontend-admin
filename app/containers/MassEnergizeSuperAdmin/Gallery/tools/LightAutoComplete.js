@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Box,
   Checkbox,
@@ -84,6 +84,8 @@ function LightAutoComplete(props) {
     args,
     params,
     selectAllV2,
+    showHiddenList,
+    renderItemsListDisplayName,
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
@@ -209,7 +211,7 @@ function LightAutoComplete(props) {
   return (
     <div style={{ position: "relative", width: "100%", marginTop: 0 }} key={props?.key}>
       <div ref={chipWrapperRef}>
-        {selected?.length > 0 && (
+        {(showHiddenList &&selected?.length>5 ) ? renderItemsListDisplayName ? renderItemsListDisplayName(selected) :<span onClick={() => showHiddenList && showHiddenList(selected)} style={{cursor: "pointer", color: "blue"}}>view full list</span> : selected?.length > 0&& (
           <>
             {selected.map((option, index) => {
               var deleteOptions = { onDelete: () => handleSelection(option) };
@@ -357,5 +359,7 @@ LightAutoComplete.defaultProps = {
   defaultSelected: [],
   allowChipRemove: true,
   multiple: false,
+  showHiddenList: null, // boolean: true if you want the list of selected items to be truncated after a count of 5
+  renderItemsListDisplayName: null, // function(component): renders  a button or text to display which toggles the list of selected items.
 };
 export default withStyles(styles)(LightAutoComplete);

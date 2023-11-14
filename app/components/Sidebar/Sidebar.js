@@ -64,11 +64,12 @@ class Sidebar extends React.Component {
       loadTransition,
       leftSidebar,
       auth,
+      featureFlags,
     } = this.props;
     const drawerWidth = 240;
 
     const { status, anchorEl, turnDarker } = this.state;
-    const dataMenu = auth && auth.is_super_admin ? superAdminMenu : communityAdminMenu;
+    const dataMenu = auth && auth.is_super_admin ? superAdminMenu : communityAdminMenu({flags:auth?.feature_flags});
     return (
       <Fragment>
         <Hidden lgUp>
@@ -143,7 +144,8 @@ Sidebar.defaultProps = {
 
 function mapStateToProps(state) {
   return {
-    auth: state.getIn(['auth'])
+    auth: state.getIn(["auth"]),
+    featureFlags: state.getIn(["featureFlags"]),
   };
 }
 const SidebarMapped = connect(mapStateToProps, null)(Sidebar);

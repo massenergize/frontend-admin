@@ -18,6 +18,9 @@ import {
   FormLabel,
   LinearProgress,
   Box,
+  Chip,
+  Grid,
+  Checkbox,
 } from "@mui/material";
 import TinyEditor from "../_FormGenerator/TinyMassEnergizeEditor";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
@@ -25,7 +28,7 @@ import ScheduleMessageModal from "./ScheduleMessageModal";
 import { apiCall } from "../../../utils/messenger";
 import { LOADING } from "../../../utils/constants";
 import Loading from "dan-components/Loading";
-import { reduxLoadMetaDataAction, reduxLoadScheduledMessages, reduxToggleUniversalToast } from "../../../redux/redux-actions/adminActions";
+import { reduxLoadMetaDataAction, reduxLoadScheduledMessages, reduxToggleUniversalModal, reduxToggleUniversalToast } from "../../../redux/redux-actions/adminActions";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 /**
@@ -50,12 +53,13 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
   const [open, setOpen] = React.useState(false);
   const [selectedCommunities, setSelectedCommunities] = React.useState([]);
   const [audience, setAudience] = React.useState([]);
-  const [sub_audience_type, setSubAudienceType] = React.useState("ALL");
+  const [sub_audience_type, setSubAudienceType] = React.useState("FROM_COMMUNITY");
   const [loading, setLoading] = React.useState(false);
+  const [checkedItems, setCheckedItems] = React.useState([]);
 
 
   const UrlParams = useParams();
-
+  
   useEffect(() => {
     setSelectedCommunities([]);
     setAudience([]);
@@ -88,7 +92,6 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
   }, [UrlParams?.id, props?.messages]);
 
   const SUB_AUDIENCE_TYPE = [
-    { id: "ALL", value: "All" },
     { id: "FROM_COMMUNITY", value: "From Community" },
     { id: "SPECIFIC", value: `Specific ${getAudienceType(currentFilter)}` },
   ];
@@ -132,7 +135,7 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
   const getEndpoint = (audience_type = currentFilter) => {
     if (audience_type === "COMMUNITY_CONTACTS")
       return "/communities.listForCommunityAdmin";
-    return "/users.listForSuperAdmin";
+    return "/users.listNoPagination";
   };
 
   const toggleMembership = () => {
@@ -148,6 +151,14 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
     if (item?.includes("all")) return true;
     return false;
   };
+
+
+  const audienceDisplayName = (item) => {
+    if(currentFilter==="COMMUNITY_CONTACTS"){
+      return `${item?.name}: ${item?.owner_name} (${item?.owner_email})`
+    }
+    return `${item?.full_name}(${item?.email})`;
+  }
 
   const onFormSubmit = (data = usersQuery) => {
     setLoading(true);
@@ -273,14 +284,20 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
           multiple={true}
           isAsync={true}
           endpoint={getEndpoint()}
-          params={{ membership: toggleMembership(), community }}
+          params={{
+            membership: toggleMembership(),
+            community,
+            sort_params: { name: "full_name", direction: "asc" },
+          }}
           onChange={(selected) => setAudience(selected)}
           data={[]}
-          labelExtractor={(item) => item?.full_name || item?.name}
+          labelExtractor={(item) => audienceDisplayName(item)}
           valueExtractor={(item) => item?.id}
           placeholder="Select audience"
-          selectAllV2={true}
+          args={{ limit: 1000 }}
           key={currentFilter}
+          showHiddenList={(items) => toggleFullAudienceListModal(items)}
+          // renderItemsListDisplayName={(items) => renderAudienceListComponent(items)}
         />
       </>
     );
@@ -299,6 +316,70 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
       return renderFromCommunities();
     }
   };
+
+    const toggleFullAudienceListModal = (items) => {
+      console.log('==items ===', items)
+      setCheckedItems(items || []);
+      console.log("=== checkedItems ===", checkedItems);
+    const { toggleModal } = props;
+    toggleModal({
+      show: true,
+      component: renderFullAudienceList(items),
+      onConfirm: () => toggleModal({ show: false, component: null }),
+      closeAfterConfirmation: true,
+      title: "Full Communities List",
+      noTitle: false,
+      noCancel: true,
+      okText: "Close",
+    });
+  }
+  const handleChecked = (e, item) => {
+    let itemAlreadyIn = checkedItems.filter((i) => i.id === item.id)?.length>0
+    if (!itemAlreadyIn) {
+      setCheckedItems([...checkedItems, item]);
+    } else {
+      setCheckedItems(checkedItems.filter((i) => i.id !== item.id));
+    }
+    
+  }
+
+  const renderFullAudienceList = (items) => {
+    return(
+       <Grid container spacing={1} sx={{maxHeight: "50vh", overflow: 'auto'}}>
+        {items.map((item, index) => {
+          return (
+            <Grid item xs={6} md={6} lg={6} xl={6} key={index}>
+              <Chip
+                label={audienceDisplayName(item)}
+                variant="outlined"
+                icon={
+                  <Checkbox
+                    checked={checkedItems.filter((i) => i.id === item.id)?.length>0}
+                    onChange={(e) => {
+                      handleChecked(e, item);
+                    }}
+                    inputProps={{ "aria-label": "controlled" }}
+                    // value={item?.id}
+                    size="small"
+                    sx={{
+                      borderRadius: 0,
+                      border: "1px solid ##f6eeee",
+                    }}
+                  />
+                }
+              />
+            </Grid>
+          );
+        })}
+        </Grid>
+    )
+  };
+
+
+
+  const renderAudienceListComponent = (items)=>{
+    return <Button variant="outlined" onClick={() => toggleFullAudienceListModal(items)}>View All Selected Audience</Button>;
+  }
 
   return (
     <PapperBlock
@@ -443,6 +524,7 @@ const mapDispatchToProps = (dispatch) => {
       putScheduledMessagesToRedux: reduxLoadScheduledMessages,
       updateTableMeta: reduxLoadMetaDataAction,
       toggleToast: reduxToggleUniversalToast,
+      toggleModal: reduxToggleUniversalModal,
     },
     dispatch
   );
