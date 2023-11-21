@@ -41,7 +41,6 @@ function MEDropdown(props) {
   const [optionsToDisplay, setOptionsToDisplay] = useState([]);
   // const [cursor, setCursor] = React.useState({ has_more: true, next: 1 });
 
-
   const isAll = (item) => {
     return typeof item === "string" && item?.toLowerCase() === "all";
   };
@@ -85,6 +84,7 @@ function MEDropdown(props) {
      ];
      setOptionsToDisplay(uniqueItems);
    }, [newItems]);
+
 
 
   // const elementObserver = useRef(null);
@@ -325,14 +325,9 @@ function MEDropdown(props) {
             return (
               <MenuItem
                 key={i}
-                // ref={
-                //   i === optionsToDisplay.length - 1 && rest?.isAsync
-                //     ? ref
-                //     : null
-                // }
+                onClick={() => handleOnChange(d)}
               >
                 <FormControlLabel
-                  onClick={() => handleOnChange(d)}
                   key={i}
                   control={
                     multiple ? (

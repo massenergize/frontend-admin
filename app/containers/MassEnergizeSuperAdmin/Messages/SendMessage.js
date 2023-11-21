@@ -27,6 +27,7 @@ import { LOADING } from "../../../utils/constants";
 import Loading from "dan-components/Loading";
 import { reduxLoadMetaDataAction, reduxLoadScheduledMessages, reduxToggleUniversalModal, reduxToggleUniversalToast } from "../../../redux/redux-actions/adminActions";
 import FullAudienceList from "./FullAudienceList";
+import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 /**
@@ -51,7 +52,7 @@ const getAudienceType = (id) => {
 };
 
 function SendMessage({ classes, meta,auth, ...props }) {
-  const [currentFilter, setCurrentFilter] = useState(SUPER_ADMIN);
+  const [currentFilter, setCurrentFilter] = useState(!auth?.is_super_admin ? COMMUNITY_ADMIN: SUPER_ADMIN);
   const [usersQuery, setQuery] = useState({});
   const [open, setOpen] = React.useState(false);
   const [selectedCommunities, setSelectedCommunities] = React.useState([]);
@@ -162,13 +163,6 @@ function SendMessage({ classes, meta,auth, ...props }) {
     }
   }
 
-  // if(auth?.is_community_admin){
-  //   AUDIENCE_TYPE = [
-  //     { id: COMMUNITY_ADMIN, value: "Community Admins" },
-  //     { id: USERS, value: "Users" },
-  //   ];
-  // }
-
 
   const audienceDisplayName = (item) => {
     if(currentFilter===COMMUNITY_CONTACTS){
@@ -177,9 +171,15 @@ function SendMessage({ classes, meta,auth, ...props }) {
     return `${item?.full_name}(${item?.email})`;
   }
 
+  const dataValidated = (data) => {
+    if(!data?.audience) return false
+    if(!data?.message) return false
+    if(!data?.subject) return false
+    return true
+  }
+
   const onFormSubmit = (data = usersQuery) => {
-    setLoading(true);
-     let msgs = props?.messages || [];
+    let msgs = props?.messages || [];
     data = {
       ...data,
       audience: isAll(audience) ? audience : audience?.map((a) => a.id),
@@ -190,6 +190,16 @@ function SendMessage({ classes, meta,auth, ...props }) {
     if(UrlParams?.id){
       data.id = UrlParams.id;
     }
+    if(!dataValidated(data)){
+      props?.toggleToast({
+        open: true,
+        message: "Please ensure audience, message and subject are filled",
+        variant: "error",
+      });
+      return;
+    }
+
+    setLoading(true);
     setOpen(false);
     apiCall("/messages.send", data).then((res) => {
       setLoading(false);
@@ -357,41 +367,62 @@ function SendMessage({ classes, meta,auth, ...props }) {
     >
       <Seo name={"Send Message"} />
       <>
-        <FormLabel>Audience Type</FormLabel>
-        <RadioGroup
-          value={currentFilter}
-          style={{ display: "flex", flexDirection: "row" }}
-          onChange={(ev) => {
-            const value = ev.target.value;
-            buildQuery("audience_type", value);
-            setCurrentFilter(value);
-          }}
-        >
-          {AUDIENCE_TYPE.map((option) => (
-            <FormControlLabel
-              name={option.key}
-              key={option.key}
-              value={option.id}
-              control={<Radio />}
-              label={
-                <Typography
-                  variant="body2"
-                  style={{ fontSize: "0.8rem", fontWeight: "bold" }}
-                >
-                  <Tooltip
-                    title={option.context}
-                    placement="top"
-                    style={{ fontWeight: "bold" }}
-                  >
-                    {option.value}
-                  </Tooltip>
-                </Typography>
-              }
-            />
-          ))}
-        </RadioGroup>
-        {renderSubAudience()}
-        <div>{renderAudienceList()}</div>
+        {auth?.is_super_admin ? (
+          <>
+            <FormLabel>Audience Type</FormLabel>
+            <RadioGroup
+              value={currentFilter}
+              style={{ display: "flex", flexDirection: "row" }}
+              onChange={(ev) => {
+                const value = ev.target.value;
+                buildQuery("audience_type", value);
+                setCurrentFilter(value);
+              }}
+            >
+              {AUDIENCE_TYPE.map((option) => (
+                <FormControlLabel
+                  name={option.key}
+                  key={option.key}
+                  value={option.id}
+                  control={<Radio />}
+                  label={
+                    <Typography
+                      variant="body2"
+                      style={{ fontSize: "0.8rem", fontWeight: "bold" }}
+                    >
+                      <Tooltip
+                        title={option.context}
+                        placement="top"
+                        style={{ fontWeight: "bold" }}
+                      >
+                        {option.value}
+                      </Tooltip>
+                    </Typography>
+                  }
+                />
+              ))}
+            </RadioGroup>
+            {renderSubAudience()}
+            <div>{renderAudienceList()}</div>
+          </>
+        ) : (
+          <>
+            <div style={{marginBottom: 20}}>
+              {/* <FormLabel component="label">{"Select Community "}</FormLabel> */}
+              <MEDropdown
+                onItemSelected={(items) => setSelectedCommunities(items)}
+                defaultValue={selectedCommunities || []}
+                smartDropdown={false}
+                labelExtractor={(item) => item?.name}
+                valueExtractor={(item) => item}
+                data={communities}
+                placeholder="Choose the community from which you want this message to originate"
+                sx={{height: 56}}
+              />
+            </div>
+            {renderAudienceForm()}
+          </>
+        )}
 
         <div style={{ marginTop: 20 }}>
           <TextField
