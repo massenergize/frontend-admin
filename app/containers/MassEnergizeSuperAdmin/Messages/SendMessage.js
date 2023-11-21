@@ -18,9 +18,6 @@ import {
   FormLabel,
   LinearProgress,
   Box,
-  Chip,
-  Grid,
-  Checkbox,
 } from "@mui/material";
 import TinyEditor from "../_FormGenerator/TinyMassEnergizeEditor";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
@@ -29,6 +26,7 @@ import { apiCall } from "../../../utils/messenger";
 import { LOADING } from "../../../utils/constants";
 import Loading from "dan-components/Loading";
 import { reduxLoadMetaDataAction, reduxLoadScheduledMessages, reduxToggleUniversalModal, reduxToggleUniversalToast } from "../../../redux/redux-actions/adminActions";
+import FullAudienceList from "./FullAudienceList";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 /**
@@ -36,89 +34,93 @@ const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
  * whenever audience type changes reset audience
  */
 
-const AUDIENCE_TYPE = [
-  { id: "SUPER_ADMIN", value: "Super Admins" },
-  { id: "COMMUNITY_CONTACTS", value: "Community Contacts" },
-  { id: "COMMUNITY_ADMIN", value: "Community Admins" },
-  { id: "USERS", value: "Users" },
+const SUPER_ADMIN = "SUPER_ADMIN";
+const COMMUNITY_CONTACTS = "COMMUNITY_CONTACTS";
+const COMMUNITY_ADMIN = "COMMUNITY_ADMIN";
+const USERS = "USERS";
+
+var AUDIENCE_TYPE = [
+  { id: SUPER_ADMIN, value: "Super Admins" },
+  { id: COMMUNITY_CONTACTS, value: "Community Contacts" },
+  { id: COMMUNITY_ADMIN, value: "Community Admins" },
+  { id: USERS, value: "Users" },
 ];
 
 const getAudienceType = (id) => {
-  return AUDIENCE_TYPE.find((a) => a.id === id).value;
+  return AUDIENCE_TYPE?.find((a) => a?.id === id)?.value;
 };
 
-function SendMessage({ classes, communities, users, meta, ...props }) {
-  const [currentFilter, setCurrentFilter] = useState("SUPER_ADMIN");
+function SendMessage({ classes, meta,auth, ...props }) {
+  const [currentFilter, setCurrentFilter] = useState(SUPER_ADMIN);
   const [usersQuery, setQuery] = useState({});
   const [open, setOpen] = React.useState(false);
   const [selectedCommunities, setSelectedCommunities] = React.useState([]);
   const [audience, setAudience] = React.useState([]);
   const [sub_audience_type, setSubAudienceType] = React.useState("FROM_COMMUNITY");
   const [loading, setLoading] = React.useState(false);
-  const [checkedItems, setCheckedItems] = React.useState([]);
-
+  const [communities, setCommunities] = React.useState([]);
+  const [allUsers, setAllUsers] = React.useState([]);
 
   const UrlParams = useParams();
-  
+
+  const SUB_AUDIENCE_TYPE = [
+    { id: "FROM_COMMUNITY", value: "From Community" },
+    {id: "SPECIFIC",value: `Specific ${getAudienceType(currentFilter)}`,
+    },
+  ];
+
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([
+      apiCall("/communities.listNoPagination", {}),
+      apiCall("/users.listNoPagination", {}),
+    ]).then((response) => {
+      const [communities, users] = response;
+      setCommunities(communities?.data || [])
+      setAllUsers(users?.data || [])
+      setLoading(false);
+    });
+    
+  }, [])
+
   useEffect(() => {
     setSelectedCommunities([]);
     setAudience([]);
-  }, [currentFilter]);
+  }, [currentFilter, sub_audience_type]);
 
   useEffect(() => {
     const { id } = UrlParams;
     if (!id) return;
 
     if (props?.messages === LOADING) return;
-    let message = (props.messages || [])?.filter(
-      (m) => m.id?.toString() === id?.toString()
-    )[0];
+    let message = (props.messages || [])?.filter( (m) => m.id?.toString() === id?.toString())[0];
     if (message) {
-      let {
-        audience_type,
-        sub_audience_type,
-        audience,
-        community_ids,
-      } = message?.schedule_info?.recipients;
+      let {audience_type,sub_audience_type,audience,community_ids} = message?.schedule_info?.recipients;
 
       setCurrentFilter(audience_type);
       setSubAudienceType(sub_audience_type);
-      setQuery({
-        message: message?.body,
-        subject: message?.title,
-      });
-      fetchListOfAudience(audience, community_ids, audience_type);
+      setQuery({message: message?.body,subject: message?.title });
+      setListOfAudience(audience, community_ids, audience_type);
     }
-  }, [UrlParams?.id, props?.messages]);
+  }, [UrlParams?.id, props?.messages, allUsers?.length, communities?.length]);
 
-  const SUB_AUDIENCE_TYPE = [
-    { id: "FROM_COMMUNITY", value: "From Community" },
-    { id: "SPECIFIC", value: `Specific ${getAudienceType(currentFilter)}` },
-  ];
 
-  if (props?.messages === LOADING) return <Loading />;
-
-  const fetchListOfAudience = (audience_ids, community_id, audience_type) => {
+  const setListOfAudience = (audience_ids, community_id, audience_type) => {
     if (community_id) {
-      apiCall("/communities.listForCommunityAdmin", {
-        community_ids: community_id?.split(","),
-      }).then((res) => {
-        if (res?.success) {
-          setSelectedCommunities(res?.data);
-        }
-      });
+      const _selectedCommunities = communities?.filter((obj) => community_id?.split(",")?.includes(obj?.id?.toString()));
+      setSelectedCommunities(_selectedCommunities);
     }
 
     if (!isAll(audience_ids)) {
-      let args = ["COMMUNITY_CONTACTS"].includes(audience_type)
-        ? { community_ids: audience_ids }
-        : { user_ids: audience_ids };
-      if (audience_ids) {
-        apiCall(getEndpoint(audience_type), args).then((res) => {
-          if (res?.success) {
-            setAudience(res?.data);
-          }
-        });
+      let arrOfIds = audience_ids?.split(",");
+
+      if (audience_type === COMMUNITY_CONTACTS) {
+        let _audience = communities?.filter((obj) => arrOfIds?.includes(obj?.id?.toString()));
+        setAudience(_audience);
+      }
+      else{
+        let _audience = allUsers?.filter((obj) => arrOfIds?.includes(obj?.id?.toString()));
+        setAudience(_audience);
       }
     }
   };
@@ -132,29 +134,44 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
     return usersQuery[name] || _default;
   };
 
-  const getEndpoint = (audience_type = currentFilter) => {
-    if (audience_type === "COMMUNITY_CONTACTS")
-      return "/communities.listForCommunityAdmin";
-    return "/users.listNoPagination";
-  };
-
-  const toggleMembership = () => {
-    if (currentFilter === "SUPER_ADMIN") return ["Super Admin"];
-    else if (currentFilter === "COMMUNITY_ADMIN") return ["Community Admin"];
-    else if (currentFilter === "COMMUNITY_CONTACTS")
-      return ["Community Contact"];
-    return ["Member"];
-  };
-
   const isAll = (item) => {
     if (!item) return false;
     if (item?.includes("all")) return true;
     return false;
   };
 
+  const getAudienceList = (audience_type)=>{
+    switch (audience_type) {
+      case SUPER_ADMIN:
+        return allUsers?.filter((u) => u.is_super_admin) || [];
+        case COMMUNITY_CONTACTS:
+          return communities;
+          
+        case COMMUNITY_ADMIN:
+            let allCadmin = allUsers?.filter((u) => u?.is_community_admin) || [];
+            if(selectedCommunities?.length){
+              return allCadmin?.filter((obj1) => obj1?.communities?.some((name1) =>selectedCommunities?.some((obj2) => obj2?.name === name1)))
+            }
+            return allCadmin;
+      default:
+        if(selectedCommunities?.length){
+          const filteredArray = allUsers?.filter((obj1) => obj1?.communities?.some((name1) =>selectedCommunities?.some((obj2) => obj2?.name === name1)))
+          return filteredArray
+        }
+        return allUsers?.filter((u) => !u?.is_super_admin || !u?.is_community_admin) || []
+    }
+  }
+
+  // if(auth?.is_community_admin){
+  //   AUDIENCE_TYPE = [
+  //     { id: COMMUNITY_ADMIN, value: "Community Admins" },
+  //     { id: USERS, value: "Users" },
+  //   ];
+  // }
+
 
   const audienceDisplayName = (item) => {
-    if(currentFilter==="COMMUNITY_CONTACTS"){
+    if(currentFilter===COMMUNITY_CONTACTS){
       return `${item?.name}: ${item?.owner_name} (${item?.owner_email})`
     }
     return `${item?.full_name}(${item?.email})`;
@@ -211,8 +228,9 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
       setOpen(false);
     });
   };
+
   const renderSubAudience = () => {
-    if (["COMMUNITY_ADMIN", "USERS"].includes(currentFilter)) {
+    if ([COMMUNITY_ADMIN, USERS].includes(currentFilter)) {
       return (
         <div>
           <FormLabel component="label">{"Filter Down the Audience"}</FormLabel>
@@ -259,10 +277,8 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
         <LightAutoComplete
           defaultSelected={selectedCommunities || []}
           multiple={true}
-          isAsync={true}
-          endpoint={"/communities.listForSuperAdmin"}
           onChange={(selected) => setSelectedCommunities(selected)}
-          data={[]}
+          data={communities||[]}
           labelExtractor={(item) => item?.name}
           valueExtractor={(item) => item?.id}
         />
@@ -276,36 +292,27 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
     if (sub_audience_type === "FROM_COMMUNITY" && community?.length > 0) {
       community = community?.map((c) => c.name);
     }
+    let data = getAudienceList(currentFilter) || [];
     return (
       <>
         <FormLabel component="label">{"Audience"}</FormLabel>
         <LightAutoComplete
           defaultSelected={audience || []}
           multiple={true}
-          isAsync={true}
-          endpoint={getEndpoint()}
-          params={{
-            membership: toggleMembership(),
-            community,
-            sort_params: { name: "full_name", direction: "asc" },
-          }}
           onChange={(selected) => setAudience(selected)}
-          data={[]}
+          data={data}
           labelExtractor={(item) => audienceDisplayName(item)}
           valueExtractor={(item) => item?.id}
           placeholder="Select audience"
-          args={{ limit: 1000 }}
-          key={currentFilter}
-          showHiddenList={(items) => toggleFullAudienceListModal(items)}
-          // renderItemsListDisplayName={(items) => renderAudienceListComponent(items)}
+          key={data?.length}
+          showHiddenList={(items, setItems) => toggleFullAudienceListModal(items, setItems)}
         />
       </>
     );
   };
 
   const renderAudienceList = () => {
-    // const {sub_audience_type} = usersQuery
-    if (["SUPER_ADMIN", "COMMUNITY_CONTACTS"].includes(currentFilter)) {
+    if ([SUPER_ADMIN, COMMUNITY_CONTACTS].includes(currentFilter)) {
       return renderAudienceForm();
     }
     if (sub_audience_type === "SPECIFIC") {
@@ -317,70 +324,31 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
     }
   };
 
-    const toggleFullAudienceListModal = (items) => {
-      console.log('==items ===', items)
-      setCheckedItems(items || []);
-      console.log("=== checkedItems ===", checkedItems);
+    const toggleFullAudienceListModal = (items, setItems) => {
     const { toggleModal } = props;
     toggleModal({
       show: true,
-      component: renderFullAudienceList(items),
-      onConfirm: () => toggleModal({ show: false, component: null }),
+      component: (
+        <FullAudienceList
+          items={items}
+          audienceDisplayName={audienceDisplayName}
+          setItems={setItems}
+          onCancel={() => toggleModal({ show: false, component: null })}
+        />
+      ),
       closeAfterConfirmation: true,
-      title: "Full Communities List",
+      title: "Full Audience List",
       noTitle: false,
-      noCancel: true,
-      okText: "Close",
+      noCancel: false,
+      okText: "Save",
+      cancelText: "Cancel",
+      fullControl: true,
     });
   }
-  const handleChecked = (e, item) => {
-    let itemAlreadyIn = checkedItems.filter((i) => i.id === item.id)?.length>0
-    if (!itemAlreadyIn) {
-      setCheckedItems([...checkedItems, item]);
-    } else {
-      setCheckedItems(checkedItems.filter((i) => i.id !== item.id));
-    }
-    
-  }
-
-  const renderFullAudienceList = (items) => {
-    return(
-       <Grid container spacing={1} sx={{maxHeight: "50vh", overflow: 'auto'}}>
-        {items.map((item, index) => {
-          return (
-            <Grid item xs={6} md={6} lg={6} xl={6} key={index}>
-              <Chip
-                label={audienceDisplayName(item)}
-                variant="outlined"
-                icon={
-                  <Checkbox
-                    checked={checkedItems.filter((i) => i.id === item.id)?.length>0}
-                    onChange={(e) => {
-                      handleChecked(e, item);
-                    }}
-                    inputProps={{ "aria-label": "controlled" }}
-                    // value={item?.id}
-                    size="small"
-                    sx={{
-                      borderRadius: 0,
-                      border: "1px solid ##f6eeee",
-                    }}
-                  />
-                }
-              />
-            </Grid>
-          );
-        })}
-        </Grid>
-    )
-  };
 
 
-
-  const renderAudienceListComponent = (items)=>{
-    return <Button variant="outlined" onClick={() => toggleFullAudienceListModal(items)}>View All Selected Audience</Button>;
-  }
-
+  if (props?.messages === LOADING) return <Loading />;
+  
   return (
     <PapperBlock
       title="Send Message"
@@ -438,7 +406,7 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
           <TinyEditor
             id={"message"}
             value={getValue("message", "")}
-            onEditorChange={(content, editor) => {
+            onEditorChange={(content) => {
               buildQuery("message", content);
             }}
             toolbar="undo redo | blocks | formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent | fontfamily | fontsize |"
@@ -513,8 +481,6 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
 const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   communities: state.getIn(["communities"]),
-  users: state.getIn(["allUsers"]),
-  sadmins: state.getIn(["sadmins"]),
   messages: state.getIn(["scheduledMessages"]),
   meta: state.getIn(["paginationMetaData"]),
 });
