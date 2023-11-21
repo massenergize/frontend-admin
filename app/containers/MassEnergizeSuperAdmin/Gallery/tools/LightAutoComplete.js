@@ -86,6 +86,7 @@ function LightAutoComplete(props) {
     selectAllV2,
     showHiddenList,
     renderItemsListDisplayName,
+    shortenListAfter,
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
@@ -211,7 +212,7 @@ function LightAutoComplete(props) {
   return (
     <div style={{ position: "relative", width: "100%", marginTop: 0 }} key={props?.key}>
       <div ref={chipWrapperRef}>
-        {(showHiddenList &&selected?.length>5 ) ? renderItemsListDisplayName ? renderItemsListDisplayName(selected,setSelected ) :<span onClick={() => showHiddenList && showHiddenList(selected, setSelected)} style={{cursor: "pointer", color: "blue"}}>View full list</span> : selected?.length > 0&& (
+        {(showHiddenList &&selected?.length>(shortenListAfter||5) ) ? renderItemsListDisplayName ? renderItemsListDisplayName(selected,setSelected ) :<span onClick={() => showHiddenList && showHiddenList(selected, setSelected)} style={{cursor: "pointer", color: "blue"}}>View full list</span> : selected?.length > 0&& (
           <>
             {selected.map((option, index) => {
               var deleteOptions = { onDelete: () => handleSelection(option) };

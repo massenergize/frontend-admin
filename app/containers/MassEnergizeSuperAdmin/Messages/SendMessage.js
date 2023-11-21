@@ -306,6 +306,7 @@ function SendMessage({ classes, meta,auth, ...props }) {
           placeholder="Select audience"
           key={data?.length}
           showHiddenList={(items, setItems) => toggleFullAudienceListModal(items, setItems)}
+          shortenListAfter={5}
         />
       </>
     );
