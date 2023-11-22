@@ -1,3 +1,5 @@
+import { FLAGS } from "../../components/FeatureFlags/flags";
+
 const CADMIN_MENU = [
   {
     key: "dashboard",
@@ -208,8 +210,10 @@ const CADMIN_MENU = [
   },
 ];
 
-const bigObj = {
-  "user-submitted-testimonials-feature-flag": {
+
+let menuAttachmentsObj = {} 
+
+menuAttachmentsObj[FLAGS.BROADCAST_MESSAGING_FF] = {
     appendTo: "messages",
     value: [
       {
@@ -225,7 +229,6 @@ const bigObj = {
     ],
     index: 1,
   }
-};
 
 
 
@@ -241,8 +244,8 @@ const communityAdminMenu = ({ flags }) => {
   if (!flags || flags?.length === 0) return CADMIN_MENU;
 
    flags.forEach((flag) => {
-    if (bigObj[flag.key]) {
-      const { appendTo, value, index } = bigObj[flag.key];
+    if (menuAttachmentsObj[flag.key]) {
+      const { appendTo, value, index } = menuAttachmentsObj[flag.key];
       
       if (appendTo) {
         const menuItemIndex = CADMIN_MENU.findIndex((item) => item.key === appendTo);
