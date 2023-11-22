@@ -73,8 +73,8 @@ function SendMessage({ classes, meta,auth, ...props }) {
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      apiCall("/communities.listNoPagination", {}),
-      apiCall("/users.listNoPagination", {}),
+      apiCall("/communities.listForCommunityAdmin", {no_pagination: true}),
+      apiCall("/users.listForCommunityAdmin", {no_pagination: true}),
     ]).then((response) => {
       const [communities, users] = response;
       setCommunities(communities?.data || [])
