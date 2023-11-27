@@ -334,7 +334,7 @@ const createFormJson = ({
                         name: "community",
                         label: "Primary Community (select one)",
                         fieldType: "Dropdown",
-                        // defaultValue: progress.community || null,
+                        defaultValue: action.community && "" + action.community.id,
                         dbName: "community_id",
                         data: [{ displayName: "--", id: "" }, ...communities],
                         isRequired: true,
