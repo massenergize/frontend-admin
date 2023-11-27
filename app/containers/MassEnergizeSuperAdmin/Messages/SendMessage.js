@@ -25,7 +25,9 @@ import ScheduleMessageModal from "./ScheduleMessageModal";
 import { apiCall } from "../../../utils/messenger";
 import { LOADING } from "../../../utils/constants";
 import Loading from "dan-components/Loading";
-import { reduxLoadMetaDataAction, reduxLoadScheduledMessages, reduxToggleUniversalToast } from "../../../redux/redux-actions/adminActions";
+import { reduxLoadMetaDataAction, reduxLoadScheduledMessages, reduxToggleUniversalModal, reduxToggleUniversalToast } from "../../../redux/redux-actions/adminActions";
+import FullAudienceList from "./FullAudienceList";
+import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 /**
@@ -33,89 +35,93 @@ const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
  * whenever audience type changes reset audience
  */
 
-const AUDIENCE_TYPE = [
-  { id: "SUPER_ADMIN", value: "Super Admins" },
-  { id: "COMMUNITY_CONTACTS", value: "Community Contacts" },
-  { id: "COMMUNITY_ADMIN", value: "Community Admins" },
-  { id: "USERS", value: "Users" },
+const SUPER_ADMIN = "SUPER_ADMIN";
+const COMMUNITY_CONTACTS = "COMMUNITY_CONTACTS";
+const COMMUNITY_ADMIN = "COMMUNITY_ADMIN";
+const USERS = "USERS";
+
+var AUDIENCE_TYPE = [
+  { id: SUPER_ADMIN, value: "Super Admins" },
+  { id: COMMUNITY_CONTACTS, value: "Community Contacts" },
+  { id: COMMUNITY_ADMIN, value: "Community Admins" },
+  { id: USERS, value: "Users" },
 ];
 
 const getAudienceType = (id) => {
-  return AUDIENCE_TYPE.find((a) => a.id === id).value;
+  return AUDIENCE_TYPE?.find((a) => a?.id === id)?.value;
 };
 
-function SendMessage({ classes, communities, users, meta, ...props }) {
-  const [currentFilter, setCurrentFilter] = useState("SUPER_ADMIN");
+function SendMessage({ classes, meta,auth, ...props }) {
+  const [currentFilter, setCurrentFilter] = useState(!auth?.is_super_admin ? COMMUNITY_ADMIN: SUPER_ADMIN);
   const [usersQuery, setQuery] = useState({});
   const [open, setOpen] = React.useState(false);
   const [selectedCommunities, setSelectedCommunities] = React.useState([]);
   const [audience, setAudience] = React.useState([]);
-  const [sub_audience_type, setSubAudienceType] = React.useState("ALL");
+  const [sub_audience_type, setSubAudienceType] = React.useState("FROM_COMMUNITY");
   const [loading, setLoading] = React.useState(false);
-
+  const [communities, setCommunities] = React.useState([]);
+  const [allUsers, setAllUsers] = React.useState([]);
 
   const UrlParams = useParams();
+
+  const SUB_AUDIENCE_TYPE = [
+    { id: "FROM_COMMUNITY", value: "From Community" },
+    {id: "SPECIFIC",value: `Specific ${getAudienceType(currentFilter)}`,
+    },
+  ];
+
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([
+      apiCall("/communities.listForCommunityAdmin", {no_pagination: true}),
+      apiCall("/users.listForCommunityAdmin", {no_pagination: true}),
+    ]).then((response) => {
+      const [communities, users] = response;
+      setCommunities(communities?.data || [])
+      setAllUsers(users?.data || [])
+      setLoading(false);
+    });
+    
+  }, [])
 
   useEffect(() => {
     setSelectedCommunities([]);
     setAudience([]);
-  }, [currentFilter]);
+  }, [currentFilter, sub_audience_type]);
 
   useEffect(() => {
     const { id } = UrlParams;
     if (!id) return;
 
     if (props?.messages === LOADING) return;
-    let message = (props.messages || [])?.filter(
-      (m) => m.id?.toString() === id?.toString()
-    )[0];
+    let message = (props.messages || [])?.filter( (m) => m.id?.toString() === id?.toString())[0];
     if (message) {
-      let {
-        audience_type,
-        sub_audience_type,
-        audience,
-        community_ids,
-      } = message?.schedule_info?.recipients;
+      let {audience_type,sub_audience_type,audience,community_ids} = message?.schedule_info?.recipients;
 
       setCurrentFilter(audience_type);
       setSubAudienceType(sub_audience_type);
-      setQuery({
-        message: message?.body,
-        subject: message?.title,
-      });
-      fetchListOfAudience(audience, community_ids, audience_type);
+      setQuery({message: message?.body,subject: message?.title });
+      setListOfAudience(audience, community_ids, audience_type);
     }
-  }, [UrlParams?.id, props?.messages]);
+  }, [UrlParams?.id, props?.messages, allUsers?.length, communities?.length]);
 
-  const SUB_AUDIENCE_TYPE = [
-    { id: "ALL", value: "All" },
-    { id: "FROM_COMMUNITY", value: "From Community" },
-    { id: "SPECIFIC", value: `Specific ${getAudienceType(currentFilter)}` },
-  ];
 
-  if (props?.messages === LOADING) return <Loading />;
-
-  const fetchListOfAudience = (audience_ids, community_id, audience_type) => {
+  const setListOfAudience = (audience_ids, community_id, audience_type) => {
     if (community_id) {
-      apiCall("/communities.listForCommunityAdmin", {
-        community_ids: community_id?.split(","),
-      }).then((res) => {
-        if (res?.success) {
-          setSelectedCommunities(res?.data);
-        }
-      });
+      const _selectedCommunities = communities?.filter((obj) => community_id?.split(",")?.includes(obj?.id?.toString()));
+      setSelectedCommunities(_selectedCommunities);
     }
 
     if (!isAll(audience_ids)) {
-      let args = ["COMMUNITY_CONTACTS"].includes(audience_type)
-        ? { community_ids: audience_ids }
-        : { user_ids: audience_ids };
-      if (audience_ids) {
-        apiCall(getEndpoint(audience_type), args).then((res) => {
-          if (res?.success) {
-            setAudience(res?.data);
-          }
-        });
+      let arrOfIds = audience_ids?.split(",");
+
+      if (audience_type === COMMUNITY_CONTACTS) {
+        let _audience = communities?.filter((obj) => arrOfIds?.includes(obj?.id?.toString()));
+        setAudience(_audience);
+      }
+      else{
+        let _audience = allUsers?.filter((obj) => arrOfIds?.includes(obj?.id?.toString()));
+        setAudience(_audience);
       }
     }
   };
@@ -129,29 +135,51 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
     return usersQuery[name] || _default;
   };
 
-  const getEndpoint = (audience_type = currentFilter) => {
-    if (audience_type === "COMMUNITY_CONTACTS")
-      return "/communities.listForCommunityAdmin";
-    return "/users.listForSuperAdmin";
-  };
-
-  const toggleMembership = () => {
-    if (currentFilter === "SUPER_ADMIN") return ["Super Admin"];
-    else if (currentFilter === "COMMUNITY_ADMIN") return ["Community Admin"];
-    else if (currentFilter === "COMMUNITY_CONTACTS")
-      return ["Community Contact"];
-    return ["Member"];
-  };
-
   const isAll = (item) => {
     if (!item) return false;
     if (item?.includes("all")) return true;
     return false;
   };
 
+  const getAudienceList = (audience_type)=>{
+    switch (audience_type) {
+      case SUPER_ADMIN:
+        return allUsers?.filter((u) => u.is_super_admin) || [];
+        case COMMUNITY_CONTACTS:
+          return communities;
+          
+        case COMMUNITY_ADMIN:
+            let allCadmin = allUsers?.filter((u) => u?.is_community_admin) || [];
+            if(selectedCommunities?.length){
+              return allCadmin?.filter((obj1) => obj1?.communities?.some((name1) =>selectedCommunities?.some((obj2) => obj2?.name === name1)))
+            }
+            return allCadmin;
+      default:
+        if(selectedCommunities?.length){
+          const filteredArray = allUsers?.filter((obj1) => obj1?.communities?.some((name1) =>selectedCommunities?.some((obj2) => obj2?.name === name1)))
+          return filteredArray
+        }
+        return allUsers?.filter((u) => !u?.is_super_admin || !u?.is_community_admin) || []
+    }
+  }
+
+
+  const audienceDisplayName = (item) => {
+    if(currentFilter===COMMUNITY_CONTACTS){
+      return `${item?.name}: ${item?.owner_name} (${item?.owner_email})`
+    }
+    return `${item?.full_name}(${item?.email})`;
+  }
+
+  const dataValidated = (data) => {
+    if(!data?.audience) return false
+    if(!data?.message) return false
+    if(!data?.subject) return false
+    return true
+  }
+
   const onFormSubmit = (data = usersQuery) => {
-    setLoading(true);
-     let msgs = props?.messages || [];
+    let msgs = props?.messages || [];
     data = {
       ...data,
       audience: isAll(audience) ? audience : audience?.map((a) => a.id),
@@ -162,6 +190,16 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
     if(UrlParams?.id){
       data.id = UrlParams.id;
     }
+    if(!dataValidated(data)){
+      props?.toggleToast({
+        open: true,
+        message: "Please ensure audience, message and subject are filled",
+        variant: "error",
+      });
+      return;
+    }
+
+    setLoading(true);
     setOpen(false);
     apiCall("/messages.send", data).then((res) => {
       setLoading(false);
@@ -200,8 +238,9 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
       setOpen(false);
     });
   };
+
   const renderSubAudience = () => {
-    if (["COMMUNITY_ADMIN", "USERS"].includes(currentFilter)) {
+    if ([COMMUNITY_ADMIN, USERS].includes(currentFilter)) {
       return (
         <div>
           <FormLabel component="label">{"Filter Down the Audience"}</FormLabel>
@@ -248,10 +287,8 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
         <LightAutoComplete
           defaultSelected={selectedCommunities || []}
           multiple={true}
-          isAsync={true}
-          endpoint={"/communities.listForSuperAdmin"}
           onChange={(selected) => setSelectedCommunities(selected)}
-          data={[]}
+          data={communities||[]}
           labelExtractor={(item) => item?.name}
           valueExtractor={(item) => item?.id}
         />
@@ -265,30 +302,28 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
     if (sub_audience_type === "FROM_COMMUNITY" && community?.length > 0) {
       community = community?.map((c) => c.name);
     }
+    let data = getAudienceList(currentFilter) || [];
     return (
       <>
         <FormLabel component="label">{"Audience"}</FormLabel>
         <LightAutoComplete
           defaultSelected={audience || []}
           multiple={true}
-          isAsync={true}
-          endpoint={getEndpoint()}
-          params={{ membership: toggleMembership(), community }}
           onChange={(selected) => setAudience(selected)}
-          data={[]}
-          labelExtractor={(item) => item?.full_name || item?.name}
+          data={data}
+          labelExtractor={(item) => audienceDisplayName(item)}
           valueExtractor={(item) => item?.id}
           placeholder="Select audience"
-          selectAllV2={true}
-          key={currentFilter}
+          key={data?.length}
+          showHiddenList={(items, setItems) => toggleFullAudienceListModal(items, setItems)}
+          shortenListAfter={5}
         />
       </>
     );
   };
 
   const renderAudienceList = () => {
-    // const {sub_audience_type} = usersQuery
-    if (["SUPER_ADMIN", "COMMUNITY_CONTACTS"].includes(currentFilter)) {
+    if ([SUPER_ADMIN, COMMUNITY_CONTACTS].includes(currentFilter)) {
       return renderAudienceForm();
     }
     if (sub_audience_type === "SPECIFIC") {
@@ -300,6 +335,31 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
     }
   };
 
+    const toggleFullAudienceListModal = (items, setItems) => {
+    const { toggleModal } = props;
+    toggleModal({
+      show: true,
+      component: (
+        <FullAudienceList
+          items={items}
+          audienceDisplayName={audienceDisplayName}
+          setItems={setItems}
+          onCancel={() => toggleModal({ show: false, component: null })}
+        />
+      ),
+      closeAfterConfirmation: true,
+      title: "Full Audience List",
+      noTitle: false,
+      noCancel: false,
+      okText: "Save",
+      cancelText: "Cancel",
+      fullControl: true,
+    });
+  }
+
+
+  if (props?.messages === LOADING) return <Loading />;
+  
   return (
     <PapperBlock
       title="Send Message"
@@ -307,41 +367,62 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
     >
       <Seo name={"Send Message"} />
       <>
-        <FormLabel>Audience Type</FormLabel>
-        <RadioGroup
-          value={currentFilter}
-          style={{ display: "flex", flexDirection: "row" }}
-          onChange={(ev) => {
-            const value = ev.target.value;
-            buildQuery("audience_type", value);
-            setCurrentFilter(value);
-          }}
-        >
-          {AUDIENCE_TYPE.map((option) => (
-            <FormControlLabel
-              name={option.key}
-              key={option.key}
-              value={option.id}
-              control={<Radio />}
-              label={
-                <Typography
-                  variant="body2"
-                  style={{ fontSize: "0.8rem", fontWeight: "bold" }}
-                >
-                  <Tooltip
-                    title={option.context}
-                    placement="top"
-                    style={{ fontWeight: "bold" }}
-                  >
-                    {option.value}
-                  </Tooltip>
-                </Typography>
-              }
-            />
-          ))}
-        </RadioGroup>
-        {renderSubAudience()}
-        <div>{renderAudienceList()}</div>
+        {auth?.is_super_admin ? (
+          <>
+            <FormLabel>Audience Type</FormLabel>
+            <RadioGroup
+              value={currentFilter}
+              style={{ display: "flex", flexDirection: "row" }}
+              onChange={(ev) => {
+                const value = ev.target.value;
+                buildQuery("audience_type", value);
+                setCurrentFilter(value);
+              }}
+            >
+              {AUDIENCE_TYPE.map((option) => (
+                <FormControlLabel
+                  name={option.key}
+                  key={option.key}
+                  value={option.id}
+                  control={<Radio />}
+                  label={
+                    <Typography
+                      variant="body2"
+                      style={{ fontSize: "0.8rem", fontWeight: "bold" }}
+                    >
+                      <Tooltip
+                        title={option.context}
+                        placement="top"
+                        style={{ fontWeight: "bold" }}
+                      >
+                        {option.value}
+                      </Tooltip>
+                    </Typography>
+                  }
+                />
+              ))}
+            </RadioGroup>
+            {renderSubAudience()}
+            <div>{renderAudienceList()}</div>
+          </>
+        ) : (
+          <>
+            <div style={{marginBottom: 20}}>
+              {/* <FormLabel component="label">{"Select Community "}</FormLabel> */}
+              <MEDropdown
+                onItemSelected={(items) => setSelectedCommunities(items)}
+                defaultValue={selectedCommunities || []}
+                smartDropdown={false}
+                labelExtractor={(item) => item?.name}
+                valueExtractor={(item) => item}
+                data={communities}
+                placeholder="Choose the community from which you want this message to originate"
+                sx={{height: 56}}
+              />
+            </div>
+            {renderAudienceForm()}
+          </>
+        )}
 
         <div style={{ marginTop: 20 }}>
           <TextField
@@ -357,7 +438,7 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
           <TinyEditor
             id={"message"}
             value={getValue("message", "")}
-            onEditorChange={(content, editor) => {
+            onEditorChange={(content) => {
               buildQuery("message", content);
             }}
             toolbar="undo redo | blocks | formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent | fontfamily | fontsize |"
@@ -432,8 +513,6 @@ function SendMessage({ classes, communities, users, meta, ...props }) {
 const mapStateToProps = (state) => ({
   auth: state.getIn(["auth"]),
   communities: state.getIn(["communities"]),
-  users: state.getIn(["allUsers"]),
-  sadmins: state.getIn(["sadmins"]),
   messages: state.getIn(["scheduledMessages"]),
   meta: state.getIn(["paginationMetaData"]),
 });
@@ -443,6 +522,7 @@ const mapDispatchToProps = (dispatch) => {
       putScheduledMessagesToRedux: reduxLoadScheduledMessages,
       updateTableMeta: reduxLoadMetaDataAction,
       toggleToast: reduxToggleUniversalToast,
+      toggleModal: reduxToggleUniversalModal,
     },
     dispatch
   );

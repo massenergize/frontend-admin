@@ -15,6 +15,7 @@ export const PAGE_PROPERTIES = {
          ALL_TAG_COLLECTS: { key: "ALL_TAG_COLLECTS" },
          ALL_TEAM_MEMBERS: { key: "ALL_TEAM_MEMBERS" },
          ACTION_ENGAGEMENTS: { key: "ACTION_ENGAGEMENTS" },
+         SCHEDULED_MESSAGES: { key: "SCHEDULED_MESSAGES" },
          EMAIL_TEMPLATES: { key: "EMAIL_TEMPLATES" },
        }; 
 

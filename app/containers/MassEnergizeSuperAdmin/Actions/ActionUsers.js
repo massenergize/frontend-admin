@@ -113,7 +113,6 @@ function ActionUsers({ classes }) {
   };
 
   const fashionData = (data) => {
-    console.log("== data ===", data)
     if (!data) return [];
     const fashioned = data.map((d) => [
       getHumanFriendlyDate(d?.recorded_at, false, true),

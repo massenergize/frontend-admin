@@ -405,7 +405,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
     apiCall("/communities.others.listForCommunityAdmin", { limit: 50 }),
     apiCall("/summary.next.steps.forAdmins"),
-    apiCall("/messages.listForCommunityAdmin", {params: JSON.stringify({is_scheduled: true})}),
+    apiCall("/messages.listScheduled"),
   ]).then((response) => {
     const [
       policies,
