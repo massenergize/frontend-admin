@@ -17,6 +17,8 @@ import { Typography } from "@mui/material";
 import { reduxLoadMetaDataAction, reduxLoadScheduledMessages, reduxToggleUniversalModal, reduxToggleUniversalToast } from "../../../redux/redux-actions/adminActions";
 import { LOADING } from "../../../utils/constants";
 import Loading from "dan-components/Loading";
+import SearchBar from "../../../utils/components/searchBar/SearchBar";
+import { onTableStateChange } from "../../../utils/helpers";
 
 
 function ScheduledMessages({
@@ -134,6 +136,23 @@ function ScheduledMessages({
       </Typography>
     );
   };
+  
+  const fashionData = (data) => {
+    return (data || [])?.map((d) => {
+      return [
+        d.id,
+        d?.user?.full_name,
+        d.title,
+        d.body,
+        convertToScheduledFor(d.scheduled_at),
+        d.id,
+      ];
+    });
+  };
+  if (messages === LOADING) return <Loading />;
+  
+  const dataForTable = fashionData(messages||[]);
+
   const options = {
     filterType: "dropdown",
     responsive: "standard",
@@ -152,28 +171,58 @@ function ScheduledMessages({
       });
       return false;
     },
+        onTableChange: (action, tableState) =>
+        onTableStateChange({
+          action,
+          tableState,
+          tableData: dataForTable,
+          metaData:meta?.scheduledMessages,
+          updateReduxFunction:props?.putScheduledMessagesToRedux,
+          reduxItems: messages,
+          apiUrl: "/messages.listScheduled",
+          pageProp: PAGE_PROPERTIES.SCHEDULED_MESSAGES,
+          updateMetaData: props?.updateTableMeta,
+          name: "scheduledMessages",
+          meta: meta,
+        }),
+      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
+        <SearchBar
+          url={"/messages.listScheduled"}
+          reduxItems={messages}
+          updateReduxFunction={props?.putScheduledMessagesToRedux}
+          handleSearch={handleSearch}
+          hideSearch={hideSearch}
+          pageProp={PAGE_PROPERTIES.SCHEDULED_MESSAGES}
+          updateMetaData={props?.updateTableMeta}
+          name="scheduledMessages"
+          meta={meta}
+        />
+      ),
+    whenFilterChanges: (
+        changedColumn,
+        filterList,
+        type,
+        changedColumnIndex,
+        displayData
+      ) =>
+        handleFilterChange({
+          filterList,
+          type,
+          columns,
+          page: PAGE_PROPERTIES.SCHEDULED_MESSAGES,
+          updateReduxFunction: putMessagesInRedux,
+          reduxItems: messages,
+          url: "/messages.listScheduled",
+          updateMetaData: props?.updateTableMeta,
+          name: "adminMessages",
+          meta: meta,
+        })
   };
-
-  const fashionData = (data) => {
-    return (data || [])?.map((d) => {
-      return [
-        d.id,
-        d?.user?.full_name,
-        d.title,
-        d.body,
-        convertToScheduledFor(d.scheduled_at),
-        d.id,
-      ];
-    });
-  };
-  if (messages === LOADING) return <Loading />;
-
-  const dataForTable = fashionData(messages||[]);
   return (
     <div>
       <Seo name={"Scheduled Messages"} />
       <METable
-        page={PAGE_PROPERTIES.FEATURE_FLAGS}
+        page={PAGE_PROPERTIES.SCHEDULED_MESSAGES}
         classes={classes}
         tableProps={{
           title: "Scheduled Messages",

@@ -9,11 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-// import MEDropDown from "./MEDropDown";
-import MEDropdownPro from "../../ME  Tools/dropdown/MEDropdownPro";
 import MEDropdown from "../../ME  Tools/dropdown/MEDropdown";
-import LightAutoComplete from "../../Gallery/tools/LightAutoComplete";
-import AsyncDropDown from "../AsyncCheckBoxDropDown";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import {
@@ -381,10 +377,6 @@ const MediaLibraryForm = ({
           </div>
         </div>
         <div>
-          {/* <MEDropdown
-            data={["Action", "Event", "Vendor"]}
-            placeholder="What are you uploading this image for? (Event, Action, Vendor, Testimonial etc...)"
-          /> */}
 
           <div style={{ margin: "10px 0px" }}>{showChips()}</div>
           <Typography

@@ -119,3 +119,10 @@ export function arrangeTabsByOrder(inputArray) {
 
   return resultArray;
 }
+
+export const functionsToExport = { 
+  toFile, 
+  getRandomStringKey, 
+  readContentOfSelectedFile,
+  getFileSize
+}

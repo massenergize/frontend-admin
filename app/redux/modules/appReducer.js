@@ -58,6 +58,7 @@ import {
   SET_MEDIA_LIBRARY_MODAL_FILTERS,
   SET_GALLERY_META_DATA,
   LOAD_SCHEDULED_MESSAGES,
+  ADD_BLOB_STRING,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -86,6 +87,14 @@ export default function reducer(state = initialImmutableState, action = {}) {
   }
 }
 
+export const reducerForAddingBlobString = (state = {}, action = {}) => {
+  switch (action.type) {
+    case ADD_BLOB_STRING:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForUserActiveStatus = (state = false, action = {}) => {
   switch (action.type) {
     case LOAD_USER_ACTIVE_STATUS:
