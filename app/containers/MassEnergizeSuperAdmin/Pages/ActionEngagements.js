@@ -104,7 +104,7 @@ function ActionEngagements({ engagements, putItemsInRedux }) {
         },
       },
       {
-        name: "# Compeleted",
+        name: "# Completed",
         key: "done",
         options: {
           display: type === DONE ? true : false,
