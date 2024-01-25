@@ -43,11 +43,14 @@ const styles = (theme) => ({
  }) {
   const [parents, setParents] = React.useState([]);
 
+  const isSuperAdmin = auth?.is_super_admin;
+
   const formJson = createFormJson({
     communities,
     autoOpenMediaLibrary: location?.state?.libOpen,
     parents: parents,
     setParents: setParents,
+    isSuperAdmin,
   });
 
   if(!formJson || !communities?.length) return <Loading />
@@ -92,28 +95,30 @@ export default withStyles(styles, { withTheme: true })(
   withRouter(NewTeamMapped)
 );
 
-const createFormJson = ({ communities, autoOpenMediaLibrary, parents, setParents }) => {
+const createFormJson = ({ communities, autoOpenMediaLibrary, parents, setParents, isSuperAdmin }) => {
   communities = (communities || []).map((c) => ({
     ...c,
     displayName: c.name,
     id: "" + c.id,
   }));
 
- const fetchAllTeamsInSelectedCommunities = (communityID) => {
-   const args = communityID ? { community_id: communityID, } : {};
-   apiCall("/teams.listForCommunityAdmin", args).then(({ data }) => {
+  const fetchAllTeamsInSelectedCommunities = (communityID) => {
+    const args = communityID ? { community_id: communityID, } : {};
+    apiCall("/teams.listForCommunityAdmin", args).then(({ data }) => {
      setParents(data || []);
-   });
- };
-   const updateParentWhenComIdsChange = (value) => {
-     if (!value) return;
-     fetchAllTeamsInSelectedCommunities(value);
-   };
+    });
+  };
 
-   parents = (parents || []).map((p) => ({
-     displayName: p.name,
-     id:p.id,
-   }))
+  const updateParentWhenComIdsChange = (value) => {
+    if (!value) return;
+    fetchAllTeamsInSelectedCommunities(value);
+  };
+
+  parents = (parents || []).map((p) => ({
+    displayName: p.name,
+    id:p.id,
+  }))
+
   const formJson = {
     title: "Create New Team",
     subTitle: "",
