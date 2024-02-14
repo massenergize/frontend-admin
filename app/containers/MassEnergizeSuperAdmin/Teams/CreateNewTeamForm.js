@@ -40,6 +40,7 @@ const styles = (theme) => ({
   classes,
   communities,
   location,
+   auth
  }) {
   const [parents, setParents] = React.useState([]);
 
