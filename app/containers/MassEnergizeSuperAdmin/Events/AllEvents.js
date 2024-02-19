@@ -126,7 +126,6 @@ class AllEvents extends React.Component {
       ),
       cancelText: 'Close',
       noOk: true,
-      // okText: "Change Event Settings",
     });
   }
 
