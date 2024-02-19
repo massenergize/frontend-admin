@@ -10,6 +10,8 @@
   },
   "parser": "babel-eslint",
   "rules": {
+    "react/jsx-one-expression-per-line": "off",
+    "react/no-unescaped-entities": "off",
     "no-use-before-define": "off",
     "react/no-unused-state": "off",
     "no-shadow": "off",
