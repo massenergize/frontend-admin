@@ -286,15 +286,15 @@ export const removePageProgressFromStorage = (key) => {
   localStorage.setItem(ME_FORM_PROGRESS, JSON.stringify(progress));
 };
 /**
-   * 
-   * This function takes a list of ids of items(msgs, actions, testimonials etc.) that need attending to and matches it against the data source, 
+   *
+   * This function takes a list of ids of items(msgs, actions, testimonials etc.) that need attending to and matches it against the data source,
    * to find out which of the items are available locally, and which ones need to be fetched.
-   * If all items are available locally, nothing happens. 
-   * If not, it fetches all the items not found and appends it to the main data source. 
-   * 
-   * This fxn helps arrange data properly so that when admins click from their dashboard to see 
+   * If all items are available locally, nothing happens.
+   * If not, it fetches all the items not found and appends it to the main data source.
+   *
+   * This fxn helps arrange data properly so that when admins click from their dashboard to see
    * "15" unanswered messages, all and only the unanswered messages will show up in the table, to make things easier.
-   
+
    */
 export const reArrangeForAdmin = ({
   dataSource,
@@ -352,3 +352,18 @@ export const convertToScheduledFor = (dateTimeString) => {
 
   return inputDate.toLocaleString("en-US", options);
 };
+
+export function findItemAtIndexAndRemainder(arr, comparator) {
+  const remainder = [];
+  let foundItem;
+  let index = -1;
+  for (let i = 0; i < arr.length; i++) {
+    const found = arr[i];
+    if (comparator && comparator(found)) {
+      foundItem = found;
+      index = i;
+    } else remainder.push(found);
+  }
+
+  return { index, foundItem, remainder };
+}

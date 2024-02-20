@@ -10,6 +10,7 @@
   },
   "parser": "babel-eslint",
   "rules": {
+    "react/jsx-wrap-multilines": "off",
     "react/jsx-one-expression-per-line": "off",
     "react/no-unescaped-entities": "off",
     "no-use-before-define": "off",
