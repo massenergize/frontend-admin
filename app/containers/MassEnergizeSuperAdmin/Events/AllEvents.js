@@ -42,7 +42,7 @@ import Seo from '../../../components/Seo/Seo';
 import CustomOptions from '../ME  Tools/table /CustomOptions';
 import { EventNotSharedWithAnyone, EventSharedWithCommunity, } from './EventSharedStateComponents';
 import MEDropdown from '../ME  Tools/dropdown/MEDropdown';
-import EventNotificationSettings from './EventNotificationSettings';
+import EventNotificationSettings from './notifcation-settings/EventNotificationSettings';
 
 
 class AllEvents extends React.Component {
@@ -109,12 +109,14 @@ class AllEvents extends React.Component {
     toggleModal({
       show: true,
       fullControl: true,
-      title: 'Notification Settings',
+
+      title: smartString(props?.name,50) || 'Notification Settings',
       component: (<EventNotificationSettings
         {...props}
         close={() => toggleModal({
           show: false,
-          component: null
+          component: null,
+
         })}
       />),
       cancelText: 'Close',
@@ -198,7 +200,7 @@ class AllEvents extends React.Component {
             style={{ margin: 10 }}
           />)}
           {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
-                                  </div>),
+        </div>),
       },
     }, {
       name: 'Name',
@@ -332,7 +334,7 @@ class AllEvents extends React.Component {
               placeholder="Options"
             />
           </div>
-                                        </div>),
+        </div>),
       },
     }, {
       name: 'Live',
@@ -398,14 +400,14 @@ class AllEvents extends React.Component {
       <Typography>
         <b>{name}</b>
         {' '}
-          is
+        is
         {isON ? 'live, ' : 'not live, '}
-          would you like
+        would you like
         {' '}
         {isON ? ' to take it offline' : ' to take it live'}
-          ?
+        ?
       </Typography>
-            </div>);
+    </div>);
   }
 
   addToHomePageUI({ id }) {
@@ -413,7 +415,7 @@ class AllEvents extends React.Component {
     const event = data?.find((item) => item.id?.toString() === id?.toString()) || {};
     return (<div>
       <Typography>
-          would you like to
+        would you like to
         {' '}
         {event?.is_on_home_page ? 'remove' : 'add'}
         {' '}
@@ -424,9 +426,9 @@ class AllEvents extends React.Component {
         <b>{event?.community?.name}</b>
         {'\'s '}
         {' '}
-          community homepage?
+        community homepage?
       </Typography>
-            </div>);
+    </div>);
   }
 
   addEventToHomePage = (id) => {
@@ -661,11 +663,11 @@ class AllEvents extends React.Component {
     };
 
     if (isEmpty(metaData)) {
-      return <Loader />;
+      return <Loader/>;
     }
 
     return (<div>
-      <Seo name="All Events" />
+      <Seo name="All Events"/>
       <Paper style={{ marginBottom: 10 }}>
         <METable
           classes={classes}
@@ -678,7 +680,7 @@ class AllEvents extends React.Component {
           }}
         />
       </Paper>
-            </div>);
+    </div>);
   }
 }
 
@@ -784,16 +786,16 @@ const EventSharedState = (props) => {
   if (numberOfSharers === 1) return <MEChip label="Yes" {...yesProps} />;
   if (numberOfSharers > 9) {
     return (<MEChip {...yesProps}>
-        (
+      (
       {numberOfSharers}
-        )
-            </MEChip>);
+      )
+    </MEChip>);
   }
   return (<MEChip {...yesProps} style={{ padding: '0px 15px' }}>
-      Yes(
+    Yes(
     {numberOfSharers}
-      )
-          </MEChip>);
+    )
+  </MEChip>);
 
   //   <Wrapper style={{ color: "rgb(65 169 65)" }}>
   //       <b>Yes({numberOfSharers})</b>

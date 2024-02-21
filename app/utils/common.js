@@ -146,7 +146,7 @@ export const pop = (arr = [], value, finder) => {
   var found = null;
   arr.forEach((item) => {
     const val = finder ? finder(item) : item;
-    if (val?.toString() === value.toString()) found = item;
+    if (val?.toString() === value?.toString()) found = item;
     else rest.push(item);
   });
 
