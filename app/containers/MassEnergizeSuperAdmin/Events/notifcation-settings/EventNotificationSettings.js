@@ -3,13 +3,16 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { Button } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { apiCall } from '../../../utils/messenger';
-import notification from '../../../components/Notification/Notification';
-import { findItemAtIndexAndRemainder } from '../../../utils/common';
-import { loadAllEvents } from '../../../redux/redux-actions/adminActions';
+import { apiCall } from '../../../../utils/messenger';
+import notification from '../../../../components/Notification/Notification';
+import { findItemAtIndexAndRemainder } from '../../../../utils/common';
+import { loadAllEvents } from '../../../../redux/redux-actions/adminActions';
+import METab from '../../ME  Tools/me-tabbed-view/METab';
+import NotificationChoices from './NotificationChoices';
+import SavedNudgeSettings from './SavedNudgeSettings';
 
 
-const OPTIONS = [{
+export const OPTIONS = [{
   key: 'when_first_uploaded',
   name: 'Notify on first nudge after event is posted or shared',
   value: false
@@ -32,12 +35,14 @@ const INITIAL_STATE = OPTIONS.reduce((acc, t) => ({
   ...acc,
   [t.key]: t.value
 }), {});
-export default function EventNotificationSettings({
-  name,
-  settings,
-  id,
-  close
-}) {
+export default function EventNotificationSettings(props) {
+  const {
+    settings,
+    id,
+    close
+  } = props || {};
+
+  // const [tabs, setTabs] = useState([]);
   const [state, setState] = useState({
     ...settings || {},
     notifications: settings?.notifications || INITIAL_STATE
@@ -114,22 +119,54 @@ export default function EventNotificationSettings({
         console.log('Error updating settings', err);
       });
   };
+  //
+  // useEffect(() => {
+  //
+  //   const tabs = [{
+  //     name: 'Nudge Settings',
+  //     id: 'nudge-settings',
+  //     renderComponent: () => <NotificationChoices handleChange={handleChange} event={props} getValue={getValue}/>
+  //     // component : <NotificationChoices handleChange={handleChange} event={props} getValue={getValue}/>
+  //   }, {
+  //     name: 'Saved Settings',
+  //     id: 'saved-settings',
+  //     renderComponent: () => <SavedNudgeSettings event={props}/>
+  //     // component : <SavedNudgeSettings event={props}/>
+  //   }];
+  //   setTabs(tabs);
+  //
+  // }, [state]);
+  const tabs = [{
+    name: 'Nudge Settings',
+    id: 'nudge-settings',
+    renderComponent: () => <NotificationChoices handleChange={handleChange} event={props} getValue={getValue}/>
+    // component : <NotificationChoices handleChange={handleChange} event={props} getValue={getValue}/>
+  }, {
+    name: 'Saved Settings',
+    id: 'saved-settings',
+    renderComponent: () => <SavedNudgeSettings event={props}/>
+    // component : <SavedNudgeSettings event={props}/>
+  }];
 
-  return (<div style={{ padding: '0px 20px' }}>
-    <p>Notification settings for <b>"{name}"</b></p>
-    {OPTIONS.map((t) => <> <FormControlLabel
-      key={t.key}
-      control={<Checkbox checked={getValue(t.key)} onChange={handleChange} name={t.key}/>}
-      label={t.name}
-      value={t.key}
-    /> <br/>
-    </>)}
+
+  return (<div style={{
+
+    width: '38vw',
+    maxHeight: 440,
+    height: 440,
+  }}>
+    <div style={{ padding: '0px 20px', }}>
+      <METab tabs={tabs}/>
+    </div>
+
     <div style={{
-      padding: 20,
       display: 'flex',
-      flexDirection: 'row'
-    }}
-    >
+      flexDirection: 'row',
+      position: 'absolute',
+      bottom: 0,
+      width: '100%',
+      padding:"10px 20px"
+    }}>
       <div style={{ marginLeft: 'auto' }}>
         <Button onClick={() => close && close()}>Close</Button>
         <Button onClick={() => sendChangesToBackend()}>{loading && <i
@@ -139,5 +176,6 @@ export default function EventNotificationSettings({
         </Button>
       </div>
     </div>
+
   </div>);
 }
