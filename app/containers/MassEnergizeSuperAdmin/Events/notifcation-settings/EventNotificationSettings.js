@@ -42,23 +42,21 @@ export default function EventNotificationSettings(props) {
     settings,
     id,
     close
-  } = props || {};
+  } = props || {}; // Contains all props, and all data in the event object
+  const eventObj = props;
 
   // const [tabs, setTabs] = useState([]);
-  const [state, setState] = useState({
-    ...settings || {},
-    notifications: settings?.notifications || INITIAL_STATE
-  });
+  const [state, setState] = useState({});
+  const [targetCommunities, setTargetCommunities] = useState([]);
+
+  console.log("LEts see target communities", targetCommunities)
+
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('nudge-settings');
+
   const dispatch = useDispatch();
 
   const allEvents = useSelector(state => state.getIn(['allEvents']));
-
-  const getValue = (name) => {
-    const data = state?.notifications || {};
-    return data[name];
-  };
 
   const resetOptions = () => {
     const data = state?.notifications || {};
@@ -99,7 +97,7 @@ export default function EventNotificationSettings(props) {
 
   const sendChangesToBackend = () => {
     setLoading(true);
-    apiCall('/events.update', {
+    apiCall('/events.nudge.settings.create', {
       event_id: id,
       settings: JSON.stringify(state)
     })
@@ -109,6 +107,7 @@ export default function EventNotificationSettings(props) {
           return console.log('Error updating settings', response);
         }
         const event = response?.data;
+        console.log("HERE IS THE EVENT", event)
         const {
           index,
           remainder
@@ -123,50 +122,80 @@ export default function EventNotificationSettings(props) {
       });
   };
 
+  const updateState = (newState) => {
+    setState({
+      ...state,
+      ...newState || {}
+    });
+  };
   const tabs = [{
     name: 'Nudge Settings',
     id: 'nudge-settings',
-    renderComponent: () => <NotificationChoices handleChange={handleChange} event={props} getValue={getValue}/>
+    renderComponent: () => <NotificationChoices setState={updateState} state={state} handleChange={handleChange}
+                                                event={eventObj}
+    />
 
   }, {
     name: 'Saved Settings',
     id: 'saved-settings',
-    renderComponent: () => <SavedNudgeSettings event={props}/>
+    renderComponent: () => <SavedNudgeSettings event={eventObj}/>
 
   }];
 
+  const findNotificationProfileWithId = (id) => {
+    const { notifications } = props?.settings || {};
+    return notifications?.find(n => n.id === id);
+  };
+
+  const makeStateObject = (notification) => {
+    return { ...INITIAL_STATE, ...notification || {} };
+  };
+
+  useEffect(() => {
+    const { settings } = props || {};
+    const firstOne = (settings?.notifications || [])[0];
+    const obj = makeStateObject(firstOne)
+    console.log("NOW LETS SEE OBJ", obj)
+    setState({
+      ...settings,
+      notifications: obj
+    });
+
+  }, []);
+
+
   const isChoicesTab = activeTab === 'nudge-settings';
 
-  return (<div style={{
-    width: '38vw',
-  }}>
-    <div style={{ padding: '0px 20px', }}>
-      <METab tabs={tabs} defaultTab={activeTab} contentStyle={{
-        maxHeight: 440,
-        height: 440,
-        paddingBottom: 70,
-        overflowY: 'scroll',
-      }}/>
-    </div>
-    {isChoicesTab &&
-      <div style={{
-        display: 'flex',
-        flexDirection: 'row',
-        position: 'absolute',
-        bottom: 0,
-        width: '100%',
-        padding: '10px 20px',
-        background: 'white'
-      }}>
-        <div style={{ marginLeft: 'auto', }}>
-          <Button onClick={() => close && close()}>Close</Button>
-          <Button onClick={() => sendChangesToBackend()}>{loading && <i
-            className="fa fa-spinner fa-spin"
-            style={{ marginRight: 10 }}
-          />} {loading ? '' : 'Apply'}
-          </Button>
-        </div>
-      </div>}
-
-  </div>);
+  return (
+    <div style={{
+      width: '38vw',
+    }}>
+      <div style={{ padding: '0px 20px', }}>
+        <METab tabs={tabs} defaultTab={activeTab} contentStyle={{
+          maxHeight: 440,
+          height: 440,
+          paddingBottom: 70,
+          overflowY: 'scroll',
+        }}/>
+      </div>
+      {isChoicesTab &&
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row',
+          position: 'absolute',
+          bottom: 0,
+          width: '100%',
+          padding: '10px 20px',
+          background: 'white'
+        }}>
+          <div style={{ marginLeft: 'auto', }}>
+            <Button onClick={() => close && close()}>Close</Button>
+            <Button onClick={() => sendChangesToBackend()}>{loading && <i
+              className="fa fa-spinner fa-spin"
+              style={{ marginRight: 10 }}
+            />} {loading ? '' : 'Apply'}
+            </Button>
+          </div>
+        </div>}
+    </div>);
 }

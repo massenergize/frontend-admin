@@ -1,32 +1,32 @@
 /** *
  * All utility Functions
  */
-import { Typography } from "@mui/material";
-import moment from "moment";
-import qs from "qs";
-import React from "react";
-import { ME_FORM_PROGRESS } from "../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
-import { apiCall } from "./messenger";
+import { Typography } from '@mui/material';
+import moment from 'moment';
+import qs from 'qs';
+import React from 'react';
+import { ME_FORM_PROGRESS } from '../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants';
+import { apiCall } from './messenger';
 
 export const getHumanFriendlyDateRange = (startDate, endDate) => {
   const start = moment(startDate);
   const end = moment(endDate);
 
   // Check if start and end dates are on the same day
-  const sameDay = start.isSame(end, "day");
+  const sameDay = start.isSame(end, 'day');
 
   if (sameDay) {
     // Format start and end times
-    const formattedStart = start.format("h:mm A");
-    const formattedEnd = end.format("h:mm A");
+    const formattedStart = start.format('h:mm A');
+    const formattedEnd = end.format('h:mm A');
 
     const formattedRange = `${start.format(
-      "Do MMMM YYYY"
+      'Do MMMM YYYY'
     )} from ${formattedStart} to ${formattedEnd}`;
     return formattedRange;
   } else {
-    const formattedStart = start.format("Do MMMM YYYY");
-    const formattedEnd = end.format("Do MMMM YYYY");
+    const formattedStart = start.format('Do MMMM YYYY');
+    const formattedEnd = end.format('Do MMMM YYYY');
 
     const formattedRange = `${formattedStart} to ${formattedEnd}`;
     return formattedRange;
@@ -39,7 +39,8 @@ export const getUniqueDates = (dates) => {
 
   // Iterate over the dates and extract the date part
   dates.forEach((date) => {
-    const dateStr = new Date(date).toISOString().slice(0, 10); // Get the date part of the ISO string
+    const dateStr = new Date(date).toISOString()
+      .slice(0, 10); // Get the date part of the ISO string
     uniqueDates.add(dateStr);
   });
 
@@ -63,7 +64,9 @@ export const separate = (ids, dataSet = [], options = {}) => {
     if (ids.includes(value)) {
       found.push(value);
       itemObjects.push(d);
-    } else remainder.push(d);
+    } else {
+      remainder.push(d);
+    }
   }
   notFound = ids.filter((id) => !found.includes(id));
   return {
@@ -73,34 +76,43 @@ export const separate = (ids, dataSet = [], options = {}) => {
     itemObjects, // Full objects of items that were found
   };
 };
-export function makeDeleteUI({ idsToDelete, templates }) {
+
+export function makeDeleteUI({
+  idsToDelete,
+  templates
+}) {
   const len = (idsToDelete && idsToDelete.length) || 0;
   var text = `Are you sure you want to delete (
-    ${(idsToDelete && idsToDelete.length) || ""})
-    ${len === 1 ? " event? " : " events? "}`;
+    ${(idsToDelete && idsToDelete.length) || ''})
+    ${len === 1 ? ' event? ' : ' events? '}`;
 
-  if (templates && templates.length)
+  if (templates && templates.length) {
     text = `Sorry, (${templates.length}) template${
-      templates.length === 1 ? "" : "s"
+      templates.length === 1 ? '' : 's'
     } selected. You can't delete templates. `;
+  }
   return <Typography>{text}</Typography>;
 }
 
 export const objArrayToString = (data, func) => {
-  var s = "";
+  var s = '';
   (data || []).forEach((d, index) => {
-    if (!s) s += func(d);
-    else s += ", " + func(d);
+    if (!s) {
+      s += func(d);
+    } else {
+      s += ', ' + func(d);
+    }
   });
   return s;
 };
 export const makeLimitsFromImageArray = (images) => {
-  if (images.length === 1)
+  if (images.length === 1) {
     return {
       lower_limit: images[0].id,
       upper_limit: images[0].id,
       images,
     };
+  }
   images = images.sort((a, b) => (a.id > b.id ? 1 : -1));
   return {
     lower_limit: images[0].id || 0,
@@ -114,23 +126,28 @@ export const getHumanFriendlyDate = (
   forSorting = true
 ) => {
   if (!dateString) return null;
-  var format = "";
-  if (forSorting) format = `YYYY-MM-DD ${includeTime ? "hh:mm a" : ""}`;
-  else format = `MMMM Do, YYYY ${includeTime ? "hh:mm a" : ""}`;
-  return moment(dateString).format(
-    // make it a bit less human friendly, so it sorts properly
-    format
-  );
+  var format = '';
+  if (forSorting) {
+    format = `YYYY-MM-DD ${includeTime ? 'hh:mm a' : ''}`;
+  } else {
+    format = `MMMM Do, YYYY ${includeTime ? 'hh:mm a' : ''}`;
+  }
+  return moment(dateString)
+    .format(
+      // make it a bit less human friendly, so it sorts properly
+      format
+    );
 };
 export const makeTimeAgo = (dateString) => {
-  if (!dateString) return "";
+  if (!dateString) return '';
 
-  return moment(dateString).fromNow();
+  return moment(dateString)
+    .fromNow();
 };
 export const smartString = (string, charLimit = 60) => {
-  if (!string) return "";
+  if (!string) return '';
   if (!charLimit) return string;
-  if (string.length > charLimit) return string.substr(0, charLimit) + "...";
+  if (string.length > charLimit) return string.substr(0, charLimit) + '...';
   return string;
 };
 /**
@@ -146,8 +163,11 @@ export const pop = (arr = [], value, finder) => {
   var found = null;
   arr.forEach((item) => {
     const val = finder ? finder(item) : item;
-    if (val?.toString() === value?.toString()) found = item;
-    else rest.push(item);
+    if (val?.toString() === value?.toString()) {
+      found = item;
+    } else {
+      rest.push(item);
+    }
   });
 
   return [found, rest];
@@ -158,22 +178,26 @@ export const findMatchesAndRest = (arr = [], finder) => {
   const rest = [];
   const found = [];
   arr.forEach((item) => {
-    if (finder(item)) found.push(item);
-    else rest.push(item);
+    if (finder(item)) {
+      found.push(item);
+    } else {
+      rest.push(item);
+    }
   });
 
   return [found, rest];
 };
+
 export function notNull(d) {
   try {
-    return d && d !== "null" && d.trim() !== "";
+    return d && d !== 'null' && d.trim() !== '';
   } catch (ex) {
     return false;
   }
 }
 
 export function isEmpty(val) {
-  return !val || ["null", "undefined", ""].indexOf(`${val}`.toLowerCase()) > -1;
+  return !val || ['null', 'undefined', ''].indexOf(`${val}`.toLowerCase()) > -1;
 }
 
 export function isNotEmpty(val) {
@@ -189,19 +213,20 @@ export function getAddress(d) {
       notNull(d.state) &&
       notNull(d.zipcode) &&
       notNull(d.country))
-  )
-    return "No Address Provided";
-  return `${notNull(d.address) ? d.address + ", " : ""}${
-    notNull(d.unit) ? d.unit + ", " : ""
-  }${notNull(d.city) ? d.city + ", " : ""}${
-    notNull(d.state) ? d.state + ", " : ""
-  }${notNull(d.zipcode) ? d.zipcode + ", " : ""}${
-    notNull(d.country) ? d.country : ""
+  ) {
+    return 'No Address Provided';
+  }
+  return `${notNull(d.address) ? d.address + ', ' : ''}${
+    notNull(d.unit) ? d.unit + ', ' : ''
+  }${notNull(d.city) ? d.city + ', ' : ''}${
+    notNull(d.state) ? d.state + ', ' : ''
+  }${notNull(d.zipcode) ? d.zipcode + ', ' : ''}${
+    notNull(d.country) ? d.country : ''
   }`;
 }
 
 export function convertBoolean(b) {
-  return `${b === true || b === "true" ? "Yes" : "No"}`;
+  return `${b === true || b === 'true' ? 'Yes' : 'No'}`;
 }
 
 export function goHere(link, history) {
@@ -215,25 +240,38 @@ export const updateFilterChoices = () => {
 };
 
 export const getUrlParamsForFilterInputs = (filterChoices) => {
-  if (!filterChoices) return "";
-  return "";
+  if (!filterChoices) return '';
+  return '';
 };
 
 export const getFilterInputsFromURL = (location) => {
-  if (!location || !location.search) return "";
+  if (!location || !location.search) return '';
   const { filterInputs } = qs.parse(location.search, {
     ignoreQueryPrefix: true,
   });
   return filterInputs;
 };
 
-export const ourCustomSort = ({ a, b, colIndex, order, compare }) => {
-  const directionConstant = order === "desc" ? 1 : -1;
+export const ourCustomSort = ({
+  a,
+  b,
+  colIndex,
+  order,
+  compare
+}) => {
+  const directionConstant = order === 'desc' ? 1 : -1;
   a = a.data[colIndex];
   b = b.data[colIndex];
-  if (compare) return compare({ a, b }) * directionConstant;
-  if (typeof a === "string" && typeof b === "string") // Forcing comparison to be done in lowercase when dealing with strings otherwise results will be off
+  if (compare) {
+    return compare({
+      a,
+      b
+    }) * directionConstant;
+  }
+  if (typeof a === 'string' && typeof b === 'string') // Forcing comparison to be done in lowercase when dealing with strings otherwise results will be off
+  {
     return (a.toLowerCase() < b.toLowerCase() ? -1 : 1) * directionConstant;
+  }
   return (a < b ? -1 : 1) * directionConstant;
 };
 
@@ -241,15 +279,16 @@ export const getTimeStamp = () => {
   const today = new Date();
   let newDate = today;
   let options = {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
   };
 
-  return Intl.DateTimeFormat("en-US", options).format(newDate);
+  return Intl.DateTimeFormat('en-US', options)
+    .format(newDate);
 };
 /**
  *
@@ -258,7 +297,7 @@ export const getTimeStamp = () => {
  * @returns
  */
 export const fetchParamsFromURL = (location, paramName, names) => {
-  if (!location || !location.search) return "";
+  if (!location || !location.search) return '';
   const obj = qs.parse(location.search, { ignoreQueryPrefix: true });
   var value = obj[paramName];
   value = value && value.toString();
@@ -274,28 +313,31 @@ export const fetchParamsFromURL = (location, paramName, names) => {
     {
       params,
       [paramName]: value,
-      rest: { object: obj, qs: qs.stringify(obj) || "" },
+      rest: {
+        object: obj,
+        qs: qs.stringify(obj) || ''
+      },
     } || {}
   );
 };
 
 export const removePageProgressFromStorage = (key) => {
-  var progress = localStorage.getItem(ME_FORM_PROGRESS) || "{}";
+  var progress = localStorage.getItem(ME_FORM_PROGRESS) || '{}';
   progress = JSON.parse(progress);
   progress[key] = {};
   localStorage.setItem(ME_FORM_PROGRESS, JSON.stringify(progress));
 };
 /**
-   *
-   * This function takes a list of ids of items(msgs, actions, testimonials etc.) that need attending to and matches it against the data source,
-   * to find out which of the items are available locally, and which ones need to be fetched.
-   * If all items are available locally, nothing happens.
-   * If not, it fetches all the items not found and appends it to the main data source.
-   *
-   * This fxn helps arrange data properly so that when admins click from their dashboard to see
-   * "15" unanswered messages, all and only the unanswered messages will show up in the table, to make things easier.
+ *
+ * This function takes a list of ids of items(msgs, actions, testimonials etc.) that need attending to and matches it against the data source,
+ * to find out which of the items are available locally, and which ones need to be fetched.
+ * If all items are available locally, nothing happens.
+ * If not, it fetches all the items not found and appends it to the main data source.
+ *
+ * This fxn helps arrange data properly so that when admins click from their dashboard to see
+ * "15" unanswered messages, all and only the unanswered messages will show up in the table, to make things easier.
 
-   */
+ */
 export const reArrangeForAdmin = ({
   dataSource,
   props,
@@ -311,7 +353,11 @@ export const reArrangeForAdmin = ({
   const { state } = location || {};
   const ids = (state && state.ids) || [];
   const result = separate(ids, dataSource, separationOptions);
-  const { notFound, itemObjects, remainder } = result;
+  const {
+    notFound,
+    itemObjects,
+    remainder
+  } = result;
   var data = [...itemObjects, ...remainder];
   data.sort(_sort);
   reduxFxn(data);
@@ -319,38 +365,39 @@ export const reArrangeForAdmin = ({
   apiCall(apiURL, {
     [fieldKey]: notFound,
     ...(args || {}),
-  }).then((response) => {
-    if (response.success) data = [...response.data, ...data];
-    //-- Items that were not found, have now been loaded from the B.E!
-    cb && cb(response.data);
-    data.sort(_sort);
-    reduxFxn(data);
-  });
+  })
+    .then((response) => {
+      if (response.success) data = [...response.data, ...data];
+      //-- Items that were not found, have now been loaded from the B.E!
+      cb && cb(response.data);
+      data.sort(_sort);
+      reduxFxn(data);
+    });
 };
 
 
 export const convertToScheduledFor = (dateTimeString) => {
-  if (!dateTimeString) return "---";
+  if (!dateTimeString) return '---';
   const inputDate = new Date(dateTimeString);
   const currentDate = new Date();
   let options = {
     // year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
   };
 
   if (inputDate.toDateString() === currentDate.toDateString()) {
-      options = {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      };
+    options = {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    };
   }
 
-  return inputDate.toLocaleString("en-US", options);
+  return inputDate.toLocaleString('en-US', options);
 };
 
 export function findItemAtIndexAndRemainder(arr, comparator) {
@@ -362,8 +409,18 @@ export function findItemAtIndexAndRemainder(arr, comparator) {
     if (comparator && comparator(found)) {
       foundItem = found;
       index = i;
-    } else remainder.push(found);
+    } else {
+      remainder.push(found);
+    }
   }
 
-  return { index, foundItem, remainder };
+  return {
+    index,
+    foundItem,
+    remainder
+  };
+}
+
+export const log = (key = "Admin Log: ", ...args) => {
+  console.log(key, ...args);
 }

@@ -111,7 +111,7 @@ class AllEvents extends React.Component {
       fullControl: true,
 
       title: smartString(props?.name,50) || 'Notification Settings',
-      component: (<EventNotificationSettings
+      renderComponent: ()=> (<EventNotificationSettings
         {...props}
         close={() => toggleModal({
           show: false,

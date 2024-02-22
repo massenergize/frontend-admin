@@ -4,7 +4,7 @@ import './me-tab.css';
 const TAB_OPTIONS = [{
   name: 'First Page',
   id: 'first-tab',
-  component: <h3>This is the  first</h3>
+  component: <h3>This is the first</h3>
 }, {
   name: 'Second Page',
   id: 'second-tab',
@@ -35,7 +35,17 @@ const METab = ({
     setActiveTab(tab);
     onChange && onChange(tab);
   };
-  const {renderComponent} = activeTab || {};
+
+  const renderComponent = (activeTab) => {
+    const {
+      component,
+      renderComponent
+    } = activeTab || {};
+    if (renderComponent) return renderComponent();
+
+    return component;
+  };
+
   return (
     <div>
       <div className="root-easy-tab">
@@ -49,8 +59,8 @@ const METab = ({
             );
           })}
         </div>
-        <div style = {contentStyle || {}}>
-          {renderComponent && renderComponent()}
+        <div style={contentStyle || {}}>
+          {renderComponent(activeTab)}
         </div>
       </div>
     </div>);

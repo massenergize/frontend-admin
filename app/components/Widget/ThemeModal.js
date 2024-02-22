@@ -21,6 +21,7 @@ function ThemeModal({
   contentStyle = {},
   title,
   noTitle = false,
+  renderComponent,
 }) {
   const fullControlStyles = { padding: 0 };
   const handleClose = () => {

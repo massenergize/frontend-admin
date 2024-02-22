@@ -149,6 +149,12 @@ class Application extends React.Component {
     return list.map((com) => com.id);
   }
 
+   renderModalComponent =(modalOptions) =>{
+    const { component, renderComponent } = modalOptions;
+    if(renderComponent) return renderComponent();
+    return component;
+  }
+
   render() {
     const { auth, signOut } = this.props;
     const {
@@ -220,8 +226,9 @@ class Application extends React.Component {
       />,
     ];
 
+
     if (!IS_LOCAL) checkIfUserNeedsMOUAttention(auth, history); // This check will not run in local mode
-    const { component, show, onConfirm, closeAfterConfirmation } = modalOptions;
+    const { show, onConfirm, closeAfterConfirmation } = modalOptions;
     return (
       <UserActivityMonitor
         minutes={10}
@@ -243,7 +250,7 @@ class Application extends React.Component {
             }}
             closeAfterConfirmation={closeAfterConfirmation}
           >
-            {component}
+            {this.renderModalComponent(modalOptions)}
           </ThemeModal>
           <ThemeToast
             {...toastOptions || {}}
