@@ -16,7 +16,7 @@ const NotificationChoices = ({
   getValue,
   event
 }) => {
-  const { name } = event || {};
+  // const { name } = event || {};
 
   const communities = useSelector(state => state.getIn(['communities']));
 

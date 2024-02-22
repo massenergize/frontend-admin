@@ -35,6 +35,8 @@ const INITIAL_STATE = OPTIONS.reduce((acc, t) => ({
   ...acc,
   [t.key]: t.value
 }), {});
+
+
 export default function EventNotificationSettings(props) {
   const {
     settings,
@@ -48,6 +50,7 @@ export default function EventNotificationSettings(props) {
     notifications: settings?.notifications || INITIAL_STATE
   });
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('nudge-settings');
   const dispatch = useDispatch();
 
   const allEvents = useSelector(state => state.getIn(['allEvents']));
@@ -119,63 +122,51 @@ export default function EventNotificationSettings(props) {
         console.log('Error updating settings', err);
       });
   };
-  //
-  // useEffect(() => {
-  //
-  //   const tabs = [{
-  //     name: 'Nudge Settings',
-  //     id: 'nudge-settings',
-  //     renderComponent: () => <NotificationChoices handleChange={handleChange} event={props} getValue={getValue}/>
-  //     // component : <NotificationChoices handleChange={handleChange} event={props} getValue={getValue}/>
-  //   }, {
-  //     name: 'Saved Settings',
-  //     id: 'saved-settings',
-  //     renderComponent: () => <SavedNudgeSettings event={props}/>
-  //     // component : <SavedNudgeSettings event={props}/>
-  //   }];
-  //   setTabs(tabs);
-  //
-  // }, [state]);
+
   const tabs = [{
     name: 'Nudge Settings',
     id: 'nudge-settings',
     renderComponent: () => <NotificationChoices handleChange={handleChange} event={props} getValue={getValue}/>
-    // component : <NotificationChoices handleChange={handleChange} event={props} getValue={getValue}/>
+
   }, {
     name: 'Saved Settings',
     id: 'saved-settings',
     renderComponent: () => <SavedNudgeSettings event={props}/>
-    // component : <SavedNudgeSettings event={props}/>
+
   }];
 
+  const isChoicesTab = activeTab === 'nudge-settings';
 
   return (<div style={{
-
     width: '38vw',
-    maxHeight: 440,
-    height: 440,
   }}>
     <div style={{ padding: '0px 20px', }}>
-      <METab tabs={tabs}/>
+      <METab tabs={tabs} defaultTab={activeTab} contentStyle={{
+        maxHeight: 440,
+        height: 440,
+        paddingBottom: 70,
+        overflowY: 'scroll',
+      }}/>
     </div>
-
-    <div style={{
-      display: 'flex',
-      flexDirection: 'row',
-      position: 'absolute',
-      bottom: 0,
-      width: '100%',
-      padding:"10px 20px"
-    }}>
-      <div style={{ marginLeft: 'auto' }}>
-        <Button onClick={() => close && close()}>Close</Button>
-        <Button onClick={() => sendChangesToBackend()}>{loading && <i
-          className="fa fa-spinner fa-spin"
-          style={{ marginRight: 10 }}
-        />} {loading ? '' : 'Apply'}
-        </Button>
-      </div>
-    </div>
+    {isChoicesTab &&
+      <div style={{
+        display: 'flex',
+        flexDirection: 'row',
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        padding: '10px 20px',
+        background: 'white'
+      }}>
+        <div style={{ marginLeft: 'auto', }}>
+          <Button onClick={() => close && close()}>Close</Button>
+          <Button onClick={() => sendChangesToBackend()}>{loading && <i
+            className="fa fa-spinner fa-spin"
+            style={{ marginRight: 10 }}
+          />} {loading ? '' : 'Apply'}
+          </Button>
+        </div>
+      </div>}
 
   </div>);
 }

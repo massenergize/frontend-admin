@@ -12,7 +12,9 @@ const TAB_OPTIONS = [{
 }];
 const METab = ({
   defaultTab,
-  tabs = TAB_OPTIONS
+  tabs = TAB_OPTIONS,
+  contentStyle,
+  onChange
 }) => {
   const [activeTab, setActiveTab] = useState();
 
@@ -31,6 +33,7 @@ const METab = ({
 
   const changeTab = (tab) => {
     setActiveTab(tab);
+    onChange && onChange(tab);
   };
   const {renderComponent} = activeTab || {};
   return (
@@ -46,7 +49,7 @@ const METab = ({
             );
           })}
         </div>
-        <div>
+        <div style = {contentStyle || {}}>
           {renderComponent && renderComponent()}
         </div>
       </div>
