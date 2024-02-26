@@ -82,8 +82,7 @@ class AllEvents extends React.Component {
       item: d
     }, {
       id: d.id,
-      is_on_home_page: d.is_on_home_page,
-      ...d
+      is_on_home_page: d.is_on_home_page, ...d
     }, d.is_published ? 'Yes' : 'No', d.is_global, getHumanFriendlyDate(d.start_date_and_time, true, false), getHumanFriendlyDate(d.end_date_and_time, true, false),]);
     return fashioned;
   }
@@ -110,8 +109,8 @@ class AllEvents extends React.Component {
       show: true,
       fullControl: true,
 
-      title: smartString(props?.name,50) || 'Notification Settings',
-      renderComponent: ()=> (<EventNotificationSettings
+      title: smartString(props?.name, 50) || 'Notification Settings',
+      renderComponent: () => (<EventNotificationSettings
         {...props}
         close={() => toggleModal({
           show: false,

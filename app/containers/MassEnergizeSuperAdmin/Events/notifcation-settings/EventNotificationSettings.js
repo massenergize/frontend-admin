@@ -12,6 +12,7 @@ import NotificationChoices from './NotificationChoices';
 import SavedNudgeSettings from './SavedNudgeSettings';
 
 
+
 export const OPTIONS = [{
   key: 'when_first_uploaded',
   name: 'Notify on first nudge after event is posted or shared',
@@ -47,34 +48,26 @@ export default function EventNotificationSettings(props) {
 
   // const [tabs, setTabs] = useState([]);
   const [state, setState] = useState({});
-  const [targetCommunities, setTargetCommunities] = useState([]);
-
-  console.log("LEts see target communities", targetCommunities)
-
+  const [targetCommunities, setTargetCommunities] = useState([]); // Holds the list of communities that these settings apply to
+  const [profiles, setProfiles] = useState([]); // Holds the list of settings profiles that are on the event at any point
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('nudge-settings');
-
   const dispatch = useDispatch();
-
   const allEvents = useSelector(state => state.getIn(['allEvents']));
 
   const resetOptions = () => {
-    const data = state?.notifications || {};
-
+    // const data = state?.notifications || {};
+    const data = state || {};
     return Object.fromEntries(Object.entries(data)
       .filter(([key]) => key !== 'never')
       .map(([key]) => [key, false]));
   };
 
   const updateNotification = (name, value) => {
-    const notifications = state.notifications || {};
     setState({
       ...state,
-      notifications: {
-        ...notifications,
-        [name]: value,
-        never: false
-      }
+      [name]: value,
+      never: false
 
     });
   };
@@ -84,11 +77,8 @@ export default function EventNotificationSettings(props) {
     if (name === 'never' && event.target.checked) {
       const remainder = resetOptions();
       return setState({
-        ...state,
-        notifications: {
-          ...remainder,
-          never: true
-        }
+        ...remainder,
+        never: true
       });
     }
     // "Never" never really gets to use this function
@@ -99,15 +89,16 @@ export default function EventNotificationSettings(props) {
     setLoading(true);
     apiCall('/events.nudge.settings.create', {
       event_id: id,
-      settings: JSON.stringify(state)
+      settings: JSON.stringify(state),
+      community_ids: (targetCommunities || []).map((c => c.id))
     })
       .then(response => {
         setLoading(false);
-        if (!response.success) {
+        if (!response?.success) {
           return console.log('Error updating settings', response);
         }
         const event = response?.data;
-        console.log("HERE IS THE EVENT", event)
+        console.log('HERE IS THE EVENT', event);
         const {
           index,
           remainder
@@ -124,14 +115,16 @@ export default function EventNotificationSettings(props) {
 
   const updateState = (newState) => {
     setState({
-      ...state,
-      ...newState || {}
+      ...state, ...newState || {}
     });
   };
+
   const tabs = [{
     name: 'Nudge Settings',
     id: 'nudge-settings',
-    renderComponent: () => <NotificationChoices setState={updateState} state={state} handleChange={handleChange}
+    renderComponent: () => <NotificationChoices setState={updateState} state={state}
+                                                targetCommunities={targetCommunities}
+                                                setCommunities={setTargetCommunities} handleChange={handleChange}
                                                 event={eventObj}
     />
 
@@ -152,50 +145,49 @@ export default function EventNotificationSettings(props) {
   };
 
   useEffect(() => {
-    const { settings } = props || {};
-    const firstOne = (settings?.notifications || [])[0];
-    const obj = makeStateObject(firstOne)
-    console.log("NOW LETS SEE OBJ", obj)
-    setState({
-      ...settings,
-      notifications: obj
-    });
-
+    const { settings: settingsObject } = props || {};
+    const firstOne = (settingsObject?.notifications || [])[0];
+    // const firstOne = TEST_API_OBJ
+      setProfiles(settingsObject?.notifications || []);
+    const obj = makeStateObject(firstOne?.settings);
+    setTargetCommunities((firstOne?.communities || []).map(c => ({
+      ...c,
+      displayName: c?.name
+    })));
+    setState(obj);
   }, []);
 
 
   const isChoicesTab = activeTab === 'nudge-settings';
 
-  return (
-    <div style={{
-      width: '38vw',
+  return (<div style={{
+    width: '38vw',
+  }}>
+    <div style={{ padding: '0px 20px', }}>
+      <METab tabs={tabs} defaultTab={activeTab} contentStyle={{
+        maxHeight: 440,
+        height: 440,
+        paddingBottom: 70,
+        overflowY: 'scroll',
+      }}/>
+    </div>
+    {isChoicesTab && <div style={{
+      display: 'flex',
+      flexDirection: 'row',
+      position: 'absolute',
+      bottom: 0,
+      width: '100%',
+      padding: '10px 20px',
+      background: 'white'
     }}>
-      <div style={{ padding: '0px 20px', }}>
-        <METab tabs={tabs} defaultTab={activeTab} contentStyle={{
-          maxHeight: 440,
-          height: 440,
-          paddingBottom: 70,
-          overflowY: 'scroll',
-        }}/>
+      <div style={{ marginLeft: 'auto', }}>
+        <Button onClick={() => close && close()}>Close</Button>
+        <Button onClick={() => sendChangesToBackend()}>{loading && <i
+          className="fa fa-spinner fa-spin"
+          style={{ marginRight: 10 }}
+        />} {loading ? '' : 'Apply'}
+        </Button>
       </div>
-      {isChoicesTab &&
-        <div style={{
-          display: 'flex',
-          flexDirection: 'row',
-          position: 'absolute',
-          bottom: 0,
-          width: '100%',
-          padding: '10px 20px',
-          background: 'white'
-        }}>
-          <div style={{ marginLeft: 'auto', }}>
-            <Button onClick={() => close && close()}>Close</Button>
-            <Button onClick={() => sendChangesToBackend()}>{loading && <i
-              className="fa fa-spinner fa-spin"
-              style={{ marginRight: 10 }}
-            />} {loading ? '' : 'Apply'}
-            </Button>
-          </div>
-        </div>}
-    </div>);
+    </div>}
+  </div>);
 }

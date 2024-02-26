@@ -12,13 +12,15 @@ import { log } from '../../../../utils/common';
 const NotificationChoices = ({
   state,
   handleChange,
+  setCommunities,
+  targetCommunities
 }) => {
 
   const communities = useSelector(state => state.getIn(['communities']));
 
 
   const getValue = (name) => {
-    const data = state?.notifications || {};
+    const data = state || {};
     return data[name] || false;
   };
 
@@ -27,12 +29,20 @@ const NotificationChoices = ({
     padding: '10px'
   }}>
     {/* <p>Notification settings for <b>"{name}"</b></p> */}
-    <LightAutoComplete selectAllV2 allowClearAndSelectAll multiple data={communities} valueExtractor={(t) => t?.id}
-                       labelExtractor={(t) => t?.name}
-                       placeholder="Select the communities that these settings apply to..."/>
+    <LightAutoComplete
+      selectAllV2
+      allowClearAndSelectAll
+      multiple
+      data={communities}
+      onChange={(t) => {
+        setCommunities(t);
+      }}
+      defaultSelected={targetCommunities}
+      valueExtractor={(t) => t?.id}
+      labelExtractor={(t) => t?.name}
+      placeholder="Select the communities that these settings apply to..."/>
 
     {OPTIONS.map((t) => {
-      console.log("GETTING VALUE", t.key, getValue(t.key));
       return <>
         {/* <input type="checkbox" checked={getValue(t.key)} onChange={handleChange} name={t.key}/> */}
         <FormControlLabel
