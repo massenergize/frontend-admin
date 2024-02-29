@@ -10,7 +10,8 @@ const SavedNudgeSettings = ({ profiles, editSettings, removeProfile }) => {
     color: "#428BCF"
   };
 
-  if (!profiles?.length) return <p>No saved settings...</p>;
+  if (!profiles?.length) return <p style={{ padding: 10, color: "black" }}>No saved settings yet... The settings you make for any group of communities will be available here.</p>;
+
   return (
     <div
       style={{

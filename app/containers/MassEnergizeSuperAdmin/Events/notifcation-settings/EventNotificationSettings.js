@@ -96,8 +96,8 @@ export default function EventNotificationSettings(props) {
 
   const sendChangesToBackend = () => {
     setLoading(true);
-    const isALL = targetCommunities?.find((c) => c?.toLowerCase() === "all");
-    apiCall("/events.nudge.settings.create", {
+    const isALL = targetCommunities?.find((c) => typeof c === "string" && c?.toLowerCase() === "all");
+    apiCall("/events.reminders.settings.create", {
       event_id: id,
       settings: JSON.stringify(state),
       community_ids: isALL ? targetCommunities : (targetCommunities || []).map((c) => c.id)
@@ -108,7 +108,6 @@ export default function EventNotificationSettings(props) {
           return console.log("Error updating settings", response);
         }
         const event = response?.data;
-        console.log("HERE IS THE EVENT", event);
         putEventInSamePosition(event);
         setProfiles(event?.settings?.notifications || []);
       })
@@ -126,7 +125,7 @@ export default function EventNotificationSettings(props) {
   };
 
   const removeProfileOnBackend = (profile) => {
-    apiCall("/events.nudge.settings.delete", {
+    apiCall("/events.reminders.settings.delete", {
       nudge_settings_id: profile?.id
     })
       .then((response) => {
@@ -153,7 +152,7 @@ export default function EventNotificationSettings(props) {
 
   const tabs = [
     {
-      name: "Nudge Settings",
+      name: "Notification Behavior",
       id: "nudge-settings",
       renderComponent: () => (
         <NotificationChoices

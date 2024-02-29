@@ -252,18 +252,22 @@ function LightAutoComplete(props) {
         classes={classes}
       />
       <div style={containerStyle || {}}>
-        <input
-          onChange={handleOnChange}
-          onClick={() => {
-            !disabled && setShowDropdown(true);
-          }}
-          style={{
-            padding: 10,
-            width: "100%",
-            margin: "10px 0px"
-          }}
-          placeholder={placeholder || label}
-        />
+        <div style={{ position: "relative" }}>
+          <i className=" fa fa-search" style={{ position: "absolute", top: 26, left: 15, color: "#a5a5a5" }} />
+          <i className=" fa fa-caret-down" style={{ position: "absolute", top: 26, right: 15, color: "#a5a5a5" }} />
+          <input
+            onChange={handleOnChange}
+            onClick={() => {
+              !disabled && setShowDropdown(true);
+            }}
+            style={{
+              padding: "10px 35px",
+              width: "100%",
+              margin: "10px 0px"
+            }}
+            placeholder={placeholder || label}
+          />
+        </div>
 
         {/* <TextField */}
         {/*   disabled={disabled} */}

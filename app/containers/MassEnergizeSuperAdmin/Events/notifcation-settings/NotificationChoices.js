@@ -4,13 +4,12 @@ import Checkbox from "@mui/material/Checkbox";
 import { Button } from "@mui/material";
 import { OPTIONS } from "./EventNotificationSettings";
 import MEDropdown from "../../ME  Tools/dropdown/MEDropdown";
-import MEDropdownPro from "../../ME  Tools/dropdown/MEDropdownPro";
 import LightAutoComplete from "../../Gallery/tools/LightAutoComplete";
 import { useSelector } from "react-redux";
-import { log } from "../../../../utils/common";
 
 const NotificationChoices = ({ state, handleChange, setCommunities, targetCommunities }) => {
   const communities = useSelector((state) => state.getIn(["communities"]));
+  const admin = useSelector((state) => state.getIn(["auth"]));
 
   const getValue = (name) => {
     const data = state || {};
@@ -23,6 +22,12 @@ const NotificationChoices = ({ state, handleChange, setCommunities, targetCommun
         padding: "10px"
       }}
     >
+      <div style={{ marginBottom: 5, color: "black", fontWeight: "bold" }}>
+        <small>
+          <b>First select a list of communities</b>
+        </small>
+      </div>
+      {/* {admin?.is_super_admin ? ( */}
       <LightAutoComplete
         selectAllV2
         allowClearAndSelectAll
@@ -31,12 +36,22 @@ const NotificationChoices = ({ state, handleChange, setCommunities, targetCommun
         onChange={(t) => {
           setCommunities(t);
         }}
+        isAsync
+        endpoint="communities.listForSuperAdmin"
         defaultSelected={targetCommunities}
         valueExtractor={(t) => t?.id}
         labelExtractor={(t) => t?.name}
         placeholder="Select the communities that these settings apply to..."
       />
 
+      <div style={{ margin: "5px 0px", color: "black", fontWeight: "bold" }}>
+        <small>
+          <b>
+            Select all options that apply. The behaviors you select here will only apply to the communities you've
+            selected above.
+          </b>
+        </small>
+      </div>
       {OPTIONS.map((t) => {
         return (
           <>
@@ -45,6 +60,7 @@ const NotificationChoices = ({ state, handleChange, setCommunities, targetCommun
               control={<Checkbox checked={getValue(t.key)} onChange={handleChange} name={t.key} />}
               label={t.name}
               value={t.key}
+              style={{ color: "black" }}
             />
             <br />
           </>

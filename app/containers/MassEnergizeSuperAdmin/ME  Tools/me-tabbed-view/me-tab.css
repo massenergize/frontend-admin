@@ -2,33 +2,40 @@
 .c-tab-item {
     padding: 10px 20px;
     display: inline-flex;
-    margin: 0 5px;
+    margin: 0 0px;
     font-weight: bold;
     cursor: pointer;
     flex-direction: column;
     align-items: center;
     border: solid 2px white;
+    border-bottom-color:#ab47bc;
     border-radius: 5px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .c-tab-item:hover {
-    border-color: var(--app-theme-color);
+    border-radius: 5px;
+    border-color: #ab47bc;
     transition: .3s ease-in-out;
+
 }
 
 .c-tab-item p {
-    color: black;
+    color: #872797;
     margin-bottom: 0px;
     font-weight: bold;
 }
 
 
 .c-tab-header-selected {
-    background: #383838;
+    /* background: #383838; */
+    background: #ab47bc;
     color: white;
     font-weight: bold;
     /*border-radius: 0;*/
-    border-radius: 5px;
+    border-radius: 5px !important;
+    border-color:white !important;
 
 }
 
