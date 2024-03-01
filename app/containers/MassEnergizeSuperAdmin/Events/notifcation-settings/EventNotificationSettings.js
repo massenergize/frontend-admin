@@ -13,7 +13,7 @@ import SavedNudgeSettings from "./SavedNudgeSettings";
 
 export const OPTIONS = [
   {
-    key: "when_first_uploaded",
+    key: "when_first_posted",
     name: "Notify on first nudge after event is posted or shared",
     alias: "Notify on first nudge",
     value: false
