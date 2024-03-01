@@ -1,65 +1,53 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
-import { Helmet } from "react-helmet";
-import brand from "dan-api/dummy/brand";
-
-import FileCopy from "@mui/icons-material/FileCopy";
-import EditIcon from "@mui/icons-material/Edit";
-import { Link, withRouter } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 
 import Paper from "@mui/material/Paper";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import { Typography } from "@mui/material";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
-import Tooltip from "@mui/material/Tooltip";
 import {
-  reduxGetAllEvents,
-  reduxGetAllCommunityEvents,
   loadAllEvents,
-  reduxToggleUniversalModal,
-  reduxToggleUniversalToast,
+  reduxGetAllCommunityEvents,
+  reduxGetAllEvents,
   reduxLoadMetaDataAction,
+  reduxToggleUniversalModal,
+  reduxToggleUniversalToast
 } from "../../../redux/redux-actions/adminActions";
 import {
   fetchParamsFromURL,
   findMatchesAndRest,
   getHumanFriendlyDate,
-  makeDeleteUI,
   getTimeStamp,
-  ourCustomSort,
-  smartString,
   isEmpty,
+  makeDeleteUI,
+  ourCustomSort,
+  smartString
 } from "../../../utils/common";
-import { Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import {
-  getAdminApiEndpoint,
-  getLimit,
-  handleFilterChange,
-  onTableStateChange,
-} from "../../../utils/helpers";
+import { getAdminApiEndpoint, getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
-import CallMadeIcon from "@mui/icons-material/CallMade";
 import { FROM } from "../../../utils/constants";
 import Loader from "../../../utils/components/Loader";
-import HomeIcon from "@mui/icons-material/Home";
-import StarsIcon from "@mui/icons-material/Stars";
-import Seo from "../../../../app/components/Seo/Seo";
+import Seo from "../../../components/Seo/Seo";
 import CustomOptions from "../ME  Tools/table /CustomOptions";
-import {
-  EventNotSharedWithAnyone,
-  EventSharedWithCommunity,
-} from "./EventSharedStateComponents";
+import { EventNotSharedWithAnyone, EventSharedWithCommunity } from "./EventSharedStateComponents";
+import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
+import EventNotificationSettings from "./notifcation-settings/EventNotificationSettings";
+
 class AllEvents extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { columns: this.getColumns(), loading: false, currentTab: 0 };
+    this.state = {
+      columns: this.getColumns()
+    };
   }
 
   componentDidMount() {
@@ -72,7 +60,7 @@ class AllEvents extends React.Component {
       this.props.callForSuperAdminEvents();
     }
     if (user.is_community_admin) {
-      let com = community || user.admin_at[0];
+      const com = community || user.admin_at[0];
       this.props.callForNormalAdminEvents(com.id);
     }
   }
@@ -84,7 +72,7 @@ class AllEvents extends React.Component {
       {
         id: d.id,
         image: d.image,
-        initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`,
+        initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
       },
       smartString(d.name),
       d,
@@ -92,34 +80,120 @@ class AllEvents extends React.Component {
         smartString(d.tags.map((t) => t.name).join(", "), 30) // limit to first 30 chars
       }`,
       d.is_global ? "Template" : d.community && d.community.name,
-      { isLive: d.is_published, item: d },
-      { id: d.id, is_on_home_page: d.is_on_home_page },
+      {
+        isLive: d.is_published,
+        item: d
+      },
+      {
+        id: d.id,
+        ...d,
+        is_on_home_page: d.is_on_home_page,
+        eventObj: d
+      },
       d.is_published ? "Yes" : "No",
       d.is_global,
       getHumanFriendlyDate(d.start_date_and_time, true, false),
-      getHumanFriendlyDate(d.end_date_and_time, true, false),
+      getHumanFriendlyDate(d.end_date_and_time, true, false)
     ]);
     return fashioned;
   }
 
+  async copyEvent(id) {
+    const { putEventsInRedux, allEvents } = this.props;
+    const copiedEventResponse = await apiCall("/events.copy", {
+      event_id: id
+    });
+    if (copiedEventResponse && copiedEventResponse.success) {
+      const newEvent = copiedEventResponse && copiedEventResponse.data;
+      this.props.history.push(`/admin/edit/${newEvent.id}/event`);
+      putEventsInRedux([newEvent, ...(allEvents || [])]);
+    }
+  }
+
+  showNotificationSettings(props) {
+    const { toggleModal } = this.props;
+    toggleModal({
+      show: true,
+      fullControl: true,
+
+      title: smartString(props?.name, 50) || "Notification Settings",
+      renderComponent: () => (
+        <EventNotificationSettings
+          {...props}
+          close={() =>
+            toggleModal({
+              show: false,
+              component: null
+            })
+          }
+        />
+      ),
+      cancelText: "Close",
+      noOk: true
+    });
+  }
+
+  makeOptions(props) {
+    const { id, is_on_home_page } = props;
+    const COMMON_STYLES = {
+      fontWeight: "bold",
+      fontSize: ".8rem",
+      padding: "10px 15px"
+    };
+
+    return [
+      {
+        key: "copy",
+        name: "Copy",
+        style: COMMON_STYLES,
+        onClick: () => this.copyEvent(id)
+      },
+      {
+        key: "edit",
+        name: "Edit",
+        style: COMMON_STYLES,
+        onClick: () => this.props.history.push(`/admin/edit/${id}/event`)
+      },
+      {
+        key: "homepage",
+        name: !is_on_home_page ? "Add to Homepage" : "Remove from Homepage",
+        style: COMMON_STYLES,
+        onClick: () => {
+          this.props.toggleLive({
+            show: true,
+            component: this.addToHomePageUI({ id }),
+            onConfirm: () => this.addEventToHomePage(id),
+            closeAfterConfirmation: true
+          });
+        }
+      },
+      {
+        key: "nudge",
+        name: "Notification Settings",
+        style: COMMON_STYLES,
+        onClick: () => this.showNotificationSettings(props)
+      }
+    ];
+  }
+
   getColumns() {
-    const { classes, putEventsInRedux, allEvents, auth, communities } = this.props;
+    const { classes, auth, communities } = this.props;
 
     return [
       {
         name: "ID",
         key: "id",
         options: {
-          filter: false,
-        },
+          filter: false
+        }
       },
       {
         name: "Date",
         key: "date",
         options: {
           filter: false,
-          download: false,
-        },
+          download: false
+        }
       },
       {
         name: "Event",
@@ -130,24 +204,18 @@ class AllEvents extends React.Component {
           download: false,
           customBodyRender: (d) => (
             <div>
-              {d.image && (
-                <Avatar
-                  alt={d.initials}
-                  src={d.image.url}
-                  style={{ margin: 10 }}
-                />
-              )}
+              {d.image && <Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} />}
               {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
             </div>
-          ),
-        },
+          )
+        }
       },
       {
         name: "Name",
         key: "name",
         options: {
-          filter: false,
-        },
+          filter: false
+        }
       },
       {
         name: "Shared",
@@ -161,16 +229,16 @@ class AllEvents extends React.Component {
               history={this.props.history}
               toggleModalOnClick={(props) => this.props.toggleModal(props)}
             />
-          ),
-        },
+          )
+        }
       },
       {
         name: "Tags",
         key: "tags",
         options: {
           filter: true,
-          filterType: "multiselect",
-        },
+          filterType: "multiselect"
+        }
       },
       {
         name: "Community",
@@ -179,12 +247,12 @@ class AllEvents extends React.Component {
           ? CustomOptions({
               data: communities,
               label: "community",
-              endpoint: "/communities.listForSuperAdmin",
+              endpoint: "/communities.listForSuperAdmin"
             })
           : {
               filter: true,
-              filterType: "multiselect",
-            },
+              filterType: "multiselect"
+            }
       },
       {
         name: "Live?",
@@ -192,101 +260,105 @@ class AllEvents extends React.Component {
         options: {
           filter: false,
           download: false,
-          customBodyRender: (d) => {
-            return (
-              <MEChip
-                onClick={() =>
-                  this.props.toggleLive({
-                    show: true,
-                    component: this.makeLiveUI({ data: d.item }),
-                    onConfirm: () => this.makeLiveOrNot(d.item),
-                    closeAfterConfirmation: true,
-                  })
-                }
-                label={d?.isLive ? "Yes" : "No"}
-                className={`${
-                  d?.isLive ? classes.yesLabel : classes.noLabel
-                } touchable-opacity`}
-              />
-            );
-          },
-        },
+          customBodyRender: (d) => (
+            <MEChip
+              onClick={() =>
+                this.props.toggleLive({
+                  show: true,
+                  component: this.makeLiveUI({ data: d.item }),
+                  onConfirm: () => this.makeLiveOrNot(d.item),
+                  closeAfterConfirmation: true
+                })
+              }
+              label={d?.isLive ? "Yes" : "No"}
+              className={`${d?.isLive ? classes.yesLabel : classes.noLabel} touchable-opacity`}
+            />
+          )
+        }
       },
       {
-        name: "Edit",
+        name: "Options",
         key: "edit_or_copy",
         options: {
           filter: false,
           download: false,
           sort: false,
-          customBodyRender: ({ id, is_on_home_page }) => (
+          customBodyRender: (content) => (
             <div style={{ display: "flex" }}>
-              <Link to={`/admin/edit/${id}/event`}>
-                <EditIcon size="small" variant="outlined" color="secondary" />
-              </Link>
-              &nbsp;&nbsp;
-              <Link
-                onClick={async () => {
-                  const copiedEventResponse = await apiCall("/events.copy", {
-                    event_id: id,
-                  });
-                  if (copiedEventResponse && copiedEventResponse.success) {
-                    const newEvent =
-                      copiedEventResponse && copiedEventResponse.data;
-                    this.props.history.push(`/admin/edit/${newEvent.id}/event`);
-                    putEventsInRedux([newEvent, ...(allEvents || [])]);
-                  }
-                }}
-                to="/admin/read/events"
-              >
-                <FileCopy size="small" variant="outlined" color="secondary" />
-              </Link>
-              {auth && auth.is_super_admin && (
-                <Link to={`/admin/read/event/${id}/event-view?from=main`}>
-                  <CallMadeIcon
-                    size="small"
-                    variant="outlined"
-                    color="secondary"
-                  />
-                </Link>
-              )}
-              <Tooltip
-                title={`${is_on_home_page ? "Remove" : "Add"} event ${
-                  is_on_home_page ? "from" : "to"
-                } community's homepage`}
-              >
-                <Link
-                  onClick={() => {
-                    this.props.toggleLive({
-                      show: true,
-                      component: this.addToHomePageUI({ id }),
-                      onConfirm: () => this.addEventToHomePage(id),
-                      closeAfterConfirmation: true,
-                    });
-                  }}
-                >
-                  {is_on_home_page ? (
-                    <StarsIcon
-                      size="small"
-                      variant="outlined"
-                      sx={{
-                        color: "rgb(65 172 65)",
-                      }}
-                    />
-                  ) : (
-                    <StarsIcon
-                      size="small"
-                      variant="outlined"
-                      sx={{
-                        color: "#bcbcbc",
-                      }}
-                    />
-                  )}
-                </Link>
-              </Tooltip>
+              {/* <Link to={`/admin/edit/${id}/event`}> */}
+              {/*   <EditIcon size="small" variant="outlined" color="secondary" /> */}
+              {/* </Link> */}
+              {/* &nbsp;&nbsp; */}
+              {/* <Link */}
+              {/*   onClick={async () => { */}
+              {/*     const copiedEventResponse = await apiCall('/events.copy', { */}
+              {/*       event_id: id, */}
+              {/*     }); */}
+              {/*     if (copiedEventResponse && copiedEventResponse.success) { */}
+              {/*       const newEvent = copiedEventResponse && copiedEventResponse.data; */}
+              {/*       this.props.history.push(`/admin/edit/${newEvent.id}/event`); */}
+              {/*       putEventsInRedux([newEvent, ...(allEvents || [])]); */}
+              {/*     } */}
+              {/*   }} */}
+              {/*   to="/admin/read/events" */}
+              {/* > */}
+              {/*   <FileCopy size="small" variant="outlined" color="secondary" /> */}
+              {/* </Link> */}
+              {/* {auth && auth.is_super_admin && ( */}
+              {/*   <Link to={`/admin/read/event/${id}/event-view?from=main`}> */}
+              {/*     <CallMadeIcon */}
+              {/*       size="small" */}
+              {/*       variant="outlined" */}
+              {/*       color="secondary" */}
+              {/*     /> */}
+              {/*   </Link> */}
+              {/* )} */}
+              {/* <Tooltip */}
+              {/*   title={`${is_on_home_page ? 'Remove' : 'Add'} event ${ */}
+              {/*     is_on_home_page ? 'from' : 'to' */}
+              {/*   } community's homepage`} */}
+              {/* > */}
+              {/*   <Link */}
+              {/*     onClick={() => { */}
+              {/*       this.props.toggleLive({ */}
+              {/*         show: true, */}
+              {/*         component: this.addToHomePageUI({ id }), */}
+              {/*         onConfirm: () => this.addEventToHomePage(id), */}
+              {/*         closeAfterConfirmation: true, */}
+              {/*       }); */}
+              {/*     }} */}
+              {/*   > */}
+              {/*     {is_on_home_page ? ( */}
+              {/*       <StarsIcon */}
+              {/*         size="small" */}
+              {/*         variant="outlined" */}
+              {/*         sx={{ */}
+              {/*           color: 'rgb(65 172 65)', */}
+              {/*         }} */}
+              {/*       /> */}
+              {/*     ) : ( */}
+              {/*       <StarsIcon */}
+              {/*         size="small" */}
+              {/*         variant="outlined" */}
+              {/*         sx={{ */}
+              {/*           color: '#bcbcbc', */}
+              {/*         }} */}
+              {/*       /> */}
+              {/*     )} */}
+              {/*   </Link> */}
+              {/* </Tooltip> */}
+              <div style={{ minWidth: 150 }}>
+                <MEDropdown
+                  fullControl
+                  data={this.makeOptions(content)}
+                  labelExtractor={(it) => it.name}
+                  valueExtractor={(it) => it.key}
+                  placeholder="Options"
+                />
+              </div>
             </div>
-          ),
-        },
+          )
+        }
       },
       {
         name: "Live",
@@ -296,8 +368,8 @@ class AllEvents extends React.Component {
           filter: true,
           searchable: false,
           download: true,
-          sort: false,
-        },
+          sort: false
+        }
       },
       {
         name: "Live",
@@ -306,8 +378,8 @@ class AllEvents extends React.Component {
           display: false,
           filter: false,
           searchable: false,
-          download: false,
-        },
+          download: false
+        }
       },
       {
         name: "Start Date",
@@ -316,8 +388,8 @@ class AllEvents extends React.Component {
           display: false,
           filter: false,
           searchable: false,
-          download: true,
-        },
+          download: true
+        }
       },
       {
         name: "End Date",
@@ -326,9 +398,9 @@ class AllEvents extends React.Component {
           display: false,
           filter: false,
           searchable: false,
-          download: true,
-        },
-      },
+          download: true
+        }
+      }
     ];
   }
 
@@ -340,12 +412,12 @@ class AllEvents extends React.Component {
     item.is_published = !status;
     data.splice(index, 1, item);
     putInRedux([...data]);
-    const community = item.community;
+    const { community } = item;
     apiCall("/events.update", {
       event_id: item.id,
       is_published: !status,
       name: item.name,
-      community_id: (community && community.id) || null,
+      community_id: (community && community.id) || null
     });
   }
 
@@ -355,7 +427,8 @@ class AllEvents extends React.Component {
     return (
       <div>
         <Typography>
-          <b>{name}</b> is {isON ? "live, " : "not live, "}
+          <b>{name}</b> is
+          {isON ? "live, " : "not live, "}
           would you like {isON ? " to take it offline" : " to take it live"}?
         </Typography>
       </div>
@@ -364,14 +437,12 @@ class AllEvents extends React.Component {
 
   addToHomePageUI({ id }) {
     const data = this.props.allEvents || [];
-    let event =
-      data?.find((item) => item.id?.toString() === id?.toString()) || {};
+    const event = data?.find((item) => item.id?.toString() === id?.toString()) || {};
     return (
       <div>
         <Typography>
-          would you like to {event?.is_on_home_page ? "remove" : "add"}{" "}
-          <b>{event?.name}</b> {event?.is_on_home_page ? "from" : "to"}{" "}
-          <b>{event?.community?.name}</b>
+          would you like to {event?.is_on_home_page ? "remove" : "add"} <b>{event?.name}</b>{" "}
+          {event?.is_on_home_page ? "from" : "to"} <b>{event?.community?.name}</b>
           {"'s "} community homepage?
         </Typography>
       </div>
@@ -381,13 +452,12 @@ class AllEvents extends React.Component {
   addEventToHomePage = (id) => {
     const { allEvents, putEventsInRedux } = this.props;
     const data = allEvents || [];
-    let event =
-      data?.find((item) => item.id?.toString() === id?.toString()) || {};
+    const event = data?.find((item) => item.id?.toString() === id?.toString()) || {};
     const index = data.findIndex((a) => a.id?.toString() === id);
 
     const toSend = {
       event_id: id,
-      community_id: event?.community?.id,
+      community_id: event?.community?.id
     };
 
     // BHN - use end_date_and_time so ongoing events/campaigns can show on home page
@@ -395,7 +465,7 @@ class AllEvents extends React.Component {
       this.props.toggleToast({
         open: true,
         message: "Event is out of date",
-        variant: "error",
+        variant: "error"
       });
       return;
     }
@@ -408,13 +478,13 @@ class AllEvents extends React.Component {
         this.props.toggleToast({
           open: true,
           message: res.data?.msg,
-          variant: res?.data?.msg?.includes("removed") ? "warning" : "success",
+          variant: res?.data?.msg?.includes("removed") ? "warning" : "success"
         });
       } else {
         this.props.toggleToast({
           open: true,
           message: res?.error,
-          variant: "error",
+          variant: "error"
         });
       }
     });
@@ -424,12 +494,18 @@ class AllEvents extends React.Component {
     // this specifying the column index as a number leads to bugs over and over again
     const isComparingLive = colIndex === 7;
     const sortForLive = ({ a, b }) => (a.isLive && !b.isLive ? -1 : 1);
-    var params = {
+    const params = {
       colIndex,
       order,
-      compare: isComparingLive && sortForLive,
+      compare: isComparingLive && sortForLive
     };
-    return data.sort((a, b) => ourCustomSort({ ...params, a, b }));
+    return data.sort((a, b) =>
+      ourCustomSort({
+        ...params,
+        a,
+        b
+      })
+    );
   }
 
   nowDelete({ idsToDelete, data }) {
@@ -443,21 +519,21 @@ class AllEvents extends React.Component {
         if (response.success) {
           putMetaDataToRedux({
             ...meta,
-            ["events"]: {
-              ...meta["events"],
-              count: meta["events"].count - 1,
-            },
+            events: {
+              ...meta.events,
+              count: meta.events.count - 1
+            }
           });
           this.props.toggleToast({
             open: true,
             message: "Event(s) successfully deleted",
-            variant: "success",
+            variant: "success"
           });
         } else {
           this.props.toggleToast({
             open: true,
             message: "An error occurred while deleting the event(s)",
-            variant: "error",
+            variant: "error"
           });
         }
       });
@@ -475,8 +551,8 @@ class AllEvents extends React.Component {
       community_ids: ids,
       exclude: exclude || false,
       limit: getLimit(PAGE_PROPERTIES.ALL_EVENTS.key),
-      params: json.stringify({}),
-      page: 1,
+      params: JSON.stringify({}),
+      page: 1
     })
       .then((response) => {
         this.setState({ loading: false });
@@ -489,17 +565,9 @@ class AllEvents extends React.Component {
   }
 
   render() {
-    const title = brand.name + " - All Events";
-    const description = brand.desc;
     const { columns } = this.state;
     const { classes } = this.props;
-    const {
-      allEvents,
-      putEventsInRedux,
-      auth,
-      meta,
-      putMetaDataToRedux,
-    } = this.props;
+    const { allEvents, putEventsInRedux, auth, meta, putMetaDataToRedux } = this.props;
     const data = this.fashionData(allEvents || []);
     const metaData = meta && meta.events;
 
@@ -523,9 +591,9 @@ class AllEvents extends React.Component {
           pageProp: PAGE_PROPERTIES.ALL_EVENTS,
           updateMetaData: putMetaDataToRedux,
           name: "events",
-          meta: meta,
+          meta
         }),
-      customSearchRender: (searchText, handleSearch, hideSearch, options) => (
+      customSearchRender: (searchText, handleSearch, hideSearch) => (
         <SearchBar
           url={getAdminApiEndpoint(auth, "/events")}
           reduxItems={allEvents}
@@ -538,28 +606,20 @@ class AllEvents extends React.Component {
           meta={meta}
         />
       ),
-      customFilterDialogFooter: (currentFilterList, applyFilters) => {
-        return (
-          <ApplyFilterButton
-            url={getAdminApiEndpoint(auth, "/events")}
-            reduxItems={allEvents}
-            updateReduxFunction={putEventsInRedux}
-            columns={columns}
-            limit={getLimit(PAGE_PROPERTIES.ALL_EVENTS.key)}
-            applyFilters={applyFilters}
-            updateMetaData={putMetaDataToRedux}
-            name="events"
-            meta={meta}
-          />
-        );
-      },
-      whenFilterChanges: (
-        changedColumn,
-        filterList,
-        type,
-        changedColumnIndex,
-        displayData
-      ) =>
+      customFilterDialogFooter: (currentFilterList, applyFilters) => (
+        <ApplyFilterButton
+          url={getAdminApiEndpoint(auth, "/events")}
+          reduxItems={allEvents}
+          updateReduxFunction={putEventsInRedux}
+          columns={columns}
+          limit={getLimit(PAGE_PROPERTIES.ALL_EVENTS.key)}
+          applyFilters={applyFilters}
+          updateMetaData={putMetaDataToRedux}
+          name="events"
+          meta={meta}
+        />
+      ),
+      whenFilterChanges: (changedColumn, filterList, type) =>
         handleFilterChange({
           filterList,
           type,
@@ -570,13 +630,12 @@ class AllEvents extends React.Component {
           url: getAdminApiEndpoint(auth, "/events"),
           updateMetaData: putMetaDataToRedux,
           name: "events",
-          meta: meta,
+          meta
         }),
       customSort: this.customSort,
-      rowsPerPageOptions: [10, 25, 100],
       downloadOptions: {
         filename: `All Events (${getTimeStamp()}).csv`,
-        separator: ",",
+        separator: ","
       },
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
@@ -590,18 +649,20 @@ class AllEvents extends React.Component {
           component: makeDeleteUI({
             idsToDelete,
             templates: found,
-            noTemplates: noTemplatesSelectedGoAhead,
+            noTemplates: noTemplatesSelectedGoAhead
           }),
           onConfirm: () =>
-            noTemplatesSelectedGoAhead && this.nowDelete({ idsToDelete, data }),
+            noTemplatesSelectedGoAhead &&
+            this.nowDelete({
+              idsToDelete,
+              data
+            }),
           closeAfterConfirmation: true,
-          cancelText: noTemplatesSelectedGoAhead
-            ? "No"
-            : "Go Back and Remove Templates",
-          noOk: !noTemplatesSelectedGoAhead,
+          cancelText: noTemplatesSelectedGoAhead ? "No" : "Go Back and Remove Templates",
+          noOk: !noTemplatesSelectedGoAhead
         });
         return false;
-      },
+      }
     };
 
     if (isEmpty(metaData)) {
@@ -610,16 +671,16 @@ class AllEvents extends React.Component {
 
     return (
       <div>
-        <Seo name={"All Events"} />
+        <Seo name="All Events" />
         <Paper style={{ marginBottom: 10 }}>
           <METable
             classes={classes}
             page={PAGE_PROPERTIES.ALL_EVENTS}
             tableProps={{
               title: "All Events",
-              data: data,
-              columns: columns,
-              options: options,
+              data,
+              columns,
+              options
             }}
           />
         </Paper>
@@ -629,7 +690,7 @@ class AllEvents extends React.Component {
 }
 
 AllEvents.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired
 };
 
 function mapStateToProps(state) {
@@ -638,9 +699,10 @@ function mapStateToProps(state) {
     allEvents: state.getIn(["allEvents"]),
     community: state.getIn(["selected_community"]),
     meta: state.getIn(["paginationMetaData"]),
-    communities: state.getIn(["communities"]),
+    communities: state.getIn(["communities"])
   };
 }
+
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
@@ -650,7 +712,7 @@ function mapDispatchToProps(dispatch) {
       toggleModal: reduxToggleUniversalModal,
       toggleLive: reduxToggleUniversalModal,
       toggleToast: reduxToggleUniversalToast,
-      putMetaDataToRedux: reduxLoadMetaDataAction,
+      putMetaDataToRedux: reduxLoadMetaDataAction
     },
     dispatch
   );
@@ -663,16 +725,7 @@ const EventsMapped = connect(
 export default withStyles(styles)(withRouter(EventsMapped));
 
 const EventSharedState = (props) => {
-  const {
-    shared_to,
-    name,
-    classes,
-    toggleModalOnClick,
-    publicity,
-    communities_under_publicity,
-    id,
-    history,
-  } = props;
+  const { shared_to, name, classes, toggleModalOnClick, publicity, communities_under_publicity, id, history } = props;
 
   const numberOfSharers = shared_to?.length || 0;
   const commonClasses = "touchable-opacity";
@@ -696,8 +749,7 @@ const EventSharedState = (props) => {
           />
         ),
         cancelText: "Close",
-        noOk: true,
-        // okText: "Change Event Settings",
+        noOk: true // okText: "Change Event Settings",
       });
   };
   const sharedWithDialog = () => {
@@ -710,21 +762,19 @@ const EventSharedState = (props) => {
             publicity={publicity}
             shared_to={shared_to}
             id={id}
-            close={close}
             shareable_to={communities_under_publicity}
             closeModal={closeModal}
             history={history}
           />
         ),
         noOk: true,
-        cancelText: "Close",
-        // okText: "ADD/REMOVE COMMUNITIES",
+        cancelText: "Close" // okText: "ADD/REMOVE COMMUNITIES",
       });
   };
 
   const yesProps = {
     className: `${classes.yesLabel} ${commonClasses}`,
-    onClick: () => sharedWithDialog(),
+    onClick: () => sharedWithDialog()
   };
 
   //   const Wrapper = ({ children, style }) => (
@@ -733,20 +783,17 @@ const EventSharedState = (props) => {
   //     </Typography>
   //   );
 
-  if (numberOfSharers === 0)
-    return (
-      <MEChip
-        label="No"
-        className={`${classes.noLabel} ${commonClasses}`}
-        onClick={() => notSharedYetDialog()}
-      />
-    );
+  if (numberOfSharers === 0) {
+    return <MEChip label="No" className={`${classes.noLabel} ${commonClasses}`} onClick={() => notSharedYetDialog()} />;
+  }
   if (numberOfSharers === 1) return <MEChip label="Yes" {...yesProps} />;
-  if (numberOfSharers > 9)
+  if (numberOfSharers > 9) {
     return <MEChip {...yesProps}>({numberOfSharers})</MEChip>;
+  }
   return (
     <MEChip {...yesProps} style={{ padding: "0px 15px" }}>
-      Yes({numberOfSharers})
+      Yes(
+      {numberOfSharers})
     </MEChip>
   );
 

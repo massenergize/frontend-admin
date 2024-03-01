@@ -72,9 +72,7 @@ import {
   EventFullView,
   EventsFromOthers,
   ActionEngagementList,
-  PolicyFullViewPage,
   TermsOfServicePage,
-  PrivacyPolicyPage,
   ActionUsers,
   SendMessage,
   ScheduledMessages,
@@ -84,7 +82,6 @@ import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
 import AddRemoveSuperAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveSuperAdmin";
 import EditCommunityByCommunityAdmin from "../MassEnergizeSuperAdmin/Community/EditCommunityByCommunityAdmin";
 import EditTeam from "../MassEnergizeSuperAdmin/Teams/EditTeam";
-//import EditCarbonEquivalency from '../MassEnergizeSuperAdmin/CarbonEquivalencies/EditCarbonEquivalency';
 import EditCategory from "../MassEnergizeSuperAdmin/Categories/EditCategory";
 import EditTestimonial from "../MassEnergizeSuperAdmin/Testimonials/EditTestimonial";
 import AllSubscribers from "../MassEnergizeSuperAdmin/Subscribers/AllSubscribers";
@@ -94,16 +91,12 @@ import TeamAdminMessages from "../MassEnergizeSuperAdmin/Messages/TeamAdminMessa
 import TeamMembers from "../MassEnergizeSuperAdmin/Teams/TeamMembers";
 import EventRSVPs from "../MassEnergizeSuperAdmin/Events/EventRSVPs";
 import ThemeModal from "../../components/Widget/ThemeModal";
-import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
-import { THREE_MINUTES, TIME_UNTIL_EXPIRATION } from "../../utils/constants";
 import ThemeToast from "../../components/Widget/ThemeToast";
-import { ME_FORM_PROGRESS } from "../MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 import { FILTER_OBJ_KEY } from "../MassEnergizeSuperAdmin/ME  Tools/table /METable";
-import { includes } from "lodash";
 import { IS_LOCAL } from "../../config/constants";
 import UserActivityMonitor from "../../components/Widget/UserActivityMonitor";
 
-//This function checks whether a user needs to sign an MOU and redirects them to the MOU page if necessary
+// This function checks whether a user needs to sign an MOU and redirects them to the MOU page if necessary
 const checkIfUserNeedsMOUAttention = (auth, history) => {
   // A list of routes that are allowed if a user has not signed their MOU
   const allowedRoutes = [
@@ -115,7 +108,7 @@ const checkIfUserNeedsMOUAttention = (auth, history) => {
   const currentUrl = window.location.pathname;
   let routeIsAllowed = false;
 
-  //Iterate through all the allowed routes listed.
+  // Iterate through all the allowed routes listed.
   allowedRoutes.forEach((route) => {
     if (currentUrl.includes(route)) routeIsAllowed = true;
   });
@@ -124,8 +117,7 @@ const checkIfUserNeedsMOUAttention = (auth, history) => {
   const MOU_URL = "/admin/view/policy/mou?ct=true"; // this will need to change if we ever change the "key" from "mou" when sadmin is creating the MOU policy. Same for PP and TOS routes.
 
   // If the user still needs to accept the MOU agreement and is accessing a route that is currently not allowed, redirect them to the MOU route with ct=true in the query string.
-  if (auth?.needs_to_accept_mou && !routeIsAllowed)
-    return history.push(MOU_URL);
+  if (auth?.needs_to_accept_mou && !routeIsAllowed) return history.push(MOU_URL);
 };
 
 class Application extends React.Component {
@@ -143,6 +135,8 @@ class Application extends React.Component {
     // ---- PICK UP SAVED FILTERS FROM LOCAL STORAGE ON FIRST LOAD ------
     this.findSavedFiltersAndInflate();
   }
+
+
   findSavedFiltersAndInflate() {
     const { putFiltersInRedux } = this.props;
     const filters = localStorage.getItem(FILTER_OBJ_KEY);
@@ -153,6 +147,12 @@ class Application extends React.Component {
     const { auth } = this.props;
     const list = (auth && auth.admin_at) || [];
     return list.map((com) => com.id);
+  }
+
+   renderModalComponent =(modalOptions) =>{
+    const { component, renderComponent } = modalOptions;
+    if(renderComponent) return renderComponent();
+    return component;
   }
 
   render() {
@@ -226,8 +226,9 @@ class Application extends React.Component {
       />,
     ];
 
+
     if (!IS_LOCAL) checkIfUserNeedsMOUAttention(auth, history); // This check will not run in local mode
-    const { component, show, onConfirm, closeAfterConfirmation } = modalOptions;
+    const { show, onConfirm, closeAfterConfirmation } = modalOptions;
     return (
       <UserActivityMonitor
         minutes={10}
@@ -249,7 +250,7 @@ class Application extends React.Component {
             }}
             closeAfterConfirmation={closeAfterConfirmation}
           >
-            {component}
+            {this.renderModalComponent(modalOptions)}
           </ThemeModal>
           <ThemeToast
             {...toastOptions || {}}
@@ -536,7 +537,7 @@ function mapDispatchToProps(dispatch) {
       fetchInitialContent: reduxFetchInitialContent,
       toggleUniversalModal: reduxToggleUniversalModal,
       checkFirebaseAuthentication,
-      restoreFormProgress: restoreFormProgress,
+      restoreFormProgress,
       toggleUniversalToast: reduxToggleUniversalToast,
       putFiltersInRedux: reduxLoadTableFilters,
       updateUserActiveStatus: reduxLoadUserActiveStatus,
