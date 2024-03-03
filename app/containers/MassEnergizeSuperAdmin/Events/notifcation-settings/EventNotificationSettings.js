@@ -53,6 +53,7 @@ export default function EventNotificationSettings(props) {
   const [profiles, setProfiles] = useState([]); // Holds the list of settings profiles that are on the event at any point
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("nudge-settings");
+  const [error, setError] = useState("");
   const dispatch = useDispatch();
   const allEvents = useSelector((state) => state.getIn(["allEvents"]));
 
@@ -96,6 +97,7 @@ export default function EventNotificationSettings(props) {
 
   const sendChangesToBackend = () => {
     setLoading(true);
+    setError("");
     const isALL = targetCommunities?.find((c) => typeof c === "string" && c?.toLowerCase() === "all");
     apiCall("/events.reminders.settings.create", {
       event_id: id,
@@ -105,6 +107,7 @@ export default function EventNotificationSettings(props) {
       .then((response) => {
         setLoading(false);
         if (!response?.success) {
+          setError(response?.error || "Error updating settings");
           return console.log("Error updating settings", response);
         }
         const event = response?.data;
@@ -113,6 +116,7 @@ export default function EventNotificationSettings(props) {
       })
       .catch((err) => {
         setLoading(false);
+        setError(err?.toString());
         console.log("Error updating settings", err);
       });
   };
@@ -131,6 +135,7 @@ export default function EventNotificationSettings(props) {
       .then((response) => {
         setLoading(false);
         if (!response?.success) {
+          setError(response?.error || "Error removing settings");
           return console.log("Error removing settings", response);
         }
         if (response?.data?.deleted) {
@@ -138,6 +143,8 @@ export default function EventNotificationSettings(props) {
         }
       })
       .catch((err) => {
+        setLoading(false);
+        setError(err?.toString());
         console.log("Error removing settings", err);
       });
   };
@@ -222,6 +229,8 @@ export default function EventNotificationSettings(props) {
         style={{
           display: "flex",
           flexDirection: "row",
+          alignItems: "center",
+
           position: "absolute",
           bottom: 0,
           width: "100%",
@@ -229,6 +238,13 @@ export default function EventNotificationSettings(props) {
           background: "white"
         }}
       >
+        {error && (
+          <small style={{ color: "#b93131", fontWeight: "bold" }}>
+            <i className=" fa fa-times" style={{ marginRight: 6 }} />
+            This is what an error will look like
+            {error}
+          </small>
+        )}
         <div style={{ marginLeft: "auto" }}>
           <Button onClick={() => close && close()}>Close</Button>
           {isChoicesTab && (
