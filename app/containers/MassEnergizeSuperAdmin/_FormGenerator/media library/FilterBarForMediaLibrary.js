@@ -252,6 +252,7 @@ export const FilterBarForMediaLibrary = ({
             labelExtractor={(item) => item?.name}
             valueExtractor={(item) => item?.id}
             data={getCommunitiesToSelectFrom()}
+            endpoint = "communities.listForCommunityAdmin"
             placeholder="Select communities and 'Apply'"
             // {...makeCadminOptions()}
           />

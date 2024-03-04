@@ -36,7 +36,6 @@ const NotificationChoices = ({ state, handleChange, setCommunities, targetCommun
         onChange={(t) => {
           setCommunities(t);
         }}
-        isAsync
         endpoint="communities.listForSuperAdmin"
         defaultSelected={targetCommunities}
         valueExtractor={(t) => t?.id}

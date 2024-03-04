@@ -72,7 +72,6 @@ function LightAutoComplete(props) {
     containerStyle,
     multiple,
     showSelectAll = true,
-    isAsync,
     endpoint,
     args,
     params,
@@ -99,6 +98,7 @@ function LightAutoComplete(props) {
     params: { search_text: query, ...(params || {}) }
   });
   useEffect(() => {
+    if (!endpoint) return;
     let newItemsConstructed = (newItems || [])?.map((item) => {
       return {
         ...item,
@@ -316,7 +316,7 @@ function LightAutoComplete(props) {
                     <span
                       onClick={() => allOrNothing({ data: optionsToDisplay })}
                       className={`${classes.option} touchable-opacity`}
-                      style={{ marginRight: 15 }}
+                      style={{ marginRight: 15, fontWeight: "bold", color: "black" }}
                     >
                       {" "}
                       Select All
@@ -326,6 +326,7 @@ function LightAutoComplete(props) {
                       <span
                         className={`${classes.option} touchable-opacity`}
                         onClick={() => allOrNothing({ nothing: true })}
+                        style={{ color: "#ca1f1f", fontWeight: "bold" }}
                       >
                         Clear
                       </span>

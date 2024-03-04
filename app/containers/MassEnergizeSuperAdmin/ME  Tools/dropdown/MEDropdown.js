@@ -4,17 +4,14 @@ import {
   FormControlLabel,
   MenuItem,
   Typography,
-
   Chip,
   FormControl,
   FormLabel,
   Select,
-  CircularProgress,
+  CircularProgress
 } from "@mui/material";
 
-import React, {
-  useCallback, useEffect, useRef, useState
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { pop } from "../../../../utils/common";
 import LightAutoComplete from "../../Gallery/tools/LightAutoComplete";
 import MEDropdownPro from "./MEDropdownPro";
@@ -55,9 +52,7 @@ function MEDropdown(props) {
   }, [defaultValue, value]);
 
   useEffect(() => {
-    if (!rest?.isAsync) {
-      setOptionsToDisplay(props.data);
-    }
+    setOptionsToDisplay(props.data);
   }, [props.data]);
 
   // -------------------------------------------------------------------
@@ -67,22 +62,18 @@ function MEDropdown(props) {
     data: optionsToDisplay,
     endpoint: rest?.endpoint,
     args: { limit: 10 },
-    params: { ...(rest?.params || {}) },
+    params: { ...(rest?.params || {}) }
   });
   useEffect(() => {
+    if (!rest?.endpoint) return;
     const newItemsConstructed = (newItems || [])?.map((item) => ({
       ...item,
-      displayName: labelExtractor
-        ? labelExtractor(item)
-        : item?.name || item?.title,
+      displayName: labelExtractor ? labelExtractor(item) : item?.name || item?.title
     }));
     const all = [...(optionsToDisplay || []), ...(newItemsConstructed || [])];
-    const uniqueItems = [
-      ...new Map(all.map((item) => [item.id, item])).values(),
-    ];
+    const uniqueItems = [...new Map(all.map((item) => [item.id, item])).values()];
     setOptionsToDisplay(uniqueItems);
   }, [newItems]);
-
 
   // const elementObserver = useRef(null);
   // const lastDropDownItemRef = useCallback(
@@ -187,10 +178,10 @@ function MEDropdown(props) {
   const MenuProps = {
     PaperProps: {
       style: {
-        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP
         // width: 250,
-      },
-    },
+      }
+    }
   };
   const renderSpotlight = () => {
     const { spotlightExtractor, spotlightText } = props;
@@ -200,14 +191,11 @@ function MEDropdown(props) {
       <div
         style={{
           border: "solid 0px #f6f6f6fc",
-          borderBottomWidth: 2,
+          borderBottomWidth: 2
         }}
       >
         {spotlightText && (
-          <Typography
-            variant="body2"
-            style={{ padding: "10px 20px", color: "grey" }}
-          >
+          <Typography variant="body2" style={{ padding: "10px 20px", color: "grey" }}>
             {spotlightText}
           </Typography>
         )}
@@ -218,15 +206,9 @@ function MEDropdown(props) {
               key={i}
               control={
                 multiple ? (
-                  <Checkbox
-                    checked={itemIsSelected(valueOf(d))}
-                    value={valueOf(d)}
-                    name={labelOf(d)}
-                  />
+                  <Checkbox checked={itemIsSelected(valueOf(d))} value={valueOf(d)} name={labelOf(d)} />
                 ) : (
-                  <Typography style={{ padding: "7px 15px" }}>
-                    {labelOf(d)}
-                  </Typography>
+                  <Typography style={{ padding: "7px 15px" }}>{labelOf(d)}</Typography>
                 )
               }
               label={multiple ? labelOf(d) : ""}
@@ -239,13 +221,8 @@ function MEDropdown(props) {
 
   return (
     <>
-      <FormControl
-        key={name || "me-dropdown"}
-        style={{ width: "100%", marginTop: 10, ...(containerStyle || {}) }}
-      >
-        {placeholder && (
-          <FormLabel component="legend">{placeholder}</FormLabel>
-        )}
+      <FormControl key={name || "me-dropdown"} style={{ width: "100%", marginTop: 10, ...(containerStyle || {}) }}>
+        {placeholder && <FormLabel component="legend">{placeholder}</FormLabel>}
         <Select
           {...generics || {}}
           open={dropOpen}
@@ -259,15 +236,11 @@ function MEDropdown(props) {
               style={{
                 display: "flex",
                 flexDirection: "row",
-                flexWrap: "wrap",
+                flexWrap: "wrap"
               }}
             >
               {itemsToDisplay.map((item, id) => (
-                <Chip
-                  key={id.toString()}
-                  label={labelOf(item, true)}
-                  style={{ margin: 5 }}
-                />
+                <Chip key={id.toString()} label={labelOf(item, true)} style={{ margin: 5 }} />
               ))}
             </div>
           )}
@@ -280,7 +253,7 @@ function MEDropdown(props) {
               style={{
                 border: "solid 0px #f6f6f6fc",
                 padding: "15px 20px",
-                borderBottomWidth: 2,
+                borderBottomWidth: 2
               }}
             >
               <a
@@ -292,8 +265,7 @@ function MEDropdown(props) {
                 href="#"
                 style={{ marginRight: 15, fontWeight: "bold", color: "black" }}
               >
-                Select All
-                {" "}
+                Select All{" "}
               </a>
               {selected?.length ? (
                 <a
@@ -304,8 +276,7 @@ function MEDropdown(props) {
                   href="#"
                   style={{ color: "#ca1f1f", fontWeight: "bold" }}
                 >
-                  Clear All
-                  {" "}
+                  Clear All{" "}
                 </a>
               ) : (
                 <></>
@@ -318,23 +289,14 @@ function MEDropdown(props) {
             const { spotlightExtractor } = props;
             if (spotlightExtractor && spotlightExtractor(d)) return <></>;
             return (
-              <MenuItem
-                key={i}
-                onClick={() => handleOnChange(d)}
-              >
+              <MenuItem key={i} onClick={() => handleOnChange(d)}>
                 <FormControlLabel
                   key={i}
                   control={
                     multiple ? (
-                      <Checkbox
-                        checked={itemIsSelected(valueOf(d))}
-                        value={valueOf(d)}
-                        name={labelOf(d)}
-                      />
+                      <Checkbox checked={itemIsSelected(valueOf(d))} value={valueOf(d)} name={labelOf(d)} />
                     ) : (
-                      <Typography style={{ padding: "7px 15px" }}>
-                        {labelOf(d)}
-                      </Typography>
+                      <Typography style={{ padding: "7px 15px" }}>{labelOf(d)}</Typography>
                     )
                   }
                   label={multiple ? labelOf(d) : ""}
@@ -342,17 +304,13 @@ function MEDropdown(props) {
               </MenuItem>
             );
           })}
-          {cursor.has_more && rest?.isAsync && (
-            <MenuItem
-              value={cursor.next}
-              key="fetcher-option"
-              ref={ref}
-            >
+          {cursor.has_more && rest?.endpoint && (
+            <MenuItem value={cursor.next} key="fetcher-option" ref={ref}>
               <Box
                 sx={{
                   width: "100%",
                   display: "flex",
-                  justifyContent: "center",
+                  justifyContent: "center"
                 }}
               >
                 <CircularProgress size={20} />
@@ -413,5 +371,5 @@ export default MEDropdown;
 MEDropdown.defaultValues = {
   multiple: false,
   allowClearAndSelectAll: false,
-  placeholder: "Enter placeholder text for your dropdown",
+  placeholder: "Enter placeholder text for your dropdown"
 };
