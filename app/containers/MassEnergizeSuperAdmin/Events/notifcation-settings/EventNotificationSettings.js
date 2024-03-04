@@ -53,6 +53,7 @@ export default function EventNotificationSettings(props) {
   const [profiles, setProfiles] = useState([]); // Holds the list of settings profiles that are on the event at any point
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("nudge-settings");
+  const [notification, setNotification] = useState({});
   const dispatch = useDispatch();
   const allEvents = useSelector((state) => state.getIn(["allEvents"]));
 
@@ -64,6 +65,13 @@ export default function EventNotificationSettings(props) {
         .filter(([key]) => key !== "never")
         .map(([key]) => [key, false])
     );
+  };
+
+  const notify = (message, type = "error") => {
+    setNotification({
+      message,
+      type
+    });
   };
 
   const updateNotification = (name, value) => {
@@ -96,23 +104,27 @@ export default function EventNotificationSettings(props) {
 
   const sendChangesToBackend = () => {
     setLoading(true);
+    setNotification({});
     const isALL = targetCommunities?.find((c) => typeof c === "string" && c?.toLowerCase() === "all");
     apiCall("/events.reminders.settings.create", {
       event_id: id,
-      settings: JSON.stringify(state),
+      ...(state || {}), // This is the settings object (notifications object
       community_ids: isALL ? targetCommunities : (targetCommunities || []).map((c) => c.id)
     })
       .then((response) => {
         setLoading(false);
         if (!response?.success) {
+          notify(response?.error || "Error updating settings");
           return console.log("Error updating settings", response);
         }
         const event = response?.data;
         putEventInSamePosition(event);
         setProfiles(event?.settings?.notifications || []);
+        notify("Settings updated successfully!", "success");
       })
       .catch((err) => {
         setLoading(false);
+        notify(err?.toString());
         console.log("Error updating settings", err);
       });
   };
@@ -131,6 +143,7 @@ export default function EventNotificationSettings(props) {
       .then((response) => {
         setLoading(false);
         if (!response?.success) {
+          notify(response?.error || "Error removing settings");
           return console.log("Error removing settings", response);
         }
         if (response?.data?.deleted) {
@@ -138,6 +151,8 @@ export default function EventNotificationSettings(props) {
         }
       })
       .catch((err) => {
+        setLoading(false);
+        notify(err?.toString());
         console.log("Error removing settings", err);
       });
   };
@@ -198,6 +213,8 @@ export default function EventNotificationSettings(props) {
 
   const isChoicesTab = activeTab === "nudge-settings";
 
+  const { message, type } = notification || {};
+  const isError = type === "error";
   return (
     <div
       style={{
@@ -222,6 +239,8 @@ export default function EventNotificationSettings(props) {
         style={{
           display: "flex",
           flexDirection: "row",
+          alignItems: "center",
+
           position: "absolute",
           bottom: 0,
           width: "100%",
@@ -229,6 +248,12 @@ export default function EventNotificationSettings(props) {
           background: "white"
         }}
       >
+        {message && (
+          <small style={{ color: isError ? "#b93131" : "Green", fontWeight: "bold" }}>
+            <i className={isError ? "fa fa-times" : "fa fa-check-circle"} style={{ marginRight: 6 }} />
+            {message}
+          </small>
+        )}
         <div style={{ marginLeft: "auto" }}>
           <Button onClick={() => close && close()}>Close</Button>
           {isChoicesTab && (
