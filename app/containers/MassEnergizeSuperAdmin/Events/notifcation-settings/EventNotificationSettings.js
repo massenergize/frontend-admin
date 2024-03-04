@@ -102,7 +102,17 @@ export default function EventNotificationSettings(props) {
     dispatch(loadAllEvents(updatedEvents));
   };
 
+  const readyForFlight = () => {
+    if (!targetCommunities?.length) {
+      notify("Please select the communities that these settings apply to");
+      return false;
+    }
+
+    return true
+  };
+
   const sendChangesToBackend = () => {
+    if (!readyForFlight()) return;
     setLoading(true);
     setNotification({});
     const isALL = targetCommunities?.find((c) => typeof c === "string" && c?.toLowerCase() === "all");
