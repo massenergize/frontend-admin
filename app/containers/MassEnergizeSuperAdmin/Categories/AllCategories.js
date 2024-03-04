@@ -27,6 +27,7 @@ import METable from "../ME  Tools/table /METable";
 import { isEmpty } from "../../../utils/common";
 import Loader from "../../../utils/components/Loader";
 import Seo from "../../../components/Seo/Seo";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
 class AllTagCollections extends React.Component {
   constructor(props) {
     super(props);
@@ -203,8 +204,8 @@ class AllTagCollections extends React.Component {
       responsive: "standard",
       count: metaData && metaData.count,
       print: true,
-      rowsPerPage: 25,
-      rowsPerPageOptions: [10, 25, 100],
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({

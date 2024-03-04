@@ -15,3 +15,6 @@ export const FROM = {
   MAIN_EVENTS: "main",
   OTHER_EVENTS: "others",
 };
+
+export const DEFAULT_ITEMS_PER_PAGE = 25;
+export const DEFAULT_ITEMS_PER_PAGE_OPTIONS = [10, 25, 50, 100];

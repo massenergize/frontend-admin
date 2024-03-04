@@ -27,6 +27,7 @@ import ApplyFilterButton from "../../../utils/components/applyFilterButton/Apply
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
 import Seo from "../../../components/Seo/Seo";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
 
 class AllCommunities extends React.Component {
   constructor(props) {
@@ -278,9 +279,9 @@ class AllCommunities extends React.Component {
       filterType: "dropdown",
       responsive: "standard",
       print: true,
-      rowsPerPage: 25,
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
       count: metaData && metaData.count,
-      rowsPerPageOptions: [10, 25, 100],
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         toggleDeleteConfirmation({

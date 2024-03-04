@@ -34,7 +34,7 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import { getAdminApiEndpoint, getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
-import { FROM } from "../../../utils/constants";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS, FROM } from '../../../utils/constants';
 import Loader from "../../../utils/components/Loader";
 import Seo from "../../../components/Seo/Seo";
 import CustomOptions from "../ME  Tools/table /CustomOptions";
@@ -575,9 +575,9 @@ class AllEvents extends React.Component {
       filterType: "dropdown",
       responsive: "standard",
       print: true,
-      rowsPerPage: 25,
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
       count: metaData && metaData.count,
-      rowsPerPageOptions: [10, 25, 100],
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
       confirmFilters: true,
       onTableChange: (action, tableState) =>
         onTableStateChange({

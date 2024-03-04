@@ -40,6 +40,7 @@ import Loader from "../../../utils/components/Loader";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import Seo from "../../../components/Seo/Seo";
 import CustomOptions from "../ME  Tools/table /CustomOptions";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
 class AllTeamAdminMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -304,8 +305,8 @@ class AllTeamAdminMessages extends React.Component {
       responsive: "standard",
       count: metaData && metaData.count,
       print: true,
-      rowsPerPage: 25,
-      rowsPerPageOptions: [10, 25, 100],
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
       confirmFilters: true,
       onTableChange: (action, tableState) =>
         onTableStateChange({

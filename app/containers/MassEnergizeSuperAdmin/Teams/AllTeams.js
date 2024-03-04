@@ -51,6 +51,7 @@ import { getData } from "../Messages/CommunityAdminMessages";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import Seo from "../../../../app/components/Seo/Seo";
 import CustomOptions from "../ME  Tools/table /CustomOptions";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
 
 class AllTeams extends React.Component {
   constructor(props) {
@@ -406,9 +407,9 @@ class AllTeams extends React.Component {
       filterType: "dropdown",
       responsive: "standard",
       print: true,
-      rowsPerPage: 25,
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
       count: metaData && metaData.count,
-      rowsPerPageOptions: [10, 25, 100],
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
       confirmFilters: true,
       onTableChange: (action, tableState) =>
         onTableStateChange({
