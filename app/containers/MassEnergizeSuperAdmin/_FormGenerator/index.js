@@ -656,7 +656,13 @@ class MassEnergizeForm extends Component {
 
   renderModalText = (field) => {
     if (field && field.modalText) {
-      return <Modal title={field.modalTitle} text={field.modalText} />;
+      return (
+        <Modal
+          title={field.modalTitle}
+          text={field.modalText}
+          onCustomBtnClick={field.onCustomBtnClick}
+        />
+      );
     }
     return <div />;
   };

@@ -370,8 +370,13 @@ const createFormJson = ({
             dbName: "calculator_action",
             data: [{ displayName: "--", id: "" }, ...ccActions],
             modalTitle: "Carbon Action List & Instructions",
-            modalText:
-              "Check out the instructions here: https://docs.google.com/document/d/1RisvrGJQifCq9c62etcwR1YCUffExz_T8lR2XDGmokQ/edit",
+            onCustomBtnClick: () => {
+              window.open(
+                "https://docs.google.com/document/d/1X7L3j9jTVOBaWyEaQE9cr43wrgf9ltuDg7VTaX0rKB4/edit#heading=h.sjra6t1pymne",
+                "_blank"
+              );
+            },
+            modalText: "Check out the instructions here: https://docs.google.com/document/d/1X7L3j9jTVOBaWyEaQE9cr43wrgf9ltuDg7VTaX0rKB4/edit#heading=h.sjra6t1pymne",
           },
         ],
       },
