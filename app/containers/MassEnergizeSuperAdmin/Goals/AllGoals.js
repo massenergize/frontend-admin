@@ -17,6 +17,7 @@ import { apiCall } from '../../../utils/messenger';
 import styles from '../../../components/Widget/widget-jss';
 import { reduxGetAllGoals, reduxGetAllCommunityGoals, reduxToggleUniversalToast } from '../../../redux/redux-actions/adminActions';
 import CommunitySwitch from '../Summary/CommunitySwitch';
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
 
 class AllGoals extends React.Component {
   constructor(props) {
@@ -186,8 +187,8 @@ class AllGoals extends React.Component {
       filterType: 'dropdown',
       responsive: 'stacked',
       print: true,
-      rowsPerPage: 25,
-      rowsPerPageOptions: [10, 25, 100],
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
       page: 1,
       indexColumn: 'id',
       onRowsDelete: (rowsDeleted) => {

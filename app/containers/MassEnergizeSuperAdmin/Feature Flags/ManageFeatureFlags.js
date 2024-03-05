@@ -9,7 +9,7 @@ import Loading from "dan-components/Loading";
 import { Link } from "react-router-dom";
 import { Paper, Typography } from "@mui/material";
 import { apiCall } from "../../../utils/messenger";
-import { LOADING } from "../../../utils/constants";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS, LOADING } from '../../../utils/constants';
 import ThemeModal from "../../../components/Widget/ThemeModal";
 import ListingComponent from "./ListingComponent";
 const hasExpired = (date) => {
@@ -239,8 +239,8 @@ function ManageFeatureFlags({
     responsive: "standard",
     download: false,
     print: false,
-    rowsPerPage: 25,
-    rowsPerPageOptions: [50, 100],
+    rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+    rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
     onRowsDelete: (rowsDeleted) => {
       const idsToDelete = rowsDeleted.data;
       toggleDeleteConfirmation({

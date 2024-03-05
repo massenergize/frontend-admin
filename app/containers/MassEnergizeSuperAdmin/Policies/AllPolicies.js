@@ -21,6 +21,7 @@ import {
 import { Typography } from "@mui/material";
 import { ArrowRight, ArrowRightAlt } from "@mui/icons-material";
 import Seo from "../../../components/Seo/Seo";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
 class AllPolicies extends React.Component {
   constructor(props) {
     super(props);
@@ -159,8 +160,8 @@ class AllPolicies extends React.Component {
       filterType: "dropdown",
       responsive: "standard",
       print: true,
-      rowsPerPage: 25,
-      rowsPerPageOptions: [10, 25, 100],
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
       page: 1,
       indexColumn: "id",
       onRowsDelete: (rowsDeleted) => {
