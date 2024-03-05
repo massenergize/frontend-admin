@@ -37,7 +37,7 @@ const NotificationChoices = ({ state, handleChange, setCommunities, targetCommun
           setCommunities(t);
         }}
         isAsync
-        endpoint="communities.listForSuperAdmin"
+        endpoint="communities.listForCommunityAdmin"
         defaultSelected={targetCommunities}
         valueExtractor={(t) => t?.id}
         labelExtractor={(t) => t?.name}

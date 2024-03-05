@@ -102,10 +102,20 @@ export default function EventNotificationSettings(props) {
     dispatch(loadAllEvents(updatedEvents));
   };
 
+  const hasValidValues = () => {
+    if (!targetCommunities?.length) {
+      notify("Please select the communities that these settings apply to");
+      return false;
+    }
+
+    return true;
+  };
+
   const sendChangesToBackend = () => {
+    if (!hasValidValues()) return;
     setLoading(true);
     setNotification({});
-    const isALL = targetCommunities?.find((c) => typeof c === "string" && c?.toLowerCase() === "all");
+    const isALL = targetCommunities?.find((com) => typeof com === "string" && com?.toLowerCase() === "all");
     apiCall("/events.reminders.settings.create", {
       event_id: id,
       ...(state || {}), // This is the settings object (notifications object
