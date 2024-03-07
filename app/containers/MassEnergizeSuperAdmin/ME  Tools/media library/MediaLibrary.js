@@ -4,12 +4,7 @@ import "./MediaLibrary.css";
 import MLButton from "./shared/components/button/MLButton";
 import MediaLibraryModal from "./shared/components/library modal/MediaLibraryModal";
 import ImageThumbnail from "./shared/components/thumbnail/ImageThumbnail";
-import {
-  DEFFAULT_MAX_SIZE,
-  IMAGE_QUALITY,
-  libraryImage,
-  TABS,
-} from "./shared/utils/values";
+import { DEFFAULT_MAX_SIZE, IMAGE_QUALITY, libraryImage, TABS } from "./shared/utils/values";
 import { EXTENSIONS, functionsToExport } from "./shared/utils/utils";
 function MediaLibrary(props) {
   const {
@@ -26,7 +21,7 @@ function MediaLibrary(props) {
     floatingMode,
     passedNotification,
     handleCropFromLink,
-    uploadMultiple,
+    uploadMultiple
   } = props;
   const [show, setShow] = useState(false);
   const [imageTray, setTrayImages] = useState([]);
@@ -106,10 +101,9 @@ function MediaLibrary(props) {
   useEffect(() => {
     setHasMountedTo(true);
     const imagesMap = new Map(images.map((item) => [item.id, item]));
-    const selectedAndExists =
-      selected?.map((item) => imagesMap.get(item.id)).filter(Boolean) || [];
+    const selectedAndExists = selected?.map((item) => imagesMap.get(item.id)).filter(Boolean) || [];
     setTrayImages(selectedAndExists);
-  }, [images, selected]);
+  }, [selected?.toString(), images?.toString()]); // TO make sure selected, and images actually change before updating the tray
 
   // useEffect(() => {}, [cropped]);
 
@@ -125,6 +119,7 @@ function MediaLibrary(props) {
   const swapPositions = () => {
     const prev = oldPosition.current;
     const next = newPosition.current;
+
     if (prev === null || next === null) return;
     const images = [...(imageTray || [])];
     const image = images.splice(prev, 1)[0];
@@ -139,7 +134,7 @@ function MediaLibrary(props) {
             position: "fixed",
             zIndex: "1500",
             top: 0,
-            left: 0,
+            left: 0
           }}
         >
           <MediaLibraryModal
@@ -179,7 +174,7 @@ function MediaLibrary(props) {
             border: "dashed 2px #e3e3e3",
             borderRadius: 10,
             marginBottom: 20,
-            padding: 20,
+            padding: 20
           }}
         >
           {!imageTray || imageTray.length === 0 ? (
@@ -210,7 +205,7 @@ function MediaLibrary(props) {
               "--btn-background": "green",
               borderRadius: 5,
               marginTop: 20,
-              padding: "15px 40px",
+              padding: "15px 40px"
             }}
           >
             {actionText}
@@ -231,15 +226,13 @@ const ImageTray = ({
   oldPosition,
   swapPositions,
   switchToCropping,
-  handleCropFromLink,
+  handleCropFromLink
 }) => {
   return (
     <>
       {dragToOrder && (
         <center>
-          <small>
-            Rearrange selected images in your preferred order, by dragging them
-          </small>
+          <small>Rearrange selected images in your preferred order, by dragging them</small>
         </center>
       )}
       <div
@@ -248,7 +241,7 @@ const ImageTray = ({
           flexWrap: "wrap",
           width: "100%",
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: "center"
         }}
       >
         {content.map((img, index) => {
@@ -291,7 +284,7 @@ const TrayImage = (props) => {
     onDragEnd,
     dragToOrder,
     switchToCropping,
-    handleCropFromLink,
+    handleCropFromLink
   } = props;
   const [loading, setLoading] = useState(false);
   const cssOptions = dragToOrder ? {} : { pointerEvents: "none" };
@@ -314,7 +307,7 @@ const TrayImage = (props) => {
       id: getRandomStringKey(),
       file,
       src: base64String,
-      size: getFileSize(file),
+      size: getFileSize(file)
     };
     return content;
   };
@@ -467,7 +460,7 @@ MediaLibrary.propTypes = {
    * In some situations, the tray images that display when a user has inserted an images from the mlibrary, is not needed. Typical example is how mlib is being used in TinyMCE
    * So, this value is used to toggle the image tray ON/OFF. (true = No image Tray)
    */
-  floatingMode: PropTypes.bool,
+  floatingMode: PropTypes.bool
 };
 
 MediaLibrary.Button = MLButton;
@@ -475,7 +468,7 @@ MediaLibrary.Image = ImageThumbnail;
 MediaLibrary.Tabs = TABS;
 MediaLibrary.AcceptedFileTypes = {
   Images: ["image/jpg", "image/png", "image/jpeg"].join(", "),
-  All: EXTENSIONS.join(", "),
+  All: EXTENSIONS.join(", ")
 };
 MediaLibrary.Functions = functionsToExport;
 MediaLibrary.CompressedQuality = IMAGE_QUALITY;
@@ -496,6 +489,6 @@ MediaLibrary.defaultProps = {
   compressedQuality: IMAGE_QUALITY.MEDIUM.key,
   maximumImageSize: DEFFAULT_MAX_SIZE,
   renderBeforeImages: null,
-  floatingMode: false,
+  floatingMode: false
 };
 export default MediaLibrary;

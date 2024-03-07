@@ -235,8 +235,8 @@ function MediaLibraryModal({
   };
 
   const tabComponent = Tabs.find((tab) => tab.key === currentTab)?.component;
-  const last = content.length - 1;
-  const activeImage = (content || [])[last]; // if multiple selection is active, just show the last selected item in the side pane
+  // const last = content.length - 1;
+  const activeImage = (content || [])[0]; // if multiple selection is active, just show the first selected item in the side pane (cos the latest items are always added to the top of the list, check Library.js [handleSelection] fxn)
 
   return (
     <React.Fragment>
