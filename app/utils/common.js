@@ -390,3 +390,15 @@ export function findItemAtIndexAndRemainder(arr, comparator) {
 export const log = (key = "Admin Log: ", ...args) => {
   console.log(key, ...args);
 };
+
+export const arrangeInSequence = (arr, idsInSequence) => {
+  if (!arr?.length || !idsInSequence?.length) return arr || [];
+  const result = [];
+  arr?.forEach((item) => {
+    const index = idsInSequence?.indexOf(item?.id);
+    if (index > -1) {
+      result[index] = item;
+    }
+  });
+  return result;
+};
