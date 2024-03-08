@@ -1,9 +1,13 @@
-import { Button, FormControlLabel, Radio, Typography } from "@mui/material";
+import { Button, FormControlLabel, Radio, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import { CheckBox } from "@mui/icons-material";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { useSelector } from "react-redux";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import MomentUtils from "@date-io/moment";
 
 const options = [
   { key: "enable", icon: "fa-play", name: "Enable Sending" },
@@ -47,11 +51,17 @@ function NudgeControlPage() {
 
   const isSelected = (sectionKey, option) => {
     const data = form || {};
-    return data[sectionKey] === option;
+    const item = data[sectionKey] || {};
+    return option === item?.key;
+  };
+  const getValue = (sectionKey) => {
+    const data = form || {};
+    const item = data[sectionKey] || {};
+    return item?.value;
   };
 
-  const selectOption = (sectionKey, optionKey) => {
-    setForm({ ...form, [sectionKey]: optionKey });
+  const selectOption = (sectionKey, optionKey, value) => {
+    setForm({ ...form, [sectionKey]: { key: optionKey, value } });
   };
   return (
     <div>
@@ -67,6 +77,7 @@ function NudgeControlPage() {
                 <div>
                   {options.map(({ key, name, icon }) => {
                     const isCustom = key === "custom" && isSelected(sectionKey, key);
+                    const isPaused = key === "pause" && isSelected(sectionKey, key);
                     return (
                       <div>
                         <FormControlLabel
@@ -84,6 +95,24 @@ function NudgeControlPage() {
                             </>
                           }
                         />
+
+                        {isPaused && (
+                          <div style={{ paddingLeft: 30 }}>
+                            <LocalizationProvider
+                              dateAdapter={AdapterMoment}
+                              utils={MomentUtils}
+                              style={{ width: "100%" }}
+                            >
+                              <DateTimePicker
+                                renderInput={(props) => <TextField {...props} />}
+                                label="" // don't put label in the box {field.label}
+                                // mask="MM/DD/YYYY, h:mm a"
+                                inputFormat="MM/DD/YYYY HH:mm:ss"
+                                mask={"__/__/____ __:__:__"}
+                              />
+                            </LocalizationProvider>
+                          </div>
+                        )}
 
                         {isCustom && <CustomChoiceBox />}
                       </div>
@@ -107,8 +136,9 @@ export default NudgeControlPage;
 
 const CustomChoiceBox = () => {
   const communities = useSelector((state) => state.getIn(["communities"]));
+
   return (
-    <div style={{ paddingLeft: 20 }}>
+    <div style={{ paddingLeft: 30 }}>
       <Typography variant="p">
         Stop For <b>(Which Communities)</b>
       </Typography>
