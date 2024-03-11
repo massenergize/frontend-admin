@@ -508,11 +508,11 @@ class About extends React.Component {
               >
                 <Typography
                   variant="h5"
-                  style={{ fontWeight: "600", fontSize: "1rem" }}
+                  style={{ fontWeight: "600", fontSize: "1rem", display:'flex', alignItems:'center' }}
                   component="h3"
                 >
                   Add/Remove Administrators for Community{" "}
-                  <Icon style={{ paddingTop: 3, color: "green" }}>
+                  <Icon style={{ color: "green" }}>
                     forward
                   </Icon>
                 </Typography>
@@ -533,11 +533,29 @@ class About extends React.Component {
               >
                 <Typography
                   variant="h5"
-                  style={{ fontWeight: "600", fontSize: "1rem" }}
+                  style={{ fontWeight: "600", fontSize: "1rem", display:'flex', alignItems:'center' }}
                   component="h3"
                 >
                   Edit Community Info{" "}
-                  <Icon style={{ paddingTop: 3, color: "green" }}>
+                  <Icon style={{  color: "green" }}>
+                    forward
+                  </Icon>
+                </Typography>
+              </Paper>
+              <Paper
+                onClick={() =>
+                  goHere(`/admin/settings/notification-control?community=${community?.id}`, this.props.history)
+                }
+                className={`${classes.pageCard}`}
+                elevation={1}
+              >
+                <Typography
+                  variant="h5"
+                  style={{ fontWeight: "600", fontSize: "1rem", display:'flex', alignItems:'center' }}
+                  component="h3"
+                >
+                   Control Notifications
+                  <Icon style={{ color: "green", marginLeft:5 }}>
                     forward
                   </Icon>
                 </Typography>
