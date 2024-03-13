@@ -16,9 +16,9 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { EVENT_NUDGE_FEATURE_FLAG_KEY } from "../Feature Flags/FlagKeys";
 import useCommunityWithId from "../../../utils/hooks/useCommunityHook";
 import useCommunityFromURL from "../../../utils/hooks/useCommunityHook";
-const ENABLED = "enabled";
-const PAUSED = "paused";
-const DISABLED = "disabled";
+export const ENABLED = "enabled";
+export const PAUSED = "paused";
+export const DISABLED = "disabled";
 const options = [
   { key: ENABLED, icon: "fa-play", name: "Enable Sending" },
   { key: DISABLED, icon: "fa-stop", name: "Disable Sending" },
@@ -86,8 +86,6 @@ function NudgeControlPage() {
         ];
       })
     );
-
-    console.log("FORMATTED: ", formatted);
     return formatted;
   };
 
@@ -103,7 +101,6 @@ function NudgeControlPage() {
       activate_on: key === PAUSED ? value : null
     };
 
-    // return console.log("Lets see the content", formBody);
 
     apiCall("communities.nudge.settings.set", formBody)
       .then((res) => {
@@ -142,7 +139,6 @@ function NudgeControlPage() {
       });
   }, [comId]);
 
-  console.log("What is loadin apge", loadPage);
   if (loadPage) return <LinearBuffer lines={1} asCard message="Hold tight, fetching your items..." />;
 
   return (

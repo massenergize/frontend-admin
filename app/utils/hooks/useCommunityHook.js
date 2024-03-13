@@ -10,7 +10,6 @@ const useCommunityFromURL = () => {
   useEffect(() => {
     const { comId } = fetchParamsFromURL(window.location, "comId");
     if (comId !== id) setId(comId);
-    console.log("lets seee id", id);
   }, [window.location, communities]);
 
   return community;

@@ -554,7 +554,25 @@ class About extends React.Component {
                   style={{ fontWeight: "600", fontSize: "1rem", display:'flex', alignItems:'center' }}
                   component="h3"
                 >
-                   Control Notifications
+                   Notification Control
+                  <Icon style={{ color: "green", marginLeft:5 }}>
+                    forward
+                  </Icon>
+                </Typography>
+              </Paper>
+              <Paper
+                onClick={() =>
+                  goHere(`/admin/settings/platform-features?comId=${community?.id}`, this.props.history)
+                }
+                className={`${classes.pageCard}`}
+                elevation={1}
+              >
+                <Typography
+                  variant="h5"
+                  style={{ fontWeight: "600", fontSize: "1rem", display:'flex', alignItems:'center' }}
+                  component="h3"
+                >
+                   Platform Features
                   <Icon style={{ color: "green", marginLeft:5 }}>
                     forward
                   </Icon>
