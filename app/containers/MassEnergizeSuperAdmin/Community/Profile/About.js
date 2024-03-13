@@ -544,7 +544,7 @@ class About extends React.Component {
               </Paper>
               <Paper
                 onClick={() =>
-                  goHere(`/admin/settings/notification-control?community=${community?.id}`, this.props.history)
+                  goHere(`/admin/settings/notification-control?comId=${community?.id}`, this.props.history)
                 }
                 className={`${classes.pageCard}`}
                 elevation={1}
