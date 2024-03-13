@@ -201,6 +201,10 @@ export default function EventNotificationSettings(props) {
             setTargetCommunities(profile?.communities || []);
             setActiveTab("nudge-settings");
           }}
+          getStarted={() => {
+            setState(INITIAL_STATE);
+            setActiveTab("nudge-settings");
+          }}
           removeProfile={removeProfile}
           event={eventObj}
         />
@@ -221,6 +225,11 @@ export default function EventNotificationSettings(props) {
     setState(obj);
   }, []);
 
+  useEffect(() => {
+    const tab = profiles?.length ? "saved-settings" : "nudge-settings";
+    setActiveTab(tab);
+  }, [profiles]);
+
   const isChoicesTab = activeTab === "nudge-settings";
 
   const { message, type } = notification || {};
@@ -228,7 +237,7 @@ export default function EventNotificationSettings(props) {
   return (
     <div
       style={{
-        width: "38vw"
+        width: "auto"
       }}
     >
       <div style={{ padding: "0px 20px" }}>

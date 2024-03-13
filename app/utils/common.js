@@ -402,3 +402,8 @@ export const arrangeInSequence = (arr, idsInSequence) => {
   });
   return result;
 };
+
+export function mergeUnique(arr1, arr2, comparator) {
+  const mergedArray = [...(arr1 || []), ...(arr2 || [])];
+  return mergedArray.filter((item, index, self) => index === self.findIndex((t) => comparator(t, item)));
+}

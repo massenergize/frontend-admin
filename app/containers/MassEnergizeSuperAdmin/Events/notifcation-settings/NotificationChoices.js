@@ -6,9 +6,12 @@ import { OPTIONS } from "./EventNotificationSettings";
 import MEDropdown from "../../ME  Tools/dropdown/MEDropdown";
 import LightAutoComplete from "../../Gallery/tools/LightAutoComplete";
 import { useSelector } from "react-redux";
+import { mergeUnique } from "../../../../utils/common";
 
-const NotificationChoices = ({ state, handleChange, setCommunities, targetCommunities }) => {
-  const communities = useSelector((state) => state.getIn(["communities"]));
+const NotificationChoices = ({ state, handleChange, setCommunities, targetCommunities, event }) => {
+  let communities = useSelector((state) => state.getIn(["communities"]));
+  const comparator = (a, b) => a?.id?.toString() === b?.id?.toString();
+  communities = mergeUnique(communities, event?.shared_to || [], comparator);
   const admin = useSelector((state) => state.getIn(["auth"]));
 
   const getValue = (name) => {
@@ -24,7 +27,10 @@ const NotificationChoices = ({ state, handleChange, setCommunities, targetCommun
     >
       <div style={{ marginBottom: 5, color: "black", fontWeight: "bold" }}>
         <small>
-          <b>First select a list of communities</b>
+          <b>
+            First select a list of communities (The list only shows communities that this event is shared to, and ones
+            you manage){" "}
+          </b>
         </small>
       </div>
       {/* {admin?.is_super_admin ? ( */}
@@ -47,7 +53,7 @@ const NotificationChoices = ({ state, handleChange, setCommunities, targetCommun
       <div style={{ margin: "5px 0px", color: "black", fontWeight: "bold" }}>
         <small>
           <b>
-            Select all options that apply. The behaviors you select here will only apply to the communities you've
+            Select all options that apply below. The behaviors you select here will only apply to the communities you've
             selected above.
           </b>
         </small>
