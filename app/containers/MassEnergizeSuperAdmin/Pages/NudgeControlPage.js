@@ -45,10 +45,6 @@ function NudgeControlPage() {
 
   const controlOptions = NUDGE_CONTROL_FEATURES;
 
-  const isLoading = (sectionKey) => {
-    return loading[sectionKey] || false;
-  };
-
   const isSelected = (sectionKey, option) => {
     const data = form || {};
     const item = data[sectionKey] || {};
