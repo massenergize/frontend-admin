@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import { CheckBox, LeakAddSharp } from "@mui/icons-material";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
@@ -16,6 +16,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { EVENT_NUDGE_FEATURE_FLAG_KEY } from "../Feature Flags/FlagKeys";
 import useCommunityWithId from "../../../utils/hooks/useCommunityHook";
 import useCommunityFromURL from "../../../utils/hooks/useCommunityHook";
+import { reduxKeepCommunityNudgeSettings } from "../../../redux/redux-actions/adminActions";
 export const ENABLED = "enabled";
 export const PAUSED = "paused";
 export const DISABLED = "disabled";
@@ -36,6 +37,8 @@ const NUDGE_CONTROL_FEATURES = [
 const ACTIVE_FLAG_KEYS = [EVENT_NUDGE_FEATURE_FLAG_KEY];
 
 function NudgeControlPage() {
+  const dispatch = useDispatch();
+  const nudgeSettingsTray = useSelector((state) => state.getIn(["communityNudgeSettings"]) || {});
   const [form, setForm] = useState({});
   const [loadPage, setLoadingPage] = useState(false);
   const [loading, setLoading] = useState({});
@@ -45,6 +48,9 @@ function NudgeControlPage() {
 
   const controlOptions = NUDGE_CONTROL_FEATURES;
 
+  const putNudgeListInRedux = (data) => {
+    dispatch(reduxKeepCommunityNudgeSettings({ ...nudgeSettingsTray, [comId]: data }));
+  };
   const isSelected = (sectionKey, option) => {
     const data = form || {};
     const item = data[sectionKey] || {};
@@ -97,7 +103,6 @@ function NudgeControlPage() {
       activate_on: key === PAUSED ? value : null
     };
 
-
     apiCall("communities.nudge.settings.set", formBody)
       .then((res) => {
         setLoading({ ...loading, [optionKey]: false });
@@ -118,6 +123,12 @@ function NudgeControlPage() {
 
   useEffect(() => {
     setLoadingPage(true);
+    //If User has been to the page for the same community before, the list should already be in redux, so fetch from redux instead of an API request
+    const nudgeList = nudgeSettingsTray[comId];
+    if (nudgeList) {
+      setLoadingPage(false);
+      return reformatBackendData(nudgeList);
+    }
     apiCall("communities.nudge.settings.list", { community_id: comId, feature_flag_keys: ACTIVE_FLAG_KEYS })
       .then((res) => {
         setLoadingPage(false);
@@ -125,9 +136,12 @@ function NudgeControlPage() {
           console.log("Error fetching nudge settings", res);
           return;
         }
+        const { data } = res || {};
+
         setLoadingPage(false);
-        setForm(reformatBackendData(res?.data));
-        console.log("FROM RESPONSE", res?.data);
+        setForm(reformatBackendData(data));
+        putNudgeListInRedux(data);
+        console.log("FROM RESPONSE", data);
       })
       .catch((err) => {
         console.log("ERROR_FETCHING_NUDGE_CONTROL: ", err?.toString());

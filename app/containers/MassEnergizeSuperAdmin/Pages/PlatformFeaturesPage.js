@@ -6,6 +6,8 @@ import { DISABLED, ENABLED } from "./NudgeControlPage";
 import { fetchParamsFromURL } from "../../../utils/common";
 import { FLAGS, USER_PORTAL_FLAGS } from "../../../components/FeatureFlags/flags";
 import { apiCall } from "../../../utils/messenger";
+import { useDispatch, useSelector } from "react-redux";
+import { reduxKeepFeatureActivations } from "../../../redux/redux-actions/adminActions";
 
 const OPTIONS = [
   { key: ENABLED, icon: "", name: "Enabled" },
@@ -49,6 +51,8 @@ const FEATURES = [
 
 const FLAG_KEYS = Object.values(USER_PORTAL_FLAGS);
 function PlatformFeaturesPage() {
+  const dispatch = useDispatch();
+  const comFeatures = useSelector((state) => state.getIn(["featureActivationsForCommunities"]) || {});
   const [form, setForm] = useState({});
   const [loading, setLoading] = useState({});
   const [errors, setErrors] = useState({});
@@ -56,6 +60,9 @@ function PlatformFeaturesPage() {
   const { comId } = fetchParamsFromURL(window.location, "comId");
   const [loadPage, setLoadingPage] = useState(false);
 
+  const putActivationsInRedux = (data) => {
+    dispatch(reduxKeepFeatureActivations({ ...comFeatures, [comId]: data }));
+  };
   const isSelected = (sectionKey, option) => {
     const data = form || {};
     const item = data[sectionKey] || {};
@@ -102,6 +109,11 @@ function PlatformFeaturesPage() {
 
   useEffect(() => {
     setLoadingPage(true);
+    const activations = comFeatures[comId];
+    // if (activations) {
+    //   setLoadingPage(false);
+    //   return reformatBackendData(nudgeList);
+    // }
     apiCall("communities.nudge.settings.list", { community_id: comId, feature_flag_keys: FLAG_KEYS })
       .then((res) => {
         setLoadingPage(false);
