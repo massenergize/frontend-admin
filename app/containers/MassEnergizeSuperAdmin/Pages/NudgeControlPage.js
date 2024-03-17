@@ -1,4 +1,4 @@
-import { Button, FormControlLabel, Radio, TextField, Typography } from "@mui/material";
+import { Button, FormControlLabel, Radio, TextField, Tooltip, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import { CheckBox, LeakAddSharp } from "@mui/icons-material";
@@ -39,6 +39,7 @@ const ACTIVE_FLAG_KEYS = [EVENT_NUDGE_FEATURE_FLAG_KEY];
 function NudgeControlPage() {
   const dispatch = useDispatch();
   const nudgeSettingsTray = useSelector((state) => state.getIn(["communityNudgeSettings"]) || {});
+  const [lastSavedOptions, setLastSavedOption] = useState({});
   const [form, setForm] = useState({});
   const [loadPage, setLoadingPage] = useState(false);
   const [loading, setLoading] = useState({});
@@ -46,7 +47,7 @@ function NudgeControlPage() {
   const community = useCommunityFromURL();
   const { comId } = fetchParamsFromURL(window.location, "comId");
 
-  const controlOptions = NUDGE_CONTROL_FEATURES;
+  const nudgeControlItems = NUDGE_CONTROL_FEATURES;
 
   const putNudgeListInRedux = (data) => {
     dispatch(reduxKeepCommunityNudgeSettings({ ...nudgeSettingsTray, [comId]: data }));
@@ -57,14 +58,15 @@ function NudgeControlPage() {
     return option === item?.key;
   };
 
-  const getValue = (sectionKey) => {
-    const data = form || {};
+  const getValue = (sectionKey, data) => {
+    data = data || form || {};
     const item = data[sectionKey] || {};
     return item;
   };
 
   const selectOption = (sectionKey, optionKey, value) => {
-    setForm({ ...form, [sectionKey]: { key: optionKey, value } });
+    const oldValue = getValue(sectionKey);
+    setForm({ ...form, [sectionKey]: { ...oldValue, key: optionKey, value } });
   };
 
   const reformat = (obj) => {
@@ -91,28 +93,40 @@ function NudgeControlPage() {
     return formatted;
   };
 
+  const updateLastSavedOption = (sectionKey, selection) => {
+    setLastSavedOption({ ...lastSavedOptions, [sectionKey]: selection });
+  };
+
+  const changesMadeAllowSave = (sectionKey) => {
+    const newItem = getValue(sectionKey, form);
+    const oldItem = getValue(sectionKey, lastSavedOptions);
+    return newItem?.key !== oldItem?.key;
+  };
   const saveChanges = (optionKey, selection) => {
     setLoading({ ...loading, [optionKey]: true });
     setErrors({ ...errors, [optionKey]: null });
-    const { key, value } = selection || {};
+    const { key, value, id } = selection || {};
     // Now run api call to save the changes
     const formBody = {
+      id,
       community_id: community?.id,
-      feature_flag_key: optionKey,
+      // feature_flag_key: optionKey,
       is_active: key === ENABLED,
       activate_on: key === PAUSED ? value : null
     };
 
-    apiCall("communities.nudge.settings.set", formBody)
+    apiCall("communities.notifications.settings.set", formBody)
       .then((res) => {
         setLoading({ ...loading, [optionKey]: false });
         if (!res || !res?.success) {
-          console.log("Error saving", res);
           setErrors({ ...errors, [optionKey]: res?.error || "An error occurred" });
           return;
         }
-
-        setForm({ ...form, [optionKey]: reformat(res?.data) });
+        updateLastSavedOption(optionKey, selection);
+        const { data } = res || {};
+        const newState = { ...form, [optionKey]: { ...(data || {}), ...reformat(data) } };
+        setForm(newState);
+        putNudgeListInRedux(newState);
       })
       .catch((err) => {
         setLoading({ ...loading, [optionKey]: false });
@@ -127,9 +141,11 @@ function NudgeControlPage() {
     const nudgeList = nudgeSettingsTray[comId];
     if (nudgeList) {
       setLoadingPage(false);
-      return reformatBackendData(nudgeList);
+      const formated = reformatBackendData(nudgeList);
+      setLastSavedOption(formated);
+      return setForm(formated);
     }
-    apiCall("communities.nudge.settings.list", { community_id: comId, feature_flag_keys: ACTIVE_FLAG_KEYS })
+    apiCall("communities.notifications.settings.list", { community_id: comId, feature_flag_keys: ACTIVE_FLAG_KEYS })
       .then((res) => {
         setLoadingPage(false);
         if (!res || !res?.success) {
@@ -139,9 +155,10 @@ function NudgeControlPage() {
         const { data } = res || {};
 
         setLoadingPage(false);
-        setForm(reformatBackendData(data));
+        const formated = reformatBackendData(data);
+        setForm(formated);
+        setLastSavedOption(formated);
         putNudgeListInRedux(data);
-        console.log("FROM RESPONSE", data);
       })
       .catch((err) => {
         console.log("ERROR_FETCHING_NUDGE_CONTROL: ", err?.toString());
@@ -159,28 +176,27 @@ function NudgeControlPage() {
         </Typography>
 
         <div style={{ marginTop: 30 }}>
-          {controlOptions?.map(({ name, key: sectionKey, description, options }) => {
+          {nudgeControlItems?.map((oneNudgeControlOption) => {
+            const { name, key: sectionKey, description, options } = oneNudgeControlOption || {};
             const isSaving = (loading || {})[sectionKey];
             const error = (errors || {})[sectionKey];
+            const userHasMadeChanges = changesMadeAllowSave(sectionKey);
+
             return (
               <div key={sectionKey} style={{ marginTop: 20, border: "solid 1px #ab47bc", padding: 20 }}>
                 <Typography variant="h6">{name}</Typography>
                 <Typography variant="p">{description}</Typography>
                 <div>
                   {options.map(({ key, name, icon }) => {
-                    const isCustom = key === "custom" && isSelected(sectionKey, key);
-                    const isPaused = key === PAUSED && isSelected(sectionKey, key);
+                    const selected = isSelected(sectionKey, key);
+                    const isCustom = key === "custom" && selected;
+                    const isPaused = key === PAUSED && selected;
 
                     return (
                       <div>
                         <FormControlLabel
                           key={key}
-                          control={
-                            <Radio
-                              checked={isSelected(sectionKey, key)}
-                              onChange={() => selectOption(sectionKey, key, true)}
-                            />
-                          }
+                          control={<Radio checked={selected} onChange={() => selectOption(sectionKey, key, true)} />}
                           label={
                             <>
                               <i className={`fa ${icon}`} style={{ marginRight: 6, color: "#ab47bc" }} />
@@ -198,15 +214,15 @@ function NudgeControlPage() {
                             >
                               <DatePicker
                                 renderInput={(props) => <TextField {...props} />}
+                                minDate={new Date()}
                                 value={getValue(sectionKey)?.value || new Date()}
                                 label="" // don't put label in the box {field.label}
-                                // mask="MM/DD/YYYY, h:mm a"
                                 inputFormat="MM/DD/YYYY"
-                                // inputFormat="YYYY-MM-DD"
-                                // mask={"__/__/____"}
                                 onChange={(date) => selectOption(sectionKey, key, date?.toString())}
                               />
                             </LocalizationProvider>
+                            <br />
+                            <small>After this date, your settings will automatically revert to "enabled"</small>
                           </div>
                         )}
 
@@ -218,14 +234,28 @@ function NudgeControlPage() {
 
                 {error && <p style={{ color: "#e64d4d", marginBottom: 5 }}>{error}</p>}
 
-                <Button
-                  variant="contained"
-                  color="primary"
-                  style={{ margin: "10px 20px" }}
-                  onClick={() => saveChanges(sectionKey, getValue(sectionKey))}
+                <Tooltip
+                  placement="right"
+                  title={
+                    userHasMadeChanges
+                      ? "Click to save the changes you just made"
+                      : "When you make changes, this button will be activated"
+                  }
                 >
-                  {isSaving ? <i className="fa fa-spinner fa-spin" style={{ marginRight: 5 }} /> : "SAVE"}
-                </Button>
+                  <div style={{ display: "inline" }}>
+                    <Button
+                      disabled={!userHasMadeChanges}
+                      variant="contained"
+                      color="primary"
+                      style={{ margin: "10px 20px" }}
+                      onClick={() => saveChanges(sectionKey, getValue(sectionKey))}
+                    >
+                      <span>
+                        {isSaving ? <i className="fa fa-spinner fa-spin" style={{ marginRight: 5 }} /> : "SAVE"}
+                      </span>
+                    </Button>
+                  </div>
+                </Tooltip>
               </div>
             );
           })}

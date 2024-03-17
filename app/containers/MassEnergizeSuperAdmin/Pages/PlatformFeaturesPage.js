@@ -114,7 +114,7 @@ function PlatformFeaturesPage() {
     //   setLoadingPage(false);
     //   return reformatBackendData(nudgeList);
     // }
-    apiCall("communities.nudge.settings.list", { community_id: comId, feature_flag_keys: FLAG_KEYS })
+    apiCall("communities.notifications.settings.list", { community_id: comId, feature_flag_keys: FLAG_KEYS })
       .then((res) => {
         setLoadingPage(false);
         if (!res || !res?.success) {
