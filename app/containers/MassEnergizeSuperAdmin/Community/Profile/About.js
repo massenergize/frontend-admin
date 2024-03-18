@@ -1,36 +1,38 @@
-import React from 'react';
-import Grid from '@mui/material/Grid';
-import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import React from "react";
+import Grid from "@mui/material/Grid";
+import PropTypes from "prop-types";
+import classNames from "classnames";
 import { withStyles } from "@mui/styles";
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import moment from 'moment';
-import Avatar from '@mui/material/Avatar';
-import LinearProgress from '@mui/material/LinearProgress';
-import LocalPhone from '@mui/icons-material/LocalPhone';
-import Icon from '@mui/material/Icon';
-import DateRange from '@mui/icons-material/DateRange';
-import LocationOn from '@mui/icons-material/LocationOn';
-import Divider from '@mui/material/Divider';
-import Chip from '@mui/material/Chip';
-import Email from '@mui/icons-material/Email';
-import { Link, Redirect, withRouter } from 'react-router-dom';
-import Check from '@mui/icons-material/Check';
-import AcUnit from '@mui/icons-material/AcUnit';
-import Type from 'dan-styles/Typography.scss';
-import PapperBlock from 'dan-components/PapperBlock/PapperBlock';
-import styles from './profile-jss';
-import { getAddress, goHere } from '../../../../utils/common';
-import Snackbar from '@mui/material/Snackbar';
-import { apiCallFile } from '../../../../utils/messenger';
-import CircularProgress from '@mui/material/CircularProgress';
-import { Alert } from '@mui/material';
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import moment from "moment";
+import Avatar from "@mui/material/Avatar";
+import LinearProgress from "@mui/material/LinearProgress";
+import LocalPhone from "@mui/icons-material/LocalPhone";
+import Icon from "@mui/material/Icon";
+import DateRange from "@mui/icons-material/DateRange";
+import LocationOn from "@mui/icons-material/LocationOn";
+import Divider from "@mui/material/Divider";
+import Chip from "@mui/material/Chip";
+import Email from "@mui/icons-material/Email";
+import { Link, Redirect, withRouter } from "react-router-dom";
+import Check from "@mui/icons-material/Check";
+import AcUnit from "@mui/icons-material/AcUnit";
+import Type from "dan-styles/Typography.scss";
+import PapperBlock from "dan-components/PapperBlock/PapperBlock";
+import styles from "./profile-jss";
+import { getAddress, goHere } from "../../../../utils/common";
+import Snackbar from "@mui/material/Snackbar";
+import { apiCallFile } from "../../../../utils/messenger";
+import CircularProgress from "@mui/material/CircularProgress";
+import { Alert } from "@mui/material";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
+import Feature from "../../../../components/FeatureFlags/Feature";
+import { FLAGS } from "../../../../components/FeatureFlags/flags";
 
 class About extends React.Component {
   constructor(props) {
@@ -43,7 +45,6 @@ class About extends React.Component {
     };
   }
 
-
   async getCSV(endpoint) {
     const { community } = this.props;
     if (!community) {
@@ -53,21 +54,21 @@ class About extends React.Component {
     let oldLoadingCSVs = this.state.loadingCSVs;
     this.setState({ loadingCSVs: oldLoadingCSVs.concat(endpoint) });
 
-    // csv downloads can be for a particular community, or they can be for all communities in which case the endpoint ends with '.all'.  
+    // csv downloads can be for a particular community, or they can be for all communities in which case the endpoint ends with '.all'.
     // In that case need to remove the '.all' from the endpoint to the API and not send the community ID in the body
     const body = {};
-    const dotAll = endpoint.indexOf('.all');
+    const dotAll = endpoint.indexOf(".all");
     if (dotAll > 0) {
-      endpoint = endpoint.substring(0,dotAll)
+      endpoint = endpoint.substring(0, dotAll);
     } else {
       body.community_id = community.id;
     }
-    const csvResponse = await apiCallFile('/downloads.' + endpoint, body);
+    const csvResponse = await apiCallFile("/downloads." + endpoint, body);
 
     oldLoadingCSVs = this.state.loadingCSVs;
     oldLoadingCSVs.splice(oldLoadingCSVs.indexOf(endpoint), 1);
     if (csvResponse.success) {
-      this.setState({success: true});
+      this.setState({ success: true });
     } else {
       this.setState({ error: csvResponse.error });
     }
@@ -75,7 +76,7 @@ class About extends React.Component {
     this.forceUpdate();
   }
 
-  getTags = tags => (tags.map(t => (t.name))).join(', ');
+  getTags = (tags) => tags.map((t) => t.name).join(", ");
 
   csvDownloader(whichCSV, displayText) {
     const { classes } = this.props;
@@ -89,26 +90,13 @@ class About extends React.Component {
           className={`${classes.pageCard}`}
           elevation={1}
         >
-          <Typography
-            variant="h5"
-            style={{ fontWeight: "600", fontSize: "1rem" }}
-            component="h3"
-          >
-            {displayText}{" "}
-            <Icon style={{ paddingTop: 3, color: "green" }}>
-              arrow_downward
-            </Icon>
-            {loadingCSVs.includes(whichCSV) && (
-              <CircularProgress
-                size={20}
-                thickness={2}
-                color="secondary"
-              />
-            )}
+          <Typography variant="h5" style={{ fontWeight: "600", fontSize: "1rem" }} component="h3">
+            {displayText} <Icon style={{ paddingTop: 3, color: "green" }}>arrow_downward</Icon>
+            {loadingCSVs.includes(whichCSV) && <CircularProgress size={20} thickness={2} color="secondary" />}
           </Typography>
         </Paper>
       </Grid>
-    );    
+    );
   }
 
   getGoalPercentage() {
@@ -124,14 +112,14 @@ class About extends React.Component {
   }
 
   handleCloseStyle = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     this.setState({ error: null });
   };
 
   handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     this.setState({ success: false });
@@ -142,7 +130,7 @@ class About extends React.Component {
     if (community !== 0) {
       const goal = community.goal ? community.goal : {};
       const targ = goal.target_number_of_actions;
-      if (!targ) return 0;      
+      if (!targ) return 0;
       const att = goal.attained_number_of_actions + goal.organic_attained_number_of_actions;
       return Math.round((att * 100) / targ);
     }
@@ -173,9 +161,8 @@ class About extends React.Component {
     return 0;
   }
 
-
   async importContacts() {
-    return <Redirect exact to="/admin/importcontacts"></Redirect>;
+    return <Redirect exact to="/admin/importcontacts" />;
   }
   render() {
     const { classes, community } = this.props;
@@ -185,7 +172,7 @@ class About extends React.Component {
     const user = this.props.auth ? this.props.auth : {};
     const { error, loadingCSVs, success } = this.state;
     if (this.state.wantImport) {
-      return <Redirect exact to="/admin/importcontacts"></Redirect>;
+      return <Redirect exact to="/admin/importcontacts" />;
     }
     return (
       <>
@@ -197,14 +184,8 @@ class About extends React.Component {
               autoHideDuration={6000}
               onClose={this.handleCloseStyle}
             >
-              <Alert
-                onClose={this.handleCloseStyle}
-                severity={"error"}
-                sx={{ width: "100%" }}
-              >
-                <small style={{ marginLeft: 15, fontSize: 15 }}>
-                  {`Unable to download: ${error}`}
-                </small>
+              <Alert onClose={this.handleCloseStyle} severity={"error"} sx={{ width: "100%" }}>
+                <small style={{ marginLeft: 15, fontSize: 15 }}>{`Unable to download: ${error}`}</small>
               </Alert>
             </Snackbar>
           </div>
@@ -217,14 +198,9 @@ class About extends React.Component {
               autoHideDuration={3000}
               onClose={this.handleClose}
             >
-              <Alert
-                onClose={this.handleClose}
-                severity={"success"}
-                sx={{ width: "100%" }}
-              >
+              <Alert onClose={this.handleClose} severity={"success"} sx={{ width: "100%" }}>
                 <small style={{ marginLeft: 15, fontSize: 15 }}>
-                  Your request has been received. Please check your email
-                  for the file.
+                  Your request has been received. Please check your email for the file.
                 </small>
               </Alert>
             </Snackbar>
@@ -236,16 +212,9 @@ class About extends React.Component {
             {/* Profile Progress */}
             <div className={classes.progressRoot}>
               <Paper className={classes.styledPaper} elevation={4}>
-                <Typography
-                  className={classes.title}
-                  variant="h5"
-                  component="h3"
-                >
+                <Typography className={classes.title} variant="h5" component="h3">
                   <center>
-                    <span
-                      className={Type.light}
-                      style={{ textAlign: "center" }}
-                    >
+                    <span className={Type.light} style={{ textAlign: "center" }}>
                       #Actions Goal
                     </span>
                   </center>
@@ -287,27 +256,21 @@ class About extends React.Component {
                       <DateRange />
                     </Avatar>
                   </ListItemIcon>
-                  <ListItemText
-                    primary="Admin Name"
-                    secondary={`${community.owner_name}`}
-                  />
+                  <ListItemText primary="Admin Name" secondary={`${community.owner_name}`} />
                 </ListItem>
                 <ListItem>
                   <ListItemIcon>
                     <Avatar>
-                        <Email />
+                      <Email />
                     </Avatar>
                   </ListItemIcon>
 
-                  <ListItemText
-                    primary="Admin Email"
-                    secondary={`${community.owner_email}`}
-                  />
+                  <ListItemText primary="Admin Email" secondary={`${community.owner_email}`} />
                 </ListItem>
                 <ListItem>
                   <ListItemIcon>
                     <Avatar>
-                        <Email />
+                      <Email />
                     </Avatar>
                   </ListItemIcon>
 
@@ -318,28 +281,25 @@ class About extends React.Component {
                 </ListItem>
 
                 <ListItem>
-                   <ListItemIcon>
+                  <ListItemIcon>
                     <Avatar>
                       <DateRange />
                     </Avatar>
-                   </ListItemIcon>
+                  </ListItemIcon>
                   <ListItemText
                     primary="Date Registered"
-                    secondary={`${moment(community.created_at).format(
-                      "MMMM Do YYYY, h:mm:ss a"
-                    )}`}
+                    secondary={`${moment(community.created_at).format("MMMM Do YYYY, h:mm:ss a")}`}
                   />
                 </ListItem>
                 <ListItem>
-                   <ListItemIcon>
-                  <Avatar>
-                    <LocalPhone />
-                  </Avatar>
-                   </ListItemIcon>
+                  <ListItemIcon>
+                    <Avatar>
+                      <LocalPhone />
+                    </Avatar>
+                  </ListItemIcon>
                   <ListItemText
                     primary="Phone Number"
-                    secondary={`${community.owner_phone_number ||
-                      "No Phone Number Provided"}`}
+                    secondary={`${community.owner_phone_number || "No Phone Number Provided"}`}
                   />
                 </ListItem>
               </List>
@@ -353,21 +313,10 @@ class About extends React.Component {
                   community.admins.map((a) => (
                     <ListItem key={a.email}>
                       {a.profile_picture && (
-                        <Avatar
-                          alt={a.initials}
-                          src={a.profile_picture.url}
-                          style={{ margin: 10 }}
-                        />
+                        <Avatar alt={a.initials} src={a.profile_picture.url} style={{ margin: 10 }} />
                       )}
-                      {!a.profile_picture && (
-                        <Avatar style={{ margin: 10 }}>
-                          {a.preferred_name.substring(0, 2)}
-                        </Avatar>
-                      )}
-                      <ListItemText
-                        primary={a.preferred_name}
-                        secondary={a.email}
-                      />
+                      {!a.profile_picture && <Avatar style={{ margin: 10 }}>{a.preferred_name.substring(0, 2)}</Avatar>}
+                      <ListItemText primary={a.preferred_name} secondary={a.email} />
                     </ListItem>
                   ))}
               </List>
@@ -380,16 +329,9 @@ class About extends React.Component {
           <Grid item md={6} xs={12}>
             <div className={classes.progressRoot}>
               <Paper className={classes.styledPaper} elevation={4}>
-                <Typography
-                  className={classes.title}
-                  variant="h5"
-                  component="h3"
-                >
+                <Typography className={classes.title} variant="h5" component="h3">
                   <center>
-                    <span
-                      className={Type.light}
-                      style={{ textAlign: "center" }}
-                    >
+                    <span className={Type.light} style={{ textAlign: "center" }}>
                       #Household Goal
                     </span>
                   </center>
@@ -406,54 +348,30 @@ class About extends React.Component {
                     color="primary"
                   />
                 </Grid>
-                <LinearProgress
-                  variant="determinate"
-                  className={classes.progress}
-                  value={this.userGoalPercentage()}
-                />
+                <LinearProgress variant="determinate" className={classes.progress} value={this.userGoalPercentage()} />
               </Paper>
             </div>
             {/* ----------------------------------------------------------------------*/}
             {/* My Interests */}
-            <PapperBlock
-              title="More Details"
-              icon="ios-aperture-outline"
-              whiteBg
-              desc=""
-            >
+            <PapperBlock title="More Details" icon="ios-aperture-outline" whiteBg desc="">
               <Grid container className={classes.colList}>
                 <Grid item md={6}>
                   <ListItem>
-                     <ListItemIcon>
-                    <Avatar
-                      className={classNames(
-                        classes.avatar,
-                        classes.purpleAvatar
-                      )}
-                    >
-                      <AcUnit />
-                    </Avatar>
-
-                     </ListItemIcon>
-                    <ListItemText
-                      primary="Subdomain"
-                      secondary={`${community.subdomain}`}
-                    />
+                    <ListItemIcon>
+                      <Avatar className={classNames(classes.avatar, classes.purpleAvatar)}>
+                        <AcUnit />
+                      </Avatar>
+                    </ListItemIcon>
+                    <ListItemText primary="Subdomain" secondary={`${community.subdomain}`} />
                   </ListItem>
                 </Grid>
                 <Grid item md={6}>
                   <ListItem>
-                     <ListItemIcon>
-                    <Avatar
-                      className={classNames(
-                        classes.avatar,
-                        classes.greenAvatar
-                      )}
-                    >
-                      <AcUnit />
-                    </Avatar>
-
-                     </ListItemIcon>
+                    <ListItemIcon>
+                      <Avatar className={classNames(classes.avatar, classes.greenAvatar)}>
+                        <AcUnit />
+                      </Avatar>
+                    </ListItemIcon>
                     <ListItemText
                       primary="Is Geographically Focused"
                       secondary={`${community.is_geographically_focused}`}
@@ -462,59 +380,36 @@ class About extends React.Component {
                 </Grid>
                 <Grid item md={6}>
                   <ListItem>
-                     <ListItemIcon>
-                    <Avatar
-                      className={classNames(
-                        classes.avatar,
-                        classes.pinkAvatar
-                      )}
-                    >
-                      <AcUnit />
-                    </Avatar>
-
-                     </ListItemIcon>
-                    <ListItemText
-                      primary="Is Approved"
-                      secondary={`${community.is_approved}`}
-                    />
+                    <ListItemIcon>
+                      <Avatar className={classNames(classes.avatar, classes.pinkAvatar)}>
+                        <AcUnit />
+                      </Avatar>
+                    </ListItemIcon>
+                    <ListItemText primary="Is Approved" secondary={`${community.is_approved}`} />
                   </ListItem>
                 </Grid>
                 <Grid item md={6}>
                   <ListItem>
-                     <ListItemIcon>
-                    <Avatar
-                      className={classNames(
-                        classes.avatar,
-                        classes.orangeAvatar
-                      )}
-                    >
-                      <LocationOn />
-                    </Avatar>
-
-                     </ListItemIcon>
-                    <ListItemText
-                      primary="Location"
-                      secondary={`${getAddress(community.location)}`}
-                    />
+                    <ListItemIcon>
+                      <Avatar className={classNames(classes.avatar, classes.orangeAvatar)}>
+                        <LocationOn />
+                      </Avatar>
+                    </ListItemIcon>
+                    <ListItemText primary="Location" secondary={`${getAddress(community.location)}`} />
                   </ListItem>
                 </Grid>
               </Grid>
               <Paper
-                onClick={() =>
-                  goHere(addRemoveCommuntyAdminLink, this.props.history)
-                }
+                onClick={() => goHere(addRemoveCommuntyAdminLink, this.props.history)}
                 className={`${classes.pageCard}`}
                 elevation={1}
               >
                 <Typography
                   variant="h5"
-                  style={{ fontWeight: "600", fontSize: "1rem", display:'flex', alignItems:'center' }}
+                  style={{ fontWeight: "600", fontSize: "1rem", display: "flex", alignItems: "center" }}
                   component="h3"
                 >
-                  Add/Remove Administrators for Community{" "}
-                  <Icon style={{ color: "green" }}>
-                    forward
-                  </Icon>
+                  Add/Remove Administrators for Community <Icon style={{ color: "green" }}>forward</Icon>
                 </Typography>
               </Paper>
               {/* <Paper onClick={() => goHere(goalsEditLink)} className={`${classes.pageCard}`} elevation={1}>
@@ -525,59 +420,54 @@ class About extends React.Component {
               </Typography>
             </Paper> */}
               <Paper
-                onClick={() =>
-                  goHere(communityEditLink, this.props.history)
-                }
+                onClick={() => goHere(communityEditLink, this.props.history)}
                 className={`${classes.pageCard}`}
                 elevation={1}
               >
                 <Typography
                   variant="h5"
-                  style={{ fontWeight: "600", fontSize: "1rem", display:'flex', alignItems:'center' }}
+                  style={{ fontWeight: "600", fontSize: "1rem", display: "flex", alignItems: "center" }}
                   component="h3"
                 >
-                  Edit Community Info{" "}
-                  <Icon style={{  color: "green" }}>
-                    forward
-                  </Icon>
+                  Edit Community Info <Icon style={{ color: "green" }}>forward</Icon>
                 </Typography>
               </Paper>
-              <Paper
-                onClick={() =>
-                  goHere(`/admin/settings/notification-control?comId=${community?.id}`, this.props.history)
-                }
-                className={`${classes.pageCard}`}
-                elevation={1}
-              >
-                <Typography
-                  variant="h5"
-                  style={{ fontWeight: "600", fontSize: "1rem", display:'flex', alignItems:'center' }}
-                  component="h3"
+
+              <Feature communities={[community]} name={FLAGS.NUDGE_CONTROL_FEATURE} fallback={<></>}>
+                <Paper
+                  onClick={() =>
+                    goHere(`/admin/settings/notification-control?comId=${community?.id}`, this.props.history)
+                  }
+                  className={`${classes.pageCard}`}
+                  elevation={1}
                 >
-                   Notification Control
-                  <Icon style={{ color: "green", marginLeft:5 }}>
-                    forward
-                  </Icon>
-                </Typography>
-              </Paper>
-              <Paper
-                onClick={() =>
-                  goHere(`/admin/settings/platform-features?comId=${community?.id}`, this.props.history)
-                }
-                className={`${classes.pageCard}`}
-                elevation={1}
-              >
-                <Typography
-                  variant="h5"
-                  style={{ fontWeight: "600", fontSize: "1rem", display:'flex', alignItems:'center' }}
-                  component="h3"
+                  <Typography
+                    variant="h5"
+                    style={{ fontWeight: "600", fontSize: "1rem", display: "flex", alignItems: "center" }}
+                    component="h3"
+                  >
+                    Notification Control
+                    <Icon style={{ color: "green", marginLeft: 5 }}>forward</Icon>
+                  </Typography>
+                </Paper>
+              </Feature>
+
+              <Feature communities={[community]} name={FLAGS.PLATFORM_FEATURES_OPT_IN} fallback={<></>}>
+                <Paper
+                  onClick={() => goHere(`/admin/settings/platform-features?comId=${community?.id}`, this.props.history)}
+                  className={`${classes.pageCard}`}
+                  elevation={1}
                 >
-                   Platform Features
-                  <Icon style={{ color: "green", marginLeft:5 }}>
-                    forward
-                  </Icon>
-                </Typography>
-              </Paper>
+                  <Typography
+                    variant="h5"
+                    style={{ fontWeight: "600", fontSize: "1rem", display: "flex", alignItems: "center" }}
+                    component="h3"
+                  >
+                    Platform Features
+                    <Icon style={{ color: "green", marginLeft: 5 }}>forward</Icon>
+                  </Typography>
+                </Paper>
+              </Feature>
             </PapperBlock>
           </Grid>
         </Grid>
@@ -590,18 +480,11 @@ class About extends React.Component {
               <Link
                 to={{
                   pathname: "/admin/importcontacts",
-                  communityId: community.id,
+                  communityId: community.id
                 }}
               >
-                <Typography
-                  variant="h5"
-                  style={{ fontWeight: "600", fontSize: "1rem" }}
-                  component="h3"
-                >
-                  Invite Users Through CSV Upload{" "}
-                  <Icon style={{ paddingTop: 3, color: "green" }}>
-                    arrow_upward
-                  </Icon>
+                <Typography variant="h5" style={{ fontWeight: "600", fontSize: "1rem" }} component="h3">
+                  Invite Users Through CSV Upload <Icon style={{ paddingTop: 3, color: "green" }}>arrow_upward</Icon>
                 </Typography>
               </Link>
             </Paper>
@@ -617,15 +500,18 @@ class About extends React.Component {
 
 About.propTypes = {
   classes: PropTypes.object.isRequired,
-  community: PropTypes.object.isRequired,
+  community: PropTypes.object.isRequired
   // data: PropTypes.object.isRequired
 };
 
 function mapStateToProps(state) {
   return {
-    auth: state.getIn(['auth'])
+    auth: state.getIn(["auth"])
   };
 }
 
-const AboutMapped = connect(mapStateToProps, null)(About);
-export default withStyles(styles)(withRouter (AboutMapped));
+const AboutMapped = connect(
+  mapStateToProps,
+  null
+)(About);
+export default withStyles(styles)(withRouter(AboutMapped));
