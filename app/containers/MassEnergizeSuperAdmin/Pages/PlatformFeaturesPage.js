@@ -214,7 +214,7 @@ function PlatformFeaturesPage() {
       </Typography>
 
       {Object.entries(form).map(([sectionKey, { name: nameProvidedBySadmin, notes }]) => {
-        const { options, name, description } = FEATURES[sectionKey];
+        const { options, name, description } = FEATURES[sectionKey] || {};
         // const { name: nameProvidedBySadmin, notes } = getValue(sectionKey);
 
         const isSaving = (loading || {})[sectionKey];
