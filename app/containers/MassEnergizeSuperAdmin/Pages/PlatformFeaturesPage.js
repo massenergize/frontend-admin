@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
-import { Button, FormControlLabel, Radio, Typography } from "@mui/material";
+import { Button, FormControlLabel, Radio, Tooltip, Typography } from "@mui/material";
 import useCommunityFromURL from "../../../utils/hooks/useCommunityHook";
 import { DISABLED, ENABLED } from "./NudgeControlPage";
 import { fetchParamsFromURL } from "../../../utils/common";
@@ -43,38 +43,12 @@ const FEATURES = {
     description: "Allow users to submit vendors."
   }
 };
-// const FEATURES = [
-//   {
-//     options: OPTIONS,
-//     key: FLAGS.USER_PORTAL_GUEST_AUTHENTICATION,
-//     name: "Guest Users",
-//     description:
-//       "Allow unknown users to fully use your community site without going through the authentication (login & registration) process"
-//   },
-//   {
-//     options: OPTIONS,
-//     key: FLAGS.USER_PORTAL_USER_SUBMITTED_ACTIONS,
-//     name: "User Generated Actions",
-//     description: "Allow users to submit actions."
-//   },
-//   {
-//     options: OPTIONS,
-//     key: FLAGS.USER_PORTAL_USER_SUBMITTED_EVENTS,
-//     name: "User Generated Events",
-//     description: "Allow users to submit events."
-//   },
-//   {
-//     options: OPTIONS,
-//     key: FLAGS.USER_PORTAL_USER_SUBMITTED_VENDORS,
-//     name: "User Generated Vendors",
-//     description: "Allow users to submit vendors."
-//   }
-// ];
 
 const FLAG_KEYS = Object.values(USER_PORTAL_FLAGS);
 function PlatformFeaturesPage() {
   const dispatch = useDispatch();
   const comFeatures = useSelector((state) => state.getIn(["featureActivationsForCommunities"]) || {});
+  const [lastSavedOptions, setLastSavedOption] = useState({});
   const [form, setForm] = useState({});
   const [loading, setLoading] = useState({});
   const [errors, setErrors] = useState({});
@@ -91,10 +65,13 @@ function PlatformFeaturesPage() {
     return option === item?.key;
   };
 
-  const getValue = (sectionKey) => {
-    const data = form || {};
+  const getValue = (sectionKey, data) => {
+    data = data || form || {};
     const item = data[sectionKey] || {};
     return item;
+  };
+  const updateLastSavedOption = (sectionKey, selection) => {
+    setLastSavedOption({ ...lastSavedOptions, [sectionKey]: selection });
   };
 
   const selectOption = (sectionKey, optionKey, value) => {
@@ -102,19 +79,21 @@ function PlatformFeaturesPage() {
     setForm({ ...form, [sectionKey]: { ...oldValue, key: optionKey, value } });
   };
 
+  const changesMadeAllowSave = (sectionKey) => {
+    const newItem = getValue(sectionKey, form);
+    const oldItem = getValue(sectionKey, lastSavedOptions);
+    return newItem?.key !== oldItem?.key;
+  };
   const saveChanges = (optionKey, selection) => {
     setLoading({ ...loading, [optionKey]: true });
     setErrors({ ...errors, [optionKey]: null });
     const { key, value } = selection || {};
-    console.log("IS THIS THE SELECTION", selection);
     // Now run api call to save the changes
     const formBody = {
       community_id: comId,
       feature_flag_key: optionKey,
       enable: key === ENABLED ? true : false
     };
-
-    // return console.log("HEre is the form Body", formBody);
 
     apiCall("communities.features.request", formBody)
       .then((res) => {
@@ -125,7 +104,10 @@ function PlatformFeaturesPage() {
           return;
         }
 
-        setForm({ ...form, [optionKey]: reformat(res?.data) });
+        const newData = { ...form, [optionKey]: reformat(res?.data) };
+        updateLastSavedOption(optionKey, selection);
+        setForm(newData);
+        putActivationsInRedux(newData);
       })
       .catch((err) => {
         setLoading({ ...loading, [optionKey]: false });
@@ -145,9 +127,9 @@ function PlatformFeaturesPage() {
 
   const reformatBackendData = (data) => {
     const formatted = Object.fromEntries(
-      data?.map((ffItem) => {
+      Object.entries(data).map(([ffKey, ffItem]) => {
         return [
-          ffItem?.key,
+          ffKey,
           {
             ...(ffItem || {}),
             ...reformat(ffItem)
@@ -162,10 +144,12 @@ function PlatformFeaturesPage() {
     setLoadingPage(true);
     setErrors({});
     const activations = comFeatures[comId];
-    // if (activations) {
-    //   setLoadingPage(false);
-    //   return reformatBackendData(nudgeList);
-    // }
+    if (activations) {
+      setLoadingPage(false);
+      const formatted = reformatBackendData(activations);
+      setLastSavedOption(formatted);
+      return setForm(formatted);
+    }
     apiCall("communities.features.list", { community_id: comId })
       .then((res) => {
         setLoadingPage(false);
@@ -174,8 +158,10 @@ function PlatformFeaturesPage() {
           return;
         }
         setLoadingPage(false);
-        setForm(reformatBackendData(res?.data));
-        console.log("FROM RESPONSE", res?.data);
+        const formatted = reformatBackendData(res?.data);
+        setForm(formatted);
+        setLastSavedOption(formatted);
+        putActivationsInRedux(formatted);
       })
       .catch((err) => {
         console.log("ERROR_FETCHING_NUDGE_CONTROL: ", err?.toString());
@@ -184,8 +170,6 @@ function PlatformFeaturesPage() {
   };
 
   useEffect(() => init(), [comId]);
-
-  // TODO: Save the request for toggled features in redux so you dont run it again each time
 
   const loadingError = errors["loadingError"];
   if (loadPage) return <LinearBuffer lines={1} asCard message="Hold tight, fetching your items..." />;
@@ -205,6 +189,13 @@ function PlatformFeaturesPage() {
       </MEPaperBlock>
     );
 
+  const featuresToDisplay = Object.entries(form);
+  if (!featuresToDisplay?.length)
+    return (
+      <MEPaperBlock banner>
+        <p>Sorry, it looks like there are no features available to opt into... </p>
+      </MEPaperBlock>
+    );
   return (
     <MEPaperBlock>
       <Typography>
@@ -213,18 +204,16 @@ function PlatformFeaturesPage() {
         you see fit.
       </Typography>
 
-      {Object.entries(form).map(([sectionKey, { name: nameProvidedBySadmin, notes }]) => {
-        const { options, name, description } = FEATURES[sectionKey] || {};
-        // const { name: nameProvidedBySadmin, notes } = getValue(sectionKey);
-
+      {featuresToDisplay.map(([sectionKey, { name, notes }]) => {
         const isSaving = (loading || {})[sectionKey];
         const error = (errors || {})[sectionKey];
+        const userHasMadeChanges = changesMadeAllowSave(sectionKey);
         return (
           <div key={sectionKey} style={{ marginTop: 20, border: "solid 1px #ab47bc", padding: 20 }}>
-            <Typography variant="h6">{name || nameProvidedBySadmin}</Typography>
-            <Typography variant="p">{notes || description}</Typography>
+            <Typography variant="h6">{name}</Typography>
+            <Typography variant="p">{notes}</Typography>
             <div>
-              {options?.map(({ key, name, icon }) => {
+              {OPTIONS.map(({ key, name, icon }) => {
                 return (
                   <div>
                     <FormControlLabel
@@ -249,14 +238,26 @@ function PlatformFeaturesPage() {
 
             {error && <p style={{ color: "#e64d4d", marginBottom: 5 }}>{error}</p>}
 
-            <Button
-              variant="contained"
-              color="primary"
-              style={{ margin: "10px 20px" }}
-              onClick={() => saveChanges(sectionKey, getValue(sectionKey))}
+            <Tooltip
+              placement="right"
+              title={
+                userHasMadeChanges
+                  ? "Click to save the changes you just made"
+                  : "When you make changes, this button will be activated"
+              }
             >
-              {isSaving ? <i className="fa fa-spinner fa-spin" style={{ marginRight: 5 }} /> : "SAVE"}
-            </Button>
+              <div style={{ display: "inline" }}>
+                <Button
+                  disabled={!userHasMadeChanges}
+                  variant="contained"
+                  color="primary"
+                  style={{ margin: "10px 20px" }}
+                  onClick={() => saveChanges(sectionKey, getValue(sectionKey))}
+                >
+                  {isSaving ? <i className="fa fa-spinner fa-spin" style={{ marginRight: 5 }} /> : "SAVE"}
+                </Button>
+              </div>
+            </Tooltip>
           </div>
         );
       })}
