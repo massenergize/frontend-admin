@@ -155,6 +155,7 @@ function PlatformFeaturesPage() {
         setLoadingPage(false);
         if (!res || !res?.success) {
           console.log("Error fetching nudge settings", res);
+          setErrors({ ...errors, loadingError: res?.error });
           return;
         }
         setLoadingPage(false);
@@ -164,6 +165,7 @@ function PlatformFeaturesPage() {
         putActivationsInRedux(formatted);
       })
       .catch((err) => {
+        setErrors({ ...errors, loadingError: err?.toString() });
         console.log("ERROR_FETCHING_NUDGE_CONTROL: ", err?.toString());
         setLoadingPage(false);
       });
@@ -177,7 +179,8 @@ function PlatformFeaturesPage() {
     return (
       <MEPaperBlock banner>
         <p style={{ color: "#af3131" }}>
-          This is the first error I have seen in my life
+          Nation tabaluga
+          {loadingError}
           <span
             onClick={() => init()}
             className="touchable-opacity"
