@@ -11,6 +11,6 @@ export const FLAGS = {
   NEW_USER_ENGAGEMENT_VIEW: "new-user-engagement-view-feature-flag",
   BROADCAST_MESSAGING_FF: "scheduled-broadcast-messages-feature-flag",
   NUDGE_CONTROL_FEATURE: "nudge-control-feature-flag",
-  PLATFORM_FEATURES_OPT_IN: "Platform-feature-opt-in-feature-flag",
+  PLATFORM_FEATURES_OPT_IN: "platform-feature-opt-in-feature-flag",
   ...USER_PORTAL_FLAGS
 };

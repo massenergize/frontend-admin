@@ -170,6 +170,7 @@ class About extends React.Component {
     const communityEditLink = `/admin/edit/${community ? community.id : null}/community/community-admin`;
     const addRemoveCommuntyAdminLink = `/admin/edit/${community ? community.id : null}/community-admins`;
     const user = this.props.auth ? this.props.auth : {};
+    console.log("I dont know about this community meerhn", community)
     const { error, loadingCSVs, success } = this.state;
     if (this.state.wantImport) {
       return <Redirect exact to="/admin/importcontacts" />;

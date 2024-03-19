@@ -4,6 +4,7 @@ import { connect, useSelector } from "react-redux";
 import { bindActionCreators } from "redux";
 
 function Feature({ name, fallback, children, auth, communities }) {
+  communities = communities || useSelector((state) => state.getIn(["communities"]));
   const [flag, setFlag] = useState();
 
   useEffect(() => {
@@ -29,8 +30,8 @@ function Feature({ name, fallback, children, auth, communities }) {
 
 const mapStateToProps = (state) => {
   return {
-    communities: state.getIn(["communities"]),
-    auth: state.getIn(["auth"]),
+    // communities: state.getIn(["communities"]),
+    auth: state.getIn(["auth"])
   };
 };
 
