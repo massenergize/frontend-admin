@@ -291,10 +291,10 @@ class AllEvents extends React.Component {
           sort: false,
           customBodyRender: (content) => {
             const { id, is_on_home_page, community } = content;
-
+            const communityObjectThatHasFeatureFlag = this.props.communities?.find((com) => com?.id === community?.id);
             return (
               <Feature
-                communities={[community]} // the feature should only be enabled for events that belong to communites that are enabled for the feature
+                communities={communityObjectThatHasFeatureFlag ? [communityObjectThatHasFeatureFlag] : null} // the feature should only be enabled for events that belong to communites that are enabled for the feature
                 name={FLAGS.EVENT_SPECIFIC_NOTIFICATION_SETTINGS}
                 fallback={
                   <div style={{ display: "flex" }}>
@@ -310,7 +310,7 @@ class AllEvents extends React.Component {
                         if (copiedEventResponse && copiedEventResponse.success) {
                           const newEvent = copiedEventResponse && copiedEventResponse.data;
                           this.props.history.push(`/admin/edit/${newEvent.id}/event`);
-                          putEventsInRedux([newEvent, ...(allEvents || [])]);
+                          putEventsInRedux([newEvent, ...(this.props.allEvents || [])]);
                         }
                       }}
                       to="/admin/read/events"

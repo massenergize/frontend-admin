@@ -9,8 +9,8 @@ function Feature({ name, fallback, children, auth, communities }) {
 
   useEffect(() => {
     communities = communities || communityList;
-    const cf = ((communities || []).map((c) => c.feature_flags) || []).flat(); // Community Flags
-    const uf = (auth || {}).feature_flags || []; // User Flags
+    const cf = ((communities || []).map((c) => c?.feature_flags) || []).flat(); // Community Flags
+    const uf = (auth || {})?.feature_flags || []; // User Flags
     const together = [...cf, ...uf];
     let flags = [];
     const track = [];
