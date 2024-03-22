@@ -30,7 +30,7 @@ jobs:
       - name: Get and bump BUILD_VERSION
         run: |
           BUILD_VERSION=$(jq -r '.BUILD_VERSION' app/config/config.json)
-          NEXT_VERSION=$((BUILD_VERSION + 1))
+          NEXT_VERSION="Gbemi"
           echo "{\"BUILD_VERSION\":$NEXT_VERSION}" > app/config/config.json
           git config --global user.email "me-bot@massenergize.org"
           git config --global user.name "Version Update Bot"
