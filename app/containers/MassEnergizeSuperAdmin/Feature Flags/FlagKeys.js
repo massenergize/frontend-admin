@@ -1,1 +1,0 @@
-export const EVENT_NUDGE_FEATURE_FLAG_KEY = "user-event-nudge-feature-flag"

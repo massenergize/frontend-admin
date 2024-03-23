@@ -13,10 +13,9 @@ import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { fetchParamsFromURL } from "../../../utils/common";
 import { apiCall } from "../../../utils/messenger";
 import { DatePicker } from "@mui/x-date-pickers";
-import { EVENT_NUDGE_FEATURE_FLAG_KEY } from "../Feature Flags/FlagKeys";
-import useCommunityWithId from "../../../utils/hooks/useCommunityHook";
 import useCommunityFromURL from "../../../utils/hooks/useCommunityHook";
 import { reduxKeepCommunityNudgeSettings } from "../../../redux/redux-actions/adminActions";
+import { FLAGS } from "../../../components/FeatureFlags/flags";
 export const ENABLED = "enabled";
 export const PAUSED = "paused";
 export const DISABLED = "disabled";
@@ -28,13 +27,13 @@ const options = [
 ];
 const NUDGE_CONTROL_FEATURES = [
   {
-    key: EVENT_NUDGE_FEATURE_FLAG_KEY,
+    key: FLAGS.EVENT_NUDGE_FEATURE_FLAG_KEY,
     name: "Event Nudges",
     description: "Manage event notifications in your community. Stop, pause, and add when you want to continue",
     options
   }
 ];
-const ACTIVE_FLAG_KEYS = [EVENT_NUDGE_FEATURE_FLAG_KEY];
+const ACTIVE_FLAG_KEYS = [FLAGS.EVENT_NUDGE_FEATURE_FLAG_KEY];
 
 function NudgeControlPage() {
   const dispatch = useDispatch();
