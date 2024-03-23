@@ -59,6 +59,8 @@ import {
   SET_GALLERY_META_DATA,
   LOAD_SCHEDULED_MESSAGES,
   ADD_BLOB_STRING,
+  KEEP_COMMUNITY_NUDGE_SETTINGS,
+  KEEP_FEATURE_ACTIVATIONS_FOR_COMMUNITY,
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -197,6 +199,22 @@ export const reducerForKeepingFormContent = (state = {}, action = {}) => {
 export const reducerForAdminActivities = (state = LOADING, action = {}) => {
   switch (action.type) {
     case LOAD_ADMIN_ACTIVITIES:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForCommunityNudgeSettings = (state = {}, action = {}) => {
+  switch (action.type) {
+    case KEEP_COMMUNITY_NUDGE_SETTINGS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForCommunityFeatureActivation = (state = {}, action = {}) => {
+  switch (action.type) {
+    case KEEP_FEATURE_ACTIVATIONS_FOR_COMMUNITY:
       return action.payload;
     default:
       return state;
