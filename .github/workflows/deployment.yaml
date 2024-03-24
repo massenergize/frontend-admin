@@ -5,7 +5,6 @@ on:
       - development
       - master
       - canary
-      - setup-better-ci-cd
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -60,7 +59,7 @@ jobs:
           git push origin "$TAG_NAME"
 
       - name: Set Prod/Canary Environment Variables 🚀
-        if: ${{  github.event.base_ref == 'refs/heads/master' || github.event.base_ref == 'refs/heads/canary' }}
+        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/canary' 
         run: |
             echo "Setting prod branch secrets..."
             echo "REACT_APP_SENTRY_DSN=${{ secrets.PROD_REACT_APP_SENTRY_DSN }}" >> $GITHUB_ENV
@@ -97,7 +96,7 @@ jobs:
             make build
         
       - name: Deploying to Prod 🚀 
-        if: github.event.base_ref == 'refs/heads/master'
+        if: github.ref.base_ref == 'refs/heads/master'
         uses: data-intuitive/netlify-deploy-site@v1
         with:
           auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
@@ -108,7 +107,7 @@ jobs:
     
       
       - name: Deploying to Canary 🚀
-        if: github.event.base_ref == 'refs/heads/canary'
+        if: github.ref == 'refs/heads/canary'
         uses: data-intuitive/netlify-deploy-site@v1
         with:
           auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
@@ -118,7 +117,7 @@ jobs:
           message: 'Deploying ${{ github.ref }}'
 
       - name: Deploying  to Dev 🚀
-        if: github.ref == 'refs/heads/development' || github.ref == 'refs/heads/setup-better-ci-cd'
+        if: github.ref == 'refs/heads/development' 
         uses: data-intuitive/netlify-deploy-site@v1
         with:
           auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
