@@ -53,8 +53,12 @@ jobs:
 
       - name: Create and push tag
         run: |
-          git tag -a "v$NEXT_VERSION" -m "Version $NEXT_VERSION"
-          git push origin "v$NEXT_VERSION"
+          BUILD_VERSION=$(jq -r '.BUILD_VERSION' < app/config/config.json)
+          TAG_NAME="v$BUILD_VERSION"
+          echo "BUILD_VERSION: $BUILD_VERSION"
+          echo "New tag name: $TAG_NAME"
+          git tag -a "$TAG_NAME" -m "Version $BUILD_VERSION"
+          git push origin "$TAG_NAME"
 
       - name: Deploy to Netlify
         if: github.ref_type == 'tag'
