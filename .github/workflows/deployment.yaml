@@ -27,24 +27,27 @@ jobs:
         run: |
           npm i --legacy-peer-deps
 
-      - name: Get and bump BUILD_VERSION
+      - name: Read old BUILD_VERSION from config.json
         run: |
-            # Retrieve the entire JSON object from config.json
-            CONFIG_JSON=$(cat app/config/config.json)
-            # Extract the BUILD_VERSION field from the JSON object and parse it as an integer
-            BUILD_VERSION=$(echo $CONFIG_JSON | jq -r '.BUILD_VERSION | tonumber')
-            # Bump up the BUILD_VERSION
-            NEXT_VERSION=$((BUILD_VERSION + 1))
-            # Update the BUILD_VERSION field in the JSON object
-            UPDATED_CONFIG_JSON=$(echo $CONFIG_JSON | jq --argjson next_version $NEXT_VERSION '.BUILD_VERSION = $next_version')
-            # Write the updated JSON object back to config.json
-            echo $UPDATED_CONFIG_JSON > app/config/config.json
-            # Commit the changes
-            git config --global user.email "me-bot@massenergize.org"
-            git config --global user.name "Version Update Bot"
-            git add app/config/config.json
-            git commit -m "Bump BUILD_VERSION to $NEXT_VERSION"
-            git push
+          OLD_VERSION=$(jq -r '.BUILD_VERSION' app/config/config.json)
+          echo "Old BUILD_VERSION: $OLD_VERSION"
+  
+      - name: Update BUILD_VERSION
+        run: |
+          CONFIG_PATH="app/config/config.json"
+          # Read the config.json file
+          CONFIG=$(<"$CONFIG_PATH")
+          # Extract old BUILD_VERSION
+          OLD_VERSION=$(jq -r '.BUILD_VERSION' <<< "$CONFIG")
+          echo "Old BUILD_VERSION: $OLD_VERSION"
+          # Increment the BUILD_VERSION using semantic versioning
+          NEW_VERSION=$(echo "$OLD_VERSION" | awk -F '.' '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+          echo "New BUILD_VERSION: $NEW_VERSION"
+          # Update the config.json file with the new BUILD_VERSION
+          UPDATED_CONFIG=$(echo "$CONFIG" | jq --arg new_version "$NEW_VERSION" '.BUILD_VERSION = $new_version')
+          echo "$UPDATED_CONFIG" > "$CONFIG_PATH"
+          git add "$CONFIG_PATH"
+          git commit -m "Bump BUILD_VERSION to $NEW_VERSION"
 
       - name: Create and push tag
         run: |

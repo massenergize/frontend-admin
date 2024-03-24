@@ -1,1 +1,6 @@
-{ "BUILD_VERSION": Gbemi }
+{
+  "IS_LOCAL": false,
+  "IS_PROD": false,
+  "IS_CANARY": false,
+  "BUILD_VERSION": "4.13.11"
+}
