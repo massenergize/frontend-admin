@@ -46,6 +46,8 @@ jobs:
           # Update the config.json file with the new BUILD_VERSION
           UPDATED_CONFIG=$(echo "$CONFIG" | jq --arg new_version "$NEW_VERSION" '.BUILD_VERSION = $new_version')
           echo "$UPDATED_CONFIG" > "$CONFIG_PATH"
+          git config --global user.email "me-bot@massenergize.org"
+          git config --global user.name "Version Update Bot"
           git add "$CONFIG_PATH"
           git commit -m "Bump BUILD_VERSION to $NEW_VERSION"
 
