@@ -135,6 +135,11 @@ jobs:
         run: |
           BRANCH_NAME=$(echo $GITHUB_REF | awk -F'/' '{print $3}')
           BUILD_VERSION=$(jq -r '.BUILD_VERSION' < app/config/config.json)
-          MESSAGE="Workflow in $BRANCH_NAME with build version : $BUILD_VERSION has completed with status: *${{ job.status }}*"
+          STATUS_EMOJI=":white_check_mark:"  # Use appropriate emoji for success status
+          if [[ "${{ job.status }}" != "success" ]]; then
+            STATUS_EMOJI=":x:"  # Use appropriate emoji for failure status
+          fi
+          MESSAGE="Deployment workflow in *$BRANCH_NAME* with build number *$BUILD_VERSION* has completed with status: $STATUS_EMOJI *${{ job.status }}*"
           PAYLOAD="{\"text\": \"$MESSAGE\"}"
           curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_WEBHOOK_URL
+        
