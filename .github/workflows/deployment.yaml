@@ -142,7 +142,7 @@ jobs:
             MEDIA="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjByemdrMWV6d25pNHdmMnpzbDBnNmp1dmcycWNuN2Voczc0ZGFqaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/8UGoOaR1lA1uaAN892/giphy.gif"
           fi
           PAYLOAD='{
-            'author_name': 'MassEnergize CI/CD Bot',
+            'author_name': 'MassEnergize CI-CD Bot',
             'text': "Deployment workflow in `'${BRANCH_NAME}'` with build number `'${BUILD_VERSION}'` has completed with '${STATUS_EMOJI}' *${{ job.status }}*",
             "blocks": [
               {
