@@ -136,10 +136,27 @@ jobs:
           BRANCH_NAME=$(echo $GITHUB_REF | awk -F'/' '{print $3}')
           BUILD_VERSION=$(jq -r '.BUILD_VERSION' < app/config/config.json)
           STATUS_EMOJI=":white_check_mark:"  # Use appropriate emoji for success status
+          MEDIA = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExamp5NTBwaTdqd2piNzNqb283YWNkOW9sYmwzejVlMXRwM2VxcWFqZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0IygWpszunxnkMAo/giphy.gif"
           if [[ "${{ job.status }}" != "success" ]]; then
             STATUS_EMOJI=":x:"  # Use appropriate emoji for failure status
+            MEDIA = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjByemdrMWV6d25pNHdmMnpzbDBnNmp1dmcycWNuN2Voczc0ZGFqaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/8UGoOaR1lA1uaAN892/giphy.gif"
           fi
-          MESSAGE="Deployment workflow in *$BRANCH_NAME* with build number *$BUILD_VERSION* has completed with status: $STATUS_EMOJI *${{ job.status }}*"
-          PAYLOAD="{\"text\": \"$MESSAGE\"}"
+          PAYLOAD='{
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "Deployment workflow in `'${BRANCH_NAME}'` with build number `'${BUILD_VERSION}'` has completed with '${STATUS_EMOJI}' `${{ job.status }}`"
+                },
+                "accessory": {
+                  "type": "image",
+                  "image_url": "${MEDIA}",
+                  "alt_text": "Deployment state GIF"
+                }
+              }
+            ]
+          }'
+          
           curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_WEBHOOK_URL
         
