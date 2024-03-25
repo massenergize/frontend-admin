@@ -135,6 +135,6 @@ jobs:
         run: |
           BRANCH_NAME=$(echo $GITHUB_REF | awk -F'/' '{print $3}')
           BUILD_VERSION=$(jq -r '.BUILD_VERSION' < app/config/config.json)
-          MESSAGE="Workflow in $BRANCH_NAME with build version : $BRANCH_NAME has completed with status: *${{ job.status }}*"
+          MESSAGE="Workflow in $BRANCH_NAME with build version : $BUILD_VERSION has completed with status: *${{ job.status }}*"
           PAYLOAD="{\"text\": \"$MESSAGE\"}"
           curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_WEBHOOK_URL
