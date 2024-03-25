@@ -13,10 +13,9 @@ import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import { fetchParamsFromURL } from "../../../utils/common";
 import { apiCall } from "../../../utils/messenger";
 import { DatePicker } from "@mui/x-date-pickers";
-import { EVENT_NUDGE_FEATURE_FLAG_KEY } from "../Feature Flags/FlagKeys";
-import useCommunityWithId from "../../../utils/hooks/useCommunityHook";
 import useCommunityFromURL from "../../../utils/hooks/useCommunityHook";
 import { reduxKeepCommunityNudgeSettings } from "../../../redux/redux-actions/adminActions";
+import { FLAGS } from "../../../components/FeatureFlags/flags";
 export const ENABLED = "enabled";
 export const PAUSED = "paused";
 export const DISABLED = "disabled";
@@ -28,13 +27,13 @@ const options = [
 ];
 const NUDGE_CONTROL_FEATURES = [
   {
-    key: EVENT_NUDGE_FEATURE_FLAG_KEY,
+    key: FLAGS.EVENT_NUDGE_FEATURE_FLAG_KEY,
     name: "Event Nudges",
     description: "Manage event notifications in your community. Stop, pause, and add when you want to continue",
     options
   }
 ];
-const ACTIVE_FLAG_KEYS = [EVENT_NUDGE_FEATURE_FLAG_KEY];
+const ACTIVE_FLAG_KEYS = [FLAGS.EVENT_NUDGE_FEATURE_FLAG_KEY];
 
 function NudgeControlPage() {
   const dispatch = useDispatch();
@@ -110,7 +109,6 @@ function NudgeControlPage() {
     const formBody = {
       id,
       community_id: community?.id,
-      // feature_flag_key: optionKey,
       is_active: key === ENABLED,
       activate_on: key === PAUSED ? value : null
     };
@@ -135,8 +133,9 @@ function NudgeControlPage() {
       });
   };
 
-  useEffect(() => {
+  const init = () => {
     setLoadingPage(true);
+    setErrors({});
     //If User has been to the page for the same community before, the list should already be in redux, so fetch from redux instead of an API request
     const nudgeList = nudgeSettingsTray[comId];
     if (nudgeList) {
@@ -150,6 +149,7 @@ function NudgeControlPage() {
         setLoadingPage(false);
         if (!res || !res?.success) {
           console.log("Error fetching nudge settings", res);
+          setErrors({ ...errors, loadingError: res?.error });
           return;
         }
         const { data } = res || {};
@@ -162,12 +162,30 @@ function NudgeControlPage() {
       })
       .catch((err) => {
         console.log("ERROR_FETCHING_NUDGE_CONTROL: ", err?.toString());
+        setErrors({ ...errors, loadingError: err?.toString() });
         setLoadingPage(false);
       });
-  }, [comId]);
+  };
+  useEffect(() => init(), [comId]);
 
   if (loadPage) return <LinearBuffer lines={1} asCard message="Hold tight, fetching your items..." />;
 
+  const loadingError = errors["loadingError"];
+  if (loadingError)
+    return (
+      <MEPaperBlock banner>
+        <p style={{ color: "#af3131" }}>
+          {loadingError}
+          <span
+            onClick={() => init()}
+            className="touchable-opacity"
+            style={{ marginLeft: 5, border: "solid 0px #af3131", borderBottomWidth: 2 }}
+          >
+            <b>Retry</b>
+          </span>
+        </p>
+      </MEPaperBlock>
+    );
   return (
     <div>
       <MEPaperBlock>
