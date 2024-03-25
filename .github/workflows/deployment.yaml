@@ -5,6 +5,7 @@ on:
       - development
       - master
       - canary
+      - setup-better-ci-cd
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -27,7 +28,8 @@ jobs:
           OLD_VERSION=$(jq -r '.BUILD_VERSION' app/config/config.json)
           echo "Old BUILD_VERSION: $OLD_VERSION"
   
-      - name: Update BUILD_VERSION
+      - name: Update BUILD_VERSION only when in development branch
+        if: github.ref == 'refs/heads/development' || github.ref == 'refs/heads/setup-better-ci-cd'
         run: |
           CONFIG_PATH="app/config/config.json"
           # Read the config.json file
@@ -131,6 +133,8 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          MESSAGE="Workflow *${{ github.ref }}* has completed with status: *${{ job.status }}*"
+          BRANCH_NAME=$(echo $GITHUB_REF | awk -F'/' '{print $3}')
+          BUILD_VERSION=$(jq -r '.BUILD_VERSION' < app/config/config.json)
+          MESSAGE="Workflow in $BRANCH_NAME with build version : $BRANCH_NAME has completed with status: *${{ job.status }}*"
           PAYLOAD="{\"text\": \"$MESSAGE\"}"
           curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_WEBHOOK_URL
