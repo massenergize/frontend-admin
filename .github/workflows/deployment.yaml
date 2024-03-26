@@ -5,7 +5,6 @@ on:
       - development
       - master
       - canary
-      - setup-better-ci-cd
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -29,7 +28,7 @@ jobs:
           echo "Old BUILD_VERSION: $OLD_VERSION"
   
       - name: Update BUILD_VERSION only when in development branch
-        if: github.ref == 'refs/heads/development' || github.ref == 'refs/heads/setup-better-ci-cd'
+        if: github.ref == 'refs/heads/development'
         run: |
           CONFIG_PATH="app/config/config.json"
           # Read the config.json file
@@ -76,7 +75,7 @@ jobs:
             echo "REACT_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.PROD_REACT_APP_FIREBASE_AUTH_DOMAIN }}" >> $GITHUB_ENV
     
       - name: Set Dev Environment Variables 🚀
-        if: github.ref == 'refs/heads/development' || github.ref == 'refs/heads/setup-better-ci-cd'
+        if: github.ref == 'refs/heads/development' 
         run: |
             echo "Setting Development branch secrets..."
             echo "Using repository secrets for $BRANCH branch..."
@@ -90,12 +89,10 @@ jobs:
             echo "REACT_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}" >> $GITHUB_ENV
   
       - name: Install dependencies  
-        if: github.ref != 'refs/heads/setup-better-ci-cd'
         run: |
               npm  i --legacy-peer-deps
       
       - name: Build App 🏗
-        if: github.ref != 'refs/heads/setup-better-ci-cd'
         run: |
             make build
         
