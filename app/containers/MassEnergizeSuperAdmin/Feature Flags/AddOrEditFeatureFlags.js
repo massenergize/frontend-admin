@@ -120,6 +120,7 @@ var createFormJson = ({
     audience,
     expires_on,
     userAudience,
+    allow_opt_in,
     id,
   } = parseFeatureForEditMode(featureToEdit);
   const fetchAllUsersInSelectedCommunities = (communityIDs=[]) => {
@@ -355,6 +356,25 @@ var createFormJson = ({
                 },
               ],
             },
+          },
+        ],
+      },
+      {
+        label: "Allow Community Admins to opt-in to this feature",
+        fieldType: "Section",
+        children: [
+          {
+            name: "allow_opt_in",
+            label: "When should this feature expire?",
+            fieldType: fieldTypes.Radio,
+            isRequired: true,
+            defaultValue: allow_opt_in ? "true" : "false",
+            dbName: "allow_opt_in",
+            readOnly: false,
+            data: [
+              { id: "true", value: "Allow Opt-In" },
+              { id: "false", value: "Dont allow Opt-In" },
+            ],
           },
         ],
       },

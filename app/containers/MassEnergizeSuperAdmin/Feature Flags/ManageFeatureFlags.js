@@ -139,6 +139,29 @@ function ManageFeatureFlags({
         },
       },
       {
+        name: "Opt-In Status",
+        key: "status",
+        options: {
+          filter: true, 
+          customBodyRender: (allowsOptIn) => {
+   
+            return (
+              <MEChip
+                label={allowsOptIn? "Allow" : "No Opt-In"}
+                style={
+                  !allowsOptIn
+                    ? { background: "rgb(184 184 184)", padding: "0px 9px" }
+                    : { padding: "0px 12px", }
+                }
+                className={`${
+                  !allowsOptIn ? classes.yesLabel : classes.yesLabel
+                } touchable-opacity`}
+              />
+            );
+          },
+        },
+      },
+      {
         name: "Expiry Date",
         key: "expiry-date",
         options: { filter: false },
@@ -183,6 +206,7 @@ function ManageFeatureFlags({
           id: feature.id,
         },
         hasExpired(feature.expires_on) ? "Expired" : "Active",
+        feature?.allow_opt_in,
         feature.expires_on
           ? getHumanFriendlyDate(feature.expires_on, false, false)
           : "Not Set",
