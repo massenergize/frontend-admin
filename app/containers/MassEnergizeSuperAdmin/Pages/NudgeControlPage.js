@@ -28,7 +28,7 @@ const options = [
 const NUDGE_CONTROL_FEATURES = [
   {
     key: FLAGS.EVENT_NUDGE_FEATURE_FLAG_KEY,
-    name: "Event Nudges",
+    name: "Event Notifications",
     description: "Manage event notifications in your community. Stop, pause, and add when you want to continue",
     options
   }
@@ -190,7 +190,8 @@ function NudgeControlPage() {
     <div>
       <MEPaperBlock>
         <Typography>
-          Control all items related to nudges for <b>{community?.name || "..."}</b> on this page
+        Use these controls to start, pause or stop sending <b>{community?.name || "..."}</b> users email notices about events.
+          {/* Control all items related to nudges for <b>{community?.name || "..."}</b> on this page */}
         </Typography>
 
         <div style={{ marginTop: 30 }}>
