@@ -145,6 +145,7 @@ jobs:
             STATUS_EMOJI=":x:"  # Use appropriate emoji for failure status
             MEDIA="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjByemdrMWV6d25pNHdmMnpzbDBnNmp1dmcycWNuN2Voczc0ZGFqaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/8UGoOaR1lA1uaAN892/giphy.gif"
           fi
-          MESSAGE="Deployment workflow in \`$BRANCH_NAME\` with build number \`$BUILD_VERSION\` has completed with status: $STATUS_EMOJI \`${{ job.status }}\` \n\n ![media]($MEDIA)"          PAYLOAD="{\"text\": \"$MESSAGE\"}"
+          MESSAGE="Deployment workflow in $BRANCH_NAME with build number $BUILD_VERSION has completed with status: $STATUS_EMOJI ${{ job.status }} \n\n $MEDIA"          
+          PAYLOAD="{\"text\": \"$MESSAGE\"}"
           curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_WEBHOOK_URL
     
