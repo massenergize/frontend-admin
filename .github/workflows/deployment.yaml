@@ -1,12 +1,11 @@
 name: Build and Deploy to Netlify CI/CD
 on:
   push:
-    tags:
-      - 'dev@[0-9]+.[0-9]+.[0-9]+'
-      - 'prod@[0-9]+.[0-9]+.[0-9]+'
-      - 'canary@[0-9]+.[0-9]+.[0-9]+'
+    branches:
+      - development
+      - master
+      - canary
 jobs:
-    
   build-and-deploy:
     runs-on: ubuntu-latest
     strategy:
@@ -14,8 +13,6 @@ jobs:
         node-version: [16.x]
     environment:
       name: Production
-
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -23,11 +20,47 @@ jobs:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
-         node-version: ${{ matrix.node-version }}
+          node-version: ${{ matrix.node-version }}
 
+      - name: Read old BUILD_VERSION from config.json
+        run: |
+          OLD_VERSION=$(jq -r '.BUILD_VERSION' app/config/config.json)
+          echo "Old BUILD_VERSION: $OLD_VERSION"
+  
+      - name: Update BUILD_VERSION only when in development branch
+        if: github.ref == 'refs/heads/development'
+        run: |
+          CONFIG_PATH="app/config/config.json"
+          # Read the config.json file
+          CONFIG=$(<"$CONFIG_PATH")
+          # Extract old BUILD_VERSION
+          OLD_VERSION=$(jq -r '.BUILD_VERSION' <<< "$CONFIG")
+          echo "Old BUILD_VERSION: $OLD_VERSION"
+          # Increment the BUILD_VERSION using semantic versioning
+          NEW_VERSION=$(echo "$OLD_VERSION" | awk -F '.' '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+          echo "New BUILD_VERSION: $NEW_VERSION"
+          # Update the config.json file with the new BUILD_VERSION
+          UPDATED_CONFIG=$(echo "$CONFIG" | jq --arg new_version "$NEW_VERSION" '.BUILD_VERSION = $new_version')
+          echo "$UPDATED_CONFIG" > "$CONFIG_PATH"
+          git config --global user.email "me-gh-action-bot@massenergize.org"
+          git config --global user.name "Version Update Bot"
+          git add "$CONFIG_PATH"
+          git commit -m "Bump BUILD_VERSION to $NEW_VERSION"
+          git push origin HEAD:$GITHUB_REF
 
-      - name: Set Prod Environment Variables 🚀
-        if: ${{  github.event.base_ref == 'refs/heads/master' || github.event.base_ref == 'refs/heads/canary' }}
+      - name: Create and push tag
+        run: |
+          BUILD_VERSION=$(jq -r '.BUILD_VERSION' < app/config/config.json)
+          BRANCH_NAME=$(echo $GITHUB_REF | awk -F'/' '{print $3}')
+          TAG_NAME="$BRANCH_NAME@$BUILD_VERSION"
+          echo "BUILD_VERSION: $BUILD_VERSION"
+          echo "Branch name: $BRANCH_NAME"
+          echo "New tag name: $TAG_NAME"
+          git tag -a "$TAG_NAME" -m "Version $BUILD_VERSION"
+          git push origin "$TAG_NAME"
+
+      - name: Set Prod/Canary Environment Variables 🚀
+        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/canary' 
         run: |
             echo "Setting prod branch secrets..."
             echo "REACT_APP_SENTRY_DSN=${{ secrets.PROD_REACT_APP_SENTRY_DSN }}" >> $GITHUB_ENV
@@ -40,9 +73,9 @@ jobs:
             echo "REACT_APP_FIREBASE_MEASUREMENT_ID=${{ secrets.PROD_REACT_APP_FIREBASE_MEASUREMENT_ID }}" >> $GITHUB_ENV
             echo "REACT_APP_FIREBASE_PROJECT_ID=${{ secrets.PROD_REACT_APP_FIREBASE_PROJECT_ID }}" >> $GITHUB_ENV
             echo "REACT_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.PROD_REACT_APP_FIREBASE_AUTH_DOMAIN }}" >> $GITHUB_ENV
-
+    
       - name: Set Dev Environment Variables 🚀
-        if: ${{github.event.base_ref == 'refs/heads/development' }}
+        if: github.ref == 'refs/heads/development' 
         run: |
             echo "Setting Development branch secrets..."
             echo "Using repository secrets for $BRANCH branch..."
@@ -54,16 +87,17 @@ jobs:
             echo "REACT_APP_FIREBASE_APP_ID=${{ secrets.REACT_APP_FIREBASE_APP_ID }}" >> $GITHUB_ENV
             echo "REACT_APP_FIREBASE_PROJECT_ID=${{ secrets.REACT_APP_FIREBASE_PROJECT_ID }}" >> $GITHUB_ENV
             echo "REACT_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}" >> $GITHUB_ENV
-
+  
       - name: Install dependencies  
         run: |
-            npm  i --legacy-peer-deps
+              npm  i --legacy-peer-deps
+      
       - name: Build App 🏗
         run: |
             make build
-      
+        
       - name: Deploying to Prod 🚀 
-        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'prod') && github.event.base_ref == 'refs/heads/master'
+        if: github.ref.base_ref == 'refs/heads/master'
         uses: data-intuitive/netlify-deploy-site@v1
         with:
           auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
@@ -74,7 +108,7 @@ jobs:
     
       
       - name: Deploying to Canary 🚀
-        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'canary') && github.event.base_ref == 'refs/heads/canary'
+        if: github.ref == 'refs/heads/canary'
         uses: data-intuitive/netlify-deploy-site@v1
         with:
           auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
@@ -83,9 +117,8 @@ jobs:
           prod: true
           message: 'Deploying ${{ github.ref }}'
 
-          
       - name: Deploying  to Dev 🚀
-        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'dev') && github.event.base_ref == 'refs/heads/development'
+        if: github.ref == 'refs/heads/development' 
         uses: data-intuitive/netlify-deploy-site@v1
         with:
           auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
@@ -94,13 +127,20 @@ jobs:
           prod: true
           message: 'Deploying ${{ github.ref }}'
 
-      - name: Report status to Slack 📢
+
+      - name: Report status to Slack
+        if: always()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          MESSAGE="Workflow *${{ github.ref}}* has completed with status: *${{ job.status }}*"
+          BRANCH_NAME=$(echo $GITHUB_REF | awk -F'/' '{print $3}')
+          BUILD_VERSION=$(jq -r '.BUILD_VERSION' < app/config/config.json)
+          MESSAGE="Workflow in $BRANCH_NAME with build version : $BUILD_VERSION has completed with status: *${{ job.status }}*"
+          STATUS_EMOJI=":white_check_mark:"  # Use appropriate emoji for success status
+          if [[ "${{ job.status }}" != "success" ]]; then
+            STATUS_EMOJI=":x:"  # Use appropriate emoji for failure status
+          fi
+          MESSAGE="Deployment workflow in $BRANCH_NAME with build number $BUILD_VERSION has completed with status: $STATUS_EMOJI ${{ job.status }}"          
           PAYLOAD="{\"text\": \"$MESSAGE\"}"
           curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_WEBHOOK_URL
-
-
-
+    
