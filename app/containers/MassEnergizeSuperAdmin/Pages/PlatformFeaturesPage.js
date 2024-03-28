@@ -9,6 +9,7 @@ import { apiCall } from "../../../utils/messenger";
 import { useDispatch, useSelector } from "react-redux";
 import { reduxKeepFeatureActivations } from "../../../redux/redux-actions/adminActions";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
+import CustomPageTitle from "../Misc/CustomPageTitle";
 
 const OPTIONS = [
   { key: ENABLED, icon: "", name: "Enabled" },
@@ -200,71 +201,77 @@ function PlatformFeaturesPage() {
       </MEPaperBlock>
     );
   return (
-    <MEPaperBlock>
-      <Typography>
-        Not all features are enabled for all communities. This page gives you a chance to review and opt into special
-        features and functionalities. You can enable or disable these features for <b>{community?.name || "..."}</b> as
-        you see fit.
-      </Typography>
+    <>
+      <CustomPageTitle>
+        Platform Features for <b>{community?.name || "..."}</b>
+      </CustomPageTitle>
 
-      {featuresToDisplay.map(([sectionKey, { name, notes }]) => {
-        const isSaving = (loading || {})[sectionKey];
-        const error = (errors || {})[sectionKey];
-        const userHasMadeChanges = changesMadeAllowSave(sectionKey);
-        return (
-          <div key={sectionKey} style={{ marginTop: 20, border: "solid 1px #ab47bc", padding: 20 }}>
-            <Typography variant="h6">{name}</Typography>
-            <Typography variant="p">{notes}</Typography>
-            <div>
-              {OPTIONS.map(({ key, name, icon }) => {
-                return (
-                  <div>
-                    <FormControlLabel
-                      key={key}
-                      control={
-                        <Radio
-                          checked={isSelected(sectionKey, key)}
-                          onChange={() => selectOption(sectionKey, key, true)}
-                        />
-                      }
-                      label={
-                        <>
-                          <i className={`fa ${icon}`} style={{ marginRight: 6, color: "#ab47bc" }} />
-                          {name}
-                        </>
-                      }
-                    />
-                  </div>
-                );
-              })}
-            </div>
+      <MEPaperBlock>
+        <Typography>
+          Not all features are enabled for all communities. This page gives you a chance to review and opt into special
+          features and functionalities. You can enable or disable these features for <b>{community?.name || "..."}</b>{" "}
+          as you see fit.
+        </Typography>
 
-            {error && <p style={{ color: "#e64d4d", marginBottom: 5 }}>{error}</p>}
-
-            <Tooltip
-              placement="right"
-              title={
-                userHasMadeChanges
-                  ? "Click to save the changes you just made"
-                  : "When you make changes, this button will be activated"
-              }
-            >
-              <div style={{ display: "inline" }}>
-                <Button
-                  disabled={!userHasMadeChanges}
-                  variant="contained"
-                  color="primary"
-                  style={{ margin: "10px 20px" }}
-                  onClick={() => saveChanges(sectionKey, getValue(sectionKey))}
-                >
-                  {isSaving ? <i className="fa fa-spinner fa-spin" style={{ marginRight: 5 }} /> : "SAVE"}
-                </Button>
+        {featuresToDisplay.map(([sectionKey, { name, notes }]) => {
+          const isSaving = (loading || {})[sectionKey];
+          const error = (errors || {})[sectionKey];
+          const userHasMadeChanges = changesMadeAllowSave(sectionKey);
+          return (
+            <div key={sectionKey} style={{ marginTop: 20, border: "solid 1px #ab47bc", padding: 20 }}>
+              <Typography variant="h6">{name}</Typography>
+              <Typography variant="p">{notes}</Typography>
+              <div>
+                {OPTIONS.map(({ key, name, icon }) => {
+                  return (
+                    <div>
+                      <FormControlLabel
+                        key={key}
+                        control={
+                          <Radio
+                            checked={isSelected(sectionKey, key)}
+                            onChange={() => selectOption(sectionKey, key, true)}
+                          />
+                        }
+                        label={
+                          <>
+                            <i className={`fa ${icon}`} style={{ marginRight: 6, color: "#ab47bc" }} />
+                            {name}
+                          </>
+                        }
+                      />
+                    </div>
+                  );
+                })}
               </div>
-            </Tooltip>
-          </div>
-        );
-      })}
-    </MEPaperBlock>
+
+              {error && <p style={{ color: "#e64d4d", marginBottom: 5 }}>{error}</p>}
+
+              <Tooltip
+                placement="right"
+                title={
+                  userHasMadeChanges
+                    ? "Click to save the changes you just made"
+                    : "When you make changes, this button will be activated"
+                }
+              >
+                <div style={{ display: "inline" }}>
+                  <Button
+                    disabled={!userHasMadeChanges}
+                    variant="contained"
+                    color="primary"
+                    style={{ margin: "10px 20px" }}
+                    onClick={() => saveChanges(sectionKey, getValue(sectionKey))}
+                  >
+                    {isSaving ? <i className="fa fa-spinner fa-spin" style={{ marginRight: 5 }} /> : "SAVE"}
+                  </Button>
+                </div>
+              </Tooltip>
+            </div>
+          );
+        })}
+      </MEPaperBlock>
+    </>
   );
 }
 
