@@ -40,13 +40,15 @@ import Seo from "../../../components/Seo/Seo";
 import CustomOptions from "../ME  Tools/table /CustomOptions";
 import { EventNotSharedWithAnyone, EventSharedWithCommunity } from "./EventSharedStateComponents";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
-import EventNotificationSettings from "./notifcation-settings/EventNotificationSettings";
+import EventNotificationSettings from "./notifcation-settings/EventNotificationSettingsOneCommunity";
 import Feature from "../../../components/FeatureFlags/Feature";
 import { FLAGS } from "../../../components/FeatureFlags/flags";
 import StarsIcon from "@mui/icons-material/Stars";
 import FileCopy from "@mui/icons-material/FileCopy";
 import EditIcon from "@mui/icons-material/Edit";
 import CallMadeIcon from "@mui/icons-material/CallMade";
+import BellIcon from "@mui/icons-material/NotificationAdd";
+import Envelope from "@mui/icons-material/Mail";
 
 class AllEvents extends React.Component {
   constructor(props) {
@@ -122,7 +124,8 @@ class AllEvents extends React.Component {
       show: true,
       fullControl: true,
 
-      title: smartString(props?.name, 50) || "Notification Settings",
+      // title: smartString(props?.name, 50) || "Notification Settings",
+      noTitle:true,
       renderComponent: () => (
         <EventNotificationSettings
           {...props}
@@ -298,25 +301,29 @@ class AllEvents extends React.Component {
                 name={FLAGS.EVENT_SPECIFIC_NOTIFICATION_SETTINGS}
                 fallback={
                   <div style={{ display: "flex" }}>
-                    <Link to={`/admin/edit/${id}/event`}>
-                      <EditIcon size="small" variant="outlined" color="secondary" />
-                    </Link>
-                    &nbsp;&nbsp;
-                    <Link
-                      onClick={async () => {
-                        const copiedEventResponse = await apiCall("/events.copy", {
-                          event_id: id
-                        });
-                        if (copiedEventResponse && copiedEventResponse.success) {
-                          const newEvent = copiedEventResponse && copiedEventResponse.data;
-                          this.props.history.push(`/admin/edit/${newEvent.id}/event`);
-                          putEventsInRedux([newEvent, ...(this.props.allEvents || [])]);
-                        }
-                      }}
-                      to="/admin/read/events"
-                    >
-                      <FileCopy size="small" variant="outlined" color="secondary" />
-                    </Link>
+                    <Tooltip title="Edit this event">
+                      <Link to={`/admin/edit/${id}/event`}>
+                        <EditIcon size="small" variant="outlined" color="secondary" />
+                      </Link>
+                      &nbsp;&nbsp;
+                    </Tooltip>
+                    <Tooltip title="Copy this event">
+                      <Link
+                        onClick={async () => {
+                          const copiedEventResponse = await apiCall("/events.copy", {
+                            event_id: id
+                          });
+                          if (copiedEventResponse && copiedEventResponse.success) {
+                            const newEvent = copiedEventResponse && copiedEventResponse.data;
+                            this.props.history.push(`/admin/edit/${newEvent.id}/event`);
+                            putEventsInRedux([newEvent, ...(this.props.allEvents || [])]);
+                          }
+                        }}
+                        to="/admin/read/events"
+                      >
+                        <FileCopy size="small" variant="outlined" color="secondary" />
+                      </Link>
+                    </Tooltip>
                     {auth && auth.is_super_admin && (
                       <Link to={`/admin/read/event/${id}/event-view?from=main`}>
                         <CallMadeIcon size="small" variant="outlined" color="secondary" />
@@ -354,6 +361,16 @@ class AllEvents extends React.Component {
                             }}
                           />
                         )}
+                      </Link>
+                    </Tooltip>
+                    <Tooltip title="Configure notifications for this event">
+                      <Link
+                        onClick={(e) => {
+                          e.preventDefault();
+                          this.showNotificationSettings(content);
+                        }}
+                      >
+                        <Envelope size="small" variant="outlined" color="secondary" />
                       </Link>
                     </Tooltip>
                   </div>
