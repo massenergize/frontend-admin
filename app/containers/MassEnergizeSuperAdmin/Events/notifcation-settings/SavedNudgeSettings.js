@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { OPTIONS } from "./EventNotificationSettings";
 import { objArrayToString, pluralize, smartString } from "../../../../utils/common";
 
-const SavedNudgeSettings = ({ profiles, editSettings, removeProfile }) => {
+const SavedNudgeSettings = ({ profiles, editSettings, removeProfile, getStarted }) => {
   const common = {
     marginRight: 10,
     textDecoration: "underline",
@@ -10,7 +10,19 @@ const SavedNudgeSettings = ({ profiles, editSettings, removeProfile }) => {
     color: "#428BCF"
   };
 
-  if (!profiles?.length) return <p style={{ padding: 10, color: "black" }}>No saved settings yet... The settings you make for any group of communities will be available here.</p>;
+  if (!profiles?.length)
+    return (
+      <p style={{ padding: 10, color: "black" }}>
+        No saved settings yet... The settings you make for any group of communities will be available here.{" "}
+        <span
+          onClick={() => getStarted()}
+          style={{ textDecoration: "underline", color: "green", fontWeight: "bold", marginLeft: 5 }}
+          className="touchable-opacity"
+        >
+          Get started
+        </span>
+      </p>
+    );
 
   return (
     <div
@@ -18,6 +30,15 @@ const SavedNudgeSettings = ({ profiles, editSettings, removeProfile }) => {
         padding: "10px"
       }}
     >
+      <div style={{ marginBottom: 5, color: "black" }}>
+        <small>
+          <b>
+            The settings you make, show up here. Remove or make changes to your previously saved settings by clicking on
+            "Edit/Remove" buttons{" "}
+          </b>
+        </small>
+        <hr />
+      </div>
       {profiles?.map((t) => {
         const communities = t?.communities || [];
         let keys = Object.entries(t?.settings);

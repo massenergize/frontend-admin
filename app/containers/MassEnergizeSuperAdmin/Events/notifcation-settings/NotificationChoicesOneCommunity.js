@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import { Button } from "@mui/material";
-import { OPTIONS } from "./EventNotificationSettings";
+import { Button, Typography } from "@mui/material";
+import { OPTIONS } from "./EventNotificationSettingsOneCommunity";
 import MEDropdown from "../../ME  Tools/dropdown/MEDropdown";
 import LightAutoComplete from "../../Gallery/tools/LightAutoComplete";
 import { useSelector } from "react-redux";
-import { mergeUnique } from "../../../../utils/common";
+import { mergeUnique, smartString } from "../../../../utils/common";
 
-const NotificationChoices = ({ state, handleChange, setCommunities, targetCommunities, event }) => {
+const NotificationChoicesOneCommunity = ({ state, handleChange, setCommunities, targetCommunities, event }) => {
   let communities = useSelector((state) => state.getIn(["communities"]));
   const comparator = (a, b) => a?.id?.toString() === b?.id?.toString();
   communities = mergeUnique(communities, event?.shared_to || [], comparator);
@@ -19,23 +19,24 @@ const NotificationChoices = ({ state, handleChange, setCommunities, targetCommun
     return data[name] || false;
   };
 
+  const community = communities?.find((c) => c?.id === event?.community?.id);
   return (
     <div
       style={{
         padding: "10px",
-        marginBottom: 50
+        marginBottom: 40
       }}
     >
-      <div style={{ marginBottom: 5, color: "black", fontWeight: "bold" }}>
+      {/* <div style={{ marginBottom: 5, color: "black", fontWeight: "bold" }}>
         <small>
           <b>
             First select a list of communities (The list only shows communities that this event is shared to, and ones
             you manage){" "}
           </b>
         </small>
-      </div>
+      </div> */}
       {/* {admin?.is_super_admin ? ( */}
-      <LightAutoComplete
+      {/* <LightAutoComplete
         selectAllV2
         allowClearAndSelectAll
         multiple
@@ -49,14 +50,14 @@ const NotificationChoices = ({ state, handleChange, setCommunities, targetCommun
         valueExtractor={(t) => t?.id}
         labelExtractor={(t) => t?.name}
         placeholder="Select the communities that these settings apply to..."
-      />
+      /> */}
 
+      <Typography variant="h6" style={{ fontWeight: "bol", color: "black", marginTop:10 }}>
+        {smartString(event?.name, 50) || "Notification Settings"}
+      </Typography>
       <div style={{ margin: "5px 0px", color: "black", fontWeight: "bold" }}>
         <small>
-          <b>
-            Select all options that apply below. The behaviors you select here will only apply to the communities you've
-            selected above.
-          </b>
+          Configure notification behaviour of this event for <b>{community?.name || "..."}</b>
         </small>
       </div>
       {OPTIONS.map((t) => {
@@ -77,4 +78,4 @@ const NotificationChoices = ({ state, handleChange, setCommunities, targetCommun
   );
 };
 
-export default NotificationChoices;
+export default NotificationChoicesOneCommunity;

@@ -8,6 +8,7 @@ export const USER_PORTAL_FLAGS = {
 };
 
 export const FLAGS = {
+  EVENT_SPECIFIC_NOTIFICATION_SETTINGS:"event-specific-notification-settings-feature-flag",
   NEW_USER_ENGAGEMENT_VIEW: "new-user-engagement-view-feature-flag",
   BROADCAST_MESSAGING_FF: "scheduled-broadcast-messages-feature-flag",
   NUDGE_CONTROL_FEATURE: "nudge-control-feature-flag",
