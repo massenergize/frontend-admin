@@ -16,6 +16,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import useCommunityFromURL from "../../../utils/hooks/useCommunityHook";
 import { reduxKeepCommunityNudgeSettings } from "../../../redux/redux-actions/adminActions";
 import { FLAGS } from "../../../components/FeatureFlags/flags";
+import CustomPageTitle from "../Misc/CustomPageTitle";
 export const ENABLED = "enabled";
 export const PAUSED = "paused";
 export const DISABLED = "disabled";
@@ -188,9 +189,13 @@ function NudgeControlPage() {
     );
   return (
     <div>
+      <CustomPageTitle>
+        Notification Control for <b>{community?.name || "..."}</b>
+      </CustomPageTitle>
       <MEPaperBlock>
         <Typography>
-        Use these controls to start, pause or stop sending <b>{community?.name || "..."}</b> users email notices about events.
+          Use these controls to start, pause or stop sending <b>{community?.name || "..."}</b> users email notices about
+          events.
           {/* Control all items related to nudges for <b>{community?.name || "..."}</b> on this page */}
         </Typography>
 
