@@ -14,19 +14,19 @@ import SavedNudgeSettings from "./SavedNudgeSettings";
 export const OPTIONS = [
   {
     key: "when_first_posted",
-    name: "Notify once on first nudge after event is posted or shared",
+    name: "Notify on first nudge after event is posted or shared",
     alias: "Notify on first nudge",
     value: false
   }, // { key: "when_first_uploaded", name: "Push" },
   {
     key: "within_30_days",
-    name: "Notify once with nudge within 30 days of event",
+    name: "Notify with nudge 30 days to the event",
     alias: "Within 30 days",
     value: true
   },
   {
     key: "within_1_week",
-    name: "Notify once with nudge within 1 week of event",
+    name: "Notify with nudge 1 week to event",
     alias: "Within 1 week",
     value: true
   },
@@ -145,7 +145,7 @@ export default function EventNotificationSettingsOneCommunity(props) {
     setState({
       ...state,
       ...(newState || {})
-    });
+    }); 
   };
 
   const removeProfileOnBackend = (profile) => {

@@ -52,13 +52,13 @@ const NotificationChoicesOneCommunity = ({ state, handleChange, setCommunities, 
         placeholder="Select the communities that these settings apply to..."
       /> */}
 
-      <Typography variant="h6" style={{ fontWeight: "bol", color: "black", marginTop:10 }}>
+      <Typography variant="h6" style={{ fontWeight: "bol", color: "black", marginTop: 10 }}>
         {smartString(event?.name, 50) || "Notification Settings"}
       </Typography>
       <div style={{ margin: "5px 0px", color: "black", fontWeight: "bold" }}>
-        <small>
-          Configure notification behaviour of this event for <b>{community?.name || "..."}</b>
-        </small>
+        <Typography variant="p" className="text-muted">
+          Configure notifications to <b>{community?.name || "..."}</b>
+        </Typography>
       </div>
       {OPTIONS.map((t) => {
         return (
