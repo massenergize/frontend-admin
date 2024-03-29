@@ -125,7 +125,7 @@ class AllEvents extends React.Component {
       fullControl: true,
 
       // title: smartString(props?.name, 50) || "Notification Settings",
-      noTitle:true,
+      noTitle: true,
       renderComponent: () => (
         <EventNotificationSettings
           {...props}
@@ -297,8 +297,9 @@ class AllEvents extends React.Component {
             const communityObjectThatHasFeatureFlag = this.props.communities?.find((com) => com?.id === community?.id);
             return (
               <Feature
-                communities={communityObjectThatHasFeatureFlag ? [communityObjectThatHasFeatureFlag] : null} // the feature should only be enabled for events that belong to communites that are enabled for the feature
-                name={FLAGS.EVENT_SPECIFIC_NOTIFICATION_SETTINGS}
+                // disable Dropdown mode for now
+                // communities={communityObjectThatHasFeatureFlag ? [communityObjectThatHasFeatureFlag] : null} // the feature should only be enabled for events that belong to communites that are enabled for the feature
+                // name={FLAGS.EVENT_SPECIFIC_NOTIFICATION_SETTINGS}
                 fallback={
                   <div style={{ display: "flex" }}>
                     <Tooltip title="Edit this event">

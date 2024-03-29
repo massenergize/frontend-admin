@@ -56,7 +56,7 @@ const NotificationChoicesOneCommunity = ({ state, handleChange, setCommunities, 
         {smartString(event?.name, 50) || "Notification Settings"}
       </Typography>
       <div style={{ margin: "5px 0px", color: "black", fontWeight: "bold" }}>
-        <Typography variant="p" className="text-muted">
+        <Typography variant="p" style={{ color: "#777" }}>
           Configure notifications to <b>{community?.name || "..."}</b>
         </Typography>
       </div>
