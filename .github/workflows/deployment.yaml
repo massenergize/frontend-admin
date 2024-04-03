@@ -4,12 +4,6 @@ on:
       types: [published]
 jobs:
   build-and-deploy:
-    if: |
-      github.ref == 'refs/heads/development' ||
-      github.ref == 'refs/heads/main' ||
-      github.ref == 'refs/heads/canary' ||
-      github.ref == 'refs/heads/setup-better-ci-cd'
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -28,6 +22,7 @@ jobs:
       - name: Read old BUILD_VERSION from config.json
         run: |
           OLD_VERSION=$(jq -r '.BUILD_VERSION' app/config/config.json)
+          echo "Github ref: $GITHUB_REF"
           echo "Old BUILD_VERSION: $OLD_VERSION"
 
       - name: Set Prod/Canary Environment Variables 🚀
