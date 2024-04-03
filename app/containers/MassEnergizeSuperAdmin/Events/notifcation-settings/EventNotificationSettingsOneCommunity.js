@@ -8,7 +8,7 @@ import notification from "../../../../components/Notification/Notification";
 import { findItemAtIndexAndRemainder } from "../../../../utils/common";
 import { loadAllEvents } from "../../../../redux/redux-actions/adminActions";
 import METab from "../../ME  Tools/me-tabbed-view/METab";
-import NotificationChoices from "./NotificationChoices";
+import NotificationChoices from "./NotificationChoicesOneCommunity";
 import SavedNudgeSettings from "./SavedNudgeSettings";
 
 export const OPTIONS = [
@@ -20,13 +20,13 @@ export const OPTIONS = [
   }, // { key: "when_first_uploaded", name: "Push" },
   {
     key: "within_30_days",
-    name: "Notify with nudge within 30 days of event",
+    name: "Notify with nudge 30 days to the event",
     alias: "Within 30 days",
     value: true
   },
   {
     key: "within_1_week",
-    name: "Notify with nudge within 1 week of event",
+    name: "Notify with nudge 1 week to event",
     alias: "Within 1 week",
     value: true
   },
@@ -46,7 +46,7 @@ const INITIAL_STATE = OPTIONS.reduce(
   {}
 );
 
-export default function EventNotificationSettings(props) {
+export default function EventNotificationSettingsOneCommunity(props) {
   const { id, close, eventObj } = props || {}; // Contains all props, and all data in the event object
   const [state, setState] = useState({});
   const [targetCommunities, setTargetCommunities] = useState([]); // Holds the list of communities that these settings apply to
@@ -112,14 +112,16 @@ export default function EventNotificationSettings(props) {
   };
 
   const sendChangesToBackend = () => {
-    if (!hasValidValues()) return;
+    // if (!hasValidValues()) return;
     setLoading(true);
     setNotification({});
-    const isALL = targetCommunities?.find((com) => typeof com === "string" && com?.toLowerCase() === "all");
+    // const isALL = targetCommunities?.find((com) => typeof com === "string" && com?.toLowerCase() === "all");
     apiCall("/events.reminders.settings.create", {
       event_id: id,
       ...(state || {}), // This is the settings object (notifications object
-      community_ids: isALL ? targetCommunities : (targetCommunities || []).map((c) => c.id)
+      // community_ids: isALL ? targetCommunities : (targetCommunities || []).map((c) => c.id)
+     
+      community_ids: [props?.community?.id]
     })
       .then((response) => {
         setLoading(false);
@@ -143,7 +145,7 @@ export default function EventNotificationSettings(props) {
     setState({
       ...state,
       ...(newState || {})
-    });
+    }); 
   };
 
   const removeProfileOnBackend = (profile) => {
@@ -216,6 +218,7 @@ export default function EventNotificationSettings(props) {
     return { ...INITIAL_STATE, ...(notification || {}) };
   };
 
+
   useEffect(() => {
     const { settings: settingsObject } = props || {};
     const defaultObj = (settingsObject?.notifications || [])[0];
@@ -225,10 +228,10 @@ export default function EventNotificationSettings(props) {
     setState(obj);
   }, []);
 
-  useEffect(() => {
-    const tab = profiles?.length ? "saved-settings" : "nudge-settings";
-    setActiveTab(tab);
-  }, [profiles]);
+  // useEffect(() => {
+  //   const tab = profiles?.length ? "saved-settings" : "nudge-settings";
+  //   setActiveTab(tab);
+  // }, [profiles]);
 
   const isChoicesTab = activeTab === "nudge-settings";
 
@@ -241,7 +244,15 @@ export default function EventNotificationSettings(props) {
       }}
     >
       <div style={{ padding: "0px 20px" }}>
-        <METab
+        <NotificationChoices
+          setState={updateState}
+          state={state}
+          targetCommunities={targetCommunities}
+          setCommunities={setTargetCommunities}
+          handleChange={handleChange}
+          event={eventObj}
+        />
+        {/* <METab
           onChange={(tab) => setActiveTab(tab.id)}
           tabs={tabs}
           defaultTab={activeTab}
@@ -251,7 +262,7 @@ export default function EventNotificationSettings(props) {
             paddingBottom: 70,
             overflowY: "scroll"
           }}
-        />
+        /> */}
       </div>
 
       <div
@@ -275,11 +286,11 @@ export default function EventNotificationSettings(props) {
         )}
         <div style={{ marginLeft: "auto" }}>
           <Button onClick={() => close && close()}>Close</Button>
-          {isChoicesTab && (
-            <Button onClick={() => sendChangesToBackend()}>
-              {loading && <i className="fa fa-spinner fa-spin" style={{ marginRight: 10 }} />} {loading ? "" : "Apply"}
-            </Button>
-          )}
+          {/* {isChoicesTab && ( */}
+          <Button onClick={() => sendChangesToBackend()}>
+            {loading && <i className="fa fa-spinner fa-spin" style={{ marginRight: 10 }} />} {loading ? "" : "Apply"}
+          </Button>
+          {/* )} */}
         </div>
       </div>
     </div>

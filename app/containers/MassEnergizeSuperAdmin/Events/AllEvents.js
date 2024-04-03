@@ -1,13 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
-import { withRouter } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 
 import Paper from "@mui/material/Paper";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { Typography } from "@mui/material";
+import { Tooltip, Typography } from "@mui/material";
 import { apiCall } from "../../../utils/messenger";
 import styles from "../../../components/Widget/widget-jss";
 import {
@@ -34,13 +34,21 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import { getAdminApiEndpoint, getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
-import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS, FROM } from '../../../utils/constants';
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS, FROM } from "../../../utils/constants";
 import Loader from "../../../utils/components/Loader";
 import Seo from "../../../components/Seo/Seo";
 import CustomOptions from "../ME  Tools/table /CustomOptions";
 import { EventNotSharedWithAnyone, EventSharedWithCommunity } from "./EventSharedStateComponents";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
-import EventNotificationSettings from "./notifcation-settings/EventNotificationSettings";
+import EventNotificationSettings from "./notifcation-settings/EventNotificationSettingsOneCommunity";
+import Feature from "../../../components/FeatureFlags/Feature";
+import { FLAGS } from "../../../components/FeatureFlags/flags";
+import StarsIcon from "@mui/icons-material/Stars";
+import FileCopy from "@mui/icons-material/FileCopy";
+import EditIcon from "@mui/icons-material/Edit";
+import CallMadeIcon from "@mui/icons-material/CallMade";
+import BellIcon from "@mui/icons-material/NotificationAdd";
+import Envelope from "@mui/icons-material/Mail";
 
 class AllEvents extends React.Component {
   constructor(props) {
@@ -116,7 +124,8 @@ class AllEvents extends React.Component {
       show: true,
       fullControl: true,
 
-      title: smartString(props?.name, 50) || "Notification Settings",
+      // title: smartString(props?.name, 50) || "Notification Settings",
+      noTitle: true,
       renderComponent: () => (
         <EventNotificationSettings
           {...props}
@@ -283,81 +292,103 @@ class AllEvents extends React.Component {
           filter: false,
           download: false,
           sort: false,
-          customBodyRender: (content) => (
-            <div style={{ display: "flex" }}>
-              {/* <Link to={`/admin/edit/${id}/event`}> */}
-              {/*   <EditIcon size="small" variant="outlined" color="secondary" /> */}
-              {/* </Link> */}
-              {/* &nbsp;&nbsp; */}
-              {/* <Link */}
-              {/*   onClick={async () => { */}
-              {/*     const copiedEventResponse = await apiCall('/events.copy', { */}
-              {/*       event_id: id, */}
-              {/*     }); */}
-              {/*     if (copiedEventResponse && copiedEventResponse.success) { */}
-              {/*       const newEvent = copiedEventResponse && copiedEventResponse.data; */}
-              {/*       this.props.history.push(`/admin/edit/${newEvent.id}/event`); */}
-              {/*       putEventsInRedux([newEvent, ...(allEvents || [])]); */}
-              {/*     } */}
-              {/*   }} */}
-              {/*   to="/admin/read/events" */}
-              {/* > */}
-              {/*   <FileCopy size="small" variant="outlined" color="secondary" /> */}
-              {/* </Link> */}
-              {/* {auth && auth.is_super_admin && ( */}
-              {/*   <Link to={`/admin/read/event/${id}/event-view?from=main`}> */}
-              {/*     <CallMadeIcon */}
-              {/*       size="small" */}
-              {/*       variant="outlined" */}
-              {/*       color="secondary" */}
-              {/*     /> */}
-              {/*   </Link> */}
-              {/* )} */}
-              {/* <Tooltip */}
-              {/*   title={`${is_on_home_page ? 'Remove' : 'Add'} event ${ */}
-              {/*     is_on_home_page ? 'from' : 'to' */}
-              {/*   } community's homepage`} */}
-              {/* > */}
-              {/*   <Link */}
-              {/*     onClick={() => { */}
-              {/*       this.props.toggleLive({ */}
-              {/*         show: true, */}
-              {/*         component: this.addToHomePageUI({ id }), */}
-              {/*         onConfirm: () => this.addEventToHomePage(id), */}
-              {/*         closeAfterConfirmation: true, */}
-              {/*       }); */}
-              {/*     }} */}
-              {/*   > */}
-              {/*     {is_on_home_page ? ( */}
-              {/*       <StarsIcon */}
-              {/*         size="small" */}
-              {/*         variant="outlined" */}
-              {/*         sx={{ */}
-              {/*           color: 'rgb(65 172 65)', */}
-              {/*         }} */}
-              {/*       /> */}
-              {/*     ) : ( */}
-              {/*       <StarsIcon */}
-              {/*         size="small" */}
-              {/*         variant="outlined" */}
-              {/*         sx={{ */}
-              {/*           color: '#bcbcbc', */}
-              {/*         }} */}
-              {/*       /> */}
-              {/*     )} */}
-              {/*   </Link> */}
-              {/* </Tooltip> */}
-              <div style={{ minWidth: 150 }}>
-                <MEDropdown
-                  fullControl
-                  data={this.makeOptions(content)}
-                  labelExtractor={(it) => it.name}
-                  valueExtractor={(it) => it.key}
-                  placeholder="Options"
-                />
-              </div>
-            </div>
-          )
+          customBodyRender: (content) => {
+            const { id, is_on_home_page, community } = content;
+            const communityObjectThatHasFeatureFlag = this.props.communities?.find((com) => com?.id === community?.id);
+            return (
+              <Feature
+                // disable Dropdown mode for now
+                // communities={communityObjectThatHasFeatureFlag ? [communityObjectThatHasFeatureFlag] : null} // the feature should only be enabled for events that belong to communites that are enabled for the feature
+                // name={FLAGS.EVENT_SPECIFIC_NOTIFICATION_SETTINGS}
+                fallback={
+                  <div style={{ display: "flex" }}>
+                    <Tooltip title="Edit this event">
+                      <Link to={`/admin/edit/${id}/event`}>
+                        <EditIcon size="small" variant="outlined" color="secondary" />
+                      </Link>
+                      &nbsp;&nbsp;
+                    </Tooltip>
+                    <Tooltip title="Copy this event">
+                      <Link
+                        onClick={async () => {
+                          const copiedEventResponse = await apiCall("/events.copy", {
+                            event_id: id
+                          });
+                          if (copiedEventResponse && copiedEventResponse.success) {
+                            const newEvent = copiedEventResponse && copiedEventResponse.data;
+                            this.props.history.push(`/admin/edit/${newEvent.id}/event`);
+                            putEventsInRedux([newEvent, ...(this.props.allEvents || [])]);
+                          }
+                        }}
+                        to="/admin/read/events"
+                      >
+                        <FileCopy size="small" variant="outlined" color="secondary" />
+                      </Link>
+                    </Tooltip>
+                    {auth && auth.is_super_admin && (
+                      <Link to={`/admin/read/event/${id}/event-view?from=main`}>
+                        <CallMadeIcon size="small" variant="outlined" color="secondary" />
+                      </Link>
+                    )}
+                    <Tooltip
+                      title={`${is_on_home_page ? "Remove" : "Add"} event ${
+                        is_on_home_page ? "from" : "to"
+                      } community's homepage`}
+                    >
+                      <Link
+                        onClick={() => {
+                          this.props.toggleLive({
+                            show: true,
+                            component: this.addToHomePageUI({ id }),
+                            onConfirm: () => this.addEventToHomePage(id),
+                            closeAfterConfirmation: true
+                          });
+                        }}
+                      >
+                        {is_on_home_page ? (
+                          <StarsIcon
+                            size="small"
+                            variant="outlined"
+                            sx={{
+                              color: "rgb(65 172 65)"
+                            }}
+                          />
+                        ) : (
+                          <StarsIcon
+                            size="small"
+                            variant="outlined"
+                            sx={{
+                              color: "#bcbcbc"
+                            }}
+                          />
+                        )}
+                      </Link>
+                    </Tooltip>
+                    <Tooltip title="Configure notifications for this event">
+                      <Link
+                        onClick={(e) => {
+                          e.preventDefault();
+                          this.showNotificationSettings(content);
+                        }}
+                      >
+                        <Envelope size="small" variant="outlined" color="secondary" />
+                      </Link>
+                    </Tooltip>
+                  </div>
+                }
+              >
+                <div style={{ minWidth: 150 }}>
+                  <MEDropdown
+                    fullControl
+                    data={this.makeOptions(content)}
+                    labelExtractor={(it) => it.name}
+                    valueExtractor={(it) => it.key}
+                    placeholder="Options"
+                  />
+                </div>
+              </Feature>
+            );
+          }
         }
       },
       {
