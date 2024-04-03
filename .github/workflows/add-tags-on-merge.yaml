@@ -5,7 +5,6 @@ on:
       - development
       - master
       - canary
-      - setup-better-ci-cd
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -29,7 +28,7 @@ jobs:
           echo "Old BUILD_VERSION: $OLD_VERSION"
   
       - name: Update BUILD_VERSION only when in development branch
-        if: github.ref == 'refs/heads/development' || github.ref == 'refs/heads/setup-better-ci-cd'
+        if: github.ref == 'refs/heads/development'
         run: |
           CONFIG_PATH="app/config/config.json"
           # Read the config.json file
