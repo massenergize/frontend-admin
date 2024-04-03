@@ -16,6 +16,7 @@ import DropMenuLayout from "./layouts/DropMenuLayout";
 import MegaMenuLayout from "./layouts/MegaMenuLayout";
 import styles from "./appStyles-jss";
 import { fetchParamsFromURL } from "../../utils/common";
+import { NO_TITLES_FOR_THESE_PAGES } from "../../utils/constants";
 
 class Dashboard extends React.Component {
   // Initial header style
@@ -76,6 +77,7 @@ class Dashboard extends React.Component {
       "/app",
       "/app/crm-dashboard",
       "/app/crypto-dashboard",
+      ...NO_TITLES_FOR_THESE_PAGES
     ];
     const parts = history.location.pathname.split("/");
     const place = this.makeTitle(parts);
