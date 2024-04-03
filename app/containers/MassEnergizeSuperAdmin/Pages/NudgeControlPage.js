@@ -154,6 +154,12 @@ function NudgeControlPage() {
           return;
         }
         const { data } = res || {};
+        const hasContent = Object.keys(data || {}).length > 0;
+        if (!hasContent)
+          return setErrors({
+            ...errors,
+            loadingError: "Nudge control keys are not available yet, please contact a super admin"
+          });
 
         setLoadingPage(false);
         const formated = reformatBackendData(data);
