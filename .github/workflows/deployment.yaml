@@ -26,7 +26,7 @@ jobs:
           echo "Old BUILD_VERSION: $OLD_VERSION"
 
       - name: Set Prod/Canary Environment Variables 🚀
-        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/canary' 
+        if: startsWith(github.ref, 'refs/heads/master') || startsWith(github.ref, 'refs/heads/canary')
         run: |
             echo "Setting prod branch secrets..."
             echo "REACT_APP_SENTRY_DSN=${{ secrets.PROD_REACT_APP_SENTRY_DSN }}" >> $GITHUB_ENV
@@ -41,7 +41,7 @@ jobs:
             echo "REACT_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.PROD_REACT_APP_FIREBASE_AUTH_DOMAIN }}" >> $GITHUB_ENV
     
       - name: Set Dev Environment Variables 🚀
-        if: github.ref == 'refs/heads/development' || github.ref == 'refs/heads/setup-better-ci-cd'
+        if:  startsWith(github.ref, 'refs/heads/development')  ||  startsWith(github.ref, 'refs/heads/setup-better-ci-cd') 
         run: |
             echo "Setting Development branch secrets..."
             echo "Using repository secrets for $BRANCH branch..."
@@ -63,7 +63,7 @@ jobs:
             make build
         
       - name: Deploying to Prod 🚀 
-        if: github.ref.base_ref == 'refs/heads/master'
+        if:  startsWith(github.ref, 'refs/heads/master') 
         uses: data-intuitive/netlify-deploy-site@v1
         with:
           auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
@@ -74,7 +74,7 @@ jobs:
     
       
       - name: Deploying to Canary 🚀
-        if: github.ref == 'refs/heads/canary'
+        if: startsWith(github.ref, 'refs/heads/canary') 
         uses: data-intuitive/netlify-deploy-site@v1
         with:
           auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
@@ -84,7 +84,7 @@ jobs:
           message: 'Deploying ${{ github.ref }}'
 
       - name: Deploying  to Dev 🚀
-        if: github.ref == 'refs/heads/development' || github.ref == 'refs/heads/setup-better-ci-cd'
+        if: startsWith(github.ref, 'refs/heads/development')  ||  startsWith(github.ref, 'refs/heads/setup-better-ci-cd') 
         uses: data-intuitive/netlify-deploy-site@v1
         with:
           auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
