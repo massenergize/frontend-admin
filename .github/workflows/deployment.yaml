@@ -1,12 +1,15 @@
-name: Build and Deploy to Netlify CI/CD
+name: Build and Deploy to Netlify
 on:
-  push:
-    branches:
-      - development
-      - master
-      - canary
+    release:
+      types: [published]
 jobs:
   build-and-deploy:
+    if: |
+      github.ref == 'refs/heads/development' ||
+      github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/canary' ||
+      github.ref == 'refs/heads/setup-better-ci-cd'
+
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -26,38 +29,6 @@ jobs:
         run: |
           OLD_VERSION=$(jq -r '.BUILD_VERSION' app/config/config.json)
           echo "Old BUILD_VERSION: $OLD_VERSION"
-  
-      - name: Update BUILD_VERSION only when in development branch
-        if: github.ref == 'refs/heads/development'
-        run: |
-          CONFIG_PATH="app/config/config.json"
-          # Read the config.json file
-          CONFIG=$(<"$CONFIG_PATH")
-          # Extract old BUILD_VERSION
-          OLD_VERSION=$(jq -r '.BUILD_VERSION' <<< "$CONFIG")
-          echo "Old BUILD_VERSION: $OLD_VERSION"
-          # Increment the BUILD_VERSION using semantic versioning
-          NEW_VERSION=$(echo "$OLD_VERSION" | awk -F '.' '{$NF = $NF + 1;} 1' | sed 's/ /./g')
-          echo "New BUILD_VERSION: $NEW_VERSION"
-          # Update the config.json file with the new BUILD_VERSION
-          UPDATED_CONFIG=$(echo "$CONFIG" | jq --arg new_version "$NEW_VERSION" '.BUILD_VERSION = $new_version')
-          echo "$UPDATED_CONFIG" > "$CONFIG_PATH"
-          git config --global user.email "me-gh-action-bot@massenergize.org"
-          git config --global user.name "Version Update Bot"
-          git add "$CONFIG_PATH"
-          git commit -m "Bump BUILD_VERSION to $NEW_VERSION"
-          git push origin HEAD:$GITHUB_REF
-
-      - name: Create and push tag
-        run: |
-          BUILD_VERSION=$(jq -r '.BUILD_VERSION' < app/config/config.json)
-          BRANCH_NAME=$(echo $GITHUB_REF | awk -F'/' '{print $3}')
-          TAG_NAME="$BRANCH_NAME@$BUILD_VERSION"
-          echo "BUILD_VERSION: $BUILD_VERSION"
-          echo "Branch name: $BRANCH_NAME"
-          echo "New tag name: $TAG_NAME"
-          git tag -a "$TAG_NAME" -m "Version $BUILD_VERSION"
-          git push origin "$TAG_NAME"
 
       - name: Set Prod/Canary Environment Variables 🚀
         if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/canary' 
@@ -75,7 +46,7 @@ jobs:
             echo "REACT_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.PROD_REACT_APP_FIREBASE_AUTH_DOMAIN }}" >> $GITHUB_ENV
     
       - name: Set Dev Environment Variables 🚀
-        if: github.ref == 'refs/heads/development' 
+        if: github.ref == 'refs/heads/development' || github.ref == 'refs/heads/setup-better-ci-cd'
         run: |
             echo "Setting Development branch secrets..."
             echo "Using repository secrets for $BRANCH branch..."
@@ -118,7 +89,7 @@ jobs:
           message: 'Deploying ${{ github.ref }}'
 
       - name: Deploying  to Dev 🚀
-        if: github.ref == 'refs/heads/development' 
+        if: github.ref == 'refs/heads/development' || github.ref == 'refs/heads/setup-better-ci-cd'
         uses: data-intuitive/netlify-deploy-site@v1
         with:
           auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
