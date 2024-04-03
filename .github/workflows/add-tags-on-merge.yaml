@@ -29,7 +29,7 @@ jobs:
           echo "Old BUILD_VERSION: $OLD_VERSION"
   
       - name: Update BUILD_VERSION only when in development branch
-        if: github.ref == 'refs/heads/development'
+        if: github.ref == 'refs/heads/development' || github.ref == 'refs/heads/setup-better-ci-cd'
         run: |
           CONFIG_PATH="app/config/config.json"
           # Read the config.json file
