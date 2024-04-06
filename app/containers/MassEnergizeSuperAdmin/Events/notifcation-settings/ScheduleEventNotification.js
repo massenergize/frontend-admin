@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import { Button } from "@mui/material";
+import { Button, FormControl, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { apiCall } from "../../../../utils/messenger";
 import notification from "../../../../components/Notification/Notification";
-import { findItemAtIndexAndRemainder } from "../../../../utils/common";
+import { findItemAtIndexAndRemainder, smartString } from "../../../../utils/common";
 import { loadAllEvents } from "../../../../redux/redux-actions/adminActions";
 import METab from "../../ME  Tools/me-tabbed-view/METab";
-import NotificationChoices from "./NotificationChoices";
+import NotificationChoices from "./NotificationChoicesOneCommunity";
 import SavedNudgeSettings from "./SavedNudgeSettings";
 
 export const OPTIONS = [
@@ -20,13 +20,13 @@ export const OPTIONS = [
   }, // { key: "when_first_uploaded", name: "Push" },
   {
     key: "within_30_days",
-    name: "Notify with nudge within 30 days of event",
+    name: "Notify with nudge 30 days to the event",
     alias: "Within 30 days",
     value: true
   },
   {
     key: "within_1_week",
-    name: "Notify with nudge within 1 week of event",
+    name: "Notify with nudge 1 week to event",
     alias: "Within 1 week",
     value: true
   },
@@ -46,8 +46,7 @@ const INITIAL_STATE = OPTIONS.reduce(
   {}
 );
 
-// As at 5th April 2024, this component is not used in the app (Cos most admins only work with one community. When admins start working with multiple communities, we can use this component)
-export default function EventNotificationSettings(props) {
+export default function ScheduleEventNotification(props) {
   const { id, close, eventObj } = props || {}; // Contains all props, and all data in the event object
   const [state, setState] = useState({});
   const [targetCommunities, setTargetCommunities] = useState([]); // Holds the list of communities that these settings apply to
@@ -113,14 +112,16 @@ export default function EventNotificationSettings(props) {
   };
 
   const sendChangesToBackend = () => {
-    if (!hasValidValues()) return;
+    // if (!hasValidValues()) return;
     setLoading(true);
     setNotification({});
-    const isALL = targetCommunities?.find((com) => typeof com === "string" && com?.toLowerCase() === "all");
+    // const isALL = targetCommunities?.find((com) => typeof com === "string" && com?.toLowerCase() === "all");
     apiCall("/events.reminders.settings.create", {
       event_id: id,
       ...(state || {}), // This is the settings object (notifications object
-      community_ids: isALL ? targetCommunities : (targetCommunities || []).map((c) => c.id)
+      // community_ids: isALL ? targetCommunities : (targetCommunities || []).map((c) => c.id)
+
+      community_ids: [props?.community?.id]
     })
       .then((response) => {
         setLoading(false);
@@ -176,43 +177,6 @@ export default function EventNotificationSettings(props) {
     removeProfileOnBackend(profile);
   };
 
-  const tabs = [
-    {
-      name: "Notification Behavior",
-      id: "nudge-settings",
-      renderComponent: () => (
-        <NotificationChoices
-          setState={updateState}
-          state={state}
-          targetCommunities={targetCommunities}
-          setCommunities={setTargetCommunities}
-          handleChange={handleChange}
-          event={eventObj}
-        />
-      )
-    },
-    {
-      name: `Saved Settings ${profiles?.length ? `(${profiles?.length})` : ""}`,
-      id: "saved-settings",
-      renderComponent: () => (
-        <SavedNudgeSettings
-          profiles={profiles}
-          editSettings={(profile) => {
-            setState(profile?.settings);
-            setTargetCommunities(profile?.communities || []);
-            setActiveTab("nudge-settings");
-          }}
-          getStarted={() => {
-            setState(INITIAL_STATE);
-            setActiveTab("nudge-settings");
-          }}
-          removeProfile={removeProfile}
-          event={eventObj}
-        />
-      )
-    }
-  ];
-
   const makeStateObject = (notification) => {
     return { ...INITIAL_STATE, ...(notification || {}) };
   };
@@ -226,33 +190,30 @@ export default function EventNotificationSettings(props) {
     setState(obj);
   }, []);
 
-  useEffect(() => {
-    const tab = profiles?.length ? "saved-settings" : "nudge-settings";
-    setActiveTab(tab);
-  }, [profiles]);
-
-  const isChoicesTab = activeTab === "nudge-settings";
-
   const { message, type } = notification || {};
   const isError = type === "error";
+
   return (
     <div
       style={{
         width: "auto"
       }}
     >
-      <div style={{ padding: "0px 20px" }}>
-        <METab
-          onChange={(tab) => setActiveTab(tab.id)}
-          tabs={tabs}
-          defaultTab={activeTab}
-          contentStyle={{
-            maxHeight: 440,
-            height: 440,
-            paddingBottom: 70,
-            overflowY: "scroll"
-          }}
-        />
+      <div style={{ padding: "0px 20px", height: 300 }}>
+        <Typography variant="h6" style={{ fontWeight: "bol", color: "black", marginTop: 10 }}>
+          {smartString(eventObj?.name, 50) || "Notification Settings"}
+        </Typography>
+        <div style={{ padding: 10, border: "solid 1px #ab47bc", margin: "10px 0px" }}>
+          <Typography variant="h6" style={{ fontWeight: "bold", color: "black", fontSize: 14, color: "#ab47bc" }}>
+            EXCLUDE FROM NEWSLETTER
+          </Typography>
+          <FormControlLabel
+            control={<Checkbox checked />}
+            label="Exclude this event from news letters"
+            style={{ color: "black" }}
+          />
+          <br />
+        </div>
       </div>
 
       <div
@@ -276,11 +237,11 @@ export default function EventNotificationSettings(props) {
         )}
         <div style={{ marginLeft: "auto" }}>
           <Button onClick={() => close && close()}>Close</Button>
-          {isChoicesTab && (
-            <Button onClick={() => sendChangesToBackend()}>
-              {loading && <i className="fa fa-spinner fa-spin" style={{ marginRight: 10 }} />} {loading ? "" : "Apply"}
-            </Button>
-          )}
+          {/* {isChoicesTab && ( */}
+          <Button onClick={() => sendChangesToBackend()}>
+            {loading && <i className="fa fa-spinner fa-spin" style={{ marginRight: 10 }} />} {loading ? "" : "Apply"}
+          </Button>
+          {/* )} */}
         </div>
       </div>
     </div>

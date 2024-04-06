@@ -40,7 +40,7 @@ import Seo from "../../../components/Seo/Seo";
 import CustomOptions from "../ME  Tools/table /CustomOptions";
 import { EventNotSharedWithAnyone, EventSharedWithCommunity } from "./EventSharedStateComponents";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
-import EventNotificationSettings from "./notifcation-settings/EventNotificationSettingsOneCommunity";
+import EventNotificationSettings from "./notifcation-settings/ScheduleEventNotification";
 import Feature from "../../../components/FeatureFlags/Feature";
 import { FLAGS } from "../../../components/FeatureFlags/flags";
 import StarsIcon from "@mui/icons-material/Stars";
