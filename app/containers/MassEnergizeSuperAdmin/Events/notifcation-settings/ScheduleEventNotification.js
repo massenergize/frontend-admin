@@ -9,6 +9,7 @@ import { loadAllEvents } from "../../../../redux/redux-actions/adminActions";
 import Accordion from "../../../../components/Accordion/Accordion";
 import MEDropdown from "../../ME  Tools/dropdown/MEDropdown";
 
+const UNIT_LIST = [{ id: "days", name: "Days" }, { id: "weeks", name: "Weeks" }];
 export const OPTIONS = [
   {
     key: "when_first_posted",
@@ -214,7 +215,16 @@ export default function ScheduleEventNotification(props) {
         </div>
         <div>
           <Accordion title={smartString(`Schedule notification for ${props?.community?.name} Members`, 60)} opened>
+            <OneSchedule prefix />
             <OneSchedule />
+
+            <h6
+              className="touchable-opacity"
+              style={{ marginTop: 10, fontSize: 15, color: "rgb(171, 71, 188)", textDecoration: "underline" }}
+            >
+              <i className="fa fa-plus" style={{ marginRight: 3 }} />
+              Add Notification
+            </h6>
           </Accordion>
         </div>
         {/* <center>
@@ -255,10 +265,13 @@ export default function ScheduleEventNotification(props) {
   );
 }
 
-const OneSchedule = ({}) => {
+const OneSchedule = ({ prefix, suffix = true }) => {
   return (
-    <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-      <Typography variant="p">Send Notification</Typography>{" "}
+    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", marginTop: 6 }}>
+      <Typography variant="p" style={{ color: "black", opacity: prefix ? 1 : 0 }}>
+        Send Notification
+      </Typography>
+
       <input
         placeholder="00"
         style={{
@@ -268,11 +281,16 @@ const OneSchedule = ({}) => {
           width: 40,
           margin: "0px 10px",
           color: "rgb(171, 71, 188)",
-          fontWeight: "bold"
+          fontWeight: "bold",
+          borderRadius: 3
         }}
       />
       <MEDropdown
-        headerStyle={{ border: "solid 1px rgb(171, 71, 188)", padding: "3px 7px" }}
+        value={["days"]}
+        labelExtractor={(item) => item.name}
+        valueExtractor={(item) => item.id}
+        data={UNIT_LIST}
+        headerStyle={{ border: "solid 1px rgb(171, 71, 188)", padding: "3px 7px", borderRadius: 3 }}
         fullControl
         placeholder="Select a time unit"
         onHeaderRender={(labels) => (
@@ -281,9 +299,16 @@ const OneSchedule = ({}) => {
           </span>
         )}
       />
-      <Typography style={{ marginLeft: 10 }} variant="p">
-        before event
-      </Typography>{" "}
+      {suffix && (
+        <Typography style={{ marginLeft: 10, color: "black" }} variant="p">
+          before event
+        </Typography>
+      )}
+
+      <i
+        className=" fa fa-times"
+        style={{ fontSize: 24, marginLeft: "auto", marginRight: 6, color: "#c54c4c", cursor: "pointer" }}
+      />
     </div>
   );
 };
