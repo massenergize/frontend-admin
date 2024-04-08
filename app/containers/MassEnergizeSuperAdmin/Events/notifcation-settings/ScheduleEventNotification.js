@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from "react";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import { Button, FormControl, Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { apiCall } from "../../../../utils/messenger";
-import notification from "../../../../components/Notification/Notification";
 import { findItemAtIndexAndRemainder, smartString } from "../../../../utils/common";
 import { loadAllEvents } from "../../../../redux/redux-actions/adminActions";
-import METab from "../../ME  Tools/me-tabbed-view/METab";
-import NotificationChoices from "./NotificationChoicesOneCommunity";
-import SavedNudgeSettings from "./SavedNudgeSettings";
+import Accordion from "../../../../components/Accordion/Accordion";
 
 export const OPTIONS = [
   {
@@ -199,7 +196,7 @@ export default function ScheduleEventNotification(props) {
         width: "auto"
       }}
     >
-      <div style={{ padding: "0px 20px", height: 300 }}>
+      <div style={{ padding: "0px 20px", minHeight: 400, maxHeight: 550, minWidth: 530 }}>
         <Typography variant="h6" style={{ fontWeight: "bol", color: "black", marginTop: 10 }}>
           {smartString(eventObj?.name, 50) || "Notification Settings"}
         </Typography>
@@ -214,6 +211,16 @@ export default function ScheduleEventNotification(props) {
           />
           <br />
         </div>
+        <div>
+          <Accordion title="Schedule notification for Wayland Community Members" opened>
+            <p> Make sure everything is controlled</p>
+          </Accordion>
+        </div>
+        {/* <center>
+          <Button variant="contained">
+            Add Notification <i className="fa fa-plus" style={{ marginLeft: 5 }} />
+          </Button>
+        </center> */}
       </div>
 
       <div
@@ -221,7 +228,6 @@ export default function ScheduleEventNotification(props) {
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
-
           position: "absolute",
           bottom: 0,
           width: "100%",
