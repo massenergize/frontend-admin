@@ -212,7 +212,7 @@ export default function ScheduleEventNotification(props) {
           <br />
         </div>
         <div>
-          <Accordion title="Schedule notification for Wayland Community Members" opened>
+          <Accordion title={smartString(`Schedule notification for ${props?.community?.name} Members`, 60)} opened>
             <p> Make sure everything is controlled</p>
           </Accordion>
         </div>
