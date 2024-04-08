@@ -7,6 +7,7 @@ import { apiCall } from "../../../../utils/messenger";
 import { findItemAtIndexAndRemainder, smartString } from "../../../../utils/common";
 import { loadAllEvents } from "../../../../redux/redux-actions/adminActions";
 import Accordion from "../../../../components/Accordion/Accordion";
+import MEDropdown from "../../ME  Tools/dropdown/MEDropdown";
 
 export const OPTIONS = [
   {
@@ -213,7 +214,7 @@ export default function ScheduleEventNotification(props) {
         </div>
         <div>
           <Accordion title={smartString(`Schedule notification for ${props?.community?.name} Members`, 60)} opened>
-            <p> Make sure everything is controlled</p>
+            <OneSchedule />
           </Accordion>
         </div>
         {/* <center>
@@ -253,3 +254,36 @@ export default function ScheduleEventNotification(props) {
     </div>
   );
 }
+
+const OneSchedule = ({}) => {
+  return (
+    <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+      <Typography variant="p">Send Notification</Typography>{" "}
+      <input
+        placeholder="00"
+        style={{
+          padding: 3,
+          border: "solid 1px rgb(171, 71, 188)",
+          textAlign: "center",
+          width: 40,
+          margin: "0px 10px",
+          color: "rgb(171, 71, 188)",
+          fontWeight: "bold"
+        }}
+      />
+      <MEDropdown
+        headerStyle={{ border: "solid 1px rgb(171, 71, 188)", padding: "3px 7px" }}
+        fullControl
+        placeholder="Select a time unit"
+        onHeaderRender={(labels) => (
+          <span style={{ color: "rgb(171, 71, 188)", fontWeight: "bold" }}>
+            {labels?.length ? labels.join(",") : "Time Unit"}
+          </span>
+        )}
+      />
+      <Typography style={{ marginLeft: 10 }} variant="p">
+        before event
+      </Typography>{" "}
+    </div>
+  );
+};
