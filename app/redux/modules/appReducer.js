@@ -57,6 +57,7 @@ import {
   LOAD_OTHER_ADMINS,
   SET_MEDIA_LIBRARY_MODAL_FILTERS,
   SET_GALLERY_META_DATA,
+  SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX
 } from "../ReduxConstants";
 
 const initialState = Map({
@@ -532,4 +533,13 @@ export const allMetaDataReducer = (state = {}, action = {}) => {
 
 export const allReducers = {
   communities: communitiesReducer,
+};
+
+export const saveCommunityFeatureFlagsReducer = (state = [], action = {}) => {
+  switch (action.type) {
+    case SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX:
+      return action.payload;
+    default:
+      return state;
+  }
 };

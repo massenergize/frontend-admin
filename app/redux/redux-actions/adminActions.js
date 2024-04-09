@@ -56,6 +56,7 @@ import {
   LOAD_OTHER_ADMINS,
   SET_MEDIA_LIBRARY_MODAL_FILTERS,
   SET_GALLERY_META_DATA,
+  SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX
 } from "../ReduxConstants";
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -400,6 +401,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
     apiCall("/communities.others.listForCommunityAdmin", { limit: 50 }),
     apiCall("/summary.next.steps.forAdmins"),
+    apiCall("/communities.features.flags.list", {})
   ]).then((response) => {
     const [
       policies,
@@ -422,6 +424,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       featureFlags,
       otherCommunities,
       adminNextSteps,
+      communityFeatureFlagsResponse,
     ] = response;
     dispatch(loadAllPolicies(policies.data));
     dispatch(reduxLoadAllCommunities(communities.data));
@@ -450,6 +453,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadFeatureFlags(featureFlags.data || {}));
     dispatch(reduxLoadAllOtherCommunities(otherCommunities.data));
     dispatch(reduxLoadNextStepsSummary(adminNextSteps.data));
+    dispatch(saveCommunityFeatureFlagsAction(communityFeatureFlagsResponse.data));
     const cursor = {
       communities: communities.cursor,
       actions: actions.cursor,
@@ -1020,6 +1024,14 @@ export const loadTaskFunctionsAction = (data = []) => {
 export const loadTasksAction = (data = []) => {
   return {
     type: LOAD_ALL_TASKS,
+    payload: data,
+  };
+};
+
+
+export const saveCommunityFeatureFlagsAction = (data = []) => {
+  return {
+    type: SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX,
     payload: data,
   };
 };
