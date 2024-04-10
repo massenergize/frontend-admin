@@ -126,16 +126,15 @@ function AsyncDropDown({
               MenuProps={MenuProps}
             >
               {data.map((t, i) => {
+                const isChecked =
+                  isThisSelectedOrNot && isThisSelectedOrNot(field.name, t.id);
                 return (
                   <MenuItem key={t.id}>
                     <FormControlLabel
                       key={t.id}
                       control={
                         <Checkbox
-                          checked={
-                            isThisSelectedOrNot &&
-                            isThisSelectedOrNot(field.name, t.id)
-                          }
+                          checked={isChecked}
                           onChange={(event) =>
                             handleCheckBoxSelect(event, field.selectMany, field)
                           }
