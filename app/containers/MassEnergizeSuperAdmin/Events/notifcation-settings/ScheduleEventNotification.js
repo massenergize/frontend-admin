@@ -152,12 +152,12 @@ export default function ScheduleEventNotification(props) {
   };
 
   useEffect(() => {
-    const { settings: settingsObject } = props || {};
-    const defaultObj = (settingsObject?.notifications || [])[0];
-    // setProfiles(settingsObject?.notifications || []);
-    const obj = makeStateObject(defaultObj?.settings);
-    // setTargetCommunities(defaultObj?.communities || []);
-    setState(obj);
+    // const { settings: settingsObject } = props || {};
+    // const defaultObj = (settingsObject?.notifications || [])[0];
+    // // setProfiles(settingsObject?.notifications || []);
+    // const obj = makeStateObject(defaultObj?.settings);
+    // // setTargetCommunities(defaultObj?.communities || []);
+    // setState(obj);
   }, []);
 
   const addNewSchedule = () => {
@@ -196,7 +196,7 @@ export default function ScheduleEventNotification(props) {
             EXCLUDE FROM NEWSLETTER
           </Typography>
           <FormControlLabel
-            control={<Checkbox checked />}
+            control={<Checkbox style={{ color: "rgb(171, 71, 188)" }} />}
             label="Exclude this event from news letters"
             style={{ color: "black" }}
           />
@@ -219,10 +219,16 @@ export default function ScheduleEventNotification(props) {
             <h6
               onClick={addNewSchedule}
               className="touchable-opacity"
-              style={{ marginTop: 10, fontSize: 15, color: "rgb(171, 71, 188)", textDecoration: "underline" }}
+              style={{
+                display: "inline-flex",
+                marginTop: 10,
+                fontSize: 15,
+                // color: "rgb(171, 71, 188)"
+                color: "green"
+              }}
             >
               <i className="fa fa-plus" style={{ marginRight: 3 }} />
-              Add Schedule
+              <span style={{ textDecoration: "underline", fontWeight: "bold" }}>Add Schedule </span>
             </h6>
           </Accordion>
         </div>
