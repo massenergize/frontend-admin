@@ -15,7 +15,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import { Typography } from "@mui/material";
 import { reduxLoadMetaDataAction, reduxLoadScheduledMessages, reduxToggleUniversalModal, reduxToggleUniversalToast } from "../../../redux/redux-actions/adminActions";
-import { LOADING } from "../../../utils/constants";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS, LOADING } from '../../../utils/constants';
 import Loading from "dan-components/Loading";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import { onTableStateChange } from "../../../utils/helpers";
@@ -159,8 +159,8 @@ function ScheduledMessages({
     count:meta?.scheduledMessages?.count,
     download: false,
     print: false,
-    rowsPerPage: 10,
-    rowsPerPageOptions: [10, 25, 50, 100],
+    rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+    rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
     onRowsDelete: (rowsDeleted) => {
       const idsToDelete = rowsDeleted.data;
       toggleDeleteConfirmation({

@@ -84,7 +84,8 @@ class EditTeam extends Component {
   static getDerivedStateFromProps(props, state) {
     var { match, communities, teams, teamsInfos, location, auth } = props;
     const { id } = match.params;
-    const isSuperAdmin = auth?.is_super_admin && !auth?.is_community_admin;
+    //const isSuperAdmin = auth?.is_super_admin && !auth?.is_community_admin;
+    const isSuperAdmin = auth?.is_super_admin;
     communities = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
@@ -112,6 +113,7 @@ class EditTeam extends Component {
     });
     return { team, formJson, parentTeamOptions, mounted: true };
   }
+  
   async componentDidMount() {
     const { id } = this.props.match.params;
     const { addTeamInfoToHeap, teamsInfos,heap } = this.props;

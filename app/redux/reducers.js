@@ -67,6 +67,8 @@ import app, {
   setGalleryMetadataReducer,
   reducerForScheduledMessages,
   reducerForAddingBlobString,
+  reducerForCommunityNudgeSettings,
+  reducerForCommunityFeatureActivation,
 } from "./modules/appReducer";
 
 /**
@@ -136,8 +138,10 @@ export default function createReducer(injectedReducers = {}) {
     paginationMetaData: allMetaDataReducer, // stores pagination data for all tables
     imageBeingEdited: setImageForEditReducer, // This is what holds  the image whose details are being edited in the mlibrary modal
     otherAdmins: reducerForLoadingOtherAdmins, // If a user is admin of multiple communities, other admins in each of their communities will be grouped here (Used in the Media Library Modal)
-    scheduledMessages:reducerForScheduledMessages,
+    scheduledMessages: reducerForScheduledMessages,
     blobTray: reducerForAddingBlobString, // When base64 image data is retrieved from the B.E with media Id, its kept here. To avoid re-running requests that have already happened before
+    communityNudgeSettings: reducerForCommunityNudgeSettings , // We dont want to always be loading the nudge settings list on the "notification-control" for the same community more than once. So after the first time, it is stashed here
+    featureActivationsForCommunities: reducerForCommunityFeatureActivation
   });
 
   // Wrap the root reducer and return a new root reducer with router state

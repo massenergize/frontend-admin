@@ -1,12 +1,8 @@
-name: Build and Deploy to Netlify CI/CD
+name: Build and Deploy to Netlify
 on:
-  push:
-    tags:
-      - 'dev@[0-9]+.[0-9]+.[0-9]+'
-      - 'prod@[0-9]+.[0-9]+.[0-9]+'
-      - 'canary@[0-9]+.[0-9]+.[0-9]+'
+    release:
+      types: [published]
 jobs:
-    
   build-and-deploy:
     runs-on: ubuntu-latest
     strategy:
@@ -14,8 +10,6 @@ jobs:
         node-version: [16.x]
     environment:
       name: Production
-
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -23,11 +17,16 @@ jobs:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
-         node-version: ${{ matrix.node-version }}
+          node-version: ${{ matrix.node-version }}
 
+      - name: Read old BUILD_VERSION from config.json
+        run: |
+          OLD_VERSION=$(jq -r '.BUILD_VERSION' app/config/config.json)
+          echo "Github ref: $GITHUB_REF"
+          echo "Old BUILD_VERSION: $OLD_VERSION"
 
-      - name: Set Prod Environment Variables 🚀
-        if: ${{  github.event.base_ref == 'refs/heads/master' || github.event.base_ref == 'refs/heads/canary' }}
+      - name: Set Prod/Canary Environment Variables 🚀
+        if: startsWith(github.ref, 'refs/tags/master') || startsWith(github.ref, 'refs/tags/canary')
         run: |
             echo "Setting prod branch secrets..."
             echo "REACT_APP_SENTRY_DSN=${{ secrets.PROD_REACT_APP_SENTRY_DSN }}" >> $GITHUB_ENV
@@ -40,9 +39,9 @@ jobs:
             echo "REACT_APP_FIREBASE_MEASUREMENT_ID=${{ secrets.PROD_REACT_APP_FIREBASE_MEASUREMENT_ID }}" >> $GITHUB_ENV
             echo "REACT_APP_FIREBASE_PROJECT_ID=${{ secrets.PROD_REACT_APP_FIREBASE_PROJECT_ID }}" >> $GITHUB_ENV
             echo "REACT_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.PROD_REACT_APP_FIREBASE_AUTH_DOMAIN }}" >> $GITHUB_ENV
-
+    
       - name: Set Dev Environment Variables 🚀
-        if: ${{github.event.base_ref == 'refs/heads/development' }}
+        if:  startsWith(github.ref, 'refs/tags/development') 
         run: |
             echo "Setting Development branch secrets..."
             echo "Using repository secrets for $BRANCH branch..."
@@ -54,16 +53,17 @@ jobs:
             echo "REACT_APP_FIREBASE_APP_ID=${{ secrets.REACT_APP_FIREBASE_APP_ID }}" >> $GITHUB_ENV
             echo "REACT_APP_FIREBASE_PROJECT_ID=${{ secrets.REACT_APP_FIREBASE_PROJECT_ID }}" >> $GITHUB_ENV
             echo "REACT_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}" >> $GITHUB_ENV
-
+  
       - name: Install dependencies  
         run: |
-            npm  i --legacy-peer-deps
+              npm  i --legacy-peer-deps
+      
       - name: Build App 🏗
         run: |
             make build
-      
+        
       - name: Deploying to Prod 🚀 
-        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'prod') && github.event.base_ref == 'refs/heads/master'
+        if:  startsWith(github.ref, 'refs/tags/master') 
         uses: data-intuitive/netlify-deploy-site@v1
         with:
           auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
@@ -74,7 +74,7 @@ jobs:
     
       
       - name: Deploying to Canary 🚀
-        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'canary') && github.event.base_ref == 'refs/heads/canary'
+        if: startsWith(github.ref, 'refs/tags/canary') 
         uses: data-intuitive/netlify-deploy-site@v1
         with:
           auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
@@ -83,9 +83,8 @@ jobs:
           prod: true
           message: 'Deploying ${{ github.ref }}'
 
-          
       - name: Deploying  to Dev 🚀
-        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'dev') && github.event.base_ref == 'refs/heads/development'
+        if: startsWith(github.ref, 'refs/tags/development') 
         uses: data-intuitive/netlify-deploy-site@v1
         with:
           auth: ${{ secrets.NETLIFY_AUTH_TOKEN }}
@@ -94,13 +93,20 @@ jobs:
           prod: true
           message: 'Deploying ${{ github.ref }}'
 
-      - name: Report status to Slack 📢
+
+      - name: Report status to Slack
+        if: always()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          MESSAGE="Workflow *${{ github.ref}}* has completed with status: *${{ job.status }}*"
+          BRANCH_NAME=$(echo $GITHUB_REF | awk -F'/' '{print $3}')
+          BUILD_VERSION=$(jq -r '.BUILD_VERSION' < app/config/config.json)
+          MESSAGE="Workflow in $BRANCH_NAME with build version : $BUILD_VERSION has completed with status: *${{ job.status }}*"
+          STATUS_EMOJI=":white_check_mark:"  # Use appropriate emoji for success status
+          if [[ "${{ job.status }}" != "success" ]]; then
+            STATUS_EMOJI=":x:"  # Use appropriate emoji for failure status
+          fi
+          MESSAGE="Deployment workflow in $BRANCH_NAME with build number $BUILD_VERSION has completed with status: $STATUS_EMOJI ${{ job.status }}"          
           PAYLOAD="{\"text\": \"$MESSAGE\"}"
           curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_WEBHOOK_URL
-
-
-
+    

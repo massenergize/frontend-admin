@@ -25,6 +25,7 @@ import { isEmpty } from "../../../utils/common";
 import Loader from "../../../utils/components/Loader";
 import Seo from "../../../components/Seo/Seo";
 import CustomOptions from "../ME  Tools/table /CustomOptions";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
 
 class AllSubscribers extends React.Component {
   constructor(props) {
@@ -212,8 +213,8 @@ class AllSubscribers extends React.Component {
       responsive: "standard",
       print: true,
       count: metaData && metaData.count,
-      rowsPerPage: 25,
-      rowsPerPageOptions: [10, 25, 100],
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
       confirmFilters: true,
       customSearchRender: (searchText, handleSearch, hideSearch, options) => (
         <SearchBar

@@ -4,11 +4,14 @@ import { connect, useSelector } from "react-redux";
 import { bindActionCreators } from "redux";
 
 function Feature({ name, fallback, children, auth, communities }) {
+  communities = communities || useSelector((state) => state.getIn(["communities"]));
   const [flag, setFlag] = useState();
+  const communityList = useSelector((state) => state.getIn(["communities"]));
 
   useEffect(() => {
-    const cf = ((communities || []).map((c) => c.feature_flags) || []).flat(); // Community Flags
-    const uf = (auth || {}).feature_flags || []; // User Flags
+    communities = communities || communityList;
+    const cf = ((communities || []).map((c) => c?.feature_flags) || []).flat(); // Community Flags
+    const uf = (auth || {})?.feature_flags || []; // User Flags
     const together = [...cf, ...uf];
     let flags = [];
     const track = [];
@@ -29,8 +32,8 @@ function Feature({ name, fallback, children, auth, communities }) {
 
 const mapStateToProps = (state) => {
   return {
-    communities: state.getIn(["communities"]),
-    auth: state.getIn(["auth"]),
+    // communities: state.getIn(["communities"]),
+    auth: state.getIn(["auth"])
   };
 };
 
