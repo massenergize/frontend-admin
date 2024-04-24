@@ -3,27 +3,16 @@ import { useState } from "react";
 import { connect, useSelector } from "react-redux";
 import { bindActionCreators } from "redux";
 
-function Feature({ name, fallback, children, auth, communities }) {
-  communities = communities || useSelector((state) => state.getIn(["communities"]));
-  const [flag, setFlag] = useState();
-  const communityList = useSelector((state) => state.getIn(["communities"]));
+function Feature({ name, fallback, children, auth }) {
+  const communityFeatureFlags = useSelector((state) => state.getIn(["communityFeatureFlags"]));
+  const loggedInUserFeatureFlags = (auth || {})?.feature_flags || [];
 
-  useEffect(() => {
-    communities = communities || communityList;
-    const cf = ((communities || []).map((c) => c?.feature_flags) || []).flat(); // Community Flags
-    const uf = (auth || {})?.feature_flags || []; // User Flags
-    const together = [...cf, ...uf];
-    let flags = [];
-    const track = [];
-    for (let f of together) {
-      if (!track.includes(f?.id)) {
-        flags.push(f);
-        track.push(f?.id);
-      }
-    }
-    let flag = (flags || []).find((f) => f?.key === name);
-    setFlag(flag);
-  }, [communities]);
+  let flags = [...loggedInUserFeatureFlags, ...(communityFeatureFlags || [])];
+  flags = Array.from(new Set(flags.map(flag => JSON.stringify(flag)))).map(flag => JSON.parse(flag));
+
+  const flag = (flags || []).find((f) => f?.key === name);
+
+  if (auth.is_super_admin) return children;
 
   if (flag) return children;
   if (fallback) return fallback;

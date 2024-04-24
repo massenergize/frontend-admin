@@ -60,8 +60,8 @@ import {
   LOAD_SCHEDULED_MESSAGES,
   ADD_BLOB_STRING,
   KEEP_COMMUNITY_NUDGE_SETTINGS,
-  KEEP_FEATURE_ACTIVATIONS_FOR_COMMUNITY,
-} from "../ReduxConstants";
+  KEEP_FEATURE_ACTIVATIONS_FOR_COMMUNITY, SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX,
+} from '../ReduxConstants';
 
 const initialState = Map({
   constants: {},
@@ -560,6 +560,15 @@ export const allTasksReducer = (state = [], action = {}) => {
 export const allMetaDataReducer = (state = {}, action = {}) => {
   switch (action.type) {
     case LOAD_ALL_META_DATA:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
+export const saveCommunityFeatureFlagsReducer = (state = [], action = {}) => {
+  switch (action.type) {
+    case SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX:
       return action.payload;
     default:
       return state;
