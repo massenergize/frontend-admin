@@ -102,6 +102,7 @@ const createFormJson = ({ communities, autoOpenMediaLibrary, parents, setParents
     displayName: c.name,
     id: "" + c.id,
   }));
+  console.log("Lets see communities", communities)
 
   const fetchAllTeamsInSelectedCommunities = (communityID) => {
     const args = communityID ? { community_id: communityID, } : {};
@@ -165,6 +166,7 @@ const createFormJson = ({ communities, autoOpenMediaLibrary, parents, setParents
             dbName: "communities",
             data: communities,
             isAsync: true,
+            // isAsync: isSuperAdmin,
             endpoint: isSuperAdmin
               ? "/communities.listForSuperAdmin"
               : "/communities.listForCommunityAdmin",
