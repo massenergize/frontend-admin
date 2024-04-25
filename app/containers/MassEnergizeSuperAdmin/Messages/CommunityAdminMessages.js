@@ -41,6 +41,7 @@ import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import { renderInvisibleChips } from "../ME  Tools/table /utils";
 import Seo from "../../../../app/components/Seo/Seo";
 import CustomOptions from "../ME  Tools/table /CustomOptions";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
 
 export const replyToMessage = ({ pathname, props, transfer }) => {
   // const pathname = `/admin/edit/${id}/message`;
@@ -348,8 +349,8 @@ class AllCommunityAdminMessages extends React.Component {
       responsive: "standard",
       count: metaData && metaData.count,
       print: true,
-      rowsPerPage: 25,
-      rowsPerPageOptions: [10, 25, 100],
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
       confirmFilters: true,
       onTableChange: (action, tableState) =>
         onTableStateChange({

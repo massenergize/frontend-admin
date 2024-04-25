@@ -17,6 +17,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Typography } from '@mui/material';
 import Seo from '../../../components/Seo/Seo';
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
 
 
 class AllCarbonEquivalencies extends React.Component {
@@ -140,8 +141,8 @@ class AllCarbonEquivalencies extends React.Component {
       filterType: "dropdown",
       responsive: "standard",
       print: true,
-      rowsPerPage: 25,
-      rowsPerPageOptions: [10, 25, 100],
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({

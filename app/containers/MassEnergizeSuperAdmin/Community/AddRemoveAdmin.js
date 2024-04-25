@@ -8,7 +8,7 @@ import MassEnergizeForm from "../_FormGenerator";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { reduxLoadAdmins } from "../../../redux/redux-actions/adminActions";
-import { LOADING } from "../../../utils/constants";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS, LOADING } from '../../../utils/constants';
 import Loading from "dan-components/Loading";
 import MEChip from "../../../components/MECustom/MEChip";
 import Seo from "../../../components/Seo/Seo";
@@ -185,8 +185,8 @@ class AddRemoveAdmin extends Component {
       filterType: "dropdown",
       responsive: "standard",
       print: true,
-      rowsPerPage: 25,
-      rowsPerPageOptions: [10, 25, 100],
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         const { pathname } = window.location;

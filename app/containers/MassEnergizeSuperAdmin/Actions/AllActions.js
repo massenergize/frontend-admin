@@ -50,6 +50,7 @@ import Loader from "../../../utils/components/Loader";
 import PeopleIcon from "@mui/icons-material/People";
 import Seo from '../../../../app/components/Seo/Seo'
 import CustomOptions from "../ME  Tools/table /CustomOptions";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
 
 class AllActions extends React.Component {
   constructor(props) {
@@ -222,7 +223,7 @@ class AllActions extends React.Component {
               label:"community",
               endpoint:"/communities.listForSuperAdmin"
             })
-          : 
+          :
           {
               filter: true,
               filterType: "multiselect",
@@ -529,9 +530,9 @@ class AllActions extends React.Component {
       filterType: "dropdown",
       responsive: "standard",
       print: true,
-      rowsPerPage: 25,
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
       count: metaData && metaData.count,
-      rowsPerPageOptions: [10, 25, 100],
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
       confirmFilters: true,
       onTableChange: (action, tableState) =>
         onTableStateChange({

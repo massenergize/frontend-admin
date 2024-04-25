@@ -49,11 +49,12 @@ function MediaLibraryModal({
   notification,
   setNotification,
   renderOnFooter,
+  previews, 
+  setPreviews
 }) {
   // const [currentTab, setCurrentTab] = useState(defaultTab);
   const [showSidePane, setShowSidePane] = useState(false);
-  const [previews, setPreviews] = useState([]);
-
+ 
   const [content, setSelectedContent] = useState(selected); // all the selected items from library will always be available in an array here
   const [state, setState] = useState({ uploading: uploading }); // this value is controlled both externally, and internally by the Mlibrary itself
   const [loadingMore, setLoadingMore] = useState(false);
@@ -96,15 +97,7 @@ function MediaLibraryModal({
   };
   const handleUpload = () => {
     if (!onUpload) return;
-    // setState((prev) => ({ ...prev, uploading: true }));
     onUpload(gatherUtils());
-    // onUpload(
-    //   clean(files),
-    //   reset,
-    //   close,
-    //   setCurrentTab,
-    // quickReturn && returnRightAfterUpload;
-    // );
   };
 
   const handleInsert = (_content, reset) => {
@@ -119,12 +112,6 @@ function MediaLibraryModal({
     setCroppedSource(null);
     setCropped({});
   };
-
-  // const fireLoadMoreFunction = () => {
-  //   if (!loadMoreFunction) return;
-  //   setLoadingMore(true);
-  //   loadMoreFunction(() => setLoadingMore(false), close);
-  // };
 
   const customName = (key, _default) => {
     const modifier = (tabModifiers || {})[key];
@@ -248,8 +235,8 @@ function MediaLibraryModal({
   };
 
   const tabComponent = Tabs.find((tab) => tab.key === currentTab)?.component;
-  const last = content.length - 1;
-  const activeImage = (content || [])[last]; // if multiple selection is active, just show the last selected item in the side pane
+  // const last = content.length - 1;
+  const activeImage = (content || [])[0]; // if multiple selection is active, just show the first selected item in the side pane (cos the latest items are always added to the top of the list, check Library.js [handleSelection] fxn)
 
   return (
     <React.Fragment>

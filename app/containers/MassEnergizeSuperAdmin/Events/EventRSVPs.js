@@ -19,6 +19,7 @@ import styles from "../../../components/Widget/widget-jss";
 import { apiCall } from "../../../utils/messenger";
 import { Paper } from "@mui/material";
 import Seo from "../../../components/Seo/Seo";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
 
 function TabContainer(props) {
   const { children } = props;
@@ -133,8 +134,8 @@ class EventRSVPs extends React.Component {
       filterType: "dropdown",
       responsive: "standard",
       print: true,
-      rowsPerPage: 25,
-      rowsPerPageOptions: [10, 25, 100],
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         idsToDelete.forEach((d) => {

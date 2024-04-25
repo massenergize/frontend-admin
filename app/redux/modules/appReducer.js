@@ -57,7 +57,11 @@ import {
   LOAD_OTHER_ADMINS,
   SET_MEDIA_LIBRARY_MODAL_FILTERS,
   SET_GALLERY_META_DATA,
-} from "../ReduxConstants";
+  LOAD_SCHEDULED_MESSAGES,
+  ADD_BLOB_STRING,
+  KEEP_COMMUNITY_NUDGE_SETTINGS,
+  KEEP_FEATURE_ACTIVATIONS_FOR_COMMUNITY, SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX,
+} from '../ReduxConstants';
 
 const initialState = Map({
   constants: {},
@@ -85,6 +89,14 @@ export default function reducer(state = initialImmutableState, action = {}) {
   }
 }
 
+export const reducerForAddingBlobString = (state = {}, action = {}) => {
+  switch (action.type) {
+    case ADD_BLOB_STRING:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForUserActiveStatus = (state = false, action = {}) => {
   switch (action.type) {
     case LOAD_USER_ACTIVE_STATUS:
@@ -112,6 +124,14 @@ export const reducerForVisitLogs = (state = null, action = {}) => {
 export const reducerForActionEngagements = (state = LOADING, action = {}) => {
   switch (action.type) {
     case ACTION_ENGAGMENTS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForScheduledMessages = (state = LOADING, action = {}) => {
+  switch (action.type) {
+    case LOAD_SCHEDULED_MESSAGES:
       return action.payload;
     default:
       return state;
@@ -179,6 +199,22 @@ export const reducerForKeepingFormContent = (state = {}, action = {}) => {
 export const reducerForAdminActivities = (state = LOADING, action = {}) => {
   switch (action.type) {
     case LOAD_ADMIN_ACTIVITIES:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForCommunityNudgeSettings = (state = {}, action = {}) => {
+  switch (action.type) {
+    case KEEP_COMMUNITY_NUDGE_SETTINGS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForCommunityFeatureActivation = (state = {}, action = {}) => {
+  switch (action.type) {
+    case KEEP_FEATURE_ACTIVATIONS_FOR_COMMUNITY:
       return action.payload;
     default:
       return state;
@@ -524,6 +560,15 @@ export const allTasksReducer = (state = [], action = {}) => {
 export const allMetaDataReducer = (state = {}, action = {}) => {
   switch (action.type) {
     case LOAD_ALL_META_DATA:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
+export const saveCommunityFeatureFlagsReducer = (state = [], action = {}) => {
+  switch (action.type) {
+    case SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX:
       return action.payload;
     default:
       return state;

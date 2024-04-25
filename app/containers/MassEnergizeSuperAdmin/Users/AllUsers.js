@@ -46,6 +46,7 @@ import { getData } from "../Messages/CommunityAdminMessages";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import Seo from "../../../components/Seo/Seo";
 import CustomOptions from "../ME  Tools/table /CustomOptions";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
 
 class AllUsers extends React.Component {
   constructor(props) {
@@ -372,8 +373,8 @@ class AllUsers extends React.Component {
       customSort: this.customSort,
       print: true,
       count: metaData && metaData.count,
-      rowsPerPage: 25,
-      rowsPerPageOptions: [10, 25, 100],
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
       confirmFilters: true,
       // When there is time, we need to think of a way to implement this in MEDatatable itself, so we dont have to repeat this
       onTableChange: (action, tableState) =>

@@ -2,6 +2,20 @@ import React from "react";
 import Loading from "dan-components/Loading";
 import loadable from "../utils/loadable";
 
+export const NudgeControlPage = loadable(
+  () => import("./MassEnergizeSuperAdmin/Pages/NudgeControlPage"),
+  {
+    fallback: <Loading />,
+  }
+);
+export const PlatformFeaturesPage = loadable(
+  () => import("./MassEnergizeSuperAdmin/Pages/PlatformFeaturesPage"),
+  {
+    fallback: <Loading />,
+  }
+);
+
+
 export const TermsOfServicePage = loadable(
   () => import("./MassEnergizeSuperAdmin/Policies/views/ViewFullPolicy"),
   {
@@ -503,3 +517,16 @@ export const ListTasks = loadable(
     fallback: <Loading />,
   }
 );
+export const SendMessage = loadable(
+  () => import("./MassEnergizeSuperAdmin/Messages/SendMessage"),
+  {
+    fallback: <Loading />,
+  }
+);
+export const ScheduledMessages = loadable(
+         () =>
+           import("./MassEnergizeSuperAdmin/Messages/ScheduledMessages"),
+         {
+           fallback: <Loading />,
+         }
+       );

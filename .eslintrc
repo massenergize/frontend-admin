@@ -10,6 +10,21 @@
   },
   "parser": "babel-eslint",
   "rules": {
+    "no-trailing-spaces": "off",
+    "react/jsx-wrap-multilines": "off",
+    "react/jsx-one-expression-per-line": "off",
+    "react/no-unescaped-entities": "off",
+    "no-use-before-define": "off",
+    "react/no-unused-state": "off",
+    "no-shadow": "off",
+    "react/no-array-index-key": "off",
+    "avoidEscape": true, // Turns off the warning for using backticks in strings
+    "no-param-reassign": "off",
+    "quotes": "off",
+    "class-methods-use-this": "off",
+    "camelcase": "off",
+    "react/destructuring-assignment": 0,
+    "consistent-return": 0,
     "no-plusplus": "off",
     "no-nested-ternary": 0,
     "import/no-unresolved": 0,
@@ -33,9 +48,11 @@
     "react/forbid-prop-types": 0,
     "jsx-a11y/href-no-hash": "off",
     "function-paren-newline": 0,
+    "react/sort-comp": 0,
     "react/no-typos": 0,
     "jsx-a11y/anchor-is-valid": 0,
-    "react/default-props-match-prop-types": 0,
+    "react/default-props-match-prop-types": 0, // Turns off the warning for default props not matching prop types
+    "react/prop-types": 0,
     "arrow-parens": 0,
     "jsx-a11y/label-has-for": [ 2, {
         "required": {

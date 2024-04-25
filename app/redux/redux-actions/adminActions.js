@@ -56,7 +56,11 @@ import {
   LOAD_OTHER_ADMINS,
   SET_MEDIA_LIBRARY_MODAL_FILTERS,
   SET_GALLERY_META_DATA,
-} from "../ReduxConstants";
+  LOAD_SCHEDULED_MESSAGES,
+  ADD_BLOB_STRING,
+  KEEP_COMMUNITY_NUDGE_SETTINGS,
+  KEEP_FEATURE_ACTIVATIONS_FOR_COMMUNITY, SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX,
+} from '../ReduxConstants';
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
 import {
@@ -179,6 +183,9 @@ export const setupSocketConnectionWithBackend = (auth) => (
   connectSocket();
 };
 
+export const reduxAddBlobString = (data) => {
+  return { type: ADD_BLOB_STRING, payload: data };
+};
 export const setGalleryMetaAction = (data) => {
   return { type: SET_GALLERY_META_DATA, payload: data };
 };
@@ -217,6 +224,12 @@ export const loadUserEngagements = (data) => {
 };
 export const setEngagementOptions = (data) => {
   return { type: SET_ENGAGMENT_OPTIONS, payload: data };
+};
+export const reduxKeepCommunityNudgeSettings = (data) => {
+  return { type: KEEP_COMMUNITY_NUDGE_SETTINGS, payload: data };
+};
+export const reduxKeepFeatureActivations = (data) => {
+  return { type: KEEP_FEATURE_ACTIVATIONS_FOR_COMMUNITY, payload: data };
 };
 
 export const fetchLatestNextSteps = (cb) => (dispatch) => {
@@ -400,6 +413,8 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     isSuperAdmin && apiCall("/featureFlags.listForSuperAdmins"),
     apiCall("/communities.others.listForCommunityAdmin", { limit: 50 }),
     apiCall("/summary.next.steps.forAdmins"),
+    apiCall("/messages.listScheduled"),
+    apiCall("/communities.features.flags.list", {})
   ]).then((response) => {
     const [
       policies,
@@ -422,6 +437,8 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       featureFlags,
       otherCommunities,
       adminNextSteps,
+      scheduledMessages,
+      communityFeatureFlagsResponse,
     ] = response;
     dispatch(loadAllPolicies(policies.data));
     dispatch(reduxLoadAllCommunities(communities.data));
@@ -450,6 +467,8 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadFeatureFlags(featureFlags.data || {}));
     dispatch(reduxLoadAllOtherCommunities(otherCommunities.data));
     dispatch(reduxLoadNextStepsSummary(adminNextSteps.data));
+    dispatch(reduxLoadScheduledMessages(scheduledMessages.data));
+    dispatch(saveCommunityFeatureFlagsAction(communityFeatureFlagsResponse.data));
     const cursor = {
       communities: communities.cursor,
       actions: actions.cursor,
@@ -464,6 +483,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       otherCommunities: otherCommunities.cursor,
       testimonials: testimonials.cursor,
       policies: policies.cursor,
+      scheduledMessages: scheduledMessages.cursor,
     };
     dispatch(reduxLoadMetaDataAction(cursor));
   });
@@ -495,6 +515,10 @@ export const loadFeatureFlags = (data = LOADING) => ({
   type: LOAD_FEATURE_FLAGS,
   payload: data,
 });
+export const reduxLoadScheduledMessages = (data = LOADING) => ({
+         type: LOAD_SCHEDULED_MESSAGES,
+         payload: data,
+       });
 export const reduxToggleUniversalModal = (data = {}) => ({
   type: TOGGLE_UNIVERSAL_MODAL,
   payload: data,
@@ -1020,6 +1044,12 @@ export const loadTaskFunctionsAction = (data = []) => {
 export const loadTasksAction = (data = []) => {
   return {
     type: LOAD_ALL_TASKS,
+    payload: data,
+  };
+};
+export const saveCommunityFeatureFlagsAction = (data = []) => {
+  return {
+    type: SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX,
     payload: data,
   };
 };

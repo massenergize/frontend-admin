@@ -19,6 +19,7 @@ import PauseOutlinedIcon from "@mui/icons-material/PauseOutlined";
 import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
 import { Link } from "react-router-dom";
 import Seo from "../../../components/Seo/Seo";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
 class AllTasks extends React.Component {
   constructor(props) {
     super(props);
@@ -269,8 +270,8 @@ class AllTasks extends React.Component {
       filterType: "dropdown",
       responsive: "standard",
       print: true,
-      rowsPerPage: 30,
-
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
       onRowsDelete: (rowsDeleted) => {
         const idsToDelete = rowsDeleted.data;
         this.props.toggleDeleteConfirmation({

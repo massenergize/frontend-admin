@@ -1,5 +1,6 @@
 import { IS_CANARY, IS_LOCAL, IS_PROD } from "../config/constants";
 import { apiCall } from "./messenger";
+import { DEFAULT_ITEMS_PER_PAGE } from './constants';
 const TABLE_PROPERTIES = "_TABLE_PROPERTIES";
 const FILTERS = "_FILTERS";
 
@@ -11,7 +12,7 @@ export const getSearchText = (key) => {
 export const getLimit = (key) => {
   var tableProp = localStorage.getItem(key + TABLE_PROPERTIES);
   tableProp = JSON.parse(tableProp || null) || {};
-  return (tableProp && tableProp.rowsPerPage) || 50;
+  return (tableProp && tableProp.rowsPerPage) || DEFAULT_ITEMS_PER_PAGE;
 };
 export const getFilterParamsFromLocalStorage = (key) => {
   var tableProp = localStorage.getItem("MAIN_FILTER_OBJECT");

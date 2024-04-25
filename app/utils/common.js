@@ -20,9 +20,7 @@ export const getHumanFriendlyDateRange = (startDate, endDate) => {
     const formattedStart = start.format("h:mm A");
     const formattedEnd = end.format("h:mm A");
 
-    const formattedRange = `${start.format(
-      "Do MMMM YYYY"
-    )} from ${formattedStart} to ${formattedEnd}`;
+    const formattedRange = `${start.format("Do MMMM YYYY")} from ${formattedStart} to ${formattedEnd}`;
     return formattedRange;
   } else {
     const formattedStart = start.format("Do MMMM YYYY");
@@ -63,60 +61,67 @@ export const separate = (ids, dataSet = [], options = {}) => {
     if (ids.includes(value)) {
       found.push(value);
       itemObjects.push(d);
-    } else remainder.push(d);
+    } else {
+      remainder.push(d);
+    }
   }
   notFound = ids.filter((id) => !found.includes(id));
   return {
     found, // Found locally
     notFound, // Not found locally
     remainder, // Just the general remaining items from the datasource
-    itemObjects, // Full objects of items that were found
+    itemObjects // Full objects of items that were found
   };
 };
+
 export function makeDeleteUI({ idsToDelete, templates }) {
   const len = (idsToDelete && idsToDelete.length) || 0;
   var text = `Are you sure you want to delete (
     ${(idsToDelete && idsToDelete.length) || ""})
     ${len === 1 ? " event? " : " events? "}`;
 
-  if (templates && templates.length)
+  if (templates && templates.length) {
     text = `Sorry, (${templates.length}) template${
       templates.length === 1 ? "" : "s"
     } selected. You can't delete templates. `;
+  }
   return <Typography>{text}</Typography>;
 }
 
 export const objArrayToString = (data, func) => {
   var s = "";
   (data || []).forEach((d, index) => {
-    if (!s) s += func(d);
-    else s += ", " + func(d);
+    if (!s) {
+      s += func(d);
+    } else {
+      s += ", " + func(d);
+    }
   });
   return s;
 };
 export const makeLimitsFromImageArray = (images) => {
-  if (images.length === 1)
+  if (images.length === 1) {
     return {
       lower_limit: images[0].id,
       upper_limit: images[0].id,
-      images,
+      images
     };
+  }
   images = images.sort((a, b) => (a.id > b.id ? 1 : -1));
   return {
     lower_limit: images[0].id || 0,
     upper_limit: images[images.length - 1].id || 0,
-    images: images || [],
+    images: images || []
   };
 };
-export const getHumanFriendlyDate = (
-  dateString,
-  includeTime = false,
-  forSorting = true
-) => {
+export const getHumanFriendlyDate = (dateString, includeTime = false, forSorting = true) => {
   if (!dateString) return null;
   var format = "";
-  if (forSorting) format = `YYYY-MM-DD ${includeTime ? "hh:mm a" : ""}`;
-  else format = `MMMM Do, YYYY ${includeTime ? "hh:mm a" : ""}`;
+  if (forSorting) {
+    format = `YYYY-MM-DD ${includeTime ? "hh:mm a" : ""}`;
+  } else {
+    format = `MMMM Do, YYYY ${includeTime ? "hh:mm a" : ""}`;
+  }
   return moment(dateString).format(
     // make it a bit less human friendly, so it sorts properly
     format
@@ -146,8 +151,11 @@ export const pop = (arr = [], value, finder) => {
   var found = null;
   arr.forEach((item) => {
     const val = finder ? finder(item) : item;
-    if (val?.toString() === value.toString()) found = item;
-    else rest.push(item);
+    if (val?.toString() === value?.toString()) {
+      found = item;
+    } else {
+      rest.push(item);
+    }
   });
 
   return [found, rest];
@@ -158,12 +166,16 @@ export const findMatchesAndRest = (arr = [], finder) => {
   const rest = [];
   const found = [];
   arr.forEach((item) => {
-    if (finder(item)) found.push(item);
-    else rest.push(item);
+    if (finder(item)) {
+      found.push(item);
+    } else {
+      rest.push(item);
+    }
   });
 
   return [found, rest];
 };
+
 export function notNull(d) {
   try {
     return d && d !== "null" && d.trim() !== "";
@@ -189,13 +201,12 @@ export function getAddress(d) {
       notNull(d.state) &&
       notNull(d.zipcode) &&
       notNull(d.country))
-  )
+  ) {
     return "No Address Provided";
-  return `${notNull(d.address) ? d.address + ", " : ""}${
-    notNull(d.unit) ? d.unit + ", " : ""
-  }${notNull(d.city) ? d.city + ", " : ""}${
-    notNull(d.state) ? d.state + ", " : ""
-  }${notNull(d.zipcode) ? d.zipcode + ", " : ""}${
+  }
+  return `${notNull(d.address) ? d.address + ", " : ""}${notNull(d.unit) ? d.unit + ", " : ""}${
+    notNull(d.city) ? d.city + ", " : ""
+  }${notNull(d.state) ? d.state + ", " : ""}${notNull(d.zipcode) ? d.zipcode + ", " : ""}${
     notNull(d.country) ? d.country : ""
   }`;
 }
@@ -222,7 +233,7 @@ export const getUrlParamsForFilterInputs = (filterChoices) => {
 export const getFilterInputsFromURL = (location) => {
   if (!location || !location.search) return "";
   const { filterInputs } = qs.parse(location.search, {
-    ignoreQueryPrefix: true,
+    ignoreQueryPrefix: true
   });
   return filterInputs;
 };
@@ -231,9 +242,18 @@ export const ourCustomSort = ({ a, b, colIndex, order, compare }) => {
   const directionConstant = order === "desc" ? 1 : -1;
   a = a.data[colIndex];
   b = b.data[colIndex];
-  if (compare) return compare({ a, b }) * directionConstant;
-  if (typeof a === "string" && typeof b === "string") // Forcing comparison to be done in lowercase when dealing with strings otherwise results will be off
+  if (compare) {
+    return (
+      compare({
+        a,
+        b
+      }) * directionConstant
+    );
+  }
+  if (typeof a === "string" && typeof b === "string") {
+    // Forcing comparison to be done in lowercase when dealing with strings otherwise results will be off
     return (a.toLowerCase() < b.toLowerCase() ? -1 : 1) * directionConstant;
+  }
   return (a < b ? -1 : 1) * directionConstant;
 };
 
@@ -246,7 +266,7 @@ export const getTimeStamp = () => {
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    second: "2-digit",
+    second: "2-digit"
   };
 
   return Intl.DateTimeFormat("en-US", options).format(newDate);
@@ -274,7 +294,10 @@ export const fetchParamsFromURL = (location, paramName, names) => {
     {
       params,
       [paramName]: value,
-      rest: { object: obj, qs: qs.stringify(obj) || "" },
+      rest: {
+        object: obj,
+        qs: qs.stringify(obj) || ""
+      }
     } || {}
   );
 };
@@ -286,26 +309,17 @@ export const removePageProgressFromStorage = (key) => {
   localStorage.setItem(ME_FORM_PROGRESS, JSON.stringify(progress));
 };
 /**
-   * 
-   * This function takes a list of ids of items(msgs, actions, testimonials etc.) that need attending to and matches it against the data source, 
-   * to find out which of the items are available locally, and which ones need to be fetched.
-   * If all items are available locally, nothing happens. 
-   * If not, it fetches all the items not found and appends it to the main data source. 
-   * 
-   * This fxn helps arrange data properly so that when admins click from their dashboard to see 
-   * "15" unanswered messages, all and only the unanswered messages will show up in the table, to make things easier.
-   
-   */
-export const reArrangeForAdmin = ({
-  dataSource,
-  props,
-  apiURL,
-  fieldKey,
-  reduxFxn,
-  separationOptions,
-  args,
-  cb,
-}) => {
+ *
+ * This function takes a list of ids of items(msgs, actions, testimonials etc.) that need attending to and matches it against the data source,
+ * to find out which of the items are available locally, and which ones need to be fetched.
+ * If all items are available locally, nothing happens.
+ * If not, it fetches all the items not found and appends it to the main data source.
+ *
+ * This fxn helps arrange data properly so that when admins click from their dashboard to see
+ * "15" unanswered messages, all and only the unanswered messages will show up in the table, to make things easier.
+
+ */
+export const reArrangeForAdmin = ({ dataSource, props, apiURL, fieldKey, reduxFxn, separationOptions, args, cb }) => {
   const _sort = (a, b) => (b.id < a.id ? -1 : 1);
   const { location } = props;
   const { state } = location || {};
@@ -318,7 +332,7 @@ export const reArrangeForAdmin = ({
   if (!notFound.length) return cb && cb(); // If all items are found locally, dont go to the B.E
   apiCall(apiURL, {
     [fieldKey]: notFound,
-    ...(args || {}),
+    ...(args || {})
   }).then((response) => {
     if (response.success) data = [...response.data, ...data];
     //-- Items that were not found, have now been loaded from the B.E!
@@ -327,3 +341,69 @@ export const reArrangeForAdmin = ({
     reduxFxn(data);
   });
 };
+
+export const convertToScheduledFor = (dateTimeString) => {
+  if (!dateTimeString) return "---";
+  const inputDate = new Date(dateTimeString);
+  const currentDate = new Date();
+  let options = {
+    // year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  };
+
+  if (inputDate.toDateString() === currentDate.toDateString()) {
+    options = {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    };
+  }
+
+  return inputDate.toLocaleString("en-US", options);
+};
+
+export function findItemAtIndexAndRemainder(arr, comparator) {
+  const remainder = [];
+  let foundItem;
+  let index = -1;
+  for (let i = 0; i < arr.length; i++) {
+    const found = arr[i];
+    if (comparator && comparator(found)) {
+      foundItem = found;
+      index = i;
+    } else {
+      remainder.push(found);
+    }
+  }
+
+  return {
+    index,
+    foundItem,
+    remainder
+  };
+}
+
+export const log = (key = "Admin Log: ", ...args) => {
+  console.log(key, ...args);
+};
+
+export const arrangeInSequence = (arr, idsInSequence) => {
+  if (!arr?.length || !idsInSequence?.length) return arr || [];
+  const result = [];
+  arr?.forEach((item) => {
+    const index = idsInSequence?.indexOf(item?.id);
+    if (index > -1) {
+      result[index] = item;
+    }
+  });
+  return result;
+};
+
+export function mergeUnique(arr1, arr2, comparator) {
+  const mergedArray = [...(arr1 || []), ...(arr2 || [])];
+  return mergedArray.filter((item, index, self) => index === self.findIndex((t) => comparator(t, item)));
+}
