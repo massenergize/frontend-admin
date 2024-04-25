@@ -57,7 +57,7 @@ const NotificationChoicesOneCommunity = ({ state, handleChange, setCommunities, 
       </Typography>
       <div style={{ margin: "5px 0px", color: "black", fontWeight: "bold" }}>
         <Typography variant="p" style={{ color: "#777" }}>
-          Configure notifications to <b>{community?.name || "..."}</b>
+          Configure notifications to <b>{community?.name || "..."}</b> users for this event
         </Typography>
       </div>
       {OPTIONS.map((t) => {

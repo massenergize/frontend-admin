@@ -9,3 +9,5 @@ node_modules/
 build/
 
 .env
+.idea/workspace.xml
+.idea/

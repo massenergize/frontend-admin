@@ -106,7 +106,7 @@ jobs:
           if [[ "${{ job.status }}" != "success" ]]; then
             STATUS_EMOJI=":x:"  # Use appropriate emoji for failure status
           fi
-          MESSAGE="Deployment workflow in $BRANCH_NAME with build number $BUILD_VERSION has completed with status: $STATUS_EMOJI ${{ job.status }}"          
+          MESSAGE="Frontend Admin deployment workflow in $BRANCH_NAME with build number $BUILD_VERSION has completed with status: $STATUS_EMOJI ${{ job.status }}"          
           PAYLOAD="{\"text\": \"$MESSAGE\"}"
           curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_WEBHOOK_URL
     

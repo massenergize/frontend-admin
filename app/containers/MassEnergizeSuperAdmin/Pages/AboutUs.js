@@ -28,7 +28,7 @@ const styles = (theme) => ({
     flexDirection: "row",
   },
   buttonInit: {
-    margin: theme.spacing(4),
+    margin: theme.spacing(4) ,
     textAlign: "center",
   },
 });
@@ -65,7 +65,7 @@ class AboutUsPageEditForm extends Component {
   createFormJson = async () => {
     const { aboutUsPageData } = this.state;
     const { community } = aboutUsPageData;
-
+    const image = aboutUsPageData && aboutUsPageData.images[0] && aboutUsPageData.images[0].url;
     const formJson = {
       title: `Edit ${
         community ? community.name + "'s" : "Community's"
@@ -85,22 +85,22 @@ class AboutUsPageEditForm extends Component {
           readOnly: true,
         },
         {
-          name: "title",
-          label: "Main Title",
-          placeholder: "eg. About our community",
-          fieldType: "TextField",
-          contentType: "text",
+          name: 'title',
+          label: 'Main Title',
+          placeholder: 'eg. About our community',
+          fieldType: 'TextField',
+          contentType: 'text',
           isRequired: false,
           defaultValue: `${aboutUsPageData.title}`,
           dbName: "title",
           readOnly: false,
         },
         {
-          name: "sub-title",
-          label: "Optional Sub-title",
-          placeholder: "eg. a tagline about our community",
-          fieldType: "TextField",
-          contentType: "text",
+          name: 'sub-title',
+          label: 'Optional Sub-title',
+          placeholder: 'eg. a tagline about our community',
+          fieldType: 'TextField',
+          contentType: 'text',
           isRequired: false,
           defaultValue: `${aboutUsPageData.sub_title}`,
           dbName: "sub_title",
@@ -132,12 +132,13 @@ class AboutUsPageEditForm extends Component {
         {
           name: "image",
           placeholder: "Select an Image",
-          fieldType: fieldTypes.MediaLibrary,
-          // fieldType: "File",
+          // TODO: change to use media library (backend changes required)
+          //fieldType: fieldTypes.MediaLibrary,
+          fieldType: "File",
           dbName: "image",
           label: "Upload File",
-          // previewLink: image,
-          defaultValue: aboutUsPageData?.images,
+          previewLink: image,
+          defaultValue: image,
           allowReset: true,
           filesLimit: 1,
         },

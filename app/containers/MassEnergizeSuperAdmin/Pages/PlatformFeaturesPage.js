@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { reduxKeepFeatureActivations } from "../../../redux/redux-actions/adminActions";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import CustomPageTitle from "../Misc/CustomPageTitle";
+import GoBack from "../../Pages/CustomPages/Frags/GoBack";
 
 const OPTIONS = [
   { key: ENABLED, icon: "", name: "Enabled" },
@@ -155,7 +156,7 @@ function PlatformFeaturesPage() {
       .then((res) => {
         setLoadingPage(false);
         if (!res || !res?.success) {
-          console.log("Error fetching nudge settings", res);
+          console.log("Error fetching platform features", res);
           setErrors({ ...errors, loadingError: res?.error });
           return;
         }
@@ -207,7 +208,8 @@ function PlatformFeaturesPage() {
       </CustomPageTitle>
 
       <MEPaperBlock>
-        <Typography>
+        <GoBack />
+        <Typography style={{ marginTop: 5 }}>
           Not all features are enabled for all communities. This page gives you a chance to review and opt into special
           features and functionalities. You can enable or disable these features for <b>{community?.name || "..."}</b>{" "}
           as you see fit.

@@ -271,13 +271,11 @@ class MassEnergizeForm extends Component {
     });
   };
 
-
-
-  setValueInForm = (content)=>{
+  setValueInForm = (content) => {
     this.setState({
-      formData:{...this.state.formData, ...(content||{})}
-    })
-  }
+      formData: { ...this.state.formData, ...(content || {}) },
+    });
+  };
 
   handleSubDomainChange = async (event) => {
     const { target } = event;
@@ -313,7 +311,7 @@ class MassEnergizeForm extends Component {
       theList = [];
     }
 
-    const pos = theList.indexOf(value);
+    const pos = theList.findIndex((v) => v == value);
     if (pos > -1) {
       theList.splice(pos, 1);
     } else if (!selectMany) {
@@ -321,6 +319,7 @@ class MassEnergizeForm extends Component {
     } else if (selectMany) {
       theList.push(value);
     }
+
     const setValueInForm = (newContent) => {
       this.setState({
         formData: { ...formData, [name]: theList, ...(newContent || {}) },
@@ -384,12 +383,8 @@ class MassEnergizeForm extends Component {
   getDisplayName = (fieldName, id, data) => {
     const { formData } = this.state;
     if (id) {
-      const [result] = data.filter(
-        (d) => d.id && d.id.toString() === id && id.toString()
-      );
-      if (result) {
-        return result.displayName;
-      }
+      const result = data.find((d) => d?.id?.toString() === id?.toString());
+      if (result) return result.displayName;
     }
 
     const val = formData[fieldName];
@@ -634,7 +629,8 @@ class MassEnergizeForm extends Component {
     const fieldValues = formData[fieldName];
     if (!fieldValues) return false;
     // if (!Array.isArray(fieldValues)) return false;
-    return fieldValues.indexOf(value.toString()) > -1;
+    const found = fieldValues.find((v) => v?.toString() == value?.toString());
+    return found ? true : false;
   };
 
   // what does this do?
@@ -691,7 +687,7 @@ class MassEnergizeForm extends Component {
         if (field?.isAsync) {
           return (
             <AsyncDropDown
-              field={field}
+              field={field} // Why pass this whole "field" object? That makes the AsyncDropdown too specific to this use case.
               renderGeneralContent={this.renderGeneralContent}
               getValue={this.getValue}
               getDisplayName={this.getDisplayName}
@@ -806,9 +802,8 @@ class MassEnergizeForm extends Component {
             getValue={this.getValue}
             renderFields={this.renderFields}
             getDisplayName={this.getDisplayName}
-            formData = {this.state.formData}
+            formData={this.state.formData}
             setValueInForm={this.setValueInForm}
-
           />
         );
       case FieldTypes.Icon:
@@ -1245,14 +1240,16 @@ class MassEnergizeForm extends Component {
               {!noBack && (
                 <Link
                   to="#"
+                 style = {{color: "#c83535",}}
                   onClick={(e) => {
                     e.preventDefault();
                     this.props.history.goBack();
                   }}
                 >
-                  Go Back
+                  <i className = "fa fa-long-arrow-left" style = {{marginRight:5}} /> <span  style = {{fontWeight:"bold"}}>Go Back</span>
                 </Link>
               )}
+            
 
               {readOnly ? (
                 <Typography variant="h7" component="h3">

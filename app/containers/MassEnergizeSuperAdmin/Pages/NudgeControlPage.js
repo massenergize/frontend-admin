@@ -17,6 +17,7 @@ import useCommunityFromURL from "../../../utils/hooks/useCommunityHook";
 import { reduxKeepCommunityNudgeSettings } from "../../../redux/redux-actions/adminActions";
 import { FLAGS } from "../../../components/FeatureFlags/flags";
 import CustomPageTitle from "../Misc/CustomPageTitle";
+import GoBack from "../../Pages/CustomPages/Frags/GoBack";
 export const ENABLED = "enabled";
 export const PAUSED = "paused";
 export const DISABLED = "disabled";
@@ -149,7 +150,7 @@ function NudgeControlPage() {
       .then((res) => {
         setLoadingPage(false);
         if (!res || !res?.success) {
-          console.log("Error fetching nudge settings", res);
+          console.log("Error fetching notification settings", res);
           setErrors({ ...errors, loadingError: res?.error });
           return;
         }
@@ -158,7 +159,7 @@ function NudgeControlPage() {
         if (!hasContent)
           return setErrors({
             ...errors,
-            loadingError: "Nudge control keys are not available yet, please contact a super admin"
+            loadingError: "Notification control keys are not available yet, please contact a super admin"
           });
 
         setLoadingPage(false);
@@ -199,9 +200,9 @@ function NudgeControlPage() {
         Notification Control for <b>{community?.name || "..."}</b>
       </CustomPageTitle>
       <MEPaperBlock>
-        <Typography>
-          Use these controls to start, pause or stop sending <b>{community?.name || "..."}</b> users email notices about
-          events.
+        <GoBack />
+        <Typography style={{ marginTop: 5 }}>
+          Use these controls to start, pause or stop sending <b>{community?.name || "..."}</b> users email notices
           {/* Control all items related to nudges for <b>{community?.name || "..."}</b> on this page */}
         </Typography>
 
