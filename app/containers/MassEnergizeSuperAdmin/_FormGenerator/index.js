@@ -1240,14 +1240,16 @@ class MassEnergizeForm extends Component {
               {!noBack && (
                 <Link
                   to="#"
+                 style = {{color: "#c83535",}}
                   onClick={(e) => {
                     e.preventDefault();
                     this.props.history.goBack();
                   }}
                 >
-                  Go Back
+                  <i className = "fa fa-long-arrow-left" style = {{marginRight:5}} /> <span  style = {{fontWeight:"bold"}}>Go Back</span>
                 </Link>
               )}
+            
 
               {readOnly ? (
                 <Typography variant="h7" component="h3">

@@ -156,7 +156,7 @@ function PlatformFeaturesPage() {
       .then((res) => {
         setLoadingPage(false);
         if (!res || !res?.success) {
-          console.log("Error fetching nudge settings", res);
+          console.log("Error fetching platform features", res);
           setErrors({ ...errors, loadingError: res?.error });
           return;
         }

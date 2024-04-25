@@ -446,7 +446,7 @@ class About extends React.Component {
                     style={{ fontWeight: "600", fontSize: "1rem", display: "flex", alignItems: "center" }}
                     component="h3"
                   >
-                    Notification Control
+                    Community User Notifications
                     <Icon style={{ color: "green", marginLeft: 5 }}>forward</Icon>
                   </Typography>
                 </Paper>

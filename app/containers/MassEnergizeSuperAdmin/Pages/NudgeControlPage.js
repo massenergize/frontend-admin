@@ -150,7 +150,7 @@ function NudgeControlPage() {
       .then((res) => {
         setLoadingPage(false);
         if (!res || !res?.success) {
-          console.log("Error fetching nudge settings", res);
+          console.log("Error fetching notification settings", res);
           setErrors({ ...errors, loadingError: res?.error });
           return;
         }
@@ -159,7 +159,7 @@ function NudgeControlPage() {
         if (!hasContent)
           return setErrors({
             ...errors,
-            loadingError: "Nudge control keys are not available yet, please contact a super admin"
+            loadingError: "Notification control keys are not available yet, please contact a super admin"
           });
 
         setLoadingPage(false);
