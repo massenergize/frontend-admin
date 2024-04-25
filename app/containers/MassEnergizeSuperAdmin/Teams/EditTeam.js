@@ -218,7 +218,7 @@ const createFormJson = ({ communities, team, parentTeamOptions,  autoOpenMediaLi
   // Force the showing communities to be only those that are part of the list of communities
   const asIds = communities?.map((c) => c.id);
   const selectedCommunities = team?.communities
-    ? team.communities.map((e) => e.id && asIds.includes(e.id) && e.id).filter((e) => e)
+    ? team.communities.map((teamCom) => teamCom.id && asIds.includes(teamCom.id) && teamCom.id).filter((existingCommunity) => existingCommunity)
     : [];
 
 
