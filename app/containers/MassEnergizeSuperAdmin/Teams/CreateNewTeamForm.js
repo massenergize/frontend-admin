@@ -165,6 +165,7 @@ const createFormJson = ({ communities, autoOpenMediaLibrary, parents, setParents
             dbName: "communities",
             data: communities,
             isAsync: true,
+            // isAsync: isSuperAdmin,
             endpoint: isSuperAdmin
               ? "/communities.listForSuperAdmin"
               : "/communities.listForCommunityAdmin",

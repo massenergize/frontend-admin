@@ -214,9 +214,14 @@ export default withStyles(styles, { withTheme: true })(
 );
 const createFormJson = ({ communities, team, parentTeamOptions,  autoOpenMediaLibrary,isSuperAdmin}) => {
   // const { communities, team, parentTeamOptions } = this.state;
+
+  // Force the showing communities to be only those that are part of the list of communities
+  const asIds = communities?.map((c) => c.id);
   const selectedCommunities = team?.communities
-    ? team.communities.map((e) => e.id)
+    ? team.communities.map((teamCom) => teamCom.id && asIds.includes(teamCom.id) && teamCom.id).filter((existingCommunity) => existingCommunity)
     : [];
+
+
 
   const formJson = {
     title: "Edit Team Information",
