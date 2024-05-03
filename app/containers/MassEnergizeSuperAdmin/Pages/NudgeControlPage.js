@@ -10,7 +10,7 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import MomentUtils from "@date-io/moment";
 import Loading from "dan-components/Loading";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
-import { fetchParamsFromURL, formatWithDelimiter } from "../../../utils/common";
+import { fetchParamsFromURL, formatWithDelimiter, formatWithMoment } from "../../../utils/common";
 import { apiCall } from "../../../utils/messenger";
 import { DatePicker } from "@mui/x-date-pickers";
 import useCommunityFromURL from "../../../utils/hooks/useCommunityHook";
@@ -197,7 +197,7 @@ function NudgeControlPage() {
     );
   return (
     <div>
-      <Seo name ="Notification Control" />
+      <Seo name="Notification Control" />
       <CustomPageTitle>
         Notification Control for <b>{community?.name || "..."}</b>
       </CustomPageTitle>
@@ -213,12 +213,15 @@ function NudgeControlPage() {
             const { name, key: sectionKey, description, options } = oneNudgeControlOption || {};
             const isSaving = (loading || {})[sectionKey];
             const error = (errors || {})[sectionKey];
-            
+
             const optionInState = getValue(sectionKey);
-            const formattedValue = formatWithDelimiter(optionInState?.value,"-");
-            const isPausedAndDateChanged = optionInState?.key === PAUSED && formattedValue !== lastSavedOptions[sectionKey]?.value;
+            // console.log("Lets see option in state", optionInState)
+            const formattedValue = formatWithDelimiter(optionInState?.value, "-");
+            const isPausedAndDateChanged =
+              optionInState?.key === PAUSED && formattedValue !== lastSavedOptions[sectionKey]?.value;
             const userHasMadeChanges = changesMadeAllowSave(sectionKey) || isPausedAndDateChanged;
-            
+            // const userHasMadeChanges = changesMadeAllowSave(sectionKey)
+
             return (
               <div key={sectionKey} style={{ marginTop: 20, border: "solid 1px #ab47bc", padding: 20 }}>
                 <Typography variant="h6">{name}</Typography>
@@ -255,7 +258,7 @@ function NudgeControlPage() {
                                 value={getValue(sectionKey)?.value || new Date()}
                                 label="" // don't put label in the box {field.label}
                                 inputFormat="MM/DD/YYYY"
-                                onChange={(date) => selectOption(sectionKey, key, date?.toString())}
+                                onChange={(date) => selectOption(sectionKey, key, formatWithMoment(date))}
                               />
                             </LocalizationProvider>
                             <br />
