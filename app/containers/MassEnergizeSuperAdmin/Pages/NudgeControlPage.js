@@ -215,13 +215,12 @@ function NudgeControlPage() {
             const error = (errors || {})[sectionKey];
 
             const optionInState = getValue(sectionKey);
-            // console.log("Lets see option in state", optionInState)
+            const last = lastSavedOptions[sectionKey];
             const formattedValue = formatWithDelimiter(optionInState?.value, "-");
-            const isPausedAndDateChanged =
-              optionInState?.key === PAUSED && formattedValue !== lastSavedOptions[sectionKey]?.value;
+            const isPausedAndDateChanged = optionInState?.key === PAUSED && formattedValue !== last?.value;
             const userHasMadeChanges = changesMadeAllowSave(sectionKey) || isPausedAndDateChanged;
-            // const userHasMadeChanges = changesMadeAllowSave(sectionKey)
-
+            const inputValue = optionInState?.value === true? optionInState?.activate_on : optionInState?.value;
+            
             return (
               <div key={sectionKey} style={{ marginTop: 20, border: "solid 1px #ab47bc", padding: 20 }}>
                 <Typography variant="h6">{name}</Typography>
@@ -255,7 +254,7 @@ function NudgeControlPage() {
                               <DatePicker
                                 renderInput={(props) => <TextField {...props} />}
                                 minDate={new Date()}
-                                value={getValue(sectionKey)?.value || new Date()}
+                                value={inputValue || new Date()}
                                 label="" // don't put label in the box {field.label}
                                 inputFormat="MM/DD/YYYY"
                                 onChange={(date) => selectOption(sectionKey, key, formatWithMoment(date))}
