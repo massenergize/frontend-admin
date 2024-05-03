@@ -8,6 +8,7 @@ import React from "react";
 import { ME_FORM_PROGRESS } from "../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 import { apiCall } from "./messenger";
 
+
 export const getHumanFriendlyDateRange = (startDate, endDate) => {
   const start = moment(startDate);
   const end = moment(endDate);
@@ -415,3 +416,8 @@ export const formatWithDelimiter = (dateString, delimiter = "-") => {
   const day = ("0" + date.getDate()).slice(-2);
   return `${year}${delimiter}${month}${delimiter}${day}`;
 };
+
+
+export function formatWithMoment(momentObject, format='YYYY-MM-DD') {
+  return momentObject.format(format);
+}
