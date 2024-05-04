@@ -103,7 +103,7 @@ function MEDropDown({
             ];
 
             setData([
-              ...new Map(items.map((item) => [item["id"], item])).values(),
+              ...new Map(items.map((item) => [item?.id?.toString(), item])).values(),
             ]);
           });
         }

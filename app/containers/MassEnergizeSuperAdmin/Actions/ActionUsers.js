@@ -17,6 +17,7 @@ import { useParams } from "react-router-dom/cjs/react-router-dom.min";
 import { getHumanFriendlyDate } from "../../../utils/common";
 import { apiCall } from "../../../utils/messenger";
 import Loader from "../../../utils/components/Loader";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
 
 function ActionUsers({ classes }) {
   const title = brand.name + " - Action Users";
@@ -103,8 +104,8 @@ function ActionUsers({ classes }) {
     filterType: "dropdown",
     responsive: "standard",
     print: true,
-    rowsPerPage: 25,
-    rowsPerPageOptions: [10, 25, 100],
+    rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+    rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
     downloadOptions: {
       filename: `${action?.title}- Action Users.csv`,
       separator: ",",
@@ -113,7 +114,6 @@ function ActionUsers({ classes }) {
   };
 
   const fashionData = (data) => {
-    console.log("== data ===", data)
     if (!data) return [];
     const fashioned = data.map((d) => [
       getHumanFriendlyDate(d?.recorded_at, false, true),

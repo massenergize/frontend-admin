@@ -1,12 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import {
-  Box,
-  Checkbox,
-  Chip,
-  CircularProgress,
-  Paper,
-  TextField,
-} from "@mui/material";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Box, Checkbox, Chip, CircularProgress, Paper, TextField } from "@mui/material";
 import { pop } from "../../../../utils/common";
 import { withStyles } from "@mui/styles";
 import useObserver from "../../../../utils/useObserver";
@@ -14,7 +7,7 @@ import useObserver from "../../../../utils/useObserver";
 const styles = (theme) => {
   return {
     textbox: {
-      width: "100%",
+      width: "100%"
     },
     ghostCurtain: {
       position: "absolute",
@@ -24,7 +17,7 @@ const styles = (theme) => {
       height: "100vh",
       background: "white",
       opacity: 0,
-      zIndex: 100,
+      zIndex: 100
     },
     dropdown: {
       borderRadius: 5,
@@ -36,35 +29,35 @@ const styles = (theme) => {
       minHeight: 50,
       boxShadow: theme.shadows[7],
       maxHeight: 330,
-      overflowY: "scroll",
+      overflowY: "scroll"
     },
     dropdownItem: {
-      padding: 16,
+      padding: 10,
       width: "100%",
       cursor: "pointer",
       "&:hover": {
-        background: "#e9e9e9",
-      },
+        background: "#e9e9e9"
+      }
     },
     chips: {
       margin: "2px",
-      opacity: "1",
+      opacity: "1"
     },
     option: {
       textDecoration: "underline",
-      cursor: "pointer",
+      cursor: "pointer"
     },
     container: {},
     error: {},
     header: {},
     dropdownArea: {},
-    success: {},
+    success: {}
   };
 };
 
 function LightAutoComplete(props) {
   const {
-    data,
+    data, // array of items to display (Items must be objects, not strings)
     onChange,
     label,
     placeholder,
@@ -82,6 +75,11 @@ function LightAutoComplete(props) {
     isAsync,
     endpoint,
     args,
+    params,
+    selectAllV2, // If true, the component will only show one chip with the text "All" and will not show the list of selected items
+    showHiddenList,
+    renderItemsListDisplayName,
+    shortenListAfter
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
@@ -98,21 +96,17 @@ function LightAutoComplete(props) {
     data: items,
     endpoint,
     args,
-    params: { search_text: query },
+    params: { search_text: query, ...(params || {}) }
   });
   useEffect(() => {
     let newItemsConstructed = (newItems || [])?.map((item) => {
       return {
         ...item,
-        displayName: labelExtractor
-          ? labelExtractor(item)
-          : item?.name || item?.title,
+        displayName: getLabel(item)
       };
     });
     let all = [...(items || []), ...(newItemsConstructed || [])];
-    const uniqueItems = [
-      ...new Map(all.map((item) => [item["id"], item])).values(),
-    ];
+    const uniqueItems = [...new Map(all.map((item) => [item["id"], item])).values()];
     if (query) setFilteredItems(uniqueItems);
     setOptionsToDisplay(uniqueItems);
   }, [newItems]);
@@ -126,6 +120,7 @@ function LightAutoComplete(props) {
     return item;
   };
   const allOrNothing = ({ nothing, data }) => {
+    if (selectAllV2) return allOrNothing2({ nothing });
     if (nothing) {
       setSelected([]);
       return transfer([]);
@@ -135,7 +130,23 @@ function LightAutoComplete(props) {
     transfer(data);
   };
 
+  const allOrNothing2 = ({ nothing }) => {
+    if (nothing) {
+      setSelected([]);
+      transfer([]);
+      // onChange([]);
+      return;
+    }
+    setSelected(["all"]);
+    transfer(["all"]);
+  };
+
+  const isAll = (item) => {
+    return typeof item === "string" && item?.toLowerCase() === "all";
+  };
+
   const getLabel = (item) => {
+    if (multiple && isAll(item)) return "All";
     if (labelExtractor) return labelExtractor(item);
     return item;
   };
@@ -147,8 +158,15 @@ function LightAutoComplete(props) {
   const handleSelection = (item) => {
     var value = getValue(item);
     var [found, rest] = pop(selected, value, getValue);
-    if (!multiple) setShowDropdown(false);
 
+    if (!isAll(item)) {
+      // If the item is not "All", then we remove the "All" item from the list (if it exists)
+      // We want to give the effect that the user has deselected "All" by selecting a specific item
+      var [_, remaining] = pop(rest, "all");
+      rest = remaining;
+    }
+
+    if (!multiple) setShowDropdown(false);
     if (found) {
       setSelected(rest);
       return transfer(rest);
@@ -164,7 +182,9 @@ function LightAutoComplete(props) {
     if (!multiple) setShowDropdown(false);
     const filtered = optionsToDisplay?.filter((item) => {
       var label = getLabel(item);
-      if (label && label.toLowerCase().includes(value)) return item;
+      if (label && label.toLowerCase().includes(value)) {
+        return item;
+      }
     });
     setFilteredItems(filtered);
   };
@@ -176,70 +196,109 @@ function LightAutoComplete(props) {
   }, [defaultSelected]);
 
   const increasedRatio = () => {
-    const height = chipWrapperRef.current
-      ? chipWrapperRef.current.clientHeight
-      : 0;
+    const height = chipWrapperRef.current ? chipWrapperRef.current.clientHeight : 0;
     return height;
   };
-  const onlyValues = (selected || []).map((itm) => getValue(itm));
-  const thereAreNoOptionsToDisplay = query
-    ? filteredItems?.length === 0
-    : optionsToDisplay.length === 0;
+
+  const onlyValues = (selected || []).map((itm) => getValue(itm)).filter((itm) => itm);
+  const thereAreNoOptionsToDisplay = query ? filteredItems?.length === 0 : optionsToDisplay.length === 0;
   const userHasSelectedStuff = selected.length;
 
   return (
-    <div style={{ position: "relative", width: "100%", marginTop: 19 }}>
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        marginTop: 0
+      }}
+      key={props?.key}
+    >
       <div ref={chipWrapperRef}>
-        {selected?.length > 0 && (
-          <>
-            {selected.map((option, index) => {
-              var deleteOptions = { onDelete: () => handleSelection(option) };
-              deleteOptions = allowChipRemove ? deleteOptions : {};
-              return (
-                <Chip
-                  key={index.toString()}
-                  label={getLabel(option)}
-                  {...deleteOptions}
-                  className={classes.chips}
-                />
-              );
-            })}
-          </>
+        {showHiddenList && selected?.length > (shortenListAfter || 5) ? (
+          renderItemsListDisplayName ? (
+            renderItemsListDisplayName(selected, setSelected)
+          ) : (
+            <span
+              onClick={() => showHiddenList && showHiddenList(selected, setSelected)}
+              style={{
+                cursor: "pointer",
+                color: "blue"
+              }}
+            >
+              View full list
+            </span>
+          )
+        ) : (
+          selected?.length > 0 && (
+            <>
+              {selected.map((option, index) => {
+                var deleteOptions = { onDelete: () => handleSelection(option) };
+                deleteOptions = allowChipRemove ? deleteOptions : {};
+                return (
+                  <Chip key={index?.toString()} label={getLabel(option)} {...deleteOptions} className={classes.chips} />
+                );
+              })}
+            </>
+          )
         )}
       </div>
       <GhostDropdown
         show={showDropdown}
         close={() => setShowDropdown(false)}
-        style={{ top: -500, height: 500 }}
+        style={{
+          top: -500,
+          height: 500
+        }}
         classes={classes}
       />
       <div style={containerStyle || {}}>
-        <TextField
-          disabled={disabled}
-          onClick={() => {
-            !disabled && setShowDropdown(true);
-          }}
-          id={id}
-          label={placeholder || label}
-          className={classes.textbox}
-          onChange={handleOnChange}
-          margin="normal"
-          variant="outlined"
-          autoComplete="off"
-        />
+        <div style={{ position: "relative" }}>
+          <i className=" fa fa-search" style={{ position: "absolute", top: 26, left: 15, color: "#a5a5a5" }} />
+          <i className=" fa fa-caret-down" style={{ position: "absolute", top: 26, right: 15, color: "#a5a5a5" }} />
+          <input
+            onChange={handleOnChange}
+            onClick={() => {
+              !disabled && setShowDropdown(true);
+            }}
+            style={{
+              padding: "10px 35px",
+              width: "100%",
+              margin: "10px 0px"
+            }}
+            placeholder={placeholder || label}
+          />
+        </div>
+
+        {/* <TextField */}
+        {/*   disabled={disabled} */}
+        {/*   onClick={() => { */}
+        {/*     !disabled && setShowDropdown(true); */}
+        {/*   }} */}
+        {/*   id={id} */}
+        {/*   label={placeholder || label} */}
+        {/*   className={classes.textbox} */}
+        {/*   onChange={handleOnChange} */}
+        {/*   margin="normal" */}
+        {/*   variant="outlined" */}
+        {/*   autoComplete="off" */}
+        {/* /> */}
         {showDropdown && (
           <>
-            <GhostDropdown
-              show={showDropdown}
-              classes={classes}
-              close={() => setShowDropdown(false)}
-            />
+            <GhostDropdown show={showDropdown} classes={classes} close={() => setShowDropdown(false)} />
             <Paper
               className={classes.dropdown}
-              style={{ top: 80 + increasedRatio() }}
+              style={{
+                top: 60 + increasedRatio(),
+                maxHeight: 220
+              }}
             >
               {thereAreNoOptionsToDisplay && (
-                <p style={{ padding: 10, color: "lightgray" }}>
+                <p
+                  style={{
+                    padding: 10,
+                    color: "lightgray"
+                  }}
+                >
                   No results found...
                 </p>
               )}
@@ -251,7 +310,7 @@ function LightAutoComplete(props) {
                       display: "flex",
                       flexDirection: "row",
                       alignItems: "center",
-                      padding: 16,
+                      padding: 10
                     }}
                   >
                     <span
@@ -281,18 +340,21 @@ function LightAutoComplete(props) {
               {(query ? filteredItems : optionsToDisplay).map((op, index) => {
                 return (
                   <div
-                    key={index.toString()}
+                    key={index?.toString()}
                     className={classes.dropdownItem}
                     onClick={() => handleSelection(op)}
                     style={{
                       display: "flex",
                       flexDirection: "row",
-                      alignItems: "center",
+                      alignItems: "center"
                     }}
                   >
                     {multiple && (
                       <Checkbox
-                        style={{ padding: 0, marginRight: 6 }}
+                        style={{
+                          padding: 0,
+                          marginRight: 6
+                        }}
                         checked={onlyValues.includes(getValue(op))}
                       />
                     )}
@@ -305,7 +367,7 @@ function LightAutoComplete(props) {
                   sx={{
                     width: "100%",
                     display: "flex",
-                    justifyContent: "center",
+                    justifyContent: "center"
                   }}
                   ref={ref}
                 >
@@ -322,13 +384,7 @@ function LightAutoComplete(props) {
 
 const GhostDropdown = ({ classes, close, show, style = {} }) => {
   if (!show) return <></>;
-  return (
-    <div
-      className={classes.ghostCurtain}
-      onClick={() => close()}
-      style={style}
-    />
-  );
+  return <div className={classes.ghostCurtain} onClick={() => close()} style={style} />;
 };
 LightAutoComplete.propTypes = {};
 LightAutoComplete.defaultProps = {
@@ -338,5 +394,7 @@ LightAutoComplete.defaultProps = {
   defaultSelected: [],
   allowChipRemove: true,
   multiple: false,
+  showHiddenList: null, // boolean: true if you want the list of selected items to be truncated after a count of 5
+  renderItemsListDisplayName: null // function(component): renders  a button or text to display which toggles the list of selected items.
 };
 export default withStyles(styles)(LightAutoComplete);

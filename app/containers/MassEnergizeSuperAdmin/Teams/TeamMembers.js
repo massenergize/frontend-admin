@@ -30,6 +30,7 @@ import METable from "../ME  Tools/table /METable";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import { getLimit } from "../../../utils/helpers";
 import Seo from "../../../components/Seo/Seo";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
 
 function TabContainer(props) {
   const { children } = props;
@@ -261,8 +262,8 @@ class TeamMembers extends React.Component {
       filterType: "dropdown",
       responsive: "standard",
       print: true,
-      rowsPerPage: 25,
-      rowsPerPageOptions: [10, 25, 100],
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
       // count: metaData && metaData.count,
       // confirmFilters: true,
       onRowsDelete: (rowsDeleted) => {

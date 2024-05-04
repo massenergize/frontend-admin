@@ -39,6 +39,7 @@ if (IS_PROD || IS_CANARY) {
   };
 } 
 
+
 console.log("=== ENV===", IS_PROD ? 'PROD' : IS_CANARY ? 'CANARY' : 'DEV')
 console.log(FIREBASE_CONFIG)
 

@@ -84,7 +84,8 @@ class EditTeam extends Component {
   static getDerivedStateFromProps(props, state) {
     var { match, communities, teams, teamsInfos, location, auth } = props;
     const { id } = match.params;
-    const isSuperAdmin = auth?.is_super_admin && !auth?.is_community_admin;
+    //const isSuperAdmin = auth?.is_super_admin && !auth?.is_community_admin;
+    const isSuperAdmin = auth?.is_super_admin;
     communities = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
@@ -112,6 +113,7 @@ class EditTeam extends Component {
     });
     return { team, formJson, parentTeamOptions, mounted: true };
   }
+  
   async componentDidMount() {
     const { id } = this.props.match.params;
     const { addTeamInfoToHeap, teamsInfos,heap } = this.props;
@@ -212,9 +214,14 @@ export default withStyles(styles, { withTheme: true })(
 );
 const createFormJson = ({ communities, team, parentTeamOptions,  autoOpenMediaLibrary,isSuperAdmin}) => {
   // const { communities, team, parentTeamOptions } = this.state;
-  const selectedCommunities = team.communities
-    ? team.communities.map((e) => e.id)
+
+  // Force the showing communities to be only those that are part of the list of communities
+  const asIds = communities?.map((c) => c.id);
+  const selectedCommunities = team?.communities
+    ? team.communities.map((teamCom) => teamCom.id && asIds.includes(teamCom.id) && teamCom.id).filter((existingCommunity) => existingCommunity)
     : [];
+
+
 
   const formJson = {
     title: "Edit Team Information",

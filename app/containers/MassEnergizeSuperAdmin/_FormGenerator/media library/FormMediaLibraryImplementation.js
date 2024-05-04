@@ -5,16 +5,17 @@ import { bindActionCreators } from "redux";
 
 import MediaLibrary from "../../ME  Tools/media library/MediaLibrary";
 import {
+  reduxAddBlobString,
   reduxAddToGalleryImages,
   reduxLoadGalleryImages,
   reduxLoadImageInfos,
   setGalleryMetaAction,
   setImageForEditAction,
-  testRedux,
+  testRedux
 } from "../../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../../utils/messenger";
 import { Typography, Tooltip } from "@mui/material";
-import { makeLimitsFromImageArray } from "../../../../utils/common";
+import { arrangeInSequence, makeLimitsFromImageArray } from "../../../../utils/common";
 import MediaLibraryForm from "./MediaLibraryForm";
 import { getFileSize } from "../../ME  Tools/media library/shared/utils/utils";
 import SidebarForMediaLibraryModal from "./SidebarForMediaLibraryModal";
@@ -36,6 +37,8 @@ export const FormMediaLibraryImplementation = (props) => {
     putImageInfosInRedux,
     meta,
     putMetaInRedux,
+    blobTray,
+    putBlobStringInRedux
   } = props;
 
   const [available, setAvailable] = useState(auth && auth.is_super_admin);
@@ -52,7 +55,7 @@ export const FormMediaLibraryImplementation = (props) => {
       theme: { background: error ? "#c30707" : "green" },
       textTheme: { color: "white" },
       close: () => setOutsideNotification(null),
-      ...(extras || {}),
+      ...(extras || {})
     };
     setOutsideNotification(obj);
   };
@@ -62,36 +65,36 @@ export const FormMediaLibraryImplementation = (props) => {
       loading: true,
       theme: { background: "green" },
       textTheme: { color: "white" },
-      close: () => setOutsideNotification(null),
+      close: () => setOutsideNotification(null)
     });
     apiCall("/gallery.find", { ids }).then((response) => {
       setOutsideNotification(null);
-      if (!response.success) {
-        setError(response.error);
+      if (!response?.success) {
+        setError(response?.error);
         return console.log("Error finding images from B.E", response.error);
       }
-      cb && cb(response.data);
+      cb && cb(response?.data);
     });
   };
 
   const useIdsToFindObjs = (ids) => {
     const images = imagesObject.images;
-    if (!ids.length) return;
+    if (!ids?.length) return;
     var bank = (images || []).map((img) => img.id);
     // sometimes an image that is preselected, may not be in the library's first load
     // in that case just add it to the library's list
     var isNotThere = ids.filter((img) => !bank.includes(img));
-    const alreadyAvailableHere = images?.filter((img) => ids.includes(img.id)); // Needed because there is a chance that some might be available in the list, but not all
+    const alreadyAvailableHere = images?.filter((img) => ids.includes(img.id)) || []; // Needed because there is a chance that some might be available in the list, but not all
     if (isNotThere?.length)
       // only run this if some items are not found in the already loaded redux content
       return fetchNeededImages(ids, (fromBackend) => {
         const together = [...alreadyAvailableHere, ...(fromBackend || [])];
         addOnToWhatImagesAreInRedux({ old: imagesObject, data: fromBackend });
-        setUserSelectedImages(together);
+        setUserSelectedImages(arrangeInSequence(together, ids));
       });
-    if (alreadyAvailableHere.length)
+    if (alreadyAvailableHere?.length)
       //all items were found here, so we move without any B.E requests
-      setUserSelectedImages(alreadyAvailableHere);
+      setUserSelectedImages(arrangeInSequence(alreadyAvailableHere, ids));
   };
 
   useEffect(() => {
@@ -112,13 +115,14 @@ export const FormMediaLibraryImplementation = (props) => {
       preselected = preselected.map((img) => img.id);
     }
     if (!justResetting) useIdsToFindObjs(preselected);
+    // console.log("All of them come here like this: ", selected);
   }, [selected, defaultValue]);
 
   const fetchWithQuery = (body, cb) => {
     const loadMoreMeta = meta?.loadMoreMeta || {};
     notify("Hold on tight...", false, {
       loading: true,
-      type: "loading-more",
+      type: "loading-more"
     });
 
     apiCall("/gallery.search", body)
@@ -131,7 +135,7 @@ export const FormMediaLibraryImplementation = (props) => {
         putMetaInRedux({
           ...meta,
           loadMoreMeta: { ...loadMoreMeta, query: body },
-          ...metaFromBE,
+          ...metaFromBE
         });
       })
       .catch((e) => {
@@ -144,12 +148,11 @@ export const FormMediaLibraryImplementation = (props) => {
     if (!auth) return console.log("It does not look like you are signed in...");
     notify("Collecting more items...", false, {
       loading: true,
-      type: "loading-more",
+      type: "loading-more"
     });
     const { upper_limit, lower_limit } = imagesObject;
     const query = meta?.loadMoreMeta?.query || {};
-    const limits =
-      upper_limit && lower_limit ? { upper_limit, lower_limit } : {};
+    const limits = upper_limit && lower_limit ? { upper_limit, lower_limit } : {};
     const body = { ...query, ...limits };
     apiCall("/gallery.search", body)
       .then((response) => {
@@ -159,12 +162,12 @@ export const FormMediaLibraryImplementation = (props) => {
         putImagesInRedux({
           data: response.data,
           old: imagesObject,
-          append: true,
+          append: true
         });
         const metaFromBE = response.data?.meta || {};
         putMetaInRedux({
           ...meta,
-          ...metaFromBE,
+          ...metaFromBE
         });
       })
       .catch((e) => {
@@ -180,20 +183,14 @@ export const FormMediaLibraryImplementation = (props) => {
     changeTabTo("upload-form");
   };
 
-  const doUpload = ({
-    files,
-    reset,
-    changeTabTo,
-    insertSelectedImages,
-    json,
-  }) => {
+  const doUpload = ({ files, reset, changeTabTo, insertSelectedImages, json }) => {
     const isUniversal = available ? { is_universal: true } : {};
     const apiJson = {
       user_id: auth.id,
       // community_ids: ((auth && auth.admin_at) || []).map((com) => com.id),
       // title: "Media library upload",
       ...isUniversal,
-      ...(json || {}),
+      ...(json || {})
     };
     setUploading(true);
 
@@ -208,25 +205,23 @@ export const FormMediaLibraryImplementation = (props) => {
         const info = {
           title: file?.name + "-media library upload",
           size: file?.size?.toString(),
-          size_text: getFileSize(file),
+          size_text: getFileSize(file)
         };
         return apiCall("/gallery.add", { ...apiJson, ...info, file: file });
       })
     )
       .then((response) => {
         setUploading(false);
-        var images = response.map(
-          (res) => (res.data && res.data.image) || null
-        );
+        var images = response.map((res) => (res.data && res.data.image) || null);
         putImagesInRedux({
           data: makeLimitsFromImageArray(images),
           old: imagesObject,
           append: true,
-          prepend: true,
+          prepend: true
         });
         changeTabTo(MediaLibrary.Tabs.LIBRARY_TAB);
         insertSelectedImages(images, response);
-        // reset();
+        reset();
         // changeTabTo(MediaLibrary.Tabs.LIBRARY_TAB);
       })
       .catch((e) => {
@@ -241,7 +236,7 @@ export const FormMediaLibraryImplementation = (props) => {
     apiCall("/gallery.item.edit", {
       ...json,
       user_upload_id: imageForEdit?.information?.id,
-      media_id: imageForEdit?.id,
+      media_id: imageForEdit?.id
     })
       .then((response) => {
         setUploading(false);
@@ -259,35 +254,32 @@ export const FormMediaLibraryImplementation = (props) => {
   const uploadAndSaveForm = (props) => {
     const train = {
       ...props,
-      json: { ...mlibraryFormData, user_id: auth?.id },
+      json: { ...mlibraryFormData, user_id: auth?.id }
     };
     if (isInEditMode) return saveImageEdits(train);
     doUpload(train);
   };
   const liveFormValidation = () => {
-    const { copyright, copyright_att, community_ids, publicity } =
-      mlibraryFormData || {};
+    const { copyright, copyright_att, community_ids, publicity } = mlibraryFormData || {};
 
     const openToSpecificCommunities = publicity === PUB_MODES.OPEN_TO;
     if (openToSpecificCommunities && (!community_ids || !community_ids?.length))
       return {
         invalid: true,
-        message:
-          "Please indicate the communities that can use the item(s) you are about to upload",
+        message: "Please indicate the communities that can use the item(s) you are about to upload"
       };
 
     const doesNotHaveCopyrightPermission = !copyright || copyright === "No";
     if (doesNotHaveCopyrightPermission)
       return {
         invalid: true,
-        message:
-          "Copyright: Please make sure you have permission to upload the item(s) you have selected",
+        message: "Copyright: Please make sure you have permission to upload the item(s) you have selected"
       };
     return {
       invalid: false,
       message: isInEditMode
         ? "Your changes will be saved when you click here"
-        : "Items will be uploaded and inserted when you click",
+        : "Items will be uploaded and inserted when you click"
     };
   };
 
@@ -301,12 +293,8 @@ export const FormMediaLibraryImplementation = (props) => {
 
   const extras = {
     [MediaLibrary.Tabs.UPLOAD_TAB]: (
-      <UploadIntroductionComponent
-        auth={auth}
-        available={available}
-        setAvailableTo={setAvailable}
-      />
-    ),
+      <UploadIntroductionComponent auth={auth} available={available} setAvailableTo={setAvailable} />
+    )
   };
 
   const validation = liveFormValidation();
@@ -322,7 +310,7 @@ export const FormMediaLibraryImplementation = (props) => {
           style={{
             display: "flex",
             flexDirection: "row",
-            alignItems: "center",
+            alignItems: "center"
           }}
         >
           <MediaLibrary.Button
@@ -348,9 +336,32 @@ export const FormMediaLibraryImplementation = (props) => {
         </div>
       );
   };
+
+  const cropFromLink = (props, cb) => {
+    const found = (blobTray || {})[props.id];
+    if (found) return cb(found);
+    apiCall("/gallery.image.read", { media_id: props.id })
+      .then((response) => {
+        cb && cb(response.data);
+        putBlobStringInRedux({
+          ...(blobTray || {}),
+          [props.id]: response.data
+        });
+        if (!response.success) {
+          return console.log("ERROR_PREPARING_IMAGE_FOR_CROP_BE:", response.error);
+        }
+      })
+      .catch((e) => {
+        // Add a toast for real User to know what happend (DO BEFORE PR : BPR)
+        cb && cb(null);
+        console.log("ERROR_READING_IMAGE::", e?.toString());
+      });
+  };
+
   return (
     <div>
       <MediaLibrary
+        handleCropFromLink={cropFromLink}
         renderOnFooter={renderOnFooter}
         passedNotification={outsideNotification}
         defaultTab={MediaLibrary.Tabs.UPLOAD_TAB}
@@ -358,11 +369,7 @@ export const FormMediaLibraryImplementation = (props) => {
         actionText="Select From Library"
         sourceExtractor={(item) => item && item.url}
         renderBeforeImages={(props) => (
-          <FilterBarForMediaLibrary
-            {...props}
-            notify={notify}
-            fetchWithQuery={fetchWithQuery}
-          />
+          <FilterBarForMediaLibrary {...props} notify={notify} fetchWithQuery={fetchWithQuery} />
         )}
         insertAfterUpload
         useAwait={true}
@@ -371,9 +378,7 @@ export const FormMediaLibraryImplementation = (props) => {
         accept={MediaLibrary.AcceptedFileTypes.Images}
         multiple={false}
         extras={extras}
-        sideExtraComponent={(props) => (
-          <SidebarForMediaLibraryModal {...props} />
-        )}
+        sideExtraComponent={(props) => <SidebarForMediaLibraryModal {...props} />}
         TooltipWrapper={({ children, title, placement }) => {
           return (
             <Tooltip title={title} placement={placement || "top"}>
@@ -383,8 +388,8 @@ export const FormMediaLibraryImplementation = (props) => {
         }}
         tabModifiers={{
           [MediaLibrary.Tabs.LIBRARY_TAB]: {
-            name: "Choose From Library",
-          },
+            name: "Choose From Library"
+          }
         }}
         {...props}
         onInsert={(files) => {
@@ -408,7 +413,7 @@ export const FormMediaLibraryImplementation = (props) => {
                   onChange={(data) => setmlibraryFormData(data)}
                   communities={communities}
                 />
-              ),
+              )
             },
             renderContextButton: (props) => (
               <MediaLibrary.Button
@@ -419,17 +424,13 @@ export const FormMediaLibraryImplementation = (props) => {
                   uploadAndSaveForm(props);
                 }}
               >
-                <Tooltip
-                  title={validation?.message}
-                  placement="top"
-                  style={{ fontWeight: "bold" }}
-                >
+                <Tooltip title={validation?.message} placement="top" style={{ fontWeight: "bold" }}>
                   {/* {uploading ? "UPLOADING..." : "UPLOAD & INSERT"} */}
                   {buttonText()}
                 </Tooltip>
               </MediaLibrary.Button>
-            ),
-          },
+            )
+          }
         ]}
       />
     </div>
@@ -437,7 +438,7 @@ export const FormMediaLibraryImplementation = (props) => {
 };
 
 FormMediaLibraryImplementation.propTypes = {
-  props: PropTypes.object,
+  props: PropTypes.object
 };
 
 const mapStateToProps = (state) => ({
@@ -448,6 +449,7 @@ const mapStateToProps = (state) => ({
   imageForEdit: state.getIn(["imageBeingEdited"]),
   imageInfos: state.getIn(["imageInfos"]),
   meta: state.getIn(["galleryMeta"]),
+  blobTray: state.getIn(["blobTray"])
 });
 
 const mapDispatchToProps = (dispatch) => {
@@ -460,6 +462,7 @@ const mapDispatchToProps = (dispatch) => {
       sendImageToReduxForEdit: setImageForEditAction,
       putImageInfosInRedux: reduxLoadImageInfos,
       putMetaInRedux: setGalleryMetaAction,
+      putBlobStringInRedux: reduxAddBlobString
     },
     dispatch
   );
@@ -472,15 +475,14 @@ export default connect(
 
 const UploadIntroductionComponent = ({ auth, setAvailableTo, available }) => {
   const comms = (auth.admin_at || []).map((c) => c.name).join(", ");
-  const is_community_admin =
-    auth && auth.is_community_admin && !auth.is_super_admin;
+  const is_community_admin = auth && auth.is_community_admin && !auth.is_super_admin;
 
   return (
     <div style={{ marginTop: -40, marginLeft: 27, width: "100%" }}>
       <Typography variant="h6">Hi {auth?.preferred_name || "..."},</Typography>
       <Typography variant="body2">
-        After selecting an item, click <b>"Continue"</b>. You will be asked to
-        provide details about your item before uploading
+        After selecting an item, click <b>"Continue"</b>. You will be asked to provide details about your item before
+        uploading
       </Typography>
       {/* {comms && is_community_admin && (
         <>

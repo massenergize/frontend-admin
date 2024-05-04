@@ -19,7 +19,7 @@ function Library({
   setShouldWait,
   awaitSeconds,
   fileLimit,
-  renderBeforeImages,
+  renderBeforeImages
 }) {
   const handleSelection = (image) => {
     if (!multiple) {
@@ -30,8 +30,12 @@ function Library({
     const images = content || [];
     const found = images.find((img) => img.id === image.id);
     let rest = images.filter((img) => img.id !== image.id);
-    if (!found) rest = [image, ...rest];
-    setShowSidePane(rest && rest.length > 0);
+    if (!found) {
+      rest = [image, ...rest];
+      setSelectedContent(rest);
+      return setShowSidePane(true);
+    }
+    setShowSidePane(false);
     const limit = fileLimit || DEFAULT_FILE_LIMIT;
     setSelectedContent(rest.slice(0, limit));
   };
@@ -65,7 +69,7 @@ function Library({
             justifyContent: "center",
             flexDirection: "column",
             height: "100%",
-            marginTop: "10%",
+            marginTop: "10%"
           }}
         >
           <img src={blank} style={{ height: 180 }} />
@@ -80,8 +84,7 @@ function Library({
       {fileLimit && (
         <div style={{ padding: "10px 25px", fontWeight: "bold" }}>
           <small>
-            You can select up to ({fileLimit}){" "}
-            {fileLimit === 1 ? "image" : "images"}
+            You can select up to ({fileLimit}) {fileLimit === 1 ? "image" : "images"}
           </small>
         </div>
       )}
@@ -90,10 +93,7 @@ function Library({
           const selected = checkIfSelected(image);
           return (
             <div key={index.toString()} style={{ position: "relative" }}>
-              <ImageThumbnail
-                imageSource={getImageSource(image)}
-                onClick={() => handleSelection(image)}
-              />
+              <ImageThumbnail imageSource={getImageSource(image)} onClick={() => handleSelection(image)} />
               {selected && (
                 <p
                   onClick={() => handleSelection(image)}

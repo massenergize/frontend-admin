@@ -175,7 +175,7 @@ function EventShareModal({
     useEffect(() => {
       let items = [...(availableCommunities || []), ...(data || [])];
       const uniqueItems = [
-        ...new Map(items.map((item) => [item["id"], item])).values(),
+        ...new Map(items.map((item) => [item?.id?.toString(), item])).values(),
       ];
       setAvailableCommunities(uniqueItems);
     }, [data]);

@@ -47,6 +47,7 @@ import { getData } from "../Messages/CommunityAdminMessages";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import Seo from "../../../components/Seo/Seo";
 import CustomOptions from "../ME  Tools/table /CustomOptions";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
 
 class AllTestimonials extends React.Component {
   constructor(props) {
@@ -440,8 +441,8 @@ class AllTestimonials extends React.Component {
       responsive: "standard",
       count: metaData && metaData.count,
       print: true,
-      rowsPerPage: 25,
-      rowsPerPageOptions: [10, 25, 100],
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
       confirmFilters: true,
       customSearchRender: (searchText, handleSearch, hideSearch, options) => (
         <SearchBar

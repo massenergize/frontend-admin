@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import { LOADING } from "../../../utils/constants";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS, LOADING } from '../../../utils/constants';
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable from "../ME  Tools/table /METable";
 import Loading from "dan-components/Loading";
@@ -104,7 +104,7 @@ function ActionEngagements({ engagements, putItemsInRedux }) {
         },
       },
       {
-        name: "# Compeleted",
+        name: "# Completed",
         key: "done",
         options: {
           display: type === DONE ? true : false,
@@ -133,8 +133,8 @@ function ActionEngagements({ engagements, putItemsInRedux }) {
     filterType: "dropdown",
     responsive: "standard",
     print: true,
-    rowsPerPage: 25,
-    rowsPerPageOptions: [10, 25, 100],
+    rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+    rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
   };
   data = fashionData(data);
   //   ----------------------------------------------------

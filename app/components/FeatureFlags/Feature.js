@@ -19,6 +19,7 @@ function Feature({ name, fallback, children, auth }) {
 
 const mapStateToProps = (state) => {
   return {
+    // communities: state.getIn(["communities"]),
     auth: state.getIn(["auth"])
   };
 };

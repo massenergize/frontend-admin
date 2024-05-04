@@ -9,7 +9,7 @@ import Loading from "dan-components/Loading";
 import { Link } from "react-router-dom";
 import { Paper, Typography } from "@mui/material";
 import { apiCall } from "../../../utils/messenger";
-import { LOADING } from "../../../utils/constants";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS, LOADING } from '../../../utils/constants';
 import ThemeModal from "../../../components/Widget/ThemeModal";
 import ListingComponent from "./ListingComponent";
 const hasExpired = (date) => {
@@ -139,6 +139,29 @@ function ManageFeatureFlags({
         },
       },
       {
+        name: "Opt-In Status",
+        key: "status",
+        options: {
+          filter: true, 
+          customBodyRender: (allowsOptIn) => {
+   
+            return (
+              <MEChip
+                label={allowsOptIn? "Allow" : "No Opt-In"}
+                style={
+                  !allowsOptIn
+                    ? { background: "rgb(184 184 184)", padding: "0px 9px" }
+                    : { padding: "0px 12px", }
+                }
+                className={`${
+                  !allowsOptIn ? classes.yesLabel : classes.yesLabel
+                } touchable-opacity`}
+              />
+            );
+          },
+        },
+      },
+      {
         name: "Expiry Date",
         key: "expiry-date",
         options: { filter: false },
@@ -183,6 +206,7 @@ function ManageFeatureFlags({
           id: feature.id,
         },
         hasExpired(feature.expires_on) ? "Expired" : "Active",
+        feature?.allow_opt_in,
         feature.expires_on
           ? getHumanFriendlyDate(feature.expires_on, false, false)
           : "Not Set",
@@ -239,8 +263,8 @@ function ManageFeatureFlags({
     responsive: "standard",
     download: false,
     print: false,
-    rowsPerPage: 25,
-    rowsPerPageOptions: [50, 100],
+    rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+    rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
     onRowsDelete: (rowsDeleted) => {
       const idsToDelete = rowsDeleted.data;
       toggleDeleteConfirmation({

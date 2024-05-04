@@ -1,4 +1,6 @@
-module.exports = [
+import { FLAGS } from "../../components/FeatureFlags/flags";
+
+const CADMIN_MENU = [
   {
     key: "dashboard",
     name: "Dashboard",
@@ -81,6 +83,7 @@ module.exports = [
         name: "All Messages",
         title: true,
       },
+
       {
         key: "all-team-admin-messages",
         name: "Team Admin Messages",
@@ -206,3 +209,64 @@ module.exports = [
     ],
   },
 ];
+
+
+let menuAttachmentsObj = {} 
+
+menuAttachmentsObj[FLAGS.BROADCAST_MESSAGING_FF] = {
+    appendTo: "messages",
+    value: [
+      {
+        key: "send-message",
+        name: "Send Message",
+        link: "/admin/send/message",
+      },
+      {
+        key: "scheduled-messages",
+        name: "Scheduled Messages",
+        link: "/admin/scheduled/messages",
+      },
+    ],
+    index: 1,
+  }
+
+
+
+const hasAlreadyBeenAppended = (mainArray, bigObjArray) =>{
+const idsA = bigObjArray.map((objA) => objA.key);
+return idsA.every((id) =>mainArray.some((objB) => objB.key === id));
+}
+
+
+
+const communityAdminMenu = ({ flags }) => {
+
+  if (!flags || flags?.length === 0) return CADMIN_MENU;
+
+   flags.forEach((flag) => {
+    if (menuAttachmentsObj[flag.key]) {
+      const { appendTo, value, index } = menuAttachmentsObj[flag.key];
+      
+      if (appendTo) {
+        const menuItemIndex = CADMIN_MENU.findIndex((item) => item.key === appendTo);
+
+        if (menuItemIndex !== -1) {
+          const updatedMenu = [...CADMIN_MENU];
+          if(hasAlreadyBeenAppended(updatedMenu[menuItemIndex].child, value)) return CADMIN_MENU;
+          updatedMenu[menuItemIndex].child.splice(index, 0, ...value);
+          CADMIN_MENU.length = 0;
+          CADMIN_MENU.push(...updatedMenu);
+        }
+        return CADMIN_MENU;
+      } else {
+        if(hasAlreadyBeenAppended(CADMIN_MENU, value)) return CADMIN_MENU;
+        CADMIN_MENU.splice(index, 0, ...value);
+        return CADMIN_MENU;
+      }
+    }
+  });
+
+  return CADMIN_MENU;
+};
+
+export default communityAdminMenu;
