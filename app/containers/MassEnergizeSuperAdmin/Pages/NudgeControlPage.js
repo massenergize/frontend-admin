@@ -10,7 +10,7 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import MomentUtils from "@date-io/moment";
 import Loading from "dan-components/Loading";
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
-import { fetchParamsFromURL } from "../../../utils/common";
+import { fetchParamsFromURL, formatWithDelimiter, formatWithMoment } from "../../../utils/common";
 import { apiCall } from "../../../utils/messenger";
 import { DatePicker } from "@mui/x-date-pickers";
 import useCommunityFromURL from "../../../utils/hooks/useCommunityHook";
@@ -18,6 +18,7 @@ import { reduxKeepCommunityNudgeSettings } from "../../../redux/redux-actions/ad
 import { FLAGS } from "../../../components/FeatureFlags/flags";
 import CustomPageTitle from "../Misc/CustomPageTitle";
 import GoBack from "../../Pages/CustomPages/Frags/GoBack";
+import Seo from "../../../components/Seo/Seo";
 export const ENABLED = "enabled";
 export const PAUSED = "paused";
 export const DISABLED = "disabled";
@@ -196,13 +197,14 @@ function NudgeControlPage() {
     );
   return (
     <div>
+      <Seo name="Notification Control" />
       <CustomPageTitle>
         Notification Control for <b>{community?.name || "..."}</b>
       </CustomPageTitle>
       <MEPaperBlock>
         <GoBack />
         <Typography style={{ marginTop: 5 }}>
-          Use these controls to start, pause or stop sending <b>{community?.name || "..."}</b> users email notices
+          Use these controls to start, pause or stop sending <b>{community?.name || "..."}</b> community members
           {/* Control all items related to nudges for <b>{community?.name || "..."}</b> on this page */}
         </Typography>
 
@@ -211,8 +213,14 @@ function NudgeControlPage() {
             const { name, key: sectionKey, description, options } = oneNudgeControlOption || {};
             const isSaving = (loading || {})[sectionKey];
             const error = (errors || {})[sectionKey];
-            const userHasMadeChanges = changesMadeAllowSave(sectionKey);
 
+            const optionInState = getValue(sectionKey);
+            const last = lastSavedOptions[sectionKey];
+            const formattedValue = formatWithDelimiter(optionInState?.value, "-");
+            const isPausedAndDateChanged = optionInState?.key === PAUSED && formattedValue !== last?.value;
+            const userHasMadeChanges = changesMadeAllowSave(sectionKey) || isPausedAndDateChanged;
+            const inputValue = optionInState?.value === true? optionInState?.activate_on : optionInState?.value;
+            
             return (
               <div key={sectionKey} style={{ marginTop: 20, border: "solid 1px #ab47bc", padding: 20 }}>
                 <Typography variant="h6">{name}</Typography>
@@ -246,10 +254,10 @@ function NudgeControlPage() {
                               <DatePicker
                                 renderInput={(props) => <TextField {...props} />}
                                 minDate={new Date()}
-                                value={getValue(sectionKey)?.value || new Date()}
+                                value={inputValue || new Date()}
                                 label="" // don't put label in the box {field.label}
                                 inputFormat="MM/DD/YYYY"
-                                onChange={(date) => selectOption(sectionKey, key, date?.toString())}
+                                onChange={(date) => selectOption(sectionKey, key, formatWithMoment(date))}
                               />
                             </LocalizationProvider>
                             <br />
