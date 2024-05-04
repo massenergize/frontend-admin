@@ -68,7 +68,8 @@ import app, {
   reducerForScheduledMessages,
   reducerForAddingBlobString,
   reducerForCommunityNudgeSettings,
-  reducerForCommunityFeatureActivation, saveCommunityFeatureFlagsReducer,
+  reducerForCommunityFeatureActivation,
+  saveCommunityFeatureFlagsReducer,
 } from './modules/appReducer';
 
 /**
