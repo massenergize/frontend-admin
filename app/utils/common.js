@@ -8,6 +8,7 @@ import React from "react";
 import { ME_FORM_PROGRESS } from "../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 import { apiCall } from "./messenger";
 
+
 export const getHumanFriendlyDateRange = (startDate, endDate) => {
   const start = moment(startDate);
   const end = moment(endDate);
@@ -406,4 +407,17 @@ export const arrangeInSequence = (arr, idsInSequence) => {
 export function mergeUnique(arr1, arr2, comparator) {
   const mergedArray = [...(arr1 || []), ...(arr2 || [])];
   return mergedArray.filter((item, index, self) => index === self.findIndex((t) => comparator(t, item)));
+}
+
+export const formatWithDelimiter = (dateString, delimiter = "-") => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = ("0" + (date.getMonth() + 1)).slice(-2); // Months are 0 based index in JavaScript
+  const day = ("0" + date.getDate()).slice(-2);
+  return `${year}${delimiter}${month}${delimiter}${day}`;
+};
+
+
+export function formatWithMoment(momentObject, format='YYYY-MM-DD') {
+  return momentObject.format(format);
 }

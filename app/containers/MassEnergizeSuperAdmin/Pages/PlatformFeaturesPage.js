@@ -11,6 +11,7 @@ import { reduxKeepFeatureActivations } from "../../../redux/redux-actions/adminA
 import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 import CustomPageTitle from "../Misc/CustomPageTitle";
 import GoBack from "../../Pages/CustomPages/Frags/GoBack";
+import Seo from "../../../components/Seo/Seo";
 
 const OPTIONS = [
   { key: ENABLED, icon: "", name: "Enabled" },
@@ -203,6 +204,7 @@ function PlatformFeaturesPage() {
     );
   return (
     <>
+      <Seo name="Platform Features" />
       <CustomPageTitle>
         Platform Features for <b>{community?.name || "..."}</b>
       </CustomPageTitle>
