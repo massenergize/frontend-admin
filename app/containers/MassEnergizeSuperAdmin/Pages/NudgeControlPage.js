@@ -68,7 +68,10 @@ function NudgeControlPage() {
 
   const selectOption = (sectionKey, optionKey, value) => {
     const oldValue = getValue(sectionKey);
-    setForm({ ...form, [sectionKey]: { ...oldValue, key: optionKey, value } });
+    setForm({
+      ...form,
+      [sectionKey]: { ...oldValue, key: optionKey, value }
+    });
   };
 
   const reformat = (obj) => {
@@ -113,7 +116,7 @@ function NudgeControlPage() {
       id,
       community_id: community?.id,
       is_active: key === ENABLED,
-      activate_on: key === PAUSED ? value : null
+      activate_on: key === PAUSED ? (value === true ? formatWithMoment() : value) : null
     };
 
     apiCall("communities.notifications.settings.set", formBody)
@@ -123,11 +126,12 @@ function NudgeControlPage() {
           setErrors({ ...errors, [optionKey]: res?.error || "An error occurred" });
           return;
         }
-        updateLastSavedOption(optionKey, selection);
         const { data } = res || {};
-        const newState = { ...form, [optionKey]: { ...(data || {}), ...reformat(data) } };
+        const formatted = {...(data || {}), ...reformat(data)}
+        const newState = { ...form, [optionKey]: formatted };
         setForm(newState);
         putNudgeListInRedux(newState);
+        updateLastSavedOption(optionKey, formatted);
       })
       .catch((err) => {
         setLoading({ ...loading, [optionKey]: false });
@@ -216,11 +220,11 @@ function NudgeControlPage() {
 
             const optionInState = getValue(sectionKey);
             const last = lastSavedOptions[sectionKey];
-            const formattedValue = formatWithDelimiter(optionInState?.value, "-");
+            const formattedValue = optionInState?.value
             const isPausedAndDateChanged = optionInState?.key === PAUSED && formattedValue !== last?.value;
             const userHasMadeChanges = changesMadeAllowSave(sectionKey) || isPausedAndDateChanged;
-            const inputValue = optionInState?.value === true? optionInState?.activate_on : optionInState?.value;
-            
+            const inputValue = optionInState?.value === true ? optionInState?.activate_on : optionInState?.value;
+
             return (
               <div key={sectionKey} style={{ marginTop: 20, border: "solid 1px #ab47bc", padding: 20 }}>
                 <Typography variant="h6">{name}</Typography>
