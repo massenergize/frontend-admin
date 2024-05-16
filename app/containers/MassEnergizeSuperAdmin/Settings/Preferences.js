@@ -318,7 +318,7 @@ const RenderRadioButtons = ({
           <FormControlLabel
             onClick={() =>
               updateSettings({
-                [valueKey]: { value: !checked },
+                [valueKey]: { value: true },
               })
             }
             key={valueKey}

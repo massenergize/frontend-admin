@@ -419,5 +419,8 @@ export const formatWithDelimiter = (dateString, delimiter = "-") => {
 
 
 export function formatWithMoment(momentObject, format='YYYY-MM-DD') {
+  if (!momentObject){
+    momentObject = moment();
+  }
   return momentObject.format(format);
 }

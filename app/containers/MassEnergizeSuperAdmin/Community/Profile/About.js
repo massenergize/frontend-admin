@@ -433,6 +433,24 @@ class About extends React.Component {
                 </Typography>
               </Paper>
 
+
+              <Feature communities={[community]} name={FLAGS.PLATFORM_FEATURES_OPT_IN} fallback={<></>}>
+                <Paper
+                  onClick={() => goHere(`/admin/settings/platform-features?comId=${community?.id}`, this.props.history)}
+                  className={`${classes.pageCard}`}
+                  elevation={1}
+                >
+                  <Typography
+                    variant="h5"
+                    style={{ fontWeight: "600", fontSize: "1rem", display: "flex", alignItems: "center" }}
+                    component="h3"
+                  >
+                    Enable or Disable Platform Features
+                    <Icon style={{ color: "green", marginLeft: 5 }}>forward</Icon>
+                  </Typography>
+                </Paper>
+              </Feature>
+
               <Feature communities={[community]} name={FLAGS.NUDGE_CONTROL_FEATURE} fallback={<></>}>
                 <Paper
                   onClick={() =>
@@ -446,28 +464,12 @@ class About extends React.Component {
                     style={{ fontWeight: "600", fontSize: "1rem", display: "flex", alignItems: "center" }}
                     component="h3"
                   >
-                    Community User Notifications
+                    Control Community User Notifications
                     <Icon style={{ color: "green", marginLeft: 5 }}>forward</Icon>
                   </Typography>
                 </Paper>
               </Feature>
 
-              <Feature communities={[community]} name={FLAGS.PLATFORM_FEATURES_OPT_IN} fallback={<></>}>
-                <Paper
-                  onClick={() => goHere(`/admin/settings/platform-features?comId=${community?.id}`, this.props.history)}
-                  className={`${classes.pageCard}`}
-                  elevation={1}
-                >
-                  <Typography
-                    variant="h5"
-                    style={{ fontWeight: "600", fontSize: "1rem", display: "flex", alignItems: "center" }}
-                    component="h3"
-                  >
-                    Platform Features
-                    <Icon style={{ color: "green", marginLeft: 5 }}>forward</Icon>
-                  </Typography>
-                </Paper>
-              </Feature>
             </PapperBlock>
           </Grid>
         </Grid>
