@@ -22,7 +22,9 @@ if (IS_LOCAL) {
 const CC_HOST = API_HOST.replace('//api', '//cc'); // local should stay the same
 
 //  ---- setting  Firebase Config routes
-let FIREBASE_CONFIG = {
+let FIREBASE_CONFIG = {}
+if (IS_PROD || IS_CANARY) {
+  FIREBASE_CONFIG = {
   apiKey:  process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
   databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
@@ -30,18 +32,22 @@ let FIREBASE_CONFIG = {
   storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.REACT_APP_FIREBASE_APP_ID,
-};
-
-if (IS_PROD || IS_CANARY) {
-  FIREBASE_CONFIG = {
-    ...FIREBASE_CONFIG,
-    measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
   };
 } 
-
+else {
+  FIREBASE_CONFIG = {
+    apiKey:  process.env.REACT_APP_LOCAL_FIREBASE_API_KEY,
+    authDomain: process.env.REACT_APP_LOCAL_FIREBASE_AUTH_DOMAIN,
+    databaseURL: process.env.REACT_APP_LOCAL_FIREBASE_DATABASE_URL,
+    projectId: process.env.REACT_APP_LOCAL_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.REACT_APP_LOCAL_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.REACT_APP_LOCAL_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.REACT_APP_LOCAL_FIREBASE_APP_ID,
+  }  
+}
 
 console.log("=== ENV===", IS_PROD ? 'PROD' : IS_CANARY ? 'CANARY' : 'DEV')
-console.log(FIREBASE_CONFIG)
 
 //  ---- setting  Community Portal routes
 let PORTAL_HOST = 'https://community.massenergize.org';
