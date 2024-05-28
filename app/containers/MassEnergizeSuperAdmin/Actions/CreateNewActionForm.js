@@ -15,25 +15,25 @@ import MassEnergizeForm from "../_FormGenerator/MassEnergizeForm";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
-    padding: 30,
+    padding: 30
   },
   field: {
     width: "100%",
-    marginBottom: 20,
+    marginBottom: 20
   },
   fieldBasic: {
     width: "100%",
     marginBottom: 20,
-    marginTop: 10,
+    marginTop: 10
   },
   inlineWrap: {
     display: "flex",
-    flexDirection: "row",
+    flexDirection: "row"
   },
   buttonInit: {
     margin: theme.spacing(4),
-    textAlign: "center",
-  },
+    textAlign: "center"
+  }
 });
 
 class CreateNewActionForm extends Component {
@@ -43,41 +43,30 @@ class CreateNewActionForm extends Component {
       communities: [],
       ccActions: [],
       vendors: [],
-      formJson: null,
+      formJson: null
     };
   }
 
   static getDerivedStateFromProps(props, state) {
-    const {
-      communities,
-      tags,
-      vendors,
-      ccActions,
-      auth,
-      location,
-    } = props;
+    const { communities, tags, vendors, ccActions, auth, location } = props;
     const fullyMountedNeverRunThisAgain =
-      communities && communities.length &&
-      tags &&
-      tags.length &&
-      ccActions &&
-      ccActions.length;
+      communities && communities.length && tags && tags.length && ccActions && ccActions.length;
 
     if (!fullyMountedNeverRunThisAgain && !state.mounted) return null;
     const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
-      id: "" + c.id,
+      id: "" + c.id
     }));
     const vends = (vendors || []).map((c) => ({
       ...c,
       displayName: c.name,
-      id: "" + c.id,
+      id: "" + c.id
     }));
     const modifiedCCActions = (ccActions || []).map((c) => ({
       ...c,
       displayName: c.description,
-      id: "" + c.id,
+      id: "" + c.id
     }));
 
     const section = makeTagSection({
@@ -92,7 +81,7 @@ class CreateNewActionForm extends Component {
       vendors: vends,
       ccActions: modifiedCCActions,
       auth,
-      autoOpenMediaLibrary: libOpen,
+      autoOpenMediaLibrary: libOpen
     });
 
     if (formJson) formJson.fields.splice(1, 0, section);
@@ -102,10 +91,9 @@ class CreateNewActionForm extends Component {
       communities: coms,
       ccActions: modifiedCCActions,
       vendors: vends,
-      formJson,
+      formJson
     };
   }
-
 
   render() {
     const { classes } = this.props;
@@ -113,19 +101,14 @@ class CreateNewActionForm extends Component {
     if (!formJson) return <Loading />;
     return (
       <div key={this.state.reRenderKey}>
-        <MassEnergizeForm
-          classes={classes}
-          formJson={formJson}
-          pageKey={PAGE_KEYS.CREATE_ACTION.key}
-          enableCancel
-        />
+        <MassEnergizeForm classes={classes} formJson={formJson} pageKey={PAGE_KEYS.CREATE_ACTION.key} enableCancel />
       </div>
     );
   }
 }
 
 CreateNewActionForm.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) => ({
@@ -135,13 +118,13 @@ const mapStateToProps = (state) => ({
   ccActions: state.getIn(["ccActions"]),
   actions: state.getIn(["allActions"]),
   auth: state.getIn(["auth"]),
-  formState: state.getIn(["tempForm"]),
+  formState: state.getIn(["tempForm"])
 });
 
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
-      saveFormTemporarily: reduxKeepFormContent,
+      saveFormTemporarily: reduxKeepFormContent
     },
     dispatch
   );
@@ -151,18 +134,9 @@ const NewActionMapped = connect(
   mapStateToProps,
   mapDispatchToProps
 )(CreateNewActionForm);
-export default withStyles(styles, { withTheme: true })(
-  withRouter(NewActionMapped)
-);
+export default withStyles(styles, { withTheme: true })(withRouter(NewActionMapped));
 
-const createFormJson = ({
-  communities,
-  ccActions,
-  vendors,
-  auth,
-  progress,
-  autoOpenMediaLibrary,
-}) => {
+const createFormJson = ({ communities, ccActions, vendors, auth, progress, autoOpenMediaLibrary }) => {
   const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Create a New Action",
@@ -184,19 +158,18 @@ const createFormJson = ({
             // defaultValue: progress.title || "",
             dbName: "title",
             readOnly: false,
-            maxLength: 40,
+            maxLength: 40
           },
           {
             name: "rank",
-            label:
-              "Rank (Which order should this action appear in?  Lower numbers come first)",
+            label: "Rank (Which order should this action appear in?  Lower numbers come first)",
             placeholder: "eg. 1",
             fieldType: "TextField",
             contentType: "number",
             isRequired: false,
             defaultValue: "",
             dbName: "rank",
-            readOnly: false,
+            readOnly: false
           },
           is_super_admin
             ? {
@@ -207,10 +180,7 @@ const createFormJson = ({
                 // defaultValue: progress.is_global || "false",
                 dbName: "is_global",
                 readOnly: false,
-                data: [
-                  { id: "false", value: "No" },
-                  { id: "true", value: "Yes" },
-                ],
+                data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
                 child: {
                   valueToCheck: "false",
                   fields: [
@@ -221,10 +191,10 @@ const createFormJson = ({
                       // defaultValue: progress.community || null,
                       dbName: "community_id",
                       data: [{ displayName: "--", id: "" }, ...communities],
-                      isRequired: true,
-                    },
-                  ],
-                },
+                      isRequired: true
+                    }
+                  ]
+                }
               }
             : {
                 name: "community",
@@ -234,14 +204,13 @@ const createFormJson = ({
                 defaultValue: communities[0].id, // for a cadmin default to first of their communities.  Need one.
                 dbName: "community_id",
                 data: [{ displayName: "--", id: "" }, ...communities],
-                isRequired: true,
-              },
-        ],
+                isRequired: true
+              }
+        ]
       },
 
       {
-        label:
-          "Carbon Calculator - Link your Action to one of our Carbon Calculator Actions",
+        label: "Carbon Calculator - Link your Action to one of our Carbon Calculator Actions",
         fieldType: "Section",
         children: [
           {
@@ -253,10 +222,22 @@ const createFormJson = ({
             dbName: "calculator_action",
             data: [{ displayName: "--", id: "" }, ...ccActions],
             modalTitle: "Carbon Action List & Instructions",
-            modalText:
-              "Check out the instructions here: https://docs.google.com/document/d/1b-tCB83hKk9yWFcB15YdHBORAFOPyh63c8jt1i15WL4",
-          },
-        ],
+            modalText: (
+              <div>
+                <p>
+                  This field allows you to link your action to a carbon calculator action.
+                  <a
+                    style={{ marginLeft: 5 }}
+                    target="_blank"
+                    href="https://docs.google.com/document/d/1b-tCB83hKk9yWFcB15YdHBORAFOPyh63c8jt1i15WL4"
+                  >
+                    Here is the list of carbon calculator actions & instructions
+                  </a>
+                </p>
+              </div>
+            )
+          }
+        ]
       },
       {
         name: "featured_summary",
@@ -266,7 +247,7 @@ const createFormJson = ({
         isMulti: true,
         isRequired: true,
         // defaultValue: progress.featured_summary || null,
-        dbName: "featured_summary",
+        dbName: "featured_summary"
       },
       {
         name: "about",
@@ -275,7 +256,7 @@ const createFormJson = ({
         fieldType: "HTMLField",
         isRequired: true,
         // defaultValue: progress.about || null,
-        dbName: "about",
+        dbName: "about"
       },
       {
         name: "steps_to_take",
@@ -284,7 +265,7 @@ const createFormJson = ({
         fieldType: "HTMLField",
         isRequired: false,
         // defaultValue: progress.steps_to_take || null,
-        dbName: "steps_to_take",
+        dbName: "steps_to_take"
       },
       {
         name: "deep_dive",
@@ -293,7 +274,7 @@ const createFormJson = ({
         fieldType: "HTMLField",
         isRequired: false,
         // defaultValue: progress.deep_dive || null,
-        dbName: "deep_dive",
+        dbName: "deep_dive"
       },
       {
         name: "vendors",
@@ -302,7 +283,7 @@ const createFormJson = ({
         selectMany: true,
         // defaultValue: progress.vendors || null,
         dbName: "vendors",
-        data: vendors,
+        data: vendors
       },
       {
         name: "image",
@@ -314,7 +295,7 @@ const createFormJson = ({
         // selected: progress.image || [],
         // defaultValue: progress.image || [],
         openState: autoOpenMediaLibrary,
-        filesLimit: 1,
+        filesLimit: 1
       },
       {
         name: "is_published",
@@ -324,9 +305,9 @@ const createFormJson = ({
         // defaultValue: progress.is_published || "false",
         dbName: "is_published",
         readOnly: false,
-        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-      },
-    ],
+        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }]
+      }
+    ]
   };
   return formJson;
 };
