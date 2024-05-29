@@ -7,7 +7,7 @@ import styles from "../../../components/Widget/widget-jss";
 import {
   loadFeatureFlags,
   reduxToggleUniversalModal,
-  reduxToggleUniversalToast,
+  reduxToggleUniversalToast
 } from "../../../redux/redux-actions/adminActions";
 import AddOrEditFeatureFlags from "./AddOrEditFeatureFlags";
 import ManageFeatureFlags from "./ManageFeatureFlags";
@@ -41,7 +41,7 @@ function FeatureFlags({
           putFlagsInRedux={putFlagsInRedux}
           toggleToast={toggleToast}
         />
-      ),
+      )
     },
     1: {
       key: "add-new-flag",
@@ -52,14 +52,17 @@ function FeatureFlags({
           communities={communities}
           // flagKeys={(featureFlags && featureFlags.keys) || {}}
           users={users}
-          switchTabs={() => setCurrentTab(0)}
+          switchTabs={() => {
+            setCurrentTab(0);
+            setFeatureToEdit(null);
+          }}
           featureFlags={featureFlags}
           putFlagsInRedux={putFlagsInRedux}
           featureToEdit={featureToEdit}
-          setFeatureToEdit = {setFeatureToEdit}
+          setFeatureToEdit={setFeatureToEdit}
         />
-      ),
-    },
+      )
+    }
   };
   const tab = TABS[currentTab];
 
@@ -69,10 +72,9 @@ function FeatureFlags({
       <Paper>
         <div style={{ padding: 20 }}>
           <Typography variant="body">
-            Feature flags help you control which functionalities are available
-            to different audiences. Here, you can create flags that can be used
-            to narrow a functionality to a group of communities, a group of
-            users, or a particular platform. Like (User portal, or admin portal)
+            Feature flags help you control which functionalities are available to different audiences. Here, you can
+            create flags that can be used to narrow a functionality to a group of communities, a group of users, or a
+            particular platform. Like (User portal, or admin portal)
           </Typography>
         </div>
 
@@ -98,7 +100,7 @@ const mapStateToProps = (state) => {
   return {
     featureFlags: state.getIn(["featureFlags"]),
     communities: state.getIn(["communities"]),
-    users: state.getIn(["allUsers"]),
+    users: state.getIn(["allUsers"])
   };
 };
 
@@ -107,7 +109,7 @@ const mapDispatchToProps = (dispatch) => {
     {
       putFlagsInRedux: loadFeatureFlags,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast: reduxToggleUniversalToast
     },
     dispatch
   );

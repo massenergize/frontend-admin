@@ -1214,7 +1214,7 @@ class MassEnergizeForm extends Component {
     ));
 
   render() {
-    const { classes, enableCancel, cancel, noBack } = this.props;
+    const { classes, enableCancel, cancel, noBack, onClear } = this.props;
     const {
       formJson,
       error,
@@ -1247,6 +1247,19 @@ class MassEnergizeForm extends Component {
                   }}
                 >
                   <i className = "fa fa-long-arrow-left" style = {{marginRight:5}} /> <span  style = {{fontWeight:"bold"}}>Go Back</span>
+                </Link>
+              )}
+              {onClear && (
+                <Link
+                  to="#"
+                 style = {{color: "#2a93d0", marginLeft:15}}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onClear && onClear()
+                   this.resetForm();
+                  }}
+                >
+                  <span  style = {{fontWeight:"bold"}}>Clear</span>
                 </Link>
               )}
             
