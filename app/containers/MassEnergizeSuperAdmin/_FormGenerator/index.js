@@ -608,7 +608,7 @@ class MassEnergizeForm extends Component {
   }
 
   renderModalText = (field) => {
-    if (field && field.modalText) {
+    if ((field && field.modalText) || field?.hasModal) {
       const { renderModalTrigger } = field || {};
       return <Modal title={field.modalTitle} renderTrigger={renderModalTrigger} text={field.modalText} />;
     }
@@ -645,7 +645,12 @@ class MassEnergizeForm extends Component {
 
     switch (field.fieldType) {
       case FieldTypes.Custom:
-        return field?.render();
+        return field?.render({
+          resetForm: this.resetForm,
+          updateForm: this.updateForm,
+          state: this.state,
+          renderModal: this.renderModalText
+        });
       case FieldTypes.Checkbox:
         if (field?.isAsync) {
           return (
@@ -1040,7 +1045,7 @@ class MassEnergizeForm extends Component {
               // maxLength={field.maxLength}
               variant="outlined"
             />
-             {this.renderAdditionalLayout(field)}
+            {this.renderAdditionalLayout(field)}
           </div>
         );
       case FieldTypes.Section:
@@ -1113,7 +1118,7 @@ class MassEnergizeForm extends Component {
                 })
               }
             />
-             {this.renderAdditionalLayout(field)}
+            {this.renderAdditionalLayout(field)}
           </div>
         );
       default:
