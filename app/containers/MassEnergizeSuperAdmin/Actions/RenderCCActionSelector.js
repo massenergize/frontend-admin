@@ -7,20 +7,37 @@ import { smartString } from "../../../utils/common";
 const DASH = "----";
 const dummies = {
   ccActions: [
-    { id: DASH, title: DASH, description: DASH},
+    { id: DASH, title: DASH, description: DASH },
     {
+      parent: 5,
       id: 1,
       title: "Install Air Condition",
       description:
         "Creates Category and Subcategory models in the carbon calculator app. Carbon Calculator Actions have their Category and Subcategory links to these models. When a cadmin adds or edits an action, these Categories and Subcategories"
     },
     {
+      parent: 4,
       id: 2,
       title: "Use Heat Pumps",
       description:
         "Creates Category and Subcategory models in the carbon calculator app. Carbon Calculator Actions have their Category and Subcategory links to these models. When a cadmin adds or edits an action, these Categories and Subcategories"
     },
     {
+      parent: 6,
+      id: 3,
+      title: "Use Energy Saving Light Bulbs",
+      description:
+        "Creates Category and Subcategory models in the carbon calculator app. Carbon Calculator Actions have their Category and Subcategory links to these models. When a cadmin adds or edits an action, these Categories and Subcategories"
+    },
+    {
+      parent: 4,
+      id: 3,
+      title: "Use Energy Saving Light Bulbs",
+      description:
+        "Creates Category and Subcategory models in the carbon calculator app. Carbon Calculator Actions have their Category and Subcategory links to these models. When a cadmin adds or edits an action, these Categories and Subcategories"
+    },
+    {
+      parent: 3,
       id: 3,
       title: "Use Energy Saving Light Bulbs",
       description:
@@ -84,6 +101,18 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
     return subCategoriesList;
   };
 
+  const makeCCActionData = (chosenSubCategory, ccActionsList) => {
+    const data = ccActionsList.filter((cc) => chosenSubCategory.includes(cc.parent));
+    if (data.length) return data;
+    return ccActionsList;
+  };
+
+  const selectedSubs = (chosenSubCategories, subCatList) => {
+    const data = subCatList.filter((sc) => chosenSubCategories.includes(sc.id));
+    return data;
+  };
+
+  
   return (
     <>
       <div style={{ border: "1px solid rgb(229, 238, 245)", padding: 20, marginBottom: 25, borderRadius: 5 }}>
@@ -104,7 +133,7 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
           <div style={{ width: "20%", marginRight: 10 }}>
             <MEDropdown
               placeholder="Sub-Category"
-              defaultValue={chosenSubCategory}
+              defaultValue={selectedSubs(chosenSubCategory, dummies.subCategories)}
               data={makeSubCategoryData(chosenCategory, dummies.subCategories)}
               labelExtractor={(c) => c.displayName}
               valueExtractor={(c) => c.id}
@@ -115,7 +144,7 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
             <MEDropdown
               placeholder="Select Carbon Calculator Action"
               defaultValue={ccAction}
-              data={dummies.ccActions}
+              data={makeCCActionData(chosenSubCategory, dummies.ccActions)}
               labelExtractor={(c) => (
                 <span>
                   <b>{c.title}: </b> <span>{smartString(c.description, 50)}</span>
