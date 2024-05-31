@@ -31,15 +31,15 @@ const dummies = {
     },
     {
       parent: 4,
-      id: 3,
-      title: "Use Energy Saving Light Bulbs",
+      id: 5,
+      title: "Fifth Energy Saving Light Bulbs",
       description:
         "Creates Category and Subcategory models in the carbon calculator app. Carbon Calculator Actions have their Category and Subcategory links to these models. When a cadmin adds or edits an action, these Categories and Subcategories"
     },
     {
       parent: 3,
-      id: 3,
-      title: "Use Energy Saving Light Bulbs",
+      id: 4,
+      title: "Fourth Energy Saving Light Bulbs",
       description:
         "Creates Category and Subcategory models in the carbon calculator app. Carbon Calculator Actions have their Category and Subcategory links to these models. When a cadmin adds or edits an action, these Categories and Subcategories"
     }
@@ -107,12 +107,15 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
     return ccActionsList;
   };
 
-  const selectedSubs = (chosenSubCategories, subCatList) => {
-    const data = subCatList.filter((sc) => chosenSubCategories.includes(sc.id));
+  const selectedSubs = (chosenSubCategory, subCatList) => {
+    const data = subCatList.filter((sc) => chosenSubCategory.includes(sc.id));
+    return data;
+  };
+  const selectedCCActions = (chosenCCAction, ccActionsList) => {
+    const data = ccActionsList.filter((sc) => chosenCCAction.includes(sc.id));
     return data;
   };
 
-  
   return (
     <>
       <div style={{ border: "1px solid rgb(229, 238, 245)", padding: 20, marginBottom: 25, borderRadius: 5 }}>
@@ -143,7 +146,7 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
           <div style={{ width: "60%" }}>
             <MEDropdown
               placeholder="Select Carbon Calculator Action"
-              defaultValue={ccAction}
+              defaultValue={selectedCCActions(ccAction, dummies.ccActions)}
               data={makeCCActionData(chosenSubCategory, dummies.ccActions)}
               labelExtractor={(c) => (
                 <span>
