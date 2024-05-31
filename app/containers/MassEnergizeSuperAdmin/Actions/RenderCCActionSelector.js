@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import { Link, Typography } from "@mui/material";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
+import { smartString } from "../../../utils/common";
 
+const DASH = "----";
 const dummies = {
   ccActions: [
+    { id: DASH, title: DASH, description: DASH},
     {
       id: 1,
       title: "Install Air Condition",
@@ -25,22 +28,28 @@ const dummies = {
     }
   ],
   categories: [
+    { id: DASH, displayName: DASH },
     { id: 1, displayName: "Home Energy" },
     { id: 2, displayName: "Food & Nutrition" },
     { id: 3, displayName: "Waste Management" }
   ],
   subCategories: [
-    { value: 1, displayName: "Sub Category 1", parent: 1 },
-    { value: 2, displayName: "Sub Category 2", parent: 1 },
-    { value: 3, displayName: "Sub Category 3", parent: 3 },
-    { value: 4, displayName: "Sub Category 3", parent: 2 },
-    { value: 5, displayName: "Sub Category 3", parent: 3 },
-    { value: 6, displayName: "Sub Category 3", parent: 2 },
-    { value: 7, displayName: "Sub Category 3", parent: 1 }
+    { id: DASH, displayName: DASH },
+    { id: 1, displayName: "Solar Beams", parent: 1 },
+    { id: 2, displayName: "Wind Turbines", parent: 1 },
+    { id: 3, displayName: "Hot Pots", parent: 3 },
+    { id: 4, displayName: "Plant Based Diet", parent: 2 },
+    { id: 5, displayName: "Spiritual Cleansing", parent: 3 },
+    { id: 6, displayName: "Recycle Cocunut Shell", parent: 2 },
+    { id: 7, displayName: "Plastic Brick", parent: 1 }
   ]
 };
 
 function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
+  const [chosenCategory, setChosenCategory] = useState([]);
+  const [chosenSubCategory, setChosenSubCategory] = useState([]);
+  const [ccAction, setChosenCCAction] = useState([]);
+
   const renderCarbonModal = () => {
     return renderModal({
       renderModalTrigger: ({ openModal }) => {
@@ -68,19 +77,24 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
       )
     });
   };
+
+  const makeSubCategoryData = (chosenCategory, subCategoriesList) => {
+    const data = subCategoriesList.filter((sc) => chosenCategory.includes(sc.parent));
+    if (data.length) return data;
+    return subCategoriesList;
+  };
+
   return (
     <>
       <div style={{ border: "1px solid rgb(229, 238, 245)", padding: 20, marginBottom: 25, borderRadius: 5 }}>
         <Typography variant="p">Carbon Calculator - Link your action to one of our Carbon Calculator Action</Typography>
         <br />
         {renderCarbonModal()}
-        {/* <Link className="touchable-opacity">
-          <b>Carbon Action List & Instructions</b>
-        </Link> */}
         <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
           <div style={{ width: "20%", marginRight: 10 }}>
-            {/* <Typography variant="small">Category</Typography> */}
             <MEDropdown
+              onItemSelected={(item) => setChosenCategory(item)}
+              defaultValue={chosenCategory}
               placeholder="Category"
               data={dummies.categories}
               labelExtractor={(c) => c.displayName}
@@ -88,14 +102,25 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
             />
           </div>
           <div style={{ width: "20%", marginRight: 10 }}>
-            {/* <Typography variant="small">Sub Category</Typography> */}
-            <MEDropdown placeholder="Sub-Category" />
+            <MEDropdown
+              placeholder="Sub-Category"
+              defaultValue={chosenSubCategory}
+              data={makeSubCategoryData(chosenCategory, dummies.subCategories)}
+              labelExtractor={(c) => c.displayName}
+              valueExtractor={(c) => c.id}
+            />
           </div>
-          <div style={{ width: "60%", marginTop: 10 }}>
-            <LightAutoComplete
-              placeholder="Select CC Action"
+
+          <div style={{ width: "60%" }}>
+            <MEDropdown
+              placeholder="Select Carbon Calculator Action"
+              defaultValue={ccAction}
               data={dummies.ccActions}
-              labelExtractor={(c) => c.title}
+              labelExtractor={(c) => (
+                <span>
+                  <b>{c.title}: </b> <span>{smartString(c.description, 50)}</span>
+                </span>
+              )}
               valueExtractor={(c) => c.id}
             />
           </div>

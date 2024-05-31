@@ -70,6 +70,7 @@ function MEDropdown(props) {
     params: { ...(rest?.params || {}) },
   });
   useEffect(() => {
+    if(!rest?.endpoint) return;
     const newItemsConstructed = (newItems || [])?.map((item) => ({
       ...item,
       displayName: labelExtractor
