@@ -104,30 +104,36 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
 
   const makeCCActionData = (chosenSubCategory, ccActionsList) => {
     // Return the ccActions that are related to the chosen subcategories
-    const data = ccActionsList.filter((cc) => chosenSubCategory.includes(cc.parent));
-    if (data.length) return data;
-    return ccActionsList;
+    return ccActionsList.filter((cc) => chosenSubCategory.includes(cc.parent));
+    // return data
+    // if (data.length) return data;
+    // return ccActionsList;
   };
 
   const selectedSubs = (chosenSubCategory, subCatList) => {
     // Return the selected subcategories that are in the current list of the subcategories
     // Meaning if a subcategory is selected, but it's not in the current list of subcategories, it will not be returned
     const data = subCatList.filter((sc) => chosenSubCategory.includes(sc.id));
-    return data;
+    return data?.map((sc) => sc.id);
   };
-  const selectedCCActions = (chosenCCAction, ccActionsList) => {
-    // Return the selected ccActions that are in the current list of the ccActions 
+  const gatherSelectedCCActions = (chosenCCAction, ccActionsList) => {
+    // Return the selected ccActions that are in the current list of the ccActions
     // Meaning if a ccAction is selected, but it's not in the current list of ccActions, it will not be returned
-    const data = ccActionsList.filter((sc) => chosenCCAction.includes(sc.id));
-    return data;
+    const data = ccActionsList.filter((cc) => chosenCCAction.includes(cc.id));
+    return data?.map((cc) => cc.id);
   };
 
-  console.log("CHOSEN CATEGORY", chosenSubCategory);
+  const filteredSubCategoriesBasedOnCategories = makeSubCategoryData(chosenCategory, dummies.subCategories);
+  const selectedSubCategories = selectedSubs(chosenSubCategory, filteredSubCategoriesBasedOnCategories);
+  const filteredCCActionsBasedOnSubCategories = makeCCActionData(chosenSubCategory, dummies.ccActions);
+  const selectedCCActions = gatherSelectedCCActions(ccAction, filteredCCActionsBasedOnSubCategories);
 
   return (
     <>
       <div style={{ border: "1px solid rgb(229, 238, 245)", padding: 20, marginBottom: 25, borderRadius: 5 }}>
-        <Typography variant="p">Carbon Calculator - Link your action to one of our Carbon Calculator Action</Typography>
+        <Typography variant="p">
+          Carbon Calculator - Link your action to one of our Carbon Calculator Actions
+        </Typography>
         <br />
         {renderCarbonModal()}
         <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
@@ -147,8 +153,8 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
                 setChosenSubCategory(item);
               }}
               placeholder="Sub-Category"
-              defaultValue={selectedSubs(chosenSubCategory, dummies.subCategories)}
-              data={makeSubCategoryData(chosenCategory, dummies.subCategories)}
+              defaultValue={selectedSubCategories}
+              data={filteredSubCategoriesBasedOnCategories}
               labelExtractor={(c) => c?.displayName}
               valueExtractor={(c) => c.id}
             />
@@ -157,12 +163,12 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
           <div style={{ width: "60%" }}>
             <MEDropdown
               placeholder="Select Carbon Calculator Action"
-              defaultValue={selectedCCActions(ccAction, dummies.ccActions)}
-              data={makeCCActionData(chosenSubCategory, dummies.ccActions)}
+              defaultValue={selectedCCActions}
+              data={filteredCCActionsBasedOnSubCategories}
               onItemSelected={(item) => setChosenCCAction(item)}
               labelExtractor={(c) => (
                 <span>
-                  <b>{c.title}: </b> <span>{smartString(c.description, 50)}</span>
+                  <b>{c?.title}: </b> <span>{smartString(c?.description, 50)}</span>
                 </span>
               )}
               valueExtractor={(c) => c.id}
