@@ -96,25 +96,33 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
   };
 
   const makeSubCategoryData = (chosenCategory, subCategoriesList) => {
+    // Return the subcategories that are related to the chosen categories
     const data = subCategoriesList.filter((sc) => chosenCategory.includes(sc.parent));
     if (data.length) return data;
     return subCategoriesList;
   };
 
   const makeCCActionData = (chosenSubCategory, ccActionsList) => {
+    // Return the ccActions that are related to the chosen subcategories
     const data = ccActionsList.filter((cc) => chosenSubCategory.includes(cc.parent));
     if (data.length) return data;
     return ccActionsList;
   };
 
   const selectedSubs = (chosenSubCategory, subCatList) => {
+    // Return the selected subcategories that are in the current list of the subcategories
+    // Meaning if a subcategory is selected, but it's not in the current list of subcategories, it will not be returned
     const data = subCatList.filter((sc) => chosenSubCategory.includes(sc.id));
     return data;
   };
   const selectedCCActions = (chosenCCAction, ccActionsList) => {
+    // Return the selected ccActions that are in the current list of the ccActions 
+    // Meaning if a ccAction is selected, but it's not in the current list of ccActions, it will not be returned
     const data = ccActionsList.filter((sc) => chosenCCAction.includes(sc.id));
     return data;
   };
+
+  console.log("CHOSEN CATEGORY", chosenSubCategory);
 
   return (
     <>
@@ -135,10 +143,13 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
           </div>
           <div style={{ width: "20%", marginRight: 10 }}>
             <MEDropdown
+              onItemSelected={(item) => {
+                setChosenSubCategory(item);
+              }}
               placeholder="Sub-Category"
               defaultValue={selectedSubs(chosenSubCategory, dummies.subCategories)}
               data={makeSubCategoryData(chosenCategory, dummies.subCategories)}
-              labelExtractor={(c) => c.displayName}
+              labelExtractor={(c) => c?.displayName}
               valueExtractor={(c) => c.id}
             />
           </div>
@@ -148,6 +159,7 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
               placeholder="Select Carbon Calculator Action"
               defaultValue={selectedCCActions(ccAction, dummies.ccActions)}
               data={makeCCActionData(chosenSubCategory, dummies.ccActions)}
+              onItemSelected={(item) => setChosenCCAction(item)}
               labelExtractor={(c) => (
                 <span>
                   <b>{c.title}: </b> <span>{smartString(c.description, 50)}</span>

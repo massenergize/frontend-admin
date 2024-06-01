@@ -85,47 +85,6 @@ function MEDropdown(props) {
   }, [newItems]);
 
 
-  // const elementObserver = useRef(null);
-  // const lastDropDownItemRef = useCallback(
-  //   (node) => {
-  //     if (elementObserver.current) elementObserver.current.disconnect();
-  //     elementObserver.current = new IntersectionObserver((entries) => {
-  //       if (entries[0].isIntersecting && cursor.has_more) {
-  //         if (!rest?.endpoint) return;
-  //         apiCall(rest?.endpoint, {
-  //           page: cursor.next,
-  //           limit: 10,
-  //           params: JSON.stringify({ ...(rest?.params || {}) }),
-  //         }).then((res) => {
-  //           setCursor({
-  //             has_more: res?.cursor?.count > optionsToDisplay?.length,
-  //             next: res?.cursor?.next,
-  //           });
-  //           let items = [
-  //             ...optionsToDisplay,
-  //             ...(res?.data || [])?.map((item) => {
-  //               return {
-  //                 ...item,
-  //                 displayName: labelExtractor
-  //                   ? labelExtractor(item)
-  //                   : item?.name || item?.title,
-  //               };
-  //             }),
-  //           ];
-
-  //           setOptionsToDisplay([
-  //             ...new Map(
-  //               items.map((item) => [item["id"], item])
-  //             ).values(),
-  //           ]);
-  //         });
-  //       }
-  //     });
-
-  //     if (node) elementObserver.current.observe(node);
-  //   },
-  //   [cursor]
-  // );
   // -------------------------------------------------------------------
   // Always switch dropdown to auto complete dropdown if there are a lot of items. A lot = (>20 items)
   if (smartDropdown && optionsToDisplay && optionsToDisplay.length > 20) {
