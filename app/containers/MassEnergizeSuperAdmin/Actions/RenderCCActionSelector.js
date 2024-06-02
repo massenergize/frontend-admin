@@ -62,10 +62,11 @@ const dummies = {
   ]
 };
 
-function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
-  const [chosenCategory, setChosenCategory] = useState([]);
-  const [chosenSubCategory, setChosenSubCategory] = useState([]);
-  const [ccAction, setChosenCCAction] = useState([]);
+function RenderCCActionSelector({ updateForm, state, renderModal }) {
+  let { category: chosenCategory, sub_category: chosenSubCategory, ccAction } = state?.formData || {};
+  chosenCategory = chosenCategory || [];
+  chosenSubCategory = chosenSubCategory || [];
+  ccAction = ccAction || [];
 
   const renderCarbonModal = () => {
     return renderModal({
@@ -177,7 +178,7 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
         <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
           <div style={{ width: "20%", marginRight: 10 }}>
             <MEDropdown
-              onItemSelected={(item) => setChosenCategory(item)}
+              onItemSelected={(item) => updateForm("category", item)}
               defaultValue={chosenCategory}
               placeholder="Category"
               data={dummies.categories}
@@ -188,7 +189,8 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
           <div style={{ width: "20%", marginRight: 10 }}>
             <MEDropdown
               onItemSelected={(item) => {
-                setChosenSubCategory(item);
+                // setChosenSubCategory(item);
+                updateForm("sub_category", item);
               }}
               placeholder={makeSubCategoryLabel(filteredSubCategoriesBasedOnCategories)}
               defaultValue={selectedSubCategories}
@@ -203,7 +205,10 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
               placeholder={makeCCALabel(filteredCCActionsBasedOnSubCategories)}
               defaultValue={selectedCCActions}
               data={filteredCCActionsBasedOnSubCategories}
-              onItemSelected={(item) => setChosenCCAction(item)}
+              onItemSelected={(item) => {
+                updateForm("ccAction", item);
+                // setChosenCCAction(item);
+              }}
               labelExtractor={(c) => (
                 <span>
                   <b>{c?.title}: </b> <span>{smartString(c?.description, 50)}</span>
