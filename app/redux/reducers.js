@@ -69,6 +69,7 @@ import app, {
   reducerForAddingBlobString,
   reducerForCommunityNudgeSettings,
   reducerForCommunityFeatureActivation, saveCommunityFeatureFlagsReducer,
+  reducerForCCActionData,
 } from './modules/appReducer';
 
 /**
@@ -98,6 +99,7 @@ export default function createReducer(injectedReducers = {}) {
     modalOptions: reducerForUniversalModal,
     toastOptions: reducerForUniversalToast,
     ccActions: reducerForCCAction,
+    ccActionsData:reducerForCCActionData,
     heap: reducerForHeap, // an object that is used to temporarily hold all kinds of random data.
     subscribers: subscribersReducer,
     teamMessages: teamMessagesReducer,

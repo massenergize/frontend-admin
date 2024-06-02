@@ -60,6 +60,7 @@ import {
   ADD_BLOB_STRING,
   KEEP_COMMUNITY_NUDGE_SETTINGS,
   KEEP_FEATURE_ACTIVATIONS_FOR_COMMUNITY, SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX,
+  LOAD_CC_ACTIONS_DATA,
 } from '../ReduxConstants';
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -452,6 +453,7 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
     dispatch(loadAllUsers(users.data));
     dispatch(loadAllVendors(vendors.data));
     dispatch(reduxLoadCCActions(ccActions.data.actions));
+    dispatch(reduxLoadCCActionsData(ccActions.data));
     dispatch(loadAllTags(tagCollections.data));
     dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
 
@@ -529,6 +531,10 @@ export const reduxToggleUniversalToast = (data = {}) => ({
 });
 export const reduxLoadCCActions = (data = []) => ({
   type: LOAD_CC_ACTIONS,
+  payload: data,
+});
+export const reduxLoadCCActionsData = (data = {}) => ({
+  type: LOAD_CC_ACTIONS_DATA,
   payload: data,
 });
 

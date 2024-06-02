@@ -3,8 +3,9 @@ import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import { Link, Typography } from "@mui/material";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { smartString } from "../../../utils/common";
+import { useSelector } from "react-redux";
 const DASH = "----";
-const EMPTY = { id: DASH, title: DASH, description: DASH, displayName: DASH };
+const EMPTY = { id: DASH, title: DASH, name: DASH, description: DASH, displayName: DASH };
 const dummies = {
   ccActions: [
     EMPTY,
@@ -63,10 +64,15 @@ const dummies = {
 };
 
 function RenderCCActionSelector({ updateForm, state, renderModal }) {
+  const allCCActions = useSelector((state) => state.getIn(["ccActionsData"]));
   let { category: chosenCategory, sub_category: chosenSubCategory, ccAction } = state?.formData || {};
   chosenCategory = chosenCategory || [];
   chosenSubCategory = chosenSubCategory || [];
   ccAction = ccAction || [];
+
+  const subCatSource = allCCActions?.subcategories || [];
+  const ccActionsSource = allCCActions?.actions || [];
+  const catSource = allCCActions?.categories || [];
 
   const renderCarbonModal = () => {
     return renderModal({
@@ -100,10 +106,10 @@ function RenderCCActionSelector({ updateForm, state, renderModal }) {
     // Return the subcategories that are related to the chosen categories
     const showAll = isSelectAll(chosenCategory);
     if (showAll) return subCategoriesList;
-    const data = subCategoriesList.filter((sc) => chosenCategory.includes(sc.parent));
+    const data = subCategoriesList.filter((sc) => chosenCategory.includes(sc.category));
     if (data.length) return [EMPTY, ...data]; // add dash option to the beginning of the list;
-    const noFiltersYet = chosenCategory?.length === 0;
-    return noFiltersYet ? subCategoriesList : [EMPTY];
+    const noFiltersSelectedShowAll = chosenCategory?.length === 0;
+    return noFiltersSelectedShowAll ? [EMPTY, ...subCategoriesList] : [EMPTY];
   };
 
   const generateCCActionListBasedOn = (chosenSubCategory, ccActionsList, filteredSubCatList) => {
@@ -119,7 +125,7 @@ function RenderCCActionSelector({ updateForm, state, renderModal }) {
     const data = ccActionsList.filter((cc) => sourceOfFilters.includes(cc.parent));
     if (data.length) return [EMPTY, ...data];
     const noFiltersSelectedShowAll = sourceOfFilters?.length === 0;
-    return noFiltersSelectedShowAll ? ccActionsList : [EMPTY];
+    return noFiltersSelectedShowAll ? [EMPTY, ...ccActionsList] : [EMPTY];
   };
 
   const isSelectAll = (arr) => {
@@ -128,7 +134,7 @@ function RenderCCActionSelector({ updateForm, state, renderModal }) {
       if (maybeDash === DASH) return true; // treat dash as the user wants to see all the options
     }
   };
-  const selectedSubs = (chosenSubCategory, subCatList) => {
+  const gatherSelectedSubs = (chosenSubCategory, subCatList) => {
     // Return the selected subcategories that are in the current list of the subcategories
     // Meaning if a subcategory is selected, but it's not in the current list of subcategories, it will not be shown
     const data = subCatList.filter((sc) => chosenSubCategory.includes(sc.id));
@@ -142,27 +148,27 @@ function RenderCCActionSelector({ updateForm, state, renderModal }) {
   };
 
   const makeSubCategoryLabel = (filtered) => {
-    if (!filtered.length) return "Sub-Category";
+    if (!filtered.length) return "Subcategory";
     const [dash] = filtered || [];
     const hasDash = dash?.id === DASH;
-    if (hasDash && filtered.length === 1) return "No Sub-Category Found";
+    if (hasDash && filtered.length === 1) return "No subcategory found";
     // -1 because we don't want to count the dash
-    return `Sub-Category (${hasDash ? filtered.length - 1 : filtered.length} found)`;
+    return `Subcategory (${hasDash ? filtered.length - 1 : filtered.length} found)`;
   };
   const makeCCALabel = (filtered) => {
     if (!filtered.length) return "Carbon Calculator Action";
     const [dash] = filtered || [];
     const hasDash = dash?.id === DASH;
-    if (hasDash && filtered.length === 1) return "No Carbon Calculator Action";
+    if (hasDash && filtered.length === 1) return "No Carbon Calculator Action found";
     // -1 because we don't want to count the dash
     return `Select Carbon Calculator Action (${hasDash ? filtered?.length - 1 : filtered?.length} found)`;
   };
 
-  const filteredSubCategoriesBasedOnCategories = generateSubCategoryListBasedOn(chosenCategory, dummies.subCategories);
-  const selectedSubCategories = selectedSubs(chosenSubCategory, filteredSubCategoriesBasedOnCategories);
+  const filteredSubCategoriesBasedOnCategories = generateSubCategoryListBasedOn(chosenCategory, subCatSource);
+  const selectedSubCategories = gatherSelectedSubs(chosenSubCategory, filteredSubCategoriesBasedOnCategories);
   const filteredCCActionsBasedOnSubCategories = generateCCActionListBasedOn(
     chosenSubCategory,
-    dummies.ccActions,
+    ccActionsSource,
     filteredSubCategoriesBasedOnCategories
   );
   const selectedCCActions = gatherSelectedCCActions(ccAction, filteredCCActionsBasedOnSubCategories);
@@ -181,8 +187,8 @@ function RenderCCActionSelector({ updateForm, state, renderModal }) {
               onItemSelected={(item) => updateForm("category", item)}
               defaultValue={chosenCategory}
               placeholder="Category"
-              data={dummies.categories}
-              labelExtractor={(c) => c.displayName}
+              data={[EMPTY, ...catSource]}
+              labelExtractor={(c) => c.name}
               valueExtractor={(c) => c.id}
             />
           </div>
@@ -195,13 +201,14 @@ function RenderCCActionSelector({ updateForm, state, renderModal }) {
               placeholder={makeSubCategoryLabel(filteredSubCategoriesBasedOnCategories)}
               defaultValue={selectedSubCategories}
               data={filteredSubCategoriesBasedOnCategories}
-              labelExtractor={(c) => c?.displayName}
+              labelExtractor={(c) => c?.name}
               valueExtractor={(c) => c.id}
             />
           </div>
 
           <div style={{ width: "60%" }}>
             <MEDropdown
+              smartDropdown={false}
               placeholder={makeCCALabel(filteredCCActionsBasedOnSubCategories)}
               defaultValue={selectedCCActions}
               data={filteredCCActionsBasedOnSubCategories}
@@ -211,7 +218,7 @@ function RenderCCActionSelector({ updateForm, state, renderModal }) {
               }}
               labelExtractor={(c) => (
                 <span>
-                  <b>{c?.title}: </b> <span>{smartString(c?.description, 50)}</span>
+                  <b>{c?.name}: </b> <span>{smartString(c?.description, 50)}</span>
                 </span>
               )}
               valueExtractor={(c) => c.id}
