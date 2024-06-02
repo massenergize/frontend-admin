@@ -95,7 +95,7 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
     });
   };
 
-  const makeSubCategoryData = (chosenCategory, subCategoriesList) => {
+  const generateSubCategoryListBasedOn = (chosenCategory, subCategoriesList) => {
     // Return the subcategories that are related to the chosen categories
     const showAll = isSelectAll(chosenCategory);
     if (showAll) return subCategoriesList;
@@ -105,21 +105,20 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
     return noFiltersYet ? subCategoriesList : [EMPTY];
   };
 
-  const makeCCActionData = (chosenSubCategory, ccActionsList, filteredSubCatList) => {
+  const generateCCActionListBasedOn = (chosenSubCategory, ccActionsList, filteredSubCatList) => {
     // Return the ccActions that are related to the chosen subcategories
     const showAll = isSelectAll(chosenSubCategory); // treat dash as the user wants to see all the options
+    let sourceOfFilters = chosenSubCategory;
     if (showAll) {
+      const subCategoryListHasOptions = filteredSubCatList?.length > 1;
+      if (subCategoryListHasOptions) sourceOfFilters = filteredSubCatList?.map((sc) => sc.id);
+      // In the initial case that subcategory dropdown is empty, we want to show all the ccActions
       if (filteredSubCatList?.length === 1) return ccActionsList;
-      const filteredIds = filteredSubCatList?.map((sc) => sc.id);
-      if (filteredSubCatList?.length > 1) {
-        const allBasedOnFilters = ccActionsList.filter((cc) => filteredIds.includes(cc.parent));
-        return allBasedOnFilters.length ? [EMPTY, ...allBasedOnFilters] : [EMPTY];
-      }
     }
-    const data = ccActionsList.filter((cc) => chosenSubCategory.includes(cc.parent));
+    const data = ccActionsList.filter((cc) => sourceOfFilters.includes(cc.parent));
     if (data.length) return [EMPTY, ...data];
-    const noFiltersYet = chosenSubCategory?.length === 0;
-    return noFiltersYet ? ccActionsList : [EMPTY];
+    const noFiltersSelectedShowAll = sourceOfFilters?.length === 0;
+    return noFiltersSelectedShowAll ? ccActionsList : [EMPTY];
   };
 
   const isSelectAll = (arr) => {
@@ -130,13 +129,13 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
   };
   const selectedSubs = (chosenSubCategory, subCatList) => {
     // Return the selected subcategories that are in the current list of the subcategories
-    // Meaning if a subcategory is selected, but it's not in the current list of subcategories, it will not be returned
+    // Meaning if a subcategory is selected, but it's not in the current list of subcategories, it will not be shown
     const data = subCatList.filter((sc) => chosenSubCategory.includes(sc.id));
     return data?.map((sc) => sc.id);
   };
   const gatherSelectedCCActions = (chosenCCAction, ccActionsList) => {
     // Return the selected ccActions that are in the current list of the ccActions
-    // Meaning if a ccAction is selected, but it's not in the current list of ccActions, it will not be returned
+    // Meaning if a ccAction is selected, but it's not in the current list of ccActions, it will not be shown
     const data = ccActionsList.filter((cc) => chosenCCAction.includes(cc.id));
     return data?.map((cc) => cc.id);
   };
@@ -146,6 +145,7 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
     const [dash] = filtered || [];
     const hasDash = dash?.id === DASH;
     if (hasDash && filtered.length === 1) return "No Sub-Category Found";
+    // -1 because we don't want to count the dash
     return `Sub-Category (${hasDash ? filtered.length - 1 : filtered.length} found)`;
   };
   const makeCCALabel = (filtered) => {
@@ -153,12 +153,13 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
     const [dash] = filtered || [];
     const hasDash = dash?.id === DASH;
     if (hasDash && filtered.length === 1) return "No Carbon Calculator Action";
+    // -1 because we don't want to count the dash
     return `Select Carbon Calculator Action (${hasDash ? filtered?.length - 1 : filtered?.length} found)`;
   };
 
-  const filteredSubCategoriesBasedOnCategories = makeSubCategoryData(chosenCategory, dummies.subCategories);
+  const filteredSubCategoriesBasedOnCategories = generateSubCategoryListBasedOn(chosenCategory, dummies.subCategories);
   const selectedSubCategories = selectedSubs(chosenSubCategory, filteredSubCategoriesBasedOnCategories);
-  const filteredCCActionsBasedOnSubCategories = makeCCActionData(
+  const filteredCCActionsBasedOnSubCategories = generateCCActionListBasedOn(
     chosenSubCategory,
     dummies.ccActions,
     filteredSubCategoriesBasedOnCategories
