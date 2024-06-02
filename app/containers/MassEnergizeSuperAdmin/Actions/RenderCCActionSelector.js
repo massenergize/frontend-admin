@@ -100,17 +100,24 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
     const showAll = isSelectAll(chosenCategory);
     if (showAll) return subCategoriesList;
     const data = subCategoriesList.filter((sc) => chosenCategory.includes(sc.parent));
-    if (data.length) return data; // add dash option to the beginning of the list;
+    if (data.length) return [EMPTY, ...data]; // add dash option to the beginning of the list;
     const noFiltersYet = chosenCategory?.length === 0;
     return noFiltersYet ? subCategoriesList : [EMPTY];
   };
 
-  const makeCCActionData = (chosenSubCategory, ccActionsList) => {
+  const makeCCActionData = (chosenSubCategory, ccActionsList, filteredSubCatList) => {
     // Return the ccActions that are related to the chosen subcategories
     const showAll = isSelectAll(chosenSubCategory); // treat dash as the user wants to see all the options
-    if (showAll) return ccActionsList;
+    if (showAll) {
+      if (filteredSubCatList?.length === 1) return ccActionsList;
+      const filteredIds = filteredSubCatList?.map((sc) => sc.id);
+      if (filteredSubCatList?.length > 1) {
+        const allBasedOnFilters = ccActionsList.filter((cc) => filteredIds.includes(cc.parent));
+        return allBasedOnFilters.length ? [EMPTY, ...allBasedOnFilters] : [EMPTY];
+      }
+    }
     const data = ccActionsList.filter((cc) => chosenSubCategory.includes(cc.parent));
-    if (data.length) return data;
+    if (data.length) return [EMPTY, ...data];
     const noFiltersYet = chosenSubCategory?.length === 0;
     return noFiltersYet ? ccActionsList : [EMPTY];
   };
@@ -137,19 +144,25 @@ function RenderCCActionSelector({ resetForm, updateForm, state, renderModal }) {
   const makeSubCategoryLabel = (filtered) => {
     if (!filtered.length) return "Sub-Category";
     const [dash] = filtered || [];
-    if (dash?.id === DASH && filtered.length === 1) return "No Sub-Category Found";
-    return `Sub-Category (${filtered.length} found)`;
+    const hasDash = dash?.id === DASH;
+    if (hasDash && filtered.length === 1) return "No Sub-Category Found";
+    return `Sub-Category (${hasDash ? filtered.length - 1 : filtered.length} found)`;
   };
   const makeCCALabel = (filtered) => {
     if (!filtered.length) return "Carbon Calculator Action";
     const [dash] = filtered || [];
-    if (dash?.id === DASH && filtered.length === 1) return "No Carbon Calculator Action";
-    return `Select Carbon Calculator Action (${filtered.length} found)`;
+    const hasDash = dash?.id === DASH;
+    if (hasDash && filtered.length === 1) return "No Carbon Calculator Action";
+    return `Select Carbon Calculator Action (${hasDash ? filtered?.length - 1 : filtered?.length} found)`;
   };
 
   const filteredSubCategoriesBasedOnCategories = makeSubCategoryData(chosenCategory, dummies.subCategories);
   const selectedSubCategories = selectedSubs(chosenSubCategory, filteredSubCategoriesBasedOnCategories);
-  const filteredCCActionsBasedOnSubCategories = makeCCActionData(chosenSubCategory, dummies.ccActions);
+  const filteredCCActionsBasedOnSubCategories = makeCCActionData(
+    chosenSubCategory,
+    dummies.ccActions,
+    filteredSubCategoriesBasedOnCategories
+  );
   const selectedCCActions = gatherSelectedCCActions(ccAction, filteredCCActionsBasedOnSubCategories);
 
   return (
