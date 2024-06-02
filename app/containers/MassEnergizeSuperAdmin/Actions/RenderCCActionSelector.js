@@ -106,7 +106,7 @@ function RenderCCActionSelector({ updateForm, state, renderModal }) {
     // Return the subcategories that are related to the chosen categories
     const showAll = isSelectAll(chosenCategory);
     if (showAll) return subCategoriesList;
-    const data = subCategoriesList.filter((sc) => chosenCategory.includes(sc.category));
+    const data = subCategoriesList.filter((sc) => chosenCategory.includes(sc.category?.id));
     if (data.length) return [EMPTY, ...data]; // add dash option to the beginning of the list;
     const noFiltersSelectedShowAll = chosenCategory?.length === 0;
     return noFiltersSelectedShowAll ? [EMPTY, ...subCategoriesList] : [EMPTY];
@@ -122,7 +122,7 @@ function RenderCCActionSelector({ updateForm, state, renderModal }) {
       // In the initial case that subcategory dropdown is empty, we want to show all the ccActions
       if (filteredSubCatList?.length === 1) return ccActionsList;
     }
-    const data = ccActionsList.filter((cc) => sourceOfFilters.includes(cc.parent));
+    const data = ccActionsList.filter((cc) => sourceOfFilters.includes(cc.subcategory?.id));
     if (data.length) return [EMPTY, ...data];
     const noFiltersSelectedShowAll = sourceOfFilters?.length === 0;
     return noFiltersSelectedShowAll ? [EMPTY, ...ccActionsList] : [EMPTY];
