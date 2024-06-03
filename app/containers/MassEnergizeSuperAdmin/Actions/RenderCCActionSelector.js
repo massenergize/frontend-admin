@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import { Link, Typography } from "@mui/material";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
@@ -69,9 +69,9 @@ const sortAlphabetically = (a, b) => {
   if (a > b) return 1;
   return 0;
 };
-function RenderCCActionSelector({ updateForm, state, renderModal }) {
+function RenderCCActionSelector({ updateForm, state, renderModal, action }) {
   const allCCActions = useSelector((state) => state.getIn(["ccActionsData"]));
-  let { category: chosenCategory, sub_category: chosenSubCategory, ccAction } = state?.formData || {};
+  let { chosenCategory, chosenSubCategory, ccAction } = state?.formData?.carbon_calculator_items || {};
   chosenCategory = chosenCategory || [];
   chosenSubCategory = chosenSubCategory || [];
   ccAction = ccAction || [];
@@ -171,6 +171,16 @@ function RenderCCActionSelector({ updateForm, state, renderModal }) {
     return `Select Carbon Calculator Action (${hasDash ? filtered?.length - 1 : filtered?.length})`;
   };
 
+  // useEffect(() => {
+  //   if (!action) return;
+  //   const { category, subcategory, calculator_action } = action || {};
+  //   const initial = {
+  //     category: category?.id ? [category?.id] : [],
+  //     subcategory: subcategory?.id ? [subcategory?.id] : [],
+  //     ccAction: calculator_action?.id ? [calculator_action?.id] : []
+  //   };
+  // }, [action?.category?.toString(), action?.subcategory?.toString()]);
+
   const filteredSubCategoriesBasedOnCategories = generateSubCategoryListBasedOn(chosenCategory, subCatSource);
   const selectedSubCategories = gatherSelectedSubs(chosenSubCategory, filteredSubCategoriesBasedOnCategories);
   const filteredCCActionsBasedOnSubCategories = generateCCActionListBasedOn(
@@ -210,7 +220,7 @@ function RenderCCActionSelector({ updateForm, state, renderModal }) {
             <MEDropdown
               onItemSelected={(item) => {
                 // setChosenSubCategory(item);
-                updateForm("sub_category", item);
+                updateForm("subcategory", item);
               }}
               placeholder={makeSubCategoryLabel(filteredSubCategoriesBasedOnCategories)}
               defaultValue={selectedSubCategories}

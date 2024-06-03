@@ -487,7 +487,6 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       policies: policies?.cursor,
       scheduledMessages: scheduledMessages?.cursor,
     };
-    console.log("WHat is cursor", cursor)
     dispatch(reduxLoadMetaDataAction(cursor));
   });
 };

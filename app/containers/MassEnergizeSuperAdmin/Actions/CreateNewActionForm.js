@@ -214,6 +214,7 @@ const createFormJson = ({ communities, ccActions, vendors, auth, progress, autoO
       {
         label: "Carbon Calculator - Link your Action to one of our Carbon Calculator Actions",
         fieldType: fieldTypes.Custom,
+        dbName: "calculator_action",
         render: (props) => <RenderCCActionSelector {...props} />
         // children: [
         //   {

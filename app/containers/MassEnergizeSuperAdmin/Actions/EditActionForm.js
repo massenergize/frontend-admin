@@ -11,28 +11,29 @@ import { PAGE_KEYS } from "../ME  Tools/MEConstants";
 import { Paper, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import Seo from "../../../components/Seo/Seo";
+import RenderCCActionSelector from "./RenderCCActionSelector";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
-    padding: 30,
+    padding: 30
   },
   field: {
     width: "100%",
-    marginBottom: 20,
+    marginBottom: 20
   },
   fieldBasic: {
     width: "100%",
     marginBottom: 20,
-    marginTop: 10,
+    marginTop: 10
   },
   inlineWrap: {
     display: "flex",
-    flexDirection: "row",
+    flexDirection: "row"
   },
   buttonInit: {
     margin: theme.spacing(4),
-    textAlign: "center",
-  },
+    textAlign: "center"
+  }
 });
 
 export const getSelectedIds = (selected, dataToCrossCheck) => {
@@ -56,8 +57,7 @@ export const checkIfReadOnly = (action, user) => {
     var correctCommunity = user.admin_at.filter((comm) => {
       return comm.id === action.community.id;
     });
-    var readOnlyWrongCommunity =
-      !user.is_super_admin && correctCommunity.length < 1;
+    var readOnlyWrongCommunity = !user.is_super_admin && correctCommunity.length < 1;
   }
   return (action.is_global && !user.is_super_admin) || readOnlyWrongCommunity;
 };
@@ -65,7 +65,7 @@ export const makeTagSection = ({ collections, action, defaults = true }) => {
   const section = {
     label: "Please select tag(s) that apply to this action",
     fieldType: "Section",
-    children: [],
+    children: []
   };
   (collections || []).forEach((tCol) => {
     var selected = (action && action.tags) || [];
@@ -73,7 +73,7 @@ export const makeTagSection = ({ collections, action, defaults = true }) => {
     if (defaults) {
       let data = selected.map((c) => c.id.toString());
       putDefaultsIfUpdating = {
-        defaultValue: defaults && getSelectedIds(data || [], tCol.tags || []),
+        defaultValue: defaults && getSelectedIds(data || [], tCol.tags || [])
       };
     }
 
@@ -81,24 +81,19 @@ export const makeTagSection = ({ collections, action, defaults = true }) => {
     const newField = {
       isRequired: false,
       name: tCol.name,
-      label: `${tCol.name} ${
-        tCol.allow_multiple
-          ? "(You can select multiple)"
-          : "(Only one selection allowed)"
-      }`,
+      label: `${tCol.name} ${tCol.allow_multiple ? "(You can select multiple)" : "(Only one selection allowed)"}`,
       placeholder: "",
       fieldType: "Checkbox",
       selectMany: tCol.allow_multiple,
       ...putDefaultsIfUpdating,
-      processedDefaultValue: (selected) =>
-        getSelectedIds(selected || [], tCol.tags || []),
+      processedDefaultValue: (selected) => getSelectedIds(selected || [], tCol.tags || []),
 
       dbName: "tags",
       data: (tCol.tags || []).map((t) => ({
         ...t,
         displayName: t.name,
-        id: "" + t.id,
-      })),
+        id: "" + t.id
+      }))
     };
 
     // want this to be the 5th field
@@ -117,14 +112,14 @@ class EditActionForm extends Component {
       vendors: [],
       ccActions: [],
       formJson: null,
-      readOnly: false,
+      readOnly: false
     };
   }
 
   async componentDidMount() {
     const { id } = this.props.match.params;
     const actionResponse = await apiCall("/actions.info", {
-      id: id,
+      id: id
     });
     if (actionResponse && !actionResponse.success) {
       return;
@@ -133,28 +128,12 @@ class EditActionForm extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    const {
-      match,
-      communities,
-      actions,
-      tags,
-      vendors,
-      auth,
-      ccActions,
-      location,
-    } = props;
+    const { match, communities, actions, tags, vendors, auth, ccActions, location } = props;
 
     const { id } = match.params;
-    const readyToRunPageFirstTime =
-      actions &&
-      actions.length &&
-      ccActions &&
-      ccActions.length &&
-      tags &&
-      tags.length;
+    const readyToRunPageFirstTime = actions && actions.length && ccActions && ccActions.length && tags && tags.length;
 
-    const jobsDoneDontRunWhatsBelowEverAgain =
-      !readyToRunPageFirstTime || state.mounted;
+    const jobsDoneDontRunWhatsBelowEverAgain = !readyToRunPageFirstTime || state.mounted;
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
     let action = state.action;
     if (!action) {
@@ -165,17 +144,17 @@ class EditActionForm extends Component {
     const coms = (communities || []).map((c) => ({
       ...c,
       displayName: c.name,
-      id: "" + c.id,
+      id: "" + c.id
     }));
     const vends = (vendors || []).map((c) => ({
       ...c,
       displayName: c.name,
-      id: "" + c.id,
+      id: "" + c.id
     }));
     const modifiedCCActions = (ccActions || []).map((c) => ({
       ...c,
       displayName: c.description,
-      id: "" + c.id,
+      id: "" + c.id
     }));
     const libOpen = location.state && location.state.libOpen;
 
@@ -185,7 +164,7 @@ class EditActionForm extends Component {
       vendors: vends,
       ccActions: modifiedCCActions,
       auth,
-      autoOpenMediaLibrary: libOpen,
+      autoOpenMediaLibrary: libOpen
     });
 
     const section = makeTagSection({ collections: tags, action });
@@ -198,7 +177,7 @@ class EditActionForm extends Component {
       vendors: vends,
       action,
       formJson,
-      readOnly,
+      readOnly
     };
   }
   setStateAsync(state) {
@@ -214,15 +193,10 @@ class EditActionForm extends Component {
     if (!action || !formJson) return <Loading />;
     return (
       <div>
-        <Seo name={`Edit Action -  ${action?.title}`}/>
+        <Seo name={`Edit Action -  ${action?.title}`} />
         <Paper style={{ padding: 15 }}>
-          <Typography>
-            Want to see a list of users who have taken this action or marked
-            as todo ?
-          </Typography>
-          <Link to={`/admin/read/${id}/action-users`}>
-            Action Users
-          </Link>
+          <Typography>Want to see a list of users who have taken this action or marked as todo ?</Typography>
+          <Link to={`/admin/read/${id}/action-users`}>Action Users</Link>
         </Paper>
 
         <br />
@@ -245,28 +219,30 @@ const mapStateToProps = (state) => ({
   communities: state.getIn(["communities"]),
   vendors: state.getIn(["allVendors"]),
   ccActions: state.getIn(["ccActions"]),
-  actions: state.getIn(["allActions"]),
+  actions: state.getIn(["allActions"])
 });
 
 const EditActionMapped = connect(mapStateToProps)(EditActionForm);
 
 EditActionForm.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles, { withTheme: true })(
-  withRouter(EditActionMapped)
-);
+export default withStyles(styles, { withTheme: true })(withRouter(EditActionMapped));
 
-const createFormJson = ({
-  action,
-  communities,
-  ccActions,
-  vendors,
-  auth,
-  autoOpenMediaLibrary,
-}) => {
+const createFormJson = ({ action, communities, ccActions, vendors, auth, autoOpenMediaLibrary }) => {
   if (!action || !ccActions || !vendors || !communities) return;
+  const { calculator_action, category, subcategory } = action || {};
+
+  const cleanBeforeSubmission = (formData) => {
+    const { carbon_calculator_items } = formData;
+    return { ...formData, calculator_action: (carbon_calculator_items?.ccAction || [])[0] || null };
+  };
+  const calculator_init_values = {
+    chosenCategory: category?.id ? [category.id] : [],
+    chosenSubCategory: subcategory?.id ? [subcategory.id] : [],
+    ccAction: calculator_action?.id ? [calculator_action.id] : []
+  };
   const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Update Action",
@@ -274,6 +250,7 @@ const createFormJson = ({
     method: "/actions.update",
     // successRedirectPage: `/admin/edit/${action.id}/action`,
     successRedirectPage: `/admin/read/actions`,
+    preflightFxn: cleanBeforeSubmission,
     fields: [
       {
         label: "About this Action",
@@ -287,7 +264,7 @@ const createFormJson = ({
             isRequired: false,
             defaultValue: action.id,
             dbName: "action_id",
-            readOnly: true,
+            readOnly: true
           },
           {
             name: "title",
@@ -299,19 +276,18 @@ const createFormJson = ({
             defaultValue: action.title,
             dbName: "title",
             readOnly: false,
-            maxLength: 40,
+            maxLength: 40
           },
           {
             name: "rank",
-            label:
-              "Rank (Which order should this action appear in?  Lower numbers come first)",
+            label: "Rank (Which order should this action appear in?  Lower numbers come first)",
             placeholder: "eg. 1",
             fieldType: "TextField",
             contentType: "number",
             isRequired: false,
             defaultValue: action.rank,
             dbName: "rank",
-            readOnly: false,
+            readOnly: false
           },
           is_super_admin
             ? {
@@ -322,10 +298,7 @@ const createFormJson = ({
                 defaultValue: action.is_global ? "true" : "false",
                 dbName: "is_global",
                 readOnly: false,
-                data: [
-                  { id: "false", value: "No" },
-                  { id: "true", value: "Yes" },
-                ],
+                data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
                 conditionalDisplays: [
                   {
                     valueToCheck: "false",
@@ -337,11 +310,11 @@ const createFormJson = ({
                         defaultValue: action.community && "" + action.community.id,
                         dbName: "community_id",
                         data: [{ displayName: "--", id: "" }, ...communities],
-                        isRequired: true,
-                      },
-                    ],
-                  },
-                ],
+                        isRequired: true
+                      }
+                    ]
+                  }
+                ]
               }
             : {
                 name: "community",
@@ -351,29 +324,36 @@ const createFormJson = ({
                 defaultValue: action.community && "" + action.community.id,
                 dbName: "community_id",
                 data: [{ displayName: "--", id: "" }, ...communities],
-                isRequired: true,
-              },
-        ],
+                isRequired: true
+              }
+        ]
       },
       {
-        label:
-          "Carbon Calculator - Link your Action to one of our Carbon Calculator Actions",
-        fieldType: "Section",
-        children: [
-          {
-            name: "calculator_action",
-            label: "Calculator Action",
-            placeholder: "eg. Wayland",
-            fieldType: "Dropdown",
-            defaultValue:
-              action.calculator_action && "" + action.calculator_action.id,
-            dbName: "calculator_action",
-            data: [{ displayName: "--", id: "" }, ...ccActions],
-            modalTitle: "Carbon Action List & Instructions",
-            modalText:
-              "Check out the instructions here: https://docs.google.com/document/d/1RisvrGJQifCq9c62etcwR1YCUffExz_T8lR2XDGmokQ/edit",
-          },
-        ],
+        label: "Carbon Calculator - Link your Action to one of our Carbon Calculator Actions",
+        fieldType: fieldTypes.Custom,
+        name: "carbon_calculator_items",
+        dbName: "carbon_calculator_items",
+        defaultValue: calculator_init_values,
+        render: (props) => <RenderCCActionSelector {...props} action={action} />
+
+        // label:
+        //   "Carbon Calculator - Link your Action to one of our Carbon Calculator Actions",
+        // fieldType: "Section",
+        // children: [
+        //   {
+        //     name: "calculator_action",
+        //     label: "Calculator Action",
+        //     placeholder: "eg. Wayland",
+        //     fieldType: "Dropdown",
+        //     defaultValue:
+        //       action.calculator_action && "" + action.calculator_action.id,
+        //     dbName: "calculator_action",
+        //     data: [{ displayName: "--", id: "" }, ...ccActions],
+        //     modalTitle: "Carbon Action List & Instructions",
+        //     modalText:
+        //       "Check out the instructions here: https://docs.google.com/document/d/1RisvrGJQifCq9c62etcwR1YCUffExz_T8lR2XDGmokQ/edit",
+        //   },
+        // ],
       },
       {
         name: "featured_summary",
@@ -384,7 +364,7 @@ const createFormJson = ({
         isRequired: false,
         defaultValue: action.featured_summary,
         dbName: "featured_summary",
-        readOnly: false,
+        readOnly: false
       },
       {
         name: "about",
@@ -394,7 +374,7 @@ const createFormJson = ({
         isRequired: true,
         defaultValue: action.about,
         dbName: "about",
-        readOnly: false,
+        readOnly: false
       },
       {
         name: "steps_to_take",
@@ -404,7 +384,7 @@ const createFormJson = ({
         isRequired: false,
         defaultValue: action.steps_to_take,
         dbName: "steps_to_take",
-        readOnly: false,
+        readOnly: false
       },
       {
         name: "deep_dive",
@@ -414,18 +394,16 @@ const createFormJson = ({
         isRequired: false,
         defaultValue: action.deep_dive,
         dbName: "deep_dive",
-        readOnly: false,
+        readOnly: false
       },
       {
         name: "vendors",
         label: "Select which vendors provide services for this action",
         fieldType: "Checkbox",
         selectMany: true,
-        defaultValue: action.vendors
-          ? action.vendors.map((v) => "" + v.id)
-          : [],
+        defaultValue: action.vendors ? action.vendors.map((v) => "" + v.id) : [],
         dbName: "vendors",
-        data: vendors,
+        data: vendors
       },
       {
         name: "image",
@@ -436,7 +414,7 @@ const createFormJson = ({
         dbName: "image",
         label: "Upload Files",
         isRequired: false,
-        defaultValue: "",
+        defaultValue: ""
       },
       {
         name: "is_published",
@@ -446,9 +424,9 @@ const createFormJson = ({
         defaultValue: action.is_published ? "true" : "false",
         dbName: "is_published",
         readOnly: false,
-        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-      },
-    ],
+        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }]
+      }
+    ]
   };
   return formJson;
 };
