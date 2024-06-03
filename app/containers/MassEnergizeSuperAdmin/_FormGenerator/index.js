@@ -1150,8 +1150,10 @@ class MassEnergizeForm extends Component {
     ));
 
   render() {
+
     const { classes, enableCancel, cancel, noBack } = this.props;
     const { formJson, error, successMsg, startCircularSpinner, readOnly, requiredFields } = this.state;
+
     if (!formJson) return <Loading />;
     return (
       <div key={this.state.refreshKey}>
@@ -1174,6 +1176,21 @@ class MassEnergizeForm extends Component {
                   <span style={{ fontWeight: "bold" }}>Go Back</span>
                 </Link>
               )}
+
+              {onClear && (
+                <Link
+                  to="#"
+                 style = {{color: "#2a93d0", marginLeft:15}}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onClear && onClear()
+                   this.resetForm();
+                  }}
+                >
+                  <span  style = {{fontWeight:"bold"}}>Clear</span>
+                </Link>
+              )}
+
 
               {readOnly ? (
                 <Typography variant="h7" component="h3">
