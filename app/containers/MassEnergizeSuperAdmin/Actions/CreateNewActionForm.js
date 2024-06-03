@@ -5,7 +5,7 @@ import { apiCall } from "../../../utils/messenger";
 // import MassEnergizeForm from "../_FormGenerator";
 import Loading from "dan-components/Loading";
 import { connect } from "react-redux";
-import { checkIfReadOnly, makeTagSection } from "./EditActionForm";
+import { checkIfReadOnly, cleanBeforeSubmission, makeTagSection } from "./EditActionForm";
 import fieldTypes from "../_FormGenerator/fieldTypes";
 import { bindActionCreators } from "redux";
 import { reduxKeepFormContent } from "../../../redux/redux-actions/adminActions";
@@ -138,13 +138,14 @@ const NewActionMapped = connect(
 )(CreateNewActionForm);
 export default withStyles(styles, { withTheme: true })(withRouter(NewActionMapped));
 
-const createFormJson = ({ communities, ccActions, vendors, auth, progress, autoOpenMediaLibrary }) => {
+const createFormJson = ({ communities, vendors, auth, progress, autoOpenMediaLibrary }) => {
   const is_super_admin = auth && auth.is_super_admin;
   const formJson = {
     title: "Create a New Action",
     subTitle: "",
     method: "/actions.create",
     successRedirectPage: "/admin/read/actions",
+    preflightFxn: cleanBeforeSubmission,
     fields: [
       {
         label: "About this Action",
@@ -212,29 +213,10 @@ const createFormJson = ({ communities, ccActions, vendors, auth, progress, autoO
       },
 
       {
-        label: "Carbon Calculator - Link your Action to one of our Carbon Calculator Actions",
+        name: "carbon_calculator_items",
+        dbName: "carbon_calculator_items",
         fieldType: fieldTypes.Custom,
-        dbName: "calculator_action",
         render: (props) => <RenderCCActionSelector {...props} />
-        // children: [
-        //   {
-        //     name: "calculator_action",
-        //     label: "Calculator Action",
-        //     placeholder: "eg. Wayland",
-        //     fieldType: "Dropdown",
-        //     // defaultValue: progress.calculator_action || null,
-        //     dbName: "calculator_action",
-        //     data: [{ displayName: "--", id: "" }, ...ccActions],
-        //     renderModalTrigger: ({ title, openModal }) => (
-        //       <Link className="touchable-opacity" style={{ fontWeight: "bold" }} onClick={() => openModal()}>
-        //         {title}
-        //       </Link>
-        //     ),
-        //     modalTitle: "Carbon Action List & Instructions",
-        //     modalText:
-        //       "Check out the instructions here: https://docs.google.com/document/d/1b-tCB83hKk9yWFcB15YdHBORAFOPyh63c8jt1i15WL4",
-        //   }
-        // ]
       },
       {
         name: "featured_summary",

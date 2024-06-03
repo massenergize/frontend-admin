@@ -230,16 +230,16 @@ EditActionForm.propTypes = {
 
 export default withStyles(styles, { withTheme: true })(withRouter(EditActionMapped));
 
+export const cleanBeforeSubmission = (formData) => {
+  const { carbon_calculator_items } = formData;
+  const newData = { ...formData, calculator_action: (carbon_calculator_items?.ccAction || [])[0] || null };
+  delete newData.carbon_calculator_items;
+  return newData;
+};
 const createFormJson = ({ action, communities, ccActions, vendors, auth, autoOpenMediaLibrary }) => {
   if (!action || !ccActions || !vendors || !communities) return;
   const { calculator_action, category, subcategory } = action || {};
 
-  const cleanBeforeSubmission = (formData) => {
-    const { carbon_calculator_items } = formData;
-    const newData = { ...formData, calculator_action: (carbon_calculator_items?.ccAction || [])[0] || null };
-    delete newData.carbon_calculator_items;
-    return newData;
-  };
   const calculator_init_values = {
     chosenCategory: category?.id ? [category.id] : [],
     chosenSubCategory: subcategory?.id ? [subcategory.id] : [],
@@ -331,31 +331,11 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth, autoOpe
         ]
       },
       {
-        label: "Carbon Calculator - Link your Action to one of our Carbon Calculator Actions",
         fieldType: fieldTypes.Custom,
         name: "carbon_calculator_items",
         dbName: "carbon_calculator_items",
         defaultValue: calculator_init_values,
         render: (props) => <RenderCCActionSelector {...props} action={action} />
-
-        // label:
-        //   "Carbon Calculator - Link your Action to one of our Carbon Calculator Actions",
-        // fieldType: "Section",
-        // children: [
-        //   {
-        //     name: "calculator_action",
-        //     label: "Calculator Action",
-        //     placeholder: "eg. Wayland",
-        //     fieldType: "Dropdown",
-        //     defaultValue:
-        //       action.calculator_action && "" + action.calculator_action.id,
-        //     dbName: "calculator_action",
-        //     data: [{ displayName: "--", id: "" }, ...ccActions],
-        //     modalTitle: "Carbon Action List & Instructions",
-        //     modalText:
-        //       "Check out the instructions here: https://docs.google.com/document/d/1RisvrGJQifCq9c62etcwR1YCUffExz_T8lR2XDGmokQ/edit",
-        //   },
-        // ],
       },
       {
         name: "featured_summary",

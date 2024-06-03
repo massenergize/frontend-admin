@@ -129,10 +129,9 @@ function RenderCCActionSelector({ updateForm, state, renderModal, action }) {
       if (filteredSubCatList?.length === 1) return ccActionsList;
     }
     const data = ccActionsList.filter((cc) => sourceOfFilters.includes(cc.subcategory?.id)).sort(sortAlphabetically);
-    if (data.length) return [EMPTY, ...data];
+    if (data.length) return data;
     const noFiltersSelectedShowAll = sourceOfFilters?.length === 0;
-    // ccActionsList.sort(sortAlphabetically);
-    return noFiltersSelectedShowAll ? [EMPTY, ...ccActionsList] : [EMPTY];
+    return noFiltersSelectedShowAll ? ccActionsList : [EMPTY];
   };
 
   const isSelectAll = (arr) => {
