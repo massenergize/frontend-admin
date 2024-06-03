@@ -62,7 +62,13 @@ const dummies = {
     { id: 7, displayName: "Plastic Brick", parent: 1 }
   ]
 };
-
+const sortAlphabetically = (a, b) => {
+  a = a?.name?.toLowerCase();
+  b = b?.name?.toLowerCase();
+  if (a < b) return -1;
+  if (a > b) return 1;
+  return 0;
+};
 function RenderCCActionSelector({ updateForm, state, renderModal }) {
   const allCCActions = useSelector((state) => state.getIn(["ccActionsData"]));
   let { category: chosenCategory, sub_category: chosenSubCategory, ccAction } = state?.formData || {};
@@ -70,9 +76,9 @@ function RenderCCActionSelector({ updateForm, state, renderModal }) {
   chosenSubCategory = chosenSubCategory || [];
   ccAction = ccAction || [];
 
-  const subCatSource = allCCActions?.subcategories || [];
-  const ccActionsSource = allCCActions?.actions || [];
-  const catSource = allCCActions?.categories || [];
+  const subCatSource = (allCCActions?.subcategories || []).sort(sortAlphabetically);
+  const ccActionsSource = (allCCActions?.actions || []).sort(sortAlphabetically);
+  const catSource = (allCCActions?.categories || []).sort(sortAlphabetically);
 
   const renderCarbonModal = () => {
     return renderModal({
@@ -106,7 +112,7 @@ function RenderCCActionSelector({ updateForm, state, renderModal }) {
     // Return the subcategories that are related to the chosen categories
     const showAll = isSelectAll(chosenCategory);
     if (showAll) return subCategoriesList;
-    const data = subCategoriesList.filter((sc) => chosenCategory.includes(sc.category?.id));
+    const data = subCategoriesList.filter((sc) => chosenCategory.includes(sc.category?.id)).sort(sortAlphabetically);
     if (data.length) return [EMPTY, ...data]; // add dash option to the beginning of the list;
     const noFiltersSelectedShowAll = chosenCategory?.length === 0;
     return noFiltersSelectedShowAll ? [EMPTY, ...subCategoriesList] : [EMPTY];
@@ -122,9 +128,10 @@ function RenderCCActionSelector({ updateForm, state, renderModal }) {
       // In the initial case that subcategory dropdown is empty, we want to show all the ccActions
       if (filteredSubCatList?.length === 1) return ccActionsList;
     }
-    const data = ccActionsList.filter((cc) => sourceOfFilters.includes(cc.subcategory?.id));
+    const data = ccActionsList.filter((cc) => sourceOfFilters.includes(cc.subcategory?.id)).sort(sortAlphabetically);
     if (data.length) return [EMPTY, ...data];
     const noFiltersSelectedShowAll = sourceOfFilters?.length === 0;
+    // ccActionsList.sort(sortAlphabetically);
     return noFiltersSelectedShowAll ? [EMPTY, ...ccActionsList] : [EMPTY];
   };
 
@@ -153,7 +160,7 @@ function RenderCCActionSelector({ updateForm, state, renderModal }) {
     const hasDash = dash?.id === DASH;
     if (hasDash && filtered.length === 1) return "No subcategory found";
     // -1 because we don't want to count the dash
-    return `Subcategory (${hasDash ? filtered.length - 1 : filtered.length} found)`;
+    return `Subcategory (${hasDash ? filtered.length - 1 : filtered.length})`;
   };
   const makeCCALabel = (filtered) => {
     if (!filtered.length) return "Carbon Calculator Action";
@@ -161,7 +168,7 @@ function RenderCCActionSelector({ updateForm, state, renderModal }) {
     const hasDash = dash?.id === DASH;
     if (hasDash && filtered.length === 1) return "No Carbon Calculator Action found";
     // -1 because we don't want to count the dash
-    return `Select Carbon Calculator Action (${hasDash ? filtered?.length - 1 : filtered?.length} found)`;
+    return `Select Carbon Calculator Action (${hasDash ? filtered?.length - 1 : filtered?.length})`;
   };
 
   const filteredSubCategoriesBasedOnCategories = generateSubCategoryListBasedOn(chosenCategory, subCatSource);
@@ -180,7 +187,14 @@ function RenderCCActionSelector({ updateForm, state, renderModal }) {
           Carbon Calculator - Link your action to one of our Carbon Calculator Actions
         </Typography>
         <br />
-        {renderCarbonModal()}
+        {/* {renderCarbonModal()} */}
+        <Link
+          style={{ fontWeight: "bold" }}
+          href="https://docs.google.com/document/d/1b-tCB83hKk9yWFcB15YdHBORAFOPyh63c8jt1i15WL4"
+          target="_blank"
+        >
+          Carbon Calculator Action List & Instructions
+        </Link>
         <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
           <div style={{ width: "20%", marginRight: 10 }}>
             <MEDropdown
