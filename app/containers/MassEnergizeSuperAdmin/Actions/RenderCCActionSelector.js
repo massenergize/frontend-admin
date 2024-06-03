@@ -171,6 +171,9 @@ function RenderCCActionSelector({ updateForm, state, renderModal, action }) {
     return `Select Carbon Calculator Action (${hasDash ? filtered?.length - 1 : filtered?.length})`;
   };
 
+  const updateState = (key, value) => {
+    updateForm("carbon_calculator_items", { ...state?.formData?.carbon_calculator_items, [key]: value });
+  };
   // useEffect(() => {
   //   if (!action) return;
   //   const { category, subcategory, calculator_action } = action || {};
@@ -208,7 +211,7 @@ function RenderCCActionSelector({ updateForm, state, renderModal, action }) {
         <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
           <div style={{ width: "20%", marginRight: 10 }}>
             <MEDropdown
-              onItemSelected={(item) => updateForm("category", item)}
+              onItemSelected={(item) => updateState("chosenCategory", item)}
               defaultValue={chosenCategory}
               placeholder="Category"
               data={[EMPTY, ...catSource]}
@@ -220,7 +223,7 @@ function RenderCCActionSelector({ updateForm, state, renderModal, action }) {
             <MEDropdown
               onItemSelected={(item) => {
                 // setChosenSubCategory(item);
-                updateForm("subcategory", item);
+                updateState("chosenSubCategory", item);
               }}
               placeholder={makeSubCategoryLabel(filteredSubCategoriesBasedOnCategories)}
               defaultValue={selectedSubCategories}
@@ -237,7 +240,7 @@ function RenderCCActionSelector({ updateForm, state, renderModal, action }) {
               defaultValue={selectedCCActions}
               data={filteredCCActionsBasedOnSubCategories}
               onItemSelected={(item) => {
-                updateForm("ccAction", item);
+                updateState("ccAction", item);
                 // setChosenCCAction(item);
               }}
               labelExtractor={(c) => (

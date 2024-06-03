@@ -538,8 +538,6 @@ class MassEnergizeForm extends Component {
       cleanedValues = formJson.preflightFxn(cleanedValues, this.setError.bind(this));
     }
 
-    return console.log("This is the final value", cleanedValues)
-
     // if validator is provided, it means we want to make some form of unique custom validation first
     // before submiting the form
     if (validator) {
