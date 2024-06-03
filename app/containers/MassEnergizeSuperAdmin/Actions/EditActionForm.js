@@ -236,7 +236,9 @@ const createFormJson = ({ action, communities, ccActions, vendors, auth, autoOpe
 
   const cleanBeforeSubmission = (formData) => {
     const { carbon_calculator_items } = formData;
-    return { ...formData, calculator_action: (carbon_calculator_items?.ccAction || [])[0] || null };
+    const newData = { ...formData, calculator_action: (carbon_calculator_items?.ccAction || [])[0] || null };
+    delete newData.carbon_calculator_items;
+    return newData;
   };
   const calculator_init_values = {
     chosenCategory: category?.id ? [category.id] : [],
