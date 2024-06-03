@@ -441,21 +441,21 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       scheduledMessages,
       communityFeatureFlagsResponse,
     ] = response;
-    dispatch(loadAllPolicies(policies.data));
-    dispatch(reduxLoadAllCommunities(communities.data));
-    dispatch(loadAllActions(actions.data));
-    dispatch(loadAllEvents(events.data));
-    dispatch(loadAllAdminMessages(messages.data));
-    dispatch(loadTeamMessages(teamMessages.data));
-    dispatch(loadAllTeams(teams.data));
-    dispatch(loadAllSubscribers(subscribers.data));
-    dispatch(loadAllTestimonials(testimonials.data));
-    dispatch(loadAllUsers(users.data));
-    dispatch(loadAllVendors(vendors.data));
-    dispatch(reduxLoadCCActions(ccActions.data.actions));
-    dispatch(reduxLoadCCActionsData(ccActions.data));
-    dispatch(loadAllTags(tagCollections.data));
-    dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
+    dispatch(loadAllPolicies(policies?.data));
+    dispatch(reduxLoadAllCommunities(communities?.data));
+    dispatch(loadAllActions(actions?.data));
+    dispatch(loadAllEvents(events?.data));
+    dispatch(loadAllAdminMessages(messages?.data));
+    dispatch(loadTeamMessages(teamMessages?.data));
+    dispatch(loadAllTeams(teams?.data));
+    dispatch(loadAllSubscribers(subscribers?.data));
+    dispatch(loadAllTestimonials(testimonials?.data));
+    dispatch(loadAllUsers(users?.data));
+    dispatch(loadAllVendors(vendors?.data));
+    dispatch(reduxLoadCCActions(ccActions?.data?.actions));
+    dispatch(reduxLoadCCActionsData(ccActions?.data));
+    dispatch(loadAllTags(tagCollections?.data));
+    dispatch(reduxLoadGalleryImages({ data: galleryImages?.data }));
 
     dispatch(
       setGalleryMetaAction({
@@ -463,30 +463,31 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
         ...(galleryImages?.data?.meta || {}),
       })
     );
-    dispatch(loadTaskFunctionsAction(tasksFunctions.data));
-    dispatch(loadTasksAction(tasks.data));
-    dispatch(loadSettings(preferences.data || {}));
-    dispatch(loadFeatureFlags(featureFlags.data || {}));
-    dispatch(reduxLoadAllOtherCommunities(otherCommunities.data));
-    dispatch(reduxLoadNextStepsSummary(adminNextSteps.data));
-    dispatch(reduxLoadScheduledMessages(scheduledMessages.data));
-    dispatch(saveCommunityFeatureFlagsAction(communityFeatureFlagsResponse.data));
+    dispatch(loadTaskFunctionsAction(tasksFunctions?.data));
+    dispatch(loadTasksAction(tasks?.data));
+    dispatch(loadSettings(preferences?.data || {}));
+    dispatch(loadFeatureFlags(featureFlags?.data || {}));
+    dispatch(reduxLoadAllOtherCommunities(otherCommunities?.data));
+    dispatch(reduxLoadNextStepsSummary(adminNextSteps?.data));
+    dispatch(reduxLoadScheduledMessages(scheduledMessages?.data));
+    dispatch(saveCommunityFeatureFlagsAction(communityFeatureFlagsResponse?.data));
     const cursor = {
-      communities: communities.cursor,
-      actions: actions.cursor,
-      events: events.cursor,
-      adminMessages: messages.cursor,
-      teamMessages: teamMessages.cursor,
-      teams: teams.cursor,
-      subscribers: subscribers.cursor,
-      users: users.cursor,
-      vendors: vendors.cursor,
-      tagCollections: tagCollections.cursor,
-      otherCommunities: otherCommunities.cursor,
-      testimonials: testimonials.cursor,
-      policies: policies.cursor,
-      scheduledMessages: scheduledMessages.cursor,
+      communities: communities?.cursor,
+      actions: actions?.cursor,
+      events: events?.cursor,
+      adminMessages: messages?.cursor,
+      teamMessages: teamMessages?.cursor,
+      teams: teams?.cursor,
+      subscribers: subscribers?.cursor,
+      users: users?.cursor,
+      vendors: vendors?.cursor,
+      tagCollections: tagCollections?.cursor,
+      otherCommunities: otherCommunities?.cursor,
+      testimonials: testimonials?.cursor,
+      policies: policies?.cursor,
+      scheduledMessages: scheduledMessages?.cursor,
     };
+    console.log("WHat is cursor", cursor)
     dispatch(reduxLoadMetaDataAction(cursor));
   });
 };
