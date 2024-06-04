@@ -1151,7 +1151,7 @@ class MassEnergizeForm extends Component {
 
   render() {
 
-    const { classes, enableCancel, cancel, noBack } = this.props;
+    const { classes, enableCancel, cancel, noBack,onClear } = this.props;
     const { formJson, error, successMsg, startCircularSpinner, readOnly, requiredFields } = this.state;
 
     if (!formJson) return <Loading />;
