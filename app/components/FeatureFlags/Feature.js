@@ -8,7 +8,8 @@ function Feature({ name, fallback, children, auth }) {
   const loggedInUserFeatureFlags = (auth || {})?.feature_flags || [];
 
   let flags = [...loggedInUserFeatureFlags, ...(communityFeatureFlags || [])];
-  flags = Array.from(new Set(flags?.map(flag => JSON.stringify(flag))))?.map(flag => JSON.parse(flag));
+
+  flags = [...flags.reduce((map, flag) => map.set(flag.key, flag), new Map()).values()];
 
   const flag = (flags || []).find((f) => f?.key === name);
 
