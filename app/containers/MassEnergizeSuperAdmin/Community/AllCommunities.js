@@ -17,7 +17,7 @@ import {
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
-import { isEmpty, smartString } from "../../../utils/common";
+import { getTimeStamp, isEmpty, smartString } from '../../../utils/common';
 import { Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import METable from "../ME  Tools/table /METable";
@@ -354,6 +354,24 @@ class AllCommunities extends React.Component {
           name: "communities",
           meta: meta,
         }),
+        downloadOptions: {
+          filename: `All Communities (${getTimeStamp()}).csv`,
+          separator: ",",
+        },
+        onDownload: (buildHead, buildBody, columns, data) => {
+          let alteredData = data.map((d) => {
+            console.log("d.data", d.data);
+            let content = [...d.data];
+            content[4] = content[4] === "Verified" ? "yes" : "No";
+            content[5] = content[5].isLive ? "yes" : "No";
+            return {
+              data: content,
+              index: d.index,
+            };
+          });
+          let csv = buildHead(columns) + buildBody(alteredData);
+          return csv;
+      },
     };
    if (isEmpty(metaData)) {
      return <Loader />;
