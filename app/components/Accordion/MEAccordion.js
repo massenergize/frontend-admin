@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-function MEAccordion({ title, header, render, children }) {
+function MEAccordion({ title, header, render, children, expanded }) {
   const [open, setOpen] = useState(false);
 
   const toggle = () => {
     setOpen(!open);
   };
+
+  useEffect(() => {
+    setOpen(expanded);
+  }, [expanded]);
   const renderHeader = () => {
     if (header) return header({ toggle });
 

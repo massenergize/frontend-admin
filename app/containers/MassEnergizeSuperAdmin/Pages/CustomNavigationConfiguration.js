@@ -1,6 +1,7 @@
 import React from "react";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import MEAccordion from "../../../components/Accordion/MEAccordion";
+import { Checkbox, TextField, Typography } from "@mui/material";
 
 const ITEMS = [
   {
@@ -57,6 +58,7 @@ function CustomNavigationConfiguration() {
           {ITEMS.map((item, index) => {
             return (
               <MEAccordion
+                expanded={index === 0}
                 key={index}
                 header={(props) => <Header {...props} {...item} />}
                 render={() => <CreateAndEditMenuItem />}
@@ -74,13 +76,26 @@ export default CustomNavigationConfiguration;
 const CreateAndEditMenuItem = () => {
   return (
     <div
-      style={{ border: "solid 2px #f5f4f9", marginBottom: 10, borderTopColor: "white", minHeight: 200, width: "100%" }}
+      style={{
+        padding: "25px 30px",
+        border: "solid 2px #f5f4f9",
+        marginBottom: 10,
+        borderTopColor: "white",
+        minHeight: 200,
+        width: "100%"
+      }}
     >
-      <ul>
-        <li>Sunday</li>
-        <li>Monday</li>
-        <li>Tuesday</li>
-      </ul>
+      <div />
+      <TextField
+        style={{ width: "100%" }}
+        label="Name"
+        placeholder="Name"
+        InputLabelProps={{
+          shrink: true
+        }}
+        inputProps={{ style: { padding: "12px 20px", width: "100%" } }}
+        variant="outlined"
+      />
     </div>
   );
 };
@@ -99,10 +114,10 @@ const Header = ({ toggle, name, is_live, url, parent, order }) => {
         marginTop: 10
       }}
     >
-      <h5 onClick={() => toggle()} style={{ margin: 0, width: "90%" }}>
+      <Typography variant="body" onClick={() => toggle()} style={{ margin: 0, width: "90%", fontWeight: "bold" }}>
         <span style={{ marginRight: 10, opacity: 0.3, fontWeight: "bold", color: "var(--app-purple)" }}>#{order}</span>
         {name || "..."}
-      </h5>
+      </Typography>
       <div style={{ marginLeft: "auto", display: "flex", flexDirection: "row", alignItems: "center" }}>
         <i className="fa fa-plus-square" style={{ marginRight: 15, fontSize: 21, color: "var(--app-purple)" }} />
         <i className="fa fa-caret-down" onClick={() => toggle()} />
