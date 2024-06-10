@@ -578,12 +578,3 @@ export const saveCommunityFeatureFlagsReducer = (state = [], action = {}) => {
 export const allReducers = {
   communities: communitiesReducer,
 };
-
-export const saveCommunityFeatureFlagsReducer = (state = [], action = {}) => {
-  switch (action.type) {
-    case SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX:
-      return action.payload;
-    default:
-      return state;
-  }
-};
