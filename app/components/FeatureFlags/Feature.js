@@ -8,11 +8,11 @@ function Feature({ name, fallback, children, auth }) {
   const loggedInUserFeatureFlags = (auth || {})?.feature_flags || [];
 
   let flags = [...loggedInUserFeatureFlags, ...(communityFeatureFlags || [])];
-  flags = Array.from(new Set(flags.map(flag => JSON.stringify(flag)))).map(flag => JSON.parse(flag));
+  flags = Array.from(new Set(flags?.map(flag => JSON.stringify(flag))))?.map(flag => JSON.parse(flag));
 
   const flag = (flags || []).find((f) => f?.key === name);
 
-  if (auth.is_super_admin) return children;
+  if (auth?.is_super_admin) return children;
 
   if (flag) return children;
   if (fallback) return fallback;
