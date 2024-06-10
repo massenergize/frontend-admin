@@ -167,56 +167,26 @@ class SummaryDashboard extends PureComponent {
         </Grid>
         <br />
         <ContinueWhereYouLeft />
-        <Feature
-          name={FLAGS.NEW_USER_ENGAGEMENT_VIEW}
-          fallback={
-            <>
-              {graph_data && <ActionsChartWidget data={graph_data || {}} />}
-              <Grid
-                container
-                md={12}
-                columnGap={2}
-                style={{ marginTop: 20 }}
-              >
-                <Grid md={8}>
-                  <ReportingActivities
-                    super_admin_mode
-                    style={{ maxHeight: 300, overflowY: "scroll" }}
-                  />
-                </Grid>
-                <Grid md={3}>
-                  <CSVDownloads
-                    loadingCSVs={loadingCSVs}
-                    classes={classes}
-                    getCSV={this.getCSV}
-                    handleOpenModal={this.handleOpenModal}
-                  />
-                </Grid>
-              </Grid>
-            </>
-          }
-        >
-          <Grid container columnGap={2} style={{ marginBottom: 15 }}>
-            <Grid item xs={7} style={{ marginRight: 10 }}>
-              <WhatNext />
-              <CommunityEngagement />
-            </Grid>
-            <Grid item xs={4}>
-              <CSVDownloads
-                loadingCSVs={loadingCSVs}
-                classes={classes}
-                getCSV={this.getCSV}
-                handleOpenModal={this.handleOpenModal}
+        <Grid container columnGap={2} style={{ marginBottom: 15 }}>
+          <Grid item xs={7} style={{ marginRight: 10 }}>
+            <WhatNext />
+            <CommunityEngagement />
+          </Grid>
+          <Grid item xs={4}>
+            <CSVDownloads
+              loadingCSVs={loadingCSVs}
+              classes={classes}
+              getCSV={this.getCSV}
+              handleOpenModal={this.handleOpenModal}
+            />
+            <Grid>
+              <ReportingActivities
+                super_admin_mode
+                style={{ maxHeight: 600, overflowY: "scroll" }}
               />
-              <Grid>
-                <ReportingActivities
-                  super_admin_mode
-                  style={{ maxHeight: 600, overflowY: "scroll" }}
-                />
-              </Grid>
             </Grid>
           </Grid>
-        </Feature>
+        </Grid>
 
         {/* <Grid>
           <ReportingActivities

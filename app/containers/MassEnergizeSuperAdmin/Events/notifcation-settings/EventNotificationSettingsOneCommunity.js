@@ -14,19 +14,19 @@ import SavedNudgeSettings from "./SavedNudgeSettings";
 export const OPTIONS = [
   {
     key: "when_first_posted",
-    name: "Notify on first nudge after event is posted or shared",
+    name: "Email notification sent when event is posted or shared",
     alias: "Notify on first nudge",
     value: false
   }, // { key: "when_first_uploaded", name: "Push" },
   {
     key: "within_30_days",
-    name: "Notify with nudge 30 days to the event",
+    name: "Email notification sent 30 days prior to event",
     alias: "Within 30 days",
     value: true
   },
   {
     key: "within_1_week",
-    name: "Notify with nudge 1 week to event",
+    name: "Email notification 1 week prior to event",
     alias: "Within 1 week",
     value: true
   },

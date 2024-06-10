@@ -229,66 +229,34 @@ class NormalAdminHome extends PureComponent {
 
         <ContinueWhereYouLeft />
 
-        <Feature
-          name={FLAGS.NEW_USER_ENGAGEMENT_VIEW}
-          fallback={
-            <>
-              {graph_data && <ActionsChartWidget data={graph_data || {}} />}
-              <Grid container columnGap={2} style={{ marginTop: 20 }}>
-                <Grid
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                  item
-                  className={classes.root}
-                  md={7}
-                  xs={12}
-                >
-                  {auth && !auth.is_super_admin && (
-                    <Grid item className={classes.root}>
-                      {this.renderTable(auth.admin_at || [], classes)}
-                    </Grid>
-                  )}
+        <>
+          <WhatNext />
+          <Grid container style={{ paddingRight: 20 }}>
+            <Grid
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                paddingRight: 20,
+              }}
+              item
+              className={classes.root}
+              md={9}
+              xs={12}
+            >
+              <CommunityEngagement />
+              {auth && !auth.is_super_admin && (
+                <Grid item className={classes.root} style={{ marginTop: 20 }}>
+                  {this.renderTable(auth.admin_at || [], classes)}
                 </Grid>
-                <Grid md={4}>
-                  <ReportingActivities
-                    style={{ maxHeight: 290, overflowY: "scroll" }}
-                  />
-                </Grid>
-              </Grid>
-            </>
-          }
-        >
-          <>
-            <WhatNext />
-            <Grid container style={{ paddingRight: 20 }}>
-              <Grid
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  paddingRight: 20,
-                }}
-                item
-                className={classes.root}
-                md={9}
-                xs={12}
-              >
-                <CommunityEngagement />
-                {auth && !auth.is_super_admin && (
-                  <Grid item className={classes.root} style={{ marginTop: 20 }}>
-                    {this.renderTable(auth.admin_at || [], classes)}
-                  </Grid>
-                )}
-              </Grid>
-              <Grid md={3}>
-                <ReportingActivities
-                  style={{ maxHeight: 615, overflowY: "scroll" }}
-                />
-              </Grid>
+              )}
             </Grid>
-          </>
-        </Feature>
+            <Grid md={3}>
+              <ReportingActivities
+                style={{ maxHeight: 615, overflowY: "scroll" }}
+              />
+            </Grid>
+          </Grid>
+        </>
       </div>
     );
   }
