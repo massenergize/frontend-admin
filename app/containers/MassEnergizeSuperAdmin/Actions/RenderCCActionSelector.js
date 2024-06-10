@@ -173,15 +173,6 @@ function RenderCCActionSelector({ updateForm, state, renderModal, action }) {
   const updateState = (key, value) => {
     updateForm("carbon_calculator_items", { ...state?.formData?.carbon_calculator_items, [key]: value });
   };
-  // useEffect(() => {
-  //   if (!action) return;
-  //   const { category, subcategory, calculator_action } = action || {};
-  //   const initial = {
-  //     category: category?.id ? [category?.id] : [],
-  //     subcategory: subcategory?.id ? [subcategory?.id] : [],
-  //     ccAction: calculator_action?.id ? [calculator_action?.id] : []
-  //   };
-  // }, [action?.category?.toString(), action?.subcategory?.toString()]);
 
   const filteredSubCategoriesBasedOnCategories = generateSubCategoryListBasedOn(chosenCategory, subCatSource);
   const selectedSubCategories = gatherSelectedSubs(chosenSubCategory, filteredSubCategoriesBasedOnCategories);
@@ -190,6 +181,7 @@ function RenderCCActionSelector({ updateForm, state, renderModal, action }) {
     ccActionsSource,
     filteredSubCategoriesBasedOnCategories
   );
+
   const selectedCCActions = gatherSelectedCCActions(ccAction, filteredCCActionsBasedOnSubCategories);
 
   return (
@@ -234,13 +226,21 @@ function RenderCCActionSelector({ updateForm, state, renderModal, action }) {
 
           <div style={{ width: "60%" }}>
             <MEDropdown
+              renderSelectedItem={({ item }) => {
+                const source = ccActionsSource;
+                const found = source.find((c) => c.id?.toString() === item?.toString());
+                return (
+                  <span>
+                    <b>{found?.name}: </b> <span>{smartString(found?.description, 50)}</span>
+                  </span>
+                );
+              }}
               smartDropdown={false}
               placeholder={makeCCALabel(filteredCCActionsBasedOnSubCategories)}
               defaultValue={selectedCCActions}
               data={filteredCCActionsBasedOnSubCategories}
               onItemSelected={(item) => {
                 updateState("ccAction", item);
-                // setChosenCCAction(item);
               }}
               labelExtractor={(c) => (
                 <span>
