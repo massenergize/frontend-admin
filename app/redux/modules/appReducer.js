@@ -61,7 +61,7 @@ import {
   ADD_BLOB_STRING,
   KEEP_COMMUNITY_NUDGE_SETTINGS,
   KEEP_FEATURE_ACTIVATIONS_FOR_COMMUNITY, SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX,
-} from '../ReduxConstants';
+} from "../ReduxConstants";
 
 const initialState = Map({
   constants: {},
@@ -577,4 +577,13 @@ export const saveCommunityFeatureFlagsReducer = (state = [], action = {}) => {
 
 export const allReducers = {
   communities: communitiesReducer,
+};
+
+export const saveCommunityFeatureFlagsReducer = (state = [], action = {}) => {
+  switch (action.type) {
+    case SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX:
+      return action.payload;
+    default:
+      return state;
+  }
 };
