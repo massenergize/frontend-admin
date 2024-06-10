@@ -208,17 +208,37 @@ function RenderCCActionSelector({ updateForm, state, renderModal, action }) {
         <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
           <div style={{ width: "20%", marginRight: 10 }}>
             <MEDropdown
+              renderSelectedItem={({ item }) => {
+                const isDash = item === DASH;
+                const source = catSource;
+                const found = source.find((c) => c.id?.toString() === item?.toString());
+                return (
+                  <span style={{ marginLeft: 10 }}>
+                    <b>{isDash ? item : smartString(found?.name, 50)}</b>
+                  </span>
+                );
+              }}
               onItemSelected={(item) => updateState("chosenCategory", item)}
               defaultValue={chosenCategory}
               placeholder="Category"
               data={[EMPTY, ...catSource]}
-              labelExtractor={(c) => c.name}
-              valueExtractor={(c) => c.id}
+              labelExtractor={(c) => c?.name}
+              valueExtractor={(c) => c?.id}
             />
           </div>
           {!subCatIsEmpty && (
             <div style={{ width: "20%", marginRight: 10 }}>
               <MEDropdown
+                renderSelectedItem={({ item }) => {
+                  const isDash = item === DASH;
+                  const source = subCatSource;
+                  const found = source.find((c) => c.id?.toString() === item?.toString());
+                  return (
+                    <span style={{ marginLeft: 10 }}>
+                      <b>{isDash ? item : smartString(found?.name, 50)}</b>
+                    </span>
+                  );
+                }}
                 onItemSelected={(item) => {
                   // setChosenSubCategory(item);
                   updateState("chosenSubCategory", item);
@@ -235,10 +255,13 @@ function RenderCCActionSelector({ updateForm, state, renderModal, action }) {
           <div style={{ width: "60%" }}>
             <MEDropdown
               renderSelectedItem={({ item }) => {
+                const isDash = item === DASH;
                 const source = ccActionsSource;
                 const found = source.find((c) => c.id?.toString() === item?.toString());
-                return (
-                  <span>
+                return isDash ? (
+                  <span style={{ marginLeft: 10 }}>{item} </span>
+                ) : (
+                  <span style={{ marginLeft: 10 }}>
                     <b>{found?.name}: </b> <span>{smartString(found?.description, 50)}</span>
                   </span>
                 );
