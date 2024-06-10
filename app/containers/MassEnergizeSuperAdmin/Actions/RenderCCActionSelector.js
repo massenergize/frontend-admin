@@ -181,8 +181,14 @@ function RenderCCActionSelector({ updateForm, state, renderModal, action }) {
     ccActionsSource,
     filteredSubCategoriesBasedOnCategories
   );
-
   const selectedCCActions = gatherSelectedCCActions(ccAction, filteredCCActionsBasedOnSubCategories);
+
+  const isEmpty = (arr) => {
+    if (!arr?.length) return true;
+    const [maybeDash] = arr || [];
+    return maybeDash?.id === DASH;
+  };
+  const subCatIsEmpty = isEmpty(filteredSubCategoriesBasedOnCategories);
 
   return (
     <>
@@ -210,19 +216,21 @@ function RenderCCActionSelector({ updateForm, state, renderModal, action }) {
               valueExtractor={(c) => c.id}
             />
           </div>
-          <div style={{ width: "20%", marginRight: 10 }}>
-            <MEDropdown
-              onItemSelected={(item) => {
-                // setChosenSubCategory(item);
-                updateState("chosenSubCategory", item);
-              }}
-              placeholder={makeSubCategoryLabel(filteredSubCategoriesBasedOnCategories)}
-              defaultValue={selectedSubCategories}
-              data={filteredSubCategoriesBasedOnCategories}
-              labelExtractor={(c) => c?.name}
-              valueExtractor={(c) => c.id}
-            />
-          </div>
+          {!subCatIsEmpty && (
+            <div style={{ width: "20%", marginRight: 10 }}>
+              <MEDropdown
+                onItemSelected={(item) => {
+                  // setChosenSubCategory(item);
+                  updateState("chosenSubCategory", item);
+                }}
+                placeholder={makeSubCategoryLabel(filteredSubCategoriesBasedOnCategories)}
+                defaultValue={selectedSubCategories}
+                data={filteredSubCategoriesBasedOnCategories}
+                labelExtractor={(c) => c?.name}
+                valueExtractor={(c) => c.id}
+              />
+            </div>
+          )}
 
           <div style={{ width: "60%" }}>
             <MEDropdown
