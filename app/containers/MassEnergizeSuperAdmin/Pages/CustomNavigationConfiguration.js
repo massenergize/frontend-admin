@@ -1,7 +1,7 @@
 import React from "react";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import MEAccordion from "../../../components/Accordion/MEAccordion";
-import { TextField, Typography } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
 import BrandCustomization from "./BrandCustomization";
 import { useDispatch } from "react-redux";
 import { reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
@@ -153,9 +153,28 @@ function CustomNavigationConfiguration() {
         <BrandCustomization />
       </MEPaperBlock>
 
-      <MEPaperBlock title="Customize Navigation">{renderMenuItems(0, ITEMS)}</MEPaperBlock>
+      <MEPaperBlock title="Customize Navigation">
+        <Typography variant="body" style={{ marginBottom: 10 }}>
+          Add and customize your site's navigation here. You can add, edit, and remove menu items.
+        </Typography>
+        <div style={{ border: "dashed 1px #61616129", padding: 20, margin: "10px 0px" }}>
+          {renderMenuItems(0, ITEMS)}
+        </div>
 
-      <MEPaperBlock title="Customize Footer" />
+        <br />
+        <div style={{ border: "dashed 1px #61616129", padding: "20px 30px", display: "flex", flexDirection: "row" }}>
+          <Button variant="contained" style={{ marginRight: 10 }}>
+            Save Changes
+          </Button>
+          <Button
+            style={{ marginRight: 10, textDecoration: "underline", color: "#d22020", textTransform: "capitalize" }}
+          >
+            Reset all menus to default
+          </Button>
+        </div>
+      </MEPaperBlock>
+
+      {/* <MEPaperBlock title="Customize Footer" /> */}
     </div>
   );
 }
