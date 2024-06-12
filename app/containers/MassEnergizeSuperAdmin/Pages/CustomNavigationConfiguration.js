@@ -3,6 +3,9 @@ import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import MEAccordion from "../../../components/Accordion/MEAccordion";
 import { TextField, Typography } from "@mui/material";
 import BrandCustomization from "./BrandCustomization";
+import { useDispatch } from "react-redux";
+import { reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
+import CreateAndEditMenu from "./CreateAndEditMenu";
 
 const ITEMS = [
   {
@@ -120,13 +123,23 @@ const ITEMS = [
 ];
 
 function CustomNavigationConfiguration() {
+  const dispatch = useDispatch();
+
+  const toggleModal = (props) => dispatch(reduxToggleUniversalModal(props));
+  const closeModal = () => toggleModal({ show: false, component: null });
+
   const renderMenuItems = (margin = 0, items) => {
     if (!items?.length) return [];
     return items.map(({ children, ...rest }, index) => {
-      // if (children) return renderMenuItems(margin + 20, children);
       return (
         <div key={index} style={{ marginLeft: margin }}>
-          <OneMenuItem {...rest} children={children} />
+          <OneMenuItem
+            {...rest}
+            children={children}
+            remove={toggleModal}
+            openModal={toggleModal}
+            closeModal={closeModal}
+          />
           {children && renderMenuItems(40, children)}
         </div>
       );
@@ -140,16 +153,7 @@ function CustomNavigationConfiguration() {
         <BrandCustomization />
       </MEPaperBlock>
 
-      <MEPaperBlock title="Customize Navigation">
-        {renderMenuItems(0, ITEMS)}
-        {/* {[1, 2, 3, 4, 5].map((item, index) => {
-          return (
-            <div key={index} style={{ marginLeft: item % 2 === 0 ? 20 : 0 }}>
-              <OneMenuItem />
-            </div>
-          );
-        })} */}
-      </MEPaperBlock>
+      <MEPaperBlock title="Customize Navigation">{renderMenuItems(0, ITEMS)}</MEPaperBlock>
 
       <MEPaperBlock title="Customize Footer" />
     </div>
@@ -157,7 +161,29 @@ function CustomNavigationConfiguration() {
 }
 
 export default CustomNavigationConfiguration;
-const OneMenuItem = ({ name, url, children }) => {
+
+const OneMenuItem = ({ name, url, children, openModal }) => {
+  const removeMenuItem = () => {
+    openModal({
+      show: true,
+      title: "Remove Item Confirmation",
+      component: (
+        <div>
+          If you remove items, all it's ({children?.length || ""}) children will be removed as well. Are you sure you
+          want to continue?
+        </div>
+      ),
+      onConfirm: () => console.log("Remove item")
+    });
+  };
+  const edit = () => {
+    openModal({
+      show: true,
+      noTitle: true,
+      fullControl: true,
+      component: <CreateAndEditMenu />
+    });
+  };
   return (
     <div
       className=" elevate-float"
@@ -183,7 +209,11 @@ const OneMenuItem = ({ name, url, children }) => {
           alignItems: "center"
         }}
       >
-        <i className=" fa fa-trash touchable-opacity" style={{ color: "#e87070", marginRight: 10, fontSize: 12 }} />
+        <i
+          onClick={() => removeMenuItem()}
+          className=" fa fa-trash touchable-opacity"
+          style={{ color: "#e87070", marginRight: 10, fontSize: 12 }}
+        />
         {name}
         {!children && (
           <span
@@ -197,61 +227,65 @@ const OneMenuItem = ({ name, url, children }) => {
       <div style={{ marginLeft: "auto" }}>
         {/* <i className=" fa fa-trash touchable-opacity" style={{ marginRight: 15, fontSize: 20 }} /> */}
         <i className=" fa fa-plus touchable-opacity" style={{ marginRight: 20, color: "green", fontSize: 20 }} />
-        <i className=" fa fa-edit touchable-opacity" style={{ fontSize: 20, color: "var(--app-cyan)" }} />
+        <i
+          onClick={() => edit()}
+          className=" fa fa-edit touchable-opacity"
+          style={{ fontSize: 20, color: "var(--app-cyan)" }}
+        />
       </div>
     </div>
   );
 };
 
-const CreateAndEditMenuItem = () => {
-  return (
-    <div
-      style={{
-        padding: "25px 30px",
-        border: "solid 2px #f5f4f9",
-        marginBottom: 10,
-        borderTopColor: "white",
-        minHeight: 200,
-        width: "100%"
-      }}
-    >
-      <div />
-      <TextField
-        style={{ width: "100%" }}
-        label="Name"
-        placeholder="Name"
-        InputLabelProps={{
-          shrink: true
-        }}
-        inputProps={{ style: { padding: "12px 20px", width: "100%" } }}
-        variant="outlined"
-      />
-    </div>
-  );
-};
-const Header = ({ toggle, name, is_live, url, parent, order }) => {
-  return (
-    <div
-      // onClick={() => toggle()}
-      className="touchable-opacity elevate-float"
-      style={{
-        padding: "10px 20px",
-        display: "inline-flex",
-        flexDirection: "row",
-        alignItems: "center",
-        width: "100%",
-        borderRadius: 3,
-        marginTop: 10
-      }}
-    >
-      <Typography variant="body" onClick={() => toggle()} style={{ margin: 0, width: "90%", fontWeight: "bold" }}>
-        <span style={{ marginRight: 10, opacity: 0.3, fontWeight: "bold", color: "var(--app-purple)" }}>#{order}</span>
-        {name || "..."}
-      </Typography>
-      <div style={{ marginLeft: "auto", display: "flex", flexDirection: "row", alignItems: "center" }}>
-        <i className="fa fa-plus-square" style={{ marginRight: 15, fontSize: 21, color: "var(--app-purple)" }} />
-        <i className="fa fa-caret-down" onClick={() => toggle()} />
-      </div>
-    </div>
-  );
-};
+// const CreateAndEditMenuItem = () => {
+//   return (
+//     <div
+//       style={{
+//         padding: "25px 30px",
+//         border: "solid 2px #f5f4f9",
+//         marginBottom: 10,
+//         borderTopColor: "white",
+//         minHeight: 200,
+//         width: "100%"
+//       }}
+//     >
+//       <div />
+//       <TextField
+//         style={{ width: "100%" }}
+//         label="Name"
+//         placeholder="Name"
+//         InputLabelProps={{
+//           shrink: true
+//         }}
+//         inputProps={{ style: { padding: "12px 20px", width: "100%" } }}
+//         variant="outlined"
+//       />
+//     </div>
+//   );
+// };
+// const Header = ({ toggle, name, is_live, url, parent, order }) => {
+//   return (
+//     <div
+//       // onClick={() => toggle()}
+//       className="touchable-opacity elevate-float"
+//       style={{
+//         padding: "10px 20px",
+//         display: "inline-flex",
+//         flexDirection: "row",
+//         alignItems: "center",
+//         width: "100%",
+//         borderRadius: 3,
+//         marginTop: 10
+//       }}
+//     >
+//       <Typography variant="body" onClick={() => toggle()} style={{ margin: 0, width: "90%", fontWeight: "bold" }}>
+//         <span style={{ marginRight: 10, opacity: 0.3, fontWeight: "bold", color: "var(--app-purple)" }}>#{order}</span>
+//         {name || "..."}
+//       </Typography>
+//       <div style={{ marginLeft: "auto", display: "flex", flexDirection: "row", alignItems: "center" }}>
+//         <i className="fa fa-plus-square" style={{ marginRight: 15, fontSize: 21, color: "var(--app-purple)" }} />
+//         <i className="fa fa-caret-down" onClick={() => toggle()} />
+//       </div>
+//     </div>
+//   );
+// };
