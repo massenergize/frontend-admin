@@ -1,7 +1,22 @@
 import { Button, TextField, Typography } from "@mui/material";
 import React from "react";
+import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
+import { useSelector } from "react-redux";
 
+const PickLogo = ({ openLibrary }) => {
+  return (
+    <img
+      onClick={() => openLibrary(true)}
+      className="touchable-opacity"
+      src="https://massenergize-prod-files.s3.amazonaws.com/media/EnergizeActon.logo.draft.1_p.2.jpeg"
+      alt="site logo"
+      style={{ width: 200, height: 100, marginTop: 10, objectFit: "contain", border: "dashed 1px #8e24aa45" }}
+    />
+  );
+};
 function BrandCustomization() {
+  const images = useSelector((state) => state.getIn(["modalLibraryImages"]));
+  console.log("Lets see meerhn", images);
   return (
     <div
       style={{
@@ -17,12 +32,7 @@ function BrandCustomization() {
     >
       <small>Click to select site logo</small>
 
-      <img
-        src="https://massenergize-prod-files.s3.amazonaws.com/media/EnergizeActon.logo.draft.1_p.2.jpeg"
-        alt="site logo"
-        style={{ width: 200, height: 100, marginTop: 10, objectFit: "contain", border: "dashed 1px #8e24aa45" }}
-      />
-
+      <MediaLibrary customRender={(props) => <PickLogo {...props} />} />
       <TextField
         inputProps={{ style: { padding: 10 } }}
         placeholder="Enter external URL..."

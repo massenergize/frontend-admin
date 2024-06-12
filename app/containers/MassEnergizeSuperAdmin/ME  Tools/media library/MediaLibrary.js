@@ -21,7 +21,8 @@ function MediaLibrary(props) {
     floatingMode,
     passedNotification,
     handleCropFromLink,
-    uploadMultiple
+    uploadMultiple,
+    customRender
   } = props;
   const [show, setShow] = useState(false);
   const [imageTray, setTrayImages] = useState([]);
@@ -126,43 +127,15 @@ function MediaLibrary(props) {
     images.splice(next, 0, image);
     handleSelected(images);
   };
-  return (
-    <React.Fragment>
-      {show && (
-        <div
-          style={{
-            position: "fixed",
-            zIndex: "1500",
-            top: 0,
-            left: 0
-          }}
-        >
-          <MediaLibraryModal
-            {...props}
-            notification={notification}
-            setNotification={setNotification}
-            // images={addPreselectedImagesToList()}
-            close={close}
-            getSelected={handleSelected}
-            selected={imageTray}
-            cropLoot={cropLoot}
-            currentTab={currentTab}
-            setCurrentTab={setCurrentTab}
-            switchToCropping={switchToCropping}
-            files={files}
-            setFiles={setFiles}
-            cropped={cropped}
-            setCropped={setCropped}
-            setCroppedSource={setCroppedSource}
-            croppedSource={croppedSource}
-            finaliseCropping={finaliseCropping}
-            previews={previews}
-            setPreviews={setPreviews}
-          />
-        </div>
-      )}
 
-      {!floatingMode && (
+  const renderSelectedItems = () => {
+    if (customRender)
+      return customRender({
+        open: show,
+        openLibrary: setShow
+      });
+    return (
+      !floatingMode && (
         <div
           style={{
             width: "100%",
@@ -211,7 +184,46 @@ function MediaLibrary(props) {
             {actionText}
           </div>
         </div>
+      )
+    );
+  };
+
+  return (
+    <React.Fragment>
+      {show && (
+        <div
+          style={{
+            position: "fixed",
+            zIndex: "1500",
+            top: 0,
+            left: 0
+          }}
+        >
+          <MediaLibraryModal
+            {...props}
+            notification={notification}
+            setNotification={setNotification}
+            // images={addPreselectedImagesToList()}
+            close={close}
+            getSelected={handleSelected}
+            selected={imageTray}
+            cropLoot={cropLoot}
+            currentTab={currentTab}
+            setCurrentTab={setCurrentTab}
+            switchToCropping={switchToCropping}
+            files={files}
+            setFiles={setFiles}
+            cropped={cropped}
+            setCropped={setCropped}
+            setCroppedSource={setCroppedSource}
+            croppedSource={croppedSource}
+            finaliseCropping={finaliseCropping}
+            previews={previews}
+            setPreviews={setPreviews}
+          />
+        </div>
       )}
+      {renderSelectedItems()}
     </React.Fragment>
   );
 }
