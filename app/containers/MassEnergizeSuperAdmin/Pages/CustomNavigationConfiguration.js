@@ -54,24 +54,49 @@ function CustomNavigationConfiguration() {
       </MEPaperBlock>
 
       <MEPaperBlock title="Customize Navigation">
-        <div style={{ width: "60%" }}>
-          {ITEMS.map((item, index) => {
-            return (
-              <MEAccordion
-                expanded={index === 0}
-                key={index}
-                header={(props) => <Header {...props} {...item} />}
-                render={() => <CreateAndEditMenuItem />}
-              />
-            );
-          })}
-        </div>
+        {[1,2, 3, 4, 5].map((item, index) => {
+          return (
+            <div key={index} style={{ marginLeft: item % 2 === 0 ? 20 : 0 }}>
+              <OneMenuItem />
+            </div>
+          );
+        })}
       </MEPaperBlock>
+
+      <MEPaperBlock title="Customize Footer" />
     </div>
   );
 }
 
 export default CustomNavigationConfiguration;
+const OneMenuItem = () => {
+  return (
+    <div
+      className=" elevate-float"
+      style={{
+        padding: "10px 20px",
+        display: "inline-flex",
+        flexDirection: "row",
+        alignItems: "center",
+        width: "60%",
+        borderRadius: 3,
+        marginTop: 10
+      }}
+    >
+      <Typography variant="body" style={{ margin: 0, fontWeight: "bold" }}>
+        Actions
+        <span style={{ marginLeft: 15, textDecoration: "underline", fontWeight: "bold", color: "#579ece" }}>
+          www.google.com/plenty-words-here <i className="fa fa-external-link" />
+        </span>
+      </Typography>
+      <div style={{ marginLeft: "auto" }}>
+        <i className=" fa fa-trash touchable-opacity" style={{ marginRight: 15, fontSize: 20 }} />
+        <i className=" fa fa-plus touchable-opacity" style={{ marginRight: 15, fontSize: 20 }} />
+        <i className=" fa fa-edit touchable-opacity" style={{ fontSize: 20 }} />
+      </div>
+    </div>
+  );
+};
 
 const CreateAndEditMenuItem = () => {
   return (
