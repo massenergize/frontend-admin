@@ -186,9 +186,9 @@ function RenderCCActionSelector({ updateForm, state, renderModal, action }) {
   const isEmpty = (arr) => {
     if (!arr?.length) return true;
     const [maybeDash] = arr || [];
-    return maybeDash?.id === DASH;
+    return maybeDash === DASH;
   };
-  const subCatIsEmpty = isEmpty(filteredSubCategoriesBasedOnCategories);
+  const categoryIsEmpty = isEmpty(chosenCategory);
 
   return (
     <>
@@ -226,7 +226,7 @@ function RenderCCActionSelector({ updateForm, state, renderModal, action }) {
               valueExtractor={(c) => c?.id}
             />
           </div>
-          {!subCatIsEmpty && (
+          {!categoryIsEmpty && (
             <div style={{ width: "20%", marginRight: 10 }}>
               <MEDropdown
                 renderSelectedItem={({ item }) => {
