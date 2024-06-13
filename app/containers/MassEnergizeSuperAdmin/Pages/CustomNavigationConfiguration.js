@@ -132,7 +132,29 @@ function CustomNavigationConfiguration() {
     if (!items?.length) return [];
     return items.map(({ children, ...rest }, index) => {
       return (
-        <div key={index} style={{ marginLeft: margin }}>
+        <div key={index} style={{ marginLeft: margin, position: "relative" }}>
+          {margin ? (
+            <div
+              style={{
+                position: "absolute",
+                // height: 25,
+                // width: 50,
+                height: 25,
+                width: 24,
+                border: "dashed 0px #e0e0e0",
+                borderBottomWidth: 2,
+                borderLeftWidth: 2,
+                opacity: 0.5,
+                top: 10,
+                // left: -25
+                left: -25
+              }}
+            >
+              {" "}
+            </div>
+          ) : (
+            <></>
+          )}
           <OneMenuItem
             {...rest}
             children={children}
