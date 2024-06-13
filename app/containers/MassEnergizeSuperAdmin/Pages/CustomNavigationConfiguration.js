@@ -118,10 +118,63 @@ const ITEMS = [
     name: "About Us",
     url: "https://example.com/item/4",
     parent: "category-c",
-    order: 7
+    order: 7,
+    children: [
+      {
+        is_live: true,
+        id: 14,
+        name: "Sub-About Us",
+        url: "https://example.com/item/14",
+        parent: "category-b",
+        order: 5,
+        children: [
+          {
+            is_live: true,
+            id: 16,
+            name: "Sub-Sub-About Us",
+            url: "https://example.com/item/16",
+            parent: "category-b",
+            order: 5
+          },
+          {
+            is_live: true,
+            id: 17,
+            name: "Sub-Sub-About Us",
+            url: "https://example.com/item/17",
+            parent: "category-b",
+            order: 6
+          }
+        ]
+      },
+      {
+        is_live: true,
+        id: 15,
+        name: "Sub-About Us",
+        url: "https://example.com/item/15",
+        parent: "category-b",
+        order: 6
+      }
+    ]
   }
 ];
 
+const LComponent = () => {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        height: 25,
+        width: 24,
+        border: "dashed 0px #e0e0e0",
+        borderBottomWidth: 2,
+        borderLeftWidth: 2,
+        opacity: 0.5,
+        top: 10,
+        left: -25
+      }}
+    />
+  );
+};
 function CustomNavigationConfiguration() {
   const dispatch = useDispatch();
 
@@ -133,28 +186,7 @@ function CustomNavigationConfiguration() {
     return items.map(({ children, ...rest }, index) => {
       return (
         <div key={index} style={{ marginLeft: margin, position: "relative" }}>
-          {margin ? (
-            <div
-              style={{
-                position: "absolute",
-                // height: 25,
-                // width: 50,
-                height: 25,
-                width: 24,
-                border: "dashed 0px #e0e0e0",
-                borderBottomWidth: 2,
-                borderLeftWidth: 2,
-                opacity: 0.5,
-                top: 10,
-                // left: -25
-                left: -25
-              }}
-            >
-              {" "}
-            </div>
-          ) : (
-            <></>
-          )}
+          {margin ? <LComponent /> : <></>}
           <OneMenuItem
             {...rest}
             children={children}
@@ -179,8 +211,24 @@ function CustomNavigationConfiguration() {
         <Typography variant="body" style={{ marginBottom: 10 }}>
           Add and customize your site's navigation here. You can add, edit, and remove menu items.
         </Typography>
-        <div style={{ border: "dashed 1px #61616129", padding: 20, margin: "10px 0px" }}>
-          {renderMenuItems(0, ITEMS)}
+        <div
+          style={{
+            border: "dashed 1px #61616129",
+            padding: 20,
+            margin: "10px 0px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            background: "#fafafa"
+          }}
+        >
+          <div>{renderMenuItems(0, ITEMS)}</div>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ height: 40, border: "dashed 0px #eeeeee", borderLeftWidth: 2 }} />
+            <Button color="secondary" variant="contained">
+              Add New Item
+            </Button>
+          </div>
         </div>
 
         <br />
@@ -233,9 +281,10 @@ const OneMenuItem = ({ name, url, children, openModal }) => {
         display: "inline-flex",
         flexDirection: "row",
         alignItems: "center",
-        width: "60%",
+        width: "100%",
         borderRadius: 3,
-        marginTop: 10
+        marginTop: 10,
+        background: "white"
       }}
     >
       <Typography
@@ -277,56 +326,3 @@ const OneMenuItem = ({ name, url, children, openModal }) => {
     </div>
   );
 };
-
-// const CreateAndEditMenuItem = () => {
-//   return (
-//     <div
-//       style={{
-//         padding: "25px 30px",
-//         border: "solid 2px #f5f4f9",
-//         marginBottom: 10,
-//         borderTopColor: "white",
-//         minHeight: 200,
-//         width: "100%"
-//       }}
-//     >
-//       <div />
-//       <TextField
-//         style={{ width: "100%" }}
-//         label="Name"
-//         placeholder="Name"
-//         InputLabelProps={{
-//           shrink: true
-//         }}
-//         inputProps={{ style: { padding: "12px 20px", width: "100%" } }}
-//         variant="outlined"
-//       />
-//     </div>
-//   );
-// };
-// const Header = ({ toggle, name, is_live, url, parent, order }) => {
-//   return (
-//     <div
-//       // onClick={() => toggle()}
-//       className="touchable-opacity elevate-float"
-//       style={{
-//         padding: "10px 20px",
-//         display: "inline-flex",
-//         flexDirection: "row",
-//         alignItems: "center",
-//         width: "100%",
-//         borderRadius: 3,
-//         marginTop: 10
-//       }}
-//     >
-//       <Typography variant="body" onClick={() => toggle()} style={{ margin: 0, width: "90%", fontWeight: "bold" }}>
-//         <span style={{ marginRight: 10, opacity: 0.3, fontWeight: "bold", color: "var(--app-purple)" }}>#{order}</span>
-//         {name || "..."}
-//       </Typography>
-//       <div style={{ marginLeft: "auto", display: "flex", flexDirection: "row", alignItems: "center" }}>
-//         <i className="fa fa-plus-square" style={{ marginRight: 15, fontSize: 21, color: "var(--app-purple)" }} />
-//         <i className="fa fa-caret-down" onClick={() => toggle()} />
-//       </div>
-//     </div>
-//   );
-// };
