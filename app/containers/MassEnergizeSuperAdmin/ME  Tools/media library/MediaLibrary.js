@@ -132,7 +132,8 @@ function MediaLibrary(props) {
     if (customRender)
       return customRender({
         open: show,
-        openLibrary: setShow
+        openLibrary: setShow, 
+        selected: imageTray,
       });
     return (
       !floatingMode && (

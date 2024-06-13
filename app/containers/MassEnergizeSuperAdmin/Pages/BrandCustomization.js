@@ -1,22 +1,32 @@
 import { Button, TextField, Typography } from "@mui/material";
 import React from "react";
-import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
+// import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import { useSelector } from "react-redux";
+import MediaLibrary from "../_FormGenerator/media library/FormMediaLibraryImplementation";
 
-const PickLogo = ({ openLibrary }) => {
+const PickLogo = ({ openLibrary, selected }) => {
+  const [img] = selected || [];
+
+  if (!img)
+    return (
+      <i
+        onClick={() => openLibrary(true)}
+        className="fa fa-upload touchable-opacity"
+        style={{ fontSize: 50, color: "var(--app-purple)", marginTop: 10 }}
+      />
+    );
   return (
     <img
       onClick={() => openLibrary(true)}
       className="touchable-opacity"
-      src="https://massenergize-prod-files.s3.amazonaws.com/media/EnergizeActon.logo.draft.1_p.2.jpeg"
+      src={img?.url}
       alt="site logo"
       style={{ width: 200, height: 100, marginTop: 10, objectFit: "contain", border: "dashed 1px #8e24aa45" }}
     />
   );
 };
 function BrandCustomization() {
-  const images = useSelector((state) => state.getIn(["modalLibraryImages"]));
-  console.log("Lets see meerhn", images);
+  const imagesObject = useSelector((state) => state.getIn(["galleryImages"]));
   return (
     <div
       style={{
@@ -32,7 +42,7 @@ function BrandCustomization() {
     >
       <small>Click to select site logo</small>
 
-      <MediaLibrary customRender={(props) => <PickLogo {...props} />} />
+      <MediaLibrary images={imagesObject?.images} customRender={(props) => <PickLogo {...props} />} />
       <TextField
         inputProps={{ style: { padding: 10 } }}
         placeholder="Enter external URL..."
