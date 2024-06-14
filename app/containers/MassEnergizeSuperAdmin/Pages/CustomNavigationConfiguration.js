@@ -5,7 +5,8 @@ import { Button, TextField, Typography } from "@mui/material";
 import BrandCustomization from "./BrandCustomization";
 import { useDispatch, useSelector } from "react-redux";
 import { reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
-import CreateAndEditMenu from "./CreateAndEditMenu";
+import CreateAndEditMenu, { INTERNAL_LINKS } from "./CreateAndEditMenu";
+import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 const ITEMS = [
   {
     is_published: true,
@@ -174,7 +175,6 @@ const ITEMS = [
   }
 ];
 
-
 const LComponent = () => {
   return (
     <div
@@ -203,6 +203,17 @@ function CustomNavigationConfiguration() {
   const toggleModal = (props) => dispatch(reduxToggleUniversalModal(props));
   const closeModal = () => toggleModal({ show: false, component: null });
 
+  const insertNewLink = (linkObj) => {
+    closeModal();
+    console.log("Edited Link", linkObj);
+  };
+
+  const editMenu = (obj) => {
+    const newMenu = menuItems.map( item => {
+      
+    })
+  };
+
   const renderMenuItems = (items, margin = 0, parent) => {
     if (!items?.length) return [];
     return items.map(({ children, ...rest }, index) => {
@@ -218,6 +229,7 @@ function CustomNavigationConfiguration() {
             updateForm={updateForm}
             formData={form}
             parent={parent}
+            insertNewLink={insertNewLink}
           />
           {children && renderMenuItems(children, 40)}
         </div>
@@ -230,6 +242,13 @@ function CustomNavigationConfiguration() {
       <MEPaperBlock title="Brand Customization">
         {/* <h4>This is what the custom navigation configuration page will look like</h4> */}
         <BrandCustomization />
+        {/* <MEDropdown
+          data={INTERNAL_LINKS}
+          labelExtractor={(l) => l?.name}
+          valueExtractor={(l) => l?.link}
+          placeholder="Link to a page within your site"
+          smartDropdown={false}
+        /> */}
       </MEPaperBlock>
 
       <MEPaperBlock title="Customize Navigation">
@@ -276,7 +295,7 @@ function CustomNavigationConfiguration() {
 
 export default CustomNavigationConfiguration;
 
-const OneMenuItem = ({ children, openModal, updateForm, formData, item, parent }) => {
+const OneMenuItem = ({ children, openModal, updateForm, formData, item, parent, insertNewLink }) => {
   const { name, link } = item || {};
   const removeMenuItem = () => {
     openModal({
@@ -296,7 +315,7 @@ const OneMenuItem = ({ children, openModal, updateForm, formData, item, parent }
       show: true,
       noTitle: true,
       fullControl: true,
-      component: <CreateAndEditMenu updateForm={updateForm} data={itemObj} />
+      component: <CreateAndEditMenu insertNewLink={insertNewLink} updateForm={updateForm} data={itemObj} />
     });
   };
 

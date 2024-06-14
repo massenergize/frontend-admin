@@ -3,7 +3,54 @@ import { Button, Checkbox, FormControlLabel, TextField, Typography } from "@mui/
 import React, { useEffect, useState } from "react";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 
-function CreateAndEditMenu({ data, parent }) {
+export const INTERNAL_LINKS = [
+  {
+    name: "Home",
+    link: "/"
+  },
+  {
+    name: "Take the tour",
+    link: "/?tour=true"
+  },
+  {
+    name: "All Actions",
+    link: "/actions"
+  },
+  {
+    name: "Service Providers",
+    link: "/services"
+  },
+  {
+    name: "Testimonials",
+    link: "/testimonials"
+  },
+  {
+    name: "Teams",
+    link: "/teams"
+  },
+  {
+    name: "Events",
+    link: "/events"
+  },
+  {
+    name: "Impact",
+    link: "/impact"
+  },
+  {
+    name: "Our Story",
+    link: "/aboutus"
+  },
+  {
+    name: "Donate",
+    link: "/donate"
+  },
+  {
+    name: "Contact Us",
+    link: "/contactus"
+  }
+];
+
+function CreateAndEditMenu({ data, parent, internalLinks = INTERNAL_LINKS, insertNewLink }) {
   const [form, setForm] = useState({});
   useEffect(() => {
     setForm(data);
@@ -13,8 +60,9 @@ function CreateAndEditMenu({ data, parent }) {
     setForm({ ...form, ...obj });
   };
 
+
+
   const { is_published, name, link, order, is_link_external: linkIsExternal } = form;
-  console.log("lets see is_publised", is_published);
   return (
     <div style={{ padding: 20, width: 500 }}>
       <Typography variant="h5" style={{ color: "var(--app-purple)", fontWeight: "bold" }} gutterBottom>
@@ -96,7 +144,12 @@ function CreateAndEditMenu({ data, parent }) {
                 value={link}
               />
             ) : (
-              <MEDropdown placeholder="Link to a page within your site" />
+              <MEDropdown
+                data={internalLinks}
+                labelExtractor={(l) => l?.name}
+                valueExtractor={(l) => l?.link}
+                placeholder="Link to a page within your site"
+              />
             )}
           </div>
         </div>
@@ -128,7 +181,9 @@ function CreateAndEditMenu({ data, parent }) {
         <Button variant="contained" style={{ marginRight: 10, background: "#cd3131" }}>
           Cancel
         </Button>
-        <Button variant="contained">OK</Button>
+        <Button variant="contained" onClick={() => insertNewLink(form)}>
+          OK
+        </Button>
       </div>
     </div>
   );
