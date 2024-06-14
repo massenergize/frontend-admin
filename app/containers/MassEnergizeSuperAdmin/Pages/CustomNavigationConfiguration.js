@@ -203,18 +203,22 @@ function CustomNavigationConfiguration() {
   const toggleModal = (props) => dispatch(reduxToggleUniversalModal(props));
   const closeModal = () => toggleModal({ show: false, component: null });
 
-  const insertNewLink = (linkObj) => {
+
+
+  const insertNewLink = (linkObj, parents) => {
     closeModal();
+    // Traverse the array, and with each of the items, use the parent to find the right place to insert the new linkObj into the children array
+  
+      
+
     console.log("Edited Link", linkObj);
   };
 
   const editMenu = (obj) => {
-    const newMenu = menuItems.map( item => {
-      
-    })
+    const newMenu = menuItems.map((item) => {});
   };
 
-  const renderMenuItems = (items, margin = 0, parent) => {
+  const renderMenuItems = (items, margin = 0, parents = []) => {
     if (!items?.length) return [];
     return items.map(({ children, ...rest }, index) => {
       return (
@@ -228,10 +232,10 @@ function CustomNavigationConfiguration() {
             closeModal={closeModal}
             updateForm={updateForm}
             formData={form}
-            parent={parent}
+            parents={parents}
             insertNewLink={insertNewLink}
           />
-          {children && renderMenuItems(children, 40)}
+          {children && renderMenuItems(children, 40, [...parents, rest?.id])}
         </div>
       );
     });
@@ -295,7 +299,7 @@ function CustomNavigationConfiguration() {
 
 export default CustomNavigationConfiguration;
 
-const OneMenuItem = ({ children, openModal, updateForm, formData, item, parent, insertNewLink }) => {
+const OneMenuItem = ({ children, openModal, updateForm, formData, item, parents, insertNewLink }) => {
   const { name, link } = item || {};
   const removeMenuItem = () => {
     openModal({
@@ -311,11 +315,18 @@ const OneMenuItem = ({ children, openModal, updateForm, formData, item, parent, 
     });
   };
   const addOrEdit = (itemObj) => {
+    console.log("Lets see parent", parents);
     openModal({
       show: true,
       noTitle: true,
       fullControl: true,
-      component: <CreateAndEditMenu insertNewLink={insertNewLink} updateForm={updateForm} data={itemObj} />
+      component: (
+        <CreateAndEditMenu
+          insertNewLink={(obj) => insertNewLink(obj, parents)}
+          updateForm={updateForm}
+          data={itemObj}
+        />
+      )
     });
   };
 
