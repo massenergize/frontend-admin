@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import MEAccordion from "../../../components/Accordion/MEAccordion";
 import { Button, TextField, Typography } from "@mui/material";
@@ -6,78 +6,86 @@ import BrandCustomization from "./BrandCustomization";
 import { useDispatch, useSelector } from "react-redux";
 import { reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
 import CreateAndEditMenu from "./CreateAndEditMenu";
-
 const ITEMS = [
   {
-    is_live: true,
+    is_published: true,
     id: 5,
     name: "Home",
-    url: "https://example.com/item/5",
+    link: "https://example.com/item/5",
+    is_link_external: false,
     parent: "category-b",
     order: 4,
     children: [
       {
-        is_live: true,
+        is_published: true,
         id: 6,
-        name: "Sub-Home",
-        url: "https://example.com/item/6",
+        name: "Introduction",
+        link: "https://external-site.com/item/6",
+        is_link_external: true,
         parent: "category-b",
         order: 5
       },
       {
-        is_live: true,
+        is_published: true,
         id: 7,
-        name: "Sub-Home",
-        url: "https://example.com/item/7",
+        name: "Overview",
+        link: "https://example.com/item/7",
+        is_link_external: false,
         parent: "category-b",
         order: 6
       }
     ]
   },
   {
-    is_live: true,
+    is_published: true,
     id: 1,
     name: "Actions",
-    url: "https://example.com/item/1",
+    link: "https://example.com/item/1",
+    is_link_external: false,
     parent: "category-a",
     order: 1
   },
   {
-    is_live: false,
+    is_published: false,
     id: 2,
     name: "Teams",
-    url: "https://example.com/item/2",
+    link: "https://example.com/item/2",
+    is_link_external: false,
     parent: "category-b",
     order: 2,
     children: [
       {
-        is_live: true,
+        is_published: true,
         id: 10,
-        name: "Sub-Teams",
-        url: "https://example.com/item/10",
+        name: "Team A",
+        link: "https://external-site.com/item/10",
+        is_link_external: true,
         parent: "category-b",
         order: 5
       },
       {
-        is_live: true,
+        is_published: true,
         id: 11,
-        name: "Sub-Teams",
-        url: "https://example.com/item/11",
+        name: "Team B",
+        link: "https://example.com/item/11",
+        is_link_external: false,
         parent: "category-b",
         children: [
           {
-            is_live: true,
+            is_published: true,
             id: 12,
-            name: "Sub-Sub-Teams",
-            url: "https://example.com/item/12",
+            name: "Team B1",
+            link: "https://example.com/item/12",
+            is_link_external: false,
             parent: "category-b",
             order: 5
           },
           {
-            is_live: true,
+            is_published: true,
             id: 13,
-            name: "Sub-Sub-Teams",
-            url: "https://example.com/item/13",
+            name: "Team B2",
+            link: "https://external-site.com/item/13",
+            is_link_external: true,
             parent: "category-b",
             order: 6
           }
@@ -87,76 +95,85 @@ const ITEMS = [
     ]
   },
   {
-    is_live: true,
+    is_published: true,
     id: 3,
     name: "Events",
-    url: "https://example.com/item/3",
+    link: "https://example.com/item/3",
+    is_link_external: false,
     parent: "category-a",
     order: 3,
     children: [
       {
-        is_live: true,
+        is_published: true,
         id: 8,
-        name: "Sub-Events",
-        url: "https://example.com/item/8",
+        name: "Upcoming Events",
+        link: "https://external-site.com/item/8",
+        is_link_external: true,
         parent: "category-b",
         order: 5
       },
       {
-        is_live: true,
+        is_published: true,
         id: 9,
-        name: "Sub-Events",
-        url: "https://example.com/item/9",
+        name: "Past Events",
+        link: "https://example.com/item/9",
+        is_link_external: false,
         parent: "category-b",
         order: 6
       }
     ]
   },
   {
-    is_live: false,
+    is_published: false,
     id: 4,
     name: "About Us",
-    url: "https://example.com/item/4",
+    link: "https://example.com/item/4",
+    is_link_external: false,
     parent: "category-c",
     order: 7,
     children: [
       {
-        is_live: true,
+        is_published: true,
         id: 14,
-        name: "Sub-About Us",
-        url: "https://example.com/item/14",
+        name: "Our Story",
+        link: "https://example.com/item/14",
+        is_link_external: false,
         parent: "category-b",
         order: 5,
         children: [
           {
-            is_live: true,
+            is_published: true,
             id: 16,
-            name: "Sub-Sub-About Us",
-            url: "https://example.com/item/16",
+            name: "Founding",
+            link: "https://external-site.com/item/16",
+            is_link_external: true,
             parent: "category-b",
             order: 5
           },
           {
-            is_live: true,
+            is_published: true,
             id: 17,
-            name: "Sub-Sub-About Us",
-            url: "https://example.com/item/17",
+            name: "Milestones",
+            link: "https://example.com/item/17",
+            is_link_external: false,
             parent: "category-b",
             order: 6
           }
         ]
       },
       {
-        is_live: true,
+        is_published: true,
         id: 15,
-        name: "Sub-About Us",
-        url: "https://example.com/item/15",
+        name: "Mission & Vision",
+        link: "https://external-site.com/item/15",
+        is_link_external: true,
         parent: "category-b",
         order: 6
       }
     ]
   }
 ];
+
 
 const LComponent = () => {
   return (
@@ -176,25 +193,33 @@ const LComponent = () => {
   );
 };
 function CustomNavigationConfiguration() {
+  const [menuItems, setMenu] = useState(ITEMS);
+  const [form, setForm] = useState({});
   const dispatch = useDispatch();
-
+  const updateForm = (key, value, reset = false) => {
+    if (reset) return setForm({});
+    setForm({ ...form, [key]: value });
+  };
   const toggleModal = (props) => dispatch(reduxToggleUniversalModal(props));
   const closeModal = () => toggleModal({ show: false, component: null });
 
-  const renderMenuItems = (margin = 0, items) => {
+  const renderMenuItems = (items, margin = 0, parent) => {
     if (!items?.length) return [];
     return items.map(({ children, ...rest }, index) => {
       return (
         <div key={index} style={{ marginLeft: margin, position: "relative" }}>
           {margin ? <LComponent /> : <></>}
           <OneMenuItem
-            {...rest}
+            item={rest}
             children={children}
             remove={toggleModal}
             openModal={toggleModal}
             closeModal={closeModal}
+            updateForm={updateForm}
+            formData={form}
+            parent={parent}
           />
-          {children && renderMenuItems(40, children)}
+          {children && renderMenuItems(children, 40)}
         </div>
       );
     });
@@ -222,7 +247,7 @@ function CustomNavigationConfiguration() {
             background: "#fafafa"
           }}
         >
-          <div>{renderMenuItems(0, ITEMS)}</div>
+          <div>{renderMenuItems(menuItems)}</div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
             <div style={{ height: 40, border: "dashed 0px #eeeeee", borderLeftWidth: 2 }} />
             <Button color="secondary" variant="contained">
@@ -251,7 +276,8 @@ function CustomNavigationConfiguration() {
 
 export default CustomNavigationConfiguration;
 
-const OneMenuItem = ({ name, url, children, openModal }) => {
+const OneMenuItem = ({ children, openModal, updateForm, formData, item, parent }) => {
+  const { name, link } = item || {};
   const removeMenuItem = () => {
     openModal({
       show: true,
@@ -265,14 +291,15 @@ const OneMenuItem = ({ name, url, children, openModal }) => {
       onConfirm: () => console.log("Remove item")
     });
   };
-  const edit = () => {
+  const addOrEdit = (itemObj) => {
     openModal({
       show: true,
       noTitle: true,
       fullControl: true,
-      component: <CreateAndEditMenu />
+      component: <CreateAndEditMenu updateForm={updateForm} data={itemObj} />
     });
   };
+
   return (
     <div
       className=" elevate-float"
@@ -310,15 +337,19 @@ const OneMenuItem = ({ name, url, children, openModal }) => {
             className="touchable-opacity"
             style={{ opacity: 0.5, marginLeft: 15, textDecoration: "underline", fontWeight: "bold", color: "grey" }}
           >
-            {url} <i className="fa fa-external-link" />
+            {link} <i className="fa fa-external-link" />
           </span>
         )}
       </Typography>
       <div style={{ marginLeft: "auto" }}>
         {/* <i className=" fa fa-trash touchable-opacity" style={{ marginRight: 15, fontSize: 20 }} /> */}
-        <i className=" fa fa-plus touchable-opacity" style={{ marginRight: 20, color: "green", fontSize: 20 }} />
         <i
-          onClick={() => edit()}
+          onClick={() => addOrEdit({ ...item, children })}
+          className=" fa fa-plus touchable-opacity"
+          style={{ marginRight: 20, color: "green", fontSize: 20 }}
+        />
+        <i
+          onClick={() => addOrEdit({ ...item, children })}
           className=" fa fa-edit touchable-opacity"
           style={{ fontSize: 20, color: "var(--app-cyan)" }}
         />
