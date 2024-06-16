@@ -203,14 +203,38 @@ function CustomNavigationConfiguration() {
   const toggleModal = (props) => dispatch(reduxToggleUniversalModal(props));
   const closeModal = () => toggleModal({ show: false, component: null });
 
-
-
+  const assembleIntoObject = (parentObj, child) => {
+    if (!child) return parentObj;
+    const index = parentObj.findIndex((p) => p?.id === child?.id);
+    parentObj[index] = child;
+    return parentObj;
+  };
   const insertNewLink = (linkObj, parents) => {
-    closeModal();
-    // Traverse the array, and with each of the items, use the parent to find the right place to insert the new linkObj into the children array
   
-      
-
+    closeModal();
+    parents = Object.entries(parents);
+    const lastIndex = parents.length - 1;
+    const [key, obj] = parents[lastIndex];
+    const sibblings = obj?.children || [];
+    // replace object =
+    const index = sibblings.findIndex((s) => s?.id === linkObj?.id);
+    if (index > -1) {
+      sibblings[index] = linkObj;
+    } else {
+      sibblings.push(linkObj);
+    }
+    parents[lastIndex] = [key, { ...obj, children: sibblings }];
+    // Now reconstructure the object train and relationships
+    const reversed = [...parents].reverse();
+    let acc = reversed[0][1];
+    for (let i = 0; i < reversed.length; i++) {
+      if (i === reversed.length - 1) break;
+      const nextIndex = i + 1;
+      const next = reversed[nextIndex];
+      const current = reversed[i];
+      acc = assembleIntoObject(next, current);
+    }
+    console.log("Accumulated", acc);
     console.log("Edited Link", linkObj);
   };
 
@@ -235,7 +259,7 @@ function CustomNavigationConfiguration() {
             parents={parents}
             insertNewLink={insertNewLink}
           />
-          {children && renderMenuItems(children, 40, [...parents, rest?.id])}
+          {children && renderMenuItems(children, 40, { ...parents, [rest?.id]: { ...rest, children } })}
         </div>
       );
     });
