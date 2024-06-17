@@ -210,12 +210,12 @@ function CustomNavigationConfiguration() {
     return parentObj;
   };
   const insertNewLink = (linkObj, parents) => {
-    // Close the modal dialog
     closeModal();
     let newObj = linkObj;
     // Convert the parents object into an array of [key, value] pairs
     parents = Object.entries(parents);
     const dealingWithAChild = parents.length > 0;
+
     // Update the last parent entry with the modified children
 
     if (dealingWithAChild) {
@@ -249,19 +249,29 @@ function CustomNavigationConfiguration() {
 
     // Find the index of the top-level menu item that corresponds to the updated structure
     const ind = menuItems.findIndex((m) => m?.id === newObj?.id);
-
     // Create a copy of the menu items array to avoid mutating the original state
     const copied = [...menuItems];
 
-    // Replace the old menu item with the updated structure
-    copied[ind] = newObj;
+    if (ind === -1) copied.push(newObj);
+    else copied[ind] = newObj;
 
-    // Update the menu state with the modified array
     setMenu(copied);
   };
 
-  const editMenu = (obj) => {
-    const newMenu = menuItems.map((item) => {});
+  const addOrEdit = (itemObj, parents = []) => {
+    // if (!itemObj) itemObj = { id: new Date().toString() };
+    toggleModal({
+      show: true,
+      noTitle: true,
+      fullControl: true,
+      component: (
+        <CreateAndEditMenu
+          insertNewLink={(obj) => insertNewLink(obj, parents)}
+          updateForm={updateForm}
+          data={itemObj}
+        />
+      )
+    });
   };
 
   const renderMenuItems = (items, margin = 0, parents = []) => {
@@ -280,6 +290,7 @@ function CustomNavigationConfiguration() {
             formData={form}
             parents={parents}
             insertNewLink={insertNewLink}
+            addOrEdit={addOrEdit}
           />
           {/* -- I'm spreading "children" here to make sure that we create a copy of the children. We want to make sure we control when the changes show up for the user */}
           {children && renderMenuItems(children, 40, { ...parents, [rest?.id]: { ...rest, children: [...children] } })}
@@ -320,7 +331,11 @@ function CustomNavigationConfiguration() {
           <div>{renderMenuItems(menuItems)}</div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
             <div style={{ height: 40, border: "dashed 0px #eeeeee", borderLeftWidth: 2 }} />
-            <Button color="secondary" variant="contained">
+            <Button
+              color="secondary"
+              variant="contained"
+              onClick={() => addOrEdit({ id: new Date().getTime()?.toString() })}
+            >
               Add New Item
             </Button>
           </div>
@@ -346,7 +361,7 @@ function CustomNavigationConfiguration() {
 
 export default CustomNavigationConfiguration;
 
-const OneMenuItem = ({ children, openModal, updateForm, formData, item, parents, insertNewLink }) => {
+const OneMenuItem = ({ addOrEdit, children, openModal, updateForm, formData, item, parents, insertNewLink }) => {
   const { name, link } = item || {};
   const removeMenuItem = () => {
     openModal({
@@ -359,20 +374,6 @@ const OneMenuItem = ({ children, openModal, updateForm, formData, item, parents,
         </div>
       ),
       onConfirm: () => console.log("Remove item")
-    });
-  };
-  const addOrEdit = (itemObj) => {
-    openModal({
-      show: true,
-      noTitle: true,
-      fullControl: true,
-      component: (
-        <CreateAndEditMenu
-          insertNewLink={(obj) => insertNewLink(obj, parents)}
-          updateForm={updateForm}
-          data={itemObj}
-        />
-      )
     });
   };
 
@@ -418,14 +419,17 @@ const OneMenuItem = ({ children, openModal, updateForm, formData, item, parents,
         )}
       </Typography>
       <div style={{ marginLeft: "auto" }}>
-        {/* <i className=" fa fa-trash touchable-opacity" style={{ marginRight: 15, fontSize: 20 }} /> */}
         <i
-          onClick={() => addOrEdit({ ...item, children })}
+          onClick={() =>
+            addOrEdit({ id: new Date().getTime()?.toString(), children }, [
+              { ...item, children: [...(children || [])] }
+            ])
+          }
           className=" fa fa-plus touchable-opacity"
           style={{ marginRight: 20, color: "green", fontSize: 20 }}
         />
         <i
-          onClick={() => addOrEdit({ ...item, children })}
+          onClick={() => addOrEdit({ ...item, children }, parents)}
           className=" fa fa-edit touchable-opacity"
           style={{ fontSize: 20, color: "var(--app-cyan)" }}
         />
