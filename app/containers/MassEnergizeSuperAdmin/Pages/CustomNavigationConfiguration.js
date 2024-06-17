@@ -15,7 +15,7 @@ const ITEMS = [
     link: "https://example.com/item/5",
     is_link_external: false,
     parent: "category-b",
-    order: 4,
+    order: 0,
     children: [
       {
         is_published: true,
@@ -298,6 +298,7 @@ function CustomNavigationConfiguration() {
 
   const renderMenuItems = (items, margin = 0, parents = {}) => {
     if (!items?.length) return [];
+    items = items.sort((a, b) => a?.order - b?.order);
     return items.map(({ children, ...rest }, index) => {
       return (
         <div key={index} style={{ marginLeft: margin, position: "relative" }}>
