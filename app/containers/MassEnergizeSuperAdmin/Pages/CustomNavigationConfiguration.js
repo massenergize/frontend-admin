@@ -207,9 +207,6 @@ function CustomNavigationConfiguration() {
     if (!child) return parentObj;
     const index = parentObj?.children?.findIndex((p) => p?.id === child?.id);
     if (index > -1) parentObj.children[index] = child;
-    console.log("Found, id ", index, child, parentObj);
-    // console.log("Found, id ", index, child, parentObj);
-    // parentObj[index] = child;
     return parentObj;
   };
 
@@ -238,7 +235,6 @@ function CustomNavigationConfiguration() {
       if (i === reversed.length - 1) break; // Exit the loop when reaching the end of the array
       const nextIndex = i + 1;
       const next = reversed[nextIndex];
-      // const current = acc;
       acc = assembleIntoObject(next[1], acc);
     }
     return acc;
@@ -252,23 +248,21 @@ function CustomNavigationConfiguration() {
   };
 
   const removeItem = (itemObj, parents) => {
-    const lastIndex = parents.length - 1;
-    const dealingWithAChild = parents.length === 0;
-    let parentAsObj = itemObj;
-    if (dealingWithAChild) {
-      const [id, immediateParent] = parents[lastIndex];
-      let family = immediateParent?.children || [];
-      family = family.filter((f) => f?.id !== id);
-      parents[lastIndex] = [id, { ...immediateParent, children: [...family] }];
-      parentAsObj = rollUp(parents);
+    closeModal();
+    parents = Object.entries(parents);
+    const dealingWithAChild = parents.length > 0;
+    if (!dealingWithAChild) {
+      const newMenu = menuItems.filter((m) => m?.id !== itemObj?.id);
+      return setMenu(newMenu);
     }
-
-    console.log("Remove this", itemObj, "From this", parents, "Resulting in", parentAsObj);
+    let parentAsObj = itemObj;
+    const lastIndex = parents.length - 1;
+    const [id, immediateParent] = parents[lastIndex];
+    let family = immediateParent?.children || [];
+    family = family.filter((f) => f?.id !== itemObj?.id);
+    parents[lastIndex] = [id, { ...immediateParent, children: [...family] }];
+    parentAsObj = rollUp(parents);
     addToTopLevelMenu(parentAsObj);
-    // const ind = menuItems.findIndex((m) => m?.id === parentAsObj?.id);
-    // const copied = [...menuItems];
-    // if (ind === -1) copied.push(parentAsObj);
-    // else copied[ind] = parentAsObj;
   };
 
   const resetToDefault = () => {
@@ -282,7 +276,6 @@ function CustomNavigationConfiguration() {
   };
 
   const addOrEdit = (itemObj, parents = {}) => {
-    console.log("Add or edit", itemObj, parents);
     toggleModal({
       show: true,
       noTitle: true,
