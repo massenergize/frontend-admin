@@ -210,32 +210,54 @@ function CustomNavigationConfiguration() {
     return parentObj;
   };
   const insertNewLink = (linkObj, parents) => {
-  
+    // Close the modal dialog
     closeModal();
+    let newObj = linkObj;
+    // Convert the parents object into an array of [key, value] pairs
     parents = Object.entries(parents);
-    const lastIndex = parents.length - 1;
-    const [key, obj] = parents[lastIndex];
-    const sibblings = obj?.children || [];
-    // replace object =
-    const index = sibblings.findIndex((s) => s?.id === linkObj?.id);
-    if (index > -1) {
-      sibblings[index] = linkObj;
-    } else {
-      sibblings.push(linkObj);
+    const dealingWithAChild = parents.length > 0;
+    // Update the last parent entry with the modified children
+
+    if (dealingWithAChild) {
+      // Get the last index in the parents array
+      const lastIndex = parents.length - 1;
+      // Destructure the key and object from the last parent entry
+      const [key, obj] = parents[lastIndex];
+      // Get the children of the last parent object, or initialize to an empty array if not present
+      const siblings = obj?.children || [];
+      // Find the index of an existing child with the same ID as linkObj
+      const index = siblings.findIndex((s) => s?.id === linkObj?.id);
+      // If a child with the same ID is found, replace it with linkObj; otherwise, add linkObj as a new child
+      if (index > -1) siblings[index] = { ...linkObj };
+      else siblings.push(linkObj);
+      parents[lastIndex] = [key, { ...obj, children: siblings }];
+      // Reverse the parents array to facilitate building the updated parent structure
+      const reversed = [...parents].reverse();
+      // Initialize the accumulator with the first parent's object
+      let acc = reversed[0][1];
+      // Reassemble the parent objects back into the original structure
+      for (let i = 0; i < reversed.length; i++) {
+        if (i === reversed.length - 1) break; // Exit the loop when reaching the end of the array
+        const nextIndex = i + 1;
+        const next = reversed[nextIndex];
+        const current = reversed[i];
+        // Rebuild the object by nesting the current parent into the next
+        acc = assembleIntoObject(next, current);
+      }
+      newObj = acc;
     }
-    parents[lastIndex] = [key, { ...obj, children: sibblings }];
-    // Now reconstructure the object train and relationships
-    const reversed = [...parents].reverse();
-    let acc = reversed[0][1];
-    for (let i = 0; i < reversed.length; i++) {
-      if (i === reversed.length - 1) break;
-      const nextIndex = i + 1;
-      const next = reversed[nextIndex];
-      const current = reversed[i];
-      acc = assembleIntoObject(next, current);
-    }
-    console.log("Accumulated", acc);
-    console.log("Edited Link", linkObj);
+
+    // Find the index of the top-level menu item that corresponds to the updated structure
+    const ind = menuItems.findIndex((m) => m?.id === newObj?.id);
+
+    // Create a copy of the menu items array to avoid mutating the original state
+    const copied = [...menuItems];
+
+    // Replace the old menu item with the updated structure
+    copied[ind] = newObj;
+
+    // Update the menu state with the modified array
+    setMenu(copied);
   };
 
   const editMenu = (obj) => {
@@ -259,7 +281,8 @@ function CustomNavigationConfiguration() {
             parents={parents}
             insertNewLink={insertNewLink}
           />
-          {children && renderMenuItems(children, 40, { ...parents, [rest?.id]: { ...rest, children } })}
+          {/* -- I'm spreading "children" here to make sure that we create a copy of the children. We want to make sure we control when the changes show up for the user */}
+          {children && renderMenuItems(children, 40, { ...parents, [rest?.id]: { ...rest, children: [...children] } })}
         </div>
       );
     });
@@ -339,7 +362,6 @@ const OneMenuItem = ({ children, openModal, updateForm, formData, item, parents,
     });
   };
   const addOrEdit = (itemObj) => {
-    console.log("Lets see parent", parents);
     openModal({
       show: true,
       noTitle: true,
