@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import MEAccordion from "../../../components/Accordion/MEAccordion";
-import { Button, TextField, Tooltip, Typography } from "@mui/material";
+import { Button, Link, TextField, Tooltip, Typography } from "@mui/material";
 import BrandCustomization from "./BrandCustomization";
 import { useDispatch, useSelector } from "react-redux";
 import { reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
@@ -275,6 +275,12 @@ function CustomNavigationConfiguration() {
     });
   };
 
+  useEffect(() => {
+    const handleLeave = (e) => console.log("You are leaving teh page already? ");
+    window.addEventListener("beforeunload", handleLeave);
+    return () => window.removeEventListener("beforeunload", handleLeave);
+  }, []);
+
   const addOrEdit = (itemObj, parents = {}) => {
     toggleModal({
       show: true,
@@ -394,7 +400,7 @@ const OneMenuItem = ({
   parents,
   insertNewLink
 }) => {
-  const { name, link, id } = item || {};
+  const { name, link, id, is_link_external } = item || {};
   const removeMenuItem = () => {
     const hasChildren = children?.length > 0;
     let message = `Are you sure you want to remove "${item?.name}" from the menu?`;
@@ -443,13 +449,33 @@ const OneMenuItem = ({
           />
         </Tooltip>
         {name}
-        {!children && (
+        {is_link_external && (
           <span
-            className="touchable-opacity"
-            style={{ opacity: 0.5, marginLeft: 15, textDecoration: "underline", fontWeight: "bold", color: "grey" }}
+            style={{
+              fontWeight: "bold",
+              border: "solid 1px var(--app-purple)",
+              padding: "0px 5px",
+              marginLeft: 10,
+              fontSize: 10,
+              color: "var(--app-purple)",
+              borderRadius: 2
+            }}
           >
-            {link} <i className="fa fa-external-link" />
+            <Tooltip title={`This is an external link`}>
+              <b>EXT</b>
+            </Tooltip>
           </span>
+        )}
+        {!children && (
+          <a href={link} target="_blank">
+            <span
+              className="touchable-opacity"
+              style={{ opacity: 0.5, marginLeft: 15, textDecoration: "underline", fontWeight: "bold", color: "grey" }}
+            >
+              {link}
+              <i className="fa fa-external-link" />
+            </span>
+          </a>
         )}
       </Typography>
       <div style={{ marginLeft: "auto" }}>
