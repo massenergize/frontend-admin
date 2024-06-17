@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import MEAccordion from "../../../components/Accordion/MEAccordion";
-import { Button, TextField, Typography } from "@mui/material";
+import { Button, TextField, Tooltip, Typography } from "@mui/material";
 import BrandCustomization from "./BrandCustomization";
 import { useDispatch, useSelector } from "react-redux";
 import { reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
@@ -205,61 +205,84 @@ function CustomNavigationConfiguration() {
 
   const assembleIntoObject = (parentObj, child) => {
     if (!child) return parentObj;
-    const index = parentObj.findIndex((p) => p?.id === child?.id);
-    parentObj[index] = child;
+    const index = parentObj?.children?.findIndex((p) => p?.id === child?.id);
+    if (index > -1) parentObj.children[index] = child;
+    console.log("Found, id ", index, child, parentObj);
+    // console.log("Found, id ", index, child, parentObj);
+    // parentObj[index] = child;
     return parentObj;
   };
+
   const insertNewLink = (linkObj, parents) => {
     closeModal();
     let newObj = linkObj;
-    // Convert the parents object into an array of [key, value] pairs
     parents = Object.entries(parents);
     const dealingWithAChild = parents.length > 0;
-
-    // Update the last parent entry with the modified children
-
     if (dealingWithAChild) {
-      // Get the last index in the parents array
       const lastIndex = parents.length - 1;
-      // Destructure the key and object from the last parent entry
       const [key, obj] = parents[lastIndex];
-      // Get the children of the last parent object, or initialize to an empty array if not present
-      const siblings = obj?.children || [];
-      // Find the index of an existing child with the same ID as linkObj
+      const siblings = [...(obj?.children || [])];
       const index = siblings.findIndex((s) => s?.id === linkObj?.id);
-      // If a child with the same ID is found, replace it with linkObj; otherwise, add linkObj as a new child
       if (index > -1) siblings[index] = { ...linkObj };
-      else siblings.push(linkObj);
-      parents[lastIndex] = [key, { ...obj, children: siblings }];
-      // Reverse the parents array to facilitate building the updated parent structure
-      const reversed = [...parents].reverse();
-      // Initialize the accumulator with the first parent's object
-      let acc = reversed[0][1];
-      // Reassemble the parent objects back into the original structure
-      for (let i = 0; i < reversed.length; i++) {
-        if (i === reversed.length - 1) break; // Exit the loop when reaching the end of the array
-        const nextIndex = i + 1;
-        const next = reversed[nextIndex];
-        const current = reversed[i];
-        // Rebuild the object by nesting the current parent into the next
-        acc = assembleIntoObject(next, current);
-      }
-      newObj = acc;
+      else siblings.push({ ...linkObj });
+      parents[lastIndex] = [key, { ...obj, children: [...siblings] }];
+      newObj = rollUp(parents);
     }
+    addToTopLevelMenu(newObj);
+  };
 
-    // Find the index of the top-level menu item that corresponds to the updated structure
-    const ind = menuItems.findIndex((m) => m?.id === newObj?.id);
-    // Create a copy of the menu items array to avoid mutating the original state
+  const rollUp = (parents) => {
+    const reversed = [...parents].reverse();
+    let acc = reversed[0][1];
+    for (let i = 0; i < reversed.length; i++) {
+      if (i === reversed.length - 1) break; // Exit the loop when reaching the end of the array
+      const nextIndex = i + 1;
+      const next = reversed[nextIndex];
+      // const current = acc;
+      acc = assembleIntoObject(next[1], acc);
+    }
+    return acc;
+  };
+  const addToTopLevelMenu = (obj) => {
+    const ind = menuItems.findIndex((m) => m?.id === obj?.id);
     const copied = [...menuItems];
-
-    if (ind === -1) copied.push(newObj);
-    else copied[ind] = newObj;
-
+    if (ind === -1) copied.push(obj);
+    else copied[ind] = obj;
     setMenu(copied);
   };
 
-  const addOrEdit = (itemObj, parents = []) => {
-    // if (!itemObj) itemObj = { id: new Date().toString() };
+  const removeItem = (itemObj, parents) => {
+    const lastIndex = parents.length - 1;
+    const dealingWithAChild = parents.length === 0;
+    let parentAsObj = itemObj;
+    if (dealingWithAChild) {
+      const [id, immediateParent] = parents[lastIndex];
+      let family = immediateParent?.children || [];
+      family = family.filter((f) => f?.id !== id);
+      parents[lastIndex] = [id, { ...immediateParent, children: [...family] }];
+      parentAsObj = rollUp(parents);
+    }
+
+    console.log("Remove this", itemObj, "From this", parents, "Resulting in", parentAsObj);
+    addToTopLevelMenu(parentAsObj);
+    // const ind = menuItems.findIndex((m) => m?.id === parentAsObj?.id);
+    // const copied = [...menuItems];
+    // if (ind === -1) copied.push(parentAsObj);
+    // else copied[ind] = parentAsObj;
+  };
+
+  const resetToDefault = () => {
+    toggleModal({
+      show: true,
+      title: "Reset Custom Menu",
+      component: <div>Are you sure you want to reset the menu to the default configuration?</div>,
+      onConfirm: () => setMenu(ITEMS),
+      onCancel: () => console.log("Cancelled")
+    });
+  };
+
+  const addOrEdit = (itemObj, parents = {}) => {
+    console.log("Add or edit", itemObj, parents);
     toggleModal({
       show: true,
       noTitle: true,
@@ -274,7 +297,7 @@ function CustomNavigationConfiguration() {
     });
   };
 
-  const renderMenuItems = (items, margin = 0, parents = []) => {
+  const renderMenuItems = (items, margin = 0, parents = {}) => {
     if (!items?.length) return [];
     return items.map(({ children, ...rest }, index) => {
       return (
@@ -283,7 +306,7 @@ function CustomNavigationConfiguration() {
           <OneMenuItem
             item={rest}
             children={children}
-            remove={toggleModal}
+            // remove={toggleModal}
             openModal={toggleModal}
             closeModal={closeModal}
             updateForm={updateForm}
@@ -291,6 +314,7 @@ function CustomNavigationConfiguration() {
             parents={parents}
             insertNewLink={insertNewLink}
             addOrEdit={addOrEdit}
+            performDeletion={removeItem}
           />
           {/* -- I'm spreading "children" here to make sure that we create a copy of the children. We want to make sure we control when the changes show up for the user */}
           {children && renderMenuItems(children, 40, { ...parents, [rest?.id]: { ...rest, children: [...children] } })}
@@ -336,7 +360,9 @@ function CustomNavigationConfiguration() {
               variant="contained"
               onClick={() => addOrEdit({ id: new Date().getTime()?.toString() })}
             >
-              Add New Item
+              <Tooltip title={`Add a new menu item`}>
+                <b>Add New Item</b>
+              </Tooltip>
             </Button>
           </div>
         </div>
@@ -344,36 +370,49 @@ function CustomNavigationConfiguration() {
         <br />
         <div style={{ border: "dashed 1px #61616129", padding: "20px 30px", display: "flex", flexDirection: "row" }}>
           <Button variant="contained" style={{ marginRight: 10 }}>
-            Save Changes
+            <Tooltip title={`Save all changes you have made to the menu`}>
+              <b>Save Changes</b>
+            </Tooltip>
           </Button>
           <Button
             style={{ marginRight: 10, textDecoration: "underline", color: "#d22020", textTransform: "capitalize" }}
+            onClick={() => resetToDefault()}
           >
-            Reset all menus to default
+            <Tooltip title={`Reverse all  custom changes you have made`}>
+              <b>Reset menu to default</b>
+            </Tooltip>
           </Button>
         </div>
       </MEPaperBlock>
-
-      {/* <MEPaperBlock title="Customize Footer" /> */}
     </div>
   );
 }
 
 export default CustomNavigationConfiguration;
 
-const OneMenuItem = ({ addOrEdit, children, openModal, updateForm, formData, item, parents, insertNewLink }) => {
-  const { name, link } = item || {};
+const OneMenuItem = ({
+  performDeletion,
+  addOrEdit,
+  children,
+  openModal,
+  updateForm,
+  formData,
+  item,
+  parents,
+  insertNewLink
+}) => {
+  const { name, link, id } = item || {};
   const removeMenuItem = () => {
+    const hasChildren = children?.length > 0;
+    let message = `Are you sure you want to remove "${item?.name}" from the menu?`;
+    if (hasChildren)
+      message = `If you remove "${item?.name}", all it's (${children?.length ||
+        ""}) children will be removed. Are you sure you want to continue?`;
     openModal({
       show: true,
-      title: "Remove Item Confirmation",
-      component: (
-        <div>
-          If you remove items, all it's ({children?.length || ""}) children will be removed as well. Are you sure you
-          want to continue?
-        </div>
-      ),
-      onConfirm: () => console.log("Remove item")
+      title: "Delete Confirmation",
+      component: <div>{message}</div>,
+      onConfirm: () => performDeletion(item, parents)
     });
   };
 
@@ -403,11 +442,13 @@ const OneMenuItem = ({ addOrEdit, children, openModal, updateForm, formData, ite
           alignItems: "center"
         }}
       >
-        <i
-          onClick={() => removeMenuItem()}
-          className=" fa fa-trash touchable-opacity"
-          style={{ color: "#e87070", marginRight: 10, fontSize: 12 }}
-        />
+        <Tooltip title={`Remove "${name}"`}>
+          <i
+            onClick={() => removeMenuItem()}
+            className=" fa fa-trash touchable-opacity"
+            style={{ color: "#e87070", marginRight: 10, fontSize: 12 }}
+          />
+        </Tooltip>
         {name}
         {!children && (
           <span
@@ -419,20 +460,26 @@ const OneMenuItem = ({ addOrEdit, children, openModal, updateForm, formData, ite
         )}
       </Typography>
       <div style={{ marginLeft: "auto" }}>
-        <i
-          onClick={() =>
-            addOrEdit({ id: new Date().getTime()?.toString(), children }, [
-              { ...item, children: [...(children || [])] }
-            ])
-          }
-          className=" fa fa-plus touchable-opacity"
-          style={{ marginRight: 20, color: "green", fontSize: 20 }}
-        />
-        <i
-          onClick={() => addOrEdit({ ...item, children }, parents)}
-          className=" fa fa-edit touchable-opacity"
-          style={{ fontSize: 20, color: "var(--app-cyan)" }}
-        />
+        <Tooltip title={`New: Add a sub-menu item to "${name}"`}>
+          <i
+            onClick={() =>
+              addOrEdit(
+                { id: new Date().getTime()?.toString() },
+                { ...(parents || {}), [item?.id]: { ...item, children: [...(children || [])] } }
+              )
+            }
+            className=" fa fa-plus touchable-opacity"
+            style={{ marginRight: 20, color: "green", fontSize: 20 }}
+          />
+        </Tooltip>
+
+        <Tooltip title={`Edit: Make changes to "${name}"`}>
+          <i
+            onClick={() => addOrEdit({ ...item, children }, parents)}
+            className=" fa fa-edit touchable-opacity"
+            style={{ fontSize: 20, color: "var(--app-cyan)" }}
+          />
+        </Tooltip>
       </div>
     </div>
   );
