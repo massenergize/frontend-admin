@@ -238,7 +238,6 @@ function CustomNavigationConfiguration() {
   };
 
   const trackChanges = (changedVersion, options) => {
-    console.log("WE SEE OPTIONS", options);
     const { context, itemBefore } = options || {};
     // Checks if an item has been edited, and if it has, it marks it as edited
     // When  a new item is added or one is removed, it is marked as such
@@ -336,13 +335,6 @@ function CustomNavigationConfiguration() {
     });
   };
 
-  console.log("Whats tracking?", trackEdited);
-
-  const getStylesBasedOnActivity = (activity) => {
-    if (activity.key === ACTIVITIES.edit.key) return { background: ACTIVITIES.edit.color };
-    if (activity.key === ACTIVITIES.add.key) return { background: ACTIVITIES.add.color };
-  };
-
   const renderMenuItems = (items, margin = 0, parents = {}) => {
     if (!items?.length) return [];
     items = items.sort((a, b) => a?.order - b?.order);
@@ -411,7 +403,7 @@ function CustomNavigationConfiguration() {
             <Button
               color="secondary"
               variant="contained"
-              onClick={() => addOrEdit({ id: new Date().getTime()?.toString() }, null, { context: ACTIVITIES.add.key })}
+              onClick={() => addOrEdit({ id: new Date().getTime()?.toString() }, {}, { context: ACTIVITIES.add.key })}
             >
               <Tooltip title={`Add a new menu item`}>
                 <b>Add New Item</b>
