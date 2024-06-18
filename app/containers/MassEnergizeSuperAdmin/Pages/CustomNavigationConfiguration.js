@@ -382,7 +382,12 @@ function CustomNavigationConfiguration() {
 
       <MEPaperBlock title="Customize Navigation">
         <Typography variant="body" style={{ marginBottom: 10 }}>
-          Add and customize your site's navigation here. You can add, edit, and remove menu items.
+          Customize your site's navigation here. You can edit, remove and
+          <span className="touchable-opacity" style={{ fontWeight: "bold", color: "var(--app-purple)", marginLeft: 5 }}>
+            <i className="fa fa-plus" style={{ margin: "0px 5px" }} />
+            Add new menu items{" "}
+          </span>
+          here
         </Typography>
         <div
           style={{
