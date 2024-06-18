@@ -51,6 +51,9 @@ export const INTERNAL_LINKS = [
 ];
 
 function CreateAndEditMenu({ data, parent, internalLinks = INTERNAL_LINKS, insertNewLink }) {
+
+  const before = data?.toString() 
+  
   const [form, setForm] = useState({});
   useEffect(() => {
     setForm(data);

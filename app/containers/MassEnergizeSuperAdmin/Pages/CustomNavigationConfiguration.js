@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
 import CreateAndEditMenu, { INTERNAL_LINKS } from "./CreateAndEditMenu";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
+import { isEqual } from "lodash";
 const ITEMS = [
   {
     is_published: true,
@@ -175,6 +176,11 @@ const ITEMS = [
   }
 ];
 
+const ACTIVITIES = {
+  edit: { key: "edit", description: "This item was edited, and unsaved!" },
+  add: { key: "add", description: "This item is new, and unsaved!" },
+  remove: { key: "remove", description: "This item is removed, but changes are not saved yet!" }
+};
 const LComponent = () => {
   return (
     <div
@@ -195,6 +201,10 @@ const LComponent = () => {
 function CustomNavigationConfiguration() {
   const [menuItems, setMenu] = useState(ITEMS);
   const [form, setForm] = useState({});
+  const [activityContext, setActivityContext] = useState(null);
+  const [trackEdited, setEdited] = useState({});
+  const [itemBeforeEdit, setItemBeforeEdit] = useState({});
+
   const dispatch = useDispatch();
   const updateForm = (key, value, reset = false) => {
     if (reset) return setForm({});
@@ -210,7 +220,39 @@ function CustomNavigationConfiguration() {
     return parentObj;
   };
 
-  const insertNewLink = (linkObj, parents) => {
+  const createChangeObject = (changedVersion, options = {}) => {
+    return { data: { ...changedVersion }, activity: options?.context };
+  };
+
+  const resetActivityContext = () => {
+    setItemBeforeEdit({});
+    setActivityContext(null);
+  };
+
+  const hasChanged = (oldObj, newObj) => {
+    const keys = Object.keys(oldObj);
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (oldObj[key] !== newObj[key]) return true;
+    }
+  };
+
+  const trackChanges = (changedVersion, options) => {
+    console.log("WE SEE OPTIONS", options);
+    const { context, itemBefore } = options || {};
+    // Checks if an item has been edited, and if it has, it marks it as edited
+    // When  a new item is added or one is removed, it is marked as such
+    if (context === ACTIVITIES.edit.key) {
+      // const itemHasChanged = JSON.stringify(changedVersion) === JSON.stringify(itemBefore);
+      const itemHasChanged = hasChanged(changedVersion, itemBefore);
+      console.log("ITem has changd", itemHasChanged, changedVersion, itemBefore);
+      if (!itemHasChanged) return resetActivityContext();
+    }
+    setEdited({ ...trackEdited, [changedVersion?.id]: createChangeObject(changedVersion, options) });
+    resetActivityContext();
+  };
+
+  const insertNewLink = (linkObj, parents, options = {}) => {
     closeModal();
     let newObj = linkObj;
     parents = Object.entries(parents);
@@ -226,6 +268,7 @@ function CustomNavigationConfiguration() {
       newObj = rollUp(parents);
     }
     addToTopLevelMenu(newObj);
+    trackChanges(linkObj, options);
   };
 
   const rollUp = (parents) => {
@@ -275,26 +318,25 @@ function CustomNavigationConfiguration() {
     });
   };
 
-  useEffect(() => {
-    const handleLeave = (e) => console.log("You are leaving teh page already? ");
-    window.addEventListener("beforeunload", handleLeave);
-    return () => window.removeEventListener("beforeunload", handleLeave);
-  }, []);
-
-  const addOrEdit = (itemObj, parents = {}) => {
+  const addOrEdit = (itemObj, parents = {}, options = {}) => {
+    // const { context } = options || {};
+    // setActivityContext(context);
+    setItemBeforeEdit(itemObj);
     toggleModal({
       show: true,
       noTitle: true,
       fullControl: true,
       component: (
         <CreateAndEditMenu
-          insertNewLink={(obj) => insertNewLink(obj, parents)}
+          insertNewLink={(obj) => insertNewLink(obj, parents, { ...options, itemBefore: itemObj })}
           updateForm={updateForm}
           data={itemObj}
         />
       )
     });
   };
+
+  console.log("Whats tracking?", trackEdited);
 
   const renderMenuItems = (items, margin = 0, parents = {}) => {
     if (!items?.length) return [];
@@ -358,7 +400,7 @@ function CustomNavigationConfiguration() {
             <Button
               color="secondary"
               variant="contained"
-              onClick={() => addOrEdit({ id: new Date().getTime()?.toString() })}
+              onClick={() => addOrEdit({ id: new Date().getTime()?.toString() }, null, { context: ACTIVITIES.add.key })}
             >
               <Tooltip title={`Add a new menu item`}>
                 <b>Add New Item</b>
@@ -415,6 +457,8 @@ const OneMenuItem = ({
       onConfirm: () => performDeletion(item, parents)
     });
   };
+
+  const parentsForNewItem = { ...(parents || {}), [item?.id]: { ...item, children: [...(children || [])] } };
 
   return (
     <div
@@ -483,10 +527,7 @@ const OneMenuItem = ({
         <Tooltip title={`New: Add a sub-menu item to "${name}"`}>
           <i
             onClick={() =>
-              addOrEdit(
-                { id: new Date().getTime()?.toString() },
-                { ...(parents || {}), [item?.id]: { ...item, children: [...(children || [])] } }
-              )
+              addOrEdit({ id: new Date().getTime()?.toString() }, parentsForNewItem, { context: ACTIVITIES.add.key })
             }
             className=" fa fa-plus touchable-opacity"
             style={{ marginRight: 20, color: "green", fontSize: 20 }}
@@ -495,7 +536,7 @@ const OneMenuItem = ({
 
         <Tooltip title={`Edit: Make changes to "${name}"`}>
           <i
-            onClick={() => addOrEdit({ ...item, children }, parents)}
+            onClick={() => addOrEdit({ ...item, children }, parents, { context: ACTIVITIES.edit.key })}
             className=" fa fa-edit touchable-opacity"
             style={{ fontSize: 20, color: "var(--app-cyan)" }}
           />
