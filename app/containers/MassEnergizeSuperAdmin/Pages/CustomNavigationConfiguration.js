@@ -177,9 +177,9 @@ const ITEMS = [
 ];
 
 const ACTIVITIES = {
-  edit: { key: "edit", description: "This item was edited, and unsaved!" },
-  add: { key: "add", description: "This item is new, and unsaved!" },
-  remove: { key: "remove", description: "This item is removed, but changes are not saved yet!" }
+  edit: { key: "edit", description: "This item was edited, and unsaved!", color: "#fffcf3" },
+  add: { key: "add", description: "This item is new, and unsaved!", color: "#f4fff4" },
+  remove: { key: "remove", description: "This item is removed, but changes are not saved yet!", color: "#ffeded" }
 };
 const LComponent = () => {
   return (
@@ -243,9 +243,7 @@ function CustomNavigationConfiguration() {
     // Checks if an item has been edited, and if it has, it marks it as edited
     // When  a new item is added or one is removed, it is marked as such
     if (context === ACTIVITIES.edit.key) {
-      // const itemHasChanged = JSON.stringify(changedVersion) === JSON.stringify(itemBefore);
       const itemHasChanged = hasChanged(changedVersion, itemBefore);
-      console.log("ITem has changd", itemHasChanged, changedVersion, itemBefore);
       if (!itemHasChanged) return resetActivityContext();
     }
     setEdited({ ...trackEdited, [changedVersion?.id]: createChangeObject(changedVersion, options) });
@@ -290,7 +288,7 @@ function CustomNavigationConfiguration() {
     setMenu(copied);
   };
 
-  const removeItem = (itemObj, parents) => {
+  const removeItem = (itemObj, parents, options = {}) => {
     closeModal();
     parents = Object.entries(parents);
     const dealingWithAChild = parents.length > 0;
@@ -304,8 +302,10 @@ function CustomNavigationConfiguration() {
     let family = immediateParent?.children || [];
     family = family.filter((f) => f?.id !== itemObj?.id);
     parents[lastIndex] = [id, { ...immediateParent, children: [...family] }];
-    parentAsObj = rollUp(parents);
-    addToTopLevelMenu(parentAsObj);
+    //if you want to remove the item from the state, uncomment the  code below
+    // parentAsObj = rollUp(parents);
+    // addToTopLevelMenu(parentAsObj);
+    trackChanges(itemObj, { ...options, context: ACTIVITIES.remove.key });
   };
 
   const resetToDefault = () => {
@@ -338,10 +338,19 @@ function CustomNavigationConfiguration() {
 
   console.log("Whats tracking?", trackEdited);
 
+  const getStylesBasedOnActivity = (activity) => {
+    if (activity.key === ACTIVITIES.edit.key) return { background: ACTIVITIES.edit.color };
+    if (activity.key === ACTIVITIES.add.key) return { background: ACTIVITIES.add.color };
+  };
+
   const renderMenuItems = (items, margin = 0, parents = {}) => {
     if (!items?.length) return [];
     items = items.sort((a, b) => a?.order - b?.order);
     return items.map(({ children, ...rest }, index) => {
+      const editTrail = trackEdited[(rest?.id)];
+      // let activity;
+      // if (editTrail) activity = ACTIVITIES[(editTrail?.activity)];
+
       return (
         <div key={index} style={{ marginLeft: margin, position: "relative" }}>
           {margin ? <LComponent /> : <></>}
@@ -357,6 +366,8 @@ function CustomNavigationConfiguration() {
             insertNewLink={insertNewLink}
             addOrEdit={addOrEdit}
             performDeletion={removeItem}
+            editTrail={editTrail}
+            // status = {activity}
           />
           {/* -- I'm spreading "children" here to make sure that we create a copy of the children. We want to make sure we control when the changes show up for the user */}
           {children && renderMenuItems(children, 40, { ...parents, [rest?.id]: { ...rest, children: [...children] } })}
@@ -441,8 +452,10 @@ const OneMenuItem = ({
   formData,
   item,
   parents,
-  insertNewLink
+  insertNewLink,
+  editTrail
 }) => {
+  let activity = editTrail ? ACTIVITIES[(editTrail?.activity)] : null;
   const { name, link, id, is_link_external } = item || {};
   const removeMenuItem = () => {
     const hasChildren = children?.length > 0;
@@ -460,6 +473,7 @@ const OneMenuItem = ({
 
   const parentsForNewItem = { ...(parents || {}), [item?.id]: { ...item, children: [...(children || [])] } };
 
+  const isRemoved = activity?.key === ACTIVITIES.remove.key;
   return (
     <div
       className=" elevate-float"
@@ -471,12 +485,12 @@ const OneMenuItem = ({
         width: "100%",
         borderRadius: 3,
         marginTop: 10,
-        background: "white"
+        background: activity ? activity.color : "white",
+        textDecoration: isRemoved ? "line-through" : "none"
       }}
     >
       <Typography
         variant="body"
-        // className="touchable-opacity"
         style={{
           margin: 0,
           fontWeight: "bold",
@@ -493,7 +507,9 @@ const OneMenuItem = ({
             style={{ color: "#e87070", marginRight: 10, fontSize: 12 }}
           />
         </Tooltip>
-        {name}
+        <Tooltip title={activity ? activity?.description : ""}>
+          <b>{name}</b>
+        </Tooltip>
         {is_link_external && (
           <span
             style={{
@@ -523,25 +539,27 @@ const OneMenuItem = ({
           </a>
         )}
       </Typography>
-      <div style={{ marginLeft: "auto" }}>
-        <Tooltip title={`New: Add a sub-menu item to "${name}"`}>
-          <i
-            onClick={() =>
-              addOrEdit({ id: new Date().getTime()?.toString() }, parentsForNewItem, { context: ACTIVITIES.add.key })
-            }
-            className=" fa fa-plus touchable-opacity"
-            style={{ marginRight: 20, color: "green", fontSize: 20 }}
-          />
-        </Tooltip>
+      {!isRemoved && (
+        <div style={{ marginLeft: "auto" }}>
+          <Tooltip title={`New: Add a sub-menu item to "${name}"`}>
+            <i
+              onClick={() =>
+                addOrEdit({ id: new Date().getTime()?.toString() }, parentsForNewItem, { context: ACTIVITIES.add.key })
+              }
+              className=" fa fa-plus touchable-opacity"
+              style={{ marginRight: 20, color: "green", fontSize: 20 }}
+            />
+          </Tooltip>
 
-        <Tooltip title={`Edit: Make changes to "${name}"`}>
-          <i
-            onClick={() => addOrEdit({ ...item, children }, parents, { context: ACTIVITIES.edit.key })}
-            className=" fa fa-edit touchable-opacity"
-            style={{ fontSize: 20, color: "var(--app-cyan)" }}
-          />
-        </Tooltip>
-      </div>
+          <Tooltip title={`Edit: Make changes to "${name}"`}>
+            <i
+              onClick={() => addOrEdit({ ...item, children }, parents, { context: ACTIVITIES.edit.key })}
+              className=" fa fa-edit touchable-opacity"
+              style={{ fontSize: 20, color: "var(--app-cyan)" }}
+            />
+          </Tooltip>
+        </div>
+      )}
     </div>
   );
 };
