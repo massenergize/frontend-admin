@@ -293,7 +293,10 @@ function CustomNavigationConfiguration() {
     const dealingWithAChild = parents.length > 0;
     if (!dealingWithAChild) {
       const newMenu = menuItems.filter((m) => m?.id !== itemObj?.id);
-      return setMenu(newMenu);
+      trackChanges(itemObj, { ...options, context: ACTIVITIES.remove.key });
+
+      // return setMenu(newMenu); Unccomment when we want to remove the item from the state
+      return;
     }
     let parentAsObj = itemObj;
     const lastIndex = parents.length - 1;
@@ -318,8 +321,6 @@ function CustomNavigationConfiguration() {
   };
 
   const addOrEdit = (itemObj, parents = {}, options = {}) => {
-    // const { context } = options || {};
-    // setActivityContext(context);
     setItemBeforeEdit(itemObj);
     toggleModal({
       show: true,
@@ -340,8 +341,6 @@ function CustomNavigationConfiguration() {
     items = items.sort((a, b) => a?.order - b?.order);
     return items.map(({ children, ...rest }, index) => {
       const editTrail = trackEdited[(rest?.id)];
-      // let activity;
-      // if (editTrail) activity = ACTIVITIES[(editTrail?.activity)];
 
       return (
         <div key={index} style={{ marginLeft: margin, position: "relative" }}>
@@ -359,7 +358,6 @@ function CustomNavigationConfiguration() {
             addOrEdit={addOrEdit}
             performDeletion={removeItem}
             editTrail={editTrail}
-            // status = {activity}
           />
           {/* -- I'm spreading "children" here to make sure that we create a copy of the children. We want to make sure we control when the changes show up for the user */}
           {children && renderMenuItems(children, 40, { ...parents, [rest?.id]: { ...rest, children: [...children] } })}
@@ -446,6 +444,7 @@ const OneMenuItem = ({
   parents,
   insertNewLink,
   editTrail
+  // removeChildrenToo
 }) => {
   let activity = editTrail ? ACTIVITIES[(editTrail?.activity)] : null;
   const { name, link, id, is_link_external } = item || {};

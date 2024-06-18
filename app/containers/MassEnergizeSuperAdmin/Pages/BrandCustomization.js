@@ -54,7 +54,7 @@ function BrandCustomization() {
       />
 
       <div
-        style={{ display: "flex", alignItems: "center", marginLeft: "auto", marginTop: 10, paddingRight: 10 }}
+        style={{ display: "flex", alignItems: "center", marginTop: 10, paddingRight: 10 }}
         // style={{ display: "flex", alignItems: "center", marginLeft: 20, marginTop: 10, paddingRight: 20 }}
       >
         <Typography variant="caption" style={{ marginRight: 10 }}>
