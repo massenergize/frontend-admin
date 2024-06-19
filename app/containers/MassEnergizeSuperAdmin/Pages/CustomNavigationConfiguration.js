@@ -180,11 +180,9 @@ function CustomNavigationConfiguration() {
     });
   };
 
-  console.log("WE SEE MENU ITEMS", menuItems);
-
   const renderMenuItems = (items, margin = 0, parents = {}, options = {}) => {
     if (!items?.length) return [];
-    items = items.sort((a, b) => a?.order - b?.order);
+    // items = items.sort((a, b) => a?.order - b?.order); //If you want to sort the items by order, uncomment this line
     return items.map(({ children, ...rest }, index) => {
       const { parentTraits } = options || {};
       const editTrail = trackEdited[(rest?.id)];
@@ -209,6 +207,10 @@ function CustomNavigationConfiguration() {
             editTrail={editTrail}
             activity={activity}
             parentTraits={parentTraits || {}}
+            isTheFirstItem={index === 0}
+            isTheLastItem={index === items?.length - 1}
+            index={index}
+            moveUp={(up) => moveUp(up, { ...rest, children }, parents, { index, sibblings: items })}
           />
           {/* -- I'm spreading "children" here to make sure that we create a copy of the children. We want to make sure we control when the changes show up for the user */}
           {children &&
@@ -227,6 +229,27 @@ function CustomNavigationConfiguration() {
     console.log("Sending changes to the server", trackEdited);
   };
 
+  const moveUp = (up, item, parents = {}, options = {}) => {
+    let { index, sibblings } = options || {};
+    const newIndex = up ? index - 1 : index + 1;
+    parents = Object.entries(parents);
+    const dealingWithAChild = parents.length > 0;
+    if (!dealingWithAChild) {
+      sibblings = [...sibblings];
+      sibblings = sibblings.filter((s, i) => i !== index);
+      sibblings.splice(newIndex, 0, item);
+      return setMenu(sibblings);
+    }
+
+    const lastIndex = parents.length - 1;
+    const [id, immediateParent] = parents[lastIndex];
+    let family = [...(immediateParent?.children || [])];
+    family = family.filter((f) => f?.id !== item?.id);
+    family.splice(newIndex, 0, item);
+    parents[lastIndex] = [id, { ...immediateParent, children: [...family] }];
+    const parentAsObj = rollUp(parents);
+    addToTopLevelMenu(parentAsObj);
+  };
   const isLoading = status[NAVIGATION];
   return (
     <div>
@@ -307,7 +330,19 @@ function CustomNavigationConfiguration() {
 
 export default CustomNavigationConfiguration;
 
-const OneMenuItem = ({ performDeletion, addOrEdit, children, openModal, item, parents, activity, parentTraits }) => {
+const OneMenuItem = ({
+  performDeletion,
+  addOrEdit,
+  children,
+  openModal,
+  item,
+  parents,
+  activity,
+  parentTraits,
+  isTheFirstItem,
+  isTheLastItem,
+  moveUp
+}) => {
   const { name, link, id, is_link_external } = item || {};
 
   const getBackColor = () => {
@@ -332,6 +367,7 @@ const OneMenuItem = ({ performDeletion, addOrEdit, children, openModal, item, pa
   const parentsForNewItem = { ...(parents || {}), [item?.id]: { ...item, children: [...(children || [])] } };
 
   const isRemoved = parentTraits?.isRemoved || activity?.key === ACTIVITIES.remove.key;
+
   return (
     <div
       className=" elevate-float"
@@ -359,13 +395,23 @@ const OneMenuItem = ({ performDeletion, addOrEdit, children, openModal, item, pa
           alignItems: "center"
         }}
       >
-        <Tooltip title={`Remove "${name}"`}>
-          <i
-            onClick={() => removeMenuItem()}
-            className=" fa fa-trash touchable-opacity"
-            style={{ color: "#e87070", marginRight: 10, fontSize: 12 }}
-          />
-        </Tooltip>
+        {!isTheFirstItem && (
+          <Tooltip title={`Move up`}>
+            <i
+              onClick={() => moveUp(true)}
+              className=" fa fa-long-arrow-up touchable-opacity"
+              style={{ color: "var(--app-cyan)", marginRight: 10, fontSize: 20 }}
+            />
+          </Tooltip>
+        )}
+        {!isTheLastItem && (
+          <Tooltip onClick={() => moveUp(false)} title={`Move down`}>
+            <i
+              className=" fa fa-long-arrow-down touchable-opacity"
+              style={{ color: "var(--app-purple)", marginRight: 10, fontSize: 20 }}
+            />
+          </Tooltip>
+        )}
         <Tooltip title={activity ? activity?.description : ""}>
           <b>{name}</b>
         </Tooltip>
@@ -409,12 +455,19 @@ const OneMenuItem = ({ performDeletion, addOrEdit, children, openModal, item, pa
               style={{ marginRight: 20, color: "green", fontSize: 20 }}
             />
           </Tooltip>
-
           <Tooltip title={`Edit: Make changes to "${name}"`}>
             <i
               onClick={() => addOrEdit({ ...item, children }, parents, { context: ACTIVITIES.edit.key })}
               className=" fa fa-edit touchable-opacity"
               style={{ fontSize: 20, color: "var(--app-cyan)" }}
+            />
+          </Tooltip>
+          <span style={{ margin: "0px 8px", fontSize: 20, color: "#ededed" }}>|</span>
+          <Tooltip title={`Remove "${name}"`}>
+            <i
+              onClick={() => removeMenuItem()}
+              className=" fa fa-trash touchable-opacity"
+              style={{ color: "#e87070", marginRight: 10, fontSize: 20 }}
             />
           </Tooltip>
         </div>
