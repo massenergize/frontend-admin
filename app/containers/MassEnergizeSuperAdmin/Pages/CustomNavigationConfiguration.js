@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { reduxToggleUniversalModal, reduxToggleUniversalToast } from "../../../redux/redux-actions/adminActions";
 import CreateAndEditMenu, { INTERNAL_LINKS } from "./CreateAndEditMenu";
 import { EXAMPLE_MENU_STRUCTURE } from "../ME  Tools/media library/shared/utils/values";
+import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 
 const NAVIGATION = "navigation";
 const FOOTER = "footer";
@@ -256,13 +257,14 @@ function CustomNavigationConfiguration() {
       <MEPaperBlock title="Brand Customization">
         {/* <h4>This is what the custom navigation configuration page will look like</h4> */}
         <BrandCustomization />
-        {/* <MEDropdown
+        
+        <MEDropdown
           data={INTERNAL_LINKS}
           labelExtractor={(l) => l?.name}
           valueExtractor={(l) => l?.link}
           placeholder="Link to a page within your site"
           smartDropdown={false}
-        /> */}
+        />
       </MEPaperBlock>
 
       <MEPaperBlock title="Customize Navigation">

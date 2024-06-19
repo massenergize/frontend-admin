@@ -51,9 +51,6 @@ export const INTERNAL_LINKS = [
 ];
 
 function CreateAndEditMenu({ data, parent, internalLinks = INTERNAL_LINKS, insertNewLink }) {
-
-  const before = data?.toString() 
-  
   const [form, setForm] = useState({});
   useEffect(() => {
     setForm(data);
@@ -62,8 +59,6 @@ function CreateAndEditMenu({ data, parent, internalLinks = INTERNAL_LINKS, inser
   const updateForm = (obj) => {
     setForm({ ...form, ...obj });
   };
-
-
 
   const { is_published, name, link, order, is_link_external: linkIsExternal } = form;
   return (
@@ -105,7 +100,7 @@ function CreateAndEditMenu({ data, parent, internalLinks = INTERNAL_LINKS, inser
           value={name}
         />
         {/* --------- EXTERNAL & INTERNAL LINKS ----------- */}
-        <div style={{ border: "dashed 1px #8e24aa45", padding: 20, margin: "10px 0px" }}>
+        <div style={{ border: "dashed 0px #8e24aa45", padding: "10px 0px", margin: "10px 0px" }}>
           <div style={{ marginLeft: 10, marginBottom: 10 }}>
             <FormControlLabel
               control={
@@ -149,6 +144,11 @@ function CreateAndEditMenu({ data, parent, internalLinks = INTERNAL_LINKS, inser
             ) : (
               <MEDropdown
                 data={internalLinks}
+                defaultValue={link ? [link] : []}
+                onItemSelected={(items) => {
+                  const link = items[0];
+                  updateForm({ link }), console.log("Lets see link", link);
+                }}
                 labelExtractor={(l) => l?.name}
                 valueExtractor={(l) => l?.link}
                 placeholder="Link to a page within your site"
@@ -156,17 +156,7 @@ function CreateAndEditMenu({ data, parent, internalLinks = INTERNAL_LINKS, inser
             )}
           </div>
         </div>
-
-        {/* <Typography variant="caption" style={{ margin: "10px 0px" }}>
-          Parent (This menu will be a submenu if you choose a parent){" "}
-        </Typography>
-
-        <MEDropdown /> */}
-
-        {/* <Typography variant="caption" style={{ marginTop: 10 }}>
-        
-        </Typography> */}
-        <TextField
+        {/* <TextField
           style={{ width: "100%", marginTop: 15 }}
           label="Order (Indicate the order of the menu item)"
           placeholder="Order Example: 1"
@@ -177,7 +167,7 @@ function CreateAndEditMenu({ data, parent, internalLinks = INTERNAL_LINKS, inser
           variant="outlined"
           onChange={(e) => updateForm({ order: e.target.value })}
           value={order}
-        />
+        /> */}
       </div>
 
       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
