@@ -313,7 +313,7 @@ function CustomNavigationConfiguration() {
   const resetToDefault = () => {
     toggleModal({
       show: true,
-      title: "Reset Custom Menu",
+      title: "Reset to default",
       component: <div>Are you sure you want to reset the menu to the default configuration?</div>,
       onConfirm: () => setMenu(ITEMS),
       onCancel: () => console.log("Cancelled")
@@ -336,11 +336,14 @@ function CustomNavigationConfiguration() {
     });
   };
 
-  const renderMenuItems = (items, margin = 0, parents = {}) => {
+  const renderMenuItems = (items, margin = 0, parents = {}, options = {}) => {
     if (!items?.length) return [];
     items = items.sort((a, b) => a?.order - b?.order);
     return items.map(({ children, ...rest }, index) => {
+      const { parentTraits } = options || {};
       const editTrail = trackEdited[(rest?.id)];
+      let activity = editTrail ? ACTIVITIES[(editTrail?.activity)] : null;
+      const isRemoved = activity?.key === ACTIVITIES.remove.key;
 
       return (
         <div key={index} style={{ marginLeft: margin, position: "relative" }}>
@@ -358,9 +361,17 @@ function CustomNavigationConfiguration() {
             addOrEdit={addOrEdit}
             performDeletion={removeItem}
             editTrail={editTrail}
+            activity={activity}
+            parentTraits={parentTraits || {}}
           />
           {/* -- I'm spreading "children" here to make sure that we create a copy of the children. We want to make sure we control when the changes show up for the user */}
-          {children && renderMenuItems(children, 40, { ...parents, [rest?.id]: { ...rest, children: [...children] } })}
+          {children &&
+            renderMenuItems(
+              children,
+              40,
+              { ...parents, [rest?.id]: { ...rest, children: [...children] } },
+              { parentTraits: { isRemoved } }
+            )}
         </div>
       );
     });
@@ -443,15 +454,12 @@ const OneMenuItem = ({
   addOrEdit,
   children,
   openModal,
-  updateForm,
-  formData,
   item,
   parents,
-  insertNewLink,
-  editTrail
-  // removeChildrenToo
+  activity,
+  parentTraits
 }) => {
-  let activity = editTrail ? ACTIVITIES[(editTrail?.activity)] : null;
+
   const { name, link, id, is_link_external } = item || {};
   const removeMenuItem = () => {
     const hasChildren = children?.length > 0;
@@ -469,7 +477,7 @@ const OneMenuItem = ({
 
   const parentsForNewItem = { ...(parents || {}), [item?.id]: { ...item, children: [...(children || [])] } };
 
-  const isRemoved = activity?.key === ACTIVITIES.remove.key;
+  const isRemoved = parentTraits?.isRemoved || activity?.key === ACTIVITIES.remove.key;
   return (
     <div
       className=" elevate-float"
