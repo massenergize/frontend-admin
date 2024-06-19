@@ -3,177 +3,13 @@ import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import { Button, Link, TextField, Tooltip, Typography } from "@mui/material";
 import BrandCustomization from "./BrandCustomization";
 import { useDispatch, useSelector } from "react-redux";
-import { reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
+import { reduxToggleUniversalModal, reduxToggleUniversalToast } from "../../../redux/redux-actions/adminActions";
 import CreateAndEditMenu, { INTERNAL_LINKS } from "./CreateAndEditMenu";
-import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
-import { isEqual } from "lodash";
-const ITEMS = [
-  {
-    is_published: true,
-    id: 5,
-    name: "Home",
-    link: "https://example.com/item/5",
-    is_link_external: false,
-    parent: "category-b",
-    order: 0,
-    children: [
-      {
-        is_published: true,
-        id: 6,
-        name: "Introduction",
-        link: "https://external-site.com/item/6",
-        is_link_external: true,
-        parent: "category-b",
-        order: 5
-      },
-      {
-        is_published: true,
-        id: 7,
-        name: "Overview",
-        link: "https://example.com/item/7",
-        is_link_external: false,
-        parent: "category-b",
-        order: 6
-      }
-    ]
-  },
-  {
-    is_published: true,
-    id: 1,
-    name: "Actions",
-    link: "https://example.com/item/1",
-    is_link_external: false,
-    parent: "category-a",
-    order: 1
-  },
-  {
-    is_published: false,
-    id: 2,
-    name: "Teams",
-    link: "https://example.com/item/2",
-    is_link_external: false,
-    parent: "category-b",
-    order: 2,
-    children: [
-      {
-        is_published: true,
-        id: 10,
-        name: "Team A",
-        link: "https://external-site.com/item/10",
-        is_link_external: true,
-        parent: "category-b",
-        order: 5
-      },
-      {
-        is_published: true,
-        id: 11,
-        name: "Team B",
-        link: "https://example.com/item/11",
-        is_link_external: false,
-        parent: "category-b",
-        children: [
-          {
-            is_published: true,
-            id: 12,
-            name: "Team B1",
-            link: "https://example.com/item/12",
-            is_link_external: false,
-            parent: "category-b",
-            order: 5
-          },
-          {
-            is_published: true,
-            id: 13,
-            name: "Team B2",
-            link: "https://external-site.com/item/13",
-            is_link_external: true,
-            parent: "category-b",
-            order: 6
-          }
-        ],
-        order: 6
-      }
-    ]
-  },
-  {
-    is_published: true,
-    id: 3,
-    name: "Events",
-    link: "https://example.com/item/3",
-    is_link_external: false,
-    parent: "category-a",
-    order: 3,
-    children: [
-      {
-        is_published: true,
-        id: 8,
-        name: "Upcoming Events",
-        link: "https://external-site.com/item/8",
-        is_link_external: true,
-        parent: "category-b",
-        order: 5
-      },
-      {
-        is_published: true,
-        id: 9,
-        name: "Past Events",
-        link: "https://example.com/item/9",
-        is_link_external: false,
-        parent: "category-b",
-        order: 6
-      }
-    ]
-  },
-  {
-    is_published: false,
-    id: 4,
-    name: "About Us",
-    link: "https://example.com/item/4",
-    is_link_external: false,
-    parent: "category-c",
-    order: 7,
-    children: [
-      {
-        is_published: true,
-        id: 14,
-        name: "Our Story",
-        link: "https://example.com/item/14",
-        is_link_external: false,
-        parent: "category-b",
-        order: 5,
-        children: [
-          {
-            is_published: true,
-            id: 16,
-            name: "Founding",
-            link: "https://external-site.com/item/16",
-            is_link_external: true,
-            parent: "category-b",
-            order: 5
-          },
-          {
-            is_published: true,
-            id: 17,
-            name: "Milestones",
-            link: "https://example.com/item/17",
-            is_link_external: false,
-            parent: "category-b",
-            order: 6
-          }
-        ]
-      },
-      {
-        is_published: true,
-        id: 15,
-        name: "Mission & Vision",
-        link: "https://external-site.com/item/15",
-        is_link_external: true,
-        parent: "category-b",
-        order: 6
-      }
-    ]
-  }
-];
+import { EXAMPLE_MENU_STRUCTURE } from "../ME  Tools/media library/shared/utils/values";
+
+const NAVIGATION = "navigation";
+const FOOTER = "footer";
+const BRAND = "brand";
 
 const ACTIVITIES = {
   edit: { key: "edit", description: "This item was edited, and unsaved!", color: "#fffcf3" },
@@ -198,18 +34,27 @@ const LComponent = () => {
   );
 };
 function CustomNavigationConfiguration() {
-  const [menuItems, setMenu] = useState(ITEMS);
+  const [menuItems, setMenu] = useState([]);
   const [form, setForm] = useState({});
-  const [activityContext, setActivityContext] = useState(null);
+  // const [activityContext, setActivityContext] = useState(null);
   const [trackEdited, setEdited] = useState({});
-  const [itemBeforeEdit, setItemBeforeEdit] = useState({});
-
+  // const [itemBeforeEdit, setItemBeforeEdit] = useState({});
+  const [status, setLoadingStatus] = useState({});
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    setMenu(EXAMPLE_MENU_STRUCTURE?.data?.menu_items);
+  }, []);
+
   const updateForm = (key, value, reset = false) => {
     if (reset) return setForm({});
     setForm({ ...form, [key]: value });
   };
+  // const setLoading = (key, value) => setLoadingStatus({ ...status, [key]: value });
   const toggleModal = (props) => dispatch(reduxToggleUniversalModal(props));
+  const notify = (message, success = false) => {
+    dispatch(reduxToggleUniversalToast({ open: true, message, variant: success ? "success" : "error" }));
+  };
   const closeModal = () => toggleModal({ show: false, component: null });
 
   const assembleIntoObject = (parentObj, child) => {
@@ -224,8 +69,8 @@ function CustomNavigationConfiguration() {
   };
 
   const resetActivityContext = () => {
-    setItemBeforeEdit({});
-    setActivityContext(null);
+    // setItemBeforeEdit({});
+    // setActivityContext(null);
   };
 
   const hasChanged = (oldObj, newObj) => {
@@ -320,7 +165,7 @@ function CustomNavigationConfiguration() {
   };
 
   const addOrEdit = (itemObj, parents = {}, options = {}) => {
-    setItemBeforeEdit(itemObj);
+    // setItemBeforeEdit(itemObj);
     toggleModal({
       show: true,
       noTitle: true,
@@ -334,6 +179,8 @@ function CustomNavigationConfiguration() {
       )
     });
   };
+
+  console.log("WE SEE MENU ITEMS", menuItems);
 
   const renderMenuItems = (items, margin = 0, parents = {}, options = {}) => {
     if (!items?.length) return [];
@@ -369,13 +216,18 @@ function CustomNavigationConfiguration() {
               children,
               40,
               { ...parents, [rest?.id]: { ...rest, children: [...children] } },
-              { parentTraits: { isRemoved } }
+              { parentTraits: { isRemoved }, ...(options || {}) }
             )}
         </div>
       );
     });
   };
 
+  const sendChangesToServer = () => {
+    console.log("Sending changes to the server", trackEdited);
+  };
+
+  const isLoading = status[NAVIGATION];
   return (
     <div>
       <MEPaperBlock title="Brand Customization">
@@ -427,12 +279,19 @@ function CustomNavigationConfiguration() {
 
         <br />
         <div style={{ border: "dashed 1px #61616129", padding: "20px 30px", display: "flex", flexDirection: "row" }}>
-          <Button variant="contained" style={{ marginRight: 10 }}>
+          <Button
+            onClick={() => {
+              sendChangesToServer();
+            }}
+            variant="contained"
+            style={{ marginRight: 10 }}
+          >
             <Tooltip title={`Save all changes you have made to the menu`}>
-              <b>Save Changes</b>
+              {isLoading ? <i className=" fa fa-spinner fa-spin" /> : <b>Save Changes</b>}
             </Tooltip>
           </Button>
           <Button
+            disabled={isLoading}
             style={{ marginRight: 10, textDecoration: "underline", color: "#d22020", textTransform: "capitalize" }}
             onClick={() => resetToDefault()}
           >
@@ -448,18 +307,14 @@ function CustomNavigationConfiguration() {
 
 export default CustomNavigationConfiguration;
 
-const OneMenuItem = ({
-  performDeletion,
-  addOrEdit,
-  children,
-  openModal,
-  item,
-  parents,
-  activity,
-  parentTraits
-}) => {
-
+const OneMenuItem = ({ performDeletion, addOrEdit, children, openModal, item, parents, activity, parentTraits }) => {
   const { name, link, id, is_link_external } = item || {};
+
+  const getBackColor = () => {
+    if (activity) return activity?.color;
+    if (parentTraits?.isRemoved) return ACTIVITIES.remove.color;
+    return "white";
+  };
   const removeMenuItem = () => {
     const hasChildren = children?.length > 0;
     let message = `Are you sure you want to remove "${item?.name}" from the menu?`;
@@ -486,9 +341,10 @@ const OneMenuItem = ({
         flexDirection: "row",
         alignItems: "center",
         width: "100%",
+        minWidth: 450,
         borderRadius: 3,
         marginTop: 10,
-        background: activity ? activity.color : "white",
+        background: getBackColor(),
         textDecoration: isRemoved ? "line-through" : "none"
       }}
     >
@@ -530,14 +386,14 @@ const OneMenuItem = ({
             </Tooltip>
           </span>
         )}
-        {!children && (
+        {!children?.length && link && (
           <a href={link} target="_blank">
             <span
               className="touchable-opacity"
               style={{ opacity: 0.5, marginLeft: 15, textDecoration: "underline", fontWeight: "bold", color: "grey" }}
             >
               {link}
-              <i className="fa fa-external-link" />
+              <i className="fa fa-external-link" style={{ margin: "0px 4px" }} />
             </span>
           </a>
         )}

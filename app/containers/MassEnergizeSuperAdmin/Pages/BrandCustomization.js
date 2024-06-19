@@ -1,5 +1,5 @@
 import { Button, TextField, Typography } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 // import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import { useSelector } from "react-redux";
 import MediaLibrary from "../_FormGenerator/media library/FormMediaLibraryImplementation";
@@ -25,8 +25,15 @@ const PickLogo = ({ openLibrary, selected }) => {
     />
   );
 };
-function BrandCustomization() {
+function BrandCustomization({  }) {
+  const [link, setLink] = useState("");
+  const [loading, setLoading] = useState(false);
   const imagesObject = useSelector((state) => state.getIn(["galleryImages"]));
+
+  const sendChangeToServer = () => {
+    setLoading(true);
+  }
+
   return (
     <div
       style={{
@@ -49,7 +56,9 @@ function BrandCustomization() {
         InputLabelProps={{
           shrink: true
         }}
+        onChange={(e) => setLink(e.target.value)}
         label="URL"
+        value  ={link}
         style={{ width: "80%", marginTop: 15, marginBottom: 0 }}
       />
 
@@ -60,7 +69,7 @@ function BrandCustomization() {
         <Typography variant="caption" style={{ marginRight: 10 }}>
           Logo will lead to the default homepage if no URL is provided
         </Typography>
-        <Button variant="contained">SAVE</Button>
+        <Button variant="contained">{loading ? <i className="fa fa-spin fa-spinner" /> : "SAVE"}</Button>
       </div>
     </div>
   );
