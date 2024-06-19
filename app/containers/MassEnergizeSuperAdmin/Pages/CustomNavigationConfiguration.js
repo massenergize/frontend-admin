@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
-import MEAccordion from "../../../components/Accordion/MEAccordion";
 import { Button, Link, TextField, Tooltip, Typography } from "@mui/material";
 import BrandCustomization from "./BrandCustomization";
 import { useDispatch, useSelector } from "react-redux";
