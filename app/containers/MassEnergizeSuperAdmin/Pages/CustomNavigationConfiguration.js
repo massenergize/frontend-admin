@@ -1,16 +1,24 @@
 import React, { useEffect, useState } from "react";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
-import { Button, Link, TextField, Tooltip, Typography } from "@mui/material";
+import { Button, Link, Paper, TextField, Tooltip, Typography } from "@mui/material";
 import BrandCustomization from "./BrandCustomization";
 import { useDispatch, useSelector } from "react-redux";
-import { reduxToggleUniversalModal, reduxToggleUniversalToast } from "../../../redux/redux-actions/adminActions";
+import {
+  reduxAddMenuConfiguration,
+  reduxToggleUniversalModal,
+  reduxToggleUniversalToast
+} from "../../../redux/redux-actions/adminActions";
 import CreateAndEditMenu, { INTERNAL_LINKS } from "./CreateAndEditMenu";
 import { EXAMPLE_MENU_STRUCTURE } from "../ME  Tools/media library/shared/utils/values";
+import Loading from "dan-components/Loading";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
+import { apiCall } from "../../../utils/messenger";
+import { fetchParamsFromURL } from "../../../utils/common";
 
 const NAVIGATION = "navigation";
 const FOOTER = "footer";
 const BRAND = "brand";
+const INIT = "INIT";
 
 const ACTIVITIES = {
   edit: { key: "edit", description: "This item was edited, and unsaved!", color: "#fffcf3" },
@@ -37,22 +45,73 @@ const LComponent = () => {
 function CustomNavigationConfiguration() {
   const [menuItems, setMenu] = useState([]);
   const [form, setForm] = useState({});
-  // const [activityContext, setActivityContext] = useState(null);
   const [trackEdited, setEdited] = useState({});
-  // const [itemBeforeEdit, setItemBeforeEdit] = useState({});
   const [status, setLoadingStatus] = useState({});
+  const [activeStash, setActiveStash] = useState({});
+  const [menuProfileStash, stashMenuProfiles] = useState([]);
+  const [error, setError] = useState(null);
+
+  const menuHeap = useSelector((state) => state.getIn(["menuConfigurations"]));
+  const { comId: community_id } = fetchParamsFromURL(window.location, "comId");
   const dispatch = useDispatch();
+  const keepInRedux = (menuProfiles, options) =>
+    dispatch(
+      reduxAddMenuConfiguration({
+        ...menuHeap,
+        [community_id]: { data: menuProfiles, ...(options || {}) }
+      })
+    );
+
+  const recreateProfileFromList = (updatedList) => {
+    const profile = { ...activeStash, content: updatedList };
+    const rem = menuProfileStash.filter((m) => m?.id !== profile?.id);
+    return [...rem, profile];
+  };
+
+  const placeDetails = (menuObject) => {
+    setMenu(menuObject?.content || []);
+    setActiveStash(menuObject);
+    // set footer details too here...
+  };
+
+  const loadContent = () => {
+    setLoading(INIT, true);
+    apiCall("menus.listForAdmins", { community_id })
+      .then((response) => {
+        setLoading(INIT, false);
+        if (!response?.success) return setError(response?.message);
+        const menuProfiles = response?.data || [];
+        // dispatch(reduxAddMenuConfiguration({ ...menuHeap, [community_id]: data }));
+        stashMenuProfiles(menuProfiles);
+        keepInRedux(menuProfiles);
+        const activeMenu = menuProfiles[0];
+        placeDetails(activeMenu);
+      })
+      .catch((er) => {
+        setLoading(INIT, false);
+        setError(er?.toString());
+      });
+  };
 
   useEffect(() => {
-    setMenu(EXAMPLE_MENU_STRUCTURE?.data?.menu_items);
+    const reduxObj = (menuHeap || {})[community_id];
+    const menuProfiles = reduxObj?.data || [];
+    console.log("MENU HEAP", menuHeap);
+    if (!menuProfiles?.length) return loadContent();
+    const menuObj = menuProfiles[0];
+    console.log("lets see menu", menuObj);
+    setEdited(reduxObj?.changeTree || {});
+    placeDetails(menuObj);
+    // setMenu(menuObj?.content || []);
   }, []);
 
   const updateForm = (key, value, reset = false) => {
     if (reset) return setForm({});
     setForm({ ...form, [key]: value });
   };
-  // const setLoading = (key, value) => setLoadingStatus({ ...status, [key]: value });
+  const setLoading = (key, value) => setLoadingStatus({ ...status, [key]: value });
   const toggleModal = (props) => dispatch(reduxToggleUniversalModal(props));
+
   const notify = (message, success = false) => {
     dispatch(reduxToggleUniversalToast({ open: true, message, variant: success ? "success" : "error" }));
   };
@@ -83,6 +142,7 @@ function CustomNavigationConfiguration() {
   };
 
   const trackChanges = (changedVersion, options) => {
+    console.log("What does ", changedVersion);
     const { context, itemBefore } = options || {};
     // Checks if an item has been edited, and if it has, it marks it as edited
     // When  a new item is added or one is removed, it is marked as such
@@ -90,8 +150,10 @@ function CustomNavigationConfiguration() {
       const itemHasChanged = hasChanged(changedVersion, itemBefore);
       if (!itemHasChanged) return resetActivityContext();
     }
-    setEdited({ ...trackEdited, [changedVersion?.id]: createChangeObject(changedVersion, options) });
-    resetActivityContext();
+    const newChangeObject = { ...trackEdited, [changedVersion?.id]: createChangeObject(changedVersion, options) };
+    setEdited(newChangeObject);
+    return newChangeObject;
+    // resetActivityContext();
   };
 
   const insertNewLink = (linkObj, parents, options = {}) => {
@@ -109,8 +171,9 @@ function CustomNavigationConfiguration() {
       parents[lastIndex] = [key, { ...obj, children: [...siblings] }];
       newObj = rollUp(parents);
     }
-    addToTopLevelMenu(newObj);
-    trackChanges(linkObj, options);
+    const newChanges = trackChanges(linkObj, options);
+    addToTopLevelMenu(newObj, newChanges);
+    // trackChanges(linkObj, options);
   };
 
   const rollUp = (parents) => {
@@ -124,12 +187,14 @@ function CustomNavigationConfiguration() {
     }
     return acc;
   };
-  const addToTopLevelMenu = (obj) => {
+  const addToTopLevelMenu = (obj, changeTree = null) => {
     const ind = menuItems.findIndex((m) => m?.id === obj?.id);
     const copied = [...menuItems];
     if (ind === -1) copied.push(obj);
     else copied[ind] = obj;
     setMenu(copied);
+    const profileList = recreateProfileFromList(copied);
+    keepInRedux(profileList, { changeTree });
   };
 
   const removeItem = (itemObj, parents, options = {}) => {
@@ -249,22 +314,29 @@ function CustomNavigationConfiguration() {
     family.splice(newIndex, 0, item);
     parents[lastIndex] = [id, { ...immediateParent, children: [...family] }];
     const parentAsObj = rollUp(parents);
-    addToTopLevelMenu(parentAsObj);
+    addToTopLevelMenu(parentAsObj, trackEdited);
   };
+
+  const pageIsLoading = status[INIT];
   const isLoading = status[NAVIGATION];
+
+  console.log("TRACKING EDITS", trackEdited);
+
+  if (pageIsLoading) return <Loading />;
+  if (error)
+    return (
+      <Paper style={{ padding: 40 }}>
+        <Typography variant="body" style={{ color: "#b93131" }}>
+          {error}
+        </Typography>
+      </Paper>
+    );
+
   return (
     <div>
       <MEPaperBlock title="Brand Customization">
         {/* <h4>This is what the custom navigation configuration page will look like</h4> */}
         <BrandCustomization />
-        
-        <MEDropdown
-          data={INTERNAL_LINKS}
-          labelExtractor={(l) => l?.name}
-          valueExtractor={(l) => l?.link}
-          placeholder="Link to a page within your site"
-          smartDropdown={false}
-        />
       </MEPaperBlock>
 
       <MEPaperBlock title="Customize Navigation">

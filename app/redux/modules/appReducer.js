@@ -61,6 +61,7 @@ import {
   ADD_BLOB_STRING,
   KEEP_COMMUNITY_NUDGE_SETTINGS,
   KEEP_FEATURE_ACTIVATIONS_FOR_COMMUNITY, SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX,
+  KEEP_LIST_OF_NAVIGATION_CONFIGURATION,
 } from '../ReduxConstants';
 
 const initialState = Map({
@@ -569,6 +570,14 @@ export const allMetaDataReducer = (state = {}, action = {}) => {
 export const saveCommunityFeatureFlagsReducer = (state = [], action = {}) => {
   switch (action.type) {
     case SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const saveNavigationConfigurationReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case KEEP_LIST_OF_NAVIGATION_CONFIGURATION:
       return action.payload;
     default:
       return state;
