@@ -50,6 +50,7 @@ function CustomNavigationConfiguration() {
   const [activeStash, setActiveStash] = useState({});
   const [menuProfileStash, stashMenuProfiles] = useState([]);
   const [error, setError] = useState(null);
+  const [brandForm, setBrandForm] = useState({});
 
   const menuHeap = useSelector((state) => state.getIn(["menuConfigurations"]));
   const { comId: community_id } = fetchParamsFromURL(window.location, "comId");
@@ -71,6 +72,7 @@ function CustomNavigationConfiguration() {
   const placeDetails = (menuObject) => {
     setMenu(menuObject?.content || []);
     setActiveStash(menuObject);
+    gatherBrandInfo(menuObject);
     // set footer details too here...
   };
 
@@ -96,13 +98,10 @@ function CustomNavigationConfiguration() {
   useEffect(() => {
     const reduxObj = (menuHeap || {})[community_id];
     const menuProfiles = reduxObj?.data || [];
-    console.log("MENU HEAP", menuHeap);
     if (!menuProfiles?.length) return loadContent();
     const menuObj = menuProfiles[0];
-    console.log("lets see menu", menuObj);
     setEdited(reduxObj?.changeTree || {});
     placeDetails(menuObj);
-    // setMenu(menuObj?.content || []);
   }, []);
 
   const updateForm = (key, value, reset = false) => {
@@ -142,7 +141,6 @@ function CustomNavigationConfiguration() {
   };
 
   const trackChanges = (changedVersion, options) => {
-    console.log("What does ", changedVersion);
     const { context, itemBefore } = options || {};
     // Checks if an item has been edited, and if it has, it marks it as edited
     // When  a new item is added or one is removed, it is marked as such
@@ -291,10 +289,6 @@ function CustomNavigationConfiguration() {
     });
   };
 
-  const sendChangesToServer = () => {
-    console.log("Sending changes to the server", trackEdited);
-  };
-
   const moveUp = (up, item, parents = {}, options = {}) => {
     let { index, sibblings } = options || {};
     const newIndex = up ? index - 1 : index + 1;
@@ -317,10 +311,47 @@ function CustomNavigationConfiguration() {
     addToTopLevelMenu(parentAsObj, trackEdited);
   };
 
+  const gatherBrandInfo = (profile) => {
+    const { community_logo_link, community } = profile || {};
+    setBrandForm({ link: community_logo_link, media: [community?.logo] });
+  };
+  const pushChangesToBackend = (data, scope) => {
+    setLoading(scope, true);
+    const [media] = brandForm?.media || [];
+    const form = {
+      id: activeStash?.id,
+      community_logo_link: brandForm?.link,
+      community_logo_id: media?.id,
+      ...(data || {})
+    };
+    console.log("FORM BEFORE", form);
+
+    apiCall("menus.update", form)
+      .then((response) => {
+        setLoading(scope, false);
+        console.log("LA RESPONSE UPDATE");
+        if (!response?.success) return notify(response?.error);
+        notify("Brand details updated successfully!", true);
+        console.log("RESPONSE", response?.data);
+        let data = response?.data;
+        if (scope === BRAND) {
+          gatherBrandInfo(data);
+          const { content, footer_content, ...rest } = data;
+          keepInRedux([{ ...activeStash, ...rest }], { changeTree: trackEdited });
+          return;
+        }
+        const profiles = [data];
+        placeDetails(data);
+        keepInRedux(profiles, { changeTree: null });
+        setEdited({});
+      })
+      .catch((er) => {
+        setLoading(scope, false);
+        notify(er?.toString());
+      });
+  };
   const pageIsLoading = status[INIT];
   const isLoading = status[NAVIGATION];
-
-  console.log("TRACKING EDITS", trackEdited);
 
   if (pageIsLoading) return <Loading />;
   if (error)
@@ -336,7 +367,12 @@ function CustomNavigationConfiguration() {
     <div>
       <MEPaperBlock title="Brand Customization">
         {/* <h4>This is what the custom navigation configuration page will look like</h4> */}
-        <BrandCustomization />
+        <BrandCustomization
+          loading={status[BRAND]}
+          saveChanges={() => pushChangesToBackend(null, BRAND)}
+          onChange={(key, value) => setBrandForm({ ...(brandForm || {}), [key]: value })}
+          form={brandForm}
+        />
       </MEPaperBlock>
 
       <MEPaperBlock title="Customize Navigation">
@@ -378,7 +414,7 @@ function CustomNavigationConfiguration() {
         <div style={{ border: "dashed 1px #61616129", padding: "20px 30px", display: "flex", flexDirection: "row" }}>
           <Button
             onClick={() => {
-              sendChangesToServer();
+              pushChangesToBackend({ content: JSON.stringify(menuItems) }, NAVIGATION);
             }}
             variant="contained"
             style={{ marginRight: 10 }}

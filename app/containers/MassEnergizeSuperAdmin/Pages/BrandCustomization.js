@@ -25,14 +25,9 @@ const PickLogo = ({ openLibrary, selected }) => {
     />
   );
 };
-function BrandCustomization({  }) {
-  const [link, setLink] = useState("");
-  const [loading, setLoading] = useState(false);
+function BrandCustomization({ saveChanges, onChange, form, loading }) {
+  const { link, media } = form || {};
   const imagesObject = useSelector((state) => state.getIn(["galleryImages"]));
-
-  const sendChangeToServer = () => {
-    setLoading(true);
-  }
 
   return (
     <div
@@ -49,16 +44,21 @@ function BrandCustomization({  }) {
     >
       <small>Click to select site logo</small>
 
-      <MediaLibrary images={imagesObject?.images} customRender={(props) => <PickLogo {...props} />} />
+      <MediaLibrary
+        selected={media}
+        onInsert={(item) => onChange("media", item)}
+        images={imagesObject?.images}
+        customRender={(props) => <PickLogo {...props} />}
+      />
       <TextField
         inputProps={{ style: { padding: 10 } }}
         placeholder="Enter external URL..."
         InputLabelProps={{
           shrink: true
         }}
-        onChange={(e) => setLink(e.target.value)}
+        onChange={(e) => onChange("link", e.target.value)}
         label="URL"
-        value  ={link}
+        value={link}
         style={{ width: "80%", marginTop: 15, marginBottom: 0 }}
       />
 
@@ -69,7 +69,9 @@ function BrandCustomization({  }) {
         <Typography variant="caption" style={{ marginRight: 10 }}>
           Logo will lead to the default homepage if no URL is provided
         </Typography>
-        <Button variant="contained">{loading ? <i className="fa fa-spin fa-spinner" /> : "SAVE"}</Button>
+        <Button disabled={loading} onClick={() => saveChanges()} variant="contained">
+          {loading ? <i className="fa fa-spin fa-spinner" /> : "SAVE"}
+        </Button>
       </div>
     </div>
   );
