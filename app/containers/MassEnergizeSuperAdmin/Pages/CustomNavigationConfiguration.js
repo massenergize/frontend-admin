@@ -202,7 +202,7 @@ function CustomNavigationConfiguration() {
     if (!dealingWithAChild) {
       const newMenu = menuItems.filter((m) => m?.id !== itemObj?.id);
       // trackChanges(itemObj, { ...options, context: ACTIVITIES.remove.key });
-      return setMenu(newMenu); 
+      return setMenu(newMenu);
     }
     let parentAsObj = itemObj;
     const lastIndex = parents.length - 1;
@@ -329,15 +329,17 @@ function CustomNavigationConfiguration() {
         setLoading(scope, false);
         console.log("LA RESPONSE UPDATE");
         if (!response?.success) return notify(response?.error);
-        notify("Brand details updated successfully!", true);
+
         console.log("RESPONSE", response?.data);
         let data = response?.data;
         if (scope === BRAND) {
+          notify(`Details updated successfully`, true);
           gatherBrandInfo(data);
           const { content, footer_content, ...rest } = data;
           keepInRedux([{ ...activeStash, ...rest }], { changeTree: trackEdited });
           return;
         }
+        notify(`Menu updated successfully`, true);
         const profiles = [data];
         placeDetails(data);
         keepInRedux(profiles, { changeTree: null });
