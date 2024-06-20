@@ -222,7 +222,7 @@ function CustomNavigationConfiguration() {
       title: "Reset to default",
       component: <div>Are you sure you want to reset the menu to the default configuration?</div>,
       onConfirm: () => setMenu(ITEMS),
-      onCancel: () => console.log("Cancelled")
+      onCancel: () => closeModal()
     });
   };
 
@@ -234,6 +234,7 @@ function CustomNavigationConfiguration() {
       fullControl: true,
       component: (
         <CreateAndEditMenu
+          cancel={closeModal}
           insertNewLink={(obj) => insertNewLink(obj, parents, { ...options, itemBefore: itemObj })}
           updateForm={updateForm}
           data={itemObj}

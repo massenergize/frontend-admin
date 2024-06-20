@@ -50,7 +50,7 @@ export const INTERNAL_LINKS = [
   }
 ];
 
-function CreateAndEditMenu({ data, parent, internalLinks = INTERNAL_LINKS, insertNewLink }) {
+function CreateAndEditMenu({ data, parent, cancel, internalLinks = INTERNAL_LINKS, insertNewLink }) {
   const [form, setForm] = useState({});
   useEffect(() => {
     setForm(data);
@@ -171,7 +171,7 @@ function CreateAndEditMenu({ data, parent, internalLinks = INTERNAL_LINKS, inser
       </div>
 
       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
-        <Button variant="contained" style={{ marginRight: 10, background: "#cd3131" }}>
+        <Button onClick={() => cancel()} variant="contained" style={{ marginRight: 10, background: "#cd3131" }}>
           Cancel
         </Button>
         <Button variant="contained" onClick={() => insertNewLink(form)}>
