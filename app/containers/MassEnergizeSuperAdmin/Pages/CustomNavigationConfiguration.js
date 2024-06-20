@@ -201,10 +201,8 @@ function CustomNavigationConfiguration() {
     const dealingWithAChild = parents.length > 0;
     if (!dealingWithAChild) {
       const newMenu = menuItems.filter((m) => m?.id !== itemObj?.id);
-      trackChanges(itemObj, { ...options, context: ACTIVITIES.remove.key });
-
-      // return setMenu(newMenu); Unccomment when we want to remove the item from the state
-      return;
+      // trackChanges(itemObj, { ...options, context: ACTIVITIES.remove.key });
+      return setMenu(newMenu); 
     }
     let parentAsObj = itemObj;
     const lastIndex = parents.length - 1;
@@ -213,9 +211,9 @@ function CustomNavigationConfiguration() {
     family = family.filter((f) => f?.id !== itemObj?.id);
     parents[lastIndex] = [id, { ...immediateParent, children: [...family] }];
     //if you want to remove the item from the state, uncomment the  code below
-    // parentAsObj = rollUp(parents);
-    // addToTopLevelMenu(parentAsObj);
-    trackChanges(itemObj, { ...options, context: ACTIVITIES.remove.key });
+    parentAsObj = rollUp(parents);
+    addToTopLevelMenu(parentAsObj);
+    // trackChanges(itemObj, { ...options, context: ACTIVITIES.remove.key });
   };
 
   const resetToDefault = () => {
