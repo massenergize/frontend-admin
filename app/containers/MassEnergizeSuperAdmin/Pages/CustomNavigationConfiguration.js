@@ -19,6 +19,7 @@ const NAVIGATION = "navigation";
 const FOOTER = "footer";
 const BRAND = "brand";
 const INIT = "INIT";
+const RESET = "RESET";
 
 const ACTIVITIES = {
   edit: { key: "edit", description: "This item was edited, and unsaved!", color: "#fffcf3" },
@@ -221,7 +222,7 @@ function CustomNavigationConfiguration() {
       show: true,
       title: "Reset to default",
       component: <div>Are you sure you want to reset the menu to the default configuration?</div>,
-      onConfirm: () => setMenu(ITEMS),
+      onConfirm: () => makeRequestToReset(),
       onCancel: () => closeModal()
     });
   };
@@ -314,6 +315,26 @@ function CustomNavigationConfiguration() {
     const { community_logo_link, community } = profile || {};
     setBrandForm({ link: community_logo_link, media: [community?.logo] });
   };
+  const makeRequestToReset = () => {
+    setLoading(NAVIGATION, true);
+    closeModal();
+    apiCall("menus.reset", { id: activeStash?.id })
+      .then((response) => {
+        setLoading(NAVIGATION, false);
+        const data = response?.data;
+        if (!response?.success) return notify(response?.error);
+        const profiles = [data];
+        placeDetails(data);
+        keepInRedux(profiles, { changeTree: null });
+        setEdited({});
+        notify("Menu reset successful!", true);
+      })
+      .catch((er) => {
+        setLoading(NAVIGATION, false);
+        notify(er?.toString());
+      });
+  };
+
   const pushChangesToBackend = (data, scope) => {
     setLoading(scope, true);
     const [media] = brandForm?.media || [];
@@ -328,10 +349,7 @@ function CustomNavigationConfiguration() {
     apiCall("menus.update", form)
       .then((response) => {
         setLoading(scope, false);
-        console.log("LA RESPONSE UPDATE");
         if (!response?.success) return notify(response?.error);
-
-        console.log("RESPONSE", response?.data);
         let data = response?.data;
         if (scope === BRAND) {
           notify(`Details updated successfully`, true);
@@ -353,6 +371,7 @@ function CustomNavigationConfiguration() {
   };
   const pageIsLoading = status[INIT];
   const isLoading = status[NAVIGATION];
+  const isResetting = status[RESET];
 
   if (pageIsLoading) return <Loading />;
   if (error)
@@ -414,6 +433,7 @@ function CustomNavigationConfiguration() {
         <br />
         <div style={{ border: "dashed 1px #61616129", padding: "20px 30px", display: "flex", flexDirection: "row" }}>
           <Button
+            disabled={isResetting}
             onClick={() => {
               pushChangesToBackend({ content: JSON.stringify(menuItems) }, NAVIGATION);
             }}
@@ -430,7 +450,7 @@ function CustomNavigationConfiguration() {
             onClick={() => resetToDefault()}
           >
             <Tooltip title={`Reverse all  custom changes you have made`}>
-              <b>Reset menu to default</b>
+              {isResetting ? <i className="fa fa-spinner fa-spin" /> : <b>Reset menu to default</b>}
             </Tooltip>
           </Button>
         </div>
