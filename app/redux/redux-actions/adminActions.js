@@ -60,6 +60,8 @@ import {
   ADD_BLOB_STRING,
   KEEP_COMMUNITY_NUDGE_SETTINGS,
   KEEP_FEATURE_ACTIVATIONS_FOR_COMMUNITY, SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX,
+  LOAD_CC_ACTIONS_DATA,
+
 } from '../ReduxConstants';
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -440,20 +442,21 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
       scheduledMessages,
       communityFeatureFlagsResponse,
     ] = response;
-    dispatch(loadAllPolicies(policies.data));
-    dispatch(reduxLoadAllCommunities(communities.data));
-    dispatch(loadAllActions(actions.data));
-    dispatch(loadAllEvents(events.data));
-    dispatch(loadAllAdminMessages(messages.data));
-    dispatch(loadTeamMessages(teamMessages.data));
-    dispatch(loadAllTeams(teams.data));
-    dispatch(loadAllSubscribers(subscribers.data));
-    dispatch(loadAllTestimonials(testimonials.data));
-    dispatch(loadAllUsers(users.data));
-    dispatch(loadAllVendors(vendors.data));
-    dispatch(reduxLoadCCActions(ccActions.data.actions));
-    dispatch(loadAllTags(tagCollections.data));
-    dispatch(reduxLoadGalleryImages({ data: galleryImages.data }));
+    dispatch(loadAllPolicies(policies?.data));
+    dispatch(reduxLoadAllCommunities(communities?.data));
+    dispatch(loadAllActions(actions?.data));
+    dispatch(loadAllEvents(events?.data));
+    dispatch(loadAllAdminMessages(messages?.data));
+    dispatch(loadTeamMessages(teamMessages?.data));
+    dispatch(loadAllTeams(teams?.data));
+    dispatch(loadAllSubscribers(subscribers?.data));
+    dispatch(loadAllTestimonials(testimonials?.data));
+    dispatch(loadAllUsers(users?.data));
+    dispatch(loadAllVendors(vendors?.data));
+    dispatch(reduxLoadCCActions(ccActions?.data?.actions));
+    dispatch(reduxLoadCCActionsData(ccActions?.data));
+    dispatch(loadAllTags(tagCollections?.data));
+    dispatch(reduxLoadGalleryImages({ data: galleryImages?.data }));
 
     dispatch(
       setGalleryMetaAction({
@@ -461,29 +464,29 @@ export const reduxFetchInitialContent = (auth) => (dispatch) => {
         ...(galleryImages?.data?.meta || {}),
       })
     );
-    dispatch(loadTaskFunctionsAction(tasksFunctions.data));
-    dispatch(loadTasksAction(tasks.data));
-    dispatch(loadSettings(preferences.data || {}));
-    dispatch(loadFeatureFlags(featureFlags.data || {}));
-    dispatch(reduxLoadAllOtherCommunities(otherCommunities.data));
-    dispatch(reduxLoadNextStepsSummary(adminNextSteps.data));
-    dispatch(reduxLoadScheduledMessages(scheduledMessages.data));
-    dispatch(saveCommunityFeatureFlagsAction(communityFeatureFlagsResponse.data));
+    dispatch(loadTaskFunctionsAction(tasksFunctions?.data));
+    dispatch(loadTasksAction(tasks?.data));
+    dispatch(loadSettings(preferences?.data || {}));
+    dispatch(loadFeatureFlags(featureFlags?.data || {}));
+    dispatch(reduxLoadAllOtherCommunities(otherCommunities?.data));
+    dispatch(reduxLoadNextStepsSummary(adminNextSteps?.data));
+    dispatch(reduxLoadScheduledMessages(scheduledMessages?.data));
+    dispatch(saveCommunityFeatureFlagsAction(communityFeatureFlagsResponse?.data));
     const cursor = {
-      communities: communities.cursor,
-      actions: actions.cursor,
-      events: events.cursor,
-      adminMessages: messages.cursor,
-      teamMessages: teamMessages.cursor,
-      teams: teams.cursor,
-      subscribers: subscribers.cursor,
-      users: users.cursor,
-      vendors: vendors.cursor,
-      tagCollections: tagCollections.cursor,
-      otherCommunities: otherCommunities.cursor,
-      testimonials: testimonials.cursor,
-      policies: policies.cursor,
-      scheduledMessages: scheduledMessages.cursor,
+      communities: communities?.cursor,
+      actions: actions?.cursor,
+      events: events?.cursor,
+      adminMessages: messages?.cursor,
+      teamMessages: teamMessages?.cursor,
+      teams: teams?.cursor,
+      subscribers: subscribers?.cursor,
+      users: users?.cursor,
+      vendors: vendors?.cursor,
+      tagCollections: tagCollections?.cursor,
+      otherCommunities: otherCommunities?.cursor,
+      testimonials: testimonials?.cursor,
+      policies: policies?.cursor,
+      scheduledMessages: scheduledMessages?.cursor,
     };
     dispatch(reduxLoadMetaDataAction(cursor));
   });
@@ -529,6 +532,10 @@ export const reduxToggleUniversalToast = (data = {}) => ({
 });
 export const reduxLoadCCActions = (data = []) => ({
   type: LOAD_CC_ACTIONS,
+  payload: data,
+});
+export const reduxLoadCCActionsData = (data = {}) => ({
+  type: LOAD_CC_ACTIONS_DATA,
   payload: data,
 });
 
@@ -1047,6 +1054,7 @@ export const loadTasksAction = (data = []) => {
     payload: data,
   };
 };
+
 export const saveCommunityFeatureFlagsAction = (data = []) => {
   return {
     type: SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX,
