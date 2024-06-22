@@ -2,6 +2,13 @@ import React from "react";
 import Loading from "dan-components/Loading";
 import loadable from "../utils/loadable";
 
+export const CustomNavigationConfiguration = loadable(
+  () => import("./MassEnergizeSuperAdmin/Pages/CustomNavigationConfiguration"),
+  {
+    fallback: <Loading />,
+  }
+);
+
 export const NudgeControlPage = loadable(
   () => import("./MassEnergizeSuperAdmin/Pages/NudgeControlPage"),
   {
