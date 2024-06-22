@@ -344,7 +344,6 @@ function CustomNavigationConfiguration() {
       community_logo_id: media?.id,
       ...(data || {})
     };
-    console.log("FORM BEFORE", form);
 
     apiCall("menus.update", form)
       .then((response) => {
