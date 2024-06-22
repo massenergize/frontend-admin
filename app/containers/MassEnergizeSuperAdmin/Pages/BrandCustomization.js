@@ -87,7 +87,7 @@ function BrandCustomization({ saveChanges, onChange, form, loading }) {
               style={{
                 marginTop: 5,
                 fontWeight: "bold",
-                color: linkIsValid ? "rgb(65 164 65)" : "rgb(205, 49, 49)"
+                color: linkIsValid ? "rgb(54 150 54)" : "rgb(205, 49, 49)"
               }}
             >
               <i className={`fa ${linkIsValid ? "fa-check-circle" : "fa-times-circle"}`} style={{ marginRight: 0 }} />{" "}

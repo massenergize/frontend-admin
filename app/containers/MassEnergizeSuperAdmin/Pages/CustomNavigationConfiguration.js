@@ -13,7 +13,7 @@ import { EXAMPLE_MENU_STRUCTURE } from "../ME  Tools/media library/shared/utils/
 import Loading from "dan-components/Loading";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import { apiCall } from "../../../utils/messenger";
-import { fetchParamsFromURL } from "../../../utils/common";
+import { fetchParamsFromURL, smartString } from "../../../utils/common";
 
 const NAVIGATION = "navigation";
 const FOOTER = "footer";
@@ -478,13 +478,14 @@ const OneMenuItem = ({
 }) => {
   const { name, link, id, is_link_external } = item || {};
 
+  const hasChildren = children?.length > 0;
   const getBackColor = () => {
     if (activity) return activity?.color;
     if (parentTraits?.isRemoved) return ACTIVITIES.remove.color;
     return "white";
   };
   const removeMenuItem = () => {
-    const hasChildren = children?.length > 0;
+    // const hasChildren = children?.length > 0;
     let message = `Are you sure you want to remove "${item?.name}" from the menu?`;
     if (hasChildren)
       message = `If you remove "${item?.name}", all it's (${children?.length ||
@@ -548,7 +549,7 @@ const OneMenuItem = ({
         <Tooltip title={activity ? activity?.description : ""}>
           <b>{name}</b>
         </Tooltip>
-        {is_link_external && (
+        {is_link_external && !hasChildren && (
           <span
             style={{
               fontWeight: "bold",
@@ -571,7 +572,7 @@ const OneMenuItem = ({
               className="touchable-opacity"
               style={{ opacity: 0.5, marginLeft: 15, textDecoration: "underline", fontWeight: "bold", color: "grey" }}
             >
-              {link}
+              {smartString(link, 40)}
               <i className="fa fa-external-link" style={{ margin: "0px 4px" }} />
             </span>
           </a>

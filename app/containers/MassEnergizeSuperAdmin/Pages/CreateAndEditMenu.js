@@ -145,9 +145,9 @@ function CreateAndEditMenu({ data, parent, cancel, insertNewLink }) {
                     <Typography
                       variant="body2"
                       style={{
-                        marginTop: 5,
+                        marginTop: 8,
                         fontWeight: "bold",
-                        color: linkIsValid ? "rgb(65 164 65)" : "rgb(205, 49, 49)"
+                        color: linkIsValid ? "rgb(54 150 54)" : "rgb(205, 49, 49)"
                       }}
                     >
                       <i
