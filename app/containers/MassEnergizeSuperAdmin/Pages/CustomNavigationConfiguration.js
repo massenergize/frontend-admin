@@ -383,6 +383,8 @@ function CustomNavigationConfiguration() {
       </Paper>
     );
 
+  const addNew = () => addOrEdit({ id: new Date().getTime()?.toString() }, {}, { context: ACTIVITIES.add.key });
+
   return (
     <div>
       <MEPaperBlock title="Brand Customization">
@@ -398,7 +400,11 @@ function CustomNavigationConfiguration() {
       <MEPaperBlock title="Customize Navigation">
         <Typography variant="body" style={{ marginBottom: 10 }}>
           Customize your site's navigation here. You can edit, remove and
-          <span className="touchable-opacity" style={{ fontWeight: "bold", color: "var(--app-purple)", marginLeft: 5 }}>
+          <span
+            onClick={() => addNew()}
+            className="touchable-opacity"
+            style={{ fontWeight: "bold", color: "var(--app-purple)", marginLeft: 5 }}
+          >
             <i className="fa fa-plus" style={{ margin: "0px 5px" }} />
             Add new menu items{" "}
           </span>
@@ -418,11 +424,7 @@ function CustomNavigationConfiguration() {
           <div>{renderMenuItems(menuItems)}</div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
             <div style={{ height: 40, border: "dashed 0px #eeeeee", borderLeftWidth: 2 }} />
-            <Button
-              color="secondary"
-              variant="contained"
-              onClick={() => addOrEdit({ id: new Date().getTime()?.toString() }, {}, { context: ACTIVITIES.add.key })}
-            >
+            <Button color="secondary" variant="contained" onClick={() => addNew()}>
               <Tooltip title={`Add a new menu item`}>
                 <b>Add New Item</b>
               </Tooltip>

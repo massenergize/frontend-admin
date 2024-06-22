@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import { reduxAddInternalLinkList } from "../../../redux/redux-actions/adminActions";
 import Loading from "dan-components/Loading";
+import { isValidURL } from "../../../utils/common";
 
 function CreateAndEditMenu({ data, parent, cancel, insertNewLink }) {
   const [form, setForm] = useState({});
@@ -46,6 +47,8 @@ function CreateAndEditMenu({ data, parent, cancel, insertNewLink }) {
 
   const { is_published, name, link, is_link_external: linkIsExternal } = form;
 
+  const linkIsValid = isValidURL(link);
+
   return (
     <div style={{ padding: 20, width: 500 }}>
       <Typography variant="h5" style={{ color: "var(--app-purple)", fontWeight: "bold" }} gutterBottom>
@@ -72,10 +75,10 @@ function CreateAndEditMenu({ data, parent, cancel, insertNewLink }) {
               />
             </div>
 
-            <a href="#" variant="caption" style={{ marginLeft: "auto", color: "#cd3131", fontWeight: "bold" }}>
+            {/* <a href="#" variant="caption" style={{ marginLeft: "auto", color: "#cd3131", fontWeight: "bold" }}>
               {" "}
               Delete{" "}
-            </a>
+            </a> */}
           </div>
           <TextField
             style={{ width: "100%", marginTop: 10 }}
@@ -89,6 +92,7 @@ function CreateAndEditMenu({ data, parent, cancel, insertNewLink }) {
             onChange={(e) => updateForm({ name: e.target.value })}
             value={name}
           />
+
           {/* --------- EXTERNAL & INTERNAL LINKS ----------- */}
           <div style={{ border: "dashed 0px #8e24aa45", padding: "10px 0px", margin: "10px 0px" }}>
             <div style={{ marginLeft: 10, marginBottom: 10 }}>
@@ -124,25 +128,46 @@ function CreateAndEditMenu({ data, parent, cancel, insertNewLink }) {
                 </span>
               )}
               {linkIsExternal ? (
-                <TextField
-                  style={{ width: "100%", marginTop: 10 }}
-                  label="URL"
-                  placeholder="Example: https://www.massenergize.org"
-                  InputLabelProps={{
-                    shrink: true
-                  }}
-                  inputProps={{ style: { padding: "10px 20px", width: "100%" } }}
-                  variant="outlined"
-                  onChange={(e) => updateForm({ link: e.target.value })}
-                  value={link}
-                />
+                <>
+                  <TextField
+                    style={{ width: "100%", marginTop: 10 }}
+                    label="URL"
+                    placeholder="Example: https://www.massenergize.org"
+                    InputLabelProps={{
+                      shrink: true
+                    }}
+                    inputProps={{ style: { padding: "10px 20px", width: "100%" } }}
+                    variant="outlined"
+                    onChange={(e) => updateForm({ link: e.target.value })}
+                    value={link}
+                  />
+                  {link && (
+                    <Typography
+                      variant="body2"
+                      style={{
+                        marginTop: 5,
+                        fontWeight: "bold",
+                        color: linkIsValid ? "rgb(65 164 65)" : "rgb(205, 49, 49)"
+                      }}
+                    >
+                      <i
+                        className={`fa ${linkIsValid ? "fa-check-circle" : "fa-times-circle"}`}
+                        style={{ marginRight: 0 }}
+                      />{" "}
+                      URL should be like this{" "}
+                      <span style={{ textDecoration: "underline", fontWeight: "bold" }}>
+                        https://www.massenergize.org
+                      </span>
+                    </Typography>
+                  )}
+                </>
               ) : (
                 <MEDropdown
                   data={internalLinks}
                   defaultValue={link ? [link] : []}
                   onItemSelected={(items) => {
                     const link = items[0];
-                    updateForm({ link }), console.log("Lets see link", link);
+                    updateForm({ link });
                   }}
                   labelExtractor={(l) => l?.name}
                   valueExtractor={(l) => l?.link}
@@ -170,7 +195,7 @@ function CreateAndEditMenu({ data, parent, cancel, insertNewLink }) {
         <Button onClick={() => cancel()} variant="contained" style={{ marginRight: 10, background: "#cd3131" }}>
           Cancel
         </Button>
-        <Button variant="contained" onClick={() => insertNewLink(form)}>
+        <Button disabled={linkIsExternal && !linkIsValid} variant="contained" onClick={() => insertNewLink(form)}>
           OK
         </Button>
       </div>
