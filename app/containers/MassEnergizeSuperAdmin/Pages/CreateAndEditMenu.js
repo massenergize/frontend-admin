@@ -1,5 +1,5 @@
 import { CheckBox } from "@mui/icons-material";
-import { Button, Checkbox, FormControlLabel, TextField, Typography } from "@mui/material";
+import { Button, Checkbox, FormControlLabel, TextField, Tooltip, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,7 +9,7 @@ import Loading from "dan-components/Loading";
 import { isValidURL } from "../../../utils/common";
 
 function CreateAndEditMenu({ data, parent, cancel, insertNewLink }) {
-  const [form, setForm] = useState({});
+  const [form, setForm] = useState({ is_published: true });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
@@ -48,6 +48,7 @@ function CreateAndEditMenu({ data, parent, cancel, insertNewLink }) {
   const { is_published, name, link, is_link_external: linkIsExternal } = form;
 
   const linkIsValid = isValidURL(link);
+  const readyToSave = (name && !linkIsExternal && link) || (name && linkIsValid && linkIsExternal && link);
 
   return (
     <div style={{ padding: 20, width: 500 }}>
@@ -195,8 +196,25 @@ function CreateAndEditMenu({ data, parent, cancel, insertNewLink }) {
         <Button onClick={() => cancel()} variant="contained" style={{ marginRight: 10, background: "#cd3131" }}>
           Cancel
         </Button>
-        <Button disabled={linkIsExternal && !linkIsValid} variant="contained" onClick={() => insertNewLink(form)}>
-          OK
+        <Button
+          // disabled={!readyToSave}
+          variant="contained"
+          style={!readyToSave ? { background: "#eeeeee", boxShadow: "000" } : {}}
+          onClick={() => {
+            if (!readyToSave) return;
+            insertNewLink(form);
+          }}
+        >
+          <Tooltip
+            title={
+              !readyToSave
+                ? "Please make sure you have provided all details"
+                : "'OK' lets you see how it looks, its not saved yet."
+            }
+            placement="top"
+          >
+            <span>OK</span>
+          </Tooltip>
         </Button>
       </div>
     </div>

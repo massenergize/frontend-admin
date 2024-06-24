@@ -5,8 +5,8 @@ import { useSelector } from "react-redux";
 import MediaLibrary from "../_FormGenerator/media library/FormMediaLibraryImplementation";
 import { isValidURL } from "../../../utils/common";
 
-const PickLogo = ({ openLibrary, selected }) => {
-  const [img] = selected || [];
+const PickLogo = ({ openLibrary, media }) => {
+  const [img] = media || [];
 
   if (!img)
     return (
@@ -57,7 +57,7 @@ function BrandCustomization({ saveChanges, onChange, form, loading }) {
         selected={media}
         onInsert={(item) => onChange("media", item)}
         images={imagesObject?.images}
-        customRender={(props) => <PickLogo {...props} />}
+        customRender={(props) => <PickLogo {...props} media={media} />}
       />
       {/* <div style={{ display: "flex", flexDirection: "row", alignItems: "center", width: "100%" }}> */}
       <TextField

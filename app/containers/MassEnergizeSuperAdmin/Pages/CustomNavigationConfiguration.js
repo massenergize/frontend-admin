@@ -66,7 +66,7 @@ function CustomNavigationConfiguration() {
 
   const recreateProfileFromList = (updatedList) => {
     const profile = { ...activeStash, content: updatedList };
-    const rem = menuProfileStash.filter((m) => m?.id !== profile?.id);
+    const rem = menuProfileStash.filter((m) => dm?.id !== profile?.id);
     return [...rem, profile];
   };
 
@@ -475,7 +475,7 @@ const OneMenuItem = ({
   isTheLastItem,
   moveUp
 }) => {
-  const { name, link, id, is_link_external } = item || {};
+  const { name, link, id, is_link_external, is_published } = item || {};
 
   const hasChildren = children?.length > 0;
   const getBackColor = () => {
@@ -566,20 +566,32 @@ const OneMenuItem = ({
           </span>
         )}
         {!children?.length && link && (
-          <a href={link} target="_blank">
+          <a
+            onClick={(e) => {
+              e.preventDefault();
+              if (is_link_external) return window.open(link, "_blank");
+            }}
+            // href={link}
+            target="_blank"
+          >
             <span
               className="touchable-opacity"
               style={{ opacity: 0.5, marginLeft: 15, textDecoration: "underline", fontWeight: "bold", color: "grey" }}
             >
               {smartString(link, 40)}
-              <i className="fa fa-external-link" style={{ margin: "0px 4px" }} />
+              {is_link_external && <i className="fa fa-external-link" style={{ margin: "0px 8px" }} />}
             </span>
           </a>
         )}
       </Typography>
       {!isRemoved && (
         <div style={{ marginLeft: "auto" }}>
-          <Tooltip title={`New: Add a sub-menu item to "${name}"`}>
+          <Tooltip title={is_published ? `Live` : `Not Live`}>
+            <i
+              onClick={() => addOrEdit({ ...item, children }, parents, { context: ACTIVITIES.edit.key })}
+              className={`fa fa-eye${is_published ? "" : "-slash"} touchable-opacity`}
+              style={{ marginRight: 20, color: is_published ? "var(--app-purple)" : "grey", fontSize: 20 }}
+            />
             <i
               onClick={() =>
                 addOrEdit({ id: new Date().getTime()?.toString() }, parentsForNewItem, { context: ACTIVITIES.add.key })
