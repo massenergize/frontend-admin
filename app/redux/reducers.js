@@ -71,11 +71,9 @@ import app, {
   reducerForCommunityFeatureActivation,
   saveCommunityFeatureFlagsReducer,
   saveNavigationConfigurationReducer,
-  reducerForSavingInternalLinksList
+  reducerForSavingInternalLinksList,
+  reducerForCCActionData
 } from "./modules/appReducer";
-  reducerForCommunityFeatureActivation, saveCommunityFeatureFlagsReducer,
-  reducerForCCActionData,
-} from './modules/appReducer';
 
 /**
  * Creates the main reducer with the dynamically injected ones
@@ -104,7 +102,7 @@ export default function createReducer(injectedReducers = {}) {
     modalOptions: reducerForUniversalModal,
     toastOptions: reducerForUniversalToast,
     ccActions: reducerForCCAction,
-    ccActionsData:reducerForCCActionData,
+    ccActionsData: reducerForCCActionData,
     heap: reducerForHeap, // an object that is used to temporarily hold all kinds of random data.
     subscribers: subscribersReducer,
     teamMessages: teamMessagesReducer,
