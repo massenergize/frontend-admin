@@ -63,7 +63,9 @@ import {
   KEEP_FEATURE_ACTIVATIONS_FOR_COMMUNITY, SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX,
   KEEP_LIST_OF_NAVIGATION_CONFIGURATION,
   SAVE_INTERNAL_MENU_LINK,
+  LOAD_CC_ACTIONS_DATA,
 } from '../ReduxConstants';
+
 
 const initialState = Map({
   constants: {},
@@ -301,6 +303,15 @@ export const reducerForUniversalToast = (state = {}, action = {}) => {
 export const reducerForCCAction = (state = [], action = {}) => {
   switch (action.type) {
     case LOAD_CC_ACTIONS:
+      return action.payload;
+
+    default:
+      return state;
+  }
+};
+export const reducerForCCActionData = (state = null, action = {}) => {
+  switch (action.type) {
+    case LOAD_CC_ACTIONS_DATA:
       return action.payload;
 
     default:
