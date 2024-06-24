@@ -271,7 +271,7 @@ class Application extends React.Component {
 
             <Route exact path="/blank" component={BlankPage} />
             <Route
-              path="/admin/configure/navigation"
+              path="/admin/community/configure/navigation"
               component={CustomNavigationConfiguration}
             />
             <Route

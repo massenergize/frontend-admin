@@ -472,7 +472,7 @@ class About extends React.Component {
               </Feature>
 
               <Paper
-                onClick={() => goHere(`/admin/configure/navigation`, this.props.history)}
+                onClick={() => goHere(`/admin/community/configure/navigation?comId=${community?.id}`, this.props.history)}
                 className={`${classes.pageCard}`}
                 elevation={1}
               >
