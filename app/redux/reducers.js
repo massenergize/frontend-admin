@@ -71,8 +71,7 @@ import app, {
   reducerForCommunityFeatureActivation,
   saveCommunityFeatureFlagsReducer,
   saveNavigationConfigurationReducer,
-  reducerForSavingInternalLinksList
-} from "./modules/appReducer";
+  reducerForSavingInternalLinksList,
   reducerForCommunityFeatureActivation, saveCommunityFeatureFlagsReducer,
   reducerForCCActionData,
 } from './modules/appReducer';
