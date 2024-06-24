@@ -18,4 +18,8 @@ export const FROM = {
 
 export const DEFAULT_ITEMS_PER_PAGE = 25;
 export const DEFAULT_ITEMS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
-export const NO_TITLES_FOR_THESE_PAGES = ["/admin/settings/platform-features", "/admin/settings/notification-control"];
+export const NO_TITLES_FOR_THESE_PAGES = [
+  "/admin/settings/platform-features",
+  "/admin/settings/notification-control",
+  "/admin/community/configure/navigation"
+];
