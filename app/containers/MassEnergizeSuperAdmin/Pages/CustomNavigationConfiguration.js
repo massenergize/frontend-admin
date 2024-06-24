@@ -229,12 +229,15 @@ function CustomNavigationConfiguration() {
 
   const addOrEdit = (itemObj, parents = {}, options = {}) => {
     // setItemBeforeEdit(itemObj);
+    const { children } = options || {};
     toggleModal({
       show: true,
       noTitle: true,
       fullControl: true,
       component: (
         <CreateAndEditMenu
+          children={children}
+          parents={parents}
           cancel={closeModal}
           insertNewLink={(obj) => insertNewLink(obj, parents, { ...options, itemBefore: itemObj })}
           updateForm={updateForm}
@@ -382,7 +385,8 @@ function CustomNavigationConfiguration() {
       </Paper>
     );
 
-  const addNew = () => addOrEdit({ id: new Date().getTime()?.toString() }, {}, { context: ACTIVITIES.add.key });
+  const addNew = () =>
+    addOrEdit({ id: new Date().getTime()?.toString(), is_published: true }, {}, { context: ACTIVITIES.add.key });
 
   return (
     <div>
@@ -500,6 +504,7 @@ const OneMenuItem = ({
   const parentsForNewItem = { ...(parents || {}), [item?.id]: { ...item, children: [...(children || [])] } };
 
   const isRemoved = parentTraits?.isRemoved || activity?.key === ACTIVITIES.remove.key;
+  const editItem = () => addOrEdit({ ...item, children }, parents, { context: ACTIVITIES.edit.key, children });
 
   return (
     <div
@@ -594,13 +599,19 @@ const OneMenuItem = ({
       </Typography>
       {!isRemoved && (
         <div style={{ marginLeft: "auto" }}>
-          <Tooltip title={is_published ? `Live` : `Not Live`}>
+          <Tooltip
+            title={
+              is_published
+                ? // ? `Live ${mother_is_not_live ? "but parent item is not live" : ""}`
+                  `Live`
+                : `Not Live, all sub items will also not show `
+            }
+          >
             <i
-              onClick={() => addOrEdit({ ...item, children }, parents, { context: ACTIVITIES.edit.key })}
+              onClick={() => editItem()}
               className={`fa fa-eye${is_published ? "" : "-slash"} touchable-opacity`}
               style={{ marginRight: 20, color: is_published ? "var(--app-purple)" : "grey", fontSize: 20 }}
             />
-
           </Tooltip>
           <Tooltip title={`New: Add a sub-menu item to "${name}"`}>
             <i
@@ -613,7 +624,7 @@ const OneMenuItem = ({
           </Tooltip>
           <Tooltip title={`Edit: Make changes to "${name}"`}>
             <i
-              onClick={() => addOrEdit({ ...item, children }, parents, { context: ACTIVITIES.edit.key })}
+              onClick={() => editItem()}
               className=" fa fa-edit touchable-opacity"
               style={{ fontSize: 20, color: "var(--app-cyan)" }}
             />
