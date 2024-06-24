@@ -8,17 +8,18 @@ import { reduxAddInternalLinkList } from "../../../redux/redux-actions/adminActi
 import Loading from "dan-components/Loading";
 import { isValidURL } from "../../../utils/common";
 
-function CreateAndEditMenu({ data, parent, cancel, insertNewLink }) {
+function CreateAndEditMenu({ data, cancel, insertNewLink, children }) {
   const [form, setForm] = useState({ is_published: true });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const internalLinks = useSelector((state) => state.getIn(["internalLinks"]));
   const keepInRedux = (data) => dispatch(reduxAddInternalLinkList(data));
+  const isParent = children?.length;
 
   useEffect(() => {
     setForm(data);
-  }, [data?.toString()]);
+  }, []);
 
   const updateForm = (obj) => {
     setForm({ ...form, ...obj });
@@ -44,11 +45,64 @@ function CreateAndEditMenu({ data, parent, cancel, insertNewLink }) {
         setLoading(false);
       });
   };
+  const formIsValid = () => {
+    if (linkIsExternal) {
+      return isParent ? Boolean(name) : name && link && linkIsValid;
+    }
 
+    return isParent ? Boolean(name) : name && link;
+  };
   const { is_published, name, link, is_link_external: linkIsExternal } = form;
-
   const linkIsValid = isValidURL(link);
-  const readyToSave = (name && !linkIsExternal && link) || (name && linkIsValid && linkIsExternal && link);
+  const readyToSave = formIsValid();
+
+  const renderLinkItems = () => {
+    if (isParent) return <Typography style={{ fontWeight: "bold", color: "var(--app-purple)" }}>Is Parent</Typography>;
+
+    return linkIsExternal ? (
+      <>
+        <TextField
+          disabled={isParent}
+          style={{ width: "100%", marginTop: 10 }}
+          label="URL"
+          placeholder="Example: https://www.massenergize.org"
+          InputLabelProps={{
+            shrink: true
+          }}
+          inputProps={{ style: { padding: "10px 20px", width: "100%" } }}
+          variant="outlined"
+          onChange={(e) => updateForm({ link: e.target.value })}
+          value={link}
+        />
+        {link && (
+          <Typography
+            variant="body2"
+            style={{
+              marginTop: 8,
+              fontWeight: "bold",
+              color: linkIsValid ? "rgb(54 150 54)" : "rgb(205, 49, 49)"
+            }}
+          >
+            <i className={`fa ${linkIsValid ? "fa-check-circle" : "fa-times-circle"}`} style={{ marginRight: 0 }} /> URL
+            should be like this{" "}
+            <span style={{ textDecoration: "underline", fontWeight: "bold" }}>https://www.massenergize.org</span>
+          </Typography>
+        )}
+      </>
+    ) : (
+      <MEDropdown
+        data={internalLinks}
+        defaultValue={link ? [link] : []}
+        onItemSelected={(items) => {
+          const link = items[0];
+          updateForm({ link });
+        }}
+        labelExtractor={(l) => l?.name}
+        valueExtractor={(l) => l?.link}
+        placeholder="Link to a page within your site"
+      />
+    );
+  };
 
   return (
     <div style={{ padding: 20, width: 500 }}>
@@ -96,85 +150,41 @@ function CreateAndEditMenu({ data, parent, cancel, insertNewLink }) {
 
           {/* --------- EXTERNAL & INTERNAL LINKS ----------- */}
           <div style={{ border: "dashed 0px #8e24aa45", padding: "10px 0px", margin: "10px 0px" }}>
-            <div style={{ marginLeft: 10, marginBottom: 10 }}>
-              <FormControlLabel
-                control={
-                  <input
-                    onChange={() => updateForm({ is_link_external: !linkIsExternal })}
-                    type="checkbox"
-                    checked={!linkIsExternal}
-                    style={{ color: "var(--app-purple)" }}
-                  />
-                }
-                style={{ marginRight: 30 }}
-                label="Internal"
-              />
-              <FormControlLabel
-                control={
-                  <input
-                    onChange={() => updateForm({ is_link_external: !linkIsExternal })}
-                    checked={linkIsExternal}
-                    type="checkbox"
-                    style={{ color: "var(--app-purple)" }}
-                  />
-                }
-                style={{}}
-                label="External"
-              />
-            </div>
+            {!isParent && (
+              <div style={{ marginLeft: 10, marginBottom: 10 }}>
+                <FormControlLabel
+                  control={
+                    <input
+                      onChange={() => updateForm({ is_link_external: !linkIsExternal })}
+                      type="checkbox"
+                      checked={!linkIsExternal}
+                      style={{ color: "var(--app-purple)" }}
+                    />
+                  }
+                  style={{ marginRight: 30 }}
+                  label="Internal"
+                />
+                <FormControlLabel
+                  control={
+                    <input
+                      onChange={() => updateForm({ is_link_external: !linkIsExternal })}
+                      checked={linkIsExternal}
+                      type="checkbox"
+                      style={{ color: "var(--app-purple)" }}
+                    />
+                  }
+                  style={{}}
+                  label="External"
+                />
+              </div>
+            )}
             <div>
-              {loading && (
+              {loading && !isParent && (
                 <span style={{ color: "var(--app-purple)" }}>
                   <i className="fa fa-spinner fa-spin" /> Fetching internal links...
                 </span>
               )}
-              {linkIsExternal ? (
-                <>
-                  <TextField
-                    style={{ width: "100%", marginTop: 10 }}
-                    label="URL"
-                    placeholder="Example: https://www.massenergize.org"
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    inputProps={{ style: { padding: "10px 20px", width: "100%" } }}
-                    variant="outlined"
-                    onChange={(e) => updateForm({ link: e.target.value })}
-                    value={link}
-                  />
-                  {link && (
-                    <Typography
-                      variant="body2"
-                      style={{
-                        marginTop: 8,
-                        fontWeight: "bold",
-                        color: linkIsValid ? "rgb(54 150 54)" : "rgb(205, 49, 49)"
-                      }}
-                    >
-                      <i
-                        className={`fa ${linkIsValid ? "fa-check-circle" : "fa-times-circle"}`}
-                        style={{ marginRight: 0 }}
-                      />{" "}
-                      URL should be like this{" "}
-                      <span style={{ textDecoration: "underline", fontWeight: "bold" }}>
-                        https://www.massenergize.org
-                      </span>
-                    </Typography>
-                  )}
-                </>
-              ) : (
-                <MEDropdown
-                  data={internalLinks}
-                  defaultValue={link ? [link] : []}
-                  onItemSelected={(items) => {
-                    const link = items[0];
-                    updateForm({ link });
-                  }}
-                  labelExtractor={(l) => l?.name}
-                  valueExtractor={(l) => l?.link}
-                  placeholder="Link to a page within your site"
-                />
-              )}
+              {renderLinkItems()}
             </div>
           </div>
           {/* <TextField
