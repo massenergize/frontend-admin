@@ -576,9 +576,17 @@ const OneMenuItem = ({
           >
             <span
               className="touchable-opacity"
-              style={{ opacity: 0.5, marginLeft: 15, textDecoration: "underline", fontWeight: "bold", color: "grey" }}
+              style={{
+                opacity: 0.5,
+                marginLeft: 15,
+                textDecoration: "underline",
+                fontWeight: "bold",
+                color: "grey",
+                marginRight: 10
+              }}
             >
               {smartString(link, 40)}
+
               {is_link_external && <i className="fa fa-external-link" style={{ margin: "0px 8px" }} />}
             </span>
           </a>
@@ -592,6 +600,9 @@ const OneMenuItem = ({
               className={`fa fa-eye${is_published ? "" : "-slash"} touchable-opacity`}
               style={{ marginRight: 20, color: is_published ? "var(--app-purple)" : "grey", fontSize: 20 }}
             />
+
+          </Tooltip>
+          <Tooltip title={`New: Add a sub-menu item to "${name}"`}>
             <i
               onClick={() =>
                 addOrEdit({ id: new Date().getTime()?.toString() }, parentsForNewItem, { context: ACTIVITIES.add.key })
