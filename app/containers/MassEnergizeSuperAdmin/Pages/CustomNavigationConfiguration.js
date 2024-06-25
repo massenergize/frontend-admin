@@ -229,13 +229,14 @@ function CustomNavigationConfiguration() {
 
   const addOrEdit = (itemObj, parents = {}, options = {}) => {
     // setItemBeforeEdit(itemObj);
-    const { children } = options || {};
+    const { children, isEdit } = options || {};
     toggleModal({
       show: true,
       noTitle: true,
       fullControl: true,
       component: (
         <CreateAndEditMenu
+          isEdit={isEdit}
           children={children}
           parents={parents}
           cancel={closeModal}
@@ -390,7 +391,7 @@ function CustomNavigationConfiguration() {
 
   return (
     <div>
-      <MEPaperBlock title="Brand Customization">
+      <MEPaperBlock title="Community Logo">
         {/* <h4>This is what the custom navigation configuration page will look like</h4> */}
         <BrandCustomization
           loading={status[BRAND]}
@@ -504,7 +505,8 @@ const OneMenuItem = ({
   const parentsForNewItem = { ...(parents || {}), [item?.id]: { ...item, children: [...(children || [])] } };
 
   const isRemoved = parentTraits?.isRemoved || activity?.key === ACTIVITIES.remove.key;
-  const editItem = () => addOrEdit({ ...item, children }, parents, { context: ACTIVITIES.edit.key, children });
+  const editItem = () =>
+    addOrEdit({ ...item, children }, parents, { context: ACTIVITIES.edit.key, children, isEdit: true });
 
   return (
     <div
@@ -616,7 +618,9 @@ const OneMenuItem = ({
           <Tooltip title={`New: Add a sub-menu item to "${name}"`}>
             <i
               onClick={() =>
-                addOrEdit({ id: new Date().getTime()?.toString() }, parentsForNewItem, { context: ACTIVITIES.add.key })
+                addOrEdit({ id: new Date().getTime()?.toString(), is_published: true }, parentsForNewItem, {
+                  context: ACTIVITIES.add.key
+                })
               }
               className=" fa fa-plus touchable-opacity"
               style={{ marginRight: 20, color: "green", fontSize: 20 }}

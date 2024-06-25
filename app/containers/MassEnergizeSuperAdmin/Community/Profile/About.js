@@ -472,7 +472,9 @@ class About extends React.Component {
               </Feature>
 
               <Paper
-                onClick={() => goHere(`/admin/community/configure/navigation?comId=${community?.id}`, this.props.history)}
+                onClick={() =>
+                  goHere(`/admin/community/configure/navigation?comId=${community?.id}`, this.props.history)
+                }
                 className={`${classes.pageCard}`}
                 elevation={1}
               >
@@ -481,7 +483,7 @@ class About extends React.Component {
                   style={{ fontWeight: "600", fontSize: "1rem", display: "flex", alignItems: "center" }}
                   component="h3"
                 >
-                  Configure Navigation System
+                  Customize User Portal Navigation (Advanced)
                   <i className=" fa fa-long-arrow-right" style={{ color: "green", marginLeft: 5 }} />
                 </Typography>
               </Paper>
