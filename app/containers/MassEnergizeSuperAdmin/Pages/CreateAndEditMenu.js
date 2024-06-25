@@ -8,8 +8,8 @@ import { reduxAddInternalLinkList } from "../../../redux/redux-actions/adminActi
 import Loading from "dan-components/Loading";
 import { isValidURL } from "../../../utils/common";
 
-function CreateAndEditMenu({ data, cancel, insertNewLink, children }) {
-  const [form, setForm] = useState({ is_published: true });
+function CreateAndEditMenu({ data, cancel, insertNewLink, children, isEdit }) {
+  const [form, setForm] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
@@ -52,7 +52,7 @@ function CreateAndEditMenu({ data, cancel, insertNewLink, children }) {
 
     return isParent ? Boolean(name) : name && link;
   };
-  const { is_published, name, link, is_link_external: linkIsExternal } = form;
+  const { is_published, name, link, is_link_external: linkIsExternal } = form || {};
   const linkIsValid = isValidURL(link);
   const readyToSave = formIsValid();
 
@@ -107,7 +107,7 @@ function CreateAndEditMenu({ data, cancel, insertNewLink, children }) {
   return (
     <div style={{ padding: 20, width: 500 }}>
       <Typography variant="h5" style={{ color: "var(--app-purple)", fontWeight: "bold" }} gutterBottom>
-        Create New Menu Item
+        {isEdit ? "Edit Menu Item" : "Create New Menu Item"}
       </Typography>
       {error ? (
         <Typography variant="body" style={{ color: "#b93131" }}>
