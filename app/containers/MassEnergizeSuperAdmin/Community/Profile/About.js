@@ -435,7 +435,7 @@ class About extends React.Component {
                 </Typography>
               </Paper>
 
-              <Feature communities={[community]} name={FLAGS.PLATFORM_FEATURES_OPT_IN} fallback={<></>}>
+              <Feature community={community} name={FLAGS.PLATFORM_FEATURES_OPT_IN} fallback={<></>}>
                 <Paper
                   onClick={() => goHere(`/admin/settings/platform-features?comId=${community?.id}`, this.props.history)}
                   className={`${classes.pageCard}`}
@@ -452,7 +452,7 @@ class About extends React.Component {
                 </Paper>
               </Feature>
 
-              <Feature communities={[community]} name={FLAGS.NUDGE_CONTROL_FEATURE} fallback={<></>}>
+              <Feature community={community} name={FLAGS.NUDGE_CONTROL_FEATURE} fallback={<></>}>
                 <Paper
                   onClick={() =>
                     goHere(`/admin/settings/notification-control?comId=${community?.id}`, this.props.history)
@@ -470,7 +470,7 @@ class About extends React.Component {
                   </Typography>
                 </Paper>
               </Feature>
-              <Feature communities={[community]} name={FLAGS.CUSTOMIZE_NAVIGATION_MENU} fallback={<></>}>
+              <Feature community={community} name={FLAGS.CUSTOMIZE_NAVIGATION_MENU} fallback={<></>}>
                 <Paper
                   onClick={() =>
                     goHere(`/admin/community/configure/navigation?comId=${community?.id}`, this.props.history)
