@@ -68,7 +68,9 @@ function MEDropdown(props) {
     params: { ...(rest?.params || {}) }
   });
   useEffect(() => {
-    if (!rest?.endpoint) return;
+
+    if(!rest?.endpoint) return 
+
     const newItemsConstructed = (newItems || [])?.map((item) => ({
       ...item,
       displayName: labelExtractor ? labelExtractor(item) : item?.name || item?.title

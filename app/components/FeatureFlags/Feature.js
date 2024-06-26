@@ -1,7 +1,7 @@
 import { connect, useSelector } from "react-redux";
 import { bindActionCreators } from "redux";
 
-function Feature({ name, fallback, children, auth }) {
+function Feature({ name, fallback, children, auth, community }) {
   const communityFeatureFlags = useSelector((state) => state.getIn(["communityFeatureFlags"]));
   const loggedInUserFeatureFlags = (auth || {})?.feature_flags || [];
 
@@ -13,7 +13,11 @@ function Feature({ name, fallback, children, auth }) {
 
   if (auth?.is_super_admin) return children;
 
-  if (flag) return children;
+  if (flag && !community) return children;
+
+  const enabledForCommunity = flag?.communities?.find((id) => id === community?.id);
+  if (enabledForCommunity) return children;
+
   if (fallback) return fallback;
   return null;
 }

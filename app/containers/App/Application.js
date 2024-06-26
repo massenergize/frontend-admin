@@ -78,6 +78,7 @@ import {
   ScheduledMessages,
   PlatformFeaturesPage,
   NudgeControlPage,
+  CustomNavigationConfiguration,
 } from "../pageListAsync";
 import EditVendor from "../MassEnergizeSuperAdmin/Vendors/EditVendor";
 import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
@@ -269,6 +270,10 @@ class Application extends React.Component {
             {user.is_super_admin && superAdminSpecialRoutes}
 
             <Route exact path="/blank" component={BlankPage} />
+            <Route
+              path="/admin/community/configure/navigation"
+              component={CustomNavigationConfiguration}
+            />
             <Route
               path="/admin/settings/notification-control"
               component={NudgeControlPage}

@@ -409,7 +409,8 @@ class About extends React.Component {
                   style={{ fontWeight: "600", fontSize: "1rem", display: "flex", alignItems: "center" }}
                   component="h3"
                 >
-                  Add/Remove Administrators for Community <Icon style={{ color: "green" }}>forward</Icon>
+                  Add/Remove Administrators for Community{" "}
+                  <i className=" fa fa-long-arrow-right" style={{ color: "green", marginLeft: 5 }} />
                 </Typography>
               </Paper>
               {/* <Paper onClick={() => goHere(goalsEditLink)} className={`${classes.pageCard}`} elevation={1}>
@@ -429,12 +430,12 @@ class About extends React.Component {
                   style={{ fontWeight: "600", fontSize: "1rem", display: "flex", alignItems: "center" }}
                   component="h3"
                 >
-                  Edit Community Info <Icon style={{ color: "green" }}>forward</Icon>
+                  Edit Community Info{" "}
+                  <i className=" fa fa-long-arrow-right" style={{ color: "green", marginLeft: 5 }} />
                 </Typography>
               </Paper>
 
-
-              <Feature communities={[community]} name={FLAGS.PLATFORM_FEATURES_OPT_IN} fallback={<></>}>
+              <Feature community={community} name={FLAGS.PLATFORM_FEATURES_OPT_IN} fallback={<></>}>
                 <Paper
                   onClick={() => goHere(`/admin/settings/platform-features?comId=${community?.id}`, this.props.history)}
                   className={`${classes.pageCard}`}
@@ -446,12 +447,12 @@ class About extends React.Component {
                     component="h3"
                   >
                     Enable or Disable Platform Features
-                    <Icon style={{ color: "green", marginLeft: 5 }}>forward</Icon>
+                    <i className=" fa fa-long-arrow-right" style={{ color: "green", marginLeft: 5 }} />
                   </Typography>
                 </Paper>
               </Feature>
 
-              <Feature communities={[community]} name={FLAGS.NUDGE_CONTROL_FEATURE} fallback={<></>}>
+              <Feature community={community} name={FLAGS.NUDGE_CONTROL_FEATURE} fallback={<></>}>
                 <Paper
                   onClick={() =>
                     goHere(`/admin/settings/notification-control?comId=${community?.id}`, this.props.history)
@@ -465,11 +466,28 @@ class About extends React.Component {
                     component="h3"
                   >
                     Control Community User Notifications
-                    <Icon style={{ color: "green", marginLeft: 5 }}>forward</Icon>
+                    <i className=" fa fa-long-arrow-right" style={{ color: "green", marginLeft: 5 }} />
                   </Typography>
                 </Paper>
               </Feature>
-
+              <Feature community={community} name={FLAGS.CUSTOMIZE_NAVIGATION_MENU} fallback={<></>}>
+                <Paper
+                  onClick={() =>
+                    goHere(`/admin/community/configure/navigation?comId=${community?.id}`, this.props.history)
+                  }
+                  className={`${classes.pageCard}`}
+                  elevation={1}
+                >
+                  <Typography
+                    variant="h5"
+                    style={{ fontWeight: "600", fontSize: "1rem", display: "flex", alignItems: "center" }}
+                    component="h3"
+                  >
+                    Customize User Portal Navigation (Advanced)
+                    <i className=" fa fa-long-arrow-right" style={{ color: "green", marginLeft: 5 }} />
+                  </Typography>
+                </Paper>
+              </Feature>
             </PapperBlock>
           </Grid>
         </Grid>
