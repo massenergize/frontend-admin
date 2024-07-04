@@ -41,11 +41,19 @@ export const getFilterData = (data, existing = [], field = "id") => {
   return unique;
 };
 
+
+const getSavedSortParamsFromLocalStorage = (key) => {
+  let tableProp = localStorage.getItem(key + TABLE_PROPERTIES);
+  tableProp = JSON.parse(tableProp || null) || {};
+  return tableProp?.sortOrder?.actual;
+};
+
 export const prepareFilterAndSearchParamsFromLocal = (key) => {
   let filterParams = getFilterParamsFromLocalStorage(key);
   let params = JSON.stringify({
     ...filterParams,
     search_text: getSearchText(key) || "",
+    sort_params: getSavedSortParamsFromLocalStorage(key) || {},
   });
 
   return params;
@@ -103,7 +111,8 @@ const callMoreData = (
   name,
   updateMetaData,
   meta,
-  otherArgs
+  otherArgs,
+  customLimit,
 ) => {
   let filterParams = getFilterParamsFromLocalStorage(pageProp.key);
   makeAPICallForMoreData({
@@ -112,7 +121,7 @@ const callMoreData = (
     updateRedux: updateReduxFunction,
     args: {
       page,
-      limit: getLimit(pageProp.key),
+      limit: customLimit || getLimit(pageProp.key),
       params: JSON.stringify({
         ...filterParams,
         search_text: getSearchText(pageProp.key) || "",
@@ -141,14 +150,17 @@ export const onTableStateChange = ({
 }) => {
   switch (action) {
     case "changePage":
-      if (metaData?.next === tableState?.page+1) {
+      console.log("== TBS: changePage ==", tableState.page);
+      let previous = localStorage.getItem(PAGE_NUMBER);
+      console.log("== TBS: previous ==", previous);
+      if (tableState?.page > previous ) {
         callMoreData(
           tableState?.page + 1,
           updateReduxFunction,
           reduxItems,
           apiUrl,
           pageProp,
-          tableState && tableState.sort,
+          tableState?.sortOrder,
           name,
           updateMetaData,
           meta,
@@ -157,17 +169,19 @@ export const onTableStateChange = ({
       }
       break;
     case "sort":
+      tableState.page = 1;
       callMoreData(
         1,
         updateReduxFunction,
-        reduxItems,
+        [],
         apiUrl,
         pageProp,
-        tableState && tableState.sortOrder,
+        tableState?.sortOrder,
         name,
         updateMetaData,
         meta,
-        otherArgs
+        otherArgs,
+        (tableState.page + 1) * tableState.rowsPerPage
       );
       break;
     
