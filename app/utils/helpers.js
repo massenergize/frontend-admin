@@ -150,10 +150,7 @@ export const onTableStateChange = ({
 }) => {
   switch (action) {
     case "changePage":
-      console.log("== TBS: changePage ==", tableState.page);
-      let previous = localStorage.getItem(PAGE_NUMBER);
-      console.log("== TBS: previous ==", previous);
-      if (tableState?.page > previous ) {
+      if (metaData?.next === tableState?.page + 1) {
         callMoreData(
           tableState?.page + 1,
           updateReduxFunction,
@@ -169,7 +166,7 @@ export const onTableStateChange = ({
       }
       break;
     case "sort":
-      tableState.page = 1;
+      tableState.page = 0;
       callMoreData(
         1,
         updateReduxFunction,
@@ -181,7 +178,6 @@ export const onTableStateChange = ({
         updateMetaData,
         meta,
         otherArgs,
-        (tableState.page + 1) * tableState.rowsPerPage
       );
       break;
     
