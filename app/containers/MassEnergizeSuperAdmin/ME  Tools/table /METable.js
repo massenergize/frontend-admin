@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { reduxLoadTableFilters } from "../../../../redux/redux-actions/adminActions";
+import { parseJSON } from "../../../../utils/common";
 
 export const FILTER_OBJ_KEY = "MAIN_FILTER_OBJECT";
 export const FILTERS = "_FILTERS";
@@ -198,7 +199,7 @@ function METable(props) {
   const getProperties = () => {
     if (ignoreSavedFilters) return {};
     const val = localStorage.getItem(page.key + TABLE_PROPERTIES);
-    return JSON.parse(val || null) || {};
+    return parseJSON(val || null) || {};
   };
 
   const savePageProperties = (obj) => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Editor as TinyEditor } from "@tinymce/tinymce-react";
 import FormMediaLibraryImplementation from "./media library/FormMediaLibraryImplementation";
-const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
+const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY_FOR_DEV;
 
 function TinyMassEnergizeEditor(props) {
   const [open, setOpen] = useState(false);

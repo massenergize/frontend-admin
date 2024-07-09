@@ -98,6 +98,7 @@ import ThemeToast from "../../components/Widget/ThemeToast";
 import { FILTER_OBJ_KEY } from "../MassEnergizeSuperAdmin/ME  Tools/table /METable";
 import { IS_LOCAL } from "../../config/constants";
 import UserActivityMonitor from "../../components/Widget/UserActivityMonitor";
+import { parseJSON } from "../../utils/common";
 
 // This function checks whether a user needs to sign an MOU and redirects them to the MOU page if necessary
 const checkIfUserNeedsMOUAttention = (auth, history) => {
@@ -132,7 +133,7 @@ class Application extends React.Component {
     // ---- UNCOMMENT THIS WHEN WE WANT TO CONTINUE WITH PERSISTING FORM PROGRESS TO LOCAL STORAGE
     // Collect form progress from local storage after page refresh
     // var progress = localStorage.getItem(ME_FORM_PROGRESS) || "{}";
-    // progress = JSON.parse(progress);
+    // progress = (progress);
     // this.props.restoreFormProgress(progress);
 
     // ---- PICK UP SAVED FILTERS FROM LOCAL STORAGE ON FIRST LOAD ------
@@ -143,7 +144,7 @@ class Application extends React.Component {
   findSavedFiltersAndInflate() {
     const { putFiltersInRedux } = this.props;
     const filters = localStorage.getItem(FILTER_OBJ_KEY);
-    putFiltersInRedux(JSON.parse(filters));
+    putFiltersInRedux(parseJSON(filters));
   }
 
   getCommunityList() {

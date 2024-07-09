@@ -23,6 +23,8 @@ import { IS_PROD, BUILD_VERSION, IS_CANARY } from '../../config/constants';
 import { TextField } from '@mui/material';
 import {withStyles} from "@mui/styles"
 import styles from "./user-jss";
+import { parseJSON } from '../../utils/common';
+
 // validation functions
 const validateEmail = value => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)
 
@@ -38,7 +40,7 @@ class LoginForm extends React.Component {
     const lastVisited = localStorage.getItem("LAST_VISITED_URL"); 
     const encodedData = lastVisited?.split("?cred=")[1]
     if (encodedData) {
-      const decodedData = JSON.parse(atob(encodedData))
+      const decodedData = parseJSON(atob(encodedData))
       this.setState({ email: decodedData.email })
     }
   }

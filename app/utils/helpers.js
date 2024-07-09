@@ -1,22 +1,23 @@
 import { IS_CANARY, IS_LOCAL, IS_PROD } from "../config/constants";
 import { apiCall } from "./messenger";
 import { DEFAULT_ITEMS_PER_PAGE } from './constants';
+import { parseJSON } from "./common";
 const TABLE_PROPERTIES = "_TABLE_PROPERTIES";
 const FILTERS = "_FILTERS";
 
 export const getSearchText = (key) => {
   var tableProp = localStorage.getItem(key + TABLE_PROPERTIES);
-  tableProp = JSON.parse(tableProp || null) || {};
+  tableProp = parseJSON(tableProp || null) || {};
   return tableProp && tableProp.search;
 };
 export const getLimit = (key) => {
   var tableProp = localStorage.getItem(key + TABLE_PROPERTIES);
-  tableProp = JSON.parse(tableProp || null) || {};
+  tableProp = parseJSON(tableProp || null) || {};
   return (tableProp && tableProp.rowsPerPage) || DEFAULT_ITEMS_PER_PAGE;
 };
 export const getFilterParamsFromLocalStorage = (key) => {
   var tableProp = localStorage.getItem("MAIN_FILTER_OBJECT");
-  tableProp = JSON.parse(tableProp || null) || {};
+  tableProp = parseJSON(tableProp || null) || {};
   key = key + FILTERS;
   let filters = {};
   tableProp = tableProp[key] || {};
@@ -44,7 +45,7 @@ export const getFilterData = (data, existing = [], field = "id") => {
 
 const getSavedSortParamsFromLocalStorage = (key) => {
   let tableProp = localStorage.getItem(key + TABLE_PROPERTIES);
-  tableProp = JSON.parse(tableProp || null) || {};
+  tableProp = parseJSON(tableProp || null) || {};
   return tableProp?.sortOrder?.actual;
 };
 

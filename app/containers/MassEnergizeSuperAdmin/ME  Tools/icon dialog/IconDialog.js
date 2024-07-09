@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./IconDialog.css";
 import debounce from "lodash.debounce";
-import { smartString } from "../../../../utils/common";
+import { parseJSON, smartString } from "../../../../utils/common";
 
 const ICONS = require("./icon_files.json");
 const RECENT_ICONS_KEY = "RECENT_ICONS_KEY";
@@ -37,7 +37,7 @@ function IconDialog({
   const [selected, setSelected] = useState(defaultValue || value || null);
   const maximumNumberOfRecentItems = maxRecents || MAX_RECENTS;
   const iconsStorageKey = recentItemsStorageKey || RECENT_ICONS_KEY;
-  const storedRecents = JSON.parse(localStorage.getItem(iconsStorageKey));
+  const storedRecents = parseJSON(localStorage.getItem(iconsStorageKey));
   const [recents, setRecents] = useState(storedRecents || []);
 
   const nextPage = () => {

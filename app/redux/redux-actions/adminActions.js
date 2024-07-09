@@ -81,6 +81,7 @@ import {
 } from "../../utils/helpers";
 import { PAGE_PROPERTIES } from "../../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 import SocketNotificationModal from "../../containers/MassEnergizeSuperAdmin/Misc/SocketNotificationModal";
+import { parseJSON } from "../../utils/common";
 
 // TODO: REOMVE THIS FUNCTiON
 export const testRedux = (value) => {
@@ -123,7 +124,7 @@ export const setupSocketConnectionWithBackend = (auth) => (
     socket.onmessage = (e) => {
       const reduxState = getState();
       const thereIsUserActivity = reduxState.getIn(["userIsActive"]);
-      let data = JSON.parse(e.data || "{}");
+      let data = parseJSON(e.data);
       const type = data?.type;
       if (type === USER_SESSION_EXPIRED) {
         // If session has expired and no activity, just redirect to login
