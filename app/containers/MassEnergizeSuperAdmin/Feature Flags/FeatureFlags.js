@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from "../../../components/Widget/widget-jss";
 import {
-  loadFeatureFlags,
+  loadFeatureFlags, reduxAddFlagInfo,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast,
 } from "../../../redux/redux-actions/adminActions";
@@ -20,7 +20,9 @@ function FeatureFlags({
   users,
   putFlagsInRedux,
   toggleDeleteConfirmation,
-  toggleToast
+  toggleToast,
+  cachedFeatureFlagsInfo,
+  keepInfoInRedux
 }) {
   const [currentTab, setCurrentTab] = useState(0);
   const [featureToEdit, setFeatureToEdit] = useState(null);
@@ -56,7 +58,9 @@ function FeatureFlags({
           featureFlags={featureFlags}
           putFlagsInRedux={putFlagsInRedux}
           featureToEdit={featureToEdit}
-          setFeatureToEdit = {setFeatureToEdit}
+          setFeatureToEdit={setFeatureToEdit}
+          keepInfoInRedux={keepInfoInRedux}
+          cachedFeatureFlagsInfo={cachedFeatureFlagsInfo}
         />
       ),
     },
@@ -99,6 +103,7 @@ const mapStateToProps = (state) => {
     featureFlags: state.getIn(["featureFlags"]),
     communities: state.getIn(["communities"]),
     users: state.getIn(["allUsers"]),
+    cachedFeatureFlagsInfo: state.getIn(["flagInfos"])
   };
 };
 
@@ -107,7 +112,8 @@ const mapDispatchToProps = (dispatch) => {
     {
       putFlagsInRedux: loadFeatureFlags,
       toggleDeleteConfirmation: reduxToggleUniversalModal,
-      toggleToast:reduxToggleUniversalToast
+      toggleToast: reduxToggleUniversalToast,
+      keepInfoInRedux: reduxAddFlagInfo,
     },
     dispatch
   );
