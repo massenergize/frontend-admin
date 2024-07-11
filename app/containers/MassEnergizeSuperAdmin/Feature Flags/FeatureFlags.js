@@ -43,7 +43,7 @@ function FeatureFlags({
           putFlagsInRedux={putFlagsInRedux}
           toggleToast={toggleToast}
         />
-      ),
+      )
     },
     1: {
       key: "add-new-flag",
@@ -62,8 +62,8 @@ function FeatureFlags({
           keepInfoInRedux={keepInfoInRedux}
           cachedFeatureFlagsInfo={cachedFeatureFlagsInfo}
         />
-      ),
-    },
+      )
+    }
   };
   const tab = TABS[currentTab];
 
@@ -73,10 +73,9 @@ function FeatureFlags({
       <Paper>
         <div style={{ padding: 20 }}>
           <Typography variant="body">
-            Feature flags help you control which functionalities are available
-            to different audiences. Here, you can create flags that can be used
-            to narrow a functionality to a group of communities, a group of
-            users, or a particular platform. Like (User portal, or admin portal)
+            Feature flags help you control which functionalities are available to different audiences. Here, you can
+            create flags that can be used to narrow a functionality to a group of communities, a group of users, or a
+            particular platform. Like (User portal, or admin portal)
           </Typography>
         </div>
 

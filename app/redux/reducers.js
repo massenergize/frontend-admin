@@ -68,8 +68,12 @@ import app, {
   reducerForScheduledMessages,
   reducerForAddingBlobString,
   reducerForCommunityNudgeSettings,
-  reducerForCommunityFeatureActivation, saveCommunityFeatureFlagsReducer,
-} from './modules/appReducer';
+  reducerForCommunityFeatureActivation,
+  saveCommunityFeatureFlagsReducer,
+  saveNavigationConfigurationReducer,
+  reducerForSavingInternalLinksList,
+  reducerForCCActionData
+} from "./modules/appReducer";
 
 /**
  * Creates the main reducer with the dynamically injected ones
@@ -98,6 +102,7 @@ export default function createReducer(injectedReducers = {}) {
     modalOptions: reducerForUniversalModal,
     toastOptions: reducerForUniversalToast,
     ccActions: reducerForCCAction,
+    ccActionsData: reducerForCCActionData,
     heap: reducerForHeap, // an object that is used to temporarily hold all kinds of random data.
     subscribers: subscribersReducer,
     teamMessages: teamMessagesReducer,
@@ -140,9 +145,11 @@ export default function createReducer(injectedReducers = {}) {
     otherAdmins: reducerForLoadingOtherAdmins, // If a user is admin of multiple communities, other admins in each of their communities will be grouped here (Used in the Media Library Modal)
     scheduledMessages: reducerForScheduledMessages,
     blobTray: reducerForAddingBlobString, // When base64 image data is retrieved from the B.E with media Id, its kept here. To avoid re-running requests that have already happened before
-    communityNudgeSettings: reducerForCommunityNudgeSettings , // We dont want to always be loading the nudge settings list on the "notification-control" for the same community more than once. So after the first time, it is stashed here
+    communityNudgeSettings: reducerForCommunityNudgeSettings, // We dont want to always be loading the nudge settings list on the "notification-control" for the same community more than once. So after the first time, it is stashed here
     featureActivationsForCommunities: reducerForCommunityFeatureActivation,
-    communityFeatureFlags: saveCommunityFeatureFlagsReducer
+    communityFeatureFlags: saveCommunityFeatureFlagsReducer,
+    menuConfigurations: saveNavigationConfigurationReducer,
+    internalLinks: reducerForSavingInternalLinksList
   });
 
   // Wrap the root reducer and return a new root reducer with router state

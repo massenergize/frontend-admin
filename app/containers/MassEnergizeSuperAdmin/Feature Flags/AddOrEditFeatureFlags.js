@@ -14,7 +14,8 @@ function AddOrEditFeatureFlags({
   featureFlags,
   featureToEdit,
   keepInfoInRedux,
-  cachedFeatureFlagsInfo
+  cachedFeatureFlagsInfo,
+  setFeatureToEdit
 }) {
   const [_users, setUsers] = useState(users || []);
   const [comIds, setComIds] = useState([]);
@@ -54,7 +55,13 @@ function AddOrEditFeatureFlags({
  });
 
   return (
-    <MassEnergizeForm formJson={formJson} onComplete={ifApiIsSuccessful} />
+    <MassEnergizeForm
+      onClear={() => {
+        setFeatureToEdit(null);
+      }}
+      formJson={formJson}
+      onComplete={ifApiIsSuccessful}
+    />
   );
 }
 // -----------------------------------------------------------------------------------

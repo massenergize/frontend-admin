@@ -14,5 +14,6 @@ export const FLAGS = {
   NUDGE_CONTROL_FEATURE: "nudge-control-feature-flag",
   PLATFORM_FEATURES_OPT_IN: "platform-feature-opt-in-feature-flag",
   EVENT_NUDGE_FEATURE_FLAG_KEY : "user-event-nudge-feature-flag",
+  CUSTOMIZE_NAVIGATION_MENU: "customize-navigation-menu-feature-flag",
   ...USER_PORTAL_FLAGS
 };
