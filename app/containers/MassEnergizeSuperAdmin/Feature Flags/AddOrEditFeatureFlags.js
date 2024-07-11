@@ -13,6 +13,8 @@ function AddOrEditFeatureFlags({
   putFlagsInRedux,
   featureFlags,
   featureToEdit,
+  keepInfoInRedux,
+  cachedFeatureFlagsInfo
 }) {
   const [_users, setUsers] = useState(users || []);
   const [comIds, setComIds] = useState([]);
@@ -34,6 +36,7 @@ function AddOrEditFeatureFlags({
     var features = (featureFlags && featureFlags.features) || [];
     features = features.filter((f) => f.id.toString() !== data.id.toString());
     putFlagsInRedux({ ...(featureFlags || {}), features: [data, ...features] });
+    keepInfoInRedux({ ...cachedFeatureFlagsInfo, [data.id]: data });
     switchTabs();
   };
 
