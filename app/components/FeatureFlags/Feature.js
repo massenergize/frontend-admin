@@ -12,7 +12,7 @@ function Feature({ name, fallback, children, auth }) {
 
   const flag = (flags || []).find((f) => f?.key === name);
 
-  if (auth.is_super_admin) return children;
+  if (auth?.is_super_admin) return children;
 
   if (flag) return children;
   if (fallback) return fallback;
