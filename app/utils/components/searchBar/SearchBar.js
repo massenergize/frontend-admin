@@ -3,6 +3,7 @@ import { Cancel } from '@mui/icons-material';
 import React, {useState} from 'react'
 import { getFilterData, getLimit } from '../../helpers';
 import { apiCall } from '../../messenger';
+import { parseJSON } from "../../common";
 
 export default function SearchBar({url, reduxItems, updateReduxFunction, handleSearch, hideSearch,pageProp, name, updateMetaData, meta,otherArgs}) {
   
@@ -10,7 +11,7 @@ export default function SearchBar({url, reduxItems, updateReduxFunction, handleS
   
   const getSearchText = () => {
     var tableProp = localStorage.getItem(pageProp.key + TABLE_PROPERTIES);
-    tableProp = JSON.parse(tableProp || null) || {};
+    tableProp = parseJSON(tableProp || null) || {};
     return tableProp && tableProp.search || "";
   };
   const [text, setText] = useState(getSearchText());

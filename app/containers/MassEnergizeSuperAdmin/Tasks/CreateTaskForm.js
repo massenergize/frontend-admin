@@ -9,6 +9,7 @@ import { withRouter } from "react-router-dom";
 import { loadTasksAction } from "../../../redux/redux-actions/adminActions";
 import { bindActionCreators } from "redux";
 import Seo from "../../../components/Seo/Seo";
+import { parseJSON } from "../../../utils/common";
 
 const styles = (theme) => ({
   root: {
@@ -141,7 +142,7 @@ const createFormJson = ({ taskFunctions, toEdit }) => {
 
   const getDateFromEditData = (toEdit) => {
     if (!toEdit.id) return;
-    let { actual } = JSON.parse(toEdit.recurring_details);
+    let { actual } = parseJSON(toEdit.recurring_details);
     return actual;
   };
 

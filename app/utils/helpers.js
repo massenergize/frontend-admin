@@ -1,22 +1,23 @@
 import { IS_CANARY, IS_LOCAL, IS_PROD } from "../config/constants";
 import { apiCall } from "./messenger";
 import { DEFAULT_ITEMS_PER_PAGE } from './constants';
+import { parseJSON } from "./common";
 const TABLE_PROPERTIES = "_TABLE_PROPERTIES";
 const FILTERS = "_FILTERS";
 
 export const getSearchText = (key) => {
   var tableProp = localStorage.getItem(key + TABLE_PROPERTIES);
-  tableProp = JSON.parse(tableProp || null) || {};
+  tableProp = parseJSON(tableProp || null) || {};
   return tableProp && tableProp.search;
 };
 export const getLimit = (key) => {
   var tableProp = localStorage.getItem(key + TABLE_PROPERTIES);
-  tableProp = JSON.parse(tableProp || null) || {};
+  tableProp = parseJSON(tableProp || null) || {};
   return (tableProp && tableProp.rowsPerPage) || DEFAULT_ITEMS_PER_PAGE;
 };
 export const getFilterParamsFromLocalStorage = (key) => {
   var tableProp = localStorage.getItem("MAIN_FILTER_OBJECT");
-  tableProp = JSON.parse(tableProp || null) || {};
+  tableProp = parseJSON(tableProp || null) || {};
   key = key + FILTERS;
   let filters = {};
   tableProp = tableProp[key] || {};
@@ -41,11 +42,19 @@ export const getFilterData = (data, existing = [], field = "id") => {
   return unique;
 };
 
+
+const getSavedSortParamsFromLocalStorage = (key) => {
+  let tableProp = localStorage.getItem(key + TABLE_PROPERTIES);
+  tableProp = parseJSON(tableProp || null) || {};
+  return tableProp?.sortOrder?.actual;
+};
+
 export const prepareFilterAndSearchParamsFromLocal = (key) => {
   let filterParams = getFilterParamsFromLocalStorage(key);
   let params = JSON.stringify({
     ...filterParams,
     search_text: getSearchText(key) || "",
+    sort_params: getSavedSortParamsFromLocalStorage(key) || {},
   });
 
   return params;
@@ -103,7 +112,8 @@ const callMoreData = (
   name,
   updateMetaData,
   meta,
-  otherArgs
+  otherArgs,
+  customLimit,
 ) => {
   let filterParams = getFilterParamsFromLocalStorage(pageProp.key);
   makeAPICallForMoreData({
@@ -112,7 +122,7 @@ const callMoreData = (
     updateRedux: updateReduxFunction,
     args: {
       page,
-      limit: getLimit(pageProp.key),
+      limit: customLimit || getLimit(pageProp.key),
       params: JSON.stringify({
         ...filterParams,
         search_text: getSearchText(pageProp.key) || "",
@@ -141,14 +151,14 @@ export const onTableStateChange = ({
 }) => {
   switch (action) {
     case "changePage":
-      if (metaData?.next === tableState?.page+1) {
+      if (metaData?.next === tableState?.page + 1) {
         callMoreData(
           tableState?.page + 1,
           updateReduxFunction,
           reduxItems,
           apiUrl,
           pageProp,
-          tableState && tableState.sort,
+          tableState?.sortOrder,
           name,
           updateMetaData,
           meta,
@@ -157,17 +167,18 @@ export const onTableStateChange = ({
       }
       break;
     case "sort":
+      tableState.page = 0;
       callMoreData(
         1,
         updateReduxFunction,
-        reduxItems,
+        [],
         apiUrl,
         pageProp,
-        tableState && tableState.sortOrder,
+        tableState?.sortOrder,
         name,
         updateMetaData,
         meta,
-        otherArgs
+        otherArgs,
       );
       break;
     

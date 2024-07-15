@@ -188,9 +188,36 @@ export function notNull(d) {
   }
 }
 
-export function isEmpty(val) {
-  return !val || ["null", "undefined", ""].indexOf(`${val}`.toLowerCase()) > -1;
-}
+export const isEmpty = (value) => {
+  return value === undefined
+    || value === null
+    || value === ""
+    || value?.length === 0
+    || value === "null"
+    || value === "undefined";
+
+};
+
+export const sanitizeValue = (val) => {
+  if (isEmpty(val)) {
+    return null;
+  }
+
+  return val;
+};
+
+
+export const parseJSON = (val) => {
+  if (typeof val === "object") return val;
+  const sanitizedValue = sanitizeValue("" + val);
+  if (!sanitizedValue) return null;
+  try {
+    return JSON.parse(sanitizedValue);
+  } catch (error) {
+    console.log(`JSON: Error parsing ${val} to JSON`);
+    return {};
+  }
+};
 
 export function isNotEmpty(val) {
   return !isEmpty(val);
@@ -308,7 +335,7 @@ export const fetchParamsFromURL = (location, paramName, names) => {
 
 export const removePageProgressFromStorage = (key) => {
   var progress = localStorage.getItem(ME_FORM_PROGRESS) || "{}";
-  progress = JSON.parse(progress);
+  progress = parseJSON(progress);
   progress[key] = {};
   localStorage.setItem(ME_FORM_PROGRESS, JSON.stringify(progress));
 };
@@ -426,3 +453,5 @@ export function formatWithMoment(momentObject, format = "YYYY-MM-DD") {
   }
   return momentObject.format(format);
 }
+
+

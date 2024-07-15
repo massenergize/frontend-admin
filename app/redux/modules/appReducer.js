@@ -65,6 +65,7 @@ import {
   SAVE_INTERNAL_MENU_LINK,
   LOAD_CC_ACTIONS_DATA,
 } from '../ReduxConstants';
+import { parseJSON } from "../../utils/common";
 
 
 const initialState = Map({
@@ -445,7 +446,7 @@ export const vendorsReducer = (state = [], action = {}) => {
   }
 };
 let localUser = localStorage.getItem("authUser");
-localUser = localUser ? JSON.parse(localUser) : null;
+localUser = localUser ? parseJSON(localUser) : null;
 
 export const authAdminReducer = (state = localUser, action = {}) => {
   switch (action.type) {
