@@ -56,6 +56,7 @@ function AddOrEditFeatureFlags({
 
   return (
     <MassEnergizeForm
+      onBack={() => switchTabs()}
       onClear={() => {
         setFeatureToEdit(null);
       }}

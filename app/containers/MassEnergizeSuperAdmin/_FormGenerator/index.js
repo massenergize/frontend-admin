@@ -1151,7 +1151,7 @@ class MassEnergizeForm extends Component {
 
   render() {
 
-    const { classes, enableCancel, cancel, noBack,onClear } = this.props;
+    const { classes, enableCancel, cancel, noBack,onClear, onBack } = this.props;
     const { formJson, error, successMsg, startCircularSpinner, readOnly, requiredFields } = this.state;
 
     if (!formJson) return <Loading />;
@@ -1169,6 +1169,7 @@ class MassEnergizeForm extends Component {
                   style={{ color: "#c83535" }}
                   onClick={(e) => {
                     e.preventDefault();
+                    if(onBack) return onBack()
                     this.props.history.goBack();
                   }}
                 >
