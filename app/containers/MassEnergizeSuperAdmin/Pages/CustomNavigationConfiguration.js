@@ -14,6 +14,7 @@ import Loading from "dan-components/Loading";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import { apiCall } from "../../../utils/messenger";
 import { fetchParamsFromURL, smartString } from "../../../utils/common";
+import { Reorder } from "framer-motion";
 
 const NAVIGATION = "navigation";
 const FOOTER = "footer";
@@ -258,37 +259,39 @@ function CustomNavigationConfiguration() {
       const isRemoved = activity?.key === ACTIVITIES.remove.key;
 
       return (
-        <div key={index} style={{ marginLeft: margin, position: "relative" }}>
-          {margin ? <LComponent /> : <></>}
-          <OneMenuItem
-            item={rest}
-            children={children}
-            // remove={toggleModal}
-            openModal={toggleModal}
-            closeModal={closeModal}
-            updateForm={updateForm}
-            formData={form}
-            parents={parents}
-            insertNewLink={insertNewLink}
-            addOrEdit={addOrEdit}
-            performDeletion={removeItem}
-            editTrail={editTrail}
-            activity={activity}
-            parentTraits={parentTraits || {}}
-            isTheFirstItem={index === 0}
-            isTheLastItem={index === items?.length - 1}
-            index={index}
-            moveUp={(up) => moveUp(up, { ...rest, children }, parents, { index, sibblings: items })}
-          />
-          {/* -- I'm spreading "children" here to make sure that we create a copy of the children. We want to make sure we control when the changes show up for the user */}
-          {children &&
-            renderMenuItems(
-              children,
-              40,
-              { ...parents, [rest?.id]: { ...rest, children: [...children] } },
-              { parentTraits: { isRemoved }, ...(options || {}) }
-            )}
-        </div>
+        <Reorder.Item key={rest?.id} itemID={rest?.id}>
+          <div key={index} style={{ marginLeft: margin, position: "relative" }}>
+            {margin ? <LComponent /> : <></>}
+            <OneMenuItem
+              item={rest}
+              children={children}
+              // remove={toggleModal}
+              openModal={toggleModal}
+              closeModal={closeModal}
+              updateForm={updateForm}
+              formData={form}
+              parents={parents}
+              insertNewLink={insertNewLink}
+              addOrEdit={addOrEdit}
+              performDeletion={removeItem}
+              editTrail={editTrail}
+              activity={activity}
+              parentTraits={parentTraits || {}}
+              isTheFirstItem={index === 0}
+              isTheLastItem={index === items?.length - 1}
+              index={index}
+              moveUp={(up) => moveUp(up, { ...rest, children }, parents, { index, sibblings: items })}
+            />
+            {/* -- I'm spreading "children" here to make sure that we create a copy of the children. We want to make sure we control when the changes show up for the user */}
+            {children &&
+              renderMenuItems(
+                children,
+                40,
+                { ...parents, [rest?.id]: { ...rest, children: [...children] } },
+                { parentTraits: { isRemoved }, ...(options || {}) }
+              )}
+          </div>
+        </Reorder.Item>
       );
     });
   };
@@ -425,7 +428,7 @@ function CustomNavigationConfiguration() {
             background: "#fafafa"
           }}
         >
-          <div>{renderMenuItems(menuItems)}</div>
+          <Reorder.Group values={menuItems}>{renderMenuItems(menuItems)}</Reorder.Group>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
             <div style={{ height: 40, border: "dashed 0px #eeeeee", borderLeftWidth: 2 }} />
             <Button color="secondary" variant="contained" onClick={() => addNew()}>
