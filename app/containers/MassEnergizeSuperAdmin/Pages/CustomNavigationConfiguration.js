@@ -257,9 +257,8 @@ function CustomNavigationConfiguration() {
       const editTrail = trackEdited[(rest?.id)];
       let activity = editTrail ? ACTIVITIES[(editTrail?.activity)] : null;
       const isRemoved = activity?.key === ACTIVITIES.remove.key;
-
       return (
-        <Reorder.Item key={rest?.id} itemID={rest?.id}>
+        <Reorder.Item key={rest?.id} style={{ listStyleType: "none" }} value={{ children, ...rest }}>
           <div key={index} style={{ marginLeft: margin, position: "relative" }}>
             {margin ? <LComponent /> : <></>}
             <OneMenuItem
@@ -392,6 +391,8 @@ function CustomNavigationConfiguration() {
   const addNew = () =>
     addOrEdit({ id: new Date().getTime()?.toString(), is_published: true }, {}, { context: ACTIVITIES.add.key });
 
+  const [source, setTrash] = useState([1, 2, 3, 4, 5]);
+
   return (
     <div>
       <MEPaperBlock title="Community Logo">
@@ -428,7 +429,27 @@ function CustomNavigationConfiguration() {
             background: "#fafafa"
           }}
         >
-          <Reorder.Group values={menuItems}>{renderMenuItems(menuItems)}</Reorder.Group>
+          <Reorder.Group
+            values={menuItems}
+            onReorder={(items) => {
+              console.log("ONREORDER: ", items,menuItems);
+              
+            }}
+          >
+            {/* <Reorder.Group
+            values={source}
+            onReorder={(items) => {
+              console.log("ONREORDER: ", items);
+              setTrash(items);
+            }}
+          > */}
+            {renderMenuItems(menuItems)}
+            {/* {source?.map((item) => (
+              <Reorder.Item key={item} value={item}>
+                <p style={{ background: `#45671${item}` }}>Item {item}</p>
+              </Reorder.Item>
+            ))} */}
+          </Reorder.Group>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
             <div style={{ height: 40, border: "dashed 0px #eeeeee", borderLeftWidth: 2 }} />
             <Button color="secondary" variant="contained" onClick={() => addNew()}>
