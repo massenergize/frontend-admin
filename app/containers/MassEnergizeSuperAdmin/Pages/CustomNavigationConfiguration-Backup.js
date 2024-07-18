@@ -52,9 +52,6 @@ function CustomNavigationConfiguration() {
   const [menuProfileStash, stashMenuProfiles] = useState([]);
   const [error, setError] = useState(null);
   const [brandForm, setBrandForm] = useState({});
-  // ----- For Dragging and Dropping ------
-  const [dragged, setBeingDragged] = useState(null);
-  const [mouse, setMouse] = useState([]);
 
   const menuHeap = useSelector((state) => state.getIn(["menuConfigurations"]));
   const { comId: community_id } = fetchParamsFromURL(window.location, "comId");
@@ -106,16 +103,6 @@ function CustomNavigationConfiguration() {
     const menuObj = menuProfiles[0];
     setEdited(reduxObj?.changeTree || {});
     placeDetails(menuObj);
-  }, []);
-
-  useEffect(() => {
-    const handler = (e) => {
-      setMouse([e.x, e.y]);
-    };
-
-    document.addEventListener("mousemove", handler);
-
-    return () => document.removeEventListener("mousemove", handler);
   }, []);
 
   const updateForm = (key, value, reset = false) => {
@@ -270,15 +257,10 @@ function CustomNavigationConfiguration() {
       let activity = editTrail ? ACTIVITIES[(editTrail?.activity)] : null;
       const isRemoved = activity?.key === ACTIVITIES.remove.key;
 
-      if (dragged?.id === rest?.id) return <></>;
-
-      // return renderOneItem({ ...rest, children }, { index, options, parents, margin });
-
       return (
         <div key={index} style={{ marginLeft: margin, position: "relative" }}>
           {margin ? <LComponent /> : <></>}
           <OneMenuItem
-            setBeingDragged={setBeingDragged}
             item={rest}
             children={children}
             // remove={toggleModal}
@@ -443,24 +425,7 @@ function CustomNavigationConfiguration() {
             background: "#fafafa"
           }}
         >
-          <div>
-            {dragged !== null && (
-              <div
-                style={{
-                  left: `${mouse[0] - 100}px`,
-                  top: `${mouse[1] - 20}px`,
-                  cursor: "grabbing",
-                  padding: "10px 20px",
-                  fontWeight: "bold",
-                  minWidth: 450
-                }}
-                className="drag-float"
-              >
-                {dragged?.name}
-              </div>
-            )}
-            {renderMenuItems(menuItems)}
-          </div>
+          <div>{renderMenuItems(menuItems)}</div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
             <div style={{ height: 40, border: "dashed 0px #eeeeee", borderLeftWidth: 2 }} />
             <Button color="secondary" variant="contained" onClick={() => addNew()}>
@@ -513,8 +478,7 @@ const OneMenuItem = ({
   parentTraits,
   isTheFirstItem,
   isTheLastItem,
-  moveUp,
-  setBeingDragged
+  moveUp
 }) => {
   const { name, link, id, is_link_external, is_published } = item || {};
 
@@ -567,10 +531,6 @@ const OneMenuItem = ({
         marginTop: 10,
         background: getBackColor(),
         textDecoration: isRemoved ? "line-through" : "none"
-      }}
-      onMouseDown={(e) => {
-        e.preventDefault();
-        setBeingDragged({ ...item, children });
       }}
     >
       <Typography

@@ -11,6 +11,14 @@ span {
   font-family: "Google Sans", Open Sans, sans-serif !important ;
 }
 
+.drag-float {
+  position: fixed;
+  background-color: white;
+  width: 200px;
+  z-index: 5;
+  box-shadow: var(--elevate-float);
+}
+
 :root {
   --app-cyan: #579ece;
   /* --app-purple: rgb(156, 39, 176); */
@@ -38,8 +46,7 @@ span {
   z-index: 6;
   border-radius: 8px;
   padding: 8px 0px;
-  box-shadow: 0px 5px 5px -3px rgba(80, 80, 80, 0.2),
-    0px 8px 10px 1px rgba(80, 80, 80, 0.14),
+  box-shadow: 0px 5px 5px -3px rgba(80, 80, 80, 0.2), 0px 8px 10px 1px rgba(80, 80, 80, 0.14),
     0px 3px 14px 2px rgba(80, 80, 80, 0.12);
 }
 
@@ -175,11 +182,11 @@ span {
   padding: 0px !important;
 }
 
-.user-community-item{
+.user-community-item {
   cursor: pointer;
   color: #3c9bda;
 }
 
-.user-community-item:hover{
+.user-community-item:hover {
   opacity: 0.7;
 }
