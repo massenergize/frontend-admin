@@ -144,6 +144,16 @@ function CustomNavigationConfiguration() {
       });
     }
   }, [dragged, mouse]);
+  useEffect(() => {
+    const handler = (e) => {
+      if (!dragged) return;
+      e.preventDefault();
+      setBeingDragged(null);
+    };
+
+    document.addEventListener("mouseup", handler);
+    return () => document.removeEventListener("mouseup", handler);
+  });
   const updateForm = (key, value, reset = false) => {
     if (reset) return setForm({});
     setForm({ ...form, [key]: value });
@@ -621,6 +631,14 @@ const OneMenuItem = ({
               e.preventDefault();
               setBeingDragged({ ...item, children });
             }}
+            // onMouseUp={(e) => {
+            //   console.log("MOuse is upping biom!", dragged);
+            //   if (dragged) {
+            //     e.preventDefault();
+            //     setBeingDragged(null);
+            //     console.log("AND WE OUCHERE");
+            //   }
+            // }}
             title={`Drag`}
           >
             <i
