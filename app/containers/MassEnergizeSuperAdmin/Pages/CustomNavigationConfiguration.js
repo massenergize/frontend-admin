@@ -554,146 +554,149 @@ const OneMenuItem = ({
   const disabledBecauseOfParent = parentIsNotLive && is_published;
 
   return (
-    <div
-      className=" elevate-float"
-      style={{
-        padding: "10px 20px",
-        display: "inline-flex",
-        flexDirection: "row",
-        alignItems: "center",
-        width: "100%",
-        minWidth: 450,
-        borderRadius: 3,
-        marginTop: 10,
-        background: getBackColor(),
-        textDecoration: isRemoved ? "line-through" : "none"
-      }}
-      onMouseDown={(e) => {
-        e.preventDefault();
-        setBeingDragged({ ...item, children });
-      }}
-    >
-      <Typography
-        variant="body"
+    <>
+      <div
+        className=" elevate-float"
         style={{
-          margin: 0,
-          fontWeight: "bold",
-
-          display: "flex",
+          padding: "10px 20px",
+          display: "inline-flex",
           flexDirection: "row",
-          alignItems: "center"
+          alignItems: "center",
+          width: "100%",
+          minWidth: 450,
+          borderRadius: 3,
+          marginTop: 10,
+          background: getBackColor(),
+          textDecoration: isRemoved ? "line-through" : "none"
+        }}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          setBeingDragged({ ...item, children });
         }}
       >
-        {!isTheFirstItem && (
-          <Tooltip title={`Move up`}>
-            <i
-              onClick={() => moveUp(true)}
-              className=" fa fa-long-arrow-up touchable-opacity"
-              style={{ color: "var(--app-cyan)", marginRight: 10, fontSize: 20 }}
-            />
-          </Tooltip>
-        )}
-        {!isTheLastItem && (
-          <Tooltip onClick={() => moveUp(false)} title={`Move down`}>
-            <i
-              className=" fa fa-long-arrow-down touchable-opacity"
-              style={{ color: "var(--app-purple)", marginRight: 10, fontSize: 20 }}
-            />
-          </Tooltip>
-        )}
-        <Tooltip title={activity ? activity?.description : ""}>
-          <b>{name}</b>
-        </Tooltip>
-        {is_link_external && !hasChildren && (
-          <span
-            style={{
-              fontWeight: "bold",
-              border: "solid 1px var(--app-purple)",
-              padding: "0px 5px",
-              marginLeft: 10,
-              fontSize: 10,
-              color: "var(--app-purple)",
-              borderRadius: 2
-            }}
-          >
-            <Tooltip title={`This is an external link`}>
-              <b>EXT</b>
+        <Typography
+          variant="body"
+          style={{
+            margin: 0,
+            fontWeight: "bold",
+
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center"
+          }}
+        >
+          {!isTheFirstItem && (
+            <Tooltip title={`Move up`}>
+              <i
+                onClick={() => moveUp(true)}
+                className=" fa fa-long-arrow-up touchable-opacity"
+                style={{ color: "var(--app-cyan)", marginRight: 10, fontSize: 20 }}
+              />
             </Tooltip>
-          </span>
-        )}
-        {!children?.length && link && (
-          <a
-            onClick={(e) => {
-              e.preventDefault();
-              if (is_link_external) return window.open(link, "_blank");
-            }}
-            // href={link}
-            target="_blank"
-          >
+          )}
+          {!isTheLastItem && (
+            <Tooltip onClick={() => moveUp(false)} title={`Move down`}>
+              <i
+                className=" fa fa-long-arrow-down touchable-opacity"
+                style={{ color: "var(--app-purple)", marginRight: 10, fontSize: 20 }}
+              />
+            </Tooltip>
+          )}
+          <Tooltip title={activity ? activity?.description : ""}>
+            <b>{name}</b>
+          </Tooltip>
+          {is_link_external && !hasChildren && (
             <span
-              className="touchable-opacity"
               style={{
-                opacity: 0.5,
-                marginLeft: 15,
-                textDecoration: "underline",
                 fontWeight: "bold",
-                color: "grey",
-                marginRight: 10
+                border: "solid 1px var(--app-purple)",
+                padding: "0px 5px",
+                marginLeft: 10,
+                fontSize: 10,
+                color: "var(--app-purple)",
+                borderRadius: 2
               }}
             >
-              {smartString(link, 40)}
-
-              {is_link_external && <i className="fa fa-external-link" style={{ margin: "0px 8px" }} />}
+              <Tooltip title={`This is an external link`}>
+                <b>EXT</b>
+              </Tooltip>
             </span>
-          </a>
-        )}
-      </Typography>
-      {!isRemoved && (
-        <div style={{ marginLeft: "auto" }}>
-          <Tooltip
-            title={
-              itemIsLive()
-                ? // ? `Live ${mother_is_not_live ? "but parent item is not live" : ""}`
-                  `Live`
-                : disabledBecauseOfParent
-                ? `Not live because parent is disabled`
-                : `Not Live, all sub items will also not show `
-            }
-          >
-            <i
-              onClick={() => editItem()}
-              className={`fa fa-eye${itemIsLive() ? "" : "-slash"} touchable-opacity`}
-              style={{ marginRight: 20, color: itemIsLive() ? "var(--app-purple)" : "grey", fontSize: 20 }}
-            />
-          </Tooltip>
-          <Tooltip title={`New: Add a sub-menu item to "${name}"`}>
-            <i
-              onClick={() =>
-                addOrEdit({ id: new Date().getTime()?.toString(), is_published: true }, parentsForNewItem, {
-                  context: ACTIVITIES.add.key
-                })
+          )}
+          {!children?.length && link && (
+            <a
+              onClick={(e) => {
+                e.preventDefault();
+                if (is_link_external) return window.open(link, "_blank");
+              }}
+              // href={link}
+              target="_blank"
+            >
+              <span
+                className="touchable-opacity"
+                style={{
+                  opacity: 0.5,
+                  marginLeft: 15,
+                  textDecoration: "underline",
+                  fontWeight: "bold",
+                  color: "grey",
+                  marginRight: 10
+                }}
+              >
+                {smartString(link, 40)}
+
+                {is_link_external && <i className="fa fa-external-link" style={{ margin: "0px 8px" }} />}
+              </span>
+            </a>
+          )}
+        </Typography>
+        {!isRemoved && (
+          <div style={{ marginLeft: "auto" }}>
+            <Tooltip
+              title={
+                itemIsLive()
+                  ? // ? `Live ${mother_is_not_live ? "but parent item is not live" : ""}`
+                    `Live`
+                  : disabledBecauseOfParent
+                  ? `Not live because parent is disabled`
+                  : `Not Live, all sub items will also not show `
               }
-              className=" fa fa-plus touchable-opacity"
-              style={{ marginRight: 20, color: "green", fontSize: 20 }}
-            />
-          </Tooltip>
-          <Tooltip title={`Edit: Make changes to "${name}"`}>
-            <i
-              onClick={() => editItem()}
-              className=" fa fa-edit touchable-opacity"
-              style={{ fontSize: 20, color: "var(--app-cyan)" }}
-            />
-          </Tooltip>
-          <span style={{ margin: "0px 8px", fontSize: 20, color: "#ededed" }}>|</span>
-          <Tooltip title={`Remove "${name}"`}>
-            <i
-              onClick={() => removeMenuItem()}
-              className=" fa fa-trash touchable-opacity"
-              style={{ color: "#e87070", marginRight: 10, fontSize: 20 }}
-            />
-          </Tooltip>
-        </div>
-      )}
-    </div>
+            >
+              <i
+                onClick={() => editItem()}
+                className={`fa fa-eye${itemIsLive() ? "" : "-slash"} touchable-opacity`}
+                style={{ marginRight: 20, color: itemIsLive() ? "var(--app-purple)" : "grey", fontSize: 20 }}
+              />
+            </Tooltip>
+            <Tooltip title={`New: Add a sub-menu item to "${name}"`}>
+              <i
+                onClick={() =>
+                  addOrEdit({ id: new Date().getTime()?.toString(), is_published: true }, parentsForNewItem, {
+                    context: ACTIVITIES.add.key
+                  })
+                }
+                className=" fa fa-plus touchable-opacity"
+                style={{ marginRight: 20, color: "green", fontSize: 20 }}
+              />
+            </Tooltip>
+            <Tooltip title={`Edit: Make changes to "${name}"`}>
+              <i
+                onClick={() => editItem()}
+                className=" fa fa-edit touchable-opacity"
+                style={{ fontSize: 20, color: "var(--app-cyan)" }}
+              />
+            </Tooltip>
+            <span style={{ margin: "0px 8px", fontSize: 20, color: "#ededed" }}>|</span>
+            <Tooltip title={`Remove "${name}"`}>
+              <i
+                onClick={() => removeMenuItem()}
+                className=" fa fa-trash touchable-opacity"
+                style={{ color: "#e87070", marginRight: 10, fontSize: 20 }}
+              />
+            </Tooltip>
+          </div>
+        )}
+      </div>
+      <div className="nav-drop-zone" />
+    </>
   );
 };

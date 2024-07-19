@@ -11,6 +11,19 @@ span {
   font-family: "Google Sans", Open Sans, sans-serif !important ;
 }
 
+.nav-drop-zone {
+  background-color: #ccc;
+  transition-property: height padding;
+  transition-duration: 250ms;
+  transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+  overflow: hidden;
+  height:45px;
+}
+
+.nav-hidden {
+  height: 0px;
+  padding: 0px;
+}
 .drag-float {
   position: fixed;
   background-color: white;
