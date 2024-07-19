@@ -55,6 +55,7 @@ function CustomNavigationConfiguration() {
   // ----- For Dragging and Dropping ------
   const [dragged, setBeingDragged] = useState(null);
   const [mouse, setMouse] = useState([]);
+  const [dropZone, setDropZone] = useState(null);
 
   const menuHeap = useSelector((state) => state.getIn(["menuConfigurations"]));
   const { comId: community_id } = fetchParamsFromURL(window.location, "comId");
@@ -112,12 +113,37 @@ function CustomNavigationConfiguration() {
     const handler = (e) => {
       setMouse([e.x, e.y]);
     };
-
     document.addEventListener("mousemove", handler);
-
     return () => document.removeEventListener("mousemove", handler);
   }, []);
+  useEffect(() => {
+    if (dragged !== null) {
+      // get all drop-zones
+      const elements = Array.from(document.getElementsByClassName("nav-drop-zone"));
+      const parentIds = elements.map((e) => e.getAttribute("data-parent-ids"));
+      const indexes = elements.map((e) => e.getAttribute("data-index"));
+      // console.log("ATTRIBUTES", parentIds);
+      // get all drop-zones' y-axis position
+      // if we were using a horizontally-scrolling list, we would get the .left property
+      const positions = elements.map((e) => e.getBoundingClientRect().top);
+      // get the difference with the mouse's y position
+      const absDifferences = positions.map((v) => Math.abs(v - mouse[1]));
 
+      // get the item closest to the mouse
+      let result = absDifferences.indexOf(Math.min(...absDifferences));
+
+      const ele = elements[result];
+      // console.log("ELEMENT", ele);
+
+      // if the item is below the dragged item, add 1 to the index
+      if (result > dragged) result += 1;
+      setDropZone({
+        parentIds: parentIds[result],
+        index: indexes[result],
+        uniqueId: `${parentIds[result]}->${indexes[result]}`
+      });
+    }
+  }, [dragged, mouse]);
   const updateForm = (key, value, reset = false) => {
     if (reset) return setForm({});
     setForm({ ...form, [key]: value });
@@ -278,6 +304,8 @@ function CustomNavigationConfiguration() {
         <div key={index} style={{ marginLeft: margin, position: "relative" }}>
           {margin ? <LComponent /> : <></>}
           <OneMenuItem
+            dragged={dragged}
+            dropZone={dropZone}
             setBeingDragged={setBeingDragged}
             item={rest}
             children={children}
@@ -514,9 +542,16 @@ const OneMenuItem = ({
   isTheFirstItem,
   isTheLastItem,
   moveUp,
-  setBeingDragged
+  setBeingDragged,
+  index,
+  dropZone,
+  dragged
 }) => {
   const { name, link, id, is_link_external, is_published } = item || {};
+
+  const combineKeysWithDelimiter = (keys, delimiter = ":") => keys.join(delimiter);
+  const parentKeys = combineKeysWithDelimiter(Object.keys(parents));
+  const uniqueId = `${parentKeys}->${index}`;
 
   const parentIsNotLive = !parentTraits?.isPublished;
   const isChild = parentTraits?.isChild;
@@ -569,10 +604,6 @@ const OneMenuItem = ({
           background: getBackColor(),
           textDecoration: isRemoved ? "line-through" : "none"
         }}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          setBeingDragged({ ...item, children });
-        }}
       >
         <Typography
           variant="body"
@@ -585,7 +616,19 @@ const OneMenuItem = ({
             alignItems: "center"
           }}
         >
-          {!isTheFirstItem && (
+          <Tooltip
+            onMouseDown={(e) => {
+              e.preventDefault();
+              setBeingDragged({ ...item, children });
+            }}
+            title={`Drag`}
+          >
+            <i
+              className=" fa fa-grip-horizontal"
+              style={{ color: "#e3e3e3", marginRight: 10, fontSize: 20, cursor: "grab" }}
+            />
+          </Tooltip>
+          {/* {!isTheFirstItem && (
             <Tooltip title={`Move up`}>
               <i
                 onClick={() => moveUp(true)}
@@ -593,15 +636,15 @@ const OneMenuItem = ({
                 style={{ color: "var(--app-cyan)", marginRight: 10, fontSize: 20 }}
               />
             </Tooltip>
-          )}
-          {!isTheLastItem && (
+          )} */}
+          {/* {!isTheLastItem && (
             <Tooltip onClick={() => moveUp(false)} title={`Move down`}>
               <i
                 className=" fa fa-long-arrow-down touchable-opacity"
                 style={{ color: "var(--app-purple)", marginRight: 10, fontSize: 20 }}
               />
             </Tooltip>
-          )}
+          )} */}
           <Tooltip title={activity ? activity?.description : ""}>
             <b>{name}</b>
           </Tooltip>
@@ -696,7 +739,11 @@ const OneMenuItem = ({
           </div>
         )}
       </div>
-      <div className="nav-drop-zone" />
+      <div
+        className={`nav-drop-zone ${!dragged || dropZone?.uniqueId !== uniqueId ? "nav-hidden" : ""}`}
+        data-parent-ids={parentKeys}
+        data-index={index}
+      />
     </>
   );
 };
