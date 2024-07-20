@@ -122,6 +122,8 @@ function CustomNavigationConfiguration() {
       const elements = Array.from(document.getElementsByClassName("nav-drop-zone"));
       const parentIds = elements.map((e) => e.getAttribute("data-parent-ids"));
       const indexes = elements.map((e) => e.getAttribute("data-index"));
+      const where = elements.map((e) => e.getAttribute("data-position"));
+      const idsOfItems = elements.map((e) => e.getAttribute("data-id"));
       // console.log("ATTRIBUTES", parentIds);
       // get all drop-zones' y-axis position
       // if we were using a horizontally-scrolling list, we would get the .left property
@@ -131,29 +133,36 @@ function CustomNavigationConfiguration() {
 
       // get the item closest to the mouse
       let result = absDifferences.indexOf(Math.min(...absDifferences));
-
-      const ele = elements[result];
-      // console.log("ELEMENT", ele);
-
       // if the item is below the dragged item, add 1 to the index
-      if (result > dragged) result += 1;
+      // if (result > dragged) result += 1;
       setDropZone({
         parentIds: parentIds[result],
         index: indexes[result],
-        uniqueId: `${parentIds[result]}->${indexes[result]}`
+        uniqueId: `${parentIds[result]}->${indexes[result]}->${where[result]}`,
+        id: idsOfItems[result]
       });
     }
   }, [dragged, mouse]);
+
   useEffect(() => {
     const handler = (e) => {
       if (!dragged) return;
       e.preventDefault();
       setBeingDragged(null);
+      reorder();
     };
-
     document.addEventListener("mouseup", handler);
     return () => document.removeEventListener("mouseup", handler);
   });
+
+  const reorder = () => {
+    if (!dropZone) return;
+    const { parentIds, index } = dropZone;
+    const pIds = parentIds?.split(":") || [];
+    const mother = menuItems?.find((item) => item?.id === pIds[0]);
+
+    console.log("This is the mother Id", mother);
+  };
   const updateForm = (key, value, reset = false) => {
     if (reset) return setForm({});
     setForm({ ...form, [key]: value });
@@ -297,6 +306,7 @@ function CustomNavigationConfiguration() {
     });
   };
 
+  const combineKeysWithDelimiter = (keys, delimiter = ":") => keys.join(delimiter);
   const renderMenuItems = (items, margin = 0, parents = {}, options = {}) => {
     if (!items?.length) return [];
     // items = items.sort((a, b) => a?.order - b?.order); //If you want to sort the items by order, uncomment this line
@@ -306,17 +316,21 @@ function CustomNavigationConfiguration() {
       let activity = editTrail ? ACTIVITIES[(editTrail?.activity)] : null;
       const isRemoved = activity?.key === ACTIVITIES.remove.key;
 
-      if (dragged?.id === rest?.id) return <></>;
+      const isBeingDragged = dragged?.id === rest?.id;
+      // if (dragged?.id === rest?.id) return <></>;
 
       // return renderOneItem({ ...rest, children }, { index, options, parents, margin });
+      const parentKeys = combineKeysWithDelimiter(Object.keys(parents));
+      const isFirstItem = index === 0;
 
       return (
-        <div key={index} style={{ marginLeft: margin, position: "relative" }}>
+        <div key={index} style={{ marginLeft: margin, position: "relative", opacity: isBeingDragged ? 0.4 : 1 }}>
           {margin ? <LComponent /> : <></>}
           <OneMenuItem
             dragged={dragged}
             dropZone={dropZone}
             setBeingDragged={setBeingDragged}
+            parentKeys={parentKeys}
             item={rest}
             children={children}
             // remove={toggleModal}
@@ -331,11 +345,21 @@ function CustomNavigationConfiguration() {
             editTrail={editTrail}
             activity={activity}
             parentTraits={parentTraits || {}}
-            isTheFirstItem={index === 0}
+            // isTheFirstItem={index === 0}
+            isTheFirstItem={isFirstItem}
             isTheLastItem={index === items?.length - 1}
             index={index}
             moveUp={(up) => moveUp(up, { ...rest, children }, parents, { index, sibblings: items })}
           />
+          {/* <div
+            // style={{ marginBottom: 10 }}
+            className={`nav-drop-zone ${
+              !dragged || dropZone?.uniqueId !== `${parentKeys}->${index}->up` ? "nav-hidden" : ""
+            }`}
+            data-parent-ids={parentKeys}
+            data-index={index}
+            data-position="up"
+          /> */}
           {/* -- I'm spreading "children" here to make sure that we create a copy of the children. We want to make sure we control when the changes show up for the user */}
           {children &&
             renderMenuItems(
@@ -485,7 +509,7 @@ function CustomNavigationConfiguration() {
             {dragged !== null && (
               <div
                 style={{
-                  left: `${mouse[0] - 100}px`,
+                  left: `${mouse[0] - 10}px`,
                   top: `${mouse[1] - 20}px`,
                   cursor: "grabbing",
                   padding: "10px 20px",
@@ -494,9 +518,20 @@ function CustomNavigationConfiguration() {
                 }}
                 className="drag-float"
               >
+                <i
+                  className=" fa fa-grip-horizontal"
+                  style={{ color: "#e3e3e3", marginRight: 10, fontSize: 20, cursor: "grab" }}
+                />
                 {dragged?.name}
               </div>
             )}
+            {/* <div
+              // className={`nav-drop-zone ${!dragged || dropZone?.uniqueId !== "->topmost" ? "nav-hidden" : ""}`}
+              className={`nav-drop-zone ${!dragged ? "nav-hidden" : ""}`}
+              data-parent-ids={""}
+              data-index={"topmost"}
+            /> */}
+
             {renderMenuItems(menuItems)}
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
@@ -555,12 +590,12 @@ const OneMenuItem = ({
   setBeingDragged,
   index,
   dropZone,
-  dragged
+  dragged,
+  parentKeys
 }) => {
   const { name, link, id, is_link_external, is_published } = item || {};
 
-  const combineKeysWithDelimiter = (keys, delimiter = ":") => keys.join(delimiter);
-  const parentKeys = combineKeysWithDelimiter(Object.keys(parents));
+  // const parentKeys = combineKeysWithDelimiter(Object.keys(parents));
   const uniqueId = `${parentKeys}->${index}`;
 
   const parentIsNotLive = !parentTraits?.isPublished;
@@ -597,9 +632,22 @@ const OneMenuItem = ({
   };
 
   const disabledBecauseOfParent = parentIsNotLive && is_published;
+  const notInTheSamePosition = dropZone?.id !== dragged?.id;
 
   return (
     <>
+      {isTheFirstItem && notInTheSamePosition && (
+        <div
+          // style={{ marginBottom: 10 }}
+          className={`nav-drop-zone ${
+            !dragged || dropZone?.uniqueId !== `${uniqueId}->up` ? "nav-hidden" : "closest-dropzone"
+          }`}
+          // className={`nav-drop-zone ${!dragged ? "nav-hidden" : isCloseToUpZone ? "closest-dropzone" : ""}`}
+          data-parent-ids={parentKeys}
+          data-index={index}
+          data-position="up"
+        />
+      )}
       <div
         className=" elevate-float"
         style={{
@@ -610,6 +658,7 @@ const OneMenuItem = ({
           width: "100%",
           minWidth: 450,
           borderRadius: 3,
+          // marginTop: !dragged ? 10 : 0,
           marginTop: 10,
           background: getBackColor(),
           textDecoration: isRemoved ? "line-through" : "none"
@@ -631,15 +680,7 @@ const OneMenuItem = ({
               e.preventDefault();
               setBeingDragged({ ...item, children });
             }}
-            // onMouseUp={(e) => {
-            //   console.log("MOuse is upping biom!", dragged);
-            //   if (dragged) {
-            //     e.preventDefault();
-            //     setBeingDragged(null);
-            //     console.log("AND WE OUCHERE");
-            //   }
-            // }}
-            title={`Drag`}
+            title={`Drag & Reorder`}
           >
             <i
               className=" fa fa-grip-horizontal"
@@ -757,11 +798,24 @@ const OneMenuItem = ({
           </div>
         )}
       </div>
-      <div
-        className={`nav-drop-zone ${!dragged || dropZone?.uniqueId !== uniqueId ? "nav-hidden" : ""}`}
-        data-parent-ids={parentKeys}
-        data-index={index}
-      />
+      {/* {dropZone?.uniqueId === `${uniqueId}->down` && ( */}
+      {/* {!hasChildren && !isTheLastItem && ( */}
+      {/* {!hasChildren && ( */}
+      {notInTheSamePosition && (
+        <div
+          // style={{ marginTop: 10 }}
+          className={`nav-drop-zone ${
+            !dragged || dropZone?.uniqueId !== `${uniqueId}->down` ? "nav-hidden" : "closest-dropzone"
+          }`}
+          // className={`nav-drop-zone ${!dragged ? "nav-hidden" : isCloseToDownZone ? "closest-dropzone" : ""}`}
+          data-parent-ids={parentKeys}
+          data-index={index}
+          data-position="down"
+          data-id={id}
+        />
+      )}
+      {/* )} */}
+      {/* )} */}
     </>
   );
 };
