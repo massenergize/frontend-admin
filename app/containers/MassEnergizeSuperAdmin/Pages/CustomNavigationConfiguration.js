@@ -157,8 +157,8 @@ function CustomNavigationConfiguration() {
     return () => document.removeEventListener("mouseup", handler);
   });
 
-  const removeDraggedItem = (dragObject) => {
-    if (!dragObject) return [];
+  const removeDraggedItem = (dragObject, list) => {
+    if (!dragObject) return list;
     const { item, parents } = dragObject;
     const parentsArr = Object.values(parents);
     const immediateParent = parentsArr[parentsArr.length - 1];
@@ -166,7 +166,25 @@ function CustomNavigationConfiguration() {
     sibblings = sibblings.filter((s) => s?.id !== item?.id);
     parents[(immediateParent?.id)] = { ...immediateParent, children: sibblings };
     const newObj = rollUp(Object.entries(parents));
-    return insertIntoTopLevelList(newObj, menuItems);
+    return insertIntoTopLevelList(newObj, list);
+  };
+  const unWrapTo = (parentIdList, mother) => {
+    const key = parentIdList[0];
+    const sibblings = mother?.children || [];
+    let tracker = {[mother?.id]: mother};
+    
+
+  };
+  const dragIntoNewPosition = (positionInformation, topLevelList) => {
+    const { parentIds, index, placement, item } = positionInformation;
+    const newPosition = placement === UP ? index : index + 1;
+    const pIds = parentIds?.split(":") || [];
+    const mother = topLevelList?.find((m) => m?.id === pIds[0]);
+    // const newObj = unWrapAndInsert(pIds.slice(1),mother, item);
+    // const immediateParent = topLevelList?.find((m) => m?.id === pIds[pIds?.length - 1]);
+    // const sibblings = immediateParent?.children || [];
+    // sibblings.splice(newPosition, 0, item);
+    // immediateParent.children = sibblings;
   };
 
   const reorder = () => {
@@ -174,9 +192,11 @@ function CustomNavigationConfiguration() {
     const { parentIds, index } = dropZone;
     const pIds = parentIds?.split(":") || [];
     const mother = menuItems?.find((item) => item?.id === pIds[0]);
-    console.log("TOGETHER AFTER REMOVAL: ", removeDraggedItem(dragged));
+    // Dragged item has been removed, top level list is modified, and ready for insertion
+    const listAfterDraggedIsRemoved = removeDraggedItem(dragged, menuItems);
+    const listAfterDragInsertion = dragIntoNewPosition(dropZone, listAfterDraggedIsRemoved);
 
-  
+    // console.log("TOGETHER AFTER REMOVAL: ", removeDraggedItem(dragged, menuItems));
   };
 
   const updateForm = (key, value, reset = false) => {
