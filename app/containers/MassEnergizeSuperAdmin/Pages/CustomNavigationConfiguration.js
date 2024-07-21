@@ -20,6 +20,8 @@ const FOOTER = "footer";
 const BRAND = "brand";
 const INIT = "INIT";
 const RESET = "RESET";
+const UP = "up";
+const DOWN = "down";
 
 const ACTIVITIES = {
   edit: { key: "edit", description: "This item was edited, and unsaved!", color: "#fffcf3" },
@@ -109,6 +111,7 @@ function CustomNavigationConfiguration() {
     placeDetails(menuObj);
   }, []);
 
+  // Add mouse move handler
   useEffect(() => {
     const handler = (e) => {
       setMouse([e.x, e.y]);
@@ -116,6 +119,8 @@ function CustomNavigationConfiguration() {
     document.addEventListener("mousemove", handler);
     return () => document.removeEventListener("mousemove", handler);
   }, []);
+
+  // Track closest drop-zone to dragged item
   useEffect(() => {
     if (dragged !== null) {
       // get all drop-zones
@@ -124,22 +129,19 @@ function CustomNavigationConfiguration() {
       const indexes = elements.map((e) => e.getAttribute("data-index"));
       const where = elements.map((e) => e.getAttribute("data-position"));
       const idsOfItems = elements.map((e) => e.getAttribute("data-id"));
-      // console.log("ATTRIBUTES", parentIds);
       // get all drop-zones' y-axis position
-      // if we were using a horizontally-scrolling list, we would get the .left property
       const positions = elements.map((e) => e.getBoundingClientRect().top);
       // get the difference with the mouse's y position
       const absDifferences = positions.map((v) => Math.abs(v - mouse[1]));
-
-      // get the item closest to the mouse
+      // get the index of the dropzone closest to the mouse
       let result = absDifferences.indexOf(Math.min(...absDifferences));
-      // if the item is below the dragged item, add 1 to the index
-      // if (result > dragged) result += 1;
+      const placement = where[result];
       setDropZone({
         parentIds: parentIds[result],
-        index: indexes[result],
-        uniqueId: `${parentIds[result]}->${indexes[result]}->${where[result]}`,
-        id: idsOfItems[result]
+        index: indexes[result], // The index of the item that is currently at the position that we are trying to drop the dragged item
+        uniqueId: `${parentIds[result]}->${indexes[result]}->${placement}`,
+        id: idsOfItems[result],
+        placement //up or down : Helps determine whether to add or subtract from index
       });
     }
   }, [dragged, mouse]);
@@ -155,14 +157,28 @@ function CustomNavigationConfiguration() {
     return () => document.removeEventListener("mouseup", handler);
   });
 
+  const removeDraggedItem = (dragObject) => {
+    if (!dragObject) return [];
+    const { item, parents } = dragObject;
+    const parentsArr = Object.values(parents);
+    const immediateParent = parentsArr[parentsArr.length - 1];
+    let sibblings = immediateParent?.children || [];
+    sibblings = sibblings.filter((s) => s?.id !== item?.id);
+    parents[(immediateParent?.id)] = { ...immediateParent, children: sibblings };
+    const newObj = rollUp(Object.entries(parents));
+    return insertIntoTopLevelList(newObj, menuItems);
+  };
+
   const reorder = () => {
     if (!dropZone) return;
     const { parentIds, index } = dropZone;
     const pIds = parentIds?.split(":") || [];
     const mother = menuItems?.find((item) => item?.id === pIds[0]);
+    console.log("TOGETHER AFTER REMOVAL: ", removeDraggedItem(dragged));
 
-    console.log("This is the mother Id", mother);
+  
   };
+
   const updateForm = (key, value, reset = false) => {
     if (reset) return setForm({});
     setForm({ ...form, [key]: value });
@@ -244,11 +260,19 @@ function CustomNavigationConfiguration() {
     }
     return acc;
   };
+  const insertIntoTopLevelList = (obj, array) => {
+    array = [...array];
+    const ind = array.findIndex((m) => m?.id === obj?.id);
+    if (ind === -1) array.push(obj);
+    else array[ind] = obj;
+    return array;
+  };
   const addToTopLevelMenu = (obj, changeTree = null) => {
-    const ind = menuItems.findIndex((m) => m?.id === obj?.id);
-    const copied = [...menuItems];
-    if (ind === -1) copied.push(obj);
-    else copied[ind] = obj;
+    // const ind = menuItems.findIndex((m) => m?.id === obj?.id);
+    // let copied = [...menuItems];
+    const copied = insertIntoTopLevelList(obj, menuItems);
+    // if (ind === -1) copied.push(obj);
+    // else copied[ind] = obj;
     setMenu(copied);
     const profileList = recreateProfileFromList(copied);
     keepInRedux(profileList, { changeTree });
@@ -309,17 +333,13 @@ function CustomNavigationConfiguration() {
   const combineKeysWithDelimiter = (keys, delimiter = ":") => keys.join(delimiter);
   const renderMenuItems = (items, margin = 0, parents = {}, options = {}) => {
     if (!items?.length) return [];
-    // items = items.sort((a, b) => a?.order - b?.order); //If you want to sort the items by order, uncomment this line
     return items.map(({ children, ...rest }, index) => {
       const { parentTraits } = options || {};
       const editTrail = trackEdited[(rest?.id)];
       let activity = editTrail ? ACTIVITIES[(editTrail?.activity)] : null;
       const isRemoved = activity?.key === ACTIVITIES.remove.key;
+      const isBeingDragged = dragged?.item?.id === rest?.id;
 
-      const isBeingDragged = dragged?.id === rest?.id;
-      // if (dragged?.id === rest?.id) return <></>;
-
-      // return renderOneItem({ ...rest, children }, { index, options, parents, margin });
       const parentKeys = combineKeysWithDelimiter(Object.keys(parents));
       const isFirstItem = index === 0;
 
@@ -522,7 +542,7 @@ function CustomNavigationConfiguration() {
                   className=" fa fa-grip-horizontal"
                   style={{ color: "#e3e3e3", marginRight: 10, fontSize: 20, cursor: "grab" }}
                 />
-                {dragged?.name}
+                {dragged?.item?.name}
               </div>
             )}
             {/* <div
@@ -632,7 +652,7 @@ const OneMenuItem = ({
   };
 
   const disabledBecauseOfParent = parentIsNotLive && is_published;
-  const notInTheSamePosition = dropZone?.id !== dragged?.id;
+  const notInTheSamePosition = dropZone?.id !== dragged?.item?.id;
 
   return (
     <>
@@ -678,7 +698,7 @@ const OneMenuItem = ({
           <Tooltip
             onMouseDown={(e) => {
               e.preventDefault();
-              setBeingDragged({ ...item, children });
+              setBeingDragged({ item: { ...item, children }, parents, index });
             }}
             title={`Drag & Reorder`}
           >
