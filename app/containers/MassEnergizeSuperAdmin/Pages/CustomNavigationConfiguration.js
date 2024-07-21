@@ -157,10 +157,18 @@ function CustomNavigationConfiguration() {
     return () => document.removeEventListener("mouseup", handler);
   });
 
+  /**
+   *
+   * @param {*} dragObject - Item that is set in the state when drage starts
+   * @param {*} list -  original list of menu items
+   * @returns
+   */
   const removeDraggedItem = (dragObject, list) => {
     if (!dragObject) return list;
     const { item, parents } = dragObject;
     const parentsArr = Object.values(parents);
+    const isTopLevelItem = parentsArr?.length === 0;
+    if (isTopLevelItem) return list.filter((m) => m?.id !== item?.id);
     const immediateParent = parentsArr[parentsArr.length - 1];
     let sibblings = immediateParent?.children || [];
     sibblings = sibblings.filter((s) => s?.id !== item?.id);
@@ -169,34 +177,45 @@ function CustomNavigationConfiguration() {
     return insertIntoTopLevelList(newObj, list);
   };
   const unWrapTo = (parentIdList, mother) => {
-    const key = parentIdList[0];
-    const sibblings = mother?.children || [];
-    let tracker = {[mother?.id]: mother};
-    
-
+    const tracker = { [mother?.id]: { ...mother, children: [...(mother?.children || [])] } };
+    parentIdList = parentIdList.slice(1);
+    let current = mother;
+    for (let i = 0; i < parentIdList.length; i++) {
+      const key = parentIdList[i];
+      const found = current?.children?.find((m) => m?.id === key);
+      tracker[(found?.id)] = found;
+      current = found;
+    }
+    return tracker;
   };
+
   const dragIntoNewPosition = (positionInformation, topLevelList) => {
-    const { parentIds, index, placement, item } = positionInformation;
-    const newPosition = placement === UP ? index : index + 1;
-    const pIds = parentIds?.split(":") || [];
+    const { parentIds, index, placement } = positionInformation;
+    const newPosition = placement === UP ? index : Number(index) + 1;
+    const pIds = (parentIds?.split(":") || []).filter(Boolean);
+    const isTopLevelItem = pIds.length === 0;
+    if (isTopLevelItem) {
+      const sibblings = [...topLevelList];
+      sibblings.splice(newPosition, 0, dragged?.item);
+      return sibblings;
+    }
     const mother = topLevelList?.find((m) => m?.id === pIds[0]);
-    // const newObj = unWrapAndInsert(pIds.slice(1),mother, item);
-    // const immediateParent = topLevelList?.find((m) => m?.id === pIds[pIds?.length - 1]);
-    // const sibblings = immediateParent?.children || [];
-    // sibblings.splice(newPosition, 0, item);
-    // immediateParent.children = sibblings;
+    const parentsAsObject = unWrapTo(pIds, mother);
+    const immediateParent = Object.values(parentsAsObject)[pIds.length - 1];
+    const sibblings = immediateParent?.children || [];
+    sibblings.splice(newPosition, 0, dragged?.item);
+    immediateParent.children = sibblings;
+    parentsAsObject[(immediateParent?.id)] = immediateParent;
+    const newObj = rollUp(Object.entries(parentsAsObject));
+    return insertIntoTopLevelList(newObj, topLevelList);
   };
 
   const reorder = () => {
-    if (!dropZone) return;
-    const { parentIds, index } = dropZone;
-    const pIds = parentIds?.split(":") || [];
-    const mother = menuItems?.find((item) => item?.id === pIds[0]);
+    if (!dropZone || dropZone?.id === dragged?.item?.id) return;
     // Dragged item has been removed, top level list is modified, and ready for insertion
-    const listAfterDraggedIsRemoved = removeDraggedItem(dragged, menuItems);
+    const listAfterDraggedIsRemoved = removeDraggedItem(dragged, [...menuItems]);
     const listAfterDragInsertion = dragIntoNewPosition(dropZone, listAfterDraggedIsRemoved);
-
-    // console.log("TOGETHER AFTER REMOVAL: ", removeDraggedItem(dragged, menuItems));
+    setStateAndExport(listAfterDragInsertion, trackEdited);
   };
 
   const updateForm = (key, value, reset = false) => {
@@ -287,15 +306,21 @@ function CustomNavigationConfiguration() {
     else array[ind] = obj;
     return array;
   };
+  const setStateAndExport = (newState, changeTree = null) => {
+    setMenu(newState);
+    const profileList = recreateProfileFromList(newState);
+    keepInRedux(profileList, { changeTree });
+  };
   const addToTopLevelMenu = (obj, changeTree = null) => {
     // const ind = menuItems.findIndex((m) => m?.id === obj?.id);
     // let copied = [...menuItems];
     const copied = insertIntoTopLevelList(obj, menuItems);
     // if (ind === -1) copied.push(obj);
     // else copied[ind] = obj;
-    setMenu(copied);
-    const profileList = recreateProfileFromList(copied);
-    keepInRedux(profileList, { changeTree });
+    // setMenu(copied);
+    // const profileList = recreateProfileFromList(copied);
+    // keepInRedux(profileList, { changeTree });
+    setStateAndExport(copied, changeTree);
   };
 
   const removeItem = (itemObj, parents, options = {}) => {
