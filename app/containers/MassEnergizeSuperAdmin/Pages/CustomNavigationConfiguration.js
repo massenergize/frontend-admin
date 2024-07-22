@@ -14,6 +14,8 @@ import Loading from "dan-components/Loading";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import { apiCall } from "../../../utils/messenger";
 import { fetchParamsFromURL, smartString } from "../../../utils/common";
+import { FLAGS } from "../../../components/FeatureFlags/flags";
+import Feature from "../../../components/FeatureFlags/Feature";
 
 const NAVIGATION = "navigation";
 const FOOTER = "footer";
@@ -312,14 +314,7 @@ function CustomNavigationConfiguration() {
     keepInRedux(profileList, { changeTree });
   };
   const addToTopLevelMenu = (obj, changeTree = null) => {
-    // const ind = menuItems.findIndex((m) => m?.id === obj?.id);
-    // let copied = [...menuItems];
     const copied = insertIntoTopLevelList(obj, menuItems);
-    // if (ind === -1) copied.push(obj);
-    // else copied[ind] = obj;
-    // setMenu(copied);
-    // const profileList = recreateProfileFromList(copied);
-    // keepInRedux(profileList, { changeTree });
     setStateAndExport(copied, changeTree);
   };
 
@@ -734,41 +729,50 @@ const OneMenuItem = ({
           style={{
             margin: 0,
             fontWeight: "bold",
-
             display: "flex",
             flexDirection: "row",
             alignItems: "center"
           }}
         >
-          <Tooltip
-            onMouseDown={(e) => {
-              e.preventDefault();
-              setBeingDragged({ item: { ...item, children }, parents, index });
-            }}
-            title={`Drag & Reorder`}
+          <Feature
+            name={FLAGS.DRAGGABLE_NAVIGATION_ITEMS}
+            // community={[]}
+            fallback={
+              <>
+                {!isTheFirstItem && (
+                  <Tooltip title={`Move up`}>
+                    <i
+                      onClick={() => moveUp(true)}
+                      className=" fa fa-long-arrow-up touchable-opacity"
+                      style={{ color: "var(--app-cyan)", marginRight: 10, fontSize: 20 }}
+                    />
+                  </Tooltip>
+                )}
+                {!isTheLastItem && (
+                  <Tooltip onClick={() => moveUp(false)} title={`Move down`}>
+                    <i
+                      className=" fa fa-long-arrow-down touchable-opacity"
+                      style={{ color: "var(--app-purple)", marginRight: 10, fontSize: 20 }}
+                    />
+                  </Tooltip>
+                )}
+              </>
+            }
           >
-            <i
-              className=" fa fa-grip-horizontal"
-              style={{ color: "#e3e3e3", marginRight: 10, fontSize: 20, cursor: "grab" }}
-            />
-          </Tooltip>
-          {/* {!isTheFirstItem && (
-            <Tooltip title={`Move up`}>
+            <Tooltip
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setBeingDragged({ item: { ...item, children }, parents, index });
+              }}
+              title={`Drag & Reorder`}
+            >
               <i
-                onClick={() => moveUp(true)}
-                className=" fa fa-long-arrow-up touchable-opacity"
-                style={{ color: "var(--app-cyan)", marginRight: 10, fontSize: 20 }}
+                className=" fa fa-grip-horizontal"
+                style={{ color: "#e3e3e3", marginRight: 10, fontSize: 20, cursor: "grab" }}
               />
             </Tooltip>
-          )} */}
-          {/* {!isTheLastItem && (
-            <Tooltip onClick={() => moveUp(false)} title={`Move down`}>
-              <i
-                className=" fa fa-long-arrow-down touchable-opacity"
-                style={{ color: "var(--app-purple)", marginRight: 10, fontSize: 20 }}
-              />
-            </Tooltip>
-          )} */}
+          </Feature>
+
           <Tooltip title={activity ? activity?.description : ""}>
             <b>{name}</b>
           </Tooltip>
@@ -816,71 +820,74 @@ const OneMenuItem = ({
             </a>
           )}
         </Typography>
-        {!isRemoved && (
-          <div style={{ marginLeft: "auto" }}>
-            <Tooltip
-              title={
-                itemIsLive()
-                  ? // ? `Live ${mother_is_not_live ? "but parent item is not live" : ""}`
-                    `Live`
-                  : disabledBecauseOfParent
-                  ? `Not live because parent is disabled`
-                  : `Not Live, all sub items will also not show `
-              }
-            >
-              <i
-                onClick={() => editItem()}
-                className={`fa fa-eye${itemIsLive() ? "" : "-slash"} touchable-opacity`}
-                style={{ marginRight: 20, color: itemIsLive() ? "var(--app-purple)" : "grey", fontSize: 20 }}
-              />
-            </Tooltip>
-            <Tooltip title={`New: Add a sub-menu item to "${name}"`}>
-              <i
-                onClick={() =>
-                  addOrEdit({ id: new Date().getTime()?.toString(), is_published: true }, parentsForNewItem, {
-                    context: ACTIVITIES.add.key
-                  })
-                }
-                className=" fa fa-plus touchable-opacity"
-                style={{ marginRight: 20, color: "green", fontSize: 20 }}
-              />
-            </Tooltip>
-            <Tooltip title={`Edit: Make changes to "${name}"`}>
-              <i
-                onClick={() => editItem()}
-                className=" fa fa-edit touchable-opacity"
-                style={{ fontSize: 20, color: "var(--app-cyan)" }}
-              />
-            </Tooltip>
-            <span style={{ margin: "0px 8px", fontSize: 20, color: "#ededed" }}>|</span>
-            <Tooltip title={`Remove "${name}"`}>
-              <i
-                onClick={() => removeMenuItem()}
-                className=" fa fa-trash touchable-opacity"
-                style={{ color: "#e87070", marginRight: 10, fontSize: 20 }}
-              />
-            </Tooltip>
-          </div>
-        )}
+
+        <Feature
+          name={FLAGS.DROPDOWN_VIEW_FOR_NAV_CONTROL}
+          
+          fallback={
+            !isRemoved && (
+              <div style={{ marginLeft: "auto" }}>
+                <Tooltip
+                  title={
+                    itemIsLive()
+                      ? // ? `Live ${mother_is_not_live ? "but parent item is not live" : ""}`
+                        `Live`
+                      : disabledBecauseOfParent
+                      ? `Not live because parent is disabled`
+                      : `Not Live, all sub items will also not show `
+                  }
+                >
+                  <i
+                    onClick={() => editItem()}
+                    className={`fa fa-eye${itemIsLive() ? "" : "-slash"} touchable-opacity`}
+                    style={{ marginRight: 20, color: itemIsLive() ? "var(--app-purple)" : "grey", fontSize: 20 }}
+                  />
+                </Tooltip>
+                <Tooltip title={`New: Add a sub-menu item to "${name}"`}>
+                  <i
+                    onClick={() =>
+                      addOrEdit({ id: new Date().getTime()?.toString(), is_published: true }, parentsForNewItem, {
+                        context: ACTIVITIES.add.key
+                      })
+                    }
+                    className=" fa fa-plus touchable-opacity"
+                    style={{ marginRight: 20, color: "green", fontSize: 20 }}
+                  />
+                </Tooltip>
+                <Tooltip title={`Edit: Make changes to "${name}"`}>
+                  <i
+                    onClick={() => editItem()}
+                    className=" fa fa-edit touchable-opacity"
+                    style={{ fontSize: 20, color: "var(--app-cyan)" }}
+                  />
+                </Tooltip>
+                <span style={{ margin: "0px 8px", fontSize: 20, color: "#ededed" }}>|</span>
+                <Tooltip title={`Remove "${name}"`}>
+                  <i
+                    onClick={() => removeMenuItem()}
+                    className=" fa fa-trash touchable-opacity"
+                    style={{ color: "#e87070", marginRight: 10, fontSize: 20 }}
+                  />
+                </Tooltip>
+              </div>
+            )
+          }
+        >
+          <small>Drop HEre</small>
+        </Feature>
       </div>
-      {/* {dropZone?.uniqueId === `${uniqueId}->down` && ( */}
-      {/* {!hasChildren && !isTheLastItem && ( */}
-      {/* {!hasChildren && ( */}
+
       {notInTheSamePosition && (
         <div
-          // style={{ marginTop: 10 }}
           className={`nav-drop-zone ${
             !dragged || dropZone?.uniqueId !== `${uniqueId}->down` ? "nav-hidden" : "closest-dropzone"
           }`}
-          // className={`nav-drop-zone ${!dragged ? "nav-hidden" : isCloseToDownZone ? "closest-dropzone" : ""}`}
           data-parent-ids={parentKeys}
           data-index={index}
           data-position="down"
           data-id={id}
         />
       )}
-      {/* )} */}
-      {/* )} */}
     </>
   );
 };
