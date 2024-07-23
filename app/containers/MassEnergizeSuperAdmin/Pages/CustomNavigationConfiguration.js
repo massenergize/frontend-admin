@@ -725,13 +725,12 @@ const OneMenuItem = ({
       </Tooltip>
     );
   };
-  const dropdownItems = useMemo(() => {
-    return [
-      { key: "edit", label: "Edit", icon: "fa-edit", color: "rgb(117 154 210)", onClick: editItem },
-      { key: "add", label: "Add Child Item", icon: "fa-plus", color: "rgb(104 180 95)", onClick: createNewSubItem },
-      { key: "remove", label: "Remove", icon: "fa-trash", color: "rgb(227 151 151)", onClick: removeMenuItem }
-    ];
-  }, []);
+  const dropdownItems = [
+    { key: "edit", label: "Edit", icon: "fa-edit", color: "rgb(117 154 210)", onClick: editItem },
+    { key: "add", label: "Add Child Item", icon: "fa-plus", color: "rgb(104 180 95)", onClick: createNewSubItem },
+    { key: "remove", label: "Remove", icon: "fa-trash", color: "rgb(227 151 151)", onClick: removeMenuItem }
+  ];
+
   // const dropdownItems = [
   //   { key: "edit", label: "Edit", icon: "fa-edit", color: "rgb(117 154 210)", onClick: editItem },
   //   { key: "add", label: "Add Child Item", icon: "fa-plus", color: "rgb(104 180 95)", onClick: createNewSubItem },
