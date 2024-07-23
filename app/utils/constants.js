@@ -23,3 +23,29 @@ export const NO_TITLES_FOR_THESE_PAGES = [
   "/admin/settings/notification-control",
   "/admin/community/configure/navigation"
 ];
+
+
+export const AUDIENCES_CONFIG = {
+  SUPER_ADMIN: {
+    params:{
+      membership: ["Super Admin"],
+    },
+    endpoint: "/users.listForCommunityAdmin",
+  },
+  COMMUNITY_CONTACTS: {
+    params: {},
+    endpoint: "/communities.listForCommunityAdmin",
+  },
+  COMMUNITY_ADMIN: {
+    params:{
+      membership: ["Community Admin"],
+    },
+    endpoint: "/users.listForCommunityAdmin",
+  },
+  USERS: {
+    params:{
+      membership: ["Member"],
+    },
+    endpoint: "/users.listForCommunityAdmin",
+  },
+};

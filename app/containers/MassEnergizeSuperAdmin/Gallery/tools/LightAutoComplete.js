@@ -72,7 +72,6 @@ function LightAutoComplete(props) {
     containerStyle,
     multiple,
     showSelectAll = true,
-    isAsync,
     endpoint,
     args,
     params,
