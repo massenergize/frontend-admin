@@ -62,7 +62,12 @@ function CustomNavigationConfiguration() {
   const [dropZone, setDropZone] = useState(null);
 
   const menuHeap = useSelector((state) => state.getIn(["menuConfigurations"]));
+  const communities = useSelector((state) => state.getIn(["communities"]));
   const { comId: community_id } = fetchParamsFromURL(window.location, "comId");
+  const community = useMemo(() => communities?.find((c) => c?.id?.toString() === community_id?.toString(), []), [
+    communities
+  ]);
+  // const community = communities?.find((c) => c?.id?.toString() === community_id?.toString(), []);
   const dispatch = useDispatch();
   const keepInRedux = (menuProfiles, options) =>
     dispatch(
@@ -387,6 +392,7 @@ function CustomNavigationConfiguration() {
         <div key={index} style={{ marginLeft: margin, position: "relative", opacity: isBeingDragged ? 0.4 : 1 }}>
           {margin ? <LComponent /> : <></>}
           <OneMenuItem
+            community={community}
             dragged={dragged}
             dropZone={dropZone}
             setBeingDragged={setBeingDragged}
@@ -651,7 +657,8 @@ const OneMenuItem = ({
   index,
   dropZone,
   dragged,
-  parentKeys
+  parentKeys,
+  community
 }) => {
   const { name, link, id, is_link_external, is_published } = item || {};
 
@@ -773,7 +780,7 @@ const OneMenuItem = ({
         >
           <Feature
             name={FLAGS.DRAGGABLE_NAVIGATION_ITEMS}
-            // community={[]}
+            community={community}
             fallback={
               <>
                 {!isTheFirstItem && (
@@ -860,6 +867,7 @@ const OneMenuItem = ({
 
         <Feature
           name={FLAGS.DROPDOWN_VIEW_FOR_NAV_CONTROL}
+          community={community}
           fallback={
             !isRemoved && (
               <div style={{ marginLeft: "auto" }}>
