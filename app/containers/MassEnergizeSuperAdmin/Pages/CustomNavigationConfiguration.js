@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import { Button, Link, Paper, TextField, Tooltip, Typography } from "@mui/material";
 import BrandCustomization from "./BrandCustomization";
@@ -685,6 +685,10 @@ const OneMenuItem = ({
   const isRemoved = parentTraits?.isRemoved || activity?.key === ACTIVITIES.remove.key;
   const editItem = () =>
     addOrEdit({ ...item, children }, parents, { context: ACTIVITIES.edit.key, children, isEdit: true });
+  const createNewSubItem = () =>
+    addOrEdit({ id: new Date().getTime()?.toString(), is_published: true }, parentsForNewItem, {
+      context: ACTIVITIES.add.key
+    });
 
   const itemIsLive = () => {
     if (isChild) return !parentIsNotLive && is_published;
@@ -693,6 +697,39 @@ const OneMenuItem = ({
 
   const disabledBecauseOfParent = parentIsNotLive && is_published;
   const notInTheSamePosition = dropZone?.id !== dragged?.item?.id;
+
+  const renderLiveVisuals = () => {
+    return (
+      <Tooltip
+        title={
+          itemIsLive()
+            ? // ? `Live ${mother_is_not_live ? "but parent item is not live" : ""}`
+              `Live`
+            : disabledBecauseOfParent
+            ? `Not live because parent is disabled`
+            : `Not Live, all sub items will also not show `
+        }
+      >
+        <i
+          onClick={() => editItem()}
+          className={`fa fa-eye${itemIsLive() ? "" : "-slash"} touchable-opacity`}
+          style={{ marginRight: 20, color: itemIsLive() ? "var(--app-purple)" : "grey", fontSize: 20 }}
+        />
+      </Tooltip>
+    );
+  };
+  const dropdownItems = useMemo(() => {
+    return [
+      { key: "edit", label: "Edit", icon: "fa-edit", color: "rgb(117 154 210)", onClick: editItem },
+      { key: "add", label: "Add Child Item", icon: "fa-plus", color: "rgb(104 180 95)", onClick: createNewSubItem },
+      { key: "remove", label: "Remove", icon: "fa-trash", color: "rgb(227 151 151)", onClick: removeMenuItem }
+    ];
+  }, []);
+  // const dropdownItems = [
+  //   { key: "edit", label: "Edit", icon: "fa-edit", color: "rgb(117 154 210)", onClick: editItem },
+  //   { key: "add", label: "Add Child Item", icon: "fa-plus", color: "rgb(104 180 95)", onClick: createNewSubItem },
+  //   { key: "remove", label: "Remove", icon: "fa-trash", color: "rgb(227 151 151)", onClick: removeMenuItem }
+  // ];
 
   return (
     <>
@@ -823,33 +860,18 @@ const OneMenuItem = ({
 
         <Feature
           name={FLAGS.DROPDOWN_VIEW_FOR_NAV_CONTROL}
-          
           fallback={
             !isRemoved && (
               <div style={{ marginLeft: "auto" }}>
-                <Tooltip
-                  title={
-                    itemIsLive()
-                      ? // ? `Live ${mother_is_not_live ? "but parent item is not live" : ""}`
-                        `Live`
-                      : disabledBecauseOfParent
-                      ? `Not live because parent is disabled`
-                      : `Not Live, all sub items will also not show `
-                  }
-                >
-                  <i
-                    onClick={() => editItem()}
-                    className={`fa fa-eye${itemIsLive() ? "" : "-slash"} touchable-opacity`}
-                    style={{ marginRight: 20, color: itemIsLive() ? "var(--app-purple)" : "grey", fontSize: 20 }}
-                  />
-                </Tooltip>
+                {renderLiveVisuals()}
                 <Tooltip title={`New: Add a sub-menu item to "${name}"`}>
                   <i
-                    onClick={() =>
-                      addOrEdit({ id: new Date().getTime()?.toString(), is_published: true }, parentsForNewItem, {
-                        context: ACTIVITIES.add.key
-                      })
-                    }
+                    // onClick={() =>
+                    //   addOrEdit({ id: new Date().getTime()?.toString(), is_published: true }, parentsForNewItem, {
+                    //     context: ACTIVITIES.add.key
+                    //   })
+                    // }
+                    onClick={() => createNewSubItem()}
                     className=" fa fa-plus touchable-opacity"
                     style={{ marginRight: 20, color: "green", fontSize: 20 }}
                   />
@@ -873,7 +895,41 @@ const OneMenuItem = ({
             )
           }
         >
-          <small>Drop HEre</small>
+          <div style={{ marginLeft: "auto" }}>
+            {renderLiveVisuals()}
+            <MEDropdown
+              fullControl
+              renderChild={(child, index) => (
+                <p
+                  className="drop-pro-child"
+                  key={index?.toString()}
+                  onClick={() => child?.onClick()}
+                  style={{
+                    padding: "5px 15px",
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    fontSize: 14,
+                    fontWeight: "bold",
+                    margin: 0
+                  }}
+                >
+                  <i
+                    className={`fa ${child?.icon}`}
+                    style={{ fontSize: 13, marginRight: 5, color: child?.color || "#cccccc" }}
+                  />
+                  {child?.label}
+                </p>
+              )}
+              labelExtractor={(item) => item.label}
+              valueExtractor={(item) => item.key}
+              data={dropdownItems}
+              noCaret
+              onHeaderRender={() => {
+                return <i className="fa fa-ellipsis-v" style={{ fontSize: 16, color: "grey" }} />;
+              }}
+            />
+          </div>
         </Feature>
       </div>
 
