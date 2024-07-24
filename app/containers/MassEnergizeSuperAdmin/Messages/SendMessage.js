@@ -5,11 +5,9 @@ import { withStyles } from '@mui/styles';
 
 import { useParams, withRouter } from 'react-router-dom';
 import {
-  Box,
   Button,
   FormControlLabel,
   FormLabel,
-  LinearProgress,
   Radio,
   RadioGroup,
   TextField,
@@ -26,6 +24,7 @@ import ScheduleMessageModal from './ScheduleMessageModal';
 import { apiCall } from '../../../utils/messenger';
 import { AUDIENCES_CONFIG, LOADING } from '../../../utils/constants';
 import {
+  cacheMessageInfoAction,
   reduxLoadMetaDataAction,
   reduxLoadScheduledMessages,
   reduxToggleUniversalModal,
@@ -71,8 +70,8 @@ function SendMessage({
   const [audience, setAudience] = React.useState([]);
   const [sub_audience_type, setSubAudienceType] = React.useState("FROM_COMMUNITY");
   const [loading, setLoading] = React.useState(false);
-  // const [communities, setCommunities] = React.useState(props.communities||[]);
   const [allUsers, setAllUsers] = React.useState([]);
+  const [message, setMessage] = React.useState({});
 
   const UrlParams = useParams();
 
@@ -86,43 +85,48 @@ function SendMessage({
     setAudience([]);
   }, [currentFilter, sub_audience_type]);
 
+
   useEffect(() => {
     const { id } = UrlParams;
+    const { cachedMessageInfo, saveMessageInfoToCache } = props;
     if (!id) return;
+    setLoading(true);
+    const cache = cachedMessageInfo[id];
 
-    if (props?.messages === LOADING) return;
-    const message = (props.messages || [])?.filter((m) => m.id?.toString() === id?.toString())[0];
-    if (message) {
-      const {
-        audience_type, sub_audience_type, audience, community_ids 
-      } = message?.schedule_info?.recipients;
+    if (cache) {
+      const { audience_type, sub_audience_type, audience, community_ids } = cache?.schedule_info?.recipients;
 
+      const _audience = audience !== "all" ? audience : [audience];
+      setSelectedCommunities(community_ids);
+      setAudience(_audience);
       setCurrentFilter(audience_type);
       setSubAudienceType(sub_audience_type);
-      setQuery({ message: message?.body, subject: message?.title });
-      setListOfAudience(audience, community_ids, audience_type);
-    }
-  }, [UrlParams?.id, props?.messages, allUsers?.length, props?.communities?.length]);
-
-
-
-  const setListOfAudience = (audience_ids, community_id, audience_type) => {
-    if (community_id) {
-      const _selectedCommunities = props.communities?.filter((obj) => community_id?.split(",")?.includes(obj?.id?.toString()));
-      setSelectedCommunities(_selectedCommunities);
+      setQuery({ message: cache?.body, subject: cache?.title });
+      setMessage(cache);
+      setLoading(false);
+      return;
     }
 
-    if (!isAll(audience_ids)) {
-      const arrOfIds = audience_ids?.split(",");
-      if (audience_type === COMMUNITY_CONTACTS) {
-        const _audience = props?.communities?.filter((obj) => arrOfIds?.includes(obj?.id?.toString()));
+    apiCall("/messages.info", { message_id: id }).then((res) => {
+
+      if (res?.success) {
+
+        saveMessageInfoToCache({ ...cachedMessageInfo, [id]: res?.data });
+        setMessage(res?.data);
+
+        const {audience_type, sub_audience_type, audience, community_ids} = res?.data?.schedule_info?.recipients;
+
+        const _audience = audience !== "all" ? audience : [audience];
+        setSelectedCommunities(community_ids);
         setAudience(_audience);
-      } else {
-        const _audience = allUsers?.filter((obj) => arrOfIds?.includes(obj?.id?.toString()));
-        setAudience(_audience);
+        setCurrentFilter(audience_type);
+        setSubAudienceType(sub_audience_type);
+        setQuery({ message: res?.data?.body, subject: res?.data?.title });
       }
-    }
-  };
+      setLoading(false);
+    });
+  }, [UrlParams?.id, props?.cachedMessageInfo, message]);
+
 
   const buildQuery = (name, item) => {
     const obj = { ...usersQuery, [name]: item };
@@ -225,7 +229,7 @@ function SendMessage({
         props?.toggleToast({
           open: true,
           message:
-            "An error occurred while deleting the message",
+            "An error occurred while sending the message",
           variant: "error",
         });
       }
@@ -275,28 +279,30 @@ function SendMessage({
   };
 
   const renderFromCommunities = () => (
-      <>
-        <FormLabel component="label">Communities</FormLabel>
-        <LightAutoComplete
-          defaultSelected={selectedCommunities || []}
-          multiple
-          onChange={(selected) => setSelectedCommunities(selected)}
-          data={props.communities || []}
-          labelExtractor={(item) => item?.name}
-          valueExtractor={(item) => item?.id}
-          endpoint="/communities.listForCommunityAdmin"
-        />
-        {selectedCommunities?.length > 0 && (<div>{renderAudienceForm()}</div>)}
+    <>
+      <FormLabel component="label">Communities</FormLabel>
+      <LightAutoComplete
+        defaultSelected={selectedCommunities || []}
+        multiple
+        onChange={(selected) => setSelectedCommunities(selected)}
+        data={props.communities || []}
+        labelExtractor={(item) => item?.name}
+        valueExtractor={(item) => item?.id}
+        endpoint="/communities.listForCommunityAdmin"
+        showSelectAll={false}
+        // key={props.communities?.length}
+      />
+      <div>{renderAudienceForm()}</div>
 
-      </>
-    );
+    </>
+  );
 
   const loadMoreAudienceParams = (audienceType, subOrdienceType = null) => {
     if (!AUDIENCES_CONFIG[audienceType]) {
       throw new Error(`Unsupported audience type: ${audienceType}`);
     }
 
-    let audienceConfig = { ...AUDIENCES_CONFIG[audienceType] };
+    const audienceConfig = { ...AUDIENCES_CONFIG[audienceType] };
 
     if (
       (audienceType === COMMUNITY_ADMIN || audienceType === USERS)
@@ -314,7 +320,7 @@ function SendMessage({
       community = community?.map((c) => c.name);
     }
     const data = getAudienceList(currentFilter) || [];
-    let params = loadMoreAudienceParams(currentFilter, sub_audience_type);
+    const params = loadMoreAudienceParams(currentFilter, sub_audience_type);
     return (
       <>
         <FormLabel component="label">Audience</FormLabel>
@@ -331,6 +337,7 @@ function SendMessage({
           shortenListAfter={5}
           endpoint={params.endpoint}
           params={params.params}
+          selectAllV2
         />
       </>
     );
@@ -365,7 +372,7 @@ function SendMessage({
   };
 
 
-  if (props?.messages === LOADING) return <Loading />;
+  if (props?.messages === LOADING || loading) return <Loading />;
 
   return (
     <PapperBlock
@@ -462,11 +469,7 @@ function SendMessage({
         </div>
 
         <>
-          {loading ? (
-            <Box sx={{ width: "100%", marginTop: 2 }}>
-              <LinearProgress />
-            </Box>
-          ) : (
+          {!loading && (
             <div
               style={{
                 marginTop: 20,
@@ -522,7 +525,8 @@ const mapStateToProps = (state) => ({
   communities: state.getIn(["communities"]),
   messages: state.getIn(["scheduledMessages"]),
   meta: state.getIn(["paginationMetaData"]),
-  users: state.getIn(["users"]),
+  users: state.getIn(["allUsers"]),
+  cachedMessageInfo: state.getIn(["messageInfoCache"]),
 });
 const mapDispatchToProps = (dispatch) => bindActionCreators(
   {
@@ -530,6 +534,7 @@ const mapDispatchToProps = (dispatch) => bindActionCreators(
     updateTableMeta: reduxLoadMetaDataAction,
     toggleToast: reduxToggleUniversalToast,
     toggleModal: reduxToggleUniversalModal,
+    saveMessageInfoToCache: cacheMessageInfoAction,
   },
   dispatch
 );
