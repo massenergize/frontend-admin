@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import { Button, Link, Paper, TextField, Tooltip, Typography } from "@mui/material";
 import BrandCustomization from "./BrandCustomization";
@@ -14,12 +14,16 @@ import Loading from "dan-components/Loading";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import { apiCall } from "../../../utils/messenger";
 import { fetchParamsFromURL, smartString } from "../../../utils/common";
+import { FLAGS } from "../../../components/FeatureFlags/flags";
+import Feature from "../../../components/FeatureFlags/Feature";
 
 const NAVIGATION = "navigation";
 const FOOTER = "footer";
 const BRAND = "brand";
 const INIT = "INIT";
 const RESET = "RESET";
+const UP = "up";
+const DOWN = "down";
 
 const ACTIVITIES = {
   edit: { key: "edit", description: "This item was edited, and unsaved!", color: "#fffcf3" },
@@ -52,9 +56,18 @@ function CustomNavigationConfiguration() {
   const [menuProfileStash, stashMenuProfiles] = useState([]);
   const [error, setError] = useState(null);
   const [brandForm, setBrandForm] = useState({});
+  // ----- For Dragging and Dropping ------
+  const [dragged, setBeingDragged] = useState(null);
+  const [mouse, setMouse] = useState([]);
+  const [dropZone, setDropZone] = useState(null);
 
   const menuHeap = useSelector((state) => state.getIn(["menuConfigurations"]));
+  const communities = useSelector((state) => state.getIn(["communities"]));
   const { comId: community_id } = fetchParamsFromURL(window.location, "comId");
+  const community = useMemo(() => communities?.find((c) => c?.id?.toString() === community_id?.toString(), []), [
+    communities
+  ]);
+  // const community = communities?.find((c) => c?.id?.toString() === community_id?.toString(), []);
   const dispatch = useDispatch();
   const keepInRedux = (menuProfiles, options) =>
     dispatch(
@@ -104,6 +117,113 @@ function CustomNavigationConfiguration() {
     setEdited(reduxObj?.changeTree || {});
     placeDetails(menuObj);
   }, []);
+
+  // Add mouse move handler
+  useEffect(() => {
+    const handler = (e) => {
+      setMouse([e.x, e.y]);
+    };
+    document.addEventListener("mousemove", handler);
+    return () => document.removeEventListener("mousemove", handler);
+  }, []);
+
+  // Track closest drop-zone to dragged item
+  useEffect(() => {
+    if (dragged !== null) {
+      // get all drop-zones
+      const elements = Array.from(document.getElementsByClassName("nav-drop-zone"));
+      const parentIds = elements.map((e) => e.getAttribute("data-parent-ids"));
+      const indexes = elements.map((e) => e.getAttribute("data-index"));
+      const where = elements.map((e) => e.getAttribute("data-position"));
+      const idsOfItems = elements.map((e) => e.getAttribute("data-id"));
+      // get all drop-zones' y-axis position
+      const positions = elements.map((e) => e.getBoundingClientRect().top);
+      // get the difference with the mouse's y position
+      const absDifferences = positions.map((v) => Math.abs(v - mouse[1]));
+      // get the index of the dropzone closest to the mouse
+      let result = absDifferences.indexOf(Math.min(...absDifferences));
+      const placement = where[result];
+      setDropZone({
+        parentIds: parentIds[result],
+        index: indexes[result], // The index of the item that is currently at the position that we are trying to drop the dragged item
+        uniqueId: `${parentIds[result]}->${indexes[result]}->${placement}`,
+        id: idsOfItems[result],
+        placement //up or down : Helps determine whether to add or subtract from index
+      });
+    }
+  }, [dragged, mouse]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (!dragged) return;
+      e.preventDefault();
+      setBeingDragged(null);
+      reorder();
+    };
+    document.addEventListener("mouseup", handler);
+    return () => document.removeEventListener("mouseup", handler);
+  });
+
+  /**
+   *
+   * @param {*} dragObject - Item that is set in the state when drage starts
+   * @param {*} list -  original list of menu items
+   * @returns
+   */
+  const removeDraggedItem = (dragObject, list) => {
+    if (!dragObject) return list;
+    const { item, parents } = dragObject;
+    const parentsArr = Object.values(parents);
+    const isTopLevelItem = parentsArr?.length === 0;
+    if (isTopLevelItem) return list.filter((m) => m?.id !== item?.id);
+    const immediateParent = parentsArr[parentsArr.length - 1];
+    let sibblings = immediateParent?.children || [];
+    sibblings = sibblings.filter((s) => s?.id !== item?.id);
+    parents[(immediateParent?.id)] = { ...immediateParent, children: sibblings };
+    const newObj = rollUp(Object.entries(parents));
+    return insertIntoTopLevelList(newObj, list);
+  };
+  const unWrapTo = (parentIdList, mother) => {
+    const tracker = { [mother?.id]: { ...mother, children: [...(mother?.children || [])] } };
+    parentIdList = parentIdList.slice(1);
+    let current = mother;
+    for (let i = 0; i < parentIdList.length; i++) {
+      const key = parentIdList[i];
+      const found = current?.children?.find((m) => m?.id === key);
+      tracker[(found?.id)] = found;
+      current = found;
+    }
+    return tracker;
+  };
+
+  const dragIntoNewPosition = (positionInformation, topLevelList) => {
+    const { parentIds, index, placement } = positionInformation;
+    const newPosition = placement === UP ? index : Number(index) + 1;
+    const pIds = (parentIds?.split(":") || []).filter(Boolean);
+    const isTopLevelItem = pIds.length === 0;
+    if (isTopLevelItem) {
+      const sibblings = [...topLevelList];
+      sibblings.splice(newPosition, 0, dragged?.item);
+      return sibblings;
+    }
+    const mother = topLevelList?.find((m) => m?.id === pIds[0]);
+    const parentsAsObject = unWrapTo(pIds, mother);
+    const immediateParent = Object.values(parentsAsObject)[pIds.length - 1];
+    const sibblings = immediateParent?.children || [];
+    sibblings.splice(newPosition, 0, dragged?.item);
+    immediateParent.children = sibblings;
+    parentsAsObject[(immediateParent?.id)] = immediateParent;
+    const newObj = rollUp(Object.entries(parentsAsObject));
+    return insertIntoTopLevelList(newObj, topLevelList);
+  };
+
+  const reorder = () => {
+    if (!dropZone || dropZone?.id === dragged?.item?.id) return;
+    // Dragged item has been removed, top level list is modified, and ready for insertion
+    const listAfterDraggedIsRemoved = removeDraggedItem(dragged, [...menuItems]);
+    const listAfterDragInsertion = dragIntoNewPosition(dropZone, listAfterDraggedIsRemoved);
+    setStateAndExport(listAfterDragInsertion, trackEdited);
+  };
 
   const updateForm = (key, value, reset = false) => {
     if (reset) return setForm({});
@@ -186,14 +306,21 @@ function CustomNavigationConfiguration() {
     }
     return acc;
   };
-  const addToTopLevelMenu = (obj, changeTree = null) => {
-    const ind = menuItems.findIndex((m) => m?.id === obj?.id);
-    const copied = [...menuItems];
-    if (ind === -1) copied.push(obj);
-    else copied[ind] = obj;
-    setMenu(copied);
-    const profileList = recreateProfileFromList(copied);
+  const insertIntoTopLevelList = (obj, array) => {
+    array = [...array];
+    const ind = array.findIndex((m) => m?.id === obj?.id);
+    if (ind === -1) array.push(obj);
+    else array[ind] = obj;
+    return array;
+  };
+  const setStateAndExport = (newState, changeTree = null) => {
+    setMenu(newState);
+    const profileList = recreateProfileFromList(newState);
     keepInRedux(profileList, { changeTree });
+  };
+  const addToTopLevelMenu = (obj, changeTree = null) => {
+    const copied = insertIntoTopLevelList(obj, menuItems);
+    setStateAndExport(copied, changeTree);
   };
 
   const removeItem = (itemObj, parents, options = {}) => {
@@ -248,19 +375,28 @@ function CustomNavigationConfiguration() {
     });
   };
 
+  const combineKeysWithDelimiter = (keys, delimiter = ":") => keys.join(delimiter);
   const renderMenuItems = (items, margin = 0, parents = {}, options = {}) => {
     if (!items?.length) return [];
-    // items = items.sort((a, b) => a?.order - b?.order); //If you want to sort the items by order, uncomment this line
     return items.map(({ children, ...rest }, index) => {
       const { parentTraits } = options || {};
       const editTrail = trackEdited[(rest?.id)];
       let activity = editTrail ? ACTIVITIES[(editTrail?.activity)] : null;
       const isRemoved = activity?.key === ACTIVITIES.remove.key;
+      const isBeingDragged = dragged?.item?.id === rest?.id;
+
+      const parentKeys = combineKeysWithDelimiter(Object.keys(parents));
+      const isFirstItem = index === 0;
 
       return (
-        <div key={index} style={{ marginLeft: margin, position: "relative" }}>
+        <div key={index} style={{ marginLeft: margin, position: "relative", opacity: isBeingDragged ? 0.4 : 1 }}>
           {margin ? <LComponent /> : <></>}
           <OneMenuItem
+            community={community}
+            dragged={dragged}
+            dropZone={dropZone}
+            setBeingDragged={setBeingDragged}
+            parentKeys={parentKeys}
             item={rest}
             children={children}
             // remove={toggleModal}
@@ -275,7 +411,8 @@ function CustomNavigationConfiguration() {
             editTrail={editTrail}
             activity={activity}
             parentTraits={parentTraits || {}}
-            isTheFirstItem={index === 0}
+            // isTheFirstItem={index === 0}
+            isTheFirstItem={isFirstItem}
             isTheLastItem={index === items?.length - 1}
             index={index}
             moveUp={(up) => moveUp(up, { ...rest, children }, parents, { index, sibblings: items })}
@@ -425,7 +562,29 @@ function CustomNavigationConfiguration() {
             background: "#fafafa"
           }}
         >
-          <div>{renderMenuItems(menuItems)}</div>
+          <div>
+            {dragged !== null && (
+              <div
+                style={{
+                  left: `${mouse[0] - 10}px`,
+                  top: `${mouse[1] - 20}px`,
+                  cursor: "grabbing",
+                  padding: "10px 20px",
+                  fontWeight: "bold",
+                  minWidth: 450
+                }}
+                className="drag-float"
+              >
+                <i
+                  className=" fa fa-grip-horizontal"
+                  style={{ color: "#e3e3e3", marginRight: 10, fontSize: 20, cursor: "grab" }}
+                />
+                {dragged?.item?.name}
+              </div>
+            )}
+
+            {renderMenuItems(menuItems)}
+          </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
             <div style={{ height: 40, border: "dashed 0px #eeeeee", borderLeftWidth: 2 }} />
             <Button color="secondary" variant="contained" onClick={() => addNew()}>
@@ -478,9 +637,18 @@ const OneMenuItem = ({
   parentTraits,
   isTheFirstItem,
   isTheLastItem,
-  moveUp
+  moveUp,
+  setBeingDragged,
+  index,
+  dropZone,
+  dragged,
+  parentKeys,
+  community
 }) => {
   const { name, link, id, is_link_external, is_published } = item || {};
+
+  // const parentKeys = combineKeysWithDelimiter(Object.keys(parents));
+  const uniqueId = `${parentKeys}->${index}`;
 
   const parentIsNotLive = !parentTraits?.isPublished;
   const isChild = parentTraits?.isChild;
@@ -509,6 +677,10 @@ const OneMenuItem = ({
   const isRemoved = parentTraits?.isRemoved || activity?.key === ACTIVITIES.remove.key;
   const editItem = () =>
     addOrEdit({ ...item, children }, parents, { context: ACTIVITIES.edit.key, children, isEdit: true });
+  const createNewSubItem = () =>
+    addOrEdit({ id: new Date().getTime()?.toString(), is_published: true }, parentsForNewItem, {
+      context: ACTIVITIES.add.key
+    });
 
   const itemIsLive = () => {
     if (isChild) return !parentIsNotLive && is_published;
@@ -516,144 +688,243 @@ const OneMenuItem = ({
   };
 
   const disabledBecauseOfParent = parentIsNotLive && is_published;
+  const notInTheSamePosition = dropZone?.id !== dragged?.item?.id;
+
+  const renderLiveVisuals = () => {
+    return (
+      <Tooltip
+        title={
+          itemIsLive()
+            ? // ? `Live ${mother_is_not_live ? "but parent item is not live" : ""}`
+              `Live`
+            : disabledBecauseOfParent
+            ? `Not live because parent is disabled`
+            : `Not Live, all sub items will also not show `
+        }
+      >
+        <i
+          onClick={() => editItem()}
+          className={`fa fa-eye${itemIsLive() ? "" : "-slash"} touchable-opacity`}
+          style={{ marginRight: 20, color: itemIsLive() ? "var(--app-purple)" : "grey", fontSize: 20 }}
+        />
+      </Tooltip>
+    );
+  };
+  const dropdownItems = [
+    { key: "edit", label: "Edit", icon: "fa-edit", color: "rgb(117 154 210)", onClick: editItem },
+    { key: "add", label: "Add Child Item", icon: "fa-plus", color: "rgb(104 180 95)", onClick: createNewSubItem },
+    { key: "remove", label: "Remove", icon: "fa-trash", color: "rgb(227 151 151)", onClick: removeMenuItem }
+  ];
 
   return (
-    <div
-      className=" elevate-float"
-      style={{
-        padding: "10px 20px",
-        display: "inline-flex",
-        flexDirection: "row",
-        alignItems: "center",
-        width: "100%",
-        minWidth: 450,
-        borderRadius: 3,
-        marginTop: 10,
-        background: getBackColor(),
-        textDecoration: isRemoved ? "line-through" : "none"
-      }}
-    >
-      <Typography
-        variant="body"
+    <>
+      {isTheFirstItem && notInTheSamePosition && (
+        <div
+          // style={{ marginBottom: 10 }}
+          className={`nav-drop-zone ${
+            !dragged || dropZone?.uniqueId !== `${uniqueId}->up` ? "nav-hidden" : "closest-dropzone"
+          }`}
+          // className={`nav-drop-zone ${!dragged ? "nav-hidden" : isCloseToUpZone ? "closest-dropzone" : ""}`}
+          data-parent-ids={parentKeys}
+          data-index={index}
+          data-position="up"
+        />
+      )}
+      <div
+        className=" elevate-float"
         style={{
-          margin: 0,
-          fontWeight: "bold",
-
-          display: "flex",
+          padding: "10px 20px",
+          display: "inline-flex",
           flexDirection: "row",
-          alignItems: "center"
+          alignItems: "center",
+          width: "100%",
+          minWidth: 450,
+          borderRadius: 3,
+          // marginTop: !dragged ? 10 : 0,
+          marginTop: 10,
+          background: getBackColor(),
+          textDecoration: isRemoved ? "line-through" : "none"
         }}
       >
-        {!isTheFirstItem && (
-          <Tooltip title={`Move up`}>
-            <i
-              onClick={() => moveUp(true)}
-              className=" fa fa-long-arrow-up touchable-opacity"
-              style={{ color: "var(--app-cyan)", marginRight: 10, fontSize: 20 }}
-            />
-          </Tooltip>
-        )}
-        {!isTheLastItem && (
-          <Tooltip onClick={() => moveUp(false)} title={`Move down`}>
-            <i
-              className=" fa fa-long-arrow-down touchable-opacity"
-              style={{ color: "var(--app-purple)", marginRight: 10, fontSize: 20 }}
-            />
-          </Tooltip>
-        )}
-        <Tooltip title={activity ? activity?.description : ""}>
-          <b>{name}</b>
-        </Tooltip>
-        {is_link_external && !hasChildren && (
-          <span
-            style={{
-              fontWeight: "bold",
-              border: "solid 1px var(--app-purple)",
-              padding: "0px 5px",
-              marginLeft: 10,
-              fontSize: 10,
-              color: "var(--app-purple)",
-              borderRadius: 2
-            }}
-          >
-            <Tooltip title={`This is an external link`}>
-              <b>EXT</b>
-            </Tooltip>
-          </span>
-        )}
-        {!children?.length && link && (
-          <a
-            onClick={(e) => {
-              e.preventDefault();
-              if (is_link_external) return window.open(link, "_blank");
-            }}
-            // href={link}
-            target="_blank"
-          >
-            <span
-              className="touchable-opacity"
-              style={{
-                opacity: 0.5,
-                marginLeft: 15,
-                textDecoration: "underline",
-                fontWeight: "bold",
-                color: "grey",
-                marginRight: 10
-              }}
-            >
-              {smartString(link, 40)}
-
-              {is_link_external && <i className="fa fa-external-link" style={{ margin: "0px 8px" }} />}
-            </span>
-          </a>
-        )}
-      </Typography>
-      {!isRemoved && (
-        <div style={{ marginLeft: "auto" }}>
-          <Tooltip
-            title={
-              itemIsLive()
-                ? // ? `Live ${mother_is_not_live ? "but parent item is not live" : ""}`
-                  `Live`
-                : disabledBecauseOfParent
-                ? `Not live because parent is disabled`
-                : `Not Live, all sub items will also not show `
+        <Typography
+          variant="body"
+          style={{
+            margin: 0,
+            fontWeight: "bold",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center"
+          }}
+        >
+          <Feature
+            name={FLAGS.DRAGGABLE_NAVIGATION_ITEMS}
+            community={community}
+            fallback={
+              <>
+                {!isTheFirstItem && (
+                  <Tooltip title={`Move up`}>
+                    <i
+                      onClick={() => moveUp(true)}
+                      className=" fa fa-long-arrow-up touchable-opacity"
+                      style={{ color: "var(--app-cyan)", marginRight: 10, fontSize: 20 }}
+                    />
+                  </Tooltip>
+                )}
+                {!isTheLastItem && (
+                  <Tooltip onClick={() => moveUp(false)} title={`Move down`}>
+                    <i
+                      className=" fa fa-long-arrow-down touchable-opacity"
+                      style={{ color: "var(--app-purple)", marginRight: 10, fontSize: 20 }}
+                    />
+                  </Tooltip>
+                )}
+              </>
             }
           >
-            <i
-              onClick={() => editItem()}
-              className={`fa fa-eye${itemIsLive() ? "" : "-slash"} touchable-opacity`}
-              style={{ marginRight: 20, color: itemIsLive() ? "var(--app-purple)" : "grey", fontSize: 20 }}
-            />
+            <Tooltip
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setBeingDragged({ item: { ...item, children }, parents, index });
+              }}
+              title={`Drag & Reorder`}
+            >
+              <i
+                className=" fa fa-grip-horizontal"
+                style={{ color: "#e3e3e3", marginRight: 10, fontSize: 20, cursor: "grab" }}
+              />
+            </Tooltip>
+          </Feature>
+
+          <Tooltip title={activity ? activity?.description : ""}>
+            <b>{name}</b>
           </Tooltip>
-          <Tooltip title={`New: Add a sub-menu item to "${name}"`}>
-            <i
-              onClick={() =>
-                addOrEdit({ id: new Date().getTime()?.toString(), is_published: true }, parentsForNewItem, {
-                  context: ACTIVITIES.add.key
-                })
-              }
-              className=" fa fa-plus touchable-opacity"
-              style={{ marginRight: 20, color: "green", fontSize: 20 }}
+          {is_link_external && !hasChildren && (
+            <span
+              style={{
+                fontWeight: "bold",
+                border: "solid 1px var(--app-purple)",
+                padding: "0px 5px",
+                marginLeft: 10,
+                fontSize: 10,
+                color: "var(--app-purple)",
+                borderRadius: 2
+              }}
+            >
+              <Tooltip title={`This is an external link`}>
+                <b>EXT</b>
+              </Tooltip>
+            </span>
+          )}
+          {!children?.length && link && (
+            <a
+              onClick={(e) => {
+                e.preventDefault();
+                if (is_link_external) return window.open(link, "_blank");
+              }}
+              // href={link}
+              target="_blank"
+            >
+              <span
+                className="touchable-opacity"
+                style={{
+                  opacity: 0.5,
+                  marginLeft: 15,
+                  textDecoration: "underline",
+                  fontWeight: "bold",
+                  color: "grey",
+                  marginRight: 10
+                }}
+              >
+                {smartString(link, 40)}
+
+                {is_link_external && <i className="fa fa-external-link" style={{ margin: "0px 8px" }} />}
+              </span>
+            </a>
+          )}
+        </Typography>
+
+        <Feature
+          name={FLAGS.DROPDOWN_VIEW_FOR_NAV_CONTROL}
+          community={community}
+          fallback={
+            !isRemoved && (
+              <div style={{ marginLeft: "auto" }}>
+                {renderLiveVisuals()}
+                <Tooltip title={`New: Add a sub-menu item to "${name}"`}>
+                  <i
+                    onClick={() => createNewSubItem()}
+                    className=" fa fa-plus touchable-opacity"
+                    style={{ marginRight: 20, color: "green", fontSize: 20 }}
+                  />
+                </Tooltip>
+                <Tooltip title={`Edit: Make changes to "${name}"`}>
+                  <i
+                    onClick={() => editItem()}
+                    className=" fa fa-edit touchable-opacity"
+                    style={{ fontSize: 20, color: "var(--app-cyan)" }}
+                  />
+                </Tooltip>
+                <span style={{ margin: "0px 8px", fontSize: 20, color: "#ededed" }}>|</span>
+                <Tooltip title={`Remove "${name}"`}>
+                  <i
+                    onClick={() => removeMenuItem()}
+                    className=" fa fa-trash touchable-opacity"
+                    style={{ color: "#e87070", marginRight: 10, fontSize: 20 }}
+                  />
+                </Tooltip>
+              </div>
+            )
+          }
+        >
+          <div style={{ marginLeft: "auto" }}>
+            {renderLiveVisuals()}
+            <MEDropdown
+              fullControl
+              renderChild={(child, index) => (
+                <p
+                  className="drop-pro-child"
+                  key={index?.toString()}
+                  onClick={() => child?.onClick()}
+                  style={{
+                    padding: "5px 15px",
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    fontSize: 14,
+                    fontWeight: "bold",
+                    margin: 0
+                  }}
+                >
+                  <i
+                    className={`fa ${child?.icon}`}
+                    style={{ fontSize: 13, marginRight: 5, color: child?.color || "#cccccc" }}
+                  />
+                  {child?.label}
+                </p>
+              )}
+              labelExtractor={(item) => item.label}
+              valueExtractor={(item) => item.key}
+              data={dropdownItems}
+              noCaret
+              onHeaderRender={() => {
+                return <i className="fa fa-ellipsis-v" style={{ fontSize: 16, color: "grey" }} />;
+              }}
             />
-          </Tooltip>
-          <Tooltip title={`Edit: Make changes to "${name}"`}>
-            <i
-              onClick={() => editItem()}
-              className=" fa fa-edit touchable-opacity"
-              style={{ fontSize: 20, color: "var(--app-cyan)" }}
-            />
-          </Tooltip>
-          <span style={{ margin: "0px 8px", fontSize: 20, color: "#ededed" }}>|</span>
-          <Tooltip title={`Remove "${name}"`}>
-            <i
-              onClick={() => removeMenuItem()}
-              className=" fa fa-trash touchable-opacity"
-              style={{ color: "#e87070", marginRight: 10, fontSize: 20 }}
-            />
-          </Tooltip>
-        </div>
+          </div>
+        </Feature>
+      </div>
+
+      {notInTheSamePosition && (
+        <div
+          className={`nav-drop-zone ${
+            !dragged || dropZone?.uniqueId !== `${uniqueId}->down` ? "nav-hidden" : "closest-dropzone"
+          }`}
+          data-parent-ids={parentKeys}
+          data-index={index}
+          data-position="down"
+          data-id={id}
+        />
       )}
-    </div>
+    </>
   );
 };
