@@ -417,15 +417,6 @@ function CustomNavigationConfiguration() {
             index={index}
             moveUp={(up) => moveUp(up, { ...rest, children }, parents, { index, sibblings: items })}
           />
-          {/* <div
-            // style={{ marginBottom: 10 }}
-            className={`nav-drop-zone ${
-              !dragged || dropZone?.uniqueId !== `${parentKeys}->${index}->up` ? "nav-hidden" : ""
-            }`}
-            data-parent-ids={parentKeys}
-            data-index={index}
-            data-position="up"
-          /> */}
           {/* -- I'm spreading "children" here to make sure that we create a copy of the children. We want to make sure we control when the changes show up for the user */}
           {children &&
             renderMenuItems(
@@ -591,12 +582,6 @@ function CustomNavigationConfiguration() {
                 {dragged?.item?.name}
               </div>
             )}
-            {/* <div
-              // className={`nav-drop-zone ${!dragged || dropZone?.uniqueId !== "->topmost" ? "nav-hidden" : ""}`}
-              className={`nav-drop-zone ${!dragged ? "nav-hidden" : ""}`}
-              data-parent-ids={""}
-              data-index={"topmost"}
-            /> */}
 
             {renderMenuItems(menuItems)}
           </div>
@@ -730,12 +715,6 @@ const OneMenuItem = ({
     { key: "add", label: "Add Child Item", icon: "fa-plus", color: "rgb(104 180 95)", onClick: createNewSubItem },
     { key: "remove", label: "Remove", icon: "fa-trash", color: "rgb(227 151 151)", onClick: removeMenuItem }
   ];
-
-  // const dropdownItems = [
-  //   { key: "edit", label: "Edit", icon: "fa-edit", color: "rgb(117 154 210)", onClick: editItem },
-  //   { key: "add", label: "Add Child Item", icon: "fa-plus", color: "rgb(104 180 95)", onClick: createNewSubItem },
-  //   { key: "remove", label: "Remove", icon: "fa-trash", color: "rgb(227 151 151)", onClick: removeMenuItem }
-  // ];
 
   return (
     <>
@@ -873,11 +852,6 @@ const OneMenuItem = ({
                 {renderLiveVisuals()}
                 <Tooltip title={`New: Add a sub-menu item to "${name}"`}>
                   <i
-                    // onClick={() =>
-                    //   addOrEdit({ id: new Date().getTime()?.toString(), is_published: true }, parentsForNewItem, {
-                    //     context: ACTIVITIES.add.key
-                    //   })
-                    // }
                     onClick={() => createNewSubItem()}
                     className=" fa fa-plus touchable-opacity"
                     style={{ marginRight: 20, color: "green", fontSize: 20 }}
