@@ -8,6 +8,12 @@ export const CustomNavigationConfiguration = loadable(
     fallback: <Loading />,
   }
 );
+export const ConfigureTranslationLanguages = loadable(
+  () => import("./MassEnergizeSuperAdmin/Pages/TranslationLanguagesPerCommunity"),
+  {
+    fallback: <Loading />,
+  }
+);
 
 export const NudgeControlPage = loadable(
   () => import("./MassEnergizeSuperAdmin/Pages/NudgeControlPage"),
