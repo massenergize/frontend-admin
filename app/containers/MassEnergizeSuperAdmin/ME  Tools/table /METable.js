@@ -249,7 +249,7 @@ function METable(props) {
     searchText: search || "",
     searchOpen: search ? true : false,
     onChangeRowsPerPage: whenRowsPerPageChanges,
-    rowsPerPage: rowsPerPage || tableProps.options.rowsPerPage,
+    rowsPerPage: rowsPerPage || tableProps.options?.rowsPerPage,
     onColumnSortChange: whenAdminSortsAColumn,
   };
 
