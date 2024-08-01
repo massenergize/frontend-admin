@@ -59,6 +59,7 @@ function TinyMassEnergizeEditor(props) {
           force_p_newlines: false,
           forced_root_block: "", // Needed for 3.x
           ...config,
+          placeholder: "Enter text here ....",
         }}
         apiKey={TINY_MCE_API_KEY}
       />
