@@ -24,12 +24,12 @@ import ScheduleMessageModal from './ScheduleMessageModal';
 import { apiCall } from '../../../utils/messenger';
 import {
   ACTIONS,
-  AUDIENCE,
+  SUPER_ADMIN_AUDIENCE,
   AUDIENCES_CONFIG,
   COMMUNITY_ADMIN,
   COMMUNITY_CONTACTS,
   LOADING,
-  SUPER_ADMIN, USERS
+  SUPER_ADMIN, USERS, COMMUNITY_ADMIN_AUDIENCE
 } from '../../../utils/constants';
 import {
   cacheMessageInfoAction,
@@ -60,6 +60,8 @@ function SendMessage({
   const [loading, setLoading] = React.useState(false);
   const [allUsers, setAllUsers] = React.useState([]);
   const [message, setMessage] = React.useState({});
+
+  const AUDIENCE = !auth?.is_super_admin ? COMMUNITY_ADMIN_AUDIENCE : SUPER_ADMIN_AUDIENCE;
 
   const UrlParams = useParams();
   
@@ -380,145 +382,123 @@ function SendMessage({
     >
       <Seo name="Send Message" />
       <>
-        {auth?.is_super_admin ? (
-          <>
-            <FormLabel component="label">Audience Category</FormLabel>
-            <RadioGroup
-              style={{
-                display: 'flex',
-                flexDirection: 'row'
-              }}
-              value={currentFilter}
-              onChange={(ev) => {
-                const { value } = ev.target;
-                buildQuery('audience_type', value);
-                setCurrentFilter(value);
-              }}
-            >
-              {AUDIENCE.map((option) => (
-                <div key={option.key} style={{ display: 'block' }}>
-                  <FormControlLabel
-                    name={option.key}
-                    value={option.id}
-                    control={<Radio />}
-                    label={
-                      <Typography
-                        variant="body2"
-                        style={{
-                          fontSize: '0.8rem',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        <Tooltip
-                          title={'Filter by ' + option.value}
-                          placement="top"
-                          style={{ fontWeight: 'bold' }}
-                        >
-                          {option.value}
-                        </Tooltip>
-                      </Typography>
-                    }
-                  />
-                </div>
-              ))}
-            </RadioGroup>
-            <div style={{ marginTop: 10, marginBottom: 10 }}>
-              {renderSubAudience() }
-            </div>
-          </>
-
-        ) : (
-          <>
-            <div style={{ marginBottom: 20 }}>
-              {/* <FormLabel component="label">{"Select Community "}</FormLabel> */}
-              <MEDropdown
-                onItemSelected={(items) => setSelectedCommunities(items)}
-                defaultValue={selectedCommunities || []}
-                smartDropdown={false}
-                labelExtractor={(item) => item?.name}
-                valueExtractor={(item) => item}
-                data={props.communities}
-                placeholder="Choose the community from which you want this message to originate"
-                sx={{ height: 56 }}
+        <FormLabel component="label">Audience Category</FormLabel>
+        <RadioGroup
+          style={{
+            display: 'flex',
+            flexDirection: 'row'
+          }}
+          value={currentFilter}
+          onChange={(ev) => {
+            const { value } = ev.target;
+            buildQuery('audience_type', value);
+            setCurrentFilter(value);
+          }}
+        >
+          {AUDIENCE.map((option) => (
+            <div key={option.key} style={{ display: 'block' }}>
+              <FormControlLabel
+                name={option.key}
+                value={option.id}
+                control={<Radio />}
+                label={
+                  <Typography
+                    variant="body2"
+                    style={{
+                      fontSize: '0.8rem',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    <Tooltip
+                      title={'Filter by ' + option.value}
+                      placement="top"
+                      style={{ fontWeight: 'bold' }}
+                    >
+                      {option.value}
+                    </Tooltip>
+                  </Typography>
+                }
               />
             </div>
-            {renderAudienceForm()}
-          </>
-        )}
-
-        <div style={{ marginTop: 20 }}>
-          <FormLabel component="label">Message Subject</FormLabel>
-          <TextField
-            fullWidth
-            label=""
-            value={getValue('subject', '')}
-            id="fullWidth"
-            onChange={(e) => buildQuery('subject', e.target.value)}
-          />
+          ))}
+        </RadioGroup>
+        <div style={{ marginTop: 10, marginBottom: 10 }}>
+          {renderSubAudience() }
         </div>
-        <div style={{ marginTop: 20 }}>
-          <FormLabel component="label">Message Body</FormLabel>
-          <TinyEditor
-            id="message"
-            value={getValue("message", "")}
-            onEditorChange={(content) => {
-              buildQuery("message", content);
-            }}
-            toolbar="undo redo | blocks | formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent | fontfamily | fontsize |"
-            plugins="advlist autolink lists link image charmap print preview anchor forecolor"
-            init={{
-              height: 350,
-              menubar: false,
-              default_link_target: "_blank",
-              forced_root_blocks: true,
-              forced_root_block: false,
-            }}
-            apiKey={TINY_MCE_API_KEY}
-          />
-        </div>
+      </>
 
-        <>
-          {!loading && (
-            <div
-              style={{
-                marginTop: 20,
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <div>
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={() => {
-                    props.history.push("/admin/scheduled/messages");
-                  }}
-                >
+      <div style={{ marginTop: 20 }}>
+        <FormLabel component="label">Message Subject</FormLabel>
+        <TextField
+          fullWidth
+          label=""
+          value={getValue('subject', '')}
+          id="fullWidth"
+          onChange={(e) => buildQuery('subject', e.target.value)}
+        />
+      </div>
+      <div style={{ marginTop: 20 }}>
+        <FormLabel component="label">Message Body</FormLabel>
+        <TinyEditor
+          id="message"
+          value={getValue("message", "")}
+          onEditorChange={(content) => {
+            buildQuery("message", content);
+          }}
+          toolbar="undo redo | blocks | formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | image | bullist numlist outdent indent | fontfamily | fontsize |"
+          plugins="advlist autolink lists link image charmap print preview anchor forecolor"
+          init={{
+            height: 350,
+            menubar: false,
+            default_link_target: "_blank",
+            forced_root_blocks: true,
+            forced_root_block: false,
+          }}
+          apiKey={TINY_MCE_API_KEY}
+        />
+      </div>
+
+      <>
+        {!loading && (
+          <div
+            style={{
+              marginTop: 20,
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <div>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => {
+                  props.history.push("/admin/scheduled/messages");
+                }}
+              >
                   Cancel
-                </Button>
-              </div>
-              <div>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => {
-                    onFormSubmit();
-                  }}
-                >
-                  Send Now
-                </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => setOpen(true)}
-                  sx={{ marginLeft: 2 }}
-                >
-                  Schedule
-                </Button>
-              </div>
+              </Button>
             </div>
-          )}
-        </>
+            <div>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  onFormSubmit();
+                }}
+              >
+                  Send Now
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => setOpen(true)}
+                sx={{ marginLeft: 2 }}
+              >
+                  Schedule
+              </Button>
+            </div>
+          </div>
+        )}
       </>
       <ScheduleMessageModal
         open={open}
