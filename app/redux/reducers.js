@@ -72,7 +72,9 @@ import app, {
   saveCommunityFeatureFlagsReducer,
   saveNavigationConfigurationReducer,
   reducerForSavingInternalLinksList,
-  reducerForCCActionData
+  reducerForCCActionData,
+  reducerForLoadingOfferedLanguages,
+  reducerForLoadingLanguageSet
 } from "./modules/appReducer";
 
 /**
@@ -149,7 +151,9 @@ export default function createReducer(injectedReducers = {}) {
     featureActivationsForCommunities: reducerForCommunityFeatureActivation,
     communityFeatureFlags: saveCommunityFeatureFlagsReducer,
     menuConfigurations: saveNavigationConfigurationReducer,
-    internalLinks: reducerForSavingInternalLinksList
+    internalLinks: reducerForSavingInternalLinksList,
+    offeredLanguages: reducerForLoadingOfferedLanguages,
+    languageSet: reducerForLoadingLanguageSet
   });
 
   // Wrap the root reducer and return a new root reducer with router state

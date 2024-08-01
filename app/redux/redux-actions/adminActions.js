@@ -63,6 +63,8 @@ import {
   KEEP_LIST_OF_NAVIGATION_CONFIGURATION,
   SAVE_INTERNAL_MENU_LINK,
   LOAD_CC_ACTIONS_DATA,
+  LOAD_LANGUAGE_SET,
+  LOAD_OFFERED_LANGUAGES,
 } from '../ReduxConstants';
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -187,6 +189,12 @@ export const setupSocketConnectionWithBackend = (auth) => (
   connectSocket();
 };
 
+export const reduxLoadLanguageSet = (data) => {
+  return { type: LOAD_LANGUAGE_SET, payload: data };
+};
+export const reduxLoadOfferedLanguages = (data) => {
+  return { type: LOAD_OFFERED_LANGUAGES, payload: data };
+};
 export const reduxAddInternalLinkList = (data) => {
   return { type: SAVE_INTERNAL_MENU_LINK, payload: data };
 };

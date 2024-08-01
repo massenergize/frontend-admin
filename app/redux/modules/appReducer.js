@@ -60,17 +60,20 @@ import {
   LOAD_SCHEDULED_MESSAGES,
   ADD_BLOB_STRING,
   KEEP_COMMUNITY_NUDGE_SETTINGS,
-  KEEP_FEATURE_ACTIVATIONS_FOR_COMMUNITY, SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX,
+  KEEP_FEATURE_ACTIVATIONS_FOR_COMMUNITY,
+  SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX,
   KEEP_LIST_OF_NAVIGATION_CONFIGURATION,
   SAVE_INTERNAL_MENU_LINK,
   LOAD_CC_ACTIONS_DATA,
-} from '../ReduxConstants';
+  LOAD_OFFERED_LANGUAGES,
+  LOAD_LANGUAGE_SET
+} from "../ReduxConstants";
 import { parseJSON } from "../../utils/common";
-
+import { LANGUAGES } from "../../containers/App/internationalization/language-set";
 
 const initialState = Map({
   constants: {},
-  profile: null,
+  profile: null
 });
 
 const initialImmutableState = fromJS(initialState);
@@ -94,6 +97,22 @@ export default function reducer(state = initialImmutableState, action = {}) {
   }
 }
 
+export const reducerForLoadingOfferedLanguages = (state = null, action = {}) => {
+  switch (action.type) {
+    case LOAD_OFFERED_LANGUAGES:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForLoadingLanguageSet = (state = LANGUAGES, action = {}) => {
+  switch (action.type) {
+    case LOAD_LANGUAGE_SET:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 export const reducerForAddingBlobString = (state = {}, action = {}) => {
   switch (action.type) {
     case ADD_BLOB_STRING:
@@ -150,10 +169,7 @@ export const reducerForUserEngagements = (state = LOADING, action = {}) => {
       return state;
   }
 };
-export const reducerForEngagementOptions = (
-  state = { range: ["last-month"] },
-  action = {}
-) => {
+export const reducerForEngagementOptions = (state = { range: ["last-month"] }, action = {}) => {
   switch (action.type) {
     case SET_ENGAGMENT_OPTIONS:
       return action.payload;
@@ -606,5 +622,5 @@ export const reducerForSavingInternalLinksList = (state = [], action = {}) => {
 };
 
 export const allReducers = {
-  communities: communitiesReducer,
+  communities: communitiesReducer
 };
