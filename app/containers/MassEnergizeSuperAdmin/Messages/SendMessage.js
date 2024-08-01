@@ -22,7 +22,15 @@ import TinyEditor from '../_FormGenerator/TinyMassEnergizeEditor';
 import LightAutoComplete from '../Gallery/tools/LightAutoComplete';
 import ScheduleMessageModal from './ScheduleMessageModal';
 import { apiCall } from '../../../utils/messenger';
-import { AUDIENCES_CONFIG, LOADING } from '../../../utils/constants';
+import {
+  ACTIONS,
+  AUDIENCE,
+  AUDIENCES_CONFIG,
+  COMMUNITY_ADMIN,
+  COMMUNITY_CONTACTS,
+  LOADING,
+  SUPER_ADMIN, USERS
+} from '../../../utils/constants';
 import {
   cacheMessageInfoAction,
   reduxLoadMetaDataAction,
@@ -39,26 +47,6 @@ const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
  * whenever audience type changes reset audience
  */
 
-const SUPER_ADMIN = "SUPER_ADMIN";
-const COMMUNITY_CONTACTS = "COMMUNITY_CONTACTS";
-const COMMUNITY_ADMIN = "COMMUNITY_ADMIN";
-const USERS = "USERS";
-
-const AUDIENCE_TYPE = [
-  { id: SUPER_ADMIN, value: "Super Admins" },
-  { id: COMMUNITY_CONTACTS, value: "Community Contacts" },
-  { id: COMMUNITY_ADMIN, value: "Community Admins" },
-  { id: USERS, value: "Users" },
-];
-
-const getAudienceType = (id) => AUDIENCE_TYPE?.find((a) => a?.id === id)?.value;
-
-const args = {
-  limit: 5,
-  params: JSON.stringify({
-    membership: ["Super Admin"]
-  })
-};
 
 function SendMessage({
   classes, meta, auth, ...props 
@@ -68,22 +56,28 @@ function SendMessage({
   const [open, setOpen] = React.useState(false);
   const [selectedCommunities, setSelectedCommunities] = React.useState([]);
   const [audience, setAudience] = React.useState([]);
-  const [sub_audience_type, setSubAudienceType] = React.useState("FROM_COMMUNITY");
+  const [sub_audience_type, setSubAudienceType] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [allUsers, setAllUsers] = React.useState([]);
   const [message, setMessage] = React.useState({});
 
   const UrlParams = useParams();
-
-  const SUB_AUDIENCE_TYPE = [
-    { id: "FROM_COMMUNITY", value: "From Community" },
-    { id: "SPECIFIC", value: `Specific ${getAudienceType(currentFilter)}`, },
-  ];
+  
 
   useEffect(() => {
     setSelectedCommunities([]);
     setAudience([]);
   }, [currentFilter, sub_audience_type]);
+
+
+  useEffect(() => {
+    const sub = AUDIENCE?.find((a) => a.id === currentFilter)?.subType;
+    if (sub) {
+      const defaultSubType = sub?.find((a) => a.default)?.id;
+      setSubAudienceType(defaultSubType);
+    }
+  }, [currentFilter]);
+
 
 
   useEffect(() => {
@@ -94,7 +88,9 @@ function SendMessage({
     const cache = cachedMessageInfo[id];
 
     if (cache) {
-      const { audience_type, sub_audience_type, audience, community_ids } = cache?.schedule_info?.recipients;
+      const {
+        audience_type, sub_audience_type, audience, community_ids 
+      } = cache?.schedule_info?.recipients;
 
       const _audience = audience !== "all" ? audience : [audience];
       setSelectedCommunities(community_ids);
@@ -108,13 +104,13 @@ function SendMessage({
     }
 
     apiCall("/messages.info", { message_id: id }).then((res) => {
-
       if (res?.success) {
-
         saveMessageInfoToCache({ ...cachedMessageInfo, [id]: res?.data });
         setMessage(res?.data);
 
-        const {audience_type, sub_audience_type, audience, community_ids} = res?.data?.schedule_info?.recipients;
+        const {
+          audience_type, sub_audience_type, audience, community_ids 
+        } = res?.data?.schedule_info?.recipients;
 
         const _audience = audience !== "all" ? audience : [audience];
         setSelectedCommunities(community_ids);
@@ -149,19 +145,10 @@ function SendMessage({
         return allUsers?.filter((u) => u.is_super_admin) || [];
       case COMMUNITY_CONTACTS:
         return props.communities;
-          
-      case COMMUNITY_ADMIN:
-        // eslint-disable-next-line no-case-declarations
-        const allCadmin = [];
-        if (selectedCommunities?.length) {
-          return allCadmin?.filter((obj1) => obj1?.communities?.some((name1) => selectedCommunities?.some((obj2) => obj2?.name === name1)));
-        }
-        return allCadmin;
+      case ACTIONS:
+        return props.actionsList?.filter((a) => a?.action_users > 0) || [];
       default:
-        if (selectedCommunities?.length) {
-          return allUsers?.filter((obj1) => obj1?.communities?.some((name1) => selectedCommunities?.some((obj2) => obj2?.name === name1)));
-        }
-        return allUsers?.filter((u) => !u?.is_super_admin || !u?.is_community_admin) || [];
+        return [];
     }
   };
 
@@ -169,6 +156,9 @@ function SendMessage({
   const audienceDisplayName = (item) => {
     if (currentFilter === COMMUNITY_CONTACTS) {
       return `${item?.name}: ${item?.owner_name} (${item?.owner_email})`;
+    }
+    if (currentFilter === ACTIONS) {
+      return `${item?.title} (${item?.community?.name || "N/A"}) - ${item?.action_users} users`;
     }
     return `${item?.full_name}(${item?.email})`;
   };
@@ -218,6 +208,7 @@ function SendMessage({
         } else {
           const filtered = msgs.filter((m) => m.id?.toString() !== UrlParams.id?.toString());
           props.putScheduledMessagesToRedux([res?.data, ...filtered]);
+          props.saveMessageInfoToCache({ ...props.cachedMessageInfo, [UrlParams.id]: null });
         }
         props.history.push(
           data?.schedule
@@ -236,46 +227,60 @@ function SendMessage({
       setOpen(false);
     });
   };
+  
+  const toggleSelectAll = () => {
+    if (currentFilter === ACTIONS) return false;
+    return true;
+  };
 
   const renderSubAudience = () => {
-    if ([COMMUNITY_ADMIN, USERS].includes(currentFilter)) {
-      return (
-        <div>
-          <FormLabel component="label">Filter Down the Audience</FormLabel>
-          <RadioGroup
-            value={sub_audience_type}
-            style={{ display: "flex", flexDirection: "row" }}
-            onChange={(ev) => {
-              const { value } = ev.target;
-              setSubAudienceType(value);
-            }}
-          >
-            {SUB_AUDIENCE_TYPE.map((option) => (
+    const subType = AUDIENCE.find((a) => a.id === currentFilter)?.subType;
+    if (!subType) return renderAudienceForm();
+
+    return (
+      <>
+        <FormLabel component="label">Specific Audience Category</FormLabel>
+        <RadioGroup
+          style={{
+            display: 'flex',
+            flexDirection: 'row'
+          }}
+          value={sub_audience_type}
+          onChange={(ev) => {
+            const { value } = ev.target;
+            setSubAudienceType(value);
+          }}
+        >
+          {subType.map((option) => (
+            <div key={option.id} style={{ display: 'block' }}>
               <FormControlLabel
-                name={option.key}
-                key={option.key}
+                name={option.id}
                 value={option.id}
                 control={<Radio />}
                 label={
                   <Typography
                     variant="body2"
-                    style={{ fontSize: "0.8rem", fontWeight: "bold" }}
+                    style={{
+                      fontSize: '0.8rem',
+                      fontWeight: 'bold'
+                    }}
                   >
                     <Tooltip
-                      title={"Filter by " + option.value}
+                      title={'Filter by ' + option.value}
                       placement="top"
-                      style={{ fontWeight: "bold" }}
+                      style={{ fontWeight: 'bold' }}
                     >
                       {option.value}
                     </Tooltip>
                   </Typography>
                 }
               />
-            ))}
-          </RadioGroup>
-        </div>
-      );
-    }
+            </div>
+          ))}
+        </RadioGroup>
+        {sub_audience_type === "FROM_COMMUNITY" ? renderFromCommunities() : renderAudienceForm()}
+      </>
+    );
   };
 
   const renderFromCommunities = () => (
@@ -290,7 +295,6 @@ function SendMessage({
         valueExtractor={(item) => item?.id}
         endpoint="/communities.listForCommunityAdmin"
         showSelectAll={false}
-        // key={props.communities?.length}
       />
       <div>{renderAudienceForm()}</div>
 
@@ -321,9 +325,10 @@ function SendMessage({
     }
     const data = getAudienceList(currentFilter) || [];
     const params = loadMoreAudienceParams(currentFilter, sub_audience_type);
+    const _audience = AUDIENCE.find((a) => a.id === currentFilter);
     return (
       <>
-        <FormLabel component="label">Audience</FormLabel>
+        <FormLabel component="label">{_audience?.audienceLabelText || "Audience"}</FormLabel>
         <LightAutoComplete
           defaultSelected={audience || []}
           multiple
@@ -338,17 +343,11 @@ function SendMessage({
           endpoint={params.endpoint}
           params={params.params}
           selectAllV2
+          showSelectAll={toggleSelectAll()}
         />
       </>
     );
   };
-
-  const renderAudienceList = () => {
-    if ([SUPER_ADMIN, COMMUNITY_CONTACTS].includes(currentFilter)) return renderAudienceForm();
-    if (sub_audience_type === "SPECIFIC") return renderAudienceForm();
-    if (sub_audience_type === "FROM_COMMUNITY") return renderFromCommunities();
-  };
-
   const toggleFullAudienceListModal = (items, setItems) => {
     const { toggleModal } = props;
     toggleModal({
@@ -383,42 +382,51 @@ function SendMessage({
       <>
         {auth?.is_super_admin ? (
           <>
-            <FormLabel>Audience Type</FormLabel>
+            <FormLabel component="label">Audience Category</FormLabel>
             <RadioGroup
+              style={{
+                display: 'flex',
+                flexDirection: 'row'
+              }}
               value={currentFilter}
-              style={{ display: "flex", flexDirection: "row" }}
               onChange={(ev) => {
                 const { value } = ev.target;
-                buildQuery("audience_type", value);
+                buildQuery('audience_type', value);
                 setCurrentFilter(value);
               }}
             >
-              {AUDIENCE_TYPE.map((option) => (
-                <FormControlLabel
-                  name={option.key}
-                  key={option.key}
-                  value={option.id}
-                  control={<Radio />}
-                  label={
-                    <Typography
-                      variant="body2"
-                      style={{ fontSize: "0.8rem", fontWeight: "bold" }}
-                    >
-                      <Tooltip
-                        title={option.context}
-                        placement="top"
-                        style={{ fontWeight: "bold" }}
+              {AUDIENCE.map((option) => (
+                <div key={option.key} style={{ display: 'block' }}>
+                  <FormControlLabel
+                    name={option.key}
+                    value={option.id}
+                    control={<Radio />}
+                    label={
+                      <Typography
+                        variant="body2"
+                        style={{
+                          fontSize: '0.8rem',
+                          fontWeight: 'bold'
+                        }}
                       >
-                        {option.value}
-                      </Tooltip>
-                    </Typography>
-                  }
-                />
+                        <Tooltip
+                          title={'Filter by ' + option.value}
+                          placement="top"
+                          style={{ fontWeight: 'bold' }}
+                        >
+                          {option.value}
+                        </Tooltip>
+                      </Typography>
+                    }
+                  />
+                </div>
               ))}
             </RadioGroup>
-            {renderSubAudience()}
-            <div>{renderAudienceList()}</div>
+            <div style={{ marginTop: 10, marginBottom: 10 }}>
+              {renderSubAudience() }
+            </div>
           </>
+
         ) : (
           <>
             <div style={{ marginBottom: 20 }}>
@@ -439,16 +447,17 @@ function SendMessage({
         )}
 
         <div style={{ marginTop: 20 }}>
+          <FormLabel component="label">Message Subject</FormLabel>
           <TextField
             fullWidth
-            label="Subject"
-            value={getValue("subject", "")}
+            label=""
+            value={getValue('subject', '')}
             id="fullWidth"
-            onChange={(e) => buildQuery("subject", e.target.value)}
+            onChange={(e) => buildQuery('subject', e.target.value)}
           />
         </div>
         <div style={{ marginTop: 20 }}>
-          <Typography>Body</Typography>
+          <FormLabel component="label">Message Body</FormLabel>
           <TinyEditor
             id="message"
             value={getValue("message", "")}
@@ -526,6 +535,7 @@ const mapStateToProps = (state) => ({
   messages: state.getIn(["scheduledMessages"]),
   meta: state.getIn(["paginationMetaData"]),
   users: state.getIn(["allUsers"]),
+  actionsList: state.getIn(["allActions"]),
   cachedMessageInfo: state.getIn(["messageInfoCache"]),
 });
 const mapDispatchToProps = (dispatch) => bindActionCreators(
