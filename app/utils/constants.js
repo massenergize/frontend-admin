@@ -27,7 +27,7 @@ export const NO_TITLES_FOR_THESE_PAGES = [
 
 export const AUDIENCES_CONFIG = {
   SUPER_ADMIN: {
-    params:{
+    params: {
       membership: ["Super Admin"],
     },
     endpoint: "/users.listForCommunityAdmin",
@@ -37,15 +37,61 @@ export const AUDIENCES_CONFIG = {
     endpoint: "/communities.listForCommunityAdmin",
   },
   COMMUNITY_ADMIN: {
-    params:{
+    params: {
       membership: ["Community Admin"],
     },
     endpoint: "/users.listForCommunityAdmin",
   },
   USERS: {
-    params:{
+    params: {
       membership: ["Member"],
     },
     endpoint: "/users.listForCommunityAdmin",
   },
+  ACTIONS: {
+    params: {
+      live: ["Yes"],
+    },
+    endpoint: "/actions.listForCommunityAdmin",
+  },
 };
+
+export const SUPER_ADMIN = "SUPER_ADMIN";
+export const COMMUNITY_CONTACTS = "COMMUNITY_CONTACTS";
+export const COMMUNITY_ADMIN = "COMMUNITY_ADMIN";
+export const USERS = "USERS";
+export const ACTIONS = "ACTIONS";
+
+
+export const AUDIENCE = [
+  { id: SUPER_ADMIN, value: "Super Admins", subType: null },
+  { id: COMMUNITY_CONTACTS, value: "Community Contacts", subType: null },
+  {
+    id: COMMUNITY_ADMIN,
+    value: "Community Admins",
+    audienceLabelText: "Select Community Admins",
+    subType: [
+      { id: "FROM_COMMUNITY", value: "From Community", default: true },
+      { id: "SPECIFIC", value: "Specific Community Admin", default: false },
+    ]
+  },
+  {
+    id: USERS,
+    value: "Users",
+    audienceLabelText: "Select Users",
+    subType: [
+      { id: "FROM_COMMUNITY", value: "From Community", default: true },
+      { id: "SPECIFIC", value: "Specific Users", default: false },
+    ]
+  },
+  {
+    id: ACTIONS,
+    value: "Actions",
+    audienceLabelText: "Select Action(s)",
+    subType: [
+      { id: "COMPLETED", value: "Marked As Completed", default: true },
+      { id: "TODO", value: "Marked As Todo", default: false },
+      { id: "BOTH", value: "Both Done & Todo", default: false },
+    ]
+  }
+];
