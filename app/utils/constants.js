@@ -120,7 +120,7 @@ export const COMMUNITY_ADMIN_AUDIENCE = [
     value: "Actions",
     audienceLabelText: "Select Action(s)",
     subType: [
-      { id: "COMPLETED", value: "Marked As Completed", default: true },
+      { id: "DONE", value: "Marked As Completed", default: true },
       { id: "TODO", value: "Marked As Todo", default: false },
       { id: "BOTH", value: "Both Done & Todo", default: false },
     ]
