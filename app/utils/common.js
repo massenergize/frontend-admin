@@ -8,7 +8,10 @@ import React from "react";
 import { ME_FORM_PROGRESS } from "../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 import { apiCall } from "./messenger";
 
-
+export function isValidURL(url) {
+  const urlPattern = /^https?:\/\/((([a-zA-Z0-9\-_]+)\.)+[a-zA-Z]{2,}|localhost)(:\d{1,5})?(\/[^\s]*)?$/;
+  return urlPattern.test(url);
+}
 export const getHumanFriendlyDateRange = (startDate, endDate) => {
   const start = moment(startDate);
   const end = moment(endDate);
@@ -417,7 +420,9 @@ export const formatWithDelimiter = (dateString, delimiter = "-") => {
   return `${year}${delimiter}${month}${delimiter}${day}`;
 };
 
-
-export function formatWithMoment(momentObject, format='YYYY-MM-DD') {
+export function formatWithMoment(momentObject, format = "YYYY-MM-DD") {
+  if (!momentObject) {
+    momentObject = moment();
+  }
   return momentObject.format(format);
 }
