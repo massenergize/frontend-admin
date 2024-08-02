@@ -595,6 +595,7 @@ export const saveNavigationConfigurationReducer = (state = {}, action = {}) => {
       return state;
   }
 };
+
 export const reducerForSavingInternalLinksList = (state = [], action = {}) => {
   switch (action.type) {
     case SAVE_INTERNAL_MENU_LINK:
@@ -607,3 +608,4 @@ export const reducerForSavingInternalLinksList = (state = [], action = {}) => {
 export const allReducers = {
   communities: communitiesReducer,
 };
+
