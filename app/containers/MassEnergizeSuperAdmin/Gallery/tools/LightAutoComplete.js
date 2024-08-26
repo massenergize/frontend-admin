@@ -72,7 +72,6 @@ function LightAutoComplete(props) {
     containerStyle,
     multiple,
     showSelectAll = true,
-    isAsync,
     endpoint,
     args,
     params,
@@ -134,11 +133,11 @@ function LightAutoComplete(props) {
     if (nothing) {
       setSelected([]);
       transfer([]);
-      // onChange([]);
       return;
     }
     setSelected(["all"]);
     transfer(["all"]);
+    setShowDropdown(false);
   };
 
   const isAll = (item) => {
@@ -204,6 +203,12 @@ function LightAutoComplete(props) {
   const thereAreNoOptionsToDisplay = query ? filteredItems?.length === 0 : optionsToDisplay.length === 0;
   const userHasSelectedStuff = selected.length;
 
+
+  const updateSelectedFromOutside = (newSelected) => {
+    setSelected(newSelected);
+    transfer(newSelected)
+  }
+
   return (
     <div
       style={{
@@ -216,10 +221,10 @@ function LightAutoComplete(props) {
       <div ref={chipWrapperRef}>
         {showHiddenList && selected?.length > (shortenListAfter || 5) ? (
           renderItemsListDisplayName ? (
-            renderItemsListDisplayName(selected, setSelected)
+            renderItemsListDisplayName(selected, updateSelectedFromOutside)
           ) : (
             <span
-              onClick={() => showHiddenList && showHiddenList(selected, setSelected)}
+              onClick={() => showHiddenList && showHiddenList(selected, updateSelectedFromOutside)}
               style={{
                 cursor: "pointer",
                 color: "blue"
