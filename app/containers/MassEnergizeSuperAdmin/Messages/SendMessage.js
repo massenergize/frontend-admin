@@ -29,7 +29,8 @@ import {
   COMMUNITY_ADMIN,
   COMMUNITY_CONTACTS,
   LOADING,
-  SUPER_ADMIN, USERS, COMMUNITY_ADMIN_AUDIENCE
+  // eslint-disable-next-line import/named
+  SUPER_ADMIN, USERS, COMMUNITY_ADMIN_AUDIENCE, FROM_COMMUNITY, ALL
 } from '../../../utils/constants';
 import {
   cacheMessageInfoAction,
@@ -39,7 +40,6 @@ import {
   reduxToggleUniversalToast
 } from '../../../redux/redux-actions/adminActions';
 import FullAudienceList from './FullAudienceList';
-import MEDropdown from '../ME  Tools/dropdown/MEDropdown';
 
 const TINY_MCE_API_KEY = process.env.REACT_APP_TINY_MCE_KEY;
 /**
@@ -94,7 +94,7 @@ function SendMessage({
         audience_type, sub_audience_type, audience, community_ids 
       } = cache?.schedule_info?.recipients;
 
-      const _audience = audience !== "all" ? audience : [audience];
+      const _audience = audience !== ALL ? audience : [audience];
       setSelectedCommunities(community_ids);
       setAudience(_audience);
       setCurrentFilter(audience_type);
@@ -114,7 +114,7 @@ function SendMessage({
           audience_type, sub_audience_type, audience, community_ids 
         } = res?.data?.schedule_info?.recipients;
 
-        const _audience = audience !== "all" ? audience : [audience];
+        const _audience = audience !== ALL ? audience : [audience];
         setSelectedCommunities(community_ids);
         setAudience(_audience);
         setCurrentFilter(audience_type);
@@ -137,7 +137,7 @@ function SendMessage({
 
   const isAll = (item) => {
     if (!item) return false;
-    if (item?.includes("all")) return true;
+    if (item?.includes(ALL)) return true;
     return false;
   };
 
@@ -280,7 +280,7 @@ function SendMessage({
             </div>
           ))}
         </RadioGroup>
-        {sub_audience_type === "FROM_COMMUNITY" ? renderFromCommunities() : renderAudienceForm()}
+        {sub_audience_type === FROM_COMMUNITY ? renderFromCommunities() : renderAudienceForm()}
       </>
     );
   };
@@ -312,7 +312,7 @@ function SendMessage({
 
     if (
       (audienceType === COMMUNITY_ADMIN || audienceType === USERS)
-      && subOrdienceType === "FROM_COMMUNITY"
+      && subOrdienceType === FROM_COMMUNITY
     ) {
       audienceConfig.params.community = selectedCommunities?.map((c) => c.id);
     }
@@ -322,7 +322,7 @@ function SendMessage({
 
   const renderAudienceForm = () => {
     let community = selectedCommunities || [];
-    if (sub_audience_type === "FROM_COMMUNITY" && community?.length > 0) {
+    if (sub_audience_type === FROM_COMMUNITY && community?.length > 0) {
       community = community?.map((c) => c.name);
     }
     const data = getAudienceList(currentFilter) || [];
