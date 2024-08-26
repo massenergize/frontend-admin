@@ -310,6 +310,12 @@ export const AllEvents = loadable(
     fallback: <Loading />,
   }
 );
+export const TestimonialsFromOthers = loadable(
+  () => import("./MassEnergizeSuperAdmin/Testimonials/TestimonialsFromOthers"),
+  {
+    fallback: <Loading />,
+  }
+);
 export const EventsFromOthers = loadable(
   () => import("./MassEnergizeSuperAdmin/Events/OtherEventsWrapper"),
   {
