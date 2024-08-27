@@ -79,6 +79,7 @@ import {
   PlatformFeaturesPage,
   NudgeControlPage,
   CustomNavigationConfiguration,
+  TestimonialsFromOthers,
 } from "../pageListAsync";
 import EditVendor from "../MassEnergizeSuperAdmin/Vendors/EditVendor";
 import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
@@ -423,6 +424,11 @@ class Application extends React.Component {
               component={EventFullView}
             />
             <Route path="/admin/read/events" exact component={AllEvents} />
+            <Route
+              path="/admin/read/testimonials/testimonial-sharing"
+              exact
+              component={TestimonialsFromOthers}
+            />
             <Route
               path="/admin/read/events/event-sharing"
               exact

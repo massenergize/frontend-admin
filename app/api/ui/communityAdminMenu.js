@@ -158,7 +158,7 @@ const CADMIN_MENU = [
       {
         key: "shared-testimonials",
         name: "Shared Testimonials from other Communities",
-        link: "/admin/read/events/event-sharing"
+        link: "/admin/read/testimonials/testimonial-sharing"
       }
     ]
   },
