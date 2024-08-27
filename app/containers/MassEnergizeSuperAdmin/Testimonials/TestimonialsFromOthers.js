@@ -28,10 +28,22 @@ function TestimonialsFromOthers({
 }) {
   const dispatch = useDispatch();
   const listOfCommunities = useSelector((state) => state.getIn(["otherCommunities"]));
+  let categories = useSelector((state) => state.getIn(["allTags"]));
+  let tags = categories
+    ?.map((c) => c.tags)
+    .flat()
+    .sort((a, b) => a?.name?.localeCompare(b?.name));
   const meta = useSelector((state) => state.getIn(["paginationMetaData"]));
+
+  const stories = useSelector((state) => state.getIn(["allTestimonials"]));
+
+  console.log("Testimonials", stories);
+
+  // -----------------------------------------------------------------------------------------
   const [loading, setLoading] = useState(false);
   const { communities, exclude, mounted } = state || {};
 
+  // -----------------------------------------------------------------------------------------
   const setCommunities = (communities) => {
     putStateInRedux({ ...(state || {}), communities });
   };
@@ -44,22 +56,24 @@ function TestimonialsFromOthers({
 
     const fashioned = data?.map((d) => [
       d.id,
-      getHumanFriendlyDate(d.start_date_and_time, true),
-      {
-        id: d.id,
-        image: d.image,
-        initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
-      },
-      smartString(d.name), // limit to first 30 chars
+      smartString(d?.title),
+      // d,
+      // getHumanFriendlyDate(d.start_date_and_time, true),
+      // {
+      //   id: d.id,
+      //   image: d.image,
+      //   initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
+      // },
+      // smartString(d.name), // limit to first 30 chars
       `${smartString(d.tags.map((t) => t.name).join(", "), 30)}`,
-      d.is_global ? "Template" : d.community && d.community.name,
+      // d.is_global ? "Template" : d.community && d.community.name,
       d.id
     ]);
     return fashioned;
   };
 
-  // const data = fashionData(otherEvents || []);
-  const data = [];
+  const data = fashionData(stories || []);
+  // const data = stories;
 
   // useEffect(() => {
   //   if (!mounted) {
@@ -101,52 +115,30 @@ function TestimonialsFromOthers({
         }
       },
       {
-        name: "Date",
-        key: "date",
+        name: "Title",
+        key: "title",
         options: {
           filter: false,
           download: true
         }
       },
       {
-        name: "Event",
-        key: "event",
+        name: "Collections",
+        key: "collections",
         options: {
           sort: false,
           filter: false,
-          download: false,
-          customBodyRender: (d) => (
-            <div>
-              {d.image && <Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} />}
-              {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
-            </div>
-          )
-        }
-      },
-      {
-        name: "Name",
-        key: "name",
-        options: {
-          filter: false
+          download: false
+          // customBodyRender: (d) => (
+          //   <div>
+          //     {d?.tags?.join(",")}
+          //     {/* {d.image && <Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} />}
+          //     {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>} */}
+          //   </div>
+          // )
         }
       },
 
-      {
-        name: "Tags",
-        key: "tags",
-        options: {
-          filter: true,
-          filterType: "multiselect"
-        }
-      },
-      {
-        name: "Community",
-        key: "community",
-        options: {
-          filter: true,
-          filterType: "multiselect"
-        }
-      },
       {
         name: "Full View",
         key: "full-view",
@@ -180,12 +172,12 @@ function TestimonialsFromOthers({
         tableState,
         tableData: data,
         metaData,
-        updateReduxFunction: putOtherEventsInRedux,
-        reduxItems: otherEvents,
+        // updateReduxFunction: putOtherEventsInRedux,
+        reduxItems: data,
         apiUrl: "/events.others.listForCommunityAdmin",
-        pageProp: PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS,
-        updateMetaData: putMetaDataToRedux,
-        name: "otherEvents",
+        pageProp: PAGE_PROPERTIES.SHARED_TESTIMONIALS,
+        // updateMetaData: putMetaDataToRedux,
+        name: "otherTestimonials",
         meta: meta,
         otherArgs: {
           community_ids: ids
@@ -249,14 +241,14 @@ function TestimonialsFromOthers({
       return (
         <Paper style={{ padding: "15px 25px" }}>
           <i className="fa fa-spinner fa-spin" style={{ marginRight: 6 }} />
-          Looking for events...
+          Looking for testimonials...
         </Paper>
       );
     if (!data.length)
       return (
         <Paper style={{ padding: "15px 25px" }}>
           {mounted ? (
-            <span> No open events are available for your list of communities. Select other ones</span>
+            <span> No open testimonials are available for your list of filters. Select other ones</span>
           ) : (
             <span>
               When you select communities and <b>"Apply"</b>, testimonials will show here..
@@ -267,9 +259,9 @@ function TestimonialsFromOthers({
     return (
       <METable
         classes={classes}
-        page={PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS}
+        page={PAGE_PROPERTIES.SHARED_TESTIMONIALS}
         tableProps={{
-          title: "Events from other communities",
+          title: "Testimonials from other communities",
           options,
           data,
           columns: makeColumns()
@@ -280,7 +272,7 @@ function TestimonialsFromOthers({
 
   return (
     <div>
-      <Seo name={`Events from other communities`} />
+      <Seo name={`Testimonials from other communities`} />
       <Paper style={{ marginBottom: 15 }}>
         <div style={{ padding: 20 }}>
           <Typography variant="h6">Show testimonials from communities I select below</Typography>
@@ -305,7 +297,7 @@ function TestimonialsFromOthers({
           <LightAutoComplete
             placeholder="Add categories or tags as filters..."
             defaultSelected={communities || []}
-            data={[]}
+            data={tags}
             labelExtractor={(it) => it.name}
             valueExtractor={(it) => it.id}
             onChange={(items) => setCommunities(items)}
