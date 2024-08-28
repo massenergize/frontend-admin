@@ -15,17 +15,10 @@ import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from "../../..
 import { useDispatch, useSelector } from "react-redux";
 import { withStyles } from "@mui/styles";
 import styles from "../../../components/Widget/widget-jss";
+import { reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
+import ShareTestimonialModalComponent from "./ShareTestimonialModalComponent";
 
-function TestimonialsFromOthers({
-  // putOtherEventsInRedux,
-  // otherCommunities,
-  // otherEvents,
-  classes,
-  state
-  // putStateInRedux,
-  // meta,
-  // putMetaDataToRedux
-}) {
+function TestimonialsFromOthers({ classes, state }) {
   const dispatch = useDispatch();
   const listOfCommunities = useSelector((state) => state.getIn(["otherCommunities"]));
   let categories = useSelector((state) => state.getIn(["allTags"]));
@@ -37,7 +30,17 @@ function TestimonialsFromOthers({
 
   const stories = useSelector((state) => state.getIn(["allTestimonials"]));
 
-  console.log("Testimonials", stories);
+  const toggleShareModal = (props) => {
+    const { show, ...rest } = props;
+    return dispatch(
+      reduxToggleUniversalModal({
+        show,
+        title: "Share Testimonial",
+        fullControl: true,
+        renderComponent: () => <ShareTestimonialModalComponent {...rest} />
+      })
+    );
+  };
 
   // -----------------------------------------------------------------------------------------
   const [loading, setLoading] = useState(false);
@@ -45,10 +48,10 @@ function TestimonialsFromOthers({
 
   // -----------------------------------------------------------------------------------------
   const setCommunities = (communities) => {
-    putStateInRedux({ ...(state || {}), communities });
+    // putStateInRedux({ ...(state || {}), communities });
   };
   const setMounted = (mounted) => {
-    putStateInRedux({ ...(state || {}), mounted });
+    // putStateInRedux({ ...(state || {}), mounted });
   };
 
   const fashionData = (data) => {
@@ -57,31 +60,18 @@ function TestimonialsFromOthers({
     const fashioned = data?.map((d) => [
       d.id,
       smartString(d?.title),
-      // d,
-      // getHumanFriendlyDate(d.start_date_and_time, true),
-      // {
-      //   id: d.id,
-      //   image: d.image,
-      //   initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
-      // },
-      // smartString(d.name), // limit to first 30 chars
       `${smartString(d.tags.map((t) => t.name).join(", "), 30)}`,
-      // d.is_global ? "Template" : d.community && d.community.name,
-      d.id
+      `${smartString(d.tags.map((t) => t.name).join(", "), 30)}`,
+      d
     ]);
     return fashioned;
   };
 
+  const renderSelected = (items, func) => {
+    return <span style={{ fontWeight: "bold", color: "purple" }}>{items.map((it) => it?.name).join(", ")}</span>;
+  };
   const data = fashionData(stories || []);
-  // const data = stories;
 
-  // useEffect(() => {
-  //   if (!mounted) {
-  //     // First time the page loads, Preselect all communities
-  //     setCommunities(otherCommunities || []);
-  //     // fetchOtherEvents(otherCommunities);  // Uncheck if we want to automatically load in events from all the preselected communities as well
-  //   }
-  // }, [otherCommunities]);
 
   const fetchOtherEvents = (passedComms = []) => {
     const ids = (passedComms || communities || []).map((it) => it.id);
@@ -138,6 +128,14 @@ function TestimonialsFromOthers({
           // )
         }
       },
+      {
+        name: "Shared To",
+        key: "shared-to",
+        options: {
+          filter: false,
+          download: false
+        }
+      },
 
       {
         name: "Full View",
@@ -145,10 +143,20 @@ function TestimonialsFromOthers({
         options: {
           filter: false,
           delete: false,
-          customBodyRender: (id) => (
-            <Link to={`/admin/read/event/${id}/event-view?from=others`}>
-              <CallMadeIcon size="small" variant="outlined" color="secondary" />
-            </Link>
+          customBodyRender: (d) => (
+            <small
+              onClick={() => toggleShareModal({ show: true, ...d })}
+              className="touchable-opacity"
+              style={{
+                background: "rgb(218 242 208)",
+                color: "green",
+                fontWeight: "bold",
+                borderRadius: 50,
+                padding: "3px 10px"
+              }}
+            >
+              <i className="fa fa-share" /> Share
+            </small>
           )
         }
       }
@@ -186,13 +194,13 @@ function TestimonialsFromOthers({
     customSearchRender: (searchText, handleSearch, hideSearch, options) => (
       <SearchBar
         url={"/events.others.listForCommunityAdmin"}
-        reduxItems={otherEvents}
-        updateReduxFunction={putOtherEventsInRedux}
+        // reduxItems={otherEvents}
+        // updateReduxFunction={putOtherEventsInRedux}
         handleSearch={handleSearch}
         hideSearch={hideSearch}
         pageProp={PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS}
-        updateMetaData={putMetaDataToRedux}
-        name="otherEvents"
+        // updateMetaData={putMetaDataToRedux}
+        name="otherTestimonials"
         meta={meta}
         otherArgs={{
           community_ids: ids
@@ -283,6 +291,7 @@ function TestimonialsFromOthers({
           </small>
 
           <LightAutoComplete
+            renderSelectedItems={renderSelected}
             placeholder="Select Communities..."
             defaultSelected={[]}
             data={listOfCommunities}
