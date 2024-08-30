@@ -105,7 +105,8 @@ class EditTestimonial extends Component {
       actions: acts,
       vendors: vends,
       testimonial,
-      isSuperAdmin
+      isSuperAdmin,
+      otherCommunities: props.otherCommunities
     });
     formJson.fields.splice(1, 0, section);
 
@@ -191,7 +192,8 @@ const mapStateToProps = (state) => {
     tags: state.getIn(["allTags"]),
     testimonials: state.getIn(["allTestimonials"]),
     communities: state.getIn(["communities"]),
-    auth: state.getIn(["auth"])
+    auth: state.getIn(["auth"]),
+    otherCommunities: state.getIn(["otherCommunities"])
   };
 };
 
@@ -211,7 +213,14 @@ const Wrapped = connect(
 
 export default withStyles(styles, { withTheme: true })(Wrapped);
 
-const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdmin }) => {
+const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdmin, otherCommunities }) => {
+  const otherCommunityList = otherCommunities?.map((c) => ({
+    displayName: c.name,
+    id: c.id
+  }));
+
+  const publicityCommunities = (testimonial.approved_for_sharing_by || []).map((c) => c.id.toString());
+
   const formJson = {
     title: "Edit Testimonial",
     subTitle: "",
@@ -341,57 +350,47 @@ const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdm
       },
 
       {
-        label: "Community Audience",
+        label: "Who can see this testimonial?",
         fieldType: "Section",
         children: [
           {
-            name: "audience",
-            label: "Should this feature be available to every community?",
-            fieldType: fieldTypes.Radio,
-            isRequired: true,
-            // defaultValue: audience || audienceKeys.EVERYONE.key,
-            dbName: "audience",
+            name: "share_type",
+            label: "Who should be able to see this testimonial?",
+            fieldType: "Radio",
+            isRequired: false,
+            defaultValue: testimonial?.share_type || null,
+            dbName: "share_type",
             readOnly: false,
-            data:[],
-            // data: audienceKeysArr.map(([_, { name, key }]) => ({
-            //   id: key,
-            //   value: name,
-            // })),
-
-            conditionalDisplays: [
+            data: [
+              { id: "OPEN", value: "All communities can use this testimonial " },
               {
-                valueToCheck: "specific",
-                fields: [
-                  {
-                    name: "community_ids",
-                    label: "Select all communities that should have this feature activated",
-                    placeholder: "eg. Wayland",
-                    fieldType: fieldTypes.Checkbox,
-                    selectMany: true,
-                    defaultValue: [],
-                    dbName: "community_ids",
-                    data: []
-                    // onClose: updateUsersWhenComIdsChange,
-                    // isAsync: true,
-                    // endpoint: "/communities.listForSuperAdmin",
-                  }
-                ]
+                id: "OPEN_TO",
+                value: "Only communities I select should see this"
               },
               {
-                valueToCheck: "all_except",
+                id: "CLOSE",
+                value: "No one can see this, keep this in my community only "
+              }
+
+              // { id: "CLOSED_TO", value: "All except these communities" },
+            ],
+            conditionalDisplays: [
+              {
+                valueToCheck: "OPEN_TO",
                 fields: [
                   {
-                    name: "community_ids",
-                    label: "Select all communities that should NOT have this feature",
-                    placeholder: "eg. Wayland",
-                    fieldType: fieldTypes.Checkbox,
+                    name: "can-view-story",
+                    label: `Select the communities that can see and use this testimonial`,
+                    placeholder: "",
+                    fieldType: "Checkbox",
                     selectMany: true,
-                    defaultValue: [],
-                    dbName: "community_ids",
-                    data: []
-                    // onClose: updateUsersWhenComIdsChange,
-                    // isAsync: true,
-                    // endpoint: "/communities.listForSuperAdmin",
+                    defaultValue: publicityCommunities,
+                    dbName: "approved_for_sharing_by",
+                    data: otherCommunityList,
+                    isAsync: true,
+                    endpoint: isSuperAdmin
+                      ? "/communities.listForSuperAdmin"
+                      : "/communities.others.listForCommunityAdmin"
                   }
                 ]
               }
