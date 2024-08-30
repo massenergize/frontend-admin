@@ -19,7 +19,7 @@ import {
   reduxLoadMetaDataAction,
   reduxLoadTableFilters,
   reduxToggleUniversalModal,
-  reduxToggleUniversalToast,
+  reduxToggleUniversalToast
 } from "../../../redux/redux-actions/adminActions";
 
 import {
@@ -28,18 +28,13 @@ import {
   isNotEmpty,
   ourCustomSort,
   reArrangeForAdmin,
-  smartString,
+  smartString
 } from "../../../utils/common";
-import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
+import { Grid, LinearProgress, Paper, Tooltip, Typography } from "@mui/material";
 import MEChip from "../../../components/MECustom/MEChip";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import METable, { FILTERS } from "../ME  Tools/table /METable";
-import {
-  getAdminApiEndpoint,
-  getLimit,
-  handleFilterChange,
-  onTableStateChange,
-} from "../../../utils/helpers";
+import { getAdminApiEndpoint, getLimit, handleFilterChange, onTableStateChange } from "../../../utils/helpers";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import Loader from "../../../utils/components/Loader";
@@ -47,14 +42,14 @@ import { getData } from "../Messages/CommunityAdminMessages";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import Seo from "../../../components/Seo/Seo";
 import CustomOptions from "../ME  Tools/table /CustomOptions";
-import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from "../../../utils/constants";
 
 class AllTestimonials extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       columns: this.getColumns(),
-      loading: true,
+      loading: true
     };
   }
 
@@ -63,13 +58,7 @@ class AllTestimonials extends React.Component {
   }
 
   componentDidMount() {
-    const {
-      fetchTestimonials,
-      location,
-      putTestimonialsInRedux,
-      updateTableFilters,
-      tableFilters,
-    } = this.props;
+    const { fetchTestimonials, location, putTestimonialsInRedux, updateTableFilters, tableFilters } = this.props;
     const { state } = location;
     const ids = state && state.ids;
     const comingFromDashboard = ids && ids.length;
@@ -81,8 +70,8 @@ class AllTestimonials extends React.Component {
       dataSource: [],
       reduxFxn: putTestimonialsInRedux,
       args: {
-        limit: getLimit(PAGE_PROPERTIES.ALL_TESTIMONIALS),
-      },
+        limit: getLimit(PAGE_PROPERTIES.ALL_TESTIMONIALS)
+      }
     };
 
     this.setState({ comingFromDashboard, ids });
@@ -94,13 +83,10 @@ class AllTestimonials extends React.Component {
     // });
 
     fetchTestimonials((data, failed) => {
-      if (failed)
-        return console.log(
-          "Sorry, could not load in more testimonials from B.E!"
-        );
+      if (failed) return console.log("Sorry, could not load in more testimonials from B.E!");
       reArrangeForAdmin({
         ...content,
-        dataSource: data,
+        dataSource: data
       });
     });
   }
@@ -110,17 +96,17 @@ class AllTestimonials extends React.Component {
       d.id,
       getHumanFriendlyDate(d.created_at, false),
       smartString(d.title), // limit to first 30 chars
-      { rank: d.rank, id: d.id },
-      d.community && d.community.name,
+      // { rank: d.rank, id: d.id },
+      d,
       {
         isLive: d.is_approved && d.is_published,
         is_approved: d.is_approved,
-        item: d,
+        item: d
       },
       smartString(d.user ? d.user.full_name : "", 20), // limit to first 20 chars
       smartString((d.action && d.action.title) || "", 30),
       d.id,
-      d.is_approved ? (d.is_published ? "Yes" : "No") : "Not Approved",
+      d.is_approved ? (d.is_published ? "Yes" : "No") : "Not Approved"
     ]);
   }
 
@@ -144,83 +130,102 @@ class AllTestimonials extends React.Component {
   };
 
   getColumns() {
-    const { classes, auth, communities} = this.props;
+    const { classes, auth, communities } = this.props;
+    const isSuperAdmin = auth?.is_super_admin;
+    const communityRender = {
+      customBodyRender: (d) => {
+        const adminComs = auth?.communities?.map((c) => c?.id) || [];
+        const isShared = !adminComs.includes(d?.community?.id);
+        return (
+          <Tooltip title={isShared && !isSuperAdmin ? `Shared from ${d?.community?.name}` : ""}>
+            {" "}
+            <b style={{ fontWeight: "bold" }}>
+              {isShared && !isSuperAdmin && <i className="fa fa-share" style={{ marginRight: 5 }} />}
+              {d?.community?.name || "..."}
+            </b>
+          </Tooltip>
+        );
+      }
+    };
     return [
       {
         name: "ID",
         key: "id",
         options: {
           filter: false,
-          filterType: "multiselect",
-        },
+          filterType: "multiselect"
+        }
       },
       {
         name: "Date",
         key: "date",
         options: {
           filter: false,
-          filterType: "textField",
-        },
+          filterType: "textField"
+        }
       },
       {
         name: "Title",
         key: "title",
         options: {
           filter: false,
-          filterType: "textField",
-        },
+          filterType: "textField"
+        }
       },
-      {
-        name: "Rank",
-        key: "rank",
-        options: {
-          filter: false,
-          customBodyRender: (d) =>
-            d && (
-              <TextField
-                key={d.id}
-                style={{ width: 50, textAlign: "center" }}
-                required
-                name="rank"
-                variant="outlined"
-                onBlur={async (event) => {
-                  const { target, key } = event;
-                  if (!target) return;
-                  const { name, value } = target;
-                  if (isNotEmpty(value) && value !== String(d.rank)) {
-                    await apiCall("/testimonials.rank", {
-                      testimonial_id: d && d.id,
-                      [name]: value,
-                    }).then((res) => {
-                      if (res && res.success) {
-                        this.updateTestimonials(res && res.data);
-                      }
-                    });
-                  }
-                }}
-                label="Rank"
-                InputLabelProps={{
-                  shrink: true,
-                  maxwidth: "10px",
-                }}
-                defaultValue={d && d.rank}
-              />
-            ),
-        },
-      },
+      // {
+      //   name: "Rank",
+      //   key: "rank",
+      //   options: {
+      //     filter: false,
+      //     customBodyRender: (d) =>
+      //       d && (
+      //         <TextField
+      //           key={d.id}
+      //           style={{ width: 50, textAlign: "center" }}
+      //           required
+      //           name="rank"
+      //           variant="outlined"
+      //           onBlur={async (event) => {
+      //             const { target, key } = event;
+      //             if (!target) return;
+      //             const { name, value } = target;
+      //             if (isNotEmpty(value) && value !== String(d.rank)) {
+      //               await apiCall("/testimonials.rank", {
+      //                 testimonial_id: d && d.id,
+      //                 [name]: value
+      //               }).then((res) => {
+      //                 if (res && res.success) {
+      //                   this.updateTestimonials(res && res.data);
+      //                 }
+      //               });
+      //             }
+      //           }}
+      //           label="Rank"
+      //           InputLabelProps={{
+      //             shrink: true,
+      //             maxwidth: "10px"
+      //           }}
+      //           defaultValue={d && d.rank}
+      //         />
+      //       )
+      //   }
+      // },
       {
         name: "Community",
         key: "community",
+
         options: auth?.is_super_admin
           ? CustomOptions({
               data: communities,
               label: "community",
               endpoint: "/communities.listForSuperAdmin",
+              ...communityRender
             })
           : {
               filter: true,
               filterType: "multiselect",
-            },
+              ...communityRender
+            }
       },
       {
         name: "Live?",
@@ -230,48 +235,45 @@ class AllTestimonials extends React.Component {
           download: false,
           customBodyRender: (d) => {
             return (
+              // <Tooltip placement="top" title="Secure Shit">
               <MEChip
+                tooltip={{ title: !d.is_approved ? "Not Approved" : "" }}
                 onClick={() => {
-                  if (!d.item.is_approved)
-                    return this.props.history.push(
-                      `/admin/edit/${d.item.id}/testimonial`
-                    );
+                  if (!d.item.is_approved) return this.props.history.push(`/admin/edit/${d.item.id}/testimonial`);
                   this.props.toggleLive({
                     show: true,
                     component: this.makeLiveUI({ data: d.item }),
                     onConfirm: () => this.makeLiveOrNot(d.item),
-                    closeAfterConfirmation: true,
+                    closeAfterConfirmation: true
                   });
                 }}
-                style={{ width: !d.is_approved ? 110 : "auto" }}
-                label={
-                  d.is_approved ? (d.isLive ? "Yes" : "No") : "Not Approved"
-                }
-                className={`${
-                  d.isLive ? classes.yesLabel : classes.noLabel
-                }  ${
+                // style={{ width: !d.is_approved ? 75 : "auto" }}
+                style={{ ...(!d.is_approved ? { width: 75, padding: "0px 10px" } : { width: "auto" }) }}
+                label={d.is_approved ? (d.isLive ? "Yes" : "No") : "Not App..."}
+                className={`${d.isLive ? classes.yesLabel : classes.noLabel}  ${
                   !d.is_approved ? "not-approved" : ""
                 } touchable-opacity`}
               />
+              // </Tooltip>
             );
-          },
-        },
+          }
+        }
       },
       {
         name: "User",
         key: "user",
         options: {
           filter: false,
-          filterType: "textField",
-        },
+          filterType: "textField"
+        }
       },
       {
         name: "Action",
         key: "action",
         options: {
           filter: true,
-          filterType: "textField",
-        },
+          filterType: "textField"
+        }
       },
       {
         name: "Edit",
@@ -288,19 +290,15 @@ class AllTestimonials extends React.Component {
                   e.preventDefault();
                   this.props.history.push({
                     pathname: `/admin/edit/${id}/testimonial`,
-                    state: { ids: this.state.ids },
+                    state: { ids: this.state.ids }
                   });
                 }}
               >
-                <EditIcon
-                  size="small"
-                  variant="outlined"
-                  color="secondary"
-                />
+                <EditIcon size="small" variant="outlined" color="secondary" />
               </Link>
             </div>
-          ),
-        },
+          )
+        }
       },
       {
         name: "Live",
@@ -309,9 +307,9 @@ class AllTestimonials extends React.Component {
           display: false,
           filter: true,
           searchable: false,
-          download: true,
-        },
-      },
+          download: true
+        }
+      }
     ];
   }
 
@@ -327,7 +325,7 @@ class AllTestimonials extends React.Component {
     apiCall("/testimonials.update", {
       testimonial_id: item.id,
       is_published: !status,
-      community_id: (community && community.id) || null,
+      community_id: (community && community.id) || null
     });
   }
 
@@ -351,30 +349,28 @@ class AllTestimonials extends React.Component {
     idsToDelete.forEach((d) => {
       const found = data[d.dataIndex][0];
       ids.push(found);
-      apiCall("/testimonials.delete", { testimonial_id: found }).then(
-        (response) => {
-          if (response.success) {
+      apiCall("/testimonials.delete", { testimonial_id: found }).then((response) => {
+        if (response.success) {
           putMetaDataToRedux({
             ...meta,
             ["testimonials"]: {
               ...meta["testimonials"],
-              count: meta["testimonials"].count - 1,
-            },
+              count: meta["testimonials"].count - 1
+            }
           });
-            this.props.toggleToast({
-              open: true,
-              message: "Testimonial successfully deleted",
-              variant: "success",
-            });
-          } else {
-            this.props.toggleToast({
-              open: true,
-              message: "An error occurred while deleting the community",
-              variant: "error",
-            });
-          }
+          this.props.toggleToast({
+            open: true,
+            message: "Testimonial successfully deleted",
+            variant: "success"
+          });
+        } else {
+          this.props.toggleToast({
+            open: true,
+            message: "An error occurred while deleting the community",
+            variant: "error"
+          });
         }
-      );
+      });
     });
     const rem = (itemsInRedux || []).filter((com) => !ids.includes(com.id));
     putTestimonialsInRedux(rem);
@@ -384,8 +380,7 @@ class AllTestimonials extends React.Component {
     const len = (idsToDelete && idsToDelete.length) || 0;
     return (
       <Typography>
-        Are you sure you want to delete (
-        {(idsToDelete && idsToDelete.length) || ""})
+        Are you sure you want to delete ({(idsToDelete && idsToDelete.length) || ""})
         {len === 1 ? " testimonial? " : " testimonials? "}
       </Typography>
     );
@@ -399,7 +394,7 @@ class AllTestimonials extends React.Component {
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-      second: "2-digit",
+      second: "2-digit"
     };
 
     return Intl.DateTimeFormat("en-US", options).format(newDate);
@@ -412,7 +407,7 @@ class AllTestimonials extends React.Component {
     const sortForRank = ({ a, b }) => (a.rank < b.rank ? -1 : 1);
     var params = {
       colIndex,
-      order,
+      order
     };
 
     if (isComparingLive) params = { ...params, compare: sortForLive };
@@ -424,15 +419,8 @@ class AllTestimonials extends React.Component {
     const title = brand.name + " - All Testimonials";
     const description = brand.desc;
     const { columns, loading, comingFromDashboard, ids } = this.state;
-    const {
-      classes,
-      allTestimonials,
-      auth,
-      putTestimonialsInRedux,
-      meta,
-      putMetaDataToRedux,
-    } = this.props;
-    
+    const { classes, allTestimonials, auth, putTestimonialsInRedux, meta, putMetaDataToRedux } = this.props;
+
     const content = getData({ source: allTestimonials || [], comingFromDashboard, ids });
     const data = this.fashionData(content);
     const metaData = meta && meta.testimonials;
@@ -469,7 +457,7 @@ class AllTestimonials extends React.Component {
           pageProp: PAGE_PROPERTIES.ALL_TESTIMONIALS,
           updateMetaData: putMetaDataToRedux,
           name: "testimonials",
-          meta: meta,
+          meta: meta
         }),
       customFilterDialogFooter: (currentFilterList, applyFilters) => {
         return (
@@ -486,13 +474,7 @@ class AllTestimonials extends React.Component {
           />
         );
       },
-      whenFilterChanges: (
-        changedColumn,
-        filterList,
-        type,
-        changedColumnIndex,
-        displayData
-      ) =>
+      whenFilterChanges: (changedColumn, filterList, type, changedColumnIndex, displayData) =>
         handleFilterChange({
           filterList,
           type,
@@ -503,7 +485,7 @@ class AllTestimonials extends React.Component {
           url: getAdminApiEndpoint(auth, "/testimonials"),
           updateMetaData: putMetaDataToRedux,
           name: "testimonials",
-          meta: meta,
+          meta: meta
         }),
       customSort: this.customSort,
       onRowsDelete: (rowsDeleted) => {
@@ -512,13 +494,13 @@ class AllTestimonials extends React.Component {
           show: true,
           component: this.makeDeleteUI({ idsToDelete }),
           onConfirm: () => this.nowDelete({ idsToDelete, data }),
-          closeAfterConfirmation: true,
+          closeAfterConfirmation: true
         });
         return false;
       },
       downloadOptions: {
         filename: `All Testimonials (${this.getTimeStamp()}).csv`,
-        separator: ",",
+        separator: ","
       },
       onDownload: (buildHead, buildBody, columns, data) => {
         let alteredData = data.map((d) => {
@@ -526,12 +508,12 @@ class AllTestimonials extends React.Component {
           content[3] = d.data[3].rank;
           return {
             data: content,
-            index: d.index,
+            index: d.index
           };
         });
         let csv = buildHead(columns) + buildBody(alteredData);
         return csv;
-      },
+      }
     };
 
     if (isEmpty(metaData)) {
@@ -544,9 +526,8 @@ class AllTestimonials extends React.Component {
         {comingFromDashboard && (
           <MEPaperBlock icon="fa fa-bullhorn" banner>
             <Typography>
-              The <b>{comingFromDashboard}</b> testimonial(s) you have not approved yet
-              are currently pre-selected and sorted in the table for you. Feel
-              free to
+              The <b>{comingFromDashboard}</b> testimonial(s) you have not approved yet are currently pre-selected and
+              sorted in the table for you. Feel free to
               <Link
                 href="#"
                 onClick={(e) => {
@@ -567,7 +548,7 @@ class AllTestimonials extends React.Component {
             title: "All Testimonials",
             data: data,
             columns: columns,
-            options: options,
+            options: options
           }}
           ignoreSavedFilters={comingFromDashboard}
           saveFilters={!comingFromDashboard}
@@ -578,7 +559,7 @@ class AllTestimonials extends React.Component {
 }
 
 AllTestimonials.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired
 };
 
 function mapStateToProps(state) {
@@ -588,7 +569,7 @@ function mapStateToProps(state) {
     community: state.getIn(["selected_community"]),
     meta: state.getIn(["paginationMetaData"]),
     tableFilters: state.getIn(["tableFilters"]),
-    communities: state.getIn(["communities"]),
+    communities: state.getIn(["communities"])
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -600,7 +581,7 @@ function mapDispatchToProps(dispatch) {
       toggleLive: reduxToggleUniversalModal,
       toggleToast: reduxToggleUniversalToast,
       putMetaDataToRedux: reduxLoadMetaDataAction,
-      updateTableFilters: reduxLoadTableFilters,
+      updateTableFilters: reduxLoadTableFilters
     },
     dispatch
   );
