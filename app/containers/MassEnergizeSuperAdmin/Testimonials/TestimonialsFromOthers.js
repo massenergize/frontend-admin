@@ -138,8 +138,8 @@ function TestimonialsFromOthers({ classes, state }) {
       },
 
       {
-        name: "Full View",
-        key: "full-view",
+        name: "Manage",
+        key: "manage",
         options: {
           filter: false,
           delete: false,
