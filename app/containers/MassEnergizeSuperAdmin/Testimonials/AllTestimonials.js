@@ -134,7 +134,7 @@ class AllTestimonials extends React.Component {
     const isSuperAdmin = auth?.is_super_admin;
     const communityRender = {
       customBodyRender: (d) => {
-        const adminComs = auth?.communities?.map((c) => c?.id) || [];
+        const adminComs = auth?.admin_at?.map((c) => c?.id) || [];
         const isShared = !adminComs.includes(d?.community?.id);
         return (
           <Tooltip title={isShared && !isSuperAdmin ? `Shared from ${d?.community?.name}` : ""}>
