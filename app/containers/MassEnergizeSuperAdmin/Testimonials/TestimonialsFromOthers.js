@@ -19,7 +19,10 @@ import { reduxToggleUniversalModal } from "../../../redux/redux-actions/adminAct
 import ShareTestimonialModalComponent from "./ShareTestimonialModalComponent";
 
 function TestimonialsFromOthers({ classes, state }) {
+  const [error, setError] = useState(null);
+  const [form, setForm] = useState({});
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.getIn(["auth"]));
   const listOfCommunities = useSelector((state) => state.getIn(["otherCommunities"]));
   let categories = useSelector((state) => state.getIn(["allTags"]));
   let tags = categories
@@ -30,14 +33,27 @@ function TestimonialsFromOthers({ classes, state }) {
 
   const stories = useSelector((state) => state.getIn(["allTestimonials"]));
 
+  const makeTitle = ({ shared }) => {
+    const isSuperAdmin = auth?.is_super_admin;
+    if (isSuperAdmin) return "Manage Sharing";
+    if (!isSuperAdmin && shared) return `Unshare this testimonial`;
+    return "Share";
+  };
+
+  const isShared = (community, list) => {
+    list = list || auth?.admin_at;
+    return list?.some((it) => it?.id === community.id);
+  };
   const toggleShareModal = (props) => {
     const { show, ...rest } = props;
+    const shared = isShared(rest.community);
+    console.log("Lets see shared", shared);
     return dispatch(
       reduxToggleUniversalModal({
         show,
-        title: "Share Testimonial",
+        title: makeTitle({ shared }),
         fullControl: true,
-        renderComponent: () => <ShareTestimonialModalComponent {...rest} />
+        renderComponent: () => <ShareTestimonialModalComponent shared={shared} story={{ ...rest }} />
       })
     );
   };
@@ -71,7 +87,6 @@ function TestimonialsFromOthers({ classes, state }) {
     return <span style={{ fontWeight: "bold", color: "purple" }}>{items.map((it) => it?.name).join(", ")}</span>;
   };
   const data = fashionData(stories || []);
-
 
   const fetchOtherEvents = (passedComms = []) => {
     const ids = (passedComms || communities || []).map((it) => it.id);

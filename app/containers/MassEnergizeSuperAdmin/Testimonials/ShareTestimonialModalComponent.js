@@ -1,28 +1,45 @@
 import React from "react";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
+import { useSelector } from "react-redux";
+import { Button } from "@mui/material";
 
-function ShareTestimonialModalComponent() {
+function ShareTestimonialModalComponent({ story, shared }) {
+  const auth = useSelector((state) => state.getIn(["auth"]));
+  const isSuperAdmin = auth?.is_super_admin;
+  const community = (auth?.admin_at || [])[0]; // Community Portal
+
+  const confirmation = () => {
+    if (isSuperAdmin) return "Save Changes";
+    if (shared) return "Yes, Unshare";
+    return "Yes, Share";
+  };
   return (
     <div style={{ padding: "0px 20px" }}>
-      {/* <CadminView /> */}
-      <SadminView />
+      {isSuperAdmin ? (
+        <SadminView auth={auth} isSuperAdmin={isSuperAdmin} story={story} />
+      ) : (
+        <CadminView shared={shared} community={community} auth={auth} isSuperAdmin={isSuperAdmin} story={story} />
+      )}
+
       <div style={{ display: "flex", justifyContent: "center" }}>
         <div style={{ marginLeft: "auto", marginBottom: 10 }}>
-          <button style={{ margin: 10 }} className="btn btn-primary">
-            Yes 
-          </button>
-          <button style={{ margin: 10 }} className="btn btn-danger">
-            No
-          </button>
+          <Button style={{ margin: 10 }} color="error">
+            {isSuperAdmin ? "Cancel" : "No"}
+          </Button>
+          <Button variant="outlined" style={{ margin: 10 }} color="primary">
+            {confirmation()}
+          </Button>
         </div>
       </div>
     </div>
   );
 }
-const CadminView = () => {
+const CadminView = ({ community, auth, isSuperAdmin, story, shared }) => {
+  const { name } = community || {};
+  const { title } = story || {};
   return (
     <p>
-      Are you sure you want to share this testimonial with <b>Wayland</b>?
+      Do you want to {shared ? "unshare" : "share"} <b>"{title || "..."}"</b> with <b>"{name || "..."}"</b>?
     </p>
   );
 };
