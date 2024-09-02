@@ -72,7 +72,8 @@ import app, {
   saveCommunityFeatureFlagsReducer,
   saveNavigationConfigurationReducer,
   reducerForSavingInternalLinksList,
-  reducerForCCActionData
+  reducerForCCActionData, 
+  reducerForOtherTestimonialState
 } from "./modules/appReducer";
 
 /**
@@ -91,6 +92,7 @@ export default function createReducer(injectedReducers = {}) {
     activities: reducerForAdminActivities,
     otherCommunities: reducerForAllOtherCommunities,
     otherEventsState: reducerForSavingOtherEventState,
+    otherTestimonialsState: reducerForOtherTestimonialState,
     otherEvents: reducerForLoadingOtherEvents,
     flagInfos: reducerForFlagInfo,
     galleryFilters: reducerForGalleryFilters,

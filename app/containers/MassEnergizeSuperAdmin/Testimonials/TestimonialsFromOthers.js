@@ -11,17 +11,25 @@ import { getLimit, handleFilterChange, onTableStateChange } from "../../../utils
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import Seo from "../../../components/Seo/Seo";
-import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from "../../../utils/constants";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS, LOADING } from "../../../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { withStyles } from "@mui/styles";
 import styles from "../../../components/Widget/widget-jss";
-import { reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
+import { reduxKeepOtherTestimonialState, reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
 import ShareTestimonialModalComponent from "./ShareTestimonialModalComponent";
 
-function TestimonialsFromOthers({ classes, state }) {
-  const [error, setError] = useState(null);
-  const [form, setForm] = useState({});
+export const renderSelectedItems = (items, func) => {
+  return <span style={{ fontWeight: "bold", color: "purple" }}>{items.map((it) => it?.name).join(", ")}</span>;
+};
+const LOADING_ERROR = "LOADING_ERROR";
+const SEARCH_ERROR = "SEARCH_ERROR";
+function TestimonialsFromOthers({ classes }) {
+  const [error, setError] = useState({});
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+  const putStateInRedux = (data) => dispatch(reduxKeepOtherTestimonialState(data));
+  // -----------------------------------------------------------------------------------------
+  const state = useSelector((state) => state.getIn(["otherTestimonialsState"]));
   const auth = useSelector((state) => state.getIn(["auth"]));
   const listOfCommunities = useSelector((state) => state.getIn(["otherCommunities"]));
   let categories = useSelector((state) => state.getIn(["allTags"]));
@@ -32,6 +40,7 @@ function TestimonialsFromOthers({ classes, state }) {
   const meta = useSelector((state) => state.getIn(["paginationMetaData"]));
 
   const stories = useSelector((state) => state.getIn(["allTestimonials"]));
+  // -----------------------------------------------------------------------------------------
 
   const makeTitle = ({ shared }) => {
     const isSuperAdmin = auth?.is_super_admin;
@@ -58,16 +67,22 @@ function TestimonialsFromOthers({ classes, state }) {
     );
   };
 
+  console.log("lets see state", state);
   // -----------------------------------------------------------------------------------------
-  const [loading, setLoading] = useState(false);
-  const { communities, exclude, mounted } = state || {};
+
+  const { communities, exclude, mounted, categories: selectedCategories } = state || {};
 
   // -----------------------------------------------------------------------------------------
-  const setCommunities = (communities) => {
-    // putStateInRedux({ ...(state || {}), communities });
-  };
-  const setMounted = (mounted) => {
-    // putStateInRedux({ ...(state || {}), mounted });
+  // const setCommunities = (communities) => {
+  //   putStateInRedux({ ...(state || {}), communities });
+  // };
+  // const setMounted = (mounted) => {
+  //   putStateInRedux({ ...(state || {}), mounted });
+  // };
+
+  const updateState = (key, value, old) => {
+    const oldData = old || state;
+    putStateInRedux({ ...(oldData || {}), [key]: value });
   };
 
   const fashionData = (data) => {
@@ -83,9 +98,6 @@ function TestimonialsFromOthers({ classes, state }) {
     return fashioned;
   };
 
-  const renderSelected = (items, func) => {
-    return <span style={{ fontWeight: "bold", color: "purple" }}>{items.map((it) => it?.name).join(", ")}</span>;
-  };
   const data = fashionData(stories || []);
 
   const fetchOtherEvents = (passedComms = []) => {
@@ -102,11 +114,12 @@ function TestimonialsFromOthers({ classes, state }) {
         if (response.success) {
           putOtherEventsInRedux(response.data);
           putMetaDataToRedux({ ...meta, otherEvents: response.cursor });
-        }
+        } else makeError(SEARCH_ERROR, response?.error || "An error occurred");
       })
       .catch((e) => {
         setLoading(false);
-        console.log("OTHER_EVENTS_BE_ERROR:", e.toString());
+        console.log("OTHER_TESTIMONIALS_ERROR:", e.toString());
+        makeError(SEARCH_ERROR, e.toString());
       });
   };
 
@@ -158,25 +171,30 @@ function TestimonialsFromOthers({ classes, state }) {
         options: {
           filter: false,
           delete: false,
-          customBodyRender: (d) => (
-            <small
-              onClick={() => toggleShareModal({ show: true, ...d })}
-              className="touchable-opacity"
-              style={{
-                background: "rgb(218 242 208)",
-                color: "green",
-                fontWeight: "bold",
-                borderRadius: 50,
-                padding: "3px 10px"
-              }}
-            >
-              <i className="fa fa-share" /> Share
-            </small>
-          )
+          customBodyRender: (d) => {
+            const shared = isShared(d.community);
+            return (
+              <small
+                onClick={() => toggleShareModal({ show: true, shared, ...d })}
+                className="touchable-opacity"
+                style={{
+                  background: shared ? "rgb(242 222 208)" : "rgb(218 242 208)",
+                  color: shared ? "rgb(223 59 59)" : "green",
+                  fontWeight: "bold",
+                  borderRadius: 50,
+                  padding: "3px 10px"
+                }}
+              >
+                <i className={`fa fa-times`} /> {shared ? "Unshare" : "Share"}
+              </small>
+            );
+          }
         }
       }
     ];
   };
+
+  const URL = "/testimonials.others.listForCommunityAdmin";
   const metaData = meta && meta.otherEvents;
   const columns = makeColumns();
   const ids = (communities || []).map((it) => it.id);
@@ -197,7 +215,7 @@ function TestimonialsFromOthers({ classes, state }) {
         metaData,
         // updateReduxFunction: putOtherEventsInRedux,
         reduxItems: data,
-        apiUrl: "/events.others.listForCommunityAdmin",
+        apiUrl: URL,
         pageProp: PAGE_PROPERTIES.SHARED_TESTIMONIALS,
         // updateMetaData: putMetaDataToRedux,
         name: "otherTestimonials",
@@ -208,7 +226,7 @@ function TestimonialsFromOthers({ classes, state }) {
       }),
     customSearchRender: (searchText, handleSearch, hideSearch, options) => (
       <SearchBar
-        url={"/events.others.listForCommunityAdmin"}
+        url={URL}
         // reduxItems={otherEvents}
         // updateReduxFunction={putOtherEventsInRedux}
         handleSearch={handleSearch}
@@ -225,7 +243,7 @@ function TestimonialsFromOthers({ classes, state }) {
     customFilterDialogFooter: (currentFilterList, applyFilters) => {
       return (
         <ApplyFilterButton
-          url={"/events.others.listForCommunityAdmin"}
+          url={URL}
           reduxItems={otherEvents}
           updateReduxFunction={putOtherEventsInRedux}
           columns={columns}
@@ -257,6 +275,10 @@ function TestimonialsFromOthers({ classes, state }) {
           community_ids: ids
         }
       })
+  };
+
+  const makeError = (key, message) => {
+    setError({ ...error, [key]: message });
   };
 
   const renderTable = ({ data, options }) => {
@@ -293,6 +315,10 @@ function TestimonialsFromOthers({ classes, state }) {
     );
   };
 
+  const loadingError = (error || {})[LOADING_ERROR];
+  const searchError = (error || {})[SEARCH_ERROR];
+
+  if (loadingError) return <Paper style={{ padding: "15px 25px", color: "red" }}>{loadingError}</Paper>;
   return (
     <div>
       <Seo name={`Testimonials from other communities`} />
@@ -306,13 +332,13 @@ function TestimonialsFromOthers({ classes, state }) {
           </small>
 
           <LightAutoComplete
-            renderSelectedItems={renderSelected}
+            renderSelectedItems={renderSelectedItems}
             placeholder="Select Communities..."
             defaultSelected={[]}
             data={listOfCommunities}
             labelExtractor={(it) => it.name}
             valueExtractor={(it) => it.id}
-            onChange={(items) => setCommunities(items)}
+            onChange={(items) => updateState("communities", items, state)}
             multiple
           />
 
@@ -320,11 +346,11 @@ function TestimonialsFromOthers({ classes, state }) {
 
           <LightAutoComplete
             placeholder="Add categories or tags as filters..."
-            defaultSelected={communities || []}
+            defaultSelected={selectedCategories || []}
             data={tags}
             labelExtractor={(it) => it.name}
             valueExtractor={(it) => it.id}
-            onChange={(items) => setCommunities(items)}
+            onChange={(items) => updateState("categories", items, state)}
             multiple
           />
           {/* <FormControlLabel
@@ -345,7 +371,7 @@ function TestimonialsFromOthers({ classes, state }) {
             <Button
               onClick={() => {
                 fetchOtherEvents(null);
-                setMounted(true);
+                updateState("mounted", true);
               }}
               disabled={!(communities || []).length || loading}
               variant="contained"
@@ -364,7 +390,11 @@ function TestimonialsFromOthers({ classes, state }) {
         </div>
       </Paper>
 
-      {renderTable({ data, options })}
+      {searchError ? (
+        <Paper style={{ padding: "15px 25px", color: "red" }}>{searchError}</Paper>
+      ) : (
+        renderTable({ data, options })
+      )}
     </div>
   );
 }
