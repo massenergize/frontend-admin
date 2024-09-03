@@ -65,7 +65,8 @@ import {
   KEEP_LIST_OF_NAVIGATION_CONFIGURATION,
   SAVE_INTERNAL_MENU_LINK,
   LOAD_CC_ACTIONS_DATA,
-  KEEP_TESTIMONIAL_STATE
+  KEEP_TESTIMONIAL_STATE,
+  LOAD_ALL_OTHER_TESTIMONIALS
 } from "../ReduxConstants";
 import { parseJSON } from "../../utils/common";
 
@@ -97,6 +98,14 @@ export default function reducer(state = initialImmutableState, action = {}) {
 export const reducerForOtherTestimonialState = (state = {}, action = {}) => {
   switch (action.type) {
     case KEEP_TESTIMONIAL_STATE:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForLoadingOtherTestimonials = (state = {}, action = {}) => {
+  switch (action.type) {
+    case LOAD_ALL_OTHER_TESTIMONIALS:
       return action.payload;
     default:
       return state;

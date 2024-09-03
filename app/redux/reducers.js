@@ -73,7 +73,8 @@ import app, {
   saveNavigationConfigurationReducer,
   reducerForSavingInternalLinksList,
   reducerForCCActionData, 
-  reducerForOtherTestimonialState
+  reducerForOtherTestimonialState,
+  reducerForLoadingOtherTestimonials
 } from "./modules/appReducer";
 
 /**
@@ -94,6 +95,7 @@ export default function createReducer(injectedReducers = {}) {
     otherEventsState: reducerForSavingOtherEventState,
     otherTestimonialsState: reducerForOtherTestimonialState,
     otherEvents: reducerForLoadingOtherEvents,
+    otherTestimonials: reducerForLoadingOtherTestimonials,
     flagInfos: reducerForFlagInfo,
     galleryFilters: reducerForGalleryFilters,
     sadmins: reducerForLoadingSuperAdmins,

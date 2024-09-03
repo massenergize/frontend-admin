@@ -64,6 +64,7 @@ import {
   SAVE_INTERNAL_MENU_LINK,
   LOAD_CC_ACTIONS_DATA,
   KEEP_TESTIMONIAL_STATE,
+  LOAD_ALL_OTHER_TESTIMONIALS,
 } from '../ReduxConstants';
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -188,6 +189,9 @@ export const setupSocketConnectionWithBackend = (auth) => (
   connectSocket();
 };
 
+export const reduxLoadOtherTestimonials = (data) => {
+  return { type: LOAD_ALL_OTHER_TESTIMONIALS, payload: data };
+};
 export const reduxKeepOtherTestimonialState = (data) => {
   return { type: KEEP_TESTIMONIAL_STATE, payload: data };
 };

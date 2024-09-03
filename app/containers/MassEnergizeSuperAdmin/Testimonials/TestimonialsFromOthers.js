@@ -15,20 +15,32 @@ import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS, LOADING } from 
 import { useDispatch, useSelector } from "react-redux";
 import { withStyles } from "@mui/styles";
 import styles from "../../../components/Widget/widget-jss";
-import { reduxKeepOtherTestimonialState, reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
+import {
+  reduxKeepOtherTestimonialState,
+  reduxLoadMetaDataAction,
+  reduxLoadOtherTestimonials,
+  reduxToggleUniversalModal
+} from "../../../redux/redux-actions/adminActions";
 import ShareTestimonialModalComponent from "./ShareTestimonialModalComponent";
 
 export const renderSelectedItems = (items, func) => {
   return <span style={{ fontWeight: "bold", color: "purple" }}>{items.map((it) => it?.name).join(", ")}</span>;
 };
+
 const LOADING_ERROR = "LOADING_ERROR";
 const SEARCH_ERROR = "SEARCH_ERROR";
+
 function TestimonialsFromOthers({ classes }) {
+  // -----------------------------------------------------------------------------------------
+  const URL = "/testimonials.other.listForCommunityAdmin";
   const [error, setError] = useState({});
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const putStateInRedux = (data) => dispatch(reduxKeepOtherTestimonialState(data));
+  const putOtherTestimonialsInRedux = (data) => dispatch(reduxLoadOtherTestimonials(data));
+  const putMetaDataToRedux = (data) => dispatch(reduxLoadMetaDataAction(data));
   // -----------------------------------------------------------------------------------------
+  const otherTestimonials = useSelector((state) => state.getIn(["otherTestimonials"]));
   const state = useSelector((state) => state.getIn(["otherTestimonialsState"]));
   const auth = useSelector((state) => state.getIn(["auth"]));
   const listOfCommunities = useSelector((state) => state.getIn(["otherCommunities"]));
@@ -56,7 +68,6 @@ function TestimonialsFromOthers({ classes }) {
   const toggleShareModal = (props) => {
     const { show, ...rest } = props;
     const shared = isShared(rest.community);
-    console.log("Lets see shared", shared);
     return dispatch(
       reduxToggleUniversalModal({
         show,
@@ -66,19 +77,11 @@ function TestimonialsFromOthers({ classes }) {
       })
     );
   };
-
-  console.log("lets see state", state);
   // -----------------------------------------------------------------------------------------
 
   const { communities, exclude, mounted, categories: selectedCategories } = state || {};
 
   // -----------------------------------------------------------------------------------------
-  // const setCommunities = (communities) => {
-  //   putStateInRedux({ ...(state || {}), communities });
-  // };
-  // const setMounted = (mounted) => {
-  //   putStateInRedux({ ...(state || {}), mounted });
-  // };
 
   const updateState = (key, value, old) => {
     const oldData = old || state;
@@ -100,20 +103,21 @@ function TestimonialsFromOthers({ classes }) {
 
   const data = fashionData(stories || []);
 
-  const fetchOtherEvents = (passedComms = []) => {
+  const fetch = (passedComms = []) => {
     const ids = (passedComms || communities || []).map((it) => it.id);
 
     setLoading(true);
-    apiCall("/events.others.listForCommunityAdmin", {
+    apiCall(URL, {
       community_ids: ids,
+      category_ids: selectedCategories?.map((it) => it.id),
       exclude: exclude || false,
-      limit: getLimit(PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS.key)
+      limit: getLimit(PAGE_PROPERTIES.SHARED_TESTIMONIALS.key)
     })
       .then((response) => {
         setLoading(false);
         if (response.success) {
-          putOtherEventsInRedux(response.data);
-          putMetaDataToRedux({ ...meta, otherEvents: response.cursor });
+          putOtherTestimonialsInRedux(response.data);
+          putMetaDataToRedux({ ...meta, otherTestimonials: response.cursor });
         } else makeError(SEARCH_ERROR, response?.error || "An error occurred");
       })
       .catch((e) => {
@@ -194,8 +198,7 @@ function TestimonialsFromOthers({ classes }) {
     ];
   };
 
-  const URL = "/testimonials.others.listForCommunityAdmin";
-  const metaData = meta && meta.otherEvents;
+  const metaData = meta && meta.otherTestimonials;
   const columns = makeColumns();
   const ids = (communities || []).map((it) => it.id);
   const options = {
@@ -213,11 +216,11 @@ function TestimonialsFromOthers({ classes }) {
         tableState,
         tableData: data,
         metaData,
-        // updateReduxFunction: putOtherEventsInRedux,
+        updateReduxFunction: putOtherTestimonialsInRedux,
         reduxItems: data,
         apiUrl: URL,
         pageProp: PAGE_PROPERTIES.SHARED_TESTIMONIALS,
-        // updateMetaData: putMetaDataToRedux,
+        updateMetaData: putMetaDataToRedux,
         name: "otherTestimonials",
         meta: meta,
         otherArgs: {
@@ -227,12 +230,12 @@ function TestimonialsFromOthers({ classes }) {
     customSearchRender: (searchText, handleSearch, hideSearch, options) => (
       <SearchBar
         url={URL}
-        // reduxItems={otherEvents}
-        // updateReduxFunction={putOtherEventsInRedux}
+        reduxItems={otherTestimonials}
+        updateReduxFunction={putOtherTestimonialsInRedux}
         handleSearch={handleSearch}
         hideSearch={hideSearch}
-        pageProp={PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS}
-        // updateMetaData={putMetaDataToRedux}
+        pageProp={PAGE_PROPERTIES.SHARED_TESTIMONIALS}
+        updateMetaData={putMetaDataToRedux}
         name="otherTestimonials"
         meta={meta}
         otherArgs={{
@@ -244,13 +247,13 @@ function TestimonialsFromOthers({ classes }) {
       return (
         <ApplyFilterButton
           url={URL}
-          reduxItems={otherEvents}
-          updateReduxFunction={putOtherEventsInRedux}
+          reduxItems={otherTestimonials}
+          updateReduxFunction={putOtherTestimonialsInRedux}
           columns={columns}
-          limit={getLimit(PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS.key)}
+          limit={getLimit(PAGE_PROPERTIES.SHARED_TESTIMONIALS.key)}
           applyFilters={applyFilters}
           updateMetaData={putMetaDataToRedux}
-          name="otherEvents"
+          name="otherTestimonials"
           meta={meta}
           otherArgs={{
             community_ids: ids
@@ -264,12 +267,12 @@ function TestimonialsFromOthers({ classes }) {
         filterList,
         type,
         columns,
-        page: PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS,
-        updateReduxFunction: putOtherEventsInRedux,
-        reduxItems: otherEvents,
-        url: "/events.others.listForCommunityAdmin",
+        page: PAGE_PROPERTIES.SHARED_TESTIMONIALS,
+        updateReduxFunction: putOtherTestimonialsInRedux,
+        reduxItems: otherTestimonials,
+        url: URL,
         updateMetaData: putMetaDataToRedux,
-        name: "otherEvents",
+        name: "otherTestimonials",
         meta,
         otherArgs: {
           community_ids: ids
@@ -334,7 +337,7 @@ function TestimonialsFromOthers({ classes }) {
           <LightAutoComplete
             renderSelectedItems={renderSelectedItems}
             placeholder="Select Communities..."
-            defaultSelected={[]}
+            defaultSelected={communities || []}
             data={listOfCommunities}
             labelExtractor={(it) => it.name}
             valueExtractor={(it) => it.id}
@@ -370,7 +373,7 @@ function TestimonialsFromOthers({ classes }) {
           >
             <Button
               onClick={() => {
-                fetchOtherEvents(null);
+                fetch(null);
                 updateState("mounted", true);
               }}
               disabled={!(communities || []).length || loading}
