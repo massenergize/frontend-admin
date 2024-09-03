@@ -43,6 +43,7 @@ function TestimonialsFromOthers({ classes }) {
   const otherTestimonials = useSelector((state) => state.getIn(["otherTestimonials"]));
   const state = useSelector((state) => state.getIn(["otherTestimonialsState"]));
   const auth = useSelector((state) => state.getIn(["auth"]));
+  const adminAt = (auth?.admin_at || [])[0];
   const listOfCommunities = useSelector((state) => state.getIn(["otherCommunities"]));
   let categories = useSelector((state) => state.getIn(["allTags"]));
   let tags = categories
@@ -65,9 +66,20 @@ function TestimonialsFromOthers({ classes }) {
     list = list || auth?.admin_at;
     return list?.some((it) => it?.id === community?.id);
   };
+
+  const afterResponse = (error, data) => {
+    if (error || !data) return;
+
+    // find the testimonial with its index in the "otherTestimonial" list
+    const index = otherTestimonials.findIndex((it) => it?.id === data?.id);
+    const copy = [...otherTestimonials];
+    copy[index] = data;
+    putOtherTestimonialsInRedux(copy);
+  };
+
   const toggleShareModal = (props) => {
     const { show, ...rest } = props;
-    const shared = isShared(rest.community);
+    const shared = isShared(adminAt, rest?.shared_with);
     return dispatch(
       reduxToggleUniversalModal({
         show,
@@ -75,6 +87,7 @@ function TestimonialsFromOthers({ classes }) {
         fullControl: true,
         renderComponent: () => (
           <ShareTestimonialModalComponent
+            onComplete={afterResponse}
             close={() => toggleShareModal({ show: false })}
             shared={shared}
             story={{ ...rest }}
@@ -186,14 +199,14 @@ function TestimonialsFromOthers({ classes }) {
           filter: false,
           delete: false,
           customBodyRender: (d) => {
-            const shared = isShared(d.community);
+            const shared = isShared(adminAt, d?.shared_with);
             return (
               <small
                 onClick={() => toggleShareModal({ show: true, shared, ...d })}
                 className="touchable-opacity"
                 style={{
-                  background: shared ? "rgb(242 222 208)" : "rgb(218 242 208)",
-                  color: shared ? "rgb(223 59 59)" : "green",
+                  background: shared ? "rgb(255 239 228)" : "rgb(218 242 208)",
+                  color: shared ? "rgb(232 54 54)" : "green",
                   fontWeight: "bold",
                   borderRadius: 50,
                   padding: "3px 10px"
