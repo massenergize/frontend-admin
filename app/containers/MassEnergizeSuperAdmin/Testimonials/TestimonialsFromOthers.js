@@ -63,7 +63,7 @@ function TestimonialsFromOthers({ classes }) {
 
   const isShared = (community, list) => {
     list = list || auth?.admin_at;
-    return list?.some((it) => it?.id === community.id);
+    return list?.some((it) => it?.id === community?.id);
   };
   const toggleShareModal = (props) => {
     const { show, ...rest } = props;
@@ -73,7 +73,13 @@ function TestimonialsFromOthers({ classes }) {
         show,
         title: makeTitle({ shared }),
         fullControl: true,
-        renderComponent: () => <ShareTestimonialModalComponent shared={shared} story={{ ...rest }} />
+        renderComponent: () => (
+          <ShareTestimonialModalComponent
+            close={() => toggleShareModal({ show: false })}
+            shared={shared}
+            story={{ ...rest }}
+          />
+        )
       })
     );
   };
@@ -95,17 +101,18 @@ function TestimonialsFromOthers({ classes }) {
       d.id,
       smartString(d?.title),
       `${smartString(d.tags.map((t) => t.name).join(", "), 30)}`,
-      `${smartString(d.tags.map((t) => t.name).join(", "), 30)}`,
+      d,
+      // `${smartString(d.tags.map((t) => t.name).join(", "), 30)}`,
       d
     ]);
     return fashioned;
   };
 
-  const data = fashionData(stories || []);
+  const data = fashionData(otherTestimonials || []);
 
   const fetch = (passedComms = []) => {
     const ids = (passedComms || communities || []).map((it) => it.id);
-
+    makeError(SEARCH_ERROR, null);
     setLoading(true);
     apiCall(URL, {
       community_ids: ids,
@@ -165,7 +172,10 @@ function TestimonialsFromOthers({ classes }) {
         key: "shared-to",
         options: {
           filter: false,
-          download: false
+          download: false,
+          customBodyRender: (d) => {
+            return <b>{smartString(d?.shared_with?.map((t) => t.name).join(", "), 30) || "..."}</b>;
+          }
         }
       },
 
@@ -189,7 +199,7 @@ function TestimonialsFromOthers({ classes }) {
                   padding: "3px 10px"
                 }}
               >
-                <i className={`fa fa-times`} /> {shared ? "Unshare" : "Share"}
+                <i className={`fa fa-${shared ? "times" : "share"}`} /> {shared ? "Unshare" : "Share"}
               </small>
             );
           }
@@ -366,7 +376,7 @@ function TestimonialsFromOthers({ classes }) {
               label="Exclude events from communities I have selected"
             /> */}
         </div>
-        <div style={{ background: "#fbfbfb" }}>
+        <div style={{ background: "#fbfbfb", borderBottomLeftRadius: 10, borderBottomRightRadius: 10 }}>
           <Tooltip
             placement="top"
             title="Click this button to find events from the communities you have selected above "

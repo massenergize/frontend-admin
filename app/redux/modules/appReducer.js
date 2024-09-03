@@ -103,7 +103,7 @@ export const reducerForOtherTestimonialState = (state = {}, action = {}) => {
       return state;
   }
 };
-export const reducerForLoadingOtherTestimonials = (state = {}, action = {}) => {
+export const reducerForLoadingOtherTestimonials = (state = [], action = {}) => {
   switch (action.type) {
     case LOAD_ALL_OTHER_TESTIMONIALS:
       return action.payload;
