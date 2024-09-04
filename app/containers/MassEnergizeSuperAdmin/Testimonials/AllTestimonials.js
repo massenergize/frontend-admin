@@ -136,7 +136,12 @@ class AllTestimonials extends React.Component {
     return list?.some((it) => it?.id === community?.id);
   }
 
-  removeSharedFromList(item) {}
+  removeSharedFromList(error, item) {
+    if (error) return console.log("ERROR_REMOVING_SHARED", error);
+    const { allTestimonials } = this.props;
+    const rem = allTestimonials.filter((com) => com.id !== item?.id);
+    this.props.putTestimonialsInRedux(rem);
+  }
 
   unshareTestimonial(story) {
     const { toggleUniversal } = this.props;
@@ -147,7 +152,7 @@ class AllTestimonials extends React.Component {
       title: `Unshare: "${story.title}"`,
       renderComponent: () => (
         <ShareTestimonialModalComponent
-          onComplete={this.removeSharedFromList}
+          onComplete={this.removeSharedFromList.bind(this)}
           story={story}
           shared
           close={() => toggleUniversal({ show: false })}

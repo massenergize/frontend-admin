@@ -67,7 +67,7 @@ const CadminView = ({ community, auth, isSuperAdmin, story, shared }) => {
     <p>
       Would you like to {shared ? "remove" : "include"} <b style={{ color: "black" }}>"{title || "..."}"</b>{" "}
       {shared ? "from " : "in "}
-      <b style={{ color: "black" }}>"{name || "..."}"'s</b> list of testimonials?
+      <b style={{ color: "black" }}>{name || "..."}'s</b> list of testimonials?
     </p>
   );
 };
