@@ -17,6 +17,7 @@ import {
   loadAllTestimonials,
   reduxGetAllCommunityTestimonials,
   reduxLoadMetaDataAction,
+  reduxLoadOtherTestimonials,
   reduxLoadTableFilters,
   reduxToggleUniversalModal,
   reduxToggleUniversalToast
@@ -138,9 +139,15 @@ class AllTestimonials extends React.Component {
 
   removeSharedFromList(error, item) {
     if (error) return console.log("ERROR_REMOVING_SHARED", error);
-    const { allTestimonials } = this.props;
+    const { allTestimonials, otherTestimonials } = this.props;
     const rem = allTestimonials.filter((com) => com.id !== item?.id);
     this.props.putTestimonialsInRedux(rem);
+    // Replace the modified in the "otherTestimonials" list
+    const copied = [...otherTestimonials];
+    const index = copied.findIndex((a) => a?.id === item?.id);
+    if (index < 0) return;
+    copied[index] = item;
+    this.props.updateOtherTestimonials(copied);
   }
 
   unshareTestimonial(story) {
@@ -616,7 +623,8 @@ function mapStateToProps(state) {
     community: state.getIn(["selected_community"]),
     meta: state.getIn(["paginationMetaData"]),
     tableFilters: state.getIn(["tableFilters"]),
-    communities: state.getIn(["communities"])
+    communities: state.getIn(["communities"]),
+    otherTestimonials: state.getIn(["otherTestimonials"])
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -629,7 +637,8 @@ function mapDispatchToProps(dispatch) {
       toggleToast: reduxToggleUniversalToast,
       putMetaDataToRedux: reduxLoadMetaDataAction,
       updateTableFilters: reduxLoadTableFilters,
-      toggleUniversal: reduxToggleUniversalModal
+      toggleUniversal: reduxToggleUniversalModal,
+      updateOtherTestimonials: reduxLoadOtherTestimonials
     },
     dispatch
   );

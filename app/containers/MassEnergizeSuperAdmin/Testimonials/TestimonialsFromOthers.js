@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { withStyles } from "@mui/styles";
 import styles from "../../../components/Widget/widget-jss";
 import {
+  loadAllTestimonials,
   reduxKeepOtherTestimonialState,
   reduxLoadMetaDataAction,
   reduxLoadOtherTestimonials,
@@ -41,6 +42,7 @@ function TestimonialsFromOthers({ classes }) {
   const putOtherTestimonialsInRedux = (data) => dispatch(reduxLoadOtherTestimonials(data));
   const putMetaDataToRedux = (data) => dispatch(reduxLoadMetaDataAction(data));
   const toggleToast = (data) => dispatch(reduxToggleUniversalToast(data));
+  const updateTestimonialList = (data) => dispatch(loadAllTestimonials(data));
   // -----------------------------------------------------------------------------------------
   const otherTestimonials = useSelector((state) => state.getIn(["otherTestimonials"]));
   const state = useSelector((state) => state.getIn(["otherTestimonialsState"]));
@@ -69,15 +71,23 @@ function TestimonialsFromOthers({ classes }) {
     return list?.some((it) => it?.id === community?.id);
   };
 
-  const afterResponse = (error, data) => {
+  const afterResponse = (error, data, options) => {
     if (error || !data) return toast(error || "Sorry, an error occured", false);
-
-    // find the testimonial with its index in the "otherTestimonial" list
+    const { remove } = options || {};
+    // Modify the item in the "otherTestimonials" list
     const index = otherTestimonials.findIndex((it) => it?.id === data?.id);
     const copy = [...otherTestimonials];
     copy[index] = data;
     putOtherTestimonialsInRedux(copy);
     toast(`"${data?.title} has been added to your testimonials! You will now see it in your list of testimonials"`);
+    // if remove is true, remove the item from the cadmin's main testimonial list if its there, otherwise, add it instead
+    if (!remove) {
+      const index = stories.findIndex((it) => it?.id === data?.id);
+      if (index === -1) return updateTestimonialList([data, ...stories]);
+    }
+
+    const rem = stories.filter((it) => it?.id !== data?.id);
+    updateTestimonialList(rem);
   };
 
   const toast = (message, good = true) => {

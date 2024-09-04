@@ -17,7 +17,7 @@ function ShareTestimonialModalComponent({ story, shared, close, onComplete }) {
       .then((response) => {
         setLoading(false);
         if (!response.success) return console.log("ERROR_SHARING_TESTIMONIAL", response?.error);
-        onComplete && onComplete(response?.error, response?.data);
+        onComplete && onComplete(response?.error, response?.data, { remove: shared });
         close && close();
       })
       .catch((e) => {
