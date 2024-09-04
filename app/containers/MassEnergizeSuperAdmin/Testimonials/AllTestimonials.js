@@ -43,6 +43,7 @@ import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import Seo from "../../../components/Seo/Seo";
 import CustomOptions from "../ME  Tools/table /CustomOptions";
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from "../../../utils/constants";
+import ShareTestimonialModalComponent from "./ShareTestimonialModalComponent";
 
 class AllTestimonials extends React.Component {
   constructor(props) {
@@ -105,7 +106,7 @@ class AllTestimonials extends React.Component {
       },
       smartString(d.user ? d.user.full_name : "", 20), // limit to first 20 chars
       smartString((d.action && d.action.title) || "", 30),
-      d.id,
+      d,
       d.is_approved ? (d.is_published ? "Yes" : "No") : "Not Approved"
     ]);
   }
@@ -129,17 +130,43 @@ class AllTestimonials extends React.Component {
     this.props.putTestimonialsInRedux(updateItems);
   };
 
+  isShared(community, list) {
+    const { auth } = this.props;
+    list = list || auth?.admin_at;
+    return list?.some((it) => it?.id === community?.id);
+  }
+
+  removeSharedFromList(item) {}
+
+  unshareTestimonial(story) {
+    const { toggleUniversal } = this.props;
+    // const close = () => toggleUniversal({ show: false });
+    toggleUniversal({
+      show: true,
+      fullControl: true,
+      title: `Unshare: "${story.title}"`,
+      renderComponent: () => (
+        <ShareTestimonialModalComponent
+          onComplete={this.removeSharedFromList}
+          story={story}
+          shared
+          close={() => toggleUniversal({ show: false })}
+        />
+      )
+    });
+  }
+
   getColumns() {
     const { classes, auth, communities } = this.props;
     const isSuperAdmin = auth?.is_super_admin;
     const communityRender = {
       customBodyRender: (d) => {
-        const adminComs = auth?.admin_at?.map((c) => c?.id) || [];
-        const isShared = !adminComs.includes(d?.community?.id);
+        // const adminComs = auth?.admin_at?.map((c) => c?.id) || [];
+        const isShared = !this.isShared(d?.community);
         return (
           <Tooltip title={isShared && !isSuperAdmin ? `Shared from ${d?.community?.name}` : ""}>
             {" "}
-            <b style={{ fontWeight: "bold" }}>
+            <b style={{ fontWeight: "bold", color: isShared ? "#ef6969" : "black" }}>
               {isShared && !isSuperAdmin && <i className="fa fa-share" style={{ marginRight: 5 }} />}
               {d?.community?.name || "..."}
             </b>
@@ -282,22 +309,37 @@ class AllTestimonials extends React.Component {
           filter: false,
           download: false,
           sort: false,
-          customBodyRender: (id) => (
-            <div>
-              <Link
-                to={`/admin/edit/${id}/testimonial`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  this.props.history.push({
-                    pathname: `/admin/edit/${id}/testimonial`,
-                    state: { ids: this.state.ids }
-                  });
-                }}
-              >
-                <EditIcon size="small" variant="outlined" color="secondary" />
-              </Link>
-            </div>
-          )
+          customBodyRender: (d) => {
+            const { id } = d || {};
+            const isShared = !this.isShared(d?.community);
+            if (isShared)
+              return (
+                <Tooltip title={`Unshare: Remove from your list`}>
+                  {" "}
+                  <i
+                    onClick={() => this.unshareTestimonial(d)}
+                    style={{ color: "#ef6969", fontSize: 22 }}
+                    className="fa fa-times touchable-opacity"
+                  />
+                </Tooltip>
+              );
+            return (
+              <div>
+                <Link
+                  to={`/admin/edit/${id}/testimonial`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    this.props.history.push({
+                      pathname: `/admin/edit/${id}/testimonial`,
+                      state: { ids: this.state.ids }
+                    });
+                  }}
+                >
+                  <EditIcon size="small" variant="outlined" color="secondary" />
+                </Link>
+              </div>
+            );
+          }
         }
       },
       {
@@ -581,7 +623,8 @@ function mapDispatchToProps(dispatch) {
       toggleLive: reduxToggleUniversalModal,
       toggleToast: reduxToggleUniversalToast,
       putMetaDataToRedux: reduxLoadMetaDataAction,
-      updateTableFilters: reduxLoadTableFilters
+      updateTableFilters: reduxLoadTableFilters,
+      toggleUniversal: reduxToggleUniversalModal
     },
     dispatch
   );

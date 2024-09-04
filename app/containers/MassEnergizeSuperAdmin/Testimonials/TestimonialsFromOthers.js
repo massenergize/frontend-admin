@@ -19,7 +19,8 @@ import {
   reduxKeepOtherTestimonialState,
   reduxLoadMetaDataAction,
   reduxLoadOtherTestimonials,
-  reduxToggleUniversalModal
+  reduxToggleUniversalModal,
+  reduxToggleUniversalToast
 } from "../../../redux/redux-actions/adminActions";
 import ShareTestimonialModalComponent from "./ShareTestimonialModalComponent";
 
@@ -39,6 +40,7 @@ function TestimonialsFromOthers({ classes }) {
   const putStateInRedux = (data) => dispatch(reduxKeepOtherTestimonialState(data));
   const putOtherTestimonialsInRedux = (data) => dispatch(reduxLoadOtherTestimonials(data));
   const putMetaDataToRedux = (data) => dispatch(reduxLoadMetaDataAction(data));
+  const toggleToast = (data) => dispatch(reduxToggleUniversalToast(data));
   // -----------------------------------------------------------------------------------------
   const otherTestimonials = useSelector((state) => state.getIn(["otherTestimonials"]));
   const state = useSelector((state) => state.getIn(["otherTestimonialsState"]));
@@ -68,13 +70,18 @@ function TestimonialsFromOthers({ classes }) {
   };
 
   const afterResponse = (error, data) => {
-    if (error || !data) return;
+    if (error || !data) return toast(error || "Sorry, an error occured", false);
 
     // find the testimonial with its index in the "otherTestimonial" list
     const index = otherTestimonials.findIndex((it) => it?.id === data?.id);
     const copy = [...otherTestimonials];
     copy[index] = data;
     putOtherTestimonialsInRedux(copy);
+    toast(`"${data?.title} has been added to your testimonials! You will now see it in your list of testimonials"`);
+  };
+
+  const toast = (message, good = true) => {
+    toggleToast({ show: true, message, variant: good ? "success" : "error" });
   };
 
   const toggleShareModal = (props) => {
@@ -181,7 +188,7 @@ function TestimonialsFromOthers({ classes }) {
         }
       },
       {
-        name: "Shared To",
+        name: "Shared With",
         key: "shared-to",
         options: {
           filter: false,
@@ -212,7 +219,7 @@ function TestimonialsFromOthers({ classes }) {
                   padding: "3px 10px"
                 }}
               >
-                <i className={`fa fa-${shared ? "times" : "share"}`} /> {shared ? "Unshare" : "Share"}
+                <i className={`fa fa-${shared ? "times" : "plus"}`} /> {shared ? "Remove" : "Add"}
               </small>
             );
           }
@@ -332,7 +339,7 @@ function TestimonialsFromOthers({ classes }) {
         classes={classes}
         page={PAGE_PROPERTIES.SHARED_TESTIMONIALS}
         tableProps={{
-          title: "Testimonials from other communities",
+          title: "Testimonials that are open to be shared with your community",
           options,
           data,
           columns: makeColumns()

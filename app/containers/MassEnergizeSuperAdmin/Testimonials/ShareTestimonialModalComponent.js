@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { Button } from "@mui/material";
 import { apiCall } from "../../../utils/messenger";
 
-function ShareTestimonialModalComponent({ story, shared, close, afterResponse }) {
+function ShareTestimonialModalComponent({ story, shared, close, onComplete }) {
   const [loading, setLoading] = useState(false);
   const auth = useSelector((state) => state.getIn(["auth"]));
   const isSuperAdmin = auth?.is_super_admin;
@@ -17,20 +17,20 @@ function ShareTestimonialModalComponent({ story, shared, close, afterResponse })
       .then((response) => {
         setLoading(false);
         if (!response.success) return console.log("ERROR_SHARING_TESTIMONIAL", response?.error);
-        afterResponse && afterResponse(response?.error, response?.data);
+        onComplete && onComplete(response?.error, response?.data);
         close && close();
       })
       .catch((e) => {
         console.log("ERROR_SHARING_TEST_SYNT", e?.toString());
-        afterResponse && afterResponse(e?.toString(), null);
+        onComplete && onComplete(e?.toString(), null);
         setLoading(false);
         close && close();
       });
   };
   const confirmation = () => {
     if (isSuperAdmin) return "Save Changes";
-    if (shared) return "Yes, Unshare";
-    return "Yes, Share";
+    if (shared) return "Yes, Remove";
+    return "Yes, Add";
   };
   return (
     <div style={{ padding: "0px 20px" }}>
@@ -65,8 +65,9 @@ const CadminView = ({ community, auth, isSuperAdmin, story, shared }) => {
   const { title } = story || {};
   return (
     <p>
-      Do you want to {shared ? "unshare" : "share"} <b style={{ color: "black" }}>"{title || "..."}"</b> with{" "}
-      <b style={{ color: "black" }}>"{name || "..."}"</b>?
+      Would you like to {shared ? "remove" : "include"} <b style={{ color: "black" }}>"{title || "..."}"</b>{" "}
+      {shared ? "from " : "in "}
+      <b style={{ color: "black" }}>"{name || "..."}"'s</b> list of testimonials?
     </p>
   );
 };
