@@ -37,7 +37,7 @@ if (IS_PROD || IS_CANARY) {
   };
 }
 
-console.log("Welcome to MassEnergize Admin Panel:", FIREBASE_CONFIG?.projectId);
+console.log("Welcome to MassEnergize Admin Panel:", FIREBASE_CONFIG);  // TODO: remove this line
 
 //  ---- setting  Community Portal routes
 let PORTAL_HOST = "https://community.massenergize.org";
