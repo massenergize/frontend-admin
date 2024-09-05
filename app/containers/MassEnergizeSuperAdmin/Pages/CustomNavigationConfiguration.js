@@ -484,6 +484,7 @@ const OneMenuItem = ({
 
   const parentIsNotLive = !parentTraits?.isPublished;
   const isChild = parentTraits?.isChild;
+
   const hasChildren = children?.length > 0;
   const getBackColor = () => {
     if (activity) return activity?.color;
@@ -509,6 +510,7 @@ const OneMenuItem = ({
   const isRemoved = parentTraits?.isRemoved || activity?.key === ACTIVITIES.remove.key;
   const editItem = () =>
     addOrEdit({ ...item, children }, parents, { context: ACTIVITIES.edit.key, children, isEdit: true });
+
 
   const itemIsLive = () => {
     if (isChild) return !parentIsNotLive && is_published;
@@ -617,6 +619,7 @@ const OneMenuItem = ({
                   `Live`
                 : disabledBecauseOfParent
                 ? `Not live because parent is disabled`
+
                 : `Not Live, all sub items will also not show `
             }
           >

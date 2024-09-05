@@ -40,13 +40,15 @@ class MetricsModal extends React.Component {
       >
         <DialogContent className={classes.rootContent}>
           <Typography variant="h4" align="center">{"All Metrics CSV  Download"}</Typography>
-          
-          <MetricsPrefs
-          communities={communities}
-          featureFlags={featureFlags}
-          featureToEdit={featureToEdit}
-          handleClose={this.handleClose}
-        />
+          <div style={{ maxHeight: '76vh', overflow: 'scroll' }}>
+            <MetricsPrefs
+              communities={communities}
+              featureFlags={featureFlags}
+              featureToEdit={featureToEdit}
+              handleClose={this.handleClose}
+            />
+          </div>
+
         </DialogContent>
       </Dialog>
     );

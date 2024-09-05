@@ -376,7 +376,7 @@ var createFormJson = ({
         children: [
           {
             name: "allow_opt_in",
-            label: "When should this feature expire?",
+            label: "Community Admins can opt-in to this feature",
             fieldType: fieldTypes.Radio,
             isRequired: true,
             defaultValue: allow_opt_in ? "true" : "false",
