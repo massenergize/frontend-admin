@@ -454,4 +454,3 @@ export function formatWithMoment(momentObject, format = "YYYY-MM-DD") {
   return momentObject.format(format);
 }
 
-

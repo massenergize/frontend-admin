@@ -65,6 +65,7 @@ import {
   LOAD_CC_ACTIONS_DATA,
   KEEP_TESTIMONIAL_STATE,
   LOAD_ALL_OTHER_TESTIMONIALS,
+  CACHE_MESSAGE_INFO,
 } from '../ReduxConstants';
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -1074,6 +1075,13 @@ export const loadTasksAction = (data = []) => {
 export const saveCommunityFeatureFlagsAction = (data = []) => {
   return {
     type: SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX,
+    payload: data,
+  };
+};
+
+export const cacheMessageInfoAction = (data = {}) => {
+  return {
+    type: CACHE_MESSAGE_INFO,
     payload: data,
   };
 };

@@ -68,6 +68,8 @@ import {
   KEEP_TESTIMONIAL_STATE,
   LOAD_ALL_OTHER_TESTIMONIALS
 } from "../ReduxConstants";
+  CACHE_MESSAGE_INFO,
+} from '../ReduxConstants';
 import { parseJSON } from "../../utils/common";
 
 const initialState = Map({
@@ -611,6 +613,7 @@ export const saveNavigationConfigurationReducer = (state = {}, action = {}) => {
       return state;
   }
 };
+
 export const reducerForSavingInternalLinksList = (state = [], action = {}) => {
   switch (action.type) {
     case SAVE_INTERNAL_MENU_LINK:
@@ -620,6 +623,16 @@ export const reducerForSavingInternalLinksList = (state = [], action = {}) => {
   }
 };
 
+export const cacheMessageInfoReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case CACHE_MESSAGE_INFO:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
 export const allReducers = {
   communities: communitiesReducer
 };
+

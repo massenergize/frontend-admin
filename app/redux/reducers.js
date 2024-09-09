@@ -77,6 +77,7 @@ import app, {
   reducerForLoadingOtherTestimonials
 } from "./modules/appReducer";
 
+
 /**
  * Creates the main reducer with the dynamically injected ones
  */
@@ -153,7 +154,8 @@ export default function createReducer(injectedReducers = {}) {
     featureActivationsForCommunities: reducerForCommunityFeatureActivation,
     communityFeatureFlags: saveCommunityFeatureFlagsReducer,
     menuConfigurations: saveNavigationConfigurationReducer,
-    internalLinks: reducerForSavingInternalLinksList
+    internalLinks: reducerForSavingInternalLinksList,
+    messageInfoCache: cacheMessageInfoReducer
   });
 
   // Wrap the root reducer and return a new root reducer with router state

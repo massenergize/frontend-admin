@@ -72,7 +72,6 @@ function LightAutoComplete(props) {
     containerStyle,
     multiple,
     showSelectAll = true,
-    isAsync,
     endpoint,
     args,
     params,
@@ -135,11 +134,11 @@ function LightAutoComplete(props) {
     if (nothing) {
       setSelected([]);
       transfer([]);
-      // onChange([]);
       return;
     }
     setSelected(["all"]);
     transfer(["all"]);
+    setShowDropdown(false);
   };
 
   const isAll = (item) => {
@@ -235,6 +234,12 @@ function LightAutoComplete(props) {
       )
     );
   };
+
+  const updateSelectedFromOutside = (newSelected) => {
+    setSelected(newSelected);
+    transfer(newSelected)
+  }
+
   return (
     <div
       style={{
@@ -244,7 +249,37 @@ function LightAutoComplete(props) {
       }}
       key={props?.key}
     >
+
       <div ref={chipWrapperRef}>{handleSelectionRender()}</div>
+      <div ref={chipWrapperRef}>
+        {showHiddenList && selected?.length > (shortenListAfter || 5) ? (
+          renderItemsListDisplayName ? (
+            renderItemsListDisplayName(selected, updateSelectedFromOutside)
+          ) : (
+            <span
+              onClick={() => showHiddenList && showHiddenList(selected, updateSelectedFromOutside)}
+              style={{
+                cursor: "pointer",
+                color: "blue"
+              }}
+            >
+              View full list
+            </span>
+          )
+        ) : (
+          selected?.length > 0 && (
+            <>
+              {selected.map((option, index) => {
+                var deleteOptions = { onDelete: () => handleSelection(option) };
+                deleteOptions = allowChipRemove ? deleteOptions : {};
+                return (
+                  <Chip key={index?.toString()} label={getLabel(option)} {...deleteOptions} className={classes.chips} />
+                );
+              })}
+            </>
+          )
+        )}
+      </div>
       <GhostDropdown
         show={showDropdown}
         close={() => setShowDropdown(false)}
