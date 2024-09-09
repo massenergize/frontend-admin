@@ -219,7 +219,7 @@ const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdm
     id: c.id
   }));
 
-  const publicityCommunities = (testimonial.approved_for_sharing_by || []).map((c) => c.id.toString());
+  const audience = (testimonial?.audience || []).map((c) => c.id.toString());
 
   const formJson = {
     title: "Edit Testimonial",
@@ -354,12 +354,12 @@ const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdm
         fieldType: "Section",
         children: [
           {
-            name: "share_type",
+            name: "sharing_type",
             label: "Who should be able to see this testimonial?",
             fieldType: "Radio",
             isRequired: false,
             defaultValue: testimonial?.share_type || null,
-            dbName: "share_type",
+            dbName: "sharing_type",
             readOnly: false,
             data: [
               { id: "OPEN", value: "All communities can use this testimonial " },
@@ -379,13 +379,13 @@ const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdm
                 valueToCheck: "OPEN_TO",
                 fields: [
                   {
-                    name: "can-view-story",
+                    name: "audience",
                     label: `Select the communities that can see and use this testimonial`,
                     placeholder: "",
                     fieldType: "Checkbox",
                     selectMany: true,
-                    defaultValue: publicityCommunities,
-                    dbName: "approved_for_sharing_by",
+                    defaultValue: audience,
+                    dbName: "audience",
                     data: otherCommunityList,
                     isAsync: true,
                     endpoint: isSuperAdmin

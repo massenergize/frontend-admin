@@ -12,7 +12,7 @@ function ShareTestimonialModalComponent({ story, shared, close, onComplete }) {
 
   const onConfirm = () => {
     setLoading(true);
-    const body = { testimonial_id: story.id, shared_with: [community.id], unshare: shared };
+    const body = { testimonial_id: story.id, community_ids: [community.id], unshare: shared };
     apiCall("/testimonials.share", body)
       .then((response) => {
         setLoading(false);

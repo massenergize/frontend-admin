@@ -259,11 +259,11 @@ const createFormJson = ({ communities, actions, vendors, isSuperAdmin, otherComm
         fieldType: "Section",
         children: [
           {
-            name: "share_type",
+            name: "sharing_type",
             label: "Who should be able to see this testimonial?",
             fieldType: "Radio",
             isRequired: false,
-            dbName: "share_type",
+            dbName: "sharing_type",
             readOnly: false,
             data: [
               { id: "OPEN", value: "All communities can use this testimonial " },
@@ -283,12 +283,12 @@ const createFormJson = ({ communities, actions, vendors, isSuperAdmin, otherComm
                 valueToCheck: "OPEN_TO",
                 fields: [
                   {
-                    name: "can-view-story",
+                    name: "audience",
                     label: `Select the communities that can see and use this testimonial`,
                     placeholder: "",
                     fieldType: "Checkbox",
                     selectMany: true,
-                    dbName: "approved_for_sharing_by",
+                    dbName: "audience",
                     data: otherCommunityList,
                     isAsync: true,
                     endpoint: isSuperAdmin
