@@ -66,8 +66,7 @@ import {
   SAVE_INTERNAL_MENU_LINK,
   LOAD_CC_ACTIONS_DATA,
   KEEP_TESTIMONIAL_STATE,
-  LOAD_ALL_OTHER_TESTIMONIALS
-} from "../ReduxConstants";
+  LOAD_ALL_OTHER_TESTIMONIALS,
   CACHE_MESSAGE_INFO,
 } from '../ReduxConstants';
 import { parseJSON } from "../../utils/common";
