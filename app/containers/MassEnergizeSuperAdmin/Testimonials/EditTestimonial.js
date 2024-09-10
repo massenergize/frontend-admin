@@ -220,7 +220,7 @@ const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdm
   }));
 
   const audience = (testimonial?.audience || []).map((c) => c.id.toString());
-
+console.log("SOCAH TOAH", testimonial)
   const formJson = {
     title: "Edit Testimonial",
     subTitle: "",
@@ -358,7 +358,7 @@ const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdm
             label: "Who should be able to see this testimonial?",
             fieldType: "Radio",
             isRequired: false,
-            defaultValue: testimonial?.share_type || null,
+            defaultValue: testimonial?.sharing_type || null,
             dbName: "sharing_type",
             readOnly: false,
             data: [
