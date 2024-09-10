@@ -74,7 +74,8 @@ import app, {
   reducerForSavingInternalLinksList,
   reducerForCCActionData, 
   reducerForOtherTestimonialState,
-  reducerForLoadingOtherTestimonials
+  reducerForLoadingOtherTestimonials,
+  cacheMessageInfoReducer
 } from "./modules/appReducer";
 
 
