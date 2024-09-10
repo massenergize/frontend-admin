@@ -220,7 +220,6 @@ const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdm
   }));
 
   const audience = (testimonial?.audience || []).map((c) => c.id.toString());
-console.log("SOCAH TOAH", testimonial)
   const formJson = {
     title: "Edit Testimonial",
     subTitle: "",
