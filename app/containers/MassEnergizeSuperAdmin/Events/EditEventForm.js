@@ -282,7 +282,6 @@ class EditEventForm extends Component {
     const { formJson, readOnly, event, mounted } = this.state;
     const { id } = (match && match.params) || passedEvent || {};
 
-    console.log("Lets see event", event)
 
     if (!event && mounted)
       return (

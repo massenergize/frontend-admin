@@ -34,11 +34,11 @@ function ShareTestimonialModalComponent({ story, shared, close, onComplete }) {
   };
   return (
     <div style={{ padding: "0px 20px" }}>
-      {isSuperAdmin ? (
+      {/* {isSuperAdmin ? (
         <SadminView auth={auth} isSuperAdmin={isSuperAdmin} story={story} />
-      ) : (
+      ) : ( */}
         <CadminView shared={shared} community={community} auth={auth} isSuperAdmin={isSuperAdmin} story={story} />
-      )}
+      {/* )} */}
 
       <div style={{ display: "flex", justifyContent: "center" }}>
         <div style={{ marginLeft: "auto", marginBottom: 10 }}>
