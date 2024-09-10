@@ -251,35 +251,6 @@ function LightAutoComplete(props) {
     >
 
       <div ref={chipWrapperRef}>{handleSelectionRender()}</div>
-      <div ref={chipWrapperRef}>
-        {showHiddenList && selected?.length > (shortenListAfter || 5) ? (
-          renderItemsListDisplayName ? (
-            renderItemsListDisplayName(selected, updateSelectedFromOutside)
-          ) : (
-            <span
-              onClick={() => showHiddenList && showHiddenList(selected, updateSelectedFromOutside)}
-              style={{
-                cursor: "pointer",
-                color: "blue"
-              }}
-            >
-              View full list
-            </span>
-          )
-        ) : (
-          selected?.length > 0 && (
-            <>
-              {selected.map((option, index) => {
-                var deleteOptions = { onDelete: () => handleSelection(option) };
-                deleteOptions = allowChipRemove ? deleteOptions : {};
-                return (
-                  <Chip key={index?.toString()} label={getLabel(option)} {...deleteOptions} className={classes.chips} />
-                );
-              })}
-            </>
-          )
-        )}
-      </div>
       <GhostDropdown
         show={showDropdown}
         close={() => setShowDropdown(false)}
