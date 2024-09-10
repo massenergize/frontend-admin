@@ -178,7 +178,7 @@ class AllTestimonials extends React.Component {
         return (
           <Tooltip title={isShared && !isSuperAdmin ? `Shared from ${d?.community?.name}` : ""}>
             {" "}
-            <b style={{ fontWeight: "bold", color: isShared ? "#ef6969" : "black" }}>
+            <b style={{ fontWeight: "bold", color: isShared && !isSuperAdmin ? "#ef6969" : "black" }}>
               {isShared && !isSuperAdmin && <i className="fa fa-share" style={{ marginRight: 5 }} />}
               {d?.community?.name || "..."}
             </b>
@@ -324,7 +324,7 @@ class AllTestimonials extends React.Component {
           customBodyRender: (d) => {
             const { id } = d || {};
             const isShared = !this.isShared(d?.community);
-            if (isShared)
+            if (isShared && !isSuperAdmin)
               return (
                 <Tooltip title={`Unshare: Remove from your list`}>
                   {" "}
