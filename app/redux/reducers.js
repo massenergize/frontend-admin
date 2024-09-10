@@ -72,9 +72,12 @@ import app, {
   saveCommunityFeatureFlagsReducer,
   saveNavigationConfigurationReducer,
   reducerForSavingInternalLinksList,
-  reducerForCCActionData,
+  reducerForCCActionData, 
+  reducerForOtherTestimonialState,
+  reducerForLoadingOtherTestimonials,
   cacheMessageInfoReducer
-} from './modules/appReducer';
+} from "./modules/appReducer";
+
 
 /**
  * Creates the main reducer with the dynamically injected ones
@@ -92,7 +95,9 @@ export default function createReducer(injectedReducers = {}) {
     activities: reducerForAdminActivities,
     otherCommunities: reducerForAllOtherCommunities,
     otherEventsState: reducerForSavingOtherEventState,
+    otherTestimonialsState: reducerForOtherTestimonialState,
     otherEvents: reducerForLoadingOtherEvents,
+    otherTestimonials: reducerForLoadingOtherTestimonials,
     flagInfos: reducerForFlagInfo,
     galleryFilters: reducerForGalleryFilters,
     sadmins: reducerForLoadingSuperAdmins,

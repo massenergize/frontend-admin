@@ -63,6 +63,8 @@ import {
   KEEP_LIST_OF_NAVIGATION_CONFIGURATION,
   SAVE_INTERNAL_MENU_LINK,
   LOAD_CC_ACTIONS_DATA,
+  KEEP_TESTIMONIAL_STATE,
+  LOAD_ALL_OTHER_TESTIMONIALS,
   CACHE_MESSAGE_INFO,
 } from '../ReduxConstants';
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
@@ -188,6 +190,12 @@ export const setupSocketConnectionWithBackend = (auth) => (
   connectSocket();
 };
 
+export const reduxLoadOtherTestimonials = (data) => {
+  return { type: LOAD_ALL_OTHER_TESTIMONIALS, payload: data };
+};
+export const reduxKeepOtherTestimonialState = (data) => {
+  return { type: KEEP_TESTIMONIAL_STATE, payload: data };
+};
 export const reduxAddInternalLinkList = (data) => {
   return { type: SAVE_INTERNAL_MENU_LINK, payload: data };
 };

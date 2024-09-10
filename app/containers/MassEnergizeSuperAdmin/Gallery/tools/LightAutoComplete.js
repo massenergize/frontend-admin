@@ -78,7 +78,8 @@ function LightAutoComplete(props) {
     selectAllV2, // If true, the component will only show one chip with the text "All" and will not show the list of selected items
     showHiddenList,
     renderItemsListDisplayName,
-    shortenListAfter
+    shortenListAfter, 
+    renderSelectedItems
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
@@ -203,6 +204,36 @@ function LightAutoComplete(props) {
   const thereAreNoOptionsToDisplay = query ? filteredItems?.length === 0 : optionsToDisplay.length === 0;
   const userHasSelectedStuff = selected.length;
 
+  const handleSelectionRender = () => {
+    if (renderSelectedItems) return renderSelectedItems(selected, setSelected);
+    return showHiddenList && selected?.length > (shortenListAfter || 5) ? (
+      renderItemsListDisplayName ? (
+        renderItemsListDisplayName(selected, setSelected)
+      ) : (
+        <span
+          onClick={() => showHiddenList && showHiddenList(selected, setSelected)}
+          style={{
+            cursor: "pointer",
+            color: "blue"
+          }}
+        >
+          View full list
+        </span>
+      )
+    ) : (
+      selected?.length > 0 && (
+        <>
+          {selected.map((option, index) => {
+            var deleteOptions = { onDelete: () => handleSelection(option) };
+            deleteOptions = allowChipRemove ? deleteOptions : {};
+            return (
+              <Chip key={index?.toString()} label={getLabel(option)} {...deleteOptions} className={classes.chips} />
+            );
+          })}
+        </>
+      )
+    );
+  };
 
   const updateSelectedFromOutside = (newSelected) => {
     setSelected(newSelected);
@@ -218,35 +249,8 @@ function LightAutoComplete(props) {
       }}
       key={props?.key}
     >
-      <div ref={chipWrapperRef}>
-        {showHiddenList && selected?.length > (shortenListAfter || 5) ? (
-          renderItemsListDisplayName ? (
-            renderItemsListDisplayName(selected, updateSelectedFromOutside)
-          ) : (
-            <span
-              onClick={() => showHiddenList && showHiddenList(selected, updateSelectedFromOutside)}
-              style={{
-                cursor: "pointer",
-                color: "blue"
-              }}
-            >
-              View full list
-            </span>
-          )
-        ) : (
-          selected?.length > 0 && (
-            <>
-              {selected.map((option, index) => {
-                var deleteOptions = { onDelete: () => handleSelection(option) };
-                deleteOptions = allowChipRemove ? deleteOptions : {};
-                return (
-                  <Chip key={index?.toString()} label={getLabel(option)} {...deleteOptions} className={classes.chips} />
-                );
-              })}
-            </>
-          )
-        )}
-      </div>
+
+      <div ref={chipWrapperRef}>{handleSelectionRender()}</div>
       <GhostDropdown
         show={showDropdown}
         close={() => setShowDropdown(false)}
