@@ -1,5 +1,5 @@
 import { Avatar, Button, Paper, Tooltip, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import { Link } from "react-router-dom";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
 import { apiCall } from "../../../utils/messenger";
