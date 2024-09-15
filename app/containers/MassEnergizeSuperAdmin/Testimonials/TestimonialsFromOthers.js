@@ -73,7 +73,7 @@ function TestimonialsFromOthers({ classes }) {
 
   const afterResponse = (error, data, options) => {
     if (error || !data) return toast(error || "Sorry, an error occured", false);
-    const { remove } = options || {};
+    const { remove, otherTestimonials } = options || {};
     // Modify the item in the "otherTestimonials" list
     const index = otherTestimonials.findIndex((it) => it?.id === data?.id);
     const copy = [...otherTestimonials];
