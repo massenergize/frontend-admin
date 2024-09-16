@@ -1,5 +1,5 @@
 import { Avatar, Button, Paper, Tooltip, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import { Link } from "react-router-dom";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
 import { apiCall } from "../../../utils/messenger";
@@ -73,7 +73,7 @@ function TestimonialsFromOthers({ classes }) {
 
   const afterResponse = (error, data, options) => {
     if (error || !data) return toast(error || "Sorry, an error occured", false);
-    const { remove } = options || {};
+    const { remove, otherTestimonials } = options || {};
     // Modify the item in the "otherTestimonials" list
     const index = otherTestimonials.findIndex((it) => it?.id === data?.id);
     const copy = [...otherTestimonials];

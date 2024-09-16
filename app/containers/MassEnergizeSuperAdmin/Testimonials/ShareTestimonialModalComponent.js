@@ -5,6 +5,7 @@ import { Button } from "@mui/material";
 import { apiCall } from "../../../utils/messenger";
 
 function ShareTestimonialModalComponent({ story, shared, close, onComplete }) {
+  const otherTestimonials = useSelector((state) => state.getIn(["otherTestimonials"]));
   const [loading, setLoading] = useState(false);
   const auth = useSelector((state) => state.getIn(["auth"]));
   const isSuperAdmin = auth?.is_super_admin;
@@ -17,7 +18,7 @@ function ShareTestimonialModalComponent({ story, shared, close, onComplete }) {
       .then((response) => {
         setLoading(false);
         if (!response.success) return console.log("ERROR_SHARING_TESTIMONIAL", response?.error);
-        onComplete && onComplete(response?.error, response?.data, { remove: shared });
+        onComplete && onComplete(response?.error, response?.data, { remove: shared, otherTestimonials });
         close && close();
       })
       .catch((e) => {

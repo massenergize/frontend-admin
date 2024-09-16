@@ -78,7 +78,7 @@ function LightAutoComplete(props) {
     selectAllV2, // If true, the component will only show one chip with the text "All" and will not show the list of selected items
     showHiddenList,
     renderItemsListDisplayName,
-    shortenListAfter, 
+    shortenListAfter,
     renderSelectedItems
   } = props;
 
@@ -192,6 +192,10 @@ function LightAutoComplete(props) {
   useEffect(() => mount(), []);
 
   useEffect(() => {
+    setOptionsToDisplay(data);
+  }, [data?.toString()]);
+
+  useEffect(() => {
     setSelected(defaultSelected);
   }, [defaultSelected]);
 
@@ -237,8 +241,8 @@ function LightAutoComplete(props) {
 
   const updateSelectedFromOutside = (newSelected) => {
     setSelected(newSelected);
-    transfer(newSelected)
-  }
+    transfer(newSelected);
+  };
 
   return (
     <div
@@ -249,7 +253,6 @@ function LightAutoComplete(props) {
       }}
       key={props?.key}
     >
-
       <div ref={chipWrapperRef}>{handleSelectionRender()}</div>
       <GhostDropdown
         show={showDropdown}
