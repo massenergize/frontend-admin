@@ -150,7 +150,7 @@
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.40",
     "mui-datatables": "^4.3.0",
-    "npm": "^9.7.2",
+    "npm": "^10.5.2",
     "prop-types": "15.7.2",
     "qs": "^6.11.2",
     "rcolor": "^1.0.1",
