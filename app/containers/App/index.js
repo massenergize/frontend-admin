@@ -22,6 +22,7 @@ import {
   TWENTY_FOUR_HOURS,
 } from "../../utils/constants";
 import * as Sentry from "@sentry/react";
+import { parseJSON } from "../../utils/common";
 
 window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
 
@@ -95,7 +96,7 @@ class App extends React.Component {
       // if admin is from an external source(email link)
       if (params[1]) {
         // decode the token
-        let decodedData = JSON.parse(atob(params[1]));
+        let decodedData = parseJSON(atob(params[1]));
         // check if admin is logged in with same email from the external source
         // if no log the admin out
         if (decodedData?.email !== user.email) {

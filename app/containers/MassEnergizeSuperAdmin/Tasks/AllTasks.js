@@ -6,7 +6,7 @@ import MUIDataTable from "mui-datatables";
 import { connect } from "react-redux";
 import styles from "../../../components/Widget/widget-jss";
 import { apiCall } from "../../../utils/messenger";
-import { smartString } from "../../../utils/common";
+import { parseJSON, smartString } from "../../../utils/common";
 import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import {
   reduxToggleUniversalModal,
@@ -79,7 +79,7 @@ class AllTasks extends React.Component {
       smartString(d.name),
       smartString(
         new Date(
-          JSON.parse(d && d.recurring_details).actual
+          parseJSON(d && d.recurring_details).actual
         ).toLocaleDateString("en-US", {
           month: "short",
           day: "numeric",

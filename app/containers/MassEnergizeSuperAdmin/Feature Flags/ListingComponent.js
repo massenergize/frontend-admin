@@ -1,6 +1,6 @@
 import { Button, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { connect, useSelector } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { reduxAddFlagInfo } from "../../../redux/redux-actions/adminActions";
 import { apiCall } from "../../../utils/messenger";
@@ -11,14 +11,16 @@ function ListingComponent({
   infos,
   close,
   isCommunity = true,
+  audienceType,
 }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [content, setContent] = useState(null); // The full version of the ff that has been loaded from the api is put here
   const [deleteContent, setDeleteContent] = useState(null); // The item that is in focus for deletion, is put here
-  const title = `This feature flag is associated with the following ${
-    isCommunity ? " communities " : " users "
-  } `;
+
+  const title = `This feature flag is associated ${audienceType === "ALL_EXCEPT" ? "with all except the following" : "only with the following"}${
+    isCommunity ? " communities:" : " users:"}`;
+
   const contentToDisplay = isCommunity
     ? (content || {}).communities
     : (content || {}).users;

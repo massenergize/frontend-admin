@@ -13,6 +13,8 @@ function AddOrEditFeatureFlags({
   putFlagsInRedux,
   featureFlags,
   featureToEdit,
+  keepInfoInRedux,
+  cachedFeatureFlagsInfo,
   setFeatureToEdit
 }) {
   const [_users, setUsers] = useState(users || []);
@@ -21,19 +23,25 @@ function AddOrEditFeatureFlags({
 
   if (featureFlags === LOADING) return <Loading />;
 
+
   const flagKeys = (featureFlags && featureFlags.keys) || {};
   if (!Object.keys(flagKeys).length)
-    return <Paper style={{ padding: 40 }}>Sorry, something happened. Please try again later.</Paper>;
+    return (
+      <Paper style={{ padding: 40 }}>
+        Sorry, something happened. Please try again later.
+      </Paper>
+    );
 
   const ifApiIsSuccessful = (data, yes) => {
     if (!yes) return;
     var features = (featureFlags && featureFlags.features) || [];
     features = features.filter((f) => f.id.toString() !== data.id.toString());
     putFlagsInRedux({ ...(featureFlags || {}), features: [data, ...features] });
+    keepInfoInRedux({ ...cachedFeatureFlagsInfo, [data.id]: data });
     switchTabs();
   };
 
-  const formJson = createFormJson({
+ const formJson = createFormJson({
     communities,
     flagKeys,
     users: _users,
@@ -42,12 +50,13 @@ function AddOrEditFeatureFlags({
     inEditMode,
     featureToEdit,
     setUsers,
-    ids: comIds,
+    ids:comIds,
     setComIds
-  });
+ });
 
   return (
     <MassEnergizeForm
+      onBack={() => switchTabs()}
       onClear={() => {
         setFeatureToEdit(null);
       }}
@@ -65,9 +74,9 @@ const preflight = (data) => {
     ...(data || {}),
     user_ids: user_ids.map((u) => u.id),
     scope,
-    key: uniqueIdentifier(data.name)
+    key: uniqueIdentifier(data.name),
   };
-  if (json.should_expire === "false") json.expires_on = null; // provide null to clear the date
+  if (json.should_expire === "false") json.expires_on = null;   // provide null to clear the date
   delete json.should_expire;
   return json;
 };
@@ -79,18 +88,29 @@ const uniqueIdentifier = (text) => {
 };
 
 const parseFeatureForEditMode = (feature) => {
-  const comIds = ((feature && feature.communities) || []).map((c) => c.id.toString());
+  const comIds = ((feature && feature.communities) || []).map((c) =>
+    c.id.toString()
+  );
   const json = {
     ...(feature || {}),
     comIds,
     selectedUsers: (feature && feature.users) || [],
     userAudience: feature && feature.user_audience,
-    scope: feature && feature.scope ? [feature.scope] : []
+    scope: feature && feature.scope ? [feature.scope] : [],
   };
   return json;
 };
 
-var createFormJson = ({ communities, flagKeys, users, inEditMode, featureToEdit, setUsers, ids, setComIds }) => {
+var createFormJson = ({
+  communities,
+  flagKeys,
+  users,
+  inEditMode,
+  featureToEdit,
+  setUsers,
+  ids,
+  setComIds
+}) => {
   const labelExt = (user) => `${user.preferred_name} - (${user.email})`;
   const valueExt = (user) => user.id;
   const audienceKeys = flagKeys.audience || {};
@@ -98,7 +118,7 @@ var createFormJson = ({ communities, flagKeys, users, inEditMode, featureToEdit,
   communities = (communities || []).map((com) => ({
     displayName: com.name,
     id: com.id,
-    value: com.id.toString()
+    value: com.id.toString(),
   }));
 
   const scopeArr = Object.entries(flagKeys.scope || {});
@@ -112,11 +132,12 @@ var createFormJson = ({ communities, flagKeys, users, inEditMode, featureToEdit,
     expires_on,
     userAudience,
     allow_opt_in,
-    id
+    id,
   } = parseFeatureForEditMode(featureToEdit);
-  const fetchAllUsersInSelectedCommunities = (communityIDs = []) => {
+  const fetchAllUsersInSelectedCommunities = (communityIDs=[]) => {
+
     const args = communityIDs?.length ? { community_ids: communityIDs } : {};
-    apiCall("/users.listForSuperAdmin", args).then(({ data }) => {
+    apiCall("/users.listForSuperAdmin",args).then(({ data }) => {
       setUsers(data || []);
     });
   };
@@ -145,7 +166,7 @@ var createFormJson = ({ communities, flagKeys, users, inEditMode, featureToEdit,
                 defaultValue: id || "",
                 dbName: "id",
                 readOnly: true,
-                disabled: true
+                disabled: true,
               }
             : {},
           {
@@ -158,19 +179,20 @@ var createFormJson = ({ communities, flagKeys, users, inEditMode, featureToEdit,
             defaultValue: name || "",
             dbName: "name",
             readOnly: false,
-            maxLength: 60
+            maxLength: 60,
           },
 
           {
             name: "notes",
             label: "Briefly describe this feature",
-            placeholder: "Eg. This feature allows guests to use all platform functionalities without...",
+            placeholder:
+              "Eg. This feature allows guests to use all platform functionalities without...",
             fieldType: fieldTypes.TextField,
             contentType: "text",
             isRequired: false,
             defaultValue: notes || "",
             dbName: "notes",
-            readOnly: false
+            readOnly: false,
           },
           {
             name: "scope",
@@ -182,10 +204,10 @@ var createFormJson = ({ communities, flagKeys, users, inEditMode, featureToEdit,
             defaultValue: scope || [],
             data: scopeArr.map(([_, { name, key }]) => ({
               id: key,
-              displayName: name
-            }))
-          }
-        ]
+              displayName: name,
+            })),
+          },
+        ],
       },
 
       {
@@ -202,7 +224,7 @@ var createFormJson = ({ communities, flagKeys, users, inEditMode, featureToEdit,
             readOnly: false,
             data: audienceKeysArr.map(([_, { name, key }]) => ({
               id: key,
-              value: name
+              value: name,
             })),
 
             conditionalDisplays: [
@@ -220,16 +242,17 @@ var createFormJson = ({ communities, flagKeys, users, inEditMode, featureToEdit,
                     data: communities,
                     onClose: updateUsersWhenComIdsChange,
                     isAsync: true,
-                    endpoint: "/communities.listForSuperAdmin"
-                  }
-                ]
+                    endpoint: "/communities.listForSuperAdmin",
+                  },
+                ],
               },
               {
                 valueToCheck: audienceKeys.ALL_EXCEPT.key,
                 fields: [
                   {
                     name: "community_ids",
-                    label: "Select all communities that should NOT have this feature",
+                    label:
+                      "Select all communities that should NOT have this feature",
                     placeholder: "eg. Wayland",
                     fieldType: fieldTypes.Checkbox,
                     selectMany: true,
@@ -238,13 +261,13 @@ var createFormJson = ({ communities, flagKeys, users, inEditMode, featureToEdit,
                     data: communities,
                     onClose: updateUsersWhenComIdsChange,
                     isAsync: true,
-                    endpoint: "/communities.listForSuperAdmin"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
+                    endpoint: "/communities.listForSuperAdmin",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       },
       // -------------------------------------
       {
@@ -261,7 +284,7 @@ var createFormJson = ({ communities, flagKeys, users, inEditMode, featureToEdit,
             readOnly: false,
             data: audienceKeysArr.map(([_, { name, key }]) => ({
               id: key,
-              value: name
+              value: name,
             })),
             conditionalDisplays: [
               {
@@ -269,8 +292,8 @@ var createFormJson = ({ communities, flagKeys, users, inEditMode, featureToEdit,
                 fields: [
                   {
                     name: "users",
-                    label: "Select all users that should have this feature activated",
-                    placeholder: "Search with their username, or email.. Eg. 'Mademoiselle Kaat'",
+                    label:"Select all users that should have this feature activated",
+                    placeholder:"Search with their username, or email.. Eg. 'Mademoiselle Kaat'",
                     fieldType: fieldTypes.AutoComplete,
                     defaultValue: selectedUsers || [],
                     selectMany: true,
@@ -281,17 +304,19 @@ var createFormJson = ({ communities, flagKeys, users, inEditMode, featureToEdit,
                     isAsync: true,
                     endpoint: "/users.listForSuperAdmin",
                     multiple: true,
-                    args: { community_ids: ids }
-                  }
-                ]
+                    args:{community_ids: ids}
+                  },
+                ],
               },
               {
                 valueToCheck: audienceKeys.ALL_EXCEPT.key,
                 fields: [
                   {
                     name: "users",
-                    label: "Select all users that should NOT have this feature",
-                    placeholder: "Search with their username, or email.. Eg. 'Monsieur Brad'",
+                    label:
+                      "Select all users that should NOT have this feature",
+                    placeholder:
+                      "Search with their username, or email.. Eg. 'Monsieur Brad'",
                     fieldType: fieldTypes.AutoComplete,
                     contentType: "text",
                     defaultValue: selectedUsers || [],
@@ -302,13 +327,13 @@ var createFormJson = ({ communities, flagKeys, users, inEditMode, featureToEdit,
                     isAsync: true,
                     endpoint: "/users.listForSuperAdmin",
                     multiple: true,
-                    selectMany: true
-                  }
-                ]
-              }
-            ]
-          }
-        ]
+                    selectMany: true,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       },
       // ------------------------------------
       {
@@ -323,7 +348,10 @@ var createFormJson = ({ communities, flagKeys, users, inEditMode, featureToEdit,
             defaultValue: expires_on ? "true" : "false",
             dbName: "should_expire",
             readOnly: false,
-            data: [{ id: "false", value: "Does not expire" }, { id: "true", value: "Should expire on" }],
+            data: [
+              { id: "false", value: "Does not expire" },
+              { id: "true", value: "Should expire on" },
+            ],
             child: {
               valueToCheck: "true",
               fields: [
@@ -335,12 +363,12 @@ var createFormJson = ({ communities, flagKeys, users, inEditMode, featureToEdit,
                   contentType: "text",
                   defaultValue: expires_on || "",
                   dbName: "expires_on",
-                  minDate: new Date()
-                }
-              ]
-            }
-          }
-        ]
+                  minDate: new Date(),
+                },
+              ],
+            },
+          },
+        ],
       },
       {
         label: "Allow Community Admins to opt-in to this feature",
@@ -354,11 +382,14 @@ var createFormJson = ({ communities, flagKeys, users, inEditMode, featureToEdit,
             defaultValue: allow_opt_in ? "true" : "false",
             dbName: "allow_opt_in",
             readOnly: false,
-            data: [{ id: "true", value: "Allow Opt-In" }, { id: "false", value: "Dont allow Opt-In" }]
-          }
-        ]
-      }
-    ]
+            data: [
+              { id: "true", value: "Allow Opt-In" },
+              { id: "false", value: "Dont allow Opt-In" },
+            ],
+          },
+        ],
+      },
+    ],
   };
   return json;
 };

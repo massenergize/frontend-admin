@@ -59,7 +59,7 @@ function ManageFeatureFlags({
         key: "is-for-every-community",
         options: {
           filter: true,
-          customBodyRender: ({ isForEveryone, id }) => {
+          customBodyRender: ({ isForEveryone, id, audienceType}) => {
             return (
               <Typography
                 variant="caption"
@@ -71,7 +71,7 @@ function ManageFeatureFlags({
                 }}
                 onClick={() => {
                   if (isForEveryone) return;
-                  setShowListingModal({ id, show: true, isCommunity: true }); // Only show modal if its for only a select number of communites
+                  setShowListingModal({ id, show: true, isCommunity: true, audienceType }); // Only show modal if its for only a select number of communites
                 }}
               >
                 <i
@@ -90,7 +90,7 @@ function ManageFeatureFlags({
         key: "is-for-every-user",
         options: {
           filter: true,
-          customBodyRender: ({ isForEveryone, id }) => {
+          customBodyRender: ({ isForEveryone, id, audienceType }) => {
             return (
               <Typography
                 variant="caption"
@@ -102,7 +102,7 @@ function ManageFeatureFlags({
                 }}
                 onClick={() => {
                   if (isForEveryone) return;
-                  setShowListingModal({ id, show: true, isCommunity: false });
+                  setShowListingModal({ id, show: true, isCommunity: false, audienceType });
                 }}
               >
                 <i
@@ -199,11 +199,13 @@ function ManageFeatureFlags({
         {
           isForEveryone: feature.audience === flagKeys.audience.EVERYONE.key,
           id: feature.id,
+          audienceType: feature.audience,
         },
         {
           isForEveryone:
             feature.user_audience === flagKeys.audience.EVERYONE.key,
           id: feature.id,
+          audienceType: feature.user_audience,
         },
         hasExpired(feature.expires_on) ? "Expired" : "Active",
         feature?.allow_opt_in,

@@ -5,7 +5,7 @@ const CADMIN_MENU = [
     key: "dashboard",
     name: "Dashboard",
     icon: "ios-stats",
-    link: "/",
+    link: "/"
   },
   {
     key: "communities",
@@ -15,14 +15,14 @@ const CADMIN_MENU = [
       {
         key: "about-communities",
         name: "My Communities",
-        title: true,
+        title: true
       },
       {
         key: "all-communities",
         name: "All My Communities",
-        link: "/admin/read/communities",
-      },
-    ],
+        link: "/admin/read/communities"
+      }
+    ]
   },
   {
     key: "actions",
@@ -32,19 +32,19 @@ const CADMIN_MENU = [
       {
         key: "about-actions",
         name: "Actions",
-        title: true,
+        title: true
       },
       {
         key: "add-action",
         name: "Add New Action",
-        link: "/admin/add/action",
+        link: "/admin/add/action"
       },
       {
         key: "all-actions",
         name: "All Actions",
-        link: "/admin/read/actions",
-      },
-    ],
+        link: "/admin/read/actions"
+      }
+    ]
   },
   {
     key: "events",
@@ -54,24 +54,24 @@ const CADMIN_MENU = [
       {
         key: "about-events",
         name: "Events & Campaigns",
-        title: true,
+        title: true
       },
       {
         key: "add-event",
         name: "Add Event or Campaign",
-        link: "/admin/add/event",
+        link: "/admin/add/event"
       },
       {
         key: "all-events",
         name: "Events - My Community",
-        link: "/admin/read/events",
+        link: "/admin/read/events"
       },
       {
         key: "other-communities",
         name: "Share Events from Other Communities",
-        link: "/admin/read/events/event-sharing",
-      },
-    ],
+        link: "/admin/read/events/event-sharing"
+      }
+    ]
   },
   {
     key: "messages",
@@ -81,20 +81,20 @@ const CADMIN_MENU = [
       {
         key: "all-messages",
         name: "All Messages",
-        title: true,
+        title: true
       },
 
       {
         key: "all-team-admin-messages",
         name: "Team Admin Messages",
-        link: "/admin/read/team-admin-messages",
+        link: "/admin/read/team-admin-messages"
       },
       {
         key: "all-community-admin-messages",
         name: "Community Admin Messages",
-        link: "/admin/read/community-admin-messages",
-      },
-    ],
+        link: "/admin/read/community-admin-messages"
+      }
+    ]
   },
   {
     key: "teams",
@@ -104,19 +104,19 @@ const CADMIN_MENU = [
       {
         key: "about-teams",
         name: "Teams",
-        title: true,
+        title: true
       },
       {
         key: "add-team",
         name: "Add New Team",
-        link: "/admin/add/team",
+        link: "/admin/add/team"
       },
       {
         key: "all-teams",
         name: "All Teams",
-        link: "/admin/read/teams",
-      },
-    ],
+        link: "/admin/read/teams"
+      }
+    ]
   },
   {
     key: "subscribers",
@@ -126,14 +126,14 @@ const CADMIN_MENU = [
       {
         key: "about-subscribers",
         name: "Subscribers",
-        title: true,
+        title: true
       },
       {
         key: "all-subscribers",
         name: "All Subscribers",
-        link: "/admin/read/subscribers",
-      },
-    ],
+        link: "/admin/read/subscribers"
+      }
+    ]
   },
   {
     key: "testimonials",
@@ -143,19 +143,24 @@ const CADMIN_MENU = [
       {
         key: "about-testimonials",
         name: "testimonials",
-        title: true,
+        title: true
       },
       {
         key: "add-testimonial",
         name: "Add New Testimonial",
-        link: "/admin/add/testimonial",
+        link: "/admin/add/testimonial"
       },
       {
         key: "all-testimonials",
         name: "All Testimonials",
-        link: "/admin/read/testimonials",
+        link: "/admin/read/testimonials"
       },
-    ],
+      {
+        key: "shared-testimonials",
+        name: "Shared Testimonials from other Communities",
+        link: "/admin/read/testimonials/testimonial-sharing"
+      }
+    ]
   },
   {
     key: "vendors",
@@ -165,19 +170,19 @@ const CADMIN_MENU = [
       {
         key: "about-vendors",
         name: "Contractors/Vendors",
-        title: true,
+        title: true
       },
       {
         key: "add-vendor",
         name: "Add New Vendor",
-        link: "/admin/add/vendor",
+        link: "/admin/add/vendor"
       },
       {
         key: "all-vendors",
         name: "All Vendors",
-        link: "/admin/read/vendors",
-      },
-    ],
+        link: "/admin/read/vendors"
+      }
+    ]
   },
   {
     key: "users",
@@ -187,14 +192,14 @@ const CADMIN_MENU = [
       {
         key: "about-users",
         name: "Users",
-        title: true,
+        title: true
       },
       {
         key: "all-users",
         name: "All Users",
-        link: "/admin/read/users",
-      },
-    ],
+        link: "/admin/read/users"
+      }
+    ]
   },
   {
     key: "settings",
@@ -204,62 +209,56 @@ const CADMIN_MENU = [
       {
         key: "settings-page",
         link: "/admin/profile/preferences",
-        name: "Communication preferences",
-      },
-    ],
-  },
+        name: "Communication preferences"
+      }
+    ]
+  }
 ];
 
-
-let menuAttachmentsObj = {} 
+let menuAttachmentsObj = {};
 
 menuAttachmentsObj[FLAGS.BROADCAST_MESSAGING_FF] = {
-    appendTo: "messages",
-    value: [
-      {
-        key: "send-message",
-        name: "Send Message",
-        link: "/admin/send/message",
-      },
-      {
-        key: "scheduled-messages",
-        name: "Scheduled Messages",
-        link: "/admin/scheduled/messages",
-      },
-    ],
-    index: 1,
-  }
+  appendTo: "messages",
+  value: [
+    {
+      key: "send-message",
+      name: "Send Message",
+      link: "/admin/send/message"
+    },
+    {
+      key: "scheduled-messages",
+      name: "Scheduled Messages",
+      link: "/admin/scheduled/messages"
+    }
+  ],
+  index: 1
+};
 
-
-
-const hasAlreadyBeenAppended = (mainArray, bigObjArray) =>{
-const idsA = bigObjArray.map((objA) => objA.key);
-return idsA.every((id) =>mainArray.some((objB) => objB.key === id));
-}
-
-
+const hasAlreadyBeenAppended = (mainArray, bigObjArray) => {
+  const idsA = bigObjArray.map((objA) => objA.key);
+  return idsA.every((id) => mainArray.some((objB) => objB.key === id));
+};
 
 const communityAdminMenu = ({ flags }) => {
-
   if (!flags || flags?.length === 0) return CADMIN_MENU;
 
-   flags.forEach((flag) => {
+  flags.forEach((flag) => {
     if (menuAttachmentsObj[flag.key]) {
       const { appendTo, value, index } = menuAttachmentsObj[flag.key];
-      
+
       if (appendTo) {
         const menuItemIndex = CADMIN_MENU.findIndex((item) => item.key === appendTo);
 
         if (menuItemIndex !== -1) {
           const updatedMenu = [...CADMIN_MENU];
-          if(hasAlreadyBeenAppended(updatedMenu[menuItemIndex].child, value)) return CADMIN_MENU;
+          if (hasAlreadyBeenAppended(updatedMenu[menuItemIndex].child, value)) return CADMIN_MENU;
           updatedMenu[menuItemIndex].child.splice(index, 0, ...value);
           CADMIN_MENU.length = 0;
           CADMIN_MENU.push(...updatedMenu);
         }
         return CADMIN_MENU;
       } else {
-        if(hasAlreadyBeenAppended(CADMIN_MENU, value)) return CADMIN_MENU;
+        if (hasAlreadyBeenAppended(CADMIN_MENU, value)) return CADMIN_MENU;
         CADMIN_MENU.splice(index, 0, ...value);
         return CADMIN_MENU;
       }

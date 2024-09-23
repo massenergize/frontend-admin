@@ -30,12 +30,11 @@ let FIREBASE_CONFIG = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID
 };
 
-if (IS_PROD || IS_CANARY) {
+if (IS_PROD || IS_CANARY)
   FIREBASE_CONFIG = {
     ...FIREBASE_CONFIG,
     measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
   };
-}
 
 console.log("Welcome to MassEnergize Admin Panel:", BUILD_VERSION);
 

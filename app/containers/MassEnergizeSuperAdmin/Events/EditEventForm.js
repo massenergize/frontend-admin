@@ -169,7 +169,7 @@ class EditEventForm extends Component {
       if (!event) findEventFromBackend({ id, storeEventInHeap });
     } else event = passedEvent;
     // ----------------------------------------------------------------------
-
+    
     const readOnly = checkIfReadOnly(event, auth);
     const thereIsNothingInEventsExceptionsList = rescheduledEvent === null;
 
@@ -281,6 +281,7 @@ class EditEventForm extends Component {
     const { classes, match, passedEvent } = this.props;
     const { formJson, readOnly, event, mounted } = this.state;
     const { id } = (match && match.params) || passedEvent || {};
+
 
     if (!event && mounted)
       return (
