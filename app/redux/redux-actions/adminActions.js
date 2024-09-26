@@ -63,6 +63,9 @@ import {
   KEEP_LIST_OF_NAVIGATION_CONFIGURATION,
   SAVE_INTERNAL_MENU_LINK,
   LOAD_CC_ACTIONS_DATA,
+  KEEP_TESTIMONIAL_STATE,
+  LOAD_ALL_OTHER_TESTIMONIALS,
+  CACHE_MESSAGE_INFO,
 } from '../ReduxConstants';
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -81,6 +84,7 @@ import {
 } from "../../utils/helpers";
 import { PAGE_PROPERTIES } from "../../containers/MassEnergizeSuperAdmin/ME  Tools/MEConstants";
 import SocketNotificationModal from "../../containers/MassEnergizeSuperAdmin/Misc/SocketNotificationModal";
+import { parseJSON } from "../../utils/common";
 
 // TODO: REOMVE THIS FUNCTiON
 export const testRedux = (value) => {
@@ -123,7 +127,7 @@ export const setupSocketConnectionWithBackend = (auth) => (
     socket.onmessage = (e) => {
       const reduxState = getState();
       const thereIsUserActivity = reduxState.getIn(["userIsActive"]);
-      let data = JSON.parse(e.data || "{}");
+      let data = parseJSON(e.data);
       const type = data?.type;
       if (type === USER_SESSION_EXPIRED) {
         // If session has expired and no activity, just redirect to login
@@ -186,6 +190,12 @@ export const setupSocketConnectionWithBackend = (auth) => (
   connectSocket();
 };
 
+export const reduxLoadOtherTestimonials = (data) => {
+  return { type: LOAD_ALL_OTHER_TESTIMONIALS, payload: data };
+};
+export const reduxKeepOtherTestimonialState = (data) => {
+  return { type: KEEP_TESTIMONIAL_STATE, payload: data };
+};
 export const reduxAddInternalLinkList = (data) => {
   return { type: SAVE_INTERNAL_MENU_LINK, payload: data };
 };
@@ -1065,6 +1075,13 @@ export const loadTasksAction = (data = []) => {
 export const saveCommunityFeatureFlagsAction = (data = []) => {
   return {
     type: SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX,
+    payload: data,
+  };
+};
+
+export const cacheMessageInfoAction = (data = {}) => {
+  return {
+    type: CACHE_MESSAGE_INFO,
     payload: data,
   };
 };

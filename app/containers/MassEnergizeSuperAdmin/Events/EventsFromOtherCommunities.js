@@ -1,10 +1,4 @@
-import {
-  Avatar,
-  Button,
-  Paper,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Avatar, Button, Checkbox, FormControl, Paper, Tooltip, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getHumanFriendlyDate, smartString } from "../../../utils/common";
@@ -17,7 +11,9 @@ import { getLimit, handleFilterChange, onTableStateChange } from "../../../utils
 import SearchBar from "../../../utils/components/searchBar/SearchBar";
 import ApplyFilterButton from "../../../utils/components/applyFilterButton/ApplyFilterButton";
 import Seo from "../../../components/Seo/Seo";
-import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from '../../../utils/constants';
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from "../../../utils/constants";
+import { renderSelectedItems } from "../Testimonials/TestimonialsFromOthers";
+import { FormControlLabel } from "@mui/material";
 
 function EventsFromOtherCommunities({
   putOtherEventsInRedux,
@@ -27,11 +23,10 @@ function EventsFromOtherCommunities({
   state,
   putStateInRedux,
   meta,
-  putMetaDataToRedux,
+  putMetaDataToRedux
 }) {
   const [loading, setLoading] = useState(false);
   const { communities, exclude, mounted } = state || {};
-
 
   const setCommunities = (communities) => {
     putStateInRedux({ ...(state || {}), communities });
@@ -49,12 +44,12 @@ function EventsFromOtherCommunities({
       {
         id: d.id,
         image: d.image,
-        initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`,
+        initials: `${d.name && d.name.substring(0, 2).toUpperCase()}`
       },
       smartString(d.name), // limit to first 30 chars
       `${smartString(d.tags.map((t) => t.name).join(", "), 30)}`,
       d.is_global ? "Template" : d.community && d.community.name,
-      d.id,
+      d.id
     ]);
     return fashioned;
   };
@@ -76,13 +71,13 @@ function EventsFromOtherCommunities({
     apiCall("/events.others.listForCommunityAdmin", {
       community_ids: ids,
       exclude: exclude || false,
-      limit:getLimit(PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS.key)
+      limit: getLimit(PAGE_PROPERTIES.OTHER_COMMUNITY_EVENTS.key)
     })
       .then((response) => {
         setLoading(false);
-        if (response.success){
+        if (response.success) {
           putOtherEventsInRedux(response.data);
-          putMetaDataToRedux({...meta, otherEvents: response.cursor });
+          putMetaDataToRedux({ ...meta, otherEvents: response.cursor });
         }
       })
       .catch((e) => {
@@ -97,16 +92,16 @@ function EventsFromOtherCommunities({
         name: "ID",
         key: "id",
         options: {
-          filter: false,
-        },
+          filter: false
+        }
       },
       {
         name: "Date",
         key: "date",
         options: {
           filter: false,
-          download: true,
-        },
+          download: true
+        }
       },
       {
         name: "Event",
@@ -117,24 +112,18 @@ function EventsFromOtherCommunities({
           download: false,
           customBodyRender: (d) => (
             <div>
-              {d.image && (
-                <Avatar
-                  alt={d.initials}
-                  src={d.image.url}
-                  style={{ margin: 10 }}
-                />
-              )}
+              {d.image && <Avatar alt={d.initials} src={d.image.url} style={{ margin: 10 }} />}
               {!d.image && <Avatar style={{ margin: 10 }}>{d.initials}</Avatar>}
             </div>
-          ),
-        },
+          )
+        }
       },
       {
         name: "Name",
         key: "name",
         options: {
-          filter: false,
-        },
+          filter: false
+        }
       },
 
       {
@@ -142,16 +131,16 @@ function EventsFromOtherCommunities({
         key: "tags",
         options: {
           filter: true,
-          filterType: "multiselect",
-        },
+          filterType: "multiselect"
+        }
       },
       {
         name: "Community",
         key: "community",
         options: {
           filter: true,
-          filterType: "multiselect",
-        },
+          filterType: "multiselect"
+        }
       },
       {
         name: "Full View",
@@ -163,14 +152,14 @@ function EventsFromOtherCommunities({
             <Link to={`/admin/read/event/${id}/event-view?from=others`}>
               <CallMadeIcon size="small" variant="outlined" color="secondary" />
             </Link>
-          ),
-        },
-      },
+          )
+        }
+      }
     ];
   };
-const metaData =meta && meta.otherEvents
-const columns = makeColumns();
-const ids = (communities || []).map((it) => it.id);
+  const metaData = meta && meta.otherEvents;
+  const columns = makeColumns();
+  const ids = (communities || []).map((it) => it.id);
   const options = {
     filterType: "dropdown",
     responsive: "standard",
@@ -194,8 +183,8 @@ const ids = (communities || []).map((it) => it.id);
         name: "otherEvents",
         meta: meta,
         otherArgs: {
-          community_ids: ids,
-        },
+          community_ids: ids
+        }
       }),
     customSearchRender: (searchText, handleSearch, hideSearch, options) => (
       <SearchBar
@@ -209,7 +198,7 @@ const ids = (communities || []).map((it) => it.id);
         name="otherEvents"
         meta={meta}
         otherArgs={{
-          community_ids: ids,
+          community_ids: ids
         }}
       />
     ),
@@ -226,19 +215,13 @@ const ids = (communities || []).map((it) => it.id);
           name="otherEvents"
           meta={meta}
           otherArgs={{
-            community_ids: ids,
+            community_ids: ids
           }}
         />
       );
     },
 
-    whenFilterChanges: (
-      changedColumn,
-      filterList,
-      type,
-      changedColumnIndex,
-      displayData
-    ) =>
+    whenFilterChanges: (changedColumn, filterList, type, changedColumnIndex, displayData) =>
       handleFilterChange({
         filterList,
         type,
@@ -251,9 +234,9 @@ const ids = (communities || []).map((it) => it.id);
         name: "otherEvents",
         meta: meta,
         otherArgs: {
-          community_ids: ids,
-        },
-      }),
+          community_ids: ids
+        }
+      })
   };
 
   const renderTable = ({ data, options }) => {
@@ -268,15 +251,10 @@ const ids = (communities || []).map((it) => it.id);
       return (
         <Paper style={{ padding: "15px 25px" }}>
           {mounted ? (
-            <span>
-              {" "}
-              No open events are available for your list of communities. Select
-              other ones
-            </span>
+            <span> No open events are available for your list of communities. Select other ones</span>
           ) : (
             <span>
-              When you select communities and <b>"Apply"</b>, events will show
-              here..
+              When you select communities and <b>"Apply"</b>, events will show here..
             </span>
           )}
         </Paper>
@@ -289,7 +267,7 @@ const ids = (communities || []).map((it) => it.id);
           title: "Events from other communities",
           options,
           data,
-          columns: makeColumns(),
+          columns: makeColumns()
         }}
       />
     );
@@ -300,17 +278,15 @@ const ids = (communities || []).map((it) => it.id);
       <Seo name={`Events from other communities`} />
       <Paper style={{ marginBottom: 15 }}>
         <div style={{ padding: 20 }}>
-          <Typography variant="h6">
-            Show events from communities I select below
-          </Typography>
+          <Typography variant="h6">Show events from communities I select below</Typography>
 
           <small style={{ color: "grey" }}>
-            When you are done selecting your communities, click the{" "}
-            <b>"apply"</b>
+            When you are done selecting your communities, click the <b>"apply"</b>
             button below
           </small>
 
           <LightAutoComplete
+            renderSelectedItems={renderSelectedItems}
             placeholder="Select Communities..."
             defaultSelected={communities || []}
             data={otherCommunities || []}
@@ -319,12 +295,15 @@ const ids = (communities || []).map((it) => it.id);
             onChange={(items) => setCommunities(items)}
             multiple
           />
+      
           {/* <FormControlLabel
             control={
+            
               <Checkbox
-                checked={exclude}
-                onChange={(e) => setExclude(e.target.checked)}
+                // checked={exclude}
+                // onChange={(e) => setExclude(e.target.checked)}
               />
+            
             }
             label="Exclude events from communities I have selected"
           /> */}
@@ -345,15 +324,10 @@ const ids = (communities || []).map((it) => it.id);
               style={{
                 borderRadius: 0,
                 padding: "10px 25px",
-                minWidth: 200,
+                minWidth: 200
               }}
             >
-              {loading && (
-                <i
-                  className=" fa fa-spinner fa-spin"
-                  style={{ marginRight: 5, color: "white" }}
-                />
-              )}
+              {loading && <i className=" fa fa-spinner fa-spin" style={{ marginRight: 5, color: "white" }} />}
               {loading ? "Fetching..." : "Apply"}
             </Button>
           </Tooltip>

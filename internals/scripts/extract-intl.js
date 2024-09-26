@@ -17,6 +17,7 @@ const addCheckmark = require('./helpers/checkmark');
 const { appLocales, DEFAULT_LOCALE } = require('../../app/i18n');
 
 const babel = require('../../babel.config.js');
+const { parseJSON } = require('../../app/utils/common.js');
 const { presets } = babel;
 let plugins = babel.plugins || [];
 
@@ -75,7 +76,7 @@ for (const locale of appLocales) {
   const translationFileName = `app/translations/${locale}.json`;
   try {
     // Parse the old translation message JSON files
-    const messages = JSON.parse(fs.readFileSync(translationFileName));
+    const messages = parseJSON(fs.readFileSync(translationFileName));
     const messageKeys = Object.keys(messages);
     for (const messageKey of messageKeys) {
       oldLocaleMappings[locale][messageKey] = messages[messageKey];

@@ -1,10 +1,11 @@
 import moment from "moment/moment";
 import { IS_CANARY, IS_LOCAL, IS_PROD } from "../../../config/constants";
+import { parseJSON } from "../../../utils/common";
 
 export const getMoreInfo = (community) => {
   // const { community } = this.state;
   const more_info =
-    community && community.more_info ? JSON.parse(community.more_info) : {};
+    community && community.more_info ? parseJSON(community.more_info) : {};
   return more_info;
 };
 

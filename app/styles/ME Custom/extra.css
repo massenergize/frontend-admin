@@ -89,8 +89,8 @@ span {
 
 .not-approved {
   width: 110px;
-  background: #bf0e0e !important;
-  color: white !important;
+  background: #fff6ea !important;
+  color: #de7a45 !important
 }
 .preview-content {
   margin-left: 30px;

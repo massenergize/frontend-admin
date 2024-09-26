@@ -286,7 +286,7 @@ function CustomNavigationConfiguration() {
               children,
               40,
               { ...parents, [rest?.id]: { ...rest, children: [...children] } },
-              { parentTraits: { isRemoved }, ...(options || {}) }
+              { parentTraits: { isRemoved, isPublished: rest?.is_published, isChild: true }, ...(options || {}) }
             )}
         </div>
       );
@@ -482,6 +482,9 @@ const OneMenuItem = ({
 }) => {
   const { name, link, id, is_link_external, is_published } = item || {};
 
+  const parentIsNotLive = !parentTraits?.isPublished;
+  const isChild = parentTraits?.isChild;
+
   const hasChildren = children?.length > 0;
   const getBackColor = () => {
     if (activity) return activity?.color;
@@ -507,6 +510,14 @@ const OneMenuItem = ({
   const isRemoved = parentTraits?.isRemoved || activity?.key === ACTIVITIES.remove.key;
   const editItem = () =>
     addOrEdit({ ...item, children }, parents, { context: ACTIVITIES.edit.key, children, isEdit: true });
+
+
+  const itemIsLive = () => {
+    if (isChild) return !parentIsNotLive && is_published;
+    return is_published;
+  };
+
+  const disabledBecauseOfParent = parentIsNotLive && is_published;
 
   return (
     <div
@@ -603,16 +614,19 @@ const OneMenuItem = ({
         <div style={{ marginLeft: "auto" }}>
           <Tooltip
             title={
-              is_published
+              itemIsLive()
                 ? // ? `Live ${mother_is_not_live ? "but parent item is not live" : ""}`
                   `Live`
+                : disabledBecauseOfParent
+                ? `Not live because parent is disabled`
+
                 : `Not Live, all sub items will also not show `
             }
           >
             <i
               onClick={() => editItem()}
-              className={`fa fa-eye${is_published ? "" : "-slash"} touchable-opacity`}
-              style={{ marginRight: 20, color: is_published ? "var(--app-purple)" : "grey", fontSize: 20 }}
+              className={`fa fa-eye${itemIsLive() ? "" : "-slash"} touchable-opacity`}
+              style={{ marginRight: 20, color: itemIsLive() ? "var(--app-purple)" : "grey", fontSize: 20 }}
             />
           </Tooltip>
           <Tooltip title={`New: Add a sub-menu item to "${name}"`}>
