@@ -12,9 +12,9 @@ import styles from "./guide-jss";
 import { Link } from "@mui/material";
 
 // const adminWrittenInstructionsLink = "https://docs.google.com/document/d/e/2PACX-1vT2ahP7U1gWS5ktfr7nG9CdH8cCazVo9qzOLHB5Ook2GhKD79GOWxRgvv-pOQRkIT1mogcAhzM8T5wE/pub"
-const adminWrittenInstructionsLink =
-  "https://resources.massenergize.org/courses/admin-training";
+const adminWrittenInstructionsLink = "https://resources.massenergize.org/courses/admin-training";
 const adminVideoInstructionsLink = null;
+const adminResourceCenterLink = "https://resources.massenergize.org/collections";
 
 function Transition(props) {
   return <Slide direction="up" {...props} />;
@@ -46,7 +46,7 @@ class GuideModal extends React.Component {
             style={{
               fontSize: "1.5rem",
               fontWeight: "bold",
-              textAlign: "left",
+              textAlign: "left"
             }}
           >
             Need Help
@@ -56,15 +56,27 @@ class GuideModal extends React.Component {
             variant="body1"
             style={{
               margin: "10px 0px",
-              textAlign: "left",
+              textAlign: "left"
             }}
           >
-            Visit our Resource Center, check out the
+            Visit our{" "}
+            <Button
+              target="_blank"
+              style={{
+                textTransform: "capitalize",
+                fontSize: "1rem",
+                padding: "0px 5px"
+              }}
+              href={adminResourceCenterLink}
+            >
+              Resource Center,
+            </Button>
+            check out the
             <Button
               style={{
                 textTransform: "capitalize",
                 fontSize: "1rem",
-                padding: "2px 5px",
+                padding: "0px 5px"
               }}
               href={adminWrittenInstructionsLink}
               target="_blank"
@@ -77,7 +89,7 @@ class GuideModal extends React.Component {
               style={{
                 textTransform: "lowercase",
                 fontSize: "1rem",
-                padding: "2px 5px",
+                padding: "2px 5px"
               }}
               href={`mailto:support@massenergize.org`}
               target="_blank"
@@ -113,7 +125,7 @@ class GuideModal extends React.Component {
 GuideModal.propTypes = {
   openGuide: PropTypes.bool.isRequired,
   closeGuide: PropTypes.func.isRequired,
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(GuideModal);
