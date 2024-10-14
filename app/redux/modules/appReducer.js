@@ -68,6 +68,8 @@ import {
   KEEP_TESTIMONIAL_STATE,
   LOAD_ALL_OTHER_TESTIMONIALS,
   CACHE_MESSAGE_INFO,
+  COMMUNITY_TESTIMONIAL_AUTO_SHARE_SETTINGS,
+  
 } from '../ReduxConstants';
 import { parseJSON } from "../../utils/common";
 
@@ -625,6 +627,14 @@ export const reducerForSavingInternalLinksList = (state = [], action = {}) => {
 export const cacheMessageInfoReducer = (state = {}, action = {}) => {
   switch (action.type) {
     case CACHE_MESSAGE_INFO:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const saveCommunityTestimonialAutoShareSettingsReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case COMMUNITY_TESTIMONIAL_AUTO_SHARE_SETTINGS:
       return action.payload;
     default:
       return state;

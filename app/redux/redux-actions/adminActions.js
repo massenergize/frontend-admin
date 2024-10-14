@@ -66,6 +66,7 @@ import {
   KEEP_TESTIMONIAL_STATE,
   LOAD_ALL_OTHER_TESTIMONIALS,
   CACHE_MESSAGE_INFO,
+  COMMUNITY_TESTIMONIAL_AUTO_SHARE_SETTINGS
 } from '../ReduxConstants';
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -1082,6 +1083,13 @@ export const saveCommunityFeatureFlagsAction = (data = []) => {
 export const cacheMessageInfoAction = (data = {}) => {
   return {
     type: CACHE_MESSAGE_INFO,
+    payload: data,
+  };
+};
+
+export const saveCommunityTestimonialAutoShareSettingsAction = (data = {}) => {
+  return {
+    type: COMMUNITY_TESTIMONIAL_AUTO_SHARE_SETTINGS,
     payload: data,
   };
 };
