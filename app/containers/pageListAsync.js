@@ -537,9 +537,19 @@ export const SendMessage = loadable(
   }
 );
 export const ScheduledMessages = loadable(
-         () =>
-           import("./MassEnergizeSuperAdmin/Messages/ScheduledMessages"),
-         {
-           fallback: <Loading />,
-         }
-       );
+  () =>
+    import("./MassEnergizeSuperAdmin/Messages/ScheduledMessages"),
+  {
+    fallback: <Loading />,
+  }
+);
+
+export const CommunityTestimonialAutoShareSetting = loadable(
+  () =>
+    import("./MassEnergizeSuperAdmin/Community/AutoShareSettings"),
+  {
+    fallback: <Loading />,
+  }
+);
+
+
