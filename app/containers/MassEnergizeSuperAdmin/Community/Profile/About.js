@@ -488,7 +488,7 @@ class About extends React.Component {
                   </Typography>
                 </Paper>
               </Feature>
-              <Feature community={community} name={FLAGS.CUSTOMIZE_NAVIGATION_MENU} fallback={<></>}>
+              <Feature community={community} name={FLAGS.CUSTOMIZE_AUTO_SHARE_SETTINGS} fallback={<></>}>
                 <Paper
                   onClick={() =>
                     goHere(`/admin/settings/auto-share?comId=${community?.id}`, this.props.history)
