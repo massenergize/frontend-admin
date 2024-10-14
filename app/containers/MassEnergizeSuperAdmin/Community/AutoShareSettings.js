@@ -63,7 +63,7 @@ const AutoShareSettings = () => {
         }
       })
       .finally(() => setLoadingPage(false));
-  }, [comId, testimonialSettings, dispatch]);
+  }, [comId, dispatch]);
 
   const category = useMemo(() => allCategories?.find((c) => c?.name === "Category"), [allCategories]);
   const tags = useMemo(() => category?.tags || [], [category]);
@@ -138,7 +138,7 @@ const AutoShareSettings = () => {
         </div>
       </div>): ( */}
         <div>
-          <FormLabel component="label">Select Communities to auto share with</FormLabel>
+          <FormLabel component="label">Select Communities</FormLabel>
           <LightAutoComplete
             defaultSelected={getValue(sectionKey)?.share_from_communities || []}
             multiple
@@ -170,7 +170,7 @@ const AutoShareSettings = () => {
      {renderSaveFunction(sectionKey)}
       </div>
       <div style={{marginTop: 15, padding: '15px 25px', border: '1px solid #bfbebe2b', borderRadius: 10 }}>
-        <FormLabel component="label">Select Categories to auto Share with</FormLabel>
+        <FormLabel component="label">Select Categories</FormLabel>
         <LightAutoComplete
           defaultSelected={getValue(sectionKey)?.excluded_tags || []}
           multiple
