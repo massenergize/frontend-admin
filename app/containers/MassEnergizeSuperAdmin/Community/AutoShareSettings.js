@@ -146,7 +146,7 @@ const AutoShareSettings = () => {
             data={[]}
             labelExtractor={(item) => item?.name}
             valueExtractor={(item) => item?.id}
-            endpoint="/communities.listForCommunityAdmin"
+            endpoint="/communities.list"
             showSelectAll={false}
           />
         </div>
