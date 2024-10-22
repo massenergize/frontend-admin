@@ -184,7 +184,8 @@ class AllTestimonials extends React.Component {
             </b>
           </Tooltip>
         );
-      }
+      },
+      valueExtractor: (d)=> d?.community?.name || "",
     };
     return [
       {
