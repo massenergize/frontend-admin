@@ -65,7 +65,7 @@ class AboutUsPageEditForm extends Component {
   createFormJson = async () => {
     const { aboutUsPageData } = this.state;
     const { community } = aboutUsPageData;
-    const image = aboutUsPageData && aboutUsPageData.images[0] && aboutUsPageData.images[0].url;
+    const images = aboutUsPageData?.images || [];
     const formJson = {
       title: `Edit ${
         community ? community.name + "'s" : "Community's"
@@ -132,15 +132,14 @@ class AboutUsPageEditForm extends Component {
         {
           name: "image",
           placeholder: "Select an Image",
-          // TODO: change to use media library (backend changes required)
-          //fieldType: fieldTypes.MediaLibrary,
-          fieldType: "File",
+          fieldType: fieldTypes.MediaLibrary,
           dbName: "image",
-          label: "Upload File",
-          previewLink: image,
-          defaultValue: image,
-          allowReset: true,
-          filesLimit: 1,
+          uploadMultiple: false,
+          multiple: false,
+          dragToOrder: true,
+          allowCropping: true,
+          fileLimit: 1,
+          selected: images,
         },
         {
           name: "enable",

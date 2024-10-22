@@ -37,6 +37,7 @@ if (IS_PROD || IS_CANARY)
   };
 
 console.log("Welcome to MassEnergize Admin Panel:", BUILD_VERSION);
+console.log("Environments: LOCAL, CANARY, PROD, DEV", IS_LOCAL, IS_CANARY, IS_PROD, !IS_LOCAL && IS_CANARY && IS_PROD);
 
 //  ---- setting  Community Portal routes
 let PORTAL_HOST = "https://community.massenergize.org";

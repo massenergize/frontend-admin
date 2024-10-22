@@ -75,7 +75,8 @@ import app, {
   reducerForCCActionData, 
   reducerForOtherTestimonialState,
   reducerForLoadingOtherTestimonials,
-  cacheMessageInfoReducer
+  cacheMessageInfoReducer,
+  saveCommunityTestimonialAutoShareSettingsReducer
 } from "./modules/appReducer";
 
 
@@ -156,7 +157,8 @@ export default function createReducer(injectedReducers = {}) {
     communityFeatureFlags: saveCommunityFeatureFlagsReducer,
     menuConfigurations: saveNavigationConfigurationReducer,
     internalLinks: reducerForSavingInternalLinksList,
-    messageInfoCache: cacheMessageInfoReducer
+    messageInfoCache: cacheMessageInfoReducer,
+    testimonialAutoShareSettings:saveCommunityTestimonialAutoShareSettingsReducer
   });
 
   // Wrap the root reducer and return a new root reducer with router state

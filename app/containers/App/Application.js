@@ -100,6 +100,7 @@ import { FILTER_OBJ_KEY } from "../MassEnergizeSuperAdmin/ME  Tools/table /METab
 import { IS_LOCAL } from "../../config/constants";
 import UserActivityMonitor from "../../components/Widget/UserActivityMonitor";
 import { parseJSON } from "../../utils/common";
+import TestimonialAutoShareSettings from "../MassEnergizeSuperAdmin/Community/AutoShareSettings";
 
 // This function checks whether a user needs to sign an MOU and redirects them to the MOU page if necessary
 const checkIfUserNeedsMOUAttention = (auth, history) => {
@@ -226,6 +227,7 @@ class Application extends React.Component {
 
             <Route exact path="/blank" component={BlankPage} />
             <Route path="/admin/community/configure/navigation" component={CustomNavigationConfiguration} />
+            <Route path="/admin/settings/auto-share" component={TestimonialAutoShareSettings} />
             <Route path="/admin/settings/notification-control" component={NudgeControlPage} />
             <Route path="/admin/settings/platform-features" component={PlatformFeaturesPage} />
             <Route path="/admin/view/policy/:policyKey" component={TermsOfServicePage} />
