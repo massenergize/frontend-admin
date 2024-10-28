@@ -11,18 +11,21 @@ export default function CustomOptions({ data , label, endpoint, customBodyRender
      customFilterListOptions: customFilterListOptions,
      filterOptions: {
        logic: (location, filters, row) => {
+
         if(typeof(location)=== "string"){
           if (filters.length) return !filters?.includes(location);
         }
-        if(typeof location === "object"){
-          let value = valueExtractor && valueExtractor(location) ;
-          if(filters.length) return !filters?.includes(value);
+
+        if (location && typeof location === "object" && !Array.isArray(location)) {
+          const value = valueExtractor?.(location);
+          return !filters.includes(value);
         }
+ 
         if (filters?.length) return !filters?.some((item) => location?.includes(item));
          return false;
        },
        display: (filterList, onChange, index, column) => {
-         let items = (data || [])?.map((c) => c?.name && c?.name);
+         let items = (data || [])?.map((c) => c?.name && c?.name);         
          return (
            <AsyncSelect
              onChange={onChange}
