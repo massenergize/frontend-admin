@@ -1,28 +1,19 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { FormLabel, Tooltip, Typography, Button } from "@mui/material";
 import MEPaperBlock from "../ME  Tools/paper block/MEPaperBlock";
 import Seo from "../../../components/Seo/Seo";
 import CustomPageTitle from "../Misc/CustomPageTitle";
 import GoBack from "../../Pages/CustomPages/Frags/GoBack";
-import useCommunityFromURL from '../../../utils/hooks/useCommunityHook';
-import { fetchParamsFromURL, isEmpty } from '../../../utils/common';
-import LightAutoComplete from '../Gallery/tools/LightAutoComplete';
-import { useDispatch, useSelector } from 'react-redux';
-import { apiCall } from '../../../utils/messenger';
-import { saveCommunityTestimonialAutoShareSettingsAction } from '../../../redux/redux-actions/adminActions';
-import LinearBuffer from '../../../components/Massenergize/LinearBuffer'
+import useCommunityFromURL from "../../../utils/hooks/useCommunityHook";
+import { fetchParamsFromURL, isEmpty, log } from "../../../utils/common";
+import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
+import { useDispatch, useSelector } from "react-redux";
+import { apiCall } from "../../../utils/messenger";
+import { saveCommunityTestimonialAutoShareSettingsAction } from "../../../redux/redux-actions/adminActions";
+import LinearBuffer from "../../../components/Massenergize/LinearBuffer";
 
 const TESTIMONIAL_AUTO_SHARE_SETTINGS_KEY = "testimonial_auto_share_settings";
-const GEO_RANGE = "Geographical Range";
 const RESET = "reset";
-
-const ENDPOINTS = {
-  [TESTIMONIAL_AUTO_SHARE_SETTINGS_KEY]: {
-    saveItems: "testimonials.autoshare.settings.update",
-    fetchItems: "community.testimonial.autoshare.settings.info",
-  },
-};
-
 
 const AutoShareSettings = () => {
   const community = useCommunityFromURL();
@@ -30,20 +21,18 @@ const AutoShareSettings = () => {
   const [loadPage, setLoadingPage] = useState(false);
   const [loading, setLoading] = useState(null);
 
-
   const dispatch = useDispatch();
 
   const allCategories = useSelector((state) => state.getIn(["allTags"]));
-  const testimonialSettings = useSelector((state) => state.getIn(['testimonialAutoShareSettings']));
-  const communities = useSelector((state) => state.getIn(['communities']));
+  const testimonialSettings = useSelector((state) => state.getIn(["testimonialAutoShareSettings"]));
+  const allcommunities = useSelector((state) => state.getIn(["communities"]));
 
   const [form, setForm] = useState({ [TESTIMONIAL_AUTO_SHARE_SETTINGS_KEY]: testimonialSettings });
-
 
   useEffect(() => {
     if (!comId || testimonialSettings?.id) return;
     setLoadingPage(true);
-    apiCall(ENDPOINTS[TESTIMONIAL_AUTO_SHARE_SETTINGS_KEY].fetchItems, { community_id: comId })
+    apiCall("community.testimonial.autoshare.settings.info", { community_id: comId })
       .then((response) => {
         if (response?.success) {
           const data = response?.data || {};
@@ -58,84 +47,115 @@ const AutoShareSettings = () => {
 
   const category = useMemo(() => allCategories?.find((c) => c?.name === "Category"), [allCategories]);
   const tags = useMemo(() => category?.tags || [], [category]);
+  const communities = useMemo(() => allcommunities || [], [allcommunities]);
 
   const getValue = useCallback((sectionKey) => form[sectionKey], [form]);
 
-  const saveChanges = useCallback((sectionKey) => {
-    const _data = getValue(sectionKey);
-    const endpoint = ENDPOINTS[sectionKey]?.saveItems;
-    const dataToSend = {
-      community_id: comId,
-      excluded_tags: isEmpty(_data?.excluded_tags) ? RESET:_data?.excluded_tags?.map((t) => t.id)||[],
-      share_from_communities: isEmpty(_data?.share_from_communities) ? RESET:_data?.share_from_communities?.map((c) => c.id)||[],
-    };
+  const saveChanges = useCallback(
+    (sectionKey, endpoint) => {
+      const _data = getValue(sectionKey);
 
-    setLoading(sectionKey);
-    apiCall(endpoint, dataToSend)
-      .then((response) => {
-        if (response?.success) {
-          dispatch(saveCommunityTestimonialAutoShareSettingsAction(response?.data));
-        }
-      })
-      .finally(() => setLoading(null));
-  }, [comId, getValue, dispatch]);
+      const dataToSend = {
+        community_id: comId,
+        excluded_tags: isEmpty(_data?.excluded_tags) ? RESET : _data?.excluded_tags?.map((t) => t.id) || [],
+        share_from_communities: isEmpty(_data?.share_from_communities)
+          ? RESET
+          : _data?.share_from_communities?.map((c) => c.id) || []
+      };
+      console.log("dataToSend", dataToSend, endpoint);
+
+      setLoading(sectionKey);
+      apiCall(endpoint, dataToSend)
+        .then((response) => {
+          if (response?.success) {
+            dispatch(saveCommunityTestimonialAutoShareSettingsAction(response?.data));
+          }
+        })
+        .finally(() => setLoading(null));
+    },
+    [comId, getValue, dispatch]
+  );
 
   const setSectionValue = useCallback((sectionKey, key, value) => {
     setForm((prev) => ({
       ...prev,
-      [sectionKey]: { ...prev[sectionKey], [key]: value },
+      [sectionKey]: { ...prev[sectionKey], [key]: value }
     }));
   }, []);
 
-  const renderSaveFunction = (sectionKey) =>{
-    return <Tooltip placement="top" title="Save changes to the auto share settings for this community.">
-      <div style={{ display: "inline" }}>
-        <Button
-          disabled={false}
-          variant="contained"
-          color="primary"
-          style={{}}
-          onClick={() => saveChanges(sectionKey)}
-        >
-          {(loading===sectionKey) ? <i className="fa fa-spinner fa-spin" style={{ marginRight: 5 }} /> : "SAVE"}
-        </Button>
-      </div>
-    </Tooltip>;
-  }
+  const PAGE_CONFIG = [
+    {
+      key: TESTIMONIAL_AUTO_SHARE_SETTINGS_KEY,
+      title: "Testimonials Auto Share Settings",
+      description:
+        "This settings allows you to automatically share testimonials from other communities or categories with this community. When a testimonial is published from any of the communities selected below or from any of the categories selected below, it will be automatically shared with your community.",
+      updateEndpoint: "testimonials.autoshare.settings.update",
+      formFields: [
+        {
+          key: "share_from_communities",
+          label: "Select Communities",
+          type: "autocomplete",
+          multiple: true,
+          valueExtractor: (item) => item?.id,
+          labelExtractor: (item) => item?.name,
+          data: communities || []
+        },
+        {
+          key: "excluded_tags",
+          label: "Select Categories to auto Share with",
+          type: "autocomplete",
+          multiple: true,
+          valueExtractor: (item) => item?.id,
+          labelExtractor: (item) => item?.name,
+          data: tags || []
+        }
+      ]
+    }
+  ];
 
-  const AutoShareSettingsForm = ({ sectionKey }) => (
-    <div style={{ marginTop: 20, marginBottom: 20 }}>
-      <div style={{padding: '15px 25px', border: '1px solid #bfbebe2b', borderRadius: 10 }}>
-        <div>
-          <FormLabel component="label">Select Communities</FormLabel>
-          <LightAutoComplete
-            defaultSelected={getValue(sectionKey)?.share_from_communities || []}
-            multiple
-            onChange={(selected) => setSectionValue(sectionKey, "share_from_communities", selected)}
-            data={communities}
-            labelExtractor={(item) => item?.name}
-            valueExtractor={(item) => item?.id}
-            // endpoint="/communities.list"
-            showSelectAll={true}
-          />
+  const renderSaveFunction = (sectionKey, endpoint) => {
+    console.log("loading", loading, sectionKey);
+
+    return (
+      <Tooltip placement="top" title="Save changes to the auto share settings for this community.">
+        <div style={{ display: "inline" }}>
+          <Button
+            disabled={false}
+            variant="contained"
+            color="primary"
+            style={{}}
+            onClick={() => saveChanges(sectionKey, endpoint)}
+          >
+            {loading === sectionKey ? <i className="fa fa-spinner fa-spin" style={{ marginRight: 5 }} /> : "SAVE"}
+          </Button>
         </div>
-     
-       <div style={{marginTop:10, marginBottom:10}}>
-        <FormLabel component="label">Select Categories to auto Share with</FormLabel>
-        <LightAutoComplete
-          defaultSelected={getValue(sectionKey)?.excluded_tags || []}
-          multiple
-          onChange={(selected) => setSectionValue(sectionKey, "excluded_tags", selected)}
-          data={tags}
-          labelExtractor={(item) => item?.name}
-          valueExtractor={(item) => item?.id}
-          showSelectAll={true}
-          label="Select Categories"
-        />
-        </div> 
-     {renderSaveFunction(sectionKey)}
-      </div>
+      </Tooltip>
+    );
+  };
 
+  const AutoShareSettingsForm = ({ sectionKey, formFields, endpoint }) => (
+    <div style={{ marginTop: 20, marginBottom: 20 }}>
+      {formFields?.map((field) => {
+        const value = getValue(sectionKey)?.[field.key];
+        return (
+          <div key={field.key} style={{ marginTop: 20 }}>
+            <FormLabel>{field.label}</FormLabel>
+            {field.type === "autocomplete" && (
+              <LightAutoComplete
+                defaultSelected={value}
+                multiple={field.multiple}
+                endpoint={field.endpoint}
+                valueExtractor={field.valueExtractor}
+                labelExtractor={field.labelExtractor}
+                onChange={(value) => setSectionValue(sectionKey, field.key, value)}
+                data={field.data}
+              />
+            )}
+          </div>
+        );
+      })}
+
+      {renderSaveFunction(sectionKey, endpoint)}
     </div>
   );
 
@@ -147,15 +167,16 @@ const AutoShareSettings = () => {
       <CustomPageTitle>
         Auto Share Settings for <b>{community?.name || "..."}</b>
       </CustomPageTitle>
-      <div style={{ marginBottom: 15 }}><GoBack /></div>
-      <MEPaperBlock>
-        <Typography variant="h5">Testimonials Auto Share Settings</Typography>
-        <Typography style={{ marginTop: 5 }}>
-          This settings allows you to automatically share testimonials from other communities or categories with this community. When a
-          testimonial is published from any of the communities selected below or from any of the categories selected below, it will be automatically shared with your community.
-        </Typography>
-        {AutoShareSettingsForm({ sectionKey: TESTIMONIAL_AUTO_SHARE_SETTINGS_KEY })}
-      </MEPaperBlock>
+      <div style={{ marginBottom: 15 }}>
+        <GoBack />
+      </div>
+      {PAGE_CONFIG.map((page) => (
+        <MEPaperBlock key={page.key}>
+          <Typography variant="h5">{page.title}</Typography>
+          <Typography style={{ marginTop: 5 }}>{page.description}</Typography>
+          {AutoShareSettingsForm({ sectionKey: page.key, formFields: page.formFields, endpoint: page.updateEndpoint })}
+        </MEPaperBlock>
+      ))}
     </div>
   );
 };
