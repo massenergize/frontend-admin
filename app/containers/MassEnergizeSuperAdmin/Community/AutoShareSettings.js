@@ -5,7 +5,7 @@ import Seo from "../../../components/Seo/Seo";
 import CustomPageTitle from "../Misc/CustomPageTitle";
 import GoBack from "../../Pages/CustomPages/Frags/GoBack";
 import useCommunityFromURL from "../../../utils/hooks/useCommunityHook";
-import { fetchParamsFromURL, isEmpty, log } from "../../../utils/common";
+import { fetchParamsFromURL, isEmpty } from "../../../utils/common";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { useDispatch, useSelector } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
@@ -62,8 +62,6 @@ const AutoShareSettings = () => {
           ? RESET
           : _data?.share_from_communities?.map((c) => c.id) || []
       };
-      console.log("dataToSend", dataToSend, endpoint);
-
       setLoading(sectionKey);
       apiCall(endpoint, dataToSend)
         .then((response) => {
@@ -114,8 +112,6 @@ const AutoShareSettings = () => {
   ];
 
   const renderSaveFunction = (sectionKey, endpoint) => {
-    console.log("loading", loading, sectionKey);
-
     return (
       <Tooltip placement="top" title="Save changes to the auto share settings for this community.">
         <div style={{ display: "inline" }}>
