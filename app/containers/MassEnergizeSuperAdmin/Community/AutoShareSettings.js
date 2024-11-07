@@ -5,19 +5,16 @@ import Seo from "../../../components/Seo/Seo";
 import CustomPageTitle from "../Misc/CustomPageTitle";
 import GoBack from "../../Pages/CustomPages/Frags/GoBack";
 import useCommunityFromURL from '../../../utils/hooks/useCommunityHook';
-import { fetchParamsFromURL } from '../../../utils/common';
+import { fetchParamsFromURL, isEmpty } from '../../../utils/common';
 import LightAutoComplete from '../Gallery/tools/LightAutoComplete';
 import { useDispatch, useSelector } from 'react-redux';
 import { apiCall } from '../../../utils/messenger';
 import { saveCommunityTestimonialAutoShareSettingsAction } from '../../../redux/redux-actions/adminActions';
 import LinearBuffer from '../../../components/Massenergize/LinearBuffer'
-import { Paper, Alert } from "@mui/material";
-import TextField from '@mui/material/TextField';
-import MEDropdown from '../ME  Tools/dropdown/MEDropdown';
 
 const TESTIMONIAL_AUTO_SHARE_SETTINGS_KEY = "testimonial_auto_share_settings";
-const COMMUNITIES = "Communities";
 const GEO_RANGE = "Geographical Range";
+const RESET = "reset";
 
 const ENDPOINTS = {
   [TESTIMONIAL_AUTO_SHARE_SETTINGS_KEY]: {
@@ -26,10 +23,6 @@ const ENDPOINTS = {
   },
 };
 
-const SHARING_AUDIENCE_TYPE = {
-  [COMMUNITIES]: COMMUNITIES,
-  [GEO_RANGE]: GEO_RANGE,
-}
 
 const AutoShareSettings = () => {
   const community = useCommunityFromURL();
@@ -42,12 +35,10 @@ const AutoShareSettings = () => {
 
   const allCategories = useSelector((state) => state.getIn(["allTags"]));
   const testimonialSettings = useSelector((state) => state.getIn(['testimonialAutoShareSettings']));
-  const communities = useSelector((state) => state.getIn(['allCommunities']));
+  const communities = useSelector((state) => state.getIn(['communities']));
 
   const [form, setForm] = useState({ [TESTIMONIAL_AUTO_SHARE_SETTINGS_KEY]: testimonialSettings });
 
-  const isGeoRange = testimonialSettings?.share_from_communities?.length === 0;
-  const [selectedOption, setSelectedOption] = useState(COMMUNITIES);
 
   useEffect(() => {
     if (!comId || testimonialSettings?.id) return;
@@ -75,8 +66,8 @@ const AutoShareSettings = () => {
     const endpoint = ENDPOINTS[sectionKey]?.saveItems;
     const dataToSend = {
       community_id: comId,
-      excluded_tags: _data?.excluded_tags?.map((t) => t.id) || [],
-      share_from_communities: _data?.share_from_communities?.map((c) => c.id) || [],
+      excluded_tags: isEmpty(_data?.excluded_tags) ? RESET:_data?.excluded_tags?.map((t) => t.id)||[],
+      share_from_communities: isEmpty(_data?.share_from_communities) ? RESET:_data?.share_from_communities?.map((c) => c.id)||[],
     };
 
     setLoading(sectionKey);
@@ -95,8 +86,6 @@ const AutoShareSettings = () => {
       [sectionKey]: { ...prev[sectionKey], [key]: value },
     }));
   }, []);
-
-
 
   const renderSaveFunction = (sectionKey) =>{
     return <Tooltip placement="top" title="Save changes to the auto share settings for this community.">
@@ -117,44 +106,21 @@ const AutoShareSettings = () => {
   const AutoShareSettingsForm = ({ sectionKey }) => (
     <div style={{ marginTop: 20, marginBottom: 20 }}>
       <div style={{padding: '15px 25px', border: '1px solid #bfbebe2b', borderRadius: 10 }}>
-      <div>
-      {/* <MEDropdown
-        defaultValue={[selectedOption]}
-        data={[{ key: COMMUNITIES, name: COMMUNITIES }, { key: GEO_RANGE, name: "Geographical Range" }]}
-        labelExtractor={(it) => it.name}
-        valueExtractor={(it) => it.key}
-        placeholder="Select the type of sharing"
-        onItemSelected={(items) => {
-          console.log("Selected", items);
-          setSelectedOption(items[0]);
-        }}
-      /> */}
-
-      {/* {selectedOption === GEO_RANGE ?  (  
-         <div>
-        <FormLabel component="label">Select ZipCode to receive testimonials from automatically</FormLabel>
-        <div style={{ marginTop: 10, marginBottom:15 }}>
-          <TextField fullWidth label="Zip Code" id="fullWidth" />
-        </div>
-      </div>): ( */}
         <div>
           <FormLabel component="label">Select Communities</FormLabel>
           <LightAutoComplete
             defaultSelected={getValue(sectionKey)?.share_from_communities || []}
             multiple
             onChange={(selected) => setSectionValue(sectionKey, "share_from_communities", selected)}
-            data={[]}
+            data={communities}
             labelExtractor={(item) => item?.name}
             valueExtractor={(item) => item?.id}
-            endpoint="/communities.list"
-            showSelectAll={false}
+            // endpoint="/communities.list"
+            showSelectAll={true}
           />
         </div>
-
-      {/* )} */}
-      </div>
      
-        {/* <div style={{marginTop:10, marginBottom:10}}>
+       <div style={{marginTop:10, marginBottom:10}}>
         <FormLabel component="label">Select Categories to auto Share with</FormLabel>
         <LightAutoComplete
           defaultSelected={getValue(sectionKey)?.excluded_tags || []}
@@ -163,25 +129,11 @@ const AutoShareSettings = () => {
           data={tags}
           labelExtractor={(item) => item?.name}
           valueExtractor={(item) => item?.id}
-          showSelectAll={false}
+          showSelectAll={true}
           label="Select Categories"
         />
-        </div> */}
+        </div> 
      {renderSaveFunction(sectionKey)}
-      </div>
-      <div style={{marginTop: 15, padding: '15px 25px', border: '1px solid #bfbebe2b', borderRadius: 10 }}>
-        <FormLabel component="label">Select Categories</FormLabel>
-        <LightAutoComplete
-          defaultSelected={getValue(sectionKey)?.excluded_tags || []}
-          multiple
-          onChange={(selected) => setSectionValue(sectionKey, "excluded_tags", selected)}
-          data={tags}
-          labelExtractor={(item) => item?.name}
-          valueExtractor={(item) => item?.id}
-          showSelectAll={false}
-          label="Select Categories"
-        />
-        {renderSaveFunction(sectionKey)}
       </div>
 
     </div>
@@ -202,7 +154,7 @@ const AutoShareSettings = () => {
           This settings allows you to automatically share testimonials from other communities or categories with this community. When a
           testimonial is published from any of the communities selected below or from any of the categories selected below, it will be automatically shared with your community.
         </Typography>
-        <AutoShareSettingsForm sectionKey={TESTIMONIAL_AUTO_SHARE_SETTINGS_KEY} />
+        {AutoShareSettingsForm({ sectionKey: TESTIMONIAL_AUTO_SHARE_SETTINGS_KEY })}
       </MEPaperBlock>
     </div>
   );
