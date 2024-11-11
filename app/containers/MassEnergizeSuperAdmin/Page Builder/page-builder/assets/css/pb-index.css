@@ -3,6 +3,10 @@
   --pb-main-color: var(--pb-main-color, black);
 }
 
+h6,
+h2 {
+  margin: 0px;
+}
 .pb-block-btn {
   padding: 6px 22px;
   font-weight: bold;
@@ -45,7 +49,6 @@
   position: relative;
   flex-basis: 20%;
   z-index: 1500;
-
 }
 
 .flex-row {
