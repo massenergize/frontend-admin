@@ -59,6 +59,8 @@ function usePropertyRenderer({ blockId, onPropertyChange, onFocused, lastFocus }
             <PBBackgroundPicker {...itemProps} />
           </ContentWrapper>
         );
+      case PROPERTY_TYPES.RICH_TEXT:
+        return <button>Open Rich Text</button>;
 
       default:
         console.log("PBError: Unknown type", _type);

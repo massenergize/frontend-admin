@@ -235,3 +235,18 @@ export const LINK_PROPS = [
   ...TEXT_COLOR_PROPS,
   ...ALIGNMENTS_PROPS,
 ];
+
+
+export const RICH_TEXT_PROPS  = [ 
+  {
+    _type: PROPERTY_TYPES.RICH_TEXT,
+    text: "Rich Text",
+    name: "text",
+    // placeholder: "0",
+    type: "richtext",
+    label: "Add text",
+    // placeholder: "Enter text here...",
+    propAccessor: "__dangerouslySetInnerHTML",
+  },
+  ...BASIC_PROPS,
+]

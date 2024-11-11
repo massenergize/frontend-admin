@@ -52,7 +52,7 @@ function CreateAndEditMenu({ data, cancel, insertNewLink, children, isEdit }) {
 
     return isParent ? Boolean(name) : name && link;
   };
-  const { is_published, name, link, is_link_external: linkIsExternal } = form || {};
+  const { is_published, name, link, is_link_external: linkIsExternal, is_custom_page: isCustomPage } = form || {};
   const linkIsValid = isValidURL(link);
   const readyToSave = formIsValid();
 
@@ -167,7 +167,7 @@ function CreateAndEditMenu({ data, cancel, insertNewLink, children, isEdit }) {
                 <FormControlLabel
                   control={
                     <input
-                      onChange={() => updateForm({ is_link_external: !linkIsExternal })}
+                      onChange={() => updateForm({ is_link_external: !linkIsExternal, is_custom_page: false })}
                       checked={linkIsExternal}
                       type="checkbox"
                       style={{ color: "var(--app-purple)" }}
@@ -176,25 +176,53 @@ function CreateAndEditMenu({ data, cancel, insertNewLink, children, isEdit }) {
                   style={{}}
                   label="External"
                 />
+                {/* <FormControlLabel
+                  control={
+                    <input
+                      onChange={() => updateForm({ is_custom_page: !isCustomPage })}
+                      checked={isCustomPage}
+                      type="checkbox"
+                      style={{ color: "var(--app-purple)" }}
+                    />
+                  }
+                  style={{}}
+                  label="Custom Page"
+                /> */}
               </div>
             )}
-            <div>
+            <div style={{ marginBottom: 10 }}>
               {loading && !isParent && (
                 <span style={{ color: "var(--app-purple)" }}>
                   <i className="fa fa-spinner fa-spin" /> Fetching internal links...
                 </span>
               )}
-              {renderLinkItems()}
+              {!isCustomPage && renderLinkItems()}
             </div>
+            {!linkIsExternal && (
+              <div style={{ margin: "0px 10px", display: "flex", flexDirection: "row", alignItems: "center" }}>
+                <FormControlLabel
+                  control={
+                    <input
+                      onChange={() => updateForm({ is_custom_page: !isCustomPage })}
+                      checked={isCustomPage}
+                      type="checkbox"
+                      style={{ color: "var(--app-purple)" }}
+                    />
+                  }
+                  style={{}}
+                  label="I want to build my own page"
+                />
 
-            {!isParent && (
-              <a
-                href={`/admin/community/configure/navigation/custom-pages/${name}`}
-                target="_blank"
-                style={{ marginTop: 10, fontWeight: "bold" }}
-              >
-                Edit with page builder
-              </a>
+                {!isParent && !linkIsExternal && isCustomPage && (
+                  <a
+                    href={`/admin/community/configure/navigation/custom-pages/${name}`}
+                    target="_blank"
+                    style={{ fontWeight: "bold" }}
+                  >
+                    Edit with page builder
+                  </a>
+                )}
+              </div>
             )}
           </div>
           {/* <TextField
