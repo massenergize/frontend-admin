@@ -1,0 +1,38 @@
+.pb-block-item {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  border: solid 1px #f1f1f1;
+  flex-basis: 15%;
+  justify-content: center;
+  margin: 1%;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pb-block-item i {
+  margin: 7px 0px;
+  color: #aaa;
+  font-size: 20px;
+}
+
+.pb-block-root {
+  display: flex;
+  flex-direction: row;
+  padding: 20px;
+  flex-wrap: wrap;
+  align-items: space-between;
+}
+
+.pb-block-item:hover {
+  border: solid 1px #0b9edc;
+  background-color: #9fddeb47;
+  transition: 0.1s ease-in-out;
+}
+
+.pb-block-item:hover i,
+.pb-block-item:hover p {
+  color: #0b9edc;
+}

@@ -186,6 +186,16 @@ function CreateAndEditMenu({ data, cancel, insertNewLink, children, isEdit }) {
               )}
               {renderLinkItems()}
             </div>
+
+            {!isParent && (
+              <a
+                href={`/admin/community/configure/navigation/custom-pages/${name}`}
+                target="_blank"
+                style={{ marginTop: 10, fontWeight: "bold" }}
+              >
+                Edit with page builder
+              </a>
+            )}
           </div>
           {/* <TextField
           style={{ width: "100%", marginTop: 15 }}

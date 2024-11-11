@@ -79,7 +79,8 @@ import {
   PlatformFeaturesPage,
   NudgeControlPage,
   CustomNavigationConfiguration,
-  TestimonialsFromOthers
+  TestimonialsFromOthers,
+  BuildCustomPages
 } from "../pageListAsync";
 import EditVendor from "../MassEnergizeSuperAdmin/Vendors/EditVendor";
 import AddRemoveAdmin from "../MassEnergizeSuperAdmin/Community/AddRemoveAdmin";
@@ -101,7 +102,6 @@ import { IS_LOCAL } from "../../config/constants";
 import UserActivityMonitor from "../../components/Widget/UserActivityMonitor";
 import { parseJSON } from "../../utils/common";
 import TestimonialAutoShareSettings from "../MassEnergizeSuperAdmin/Community/AutoShareSettings";
-
 // This function checks whether a user needs to sign an MOU and redirects them to the MOU page if necessary
 const checkIfUserNeedsMOUAttention = (auth, history) => {
   // A list of routes that are allowed if a user has not signed their MOU
@@ -197,6 +197,9 @@ class Application extends React.Component {
         // minutes = {0.2} // --- FOR TESTING
         onStateChange={(status) => updateUserActiveStatus(status)}
       >
+        <Switch>
+          <Route exact path="/admin/community/configure/navigation/custom-pages/:id" component={BuildCustomPages} />
+        </Switch>
         <Dashboard history={history} changeMode={changeMode} lock={!IS_LOCAL && auth?.needs_to_accept_mou}>
           <ThemeModal
             {...modalOptions || {}}
@@ -224,9 +227,8 @@ class Application extends React.Component {
             {user.is_super_admin && superAdminSpecialRoutes}
             {user.is_community_admin && communityAdminSpecialRoutes}
 
-
             <Route exact path="/blank" component={BlankPage} />
-            <Route path="/admin/community/configure/navigation" component={CustomNavigationConfiguration} />
+            <Route exact path="/admin/community/configure/navigation" component={CustomNavigationConfiguration} />
             <Route path="/admin/settings/auto-share" component={TestimonialAutoShareSettings} />
             <Route path="/admin/settings/notification-control" component={NudgeControlPage} />
             <Route path="/admin/settings/platform-features" component={PlatformFeaturesPage} />

@@ -1,0 +1,32 @@
+.pb-bordered-section {
+  border: solid 1px #ccc;
+  padding: 15px;
+  border-radius: 5px;
+  margin: 10px 0px;
+}
+
+.pb-bordered-section label {
+  font-size: 13px;
+  color: grey;
+}
+
+.pb-s-radio {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 5px 0px;
+}
+
+.pb-s-radio span {
+  color: #383838;
+  font-size: 15px;
+  margin: 0px 7px;
+}
+
+.pb-s-btn {
+  padding: 7px 23px;
+  font-weight: bold;
+  background-color: rgb(11, 158, 220);
+  border-radius: 55px;
+  border-width: 0px;
+}

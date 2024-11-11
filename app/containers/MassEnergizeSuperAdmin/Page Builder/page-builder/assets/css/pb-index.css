@@ -1,0 +1,80 @@
+@import url(./elevations.css);
+:root {
+  --pb-main-color: var(--pb-main-color, black);
+}
+
+.pb-block-btn {
+  padding: 6px 22px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #9fddeb47;
+  border: solid 0px #0b9edc;
+  border-radius: 4px;
+  color: #0b9edc;
+  width: fit-content;
+  display: flex;
+  flex-direction: row;
+}
+
+.touchable-opacity {
+  cursor: pointer;
+}
+.touchable-opacity:hover {
+  opacity: 0.8;
+  transition: 0.4s ease-in-out;
+}
+.pb-root {
+  height: 100vh;
+  width: 100vw;
+  background-color: #fafdff;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+}
+
+.pb-canvas {
+  flex-basis: 80%;
+  position: relative;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  background-color: white;
+  z-index: 1500;
+}
+
+.pb-right-panel {
+  position: relative;
+  flex-basis: 20%;
+  z-index: 1500;
+
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+.align-center {
+  align-items: center;
+}
+.justify-center {
+  justify-content: center;
+}
+
+.pb-textbox {
+  width: auto;
+}
+
+.pb-textbox label {
+  font-size: 13px;
+  color: grey;
+  margin-bottom: 10px;
+}
+
+.pb-textbox input {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  margin-bottom: 10px;
+}

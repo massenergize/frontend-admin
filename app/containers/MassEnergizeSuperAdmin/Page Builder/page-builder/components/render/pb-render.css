@@ -1,0 +1,37 @@
+.pb-render-wrapper {
+  padding: 5px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  border: solid 1px #9fddeb21;
+}
+.pb-render-wrapper:hover {
+  border: solid 1px #0b9edc;
+  background-color: #9fddeb21;
+}
+
+.pb-render-wrapper:hover .render-plus {
+  opacity: 1;
+  /* transition: 0.2s ease-in-out; */
+}
+
+.render-plus {
+  opacity: 0;
+  bottom: -17px;
+  position: absolute;
+  z-index: 7;
+  transform: translate(38vw, 0px);
+  background-color: white;
+  padding: 8px 15px;
+  border-radius: 55px;
+}
+.render-plus i {
+  margin: 0px 5px;
+  font-size: 22px;
+}
+
+.render-plus .fa-plus {
+  color: green;
+}
+.render-plus .fa-times {
+  color: #bd5a5a;
+}
