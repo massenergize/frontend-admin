@@ -17,6 +17,9 @@
   color: #aaa;
   font-size: 20px;
 }
+.pb-block-item p { 
+  font-size: 14px;
+}
 
 .pb-block-root {
   display: flex;
