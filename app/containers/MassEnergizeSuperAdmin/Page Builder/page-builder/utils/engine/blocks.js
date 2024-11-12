@@ -18,6 +18,24 @@ export const RichText = (props) => {
   const iframeRef = useRef();
   const { children, __html, ...rest } = props || {};
   // return <div className="rogue-div" {...rest} dangerouslySetInnerHTML={{ __html }} />;
+
+  useEffect(() => {
+    const adjustHeight = () => {
+      if (iframeRef.current && iframeRef.current.contentWindow) {
+        const iframeDocument = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
+        iframeRef.current.style.height = iframeDocument.body.scrollHeight + "px";
+      }
+    };
+
+    // Adjust height initially and when content changes
+    iframeRef.current.onload = adjustHeight;
+
+    return () => {
+      if (iframeRef.current) {
+        iframeRef.current.onload = null;
+      }
+    };
+  }, []);
   useEffect(() => {
     if (iframeRef?.current) {
       const doc = iframeRef.current?.contentDocument || iframeRef.current?.contentWindow?.document;
