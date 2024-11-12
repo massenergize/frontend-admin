@@ -7,6 +7,15 @@ h6,
 h2 {
   margin: 0px;
 }
+
+.pb-r-t {
+  margin: 10px 0px;
+  color: #0b9edc;
+  background-color: #9fddeb47;
+  padding: 10px 20px;
+  font-size: 15px;
+  width: 100%;
+}
 .pb-block-btn {
   padding: 6px 22px;
   font-weight: bold;
@@ -48,7 +57,7 @@ h2 {
 .pb-right-panel {
   position: relative;
   flex-basis: 20%;
-  z-index: 1500;
+  z-index: 1502;
 }
 
 .flex-row {

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { PBBackgroundPicker, PBColorPicker, PBInput, PBInputGroup, PROPERTY_TYPES } from "./PBPropertyTypes";
 import PBDropdown from "../dropdown/PBDropdown";
 
-function usePropertyRenderer({ blockId, onPropertyChange, onFocused, lastFocus }) {
+function usePropertyRenderer({ blockId, onPropertyChange, onFocused, lastFocus, openBottomSheet }) {
   const onChange = (prop) => {
     onPropertyChange && onPropertyChange({ blockId, prop });
   };
@@ -60,7 +60,11 @@ function usePropertyRenderer({ blockId, onPropertyChange, onFocused, lastFocus }
           </ContentWrapper>
         );
       case PROPERTY_TYPES.RICH_TEXT:
-        return <button>Open Rich Text</button>;
+        return (
+          <button onClick={() => openBottomSheet && openBottomSheet()} className="touchable-opacity pb-r-t">
+            {text}
+          </button>
+        );
 
       default:
         console.log("PBError: Unknown type", _type);

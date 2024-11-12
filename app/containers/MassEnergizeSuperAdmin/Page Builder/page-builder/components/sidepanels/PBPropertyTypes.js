@@ -7,7 +7,7 @@ export const PROPERTY_TYPES = {
   DROPDOWN: "dropdown",
   COLOR_PICKER: "color-picker",
   BACKGROUND_PICKER: "background-picker",
-  RICH_TEXT: "rich-text",
+  RICH_TEXT: "richtext",
   
 
 };

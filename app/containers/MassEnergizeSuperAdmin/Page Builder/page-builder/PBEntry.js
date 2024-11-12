@@ -10,7 +10,7 @@ import PBSection from "./components/sectionizer/PBSectionizer";
 import PBBlockContainer from "./components/layouts/blocks/PBBlockContainer";
 import PBPageSettings from "./pages/PBPageSettings";
 const PAGE_SETTINGS_KEY = "PAGE_SETTINGS";
-function PBEntry() {
+function PBEntry({ tinyKey }) {
   const { Modal, open: openModal, close, modalProps, setModalProps } = usePBModal();
   const { BottomSheet, open: openBottomSheet, heightIsToggled } = usePBBottomSheet();
   const [sections, setSection] = useState([]);
@@ -67,7 +67,7 @@ function PBEntry() {
     const newElement = { ...element, props: { ...props, ...newProps } };
     const newBlock = {
       ...rest,
-      block: { ...blockItem, properties: newProperties, template: { ...template, element: newElement } },
+      block: { ...blockItem, properties: newProperties, template: { ...template, element: newElement } }
     };
     return newBlock;
   };
@@ -76,8 +76,8 @@ function PBEntry() {
     const newSectionList = [...sections];
     const block = newSectionList.find((section) => section.block.id === data?.blockId);
     const valueTrain = { [data?.prop?.accessor]: data?.prop?.value };
-    console.log("What DATA LOOKS LIKE", data);
     const newBlock = applyProps(blockInFocus, valueTrain, data?.prop);
+    console.log("WHAT'S NEW ON TEH BLOCK", newBlock);
     newSectionList.splice(block?.options?.position, 1, newBlock);
     setSection(newSectionList);
     setBlockInFocus(newBlock);
@@ -121,13 +121,14 @@ function PBEntry() {
           removeBlockItem={removeBlockItem}
         />
       </PBCanvas>
-      <BottomSheet>
+      {/* <BottomSheet>
         <div style={{ width: "70%" }}>
           <PBRichTextEditor height={heightIsToggled ? 500 : 300} />
         </div>
-      </BottomSheet>
+      </BottomSheet> */}
       <div className="pb-right-panel">
         <PBSidePanel
+          tinyKey={tinyKey}
           onFocused={onFocused}
           lastFocus={recentlyUsedFieldRef?.current}
           onPropertyChange={whenPropertyChanges}

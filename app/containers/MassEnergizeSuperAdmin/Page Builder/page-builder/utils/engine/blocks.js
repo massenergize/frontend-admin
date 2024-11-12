@@ -14,6 +14,11 @@ export const Paragraph = (props) => {
   const { children, ...rest } = props || {};
   return <p {...rest}>{children}</p>;
 };
+export const RichText = (props) => {
+  const { children, __dangerouslySetInnerHTML, ...rest } = props || {};
+  console.log("WHANA HTML", props);
+  return <div {...rest} __dangerouslySetInnerHTML={{ __html: __dangerouslySetInnerHTML }} />;
+};
 export const Title = (props) => {
   const { children, ...rest } = props || {};
   return <h2 {...rest}>{children}</h2>;
@@ -38,7 +43,7 @@ export const Icon = (props) => {
   const { faIcon, ...rest } = props || {};
   return (
     <span>
-      <i className={`fa ${faIcon || "fa-globe"}`} {...rest}></i>
+      <i className={`fa ${faIcon || "fa-globe"}`} {...rest} />
     </span>
   );
 };
@@ -60,7 +65,7 @@ export const YoutubeVideo = (props) => {
           left: 0,
           width: "100%",
           height: "100%",
-          border: "none",
+          border: "none"
         }}
       />
     </div>
@@ -76,4 +81,5 @@ export const Blocks = {
   video: YoutubeVideo,
   link: Link,
   icon: Icon,
+  richtext: Paragraph
 };

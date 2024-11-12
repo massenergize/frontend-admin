@@ -4,7 +4,7 @@ import PBEntry from "./page-builder/PBEntry";
 function MEPageBuilderImplementation() {
   return (
     <>
-      <PBEntry />
+      <PBEntry tinyKey = {process.env.REACT_APP_TINY_MCE_KEY} />
     </>
   );
 }

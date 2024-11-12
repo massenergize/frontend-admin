@@ -240,7 +240,7 @@ export const LINK_PROPS = [
 export const RICH_TEXT_PROPS  = [ 
   {
     _type: PROPERTY_TYPES.RICH_TEXT,
-    text: "Rich Text",
+    text: "Add Rich Text",
     name: "text",
     // placeholder: "0",
     type: "richtext",

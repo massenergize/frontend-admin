@@ -1,16 +1,20 @@
 import React from "react";
 import { Editor as TinyEditor } from "@tinymce/tinymce-react";
-function TinMCE({ height, ...props }) {
+function TinMCE({ height, onChange, ...props }) {
+  const handleOnChange = (content, editor) => {
+    // console.log("LEts se what content, editor", content, editor);
+    onChange && onChange({ content, editor });
+  };
   return (
     <div style={{ padding: 10 }}>
-      <div style={{ marginTop: 20 }}></div>
+      <div style={{ marginTop: 20 }} />
       <TinyEditor
         onInit={(editor) => {
           //   let ed = editor?.target?.editorCommands || {};
           //   setEditor(ed?.editor);
         }}
         {...props}
-        // onEditorChange={handleEditorChange}
+        onEditorChange={handleOnChange}
         toolbar="undo redo | blocks | formatselect| bold italic backcolor forecolor|  link | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | fontfamily | fontsize |"
         plugins="advlist media_library autolink lists link charmap print preview anchor forecolor"
         init={{
@@ -19,9 +23,9 @@ function TinMCE({ height, ...props }) {
           default_link_target: "_blank",
           force_br_newlines: true,
           force_p_newlines: false,
-          forced_root_block: "", // Needed for 3.x
+          forced_root_block: "" // Needed for 3.x
         }}
-        // apiKey={TINY_MCE_API_KEY}
+        apiKey={props?.apiKey}
       />
       <div style={{ display: "flex", flexDirection: "row" }}>
         <small style={{ marginLeft: "auto", marginTop: 5, color: "grey", fontSize: 12 }}>
