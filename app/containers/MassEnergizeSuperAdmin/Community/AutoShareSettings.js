@@ -96,7 +96,7 @@ const AutoShareSettings = () => {
           multiple: true,
           valueExtractor: (item) => item?.id,
           labelExtractor: (item) => item?.name,
-          data: communities || []
+          data: communities?.filter(c=> c?.id !== comId) || []
         },
         {
           key: "excluded_tags",
