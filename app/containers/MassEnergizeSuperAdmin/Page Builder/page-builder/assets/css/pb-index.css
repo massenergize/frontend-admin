@@ -89,8 +89,9 @@ h2 {
 
 .pb-textbox input {
   width: 100%;
-  padding: 4px 8px;
-  border: 1px solid #ccc;
+  padding: 5px 10px;
+  border: 1px solid #ededed;
   border-radius: 3px;
   margin-bottom: 10px;
+  font-size:14px;
 }

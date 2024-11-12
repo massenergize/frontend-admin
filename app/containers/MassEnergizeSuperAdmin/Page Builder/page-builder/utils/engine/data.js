@@ -81,7 +81,11 @@ export const IMAGE_BLOCK = {
   element: {
     // id: Date.now(),
     type: "img",
-    props: { style: { padding: 10 }, src: "https://via.placeholder.com/150", alt: "Placeholder content" }
+    props: {
+      style: { padding: 10, objectFit: "cover", width: "100%", height: 250 },
+      src: "https://via.placeholder.com/300",
+      alt: "Placeholder content"
+    }
   }
 };
 export const VIDEO_BLOCK = {

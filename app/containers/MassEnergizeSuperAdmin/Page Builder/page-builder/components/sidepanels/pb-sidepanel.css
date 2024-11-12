@@ -9,6 +9,17 @@
   padding: 20px;
 }
 
+.pb-reset-btn {
+  background: #ffe7e7a6;
+  color: #d15050;
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 10px 20px;
+  width: 100%;
+  font-size: 14px;
+  border: solid 1px #d15050;
+}
+
 .pb-color-picker {
   cursor: pointer;
   width: 100%;

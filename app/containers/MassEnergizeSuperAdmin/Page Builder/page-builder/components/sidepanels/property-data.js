@@ -22,25 +22,23 @@ const TEXT_PROPS = [
 const BASIC_PROPS = [
   {
     _type: PROPERTY_TYPES.INPUT_GROUP,
-    text: "Dimensions(px)",
+    text: "Dimensions",
     group: [
       {
         ...STYLE_DEFS,
         name: "width",
         placeholder: "0",
         type: "number",
-        label: "Width",
-
+        label: "Width(%)",
         accessor: "width",
-        unit: "px"
+        unit: "%"
       },
       {
         ...STYLE_DEFS,
         name: "height",
         placeholder: "0",
         type: "number",
-        label: "Height",
-
+        label: "Height(px)",
         accessor: "height",
         unit: "px"
       }
@@ -271,4 +269,21 @@ export const TITLE_PROPS = [
   ...BACKGROUND_PROPS,
   ...TEXT_COLOR_PROPS,
   ...ALIGNMENTS_PROPS
+];
+
+export const IMAGE_PROPS = [
+  ...BASIC_PROPS,
+  {
+    ...STYLE_DEFS,
+    _type: PROPERTY_TYPES.DROPDOWN,
+    name: "fill",
+    text: "Image Fill",
+    accessor: "objectFit",
+    value: "cover",
+    data: [
+      { name: "Fill", value: "cover" },
+      { name: "Show as is", value: "contain" }
+      // { name: "Right", value: "flex-end" }
+    ]
+  }
 ];

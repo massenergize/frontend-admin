@@ -7,7 +7,7 @@ export const Div = (props) => {
 
 export const Image = (props) => {
   //   const { children, ...rest } = props || {};
-  return <img alt="default media alt" {...props} />;
+  return <img alt="default media alt" {...props}  />;
 };
 
 export const Paragraph = (props) => {

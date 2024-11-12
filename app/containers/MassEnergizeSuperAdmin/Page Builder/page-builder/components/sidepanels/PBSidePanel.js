@@ -37,12 +37,20 @@ function PBSidePanel({ block, onPropertyChange, onFocused, lastFocus, tinyKey })
   };
 
   const value = block?.template?.element?.props?.__html;
-  console.log("BLock in the Value", value);
   return (
     <>
       <div className="pb-side-panel-root">
         <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
           <h6>Properties</h6> <small style={{ marginLeft: "auto", color: "grey" }}>v1.0.0</small>
+        </div>
+        <div style={{ margin: "10px 0px" }}>
+          <button
+            onClick={() => console.log("HERE I AM")}
+            disabled={!block?.properties}
+            className="pb-reset-btn touchable-opacity"
+          >
+            Reset Properties
+          </button>
         </div>
         <PropertyRenderer properties={block?.properties} />
       </div>
