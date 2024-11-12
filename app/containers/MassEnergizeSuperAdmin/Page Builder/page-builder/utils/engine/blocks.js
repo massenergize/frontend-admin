@@ -1,4 +1,23 @@
 import React, { useEffect, useRef } from "react";
+import { BUTTON_PROPS, IMAGE_PROPS, LINK_PROPS, RICH_TEXT_PROPS, TITLE_PROPS, VIDEO_PROPS } from "../../components/sidepanels/property-data";
+import { BTN_BLOCK, IMAGE_BLOCK, LINK_BLOCK, RICH_TEXT_BLOCK, TITLE_BLOCK, VIDEO_BLOCK } from "./data";
+
+export const BLOCKS = [
+  { name: "Title", icon: "fa-font", key: "title", template: TITLE_BLOCK, properties: TITLE_PROPS },
+  { name: "Button", icon: "fa-square", key: "button", template: BTN_BLOCK, properties: BUTTON_PROPS },
+  {
+    name: "Rich Text",
+    icon: "fa-paragraph",
+    key: "richtext",
+    template: RICH_TEXT_BLOCK,
+    properties: RICH_TEXT_PROPS
+  },
+  { name: "Link", icon: "fa-link", key: "link", template: LINK_BLOCK, properties: LINK_PROPS },
+  // { name: "Section", icon: "fa-square-o", key: "section", template: SECTION_BLOCK },
+  { name: "Video", icon: "fa-youtube", key: "video", template: VIDEO_BLOCK, properties: VIDEO_PROPS },
+  { name: "Image", icon: "fa-image", key: "image", template: IMAGE_BLOCK, properties: IMAGE_PROPS }
+  // { name: "Icon", icon: "fa-circle-o", key: "icon", template: ICON_BLOCK, properties: DEFAULT_PROPERTIES }
+];
 
 export const Div = (props) => {
   const { children, ...rest } = props || {};
@@ -7,7 +26,7 @@ export const Div = (props) => {
 
 export const Image = (props) => {
   //   const { children, ...rest } = props || {};
-  return <img alt="default media alt" {...props}  />;
+  return <img alt="default media alt" {...props} />;
 };
 
 export const Paragraph = (props) => {

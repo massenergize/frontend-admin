@@ -8,7 +8,7 @@ import { usePBBottomSheet } from "../../hooks/usePBBottomSheet";
 import PBRichTextEditor from "../richtext/PBRichTextEditor";
 // import PropertyRenderer from "./PropertyRenderer";
 
-function PBSidePanel({ block, onPropertyChange, onFocused, lastFocus, tinyKey }) {
+function PBSidePanel({ block, onPropertyChange, onFocused, lastFocus, tinyKey, reset }) {
   const { BottomSheet, open: openBottomSheet, heightIsToggled } = usePBBottomSheet();
   const { PropertyRenderer } = usePropertyRenderer({
     blockId: block?.id,
@@ -45,7 +45,7 @@ function PBSidePanel({ block, onPropertyChange, onFocused, lastFocus, tinyKey })
         </div>
         <div style={{ margin: "10px 0px" }}>
           <button
-            onClick={() => console.log("HERE I AM")}
+            onClick={() => reset && reset()}
             disabled={!block?.properties}
             className="pb-reset-btn touchable-opacity"
           >

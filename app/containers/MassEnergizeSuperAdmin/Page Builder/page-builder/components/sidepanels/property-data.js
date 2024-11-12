@@ -16,6 +16,7 @@ const TEXT_PROPS = [
     type: "text",
     label: "Add text",
     placeholder: "Enter text here...",
+    _resetValue: "",
     propAccessor: "text"
   }
 ];
@@ -31,6 +32,7 @@ const BASIC_PROPS = [
         type: "number",
         label: "Width(%)",
         accessor: "width",
+        _resetValue: 0,
         unit: "%"
       },
       {
@@ -40,6 +42,7 @@ const BASIC_PROPS = [
         type: "number",
         label: "Height(px)",
         accessor: "height",
+        _resetValue: 0,
         unit: "px"
       }
     ]
@@ -55,6 +58,7 @@ const BASIC_PROPS = [
         placeholder: "0",
         type: "number",
         name: "pl",
+        _resetValue: 0,
         cssKey: "paddingLeft"
       },
       {
@@ -63,6 +67,7 @@ const BASIC_PROPS = [
         placeholder: "0",
         type: "number",
         name: "pr",
+        _resetValue: 0,
         accessor: "paddingRight"
       },
       {
@@ -71,6 +76,7 @@ const BASIC_PROPS = [
         placeholder: "0",
         type: "number",
         name: "pt",
+        _resetValue: 0,
         accessor: "paddingTop"
       },
       {
@@ -79,6 +85,7 @@ const BASIC_PROPS = [
         placeholder: "0",
         type: "number",
         name: "pb",
+        _resetValue: 0,
         accessor: "paddingBottom"
       }
     ]
@@ -94,6 +101,7 @@ const BASIC_PROPS = [
         placeholder: "0",
         type: "number",
         name: "pl",
+        _resetValue: 0,
         accessor: "marginLeft"
       },
       {
@@ -102,6 +110,7 @@ const BASIC_PROPS = [
         placeholder: "0",
         type: "number",
         name: "pr",
+        _resetValue: 0,
         accessor: "marginRight"
       },
       {
@@ -110,6 +119,7 @@ const BASIC_PROPS = [
         placeholder: "0",
         type: "number",
         name: "pt",
+        _resetValue: 0,
         accessor: "marginTop"
       },
       {
@@ -118,6 +128,7 @@ const BASIC_PROPS = [
         placeholder: "0",
         type: "number",
         name: "pb",
+        _resetValue: 0,
         accessor: "marginBottom"
       }
     ]
@@ -145,6 +156,7 @@ const ALIGNMENTS_PROPS = [
     text: "Horizontal Alignment",
     accessor: "alignItems",
     value: "flex-start",
+    _resetValue: "flex-start",
     data: [
       { name: "Center", value: "center" },
       { name: "Left", value: "flex-start" },
@@ -160,7 +172,8 @@ const BACKGROUND_PROPS = [
     name: "background",
     text: "Background Color",
     accessor: "background",
-    value: "#dddddd"
+    value: "#dddddd",
+    _resetValue: "#dddddd"
   }
 ];
 const FONT_SIZE_PROPS = [
@@ -173,6 +186,7 @@ const FONT_SIZE_PROPS = [
     type: "number",
     accessor: "fontSize",
     value: 22,
+    _resetValue: 22,
     unit: "px"
   }
 ];
@@ -183,7 +197,8 @@ const TEXT_COLOR_PROPS = [
     name: "color",
     text: "Text Color",
     accessor: "color",
-    value: "#000000"
+    value: "#000000",
+    _resetValue: "#000000"
   }
 ];
 export const DEFAULT_PROPERTIES = [
@@ -204,7 +219,8 @@ export const DEFAULT_PROPERTIES = [
     name: "background",
     text: "Background Color",
     accessor: "background",
-    value: "#dddddd"
+    value: "#dddddd",
+    _resetValue: "#dddddd",
   },
   ...ALIGNMENTS_PROPS
 ];
@@ -218,6 +234,7 @@ export const VIDEO_PROPS = [
     type: "text",
     label: "Add video link(Eg. Youtube)",
     placeholder: "Add link here...",
+    _resetValue: "",
     propAccessor: "src"
   },
   ...BASIC_PROPS
@@ -239,6 +256,7 @@ export const LINK_PROPS = [
     type: "text",
     label: "URL Definition",
     placeholder: "Insert link here...",
+    _resetValue: "",
     propAccessor: "href"
   },
   ...BASIC_PROPS,
@@ -280,6 +298,7 @@ export const IMAGE_PROPS = [
     text: "Image Fill",
     accessor: "objectFit",
     value: "cover",
+    _resetValue: "cover",
     data: [
       { name: "Fill", value: "cover" },
       { name: "Show as is", value: "contain" }

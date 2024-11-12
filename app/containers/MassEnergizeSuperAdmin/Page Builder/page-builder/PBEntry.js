@@ -9,6 +9,7 @@ import PBFloatingFooter from "./components/floating-footer/PBFloatingFooter";
 import PBSection from "./components/sectionizer/PBSectionizer";
 import PBBlockContainer from "./components/layouts/blocks/PBBlockContainer";
 import PBPageSettings from "./pages/PBPageSettings";
+import { BLOCKS } from "./utils/engine/blocks";
 const PAGE_SETTINGS_KEY = "PAGE_SETTINGS";
 function PBEntry({ tinyKey }) {
   const { Modal, open: openModal, close, modalProps, setModalProps } = usePBModal();
@@ -105,6 +106,22 @@ function PBEntry({ tinyKey }) {
     setSection(newSection);
   };
   const IS_PAGE_SETTINGS = modalProps?.modalKey === PAGE_SETTINGS_KEY;
+
+  const resetAnItem = () => {
+    // console.log("Reset this item", b);
+    console.log("IN FOCUS", blockInFocus)
+    const { options } = blockInFocus || {};
+    const newSection = [...sections];
+    const freshVersion = BLOCKS.find((block) => block.key === blockInFocus?.block?.key);
+    const newBlock = {
+      block: { id: blockInFocus?.block?.id, ...(freshVersion || {}) },
+      options: blockInFocus?.options
+    };
+    newSection.splice(options?.position, 1, newBlock);
+    console.log("NEW SECTIONs", newSection)
+    setSection(newSection);
+    setBlockInFocus(newBlock);
+  };
   return (
     <div className="pb-root">
       <Modal style={{ minHeight: 300 }}>
@@ -127,6 +144,7 @@ function PBEntry({ tinyKey }) {
       </BottomSheet> */}
       <div className="pb-right-panel">
         <PBSidePanel
+          reset={resetAnItem}
           tinyKey={tinyKey}
           onFocused={onFocused}
           lastFocus={recentlyUsedFieldRef?.current}
