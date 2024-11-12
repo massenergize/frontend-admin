@@ -165,6 +165,19 @@ const BACKGROUND_PROPS = [
     value: "#dddddd"
   }
 ];
+const FONT_SIZE_PROPS = [
+  {
+    ...STYLE_DEFS,
+    _type: PROPERTY_TYPES.INPUT,
+    name: "font-size",
+    text: "Text Size",
+    label: "Change text size",
+    type: "number",
+    accessor: "fontSize",
+    value: 22,
+    unit: "px"
+  }
+];
 const TEXT_COLOR_PROPS = [
   {
     ...STYLE_DEFS,
@@ -231,6 +244,7 @@ export const LINK_PROPS = [
     propAccessor: "href"
   },
   ...BASIC_PROPS,
+  ...FONT_SIZE_PROPS,
   ...BACKGROUND_PROPS,
   ...TEXT_COLOR_PROPS,
   ...ALIGNMENTS_PROPS
@@ -248,4 +262,13 @@ export const RICH_TEXT_PROPS = [
     propAccessor: "__html"
   },
   ...BASIC_PROPS
+];
+
+export const TITLE_PROPS = [
+  ...TEXT_PROPS,
+  ...BASIC_PROPS,
+  ...FONT_SIZE_PROPS,
+  ...BACKGROUND_PROPS,
+  ...TEXT_COLOR_PROPS,
+  ...ALIGNMENTS_PROPS
 ];

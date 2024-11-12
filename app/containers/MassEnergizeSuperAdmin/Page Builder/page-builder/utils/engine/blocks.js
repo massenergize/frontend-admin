@@ -16,7 +16,7 @@ export const Paragraph = (props) => {
 };
 export const RichText = (props) => {
   const iframeRef = useRef();
-  const { children, __html, ...rest } = props || {};
+  const { children, __html, style, ...rest } = props || {};
   // return <div className="rogue-div" {...rest} dangerouslySetInnerHTML={{ __html }} />;
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export const RichText = (props) => {
       <iframe
         ref={iframeRef}
         title="Rich Text Display"
-        style={{ width: "100%", border: "none", height: "auto", pointerEvents: "none" }}
+        style={{ width: "100%", border: "none", height: "auto", pointerEvents: "none", ...(style || {}) }}
       />
     </div>
   );

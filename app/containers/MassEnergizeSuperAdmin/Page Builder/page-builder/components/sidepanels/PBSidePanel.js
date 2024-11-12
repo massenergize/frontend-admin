@@ -35,6 +35,9 @@ function PBSidePanel({ block, onPropertyChange, onFocused, lastFocus, tinyKey })
       }
     });
   };
+
+  const value = block?.template?.element?.props?.__html;
+  console.log("BLock in the Value", value);
   return (
     <>
       <div className="pb-side-panel-root">
@@ -45,7 +48,12 @@ function PBSidePanel({ block, onPropertyChange, onFocused, lastFocus, tinyKey })
       </div>
       <BottomSheet>
         <div style={{ width: "70%" }}>
-          <PBRichTextEditor onChange={onEditorChange} apiKey={tinyKey} height={heightIsToggled ? 500 : 300} />
+          <PBRichTextEditor
+            value={value || ""}
+            onChange={onEditorChange}
+            apiKey={tinyKey}
+            height={heightIsToggled ? 500 : 300}
+          />
         </div>
       </BottomSheet>
     </>
