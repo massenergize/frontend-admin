@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 export const Div = (props) => {
   const { children, ...rest } = props || {};
@@ -15,8 +15,32 @@ export const Paragraph = (props) => {
   return <p {...rest}>{children}</p>;
 };
 export const RichText = (props) => {
+  const iframeRef = useRef();
   const { children, __html, ...rest } = props || {};
-  return <div {...rest} dangerouslySetInnerHTML={{ __html }} />;
+  // return <div className="rogue-div" {...rest} dangerouslySetInnerHTML={{ __html }} />;
+  useEffect(() => {
+    if (iframeRef?.current) {
+      const doc = iframeRef.current?.contentDocument || iframeRef.current?.contentWindow?.document;
+      doc.open();
+      doc.write(`
+        <html>
+          <head>
+          </head>
+          <body>${__html || "<p>Add your rich text here...</p>"}</body>
+        </html>
+      `);
+      doc.close();
+    }
+  }, [__html]);
+  return (
+    <div style={{ position: "relative" }}>
+      <iframe
+        ref={iframeRef}
+        title="Rich Text Display"
+        style={{ width: "100%", border: "none", height: "auto", pointerEvents: "none" }}
+      />
+    </div>
+  );
 };
 export const Title = (props) => {
   const { children, ...rest } = props || {};
@@ -64,7 +88,8 @@ export const YoutubeVideo = (props) => {
           left: 0,
           width: "100%",
           height: "100%",
-          border: "none"
+          border: "none",
+          pointerEvents: "none"
         }}
       />
     </div>
