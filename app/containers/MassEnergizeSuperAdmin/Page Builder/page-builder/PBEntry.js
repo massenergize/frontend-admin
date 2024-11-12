@@ -77,7 +77,6 @@ function PBEntry({ tinyKey }) {
     const block = newSectionList.find((section) => section.block.id === data?.blockId);
     const valueTrain = { [data?.prop?.accessor]: data?.prop?.value };
     const newBlock = applyProps(blockInFocus, valueTrain, data?.prop);
-    console.log("WHAT'S NEW ON TEH BLOCK", newBlock);
     newSectionList.splice(block?.options?.position, 1, newBlock);
     setSection(newSectionList);
     setBlockInFocus(newBlock);

@@ -3,7 +3,7 @@ import { PROPERTY_TYPES } from "./PBPropertyTypes";
 const STYLE_DEFS = {
   append: true,
   propAccessor: "style",
-  propIsObj: true,
+  propIsObj: true
 };
 
 const TEXT_PROPS = [
@@ -16,8 +16,8 @@ const TEXT_PROPS = [
     type: "text",
     label: "Add text",
     placeholder: "Enter text here...",
-    propAccessor: "text",
-  },
+    propAccessor: "text"
+  }
 ];
 const BASIC_PROPS = [
   {
@@ -32,7 +32,7 @@ const BASIC_PROPS = [
         label: "Width",
 
         accessor: "width",
-        unit: "px",
+        unit: "px"
       },
       {
         ...STYLE_DEFS,
@@ -42,9 +42,9 @@ const BASIC_PROPS = [
         label: "Height",
 
         accessor: "height",
-        unit: "px",
-      },
-    ],
+        unit: "px"
+      }
+    ]
   },
   {
     _type: PROPERTY_TYPES.INPUT_GROUP,
@@ -57,7 +57,7 @@ const BASIC_PROPS = [
         placeholder: "0",
         type: "number",
         name: "pl",
-        cssKey: "paddingLeft",
+        cssKey: "paddingLeft"
       },
       {
         ...STYLE_DEFS,
@@ -65,7 +65,7 @@ const BASIC_PROPS = [
         placeholder: "0",
         type: "number",
         name: "pr",
-        accessor: "paddingRight",
+        accessor: "paddingRight"
       },
       {
         ...STYLE_DEFS,
@@ -73,7 +73,7 @@ const BASIC_PROPS = [
         placeholder: "0",
         type: "number",
         name: "pt",
-        accessor: "paddingTop",
+        accessor: "paddingTop"
       },
       {
         ...STYLE_DEFS,
@@ -81,9 +81,9 @@ const BASIC_PROPS = [
         placeholder: "0",
         type: "number",
         name: "pb",
-        accessor: "paddingBottom",
-      },
-    ],
+        accessor: "paddingBottom"
+      }
+    ]
   },
   {
     _type: PROPERTY_TYPES.INPUT_GROUP,
@@ -96,7 +96,7 @@ const BASIC_PROPS = [
         placeholder: "0",
         type: "number",
         name: "pl",
-        accessor: "marginLeft",
+        accessor: "marginLeft"
       },
       {
         ...STYLE_DEFS,
@@ -104,7 +104,7 @@ const BASIC_PROPS = [
         placeholder: "0",
         type: "number",
         name: "pr",
-        accessor: "marginRight",
+        accessor: "marginRight"
       },
       {
         ...STYLE_DEFS,
@@ -112,7 +112,7 @@ const BASIC_PROPS = [
         placeholder: "0",
         type: "number",
         name: "pt",
-        accessor: "marginTop",
+        accessor: "marginTop"
       },
       {
         ...STYLE_DEFS,
@@ -120,10 +120,10 @@ const BASIC_PROPS = [
         placeholder: "0",
         type: "number",
         name: "pb",
-        accessor: "marginBottom",
-      },
-    ],
-  },
+        accessor: "marginBottom"
+      }
+    ]
+  }
 ];
 
 const ALIGNMENTS_PROPS = [
@@ -137,8 +137,8 @@ const ALIGNMENTS_PROPS = [
     data: [
       { name: "Center", value: "center" },
       { name: "Top", value: "flex-start" },
-      { name: "Bottom", value: "flex-end" },
-    ],
+      { name: "Bottom", value: "flex-end" }
+    ]
   },
   {
     ...STYLE_DEFS,
@@ -150,9 +150,9 @@ const ALIGNMENTS_PROPS = [
     data: [
       { name: "Center", value: "center" },
       { name: "Left", value: "flex-start" },
-      { name: "Right", value: "flex-end" },
-    ],
-  },
+      { name: "Right", value: "flex-end" }
+    ]
+  }
 ];
 
 const BACKGROUND_PROPS = [
@@ -162,8 +162,8 @@ const BACKGROUND_PROPS = [
     name: "background",
     text: "Background Color",
     accessor: "background",
-    value: "#dddddd",
-  },
+    value: "#dddddd"
+  }
 ];
 const TEXT_COLOR_PROPS = [
   {
@@ -172,8 +172,8 @@ const TEXT_COLOR_PROPS = [
     name: "color",
     text: "Text Color",
     accessor: "color",
-    value: "#000000",
-  },
+    value: "#000000"
+  }
 ];
 export const DEFAULT_PROPERTIES = [
   {
@@ -184,7 +184,7 @@ export const DEFAULT_PROPERTIES = [
     type: "text",
     label: "Add text",
     placeholder: "Enter text here...",
-    propAccessor: "text",
+    propAccessor: "text"
   },
   ...BASIC_PROPS,
   {
@@ -193,9 +193,9 @@ export const DEFAULT_PROPERTIES = [
     name: "background",
     text: "Background Color",
     accessor: "background",
-    value: "#dddddd",
+    value: "#dddddd"
   },
-  ...ALIGNMENTS_PROPS,
+  ...ALIGNMENTS_PROPS
 ];
 
 export const VIDEO_PROPS = [
@@ -207,16 +207,16 @@ export const VIDEO_PROPS = [
     type: "text",
     label: "Add video link(Eg. Youtube)",
     placeholder: "Add link here...",
-    propAccessor: "src",
+    propAccessor: "src"
   },
-  ...BASIC_PROPS,
+  ...BASIC_PROPS
 ];
 export const BUTTON_PROPS = [
   ...TEXT_PROPS,
   ...BASIC_PROPS,
   ...BACKGROUND_PROPS,
   ...TEXT_COLOR_PROPS,
-  ...ALIGNMENTS_PROPS,
+  ...ALIGNMENTS_PROPS
 ];
 export const LINK_PROPS = [
   ...TEXT_PROPS,
@@ -228,16 +228,15 @@ export const LINK_PROPS = [
     type: "text",
     label: "URL Definition",
     placeholder: "Insert link here...",
-    propAccessor: "href",
+    propAccessor: "href"
   },
   ...BASIC_PROPS,
   ...BACKGROUND_PROPS,
   ...TEXT_COLOR_PROPS,
-  ...ALIGNMENTS_PROPS,
+  ...ALIGNMENTS_PROPS
 ];
 
-
-export const RICH_TEXT_PROPS  = [ 
+export const RICH_TEXT_PROPS = [
   {
     _type: PROPERTY_TYPES.RICH_TEXT,
     text: "Add Rich Text",
@@ -246,7 +245,7 @@ export const RICH_TEXT_PROPS  = [
     type: "richtext",
     label: "Add text",
     // placeholder: "Enter text here...",
-    propAccessor: "__dangerouslySetInnerHTML",
+    propAccessor: "__html"
   },
-  ...BASIC_PROPS,
-]
+  ...BASIC_PROPS
+];

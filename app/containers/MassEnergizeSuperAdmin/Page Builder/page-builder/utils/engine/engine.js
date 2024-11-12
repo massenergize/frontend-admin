@@ -20,6 +20,7 @@ export const renderSection = (block) => {
   const { text } = element?.props || {};
   if (!element) return null;
   let Tag = Blocks[type] || Blocks.div;
+  
   const Element = ({ style, children, ...rest }) => {
     const containerStyle = { ...style, ...layoutFlow(direction) };
     return (
@@ -28,6 +29,7 @@ export const renderSection = (block) => {
       </Tag>
     );
   };
+
   if (!text && !content) return <Element {...element?.props} />;
   const innerHTML = content || childElements;
   return (

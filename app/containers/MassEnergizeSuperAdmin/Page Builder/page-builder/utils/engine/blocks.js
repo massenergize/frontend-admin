@@ -15,9 +15,8 @@ export const Paragraph = (props) => {
   return <p {...rest}>{children}</p>;
 };
 export const RichText = (props) => {
-  const { children, __dangerouslySetInnerHTML, ...rest } = props || {};
-  console.log("WHANA HTML", props);
-  return <div {...rest} __dangerouslySetInnerHTML={{ __html: __dangerouslySetInnerHTML }} />;
+  const { children, __html, ...rest } = props || {};
+  return <div {...rest} dangerouslySetInnerHTML={{ __html }} />;
 };
 export const Title = (props) => {
   const { children, ...rest } = props || {};
@@ -81,5 +80,5 @@ export const Blocks = {
   video: YoutubeVideo,
   link: Link,
   icon: Icon,
-  richtext: Paragraph
+  richtext: RichText
 };

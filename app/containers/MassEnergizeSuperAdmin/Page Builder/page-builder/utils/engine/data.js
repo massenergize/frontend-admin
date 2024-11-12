@@ -61,21 +61,18 @@ export const TITLE_BLOCK = {
 };
 export const RICH_TEXT_BLOCK = {
   element: {
-    id: Date.now(),
-    type: "div",
+    type: "richtext",
     props: { style: { padding: 10, margin: 0 }, text: "Add rich text here..." }
   }
 };
 export const PARAGRAPH_BLOCK = {
   element: {
-    id: Date.now(),
     type: "p",
     props: { style: { padding: 10, margin: 0 }, text: "Start adding your paragraph here..." }
   }
 };
 export const BTN_BLOCK = {
   element: {
-    id: Date.now(),
     type: "button",
     props: { className: "pb-block-btn touchable-opacity", style: {}, text: "Click Me" }
   }
