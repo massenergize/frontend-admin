@@ -1,5 +1,12 @@
 import React, { useEffect } from "react";
-import { PBBackgroundPicker, PBColorPicker, PBInput, PBInputGroup, PROPERTY_TYPES } from "./PBPropertyTypes";
+import {
+  PBBackgroundPicker,
+  PBColorPicker,
+  PBFixedCheckbox,
+  PBInput,
+  PBInputGroup,
+  PROPERTY_TYPES
+} from "./PBPropertyTypes";
 import PBDropdown from "../dropdown/PBDropdown";
 
 function usePropertyRenderer({ blockId, onPropertyChange, onFocused, lastFocus, openBottomSheet }) {
@@ -65,20 +72,8 @@ function usePropertyRenderer({ blockId, onPropertyChange, onFocused, lastFocus, 
             {text}
           </button>
         );
-      case PROPERTY_TYPES.CHECKBOX:
-        return (
-          <div style={{ display: "flex", flexDirection: "row", alignItems: "center", margin: "10px 0px" }}>
-            <input
-              onChange={(e) => console.log("STATE", e.target.value)}
-              type="checkbox"
-              name={itemProps?.name}
-              value={itemProps?.value}
-              checked
-            />
-            <label>{itemProps?.label}</label>
-          </div>
-        );
-
+      case PROPERTY_TYPES.FIXED_CHECKBOX:
+        return <PBFixedCheckbox {...itemProps} />;
       default:
         console.log("PBError: Unknown type", _type);
         break;

@@ -48,14 +48,15 @@ const BASIC_PROPS = [
     ]
   },
   {
-    _type: PROPERTY_TYPES.CHECKBOX,
+    _type: PROPERTY_TYPES.FIXED_CHECKBOX,
     text: "Full Width",
     ...STYLE_DEFS,
     name: "full-width",
     label: "Snap to full width",
     accessor: "width",
-    _resetValue: "100",
+    _resetValue: "50",
     value: "100",
+    checkedValue: "100",
     unit: "%"
   },
   {
@@ -70,7 +71,7 @@ const BASIC_PROPS = [
         type: "number",
         name: "pl",
         _resetValue: 0,
-        cssKey: "paddingLeft"
+        accessor: "paddingLeft"
       },
       {
         ...STYLE_DEFS,

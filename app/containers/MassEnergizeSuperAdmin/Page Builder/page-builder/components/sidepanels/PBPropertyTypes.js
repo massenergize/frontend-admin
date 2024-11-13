@@ -8,7 +8,7 @@ export const PROPERTY_TYPES = {
   COLOR_PICKER: "color-picker",
   BACKGROUND_PICKER: "background-picker",
   RICH_TEXT: "richtext",
-  CHECKBOX: "checkbox",
+  FIXED_CHECKBOX: "fixed-checkbox"
 };
 
 export const PBInputGroup = (props) => {
@@ -48,7 +48,7 @@ export const PBInput = (props) => {
     placeholder,
     name,
     cssKey,
-    propertyIndex,
+    propertyIndex
   } = props || {};
   const ref = useRef();
   useEffect(() => {
@@ -77,7 +77,7 @@ export const PBInput = (props) => {
               propIsObj,
               propAccessor,
               append,
-              e,
+              e
             })
           }
           type={type}
@@ -113,7 +113,7 @@ export const PBColorPicker = (props) => {
           accessor,
           propAccessor,
           propIsObj,
-          append,
+          append
         })
       }
       value={value}
@@ -128,7 +128,7 @@ export const PBBackgroundPicker = (props) => {
   return (
     <>
       <div className="pb-image-picker">
-        <i className=" fa fa-image"></i>
+        <i className=" fa fa-image" />
       </div>
       <br />
       <label style={{ color: "grey" }}>{colorPickerLabel}</label>
@@ -144,4 +144,48 @@ export const Dropdown = (props) => {
   const ref = forwardRef();
 
   return <PBDropdown ref={ref} {...props} />;
+};
+
+export const PBFixedCheckbox = (props) => {
+  const {
+    name,
+    accessor,
+    propertyIndex,
+    propIsObj,
+    propAccessor,
+    append,
+    onChange,
+    value,
+    _resetValue,
+    unit,
+    checkedValue,
+    ...rest
+  } = props;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", margin: "10px 0px" }}>
+      <input
+        onChange={(e) => {
+          const valueToUse = e?.target.value === checkedValue ? _resetValue : checkedValue;
+          onChange({
+            value: e?.target?.checked,
+            accessor,
+            value: `${valueToUse}${unit || "%"}`,
+            rawValue: valueToUse,
+            name: e?.target.name,
+            propertyIndex,
+            propIsObj,
+            propAccessor,
+            append,
+            e
+          });
+        }}
+        type="checkbox"
+        name={name}
+        value={value}
+        checked={value === checkedValue}
+      />
+      <label>{rest?.label}</label>
+    </div>
+  );
 };
