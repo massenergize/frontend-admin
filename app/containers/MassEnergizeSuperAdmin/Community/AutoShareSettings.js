@@ -30,7 +30,7 @@ const AutoShareSettings = () => {
   const [form, setForm] = useState({ [TESTIMONIAL_AUTO_SHARE_SETTINGS_KEY]: testimonialSettings });
 
   useEffect(() => {
-    if (!comId || testimonialSettings?.id) return;
+    if (!comId || testimonialSettings?.community?.id === comId) return;
     setLoadingPage(true);
     apiCall("community.testimonial.autoshare.settings.info", { community_id: comId })
       .then((response) => {
@@ -86,7 +86,7 @@ const AutoShareSettings = () => {
       key: TESTIMONIAL_AUTO_SHARE_SETTINGS_KEY,
       title: "Testimonials Auto Share Settings",
       description:
-        "This settings allows you to automatically share testimonials from other communities or categories with this community. When a testimonial is published from any of the communities selected below or from any of the categories selected below, it will be automatically shared with your community.",
+        "This settings allows you to automatically share testimonials from other communities or categories with this community. When a testimonial is published from any of the communities selected below with any of the categories selected below, it will be automatically shared with your community.",
       updateEndpoint: "testimonials.autoshare.settings.update",
       formFields: [
         {
