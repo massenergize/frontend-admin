@@ -8,6 +8,7 @@ export const PROPERTY_TYPES = {
   COLOR_PICKER: "color-picker",
   BACKGROUND_PICKER: "background-picker",
   RICH_TEXT: "richtext",
+  CHECKBOX: "checkbox",
 };
 
 export const PBInputGroup = (props) => {

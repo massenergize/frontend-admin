@@ -65,6 +65,19 @@ function usePropertyRenderer({ blockId, onPropertyChange, onFocused, lastFocus, 
             {text}
           </button>
         );
+      case PROPERTY_TYPES.CHECKBOX:
+        return (
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "center", margin: "10px 0px" }}>
+            <input
+              onChange={(e) => console.log("STATE", e.target.value)}
+              type="checkbox"
+              name={itemProps?.name}
+              value={itemProps?.value}
+              checked
+            />
+            <label>{itemProps?.label}</label>
+          </div>
+        );
 
       default:
         console.log("PBError: Unknown type", _type);

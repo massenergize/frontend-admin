@@ -10,6 +10,7 @@ function PBSection({ onButtonClick, openBlockModal, sections, focusOnBlock, bloc
       {hasSections ? (
         sections?.map(({ block }, position) => (
           <PBRender
+            inFocus={blockInFocus?.block?.id === block?.id}
             onBlockClick={() => focusOnBlock({ block, options: { position } })}
             json={block}
             onClick={() => onButtonClick({ position: position + 1 })}

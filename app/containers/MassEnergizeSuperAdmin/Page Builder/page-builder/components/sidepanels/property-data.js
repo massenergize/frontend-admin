@@ -48,6 +48,17 @@ const BASIC_PROPS = [
     ]
   },
   {
+    _type: PROPERTY_TYPES.CHECKBOX,
+    text: "Full Width",
+    ...STYLE_DEFS,
+    name: "full-width",
+    label: "Snap to full width",
+    accessor: "width",
+    _resetValue: "100",
+    value: "100",
+    unit: "%"
+  },
+  {
     _type: PROPERTY_TYPES.INPUT_GROUP,
     name: "padding",
     text: "Padding (%)",
@@ -220,7 +231,7 @@ export const DEFAULT_PROPERTIES = [
     text: "Background Color",
     accessor: "background",
     value: "#dddddd",
-    _resetValue: "#dddddd",
+    _resetValue: "#dddddd"
   },
   ...ALIGNMENTS_PROPS
 ];
