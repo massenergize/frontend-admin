@@ -33,6 +33,7 @@ const DIMENSIONS = [
         type: "number",
         label: "Width(%)",
         accessor: "width",
+        value: 100,
         _resetValue: 0,
         unit: "%"
       },
@@ -61,7 +62,7 @@ const MARGIN = [
         label: "Left",
         placeholder: "0",
         type: "number",
-        name: "pl",
+        name: "ml",
         _resetValue: 0,
         accessor: "marginLeft"
       },
@@ -70,7 +71,7 @@ const MARGIN = [
         label: "Right",
         placeholder: "0",
         type: "number",
-        name: "pr",
+        name: "mr",
         _resetValue: 0,
         accessor: "marginRight"
       },
@@ -79,7 +80,7 @@ const MARGIN = [
         label: "Top",
         placeholder: "0",
         type: "number",
-        name: "pt",
+        name: "mt",
         _resetValue: 0,
         accessor: "marginTop"
       },
@@ -88,7 +89,7 @@ const MARGIN = [
         label: "Bottom",
         placeholder: "0",
         type: "number",
-        name: "pb",
+        name: "mb",
         _resetValue: 0,
         accessor: "marginBottom"
       }
@@ -156,8 +157,8 @@ const SNAP_TO_FULL_WIDTH = [
     unit: "%"
   }
 ];
-const BASIC_PROPS_WITH_FULL_WIDTH_SNAP = [...DIMENSIONS, ...SNAP_TO_FULL_WIDTH, ...MARGIN, , ...PADDING];
-const BASIC_PROPS = [...DIMENSIONS, ...MARGIN, , ...PADDING];
+const BASIC_PROPS_WITH_FULL_WIDTH_SNAP = [...DIMENSIONS, ...SNAP_TO_FULL_WIDTH, ...MARGIN, ...PADDING];
+const BASIC_PROPS = [...DIMENSIONS, ...MARGIN, ...PADDING];
 
 const ALIGNMENTS_PROPS = [
   {
@@ -266,6 +267,7 @@ export const VIDEO_PROPS = [
 export const BUTTON_PROPS = [
   ...TEXT_PROPS,
   ...BASIC_PROPS,
+  ...FONT_SIZE_PROPS,
   ...BACKGROUND_PROPS,
   ...TEXT_COLOR_PROPS,
   ...ALIGNMENTS_PROPS

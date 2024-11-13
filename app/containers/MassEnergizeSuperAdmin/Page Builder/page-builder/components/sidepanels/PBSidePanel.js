@@ -6,6 +6,7 @@ import usePropertyRenderer from "./usePropertyRenderer";
 import { DEFAULT_PROPERTIES, EXAMPLE_PROPERTIES } from "./property-data";
 import { usePBBottomSheet } from "../../hooks/usePBBottomSheet";
 import PBRichTextEditor from "../richtext/PBRichTextEditor";
+import { useMemo } from "react";
 // import PropertyRenderer from "./PropertyRenderer";
 
 function PBSidePanel({ block, onPropertyChange, onFocused, lastFocus, tinyKey, reset }) {
@@ -18,7 +19,39 @@ function PBSidePanel({ block, onPropertyChange, onFocused, lastFocus, tinyKey, r
     openBottomSheet
   });
 
+  // const extractValue = (v, unit) => {
+  //   if (!v) return null;
+  //   return v?.toString().split(unit)?.[0];
+  // };
+  // const getStartingValueFromElement = (prop, elementProps) => {
+  //   const { group, propAccessor, accessor, unit } = prop || {};
+
+  //   if (group) return { ...prop, group: group?.map((p) => getStartingValueFromElement(p, elementProps)) };
+  //   let value;
+  //   if (!propAccessor) {
+  //     value = elementProps[accessor];
+  //     value = extractValue(value, unit);
+  //     return { ...prop, value };
+  //   }
+
+  //   const obj = elementProps[propAccessor] || {};
+  //   value = extractValue(obj[accessor]);
+  //   return { ...prop, value };
+  // };
+
+  // const transformPropertiesToMatchElementProps = (blockInFocus) => {
+  //   if (!blockInFocus) return null;
+  //   const elementProps = blockInFocus?.template?.element?.props;
+  //   const properties = blockInFocus?.properties;
+  //   const newProps = properties?.map((prop) => getStartingValueFromElement(prop, elementProps));
+  //   return { ...blockInFocus, properties: newProps };
+  // };
+
+  // const transformedBlock = useMemo(() => transformPropertiesToMatchElementProps(block), [block]);
+  const transformedBlock = block;
+
   const onEditorChange = (data) => {
+    const block = transformedBlock;
     const { content } = data;
     const func = (prop) => prop?._type === PROPERTY_TYPES.RICH_TEXT;
     const richProp = block?.properties?.find(func);
@@ -36,7 +69,7 @@ function PBSidePanel({ block, onPropertyChange, onFocused, lastFocus, tinyKey, r
     });
   };
 
-  const value = block?.template?.element?.props?.__html;
+  const value = transformedBlock?.template?.element?.props?.__html;
   return (
     <>
       <div className="pb-side-panel-root">
@@ -52,7 +85,7 @@ function PBSidePanel({ block, onPropertyChange, onFocused, lastFocus, tinyKey, r
             Reset Properties
           </button>
         </div>
-        <PropertyRenderer properties={block?.properties} />
+        <PropertyRenderer properties={transformedBlock?.properties} />
       </div>
       <BottomSheet>
         <div style={{ width: "70%" }}>

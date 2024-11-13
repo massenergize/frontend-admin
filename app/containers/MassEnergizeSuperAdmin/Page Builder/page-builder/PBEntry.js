@@ -22,6 +22,7 @@ function PBEntry({ tinyKey }) {
     recentlyUsedFieldRef.current = target;
   }, []);
 
+
   const handlePropertyChange = (properties, options) => {
     const { isGrouped, rawValue, cssKey, groupIndex, propertyIndex } = options || {};
     const newProperties = [...properties];

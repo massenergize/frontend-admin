@@ -56,19 +56,19 @@ export const SECTION_BLOCK = {
 export const TITLE_BLOCK = {
   element: {
     type: "h2",
-    props: { style: { padding: 10 }, text: "New title here..." }
+    props: { style: { padding: 0, fontSize:22 }, text: "New title here..." }
   }
 };
 export const RICH_TEXT_BLOCK = {
   element: {
     type: "richtext",
-    props: { style: { padding: 10, margin: 0 }, text: "Add rich text here..." }
+    props: { style: { padding: 0, margin: 0 }, text: "Add rich text here..." }
   }
 };
 export const PARAGRAPH_BLOCK = {
   element: {
     type: "p",
-    props: { style: { padding: 10, margin: 0 }, text: "Start adding your paragraph here..." }
+    props: { style: { padding: 0, margin: 0 }, text: "Start adding your paragraph here..." }
   }
 };
 export const BTN_BLOCK = {
@@ -82,7 +82,7 @@ export const IMAGE_BLOCK = {
     // id: Date.now(),
     type: "img",
     props: {
-      style: { padding: 10, objectFit: "cover", width: "100%", height: 250 },
+      style: { padding: 0, objectFit: "cover", width: "100%", height: 250 },
       src: "https://via.placeholder.com/300",
       alt: "Placeholder content"
     }
