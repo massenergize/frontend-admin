@@ -4,12 +4,12 @@ const AUDIENCE = [
   // everyone, specific communities, only my community
   { id: 1, name: "Everyone", key: "everyone" },
   { id: 2, name: "Specific Communities", key: "specific-communities" },
-  { id: 3, name: "Only My Community", key: "only-my-community" },
+  { id: 3, name: "Only My Community", key: "only-my-community" }
 ];
 function PBPageSettings() {
   return (
     <div style={{ padding: 20 }}>
-      <h6 style={{ color: "#0b9edc" }}>PAGE SETTINGS</h6>
+      <h6 style={{ color: "#0b9edc", fontSize: 21 }}>Page Settings</h6>
       <div className="pb-textbox">
         <label>What's the name of the page</label>
         <input className="here-we-go" type="text" placeholder="Enter page title..." />

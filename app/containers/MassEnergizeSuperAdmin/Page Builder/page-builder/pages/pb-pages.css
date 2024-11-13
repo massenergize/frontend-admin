@@ -1,5 +1,5 @@
 .pb-bordered-section {
-  border: solid 1px #f8e2e2;
+  border: solid 1px #ededed;
   padding: 15px;
   border-radius: 5px;
   margin: 10px 0px;
@@ -24,9 +24,10 @@
 }
 
 .pb-s-btn {
-  padding: 7px 23px;
+  padding: 10px 20px;
   font-weight: bold;
   background-color: rgb(11, 158, 220);
   border-radius: 55px;
   border-width: 0px;
+  color:white;
 }
