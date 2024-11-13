@@ -80,6 +80,7 @@ const AutoShareSettings = () => {
       [sectionKey]: { ...prev[sectionKey], [key]: value }
     }));
   }, []);
+  
 
   const PAGE_CONFIG = [
     {
@@ -96,7 +97,7 @@ const AutoShareSettings = () => {
           multiple: true,
           valueExtractor: (item) => item?.id,
           labelExtractor: (item) => item?.name,
-          data: communities?.filter(c=> c?.id !== comId) || []
+          data: communities?.filter(c=> c?.id?.toString() !== comId) || []
         },
         {
           key: "excluded_tags",
