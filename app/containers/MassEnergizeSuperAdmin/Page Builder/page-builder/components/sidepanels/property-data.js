@@ -20,7 +20,8 @@ const TEXT_PROPS = [
     propAccessor: "text"
   }
 ];
-const BASIC_PROPS = [
+
+const DIMENSIONS = [
   {
     _type: PROPERTY_TYPES.INPUT_GROUP,
     text: "Dimensions",
@@ -46,62 +47,10 @@ const BASIC_PROPS = [
         unit: "px"
       }
     ]
-  },
-  {
-    _type: PROPERTY_TYPES.FIXED_CHECKBOX,
-    text: "Full Width",
-    ...STYLE_DEFS,
-    name: "full-width",
-    label: "Snap to full width",
-    accessor: "width",
-    _resetValue: "50",
-    value: "100",
-    checkedValue: "100",
-    unit: "%"
-  },
-  {
-    _type: PROPERTY_TYPES.INPUT_GROUP,
-    name: "padding",
-    text: "Padding (%)",
-    group: [
-      {
-        ...STYLE_DEFS,
-        label: "Left",
-        placeholder: "0",
-        type: "number",
-        name: "pl",
-        _resetValue: 0,
-        accessor: "paddingLeft"
-      },
-      {
-        ...STYLE_DEFS,
-        label: "Right",
-        placeholder: "0",
-        type: "number",
-        name: "pr",
-        _resetValue: 0,
-        accessor: "paddingRight"
-      },
-      {
-        ...STYLE_DEFS,
-        label: "Top",
-        placeholder: "0",
-        type: "number",
-        name: "pt",
-        _resetValue: 0,
-        accessor: "paddingTop"
-      },
-      {
-        ...STYLE_DEFS,
-        label: "Bottom",
-        placeholder: "0",
-        type: "number",
-        name: "pb",
-        _resetValue: 0,
-        accessor: "paddingBottom"
-      }
-    ]
-  },
+  }
+];
+
+const MARGIN = [
   {
     _type: PROPERTY_TYPES.INPUT_GROUP,
     name: "margin",
@@ -146,6 +95,69 @@ const BASIC_PROPS = [
     ]
   }
 ];
+
+const PADDING = [
+  {
+    _type: PROPERTY_TYPES.INPUT_GROUP,
+    name: "padding",
+    text: "Padding (%)",
+    group: [
+      {
+        ...STYLE_DEFS,
+        label: "Left",
+        placeholder: "0",
+        type: "number",
+        name: "pl",
+        _resetValue: 0,
+        accessor: "paddingLeft"
+      },
+      {
+        ...STYLE_DEFS,
+        label: "Right",
+        placeholder: "0",
+        type: "number",
+        name: "pr",
+        _resetValue: 0,
+        accessor: "paddingRight"
+      },
+      {
+        ...STYLE_DEFS,
+        label: "Top",
+        placeholder: "0",
+        type: "number",
+        name: "pt",
+        _resetValue: 0,
+        accessor: "paddingTop"
+      },
+      {
+        ...STYLE_DEFS,
+        label: "Bottom",
+        placeholder: "0",
+        type: "number",
+        name: "pb",
+        _resetValue: 0,
+        accessor: "paddingBottom"
+      }
+    ]
+  }
+];
+
+const SNAP_TO_FULL_WIDTH = [
+  {
+    _type: PROPERTY_TYPES.FIXED_CHECKBOX,
+    text: "Full Width",
+    ...STYLE_DEFS,
+    name: "full-width",
+    label: "Snap to full width",
+    accessor: "width",
+    _resetValue: "50",
+    value: "100",
+    checkedValue: "100",
+    unit: "%"
+  }
+];
+const BASIC_PROPS_WITH_FULL_WIDTH_SNAP = [...DIMENSIONS, ...SNAP_TO_FULL_WIDTH, ...MARGIN, , ...PADDING];
+const BASIC_PROPS = [...DIMENSIONS, ...MARGIN, , ...PADDING];
 
 const ALIGNMENTS_PROPS = [
   {
@@ -302,7 +314,7 @@ export const TITLE_PROPS = [
 ];
 
 export const IMAGE_PROPS = [
-  ...BASIC_PROPS,
+  ...BASIC_PROPS_WITH_FULL_WIDTH_SNAP,
   {
     ...STYLE_DEFS,
     _type: PROPERTY_TYPES.DROPDOWN,

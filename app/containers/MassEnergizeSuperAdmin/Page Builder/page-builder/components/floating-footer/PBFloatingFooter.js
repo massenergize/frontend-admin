@@ -22,7 +22,13 @@ function PBFloatingFooter({ openPageSettings, close, save }) {
             className="pb-preview pb-footer-btn"
             onClick={() => alert("The 'Preview' feature will be implemented soon!")}
           >
-            Preview <i className="fa fa-external-link" style={{ marginLeft: 5 }} />
+            Preview <i className="fa fa-eye" style={{ marginLeft: 5 }} />
+          </button>
+          <button
+            className="pb-publish pb-footer-btn"
+            onClick={() => alert("The 'Publish' feature will be implemented soon!")}
+          >
+            Publish <i className="fa fa-external-link" style={{ marginLeft: 5 }} />
           </button>
         </div>
       </div>

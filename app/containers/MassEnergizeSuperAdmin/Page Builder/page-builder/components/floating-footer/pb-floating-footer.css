@@ -53,11 +53,22 @@
   color: white;
   border-top-left-radius: 55px;
   border-bottom-left-radius: 55px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
 }
 
 .pb-preview {
+  background-color: #383838;
+  color: white;
+  border-radius: 0px;
+  /* border-top-right-radius: 55px; */
+  /* border-bottom-right-radius: 55px; */
+}
+.pb-publish {
   background-color: #0b9edc;
   color: white;
   border-top-right-radius: 55px;
   border-bottom-right-radius: 55px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
 }

@@ -5,8 +5,22 @@ import PBRender from "../render/PBRender";
 function PBSection({ onButtonClick, openBlockModal, sections, focusOnBlock, blockInFocus, removeBlockItem }) {
   const hasSections = sections.length > 0;
 
+  const renderAddSectionButton = (props, config) => {
+    const { text } = config || {};
+    return (
+      <div className="pb-add-area">
+        <button
+          onClick={() => onButtonClick({ position: sections?.length, ...(props || {}) })}
+          className="pb-add-section touchable-opacity"
+        >
+          {text || "Add Block"}
+        </button>
+      </div>
+    );
+  };
   return (
     <>
+      {hasSections && renderAddSectionButton({ position: 0 }, { text: "Add to Top" })}
       {hasSections ? (
         sections?.map(({ block }, position) => (
           <PBRender
@@ -20,14 +34,7 @@ function PBSection({ onButtonClick, openBlockModal, sections, focusOnBlock, bloc
       ) : (
         <EmptySection open={() => openBlockModal({ position: 0 })} />
       )}
-      <div className="pb-add-area">
-        <button
-          onClick={() => onButtonClick({ position: sections?.length })}
-          className="pb-add-section touchable-opacity"
-        >
-          Add Section
-        </button>
-      </div>
+      {renderAddSectionButton()}
     </>
   );
 }
