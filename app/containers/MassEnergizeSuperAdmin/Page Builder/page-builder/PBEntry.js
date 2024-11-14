@@ -11,7 +11,7 @@ import PBBlockContainer from "./components/layouts/blocks/PBBlockContainer";
 import PBPageSettings from "./pages/PBPageSettings";
 import { BLOCKS } from "./utils/engine/blocks";
 const PAGE_SETTINGS_KEY = "PAGE_SETTINGS";
-function PBEntry({ tinyKey }) {
+function PBEntry({ tinyKey, openMediaLibrary, propsOverride }) {
   const { Modal, open: openModal, close, modalProps, setModalProps } = usePBModal();
   const { BottomSheet, open: openBottomSheet, heightIsToggled } = usePBBottomSheet();
   const [sections, setSection] = useState([]);
@@ -21,7 +21,6 @@ function PBEntry({ tinyKey }) {
   const onFocused = useCallback((target) => {
     recentlyUsedFieldRef.current = target;
   }, []);
-
 
   const handlePropertyChange = (properties, options) => {
     const { isGrouped, rawValue, cssKey, groupIndex, propertyIndex } = options || {};
@@ -110,7 +109,7 @@ function PBEntry({ tinyKey }) {
 
   const resetAnItem = () => {
     // console.log("Reset this item", b);
-    console.log("IN FOCUS", blockInFocus)
+    console.log("IN FOCUS", blockInFocus);
     const { options } = blockInFocus || {};
     const newSection = [...sections];
     const freshVersion = BLOCKS.find((block) => block.key === blockInFocus?.block?.key);
@@ -119,7 +118,7 @@ function PBEntry({ tinyKey }) {
       options: blockInFocus?.options
     };
     newSection.splice(options?.position, 1, newBlock);
-    console.log("NEW SECTIONs", newSection)
+    console.log("NEW SECTIONs", newSection);
     setSection(newSection);
     setBlockInFocus(newBlock);
   };
@@ -145,12 +144,14 @@ function PBEntry({ tinyKey }) {
       </BottomSheet> */}
       <div className="pb-right-panel">
         <PBSidePanel
+          propsOverride={propsOverride}
           reset={resetAnItem}
           tinyKey={tinyKey}
           onFocused={onFocused}
           lastFocus={recentlyUsedFieldRef?.current}
           onPropertyChange={whenPropertyChanges}
           block={blockInFocus?.block}
+          openMediaLibrary={openMediaLibrary}
         />
       </div>
       <PBFloatingFooter

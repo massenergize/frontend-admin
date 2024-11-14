@@ -9,14 +9,25 @@ import PBRichTextEditor from "../richtext/PBRichTextEditor";
 import { useMemo } from "react";
 // import PropertyRenderer from "./PropertyRenderer";
 
-function PBSidePanel({ block, onPropertyChange, onFocused, lastFocus, tinyKey, reset }) {
+function PBSidePanel({
+  propsOverride,
+  block,
+  onPropertyChange,
+  onFocused,
+  lastFocus,
+  tinyKey,
+  reset,
+  openMediaLibrary
+}) {
   const { BottomSheet, open: openBottomSheet, heightIsToggled } = usePBBottomSheet();
   const { PropertyRenderer } = usePropertyRenderer({
     blockId: block?.id,
     onPropertyChange,
     onFocused,
     lastFocus,
-    openBottomSheet
+    openBottomSheet,
+    openMediaLibrary,
+    propsOverride
   });
 
   // const extractValue = (v, unit) => {

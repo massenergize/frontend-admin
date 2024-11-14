@@ -9,6 +9,19 @@
   padding: 20px;
 }
 
+.pb-img-remove {
+  font-weight: bold;
+  font-size: 15px;
+  color: crimson;
+  text-decoration: underline;
+  margin: 10px 0px;
+}
+
+.pb-side-image-preview {
+  object-fit: contain;
+  height: 150px;
+  width: 150px;
+}
 .pb-reset-btn {
   background: #ffe7e7a6;
   color: #d15050;

@@ -318,6 +318,16 @@ export const TITLE_PROPS = [
 export const IMAGE_PROPS = [
   ...BASIC_PROPS_WITH_FULL_WIDTH_SNAP,
   {
+    _type: PROPERTY_TYPES.MEDIA,
+    text: "Select Image",
+    name: "src",
+    // placeholder: "0",
+    type: "image",
+    label: "Add image",
+    // placeholder: "Enter text here...",
+    propAccessor: "src"
+  },
+  {
     ...STYLE_DEFS,
     _type: PROPERTY_TYPES.DROPDOWN,
     name: "fill",

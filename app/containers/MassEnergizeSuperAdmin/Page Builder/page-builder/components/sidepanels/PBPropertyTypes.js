@@ -8,7 +8,8 @@ export const PROPERTY_TYPES = {
   COLOR_PICKER: "color-picker",
   BACKGROUND_PICKER: "background-picker",
   RICH_TEXT: "richtext",
-  FIXED_CHECKBOX: "fixed-checkbox"
+  FIXED_CHECKBOX: "fixed-checkbox",
+  MEDIA: "MEDIA"
 };
 
 export const PBInputGroup = (props) => {
@@ -186,6 +187,36 @@ export const PBFixedCheckbox = (props) => {
         checked={value === checkedValue}
       />
       <label>{rest?.label}</label>
+    </div>
+  );
+};
+
+export const PBImageSelector = (props) => {
+  const { text, openMediaLibrary, src } = props || {};
+  const open = () => openMediaLibrary && openMediaLibrary();
+  return (
+    <div>
+      <div style={{ marginTop: 10 }}>
+        {!src ? (
+          <div className="pb-image-picker" onClick={() => open()}>
+            <i className=" fa fa-image" />
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <img
+              src="https://via.placeholder.com/150"
+              alt="Other image placeholder"
+              className="pb-side-image-preview"
+            />
+            <p onClick={() => open()} className="pb-img-remove touchable-opacity">
+              Remove
+            </p>
+          </div>
+        )}
+      </div>
+      <button onClick={() => openMediaLibrary && openMediaLibrary()} className="touchable-opacity pb-r-t">
+        {text}
+      </button>
     </div>
   );
 };

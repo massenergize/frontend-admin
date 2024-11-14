@@ -3,13 +3,22 @@ import {
   PBBackgroundPicker,
   PBColorPicker,
   PBFixedCheckbox,
+  PBImageSelector,
   PBInput,
   PBInputGroup,
   PROPERTY_TYPES
 } from "./PBPropertyTypes";
 import PBDropdown from "../dropdown/PBDropdown";
 
-function usePropertyRenderer({ blockId, onPropertyChange, onFocused, lastFocus, openBottomSheet }) {
+function usePropertyRenderer({
+  propsOverride,
+  blockId,
+  onPropertyChange,
+  onFocused,
+  lastFocus,
+  openBottomSheet,
+  openMediaLibrary
+}) {
   const onChange = (prop) => {
     onPropertyChange && onPropertyChange({ blockId, prop });
   };
@@ -17,7 +26,10 @@ function usePropertyRenderer({ blockId, onPropertyChange, onFocused, lastFocus, 
     onFocused && onFocused(focusedProps);
   };
 
-  const ContentWrapper = ({ text, children }) => {
+  const ContentWrapper = (props) => {
+    const { text, children, _type } = props || {};
+    const override = propsOverride?.[_type];
+    if (override) return override(props);
     return (
       <div>
         {text && <h6 className="pb-panel-area-heading">{text}</h6>}
@@ -28,7 +40,7 @@ function usePropertyRenderer({ blockId, onPropertyChange, onFocused, lastFocus, 
 
   const PropertyField = ({ json, propertyIndex }) => {
     const { _type, text, ...rest } = json || {};
-    const commonProps = { text };
+    const commonProps = { text, propsOverride, _type };
     const itemProps = { onChange, onFocus: handleFocus, propertyIndex, ...rest };
     const shouldBeFocused = (name) => lastFocus?.key === name;
     switch (_type) {
@@ -72,8 +84,19 @@ function usePropertyRenderer({ blockId, onPropertyChange, onFocused, lastFocus, 
             {text}
           </button>
         );
+      case PROPERTY_TYPES.MEDIA:
+        return (
+          <ContentWrapper {...commonProps}>
+            <PBImageSelector text={text} {...itemProps} openMediaLibrary={openMediaLibrary} />
+          </ContentWrapper>
+        );
+
       case PROPERTY_TYPES.FIXED_CHECKBOX:
-        return <PBFixedCheckbox {...itemProps} />;
+        return (
+          <ContentWrapper {...commonProps}>
+            <PBFixedCheckbox {...itemProps} />
+          </ContentWrapper>
+        );
       default:
         console.log("PBError: Unknown type", _type);
         break;
