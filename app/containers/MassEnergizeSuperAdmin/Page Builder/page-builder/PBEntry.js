@@ -117,8 +117,6 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride }) {
   const IS_PAGE_SETTINGS = modalProps?.modalKey === PAGE_SETTINGS_KEY;
 
   const resetAnItem = () => {
-    // console.log("Reset this item", b);
-    console.log("IN FOCUS", blockInFocus);
     const { options } = blockInFocus || {};
     const newSection = [...sections];
     const freshVersion = BLOCKS.find((block) => block.key === blockInFocus?.block?.key);
@@ -127,10 +125,11 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride }) {
       options: blockInFocus?.options
     };
     newSection.splice(options?.position, 1, newBlock);
-    console.log("NEW SECTIONs", newSection);
     setSection(newSection);
     updateFocus(blockInFocus, newBlock);
   };
+
+  console.log("SEE LES BLOCKS", sections);
   return (
     <div className="pb-root">
       <Modal style={{ minHeight: 300 }}>

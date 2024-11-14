@@ -321,10 +321,7 @@ export const IMAGE_PROPS = [
     _type: PROPERTY_TYPES.MEDIA,
     text: "Select Image",
     name: "src",
-    // placeholder: "0",
-    type: "image",
     label: "Add image",
-    // placeholder: "Enter text here...",
     propAccessor: "src"
   },
   {

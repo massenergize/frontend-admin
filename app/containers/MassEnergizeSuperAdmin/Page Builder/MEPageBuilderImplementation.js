@@ -2,18 +2,34 @@ import React from "react";
 import PBEntry from "./page-builder/PBEntry";
 import { PBImageSelector, PROPERTY_TYPES } from "./page-builder/components/sidepanels/PBPropertyTypes";
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
+import { useSelector } from "react-redux";
 
 function MEPageBuilderImplementation() {
+  const imagesObject = useSelector((state) => state.getIn(["galleryImages"]));
   const openMediaLibrary = () => {
     console.log("I have opened the media library");
   };
 
+  const fetchMediaItems = () => {};
+
   const overrideProperties = {
     [PROPERTY_TYPES.MEDIA]: (props) => {
+      const { onPropertyChange, itemProps } = props || {};
       return (
         <MediaLibrary
-          customRender={({ openLibrary }) => {
-            return <PBImageSelector {...props} openMediaLibrary={() => openLibrary(true)} />;
+          images={imagesObject?.images}
+          onInsert={(item) => {
+            const [image] = item || [];
+            if (!image) return console.log("Did not select any image...");
+            onPropertyChange({
+              blockId: props?.blockId,
+              prop: { ...(itemProps || {}), value: image?.url, rawValue: image?.url }
+            });
+          }}
+          customRender={({ openLibrary, selected }) => {
+            const [img] = selected || [];
+            console.log("We see the image here", img, selected);
+            return <PBImageSelector {...props} src={img?.url} openMediaLibrary={() => openLibrary(true)} />;
           }}
         />
       );

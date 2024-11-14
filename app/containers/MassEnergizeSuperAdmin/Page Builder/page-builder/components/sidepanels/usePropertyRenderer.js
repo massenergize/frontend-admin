@@ -17,7 +17,7 @@ function usePropertyRenderer({
   onFocused,
   lastFocus,
   openBottomSheet,
-  openMediaLibrary
+  openMediaLibrary // remember to remove this when the media library starts working
 }) {
   const onChange = (prop) => {
     onPropertyChange && onPropertyChange({ blockId, prop });
@@ -40,8 +40,8 @@ function usePropertyRenderer({
 
   const PropertyField = ({ json, propertyIndex }) => {
     const { _type, text, ...rest } = json || {};
-    const commonProps = { text, propsOverride, _type };
     const itemProps = { onChange, onFocus: handleFocus, propertyIndex, ...rest };
+    const commonProps = { text, propsOverride, _type, itemProps, onPropertyChange };
     const shouldBeFocused = (name) => lastFocus?.key === name;
     switch (_type) {
       case PROPERTY_TYPES.INPUT:
