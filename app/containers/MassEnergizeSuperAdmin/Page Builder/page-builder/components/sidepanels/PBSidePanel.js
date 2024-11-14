@@ -19,7 +19,7 @@ function PBSidePanel({
   reset,
   openMediaLibrary
 }) {
-  const { BottomSheet, open: openBottomSheet, heightIsToggled } = usePBBottomSheet();
+  const { BottomSheet, open: openBottomSheet, heightIsToggled, close } = usePBBottomSheet();
   const { PropertyRenderer } = usePropertyRenderer({
     blockId: block?.id,
     onPropertyChange,
@@ -29,6 +29,10 @@ function PBSidePanel({
     openMediaLibrary,
     propsOverride
   });
+
+  useEffect(() => {
+    if (block?.key !== PROPERTY_TYPES.RICH_TEXT) return close();
+  }, [block?.key]);
 
   // const extractValue = (v, unit) => {
   //   if (!v) return null;

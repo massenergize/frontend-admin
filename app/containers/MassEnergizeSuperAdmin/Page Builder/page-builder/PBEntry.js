@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import PBCanvas from "./PBCanvas";
 import "./assets/css/pb-index.css";
 import PBSidePanel from "./components/sidepanels/PBSidePanel";
@@ -10,17 +10,25 @@ import PBSection from "./components/sectionizer/PBSectionizer";
 import PBBlockContainer from "./components/layouts/blocks/PBBlockContainer";
 import PBPageSettings from "./pages/PBPageSettings";
 import { BLOCKS } from "./utils/engine/blocks";
+import { PROPERTY_TYPES } from "./components/sidepanels/PBPropertyTypes";
 const PAGE_SETTINGS_KEY = "PAGE_SETTINGS";
 function PBEntry({ tinyKey, openMediaLibrary, propsOverride }) {
   const { Modal, open: openModal, close, modalProps, setModalProps } = usePBModal();
-  const { BottomSheet, open: openBottomSheet, heightIsToggled } = usePBBottomSheet();
   const [sections, setSection] = useState([]);
   const [blockInFocus, setBlockInFocus] = useState(null);
+  const [outOfFocus, setOutOfFocus] = useState(null);
   const recentlyUsedFieldRef = useRef();
 
+  const updateFocus = (oldBlock, newBlock) => {
+    setBlockInFocus(newBlock);
+    setOutOfFocus(oldBlock);
+  };
   const onFocused = useCallback((target) => {
     recentlyUsedFieldRef.current = target;
   }, []);
+
+
+
 
   const handlePropertyChange = (properties, options) => {
     const { isGrouped, rawValue, cssKey, groupIndex, propertyIndex } = options || {};
@@ -80,7 +88,7 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride }) {
     const newBlock = applyProps(blockInFocus, valueTrain, data?.prop);
     newSectionList.splice(block?.options?.position, 1, newBlock);
     setSection(newSectionList);
-    setBlockInFocus(newBlock);
+    updateFocus(blockInFocus, newBlock);
   };
 
   const selectBlock = (blockJson) => {
@@ -104,6 +112,7 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride }) {
   const removeBlockItem = ({ blockId }) => {
     const newSection = sections.filter((section) => section.block.id !== blockId);
     setSection(newSection);
+    updateFocus(blockInFocus, null);
   };
   const IS_PAGE_SETTINGS = modalProps?.modalKey === PAGE_SETTINGS_KEY;
 
@@ -120,7 +129,7 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride }) {
     newSection.splice(options?.position, 1, newBlock);
     console.log("NEW SECTIONs", newSection);
     setSection(newSection);
-    setBlockInFocus(newBlock);
+    updateFocus(blockInFocus, newBlock);
   };
   return (
     <div className="pb-root">
@@ -130,7 +139,7 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride }) {
       <PBCanvas>
         <PBSection
           blockInFocus={blockInFocus}
-          focusOnBlock={setBlockInFocus}
+          focusOnBlock={(block) => updateFocus(blockInFocus, block)}
           sections={sections}
           onButtonClick={openModal}
           openBlockModal={openModal}
