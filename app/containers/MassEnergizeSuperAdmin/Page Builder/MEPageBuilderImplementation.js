@@ -1,6 +1,7 @@
 import React from "react";
 import PBEntry from "./page-builder/PBEntry";
-import { PROPERTY_TYPES } from "./page-builder/components/sidepanels/PBPropertyTypes";
+import { PBImageSelector, PROPERTY_TYPES } from "./page-builder/components/sidepanels/PBPropertyTypes";
+import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 
 function MEPageBuilderImplementation() {
   const openMediaLibrary = () => {
@@ -9,7 +10,13 @@ function MEPageBuilderImplementation() {
 
   const overrideProperties = {
     [PROPERTY_TYPES.MEDIA]: (props) => {
-      return <h3>Apuskeleke eee, apuskeleke eeee, apuskeleke wosik</h3>;
+      return (
+        <MediaLibrary
+          customRender={({ openLibrary }) => {
+            return <PBImageSelector {...props} openMediaLibrary={() => openLibrary(true)} />;
+          }}
+        />
+      );
     }
   };
   return (

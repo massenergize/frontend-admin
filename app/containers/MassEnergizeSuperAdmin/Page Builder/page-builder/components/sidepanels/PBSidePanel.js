@@ -101,6 +101,8 @@ function PBSidePanel({
       <BottomSheet>
         <div style={{ width: "70%" }}>
           <PBRichTextEditor
+            onFocused={onFocused}
+            focus={lastFocus?.key === block?.name}
             value={value || ""}
             onChange={onEditorChange}
             apiKey={tinyKey}
