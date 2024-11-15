@@ -245,6 +245,12 @@ function LightAutoComplete(props) {
     transfer(newSelected);
   };
 
+  const retrieveDisplayItems = ()=> {
+    const items = query ? filteredItems : optionsToDisplay;
+    if(filterFunc) return filterFunc(items);
+    return items;
+  }
+
   return (
     <div
       style={{
@@ -350,8 +356,7 @@ function LightAutoComplete(props) {
                 </div>
               )}
 
-            {(filterFunc ? filterFunc(query ? filteredItems : optionsToDisplay) : (query ? filteredItems : optionsToDisplay))
-              .map((op, index) => (
+            {retrieveDisplayItems()?.map((op, index) => (
                 <div
                   key={index.toString()}
                   className={classes.dropdownItem}
@@ -411,3 +416,5 @@ LightAutoComplete.defaultProps = {
   filterFunc:null, // function: filters the list of items to display
 };
 export default withStyles(styles)(LightAutoComplete);
+
+

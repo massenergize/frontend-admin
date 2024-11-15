@@ -109,7 +109,7 @@ const AutoShareSettings = () => {
           valueExtractor: (item) => item?.id,
           labelExtractor: (item) => item?.name,
           data: tags || [],
-          endpoint: "tags.listForCommunityAdmin",
+          endpoint: "tags.listForSuperAdmin",
           filterFunc: (tags) => tags.filter((t) => t?.tag_collection_name	 === "Category")
         }
       ]
