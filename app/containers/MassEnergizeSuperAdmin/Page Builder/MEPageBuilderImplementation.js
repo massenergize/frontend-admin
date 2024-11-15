@@ -26,10 +26,19 @@ function MEPageBuilderImplementation() {
               prop: { ...(itemProps || {}), value: image?.url, rawValue: image?.url }
             });
           }}
-          customRender={({ openLibrary, selected }) => {
-            const [img] = selected || [];
-            console.log("We see the image here", img, selected);
-            return <PBImageSelector {...props} src={img?.url} openMediaLibrary={() => openLibrary(true)} />;
+          customRender={({ openLibrary }) => {
+            // console.log("We see the image here", img, selected);
+            return (
+              <PBImageSelector
+                {...props}
+                remove={() =>
+                  onPropertyChange &&
+                  onPropertyChange({ blockId: props?.blockId, prop: { ...(itemProps || {}), value: "", rawValue: "" } })
+                }
+                src={itemProps?.value}
+                openMediaLibrary={() => openLibrary(true)}
+              />
+            );
           }}
         />
       );

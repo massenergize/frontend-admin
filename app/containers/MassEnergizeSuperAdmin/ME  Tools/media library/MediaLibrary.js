@@ -129,7 +129,6 @@ function MediaLibrary(props) {
   };
 
   const renderSelectedItems = ({ show, imageTray }) => {
-    console.log("WHAT JUST PAPPED", imageTray);
     if (customRender)
       return customRender({
         open: show,

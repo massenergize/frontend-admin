@@ -129,7 +129,7 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride }) {
     updateFocus(blockInFocus, newBlock);
   };
 
-  console.log("SEE LES BLOCKS", sections);
+  // console.log("SEE LES BLOCKS", sections);
   return (
     <div className="pb-root">
       <Modal style={{ minHeight: 300 }}>

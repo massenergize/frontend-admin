@@ -1,5 +1,6 @@
 import React, { forwardRef, useEffect, useRef } from "react";
 import PBDropdown from "../dropdown/PBDropdown";
+import { remove } from "lodash";
 
 export const PROPERTY_TYPES = {
   INPUT: "input",
@@ -192,7 +193,7 @@ export const PBFixedCheckbox = (props) => {
 };
 
 export const PBImageSelector = (props) => {
-  const { text, openMediaLibrary, src } = props || {};
+  const { text, openMediaLibrary, src, remove } = props || {};
   const open = () => openMediaLibrary && openMediaLibrary();
   return (
     <div>
@@ -203,12 +204,8 @@ export const PBImageSelector = (props) => {
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <img
-              src="https://via.placeholder.com/150"
-              alt="Other image placeholder"
-              className="pb-side-image-preview"
-            />
-            <p onClick={() => open()} className="pb-img-remove touchable-opacity">
+            <img src={src} alt="Other image placeholder" className="pb-side-image-preview" />
+            <p onClick={() => remove && remove()} className="pb-img-remove touchable-opacity">
               Remove
             </p>
           </div>
