@@ -12,7 +12,7 @@ import PBPageSettings from "./pages/PBPageSettings";
 import { BLOCKS } from "./utils/engine/blocks";
 import { PROPERTY_TYPES } from "./components/sidepanels/PBPropertyTypes";
 const PAGE_SETTINGS_KEY = "PAGE_SETTINGS";
-function PBEntry({ tinyKey, openMediaLibrary, propsOverride }) {
+function PBEntry({ tinyKey, openMediaLibrary, propsOverride, renderPageSettings }) {
   const { Modal, open: openModal, close, modalProps, setModalProps } = usePBModal();
   const [sections, setSection] = useState([]);
   const [blockInFocus, setBlockInFocus] = useState(null);
@@ -26,9 +26,6 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride }) {
   const onFocused = useCallback((target) => {
     recentlyUsedFieldRef.current = target;
   }, []);
-
-
-
 
   const handlePropertyChange = (properties, options) => {
     const { isGrouped, rawValue, cssKey, groupIndex, propertyIndex } = options || {};
@@ -130,10 +127,15 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride }) {
   };
 
   // console.log("SEE LES BLOCKS", sections);
+
+  const pageSettings = () => {
+    if (!renderPageSettings) return <PBPageSettings />;
+    return renderPageSettings({ sections });
+  };
   return (
     <div className="pb-root">
       <Modal style={{ minHeight: 300 }}>
-        {IS_PAGE_SETTINGS ? <PBPageSettings /> : <PBBlockContainer onItemSelected={selectBlock} />}
+        {IS_PAGE_SETTINGS ? pageSettings() : <PBBlockContainer onItemSelected={selectBlock} />}
       </Modal>
       <PBCanvas>
         <PBSection

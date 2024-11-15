@@ -3,6 +3,7 @@ import PBEntry from "./page-builder/PBEntry";
 import { PBImageSelector, PROPERTY_TYPES } from "./page-builder/components/sidepanels/PBPropertyTypes";
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import { useSelector } from "react-redux";
+import AdminPageBuilderSettings from "./AdminPageBuilderSettings";
 
 function MEPageBuilderImplementation() {
   const imagesObject = useSelector((state) => state.getIn(["galleryImages"]));
@@ -10,6 +11,9 @@ function MEPageBuilderImplementation() {
     console.log("I have opened the media library");
   };
 
+  const renderPageSettings = () => {
+    return <AdminPageBuilderSettings />;
+  };
   const fetchMediaItems = () => {};
 
   const overrideProperties = {
@@ -73,6 +77,7 @@ function MEPageBuilderImplementation() {
   return (
     <>
       <PBEntry
+        renderPageSettings={renderPageSettings}
         propsOverride={overrideProperties}
         openMediaLibrary={openMediaLibrary}
         tinyKey={process.env.REACT_APP_TINY_MCE_KEY}
