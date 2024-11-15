@@ -27,17 +27,43 @@ function MEPageBuilderImplementation() {
             });
           }}
           customRender={({ openLibrary }) => {
-            // console.log("We see the image here", img, selected);
+            if (!imagesObject?.images)
+              return (
+                <div
+                  style={{
+                    color: "#29d",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    margin: "10px 0px",
+                    fontWeight: "bold"
+                  }}
+                >
+                  <div>
+                    {" "}
+                    <i className="fa fa-spinner fa-spin" />
+                  </div>
+
+                  <small>
+                    <b>Just a moment...</b>
+                  </small>
+                </div>
+              );
             return (
-              <PBImageSelector
-                {...props}
-                remove={() =>
-                  onPropertyChange &&
-                  onPropertyChange({ blockId: props?.blockId, prop: { ...(itemProps || {}), value: "", rawValue: "" } })
-                }
-                src={itemProps?.value}
-                openMediaLibrary={() => openLibrary(true)}
-              />
+              <>
+                <PBImageSelector
+                  {...props}
+                  remove={() =>
+                    onPropertyChange &&
+                    onPropertyChange({
+                      blockId: props?.blockId,
+                      prop: { ...(itemProps || {}), value: "", rawValue: "" }
+                    })
+                  }
+                  src={itemProps?.value}
+                  openMediaLibrary={() => openLibrary(true)}
+                />
+              </>
             );
           }}
         />
