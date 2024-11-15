@@ -97,7 +97,9 @@ const AutoShareSettings = () => {
           multiple: true,
           valueExtractor: (item) => item?.id,
           labelExtractor: (item) => item?.name,
-          data: communities?.filter(c=> c?.id?.toString() !== comId) || []
+          data: communities?.filter(c=> c?.id?.toString() !== comId) || [],
+          endpoint: "communities.list",
+          filterFunc:(communities)=>communities.filter(c=> c?.id?.toString() !== comId)
         },
         {
           key: "excluded_tags",
@@ -106,7 +108,9 @@ const AutoShareSettings = () => {
           multiple: true,
           valueExtractor: (item) => item?.id,
           labelExtractor: (item) => item?.name,
-          data: tags || []
+          data: tags || [],
+          endpoint: "tags.listForSuperAdmin",
+          filterFunc: (tags) => tags.filter((t) => t?.tag_collection_name	 === "Category")
         }
       ]
     }
@@ -146,6 +150,8 @@ const AutoShareSettings = () => {
                 labelExtractor={field.labelExtractor}
                 onChange={(value) => setSectionValue(sectionKey, field.key, value)}
                 data={field.data}
+                filterFunc={field.filterFunc}
+                params = {field?.params}
               />
             )}
           </div>
@@ -156,7 +162,7 @@ const AutoShareSettings = () => {
     </div>
   );
 
-  if (loadPage) return <LinearBuffer lines={1} asCard message="Hold tight, fetching your items..." />;
+  if (loadPage|| !community?.name) return <LinearBuffer lines={1} asCard message="Hold tight, fetching your items..." />;
 
   return (
     <div>
