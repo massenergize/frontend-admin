@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./admin-pb-settings.css";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
+import { useSelector } from "react-redux";
 
 const SPECIFIC = "specific-communities";
 const AUDIENCE = [
@@ -11,24 +12,37 @@ const AUDIENCE = [
   { id: 2, name: "Specific Communities", key: SPECIFIC }
 ];
 function AdminPageBuilderSettings() {
+  const communities = useSelector((state) => state.getIn(["communities"]));
   const [form, setform] = useState({ scope: "everyone" });
 
   const onChange = (e) => {
     const { name, value } = e.target || {};
     setform({ ...form, [name]: value });
   };
-
   const { scope, name, slug } = form || {};
+  console.log("LE FORM", form);
+
+  const slugValue = (s) =>
+    s
+      ?.toLowerCase()
+      .replace(/ /g, "-")
+      .replace(/[^a-zA-Z0-9-]/g, "");
   return (
     <div style={{ padding: 20 }}>
       <h6 style={{ color: "#0b9edc", fontSize: 21 }}>Admin Settings</h6>
       <div className="pb-textbox">
         <label>What's the name of the page</label>
-        <input className="here-we-go" type="text" placeholder="Enter page title..." />
+        <input onChange={onChange} name="name" value={name} type="text" placeholder="Enter page title..." />
       </div>
       <div className="pb-textbox">
         <label>Enter page slug</label>
-        <input className="here-we-go" type="text" placeholder="Eg. 'homepage-for-concord'" />
+        <input
+          onChange={onChange}
+          name="slug"
+          value={slugValue(slug)}
+          type="text"
+          placeholder="Eg. 'homepage-for-concord'"
+        />
       </div>
       {/* --- AUDIENCE SECTION ------ */}
       <div className="pb-bordered-section">
@@ -50,7 +64,12 @@ function AdminPageBuilderSettings() {
           {scope === SPECIFIC && (
             <div style={{ marginTop: 10 }}>
               <p>Please select the communities?</p>
-              <LightAutoComplete />
+              <LightAutoComplete
+                data={communities}
+                onChange={(items) => onChange({ target: { name: "community_ids", value: items } })}
+                valuExtractor={(c) => c.id}
+                labelExtractor={(c) => c.name}
+              />
             </div>
           )}
         </div>
@@ -58,7 +77,7 @@ function AdminPageBuilderSettings() {
 
       <div style={{ display: "flex", flexDirection: "row" }}>
         <button style={{ marginLeft: "auto" }} className="pb-s-btn touchable-opacity">
-          Save
+          <i className="fa fa-spinner fa-spin" /> Save
         </button>
       </div>
     </div>
