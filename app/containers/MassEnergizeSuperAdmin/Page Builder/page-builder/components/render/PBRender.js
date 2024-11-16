@@ -6,7 +6,10 @@ function PBRender({ readOnly, json, onClick, onBlockClick, remove, inFocus }) {
   const html = renderSection(json?.template);
   return (
     <div
-      onClick={() => onBlockClick && onBlockClick()}
+      onClick={() => {
+        if (readOnly) return;
+        onBlockClick && onBlockClick();
+      }}
       className={readOnly ? "" : `pb-render-wrapper ${inFocus ? "pb-in-focus" : ""}`}
       style={{ position: "relative" }}
     >
