@@ -2,10 +2,11 @@ import React from "react";
 import "./pb-section.css";
 import { usePBModal } from "../../hooks/usePBModal";
 import PBRender from "../render/PBRender";
-function PBSection({ onButtonClick, openBlockModal, sections, focusOnBlock, blockInFocus, removeBlockItem }) {
+function PBSection({ readOnly, onButtonClick, openBlockModal, sections, focusOnBlock, blockInFocus, removeBlockItem }) {
   const hasSections = sections.length > 0;
 
   const renderAddSectionButton = (props, config) => {
+    if (readOnly) return null;
     const { text } = config || {};
     return (
       <div className="pb-add-area">
@@ -24,6 +25,7 @@ function PBSection({ onButtonClick, openBlockModal, sections, focusOnBlock, bloc
       {hasSections ? (
         sections?.map(({ block }, position) => (
           <PBRender
+            readOnly={readOnly}
             inFocus={blockInFocus?.block?.id === block?.id}
             onBlockClick={() => focusOnBlock({ block, options: { position } })}
             json={block}

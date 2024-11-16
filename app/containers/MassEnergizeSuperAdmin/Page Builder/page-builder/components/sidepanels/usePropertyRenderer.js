@@ -41,7 +41,7 @@ function usePropertyRenderer({
   const PropertyField = ({ json, propertyIndex }) => {
     const { _type, text, ...rest } = json || {};
     const itemProps = { onChange, onFocus: handleFocus, propertyIndex, ...rest };
-    const commonProps = { text, propsOverride, _type, itemProps, onPropertyChange };
+    const commonProps = { blockId, text, propsOverride, _type, itemProps, onPropertyChange };
     const shouldBeFocused = (name) => lastFocus?.key === name;
     switch (_type) {
       case PROPERTY_TYPES.INPUT:

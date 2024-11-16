@@ -17,6 +17,7 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride, renderPageSettings 
   const [sections, setSection] = useState([]);
   const [blockInFocus, setBlockInFocus] = useState(null);
   const [outOfFocus, setOutOfFocus] = useState(null);
+  const [preview, setPreview] = useState(false);
   const recentlyUsedFieldRef = useRef();
 
   const updateFocus = (oldBlock, newBlock) => {
@@ -132,6 +133,7 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride, renderPageSettings 
     if (!renderPageSettings) return <PBPageSettings />;
     return renderPageSettings({ sections });
   };
+ 
   return (
     <div className="pb-root">
       <Modal style={{ minHeight: 300 }}>
@@ -139,6 +141,7 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride, renderPageSettings 
       </Modal>
       <PBCanvas>
         <PBSection
+          readOnly={preview}
           blockInFocus={blockInFocus}
           focusOnBlock={(block) => updateFocus(blockInFocus, block)}
           sections={sections}
@@ -165,6 +168,8 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride, renderPageSettings 
         />
       </div>
       <PBFloatingFooter
+        sections={sections}
+        preview={() => setPreview(!preview)}
         save={() => console.log("FINAL PAYLOAD: ", sections)}
         close={closeModalWithKey}
         openPageSettings={() => openSpecificModal(PAGE_SETTINGS_KEY)}

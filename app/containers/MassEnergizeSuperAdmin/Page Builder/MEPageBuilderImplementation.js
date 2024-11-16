@@ -19,6 +19,7 @@ function MEPageBuilderImplementation() {
   const overrideProperties = {
     [PROPERTY_TYPES.MEDIA]: (props) => {
       const { onPropertyChange, itemProps } = props || {};
+
       return (
         <MediaLibrary
           images={imagesObject?.images}
@@ -79,7 +80,7 @@ function MEPageBuilderImplementation() {
       <PBEntry
         renderPageSettings={renderPageSettings}
         propsOverride={overrideProperties}
-        openMediaLibrary={openMediaLibrary}
+        // openMediaLibrary={openMediaLibrary}
         tinyKey={process.env.REACT_APP_TINY_MCE_KEY}
       />
     </>
