@@ -8,6 +8,12 @@ export const BuildCustomPages = loadable(
     fallback: <Loading />,
   }
 );
+export const PreviewCustomPages = loadable(
+  () => import("./MassEnergizeSuperAdmin/Page Builder/PreviewCustomPages.js"),
+  {
+    fallback: <Loading />,
+  }
+);
 export const CustomNavigationConfiguration = loadable(
   () => import("./MassEnergizeSuperAdmin/Pages/CustomNavigationConfiguration"),
   {
