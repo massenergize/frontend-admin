@@ -77,7 +77,8 @@ export const BTN_BLOCK = {
     props: {
       className: "pb-block-btn touchable-opacity",
       style: { width: "100%", alignItems: "center" },
-      text: "Click Me"
+      text: "Click Me",
+      target: "_blank"
     }
   }
 };
@@ -96,7 +97,7 @@ export const VIDEO_BLOCK = {
   element: {
     // id: Date.now(),
     type: "video",
-    props: { style: { padding: 10 }, src: "https://www.youtube.com/embed/J3oijWs-dCs", alt: "Placeholder content" }
+    props: { style: { padding: 10 }, src: "J3oijWs-dCs", alt: "Placeholder content" }
   }
 };
 export const LINK_BLOCK = {
@@ -107,7 +108,7 @@ export const LINK_BLOCK = {
     props: {
       text: "Here is a link, change the url in right panel...",
       style: {},
-      href: "https://www.youtube.com/watch?v=J3oijWs-dCs",
+      href: "https://www.massenergize.org/",
       target: "_blank"
     }
   }

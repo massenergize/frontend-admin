@@ -168,6 +168,7 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride, renderPageSettings 
         />
       </div>
       <PBFloatingFooter
+        inPreview = {preview}
         sections={sections}
         preview={() => setPreview(!preview)}
         save={() => console.log("FINAL PAYLOAD: ", sections)}

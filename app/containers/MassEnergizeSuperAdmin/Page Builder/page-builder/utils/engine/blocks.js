@@ -1,5 +1,12 @@
 import React, { useEffect, useRef } from "react";
-import { BUTTON_PROPS, IMAGE_PROPS, LINK_PROPS, RICH_TEXT_PROPS, TITLE_PROPS, VIDEO_PROPS } from "../../components/sidepanels/property-data";
+import {
+  BUTTON_PROPS,
+  IMAGE_PROPS,
+  LINK_PROPS,
+  RICH_TEXT_PROPS,
+  TITLE_PROPS,
+  VIDEO_PROPS
+} from "../../components/sidepanels/property-data";
 import { BTN_BLOCK, IMAGE_BLOCK, LINK_BLOCK, RICH_TEXT_BLOCK, TITLE_BLOCK, VIDEO_BLOCK } from "./data";
 
 export const BLOCKS = [
@@ -14,7 +21,7 @@ export const BLOCKS = [
   },
   { name: "Link", icon: "fa-link", key: "link", template: LINK_BLOCK, properties: LINK_PROPS },
   // { name: "Section", icon: "fa-square-o", key: "section", template: SECTION_BLOCK },
-  { name: "Video", icon: "fa-youtube", key: "video", template: VIDEO_BLOCK, properties: VIDEO_PROPS },
+  { name: "Video", icon: "fa-play-circle", key: "video", template: VIDEO_BLOCK, properties: VIDEO_PROPS },
   { name: "Image", icon: "fa-image", key: "image", template: IMAGE_BLOCK, properties: IMAGE_PROPS }
   // { name: "Icon", icon: "fa-circle-o", key: "icon", template: ICON_BLOCK, properties: DEFAULT_PROPERTIES }
 ];
@@ -107,6 +114,11 @@ export const Icon = (props) => {
     </span>
   );
 };
+
+const youtubeLink = (src) => {
+  if (!src) return `https://www.youtube.com/embed/J3oijWs-dCs`;
+  return `https://www.youtube.com/embed/${src}`;
+};
 export const YoutubeVideo = (props) => {
   const { style, src, ...rest } = props || {};
   return (
@@ -115,7 +127,7 @@ export const YoutubeVideo = (props) => {
       style={{ position: "relative", paddingBottom: "56.25%", height: 600, overflow: "hidden", ...(style || {}) }}
     >
       <iframe
-        src={src || `https://www.youtube.com/embed/J3oijWs-dCs`}
+        src={youtubeLink(src)}
         title="YouTube video"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
@@ -142,5 +154,6 @@ export const Blocks = {
   video: YoutubeVideo,
   link: Link,
   icon: Icon,
-  richtext: RichText
+  richtext: RichText,
+  button: Button
 };

@@ -1,6 +1,6 @@
 import React from "react";
 import "./pb-floating-footer.css";
-function PBFloatingFooter({ openPageSettings, close, save, preview, sections }) {
+function PBFloatingFooter({ openPageSettings, close, save, preview, inPreview, sections }) {
   const disabled = !sections?.length;
   return (
     <div className="pb-footer-root">
@@ -21,7 +21,8 @@ function PBFloatingFooter({ openPageSettings, close, save, preview, sections }) 
             <i className="fa fa-save" style={{ marginRight: 5 }} /> Save
           </button>
           <button disabled={disabled} className="pb-preview pb-footer-btn" onClick={() => preview && preview()}>
-            Preview <i className="fa fa-eye" style={{ marginLeft: 5 }} />
+            {inPreview ? "Edit Mode" : "Preview"}{" "}
+            <i className={inPreview ? "fa fa-edit" : "fa fa-eye"} style={{ marginLeft: 5 }} />
           </button>
           <button
             disabled={disabled}

@@ -253,12 +253,12 @@ export const DEFAULT_PROPERTIES = [
 export const VIDEO_PROPS = [
   {
     _type: PROPERTY_TYPES.INPUT,
-    text: "Video Source",
+    text: "Youtube Video ID",
     name: "src",
     // placeholder: "0",
     type: "text",
-    label: "Add video link(Eg. Youtube)",
-    placeholder: "Add link here...",
+    label: "Add video ID (Eg. J3oijWs-dCs)",
+    placeholder: "Add video ID here...",
     _resetValue: "",
     propAccessor: "src"
   },
@@ -266,6 +266,18 @@ export const VIDEO_PROPS = [
 ];
 export const BUTTON_PROPS = [
   ...TEXT_PROPS,
+  {
+    // ...STYLE_DEFS,
+    _type: PROPERTY_TYPES.INPUT,
+    text: "URL",
+    name: "url",
+    // placeholder: "0",
+    type: "text",
+    label: "Add URL",
+    placeholder: "Example: https://massenergize.org...",
+    _resetValue: "",
+    propAccessor: "href"
+  },
   ...BASIC_PROPS,
   ...FONT_SIZE_PROPS,
   ...BACKGROUND_PROPS,
