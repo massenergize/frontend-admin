@@ -7,6 +7,7 @@
   right: 0;
   z-index: 5;
   padding: 20px;
+  overflow-y: scroll;
 }
 
 .pb-img-remove {
