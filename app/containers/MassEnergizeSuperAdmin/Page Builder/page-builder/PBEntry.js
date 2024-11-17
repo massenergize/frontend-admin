@@ -11,6 +11,7 @@ import PBBlockContainer from "./components/layouts/blocks/PBBlockContainer";
 import PBPageSettings from "./pages/PBPageSettings";
 import { BLOCKS } from "./utils/engine/blocks";
 import { PROPERTY_TYPES } from "./components/sidepanels/PBPropertyTypes";
+import PBPublishedRender from "./components/render/PBPublishedRender";
 const PAGE_SETTINGS_KEY = "PAGE_SETTINGS";
 function PBEntry({ tinyKey, openMediaLibrary, propsOverride, renderPageSettings }) {
   const { Modal, open: openModal, close, modalProps, setModalProps } = usePBModal();
@@ -133,42 +134,49 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride, renderPageSettings 
     if (!renderPageSettings) return <PBPageSettings />;
     return renderPageSettings({ sections });
   };
- 
+
   return (
     <div className="pb-root">
       <Modal style={{ minHeight: 300 }}>
         {IS_PAGE_SETTINGS ? pageSettings() : <PBBlockContainer onItemSelected={selectBlock} />}
       </Modal>
-      <PBCanvas>
-        <PBSection
-          readOnly={preview}
-          blockInFocus={blockInFocus}
-          focusOnBlock={(block) => updateFocus(blockInFocus, block)}
-          sections={sections}
-          onButtonClick={openModal}
-          openBlockModal={openModal}
-          removeBlockItem={removeBlockItem}
-        />
-      </PBCanvas>
+      {preview ? (
+        <PBPublishedRender sections={sections} />
+      ) : (
+        <>
+          <PBCanvas>
+            <PBSection
+              readOnly={preview}
+              blockInFocus={blockInFocus}
+              focusOnBlock={(block) => updateFocus(blockInFocus, block)}
+              sections={sections}
+              onButtonClick={openModal}
+              openBlockModal={openModal}
+              removeBlockItem={removeBlockItem}
+            />
+          </PBCanvas>
+          <div className="pb-right-panel">
+            <PBSidePanel
+              propsOverride={propsOverride}
+              reset={resetAnItem}
+              tinyKey={tinyKey}
+              onFocused={onFocused}
+              lastFocus={recentlyUsedFieldRef?.current}
+              onPropertyChange={whenPropertyChanges}
+              block={blockInFocus?.block}
+              openMediaLibrary={openMediaLibrary}
+            />
+          </div>
+        </>
+      )}
       {/* <BottomSheet>
         <div style={{ width: "70%" }}>
           <PBRichTextEditor height={heightIsToggled ? 500 : 300} />
         </div>
       </BottomSheet> */}
-      <div className="pb-right-panel">
-        <PBSidePanel
-          propsOverride={propsOverride}
-          reset={resetAnItem}
-          tinyKey={tinyKey}
-          onFocused={onFocused}
-          lastFocus={recentlyUsedFieldRef?.current}
-          onPropertyChange={whenPropertyChanges}
-          block={blockInFocus?.block}
-          openMediaLibrary={openMediaLibrary}
-        />
-      </div>
+
       <PBFloatingFooter
-        inPreview = {preview}
+        inPreview={preview}
         sections={sections}
         preview={() => setPreview(!preview)}
         save={() => console.log("FINAL PAYLOAD: ", sections)}

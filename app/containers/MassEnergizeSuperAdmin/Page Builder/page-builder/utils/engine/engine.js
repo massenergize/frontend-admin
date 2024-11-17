@@ -1,17 +1,20 @@
-import { Blocks } from "./blocks";
+import { Blocks, Tags } from "./blocks";
 import React from "react";
+import { serializeCss } from "./serialize-css";
 const X = "x";
 const Y = "y";
 export const DIRECTIONS = { X, Y };
 
-const layoutFlow = (direction) => {
+const layoutFlow = (direction, serialize = false) => {
+  // let directionKey = serialize ? "flex-direction" : "flexDirection";
+
   return { display: "flex", flexDirection: direction === DIRECTIONS.X ? "row" : "column" };
 };
 
 const renderElement = (element) => {
   const { type, props, direction } = element;
   let Element = Blocks[type] || Blocks.div;
-  return <Element {...(props || {})} style={{ ...props?.style, ...layoutFlow(direction, Y) }} />;
+  return <Element {...props || {}} style={{ ...props?.style, ...layoutFlow(direction) }} />;
 };
 
 export const renderSection = (block) => {
@@ -20,7 +23,7 @@ export const renderSection = (block) => {
   const { text } = element?.props || {};
   if (!element) return null;
   let Tag = Blocks[type] || Blocks.div;
-  
+
   const Element = ({ style, children, ...rest }) => {
     const containerStyle = { ...style, ...layoutFlow(direction) };
     return (
@@ -38,4 +41,43 @@ export const renderSection = (block) => {
       {innerHTML && innerHTML?.map((el) => <React.Fragment key={el?.key}>{renderSection(el)}</React.Fragment>)}
     </Element>
   );
+};
+export const serializeBlock = (block) => {
+  const { direction, element, content, children: childElements } = block || {};
+  const { type } = element || {};
+  const { text, style, ...props } = element?.props || {};
+  if (!element) return "";
+
+  // Determine the tag to use
+  const Tag = Tags[type]?.type || "div";
+  const defaultTagStyle = Tags[type]?.style || {};
+
+  // Convert style object to inline style string
+  const styleTogether = { ...defaultTagStyle, ...style, ...layoutFlow(direction, true) };
+  const styleString = serializeCss(styleTogether);
+  // const styleString = style
+  //   ? Object.entries({ ...defaultTagStyle, ...style, ...layoutFlow(direction, true) })
+  //       .map(([key, value]) => `${key}: ${value};`)
+  //       .join(" ")
+  //   : "";
+
+  // Serialize props (excluding style and text)
+  const propsString = Object.entries(props || {})
+    .map(([key, value]) => `${key}="${value}"`)
+    .join(" ");
+
+  // Serialize children recursively
+  const innerHTML =
+    content ||
+    (childElements &&
+      childElements
+        .map((el) => serializeBlock(el)) // Recursively serialize children
+        .join("")) ||
+    "";
+
+  // Serialize the block
+  return `<${Tag} ${styleString ? `style="${styleString}"` : ""} ${propsString}>
+    ${text || ""}
+    ${innerHTML}
+  </${Tag}>`;
 };
