@@ -55,16 +55,20 @@ export const serializeBlock = (block) => {
   // Convert style object to inline style string
   const styleTogether = { ...defaultTagStyle, ...style, ...layoutFlow(direction, true) };
   const styleString = serializeCss(styleTogether);
-  // const styleString = style
-  //   ? Object.entries({ ...defaultTagStyle, ...style, ...layoutFlow(direction, true) })
-  //       .map(([key, value]) => `${key}: ${value};`)
-  //       .join(" ")
-  //   : "";
 
   // Serialize props (excluding style and text)
   const propsString = Object.entries(props || {})
     .map(([key, value]) => `${key}="${value}"`)
     .join(" ");
+
+  const isRich = type === "richtext";
+  const isVideo = type === "video";
+
+  console.log("Whats in this block", block);
+
+  // If the block is rich text, return the inner HTML
+  if (isRich) return props?.__html;
+  if (isVideo) return serializeVideoBlock({ src: props?.src, styleString: serializeCss(style), propsString });
 
   // Serialize children recursively
   const innerHTML =
@@ -81,3 +85,22 @@ export const serializeBlock = (block) => {
     ${innerHTML}
   </${Tag}>`;
 };
+
+const serializeVideoBlock = ({ src, styleString, propsString }) => {
+  return ` 
+    <div>
+      <iframe
+      src = "https://www.youtube.com/embed/${src}"
+            
+            title="YouTube video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            style="width:100%;border:none;${styleString}"
+            ${propsString}
+          />
+      </div>
+      `;
+};
+
+// src={${src}}
+// style="width:100%;height: auto;border: none;"

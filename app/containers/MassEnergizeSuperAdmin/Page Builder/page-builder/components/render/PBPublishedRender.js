@@ -34,7 +34,7 @@ function PBPublishedRender({ sections }) {
 
   return (
     <div style={{ width: "100%" }}>
-      <iframe ref={iframeRef} style={{ width: "100%", height: "auto", borderWidth: 0 }} />
+      <iframe ref={iframeRef} style={{ width: "100%", height: "100%", borderWidth: 0 }} />
     </div>
   );
 }

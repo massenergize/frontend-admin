@@ -97,7 +97,7 @@ export const VIDEO_BLOCK = {
   element: {
     // id: Date.now(),
     type: "video",
-    props: { style: { padding: 10 }, src: "J3oijWs-dCs", alt: "Placeholder content" }
+    props: { style: { height: "600px" }, src: "J3oijWs-dCs", alt: "Placeholder content" }
   }
 };
 export const LINK_BLOCK = {
