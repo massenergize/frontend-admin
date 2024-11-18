@@ -47,7 +47,7 @@ export const serializeBlock = (block) => {
   const { type } = element || {};
   const { text, style, ...props } = element?.props || {};
   if (!element) return "";
-  
+
   // Determine the tag to use
   const Tag = Tags[type]?.type || "div";
   const defaultTagStyle = Tags[type]?.style || {};

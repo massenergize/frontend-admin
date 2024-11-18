@@ -315,7 +315,8 @@ export const RICH_TEXT_PROPS = [
     // placeholder: "Enter text here...",
     propAccessor: "__html"
   },
-  ...BASIC_PROPS
+  ...BASIC_PROPS, 
+  ...BACKGROUND_PROPS,
 ];
 
 export const TITLE_PROPS = [
