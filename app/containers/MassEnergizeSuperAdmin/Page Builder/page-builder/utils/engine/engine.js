@@ -47,7 +47,7 @@ export const serializeBlock = (block) => {
   const { type } = element || {};
   const { text, style, ...props } = element?.props || {};
   if (!element) return "";
-
+  
   // Determine the tag to use
   const Tag = Tags[type]?.type || "div";
   const defaultTagStyle = Tags[type]?.style || {};
@@ -65,8 +65,10 @@ export const serializeBlock = (block) => {
   const isVideo = type === "video";
 
   // If the block is rich text, return the inner HTML
-  if (isRich) return props?.__html;
-  if (isVideo) return serializeVideoBlock({ src: props?.src, styleString: serializeCss(style), propsString });
+  const rich = `<div style="${styleString}"> ${props?.__html} </div>`;
+  console.log("RICH THINGS", rich);
+  if (isRich) return rich;
+  if (isVideo) return serializeVideoBlock({ src: props?.src, styleString: serializeCss(styleTogether), propsString });
 
   // Serialize children recursively
   const innerHTML =

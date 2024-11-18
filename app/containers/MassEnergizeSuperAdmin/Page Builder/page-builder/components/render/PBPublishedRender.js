@@ -33,7 +33,6 @@ function PBPublishedRender({ sections }) {
     };
   }, []);
 
-  console.log("THIS IS THE HTML", html);
   useEffect(() => {
     if (iframeRef?.current) {
       const doc = iframeRef.current?.contentDocument || iframeRef.current?.contentWindow?.document;
