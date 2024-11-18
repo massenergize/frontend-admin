@@ -215,7 +215,7 @@ function CreateAndEditMenu({ data, cancel, insertNewLink, children, isEdit }) {
 
                 {!isParent && !linkIsExternal && isCustomPage && (
                   <a
-                    href={`/admin/community/configure/navigation/custom-pages/${name}`}
+                    href={`/admin/community/configure/navigation/custom-pages`}
                     target="_blank"
                     style={{ fontWeight: "bold" }}
                   >
