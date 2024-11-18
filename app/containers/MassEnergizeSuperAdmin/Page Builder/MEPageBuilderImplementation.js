@@ -22,6 +22,7 @@ function MEPageBuilderImplementation() {
 
       return (
         <MediaLibrary
+          excludeTabs={[MediaLibrary.Tabs.UPLOAD_TAB]}
           images={imagesObject?.images}
           onInsert={(item) => {
             const [image] = item || [];

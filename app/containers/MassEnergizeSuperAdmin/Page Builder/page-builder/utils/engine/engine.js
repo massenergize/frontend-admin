@@ -64,8 +64,6 @@ export const serializeBlock = (block) => {
   const isRich = type === "richtext";
   const isVideo = type === "video";
 
-  console.log("Whats in this block", block);
-
   // If the block is rich text, return the inner HTML
   if (isRich) return props?.__html;
   if (isVideo) return serializeVideoBlock({ src: props?.src, styleString: serializeCss(style), propsString });

@@ -2,21 +2,38 @@ import React, { useEffect, useMemo, useRef } from "react";
 import { renderSection, serializeBlock } from "../../utils/engine/engine";
 
 function PBPublishedRender({ sections }) {
-  console.log("SECTIONS", sections);
   const iframeRef = useRef();
+  const contRef = useRef();
+
   const html = useMemo(
     () =>
       sections
         .map(({ block }) => {
-          console.log("LE BLOCK", block);
           return serializeBlock(block?.template);
         })
         ?.join(""),
     [sections]
   );
 
-  console.log("LEts see html", html);
+  useEffect(() => {
+    const adjustHeight = () => {
+      if (iframeRef.current && iframeRef.current.contentWindow) {
+        const iframeDocument = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
+        const height = iframeDocument.body.scrollHeight;
+        contRef.current.style.height = height + "px";
+        iframeRef.current.style.height = iframeDocument.body.scrollHeight + "px";
+      }
+    };
+    // Adjust height initially and when content changes
+    iframeRef.current.onload = adjustHeight;
+    return () => {
+      if (iframeRef.current) {
+        iframeRef.current.onload = null;
+      }
+    };
+  }, []);
 
+  console.log("THIS IS THE HTML", html);
   useEffect(() => {
     if (iframeRef?.current) {
       const doc = iframeRef.current?.contentDocument || iframeRef.current?.contentWindow?.document;
@@ -33,8 +50,8 @@ function PBPublishedRender({ sections }) {
   }, [html]);
 
   return (
-    <div style={{ width: "100%" }}>
-      <iframe ref={iframeRef} style={{ width: "100%", height: "100%", borderWidth: 0 }} />
+    <div ref={contRef} style={{ width: "100%", overflowY: "scroll" }}>
+      <iframe ref={iframeRef} style={{ width: "100%", borderWidth: 0, overflowY: "scroll" }} />
     </div>
   );
 }

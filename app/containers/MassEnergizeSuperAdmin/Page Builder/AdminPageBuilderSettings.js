@@ -77,7 +77,8 @@ function AdminPageBuilderSettings() {
 
       <div style={{ display: "flex", flexDirection: "row" }}>
         <button style={{ marginLeft: "auto" }} className="pb-s-btn touchable-opacity">
-          <i className="fa fa-spinner fa-spin" /> Save
+          {/* <i className="fa fa-spinner fa-spin" /> Save  */}
+          Save
         </button>
       </div>
     </div>

@@ -56,6 +56,7 @@ h2 {
   overflow-x: hidden;
   background-color: white;
   z-index: 1500;
+  padding-bottom: 200px;
 }
 
 .pb-right-panel {

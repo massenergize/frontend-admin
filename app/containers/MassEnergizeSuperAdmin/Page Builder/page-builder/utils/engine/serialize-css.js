@@ -4,7 +4,15 @@ const INLINE_KEYS = {
   justifyContent: "justify-content",
   flexWrap: "flex-wrap",
   flexBasis: "flex-basis",
-  objectFit: "object-fit"
+  objectFit: "object-fit",
+  marginTop: "margin-top",
+  marginBottom: "margin-bottom",
+  marginLeft: "margin-left",
+  marginRight: "margin-right",
+  paddingTop: "padding-top",
+  paddingBottom: "padding-bottom",
+  paddingLeft: "padding-left",
+  paddingRight: "padding-right"
 };
 export const serializeCss = (inLinObj) => {
   return Object.entries(inLinObj)
