@@ -12,7 +12,7 @@ const AUDIENCE = [
   { id: 2, name: "Specific Communities", key: SPECIFIC }
 ];
 function AdminPageBuilderSettings() {
-  const communities = useSelector((state) => state.getIn(["communities"]));
+  const communities = useSelector((state) => state.getIn(["otherCommunities"]));
   const [form, setform] = useState({ scope: "everyone" });
 
   const onChange = (e) => {
@@ -65,9 +65,13 @@ function AdminPageBuilderSettings() {
             <div style={{ marginTop: 10 }}>
               <p>Please select the communities?</p>
               <LightAutoComplete
+                multiple
                 data={communities}
-                onChange={(items) => onChange({ target: { name: "community_ids", value: items } })}
-                valuExtractor={(c) => c.id}
+                onChange={(items) => {
+                  console.log("Items came in like this", items);
+                  onChange({ target: { name: "community_ids", value: items } });
+                }}
+                valueExtractor={(c) => c.id}
                 labelExtractor={(c) => c.name}
               />
             </div>

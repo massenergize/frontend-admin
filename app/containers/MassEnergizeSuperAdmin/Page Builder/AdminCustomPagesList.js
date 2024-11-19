@@ -12,25 +12,27 @@ function AdminCustomPagesList({ classes }) {
         name: "ID",
         key: "id",
         options: {
-          filter: false,
-          filterType: "multiselect"
+          filter: false
         }
       },
       {
-        name: "ID",
-        key: "id",
+        name: "Name",
+        key: "name",
         options: {
-          filter: false,
-          filterType: "multiselect"
+          filter: false
         }
       },
       {
-        name: "ID",
-        key: "id",
+        name: "Communities",
+        key: "communities",
         options: {
-          filter: false,
-          filterType: "multiselect"
+          filter: false
         }
+      },
+      {
+        name: "Actions",
+        key: "actions",
+        options: {}
       }
     ];
   };
@@ -63,7 +65,7 @@ function AdminCustomPagesList({ classes }) {
 
       <METable
         classes={classes}
-        page={PAGE_PROPERTIES.ALL_ACTIONS}
+        page={PAGE_PROPERTIES.CUSTOM_PAGES}
         tableProps={{
           title: "All Custom Pages",
           data: [],
