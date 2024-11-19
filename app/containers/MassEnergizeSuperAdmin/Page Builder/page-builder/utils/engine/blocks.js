@@ -122,10 +122,7 @@ const youtubeLink = (src) => {
 export const YoutubeVideo = (props) => {
   const { style, src, ...rest } = props || {};
   return (
-    <div
-      {...rest}
-      style={{ position: "relative", paddingBottom: "56.25%", height: 600, overflow: "hidden", ...(style || {}) }}
-    >
+    <div {...rest} style={{ position: "relative", height: 600, overflow: "hidden", ...(style || {}) }}>
       <iframe
         src={youtubeLink(src)}
         title="YouTube video"
