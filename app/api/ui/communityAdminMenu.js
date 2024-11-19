@@ -25,6 +25,24 @@ const CADMIN_MENU = [
     ]
   },
   {
+    key: "custom-pages",
+    name: "Custom Pages",
+    icon: "ios-paper",
+    child: [
+      {
+        key: "create-custom-page",
+        name: "Create Page",
+        link: "/admin/community/configure/navigation/custom-pages",
+        target: "_blank"
+      },
+      {
+        key: "all-custom-pages",
+        name: "All My Custom Pages",
+        link: "/admin/list/custom-pages"
+      }
+    ]
+  },
+  {
     key: "actions",
     name: "Actions",
     icon: "ios-bulb",
