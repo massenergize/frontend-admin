@@ -15,23 +15,23 @@ function PBPublishedRender({ sections }) {
     [sections]
   );
 
-  useEffect(() => {
-    const adjustHeight = () => {
-      if (iframeRef.current && iframeRef.current.contentWindow) {
-        const iframeDocument = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
-        const height = iframeDocument.body.scrollHeight;
-        contRef.current.style.height = height + "px";
-        iframeRef.current.style.height = iframeDocument.body.scrollHeight + "px";
-      }
-    };
-    // Adjust height initially and when content changes
-    iframeRef.current.onload = adjustHeight;
-    return () => {
-      if (iframeRef.current) {
-        iframeRef.current.onload = null;
-      }
-    };
-  }, []);
+  // useEffect(() => {
+  //   const adjustHeight = () => {
+  //     if (iframeRef.current && iframeRef.current.contentWindow) {
+  //       const iframeDocument = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
+  //       const height = iframeDocument.body.scrollHeight;
+  //       contRef.current.style.height = height + "px";
+  //       iframeRef.current.style.height = iframeDocument.body.scrollHeight + "px";
+  //     }
+  //   };
+  //   // Adjust height initially and when content changes
+  //   iframeRef.current.onload = adjustHeight;
+  //   return () => {
+  //     if (iframeRef.current) {
+  //       iframeRef.current.onload = null;
+  //     }
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (iframeRef?.current) {
@@ -49,8 +49,11 @@ function PBPublishedRender({ sections }) {
   }, [html]);
 
   return (
-    <div ref={contRef} style={{ width: "100%", overflowY: "scroll" }}>
-      <iframe ref={iframeRef} style={{ width: "100%", borderWidth: 0, overflowY: "scroll" }} />
+    <div ref={contRef} style={{ width: "100%", overflowY: "scroll", overflowX: "hidden", height: "100vh" }}>
+      <iframe
+        ref={iframeRef}
+        style={{ width: "100%", borderWidth: 0, overflowY: "scroll", overflowX: "hidden", height: "100vh" }}
+      />
     </div>
   );
 }

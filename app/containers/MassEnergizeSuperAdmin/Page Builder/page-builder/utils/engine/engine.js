@@ -65,9 +65,8 @@ export const serializeBlock = (block) => {
   const isVideo = type === "video";
 
   // If the block is rich text, return the inner HTML
-  const rich = `<div style="${styleString}"> ${props?.__html} </div>`;
-  console.log("RICH THINGS", rich);
-  if (isRich) return rich;
+  const richText = `<div style="${styleString}"> ${props?.__html} </div>`;
+  if (isRich) return richText;
   if (isVideo) return serializeVideoBlock({ src: props?.src, styleString: serializeCss(styleTogether), propsString });
 
   // Serialize children recursively
@@ -97,7 +96,8 @@ const serializeVideoBlock = ({ src, styleString, propsString }) => {
             allowFullScreen
             style="width:100%;border:none;${styleString}"
             ${propsString}
-          />
+          >
+          </iframe>
       </div>
       `;
 };
