@@ -1,5 +1,5 @@
 import { Button, Link, Paper, Typography, withStyles } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import { APP_LINKS, DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from "../../../utils/constants";
@@ -7,6 +7,7 @@ import { withRouter } from "react-router-dom/cjs/react-router-dom.min";
 import { useDispatch } from "react-redux";
 import { reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
 import CopyCustomPageModal, { DeleteCustomPageModalConfirmation } from "./CopyCustomPageModal";
+import { useApiRequest } from "../../../utils/hooks/useApiRequest";
 
 const DUMMY_DATA = [
   {
@@ -51,6 +52,13 @@ const DUMMY_DATA = [
   }
 ];
 function AdminCustomPagesList({ classes }) {
+  const [comListRequester, ffRequester] = useApiRequest([
+    { key: "communityList", url: "communities.listForCommunityAdmin" },
+    { key: "ffList", url: "communities.features.flags.list" }
+  ]);
+
+  const { apiRequest, loading, error, data } = comListRequester || {};
+  const { apiRequest: ffRequest, loading: ffLoading, error: ffError, data: ff } = ffRequester || {};
   const dispatch = useDispatch();
   const toggleModal = (props) => dispatch(reduxToggleUniversalModal(props));
 
@@ -181,6 +189,7 @@ function AdminCustomPagesList({ classes }) {
       // });
     }
   };
+
   return (
     <div>
       <Paper style={{ padding: 20 }}>
@@ -194,8 +203,25 @@ function AdminCustomPagesList({ classes }) {
             style={{ textTransform: "unset", fontWeight: "bold", textDecoration: "none" }}
             target="_blank"
             href={APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT}
+            onClick={(e) => {
+              e.preventDefault();
+              apiRequest();
+            }}
           >
             <i style={{ marginRight: 5 }} className="fa fa-plus" /> Create A Custom Page
+            {loading && <i className="fa fa-spinner fa-spin" />}
+          </Link>
+          <Link
+            style={{ textTransform: "unset", fontWeight: "bold", textDecoration: "none", marginLeft: 10 }}
+            target="_blank"
+            href={APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT}
+            onClick={(e) => {
+              e.preventDefault();
+              ffRequest();
+            }}
+          >
+            <i style={{ marginRight: 5 }} className="fa fa-plus" /> Request FF
+            {ffLoading && <i className="fa fa-spinner fa-spin" />}
           </Link>
         </div>
       </Paper>
