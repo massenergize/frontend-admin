@@ -26,6 +26,7 @@ export const BLOCKS = [
   // { name: "Icon", icon: "fa-circle-o", key: "icon", template: ICON_BLOCK, properties: DEFAULT_PROPERTIES }
 ];
 
+
 export const Div = (props) => {
   const { children, ...rest } = props || {};
   return <div {...rest}>{children}</div>;

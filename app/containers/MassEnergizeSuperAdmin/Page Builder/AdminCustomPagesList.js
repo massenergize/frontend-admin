@@ -1,4 +1,4 @@
-import { Paper, Typography, withStyles } from "@mui/material";
+import { Button,Link, Paper, Typography, withStyles } from "@mui/material";
 import React from "react";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
@@ -23,8 +23,15 @@ function AdminCustomPagesList({ classes }) {
         }
       },
       {
-        name: "Communities",
-        key: "communities",
+        name: "Community",
+        key: "community",
+        options: {
+          filter: false
+        }
+      },
+      {
+        name: "Created By",
+        key: "created-by",
         options: {
           filter: false
         }
@@ -56,10 +63,22 @@ function AdminCustomPagesList({ classes }) {
     <div>
       <Paper style={{ padding: 20 }}>
         <Typography variant="h6">Manage your custom pages</Typography>
-        <Typography variant="p">
-          Here you can create pages for resrouce guides, and other topics on your your community sites. You can also set
+        <Typography variant="p" style={{ margin: "10px 0px" }}>
+          Here you can create pages for resource guides, and other topics on your your community sites. You can also set
           which communities can make copies of your pages.
         </Typography>
+        <div>
+          <Link
+            style={{ marginTop: 10, textTransform: "unset" }}
+            target="_blank"
+            href="/admin/community/configure/navigation/custom-pages"
+          >
+            Create a Custom Page
+          </Link>
+          {/* <Button  variant="outlined" color="primary" style={{ marginTop: 10, textTransform: "unset" }}>
+            Create a Custom Page
+          </Button> */}
+        </div>
       </Paper>
       <br />
 

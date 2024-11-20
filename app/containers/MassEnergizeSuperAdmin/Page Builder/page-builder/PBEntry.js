@@ -128,8 +128,6 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride, renderPageSettings 
     updateFocus(blockInFocus, newBlock);
   };
 
-  // console.log("SEE LES BLOCKS", sections);
-
   const pageSettings = () => {
     if (!renderPageSettings) return <PBPageSettings />;
     return renderPageSettings({ sections });
