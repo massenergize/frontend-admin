@@ -1,25 +1,65 @@
-import { Button,Link, Paper, Typography, withStyles } from "@mui/material";
+import { Button, Link, Paper, Typography, withStyles } from "@mui/material";
 import React from "react";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from "../../../utils/constants";
 import { withRouter } from "react-router-dom/cjs/react-router-dom.min";
 
+const DUMMY_DATA = [
+  {
+    id: Date.now(),
+    name: "Resource Guide",
+    community: "Concord",
+    access: "Nowhere,Ablekuma,Agawam...",
+    creator: "Frimpong"
+  },
+  {
+    id: Date.now() + 1,
+    name: "Energy Saving Tips",
+    community: "Concord",
+    access: "Nowhere,Ablekuma,Agawam...",
+    creator: "Brad"
+  },
+  {
+    id: Date.now() + 2,
+    name: "Solar Power 101",
+    community: "Wayland",
+    access: "Nowhere,Ablekuma,Agawam...",
+    creator: "Tahiru"
+  },
+  {
+    id: Date.now() + 3,
+    name: "Electric Cars",
+    community: "Concord",
+    access: "Nowhere,Ablekuma,Agawam...",
+    creator: "Frimpong"
+  },
+  {
+    id: Date.now() + 4,
+    name: "Community Solar",
+    community: "Framingham",
+    access: "Nowhere,Ablekuma,Agawam",
+    creator: "Brad"
+  }
+];
 function AdminCustomPagesList({ classes }) {
   const makeColumns = () => {
     return [
-      {
-        name: "ID",
-        key: "id",
-        options: {
-          filter: false
-        }
-      },
+      // {
+      //   name: "ID",
+      //   key: "id",
+      //   options: {
+      //     filter: false
+      //   }
+      // },
       {
         name: "Name",
         key: "name",
         options: {
-          filter: false
+          filter: false,
+          customBodyRender: (name) => {
+            return <b>{name}</b>;
+          }
         }
       },
       {
@@ -37,11 +77,52 @@ function AdminCustomPagesList({ classes }) {
         }
       },
       {
+        name: "Access",
+        key: "access",
+        options: {
+          filter: false
+        }
+      },
+
+      {
         name: "Actions",
         key: "actions",
         options: {}
       }
     ];
+  };
+
+  const fashionData = (data) => {
+    return data?.map((d) => {
+      return [
+        // d.id,
+        d.name,
+        d.community,
+        d.creator,
+        <Link href="#" style={{ fontWeight: "bold" }}>
+          {d.access}
+        </Link>,
+
+        <div>
+          <Link
+            color={"secondary"}
+            style={{ textTransform: "unset", fontWeight: "bold", textDecoration: "none" }}
+            target="_blank"
+            href="/admin/community/configure/navigation/custom-pages"
+          >
+            <i style={{ marginRight: 5 }} className="fa fa-edit" /> Edit
+          </Link>
+          <Link
+            color="secondary"
+            style={{ textTransform: "unset", fontWeight: "bold", textDecoration: "none", marginLeft: 10 }}
+            target="_blank"
+            href="/admin/community/configure/navigation/custom-pages"
+          >
+            <i style={{ marginRight: 5 }} className="fa fa-copy" /> Copy
+          </Link>
+        </div>
+      ];
+    });
   };
   const options = {
     filterType: "dropdown",
@@ -67,17 +148,14 @@ function AdminCustomPagesList({ classes }) {
           Here you can create pages for resource guides, and other topics on your your community sites. You can also set
           which communities can make copies of your pages.
         </Typography>
-        <div>
+        <div style={{ marginTop: 10 }}>
           <Link
-            style={{ marginTop: 10, textTransform: "unset" }}
+            style={{ textTransform: "unset", fontWeight: "bold", textDecoration: "none" }}
             target="_blank"
             href="/admin/community/configure/navigation/custom-pages"
           >
-            Create A Custom Page
+            <i style={{ marginRight: 5 }} className="fa fa-plus" /> Create A Custom Page
           </Link>
-          {/* <Button  variant="outlined" color="primary" style={{ marginTop: 10, textTransform: "unset" }}>
-            Create a Custom Page
-          </Button> */}
         </div>
       </Paper>
       <br />
@@ -87,7 +165,7 @@ function AdminCustomPagesList({ classes }) {
         page={PAGE_PROPERTIES.CUSTOM_PAGES}
         tableProps={{
           title: "All Custom Pages",
-          data: [],
+          data: fashionData(DUMMY_DATA),
           columns: makeColumns(),
           options: options
         }}

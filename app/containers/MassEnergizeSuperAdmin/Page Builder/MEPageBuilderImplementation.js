@@ -80,10 +80,10 @@ function MEPageBuilderImplementation() {
 
   const builderOverrides = {
     modals: {
-      [PBEntry.PAGE_SETTINGS_MODAL_KEY]: () => <AdminPublishConfirmationDialog />
+      [PBEntry.PUBLISH_CONFIRMATION_DIALOG_MODAL_KEY]: () => <AdminPublishConfirmationDialog />
     }
   };
-  
+
   return (
     <>
       <PBEntry

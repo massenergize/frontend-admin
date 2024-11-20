@@ -203,6 +203,7 @@ function PBEntry({ builderOverrides, tinyKey, openMediaLibrary, propsOverride, r
         save={() => console.log("FINAL PAYLOAD: ", sections)}
         close={closeModalWithKey}
         openPageSettings={() => openSpecificModal(PAGE_SETTINGS_KEY)}
+        publish={() => openSpecificModal(PUBLISH_CONFIRMATION_DIALOG)}
       />
     </div>
   );
