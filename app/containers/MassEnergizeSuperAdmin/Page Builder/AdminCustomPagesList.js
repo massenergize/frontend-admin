@@ -4,6 +4,9 @@ import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from "../../../utils/constants";
 import { withRouter } from "react-router-dom/cjs/react-router-dom.min";
+import { useDispatch } from "react-redux";
+import { reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
+import CopyCustomPageModal, { DeleteCustomPageModalConfirmation } from "./CopyCustomPageModal";
 
 const DUMMY_DATA = [
   {
@@ -43,15 +46,11 @@ const DUMMY_DATA = [
   }
 ];
 function AdminCustomPagesList({ classes }) {
+  const dispatch = useDispatch();
+  const toggleModal = (props) => dispatch(reduxToggleUniversalModal(props));
+
   const makeColumns = () => {
     return [
-      // {
-      //   name: "ID",
-      //   key: "id",
-      //   options: {
-      //     filter: false
-      //   }
-      // },
       {
         name: "Name",
         key: "name",
@@ -116,7 +115,19 @@ function AdminCustomPagesList({ classes }) {
             color="secondary"
             style={{ textTransform: "unset", fontWeight: "bold", textDecoration: "none", marginLeft: 10 }}
             target="_blank"
-            href="/admin/community/configure/navigation/custom-pages"
+            // href="/admin/community/configure/navigation/custom-pages"
+            onClick={(e) => {
+              e.preventDefault();
+              console.log("Lets see onclicK'");
+              toggleModal({
+                show: true,
+                noTitle: true,
+                fullControl: true,
+                // title: "Copy Custom Page",
+                component: <CopyCustomPageModal />,
+                data: { page: d }
+              });
+            }}
           >
             <i style={{ marginRight: 5 }} className="fa fa-copy" /> Copy
           </Link>
@@ -129,16 +140,23 @@ function AdminCustomPagesList({ classes }) {
     responsive: "standard",
     print: true,
     rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
-    rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS
+    rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
     // count: metaData && metaData.count,
     // confirmFilters: true,
-    // onRowsDelete: (rowsDeleted) => {
-    //   const idsToDelete = rowsDeleted.data;
-    //   idsToDelete.forEach((d) => {
-    //     const email = data[d.dataIndex][2];
-    //     apiCall("/teams.removeMember", { team_id: team.id, email });
-    //   });
-    // },
+    onRowsDelete: (rowsDeleted) => {
+      toggleModal({
+        show: true,
+        noTitle: true,
+        fullControl: true,
+        // title: "Copy Custom Page",
+        component: <DeleteCustomPageModalConfirmation />
+      });
+      // const idsToDelete = rowsDeleted.data;
+      // idsToDelete.forEach((d) => {
+      //   const email = data[d.dataIndex][2];
+      //   apiCall("/teams.removeMember", { team_id: team.id, email });
+      // });
+    }
   };
   return (
     <div>
