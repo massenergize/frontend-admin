@@ -15,7 +15,7 @@ import PBPublishedRender from "./components/render/PBPublishedRender";
 const PAGE_SETTINGS_KEY = "PAGE_SETTINGS";
 const BLOCK_SELECTOR_PAGE = "BLOCK_SELECTOR_PAGE";
 const PUBLISH_CONFIRMATION_DIALOG = "PUBLISH_CONFIRMATION_DIALOG";
-function PBEntry({ builderOverrides, tinyKey, openMediaLibrary, propsOverride, renderPageSettings }) {
+function PBEntry({ publishedProps, builderOverrides, tinyKey, openMediaLibrary, propsOverride, renderPageSettings }) {
   const { modals: modalOverrides } = builderOverrides || {};
   const { Modal, open: openModal, close, modalProps, setModalProps } = usePBModal();
   const [sections, setSection] = useState([]);
@@ -170,7 +170,7 @@ function PBEntry({ builderOverrides, tinyKey, openMediaLibrary, propsOverride, r
         <PBPublishedRender sections={sections} />
       ) : (
         <>
-          <PBCanvas>
+          <PBCanvas publishedProps={publishedProps}>
             <PBSection
               readOnly={preview}
               blockInFocus={blockInFocus}

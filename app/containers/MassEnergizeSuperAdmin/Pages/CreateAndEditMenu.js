@@ -198,7 +198,7 @@ function CreateAndEditMenu({ data, cancel, insertNewLink, children, isEdit }) {
               )}
               {!isCustomPage && renderLinkItems()}
             </div>
-            {!linkIsExternal && (
+            {/* {!linkIsExternal && (
               <div style={{ margin: "0px 10px", display: "flex", flexDirection: "row", alignItems: "center" }}>
                 <FormControlLabel
                   control={
@@ -223,7 +223,7 @@ function CreateAndEditMenu({ data, cancel, insertNewLink, children, isEdit }) {
                   </a>
                 )}
               </div>
-            )}
+            )} */}
           </div>
           {/* <TextField
           style={{ width: "100%", marginTop: 15 }}

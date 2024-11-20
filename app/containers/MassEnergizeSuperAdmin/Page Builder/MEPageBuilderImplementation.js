@@ -84,12 +84,17 @@ function MEPageBuilderImplementation() {
     }
   };
 
+  const publishedProps = {
+    published_at: "2021-10-10",
+    published_link: "https://www.google.com"
+  };
   return (
     <>
       <PBEntry
         renderPageSettings={renderPageSettings}
         propsOverride={overrideProperties}
         builderOverrides={builderOverrides}
+        publishedProps={publishedProps}
         // openMediaLibrary={openMediaLibrary}
         tinyKey={process.env.REACT_APP_TINY_MCE_KEY}
       />

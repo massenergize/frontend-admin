@@ -44,7 +44,10 @@ function AdminPageBuilderSettings() {
       {/* --- AUDIENCE SECTION ------ */}
       <div className="pb-bordered-section">
         <h6 style={{ color: "#0b9edc" }}>Access</h6>
-        <label>Which communities should be able to copy this page?</label>
+        <label>
+          Which community admins should have access to this page? Communities you select here can add your page to their
+          navigation and make a copy of your page too.
+        </label>
         <div>
           {AUDIENCE?.map(({ key, name }) => {
             return (
