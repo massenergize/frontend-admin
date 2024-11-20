@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import PBCanvas from "./PBCanvas";
 import "./assets/css/pb-index.css";
 import PBSidePanel from "./components/sidepanels/PBSidePanel";
@@ -13,7 +13,10 @@ import { BLOCKS } from "./utils/engine/blocks";
 import { PROPERTY_TYPES } from "./components/sidepanels/PBPropertyTypes";
 import PBPublishedRender from "./components/render/PBPublishedRender";
 const PAGE_SETTINGS_KEY = "PAGE_SETTINGS";
-function PBEntry({ tinyKey, openMediaLibrary, propsOverride, renderPageSettings }) {
+const BLOCK_SELECTOR_PAGE = "BLOCK_SELECTOR_PAGE";
+const PUBLISH_CONFIRMATION_DIALOG = "PUBLISH_CONFIRMATION_DIALOG";
+function PBEntry({ builderOverrides, tinyKey, openMediaLibrary, propsOverride, renderPageSettings }) {
+  const { modals: modalOverrides } = builderOverrides || {};
   const { Modal, open: openModal, close, modalProps, setModalProps } = usePBModal();
   const [sections, setSection] = useState([]);
   const [blockInFocus, setBlockInFocus] = useState(null);
@@ -23,7 +26,7 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride, renderPageSettings 
 
   const updateFocus = (oldBlock, newBlock) => {
     setBlockInFocus(newBlock);
-    setOutOfFocus(oldBlock);
+    // setOutOfFocus(oldBlock);
   };
   const onFocused = useCallback((target) => {
     recentlyUsedFieldRef.current = target;
@@ -99,9 +102,9 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride, renderPageSettings 
     close();
   };
 
-  const openSpecificModal = (modalKey) => {
+  const openSpecificModal = (modalKey, options) => {
     setModalProps({ ...modalProps, modalKey });
-    openModal();
+    openModal({ ...(options || {}), modalKey });
   };
   const closeModalWithKey = () => {
     setModalProps({ ...modalProps, modalKey: null });
@@ -113,7 +116,7 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride, renderPageSettings 
     setSection(newSection);
     updateFocus(blockInFocus, null);
   };
-  const IS_PAGE_SETTINGS = modalProps?.modalKey === PAGE_SETTINGS_KEY;
+  // const IS_PAGE_SETTINGS = modalProps?.modalKey === PAGE_SETTINGS_KEY;
 
   const resetAnItem = () => {
     const { options } = blockInFocus || {};
@@ -133,10 +136,35 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride, renderPageSettings 
     return renderPageSettings({ sections });
   };
 
+  const getModalComponentWithKey = useCallback(
+    (key) => {
+      const OBJ = {
+        [PAGE_SETTINGS_KEY]: pageSettings,
+        [BLOCK_SELECTOR_PAGE]: () => <PBBlockContainer onItemSelected={selectBlock} />,
+        [PUBLISH_CONFIRMATION_DIALOG]: () => <h1> Include a modal override to show here instead...</h1>,
+        ...(modalOverrides || {})
+      };
+
+      return OBJ[key] || (() => <i style={{ padding: 10 }}> Could not access the modal you were looking for...</i>);
+    },
+    [sections?.toString(), selectBlock?.toString(), modalOverrides?.toString()]
+  );
+
+  const renderMComponent = useMemo(() => getModalComponentWithKey(modalProps?.modalKey), [
+    getModalComponentWithKey,
+    modalProps?.modalKey
+  ]);
+
+  const openBlockModal = (props) => {
+    openSpecificModal(BLOCK_SELECTOR_PAGE, props);
+    // More to come...
+  };
+
   return (
     <div className="pb-root">
       <Modal style={{ minHeight: 300 }}>
-        {IS_PAGE_SETTINGS ? pageSettings() : <PBBlockContainer onItemSelected={selectBlock} />}
+        {/* {IS_PAGE_SETTINGS ? pageSettings() : <PBBlockContainer onItemSelected={selectBlock} />} */}
+        {renderMComponent()}
       </Modal>
       {preview ? (
         <PBPublishedRender sections={sections} />
@@ -148,8 +176,8 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride, renderPageSettings 
               blockInFocus={blockInFocus}
               focusOnBlock={(block) => updateFocus(blockInFocus, block)}
               sections={sections}
-              onButtonClick={openModal}
-              openBlockModal={openModal}
+              onButtonClick={openBlockModal}
+              openBlockModal={openBlockModal}
               removeBlockItem={removeBlockItem}
             />
           </PBCanvas>
@@ -167,11 +195,6 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride, renderPageSettings 
           </div>
         </>
       )}
-      {/* <BottomSheet>
-        <div style={{ width: "70%" }}>
-          <PBRichTextEditor height={heightIsToggled ? 500 : 300} />
-        </div>
-      </BottomSheet> */}
 
       <PBFloatingFooter
         inPreview={preview}
@@ -185,4 +208,7 @@ function PBEntry({ tinyKey, openMediaLibrary, propsOverride, renderPageSettings 
   );
 }
 
+PBEntry.PAGE_SETTINGS_MODAL_KEY = PAGE_SETTINGS_KEY;
+PBEntry.BLOCK_SELECTOR_MODAL_KEY = BLOCK_SELECTOR_PAGE;
+PBEntry.PUBLISH_CONFIRMATION_DIALOG_MODAL_KEY = PUBLISH_CONFIRMATION_DIALOG;
 export default PBEntry;

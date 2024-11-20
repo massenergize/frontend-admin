@@ -4,6 +4,7 @@ import { PBImageSelector, PROPERTY_TYPES } from "./page-builder/components/sidep
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import { useSelector } from "react-redux";
 import AdminPageBuilderSettings from "./AdminPageBuilderSettings";
+import AdminPublishConfirmationDialog from "./AdminPublishConfirmationDialog";
 
 function MEPageBuilderImplementation() {
   const imagesObject = useSelector((state) => state.getIn(["galleryImages"]));
@@ -76,11 +77,19 @@ function MEPageBuilderImplementation() {
       );
     }
   };
+
+  const builderOverrides = {
+    modals: {
+      [PBEntry.PAGE_SETTINGS_MODAL_KEY]: () => <AdminPublishConfirmationDialog />
+    }
+  };
+  
   return (
     <>
       <PBEntry
         renderPageSettings={renderPageSettings}
         propsOverride={overrideProperties}
+        builderOverrides={builderOverrides}
         // openMediaLibrary={openMediaLibrary}
         tinyKey={process.env.REACT_APP_TINY_MCE_KEY}
       />

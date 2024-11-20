@@ -5,11 +5,9 @@ import { useSelector } from "react-redux";
 
 const SPECIFIC = "specific-communities";
 const AUDIENCE = [
-  // everyone, specific communities, only my community
-
-  { id: 3, name: "Only My Community", key: "only-my-community" },
-  { id: 1, name: "Everyone", key: "everyone" },
-  { id: 2, name: "Specific Communities", key: SPECIFIC }
+  { id: 3, name: "Only admins in my community", key: "only-my-community" },
+  { id: 1, name: "Admins from all communities", key: "everyone" },
+  { id: 2, name: "Admins from specific communities", key: SPECIFIC }
 ];
 function AdminPageBuilderSettings() {
   const communities = useSelector((state) => state.getIn(["otherCommunities"]));
@@ -20,7 +18,6 @@ function AdminPageBuilderSettings() {
     setform({ ...form, [name]: value });
   };
   const { scope, name, slug } = form || {};
-  console.log("LE FORM", form);
 
   const slugValue = (s) =>
     s
@@ -46,8 +43,8 @@ function AdminPageBuilderSettings() {
       </div>
       {/* --- AUDIENCE SECTION ------ */}
       <div className="pb-bordered-section">
-        <h6 style={{ color: "#0b9edc" }}>Audience</h6>
-        <label>Who can view this page?</label>
+        <h6 style={{ color: "#0b9edc" }}>Access</h6>
+        <label>Which communities should be able to copy this page?</label>
         <div>
           {AUDIENCE?.map(({ key, name }) => {
             return (

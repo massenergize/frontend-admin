@@ -73,7 +73,7 @@ function AdminCustomPagesList({ classes }) {
             target="_blank"
             href="/admin/community/configure/navigation/custom-pages"
           >
-            Create a Custom Page
+            Create A Custom Page
           </Link>
           {/* <Button  variant="outlined" color="primary" style={{ marginTop: 10, textTransform: "unset" }}>
             Create a Custom Page
