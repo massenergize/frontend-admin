@@ -1,3 +1,5 @@
+const { APP_LINKS } = require("../../utils/constants");
+
 module.exports = [
   {
     key: "dashboard",
@@ -28,25 +30,7 @@ module.exports = [
       }
     ]
   },
-  {
-    key: "custom-pages",
-    name: "Custom Pages",
-    icon: "ios-people",
-    child: [
-      {
-        key: "create-custom-page",
-        icon: "ios-plus",
-        name: "Create Page",
-        link: "/admin/community/configure/navigation/custom-pages"
-      },
-      {
-        key: "all-custom-pages",
-        icon: "ios-list",
-        name: "All My Custom Pages",
-        link: "/admin/list/custom-pages"
-      }
-    ]
-  },
+
   {
     key: "actions",
     name: "Actions",
@@ -247,6 +231,25 @@ module.exports = [
         key: "all-users",
         name: "All Users",
         link: "/admin/read/users"
+      }
+    ]
+  },
+  {
+    key: "custom-pages",
+    name: "Pages",
+    icon: "ios-people",
+    child: [
+      {
+        key: "create-custom-page",
+        icon: "ios-plus",
+        name: "Create Page",
+        link: APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT
+      },
+      {
+        key: "all-custom-pages",
+        icon: "ios-list",
+        name: "All My Custom Pages",
+        link: APP_LINKS.PAGE_BUILDER_VIEW_PAGES
       }
     ]
   },

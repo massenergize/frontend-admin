@@ -343,3 +343,4 @@ export const EXAMPLE_MENU_STRUCTURE = {
   success: true,
   cursor: {}
 };
+

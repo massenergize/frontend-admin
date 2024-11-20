@@ -105,6 +105,7 @@ import UserActivityMonitor from "../../components/Widget/UserActivityMonitor";
 import { parseJSON } from "../../utils/common";
 import TestimonialAutoShareSettings from "../MassEnergizeSuperAdmin/Community/AutoShareSettings";
 import AdminCustomPagesList from "../MassEnergizeSuperAdmin/Page Builder/AdminCustomPagesList";
+import { APP_LINKS } from "../../utils/constants";
 // This function checks whether a user needs to sign an MOU and redirects them to the MOU page if necessary
 const checkIfUserNeedsMOUAttention = (auth, history) => {
   // A list of routes that are allowed if a user has not signed their MOU
@@ -131,7 +132,7 @@ const checkIfUserNeedsMOUAttention = (auth, history) => {
 };
 
 const routesWithNoDashboardView = [
-  "/admin/community/configure/navigation/custom-pages",
+  APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT,
   "/admin/community/configure/navigation/custom-pages/preview"
 ];
 
@@ -211,7 +212,7 @@ class Application extends React.Component {
       >
         {routeDoesNotRequireDashboard ? (
           <Switch>
-            <Route exact path="/admin/community/configure/navigation/custom-pages" component={BuildCustomPages} />
+            <Route exact path={APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT} component={BuildCustomPages} />
             <Route
               exact
               path="/admin/community/configure/navigation/custom-pages/preview"
@@ -248,7 +249,7 @@ class Application extends React.Component {
 
               <Route exact path="/blank" component={BlankPage} />
               <Route exact path="/admin/community/configure/navigation" component={CustomNavigationConfiguration} />
-              <Route exact path="/admin/list/custom-pages" component={CustomPagesList} />
+              <Route exact path={APP_LINKS.PAGE_BUILDER_VIEW_PAGES} component={CustomPagesList} />
               <Route path="/admin/settings/auto-share" component={TestimonialAutoShareSettings} />
               <Route path="/admin/settings/notification-control" component={NudgeControlPage} />
               <Route path="/admin/settings/platform-features" component={PlatformFeaturesPage} />

@@ -2,7 +2,7 @@ import { Button, Link, Paper, Typography, withStyles } from "@mui/material";
 import React from "react";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
-import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from "../../../utils/constants";
+import { APP_LINKS, DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from "../../../utils/constants";
 import { withRouter } from "react-router-dom/cjs/react-router-dom.min";
 import { useDispatch } from "react-redux";
 import { reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
@@ -14,35 +14,40 @@ const DUMMY_DATA = [
     name: "Resource Guide",
     community: "Concord",
     access: "Nowhere,Ablekuma,Agawam...",
-    creator: "Frimpong"
+    creator: "Frimpong",
+    published_at: "2021-10-10"
   },
   {
     id: Date.now() + 1,
     name: "Energy Saving Tips",
     community: "Concord",
     access: "Nowhere,Ablekuma,Agawam...",
-    creator: "Brad"
+    creator: "Brad",
+    published_at: "2021-10-10"
   },
   {
     id: Date.now() + 2,
     name: "Solar Power 101",
     community: "Wayland",
     access: "Nowhere,Ablekuma,Agawam...",
-    creator: "Tahiru"
+    creator: "Tahiru",
+    published_at: "2021-10-10"
   },
   {
     id: Date.now() + 3,
     name: "Electric Cars",
     community: "Concord",
     access: "Nowhere,Ablekuma,Agawam...",
-    creator: "Frimpong"
+    creator: "Frimpong",
+    published_at: "2021-10-10"
   },
   {
     id: Date.now() + 4,
     name: "Community Solar",
     community: "Framingham",
     access: "Nowhere,Ablekuma,Agawam",
-    creator: "Brad"
+    creator: "Brad",
+    published_at: "2021-10-10"
   }
 ];
 function AdminCustomPagesList({ classes }) {
@@ -82,6 +87,20 @@ function AdminCustomPagesList({ classes }) {
           filter: false
         }
       },
+      {
+        name: "Last Published",
+        key: "last-published",
+        options: {
+          filter: false
+        }
+      },
+      {
+        name: "Preview",
+        key: "preview",
+        options: {
+          filter: false
+        }
+      },
 
       {
         name: "Actions",
@@ -101,13 +120,17 @@ function AdminCustomPagesList({ classes }) {
         <Link href="#" style={{ fontWeight: "bold" }}>
           {d.access}
         </Link>,
+        d.published_at,
+        <Link href="#" style={{ fontWeight: "bold" }}>
+          View Published
+        </Link>,
 
         <div>
           <Link
             color={"secondary"}
             style={{ textTransform: "unset", fontWeight: "bold", textDecoration: "none" }}
             target="_blank"
-            href="/admin/community/configure/navigation/custom-pages"
+            href={APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT}
           >
             <i style={{ marginRight: 5 }} className="fa fa-edit" /> Edit
           </Link>
@@ -170,7 +193,7 @@ function AdminCustomPagesList({ classes }) {
           <Link
             style={{ textTransform: "unset", fontWeight: "bold", textDecoration: "none" }}
             target="_blank"
-            href="/admin/community/configure/navigation/custom-pages"
+            href={APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT}
           >
             <i style={{ marginRight: 5 }} className="fa fa-plus" /> Create A Custom Page
           </Link>

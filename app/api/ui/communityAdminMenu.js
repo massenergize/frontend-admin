@@ -1,4 +1,5 @@
 import { FLAGS } from "../../components/FeatureFlags/flags";
+import { APP_LINKS } from "../../utils/constants";
 
 const CADMIN_MENU = [
   {
@@ -24,24 +25,7 @@ const CADMIN_MENU = [
       }
     ]
   },
-  {
-    key: "custom-pages",
-    name: "Custom Pages",
-    icon: "ios-paper",
-    child: [
-      {
-        key: "create-custom-page",
-        name: "Create Page",
-        link: "/admin/community/configure/navigation/custom-pages",
-        target: "_blank"
-      },
-      {
-        key: "all-custom-pages",
-        name: "All My Custom Pages",
-        link: "/admin/list/custom-pages"
-      }
-    ]
-  },
+
   {
     key: "actions",
     name: "Actions",
@@ -216,6 +200,24 @@ const CADMIN_MENU = [
         key: "all-users",
         name: "All Users",
         link: "/admin/read/users"
+      }
+    ]
+  },
+  {
+    key: "custom-pages",
+    name: "Pages",
+    icon: "ios-paper",
+    child: [
+      {
+        key: "create-custom-page",
+        name: "Create Page",
+        link: APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT,
+        target: "_blank"
+      },
+      {
+        key: "all-custom-pages",
+        name: "All My Custom Pages",
+        link: APP_LINKS.PAGE_BUILDER_VIEW_PAGES
       }
     ]
   },

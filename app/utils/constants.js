@@ -22,39 +22,38 @@ export const NO_TITLES_FOR_THESE_PAGES = [
   "/admin/settings/platform-features",
   "/admin/settings/notification-control",
   "/admin/community/configure/navigation",
-  "/admin/settings/auto-share",
+  "/admin/settings/auto-share"
 ];
-
 
 export const AUDIENCES_CONFIG = {
   SUPER_ADMINS: {
     params: {
-      membership: ["Super Admin"],
+      membership: ["Super Admin"]
     },
-    endpoint: "/users.listForCommunityAdmin",
+    endpoint: "/users.listForCommunityAdmin"
   },
   COMMUNITY_CONTACTS: {
     params: {},
-    endpoint: "/communities.listForCommunityAdmin",
+    endpoint: "/communities.listForCommunityAdmin"
   },
   COMMUNITY_ADMINS: {
     params: {
-      membership: ["Community Admin"],
+      membership: ["Community Admin"]
     },
-    endpoint: "/users.listForCommunityAdmin",
+    endpoint: "/users.listForCommunityAdmin"
   },
   USERS: {
     params: {
-      membership: ["Member"],
+      membership: ["Member"]
     },
-    endpoint: "/users.listForCommunityAdmin",
+    endpoint: "/users.listForCommunityAdmin"
   },
   ACTIONS: {
     params: {
-      live: ["Yes"],
+      live: ["Yes"]
     },
-    endpoint: "/actions.listForCommunityAdmin",
-  },
+    endpoint: "/actions.listForCommunityAdmin"
+  }
 };
 
 export const ALL = "all";
@@ -70,7 +69,6 @@ const DONE = "DONE";
 const TODO = "TODO";
 const BOTH = "BOTH";
 
-
 export const SUPER_ADMIN_AUDIENCE = [
   { id: SUPER_ADMIN, value: "Super Admins", subType: null },
   { id: COMMUNITY_CONTACTS, value: "Community Contacts", subType: null },
@@ -80,7 +78,7 @@ export const SUPER_ADMIN_AUDIENCE = [
     audienceLabelText: "Select Community Admins",
     subType: [
       { id: FROM_COMMUNITY, value: "From Community", default: true },
-      { id: SPECIFIC, value: "Specific Community Admin", default: false },
+      { id: SPECIFIC, value: "Specific Community Admin", default: false }
     ]
   },
   {
@@ -89,7 +87,7 @@ export const SUPER_ADMIN_AUDIENCE = [
     audienceLabelText: "Select Users",
     subType: [
       { id: FROM_COMMUNITY, value: "From Community", default: true },
-      { id: SPECIFIC, value: "Specific Users", default: false },
+      { id: SPECIFIC, value: "Specific Users", default: false }
     ]
   },
   {
@@ -99,7 +97,7 @@ export const SUPER_ADMIN_AUDIENCE = [
     subType: [
       { id: DONE, value: "Marked As Completed", default: true },
       { id: TODO, value: "Marked As Todo", default: false },
-      { id: BOTH, value: "Both Done & Todo", default: false },
+      { id: BOTH, value: "Both Done & Todo", default: false }
     ]
   }
 ];
@@ -111,7 +109,7 @@ export const COMMUNITY_ADMIN_AUDIENCE = [
     audienceLabelText: "Select Community Admins",
     subType: [
       { id: FROM_COMMUNITY, value: "From Community", default: true },
-      { id: SPECIFIC, value: "Specific Community Admin", default: false },
+      { id: SPECIFIC, value: "Specific Community Admin", default: false }
     ]
   },
   {
@@ -120,7 +118,7 @@ export const COMMUNITY_ADMIN_AUDIENCE = [
     audienceLabelText: "Select Users",
     subType: [
       { id: FROM_COMMUNITY, value: "From Community", default: true },
-      { id: SPECIFIC, value: "Specific Users", default: false },
+      { id: SPECIFIC, value: "Specific Users", default: false }
     ]
   },
   {
@@ -130,7 +128,12 @@ export const COMMUNITY_ADMIN_AUDIENCE = [
     subType: [
       { id: DONE, value: "Marked As Completed", default: true },
       { id: TODO, value: "Marked As Todo", default: false },
-      { id: BOTH, value: "Both Done & Todo", default: false },
+      { id: BOTH, value: "Both Done & Todo", default: false }
     ]
   }
 ];
+
+export const APP_LINKS = {
+  PAGE_BUILDER_CREATE_OR_EDIT: "/admin/community/community/manage/custom-page",
+  PAGE_BUILDER_VIEW_PAGES: "/admin/community/list/custom/pages"
+};
