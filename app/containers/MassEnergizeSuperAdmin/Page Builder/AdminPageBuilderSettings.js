@@ -18,7 +18,7 @@ const URLS = {
   CREATE: "/community.custom.pages.create",
   PUBLISH: "/community.custom.pages.publish"
 };
-function AdminPageBuilderSettings({ data: passedPage }) {
+function AdminPageBuilderSettings({ data: passedPage, updateData }) {
   const communities = useSelector((state) => state.getIn(["otherCommunities"]));
   const adminCommunities = useSelector((state) => state.getIn(["communities"]));
   const [form, setForm] = useState({ sharing_type: AUDIENCE_TYPES.EVERYONE });
@@ -51,6 +51,10 @@ function AdminPageBuilderSettings({ data: passedPage }) {
       if (response?.success) {
         const { page } = response?.data || {};
         if (isCreating) return (window.location.href = `${APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT}?pageId=${page?.id}`);
+        else {
+          console.log("THIS IS WHERE IT IS", response.data);
+          updateData(response?.data);
+        }
       }
     });
   };

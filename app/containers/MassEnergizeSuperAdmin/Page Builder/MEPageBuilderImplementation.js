@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import PBEntry from "./page-builder/PBEntry";
 import { PBImageSelector, PROPERTY_TYPES } from "./page-builder/components/sidepanels/PBPropertyTypes";
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
@@ -14,14 +14,12 @@ function MEPageBuilderImplementation() {
   const [requestHandler] = useApiRequest([{ key: "findPages", url: "/community.custom.pages.info" }]);
 
   const [fetchPage, page, error, loading, setError, setValue, setData] = requestHandler || [];
-  const openMediaLibrary = () => {
-    console.log("I have opened the media library");
-  };
+
   const { pageId } = fetchParamsFromURL(window.location, "pageId");
 
-  const renderPageSettings = () => {
+  const renderPageSettings = useCallback(() => {
     return <AdminPageBuilderSettings data={page} updateData={setData} />;
-  };
+  }, [page, setData]);
 
   useEffect(() => {
     if (!pageId) return;
@@ -102,7 +100,7 @@ function MEPageBuilderImplementation() {
 
   const publishedProps = {
     published_at: getHumanFriendlyDate(page?.latest_version?.created_at),
-    published_link: null // TODO: change this when you have the preview link setup
+    published_link: null // TODO: change this when you have the link preview setup
   };
   return (
     <>
@@ -111,7 +109,6 @@ function MEPageBuilderImplementation() {
         propsOverride={overrideProperties}
         builderOverrides={builderOverrides}
         publishedProps={publishedProps}
-        // openMediaLibrary={openMediaLibrary}
         tinyKey={process.env.REACT_APP_TINY_MCE_KEY}
       />
     </>

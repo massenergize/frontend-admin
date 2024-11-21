@@ -137,3 +137,5 @@ export const APP_LINKS = {
   PAGE_BUILDER_CREATE_OR_EDIT: "/admin/community/community/manage/custom-page",
   PAGE_BUILDER_VIEW_PAGES: "/admin/community/list/custom/pages"
 };
+
+export const AUDIENCE_TYPES = { EVERYONE: "OPEN", ONLY_ME: "CLOSE", SPECIFIC_COMMUNITIES: "OPENED_TO" };

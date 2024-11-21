@@ -131,10 +131,10 @@ function PBEntry({ publishedProps, builderOverrides, tinyKey, openMediaLibrary, 
     updateFocus(blockInFocus, newBlock);
   };
 
-  const pageSettings = () => {
+  const pageSettings = useCallback(() => {
     if (!renderPageSettings) return <PBPageSettings />;
     return renderPageSettings({ sections });
-  };
+  }, [renderPageSettings]);
 
   const getModalComponentWithKey = useCallback(
     (key) => {
@@ -147,7 +147,7 @@ function PBEntry({ publishedProps, builderOverrides, tinyKey, openMediaLibrary, 
 
       return OBJ[key] || (() => <i style={{ padding: 10 }}> Could not access the modal you were looking for...</i>);
     },
-    [sections?.toString(), selectBlock?.toString(), modalOverrides?.toString()]
+    [sections?.toString(), selectBlock, modalOverrides?.toString(), pageSettings]
   );
 
   const renderMComponent = useMemo(() => getModalComponentWithKey(modalProps?.modalKey), [
