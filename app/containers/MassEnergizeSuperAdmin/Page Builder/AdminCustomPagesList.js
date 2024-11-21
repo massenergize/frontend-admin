@@ -5,7 +5,7 @@ import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import { APP_LINKS, DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from "../../../utils/constants";
 import { withRouter } from "react-router-dom/cjs/react-router-dom.min";
 import { useDispatch, useSelector } from "react-redux";
-import { reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
+import { reduxLoadCustomPages, reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
 import CopyCustomPageModal, { DeleteCustomPageModalConfirmation } from "./CopyCustomPageModal";
 import { useApiRequest } from "../../../utils/hooks/useApiRequest";
 import Loading from "dan-components/Loading";
@@ -54,11 +54,13 @@ const DUMMY_DATA = [
 ];
 function AdminCustomPagesList({ classes }) {
   const adminCommunities = useSelector((state) => state.getIn(["communities"]));
+  const customPagesList = useSelector((state) => state.getIn(["customPagesList"]));
 
+  const dispatch = useDispatch();
   const [customPagesRequestHandler] = useApiRequest([{ key: "customPageList", url: "/community.custom.pages.list" }]);
   const [fetchPages, data, error, loading, setError, setLoading] = customPagesRequestHandler || [];
 
-  const dispatch = useDispatch();
+  const putCustomPagesInRedux = (pages) => dispatch(reduxLoadCustomPages(pages));
   const toggleModal = (props) => dispatch(reduxToggleUniversalModal(props));
 
   const makeColumns = () => {
@@ -117,15 +119,15 @@ function AdminCustomPagesList({ classes }) {
     ];
   };
 
-  console.log("LA DATA", data);
+  console.log("CUSTOM PAGES", customPagesList);
   const fashionData = (data) => {
     return data?.map((d) => {
-      const publishedVersion = d.page.latest_version;
+      const publishedVersion = d?.page?.latest_version;
       return [
         // d.id,
-        d.page?.title,
-        d.community?.name,
-        d.page?.user?.full_name,
+        d?.page?.title,
+        d?.community?.name,
+        d?.page?.user?.full_name,
         <Link href="#" style={{ fontWeight: "bold" }}>
           {/* {d.access} */}
           ...
@@ -155,7 +157,6 @@ function AdminCustomPagesList({ classes }) {
             // href="/admin/community/configure/navigation/custom-pages"
             onClick={(e) => {
               e.preventDefault();
-              console.log("Lets see onclicK'");
               toggleModal({
                 show: true,
                 noTitle: true,
@@ -198,7 +199,12 @@ function AdminCustomPagesList({ classes }) {
   };
 
   useEffect(() => {
-    fetchPages({ community_ids: adminCommunities?.map((c) => c.id) });
+    if (customPagesList?.length) return;
+    fetchPages({ community_ids: adminCommunities?.map((c) => c.id) }, (response) => {
+      if (response?.success) {
+        putCustomPagesInRedux(response?.data);
+      }
+    });
   }, []);
 
   if (loading) return <Loading />;
@@ -246,7 +252,7 @@ function AdminCustomPagesList({ classes }) {
         page={PAGE_PROPERTIES.CUSTOM_PAGES}
         tableProps={{
           title: "All Custom Pages",
-          data: fashionData(data),
+          data: fashionData(customPagesList),
           columns: makeColumns(),
           options: options
         }}

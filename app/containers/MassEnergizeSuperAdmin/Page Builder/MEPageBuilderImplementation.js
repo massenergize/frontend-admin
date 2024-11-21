@@ -6,20 +6,21 @@ import { useSelector } from "react-redux";
 import AdminPageBuilderSettings from "./AdminPageBuilderSettings";
 import AdminPublishConfirmationDialog from "./AdminPublishConfirmationDialog";
 import { useApiRequest } from "../../../utils/hooks/useApiRequest";
-import { fetchParamsFromURL } from "../../../utils/common";
+import { fetchParamsFromURL, getHumanFriendlyDate } from "../../../utils/common";
 import Loading from "dan-components/Loading";
 function MEPageBuilderImplementation() {
   const imagesObject = useSelector((state) => state.getIn(["galleryImages"]));
+  const customPages = useSelector((state) => state.getIn(["customPagesList"]));
   const [requestHandler] = useApiRequest([{ key: "findPages", url: "/community.custom.pages.info" }]);
 
-  const [fetchPage, page, error, loading, setError] = requestHandler || [];
+  const [fetchPage, page, error, loading, setError, setValue, setData] = requestHandler || [];
   const openMediaLibrary = () => {
     console.log("I have opened the media library");
   };
   const { pageId } = fetchParamsFromURL(window.location, "pageId");
 
   const renderPageSettings = () => {
-    return <AdminPageBuilderSettings />;
+    return <AdminPageBuilderSettings data={page} updateData={setData} />;
   };
 
   useEffect(() => {
@@ -28,6 +29,7 @@ function MEPageBuilderImplementation() {
 
   console.log("PAGE_IDS", pageId);
   console.log("LE PAGE", page);
+
   const overrideProperties = {
     [PROPERTY_TYPES.MEDIA]: (props) => {
       const { onPropertyChange, itemProps } = props || {};
@@ -99,8 +101,8 @@ function MEPageBuilderImplementation() {
   if (error) console.log("Error: ", error);
 
   const publishedProps = {
-    published_at: "2021-10-10",
-    published_link: "https://www.google.com"
+    published_at: getHumanFriendlyDate(page?.latest_version?.created_at),
+    published_link: null // TODO: change this when you have the preview link setup
   };
   return (
     <>

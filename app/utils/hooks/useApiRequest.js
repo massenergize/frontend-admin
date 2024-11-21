@@ -76,7 +76,7 @@ export const useApiRequest = (objArrays) => {
           setErrorValue(key, response?.error);
         }
         handleResponse(key, response);
-        cb && cb(response?.data);
+        cb && cb(response);
       })
       .catch((e) => {
         console.log(`useApiError: ${key} => `, e);
@@ -106,6 +106,7 @@ export const useApiRequest = (objArrays) => {
       loading[key],
       (error) => setErrorValue(key, error),
       (value) => setLoadingValue(key, value),
+      (data) => setDataValue(key, data),
       response[key]
     ];
   });

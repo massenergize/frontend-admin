@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./admin-pb-settings.css";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { useSelector } from "react-redux";
@@ -17,10 +17,10 @@ const URLS = {
   CREATE: "/community.custom.pages.create",
   PUBLISH: "/community.custom.pages.publish"
 };
-function AdminPageBuilderSettings() {
+function AdminPageBuilderSettings({ data: passedPage }) {
   const communities = useSelector((state) => state.getIn(["otherCommunities"]));
   const adminCommunities = useSelector((state) => state.getIn(["communities"]));
-  const [form, setform] = useState({ sharing_type: AUDIENCE_TYPES.EVERYONE });
+  const [form, setForm] = useState({ sharing_type: AUDIENCE_TYPES.EVERYONE });
   const [pageUpdateRequestObject] = useApiRequest([{ key: "pageUpdateRequest", url: URLS.UPDATE }]);
 
   const [sendUpdate, data, error, loading, setError] = pageUpdateRequestObject || [];
@@ -29,9 +29,9 @@ function AdminPageBuilderSettings() {
     const { name, value } = e.target || {};
     let extras = {};
     if (name === "title") extras = { slug: slugValue(value) };
-    setform({ ...form, [name]: value, ...extras });
+    setForm({ ...form, [name]: value, ...extras });
   };
-  const { sharing_type: scope, title, slug } = form || {};
+  const { sharing_type: scope, title, slug, audience, community_id } = form || {};
 
   const slugValue = (s) =>
     s
@@ -47,7 +47,16 @@ function AdminPageBuilderSettings() {
     const body = { ...form, audience: form.audience?.map((c) => c.id), community_id };
     sendUpdate(body);
   };
-  console.log("LA DATA", data);
+
+  useEffect(() => {
+    setForm({
+      slug: passedPage?.page?.slug,
+      title: passedPage?.page?.title,
+      sharing_type: passedPage?.sharing_type,
+      audience: passedPage?.audience,
+      community_id: [passedPage?.community]
+    });
+  }, [passedPage?.toString()]);
 
   return (
     <div style={{ padding: 20, maxHeight: "70vh", overflowY: "scroll" }}>
@@ -72,6 +81,7 @@ function AdminPageBuilderSettings() {
             {/* <p>Select the community that owns this page</p> */}
             <LightAutoComplete
               data={adminCommunities}
+              defaultSelected={community_id}
               onChange={(items) => {
                 onChange({ target: { name: "community_id", value: items } });
               }}
@@ -107,6 +117,7 @@ function AdminPageBuilderSettings() {
               <LightAutoComplete
                 multiple
                 data={communities}
+                defaultSelected={audience}
                 onChange={(items) => {
                   onChange({ target: { name: "audience", value: items } });
                 }}
