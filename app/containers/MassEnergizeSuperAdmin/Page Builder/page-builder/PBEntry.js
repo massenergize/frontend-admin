@@ -15,12 +15,19 @@ import PBPublishedRender from "./components/render/PBPublishedRender";
 const PAGE_SETTINGS_KEY = "PAGE_SETTINGS";
 const BLOCK_SELECTOR_PAGE = "BLOCK_SELECTOR_PAGE";
 const PUBLISH_CONFIRMATION_DIALOG = "PUBLISH_CONFIRMATION_DIALOG";
-function PBEntry({ publishedProps, builderOverrides, tinyKey, openMediaLibrary, propsOverride, renderPageSettings }) {
+function PBEntry({
+  footerOverrides,
+  publishedProps,
+  builderOverrides,
+  tinyKey,
+  openMediaLibrary,
+  propsOverride,
+  renderPageSettings
+}) {
   const { modals: modalOverrides } = builderOverrides || {};
   const { Modal, open: openModal, close, modalProps, setModalProps } = usePBModal();
   const [sections, setSection] = useState([]);
   const [blockInFocus, setBlockInFocus] = useState(null);
-  const [outOfFocus, setOutOfFocus] = useState(null);
   const [preview, setPreview] = useState(false);
   const recentlyUsedFieldRef = useRef();
 
@@ -160,6 +167,12 @@ function PBEntry({ publishedProps, builderOverrides, tinyKey, openMediaLibrary, 
     // More to come...
   };
 
+  const save = () => {
+    const { save } = footerOverrides || {};
+    if (save) return save({ sections });
+    console.log("FIRED SAVE FXN");
+  };
+
   return (
     <div className="pb-root">
       <Modal style={{ minHeight: 300 }}>
@@ -197,10 +210,11 @@ function PBEntry({ publishedProps, builderOverrides, tinyKey, openMediaLibrary, 
       )}
 
       <PBFloatingFooter
+        footerOverrides={footerOverrides}
         inPreview={preview}
         sections={sections}
         preview={() => setPreview(!preview)}
-        save={() => console.log("FINAL PAYLOAD: ", sections)}
+        save={save}
         close={closeModalWithKey}
         openPageSettings={() => openSpecificModal(PAGE_SETTINGS_KEY)}
         publish={() => openSpecificModal(PUBLISH_CONFIRMATION_DIALOG)}

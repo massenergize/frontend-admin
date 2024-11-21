@@ -89,17 +89,40 @@ function MEPageBuilderImplementation() {
     }
   };
 
+  const groupPropertyValues = (properties) => {
+    let grouped = {};
+    properties.forEach((prop) => {
+      const { _type, name, value, group } = prop;
+      if (group) grouped = { ...grouped, ...groupPropertyValues(group) };
+      if (name) grouped[name] = { name, type: _type, value: value || null };
+    });
+    return grouped;
+  };
+  const saveToBackend = (props) => {
+    const { sections } = props || {};
+    const mapped = sections.map((section) => {
+      const { options } = section || {};
+      const grouped = groupPropertyValues(section?.block?.properties);
+      return { ...section, properties: null, options: { ...options, _propertValues: grouped } };
+    });
+
+    console.log("These are the mapped sections", mapped);
+  };
   const builderOverrides = {
     modals: {
       [PBEntry.PUBLISH_CONFIRMATION_DIALOG_MODAL_KEY]: () => <AdminPublishConfirmationDialog />
     }
+  };
+
+  const footerOverrides = {
+    save: saveToBackend
   };
   if (loading) return <Loading />;
 
   if (error) console.log("Error: ", error);
 
   const publishedProps = {
-    published_at: getHumanFriendlyDate(page?.latest_version?.created_at),
+    published_at: getHumanFriendlyDate(page?.page?.latest_version?.created_at),
     published_link: null // TODO: change this when you have the link preview setup
   };
   return (
@@ -110,6 +133,7 @@ function MEPageBuilderImplementation() {
         builderOverrides={builderOverrides}
         publishedProps={publishedProps}
         tinyKey={process.env.REACT_APP_TINY_MCE_KEY}
+        footerOverrides={footerOverrides}
       />
     </>
   );

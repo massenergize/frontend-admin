@@ -7,14 +7,13 @@ function PBFloatingFooter({ publish, openPageSettings, close, save, preview, inP
       <div className="pb-footer-content">
         <h6 className="touchable-opacity" role="button" onClick={() => openPageSettings()}>
           <i className="fa fa-cog" style={{ marginRight: 5 }} />
-          Modify Page Settings
+          Page Configuration
         </h6>
         <div className="right-dock">
           <button
             disabled={disabled}
             className="pb-save pb-footer-btn"
             onClick={() => {
-              alert("The 'Save' feature will be implemented soon!");
               save && save();
             }}
           >
