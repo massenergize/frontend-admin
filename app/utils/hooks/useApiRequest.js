@@ -105,6 +105,7 @@ export const useApiRequest = (objArrays) => {
       error[key],
       loading[key],
       (error) => setErrorValue(key, error),
+      (value) => setLoadingValue(key, value),
       response[key]
     ];
   });

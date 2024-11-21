@@ -4,11 +4,11 @@ import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import { APP_LINKS, DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from "../../../utils/constants";
 import { withRouter } from "react-router-dom/cjs/react-router-dom.min";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { reduxToggleUniversalModal } from "../../../redux/redux-actions/adminActions";
 import CopyCustomPageModal, { DeleteCustomPageModalConfirmation } from "./CopyCustomPageModal";
 import { useApiRequest } from "../../../utils/hooks/useApiRequest";
-
+import Loading from "dan-components/Loading";
 const DUMMY_DATA = [
   {
     id: Date.now(),
@@ -52,17 +52,15 @@ const DUMMY_DATA = [
   }
 ];
 function AdminCustomPagesList({ classes }) {
-  const [comListRequester, ffRequester] = useApiRequest([
-    { key: "communityList", url: "communities.listForCommunityAdmin" },
-    { key: "ffList", url: "communities.features.flags.list" },
-  ]);
+  const adminCommunities = useSelector((state) => state.getIn(["communities"]));
 
+  const [customPagesRequestHandler] = useApiRequest([{ key: "customPageList", url: "/community.custom.pages.list" }]);
+  const [fetchPages, data, error, loading, setError, setLoading] = customPagesRequestHandler || [];
   // const { apiRequest, loading, error, data } = comListRequester || {};
   // const [sdkfjlskdf, sdjfklsdf, sdkfjlksjd, sdfjklsdf] = comListRequester || {};
   // const { apiRequest: ffRequest, loading: ffLoading, error: ffError, data: ff } = ffRequester || {};
   const dispatch = useDispatch();
   const toggleModal = (props) => dispatch(reduxToggleUniversalModal(props));
-
 
   const makeColumns = () => {
     return [
@@ -167,7 +165,6 @@ function AdminCustomPagesList({ classes }) {
         </div>
       ];
     });
-
   };
 
   const options = {
@@ -194,6 +191,26 @@ function AdminCustomPagesList({ classes }) {
     }
   };
 
+  useEffect(() => {
+    fetchPages({ community_ids: adminCommunities?.map((c) => c.id) });
+  }, []);
+
+  if (loading) return <Loading />;
+
+  if (error) {
+    return (
+      <Paper style={{ padding: 20 }}>
+        <Typography variant="p" style={{ margin: "10px 0px", color: "red" }}>
+          {error}
+          <p className="touchable-opacity" onClick={() => fetchPages()} style={{ textDecoration: "underline" }}>
+            Retry
+          </p>
+        </Typography>
+      </Paper>
+    );
+  }
+
+  console.log("LETS SEE DATA", data);
   return (
     <div>
       <Paper style={{ padding: 20 }}>
