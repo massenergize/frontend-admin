@@ -9,6 +9,7 @@ import { reduxToggleUniversalModal } from "../../../redux/redux-actions/adminAct
 import CopyCustomPageModal, { DeleteCustomPageModalConfirmation } from "./CopyCustomPageModal";
 import { useApiRequest } from "../../../utils/hooks/useApiRequest";
 import Loading from "dan-components/Loading";
+import { getHumanFriendlyDate } from "../../../utils/common";
 const DUMMY_DATA = [
   {
     id: Date.now(),
@@ -56,9 +57,7 @@ function AdminCustomPagesList({ classes }) {
 
   const [customPagesRequestHandler] = useApiRequest([{ key: "customPageList", url: "/community.custom.pages.list" }]);
   const [fetchPages, data, error, loading, setError, setLoading] = customPagesRequestHandler || [];
-  // const { apiRequest, loading, error, data } = comListRequester || {};
-  // const [sdkfjlskdf, sdjfklsdf, sdkfjlksjd, sdfjklsdf] = comListRequester || {};
-  // const { apiRequest: ffRequest, loading: ffLoading, error: ffError, data: ff } = ffRequester || {};
+
   const dispatch = useDispatch();
   const toggleModal = (props) => dispatch(reduxToggleUniversalModal(props));
 
@@ -118,27 +117,34 @@ function AdminCustomPagesList({ classes }) {
     ];
   };
 
+  console.log("LA DATA", data);
   const fashionData = (data) => {
     return data?.map((d) => {
+      const publishedVersion = d.page.latest_version;
       return [
         // d.id,
-        d.name,
-        d.community,
-        d.creator,
+        d.page?.title,
+        d.community?.name,
+        d.page?.user?.full_name,
         <Link href="#" style={{ fontWeight: "bold" }}>
-          {d.access}
+          {/* {d.access} */}
+          ...
         </Link>,
-        d.published_at,
-        <Link href="#" style={{ fontWeight: "bold" }}>
-          View Published
-        </Link>,
+        publishedVersion ? getHumanFriendlyDate(publishedVersion?.created_at) : "Not Published",
+        publishedVersion ? (
+          <Link href={publishedVersion ? "" : "#"} style={{ fontWeight: "bold" }}>
+            {publishedVersion ? "" : "Not Published"}
+          </Link>
+        ) : (
+          "-"
+        ),
 
         <div>
           <Link
             color={"secondary"}
             style={{ textTransform: "unset", fontWeight: "bold", textDecoration: "none" }}
             target="_blank"
-            href={APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT}
+            href={`${APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT}?pageId=${d?.page?.id}`}
           >
             <i style={{ marginRight: 5 }} className="fa fa-edit" /> Edit
           </Link>
@@ -210,7 +216,6 @@ function AdminCustomPagesList({ classes }) {
     );
   }
 
-  console.log("LETS SEE DATA", data);
   return (
     <div>
       <Paper style={{ padding: 20 }}>
@@ -232,18 +237,6 @@ function AdminCustomPagesList({ classes }) {
             <i style={{ marginRight: 5 }} className="fa fa-plus" /> Create A Custom Page
             {/* {loading && <i className="fa fa-spinner fa-spin" />} */}
           </Link>
-          <Link
-            style={{ textTransform: "unset", fontWeight: "bold", textDecoration: "none", marginLeft: 10 }}
-            target="_blank"
-            href={APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT}
-            onClick={(e) => {
-              e.preventDefault();
-              // ffRequest();
-            }}
-          >
-            <i style={{ marginRight: 5 }} className="fa fa-plus" /> Request FF
-            {/* {ffLoading && <i className="fa fa-spinner fa-spin" />} */}
-          </Link>
         </div>
       </Paper>
       <br />
@@ -253,7 +246,7 @@ function AdminCustomPagesList({ classes }) {
         page={PAGE_PROPERTIES.CUSTOM_PAGES}
         tableProps={{
           title: "All Custom Pages",
-          data: fashionData(DUMMY_DATA),
+          data: fashionData(data),
           columns: makeColumns(),
           options: options
         }}
