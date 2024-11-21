@@ -54,13 +54,15 @@ const DUMMY_DATA = [
 function AdminCustomPagesList({ classes }) {
   const [comListRequester, ffRequester] = useApiRequest([
     { key: "communityList", url: "communities.listForCommunityAdmin" },
-    { key: "ffList", url: "communities.features.flags.list" }
+    { key: "ffList", url: "communities.features.flags.list" },
   ]);
 
-  const { apiRequest, loading, error, data } = comListRequester || {};
-  const { apiRequest: ffRequest, loading: ffLoading, error: ffError, data: ff } = ffRequester || {};
+  // const { apiRequest, loading, error, data } = comListRequester || {};
+  // const [sdkfjlskdf, sdjfklsdf, sdkfjlksjd, sdfjklsdf] = comListRequester || {};
+  // const { apiRequest: ffRequest, loading: ffLoading, error: ffError, data: ff } = ffRequester || {};
   const dispatch = useDispatch();
   const toggleModal = (props) => dispatch(reduxToggleUniversalModal(props));
+
 
   const makeColumns = () => {
     return [
@@ -165,7 +167,9 @@ function AdminCustomPagesList({ classes }) {
         </div>
       ];
     });
+
   };
+
   const options = {
     filterType: "dropdown",
     responsive: "standard",
@@ -205,11 +209,11 @@ function AdminCustomPagesList({ classes }) {
             href={APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT}
             onClick={(e) => {
               e.preventDefault();
-              apiRequest();
+              // apiRequest();
             }}
           >
             <i style={{ marginRight: 5 }} className="fa fa-plus" /> Create A Custom Page
-            {loading && <i className="fa fa-spinner fa-spin" />}
+            {/* {loading && <i className="fa fa-spinner fa-spin" />} */}
           </Link>
           <Link
             style={{ textTransform: "unset", fontWeight: "bold", textDecoration: "none", marginLeft: 10 }}
@@ -217,11 +221,11 @@ function AdminCustomPagesList({ classes }) {
             href={APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT}
             onClick={(e) => {
               e.preventDefault();
-              ffRequest();
+              // ffRequest();
             }}
           >
             <i style={{ marginRight: 5 }} className="fa fa-plus" /> Request FF
-            {ffLoading && <i className="fa fa-spinner fa-spin" />}
+            {/* {ffLoading && <i className="fa fa-spinner fa-spin" />} */}
           </Link>
         </div>
       </Paper>
