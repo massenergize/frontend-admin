@@ -118,8 +118,6 @@ function AdminCustomPagesList({ classes }) {
       }
     ];
   };
-
-  console.log("CUSTOM PAGES", customPagesList);
   const fashionData = (data) => {
     return data?.map((d) => {
       const publishedVersion = d?.page?.latest_version;
@@ -235,10 +233,6 @@ function AdminCustomPagesList({ classes }) {
             style={{ textTransform: "unset", fontWeight: "bold", textDecoration: "none" }}
             target="_blank"
             href={APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT}
-            onClick={(e) => {
-              e.preventDefault();
-              // apiRequest();
-            }}
           >
             <i style={{ marginRight: 5 }} className="fa fa-plus" /> Create A Custom Page
             {/* {loading && <i className="fa fa-spinner fa-spin" />} */}

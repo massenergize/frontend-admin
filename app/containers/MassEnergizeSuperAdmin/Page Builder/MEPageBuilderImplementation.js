@@ -24,10 +24,10 @@ function MEPageBuilderImplementation() {
   };
 
   useEffect(() => {
+    if (!pageId) return;
     fetchPage({ id: pageId });
   }, []);
 
-  console.log("PAGE_IDS", pageId);
   console.log("LE PAGE", page);
 
   const overrideProperties = {

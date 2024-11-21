@@ -3,6 +3,7 @@ import "./admin-pb-settings.css";
 import LightAutoComplete from "../Gallery/tools/LightAutoComplete";
 import { useSelector } from "react-redux";
 import { useApiRequest } from "../../../utils/hooks/useApiRequest";
+import { APP_LINKS } from "../../../utils/constants";
 
 const SPECIFIC = "specific-communities";
 const AUDIENCE_TYPES = { EVERYONE: "OPEN", ONLY_ME: "CLOSE", SPECIFIC_COMMUNITIES: "OPENED_TO" };
@@ -45,16 +46,23 @@ function AdminPageBuilderSettings({ data: passedPage }) {
     if (!title) return setError("Please enter a name for the page");
     if (!slug) return setError("Please enter a slug for the page");
     const body = { ...form, audience: form.audience?.map((c) => c.id), community_id };
-    sendUpdate(body);
+    const isCreating = !form?.id;
+    sendUpdate(body, (response) => {
+      if (response?.success) {
+        const { page } = response?.data || {};
+        if (isCreating) return (window.location.href = `${APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT}?pageId=${page?.id}`);
+      }
+    });
   };
 
   useEffect(() => {
     setForm({
+      id: passedPage?.page?.id,
       slug: passedPage?.page?.slug,
       title: passedPage?.page?.title,
       sharing_type: passedPage?.sharing_type,
       audience: passedPage?.audience,
-      community_id: [passedPage?.community]
+      community_id: passedPage?.community ? [passedPage?.community] : []
     });
   }, [passedPage?.toString()]);
 
@@ -85,8 +93,8 @@ function AdminPageBuilderSettings({ data: passedPage }) {
               onChange={(items) => {
                 onChange({ target: { name: "community_id", value: items } });
               }}
-              valueExtractor={(c) => c.id}
-              labelExtractor={(c) => c.name}
+              valueExtractor={(c) => c?.id}
+              labelExtractor={(c) => c?.name}
             />
           </div>
         </div>
@@ -121,8 +129,8 @@ function AdminPageBuilderSettings({ data: passedPage }) {
                 onChange={(items) => {
                   onChange({ target: { name: "audience", value: items } });
                 }}
-                valueExtractor={(c) => c.id}
-                labelExtractor={(c) => c.name}
+                valueExtractor={(c) => c?.id}
+                labelExtractor={(c) => c?.name}
               />
             </div>
           )}
