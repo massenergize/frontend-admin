@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import PBEntry from "./page-builder/PBEntry";
 import { PBImageSelector, PROPERTY_TYPES } from "./page-builder/components/sidepanels/PBPropertyTypes";
 import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
@@ -13,20 +13,22 @@ function MEPageBuilderImplementation() {
   const customPages = useSelector((state) => state.getIn(["customPagesList"]));
   const [requestHandler] = useApiRequest([{ key: "findPages", url: "/community.custom.pages.info" }]);
 
+  const [builderContent, setPageBuilderContent] = useState({});
   const [fetchPage, page, error, loading, setError, setValue, setData] = requestHandler || [];
 
   const { pageId } = fetchParamsFromURL(window.location, "pageId");
 
   const renderPageSettings = useCallback(() => {
-    return <AdminPageBuilderSettings data={page} updateData={setData} />;
-  }, [page, setData]);
+    return <AdminPageBuilderSettings sections={builderContent?.sections} data={page} updateData={setData} />;
+  }, [page, setData, builderContent?.sections?.toString()]);
 
   useEffect(() => {
     if (!pageId) return;
     fetchPage({ id: pageId });
   }, []);
 
-  console.log("LE PAGE", page);
+  // console.log("LE SECTIONS", builderContent);
+  console.log("PAGE", page);
 
   const overrideProperties = {
     [PROPERTY_TYPES.MEDIA]: (props) => {
@@ -90,13 +92,15 @@ function MEPageBuilderImplementation() {
   };
 
   const saveToBackend = (props) => {
-    const { pruneProperties } = PBEntry.Functions;
+    const { pruneSections } = PBEntry.Functions;
     const { sections, notify } = props || {};
-    const mapped = sections.map((section) => {
-      const { options } = section || {};
-      const grouped = pruneProperties(section?.block?.properties);
-      return { ...section, properties: null, options: { ...options, _propertValues: grouped } };
-    });
+    // const mapped = sections.map((section) => {
+    //   const { options } = section || {};
+    //   const grouped = pruneProperties(section?.block?.properties);
+    //   return { ...section, properties: null, options: { ...options, _propertValues: grouped } };
+    // });
+
+    const mapped = pruneSections(sections);
 
     notify({ type: "error", message: "Y'all just be clicking me any how, what's your problem?" });
 
@@ -122,6 +126,7 @@ function MEPageBuilderImplementation() {
   return (
     <>
       <PBEntry
+        onChange={setPageBuilderContent}
         renderPageSettings={renderPageSettings}
         propsOverride={overrideProperties}
         builderOverrides={builderOverrides}

@@ -7,3 +7,12 @@ export const pruneProperties = (properties) => {
     });
     return grouped;
   };
+
+
+  export const pruneSections = (sections) => { 
+    return sections.map((section) => {
+      const { options } = section || {};
+      const grouped = pruneProperties(section?.block?.properties);
+      return { ...section, properties: null, options: { ...options, _propertValues: grouped } };
+    });
+  }

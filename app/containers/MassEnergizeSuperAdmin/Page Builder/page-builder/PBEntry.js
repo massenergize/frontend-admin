@@ -12,7 +12,7 @@ import PBPageSettings from "./pages/PBPageSettings";
 import { BLOCKS } from "./utils/engine/blocks";
 import { PROPERTY_TYPES } from "./components/sidepanels/PBPropertyTypes";
 import PBPublishedRender from "./components/render/PBPublishedRender";
-import { pruneProperties } from "./utils/pb-utils";
+import { pruneProperties, pruneSections } from "./utils/pb-utils";
 const PAGE_SETTINGS_KEY = "PAGE_SETTINGS";
 const BLOCK_SELECTOR_PAGE = "BLOCK_SELECTOR_PAGE";
 const PUBLISH_CONFIRMATION_DIALOG = "PUBLISH_CONFIRMATION_DIALOG";
@@ -23,7 +23,8 @@ function PBEntry({
   tinyKey,
   openMediaLibrary,
   propsOverride,
-  renderPageSettings
+  renderPageSettings,
+  onChange
 }) {
   const { modals: modalOverrides } = builderOverrides || {};
   const { Modal, open: openModal, close, modalProps, setModalProps } = usePBModal();
@@ -110,6 +111,15 @@ function PBEntry({
     setSection(newSection);
     close();
   };
+
+  const transfer = (key, value) => {
+    let content = {};
+    if (key) content = { [key]: value || null };
+    if (onChange) onChange({ sections, ...content });
+  };
+  useEffect(() => {
+    transfer();
+  }, [sections?.toString()]);
 
   const openSpecificModal = (modalKey, options) => {
     setModalProps({ ...modalProps, modalKey });
@@ -228,6 +238,7 @@ PBEntry.PAGE_SETTINGS_MODAL_KEY = PAGE_SETTINGS_KEY;
 PBEntry.BLOCK_SELECTOR_MODAL_KEY = BLOCK_SELECTOR_PAGE;
 PBEntry.PUBLISH_CONFIRMATION_DIALOG_MODAL_KEY = PUBLISH_CONFIRMATION_DIALOG;
 PBEntry.Functions = {
-  pruneProperties
+  pruneProperties,
+  pruneSections
 };
 export default PBEntry;
