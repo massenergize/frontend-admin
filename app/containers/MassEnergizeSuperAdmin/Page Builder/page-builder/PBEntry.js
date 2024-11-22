@@ -209,7 +209,7 @@ function PBEntry({
     <div className="pb-root">
       <Modal style={{ minHeight: 300 }}>
         {/* {IS_PAGE_SETTINGS ? pageSettings() : <PBBlockContainer onItemSelected={selectBlock} />} */}
-        {renderMComponent()}
+        {renderMComponent({ closeModal: close })}
       </Modal>
       {preview ? (
         <PBPublishedRender sections={sections} />
