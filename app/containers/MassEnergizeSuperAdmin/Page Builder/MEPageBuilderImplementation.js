@@ -11,10 +11,14 @@ import Loading from "dan-components/Loading";
 function MEPageBuilderImplementation() {
   const imagesObject = useSelector((state) => state.getIn(["galleryImages"]));
   const customPages = useSelector((state) => state.getIn(["customPagesList"]));
-  const [requestHandler] = useApiRequest([{ key: "findPages", url: "/community.custom.pages.info" }]);
+  const [requestHandler, pageSaveHandler] = useApiRequest([
+    { key: "findPages", url: "/community.custom.pages.info" },
+    { key: "saveOrUpdate", url: "/community.custom.pages.update" }
+  ]);
 
   const [builderContent, setPageBuilderContent] = useState({});
   const [fetchPage, page, error, loading, setError, setValue, setData] = requestHandler || [];
+  const [savePageFunction, _, errorAfterSave] = pageSaveHandler || [];
 
   const { pageId } = fetchParamsFromURL(window.location, "pageId");
 
@@ -93,18 +97,26 @@ function MEPageBuilderImplementation() {
 
   const saveToBackend = (props) => {
     const { pruneSections } = PBEntry.Functions;
-    const { sections, notify } = props || {};
-    // const mapped = sections.map((section) => {
-    //   const { options } = section || {};
-    //   const grouped = pruneProperties(section?.block?.properties);
-    //   return { ...section, properties: null, options: { ...options, _propertValues: grouped } };
-    // });
-
+    const { sections, notify, openPageSettings, setLoading } = props || {};
+    const id = page?.page?.id;
+    if (!id) {
+      console.log("User is creating for the first time...");
+      notify({ type: "error", message: "Please provide a name for the page (Page Configuration)" });
+      return openPageSettings();
+    }
     const mapped = pruneSections(sections);
+    notify();
+    setLoading(true);
+    const body = { id, content: JSON.stringify(mapped) };
+    // savePageFunction(body, (response) => {
+    //   setLoading(false);
+    //   if (!response?.success) return notify({ type: "error", message: response?.error });
+    //   notify({ type: "success", message: "Page saved successfully!" });
+    //   setData(response?.data);
+    // });
+    // notify({ type: "success", message: "Boom saved successfully!" });
 
-    notify({ type: "error", message: "Y'all just be clicking me any how, what's your problem?" });
-
-    console.log("These are the mapped sections", mapped);
+    // console.log("PAGE ID DEY, WE ARE ALL MAPPED =>", mapped);
   };
   const builderOverrides = {
     modals: {

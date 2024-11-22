@@ -3,7 +3,7 @@ import "./assets/css/pb-index.css";
 import PBSidePanel from "./components/sidepanels/PBSidePanel";
 import PBBottomSheet from "./components/bottom-sheet/PBBottomSheet";
 import PBModal from "./components/modal/PBModal";
-function PBCanvas({ children, publishedProps, notification }) {
+function PBCanvas({ children, publishedProps, notification, setNotification }) {
   const { published_at, published_link } = publishedProps || {};
   const IS_ERROR = notification && notification.type === "error";
 
@@ -40,7 +40,12 @@ function PBCanvas({ children, publishedProps, notification }) {
       )}
       {notification && (
         <p className={`pb-canvas-notification pb-${IS_ERROR ? "dangerous" : "success"}-note`}>
-          {notification?.message}
+          {notification?.message}{" "}
+          <i
+            className="fa fa-times touchable-opacity"
+            style={{ marginLeft: "auto" }}
+            onClick={() => setNotification(null)}
+          />
         </p>
       )}
 

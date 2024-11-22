@@ -16,6 +16,9 @@ import { pruneProperties, pruneSections } from "./utils/pb-utils";
 const PAGE_SETTINGS_KEY = "PAGE_SETTINGS";
 const BLOCK_SELECTOR_PAGE = "BLOCK_SELECTOR_PAGE";
 const PUBLISH_CONFIRMATION_DIALOG = "PUBLISH_CONFIRMATION_DIALOG";
+export const PBKEYS = {
+  FOOTER: { SAVING: "SAVING", PUBLISHING: "PUBLISHING", PREVIEWING: "PREVIEWING" }
+};
 function PBEntry({
   footerOverrides,
   publishedProps,
@@ -32,8 +35,12 @@ function PBEntry({
   const [blockInFocus, setBlockInFocus] = useState(null);
   const [preview, setPreview] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [loadingStates, setLoadingStates] = useState({});
   const recentlyUsedFieldRef = useRef();
 
+  const setLoading = (key, value) => {
+    setLoadingStates({ ...loadingStates, [key]: value });
+  };
   const updateFocus = (oldBlock, newBlock) => {
     setBlockInFocus(newBlock);
     // setOutOfFocus(oldBlock);
@@ -181,7 +188,13 @@ function PBEntry({
 
   const save = () => {
     const { save } = footerOverrides || {};
-    if (save) return save({ sections, notify: setNotification });
+    if (save)
+      return save({
+        setLoading: (value) => setLoading(PBKEYS.FOOTER.SAVING, value),
+        sections,
+        notify: setNotification,
+        openPageSettings: () => openSpecificModal(PAGE_SETTINGS_KEY)
+      });
   };
 
   return (
@@ -194,7 +207,7 @@ function PBEntry({
         <PBPublishedRender sections={sections} />
       ) : (
         <>
-          <PBCanvas notification={notification} publishedProps={publishedProps}>
+          <PBCanvas setNotification={setNotification} notification={notification} publishedProps={publishedProps}>
             <PBSection
               readOnly={preview}
               blockInFocus={blockInFocus}
@@ -221,6 +234,7 @@ function PBEntry({
       )}
 
       <PBFloatingFooter
+        loadingStates={loadingStates || {}}
         footerOverrides={footerOverrides}
         inPreview={preview}
         sections={sections}
@@ -241,4 +255,5 @@ PBEntry.Functions = {
   pruneProperties,
   pruneSections
 };
+PBEntry.KEYS = PBKEYS;
 export default PBEntry;

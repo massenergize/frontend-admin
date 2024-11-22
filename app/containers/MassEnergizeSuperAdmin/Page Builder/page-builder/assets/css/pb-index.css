@@ -19,6 +19,9 @@ h2 {
   text-align: center;
   padding: 10px 20px;
   font-size: 15px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .pb-dangerous-note {
@@ -27,7 +30,7 @@ h2 {
 }
 .pb-success-note {
   color: green;
-  background-color: #5fff5f26;
+  background-color: #29bf2926;
 }
 .pb-r-t {
   margin: 10px 0px;
