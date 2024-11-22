@@ -132,7 +132,6 @@ function PBEntry({
 
   useEffect(() => {
     const configureForUser = data?.content;
-    console.log("configureForUser", configureForUser);
     setSection(data?.content || []);
   }, [data?.content?.toString()]);
 
