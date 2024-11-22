@@ -12,7 +12,7 @@ import PBPageSettings from "./pages/PBPageSettings";
 import { BLOCKS } from "./utils/engine/blocks";
 import { PROPERTY_TYPES } from "./components/sidepanels/PBPropertyTypes";
 import PBPublishedRender from "./components/render/PBPublishedRender";
-import { pruneProperties, pruneSections } from "./utils/pb-utils";
+import { pruneProperties, pruneSections, reconfigurePruned } from "./utils/pb-utils";
 const PAGE_SETTINGS_KEY = "PAGE_SETTINGS";
 const BLOCK_SELECTOR_PAGE = "BLOCK_SELECTOR_PAGE";
 const PUBLISH_CONFIRMATION_DIALOG = "PUBLISH_CONFIRMATION_DIALOG";
@@ -27,7 +27,8 @@ function PBEntry({
   openMediaLibrary,
   propsOverride,
   renderPageSettings,
-  onChange
+  onChange,
+  data
 }) {
   const { modals: modalOverrides } = builderOverrides || {};
   const { Modal, open: openModal, close, modalProps, setModalProps } = usePBModal();
@@ -124,14 +125,22 @@ function PBEntry({
     if (key) content = { [key]: value || null };
     if (onChange) onChange({ sections, ...content });
   };
+
   useEffect(() => {
     transfer();
   }, [sections?.toString()]);
+
+  useEffect(() => {
+    const configureForUser = data?.content;
+    console.log("configureForUser", configureForUser);
+    setSection(data?.content || []);
+  }, [data?.content?.toString()]);
 
   const openSpecificModal = (modalKey, options) => {
     setModalProps({ ...modalProps, modalKey });
     openModal({ ...(options || {}), modalKey });
   };
+
   const closeModalWithKey = () => {
     setModalProps({ ...modalProps, modalKey: null });
     close();
@@ -253,7 +262,8 @@ PBEntry.BLOCK_SELECTOR_MODAL_KEY = BLOCK_SELECTOR_PAGE;
 PBEntry.PUBLISH_CONFIRMATION_DIALOG_MODAL_KEY = PUBLISH_CONFIRMATION_DIALOG;
 PBEntry.Functions = {
   pruneProperties,
-  pruneSections
+  pruneSections,
+  reconfigurePruned
 };
 PBEntry.KEYS = PBKEYS;
 export default PBEntry;

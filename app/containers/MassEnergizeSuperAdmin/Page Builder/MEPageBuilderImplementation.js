@@ -108,15 +108,12 @@ function MEPageBuilderImplementation() {
     notify();
     setLoading(true);
     const body = { id, content: JSON.stringify(mapped) };
-    // savePageFunction(body, (response) => {
-    //   setLoading(false);
-    //   if (!response?.success) return notify({ type: "error", message: response?.error });
-    //   notify({ type: "success", message: "Page saved successfully!" });
-    //   setData(response?.data);
-    // });
-    // notify({ type: "success", message: "Boom saved successfully!" });
-
-    // console.log("PAGE ID DEY, WE ARE ALL MAPPED =>", mapped);
+    savePageFunction(body, (response) => {
+      setLoading(false);
+      if (!response?.success) return notify({ type: "error", message: response?.error });
+      notify({ type: "success", message: "Page saved successfully!" });
+      setData(response?.data);
+    });
   };
   const builderOverrides = {
     modals: {
@@ -139,6 +136,7 @@ function MEPageBuilderImplementation() {
     <>
       <PBEntry
         onChange={setPageBuilderContent}
+        data={{ content: PBEntry.Functions.reconfigurePruned(page?.page?.content) }}
         renderPageSettings={renderPageSettings}
         propsOverride={overrideProperties}
         builderOverrides={builderOverrides}
