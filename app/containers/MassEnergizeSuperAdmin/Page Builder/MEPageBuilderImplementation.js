@@ -89,22 +89,16 @@ function MEPageBuilderImplementation() {
     }
   };
 
-  const groupPropertyValues = (properties) => {
-    let grouped = {};
-    properties.forEach((prop) => {
-      const { _type, name, value, group } = prop;
-      if (group) grouped = { ...grouped, ...groupPropertyValues(group) };
-      if (name) grouped[name] = { name, type: _type, value: value || null };
-    });
-    return grouped;
-  };
   const saveToBackend = (props) => {
-    const { sections } = props || {};
+    const { pruneProperties } = PBEntry.Functions;
+    const { sections, notify } = props || {};
     const mapped = sections.map((section) => {
       const { options } = section || {};
-      const grouped = groupPropertyValues(section?.block?.properties);
+      const grouped = pruneProperties(section?.block?.properties);
       return { ...section, properties: null, options: { ...options, _propertValues: grouped } };
     });
+
+    notify({ type: "error", message: "Y'all just be clicking me any how, what's your problem?" });
 
     console.log("These are the mapped sections", mapped);
   };

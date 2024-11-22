@@ -3,8 +3,10 @@ import "./assets/css/pb-index.css";
 import PBSidePanel from "./components/sidepanels/PBSidePanel";
 import PBBottomSheet from "./components/bottom-sheet/PBBottomSheet";
 import PBModal from "./components/modal/PBModal";
-function PBCanvas({ children, publishedProps }) {
+function PBCanvas({ children, publishedProps, notification }) {
   const { published_at, published_link } = publishedProps || {};
+  const IS_ERROR = notification && notification.type === "error";
+
   return (
     <div className="pb-canvas">
       {publishedProps && (
@@ -35,6 +37,11 @@ function PBCanvas({ children, publishedProps }) {
             )}
           </div>
         </div>
+      )}
+      {notification && (
+        <p className={`pb-canvas-notification pb-${IS_ERROR ? "dangerous" : "success"}-note`}>
+          {notification?.message}
+        </p>
       )}
 
       {children}

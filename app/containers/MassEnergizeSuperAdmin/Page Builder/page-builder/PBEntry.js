@@ -12,6 +12,7 @@ import PBPageSettings from "./pages/PBPageSettings";
 import { BLOCKS } from "./utils/engine/blocks";
 import { PROPERTY_TYPES } from "./components/sidepanels/PBPropertyTypes";
 import PBPublishedRender from "./components/render/PBPublishedRender";
+import { pruneProperties } from "./utils/pb-utils";
 const PAGE_SETTINGS_KEY = "PAGE_SETTINGS";
 const BLOCK_SELECTOR_PAGE = "BLOCK_SELECTOR_PAGE";
 const PUBLISH_CONFIRMATION_DIALOG = "PUBLISH_CONFIRMATION_DIALOG";
@@ -29,6 +30,7 @@ function PBEntry({
   const [sections, setSection] = useState([]);
   const [blockInFocus, setBlockInFocus] = useState(null);
   const [preview, setPreview] = useState(false);
+  const [notification, setNotification] = useState(null);
   const recentlyUsedFieldRef = useRef();
 
   const updateFocus = (oldBlock, newBlock) => {
@@ -169,8 +171,7 @@ function PBEntry({
 
   const save = () => {
     const { save } = footerOverrides || {};
-    if (save) return save({ sections });
-    console.log("FIRED SAVE FXN");
+    if (save) return save({ sections, notify: setNotification });
   };
 
   return (
@@ -183,7 +184,7 @@ function PBEntry({
         <PBPublishedRender sections={sections} />
       ) : (
         <>
-          <PBCanvas publishedProps={publishedProps}>
+          <PBCanvas notification={notification} publishedProps={publishedProps}>
             <PBSection
               readOnly={preview}
               blockInFocus={blockInFocus}
@@ -226,4 +227,7 @@ function PBEntry({
 PBEntry.PAGE_SETTINGS_MODAL_KEY = PAGE_SETTINGS_KEY;
 PBEntry.BLOCK_SELECTOR_MODAL_KEY = BLOCK_SELECTOR_PAGE;
 PBEntry.PUBLISH_CONFIRMATION_DIALOG_MODAL_KEY = PUBLISH_CONFIRMATION_DIALOG;
+PBEntry.Functions = {
+  pruneProperties
+};
 export default PBEntry;

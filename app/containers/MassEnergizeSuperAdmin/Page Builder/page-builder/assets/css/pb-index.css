@@ -12,6 +12,23 @@ h2 {
   all: unset;
 } */
 
+.pb-canvas-notification {
+  width: 100%;
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
+  padding: 10px 20px;
+  font-size: 15px;
+}
+
+.pb-dangerous-note {
+  color: #c14e4e;
+  background-color: #ff000014;
+}
+.pb-success-note {
+  color: green;
+  background-color: #5fff5f26;
+}
 .pb-r-t {
   margin: 10px 0px;
   color: #0b9edc;
@@ -94,5 +111,5 @@ h2 {
   border: 1px solid #ededed;
   border-radius: 3px;
   margin-bottom: 10px;
-  font-size:14px;
+  font-size: 14px;
 }
