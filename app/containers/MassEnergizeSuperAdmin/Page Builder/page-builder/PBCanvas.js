@@ -9,7 +9,7 @@ function PBCanvas({ children, publishedProps, notification, setNotification }) {
 
   return (
     <div className="pb-canvas">
-      {published_at && published_link && (
+      {published_at && (
         <div
           style={{
             marginBottom: 10,

@@ -228,13 +228,23 @@ function AdminCustomPagesList({ classes }) {
           Here you can create pages for resource guides, and other topics on your your community sites. You can also set
           which communities can make copies of your pages.
         </Typography>
-        <div style={{ marginTop: 10 }}>
+        <div style={{ marginTop: 10, display: "flex", flexDirection: "row" }}>
           <Link
             style={{ textTransform: "unset", fontWeight: "bold", textDecoration: "none" }}
             target="_blank"
             href={APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT}
           >
             <i style={{ marginRight: 5 }} className="fa fa-plus" /> Create A Custom Page
+            {/* {loading && <i className="fa fa-spinner fa-spin" />} */}
+          </Link>
+          <Link
+            className="touchable-opacity"
+            style={{ textTransform: "unset", fontWeight: "bold", textDecoration: "none", marginLeft: "auto" }}
+            target="_blank"
+            // href={APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT}
+            onClick={() => fetchPages()}
+          >
+            <i style={{ marginRight: 5 }} className="fa fa-refresh" /> Refresh Table
             {/* {loading && <i className="fa fa-spinner fa-spin" />} */}
           </Link>
         </div>

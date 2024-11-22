@@ -140,7 +140,7 @@ function MEPageBuilderImplementation() {
 
   const publishedProps = useMemo(
     () => ({
-      published_at: getHumanFriendlyDate(page?.page?.latest_version?.created_at),
+      published_at: getHumanFriendlyDate(page?.page?.latest_version?.created_at, true, false),
       published_link: null // TODO: change this when you have the link preview setup
     }),
     [page?.page?.toString()]
