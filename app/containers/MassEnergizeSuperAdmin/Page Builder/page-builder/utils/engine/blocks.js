@@ -70,6 +70,14 @@ export const RichText = (props) => {
       doc.write(`
         <html>
           <head>
+            <style>
+              @import url("https://fonts.googleapis.com/css?family=Google+Sans:400,400i,500,500i,600,600i,700,700i,900,900i");
+              @import url("https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i,700,700i");
+              @import url("https://fonts.googleapis.com/css?family=Nunito:400,500,700");
+              body {
+                font-family: "Google Sans", "Roboto", sans-serif;
+              }
+            </style>
           </head>
           <body>${__html || "<p>Add your rich text here...</p>"}</body>
         </html>

@@ -15,24 +15,6 @@ function PBPublishedRender({ sections }) {
     [sections]
   );
 
-  // useEffect(() => {
-  //   const adjustHeight = () => {
-  //     if (iframeRef.current && iframeRef.current.contentWindow) {
-  //       const iframeDocument = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
-  //       const height = iframeDocument.body.scrollHeight;
-  //       contRef.current.style.height = height + "px";
-  //       iframeRef.current.style.height = iframeDocument.body.scrollHeight + "px";
-  //     }
-  //   };
-  //   // Adjust height initially and when content changes
-  //   iframeRef.current.onload = adjustHeight;
-  //   return () => {
-  //     if (iframeRef.current) {
-  //       iframeRef.current.onload = null;
-  //     }
-  //   };
-  // }, []);
-
   useEffect(() => {
     if (iframeRef?.current) {
       const doc = iframeRef.current?.contentDocument || iframeRef.current?.contentWindow?.document;
@@ -40,6 +22,14 @@ function PBPublishedRender({ sections }) {
       doc.write(`
         <html>
           <head>
+          <style>
+            @import url("https://fonts.googleapis.com/css?family=Google+Sans:400,400i,500,500i,600,600i,700,700i,900,900i");
+            @import url("https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i,700,700i");
+            @import url("https://fonts.googleapis.com/css?family=Nunito:400,500,700");
+            body {
+              font-family: "Google Sans", "Roboto", sans-serif;
+            }
+          </style>  
           </head>
           <body>${html}</body>
         </html>

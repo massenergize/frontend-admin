@@ -16,10 +16,6 @@ function TinMCE({ height, onChange, onFocused, focus, ...props }) {
       <div style={{ marginTop: 20 }} />
       <TinyEditor
         ref={ref}
-        onInit={(editor) => {
-          //   let ed = editor?.target?.editorCommands || {};
-          //   setEditor(ed?.editor);
-        }}
         {...props}
         onFocus={onFocused}
         onEditorChange={handleOnChange}
@@ -31,7 +27,16 @@ function TinMCE({ height, onChange, onFocused, focus, ...props }) {
           default_link_target: "_blank",
           force_br_newlines: true,
           force_p_newlines: false,
-          forced_root_block: "" // Needed for 3.x
+          forced_root_block: "", // Needed for 3.x
+          font_formats: "Google Sans='Google Sans';",
+          font_default: "Google Sans",
+          content_style: `
+            @import url('https://fonts.googleapis.com/css?family=Google+Sans:400,400i,500,500i,600,600i,700,700i,900,900i&display=swap');
+            body { 
+              font-family: Google Sans, sans-serif; 
+              font-size: 14px; 
+            }
+          `
         }}
         apiKey={props?.apiKey}
       />

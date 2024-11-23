@@ -12,18 +12,16 @@ function TinyMassEnergizeEditor(props) {
   useEffect(() => {
     if (!image || !editor) return;
     editor.insertContent &&
-      editor.insertContent(
-        `<img style='object-fit:contain;' src="${image}" alt="Google Image" />`
-      );
+      editor.insertContent(`<img style='object-fit:contain;' src="${image}" alt="Google Image" />`);
   }, [image]);
 
   const config = {
     setup: (editor) => {
       editor.ui.registry.addButton("media_library", {
         text: "Media Library",
-        onAction: () => setOpen(true),
+        onAction: () => setOpen(true)
       });
-    },
+    }
   };
   const handleEditorChange = (content, _editor) => {
     setEditor(_editor);
@@ -47,6 +45,7 @@ function TinyMassEnergizeEditor(props) {
           let ed = editor?.target?.editorCommands || {};
           setEditor(ed?.editor);
         }}
+        
         {...props}
         onEditorChange={handleEditorChange}
         toolbar="undo redo | blocks | formatselect | media_library | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | link | bullist numlist outdent indent | fontfamily | fontsize |"
@@ -59,7 +58,7 @@ function TinyMassEnergizeEditor(props) {
           force_p_newlines: false,
           forced_root_block: "", // Needed for 3.x
           ...config,
-          placeholder: "Enter text here ....",
+          placeholder: "Enter text here ...."
         }}
         apiKey={TINY_MCE_API_KEY}
       />

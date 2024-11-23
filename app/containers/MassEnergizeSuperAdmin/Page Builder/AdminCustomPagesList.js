@@ -10,6 +10,8 @@ import CopyCustomPageModal, { DeleteCustomPageModalConfirmation } from "./CopyCu
 import { useApiRequest } from "../../../utils/hooks/useApiRequest";
 import Loading from "dan-components/Loading";
 import { getHumanFriendlyDate } from "../../../utils/common";
+import { Helmet } from "react-helmet";
+import brand from "dan-api/dummy/brand";
 const DUMMY_DATA = [
   {
     id: Date.now(),
@@ -148,7 +150,7 @@ function AdminCustomPagesList({ classes }) {
           >
             <i style={{ marginRight: 5 }} className="fa fa-edit" /> Edit
           </Link>
-          <Link
+          {/* <Link
             color="secondary"
             style={{ textTransform: "unset", fontWeight: "bold", textDecoration: "none", marginLeft: 10 }}
             target="_blank"
@@ -166,7 +168,7 @@ function AdminCustomPagesList({ classes }) {
             }}
           >
             <i style={{ marginRight: 5 }} className="fa fa-copy" /> Copy
-          </Link>
+          </Link> */}
         </div>
       ];
     });
@@ -222,6 +224,9 @@ function AdminCustomPagesList({ classes }) {
 
   return (
     <div>
+      <Helmet>
+        <title>{brand.name} | Custom Pages</title>
+      </Helmet>
       <Paper style={{ padding: 20 }}>
         <Typography variant="h6">Manage your custom pages</Typography>
         <Typography variant="p" style={{ margin: "10px 0px" }}>
