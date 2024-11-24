@@ -110,7 +110,7 @@ function PBSidePanel({
             value={value || ""}
             onChange={onEditorChange}
             apiKey={tinyKey}
-            height={heightIsToggled ? 500 : 300}
+            height={heightIsToggled ? 800 : 600}
           />
         </div>
       </BottomSheet>

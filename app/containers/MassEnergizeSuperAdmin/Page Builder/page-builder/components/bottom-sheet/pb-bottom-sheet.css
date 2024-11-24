@@ -1,3 +1,12 @@
+.bg-btm-sheet-ghost {
+  background-color: #0000007d;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1509;
+}
 .pb-bottom-sheet {
   position: fixed;
   bottom: 0;

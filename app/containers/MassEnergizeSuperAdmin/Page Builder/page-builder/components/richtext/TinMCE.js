@@ -22,7 +22,7 @@ function TinMCE({ height, onChange, onFocused, focus, ...props }) {
         toolbar="undo redo | blocks | formatselect| bold italic backcolor forecolor|  link | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | fontfamily | fontsize |"
         plugins="advlist media_library autolink lists link charmap print preview anchor forecolor"
         init={{
-          height: height || 300,
+          height: height || 600,
           menubar: false,
           default_link_target: "_blank",
           force_br_newlines: true,
