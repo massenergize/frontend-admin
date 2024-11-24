@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Editor as TinyEditor } from "@tinymce/tinymce-react";
+import { debounce } from "../../utils/engine/engine";
 function TinMCE({ height, onChange, onFocused, focus, ...props }) {
+  const [value, setValue] = useState("");
   const handleOnChange = (content, editor) => {
-    // console.log("LEts se what content, editor", content, editor);
     onChange && onChange({ content, editor });
   };
   const ref = useRef();
@@ -11,14 +12,23 @@ function TinMCE({ height, onChange, onFocused, focus, ...props }) {
       ref.current.focus();
     }
   }, [focus]);
+
+  useEffect(() => {
+    setValue(props?.value);
+  }, []);
   return (
     <div style={{ padding: 10 }}>
       <div style={{ marginTop: 20 }} />
       <TinyEditor
         ref={ref}
+        onBlur={() => {
+          onChange && onChange({ content: value });
+        }}
         {...props}
+        value={value}
         onFocus={onFocused}
-        onEditorChange={handleOnChange}
+        // onEditorChange={handleOnChange}
+        onEditorChange={(content, editor) => setValue(content)}
         toolbar="undo redo | blocks | formatselect| bold italic backcolor forecolor|  link | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | fontfamily | fontsize |"
         plugins="advlist media_library autolink lists link charmap print preview anchor forecolor"
         init={{

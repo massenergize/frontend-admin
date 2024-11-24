@@ -10,15 +10,18 @@ import { fetchParamsFromURL, getHumanFriendlyDate } from "../../../utils/common"
 import Loading from "dan-components/Loading";
 function MEPageBuilderImplementation() {
   const imagesObject = useSelector((state) => state.getIn(["galleryImages"]));
-  const customPages = useSelector((state) => state.getIn(["customPagesList"]));
-  const [requestHandler, pageSaveHandler] = useApiRequest([
-    { key: "findPages", url: "/community.custom.pages.info" },
-    { key: "saveOrUpdate", url: "/community.custom.pages.update" }
-  ]);
-
+  // const customPages = useSelector((state) => state.getIn(["customPagesList"]));
+  const admin = useSelector((state) => state.getIn(["auth"]));
   const [builderContent, setPageBuilderContent] = useState({});
+
+  const [requestHandler, pageSaveHandler, mediaRequestHandler] = useApiRequest([
+    { key: "findPages", url: "/community.custom.pages.info" },
+    { key: "saveOrUpdate", url: "/community.custom.pages.update" },
+    { key: "addMedia", url: "/gallery.add" }
+  ]);
   const [fetchPage, page, error, loading, setError, setValue, setData] = requestHandler || [];
   const [savePageFunction] = pageSaveHandler || [];
+  const [saveNewImage] = mediaRequestHandler || [];
 
   const { pageId } = fetchParamsFromURL(window.location, "pageId");
 
@@ -33,6 +36,24 @@ function MEPageBuilderImplementation() {
 
   console.log("PAGE", page);
 
+  const uploadMedia = useCallback(
+    (props) => {
+      const { files, setNotification } = props || {};
+      const file = (files || [])[0];
+      console.log("The props from media", props);
+      const body = {
+        user_id: admin?.id,
+        file, 
+        community_ids: []
+      };
+      saveNewImage(body, (response) => {
+        console.log("HERE IS THE RESPONSE AFTER UPLAOD", response);
+        if (response?.error) return setNotification({ type: "error", message: response?.error });
+      });
+    },
+    [admin]
+  );
+
   const overrideProperties = useMemo(
     () => ({
       [PROPERTY_TYPES.MEDIA]: (props) => {
@@ -40,7 +61,8 @@ function MEPageBuilderImplementation() {
 
         return (
           <MediaLibrary
-            excludeTabs={[MediaLibrary.Tabs.UPLOAD_TAB]}
+            onUpload={uploadMedia}
+            // excludeTabs={[MediaLibrary.Tabs.UPLOAD_TAB]}
             images={imagesObject?.images}
             onInsert={(item) => {
               const [image] = item || [];

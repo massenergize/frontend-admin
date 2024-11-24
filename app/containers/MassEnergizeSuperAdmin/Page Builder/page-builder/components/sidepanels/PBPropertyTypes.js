@@ -1,6 +1,6 @@
-import React, { forwardRef, useEffect, useRef } from "react";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
 import PBDropdown from "../dropdown/PBDropdown";
-import { remove } from "lodash";
+import { remove, set } from "lodash";
 
 export const PROPERTY_TYPES = {
   INPUT: "input",
@@ -35,6 +35,7 @@ export const PBInputGroup = (props) => {
   );
 };
 export const PBInput = (props) => {
+  // const [valueObj, setValue] = useState({});
   const {
     propIsObj,
     propAccessor,
@@ -59,12 +60,20 @@ export const PBInput = (props) => {
     }
   }, [focus]);
 
+  // useEffect(() => {
+  //   setValue({ rawValue: value });
+  // }, []);
+  // const { rawValue } = valueObj || {};
   return (
     <div className="flex-row align-center">
       <div className="pb-textbox" style={{ marginRight: 10, width: "100%" }}>
         <label>{label || "..."}</label>
         <br />
         <input
+          // onBlur={() => {
+          //   console.log("This is what you are taking ou", valueObj);
+          //   onChange && onChange(valueObj);
+          // }}
           ref={ref}
           onFocus={onFocus}
           name={name}
@@ -83,6 +92,7 @@ export const PBInput = (props) => {
             })
           }
           type={type}
+          // value={rawValue || ""}
           value={value || ""}
           placeholder={placeholder}
         />

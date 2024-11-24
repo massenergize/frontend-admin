@@ -5,6 +5,16 @@ const X = "x";
 const Y = "y";
 export const DIRECTIONS = { X, Y };
 
+export function debounce(func, delay) {
+  let timeout;
+
+  return function (...args) {
+    clearTimeout(timeout); // Clear the previous timeout
+    timeout = setTimeout(() => {
+      func.apply(this, args); // Call the function after the delay
+    }, delay);
+  };
+}
 const layoutFlow = (direction, serialize = false) => {
   // let directionKey = serialize ? "flex-direction" : "flexDirection";
 
