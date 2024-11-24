@@ -106,7 +106,11 @@ function AdminPageBuilderSettings({ data: passedPage, updateData, sections }) {
               data={adminCommunities}
               defaultSelected={community_id}
               onChange={(items) => {
-                onChange({ target: { name: "community_id", value: items } });
+                let value;
+                const lastIndex = items?.length - 1;
+                if (items?.length > 1) value = [items[lastIndex]];
+                else value = items;
+                onChange({ target: { name: "community_id", value } });
               }}
               valueExtractor={(c) => c?.id}
               labelExtractor={(c) => c?.name}

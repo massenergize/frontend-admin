@@ -4,7 +4,7 @@ import { useApiRequest } from "../../../utils/hooks/useApiRequest";
 import { APP_LINKS } from "../../../utils/constants";
 
 function AdminPublishConfirmationDialog({ data, closeModal }) {
-  const [publishHandler] = useApiRequest([{ key: "publishPage", url: "/custom.page.publish" }]);
+  const [publishHandler] = useApiRequest([{ key: "publishPage", url: "/custom.pages.publish" }]);
   const [publishPage, _, error, loading, setError, setValue, setData] = publishHandler || [];
 
   const { page } = data || {};
