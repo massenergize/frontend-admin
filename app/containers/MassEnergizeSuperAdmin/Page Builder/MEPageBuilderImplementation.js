@@ -131,9 +131,14 @@ function MEPageBuilderImplementation() {
     [page?.page?.toString()]
   );
 
+  const publishPage = ({ defaultFunction }) => {
+    if (!page?.page?.id) return console.log("Please create a page first...");
+    defaultFunction && defaultFunction();
+  };
   const footerOverrides = useMemo(
     () => ({
-      save: saveToBackend
+      save: saveToBackend,
+      publish: publishPage
     }),
     [saveToBackend]
   );

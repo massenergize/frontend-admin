@@ -1,5 +1,5 @@
 import { Button, Link, Paper, Typography, withStyles } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import METable from "../ME  Tools/table /METable";
 import { PAGE_PROPERTIES } from "../ME  Tools/MEConstants";
 import { APP_LINKS, DEFAULT_ITEMS_PER_PAGE, DEFAULT_ITEMS_PER_PAGE_OPTIONS } from "../../../utils/constants";
@@ -59,8 +59,12 @@ function AdminCustomPagesList({ classes }) {
   const customPagesList = useSelector((state) => state.getIn(["customPagesList"]));
 
   const dispatch = useDispatch();
-  const [customPagesRequestHandler] = useApiRequest([{ key: "customPageList", url: "/community.custom.pages.list" }]);
+  const [customPagesRequestHandler, deleteRequestHandler] = useApiRequest([
+    { key: "customPageList", url: "/community.custom.pages.list" },
+    { key: "deletePages", url: "/community.custom.pages.delete" }
+  ]);
   const [fetchPages, data, error, loading, setError, setLoading] = customPagesRequestHandler || [];
+  const [deletePage, dataAfterDelete, deleteError, delLoading] = deleteRequestHandler || [];
 
   const putCustomPagesInRedux = (pages) => dispatch(reduxLoadCustomPages(pages));
   const toggleModal = (props) => dispatch(reduxToggleUniversalModal(props));
@@ -174,37 +178,52 @@ function AdminCustomPagesList({ classes }) {
     });
   };
 
-  const options = {
-    filterType: "dropdown",
-    responsive: "standard",
-    print: true,
-    rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
-    rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
-    // count: metaData && metaData.count,
-    // confirmFilters: true,
-    onRowsDelete: (rowsDeleted) => {
-      toggleModal({
-        show: true,
-        noTitle: true,
-        fullControl: true,
-        // title: "Copy Custom Page",
-        component: <DeleteCustomPageModalConfirmation />
-      });
-      // const idsToDelete = rowsDeleted.data;
-      // idsToDelete.forEach((d) => {
-      //   const email = data[d.dataIndex][2];
-      //   apiCall("/teams.removeMember", { team_id: team.id, email });
-      // });
-    }
+  const doDeletion = (dIndexArr) => {
+    const indexes = dIndexArr?.map((d) => d.dataIndex);
+    const ids = indexes?.map((i) => customPagesList[i]?.page?.id);
+    const rem = customPagesList?.filter((p) => !ids.includes(p?.page?.id));
+    putCustomPagesInRedux(rem);
+    // TODO:  Send request to retrieve from Api when tahiru does the "multiple" functionality
   };
 
-  useEffect(() => {
-    if (customPagesList?.length) return;
+  const options = useMemo(
+    () => ({
+      filterType: "dropdown",
+      responsive: "standard",
+      print: true,
+      rowsPerPage: DEFAULT_ITEMS_PER_PAGE,
+      rowsPerPageOptions: DEFAULT_ITEMS_PER_PAGE_OPTIONS,
+      onRowsDelete: (rowsDeleted) => {
+        const data = rowsDeleted?.data;
+        const deleteable = data?.map((d) => customPagesList[d.dataIndex]);
+        toggleModal({
+          show: true,
+          noTitle: true,
+          fullControl: true,
+          renderComponent: (props) => (
+            <DeleteCustomPageModalConfirmation data={deleteable} deleteFunction={() => doDeletion(data)} {...props} />
+          )
+        });
+      }
+    }),
+    [customPagesList?.toString()]
+  );
+
+  const fetchAllPages = () => {
     fetchPages({ community_ids: adminCommunities?.map((c) => c.id) }, (response) => {
       if (response?.success) {
         putCustomPagesInRedux(response?.data);
       }
     });
+  };
+  useEffect(() => {
+    if (customPagesList?.length) return;
+    // fetchPages({ community_ids: adminCommunities?.map((c) => c.id) }, (response) => {
+    //   if (response?.success) {
+    //     putCustomPagesInRedux(response?.data);
+    //   }
+    // });
+    fetchAllPages();
   }, []);
 
   if (loading) return <Loading />;
@@ -214,7 +233,7 @@ function AdminCustomPagesList({ classes }) {
       <Paper style={{ padding: 20 }}>
         <Typography variant="p" style={{ margin: "10px 0px", color: "red" }}>
           {error}
-          <p className="touchable-opacity" onClick={() => fetchPages()} style={{ textDecoration: "underline" }}>
+          <p className="touchable-opacity" onClick={() => fetchAllPages()} style={{ textDecoration: "underline" }}>
             Retry
           </p>
         </Typography>
@@ -230,8 +249,8 @@ function AdminCustomPagesList({ classes }) {
       <Paper style={{ padding: 20 }}>
         <Typography variant="h6">Manage your custom pages</Typography>
         <Typography variant="p" style={{ margin: "10px 0px" }}>
-          Here you can create pages for resource guides, and other topics on your your community sites. You can also set
-          which communities can make copies of your pages.
+          Create pages for resource guides, and other topics on your your community sites. You can also set which
+          communities can make copies of your pages.
         </Typography>
         <div style={{ marginTop: 10, display: "flex", flexDirection: "row" }}>
           <Link
@@ -247,7 +266,7 @@ function AdminCustomPagesList({ classes }) {
             style={{ textTransform: "unset", fontWeight: "bold", textDecoration: "none", marginLeft: "auto" }}
             target="_blank"
             // href={APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT}
-            onClick={() => fetchPages()}
+            onClick={() => fetchAllPages()}
           >
             <i style={{ marginRight: 5 }} className="fa fa-refresh" /> Refresh Table
             {/* {loading && <i className="fa fa-spinner fa-spin" />} */}

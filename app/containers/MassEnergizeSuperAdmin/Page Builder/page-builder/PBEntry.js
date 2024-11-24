@@ -204,6 +204,17 @@ function PBEntry({
         openPageSettings: () => openSpecificModal(PAGE_SETTINGS_KEY)
       });
   };
+  const publishPage = () => {
+    const { publish } = footerOverrides || {};
+    if (publish)
+      return publish({
+        setLoading: (value) => setLoading(PBKEYS.FOOTER.PUBLISHING, value),
+        sections,
+        notify: setNotification,
+        defaultFunction: () => openSpecificModal(PUBLISH_CONFIRMATION_DIALOG),
+        openPageSettings: () => openSpecificModal(PAGE_SETTINGS_KEY)
+      });
+  };
 
   return (
     <div className="pb-root">
@@ -250,7 +261,7 @@ function PBEntry({
         save={save}
         close={closeModalWithKey}
         openPageSettings={() => openSpecificModal(PAGE_SETTINGS_KEY)}
-        publish={() => openSpecificModal(PUBLISH_CONFIRMATION_DIALOG)}
+        publish={publishPage}
       />
     </div>
   );
