@@ -128,12 +128,11 @@ function PBEntry({
 
   useEffect(() => {
     transfer();
-  }, [sections?.toString()]);
+  }, [sections]);
 
   useEffect(() => {
-    const configureForUser = data?.content;
     setSection(data?.content || []);
-  }, [data?.content?.toString()]);
+  }, []);
 
   const openSpecificModal = (modalKey, options) => {
     setModalProps({ ...modalProps, modalKey });
@@ -181,7 +180,7 @@ function PBEntry({
 
       return OBJ[key] || (() => <i style={{ padding: 10 }}> Could not access the modal you were looking for...</i>);
     },
-    [sections?.toString(), selectBlock, modalOverrides?.toString(), pageSettings]
+    [sections, selectBlock, modalOverrides, pageSettings]
   );
 
   const renderMComponent = useMemo(() => getModalComponentWithKey(modalProps?.modalKey), [

@@ -24,7 +24,7 @@ function MEPageBuilderImplementation() {
 
   const renderPageSettings = useCallback(() => {
     return <AdminPageBuilderSettings sections={builderContent?.sections} data={page} updateData={setData} />;
-  }, [page, setData, builderContent?.sections?.toString()]);
+  }, [page, setData, builderContent?.sections]);
 
   useEffect(() => {
     if (!pageId) return;
@@ -148,7 +148,7 @@ function MEPageBuilderImplementation() {
       published_at: getHumanFriendlyDate(page?.page?.latest_version?.created_at, true, false),
       published_link: null // TODO: change this when you have the link preview setup
     }),
-    [page?.page?.toString()]
+    [page?.page]
   );
   // -------------------------------------------------- RENDER ------------------------------------------------
   if (loading) return <Loading />;

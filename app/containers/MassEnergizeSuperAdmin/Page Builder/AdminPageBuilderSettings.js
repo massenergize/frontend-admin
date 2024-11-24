@@ -43,17 +43,21 @@ function AdminPageBuilderSettings({ data: passedPage, updateData, sections }) {
 
   const makeRequest = () => {
     const { pruneSections } = PBEntry.Functions;
-    const community_id = form.community_id?.[0]?.id;
+    const community_id = form.community_id?.[0]?.id || null;
     if (!community_id) return setError("Please select a community to own this page");
     if (!title) return setError("Please enter a name for the page");
     if (!slug) return setError("Please enter a slug for the page");
+
+    console.log("BEFORE PRUNNING", sections);
+    console.log("PRUNED", pruneSections(sections));
     const body = {
       ...form,
       audience: form.audience?.map((c) => c.id),
       community_id,
       content: JSON.stringify(pruneSections(sections))
     };
-    console.log("BODY BEFORE FLIGHT", body);
+
+    // console.log("BODY BEFORE FLIGHT", body);
     const isCreating = !form?.id;
     sendUpdate(body, (response) => {
       if (response?.success) {

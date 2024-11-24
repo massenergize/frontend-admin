@@ -95,13 +95,13 @@ function AdminCustomPagesList({ classes }) {
           filter: false
         }
       },
-      {
-        name: "Access",
-        key: "access",
-        options: {
-          filter: false
-        }
-      },
+      // {
+      //   name: "Access",
+      //   key: "access",
+      //   options: {
+      //     filter: false
+      //   }
+      // },
       {
         name: "Last Published",
         key: "last-published",
@@ -109,13 +109,13 @@ function AdminCustomPagesList({ classes }) {
           filter: false
         }
       },
-      {
-        name: "Preview",
-        key: "preview",
-        options: {
-          filter: false
-        }
-      },
+      // {
+      //   name: "Preview",
+      //   key: "preview",
+      //   options: {
+      //     filter: false
+      //   }
+      // },
 
       {
         name: "Actions",
@@ -132,18 +132,18 @@ function AdminCustomPagesList({ classes }) {
         d?.page?.title,
         d?.community?.name,
         d?.page?.user?.full_name,
-        <Link href="#" style={{ fontWeight: "bold" }}>
-          {/* {d.access} */}
-          ...
-        </Link>,
+        // <Link href="#" style={{ fontWeight: "bold" }}>
+        //   {/* {d.access} */}
+        //   ...
+        // </Link>,
         publishedVersion ? getHumanFriendlyDate(publishedVersion?.created_at) : "Not Published",
-        publishedVersion ? (
-          <Link href={publishedVersion ? "" : "#"} style={{ fontWeight: "bold" }}>
-            {publishedVersion ? "" : "Not Published"}
-          </Link>
-        ) : (
-          "-"
-        ),
+        // publishedVersion ? (
+        //   <Link href={publishedVersion ? "" : "#"} style={{ fontWeight: "bold" }}>
+        //     {publishedVersion ? "" : "Not Published"}
+        //   </Link>
+        // ) : (
+        //   "-"
+        // ),
 
         <div>
           <Link
