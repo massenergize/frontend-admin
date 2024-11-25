@@ -315,8 +315,8 @@ export const RICH_TEXT_PROPS = [
     // placeholder: "Enter text here...",
     propAccessor: "__html"
   },
-  ...BASIC_PROPS, 
-  ...BACKGROUND_PROPS,
+  ...BASIC_PROPS,
+  ...BACKGROUND_PROPS
 ];
 
 export const TITLE_PROPS = [
@@ -343,8 +343,8 @@ export const IMAGE_PROPS = [
     name: "fill",
     text: "Image Fill",
     accessor: "objectFit",
-    value: "cover",
-    _resetValue: "cover",
+    value: "contain",
+    _resetValue: "contain",
     data: [
       { name: "Fill", value: "cover" },
       { name: "Show as is", value: "contain" }

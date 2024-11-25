@@ -64,7 +64,7 @@ function AdminCustomPagesList({ classes }) {
     { key: "deletePages", url: "/community.custom.pages.delete" }
   ]);
   const [fetchPages, data, error, loading, setError, setLoading] = customPagesRequestHandler || [];
-  const [deletePage, dataAfterDelete, deleteError, delLoading] = deleteRequestHandler || [];
+  const [deletePages, dataAfterDelete, deleteError, delLoading] = deleteRequestHandler || [];
 
   const putCustomPagesInRedux = (pages) => dispatch(reduxLoadCustomPages(pages));
   const toggleModal = (props) => dispatch(reduxToggleUniversalModal(props));
@@ -183,6 +183,10 @@ function AdminCustomPagesList({ classes }) {
     const ids = indexes?.map((i) => customPagesList[i]?.page?.id);
     const rem = customPagesList?.filter((p) => !ids.includes(p?.page?.id));
     putCustomPagesInRedux(rem);
+    deletePages({ id: ids }, (response) => {
+      console.log(response);
+      if (!response?.success) return;
+    });
     // TODO:  Send request to retrieve from Api when tahiru does the "multiple" functionality
   };
 
@@ -201,7 +205,12 @@ function AdminCustomPagesList({ classes }) {
           noTitle: true,
           fullControl: true,
           renderComponent: (props) => (
-            <DeleteCustomPageModalConfirmation data={deleteable} deleteFunction={() => doDeletion(data)} {...props} />
+            <DeleteCustomPageModalConfirmation
+              loading={delLoading}
+              data={deleteable}
+              deleteFunction={() => doDeletion(data)}
+              {...props}
+            />
           )
         });
       }

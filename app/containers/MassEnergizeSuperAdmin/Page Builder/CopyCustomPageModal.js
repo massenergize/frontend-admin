@@ -33,7 +33,7 @@ function CopyCustomPageModal({ close }) {
 
 export default CopyCustomPageModal;
 
-export function DeleteCustomPageModalConfirmation({ close, deleteFunction, data }) {
+export function DeleteCustomPageModalConfirmation({ loading, close, deleteFunction, data }) {
   const closeModal = () => close && close();
   return (
     <div
@@ -53,6 +53,7 @@ export function DeleteCustomPageModalConfirmation({ close, deleteFunction, data 
             No
           </Button>
           <Button
+            loading={loading}
             onClick={() => {
               deleteFunction();
               closeModal();
@@ -60,7 +61,7 @@ export function DeleteCustomPageModalConfirmation({ close, deleteFunction, data 
             color="success"
             variant="contained"
           >
-            Yes
+            {loading ? <i className=" fa fa-spinner fa-spin" style={{ marginRight: 5 }} /> : "Yes"}
           </Button>
         </div>
       </div>
