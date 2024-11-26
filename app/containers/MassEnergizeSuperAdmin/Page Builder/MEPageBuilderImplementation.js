@@ -5,23 +5,29 @@ import MediaLibrary from "../ME  Tools/media library/MediaLibrary";
 import { useSelector } from "react-redux";
 import AdminPageBuilderSettings from "./AdminPageBuilderSettings";
 import AdminPublishConfirmationDialog from "./AdminPublishConfirmationDialog";
-import { useApiRequest } from "../../../utils/hooks/useApiRequest";
+import { useApiRequest, useSimpleRequest } from "../../../utils/hooks/useApiRequest";
 import { fetchParamsFromURL, getHumanFriendlyDate } from "../../../utils/common";
 import Loading from "dan-components/Loading";
+import { apiCall } from "../../../utils/messenger";
 function MEPageBuilderImplementation() {
   const imagesObject = useSelector((state) => state.getIn(["galleryImages"]));
   // const customPages = useSelector((state) => state.getIn(["customPagesList"]));
   const admin = useSelector((state) => state.getIn(["auth"]));
   const [builderContent, setPageBuilderContent] = useState({});
 
-  const [requestHandler, pageSaveHandler, mediaRequestHandler] = useApiRequest([
+  const [requestHandler, pageSaveHandler, mediaRequestHandler, galleryFetchHandler] = useApiRequest([
     { key: "findPages", url: "/community.custom.pages.info" },
     { key: "saveOrUpdate", url: "/community.custom.pages.update" },
-    { key: "addMedia", url: "/gallery.add" }
+    { key: "addMedia", url: "/gallery.add" },
+    { key: "fetchImages", url: "/gallery.search" }
   ]);
+  const [fetchImages, loadedImages, e, l, se, sl, updateImages] = useSimpleRequest({
+    url: "/gallery.search",
+    body: { my_uploads: true }
+  });
+  const [saveNewImage, _, __, saveLoading] = useSimpleRequest({ url: "/gallery.add" });
   const [fetchPage, page, error, loading, setError, setValue, setData] = requestHandler || [];
   const [savePageFunction] = pageSaveHandler || [];
-  const [saveNewImage] = mediaRequestHandler || [];
 
   const { pageId } = fetchParamsFromURL(window.location, "pageId");
 
@@ -30,30 +36,33 @@ function MEPageBuilderImplementation() {
   }, [page, setData, builderContent?.sections]);
 
   useEffect(() => {
+    fetchImages();
     if (!pageId) return;
     fetchPage({ id: pageId });
   }, []);
 
-  console.log("PAGE", page);
-
   const uploadMedia = useCallback(
     (props) => {
-      const { files, setNotification } = props || {};
+      const { files, setNotification, insertSelectedImages } = props || {};
       const file = (files || [])[0];
-      console.log("The props from media", props);
       const body = {
         user_id: admin?.id,
-        file, 
+        file,
         community_ids: []
       };
       saveNewImage(body, (response) => {
-        console.log("HERE IS THE RESPONSE AFTER UPLAOD", response);
-        if (response?.error) return setNotification({ type: "error", message: response?.error });
+        const image = response?.data?.image;
+        if (image) {
+          insertSelectedImages([response?.data?.image]);
+          updateImages({ ...loadedImages, images: [image, ...loadedImages?.images] });
+        }
+        // if (response?.error) return setNotification({ type: "error", message: response?.error });
       });
     },
-    [admin]
+    [admin?.id?.toString(), loadedImages]
   );
 
+  const listOfImages = useMemo(() => loadedImages?.images || [], [loadedImages?.images]);
   const overrideProperties = useMemo(
     () => ({
       [PROPERTY_TYPES.MEDIA]: (props) => {
@@ -62,8 +71,8 @@ function MEPageBuilderImplementation() {
         return (
           <MediaLibrary
             onUpload={uploadMedia}
-            excludeTabs={[MediaLibrary.Tabs.UPLOAD_TAB]}
-            images={imagesObject?.images}
+            // excludeTabs={[MediaLibrary.Tabs.UPLOAD_TAB]}
+            images={listOfImages}
             onInsert={(item) => {
               const [image] = item || [];
               if (!image) return console.log("Did not select any image...");
@@ -73,7 +82,7 @@ function MEPageBuilderImplementation() {
               });
             }}
             customRender={({ openLibrary }) => {
-              if (!imagesObject?.images)
+              if (!listOfImages || saveLoading)
                 return (
                   <div
                     style={{
@@ -116,7 +125,7 @@ function MEPageBuilderImplementation() {
         );
       }
     }),
-    [imagesObject?.images?.toString()]
+    [listOfImages, saveLoading]
   );
 
   const saveToBackend = useCallback(
@@ -140,7 +149,7 @@ function MEPageBuilderImplementation() {
         setData(response?.data);
       });
     },
-    [page?.toString()]
+    [page]
   );
   const builderOverrides = useMemo(
     () => ({
@@ -150,7 +159,7 @@ function MEPageBuilderImplementation() {
         )
       }
     }),
-    [page?.page?.toString()]
+    [page?.page]
   );
 
   const publishPage = ({ defaultFunction }) => {

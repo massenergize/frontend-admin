@@ -1,36 +1,42 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { apiCall } from "../messenger";
 
-// export const useApiRequest = ({ url, method, body, headers }) => {
-//   const [loading, setLoading] = useState(false);
-//   const [data, setData] = useState(null);
-//   const [response, setResponse] = useState(null);
-//   const [error, setError] = useState(null);
+export const useSimpleRequest = ({ url, body: initialBody, ...rest }) => {
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null);
+  const [response, setResponse] = useState(null);
+  const [error, setError] = useState(null);
 
-//   const handleResponse = (response) => {
-//     setData(response?.data);
-//     setResponse(response);
-//   };
-//   const apiRequest = useCallback(() => {
-//     setLoading(true);
-//     setError(null);
-//     apiCall(url, body)
-//       .then((response) => {
-//         setLoading(false);
-//         if (!response?.success) {
-//           setError(response?.error);
-//         }
-//         handleResponse(response);
-//       })
-//       .catch((e) => {
-//         console.log("useApiError: ", e);
-//         setLoading(false);
-//         setError(e?.toString());
-//       });
-//   }, [url, body]);
+  const handleResponse = (response) => {
+    setData(response?.data);
+    setResponse(response);
+  };
+  const apiRequest = useCallback(
+    (body, cb, options) => {
+      setLoading(true);
+      setError(null);
+      apiCall(url, body || initialBody)
+        .then((response) => {
+          setLoading(false);
+          if (!response?.success) {
+            setError(response?.error);
+          }
+          handleResponse(response);
+          cb && cb(response);
+        })
+        .catch((e) => {
+          console.log("useSimpleRequestError: ", e);
+          setLoading(false);
+          setError(e?.toString());
+          cb && cb(null, e?.toString());
+        });
+    },
+    [url, initialBody]
+  );
 
-//   return { error, loading, apiRequest, data, response };
-// };
+  // return { error, loading, apiRequest, data, response };
+  return [apiRequest, data, error, loading, setError, setLoading, setData, response];
+};
 /**
  *
  * @param {*} objArrays
@@ -65,7 +71,7 @@ export const useApiRequest = (objArrays) => {
     setResponse({ ...response, [key]: value });
   };
 
-  const apiRequest = (body, cb, options) => {
+  const apiRequest = useCallback((body, cb, options) => {
     const { url, key } = options || {};
     setLoadingValue(key, true);
     setErrorValue(key, null);
@@ -84,7 +90,7 @@ export const useApiRequest = (objArrays) => {
         setErrorValue(key, e?.toString());
         cb && cb(null, e?.toString());
       });
-  };
+  }, []);
 
   // return objArrays.map((obj) => {
   //   const key = obj?.key;

@@ -346,8 +346,9 @@ export const IMAGE_PROPS = [
     value: "contain",
     _resetValue: "contain",
     data: [
-      { name: "Fill", value: "cover" },
-      { name: "Show as is", value: "contain" }
+      { name: "Show as is", value: "contain" },
+      { name: "Fill", value: "cover" }
+
       // { name: "Right", value: "flex-end" }
     ]
   }
