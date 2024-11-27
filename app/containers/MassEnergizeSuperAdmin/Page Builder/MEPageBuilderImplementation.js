@@ -11,23 +11,20 @@ import Loading from "dan-components/Loading";
 import { apiCall } from "../../../utils/messenger";
 function MEPageBuilderImplementation() {
   const imagesObject = useSelector((state) => state.getIn(["galleryImages"]));
-  // const customPages = useSelector((state) => state.getIn(["customPagesList"]));
   const admin = useSelector((state) => state.getIn(["auth"]));
   const [builderContent, setPageBuilderContent] = useState({});
 
-  const [requestHandler, pageSaveHandler, mediaRequestHandler, galleryFetchHandler] = useApiRequest([
-    { key: "findPages", url: "/community.custom.pages.info" },
-    { key: "saveOrUpdate", url: "/community.custom.pages.update" },
-    { key: "addMedia", url: "/gallery.add" },
-    { key: "fetchImages", url: "/gallery.search" }
-  ]);
   const [fetchImages, loadedImages, e, l, se, sl, updateImages] = useSimpleRequest({
     url: "/gallery.search",
     body: { my_uploads: true }
   });
   const [saveNewImage, _, __, saveLoading] = useSimpleRequest({ url: "/gallery.add" });
-  const [fetchPage, page, error, loading, setError, setValue, setData] = requestHandler || [];
-  const [savePageFunction] = pageSaveHandler || [];
+  const [fetchPage, page, error, loading, setError, setValue, setData] = useSimpleRequest({
+    url: "/community.custom.pages.info"
+  });
+  const [savePageFunction] = useSimpleRequest({ url: "/community.custom.pages.update" });
+
+  // -------------------------------------------------- FUNCTIONS ------------------------------------------------
 
   const { pageId } = fetchParamsFromURL(window.location, "pageId");
 
@@ -184,10 +181,53 @@ function MEPageBuilderImplementation() {
   // -------------------------------------------------- RENDER ------------------------------------------------
   if (loading) return <Loading />;
 
-  if (error) console.log("Error: ", error);
+  // if (error) {
+  //   return (
+  //     // <div style={{ color: "red", padding: 20, borderRadius: 10, textAlign: "center" }}>
+  //     //   <h6> Error: {error} </h6>
+  //     // </div>
+  //     <p className={`pb-canvas-notification pb-dangerous`}>
+  //       {error}{" "}
+  //       <i className="fa fa-times touchable-opacity" style={{ marginLeft: "auto" }} onClick={() => setError(null)} />
+  //     </p>
+  //   );
+  //   // console.log("Error: ", error);
+  // }
 
   return (
     <>
+      {error && (
+        <div
+          style={{
+            width: "100%",
+            position: "fixed",
+            top: 10,
+            zIndex: "30000",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <p
+            className={`elevate-float`}
+            style={{
+              fontWeight: "bold",
+
+              padding: "10px 20px",
+              color: "#c14e4e",
+              backgroundColor: "#ff000014",
+              borderRadius: 5,
+              width: "fit-content",
+              marginLeft: "-21%"
+            }}
+          >
+            {/* Lets see what the error will look like */}
+            {error}{" "}
+            <i className="fa fa-times touchable-opacity" style={{ marginLeft: 10 }} onClick={() => setError(null)} />
+          </p>
+        </div>
+      )}
       <PBEntry
         onChange={setPageBuilderContent}
         data={{ content: PBEntry.Functions.reconfigurePruned(page?.page?.content) }}

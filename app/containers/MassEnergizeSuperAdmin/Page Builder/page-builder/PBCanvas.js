@@ -39,14 +39,16 @@ function PBCanvas({ children, publishedProps, notification, setNotification }) {
         </div>
       )}
       {notification && (
-        <p className={`pb-canvas-notification pb-${IS_ERROR ? "dangerous" : "success"}-note`}>
-          {notification?.message}{" "}
-          <i
-            className="fa fa-times touchable-opacity"
-            style={{ marginLeft: "auto" }}
-            onClick={() => setNotification(null)}
-          />
-        </p>
+        <div className="pb-canvas-not-wrapper">
+          <p className={`pb-canvas-notification pb-${IS_ERROR ? "dangerous" : "success"}-note`}>
+            {notification?.message}{" "}
+            <i
+              className="fa fa-times touchable-opacity"
+              style={{ marginLeft: "auto" }}
+              onClick={() => setNotification(null)}
+            />
+          </p>
+        </div>
       )}
 
       {children}
