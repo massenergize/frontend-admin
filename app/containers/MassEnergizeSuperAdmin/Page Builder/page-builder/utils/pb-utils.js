@@ -14,9 +14,13 @@ export const pruneSections = (sections) => {
   // This function detaches the bulky properties array from the sections so that the payload of an api request will be small
   // While doing that, it keeps track of the value of each property so that it can be reattached later
   return sections.map((section) => {
-    const { options } = section || {};
+    const { options, block } = section || {};
     const grouped = pruneProperties(section?.block?.properties);
-    return { ...section, properties: null, options: { ...options, _propertValues: grouped } };
+    return {
+      ...section,
+      block: { ...(block || {}), properties: null },
+      options: { ...options, _propertValues: grouped }
+    };
   });
 };
 

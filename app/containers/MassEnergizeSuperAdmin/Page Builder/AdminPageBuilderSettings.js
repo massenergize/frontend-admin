@@ -48,8 +48,6 @@ function AdminPageBuilderSettings({ data: passedPage, updateData, sections }) {
     if (!title) return setError("Please enter a name for the page");
     if (!slug) return setError("Please enter a slug for the page");
 
-    console.log("BEFORE PRUNNING", sections);
-    console.log("PRUNED", pruneSections(sections));
     const body = {
       ...form,
       audience: form.audience?.map((c) => c.id),
@@ -57,7 +55,6 @@ function AdminPageBuilderSettings({ data: passedPage, updateData, sections }) {
       content: JSON.stringify(pruneSections(sections))
     };
 
-    // console.log("BODY BEFORE FLIGHT", body);
     const isCreating = !form?.id;
     sendUpdate(body, (response) => {
       if (response?.success) {
