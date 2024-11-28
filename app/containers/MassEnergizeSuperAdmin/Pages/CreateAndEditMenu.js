@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import { reduxAddInternalLinkList } from "../../../redux/redux-actions/adminActions";
 import Loading from "dan-components/Loading";
-import { isValidURL } from "../../../utils/common";
+import { fetchParamsFromURL, isValidURL } from "../../../utils/common";
 
 function CreateAndEditMenu({ data, cancel, insertNewLink, children, isEdit }) {
   const [form, setForm] = useState({});
@@ -16,6 +16,8 @@ function CreateAndEditMenu({ data, cancel, insertNewLink, children, isEdit }) {
   const internalLinks = useSelector((state) => state.getIn(["internalLinks"]));
   const keepInRedux = (data) => dispatch(reduxAddInternalLinkList(data));
   const isParent = children?.length;
+
+  const { comId } = fetchParamsFromURL(window.location, "comId");
 
   useEffect(() => {
     setForm(data);
@@ -32,7 +34,7 @@ function CreateAndEditMenu({ data, cancel, insertNewLink, children, isEdit }) {
 
   const fetchInternalLinks = () => {
     setLoading(true);
-    apiCall("links.internal.get")
+    apiCall("links.internal.get", { community_ids: [comId] })
       .then((response) => {
         setLoading(false);
         if (!response?.success) {

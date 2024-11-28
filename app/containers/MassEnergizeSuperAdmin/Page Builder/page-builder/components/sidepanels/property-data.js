@@ -273,7 +273,7 @@ export const BUTTON_PROPS = [
     name: "url",
     // placeholder: "0",
     type: "text",
-    label: "Add URL",
+    label: "Add URL (http or https://...)",
     placeholder: "Example: https://massenergize.org...",
     _resetValue: "",
     propAccessor: "href"
@@ -292,7 +292,7 @@ export const LINK_PROPS = [
     name: "url",
     // placeholder: "0",
     type: "text",
-    label: "URL Definition",
+    label: "Define URl like this (http or https://...)",
     placeholder: "Insert link here...",
     _resetValue: "",
     propAccessor: "href"

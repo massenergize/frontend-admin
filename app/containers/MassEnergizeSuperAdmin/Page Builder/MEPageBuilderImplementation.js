@@ -10,7 +10,7 @@ import { fetchParamsFromURL, getHumanFriendlyDate } from "../../../utils/common"
 import Loading from "dan-components/Loading";
 import { apiCall } from "../../../utils/messenger";
 function MEPageBuilderImplementation() {
-  const imagesObject = useSelector((state) => state.getIn(["galleryImages"]));
+  // const imagesObject = useSelector((state) => state.getIn(["galleryImages"]));
   const admin = useSelector((state) => state.getIn(["auth"]));
   const [builderContent, setPageBuilderContent] = useState({});
 

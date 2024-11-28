@@ -239,12 +239,12 @@ module.exports = [
     name: "Pages",
     icon: "ios-people",
     child: [
-      {
-        key: "create-custom-page",
-        icon: "ios-plus",
-        name: "Create Page",
-        link: APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT
-      },
+      // {
+      //   key: "create-custom-page",
+      //   icon: "ios-plus",
+      //   name: "Create Page",
+      //   link: APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT
+      // },
       {
         key: "all-custom-pages",
         icon: "ios-list",

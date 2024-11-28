@@ -208,12 +208,12 @@ const CADMIN_MENU = [
     name: "Pages",
     icon: "ios-paper",
     child: [
-      {
-        key: "create-custom-page",
-        name: "Create Page",
-        link: APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT,
-        target: "_blank"
-      },
+      // {
+      //   key: "create-custom-page",
+      //   name: "Create Page",
+      //   link: APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT,
+      //   target: "_blank"
+      // },
       {
         key: "all-custom-pages",
         name: "All My Custom Pages",

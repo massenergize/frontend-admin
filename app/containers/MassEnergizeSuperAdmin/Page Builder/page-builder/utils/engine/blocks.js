@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import {
   BUTTON_PROPS,
   IMAGE_PROPS,
@@ -26,7 +26,6 @@ export const BLOCKS = [
   // { name: "Icon", icon: "fa-circle-o", key: "icon", template: ICON_BLOCK, properties: DEFAULT_PROPERTIES }
 ];
 
-
 export const Div = (props) => {
   const { children, ...rest } = props || {};
   return <div {...rest}>{children}</div>;
@@ -41,6 +40,7 @@ export const Paragraph = (props) => {
   const { children, ...rest } = props || {};
   return <p {...rest}>{children}</p>;
 };
+
 export const RichText = (props) => {
   const iframeRef = useRef();
   const { children, __html, style, ...rest } = props || {};
@@ -95,6 +95,7 @@ export const RichText = (props) => {
     </div>
   );
 };
+
 export const Title = (props) => {
   const { children, ...rest } = props || {};
   return <h2 {...rest}>{children}</h2>;
@@ -106,14 +107,30 @@ export const Span = (props) => {
 export const Link = (props) => {
   const { children, style, ...rest } = props || {};
   return (
-    <a target="_blank" style={{ width: "fit-content", ...(style || {}) }} {...rest}>
+    <a target="_blank" style={{ ...(style || {}) }} {...rest}>
       {children}
     </a>
   );
 };
 export const Button = (props) => {
-  const { children, text, ...rest } = props || {};
-  return <a {...rest}>{text || children}</a>;
+  const { children, text, style, ...rest } = props || {};
+  const { alignItems, justifyContent, ...remStyles } = style || {};
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        width: "100%",
+        // Intentionally swapped...
+        alignItems: justifyContent || "flex-start",
+        justifyContent: alignItems || "flex-start"
+      }}
+    >
+      <a style={{ alignItems: "center", justifyContent: "center", ...(remStyles || {}) }} {...rest}>
+        {text || children}
+      </a>
+    </div>
+  );
 };
 export const Icon = (props) => {
   const { faIcon, ...rest } = props || {};
