@@ -8,7 +8,7 @@ export const DIRECTIONS = { X, Y };
 export function debounce(func, delay) {
   let timeout;
 
-  return function (...args) {
+  return function(...args) {
     clearTimeout(timeout); // Clear the previous timeout
     timeout = setTimeout(() => {
       func.apply(this, args); // Call the function after the delay
@@ -73,9 +73,19 @@ export const serializeBlock = (block) => {
 
   const isRich = type === "richtext";
   const isVideo = type === "video";
+  const isButton = type === "button";
 
   // If the block is rich text, return the inner HTML
   const richText = `<div style="${styleString}"> ${props?.__html} </div>`;
+
+  if (isButton) {
+    const { alignItems, justifyContent, color, ...btnRest } = styleTogether || {};
+    const obj = { alignItems, justifyContent };
+    const rootStyles = serializeCss(obj);
+    const colorString = color ? `color:${color};` : "";
+    const btnRestString = serializeCss(btnRest);
+    return `<div style="width:100%;display:flex; flex-direction:column;${rootStyles}"><a style ="text-align:center;${colorString}${btnRestString}" ${propsString}>${text}</a></div>`;
+  }
   if (isRich) return richText;
   if (isVideo) return serializeVideoBlock({ src: props?.src, styleString: serializeCss(styleTogether), propsString });
 

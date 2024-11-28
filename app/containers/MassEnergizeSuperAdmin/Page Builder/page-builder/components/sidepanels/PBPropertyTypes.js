@@ -173,7 +173,6 @@ export const PBFixedCheckbox = (props) => {
     checkedValue,
     ...rest
   } = props;
-
   return (
     <div style={{ display: "flex", flexDirection: "row", alignItems: "center", margin: "10px 0px" }}>
       <input

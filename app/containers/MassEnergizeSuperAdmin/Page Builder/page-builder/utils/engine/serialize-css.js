@@ -12,8 +12,10 @@ const INLINE_KEYS = {
   paddingTop: "padding-top",
   paddingBottom: "padding-bottom",
   paddingLeft: "padding-left",
-  paddingRight: "padding-right", 
+  paddingRight: "padding-right",
   fontSize: "font-size",
+  fontWeight: "font-weight",
+  backgroundColor: "background-color"
 };
 export const serializeCss = (inLinObj) => {
   return Object.entries(inLinObj)
