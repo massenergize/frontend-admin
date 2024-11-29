@@ -44,16 +44,20 @@ function PBEntry({
   };
   const updateFocus = useCallback(
     (oldBlock, newBlock) => {
-      if (blockInFocus?.block?.id === newBlock?.block?.id) return;
+      // if (blockInFocus?.block?.id === newBlock?.block?.id) return;
       setBlockInFocus(newBlock);
     },
     [blockInFocus]
   );
+  // const updateFocus = (oldBlock, newBlock) => {
+  //   // if (blockInFocus?.block?.id === newBlock?.block?.id) return;
+  //   setBlockInFocus(newBlock);
+  // };
   const onFocused = useCallback((target) => {
     recentlyUsedFieldRef.current = target;
   }, []);
 
-  const handlePropertyChange = (properties, options) => {
+  const handlePropertyChange = useCallback((properties, options) => {
     const { isGrouped, rawValue, cssKey, groupIndex, propertyIndex } = options || {};
     const newProperties = [...properties];
     if (isGrouped) {
@@ -71,7 +75,7 @@ function PBEntry({
     propItem = { ...propItem, value: rawValue };
     newProperties.splice(propertyIndex, 1, propItem);
     return newProperties;
-  };
+  }, []);
 
   const mergeProps = (oldProps, valueObj, options) => {
     const { propAccessor, append, propIsObj, rawValue } = options || {};
@@ -85,7 +89,7 @@ function PBEntry({
     return newProps;
   };
 
-  const applyProps = (block, valueObj, options) => {
+  const applyProps = useCallback((block, valueObj, options) => {
     const { data } = options || {};
 
     const { block: blockItem, group, ...rest } = block;
@@ -102,22 +106,27 @@ function PBEntry({
       block: { ...blockItem, properties: newProperties, template: { ...template, element: newElement } }
     };
     return newBlock;
-  };
+  }, []);
 
-  const whenPropertyChanges = (data) => {
-    const newSectionList = [...sections];
-    const block = newSectionList.find((section) => section.block.id === data?.blockId);
-    const valueTrain = { [data?.prop?.accessor]: data?.prop?.value };
-    const newBlock = applyProps(blockInFocus, valueTrain, data?.prop);
-    console.log("WHEN PROPERTY CHANGES OLD BLOCK: ", block);
-    console.log("WHEN PROPERTY CHANGES NEW BLOCK:", newBlock);
-    newSectionList.splice(block?.options?.position, 1, newBlock);
-    setSection(newSectionList);
-    updateFocus(blockInFocus, newBlock);
-  };
+  const whenPropertyChanges = useCallback(
+    (data) => {
+      const newSectionList = [...sections];
+      const findFxn = (section) => section.block.id === data?.blockId;
+      const index = newSectionList.findIndex(findFxn);
+      const block = newSectionList.find(findFxn);
+      const valueTrain = { [data?.prop?.accessor]: data?.prop?.value };
+      const newBlock = applyProps(blockInFocus, valueTrain, data?.prop);
+      console.log("WHEN PROPERTY CHANGES OLD BLOCK: ", block);
+      console.log("WHEN PROPERTY CHANGES NEW BLOCK:", newBlock);
+      newSectionList.splice(index, 1, newBlock);
+      setSection(newSectionList);
+      updateFocus(blockInFocus, newBlock);
+    },
+    [sections, blockInFocus]
+  );
 
   console.log("LIST OF AVAILABLE SECTIONS --> ", sections);
-  const selectBlock = (blockJson) => {
+  const selectBlock = useCallback((blockJson) => {
     console.log("WHAT HAPPENS: blockjson, modalprosp", blockJson, modalProps);
     const { position } = modalProps || {};
     const newSection = [...sections];
@@ -125,7 +134,7 @@ function PBEntry({
     newSection.splice(position, 0, { ...blockJson, options: { ...oldOptions, position } });
     setSection(newSection);
     close();
-  };
+  }, [modalProps,sections]);
 
   const transfer = (key, value) => {
     let content = {};
@@ -146,30 +155,31 @@ function PBEntry({
     openModal({ ...(options || {}), modalKey });
   };
 
-  const closeModalWithKey = () => {
+  const closeModalWithKey = useCallback(() => {
     setModalProps({ ...modalProps, modalKey: null });
     close();
-  };
+  }, [modalProps]);
 
-  const removeBlockItem = ({ blockId }) => {
+  const removeBlockItem = useCallback(({ blockId }) => {
     const newSection = sections.filter((section) => section.block.id !== blockId);
     setSection(newSection);
     updateFocus(blockInFocus, null);
-  };
+  }, []);
   // const IS_PAGE_SETTINGS = modalProps?.modalKey === PAGE_SETTINGS_KEY;
 
-  const resetAnItem = () => {
+  const resetAnItem = useCallback(() => {
     const { options } = blockInFocus || {};
     const newSection = [...sections];
+    const index = newSection.findIndex((section) => section.block.id === blockInFocus?.block?.id);
     const freshVersion = BLOCKS.find((block) => block.key === blockInFocus?.block?.key);
     const newBlock = {
       block: { id: blockInFocus?.block?.id, ...(freshVersion || {}) },
       options: blockInFocus?.options
     };
-    newSection.splice(options?.position, 1, newBlock);
+    newSection.splice(index, 1, newBlock);
     setSection(newSection);
     updateFocus(blockInFocus, newBlock);
-  };
+  }, [sections, blockInFocus]);
 
   const pageSettings = useCallback(() => {
     if (!renderPageSettings) return <PBPageSettings />;
@@ -195,12 +205,12 @@ function PBEntry({
     modalProps?.modalKey
   ]);
 
-  const openBlockModal = (props) => {
+  const openBlockModal = useCallback((props) => {
     openSpecificModal(BLOCK_SELECTOR_PAGE, props);
     // More to come...
-  };
+  }, []);
 
-  const save = () => {
+  const save = useCallback(() => {
     const { save } = footerOverrides || {};
     if (save)
       return save({
@@ -209,8 +219,9 @@ function PBEntry({
         notify: setNotification,
         openPageSettings: () => openSpecificModal(PAGE_SETTINGS_KEY)
       });
-  };
-  const publishPage = () => {
+  }, [sections]);
+
+  const publishPage = useCallback(() => {
     const { publish } = footerOverrides || {};
     if (publish)
       return publish({
@@ -220,7 +231,7 @@ function PBEntry({
         defaultFunction: () => openSpecificModal(PUBLISH_CONFIRMATION_DIALOG),
         openPageSettings: () => openSpecificModal(PAGE_SETTINGS_KEY)
       });
-  };
+  }, [sections]);
 
   console.log("MODAL PROPS -> ", modalProps);
   console.log("BLOCK IN FOCUS ->", blockInFocus);

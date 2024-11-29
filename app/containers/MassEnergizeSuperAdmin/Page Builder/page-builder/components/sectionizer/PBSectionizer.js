@@ -27,9 +27,12 @@ function PBSection({ readOnly, onButtonClick, openBlockModal, sections, focusOnB
           <PBRender
             readOnly={readOnly}
             inFocus={blockInFocus?.block?.id === block?.id}
-            onBlockClick={() => focusOnBlock({ block, options: { position } })}
+            // onBlockClick={() => focusOnBlock({ block, options: { position } })}
+            onBlockClick={() => focusOnBlock({ block, options: {} })}
+            // onBlockClick={() => focusOnBlock({ block, options: {} })}
             json={block}
             onClick={() => onButtonClick({ position: position + 1 })}
+            // onClick={() => onButtonClick()}
             remove={() => removeBlockItem({ blockId: block?.id })}
           />
         ))
