@@ -16,13 +16,18 @@ function TinMCE({ height, onChange, onFocused, focus, ...props }) {
   useEffect(() => {
     setValue(props?.value);
   }, []);
+
+  const transfer = () => {
+    onChange && onChange({ content: value });
+  };
   return (
     <div style={{ padding: 10 }}>
       <div style={{ marginTop: 20 }} />
       <TinyEditor
         ref={ref}
         onBlur={() => {
-          onChange && onChange({ content: value });
+          // onChange && onChange({ content: value });
+          transfer();
         }}
         {...props}
         value={value}
@@ -51,9 +56,14 @@ function TinMCE({ height, onChange, onFocused, focus, ...props }) {
         apiKey={props?.apiKey}
       />
       <div style={{ display: "flex", flexDirection: "row" }}>
-        <small style={{ marginLeft: "auto", marginTop: 5, color: "grey", fontSize: 12 }}>
+        <small style={{ marginLeft: "auto", marginTop: 5, color: "white", fontWeight: "bold", fontSize: 12 }}>
           Resize here if the editor is too small
         </small>
+      </div>
+      <div style={{ width: "100%", display: "flex", flexDirection: "row", justifyContent: "center" }}>
+        <button className="touchable-opacity" onClick={() => transfer()}>
+          Insert Text
+        </button>
       </div>
     </div>
   );
