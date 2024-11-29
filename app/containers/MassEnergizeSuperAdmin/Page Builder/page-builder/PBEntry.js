@@ -106,12 +106,16 @@ function PBEntry({
     const block = newSectionList.find((section) => section.block.id === data?.blockId);
     const valueTrain = { [data?.prop?.accessor]: data?.prop?.value };
     const newBlock = applyProps(blockInFocus, valueTrain, data?.prop);
+    console.log("WHEN PROPERTY CHANGES OLD BLOCK: ", block);
+    console.log("WHEN PROPERTY CHANGES NEW BLOCK:", newBlock);
     newSectionList.splice(block?.options?.position, 1, newBlock);
     setSection(newSectionList);
     updateFocus(blockInFocus, newBlock);
   };
 
+  console.log("LIST OF AVAILABLE SECTIONS --> ", sections);
   const selectBlock = (blockJson) => {
+    console.log("WHAT HAPPENS: blockjson, modalprosp", blockJson, modalProps);
     const { position } = modalProps || {};
     const newSection = [...sections];
     const oldOptions = blockJson?.options || {};
@@ -215,6 +219,8 @@ function PBEntry({
       });
   };
 
+  console.log("MODAL PROPS -> ", modalProps);
+  console.log("BLOCK IN FOCUS ->", blockInFocus);
   return (
     <div className="pb-root">
       <Modal style={{ minHeight: 300 }}>
