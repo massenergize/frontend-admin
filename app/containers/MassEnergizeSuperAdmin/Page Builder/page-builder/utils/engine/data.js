@@ -76,7 +76,7 @@ export const BTN_BLOCK = {
     type: "button",
     props: {
       className: "pb-block-btn touchable-opacity",
-      style: { width: "100%", alignItems: "center" },
+      style: { width: "100%", alignItems: "flex-start" },
       text: "Click Me",
       target: "_blank"
     }

@@ -6,7 +6,7 @@ import PBModal from "./components/modal/PBModal";
 function PBCanvas({ children, publishedProps, notification, setNotification }) {
   const { published_at, published_link } = publishedProps || {};
   const IS_ERROR = notification && notification.type === "error";
-  
+
   return (
     <div className="pb-canvas">
       {published_at && (
@@ -50,7 +50,7 @@ function PBCanvas({ children, publishedProps, notification, setNotification }) {
           </p>
         </div>
       )}
-
+   
 
       {children}
     </div>
