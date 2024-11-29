@@ -51,6 +51,7 @@ function PBCanvas({ children, publishedProps, notification, setNotification }) {
         </div>
       )}
 
+
       {children}
     </div>
   );

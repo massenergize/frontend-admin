@@ -107,7 +107,7 @@ export const Span = (props) => {
 export const Link = (props) => {
   const { children, style, ...rest } = props || {};
   return (
-    <a target="_blank" style={{ ...(style || {}) }} {...rest}>
+    <a onClick={(e) => e.preventDefault()} target="_blank" style={{ ...(style || {}) }} {...rest}>
       {children}
     </a>
   );
@@ -126,7 +126,11 @@ export const Button = (props) => {
         justifyContent: alignItems || "flex-start"
       }}
     >
-      <a style={{ alignItems: "center", justifyContent: "center", ...(remStyles || {}) }} {...rest}>
+      <a
+        onClick={(e) => e.preventDefault()}
+        style={{ alignItems: "center", justifyContent: "center", ...(remStyles || {}) }}
+        {...rest}
+      >
         {text || children}
       </a>
     </div>
@@ -201,8 +205,8 @@ export const Tags = {
       border: "solid 0px #0b9edc",
       padding: "10px 20px",
       color: "#0b9edc",
-      fontWeight: "bold", 
-      padding: "10px 20px",
+      fontWeight: "bold",
+      padding: "10px 20px"
     }
   }
 };

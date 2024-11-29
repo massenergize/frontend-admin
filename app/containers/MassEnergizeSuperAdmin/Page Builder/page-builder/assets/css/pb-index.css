@@ -43,12 +43,16 @@ h2 {
 }
 
 .pb-dangerous-note {
-  color: #c14e4e;
-  background-color: #ff000014;
+  color: white;
+  background-color: #ec7c7c;
+  /* color: #c14e4e;
+  background-color: #ff000014; */
 }
 .pb-success-note {
   color: green;
   background-color: #29bf2926;
+  /* color: green;
+  background-color: #29bf2926; */
 }
 .pb-r-t {
   margin: 10px 0px;
