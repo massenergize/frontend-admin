@@ -19,13 +19,13 @@ function PBBottomSheet({ children, close, height, toggleHeight, toggled }) {
             <span onClick={() => close && close()} className="touchable-opacity" style={{ color: "red" }}>
               &#10005;
             </span>
-            <span
+            {/* <span
               onClick={() => toggleHeight()}
               className="touchable-opacity"
               style={{ transform: toggled ? "rotate(180deg)" : "rotate(0deg)", marginLeft: 10, color: "green" }}
             >
               &#9651;
-            </span>
+            </span> */}
           </div>
           {/* <button onClick={() => close && close()} className="pb-close-btn">
           <span>&#10005;</span>

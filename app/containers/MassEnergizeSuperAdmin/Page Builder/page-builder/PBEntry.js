@@ -42,10 +42,13 @@ function PBEntry({
   const setLoading = (key, value) => {
     setLoadingStates({ ...loadingStates, [key]: value });
   };
-  const updateFocus = (oldBlock, newBlock) => {
-    setBlockInFocus(newBlock);
-    // setOutOfFocus(oldBlock);
-  };
+  const updateFocus = useCallback(
+    (oldBlock, newBlock) => {
+      if (blockInFocus?.block?.id === newBlock?.block?.id) return;
+      setBlockInFocus(newBlock);
+    },
+    [blockInFocus]
+  );
   const onFocused = useCallback((target) => {
     recentlyUsedFieldRef.current = target;
   }, []);

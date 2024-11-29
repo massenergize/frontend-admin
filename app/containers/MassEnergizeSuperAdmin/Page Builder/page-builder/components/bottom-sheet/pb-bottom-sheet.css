@@ -51,11 +51,12 @@
   border-radius: 4px;
   display: flex;
   flex-direction: row;
-  padding: 7px 20px;
+  padding: 7px 14px;
   background-color: white;
   color: #383838;
   box-shadow: var(--elevate-float);
   font-weight: bold;
+  border-radius: 100%;
 
   /* min-width: 100px; */
 }
