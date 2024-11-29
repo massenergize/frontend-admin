@@ -110,7 +110,8 @@ function PBEntry({
 
   const whenPropertyChanges = useCallback(
     (data) => {
-      const newSectionList = [...sections];
+      // const newSectionList = [...sections];
+      const newSectionList = sections;
       const findFxn = (section) => section.block.id === data?.blockId;
       const index = newSectionList.findIndex(findFxn);
       const block = newSectionList.find(findFxn);
@@ -130,7 +131,8 @@ function PBEntry({
     (blockJson) => {
       console.log("WHAT HAPPENS: blockjson, modalprosp", blockJson, modalProps);
       const { position } = modalProps || {};
-      const newSection = [...sections];
+      // const newSection = [...sections];
+      const newSection = sections;
       const oldOptions = blockJson?.options || {};
       newSection.splice(position, 0, { ...blockJson, options: { ...oldOptions, position } });
       setSection(newSection);
@@ -178,7 +180,8 @@ function PBEntry({
 
   const resetAnItem = useCallback(() => {
     const { options } = blockInFocus || {};
-    const newSection = [...sections];
+    // const newSection = [...sections];
+    const newSection = sections;
     const index = newSection.findIndex((section) => section.block.id === blockInFocus?.block?.id);
     const freshVersion = BLOCKS.find((block) => block.key === blockInFocus?.block?.key);
     const newBlock = {

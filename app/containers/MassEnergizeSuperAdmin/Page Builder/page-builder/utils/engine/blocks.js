@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   BUTTON_PROPS,
   IMAGE_PROPS,
@@ -150,10 +150,19 @@ const youtubeLink = (src) => {
   return `https://www.youtube.com/embed/${src}`;
 };
 export const YoutubeVideo = (props) => {
+  // const [link, setLink] = useState(null);
   const { style, src, ...rest } = props || {};
+
+  // useEffect(() => {
+  //   setLink(youtubeLink(src));
+  // }, [src]);
+
+  // const iframeRef = useRef();
+
   return (
     <div {...rest} style={{ position: "relative", height: 600, overflow: "hidden", ...(style || {}) }}>
       <iframe
+    
         src={youtubeLink(src)}
         title="YouTube video"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
