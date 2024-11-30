@@ -79,7 +79,8 @@ function PBEntry({
 
   const mergeProps = (oldProps, valueObj, options) => {
     const { propAccessor, append, propIsObj, rawValue } = options || {};
-    const newProps = { ...oldProps };
+    // const newProps = { ...oldProps };
+    const newProps = oldProps;
     let prop = oldProps[propAccessor] || {};
     if (propIsObj) {
       if (append) prop = { ...prop, ...valueObj };
@@ -117,8 +118,6 @@ function PBEntry({
       const block = newSectionList.find(findFxn);
       const valueTrain = { [data?.prop?.accessor]: data?.prop?.value };
       const newBlock = applyProps(blockInFocus, valueTrain, data?.prop);
-      console.log("WHEN PROPERTY CHANGES OLD BLOCK: ", block);
-      console.log("WHEN PROPERTY CHANGES NEW BLOCK:", newBlock);
       newSectionList.splice(index, 1, newBlock);
       setSection(newSectionList);
       updateFocus(blockInFocus, newBlock);
@@ -126,10 +125,8 @@ function PBEntry({
     [sections, blockInFocus]
   );
 
-  console.log("LIST OF AVAILABLE SECTIONS --> ", sections);
   const selectBlock = useCallback(
     (blockJson) => {
-      console.log("WHAT HAPPENS: blockjson, modalprosp", blockJson, modalProps);
       const { position } = modalProps || {};
       // const newSection = [...sections];
       const newSection = sections;
@@ -248,8 +245,6 @@ function PBEntry({
       });
   }, [sections, openSpecificModal]);
 
-  console.log("MODAL PROPS -> ", modalProps);
-  console.log("BLOCK IN FOCUS ->", blockInFocus);
   return (
     <div className="pb-root">
       <Modal style={{ minHeight: 300 }}>
