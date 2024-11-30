@@ -9,6 +9,8 @@ import { useApiRequest, useSimpleRequest } from "../../../utils/hooks/useApiRequ
 import { fetchParamsFromURL, getHumanFriendlyDate } from "../../../utils/common";
 import Loading from "dan-components/Loading";
 import { apiCall } from "../../../utils/messenger";
+import { BUG_REPORT_EMAIL } from "../ME  Tools/media library/shared/utils/values";
+import { Typography } from "@mui/material";
 function MEPageBuilderImplementation() {
   // const imagesObject = useSelector((state) => state.getIn(["galleryImages"]));
   const admin = useSelector((state) => state.getIn(["auth"]));
@@ -171,6 +173,28 @@ function MEPageBuilderImplementation() {
     [saveToBackend]
   );
 
+  // Remember to come up with a better way to handle (beta,published,etc) stages
+  const stageConfig = useMemo(() => {
+    return {
+      beta: {
+        title: "Beta Feature",
+        render: () => (
+          // <div style={{ padding: "5px 25px", marginBottom: 10, background: "rgb(254, 251, 243)" }}>
+          <div style={{ padding: "0px 0px" }}>
+            <Typography variant="caption">
+              <i className="fa fa-bullhorn" style={{ marginRight: 5 }} />
+              This feature is still under development (beta). We're always looking for ways to improve, so please report
+              any bugs you find to{" "}
+              <a href={`mailto::${BUG_REPORT_EMAIL}`}>
+                <b>our email for bugs</b>
+              </a>
+              .
+            </Typography>
+          </div>
+        )
+      }
+    };
+  }, []);
   const publishedProps = useMemo(
     () => ({
       published_at: getHumanFriendlyDate(page?.page?.latest_version?.created_at, true, false),
@@ -180,19 +204,6 @@ function MEPageBuilderImplementation() {
   );
   // -------------------------------------------------- RENDER ------------------------------------------------
   if (loading) return <Loading />;
-
-  // if (error) {
-  //   return (
-  //     // <div style={{ color: "red", padding: 20, borderRadius: 10, textAlign: "center" }}>
-  //     //   <h6> Error: {error} </h6>
-  //     // </div>
-  //     <p className={`pb-canvas-notification pb-dangerous`}>
-  //       {error}{" "}
-  //       <i className="fa fa-times touchable-opacity" style={{ marginLeft: "auto" }} onClick={() => setError(null)} />
-  //     </p>
-  //   );
-  //   // console.log("Error: ", error);
-  // }
 
   return (
     <>
@@ -229,6 +240,7 @@ function MEPageBuilderImplementation() {
         </div>
       )}
       <PBEntry
+        stageConfig={stageConfig}
         onChange={setPageBuilderContent}
         data={{ content: PBEntry.Functions.reconfigurePruned(page?.page?.content) }}
         renderPageSettings={renderPageSettings}

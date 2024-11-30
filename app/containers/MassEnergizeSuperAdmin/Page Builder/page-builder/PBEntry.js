@@ -28,7 +28,8 @@ function PBEntry({
   propsOverride,
   renderPageSettings,
   onChange,
-  data
+  data,
+  stageConfig
 }) {
   const { modals: modalOverrides } = builderOverrides || {};
   const { Modal, open: openModal, close, modalProps, setModalProps } = usePBModal();
@@ -245,6 +246,11 @@ function PBEntry({
       });
   }, [sections, openSpecificModal]);
 
+  const betaRender = useMemo(() => {
+    const { beta } = stageConfig || {};
+    return beta?.render ? beta.render : () => null;
+  }, [stageConfig?.beta]);
+
   return (
     <div className="pb-root">
       <Modal style={{ minHeight: 300 }}>
@@ -252,10 +258,18 @@ function PBEntry({
         {renderMComponent({ closeModal: close })}
       </Modal>
       {preview ? (
-        <PBPublishedRender sections={sections} />
+        <>
+          {betaRender()}
+          <PBPublishedRender sections={sections} />
+        </>
       ) : (
         <>
-          <PBCanvas setNotification={setNotification} notification={notification} publishedProps={publishedProps}>
+          <PBCanvas
+            betaRender={betaRender}
+            setNotification={setNotification}
+            notification={notification}
+            publishedProps={publishedProps}
+          >
             <PBSection
               readOnly={preview}
               blockInFocus={blockInFocus}

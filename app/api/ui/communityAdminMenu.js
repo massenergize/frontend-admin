@@ -205,7 +205,7 @@ const CADMIN_MENU = [
   },
   {
     key: "custom-pages",
-    name: "Pages",
+    name: "Pages(Beta)",
     icon: "ios-paper",
     child: [
       // {

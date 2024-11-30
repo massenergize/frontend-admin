@@ -3,13 +3,14 @@ import "./assets/css/pb-index.css";
 import PBSidePanel from "./components/sidepanels/PBSidePanel";
 import PBBottomSheet from "./components/bottom-sheet/PBBottomSheet";
 import PBModal from "./components/modal/PBModal";
-function PBCanvas({ children, publishedProps, notification, setNotification }) {
+function PBCanvas({ betaRender, children, publishedProps, notification, setNotification }) {
   const { published_at, published_link } = publishedProps || {};
   const IS_ERROR = notification && notification.type === "error";
 
   return (
     <div className="pb-canvas">
-      {published_at && (
+      {/* {betaRender()} */}
+      {(published_at || betaRender()) && (
         <div
           style={{
             marginBottom: 10,
@@ -20,6 +21,7 @@ function PBCanvas({ children, publishedProps, notification, setNotification }) {
             flexDirection: "row"
           }}
         >
+          {betaRender()}
           <div style={{ marginLeft: "auto", fontSize: 14 }}>
             {published_at && (
               <small style={{ fontWeight: "bold", color: "rgb(43 177 207)" }}>
@@ -50,7 +52,6 @@ function PBCanvas({ children, publishedProps, notification, setNotification }) {
           </p>
         </div>
       )}
-   
 
       {children}
     </div>

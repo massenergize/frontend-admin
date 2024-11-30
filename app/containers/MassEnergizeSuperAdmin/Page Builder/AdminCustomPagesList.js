@@ -12,6 +12,7 @@ import Loading from "dan-components/Loading";
 import { getHumanFriendlyDate } from "../../../utils/common";
 import { Helmet } from "react-helmet";
 import brand from "dan-api/dummy/brand";
+import { BUG_REPORT_EMAIL } from "../ME  Tools/media library/shared/utils/values";
 const DUMMY_DATA = [
   {
     id: Date.now(),
@@ -255,6 +256,13 @@ function AdminCustomPagesList({ classes }) {
       <Helmet>
         <title>{brand.name} | Custom Pages</title>
       </Helmet>
+      <Paper style={{ padding: "15px 25px", marginBottom: 10, background: "rgb(254, 251, 243)" }}>
+        <Typography variant="p">
+          <i className=" fa fa-bullhorn" style={{ marginRight: 5 }} /> This feature is still under development (beta).
+          We're always looking for ways to improve, so please report any bugs you find to{" "}
+          <a href={`mailto::${BUG_REPORT_EMAIL}`}>our email for bugs</a>.
+        </Typography>
+      </Paper>
       <Paper style={{ padding: 20 }}>
         <Typography variant="h6">Manage your custom pages</Typography>
         <Typography variant="p" style={{ margin: "10px 0px" }}>
