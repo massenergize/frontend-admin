@@ -258,10 +258,10 @@ function PBEntry({
         {renderMComponent({ closeModal: close })}
       </Modal>
       {preview ? (
-        <>
-          {betaRender()}
+        <div style={{ width: "100%" }}>
+          <div style={{ padding: "4px 15px", background: "rgba(159, 221, 235, 0.17)" }}>{betaRender()}</div>
           <PBPublishedRender sections={sections} />
-        </>
+        </div>
       ) : (
         <>
           <PBCanvas
