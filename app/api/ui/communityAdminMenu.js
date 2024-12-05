@@ -284,7 +284,6 @@ const hasAlreadyBeenAppended = (mainArray, bigObjArray) => {
 
 // TODO: Rewrite this so that it is more readable, and it also handles the case where the item to be appended to is a child item (make it recurse?)
 const communityAdminMenu = ({ flags }) => {
-  console.log("LET SEE FLAGS", flags);
   if (!flags || flags?.length === 0) return CADMIN_MENU;
 
   flags.forEach((flag) => {
