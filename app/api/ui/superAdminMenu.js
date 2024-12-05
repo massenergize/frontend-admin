@@ -237,7 +237,7 @@ module.exports = [
   {
     key: "custom-pages",
     name: "Pages(Beta)",
-    icon: "ios-people",
+    icon: "ios-paper",
     child: [
       // {
       //   key: "create-custom-page",
