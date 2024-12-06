@@ -18,25 +18,25 @@ import Seo from "../../../components/Seo/Seo";
 const styles = (theme) => ({
   root: {
     flexGrow: 1,
-    padding: 30,
+    padding: 30
   },
   field: {
     width: "100%",
-    marginBottom: 20,
+    marginBottom: 20
   },
   fieldBasic: {
     width: "100%",
     marginBottom: 20,
-    marginTop: 10,
+    marginTop: 10
   },
   inlineWrap: {
     display: "flex",
-    flexDirection: "row",
+    flexDirection: "row"
   },
   buttonInit: {
-    margin: theme.spacing(4) ,
-    textAlign: "center",
-  },
+    margin: theme.spacing(4),
+    textAlign: "center"
+  }
 });
 
 class EditTestimonial extends Component {
@@ -47,7 +47,7 @@ class EditTestimonial extends Component {
       actions: [],
       vendors: [],
       formJson: null,
-      testimonial: null,
+      testimonial: null
     };
   }
 
@@ -55,13 +55,13 @@ class EditTestimonial extends Component {
     // you need: communities, actions, vendors, tags, testimonials, testimonial
     var { testimonials, vendors, actions, tags, communities, match, auth } = props;
     const { id } = match.params;
-    let testimonial = ((testimonials) || []).find((t) => t.id.toString() === id.toString());
-    if (!testimonial){
-      apiCall("/testimonials.info", {id: id }).then(response=>{
-        if (response.success){
-          testimonial = response.data
+    let testimonial = (testimonials || []).find((t) => t.id.toString() === id.toString());
+    if (!testimonial) {
+      apiCall("/testimonials.info", { id: id }).then((response) => {
+        if (response.success) {
+          testimonial = response.data;
         }
-      })
+      });
     }
     const readyToRenderThePageFirstTime =
       testimonials &&
@@ -69,29 +69,28 @@ class EditTestimonial extends Component {
       vendors &&
       vendors.length &&
       actions &&
-      actions.length&& 
+      actions.length &&
       tags &&
       tags.length;
-      const isSuperAdmin = auth?.is_super_admin
+    const isSuperAdmin = auth?.is_super_admin;
 
-    const jobsDoneDontRunWhatsBelowEverAgain =
-      !readyToRenderThePageFirstTime || state.mounted;
+    const jobsDoneDontRunWhatsBelowEverAgain = !readyToRenderThePageFirstTime || state.mounted;
 
-    const coms = ((communities) || []).map((c) => ({
+    const coms = (communities || []).map((c) => ({
       ...c,
-      id:c.id,
-      displayName: c.name,
+      id: c.id,
+      displayName: c.name
     }));
 
-    const vends = ((vendors) || []).map((c) => ({
+    const vends = (vendors || []).map((c) => ({
       ...c,
       displayName: c.name,
-      id:c.id,
+      id: c.id
     }));
-    const acts = ((actions) || []).map((c) => ({
+    const acts = (actions || []).map((c) => ({
       ...c,
-      id:c.id,
-      displayName: c.title + ` - ${c.community && c.community.name}`,
+      id: c.id,
+      displayName: c.title + ` - ${c.community && c.community.name}`
     }));
 
     if (jobsDoneDontRunWhatsBelowEverAgain) return null;
@@ -99,7 +98,7 @@ class EditTestimonial extends Component {
     const section = makeTagSection({
       collections: tags,
       event: testimonial,
-      title: "Please select tag(s) that apply to this testimonial",
+      title: "Please select tag(s) that apply to this testimonial"
     });
     const formJson = createFormJson({
       communities: coms,
@@ -107,6 +106,7 @@ class EditTestimonial extends Component {
       vendors: vends,
       testimonial,
       isSuperAdmin,
+      otherCommunities: props.otherCommunities
     });
     formJson.fields.splice(1, 0, section);
 
@@ -116,7 +116,7 @@ class EditTestimonial extends Component {
       vendors: vends,
       communities: coms,
       mounted: true,
-      testimonial,
+      testimonial
     };
   }
 
@@ -135,7 +135,7 @@ class EditTestimonial extends Component {
     ids = ids.filter((_id) => _id.toString() !== id && id.toString());
     history.push({
       pathname,
-      state: { ids },
+      state: { ids }
     });
   }
 
@@ -156,7 +156,7 @@ class EditTestimonial extends Component {
     if (!formJson) return <Loading />;
     return (
       <>
-      <Seo name={`Edit Testimonial - ${testimonial?.title}`} />
+        <Seo name={`Edit Testimonial - ${testimonial?.title}`} />
         <Paper style={{ padding: 15 }}>
           <Typography variant="h6">Created By</Typography>
           {testimonial && testimonial.user && (
@@ -182,7 +182,7 @@ class EditTestimonial extends Component {
 }
 
 EditTestimonial.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) => {
@@ -193,13 +193,14 @@ const mapStateToProps = (state) => {
     testimonials: state.getIn(["allTestimonials"]),
     communities: state.getIn(["communities"]),
     auth: state.getIn(["auth"]),
+    otherCommunities: state.getIn(["otherCommunities"])
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
-      updateNextSteps: fetchLatestNextSteps,
+      updateNextSteps: fetchLatestNextSteps
     },
     dispatch
   );
@@ -212,7 +213,13 @@ const Wrapped = connect(
 
 export default withStyles(styles, { withTheme: true })(Wrapped);
 
-const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdmin }) => {
+const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdmin, otherCommunities }) => {
+  const otherCommunityList = otherCommunities?.map((c) => ({
+    displayName: c.name,
+    id: c.id
+  }));
+
+  const audience = (testimonial?.audience || []).map((c) => c.id.toString());
   const formJson = {
     title: "Edit Testimonial",
     subTitle: "",
@@ -231,7 +238,7 @@ const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdm
             contentType: "text",
             defaultValue: testimonial && testimonial.id,
             dbName: "testimonial_id",
-            readOnly: true,
+            readOnly: true
           },
           {
             name: "preferredName",
@@ -242,7 +249,7 @@ const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdm
             isRequired: false,
             defaultValue: testimonial && testimonial.preferred_name,
             dbName: "preferred_name",
-            readOnly: false,
+            readOnly: false
           },
           {
             name: "title",
@@ -253,7 +260,7 @@ const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdm
             isRequired: true,
             defaultValue: testimonial && testimonial.title,
             dbName: "title",
-            readOnly: false,
+            readOnly: false
           },
           {
             name: "body",
@@ -266,21 +273,20 @@ const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdm
             isMultiline: true,
             defaultValue: testimonial && testimonial.body,
             dbName: "body",
-            readOnly: false,
+            readOnly: false
           },
           {
             name: "rank",
-            label:
-              "Give this testimonial a number to determine which order it appears in.  Smaller appears first",
+            label: "Give this testimonial a number to determine which order it appears in.  Smaller appears first",
             placeholder: "eg. 0",
             fieldType: "TextField",
             contentType: "number",
             isRequired: false,
             defaultValue: testimonial && testimonial.rank,
             dbName: "rank",
-            readOnly: false,
-          },
-        ],
+            readOnly: false
+          }
+        ]
       },
       {
         label: "What this Testimonial is linked to",
@@ -295,35 +301,29 @@ const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdm
             dbName: "community_id",
             data: [{ displayName: "--", id: "" }, ...communities],
             isAsync: true,
-            endpoint: isSuperAdmin
-              ? "/communities.listForSuperAdmin"
-              : "/communities.listForCommunityAdmin",
+            endpoint: isSuperAdmin ? "/communities.listForSuperAdmin" : "/communities.listForCommunityAdmin"
           },
           {
             name: "action",
             label: "Primary Action",
             placeholder: "eg. Action",
             fieldType: "Dropdown",
-            defaultValue:testimonial?.action?.id,
+            defaultValue: testimonial?.action?.id,
             dbName: "action_id",
             data: [{ displayName: "--", id: "" }, ...actions],
             isAsync: true,
-            endpoint: isSuperAdmin
-              ? "/actions.listForSuperAdmin"
-              : "/actions.listForCommunityAdmin",
+            endpoint: isSuperAdmin ? "/actions.listForSuperAdmin" : "/actions.listForCommunityAdmin"
           },
           {
             name: "vendor",
             label: "Which Vendor did you use?",
             placeholder: "eg. Wayland",
             fieldType: "Dropdown",
-            defaultValue:testimonial?.vendor?.id,
+            defaultValue: testimonial?.vendor?.id,
             dbName: "vendor_id",
             data: [{ displayName: "--", id: "" }, ...vendors],
             isAsync: true,
-            endpoint: isSuperAdmin
-              ? "/vendors.listForSuperAdmin"
-              : "/vendors.listForCommunityAdmin",
+            endpoint: isSuperAdmin ? "/vendors.listForSuperAdmin" : "/vendors.listForCommunityAdmin"
           },
           {
             name: "other_vendor",
@@ -332,9 +332,9 @@ const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdm
             fieldType: "TextField",
             contentType: "text",
             defaultValue: testimonial && testimonial.other_vendor,
-            dbName: "other_vendor",
-          },
-        ],
+            dbName: "other_vendor"
+          }
+        ]
       },
       {
         name: "image",
@@ -345,31 +345,79 @@ const createFormJson = ({ communities, actions, vendors, testimonial, isSuperAdm
         label: "Upload a file for this testimonial",
         uploadMultiple: false,
         multiple: false,
-        isRequired: false,
+        isRequired: false
+      },
+
+      {
+        label: "Who can see this testimonial?",
+        fieldType: "Section",
+        children: [
+          {
+            name: "sharing_type",
+            label: "Who should be able to see this testimonial?",
+            fieldType: "Radio",
+            isRequired: false,
+            defaultValue: testimonial?.sharing_type || null,
+            dbName: "sharing_type",
+            readOnly: false,
+            data: [
+              { id: "OPEN", value: "All communities can use this testimonial " },
+              {
+                id: "OPEN_TO",
+                value: "Only communities I select should see this"
+              },
+              {
+                id: "CLOSE",
+                value: "No one can see this, keep this in my community only "
+              }
+
+              // { id: "CLOSED_TO", value: "All except these communities" },
+            ],
+            conditionalDisplays: [
+              {
+                valueToCheck: "OPEN_TO",
+                fields: [
+                  {
+                    name: "audience",
+                    label: `Select the communities that can see and use this testimonial`,
+                    placeholder: "",
+                    fieldType: "Checkbox",
+                    selectMany: true,
+                    defaultValue: audience,
+                    dbName: "audience",
+                    data: otherCommunityList,
+                    isAsync: true,
+                    endpoint: isSuperAdmin
+                      ? "/communities.listForSuperAdmin"
+                      : "/communities.others.listForCommunityAdmin"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       },
       {
         name: "is_approved",
         label: "Do you approve this testimonial?",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue:
-          testimonial && testimonial.is_approved ? "true" : "false",
+        defaultValue: testimonial && testimonial.is_approved ? "true" : "false",
         dbName: "is_approved",
         readOnly: false,
-        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
+        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }]
       },
       {
         name: "is_published",
         label: "Should this go live ?",
         fieldType: "Radio",
         isRequired: false,
-        defaultValue:
-          testimonial && testimonial.is_published ? "true" : "false",
+        defaultValue: testimonial && testimonial.is_published ? "true" : "false",
         dbName: "is_published",
         readOnly: false,
-        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }],
-      },
-    ],
+        data: [{ id: "false", value: "No" }, { id: "true", value: "Yes" }]
+      }
+    ]
   };
   return formJson;
 };

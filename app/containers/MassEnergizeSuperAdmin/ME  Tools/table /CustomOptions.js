@@ -2,7 +2,7 @@ import React from 'react'
 import AsyncSelect from '../../../../utils/components/AsyncSelect/AsyncSelect';
 import { customFilterListOptions } from './utils';
 
-export default function CustomOptions({ data , label, endpoint, customBodyRender}) {
+export default function CustomOptions({ data , label, endpoint, customBodyRender, valueExtractor}) {
    return {
      filter: true,
      filterType: "custom",
@@ -11,14 +11,21 @@ export default function CustomOptions({ data , label, endpoint, customBodyRender
      customFilterListOptions: customFilterListOptions,
      filterOptions: {
        logic: (location, filters, row) => {
+
         if(typeof(location)=== "string"){
           if (filters.length) return !filters?.includes(location);
         }
-         if (filters?.length) return !filters?.some((item) => location?.includes(item));
+
+        if (location && typeof location === "object" && !Array.isArray(location)) {
+          const value = valueExtractor?.(location);
+          return !filters.includes(value);
+        }
+ 
+        if (filters?.length) return !filters?.some((item) => location?.includes(item));
          return false;
        },
        display: (filterList, onChange, index, column) => {
-         let items = (data || [])?.map((c) => c?.name && c?.name);
+         let items = (data || [])?.map((c) => c?.name && c?.name);         
          return (
            <AsyncSelect
              onChange={onChange}

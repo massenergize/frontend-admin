@@ -488,6 +488,24 @@ class About extends React.Component {
                   </Typography>
                 </Paper>
               </Feature>
+              <Feature community={community} name={FLAGS.CUSTOMIZE_AUTO_SHARE_SETTINGS} fallback={<></>}>
+                <Paper
+                  onClick={() =>
+                    goHere(`/admin/settings/auto-share?comId=${community?.id}`, this.props.history)
+                  }
+                  className={`${classes.pageCard}`}
+                  elevation={1}
+                >
+                  <Typography
+                    variant="h5"
+                    style={{ fontWeight: "600", fontSize: "1rem", display: "flex", alignItems: "center" }}
+                    component="h3"
+                  >
+                    Customize Community Auto Share Settings
+                    <i className=" fa fa-long-arrow-right" style={{ color: "green", marginLeft: 5 }} />
+                  </Typography>
+                </Paper>
+              </Feature>
             </PapperBlock>
           </Grid>
         </Grid>

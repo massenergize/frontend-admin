@@ -78,7 +78,9 @@ function LightAutoComplete(props) {
     selectAllV2, // If true, the component will only show one chip with the text "All" and will not show the list of selected items
     showHiddenList,
     renderItemsListDisplayName,
-    shortenListAfter
+    shortenListAfter,
+    renderSelectedItems,
+    filterFunc
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
@@ -191,6 +193,10 @@ function LightAutoComplete(props) {
   useEffect(() => mount(), []);
 
   useEffect(() => {
+    setOptionsToDisplay(data);
+  }, [data?.toString()]);
+
+  useEffect(() => {
     setSelected(defaultSelected);
   }, [defaultSelected]);
 
@@ -203,10 +209,46 @@ function LightAutoComplete(props) {
   const thereAreNoOptionsToDisplay = query ? filteredItems?.length === 0 : optionsToDisplay.length === 0;
   const userHasSelectedStuff = selected.length;
 
+  const handleSelectionRender = () => {
+    if (renderSelectedItems) return renderSelectedItems(selected, setSelected);
+    return showHiddenList && selected?.length > (shortenListAfter || 5) ? (
+      renderItemsListDisplayName ? (
+        renderItemsListDisplayName(selected, setSelected)
+      ) : (
+        <span
+          onClick={() => showHiddenList && showHiddenList(selected, setSelected)}
+          style={{
+            cursor: "pointer",
+            color: "blue"
+          }}
+        >
+          View full list
+        </span>
+      )
+    ) : (
+      selected?.length > 0 && (
+        <>
+          {selected.map((option, index) => {
+            var deleteOptions = { onDelete: () => handleSelection(option) };
+            deleteOptions = allowChipRemove ? deleteOptions : {};
+            return (
+              <Chip key={index?.toString()} label={getLabel(option)} {...deleteOptions} className={classes.chips} />
+            );
+          })}
+        </>
+      )
+    );
+  };
 
   const updateSelectedFromOutside = (newSelected) => {
     setSelected(newSelected);
-    transfer(newSelected)
+    transfer(newSelected);
+  };
+
+  const retrieveDisplayItems = ()=> {
+    const items = query ? filteredItems : optionsToDisplay;
+    if(filterFunc) return filterFunc(items);
+    return items;
   }
 
   return (
@@ -218,35 +260,7 @@ function LightAutoComplete(props) {
       }}
       key={props?.key}
     >
-      <div ref={chipWrapperRef}>
-        {showHiddenList && selected?.length > (shortenListAfter || 5) ? (
-          renderItemsListDisplayName ? (
-            renderItemsListDisplayName(selected, updateSelectedFromOutside)
-          ) : (
-            <span
-              onClick={() => showHiddenList && showHiddenList(selected, updateSelectedFromOutside)}
-              style={{
-                cursor: "pointer",
-                color: "blue"
-              }}
-            >
-              View full list
-            </span>
-          )
-        ) : (
-          selected?.length > 0 && (
-            <>
-              {selected.map((option, index) => {
-                var deleteOptions = { onDelete: () => handleSelection(option) };
-                deleteOptions = allowChipRemove ? deleteOptions : {};
-                return (
-                  <Chip key={index?.toString()} label={getLabel(option)} {...deleteOptions} className={classes.chips} />
-                );
-              })}
-            </>
-          )
-        )}
-      </div>
+      <div ref={chipWrapperRef}>{handleSelectionRender()}</div>
       <GhostDropdown
         show={showDropdown}
         close={() => setShowDropdown(false)}
@@ -342,31 +356,29 @@ function LightAutoComplete(props) {
                 </div>
               )}
 
-              {(query ? filteredItems : optionsToDisplay).map((op, index) => {
-                return (
-                  <div
-                    key={index?.toString()}
-                    className={classes.dropdownItem}
-                    onClick={() => handleSelection(op)}
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center"
-                    }}
-                  >
-                    {multiple && (
-                      <Checkbox
-                        style={{
-                          padding: 0,
-                          marginRight: 6
-                        }}
-                        checked={onlyValues.includes(getValue(op))}
-                      />
-                    )}
-                    {getLabel(op)}
-                  </div>
-                );
-              })}
+            {retrieveDisplayItems()?.map((op, index) => (
+                <div
+                  key={index.toString()}
+                  className={classes.dropdownItem}
+                  onClick={() => handleSelection(op)}
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center"
+                  }}
+                >
+                  {multiple && (
+                    <Checkbox
+                      style={{
+                        padding: 0,
+                        marginRight: 6
+                      }}
+                      checked={onlyValues.includes(getValue(op))}
+                    />
+                  )}
+                  {getLabel(op)}
+                </div>
+              ))}
               {endpoint && cursor?.has_more ? (
                 <Box
                   sx={{
@@ -400,6 +412,9 @@ LightAutoComplete.defaultProps = {
   allowChipRemove: true,
   multiple: false,
   showHiddenList: null, // boolean: true if you want the list of selected items to be truncated after a count of 5
-  renderItemsListDisplayName: null // function(component): renders  a button or text to display which toggles the list of selected items.
+  renderItemsListDisplayName: null, // function(component): renders  a button or text to display which toggles the list of selected items.
+  filterFunc:null, // function: filters the list of items to display
 };
 export default withStyles(styles)(LightAutoComplete);
+
+

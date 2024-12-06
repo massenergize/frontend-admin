@@ -310,6 +310,12 @@ export const AllEvents = loadable(
     fallback: <Loading />,
   }
 );
+export const TestimonialsFromOthers = loadable(
+  () => import("./MassEnergizeSuperAdmin/Testimonials/TestimonialsFromOthers"),
+  {
+    fallback: <Loading />,
+  }
+);
 export const EventsFromOthers = loadable(
   () => import("./MassEnergizeSuperAdmin/Events/OtherEventsWrapper"),
   {
@@ -531,9 +537,19 @@ export const SendMessage = loadable(
   }
 );
 export const ScheduledMessages = loadable(
-         () =>
-           import("./MassEnergizeSuperAdmin/Messages/ScheduledMessages"),
-         {
-           fallback: <Loading />,
-         }
-       );
+  () =>
+    import("./MassEnergizeSuperAdmin/Messages/ScheduledMessages"),
+  {
+    fallback: <Loading />,
+  }
+);
+
+export const CommunityTestimonialAutoShareSetting = loadable(
+  () =>
+    import("./MassEnergizeSuperAdmin/Community/AutoShareSettings"),
+  {
+    fallback: <Loading />,
+  }
+);
+
+

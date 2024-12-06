@@ -72,9 +72,13 @@ import app, {
   saveCommunityFeatureFlagsReducer,
   saveNavigationConfigurationReducer,
   reducerForSavingInternalLinksList,
-  reducerForCCActionData,
-  cacheMessageInfoReducer
-} from './modules/appReducer';
+  reducerForCCActionData, 
+  reducerForOtherTestimonialState,
+  reducerForLoadingOtherTestimonials,
+  cacheMessageInfoReducer,
+  saveCommunityTestimonialAutoShareSettingsReducer
+} from "./modules/appReducer";
+
 
 /**
  * Creates the main reducer with the dynamically injected ones
@@ -92,7 +96,9 @@ export default function createReducer(injectedReducers = {}) {
     activities: reducerForAdminActivities,
     otherCommunities: reducerForAllOtherCommunities,
     otherEventsState: reducerForSavingOtherEventState,
+    otherTestimonialsState: reducerForOtherTestimonialState,
     otherEvents: reducerForLoadingOtherEvents,
+    otherTestimonials: reducerForLoadingOtherTestimonials,
     flagInfos: reducerForFlagInfo,
     galleryFilters: reducerForGalleryFilters,
     sadmins: reducerForLoadingSuperAdmins,
@@ -151,7 +157,8 @@ export default function createReducer(injectedReducers = {}) {
     communityFeatureFlags: saveCommunityFeatureFlagsReducer,
     menuConfigurations: saveNavigationConfigurationReducer,
     internalLinks: reducerForSavingInternalLinksList,
-    messageInfoCache: cacheMessageInfoReducer
+    messageInfoCache: cacheMessageInfoReducer,
+    testimonialAutoShareSettings:saveCommunityTestimonialAutoShareSettingsReducer
   });
 
   // Wrap the root reducer and return a new root reducer with router state

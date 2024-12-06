@@ -151,8 +151,6 @@ var createFormJson = ({
                     data: communities,
                     isAsync: true,
                     endpoint: "/communities.listForCommunityAdmin",
-                    // onChangeMiddleware: ,
-
                   },
                 ],
               },

@@ -60,18 +60,22 @@ import {
   LOAD_SCHEDULED_MESSAGES,
   ADD_BLOB_STRING,
   KEEP_COMMUNITY_NUDGE_SETTINGS,
-  KEEP_FEATURE_ACTIVATIONS_FOR_COMMUNITY, SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX,
+  KEEP_FEATURE_ACTIVATIONS_FOR_COMMUNITY,
+  SAVE_COMMUNITY_FEATURE_FLAG_TO_REDUX,
   KEEP_LIST_OF_NAVIGATION_CONFIGURATION,
   SAVE_INTERNAL_MENU_LINK,
   LOAD_CC_ACTIONS_DATA,
+  KEEP_TESTIMONIAL_STATE,
+  LOAD_ALL_OTHER_TESTIMONIALS,
   CACHE_MESSAGE_INFO,
+  COMMUNITY_TESTIMONIAL_AUTO_SHARE_SETTINGS,
+  
 } from '../ReduxConstants';
 import { parseJSON } from "../../utils/common";
 
-
 const initialState = Map({
   constants: {},
-  profile: null,
+  profile: null
 });
 
 const initialImmutableState = fromJS(initialState);
@@ -94,6 +98,22 @@ export default function reducer(state = initialImmutableState, action = {}) {
       return state;
   }
 }
+export const reducerForOtherTestimonialState = (state = {}, action = {}) => {
+  switch (action.type) {
+    case KEEP_TESTIMONIAL_STATE:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+export const reducerForLoadingOtherTestimonials = (state = [], action = {}) => {
+  switch (action.type) {
+    case LOAD_ALL_OTHER_TESTIMONIALS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 
 export const reducerForAddingBlobString = (state = {}, action = {}) => {
   switch (action.type) {
@@ -151,10 +171,7 @@ export const reducerForUserEngagements = (state = LOADING, action = {}) => {
       return state;
   }
 };
-export const reducerForEngagementOptions = (
-  state = { range: ["last-month"] },
-  action = {}
-) => {
+export const reducerForEngagementOptions = (state = { range: ["last-month"] }, action = {}) => {
   switch (action.type) {
     case SET_ENGAGMENT_OPTIONS:
       return action.payload;
@@ -597,6 +614,7 @@ export const saveNavigationConfigurationReducer = (state = {}, action = {}) => {
       return state;
   }
 };
+
 export const reducerForSavingInternalLinksList = (state = [], action = {}) => {
   switch (action.type) {
     case SAVE_INTERNAL_MENU_LINK:
@@ -614,7 +632,16 @@ export const cacheMessageInfoReducer = (state = {}, action = {}) => {
       return state;
   }
 };
+export const saveCommunityTestimonialAutoShareSettingsReducer = (state = {}, action = {}) => {
+  switch (action.type) {
+    case COMMUNITY_TESTIMONIAL_AUTO_SHARE_SETTINGS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
 
 export const allReducers = {
-  communities: communitiesReducer,
+  communities: communitiesReducer
 };
+
