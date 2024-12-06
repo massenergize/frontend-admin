@@ -501,7 +501,7 @@ class About extends React.Component {
                     style={{ fontWeight: "600", fontSize: "1rem", display: "flex", alignItems: "center" }}
                     component="h3"
                   >
-                    Edit Auto Share Settings
+                    Customize Community Auto Share Settings
                     <i className=" fa fa-long-arrow-right" style={{ color: "green", marginLeft: 5 }} />
                   </Typography>
                 </Paper>

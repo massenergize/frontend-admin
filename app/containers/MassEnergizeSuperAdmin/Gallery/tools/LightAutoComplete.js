@@ -79,7 +79,8 @@ function LightAutoComplete(props) {
     showHiddenList,
     renderItemsListDisplayName,
     shortenListAfter,
-    renderSelectedItems
+    renderSelectedItems,
+    filterFunc
   } = props;
 
   const [optionsToDisplay, setOptionsToDisplay] = useState(data || []);
@@ -244,6 +245,12 @@ function LightAutoComplete(props) {
     transfer(newSelected);
   };
 
+  const retrieveDisplayItems = ()=> {
+    const items = query ? filteredItems : optionsToDisplay;
+    if(filterFunc) return filterFunc(items);
+    return items;
+  }
+
   return (
     <div
       style={{
@@ -349,31 +356,29 @@ function LightAutoComplete(props) {
                 </div>
               )}
 
-              {(query ? filteredItems : optionsToDisplay).map((op, index) => {
-                return (
-                  <div
-                    key={index?.toString()}
-                    className={classes.dropdownItem}
-                    onClick={() => handleSelection(op)}
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center"
-                    }}
-                  >
-                    {multiple && (
-                      <Checkbox
-                        style={{
-                          padding: 0,
-                          marginRight: 6
-                        }}
-                        checked={onlyValues.includes(getValue(op))}
-                      />
-                    )}
-                    {getLabel(op)}
-                  </div>
-                );
-              })}
+            {retrieveDisplayItems()?.map((op, index) => (
+                <div
+                  key={index.toString()}
+                  className={classes.dropdownItem}
+                  onClick={() => handleSelection(op)}
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center"
+                  }}
+                >
+                  {multiple && (
+                    <Checkbox
+                      style={{
+                        padding: 0,
+                        marginRight: 6
+                      }}
+                      checked={onlyValues.includes(getValue(op))}
+                    />
+                  )}
+                  {getLabel(op)}
+                </div>
+              ))}
               {endpoint && cursor?.has_more ? (
                 <Box
                   sx={{
@@ -407,6 +412,9 @@ LightAutoComplete.defaultProps = {
   allowChipRemove: true,
   multiple: false,
   showHiddenList: null, // boolean: true if you want the list of selected items to be truncated after a count of 5
-  renderItemsListDisplayName: null // function(component): renders  a button or text to display which toggles the list of selected items.
+  renderItemsListDisplayName: null, // function(component): renders  a button or text to display which toggles the list of selected items.
+  filterFunc:null, // function: filters the list of items to display
 };
 export default withStyles(styles)(LightAutoComplete);
+
+
