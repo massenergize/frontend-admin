@@ -18,6 +18,7 @@ export const PAGE_PROPERTIES = {
          ACTION_ENGAGEMENTS: { key: "ACTION_ENGAGEMENTS" },
          SCHEDULED_MESSAGES: { key: "SCHEDULED_MESSAGES" },
          EMAIL_TEMPLATES: { key: "EMAIL_TEMPLATES" },
+         CUSTOM_PAGES: { key: "CUSTOM_PAGES" },
        }; 
 
 

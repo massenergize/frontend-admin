@@ -15,6 +15,7 @@ export const FLAGS = {
   PLATFORM_FEATURES_OPT_IN: "platform-feature-opt-in-feature-flag",
   EVENT_NUDGE_FEATURE_FLAG_KEY : "user-event-nudge-feature-flag",
   CUSTOMIZE_NAVIGATION_MENU: "customize-navigation-menu-feature-flag",
-  CUSTOMIZE_AUTO_SHARE_SETTINGS: "testimonial-auto-sharing-feature-flag",
+  CUSTOMIZE_AUTO_SHARE_SETTINGS: "shared-testimonials-nudge-feature-flag",
+  CUSTOM_PAGES: "custom-pages-feature-flag",
   ...USER_PORTAL_FLAGS
 };

@@ -1,9 +1,11 @@
+const { APP_LINKS } = require("../../utils/constants");
+
 module.exports = [
   {
     key: "dashboard",
     name: "Dashboard",
     icon: "ios-stats",
-    link: "/",
+    link: "/"
   },
   {
     key: "communities",
@@ -13,20 +15,22 @@ module.exports = [
       {
         key: "about-communities",
         name: "Communities",
-        title: true,
+        title: true
       },
       {
         key: "onboard-community",
         name: "Add New Community",
         link: "/admin/add/community",
+        target: "_blank"
       },
       {
         key: "all-communities",
         name: "All Communities",
-        link: "/admin/read/communities",
-      },
-    ],
+        link: "/admin/read/communities"
+      }
+    ]
   },
+
   {
     key: "actions",
     name: "Actions",
@@ -35,19 +39,19 @@ module.exports = [
       {
         key: "about-actions",
         name: "Actions",
-        title: true,
+        title: true
       },
       {
         key: "add-action",
         name: "Add New Action",
-        link: "/admin/add/action",
+        link: "/admin/add/action"
       },
       {
         key: "all-actions",
         name: "All Actions",
-        link: "/admin/read/actions",
-      },
-    ],
+        link: "/admin/read/actions"
+      }
+    ]
   },
   {
     key: "events",
@@ -57,19 +61,19 @@ module.exports = [
       {
         key: "about-events",
         name: "Events & Campaigns",
-        title: true,
+        title: true
       },
       {
         key: "add-event",
         name: "Add Event or Campaign",
-        link: "/admin/add/event",
+        link: "/admin/add/event"
       },
       {
         key: "all-events",
         name: "All Events & Campaigns",
-        link: "/admin/read/events",
-      },
-    ],
+        link: "/admin/read/events"
+      }
+    ]
   },
   {
     key: "messages",
@@ -79,29 +83,29 @@ module.exports = [
       {
         key: "all-messages",
         name: "All Messages",
-        title: true,
+        title: true
       },
       {
         key: "send-message",
         name: "Send Message",
-        link: "/admin/send/message",
+        link: "/admin/send/message"
       },
       {
         key: "scheduled-messages",
         name: "Scheduled Messages",
-        link: "/admin/scheduled/messages",
+        link: "/admin/scheduled/messages"
       },
       {
         key: "all-team-admin-messages",
         name: "Team Admin Messages",
-        link: "/admin/read/team-admin-messages",
+        link: "/admin/read/team-admin-messages"
       },
       {
         key: "all-community-admin-messages",
         name: "Community Admin Messages",
-        link: "/admin/read/community-admin-messages",
-      },
-    ],
+        link: "/admin/read/community-admin-messages"
+      }
+    ]
   },
   {
     key: "teams",
@@ -111,19 +115,19 @@ module.exports = [
       {
         key: "about-teams",
         name: "Teams",
-        title: true,
+        title: true
       },
       {
         key: "add-team",
         name: "Add New Team",
-        link: "/admin/add/team",
+        link: "/admin/add/team"
       },
       {
         key: "all-teams",
         name: "All Teams",
-        link: "/admin/read/teams",
-      },
-    ],
+        link: "/admin/read/teams"
+      }
+    ]
   },
   {
     key: "subscribers",
@@ -133,7 +137,7 @@ module.exports = [
       {
         key: "about-subscribers",
         name: "Subscribers",
-        title: true,
+        title: true
       },
       // {
       //   key: 'add-subscriber',
@@ -143,9 +147,9 @@ module.exports = [
       {
         key: "all-subscribers",
         name: "All Subscribers",
-        link: "/admin/read/subscribers",
-      },
-    ],
+        link: "/admin/read/subscribers"
+      }
+    ]
   },
   {
     key: "testimonials",
@@ -155,19 +159,19 @@ module.exports = [
       {
         key: "about-testimonials",
         name: "testimonials",
-        title: true,
+        title: true
       },
       {
         key: "add-testimonial",
         name: "Add New Testimonial",
-        link: "/admin/add/testimonial",
+        link: "/admin/add/testimonial"
       },
       {
         key: "all-testimonials",
         name: "All Testimonials",
-        link: "/admin/read/testimonials",
-      },
-    ],
+        link: "/admin/read/testimonials"
+      }
+    ]
   },
   {
     key: "vendors",
@@ -177,19 +181,19 @@ module.exports = [
       {
         key: "about-vendors",
         name: "Contractors/Vendors",
-        title: true,
+        title: true
       },
       {
         key: "add-vendor",
         name: "Add New Vendor",
-        link: "/admin/add/vendor",
+        link: "/admin/add/vendor"
       },
       {
         key: "all-vendors",
         name: "All Vendors",
-        link: "/admin/read/vendors",
-      },
-    ],
+        link: "/admin/read/vendors"
+      }
+    ]
   },
   {
     key: "policies",
@@ -199,19 +203,19 @@ module.exports = [
       {
         key: "about-policies",
         name: "policies",
-        title: true,
+        title: true
       },
       {
         key: "add-policy",
         name: "Add New Policy",
-        link: "/admin/add/policy",
+        link: "/admin/add/policy"
       },
       {
         key: "all-policies",
         name: "All Policies",
-        link: "/admin/read/policies",
-      },
-    ],
+        link: "/admin/read/policies"
+      }
+    ]
   },
   {
     key: "users",
@@ -221,20 +225,39 @@ module.exports = [
       {
         key: "about-users",
         name: "Users",
-        title: true,
+        title: true
       },
       {
         key: "all-users",
         name: "All Users",
-        link: "/admin/read/users",
-      },
-    ],
+        link: "/admin/read/users"
+      }
+    ]
+  },
+  {
+    key: "custom-pages",
+    name: "Pages(Beta)",
+    icon: "ios-paper",
+    child: [
+      // {
+      //   key: "create-custom-page",
+      //   icon: "ios-plus",
+      //   name: "Create Page",
+      //   link: APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT
+      // },
+      {
+        key: "all-custom-pages",
+        icon: "ios-list",
+        name: "All My Custom Pages",
+        link: APP_LINKS.PAGE_BUILDER_VIEW_PAGES
+      }
+    ]
   },
   {
     key: "add-new-super-admin",
     name: "New Super admin",
     icon: "ios-add-circle",
-    link: "/admin/add-super-admin",
+    link: "/admin/add-super-admin"
   },
   {
     key: "tags-collections",
@@ -244,19 +267,19 @@ module.exports = [
       {
         key: "about-categories",
         name: "Tags & Tag Collections",
-        title: true,
+        title: true
       },
       {
         key: "add-category",
         name: "Add New Category",
-        link: "/admin/add/category",
+        link: "/admin/add/category"
       },
       {
         key: "all-collections",
         name: "All Tag Collections",
-        link: "/admin/read/tag-collections",
-      },
-    ],
+        link: "/admin/read/tag-collections"
+      }
+    ]
   },
   {
     key: "carbon-equivalancies",
@@ -266,19 +289,19 @@ module.exports = [
       {
         key: "about-equivalencies",
         name: "Carbon Equivalencies",
-        title: true,
+        title: true
       },
       {
         key: "add-equivalency",
         name: "Add Carbon Equivalency",
-        link: "/admin/add/carbon-equivalency",
+        link: "/admin/add/carbon-equivalency"
       },
       {
         key: "all-equivalencies",
         name: "All Carbon Equivalencies",
-        link: "/admin/read/carbon-equivalencies",
-      },
-    ],
+        link: "/admin/read/carbon-equivalencies"
+      }
+    ]
   },
   {
     key: "tasks",
@@ -288,14 +311,14 @@ module.exports = [
       {
         key: "create-tasks",
         name: "Add New task",
-        link: "/admin/tasks/add",
+        link: "/admin/tasks/add"
       },
       {
         key: "all-tasks",
         name: "All Tasks",
-        link: "/admin/read/tasks",
-      },
-    ],
+        link: "/admin/read/tasks"
+      }
+    ]
   },
   {
     key: "settings",
@@ -305,13 +328,13 @@ module.exports = [
       {
         key: "settings-page",
         link: "/admin/profile/preferences",
-        name: "Communication preferences",
+        name: "Communication preferences"
       },
       {
         key: "feature-flags",
         link: "/admin/settings/feature-flags",
-        name: "Feature Flags",
-      },
-    ],
-  },
+        name: "Feature Flags"
+      }
+    ]
+  }
 ];

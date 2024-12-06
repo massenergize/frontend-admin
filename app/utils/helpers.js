@@ -1,9 +1,16 @@
 import { IS_CANARY, IS_LOCAL, IS_PROD } from "../config/constants";
 import { apiCall } from "./messenger";
-import { DEFAULT_ITEMS_PER_PAGE } from './constants';
+import { DEFAULT_ITEMS_PER_PAGE } from "./constants";
 import { parseJSON } from "./common";
 const TABLE_PROPERTIES = "_TABLE_PROPERTIES";
 const FILTERS = "_FILTERS";
+
+export const mergeTwoArrOfObjs = (arr1, arr2, key) => {
+  let obj = {};
+  arr1.forEach((item) => (obj[item[key]] = item));
+  arr2.forEach((item) => (obj[item[key]] = item));
+  return Object.values(obj);
+};
 
 export const getSearchText = (key) => {
   var tableProp = localStorage.getItem(key + TABLE_PROPERTIES);
@@ -24,12 +31,7 @@ export const getFilterParamsFromLocalStorage = (key) => {
 
   Object.values(tableProp).forEach((value) => {
     if (value.list.length) {
-      filters[
-        value &&
-          value.name &&
-          value.name.toLowerCase &&
-          value.name.toLowerCase()
-      ] = value.list;
+      filters[value && value.name && value.name.toLowerCase && value.name.toLowerCase()] = value.list;
     }
   });
   return filters;
@@ -42,7 +44,6 @@ export const getFilterData = (data, existing = [], field = "id") => {
   return unique;
 };
 
-
 const getSavedSortParamsFromLocalStorage = (key) => {
   let tableProp = localStorage.getItem(key + TABLE_PROPERTIES);
   tableProp = parseJSON(tableProp || null) || {};
@@ -54,21 +55,13 @@ export const prepareFilterAndSearchParamsFromLocal = (key) => {
   let params = JSON.stringify({
     ...filterParams,
     search_text: getSearchText(key) || "",
-    sort_params: getSavedSortParamsFromLocalStorage(key) || {},
+    sort_params: getSavedSortParamsFromLocalStorage(key) || {}
   });
 
   return params;
 };
 
-export const makeAPICallForMoreData = ({
-  apiUrl,
-  existing,
-  updateRedux,
-  args,
-  name,
-  updateMetaData,
-  meta,
-}) => {
+export const makeAPICallForMoreData = ({ apiUrl, existing, updateRedux, args, name, updateMetaData, meta }) => {
   apiCall(apiUrl, args).then((res) => {
     if (res.success) {
       let data = getFilterData(res, existing);
@@ -84,22 +77,17 @@ export const generateFilterParams = (items, columns) => {
     .map((item, index) => {
       return {
         name: columns[index].name,
-        val: item,
+        val: item
       };
     })
     .filter((item) => item.val.length > 0)
-    .reduce(
-      (acc, curr) => ((acc[curr["name"].toLowerCase()] = curr.val), acc),
-      {}
-    );
+    .reduce((acc, curr) => ((acc[curr["name"].toLowerCase()] = curr.val), acc), {});
 };
 
 export const getAdminApiEndpoint = (auth, base) => {
   let url = base;
   const isSuperAdmin = auth && auth.is_super_admin;
-  return isSuperAdmin
-    ? `${url}.listForSuperAdmin`
-    : `${url}.listForCommunityAdmin`;
+  return isSuperAdmin ? `${url}.listForSuperAdmin` : `${url}.listForCommunityAdmin`;
 };
 
 const callMoreData = (
@@ -113,7 +101,7 @@ const callMoreData = (
   updateMetaData,
   meta,
   otherArgs,
-  customLimit,
+  customLimit
 ) => {
   let filterParams = getFilterParamsFromLocalStorage(pageProp.key);
   makeAPICallForMoreData({
@@ -126,13 +114,13 @@ const callMoreData = (
       params: JSON.stringify({
         ...filterParams,
         search_text: getSearchText(pageProp.key) || "",
-        sort_params: sortBy,
+        sort_params: sortBy
       }),
-      ...(otherArgs || {}),
+      ...(otherArgs || {})
     },
     name,
     updateMetaData,
-    meta,
+    meta
   });
 };
 
@@ -147,7 +135,7 @@ export const onTableStateChange = ({
   name,
   updateMetaData,
   meta,
-  otherArgs,
+  otherArgs
 }) => {
   switch (action) {
     case "changePage":
@@ -178,10 +166,10 @@ export const onTableStateChange = ({
         name,
         updateMetaData,
         meta,
-        otherArgs,
+        otherArgs
       );
       break;
-    
+
     default:
   }
 };
@@ -193,14 +181,14 @@ const convertToLocalFormat = (filterList, columns) => {
   columns.forEach((column, index) => {
     let newColumn = {
       ...column,
-      options: { ...column.options, filterList: filterList[index] },
+      options: { ...column.options, filterList: filterList[index] }
     };
     newColumns.push(newColumn);
 
     let filter = {
       name: column.name,
       type: column.options.filterType || "",
-      list: filterList[index],
+      list: filterList[index]
     };
     obj = { ...(obj || {}), [index]: filter };
   });
@@ -219,14 +207,14 @@ export const handleFilterChange = ({
   meta,
   name,
   updateMetaData,
-  otherArgs,
+  otherArgs
 }) => {
   if (type === "chip" || type === "custom") {
     let arr = generateFilterParams(filterList, columns);
     apiCall(url, {
       params: JSON.stringify(arr),
       limit: getLimit(page.key),
-      ...(otherArgs || {}),
+      ...(otherArgs || {})
     }).then((res) => {
       if (res && res.success) {
         let filterData = getFilterData(res, reduxItems, "id");
@@ -247,13 +235,12 @@ export const removeDuplicates = (first, second) => {
   return uniqueItems;
 };
 
-export const getOrigin = ()=>{
-  if(IS_PROD) return "https://api.massenergize.org"
+export const getOrigin = () => {
+  if (IS_PROD) return "https://api.massenergize.org";
   else if (IS_CANARY) return "https://api-canary.massenergize.org";
-  else if(IS_LOCAL) return "http://127.0.0.1:8000";
+  else if (IS_LOCAL) return "http://127.0.0.1:8000";
   return "https://api.massenergize.dev";
-}
-
+};
 
 export function sortByField(arr, field) {
   return arr.sort((a, b) => {

@@ -128,12 +128,12 @@ function MediaLibrary(props) {
     handleSelected(images);
   };
 
-  const renderSelectedItems = () => {
+  const renderSelectedItems = ({ show, imageTray }) => {
     if (customRender)
       return customRender({
         open: show,
-        openLibrary: setShow, 
-        selected: imageTray,
+        openLibrary: setShow,
+        selected: imageTray
       });
     return (
       !floatingMode && (
@@ -224,7 +224,7 @@ function MediaLibrary(props) {
           />
         </div>
       )}
-      {renderSelectedItems()}
+      {renderSelectedItems({ show, imageTray })}
     </React.Fragment>
   );
 }

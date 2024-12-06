@@ -1,0 +1,15 @@
+.pb-undefault {
+  /* background-color: grey; */
+  border-width: 0px;
+  width: 100%;
+  background-color: transparent;
+  outline: none;
+  margin: 0px;
+}
+
+.pb-dropdown {
+  padding: 8px;
+  font-size: 16px;
+  border: solid 1px #ccc;
+  border-radius: 3px;
+}

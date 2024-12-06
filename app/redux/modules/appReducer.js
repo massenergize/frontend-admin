@@ -69,8 +69,8 @@ import {
   LOAD_ALL_OTHER_TESTIMONIALS,
   CACHE_MESSAGE_INFO,
   COMMUNITY_TESTIMONIAL_AUTO_SHARE_SETTINGS,
-  
-} from '../ReduxConstants';
+  LOAD_USERS_CUSTOM_PAGES
+} from "../ReduxConstants";
 import { parseJSON } from "../../utils/common";
 
 const initialState = Map({
@@ -94,6 +94,15 @@ export default function reducer(state = initialImmutableState, action = {}) {
   switch (action.type) {
     case START_UP:
       return state;
+    default:
+      return state;
+  }
+}
+
+export function reducerForCustomPages(state = [], action = {}) {
+  switch (action.type) {
+    case LOAD_USERS_CUSTOM_PAGES:
+      return action.payload;
     default:
       return state;
   }
@@ -644,4 +653,3 @@ export const saveCommunityTestimonialAutoShareSettingsReducer = (state = {}, act
 export const allReducers = {
   communities: communitiesReducer
 };
-
