@@ -127,8 +127,7 @@ class AddRemoveSuperAdmin extends Component {
       {
         id: d.id,
         image: d.profile_picture,
-        initials: `${d.preferred_name &&
-          d.preferred_name.substring(0, 2).toUpperCase()}`,
+        initials: `${d?.preferred_name?.substring(0, 2)?.toUpperCase()}`,
       },
       d.full_name,
       d.preferred_name,
@@ -136,8 +135,8 @@ class AddRemoveSuperAdmin extends Component {
     ]);
   };
 
-  whenRequestIsCompleted(data, successfull, resetForm) {
-    if (!successfull || !data) return;
+  whenRequestIsCompleted(data, successful, resetForm) {
+    if (!successful || !data) return;
     const { putSadminsInRedux, sadmins } = this.props;
     putSadminsInRedux([data, ...sadmins]);
     resetForm && resetForm();
