@@ -246,7 +246,6 @@ class Application extends React.Component {
             <Switch>
               {user.is_super_admin && superAdminSpecialRoutes}
               {user.is_community_admin && communityAdminSpecialRoutes}
-
               <Route exact path="/blank" component={BlankPage} />
               <Route exact path="/admin/community/configure/navigation" component={CustomNavigationConfiguration} />
               <Route exact path={APP_LINKS.PAGE_BUILDER_VIEW_PAGES} component={CustomPagesList} />
