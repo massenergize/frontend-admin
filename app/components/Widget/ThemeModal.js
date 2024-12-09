@@ -21,13 +21,21 @@ function ThemeModal({
   contentStyle = {},
   title,
   noTitle = false,
-  renderComponent,
+  renderComponent
 }) {
   const fullControlStyles = { padding: 0 };
   const handleClose = () => {
     if (onCancel) return onCancel();
 
     close && close();
+  };
+
+  const componentRender = () => {
+    if (renderComponent) {
+      return renderComponent({ open, close });
+    }
+
+    return children;
   };
   return (
     <>
@@ -37,21 +45,9 @@ function ThemeModal({
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        {!noTitle && (
-          <DialogTitle id="alert-dialog-title">
-            {title || "Confirmation Dialog"}
-          </DialogTitle>
-        )}
-        <DialogContent
-          style={
-            fullControl
-              ? { ...fullControlStyles, ...(contentStyle || {}) }
-              : contentStyle || {}
-          }
-        >
-          <DialogContentText id="alert-dialog-description">
-            {children}
-          </DialogContentText>
+        {!noTitle && <DialogTitle id="alert-dialog-title">{title || "Confirmation Dialog"}</DialogTitle>}
+        <DialogContent style={fullControl ? { ...fullControlStyles, ...(contentStyle || {}) } : contentStyle || {}}>
+          <DialogContentText id="alert-dialog-description">{componentRender()}</DialogContentText>
         </DialogContent>
         {!fullControl && (
           <DialogActions>

@@ -343,3 +343,5 @@ export const EXAMPLE_MENU_STRUCTURE = {
   success: true,
   cursor: {}
 };
+
+export const BUG_REPORT_EMAIL = "brad@massenergize.org";

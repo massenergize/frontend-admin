@@ -1,4 +1,5 @@
 import { FLAGS } from "../../components/FeatureFlags/flags";
+import { APP_LINKS } from "../../utils/constants";
 
 const CADMIN_MENU = [
   {
@@ -24,6 +25,7 @@ const CADMIN_MENU = [
       }
     ]
   },
+
   {
     key: "actions",
     name: "Actions",
@@ -201,6 +203,7 @@ const CADMIN_MENU = [
       }
     ]
   },
+
   {
     key: "settings",
     name: "Settings",
@@ -215,30 +218,71 @@ const CADMIN_MENU = [
   }
 ];
 
-let menuAttachmentsObj = {};
-
-menuAttachmentsObj[FLAGS.BROADCAST_MESSAGING_FF] = {
-  appendTo: "messages",
-  value: [
-    {
-      key: "send-message",
-      name: "Send Message",
-      link: "/admin/send/message"
-    },
-    {
-      key: "scheduled-messages",
-      name: "Scheduled Messages",
-      link: "/admin/scheduled/messages"
-    }
-  ],
-  index: 1
+let menuAttachmentsObj = {
+  [FLAGS.BROADCAST_MESSAGING_FF]: {
+    appendTo: "messages",
+    value: [
+      {
+        key: "send-message",
+        name: "Send Message",
+        link: "/admin/send/message"
+      },
+      {
+        key: "scheduled-messages",
+        name: "Scheduled Messages",
+        link: "/admin/scheduled/messages"
+      }
+    ],
+    index: 1
+  },
+  [FLAGS.CUSTOM_PAGES]: {
+    index: 10,
+    value: [
+      {
+        key: "custom-pages",
+        name: "Pages(Beta)",
+        icon: "ios-paper",
+        child: [
+          // {
+          //   key: "create-custom-page",
+          //   name: "Create Page",
+          //   link: APP_LINKS.PAGE_BUILDER_CREATE_OR_EDIT,
+          //   target: "_blank"
+          // },
+          {
+            key: "all-custom-pages",
+            name: "All My Custom Pages",
+            link: APP_LINKS.PAGE_BUILDER_VIEW_PAGES
+          }
+        ]
+      }
+    ]
+  }
 };
+
+// menuAttachmentsObj[FLAGS.BROADCAST_MESSAGING_FF] = {
+//   appendTo: "messages",
+//   value: [
+//     {
+//       key: "send-message",
+//       name: "Send Message",
+//       link: "/admin/send/message"
+//     },
+//     {
+//       key: "scheduled-messages",
+//       name: "Scheduled Messages",
+//       link: "/admin/scheduled/messages"
+//     }
+//   ],
+//   index: 1
+// };
 
 const hasAlreadyBeenAppended = (mainArray, bigObjArray) => {
   const idsA = bigObjArray.map((objA) => objA.key);
   return idsA.every((id) => mainArray.some((objB) => objB.key === id));
 };
 
+// TODO: Rewrite this so that it is more readable, and it also handles the case where the item to be appended to is a child item (make it recurse?)
 const communityAdminMenu = ({ flags }) => {
   if (!flags || flags?.length === 0) return CADMIN_MENU;
 

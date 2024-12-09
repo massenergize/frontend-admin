@@ -1,0 +1,140 @@
+@import url(./elevations.css);
+:root {
+  --pb-main-color: var(--pb-main-color, black);
+}
+
+h6,
+h2 {
+  margin: 0px;
+}
+/* 
+.rogue-div * {
+  all: unset;
+} */
+
+.pb-canvas-not-wrapper {
+  width: 100%;
+  position: fixed;
+  top: 10px;
+  z-index: 30000;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.pb-canvas-notification {
+  /* width: 100%;
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
+  padding: 10px 20px;
+  font-size: 15px;
+  display: flex;
+  flex-direction: row;
+  align-items: center; */
+
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 5px;
+  width: fit-content;
+  margin-left: -21%;
+  box-shadow: 0 1px 0px 0 rgba(0, 0, 0, -1.84),
+  0 2px 10px 0 rgba(0, 0, 0, 0.1);
+}
+
+.pb-dangerous-note {
+  color: white;
+  background-color: #ec7c7c;
+  /* color: #c14e4e;
+  background-color: #ff000014; */
+}
+.pb-success-note {
+  color: white;
+  background-color: #2d9d2d;
+  /* color: green;
+  background-color: #29bf2926; */
+}
+.pb-r-t {
+  margin: 10px 0px;
+  color: #0b9edc;
+  background-color: #9fddeb47;
+  padding: 10px 20px;
+  font-size: 15px;
+  width: 100%;
+}
+.pb-block-btn {
+  padding: 6px 22px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #9fddeb47;
+  border: solid 0px #0b9edc;
+  border-radius: 4px;
+  color: #0b9edc;
+  width: fit-content;
+  display: flex;
+  flex-direction: row;
+}
+
+.touchable-opacity {
+  cursor: pointer;
+}
+.touchable-opacity:hover {
+  opacity: 0.8;
+  transition: 0.4s ease-in-out;
+}
+.pb-root {
+  height: 100vh;
+  width: 100vw;
+  background-color: #fafdff;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+}
+
+.pb-canvas {
+  flex-basis: 80%;
+  position: relative;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  background-color: white;
+  z-index: 1500;
+  padding-bottom: 200px;
+}
+
+.pb-right-panel {
+  position: relative;
+  flex-basis: 20%;
+  z-index: 1502;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+.align-center {
+  align-items: center;
+}
+.justify-center {
+  justify-content: center;
+}
+
+.pb-textbox {
+  width: auto;
+}
+
+.pb-textbox label {
+  font-size: 13px;
+  color: grey;
+  margin-bottom: 10px;
+}
+
+.pb-textbox input {
+  width: 100%;
+  padding: 5px 10px;
+  border: 1px solid #ededed;
+  border-radius: 3px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}

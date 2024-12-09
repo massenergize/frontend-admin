@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { apiCall } from "../../../utils/messenger";
 import { reduxAddInternalLinkList } from "../../../redux/redux-actions/adminActions";
 import Loading from "dan-components/Loading";
-import { isValidURL } from "../../../utils/common";
+import { fetchParamsFromURL, isValidURL } from "../../../utils/common";
 
 function CreateAndEditMenu({ data, cancel, insertNewLink, children, isEdit }) {
   const [form, setForm] = useState({});
@@ -16,6 +16,8 @@ function CreateAndEditMenu({ data, cancel, insertNewLink, children, isEdit }) {
   const internalLinks = useSelector((state) => state.getIn(["internalLinks"]));
   const keepInRedux = (data) => dispatch(reduxAddInternalLinkList(data));
   const isParent = children?.length;
+
+  const { comId } = fetchParamsFromURL(window.location, "comId");
 
   useEffect(() => {
     setForm(data);
@@ -32,7 +34,7 @@ function CreateAndEditMenu({ data, cancel, insertNewLink, children, isEdit }) {
 
   const fetchInternalLinks = () => {
     setLoading(true);
-    apiCall("links.internal.get")
+    apiCall("links.internal.get", { community_ids: [comId] })
       .then((response) => {
         setLoading(false);
         if (!response?.success) {
@@ -52,7 +54,7 @@ function CreateAndEditMenu({ data, cancel, insertNewLink, children, isEdit }) {
 
     return isParent ? Boolean(name) : name && link;
   };
-  const { is_published, name, link, is_link_external: linkIsExternal } = form || {};
+  const { is_published, name, link, is_link_external: linkIsExternal, is_custom_page: isCustomPage } = form || {};
   const linkIsValid = isValidURL(link);
   const readyToSave = formIsValid();
 
@@ -167,7 +169,7 @@ function CreateAndEditMenu({ data, cancel, insertNewLink, children, isEdit }) {
                 <FormControlLabel
                   control={
                     <input
-                      onChange={() => updateForm({ is_link_external: !linkIsExternal })}
+                      onChange={() => updateForm({ is_link_external: !linkIsExternal, is_custom_page: false })}
                       checked={linkIsExternal}
                       type="checkbox"
                       style={{ color: "var(--app-purple)" }}
@@ -176,16 +178,54 @@ function CreateAndEditMenu({ data, cancel, insertNewLink, children, isEdit }) {
                   style={{}}
                   label="External"
                 />
+                {/* <FormControlLabel
+                  control={
+                    <input
+                      onChange={() => updateForm({ is_custom_page: !isCustomPage })}
+                      checked={isCustomPage}
+                      type="checkbox"
+                      style={{ color: "var(--app-purple)" }}
+                    />
+                  }
+                  style={{}}
+                  label="Custom Page"
+                /> */}
               </div>
             )}
-            <div>
+            <div style={{ marginBottom: 10 }}>
               {loading && !isParent && (
                 <span style={{ color: "var(--app-purple)" }}>
                   <i className="fa fa-spinner fa-spin" /> Fetching internal links...
                 </span>
               )}
-              {renderLinkItems()}
+              {!isCustomPage && renderLinkItems()}
             </div>
+            {/* {!linkIsExternal && (
+              <div style={{ margin: "0px 10px", display: "flex", flexDirection: "row", alignItems: "center" }}>
+                <FormControlLabel
+                  control={
+                    <input
+                      onChange={() => updateForm({ is_custom_page: !isCustomPage })}
+                      checked={isCustomPage}
+                      type="checkbox"
+                      style={{ color: "var(--app-purple)" }}
+                    />
+                  }
+                  style={{}}
+                  label="I want to build my own page"
+                />
+
+                {!isParent && !linkIsExternal && isCustomPage && (
+                  <a
+                    href={`/admin/community/configure/navigation/custom-pages`}
+                    target="_blank"
+                    style={{ fontWeight: "bold" }}
+                  >
+                    Edit with page builder
+                  </a>
+                )}
+              </div>
+            )} */}
           </div>
           {/* <TextField
           style={{ width: "100%", marginTop: 15 }}

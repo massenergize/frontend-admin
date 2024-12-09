@@ -1,18 +1,18 @@
-import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
+import React, { Fragment } from "react";
+import PropTypes from "prop-types";
 import { withStyles } from "@mui/styles";
-import { connect } from 'react-redux';
-import classNames from 'classnames';
-import Hidden from '@mui/material/Hidden';
-import Drawer from '@mui/material/Drawer';
-import SwipeableDrawer from '@mui/material/SwipeableDrawer';
-import dummy from 'dan-api/dummy/dummyContents';
-import { bindActionCreators } from 'redux';
-import styles from './sidebar-jss';
-import SidebarContent from './SidebarContent';
-import communityAdminMenu from '../../api/ui/communityAdminMenu';
-import superAdminMenu from '../../api/ui/superAdminMenu';
-
+import { connect } from "react-redux";
+import classNames from "classnames";
+import Hidden from "@mui/material/Hidden";
+import Drawer from "@mui/material/Drawer";
+import SwipeableDrawer from "@mui/material/SwipeableDrawer";
+import dummy from "dan-api/dummy/dummyContents";
+import { bindActionCreators } from "redux";
+import styles from "./sidebar-jss";
+import SidebarContent from "./SidebarContent";
+import communityAdminMenu from "../../api/ui/communityAdminMenu";
+import superAdminMenu from "../../api/ui/superAdminMenu";
+import { mergeTwoArrOfObjs } from "../../utils/helpers";
 
 class Sidebar extends React.Component {
   state = {
@@ -25,24 +25,24 @@ class Sidebar extends React.Component {
   flagDarker = false;
 
   componentDidMount = () => {
-    window.addEventListener('scroll', this.handleScroll);
-  }
+    window.addEventListener("scroll", this.handleScroll);
+  };
 
   componentWillUnmount() {
-    window.removeEventListener('scroll', this.handleScroll);
+    window.removeEventListener("scroll", this.handleScroll);
   }
 
   handleScroll = () => {
     const doc = document.documentElement;
     const scroll = (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0);
-    const newFlagDarker = (scroll > 30);
+    const newFlagDarker = scroll > 30;
     if (this.flagDarker !== newFlagDarker) {
       this.setState({ turnDarker: newFlagDarker });
       this.flagDarker = newFlagDarker;
     }
-  }
+  };
 
-  handleOpen = event => {
+  handleOpen = (event) => {
     this.setState({ anchorEl: event.currentTarget });
   };
 
@@ -50,26 +50,24 @@ class Sidebar extends React.Component {
     this.setState({ anchorEl: null });
   };
 
-  handleChangeStatus = status => {
+  handleChangeStatus = (status) => {
     this.setState({ status });
     this.handleClose();
-  }
-
+  };
 
   render() {
-    const {
-      classes,
-      open,
-      toggleDrawerOpen,
-      loadTransition,
-      leftSidebar,
-      auth,
-      featureFlags,
-    } = this.props;
+    const { classes, open, toggleDrawerOpen, loadTransition, leftSidebar, auth, featureFlags } = this.props;
     const drawerWidth = 240;
 
     const { status, anchorEl, turnDarker } = this.state;
-    const dataMenu = auth && auth.is_super_admin ? superAdminMenu : communityAdminMenu({flags:auth?.feature_flags});
+    let flagsTogether = auth?.feature_flags || [];
+
+    // Merge the user specific flags and the community specific flags together
+    flagsTogether = auth?.admin_at?.reduce(
+      (acc, curr) => mergeTwoArrOfObjs(acc, curr?.feature_flags, "key"),
+      flagsTogether
+    );
+    const dataMenu = auth && auth.is_super_admin ? superAdminMenu : communityAdminMenu({ flags: flagsTogether });
     return (
       <Fragment>
         <Hidden lgUp>
@@ -100,11 +98,7 @@ class Sidebar extends React.Component {
             variant="permanent"
             onClose={toggleDrawerOpen}
             classes={{
-              paper: classNames(
-                classes.drawer,
-                classes.drawerPaper,
-                !open ? classes.drawerPaperClose : ""
-              ),
+              paper: classNames(classes.drawer, classes.drawerPaper, !open ? classes.drawerPaperClose : "")
             }}
             open={open}
             anchor={leftSidebar ? "left" : "right"}
@@ -135,7 +129,7 @@ Sidebar.propTypes = {
   loadTransition: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
   leftSidebar: PropTypes.bool,
-  dataMenu: PropTypes.array.isRequired,
+  dataMenu: PropTypes.array.isRequired
 };
 
 Sidebar.defaultProps = {
@@ -145,8 +139,11 @@ Sidebar.defaultProps = {
 function mapStateToProps(state) {
   return {
     auth: state.getIn(["auth"]),
-    featureFlags: state.getIn(["featureFlags"]),
+    featureFlags: state.getIn(["featureFlags"])
   };
 }
-const SidebarMapped = connect(mapStateToProps, null)(Sidebar);
+const SidebarMapped = connect(
+  mapStateToProps,
+  null
+)(Sidebar);
 export default withStyles(styles)(SidebarMapped);

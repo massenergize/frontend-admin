@@ -2,6 +2,24 @@ import React from "react";
 import Loading from "dan-components/Loading";
 import loadable from "../utils/loadable";
 
+export const CustomPagesList = loadable(
+  () => import("./MassEnergizeSuperAdmin/Page Builder/AdminCustomPagesList.js"),
+  {
+    fallback: <Loading />,
+  }
+);
+export const BuildCustomPages = loadable(
+  () => import("./MassEnergizeSuperAdmin/Page Builder/MEPageBuilderImplementation.js"),
+  {
+    fallback: <Loading />,
+  }
+);
+export const PreviewCustomPages = loadable(
+  () => import("./MassEnergizeSuperAdmin/Page Builder/PreviewCustomPages.js"),
+  {
+    fallback: <Loading />,
+  }
+);
 export const CustomNavigationConfiguration = loadable(
   () => import("./MassEnergizeSuperAdmin/Pages/CustomNavigationConfiguration"),
   {

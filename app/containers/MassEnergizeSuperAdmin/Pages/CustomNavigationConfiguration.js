@@ -14,7 +14,8 @@ import Loading from "dan-components/Loading";
 import MEDropdown from "../ME  Tools/dropdown/MEDropdown";
 import { apiCall } from "../../../utils/messenger";
 import { fetchParamsFromURL, smartString } from "../../../utils/common";
-
+import brand from "dan-api/dummy/brand";
+import { Helmet } from "react-helmet";
 const NAVIGATION = "navigation";
 const FOOTER = "footer";
 const BRAND = "brand";
@@ -391,6 +392,9 @@ function CustomNavigationConfiguration() {
 
   return (
     <div>
+      <Helmet>
+        <title>{brand?.name} | Custom Navigation</title>
+      </Helmet>
       <MEPaperBlock title="Community Logo">
         {/* <h4>This is what the custom navigation configuration page will look like</h4> */}
         <BrandCustomization
@@ -511,7 +515,6 @@ const OneMenuItem = ({
   const editItem = () =>
     addOrEdit({ ...item, children }, parents, { context: ACTIVITIES.edit.key, children, isEdit: true });
 
-
   const itemIsLive = () => {
     if (isChild) return !parentIsNotLive && is_published;
     return is_published;
@@ -619,7 +622,6 @@ const OneMenuItem = ({
                   `Live`
                 : disabledBecauseOfParent
                 ? `Not live because parent is disabled`
-
                 : `Not Live, all sub items will also not show `
             }
           >

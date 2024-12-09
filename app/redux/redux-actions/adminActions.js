@@ -66,7 +66,8 @@ import {
   KEEP_TESTIMONIAL_STATE,
   LOAD_ALL_OTHER_TESTIMONIALS,
   CACHE_MESSAGE_INFO,
-  COMMUNITY_TESTIMONIAL_AUTO_SHARE_SETTINGS
+  COMMUNITY_TESTIMONIAL_AUTO_SHARE_SETTINGS,
+  LOAD_USERS_CUSTOM_PAGES
 } from '../ReduxConstants';
 import { apiCall, PERMISSION_DENIED } from "../../utils/messenger";
 import { getTagCollectionsData } from "../../api/data";
@@ -191,6 +192,9 @@ export const setupSocketConnectionWithBackend = (auth) => (
   connectSocket();
 };
 
+export const reduxLoadCustomPages = (data) => {
+  return { type: LOAD_USERS_CUSTOM_PAGES, payload: data };
+};
 export const reduxLoadOtherTestimonials = (data) => {
   return { type: LOAD_ALL_OTHER_TESTIMONIALS, payload: data };
 };
