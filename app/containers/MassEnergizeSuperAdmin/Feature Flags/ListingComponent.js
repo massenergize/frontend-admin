@@ -126,15 +126,15 @@ function ListingComponent({
         <div style={{ overflowY: "scroll", maxHeight: 309, paddingBottom: 50 }}>
           {(contentToDisplay || []).map((item) => {
             const name = isCommunity
-              ? item.name
-              : `${item.preferred_name} (${item.email})`;
+              ? item?.name
+              : `${item?.preferred_name} (${item?.email})`;
             return (
               <OneDisplayItem
                 name={name}
                 triggerRemoveConfirmation={() =>
                   setDeleteContent({
                     ...item,
-                    name: item.name || item.preferred_name,
+                    name: item?.name || item?.preferred_name,
                   })
                 }
               />

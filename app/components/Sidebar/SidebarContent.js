@@ -92,22 +92,22 @@ class SidebarContent extends React.Component {
                 marginTop: transform * -0.3,
               }}
             >
-              {user.profile_picture && (
+              {user?.profile_picture && (
                 <Avatar
-                  alt={user.preferred_name}
-                  src={user.profile_picture.url}
+                  alt={user?.preferred_name}
+                  src={user?.profile_picture.url}
                   style={{ margin: 10 }}
                 />
               )}
-              {!user.profile_picture && (
+              {!user?.profile_picture && (
                 <Avatar style={{ margin: 10 }}>
-                  {user.preferred_name.substring(0, 2)}
+                  {user?.preferred_name?.substring(0, 2)}
                 </Avatar>
               )}
               <div>
-                <h4>{user.preferred_name ? user.preferred_name : "..."}</h4>
+                <h4>{user?.preferred_name ? user?.preferred_name : "..."}</h4>
                 <small>
-                  {user.is_super_admin ? "Super Admin" : "Community Admin "}
+                  {user?.is_super_admin ? "Super Admin" : "Community Admin "}
                 </small>
                 <p style={{ fontSize: "7px" }}>
                   {IS_PROD ? "Production " : "Development "}

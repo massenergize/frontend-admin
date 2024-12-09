@@ -75,7 +75,7 @@ const OneActivity = ({
   by_super_admin,
 }) => {
   const activityType = (activityTypes || {})[activity_type] || {};
-  const name = actor.preferred_name || actor.full_name || "...";
+  const name = actor?.preferred_name || actor?.full_name || "...";
 
   const extra = super_admin_mode ? { fontSize: 15 } : {};
   const byASadmin = !super_admin_mode && by_super_admin; // To mark activities that show what superadmins have been doing to your community

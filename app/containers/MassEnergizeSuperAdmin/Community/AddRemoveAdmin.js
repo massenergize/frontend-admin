@@ -91,8 +91,7 @@ class AddRemoveAdmin extends Component {
       {
         id: d.email,
         image: d.profile_picture,
-        initials: `${d.preferred_name &&
-          d.preferred_name.substring(0, 2).toUpperCase()}`,
+        initials: `${d?.preferred_name?.substring(0, 2)?.toUpperCase()}`,
       },
       d.full_name,
       d.preferred_name,
