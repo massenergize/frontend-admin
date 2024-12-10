@@ -312,11 +312,11 @@ class About extends React.Component {
                   community.admins &&
                   community.admins.map((a) => (
                     <ListItem key={a.email}>
-                      {a.profile_picture && (
-                        <Avatar alt={a.initials} src={a.profile_picture.url} style={{ margin: 10 }} />
+                      {a?.profile_picture && (
+                        <Avatar alt={a.initials} src={a?.profile_picture.url} style={{ margin: 10 }} />
                       )}
-                      {!a.profile_picture && <Avatar style={{ margin: 10 }}>{a.preferred_name.substring(0, 2)}</Avatar>}
-                      <ListItemText primary={a.preferred_name} secondary={a.email} />
+                      {!a?.profile_picture && <Avatar style={{ margin: 10 }}>{a?.preferred_name?.substring(0, 2)}</Avatar>}
+                      <ListItemText primary={a?.preferred_name} secondary={a?.email} />
                     </ListItem>
                   ))}
               </List>
