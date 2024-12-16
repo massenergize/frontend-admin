@@ -530,6 +530,7 @@ class About extends React.Component {
           {this.csvDownloader("actions.all", "Request All Actions CSV")}
           {this.csvDownloader("metrics", "Request Metrics CSV")}
           {this.csvDownloader("pagemap", "Request Community Page Map")}
+          {this.csvDownloader("postmark.nudge_report", "Request Community Nudge Report")}
         </Grid>
       </>
     );
