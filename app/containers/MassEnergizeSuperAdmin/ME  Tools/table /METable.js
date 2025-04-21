@@ -4,6 +4,8 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { reduxLoadTableFilters } from "../../../../redux/redux-actions/adminActions";
 import { parseJSON } from "../../../../utils/common";
+import { Button } from "@mui/material";
+import { CloudDownload, Comment } from "@mui/icons-material";
 
 export const FILTER_OBJ_KEY = "MAIN_FILTER_OBJECT";
 export const FILTERS = "_FILTERS";
@@ -240,6 +242,37 @@ function METable(props) {
     savePageProperties(pageTableProperties.current); // then save these new changes to localStorage
   };
 
+  const customToolbar = () => {
+    return (
+      <CloudDownload onClick={() => onDownload()} style={{ cursor: "pointer" , color:"grey"}} />
+
+    );
+  };
+
+  const onDownload = () => {
+    /**
+     PLAN
+     - get active columns
+     - check if there are filters applied
+     -  check for search text.
+     -  send all these to the backend.
+     -  generate a csv file and download it.
+     */
+    const path  =  window.location.pathname;
+    console.log("path", path);
+    const searchText = pageTableProperties.current.search;
+    const activeFilters = filterObject.current;
+
+    const map = Object.values(activeFilters).map((value) => ({ name: value.name.toLowerCase(), list: value.list }))
+    const payload = {
+      filters: map,
+      search: searchText,
+    }
+
+    console.log("payload", payload);
+
+  };
+
   var { search, rowsPerPage } = getProperties();
   const options = {
     onFilterChange,
@@ -251,6 +284,9 @@ function METable(props) {
     onChangeRowsPerPage: whenRowsPerPageChanges,
     rowsPerPage: rowsPerPage || tableProps.options.rowsPerPage,
     onColumnSortChange: whenAdminSortsAColumn,
+    onDownload: onDownload,
+    download: false,
+    customToolbar: customToolbar,
   };
 
   return (
