@@ -45,7 +45,7 @@ class About extends React.Component {
     };
   }
 
-  async getCSV(endpoint) {
+  async getCSV(endpoint, isExport) {
     const { community } = this.props;
     if (!community) {
       return;
@@ -63,7 +63,7 @@ class About extends React.Component {
     } else {
       body.community_id = community.id;
     }
-    const csvResponse = await apiCallFile("/downloads." + endpoint, body);
+    const csvResponse = await apiCallFile(isExport ? `/${endpoint}`: "/downloads." + endpoint, body);
 
     oldLoadingCSVs = this.state.loadingCSVs;
     oldLoadingCSVs.splice(oldLoadingCSVs.indexOf(endpoint), 1);
@@ -78,20 +78,20 @@ class About extends React.Component {
 
   getTags = (tags) => tags.map((t) => t.name).join(", ");
 
-  csvDownloader(whichCSV, displayText) {
+  csvDownloader(whichCSV, displayText, isExport) {
     const { classes } = this.props;
     const { loadingCSVs } = this.state;
     return (
       <Grid item xs={4}>
         <Paper
           onClick={() => {
-            !loadingCSVs.includes(whichCSV) && this.getCSV(whichCSV);
+            !loadingCSVs.includes(whichCSV) && this.getCSV(whichCSV, isExport);
           }}
           className={`${classes.pageCard}`}
           elevation={1}
         >
           <Typography variant="h5" style={{ fontWeight: "600", fontSize: "1rem" }} component="h3">
-            {displayText} <Icon style={{ paddingTop: 3, color: "green" }}>arrow_downward</Icon>
+            {displayText} <Icon style={{ paddingTop: 3, color: "green" }}>{isExport? "arrow_upward":"arrow_downward"}</Icon>
             {loadingCSVs.includes(whichCSV) && <CircularProgress size={20} thickness={2} color="secondary" />}
           </Typography>
         </Paper>
@@ -532,6 +532,15 @@ class About extends React.Component {
           {this.csvDownloader("pagemap", "Request Community Page Map")}
           {this.csvDownloader("postmark.nudge_report", "Request Community Nudge Report")}
         </Grid>
+        <Divider className={classes.divider} >Data Export</Divider>
+        <Grid container className={classes.colList}>
+          {this.csvDownloader("export.actions", "Export Community Actions", true)}
+          {this.csvDownloader("export.events", "Export Community Events", true)}
+          {this.csvDownloader("export.testimonials", "Export Community Testimonials", true)}
+          {/* {this.csvDownloader("export.cc.actions", "Export C", true)} */}
+          {this.csvDownloader("export.vendors", "Export Community Vendors", true)}
+        </Grid>
+        
       </>
     );
   }
