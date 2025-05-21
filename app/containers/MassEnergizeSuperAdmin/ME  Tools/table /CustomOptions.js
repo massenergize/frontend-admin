@@ -11,6 +11,7 @@ export default function CustomOptions({ data , label, endpoint, customBodyRender
      customFilterListOptions: customFilterListOptions,
      filterOptions: {
        logic: (location, filters, row) => {
+        if (filters?.length === 0) return false;
 
         if(typeof(location)=== "string"){
           if (filters.length) return !filters?.includes(location);
