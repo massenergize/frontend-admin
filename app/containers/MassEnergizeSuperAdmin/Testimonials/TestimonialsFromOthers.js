@@ -385,9 +385,9 @@ function TestimonialsFromOthers({ classes }) {
             multiple
           />
 
-          <small style={{ color: "grey" }}>Add categories and tags to narrow down your search</small>
+          {/* <small style={{ color: "grey" }}>Add categories and tags to narrow down your search</small> */}
 
-          <LightAutoComplete
+          {/* <LightAutoComplete
             placeholder="Add categories or tags as filters..."
             defaultSelected={selectedCategories || []}
             data={tags}
@@ -395,7 +395,7 @@ function TestimonialsFromOthers({ classes }) {
             valueExtractor={(it) => it.id}
             onChange={(items) => updateState("categories", items, state)}
             multiple
-          />
+          /> */}
           {/* <FormControlLabel
               control={
                 <Checkbox
