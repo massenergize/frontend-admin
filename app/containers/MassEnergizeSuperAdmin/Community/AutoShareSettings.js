@@ -101,17 +101,17 @@ const AutoShareSettings = () => {
           endpoint: "communities.list",
           filterFunc:(communities)=>communities.filter(c=> c?.id?.toString() !== comId)
         },
-        {
-          key: "excluded_tags",
-          label: "Select Categories to auto Share with",
-          type: "autocomplete",
-          multiple: true,
-          valueExtractor: (item) => item?.id,
-          labelExtractor: (item) => item?.name,
-          data: tags || [],
-          endpoint: "tags.listForSuperAdmin",
-          filterFunc: (tags) => tags.filter((t) => t?.tag_collection_name	 === "Category")
-        }
+        // {
+        //   key: "excluded_tags",
+        //   label: "Select Categories to auto Share with",
+        //   type: "autocomplete",
+        //   multiple: true,
+        //   valueExtractor: (item) => item?.id,
+        //   labelExtractor: (item) => item?.name,
+        //   data: tags || [],
+        //   endpoint: "tags.listForSuperAdmin",
+        //   filterFunc: (tags) => tags.filter((t) => t?.tag_collection_name	 === "Category")
+        // }
       ]
     }
   ];
