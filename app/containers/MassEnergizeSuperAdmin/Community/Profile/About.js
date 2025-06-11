@@ -513,7 +513,7 @@ class About extends React.Component {
           {this.csvDownloader("users", "Request Users CSV")}
           {this.csvDownloader("actions", "Request Community Actions CSV")}
           {this.csvDownloader("teams", "Request Teams CSV")}
-          {this.csvDownloader("downloads.action.users", "Request Actions+Users CSV", true)}
+          {this.csvDownloader("downloads.actions.users", "Request Actions+Users CSV", true)}
           <Grid item xs={4}>
             <Paper className={`${classes.pageCard}`} elevation={1}>
               <Link
