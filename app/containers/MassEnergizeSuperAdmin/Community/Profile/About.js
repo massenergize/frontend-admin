@@ -535,10 +535,11 @@ class About extends React.Component {
         </Grid>
         <Divider className={classes.divider} >Data Export</Divider>
         <Grid container className={classes.colList}>
+          {this.csvDownloader("export.site.data", "Export Site Data(WP)", true)}
           {this.csvDownloader("export.actions", "Export Community Actions", true)}
           {this.csvDownloader("export.events", "Export Community Events", true)}
           {this.csvDownloader("export.testimonials", "Export Community Testimonials", true)}
-          {/* {this.csvDownloader("export.cc.actions", "Export C", true)} */}
+          
           {this.csvDownloader("export.vendors", "Export Community Vendors", true)}
         </Grid>
         
